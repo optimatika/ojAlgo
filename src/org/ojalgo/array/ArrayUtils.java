@@ -323,9 +323,6 @@ public abstract class ArrayUtils {
                 return new Iterator1D<Double>(this);
             }
 
-            public int size() {
-                return aRaw.length;
-            }
         };
     }
 
@@ -348,9 +345,6 @@ public abstract class ArrayUtils {
                 return new Iterator1D<N>(this);
             }
 
-            public int size() {
-                return aList.size();
-            }
         };
     }
 
@@ -373,9 +367,6 @@ public abstract class ArrayUtils {
                 return new Iterator1D<N>(this);
             }
 
-            public int size() {
-                return aRaw.length;
-            }
         };
     }
 
@@ -411,21 +402,10 @@ public abstract class ArrayUtils {
                 return aRaw[(int) aRow][(int) aCol];
             }
 
-            public int getColDim() {
-                return aRaw[0].length;
-            }
-
-            public int getRowDim() {
-                return aRaw.length;
-            }
-
             public Iterator<Double> iterator() {
                 return new Iterator1D<Double>(this);
             }
 
-            public int size() {
-                return aRaw.length * aRaw[0].length;
-            }
         };
     }
 
@@ -461,21 +441,10 @@ public abstract class ArrayUtils {
                 return aRaw[(int) aRow][(int) aCol];
             }
 
-            public int getColDim() {
-                return aRaw[0].length;
-            }
-
-            public int getRowDim() {
-                return aRaw.length;
-            }
-
             public Iterator<N> iterator() {
                 return new Iterator1D<N>(this);
             }
 
-            public int size() {
-                return aRaw.length * aRaw[0].length;
-            }
         };
     }
 
