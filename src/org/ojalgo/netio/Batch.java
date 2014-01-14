@@ -30,27 +30,27 @@ public class Batch extends ArrayList<Message> {
         super();
     }
 
-    public Batch(Collection<? extends Message> aCollection) {
+    public Batch(final Collection<? extends Message> aCollection) {
         super(aCollection);
     }
 
-    public Batch(int anInitialCapacity) {
+    public Batch(final int anInitialCapacity) {
         super(anInitialCapacity);
     }
 
-    public boolean add(String aCommand) {
+    public boolean add(final String aCommand) {
         return super.add(new Message(aCommand));
     }
 
-    public boolean add(String aCommand, String anArgument) {
+    public boolean add(final String aCommand, final String anArgument) {
         return super.add(new Message(aCommand, anArgument));
     }
 
-    public boolean add(String aCommand, String anArgument, String aParameter) {
+    public boolean add(final String aCommand, final String anArgument, final String aParameter) {
         return super.add(new Message(aCommand, anArgument, aParameter));
     }
 
-    public boolean add(String[] aCommand) {
+    public boolean add(final String[] aCommand) {
         return super.add(new Message(aCommand));
     }
 
