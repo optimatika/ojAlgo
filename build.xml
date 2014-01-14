@@ -1,0 +1,234 @@
+<project name="ojAlgo" default="dist" basedir=".">
+
+    <target name="init">
+
+        <tstamp>
+            <format property="DSTAMP" pattern="yyyy-MM-dd" />
+            <format property="TSTAMP" pattern="hh:mm" />
+        </tstamp>
+
+        <property file="build.properties" />
+
+        <property name="path.DevProj" value="..${file.separator}${alias.DevProj}" />
+        <property name="path.BizProj" value="..${file.separator}${alias.BizProj}" />
+        <property name="path.TestProj" value="..${file.separator}${alias.TestProj}" />
+
+        <property name="path.ExtAMPL" value="..${file.separator}${alias.ExtAMPL}" />
+        <property name="path.ExtJavaMail" value="..${file.separator}${alias.ExtJavaMail}" />
+        <property name="path.ExtJExcel" value="..${file.separator}${alias.ExtJExcel}" />
+        <property name="path.ExtJFree" value="..${file.separator}${alias.ExtJFree}" />
+        <property name="path.ExtPriDE" value="..${file.separator}${alias.ExtPriDE}" />
+
+        <property name="path.doc" value="..${file.separator}${dist.doc.alias}${file.separator}${dist.doc.dir}" />
+        <property name="path.dist" value="${path.DevProj}${file.separator}${dir.dist}" />
+
+        <property name="name.ojalgo" value="${dist.ojalgo}-${version.release}.${version.build}" />
+        <property name="name.ojalgo-biz" value="${dist.ojalgo-biz}-${version.release}.${version.build}" />
+        <property name="name.ojalgo-ext" value="${dist.ojalgo-ext}-${version.release}.${version.build}" />
+
+    </target>
+
+    <target name="compile_project" if="tmp.proj_path">
+
+        <javac srcdir="${param.proj_path}${file.separator}${dir.src}" destdir="${param.proj_path}${file.separator}${dir.bin}" classpath="${param.proj_path}${file.separator}${dir.lib}" includeantruntime="false" />
+
+    </target>
+
+    <target name="compile" depends="init">
+
+        <antcall target="compile_project">
+            <param name="param.proj_path" value="${path.DevProj}" />
+        </antcall>
+
+        <antcall target="compile_project">
+            <param name="param.proj_path" value="${path.BizProj}" />
+        </antcall>
+
+        <antcall target="compile_project">
+            <param name="param.proj_path" value="${path.TestProj}" />
+        </antcall>
+
+        <antcall target="compile_project">
+            <param name="param.proj_path" value="${path.ExtAMPL}" />
+        </antcall>
+
+        <antcall target="compile_project">
+            <param name="param.proj_path" value="${path.ExtJavaMail}" />
+        </antcall>
+
+        <antcall target="compile_project">
+            <param name="param.proj_path" value="${path.ExtJExcel}" />
+        </antcall>
+
+        <antcall target="compile_project">
+            <param name="param.proj_path" value="${path.ExtJFree}" />
+        </antcall>
+
+        <antcall target="compile_project">
+            <param name="param.proj_path" value="${path.ExtPriDE}" />
+        </antcall>
+
+    </target>
+
+    <target name="junit_functionality_test" depends="compile">
+
+        <junit>
+            <test name="org.ojalgo.AllFunctionalityTests" outfile="${path.TestProj}${file.separator}${dir.doc}${file.separator}state_of_ojalgo" />
+            <classpath>
+                <pathelement location="${path.TestProj}${file.separator}${dir.bin}" />
+                <pathelement location="${path.DevProj}${file.separator}${dir.bin}" />
+            </classpath>
+            <formatter type="xml" />
+        </junit>
+
+    </target>
+
+    <target name="junit_performance_compare" depends="compile">
+
+        <junit>
+            <test name="org.ojalgo.AllPerformanceComparisons" outfile="${path.TestProj}${file.separator}${dir.doc}${file.separator}comparison" />
+            <classpath>
+                <pathelement location="${path.TestProj}${file.separator}${dir.bin}" />
+                <pathelement location="${path.DevProj}${file.separator}${dir.bin}" />
+            </classpath>
+            <formatter type="xml" />
+        </junit>
+
+    </target>
+
+    <target name="javadoc" depends="init">
+
+        <delete dir="${path.doc}" />
+        <mkdir dir="${path.doc}" />
+
+        <javadoc access="public" doctitle="ojAlgo Generated Documentation" destdir="${path.doc}" noindex="true" splitindex="no" encoding="utf-8">
+
+            <fileset dir="${path.DevProj}${file.separator}${dir.src}">
+                <include name="**/*.java" />
+            </fileset>
+
+            <fileset dir="${path.BizProj}${file.separator}${dir.src}">
+                <include name="**/*.java" />
+            </fileset>
+
+            <fileset dir="${path.ExtAMPL}${file.separator}${dir.src}">
+                <include name="**/*.java" />
+            </fileset>
+
+            <fileset dir="${path.ExtJavaMail}${file.separator}${dir.src}">
+                <include name="**/*.java" />
+            </fileset>
+
+            <fileset dir="${path.ExtJExcel}${file.separator}${dir.src}">
+                <include name="**/*.java" />
+            </fileset>
+
+            <fileset dir="${path.ExtJFree}${file.separator}${dir.src}">
+                <include name="**/*.java" />
+            </fileset>
+
+            <fileset dir="${path.ExtPriDE}${file.separator}${dir.src}">
+                <include name="**/*.java" />
+            </fileset>
+
+            <link href="http://download.oracle.com/javase/6/docs/api/" />
+            <link href="http://jexcelapi.sourceforge.net/resources/javadocs/current/docs/" />
+            <link href="http://www.jfree.org/jfreechart/api/javadoc/" />
+            <link href="http://pride.sourceforge.net/javadoc/" />
+
+        </javadoc>
+
+    </target>
+
+    <target name="dist" depends="init,compile">
+
+        <property name="tmp.ojalgo" value="${path.dist}${file.separator}${name.ojalgo}" />
+        <property name="tmp.ojalgo-biz" value="${path.dist}${file.separator}${name.ojalgo-biz}" />
+        <property name="tmp.ojalgo-ext" value="${path.dist}${file.separator}${name.ojalgo-ext}" />
+
+        <delete dir="${path.dist}" />
+        <mkdir dir="${path.dist}" />
+
+        <jar destfile="${tmp.ojalgo}.jar">
+
+            <fileset dir="${path.DevProj}${file.separator}${dir.bin}" />
+
+            <fileset dir="${path.DevProj}${file.separator}${dir.src}" />
+
+            <manifest>
+                <attribute name="Specification-Title" value="ojAlgo" />
+                <attribute name="Specification-Version" value="${DSTAMP}" />
+                <attribute name="Specification-Vendor" value="Optimatika" />
+                <attribute name="Implementation-Title" value="ojAlgo" />
+                <attribute name="Implementation-Version" value="${version.release}.${version.build}" />
+                <attribute name="Implementation-Vendor" value="Optimatika" />
+            </manifest>
+        </jar>
+
+        <jar destfile="${tmp.ojalgo-biz}.jar">
+
+            <fileset dir="${path.BizProj}${file.separator}${dir.bin}" />
+
+            <fileset dir="${path.DevProj}${file.separator}${dir.src}" />
+
+            <manifest>
+                <attribute name="Specification-Title" value="ojAlgo" />
+                <attribute name="Specification-Version" value="${DSTAMP}" />
+                <attribute name="Specification-Vendor" value="Optimatika" />
+                <attribute name="Implementation-Title" value="ojAlgo" />
+                <attribute name="Implementation-Version" value="${version.release}.${version.build}" />
+                <attribute name="Implementation-Vendor" value="Optimatika" />
+            </manifest>
+        </jar>
+
+        <jar destfile="${tmp.ojalgo-ext}.jar">
+
+            <fileset dir="${path.ExtAMPL}${file.separator}${dir.bin}" />
+            <fileset dir="${path.ExtJavaMail}${file.separator}${dir.bin}" />
+            <fileset dir="${path.ExtJExcel}${file.separator}${dir.bin}" />
+            <fileset dir="${path.ExtJFree}${file.separator}${dir.bin}" />
+            <fileset dir="${path.ExtPriDE}${file.separator}${dir.bin}" />
+
+            <fileset dir="${path.ExtAMPL}${file.separator}${dir.src}" />
+            <fileset dir="${path.ExtJavaMail}${file.separator}${dir.src}" />
+            <fileset dir="${path.ExtJExcel}${file.separator}${dir.src}" />
+            <fileset dir="${path.ExtJFree}${file.separator}${dir.src}" />
+            <fileset dir="${path.ExtPriDE}${file.separator}${dir.src}" />
+
+            <manifest>
+                <attribute name="Specification-Title" value="ojAlgo Extensions" />
+                <attribute name="Specification-Version" value="${DSTAMP}" />
+                <attribute name="Specification-Vendor" value="Optimatika" />
+                <attribute name="Implementation-Title" value="ojAlgo Extensions" />
+                <attribute name="Implementation-Version" value="${version.release}.${version.build}" />
+                <attribute name="Implementation-Vendor" value="Optimatika" />
+            </manifest>
+        </jar>
+
+        <tar destfile="${tmp.ojalgo}.tar.gz" compression="gzip">
+
+            <tarfileset dir="${path.DevProj}${file.separator}${dir.doc}" includes="*.txt" />
+
+            <tarfileset dir="${path.dist}" includes="*.jar" />
+
+            <tarfileset dir="${path.doc}" prefix="${dir.doc}" />
+
+        </tar>
+
+        <zip destfile="${tmp.ojalgo}.zip" level="9">
+
+            <zipfileset dir="${path.DevProj}${file.separator}${dir.doc}" includes="*.txt" />
+
+            <zipfileset dir="${path.dist}" includes="*.jar" />
+
+            <zipfileset dir="${path.doc}" prefix="${dir.doc}" />
+
+        </zip>
+
+        <propertyfile file="build.properties">
+            <entry key="version.build" type="int" operation="+" default="0" />
+        </propertyfile>
+
+    </target>
+
+</project>
