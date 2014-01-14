@@ -30,8 +30,8 @@ public class Batch extends ArrayList<Message> {
         super();
     }
 
-    public Batch(final Collection<? extends Message> aCollection) {
-        super(aCollection);
+    public Batch(final Collection<? extends Message> collection) {
+        super(collection);
     }
 
     public Batch(final int anInitialCapacity) {
