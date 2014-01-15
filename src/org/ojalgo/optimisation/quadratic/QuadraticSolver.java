@@ -108,8 +108,8 @@ public abstract class QuadraticSolver extends BaseSolver {
             if (this.hasInequalityConstraints()) {
                 return new ActiveSetSolver(tmpModel, options, this);
             } else if (this.hasEqualityConstraints()) {
-                return new LagrangeSolver(tmpModel, options, this);
-                //return new NullspaceSolver(tmpModel, options, this);
+                //return new LagrangeSolver(tmpModel, options, this);
+                return new NullspaceSolver(tmpModel, options, this);
             } else {
                 return new UnconstrainedSolver(tmpModel, options, this);
             }
