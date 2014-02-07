@@ -230,7 +230,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private transient int[] myNegativeIndices = null;
     private transient List<Variable> myNegativeVariables = null;
     private transient Expression myObjectiveExpression = null;
-    private transient MultiaryFunction<Double> myObjectiveFunction = null;
+    private transient MultiaryFunction.TwiceDifferentiable<Double> myObjectiveFunction = null;
     private transient int[] myPositiveIndices = null;
     private transient List<Variable> myPositiveVariables = null;
     private final ArrayList<Variable> myVariables = new ArrayList<Variable>();
@@ -463,7 +463,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return myObjectiveExpression;
     }
 
-    public MultiaryFunction<Double> getObjectiveFunction() {
+    public MultiaryFunction.TwiceDifferentiable<Double> getObjectiveFunction() {
 
         if (myObjectiveFunction == null) {
             myObjectiveFunction = this.getObjectiveExpression().toFunction();

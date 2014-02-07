@@ -504,13 +504,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         throw new UnsupportedOperationException();
     }
 
-    public ComplexDenseStore conjugate() {
-
-        final ComplexDenseStore retVal = new ComplexDenseStore(myColDim, myRowDim);
-
-        retVal.fillConjugated(this);
-
-        return retVal;
+    public MatrixStore<ComplexNumber> conjugate() {
+        return new ConjugatedStore<>(this);
     }
 
     public ComplexDenseStore copy() {
@@ -899,6 +894,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return retVal;
     }
 
+    public MatrixStore<ComplexNumber> negate() {
+        return new ModificationStore<>(this, FACTORY.function().negate());
+    }
+
     public void negateColumn(final int aCol) {
         myUtility.modifyColumn(0, aCol, ComplexFunction.NEGATE);
     }
@@ -1089,13 +1088,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         HouseholderHermitian.invoke(data, ComplexDenseStore.cast(aTransf), new ComplexNumber[(int) aTransf.count()]);
     }
 
-    public ComplexDenseStore transpose() {
-
-        final ComplexDenseStore retVal = new ComplexDenseStore(myColDim, myRowDim);
-
-        retVal.fillTransposed(this);
-
-        return retVal;
+    public MatrixStore<ComplexNumber> transpose() {
+        return new TransposedStore<>(this);
     }
 
     public void tred2(final BasicArray<ComplexNumber> mainDiagonal, final BasicArray<ComplexNumber> offDiagonal, final boolean yesvecs) {

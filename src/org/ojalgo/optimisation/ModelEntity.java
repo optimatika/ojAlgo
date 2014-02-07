@@ -24,6 +24,7 @@ package org.ojalgo.optimisation;
 import java.math.BigDecimal;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -199,16 +200,17 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myUpperLimit != null;
     }
 
-    @SuppressWarnings("unchecked")
-    public final ME level(final BigDecimal aLowerAndUpperLimit) {
-        myLowerLimit = aLowerAndUpperLimit;
-        myUpperLimit = aLowerAndUpperLimit;
-        return (ME) this;
+    public final ME level(final Number aLowerAndUpperLimit) {
+        return this.lower(aLowerAndUpperLimit).upper(aLowerAndUpperLimit);
     }
 
     @SuppressWarnings("unchecked")
-    public final ME lower(final BigDecimal aLowerLimit) {
-        myLowerLimit = aLowerLimit;
+    public final ME lower(final Number lowerLimit) {
+        if (lowerLimit != null) {
+            myLowerLimit = TypeUtils.toBigDecimal(lowerLimit);
+        } else {
+            myLowerLimit = null;
+        }
         return (ME) this;
     }
 
@@ -223,43 +225,48 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     @SuppressWarnings("unchecked")
-    public final ME upper(final BigDecimal anUpperLimit) {
-        myUpperLimit = anUpperLimit;
+    public final ME upper(final Number upperLimit) {
+        if (upperLimit != null) {
+            myUpperLimit = TypeUtils.toBigDecimal(upperLimit);
+        } else {
+            myUpperLimit = null;
+        }
         return (ME) this;
     }
 
     @SuppressWarnings("unchecked")
-    public final ME weight(final BigDecimal aContributionWeight) {
-        if ((aContributionWeight != null) && (aContributionWeight.signum() != 0)) {
-            myContributionWeight = aContributionWeight;
+    public final ME weight(final Number contributionWeight) {
+        final BigDecimal tmpWeight = TypeUtils.toBigDecimal(contributionWeight);
+        if ((tmpWeight != null) && (tmpWeight.signum() != 0)) {
+            myContributionWeight = tmpWeight;
         } else {
             myContributionWeight = null;
         }
         return (ME) this;
     }
 
-    protected void appendLeftPart(final StringBuilder aStringBuilder) {
+    protected void appendLeftPart(final StringBuilder builder) {
         if (this.isLowerConstraint() || this.isEqualityConstraint()) {
-            aStringBuilder.append(OptimisationUtils.DISPLAY.enforce(this.getLowerLimit()).toPlainString());
-            aStringBuilder.append(" <= ");
+            builder.append(OptimisationUtils.DISPLAY.enforce(this.getLowerLimit()).toPlainString());
+            builder.append(" <= ");
         }
     }
 
-    protected void appendMiddlePart(final StringBuilder aStringBuilder) {
+    protected void appendMiddlePart(final StringBuilder builder) {
 
-        aStringBuilder.append(this.getName());
+        builder.append(this.getName());
 
         if (this.isObjective()) {
-            aStringBuilder.append(" (");
-            aStringBuilder.append(OptimisationUtils.DISPLAY.enforce(this.getContributionWeight()).toPlainString());
-            aStringBuilder.append(")");
+            builder.append(" (");
+            builder.append(OptimisationUtils.DISPLAY.enforce(this.getContributionWeight()).toPlainString());
+            builder.append(")");
         }
     }
 
-    protected void appendRightPart(final StringBuilder aStringBuilder) {
+    protected void appendRightPart(final StringBuilder builder) {
         if (this.isUpperConstraint() || this.isEqualityConstraint()) {
-            aStringBuilder.append(" <= ");
-            aStringBuilder.append(OptimisationUtils.DISPLAY.enforce(this.getUpperLimit()).toPlainString());
+            builder.append(" <= ");
+            builder.append(OptimisationUtils.DISPLAY.enforce(this.getUpperLimit()).toPlainString());
         }
     }
 
@@ -309,10 +316,10 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return retVal;
     }
 
-    final void appendToString(final StringBuilder aStringBuilder) {
-        this.appendLeftPart(aStringBuilder);
-        this.appendMiddlePart(aStringBuilder);
-        this.appendRightPart(aStringBuilder);
+    final void appendToString(final StringBuilder builder) {
+        this.appendLeftPart(builder);
+        this.appendMiddlePart(builder);
+        this.appendRightPart(builder);
     }
 
     final BigDecimal getLowerLimit(final boolean adjusted) {

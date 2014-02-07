@@ -172,7 +172,7 @@ abstract class NonsymmetricEvD<N extends Number> extends EigenvalueDecomposition
 
         final int tmpDim = (int) tmpD.countRows();
 
-        final PhysicalStore<N> tmpMtrx = tmpV.transpose();
+        final PhysicalStore<N> tmpMtrx = tmpV.transpose().copy();
 
         final N tmpZero = this.getStaticZero();
         final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();

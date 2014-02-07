@@ -52,7 +52,7 @@ public abstract class BasicLogger {
         BasicLogger.println(DEBUG);
     }
 
-    public static void debug(final String message) {
+    public static void debug(final Object message) {
         BasicLogger.println(DEBUG, message);
     }
 
@@ -77,7 +77,7 @@ public abstract class BasicLogger {
         BasicLogger.println(ERROR);
     }
 
-    public static void error(final String message) {
+    public static void error(final Object message) {
         BasicLogger.println(ERROR, message);
     }
 
@@ -104,7 +104,7 @@ public abstract class BasicLogger {
         }
     }
 
-    public static void println(final PrintStream stream, final String message) {
+    public static void println(final PrintStream stream, final Object message) {
         if (stream != null) {
             stream.println(message);
         }

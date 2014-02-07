@@ -1119,7 +1119,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return Array1D.COMPLEX.wrap(retVal);
     }
 
-    public PrimitiveDenseStore conjugate() {
+    public MatrixStore<Double> conjugate() {
         return this.transpose();
     }
 
@@ -1488,6 +1488,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return retVal;
     }
 
+    public MatrixStore<Double> negate() {
+        return new ModificationStore<>(this, FACTORY.function().negate());
+    }
+
     public void negateColumn(final int aCol) {
         myUtility.modifyColumn(0, aCol, PrimitiveFunction.NEGATE);
     }
@@ -1678,13 +1682,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         HouseholderHermitian.invoke(data, PrimitiveDenseStore.cast(aTransf), new double[(int) aTransf.count()]);
     }
 
-    public PrimitiveDenseStore transpose() {
-
-        final PrimitiveDenseStore retVal = new PrimitiveDenseStore(myColDim, myRowDim);
-
-        retVal.fillTransposed(this);
-
-        return retVal;
+    public MatrixStore<Double> transpose() {
+        return new TransposedStore<>(this);
     }
 
     public void tred2(final BasicArray<Double> mainDiagonal, final BasicArray<Double> offDiagonal, final boolean yesvecs) {

@@ -21,16 +21,21 @@
  */
 package org.ojalgo.array;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.scalar.BigScalar;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
@@ -39,12 +44,24 @@ import org.ojalgo.type.TypeUtils;
  * 
  * @author apete
  */
-final class SparseArray<N extends Number> extends BasicArray<N> {
+public final class SparseArray<N extends Number> extends BasicArray<N> {
 
-    static final int INITIAL_CAPACITY = 11;
+    private static final int INITIAL_CAPACITY = 7;
 
-    public static SparseArray<Double> make(final long count) {
-        return new SparseArray<>(0L, count, new PrimitiveArray(INITIAL_CAPACITY), PrimitiveScalar.ZERO);
+    public static SparseArray<BigDecimal> makeBig(final long count) {
+        return new SparseArray<>(count, new BigArray(INITIAL_CAPACITY), BigScalar.ZERO);
+    }
+
+    public static SparseArray<ComplexNumber> makeComplex(final long count) {
+        return new SparseArray<>(count, new ComplexArray(INITIAL_CAPACITY), ComplexNumber.ZERO);
+    }
+
+    public static SparseArray<Double> makePrimitive(final long count) {
+        return new SparseArray<>(count, new PrimitiveArray(INITIAL_CAPACITY), PrimitiveScalar.ZERO);
+    }
+
+    public static SparseArray<RationalNumber> makeRational(final long count) {
+        return new SparseArray<>(count, new RationalArray(INITIAL_CAPACITY), RationalNumber.ZERO);
     }
 
     /**
@@ -52,22 +69,18 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
      */
     private int myActualLength = 0;
     private final long myCount;
-    private final long myFirst;
     private long[] myIndices;
-    private final long myLimit;
     private DenseArray<N> myValues;
 
     private final N myZeroNumber;
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
 
-    SparseArray(final long first, final long limit, final DenseArray<N> values, final Scalar<N> zero) {
+    SparseArray(final long count, final DenseArray<N> values, final Scalar<N> zero) {
 
         super();
 
-        myFirst = first;
-        myCount = limit - first;
-        myLimit = limit;
+        myCount = count;
 
         myIndices = new long[values.size()];
         myValues = values;
@@ -75,8 +88,6 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
         myZeroScalar = zero;
         myZeroNumber = zero.getNumber();
         myZeroValue = zero.doubleValue();
-
-        Arrays.fill(myIndices, Long.MAX_VALUE);
     }
 
     public final long count() {
@@ -98,40 +109,27 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
 
         if (TypeUtils.isZero(value.doubleValue())) {
 
+            myValues.fillAll(myZeroNumber);
+
         } else {
 
             // Bad idea...
 
-            final int tmpCount = (int) this.count();
+            final int tmpSize = (int) this.count();
 
-            if (tmpCount != myIndices.length) {
-                myIndices = new long[tmpCount];
-                myValues = myValues.newInstance(tmpCount);
-                myActualLength = tmpCount;
+            if (tmpSize != myIndices.length) {
+                myIndices = AccessUtils.makeIncreasingRange(0L, tmpSize);
+                myValues = myValues.newInstance(tmpSize);
+                myActualLength = tmpSize;
             }
 
-            for (int i = 0; i < myActualLength; i++) {
-                myIndices[i] = this.first() + i;
-                myValues.set(i, value);
-            }
+            myValues.fillAll(value);
         }
     }
 
     @Override
     public void fillRange(final long first, final long limit, final N value) {
-
-        if (TypeUtils.isZero(value.doubleValue())) {
-
-        } else {
-
-        }
-
-        //        final long tmpFirst = Math.max(this.first(), first);
-        //        final long tmpLimit = Math.max(myLimit, limit);
-        //
-        //        for (int i = tmpFirst; i < tmpLimit; i++) {
-        //            this.set(i, value);
-        //        }
+        this.fill(first, limit, 1L, value);
     }
 
     @Override
@@ -347,7 +345,6 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
 
     @Override
     protected void fill(final long first, final long limit, final long step, final N value) {
-        final N tmpValue = value;
         int tmpFirst = this.index(first);
         if (tmpFirst < 0) {
             tmpFirst = -tmpFirst + 1;
@@ -356,8 +353,15 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
         if (tmpLimit < 0) {
             tmpLimit = -tmpLimit + 1;
         }
-        for (int i = tmpFirst; i < tmpLimit; i++) {
-            myValues.set(i, tmpValue);
+        if (this.isPrimitive()) {
+            final double tmpValue = value.doubleValue();
+            for (int i = tmpFirst; i < tmpLimit; i++) {
+                myValues.set(i, tmpValue);
+            }
+        } else {
+            for (int i = tmpFirst; i < tmpLimit; i++) {
+                myValues.set(i, value);
+            }
         }
     }
 
@@ -468,16 +472,12 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
         return retVal;
     }
 
-    final long first() {
-        return myFirst;
-    }
-
     final int first(final long first) {
-        return this.index(Math.max(myFirst, first));
+        return this.index(first);
     }
 
     final int index(final long index) {
-        return Arrays.binarySearch(myIndices, index);
+        return Arrays.binarySearch(myIndices, 0, myActualLength, index);
     }
 
     @Override
@@ -485,12 +485,8 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
         return myValues.isPrimitive();
     }
 
-    final long limit() {
-        return myLimit;
-    }
-
     final int limit(final long limit) {
-        return this.index(Math.min(myLimit, limit));
+        return this.index(Math.min(myCount, limit));
     }
 
     final int step(final long step) {

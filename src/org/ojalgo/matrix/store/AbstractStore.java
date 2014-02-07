@@ -71,8 +71,8 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return new MatrixStore.Builder<N>(this);
     }
 
-    public PhysicalStore<N> conjugate() {
-        return this.factory().conjugate(this);
+    public MatrixStore<N> conjugate() {
+        return new ConjugatedStore<>(this);
     }
 
     public PhysicalStore<N> copy() {
@@ -200,13 +200,17 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return retVal;
     }
 
+    public final MatrixStore<N> negate() {
+        return new ModificationStore<>(this, this.factory().function().negate());
+    }
+
     @Override
     public final String toString() {
         return MatrixUtils.toString(this);
     }
 
-    public PhysicalStore<N> transpose() {
-        return this.factory().transpose(this);
+    public MatrixStore<N> transpose() {
+        return new TransposedStore<>(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

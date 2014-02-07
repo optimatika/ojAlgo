@@ -22,40 +22,60 @@
 package org.ojalgo.array;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * Huge array - only deals with long indices. Delegates to its segments, localises indices for them.
  * 
  * @author apete
  */
-final class SegmentedArray<N extends Number> extends BasicArray<N> {
+public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
-    public static SegmentedArray<Double> makePrimitive(final long count) {
+    public static SegmentedArray<Double> makePrimitive(final long... structure) {
 
-        final long mySegmentSize = (32L * 1024L) / 16L;
+        final long tmpTotalCount = AccessUtils.count(structure);
 
-        final int tmpNumberOfSegments = (int) (count / mySegmentSize);
+        final long tmpBalance = (long) Math.sqrt(tmpTotalCount);
+
+        long tmpUniformSegmentSize = tmpTotalCount;
+        int tmpNumberOfUniformSegments = 1;
+
+        if (structure.length == 1) {
+            tmpUniformSegmentSize = tmpUniformSegmentSize / tmpBalance;
+            tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpBalance);
+        } else {
+            for (int i = 0; i < structure.length; i++) {
+                final long tmpSS = tmpUniformSegmentSize / structure[i];
+                final long tmpNoS = tmpNumberOfUniformSegments * structure[i];
+                if ((tmpNoS <= tmpBalance) && (tmpSS >= tmpBalance)) {
+                    tmpUniformSegmentSize = tmpSS;
+                    tmpNumberOfUniformSegments = (int) tmpNoS;
+                }
+            }
+        }
+
+        final long tmpCountDiff = tmpTotalCount - (tmpUniformSegmentSize * tmpNumberOfUniformSegments);
+
+        final int tmpTotalNumberOfSegments = tmpCountDiff == 0L ? tmpNumberOfUniformSegments : tmpNumberOfUniformSegments + 1;
 
         @SuppressWarnings("unchecked")
-        final SparseArray<Double>[] mySegments = new SparseArray[tmpNumberOfSegments + 1];
-        for (int s = 0; s < tmpNumberOfSegments; s++) {
-            mySegments[s] = SparseArray.make(mySegmentSize);
+        final SparseArray<Double>[] tmpSegments = new SparseArray[tmpTotalNumberOfSegments];
+        for (int s = 0; s < tmpNumberOfUniformSegments; s++) {
+            tmpSegments[s] = SparseArray.makePrimitive(tmpUniformSegmentSize);
         }
-        mySegments[tmpNumberOfSegments] = SparseArray.make(count - (mySegmentSize * tmpNumberOfSegments));
+        if (tmpCountDiff != 0L) {
+            tmpSegments[tmpNumberOfUniformSegments] = SparseArray.makePrimitive(tmpCountDiff);
+        }
 
-        return new SegmentedArray<Double>(count, mySegments);
+        return new SegmentedArray<Double>(tmpTotalCount, tmpSegments);
     }
 
     private final long myCount;
-
     private final BasicArray<N>[] mySegments;
-
     private final long mySegmentSize;
 
     SegmentedArray(final long count, final SparseArray<N>[] segments) {
@@ -133,10 +153,6 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     public void set(final long index, final Number value) {
         mySegments[(int) (index / mySegmentSize)].set(index % mySegmentSize, value);
-    }
-
-    private boolean isZeroModified(final UnaryFunction<N> function) {
-        return !TypeUtils.isZero(function.invoke(PrimitiveMath.ZERO));
     }
 
     @Override
@@ -237,19 +253,27 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     @Override
     protected void modify(final long first, final long limit, final long step, final Access1D<N> left, final BinaryFunction<N> function) {
-        final int tmpFirst = (int) (first / mySegmentSize);
-        final int tmpLast = (int) (limit / mySegmentSize);
-        for (int s = tmpFirst; s <= tmpLast; s++) {
-            mySegments[s].modify(first, limit, step, left, function);
+        if (this.isPrimitive()) {
+            for (long l = first; l < limit; l += step) {
+                this.set(l, function.invoke(left.doubleValue(l), this.doubleValue(l)));
+            }
+        } else {
+            for (long l = first; l < limit; l += step) {
+                this.set(l, function.invoke(left.get(l), this.get(l)));
+            }
         }
     }
 
     @Override
     protected void modify(final long first, final long limit, final long step, final BinaryFunction<N> function, final Access1D<N> right) {
-        final int tmpFirst = (int) (first / mySegmentSize);
-        final int tmpLast = (int) (limit / mySegmentSize);
-        for (int s = tmpFirst; s <= tmpLast; s++) {
-            mySegments[s].modify(first, limit, step, function, right);
+        if (this.isPrimitive()) {
+            for (long l = first; l < limit; l += step) {
+                this.set(l, function.invoke(this.doubleValue(l), right.doubleValue(l)));
+            }
+        } else {
+            for (long l = first; l < limit; l += step) {
+                this.set(l, function.invoke(this.get(l), right.get(l)));
+            }
         }
     }
 

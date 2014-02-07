@@ -29,11 +29,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -129,7 +129,7 @@ final class SimplexTableauSolver extends LinearSolver {
             tmpTableauBuilder.above(matrices.getAE(), matrices.getBE());
         }
         tmpTableauBuilder.below(1);
-        myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose();
+        myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
 
         final Result tmpKickStarter = matrices.getKickStarter();
         final int[] tmpBasis = tmpKickStarter != null ? tmpKickStarter.getBasis() : null;
@@ -137,7 +137,7 @@ final class SimplexTableauSolver extends LinearSolver {
             myBasis = tmpBasis;
             this.include(tmpBasis);
         } else {
-            myBasis = MatrixUtils.makeIncreasingRange(-tmpConstraintsCount, tmpConstraintsCount);
+            myBasis = AccessUtils.makeIncreasingRange(-tmpConstraintsCount, tmpConstraintsCount);
         }
 
         for (int i = 0; i < tmpConstraintsCount; i++) {

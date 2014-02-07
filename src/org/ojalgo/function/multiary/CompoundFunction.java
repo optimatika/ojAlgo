@@ -33,7 +33,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * [x]<sup>T</sup>[Q][x] + [c]<sup>T</sup>[x] + b
- *
+ * 
  * @author apete
  */
 public final class CompoundFunction<N extends Number> extends AbstractMultiary<N, CompoundFunction<N>> implements MultiaryFunction.Linear<N>,

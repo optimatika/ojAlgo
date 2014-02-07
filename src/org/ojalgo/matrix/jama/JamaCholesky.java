@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.jama;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -133,7 +134,7 @@ public final class JamaCholesky extends JamaAbstractDecomposition implements Cho
     }
 
     public int[] getPivotOrder() {
-        return MatrixUtils.makeIncreasingRange(0, this.getOldL().getRowDim());
+        return AccessUtils.makeIncreasingRange(0, this.getOldL().getRowDim());
     }
 
     public JamaMatrix getR() {

@@ -98,11 +98,15 @@ final class LagrangeSolver extends QuadraticSolver {
             final MatrixStore<Double> tmpLowerLefAE = tmpAE;
             final MatrixStore<Double> tmpLowerRightAE = ZeroStore.makePrimitive(tmpZeroSize, tmpZeroSize);
 
+            // tmpUpperLeftAE = tmpUpperLeftAE.builder().superimpose(0, 0, tmpUpperRightAE.multiplyRight(tmpLowerLefAE)).build();
+
             final MatrixStore<Double> tmpSubAE = new AboveBelowStore<Double>(new LeftRightStore<Double>(tmpUpperLeftAE, tmpUpperRightAE),
                     new LeftRightStore<Double>(tmpLowerLefAE, tmpLowerRightAE));
 
             final MatrixStore<Double> tmpUpperBE = tmpC;
             final MatrixStore<Double> tmpLowerBE = tmpBE;
+
+            // tmpUpperBE = tmpUpperBE.builder().superimpose(0, 0, tmpUpperRightAE.multiplyRight(tmpLowerBE)).build();
 
             final MatrixStore<Double> tmpSubBE = new AboveBelowStore<Double>(tmpUpperBE, tmpLowerBE);
 

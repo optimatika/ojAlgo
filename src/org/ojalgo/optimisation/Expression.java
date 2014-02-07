@@ -443,13 +443,13 @@ public final class Expression extends ModelEntity<Expression> {
      * given point.
      * 
      * @param variables The relevant variables
-     * @param aPoint The point to measure from
+     * @param point The point to measure from
      */
-    public void setCompoundFactorsOffset(final List<Variable> variables, final Access1D<?> aPoint) {
+    public void setCompoundFactorsOffset(final List<Variable> variables, final Access1D<?> point) {
 
         final int tmpLength = variables.size();
 
-        if (aPoint.count() != tmpLength) {
+        if (point.count() != tmpLength) {
             throw new IllegalArgumentException();
         }
 
@@ -460,7 +460,7 @@ public final class Expression extends ModelEntity<Expression> {
         for (int ij = 0; ij < tmpLength; ij++) {
 
             tmpVariable = variables.get(ij);
-            tmpVal = TypeUtils.toBigDecimal(aPoint.get(ij));
+            tmpVal = TypeUtils.toBigDecimal(point.get(ij));
 
             this.setQuadraticFactor(tmpVariable, tmpVariable, BigMath.ONE);
 
@@ -564,7 +564,7 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    public MultiaryFunction<Double> toFunction() {
+    public MultiaryFunction.TwiceDifferentiable<Double> toFunction() {
 
         if (this.isFunctionCompound()) {
             return this.getCompoundFunction();
