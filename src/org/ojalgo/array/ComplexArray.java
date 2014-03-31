@@ -206,6 +206,10 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
         ComplexArray.exchange(data, firstA, firstB, step, count);
     }
 
+<<<<<<< HEAD
+=======
+    @Override
+>>>>>>> FETCH_HEAD
     protected void fill(final Access1D<?> value) {
         ComplexArray.fill(data, value);
     }

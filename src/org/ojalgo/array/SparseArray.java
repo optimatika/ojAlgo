@@ -47,6 +47,7 @@ import org.ojalgo.type.TypeUtils;
  * @author apete
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
+<<<<<<< HEAD
 
     static abstract class SparseFactory<N extends Number> extends BasicFactory<N> {
 
@@ -160,6 +161,23 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return new SparseArray<>(count, new PrimitiveArray(INITIAL_CAPACITY), PrimitiveScalar.ZERO);
     }
 
+=======
+
+    private static final int INITIAL_CAPACITY = 7;
+
+    public static SparseArray<BigDecimal> makeBig(final long count) {
+        return new SparseArray<>(count, new BigArray(INITIAL_CAPACITY), BigScalar.ZERO);
+    }
+
+    public static SparseArray<ComplexNumber> makeComplex(final long count) {
+        return new SparseArray<>(count, new ComplexArray(INITIAL_CAPACITY), ComplexNumber.ZERO);
+    }
+
+    public static SparseArray<Double> makePrimitive(final long count) {
+        return new SparseArray<>(count, new PrimitiveArray(INITIAL_CAPACITY), PrimitiveScalar.ZERO);
+    }
+
+>>>>>>> FETCH_HEAD
     public static SparseArray<RationalNumber> makeRational(final long count) {
         return new SparseArray<>(count, new RationalArray(INITIAL_CAPACITY), RationalNumber.ZERO);
     }
@@ -593,6 +611,13 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return retVal;
     }
 
+<<<<<<< HEAD
+=======
+    final int first(final long first) {
+        return this.index(first);
+    }
+
+>>>>>>> FETCH_HEAD
     final int index(final long index) {
         return Arrays.binarySearch(myIndices, 0, myActualLength, index);
     }
@@ -602,4 +627,15 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myValues.isPrimitive();
     }
 
+<<<<<<< HEAD
+=======
+    final int limit(final long limit) {
+        return this.index(Math.min(myCount, limit));
+    }
+
+    final int step(final long step) {
+        return (int) step;
+    }
+
+>>>>>>> FETCH_HEAD
 }

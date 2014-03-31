@@ -54,11 +54,14 @@ public interface MultiaryFunction<N extends Number> extends Function<N> {
 
     }
 
+<<<<<<< HEAD
     /**
      * Twice (Continuously) Differentiable Multiary Function
      * 
      * @author apete
      */
+=======
+>>>>>>> FETCH_HEAD
     public static interface TwiceDifferentiable<N extends Number> extends MultiaryFunction<N> {
 
         /**

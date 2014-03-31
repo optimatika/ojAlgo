@@ -208,10 +208,13 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return new ModificationStore<>(this, this.factory().function().negate());
     }
 
+<<<<<<< HEAD
     public MatrixStore<N> scale(final N scalar) {
         return new ModificationStore<>(this, this.factory().function().multiply().first(scalar));
     }
 
+=======
+>>>>>>> FETCH_HEAD
     @Override
     public final String toString() {
         return MatrixUtils.toString(this);
