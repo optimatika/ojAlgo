@@ -188,13 +188,10 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
-<<<<<<< HEAD
         public final PhysicalStore<N> copy() {
             return myStore.copy();
         }
 
-=======
->>>>>>> FETCH_HEAD
         public final Builder<N> diagonal(final boolean assumeOne) {
             myStore = new UpperTriangularStore<N>(new LowerTriangularStore<N>(myStore, assumeOne), assumeOne);
             return this;
@@ -262,7 +259,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
-<<<<<<< HEAD
         public final Builder<N> multiplyLeft(final Access1D<N> leftMtrx) {
             myStore = myStore.multiplyLeft(leftMtrx);
             return this;
@@ -278,8 +274,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
-=======
->>>>>>> FETCH_HEAD
         public final Builder<N> right(final int aColDim) {
             final MatrixStore<N> tmpRightStore = new ZeroStore<N>(myStore.factory(), (int) myStore.countRows(), aColDim);
             myStore = new LeftRightStore<N>(myStore, tmpRightStore);
@@ -310,14 +304,11 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
-<<<<<<< HEAD
         public final Builder<N> scale(final N scalar) {
             myStore = myStore.scale(scalar);
             return this;
         }
 
-=======
->>>>>>> FETCH_HEAD
         public final Builder<N> superimpose(final int aRow, final int aCol, final MatrixStore<N> aStore) {
             myStore = new SuperimposedStore<N>(myStore, aRow, aCol, aStore);
             return this;
@@ -333,14 +324,11 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
-<<<<<<< HEAD
         @Override
         public String toString() {
             return myStore.toString();
         }
 
-=======
->>>>>>> FETCH_HEAD
         public final Builder<N> transpose() {
             if (myStore instanceof TransposedStore) {
                 myStore = ((TransposedStore<N>) myStore).getOriginal();
@@ -374,11 +362,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
 
     /**
      * Each call must produce a new instance.
-<<<<<<< HEAD
      *
-=======
-     * 
->>>>>>> FETCH_HEAD
      * @return A new conjugated instance.
      */
     MatrixStore<N> conjugate();
@@ -414,20 +398,13 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
 
     MatrixStore<N> negate();
 
-<<<<<<< HEAD
     MatrixStore<N> scale(N scalar);
 
-=======
->>>>>>> FETCH_HEAD
     Scalar<N> toScalar(long row, long column);
 
     /**
      * Each call must produce a new instance.
-<<<<<<< HEAD
      *
-=======
-     * 
->>>>>>> FETCH_HEAD
      * @return A new transposed instance.
      */
     MatrixStore<N> transpose();

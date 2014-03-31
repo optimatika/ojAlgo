@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.convex;
 
-<<<<<<< HEAD
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.aggregator.Aggregator;
@@ -41,42 +40,17 @@ public final class KKTSolver extends Object {
         private final MatrixStore<Double> myB;
         private final MatrixStore<Double> myC;
         private final MatrixStore<Double> myQ;
-=======
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
-import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.decomposition.SingularValueDecomposition;
-import org.ojalgo.matrix.store.MatrixStore;
-
-public abstract class KKTSolver {
-
-    public static final class Data {
-
-        public final MatrixStore<Double> myQ;
-        public final MatrixStore<Double> myA;
-        public final MatrixStore<Double> myB;
-        public final MatrixStore<Double> myC;
->>>>>>> FETCH_HEAD
 
         /**
          * | Q | A<sup>T</sup> | = | C | <br>
          * | A | 0 | = | B |
-<<<<<<< HEAD
          *
-=======
-         * 
->>>>>>> FETCH_HEAD
          * @param Q
          * @param C
          * @param A
          * @param B
          */
-<<<<<<< HEAD
         public Input(final MatrixStore<Double> Q, final MatrixStore<Double> C, final MatrixStore<Double> A, final MatrixStore<Double> B) {
-=======
-        protected Data(final MatrixStore<Double> Q, final MatrixStore<Double> C, final MatrixStore<Double> A, final MatrixStore<Double> B) {
->>>>>>> FETCH_HEAD
 
             super();
 
@@ -84,10 +58,6 @@ public abstract class KKTSolver {
             myC = C;
             myA = A;
             myB = B;
-<<<<<<< HEAD
-=======
-
->>>>>>> FETCH_HEAD
         }
 
         final MatrixStore<Double> getA() {
@@ -102,18 +72,12 @@ public abstract class KKTSolver {
             return myC;
         }
 
-<<<<<<< HEAD
         final MatrixStore<Double> getKKT() {
             if (myA != null) {
                 return myQ.builder().right(myA.transpose()).below(myA).build();
             } else {
                 return myQ;
             }
-=======
-        @SuppressWarnings("unchecked")
-        final MatrixStore<Double> getKKT() {
-            return myQ.builder().right(myA.transpose()).below(myA).build();
->>>>>>> FETCH_HEAD
         }
 
         final MatrixStore<Double> getQ() {
@@ -121,7 +85,6 @@ public abstract class KKTSolver {
         }
 
         final MatrixStore<Double> getRHS() {
-<<<<<<< HEAD
             if (myB != null) {
                 return myC.builder().below(myB).build();
             } else {
@@ -261,112 +224,6 @@ public abstract class KKTSolver {
 
         }
 
-=======
-            return myC.builder().below(myB).build();
-        }
-
-    }
-
-    static class EliminationSolver extends KKTSolver {
-
-        EliminationSolver(final MatrixStore<Double> Q, final MatrixStore<Double> C, final MatrixStore<Double> A, final MatrixStore<Double> B) {
-
-            super(Q, C, A, B);
-
-        }
-
-        @Override
-        protected MatrixStore<Double> solve() {
-
-            final Cholesky<Double> tmpCholesky = CholeskyDecomposition.make(this.getQ());
-            tmpCholesky.compute(this.getQ());
-
-            final MatrixStore<Double> tmpAT = tmpCholesky.solve(this.getA().transpose());
-            final MatrixStore<Double> tmpC = tmpCholesky.solve(this.getC().builder().modify(PrimitiveFunction.NEGATE).build());
-
-            final MatrixStore<Double> tmpSchurComplement = tmpAT.multiplyLeft(this.getA()).builder().modify(PrimitiveFunction.NEGATE).build();
-
-            return null;
-        }
-
-    }
-
-    static class SafeSolver extends KKTSolver {
-
-        private final SingularValue<Double> myDelegate;
-
-        SafeSolver(final MatrixStore<Double> Q, final MatrixStore<Double> C, final MatrixStore<Double> A, final MatrixStore<Double> B) {
-
-            super(Q, C, A, B);
-
-            myDelegate = SingularValueDecomposition.make(this.getKKT());
-        }
-
-        @Override
-        protected MatrixStore<Double> solve() {
-            return myDelegate.solve(this.getRHS());
-        }
-
-    }
-
-    private final MatrixStore<Double> myQ;
-    private final MatrixStore<Double> myA;
-    private final MatrixStore<Double> myB;
-    private final MatrixStore<Double> myC;
-    private final MatrixStore<Double> myKKT;
-    private final MatrixStore<Double> myRHS;
-
-    private KKTSolver() {
-        this(null, null, null, null);
-    }
-
-    /**
-     * | Q | A<sup>T</sup> | = | C | <br>
-     * | A | 0 | = | B |
-     * 
-     * @param Q
-     * @param C
-     * @param A
-     * @param B
-     */
-    protected KKTSolver(final MatrixStore<Double> Q, final MatrixStore<Double> C, final MatrixStore<Double> A, final MatrixStore<Double> B) {
-
-        super();
-
-        myQ = Q;
-        myC = C;
-        myA = A;
-        myB = B;
-
-        myKKT = myQ.builder().right(myA.builder().transpose().build()).below(myA).build();
-        myRHS = myC.builder().below(myB).build();
-    }
-
-    protected abstract MatrixStore<Double> solve();
-
-    final MatrixStore<Double> getA() {
-        return myA;
-    }
-
-    final MatrixStore<Double> getB() {
-        return myB;
-    }
-
-    final MatrixStore<Double> getC() {
-        return myC;
-    }
-
-    final MatrixStore<Double> getKKT() {
-        return myKKT;
-    }
-
-    final MatrixStore<Double> getQ() {
-        return myQ;
-    }
-
-    final MatrixStore<Double> getRHS() {
-        return myRHS;
->>>>>>> FETCH_HEAD
     }
 
 }
