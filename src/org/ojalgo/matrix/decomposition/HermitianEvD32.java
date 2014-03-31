@@ -271,7 +271,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
 
             final int tmpDim = (int) tmpD.countRows();
 
-            final PhysicalStore<N> tmpMtrx = tmpV.conjugate();
+            final PhysicalStore<N> tmpMtrx = tmpV.conjugate().copy();
 
             final N tmpZero = this.getStaticZero();
             final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();

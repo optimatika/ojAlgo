@@ -22,14 +22,22 @@
 package org.ojalgo.array;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Iterator;
 
+import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Iterator1D;
+import org.ojalgo.array.DenseArray.DenseFactory;
+import org.ojalgo.array.SegmentedArray.SegmentedFactory;
+import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.netio.ASCII;
+import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -42,11 +50,127 @@ import org.ojalgo.scalar.Scalar;
  * This abstract class defines a set of methods to access and modify array elements. It does not "know" anything about
  * linear algebra or similar.
  * </p>
- * 
+ *
  * @author apete
  */
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-        Access1D.Visitable<N>, Serializable {
+Access1D.Visitable<N>, Serializable {
+
+    static abstract class BasicFactory<N extends Number> extends Object {
+
+        abstract DenseArray.DenseFactory<N> getDenseFactory();
+
+        long getElementSize() {
+            return this.getDenseFactory().getElementSize();
+        }
+
+        abstract SegmentedArray.SegmentedFactory<N> getSegmentedFactory();
+
+        abstract SparseArray.SparseFactory<N> getSparseFactory();
+
+        BasicArray<N> makeToBeFilled(final long... structure) {
+
+            final long tmpTotal = AccessUtils.count(structure);
+
+            if (tmpTotal > Integer.MAX_VALUE) {
+                return this.getSegmentedFactory().makeToBeFilled(structure);
+            } else {
+                return this.getDenseFactory().makeToBeFilled(structure);
+            }
+
+        }
+
+        BasicArray<N> makeZero(final long... structure) {
+
+            final long tmpTotal = AccessUtils.count(structure);
+
+            if (tmpTotal > Integer.MAX_VALUE) {
+                return this.getSegmentedFactory().makeZero(structure);
+            } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize())) {
+                return this.getSparseFactory().makeZero(structure);
+            } else {
+                return this.getDenseFactory().makeZero(structure);
+            }
+
+        }
+
+    }
+
+    static final BasicFactory<BigDecimal> BIG = new BasicFactory<BigDecimal>() {
+
+        @Override
+        DenseFactory<BigDecimal> getDenseFactory() {
+            return BigArray.FACTORY;
+        }
+
+        @Override
+        SegmentedFactory<BigDecimal> getSegmentedFactory() {
+            return SegmentedArray.BIG;
+        }
+
+        @Override
+        SparseFactory<BigDecimal> getSparseFactory() {
+            return SparseArray.BIG;
+        }
+
+    };
+
+    static final BasicFactory<ComplexNumber> COMPLEX = new BasicFactory<ComplexNumber>() {
+
+        @Override
+        DenseFactory<ComplexNumber> getDenseFactory() {
+            return ComplexArray.FACTORY;
+        }
+
+        @Override
+        SegmentedFactory<ComplexNumber> getSegmentedFactory() {
+            return SegmentedArray.COMPLEX;
+        }
+
+        @Override
+        SparseFactory<ComplexNumber> getSparseFactory() {
+            return SparseArray.COMPLEX;
+        }
+
+    };
+
+    static final BasicFactory<Double> PRIMITIVE = new BasicFactory<Double>() {
+
+        @Override
+        DenseFactory<Double> getDenseFactory() {
+            return PrimitiveArray.FACTORY;
+        }
+
+        @Override
+        SegmentedFactory<Double> getSegmentedFactory() {
+            return SegmentedArray.PRIMITIVE;
+        }
+
+        @Override
+        SparseFactory<Double> getSparseFactory() {
+            return SparseArray.PRIMITIVE;
+        }
+
+    };
+
+    static final BasicFactory<RationalNumber> RATIONAL = new BasicFactory<RationalNumber>() {
+
+        @Override
+        DenseFactory<RationalNumber> getDenseFactory() {
+            return RationalArray.FACTORY;
+        }
+
+        @Override
+        SegmentedFactory<RationalNumber> getSegmentedFactory() {
+            return SegmentedArray.RATIONAL;
+        }
+
+        @Override
+        SparseFactory<RationalNumber> getSparseFactory() {
+            return SparseArray.RATIONAL;
+        }
+
+    };
 
     protected BasicArray() {
         super();
@@ -134,13 +258,9 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     protected abstract void exchange(long firstA, long firstB, long step, long count);
 
-    protected abstract void fill(Access1D<?> values);
-
-    protected abstract void fill(final long first, final long limit, final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right);
-
     protected abstract void fill(long first, long limit, long step, N value);
 
-    protected abstract long getIndexOfLargest(long first, long limit, long step);
+    protected abstract long indexOfLargest(long first, long limit, long step);
 
     protected abstract boolean isZeros(long first, long limit, long step);
 

@@ -26,6 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -60,7 +61,7 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
 
             super();
 
-            myOrder = MatrixUtils.makeIncreasingRange(0, aRowDim);
+            myOrder = AccessUtils.makeIncreasingRange(0, aRowDim);
             mySign = 1;
         }
 

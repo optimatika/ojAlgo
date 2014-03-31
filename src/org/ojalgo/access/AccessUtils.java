@@ -195,6 +195,38 @@ public abstract class AccessUtils {
         return retVal;
     }
 
+    public static int[] makeDecreasingRange(final int first, final int count) {
+        final int[] retVal = new int[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first - i;
+        }
+        return retVal;
+    }
+
+    public static long[] makeDecreasingRange(final long first, final int count) {
+        final long[] retVal = new long[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first - i;
+        }
+        return retVal;
+    }
+
+    public static int[] makeIncreasingRange(final int first, final int count) {
+        final int[] retVal = new int[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first + i;
+        }
+        return retVal;
+    }
+
+    public static long[] makeIncreasingRange(final long first, final int count) {
+        final long[] retVal = new long[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first + i;
+        }
+        return retVal;
+    }
+
     public static int row(final int index, final int structure) {
         return index % structure;
     }
@@ -251,7 +283,7 @@ public abstract class AccessUtils {
 
     /**
      * A more complex/general version of {@linkplain #step(int[], int)}.
-     * 
+     *
      * @param structure An access structure
      * @param increment A vector indication a direction (and size)
      * @return The step size (index change)
@@ -282,7 +314,7 @@ public abstract class AccessUtils {
 
     /**
      * A more complex/general version of {@linkplain #step(int[], int)}.
-     * 
+     *
      * @param structure An access structure
      * @param increment A vector indication a direction (and size)
      * @return The step size (index change)

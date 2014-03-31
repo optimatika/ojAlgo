@@ -86,8 +86,4 @@ public class RowsIterator<N extends Number> implements Access1D<N>, Iterator<Acc
         throw new UnsupportedOperationException();
     }
 
-    public int size() {
-        return (int) this.count();
-    }
-
 }

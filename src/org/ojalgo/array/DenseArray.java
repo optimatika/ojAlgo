@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.util.RandomAccess;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -32,10 +33,31 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * Represents a single dense array - casts long indices to int.
- * 
+ *
  * @author apete
  */
 abstract class DenseArray<N extends Number> extends BasicArray<N> implements RandomAccess {
+
+    static abstract class DenseFactory<N extends Number> extends BasicFactory<N> {
+
+        @Override
+        final DenseFactory<N> getDenseFactory() {
+            return this;
+        }
+
+        abstract DenseArray<N> make(int size);
+
+        @Override
+        final DenseArray<N> makeZero(final long... structure) {
+            return this.make((int) AccessUtils.count(structure));
+        }
+
+        @Override
+        final DenseArray<N> makeToBeFilled(final long... structure) {
+            return this.make((int) AccessUtils.count(structure));
+        }
+
+    }
 
     DenseArray() {
         super();
@@ -129,22 +151,17 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     protected abstract void fill(final int first, final int limit, final N left, final BinaryFunction<N> function, final Access1D<N> right);
 
     @Override
-    protected final void fill(final long first, final long limit, final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-        this.fill((int) first, (int) limit, left, function, right);
-    }
-
-    @Override
     protected final void fill(final long first, final long limit, final long step, final N value) {
         this.fill((int) first, (int) limit, (int) step, value);
     }
 
     protected abstract N get(final int index);
 
-    protected abstract int getIndexOfLargest(int first, int limit, int step);
+    protected abstract int indexOfLargest(int first, int limit, int step);
 
     @Override
-    protected final long getIndexOfLargest(final long first, final long limit, final long step) {
-        return this.getIndexOfLargest((int) first, (int) limit, (int) step);
+    protected final long indexOfLargest(final long first, final long limit, final long step) {
+        return this.indexOfLargest((int) first, (int) limit, (int) step);
     }
 
     /**

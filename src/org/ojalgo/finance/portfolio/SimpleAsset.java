@@ -31,7 +31,7 @@ import org.ojalgo.type.TypeUtils;
 
 /**
  * SimpleAsset is used to describe 1 asset (portfolio member).
- *
+ * 
  * @author apete
  */
 public final class SimpleAsset extends FinancePortfolio {
@@ -81,8 +81,7 @@ public final class SimpleAsset extends FinancePortfolio {
     }
 
     /**
-     * Assuming there is precisely 1 weight - this class is used to
-     * describe 1 asset (portfolio member).
+     * Assuming there is precisely 1 weight - this class is used to describe 1 asset (portfolio member).
      */
     public BigDecimal getWeight() {
         return myWeight;

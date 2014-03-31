@@ -31,20 +31,24 @@ import org.ojalgo.scalar.Scalar;
 /**
  * A merger of two {@linkplain MatrixStore} instances by placing one store to the right of the other. The two matrices
  * must have the same number of rows. The rows of the two matrices are logically merged to form new longer rows.
- * 
+ *
  * @author apete
  */
 public final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
 
-    private final int myColSplit;
-    private final MatrixStore<N> myRightStore;
+    private final int mySplit;
+    private final MatrixStore<N> myRight;
 
-    public LeftRightStore(final MatrixStore<N> base, final MatrixStore<N> rightStore) {
+    public LeftRightStore(final MatrixStore<N> base, final MatrixStore<N> right) {
 
-        super((int) base.countRows(), (int) (base.countColumns() + rightStore.countColumns()), base);
+        super((int) base.countRows(), (int) (base.countColumns() + right.countColumns()), base);
 
-        myRightStore = rightStore;
-        myColSplit = (int) base.countColumns();
+        myRight = right;
+        mySplit = (int) base.countColumns();
+
+        if (base.countRows() != right.countRows()) {
+            throw new IllegalArgumentException();
+        }
     }
 
     @SuppressWarnings("unused")
@@ -59,11 +63,11 @@ public final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
     public double doubleValue(final long row, final long column) {
-        return (column >= myColSplit) ? myRightStore.doubleValue(row, column - myColSplit) : this.getBase().doubleValue(row, column);
+        return (column >= mySplit) ? myRight.doubleValue(row, column - mySplit) : this.getBase().doubleValue(row, column);
     }
 
     public N get(final long row, final long column) {
-        return (column >= myColSplit) ? myRightStore.get(row, column - myColSplit) : this.getBase().get(row, column);
+        return (column >= mySplit) ? myRight.get(row, column - mySplit) : this.getBase().get(row, column);
     }
 
     public boolean isLowerLeftShaded() {
@@ -79,7 +83,7 @@ public final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
 
         final Future<MatrixStore<N>> tmpBaseFuture = this.executeMultiplyLeftOnBase(leftMtrx);
 
-        final MatrixStore<N> tmpRight = myRightStore.multiplyLeft(leftMtrx);
+        final MatrixStore<N> tmpRight = myRight.multiplyLeft(leftMtrx);
 
         try {
             return new LeftRightStore<N>(tmpBaseFuture.get(), tmpRight);
@@ -89,7 +93,7 @@ public final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
-        return (column >= myColSplit) ? myRightStore.toScalar(row, column - myColSplit) : this.getBase().toScalar(row, column);
+        return (column >= mySplit) ? myRight.toScalar(row, column - mySplit) : this.getBase().toScalar(row, column);
     }
 
 }

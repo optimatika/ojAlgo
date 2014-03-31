@@ -175,6 +175,10 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         return new JamaMatrix(new Matrix(tmpArrayCopy));
     }
 
+    public MatrixStore<Double> add(final MatrixStore<Double> addend) {
+        return new JamaMatrix(myDelegate.plus(JamaMatrix.convert(addend)));
+    }
+
     public JamaMatrix add(final Number aNmbr) {
 
         final double[][] retVal = myDelegate.getArrayCopy();
@@ -812,12 +816,16 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         return new JamaMatrix(retVal);
     }
 
+    public JamaMatrix scale(final Double scalar) {
+        return new JamaMatrix(myDelegate.times(scalar.doubleValue()));
+    }
+
     public JamaMatrix selectColumns(final int... someCols) {
-        return new JamaMatrix(myDelegate.getMatrix(MatrixUtils.makeIncreasingRange(0, this.getRowDim()), someCols));
+        return new JamaMatrix(myDelegate.getMatrix(AccessUtils.makeIncreasingRange(0, this.getRowDim()), someCols));
     }
 
     public JamaMatrix selectRows(final int... someRows) {
-        return new JamaMatrix(myDelegate.getMatrix(someRows, MatrixUtils.makeIncreasingRange(0, this.getColDim())));
+        return new JamaMatrix(myDelegate.getMatrix(someRows, AccessUtils.makeIncreasingRange(0, this.getColDim())));
     }
 
     public Double set(final int anInd, final Number value) {

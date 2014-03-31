@@ -30,11 +30,6 @@ public final class TransposedStore<N extends Number> extends TransjugatedStore<N
         super(aBase);
     }
 
-    @Override
-    public PhysicalStore<N> copy() {
-        return this.getBase().transpose();
-    }
-
     public N get(final long aRow, final long aCol) {
         return this.getBase().get(aCol, aRow);
     }
@@ -88,8 +83,8 @@ public final class TransposedStore<N extends Number> extends TransjugatedStore<N
     }
 
     @Override
-    public PhysicalStore<N> transpose() {
-        return this.getBase().copy();
+    public MatrixStore<N> transpose() {
+        return this.getBase();
     }
 
 }

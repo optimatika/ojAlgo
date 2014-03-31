@@ -142,11 +142,10 @@ public final class OldIntegerSolver extends IntegerSolver {
 
                     if (OldIntegerSolver.this.isDebug()) {
                         OldIntegerSolver.this.debug(OldIntegerSolver.this.getBestResultSoFar().toString());
+                        BasicLogger.debug();
+                        BasicLogger.debug(OldIntegerSolver.this.toString());
+                        BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
                     }
-
-                    BasicLogger.debug();
-                    BasicLogger.debug(OldIntegerSolver.this.toString());
-                    BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
 
                 } else {
                     if (OldIntegerSolver.this.isDebug()) {

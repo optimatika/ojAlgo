@@ -30,6 +30,7 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.decomposition.*;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -282,20 +283,20 @@ public abstract class MatrixUtils {
         return anAccess instanceof MatrixStore<?> ? ((MatrixStore<?>) anAccess).isUpperRightShaded() : false;
     }
 
-    public static int[] makeDecreasingRange(final int aFirst, final int aCount) {
-        final int[] retVal = new int[aCount];
-        for (int i = 0; i < retVal.length; i++) {
-            retVal[i] = aFirst - i;
-        }
-        return retVal;
+    /**
+     * @deprecated v36 Use {@link AccessUtils#makeDecreasingRange(int,int)} instead
+     */
+    @Deprecated
+    public static int[] makeDecreasingRange(final int first, final int count) {
+        return AccessUtils.makeDecreasingRange(first, count);
     }
 
-    public static int[] makeIncreasingRange(final int aFirst, final int aCount) {
-        final int[] retVal = new int[aCount];
-        for (int i = 0; i < retVal.length; i++) {
-            retVal[i] = aFirst + i;
-        }
-        return retVal;
+    /**
+     * @deprecated v36 Use {@link AccessUtils#makeIncreasingRange(int,int)} instead
+     */
+    @Deprecated
+    public static int[] makeIncreasingRange(final int first, final int count) {
+        return AccessUtils.makeIncreasingRange(first, count);
     }
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int aRowDim, final int aColDim) {
@@ -313,24 +314,20 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
-    public static int[] makeRange(final int anInd) {
-        return new int[] { anInd };
-    }
-
+    /**
+     * @deprecated v36 Use {@link FunctionUtils#max(int...)} instead
+     */
+    @Deprecated
     public static int max(final int... values) {
-        int retVal = Integer.MIN_VALUE;
-        for (int i = values.length; i-- != 0;) {
-            retVal = values[i] > retVal ? values[i] : retVal;
-        }
-        return retVal;
+        return FunctionUtils.max(values);
     }
 
+    /**
+     * @deprecated v36 Use {@link FunctionUtils#min(int...)} instead
+     */
+    @Deprecated
     public static int min(final int... values) {
-        int retVal = Integer.MAX_VALUE;
-        for (int i = values.length; i-- != 0;) {
-            retVal = values[i] < retVal ? values[i] : retVal;
-        }
-        return retVal;
+        return FunctionUtils.min(values);
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final Bidiagonal<N> decomposition) {

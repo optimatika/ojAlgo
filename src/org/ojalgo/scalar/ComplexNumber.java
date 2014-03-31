@@ -35,7 +35,7 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
 /**
  * ComplexNumber is an immutable complex number class. It only implements the most basic complex number operations.
  * {@linkplain org.ojalgo.function.ComplexFunction} implements some of the more complicated ones.
- * 
+ *
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
@@ -282,7 +282,7 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
 
     /**
      * Will call {@linkplain NumberContext#enforce(double)} on the real and imaginary parts separately.
-     * 
+     *
      * @see org.ojalgo.scalar.Scalar#enforce(org.ojalgo.type.context.NumberContext)
      */
     public ComplexNumber enforce(final NumberContext context) {

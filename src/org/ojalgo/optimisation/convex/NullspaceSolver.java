@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.quadratic;
+package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -33,9 +33,9 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 
-final class NullspaceSolver extends QuadraticSolver {
+public final class NullspaceSolver extends ConvexSolver {
 
-    public NullspaceSolver(final ExpressionsBasedModel aModel, final Options solverOptions, final QuadraticSolver.Builder matrices) {
+    public NullspaceSolver(final ExpressionsBasedModel aModel, final Options solverOptions, final ConvexSolver.Builder matrices) {
         super(aModel, solverOptions, matrices);
     }
 

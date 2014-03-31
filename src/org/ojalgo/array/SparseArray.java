@@ -21,30 +21,147 @@
  */
 package org.ojalgo.array;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Iterator1D;
+import org.ojalgo.array.DenseArray.DenseFactory;
+import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.scalar.BigScalar;
+import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
 /**
  * Sparse array - maps long to int.
- * 
+ *
  * @author apete
  */
-final class SparseArray<N extends Number> extends BasicArray<N> {
+public final class SparseArray<N extends Number> extends BasicArray<N> {
 
-    static final int INITIAL_CAPACITY = 11;
+    static abstract class SparseFactory<N extends Number> extends BasicFactory<N> {
 
-    public static SparseArray<Double> make(final long count) {
-        return new SparseArray<>(0L, count, new PrimitiveArray(INITIAL_CAPACITY), PrimitiveScalar.ZERO);
+        @Override
+        final SparseFactory<N> getSparseFactory() {
+            return this;
+        }
+
+        abstract SparseArray<N> make(long count);
+
+        @Override
+        final SparseArray<N> makeToBeFilled(final long... structure) {
+            return this.make(AccessUtils.count(structure));
+        }
+
+        @Override
+        final SparseArray<N> makeZero(final long... structure) {
+            return this.make(AccessUtils.count(structure));
+        }
+
+    }
+
+    private static final int INITIAL_CAPACITY = 7;
+
+    static final SparseFactory<BigDecimal> BIG = new SparseFactory<BigDecimal>() {
+
+        @Override
+        DenseFactory<BigDecimal> getDenseFactory() {
+            return BigArray.FACTORY;
+        }
+
+        @Override
+        SegmentedFactory<BigDecimal> getSegmentedFactory() {
+            return SegmentedArray.BIG;
+        }
+
+        @Override
+        SparseArray<BigDecimal> make(final long count) {
+            return SparseArray.makeBig(count);
+        }
+
+    };
+
+    static final SparseFactory<ComplexNumber> COMPLEX = new SparseFactory<ComplexNumber>() {
+
+        @Override
+        DenseFactory<ComplexNumber> getDenseFactory() {
+            return ComplexArray.FACTORY;
+        }
+
+        @Override
+        SegmentedFactory<ComplexNumber> getSegmentedFactory() {
+            return SegmentedArray.COMPLEX;
+        }
+
+        @Override
+        SparseArray<ComplexNumber> make(final long count) {
+            return SparseArray.makeComplex(count);
+        }
+
+    };
+
+    static final SparseFactory<Double> PRIMITIVE = new SparseFactory<Double>() {
+
+        @Override
+        DenseFactory<Double> getDenseFactory() {
+            return PrimitiveArray.FACTORY;
+        }
+
+        @Override
+        SegmentedFactory<Double> getSegmentedFactory() {
+            return SegmentedArray.PRIMITIVE;
+        }
+
+        @Override
+        SparseArray<Double> make(final long count) {
+            return SparseArray.makePrimitive(count);
+        }
+
+    };
+
+    static final SparseFactory<RationalNumber> RATIONAL = new SparseFactory<RationalNumber>() {
+
+        @Override
+        DenseFactory<RationalNumber> getDenseFactory() {
+            return RationalArray.FACTORY;
+        }
+
+        @Override
+        SegmentedFactory<RationalNumber> getSegmentedFactory() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        SparseArray<RationalNumber> make(final long count) {
+            return SparseArray.makeRational(count);
+        }
+
+    };
+
+    public static SparseArray<BigDecimal> makeBig(final long count) {
+        return new SparseArray<>(count, new BigArray(INITIAL_CAPACITY), BigScalar.ZERO);
+    }
+
+    public static SparseArray<ComplexNumber> makeComplex(final long count) {
+        return new SparseArray<>(count, new ComplexArray(INITIAL_CAPACITY), ComplexNumber.ZERO);
+    }
+
+    public static SparseArray<Double> makePrimitive(final long count) {
+        return new SparseArray<>(count, new PrimitiveArray(INITIAL_CAPACITY), PrimitiveScalar.ZERO);
+    }
+
+    public static SparseArray<RationalNumber> makeRational(final long count) {
+        return new SparseArray<>(count, new RationalArray(INITIAL_CAPACITY), RationalNumber.ZERO);
     }
 
     /**
@@ -52,22 +169,18 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
      */
     private int myActualLength = 0;
     private final long myCount;
-    private final long myFirst;
     private long[] myIndices;
-    private final long myLimit;
     private DenseArray<N> myValues;
 
     private final N myZeroNumber;
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
 
-    SparseArray(final long first, final long limit, final DenseArray<N> values, final Scalar<N> zero) {
+    SparseArray(final long count, final DenseArray<N> values, final Scalar<N> zero) {
 
         super();
 
-        myFirst = first;
-        myCount = limit - first;
-        myLimit = limit;
+        myCount = count;
 
         myIndices = new long[values.size()];
         myValues = values;
@@ -75,8 +188,6 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
         myZeroScalar = zero;
         myZeroNumber = zero.getNumber();
         myZeroValue = zero.doubleValue();
-
-        Arrays.fill(myIndices, Long.MAX_VALUE);
     }
 
     public final long count() {
@@ -98,40 +209,27 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
 
         if (TypeUtils.isZero(value.doubleValue())) {
 
+            myValues.fillAll(myZeroNumber);
+
         } else {
 
             // Bad idea...
 
-            final int tmpCount = (int) this.count();
+            final int tmpSize = (int) this.count();
 
-            if (tmpCount != myIndices.length) {
-                myIndices = new long[tmpCount];
-                myValues = myValues.newInstance(tmpCount);
-                myActualLength = tmpCount;
+            if (tmpSize != myIndices.length) {
+                myIndices = AccessUtils.makeIncreasingRange(0L, tmpSize);
+                myValues = myValues.newInstance(tmpSize);
+                myActualLength = tmpSize;
             }
 
-            for (int i = 0; i < myActualLength; i++) {
-                myIndices[i] = this.first() + i;
-                myValues.set(i, value);
-            }
+            myValues.fillAll(value);
         }
     }
 
     @Override
     public void fillRange(final long first, final long limit, final N value) {
-
-        if (TypeUtils.isZero(value.doubleValue())) {
-
-        } else {
-
-        }
-
-        //        final long tmpFirst = Math.max(this.first(), first);
-        //        final long tmpLimit = Math.max(myLimit, limit);
-        //
-        //        for (int i = tmpFirst; i < tmpLimit; i++) {
-        //            this.set(i, value);
-        //        }
+        this.fill(first, limit, 1L, value);
     }
 
     @Override
@@ -329,25 +427,45 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
 
     @Override
     protected void exchange(final long firstA, final long firstB, final long step, final long count) {
-        // TODO Auto-generated method stub
 
-    }
+        if (this.isPrimitive()) {
 
-    @Override
-    protected void fill(final Access1D<?> values) {
-        // TODO Auto-generated method stub
+            long tmpIndexA = firstA;
+            long tmpIndexB = firstB;
 
-    }
+            double tmpVal;
 
-    @Override
-    protected void fill(final long first, final long limit, final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-        // TODO Auto-generated method stub
+            for (long i = 0; i < count; i++) {
 
+                tmpVal = this.doubleValue(tmpIndexA);
+                this.set(tmpIndexA, this.doubleValue(tmpIndexB));
+                this.set(tmpIndexB, tmpVal);
+
+                tmpIndexA += step;
+                tmpIndexB += step;
+            }
+
+        } else {
+
+            long tmpIndexA = firstA;
+            long tmpIndexB = firstB;
+
+            N tmpVal;
+
+            for (long i = 0; i < count; i++) {
+
+                tmpVal = this.get(tmpIndexA);
+                this.set(tmpIndexA, this.get(tmpIndexB));
+                this.set(tmpIndexB, tmpVal);
+
+                tmpIndexA += step;
+                tmpIndexB += step;
+            }
+        }
     }
 
     @Override
     protected void fill(final long first, final long limit, final long step, final N value) {
-        final N tmpValue = value;
         int tmpFirst = this.index(first);
         if (tmpFirst < 0) {
             tmpFirst = -tmpFirst + 1;
@@ -356,13 +474,20 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
         if (tmpLimit < 0) {
             tmpLimit = -tmpLimit + 1;
         }
-        for (int i = tmpFirst; i < tmpLimit; i++) {
-            myValues.set(i, tmpValue);
+        if (this.isPrimitive()) {
+            final double tmpValue = value.doubleValue();
+            for (int i = tmpFirst; i < tmpLimit; i++) {
+                myValues.set(i, tmpValue);
+            }
+        } else {
+            for (int i = tmpFirst; i < tmpLimit; i++) {
+                myValues.set(i, value);
+            }
         }
     }
 
     @Override
-    protected long getIndexOfLargest(final long first, final long limit, final long step) {
+    protected long indexOfLargest(final long first, final long limit, final long step) {
 
         double tmpVal = PrimitiveMath.ZERO;
         long retVal = Long.MIN_VALUE;
@@ -468,33 +593,13 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
         return retVal;
     }
 
-    final long first() {
-        return myFirst;
-    }
-
-    final int first(final long first) {
-        return this.index(Math.max(myFirst, first));
-    }
-
     final int index(final long index) {
-        return Arrays.binarySearch(myIndices, index);
+        return Arrays.binarySearch(myIndices, 0, myActualLength, index);
     }
 
     @Override
     boolean isPrimitive() {
         return myValues.isPrimitive();
-    }
-
-    final long limit() {
-        return myLimit;
-    }
-
-    final int limit(final long limit) {
-        return this.index(Math.min(myLimit, limit));
-    }
-
-    final int step(final long step) {
-        return (int) step;
     }
 
 }

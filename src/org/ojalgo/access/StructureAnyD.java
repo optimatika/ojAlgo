@@ -28,4 +28,6 @@ interface StructureAnyD extends Structure1D {
      */
     long count(int dimension);
 
+    long[] structure();
+
 }

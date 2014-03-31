@@ -19,37 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.array;
+package org.ojalgo.function;
 
-import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.type.TypeUtils;
 
-public class PlainArray extends UnsafeArray {
+public abstract class FunctionUtils {
 
-    private final double[] data;
-
-    public PlainArray(final long count) {
-
-        super(count);
-
-        data = new double[(int) count];
+    private FunctionUtils() {
+        super();
     }
 
-    @Override
-    public double doubleValue(final long index) {
-        return data[(int) index];
+    public static <N extends Number> boolean isZeroModified(final UnaryFunction<N> function) {
+        return !TypeUtils.isZero(function.invoke(PrimitiveMath.ZERO));
     }
 
-    @Override
-    public void modify(final UnaryFunction<Double> function) {
-        final int tmpLength = data.length;
-        for (int i = 0; i < tmpLength; i++) {
-            data[i] = function.invoke(data[i]);
+    public static int max(final int... values) {
+        int retVal = Integer.MIN_VALUE;
+        for (int i = values.length; i-- != 0;) {
+            retVal = values[i] > retVal ? values[i] : retVal;
         }
+        return retVal;
     }
 
-    @Override
-    public void set(final long index, final double value) {
-        data[(int) index] = value;
+    public static int min(final int... values) {
+        int retVal = Integer.MAX_VALUE;
+        for (int i = values.length; i-- != 0;) {
+            retVal = values[i] < retVal ? values[i] : retVal;
+        }
+        return retVal;
     }
 
 }

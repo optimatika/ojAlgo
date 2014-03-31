@@ -936,6 +936,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
     }
 
+    public MatrixStore<Double> add(final MatrixStore<Double> addend) {
+        return new SuperimposedStore<>(this, addend);
+    }
+
     public Double aggregateAll(final Aggregator aggregator) {
 
         final int tmpRowDim = myRowDim;
@@ -1051,7 +1055,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         for (int ij = 0; ij < tmpMinDim; ij++) {
 
             // Find next pivot row
-            final int tmpPivotRow = (int) (this.isZero(ij, ij) ? myUtility.getIndexOfLargestInColumn(ij, ij) : ij);
+            final int tmpPivotRow = (int) (this.isZero(ij, ij) ? myUtility.indexOfLargestInColumn(ij, ij) : ij);
             // Pivot?
             if (tmpPivotRow != ij) {
                 myUtility.exchangeRows(tmpPivotRow, ij);
@@ -1119,7 +1123,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return Array1D.COMPLEX.wrap(retVal);
     }
 
-    public PrimitiveDenseStore conjugate() {
+    public MatrixStore<Double> conjugate() {
         return this.transpose();
     }
 
@@ -1348,7 +1352,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     public int getIndexOfLargestInColumn(final int aRow, final int aCol) {
-        return (int) myUtility.getIndexOfLargestInColumn(aRow, aCol);
+        return (int) myUtility.indexOfLargestInColumn(aRow, aCol);
     }
 
     public int getMaxDim() {
@@ -1488,6 +1492,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return retVal;
     }
 
+    public MatrixStore<Double> negate() {
+        return new ModificationStore<>(this, FACTORY.function().negate());
+    }
+
     public void negateColumn(final int aCol) {
         myUtility.modifyColumn(0, aCol, PrimitiveFunction.NEGATE);
     }
@@ -1498,6 +1506,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
         RotateRight.invoke(data, myRowDim, aLow, aHigh, aCos, aSin);
+    }
+
+    public MatrixStore<Double> scale(final Double scalar) {
+        return new ModificationStore<>(this, FACTORY.function().multiply().first(scalar));
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
@@ -1678,13 +1690,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         HouseholderHermitian.invoke(data, PrimitiveDenseStore.cast(aTransf), new double[(int) aTransf.count()]);
     }
 
-    public PrimitiveDenseStore transpose() {
-
-        final PrimitiveDenseStore retVal = new PrimitiveDenseStore(myColDim, myRowDim);
-
-        retVal.fillTransposed(this);
-
-        return retVal;
+    public MatrixStore<Double> transpose() {
+        return new TransposedStore<>(this);
     }
 
     public void tred2(final BasicArray<Double> mainDiagonal, final BasicArray<Double> offDiagonal, final boolean yesvecs) {

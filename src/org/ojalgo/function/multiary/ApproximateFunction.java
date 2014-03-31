@@ -24,11 +24,11 @@ package org.ojalgo.function.multiary;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-abstract class ApproximateFunction<N extends Number> implements MultiaryFunction<N> {
+abstract class ApproximateFunction<N extends Number> implements MultiaryFunction<N>, MultiaryFunction.TwiceDifferentiable<N> {
 
     private final Access1D<N> myPoint;
 
-    protected ApproximateFunction(final MultiaryFunction<N> function, final Access1D<N> point) {
+    protected ApproximateFunction(final MultiaryFunction.TwiceDifferentiable<N> function, final Access1D<N> point) {
 
         super();
 
@@ -63,6 +63,14 @@ abstract class ApproximateFunction<N extends Number> implements MultiaryFunction
         int result = 1;
         result = (prime * result) + ((myPoint == null) ? 0 : myPoint.hashCode());
         return result;
+    }
+
+    public final FirstOrderApproximation<N> toFirstOrderApproximation(final Access1D<N> arg) {
+        return new FirstOrderApproximation<N>(this, arg);
+    }
+
+    public final SecondOrderApproximation<N> toSecondOrderApproximation(final Access1D<N> arg) {
+        return new SecondOrderApproximation<N>(this, arg);
     }
 
     protected abstract PhysicalStore.Factory<N, ?> factory();

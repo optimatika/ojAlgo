@@ -29,162 +29,106 @@ import java.util.Iterator;
 import org.ojalgo.access.AccessAnyD;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Iterator1D;
+import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * ArrayAnyD
- * 
+ *
  * @author apete
  */
 public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>,
-        AccessAnyD.Visitable<N>, Serializable {
+AccessAnyD.Visitable<N>, Serializable {
 
-    public static final Factory<ArrayAnyD<BigDecimal>> BIG = new Factory<ArrayAnyD<BigDecimal>>() {
+    public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
 
-        public ArrayAnyD<BigDecimal> copy(final AccessAnyD<?> aSource) {
+        public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
 
-            final int tmpSize = (int) aSource.count();
+            final long[] tmpStructure = source.structure();
 
-            final BigDecimal[] tmpData = new BigDecimal[tmpSize];
-            final long[] tmpStructure = AccessUtils.structure(aSource);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpStructure);
 
-            for (int i = 0; i < tmpSize; i++) {
-                tmpData[i] = TypeUtils.toBigDecimal(aSource.get(i));
+            final long tmpCount = source.count();
+            for (long index = 0L; index < tmpCount; index++) {
+                tmpDelegate.set(index, source.get(index));
             }
 
-            return new BigArray(tmpData).asArrayAnyD(tmpStructure);
+            return tmpDelegate.asArrayAnyD(tmpStructure);
         }
 
-        public ArrayAnyD<BigDecimal> makeRandom(final long[] structure, final RandomNumber distribution) {
+        public final ArrayAnyD<N> makeRandom(final long[] structure, final RandomNumber distribution) {
 
-            final int tmpSize = (int) AccessUtils.count(structure);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(structure);
 
-            final BigDecimal[] tmpData = new BigDecimal[tmpSize];
-
-            for (int i = 0; i < tmpSize; i++) {
-                tmpData[i] = TypeUtils.toBigDecimal(distribution.doubleValue());
+            final long tmpCount = AccessUtils.count(structure);
+            for (long index = 0L; index < tmpCount; index++) {
+                tmpDelegate.set(index, distribution);
             }
 
-            return new BigArray(tmpData).asArrayAnyD(structure);
+            return tmpDelegate.asArrayAnyD(structure);
         }
 
-        public ArrayAnyD<BigDecimal> makeZero(final long... aStructure) {
-            final int tmpSize = (int) AccessUtils.count(aStructure);
-            return new BigArray(tmpSize).asArrayAnyD(aStructure);
+        public final ArrayAnyD<N> makeZero(final long... structure) {
+            return this.delegate().makeZero(structure).asArrayAnyD(structure);
+        }
+
+        abstract BasicArray.BasicFactory<N> delegate();
+
+    }
+
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+
+        @Override
+        BasicFactory<BigDecimal> delegate() {
+            return BasicArray.BIG;
         }
 
     };
 
-    public static final Factory<ArrayAnyD<ComplexNumber>> COMPLEX = new Factory<ArrayAnyD<ComplexNumber>>() {
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
-        public ArrayAnyD<ComplexNumber> copy(final AccessAnyD<?> aSource) {
-
-            final int tmpSize = (int) aSource.count();
-
-            final ComplexNumber[] tmpData = new ComplexNumber[tmpSize];
-            final long[] tmpStructure = AccessUtils.structure(aSource);
-
-            for (int i = 0; i < tmpSize; i++) {
-                tmpData[i] = TypeUtils.toComplexNumber(aSource.get(i));
-            }
-
-            return new ComplexArray(tmpData).asArrayAnyD(tmpStructure);
-        }
-
-        public ArrayAnyD<ComplexNumber> makeRandom(final long[] structure, final RandomNumber distribution) {
-
-            final int tmpSize = (int) AccessUtils.count(structure);
-
-            final ComplexNumber[] tmpData = new ComplexNumber[tmpSize];
-
-            for (int i = 0; i < tmpSize; i++) {
-                tmpData[i] = TypeUtils.toComplexNumber(distribution.doubleValue());
-            }
-
-            return new ComplexArray(tmpData).asArrayAnyD(structure);
-        }
-
-        public ArrayAnyD<ComplexNumber> makeZero(final long... aStructure) {
-            final int tmpSize = (int) AccessUtils.count(aStructure);
-            return new ComplexArray(tmpSize).asArrayAnyD(aStructure);
+        @Override
+        BasicFactory<ComplexNumber> delegate() {
+            return BasicArray.COMPLEX;
         }
 
     };
 
-    public static final Factory<ArrayAnyD<Double>> PRIMITIVE = new Factory<ArrayAnyD<Double>>() {
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
-        public ArrayAnyD<Double> copy(final AccessAnyD<?> aSource) {
+        @Override
+        public ArrayAnyD<Double> copy(final AccessAnyD<?> source) {
 
-            final int tmpSize = (int) aSource.count();
+            final long[] tmpStructure = source.structure();
 
-            final double[] tmpData = new double[tmpSize];
-            final long[] tmpStructure = AccessUtils.structure(aSource);
+            final BasicArray<Double> tmpDelegate = this.delegate().makeToBeFilled(tmpStructure);
 
-            for (int i = 0; i < tmpSize; i++) {
-                tmpData[i] = aSource.doubleValue(i);
+            final long tmpCount = source.count();
+            for (long index = 0L; index < tmpCount; index++) {
+                tmpDelegate.set(index, source.doubleValue(index));
             }
 
-            return new PrimitiveArray(tmpData).asArrayAnyD(tmpStructure);
+            return tmpDelegate.asArrayAnyD(tmpStructure);
         }
 
-        public ArrayAnyD<Double> makeRandom(final long[] structure, final RandomNumber aRndm) {
-
-            final int tmpSize = (int) AccessUtils.count(structure);
-
-            final double[] tmpData = new double[tmpSize];
-
-            for (int i = 0; i < tmpSize; i++) {
-                tmpData[i] = aRndm.doubleValue();
-            }
-
-            return new PrimitiveArray(tmpData).asArrayAnyD(structure);
-        }
-
-        public ArrayAnyD<Double> makeZero(final long... aStructure) {
-            final int tmpSize = (int) AccessUtils.count(aStructure);
-            return new PrimitiveArray(tmpSize).asArrayAnyD(aStructure);
+        @Override
+        BasicFactory<Double> delegate() {
+            return BasicArray.PRIMITIVE;
         }
 
     };
 
-    public static final Factory<ArrayAnyD<RationalNumber>> RATIONAL = new Factory<ArrayAnyD<RationalNumber>>() {
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
-        public ArrayAnyD<RationalNumber> copy(final AccessAnyD<?> aSource) {
-
-            final int tmpSize = (int) aSource.count();
-
-            final BasicArray<RationalNumber> tmpBase = new RationalArray(tmpSize);
-
-            tmpBase.fill(aSource);
-
-            final long[] tmpStructure = AccessUtils.structure(aSource);
-
-            return tmpBase.asArrayAnyD(tmpStructure);
-        }
-
-        public ArrayAnyD<RationalNumber> makeRandom(final long[] structure, final RandomNumber distribution) {
-
-            final ArrayAnyD<RationalNumber> retVal = this.makeZero(structure);
-
-            final long tmpSize = AccessUtils.count(structure);
-            for (long i = 0; i < tmpSize; i++) {
-                retVal.set(i, distribution.doubleValue());
-            }
-
-            return retVal;
-        }
-
-        public ArrayAnyD<RationalNumber> makeZero(final long... aStructure) {
-            final int tmpSize = (int) AccessUtils.count(aStructure);
-            return new RationalArray(tmpSize).asArrayAnyD(aStructure);
+        @Override
+        BasicFactory<RationalNumber> delegate() {
+            return BasicArray.RATIONAL;
         }
 
     };

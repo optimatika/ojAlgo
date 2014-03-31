@@ -30,7 +30,7 @@ import java.util.Iterator;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Iterator1D;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.array.Array1D;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.type.CalendarDateUnit;
@@ -352,7 +352,7 @@ public interface Optimisation {
 
         @Override
         public String toString() {
-            return myState + " " + myValue + " @ " + PrimitiveDenseStore.FACTORY.columns(mySolution);
+            return myState + " " + myValue + " @ " + Array1D.PRIMITIVE.copy(mySolution);
         }
     }
 

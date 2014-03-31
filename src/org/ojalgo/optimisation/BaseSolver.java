@@ -87,11 +87,11 @@ public abstract class BaseSolver extends GenericSolver {
             }
         }
 
-        protected AbstractBuilder(final ExpressionsBasedModel aModel) {
+        protected AbstractBuilder(final ExpressionsBasedModel model) {
 
             super();
 
-            myModel = aModel;
+            myModel = model;
         }
 
         protected AbstractBuilder(final MatrixStore<Double> C) {
@@ -130,26 +130,26 @@ public abstract class BaseSolver extends GenericSolver {
             myBI = null;
         }
 
-        protected AbstractBuilder(final MatrixStore<Double>[] aMtrxArr) {
+        protected AbstractBuilder(final MatrixStore<Double>[] matrices) {
 
             super();
 
             myModel = null;
 
-            if ((aMtrxArr.length >= 2) && (aMtrxArr[0] != null) && (aMtrxArr[1] != null)) {
-                this.equalities(aMtrxArr[0], aMtrxArr[1]);
+            if ((matrices.length >= 2) && (matrices[0] != null) && (matrices[1] != null)) {
+                this.equalities(matrices[0], matrices[1]);
             }
 
-            if (aMtrxArr.length >= 4) {
-                if (aMtrxArr[2] != null) {
-                    this.objective(aMtrxArr[2], aMtrxArr[3]);
-                } else if (aMtrxArr[3] != null) {
-                    this.objective(aMtrxArr[3]);
+            if (matrices.length >= 4) {
+                if (matrices[2] != null) {
+                    this.objective(matrices[2], matrices[3]);
+                } else if (matrices[3] != null) {
+                    this.objective(matrices[3]);
                 }
             }
 
-            if ((aMtrxArr.length >= 6) && (aMtrxArr[4] != null) && (aMtrxArr[5] != null)) {
-                this.inequalities(aMtrxArr[4], aMtrxArr[5]);
+            if ((matrices.length >= 6) && (matrices[4] != null) && (matrices[5] != null)) {
+                this.inequalities(matrices[4], matrices[5]);
             }
         }
 
@@ -416,7 +416,7 @@ public abstract class BaseSolver extends GenericSolver {
             }
         }
 
-        public final void setKickStarter(final Optimisation.Result kickStarter) {
+        public void setKickStarter(final Optimisation.Result kickStarter) {
             myKickStarter = kickStarter;
         }
 
@@ -743,13 +743,6 @@ public abstract class BaseSolver extends GenericSolver {
         super(aModel, solverOptions);
 
         myMatrices = matrices;
-
-        //options.debug = System.out;
-    }
-
-    public BaseSolver relax(final boolean b) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

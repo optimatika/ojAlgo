@@ -399,6 +399,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         multiplyRight = MultiplyRight.getBig(myRowDim, myColDim);
     }
 
+    public MatrixStore<BigDecimal> add(final MatrixStore<BigDecimal> addend) {
+        return new SuperimposedStore<>(this, addend);
+    }
+
     public BigDecimal aggregateAll(final Aggregator aggregator) {
 
         final int tmpRowDim = myRowDim;
@@ -499,7 +503,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         throw new UnsupportedOperationException();
     }
 
-    public BigDenseStore conjugate() {
+    public MatrixStore<BigDecimal> conjugate() {
         return this.transpose();
     }
 
@@ -729,7 +733,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     }
 
     public int getIndexOfLargestInColumn(final int aRow, final int aCol) {
-        return (int) myUtility.getIndexOfLargestInColumn(aRow, aCol);
+        return (int) myUtility.indexOfLargestInColumn(aRow, aCol);
     }
 
     public int getMaxDim() {
@@ -869,6 +873,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return retVal;
     }
 
+    public MatrixStore<BigDecimal> negate() {
+        return new ModificationStore<>(this, FACTORY.function().negate());
+    }
+
     public void negateColumn(final int aCol) {
         myUtility.modifyColumn(0, aCol, BigFunction.NEGATE);
     }
@@ -879,6 +887,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
         RotateRight.invoke(data, myRowDim, aLow, aHigh, FACTORY.scalar().cast(aCos), FACTORY.scalar().cast(aSin));
+    }
+
+    public MatrixStore<BigDecimal> scale(final BigDecimal scalar) {
+        return new ModificationStore<>(this, FACTORY.function().multiply().first(scalar));
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
@@ -1059,13 +1071,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         HouseholderHermitian.invoke(data, BigDenseStore.cast(aTransf), new BigDecimal[(int) aTransf.count()]);
     }
 
-    public BigDenseStore transpose() {
-
-        final BigDenseStore retVal = new BigDenseStore(myColDim, myRowDim);
-
-        retVal.fillTransposed(this);
-
-        return retVal;
+    public MatrixStore<BigDecimal> transpose() {
+        return new TransposedStore<>(this);
     }
 
     public void tred2(final BasicArray<BigDecimal> mainDiagonal, final BasicArray<BigDecimal> offDiagonal, final boolean yesvecs) {

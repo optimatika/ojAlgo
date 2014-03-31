@@ -26,6 +26,8 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.array.SegmentedArray.SegmentedFactory;
+import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
@@ -34,6 +36,7 @@ import org.ojalgo.function.ParameterFunction.FixedParameter;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
@@ -47,10 +50,47 @@ import org.ojalgo.type.TypeUtils;
  * that subclass, or use one of the static factory methods in {@linkplain Array1D}, {@linkplain Array2D} or
  * {@linkplain ArrayAnyD}.
  * </p>
- * 
+ *
  * @author apete
  */
 public class PrimitiveArray extends DenseArray<Double> {
+
+    static abstract class PrimitiveFactory extends DenseFactory<Double> {
+
+        abstract PrimitiveArray wrap(double[] data);
+
+    }
+
+    static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
+
+    static final PrimitiveFactory FACTORY = new PrimitiveFactory() {
+
+        @Override
+        long getElementSize() {
+            return ELEMENT_SIZE;
+        }
+
+        @Override
+        SegmentedFactory<Double> getSegmentedFactory() {
+            return SegmentedArray.PRIMITIVE;
+        }
+
+        @Override
+        SparseFactory<Double> getSparseFactory() {
+            return SparseArray.PRIMITIVE;
+        }
+
+        @Override
+        DenseArray<Double> make(final int size) {
+            return PrimitiveArray.make(size);
+        }
+
+        @Override
+        PrimitiveArray wrap(final double[] data) {
+            return PrimitiveArray.wrap(data);
+        }
+
+    };
 
     public static final PrimitiveArray make(final int size) {
         return new PrimitiveArray(size);
@@ -354,7 +394,6 @@ public class PrimitiveArray extends DenseArray<Double> {
         PrimitiveArray.exchange(data, firstA, firstB, step, count);
     }
 
-    @Override
     protected void fill(final Access1D<?> values) {
         PrimitiveArray.fill(data, values);
     }
@@ -385,7 +424,7 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
-    protected final int getIndexOfLargest(final int first, final int limit, final int step) {
+    protected final int indexOfLargest(final int first, final int limit, final int step) {
 
         int retVal = first;
         double tmpLargest = ZERO;
