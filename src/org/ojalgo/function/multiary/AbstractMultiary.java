@@ -25,7 +25,8 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.Scalar;
 
-abstract class AbstractMultiary<N extends Number, F extends AbstractMultiary<N, ?>> implements MultiaryFunction<N>, MultiaryFunction.Constant<N, F> {
+abstract class AbstractMultiary<N extends Number, F extends AbstractMultiary<N, ?>> implements MultiaryFunction<N>, MultiaryFunction.Constant<N, F>,
+        MultiaryFunction.TwiceDifferentiable<N> {
 
     private Scalar<N> myConstant = null;
 
@@ -43,11 +44,11 @@ abstract class AbstractMultiary<N extends Number, F extends AbstractMultiary<N, 
         return this.getScalarConstant().getNumber();
     }
 
-    public final FirstOrderApproximation<N> getFirstOrderApproximation(final Access1D<N> arg) {
+    public final FirstOrderApproximation<N> toFirstOrderApproximation(final Access1D<N> arg) {
         return new FirstOrderApproximation<N>(this, arg);
     }
 
-    public final SecondOrderApproximation<N> getSecondOrderApproximation(final Access1D<N> arg) {
+    public final SecondOrderApproximation<N> toSecondOrderApproximation(final Access1D<N> arg) {
         return new SecondOrderApproximation<N>(this, arg);
     }
 

@@ -26,20 +26,60 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.array.SegmentedArray.SegmentedFactory;
+import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.TypeUtils;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.ComplexNumber}.
- * 
+ *
  * @see PrimitiveArray
  * @author apete
  */
 public class ComplexArray extends DenseArray<ComplexNumber> {
+
+    static abstract class ComplexFactory extends DenseFactory<ComplexNumber> {
+
+        abstract ComplexArray wrap(ComplexNumber[] data);
+
+    }
+
+    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(ComplexNumber.class);
+
+    static final ComplexFactory FACTORY = new ComplexFactory() {
+
+        @Override
+        long getElementSize() {
+            return ELEMENT_SIZE;
+        }
+
+        @Override
+        SegmentedFactory<ComplexNumber> getSegmentedFactory() {
+            return SegmentedArray.COMPLEX;
+        }
+
+        @Override
+        SparseFactory<ComplexNumber> getSparseFactory() {
+            return SparseArray.COMPLEX;
+        }
+
+        @Override
+        DenseArray<ComplexNumber> make(final int size) {
+            return ComplexArray.make(size);
+        }
+
+        @Override
+        ComplexArray wrap(final ComplexNumber[] data) {
+            return ComplexArray.wrap(data);
+        }
+
+    };
 
     public static final ComplexArray make(final int size) {
         return new ComplexArray(size);
@@ -49,75 +89,75 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
         return new ComplexArray(data);
     }
 
-    protected static void exchange(final ComplexNumber[] aData, final int aFirstA, final int aFirstB, final int aStep, final int aCount) {
+    protected static void exchange(final ComplexNumber[] data, final int firstA, final int firstB, final int step, final int aCount) {
 
-        int tmpIndexA = aFirstA;
-        int tmpIndexB = aFirstB;
+        int tmpIndexA = firstA;
+        int tmpIndexB = firstB;
 
         ComplexNumber tmpVal;
 
         for (int i = 0; i < aCount; i++) {
 
-            tmpVal = aData[tmpIndexA];
-            aData[tmpIndexA] = aData[tmpIndexB];
-            aData[tmpIndexB] = tmpVal;
+            tmpVal = data[tmpIndexA];
+            data[tmpIndexA] = data[tmpIndexB];
+            data[tmpIndexB] = tmpVal;
 
-            tmpIndexA += aStep;
-            tmpIndexB += aStep;
+            tmpIndexA += step;
+            tmpIndexB += step;
         }
     }
 
-    protected static void fill(final ComplexNumber[] aData, final Access1D<?> anArg) {
-        final int tmpLimit = (int) Math.min(aData.length, anArg.count());
+    protected static void fill(final ComplexNumber[] data, final Access1D<?> value) {
+        final int tmpLimit = (int) Math.min(data.length, value.count());
         for (int i = 0; i < tmpLimit; i++) {
-            aData[i] = TypeUtils.toComplexNumber(anArg.get(i));
+            data[i] = TypeUtils.toComplexNumber(value.get(i));
         }
     }
 
-    protected static void fill(final ComplexNumber[] aData, final int aFirst, final int aLimit, final int aStep, final ComplexNumber aNmbr) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aNmbr;
+    protected static void fill(final ComplexNumber[] data, final int first, final int limit, final int step, final ComplexNumber value) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = value;
         }
     }
 
-    protected static void invoke(final ComplexNumber[] aData, final int aFirst, final int aLimit, final int aStep, final Access1D<ComplexNumber> aLeftArg,
-            final BinaryFunction<ComplexNumber> aFunc, final Access1D<ComplexNumber> aRightArg) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aFunc.invoke(aLeftArg.get(i), aRightArg.get(i));
+    protected static void invoke(final ComplexNumber[] data, final int first, final int limit, final int step, final Access1D<ComplexNumber> left,
+            final BinaryFunction<ComplexNumber> function, final Access1D<ComplexNumber> right) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = function.invoke(left.get(i), right.get(i));
         }
     }
 
-    protected static void invoke(final ComplexNumber[] aData, final int aFirst, final int aLimit, final int aStep, final Access1D<ComplexNumber> aLeftArg,
-            final BinaryFunction<ComplexNumber> aFunc, final ComplexNumber aRightArg) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aFunc.invoke(aLeftArg.get(i), aRightArg);
+    protected static void invoke(final ComplexNumber[] data, final int first, final int limit, final int step, final Access1D<ComplexNumber> left,
+            final BinaryFunction<ComplexNumber> function, final ComplexNumber right) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = function.invoke(left.get(i), right);
         }
     }
 
-    protected static void invoke(final ComplexNumber[] aData, final int aFirst, final int aLimit, final int aStep, final Access1D<ComplexNumber> anArg,
-            final ParameterFunction<ComplexNumber> aFunc, final int aParam) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aFunc.invoke(anArg.get(i), aParam);
+    protected static void invoke(final ComplexNumber[] data, final int first, final int limit, final int step, final Access1D<ComplexNumber> value,
+            final ParameterFunction<ComplexNumber> function, final int aParam) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = function.invoke(value.get(i), aParam);
         }
     }
 
-    protected static void invoke(final ComplexNumber[] aData, final int aFirst, final int aLimit, final int aStep, final Access1D<ComplexNumber> anArg,
-            final UnaryFunction<ComplexNumber> aFunc) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aFunc.invoke(anArg.get(i));
+    protected static void invoke(final ComplexNumber[] data, final int first, final int limit, final int step, final Access1D<ComplexNumber> value,
+            final UnaryFunction<ComplexNumber> function) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = function.invoke(value.get(i));
         }
     }
 
-    protected static void invoke(final ComplexNumber[] aData, final int aFirst, final int aLimit, final int aStep, final ComplexNumber aLeftArg,
-            final BinaryFunction<ComplexNumber> aFunc, final Access1D<ComplexNumber> aRightArg) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aFunc.invoke(aLeftArg, aRightArg.get(i));
+    protected static void invoke(final ComplexNumber[] data, final int first, final int limit, final int step, final ComplexNumber left,
+            final BinaryFunction<ComplexNumber> function, final Access1D<ComplexNumber> right) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = function.invoke(left, right.get(i));
         }
     }
 
-    protected static void invoke(final ComplexNumber[] aData, final int aFirst, final int aLimit, final int aStep, final VoidFunction<ComplexNumber> aVisitor) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aVisitor.invoke(aData[i]);
+    protected static void invoke(final ComplexNumber[] data, final int first, final int limit, final int step, final VoidFunction<ComplexNumber> aVisitor) {
+        for (int i = first; i < limit; i += step) {
+            aVisitor.invoke(data[i]);
         }
     }
 
@@ -166,27 +206,26 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
         ComplexArray.exchange(data, firstA, firstB, step, count);
     }
 
-    @Override
-    protected void fill(final Access1D<?> anArg) {
-        ComplexArray.fill(data, anArg);
+    protected void fill(final Access1D<?> value) {
+        ComplexArray.fill(data, value);
     }
 
     @Override
-    protected final void fill(final int aFirst, final int aLimit, final Access1D<ComplexNumber> aLeftArg, final BinaryFunction<ComplexNumber> aFunc,
-            final Access1D<ComplexNumber> aRightArg) {
-        ComplexArray.invoke(data, aFirst, aLimit, 1, aLeftArg, aFunc, aRightArg);
+    protected final void fill(final int first, final int limit, final Access1D<ComplexNumber> left, final BinaryFunction<ComplexNumber> function,
+            final Access1D<ComplexNumber> right) {
+        ComplexArray.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
-    protected final void fill(final int aFirst, final int aLimit, final Access1D<ComplexNumber> aLeftArg, final BinaryFunction<ComplexNumber> aFunc,
-            final ComplexNumber aRightArg) {
-        ComplexArray.invoke(data, aFirst, aLimit, 1, aLeftArg, aFunc, aRightArg);
+    protected final void fill(final int first, final int limit, final Access1D<ComplexNumber> left, final BinaryFunction<ComplexNumber> function,
+            final ComplexNumber right) {
+        ComplexArray.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
-    protected final void fill(final int aFirst, final int aLimit, final ComplexNumber aLeftArg, final BinaryFunction<ComplexNumber> aFunc,
-            final Access1D<ComplexNumber> aRightArg) {
-        ComplexArray.invoke(data, aFirst, aLimit, 1, aLeftArg, aFunc, aRightArg);
+    protected final void fill(final int first, final int limit, final ComplexNumber left, final BinaryFunction<ComplexNumber> function,
+            final Access1D<ComplexNumber> right) {
+        ComplexArray.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
@@ -200,7 +239,7 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
     }
 
     @Override
-    protected final int getIndexOfLargest(final int first, final int limit, final int step) {
+    protected final int indexOfLargest(final int first, final int limit, final int step) {
 
         int retVal = first;
         double tmpLargest = ZERO;
@@ -270,48 +309,48 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
     }
 
     @Override
-    protected final void modify(final int aFirst, final int aLimit, final int aStep, final Access1D<ComplexNumber> aLeftArg,
-            final BinaryFunction<ComplexNumber> aFunc) {
-        ComplexArray.invoke(data, aFirst, aLimit, aStep, aLeftArg, aFunc, this);
+    protected final void modify(final int first, final int limit, final int step, final Access1D<ComplexNumber> left,
+            final BinaryFunction<ComplexNumber> function) {
+        ComplexArray.invoke(data, first, limit, step, left, function, this);
     }
 
     @Override
-    protected final void modify(final int aFirst, final int aLimit, final int aStep, final BinaryFunction<ComplexNumber> aFunc,
-            final Access1D<ComplexNumber> aRightArg) {
-        ComplexArray.invoke(data, aFirst, aLimit, aStep, this, aFunc, aRightArg);
+    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<ComplexNumber> function,
+            final Access1D<ComplexNumber> right) {
+        ComplexArray.invoke(data, first, limit, step, this, function, right);
     }
 
     @Override
-    protected final void modify(final int aFirst, final int aLimit, final int aStep, final BinaryFunction<ComplexNumber> aFunc, final ComplexNumber aRightArg) {
-        ComplexArray.invoke(data, aFirst, aLimit, aStep, this, aFunc, aRightArg);
+    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<ComplexNumber> function, final ComplexNumber right) {
+        ComplexArray.invoke(data, first, limit, step, this, function, right);
     }
 
     @Override
-    protected final void modify(final int aFirst, final int aLimit, final int aStep, final ComplexNumber aLeftArg, final BinaryFunction<ComplexNumber> aFunc) {
-        ComplexArray.invoke(data, aFirst, aLimit, aStep, aLeftArg, aFunc, this);
+    protected final void modify(final int first, final int limit, final int step, final ComplexNumber left, final BinaryFunction<ComplexNumber> function) {
+        ComplexArray.invoke(data, first, limit, step, left, function, this);
     }
 
     @Override
-    protected final void modify(final int first, final int limit, final int step, final ParameterFunction<ComplexNumber> func, final int param) {
-        ComplexArray.invoke(data, first, limit, step, this, func, param);
+    protected final void modify(final int first, final int limit, final int step, final ParameterFunction<ComplexNumber> function, final int parameter) {
+        ComplexArray.invoke(data, first, limit, step, this, function, parameter);
     }
 
     @Override
-    protected final void modify(final int first, final int limit, final int step, final UnaryFunction<ComplexNumber> func) {
-        ComplexArray.invoke(data, first, limit, step, this, func);
+    protected final void modify(final int first, final int limit, final int step, final UnaryFunction<ComplexNumber> function) {
+        ComplexArray.invoke(data, first, limit, step, this, function);
     }
 
     @Override
-    protected void modify(final int index, final UnaryFunction<ComplexNumber> func) {
-        data[index] = func.invoke(data[index]);
+    protected void modify(final int index, final UnaryFunction<ComplexNumber> function) {
+        data[index] = function.invoke(data[index]);
     }
 
     /**
      * @see org.ojalgo.array.BasicArray#searchAscending(java.lang.Number)
      */
     @Override
-    protected final int searchAscending(final ComplexNumber aNmbr) {
-        return Arrays.binarySearch(data, aNmbr);
+    protected final int searchAscending(final ComplexNumber value) {
+        return Arrays.binarySearch(data, value);
     }
 
     @Override

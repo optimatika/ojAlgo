@@ -35,7 +35,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
 
     public final Optimisation.Options options;
 
-    private final MultiaryFunction<Double> myFunction;
+    private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);
     private final ExpressionsBasedModel myModel;
     private long myResetTime;

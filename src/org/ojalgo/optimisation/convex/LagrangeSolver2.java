@@ -1,25 +1,25 @@
-/*
+/* 
  * Copyright 1997-2014 Optimatika (www.optimatika.se)
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * SOFTWARE. 
  */
-package org.ojalgo.optimisation.quadratic;
+package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
@@ -40,12 +40,12 @@ import org.ojalgo.optimisation.Optimisation;
 /**
  * @author apete
  */
-final class LagrangeSolver extends QuadraticSolver {
+public final class LagrangeSolver2 extends ConvexSolver {
 
     private final LU<Double> myLU = LUDecomposition.makePrimitive();
     private final SingularValue<Double> mySingularValue = SingularValueDecomposition.makePrimitive();
 
-    LagrangeSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final QuadraticSolver.Builder matrices) {
+    LagrangeSolver2(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
         super(aModel, solverOptions, matrices);
     }
 
@@ -94,15 +94,14 @@ final class LagrangeSolver extends QuadraticSolver {
             final int tmpZeroSize = (int) tmpAE.countRows();
 
             final MatrixStore<Double> tmpUpperLeftAE = tmpQ;
-            final MatrixStore<Double> tmpUpperRightAE = tmpAE.transpose();
-            final MatrixStore<Double> tmpLowerLeftAE = tmpAE;
+            final MatrixStore<Double> tmpUpperRightAE = tmpAE.builder().transpose().build();
+            final MatrixStore<Double> tmpLowerLefAE = tmpAE;
             final MatrixStore<Double> tmpLowerRightAE = ZeroStore.makePrimitive(tmpZeroSize, tmpZeroSize);
 
             // tmpUpperLeftAE = tmpUpperLeftAE.builder().superimpose(0, 0, tmpUpperRightAE.multiplyRight(tmpLowerLefAE)).build();
 
-            final LeftRightStore<Double> tmpAbowe = new LeftRightStore<Double>(tmpUpperLeftAE, tmpUpperRightAE);
-            final LeftRightStore<Double> tmpBelow = new LeftRightStore<Double>(tmpLowerLeftAE, tmpLowerRightAE);
-            final MatrixStore<Double> tmpSubAE = new AboveBelowStore<Double>(tmpAbowe, tmpBelow);
+            final MatrixStore<Double> tmpSubAE = new AboveBelowStore<Double>(new LeftRightStore<Double>(tmpUpperLeftAE, tmpUpperRightAE),
+                    new LeftRightStore<Double>(tmpLowerLefAE, tmpLowerRightAE));
 
             final MatrixStore<Double> tmpUpperBE = tmpC;
             final MatrixStore<Double> tmpLowerBE = tmpBE;

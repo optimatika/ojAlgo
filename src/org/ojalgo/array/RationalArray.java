@@ -24,20 +24,59 @@ package org.ojalgo.array;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.array.SegmentedArray.SegmentedFactory;
+import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.TypeUtils;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.RationalNumber}.
- * 
+ *
  * @see PrimitiveArray
  * @author apete
  */
 public class RationalArray extends DenseArray<RationalNumber> {
+
+    static abstract class RationalFactory extends DenseFactory<RationalNumber> {
+
+        abstract RationalArray wrap(RationalNumber[] data);
+
+    }
+
+    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(RationalNumber.class);
+
+    static final RationalFactory FACTORY = new RationalFactory() {
+
+        @Override
+        long getElementSize() {
+            return ELEMENT_SIZE;
+        }
+
+        @Override
+        SegmentedFactory<RationalNumber> getSegmentedFactory() {
+            return SegmentedArray.RATIONAL;
+        }
+
+        @Override
+        SparseFactory<RationalNumber> getSparseFactory() {
+            return SparseArray.RATIONAL;
+        }
+
+        @Override
+        DenseArray<RationalNumber> make(final int size) {
+            return RationalArray.make(size);
+        }
+
+        @Override
+        RationalArray wrap(final RationalNumber[] data) {
+            return RationalArray.wrap(data);
+        }
+    };
 
     public static final RationalArray make(final int size) {
         return new RationalArray(size);
@@ -164,7 +203,6 @@ public class RationalArray extends DenseArray<RationalNumber> {
         RationalArray.exchange(data, firstA, firstB, step, count);
     }
 
-    @Override
     protected void fill(final Access1D<?> anArg) {
         RationalArray.fill(data, anArg);
     }
@@ -198,7 +236,7 @@ public class RationalArray extends DenseArray<RationalNumber> {
     }
 
     @Override
-    protected final int getIndexOfLargest(final int first, final int limit, final int step) {
+    protected final int indexOfLargest(final int first, final int limit, final int step) {
 
         int retVal = first;
         RationalNumber tmpLargest = RationalNumber.ZERO;

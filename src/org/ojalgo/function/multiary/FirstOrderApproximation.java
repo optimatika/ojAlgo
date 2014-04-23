@@ -29,7 +29,7 @@ public final class FirstOrderApproximation<N extends Number> extends Approximate
 
     private final LinearFunction<N> myDelegate;
 
-    public FirstOrderApproximation(final MultiaryFunction<N> function, final Access1D<N> point) {
+    public FirstOrderApproximation(final MultiaryFunction.TwiceDifferentiable<N> function, final Access1D<N> point) {
 
         super(function, point);
 

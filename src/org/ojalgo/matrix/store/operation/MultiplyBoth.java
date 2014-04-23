@@ -28,6 +28,7 @@ import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
 import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyBoth;
@@ -475,8 +476,8 @@ public final class MultiplyBoth extends MatrixOperation {
 
             for (int j = 0; j < tmpColDim; j++) {
                 if (tmpPrune) {
-                    tmpFirst = MatrixUtils.max(tmpLL ? i - 1 : 0, tmpRU ? j - 1 : 0, 0);
-                    tmpLimit = MatrixUtils.min(tmpLU ? i + 2 : complexity, tmpRL ? j + 2 : complexity, complexity);
+                    tmpFirst = FunctionUtils.max(tmpLL ? i - 1 : 0, tmpRU ? j - 1 : 0, 0);
+                    tmpLimit = FunctionUtils.min(tmpLU ? i + 2 : complexity, tmpRL ? j + 2 : complexity, complexity);
                 }
                 tmpVal = BigMath.ZERO;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
@@ -512,8 +513,8 @@ public final class MultiplyBoth extends MatrixOperation {
 
             for (int j = 0; j < tmpColDim; j++) {
                 if (tmpPrune) {
-                    tmpFirst = MatrixUtils.max(tmpLL ? i - 1 : 0, tmpRU ? j - 1 : 0, 0);
-                    tmpLimit = MatrixUtils.min(tmpLU ? i + 2 : complexity, tmpRL ? j + 2 : complexity, complexity);
+                    tmpFirst = FunctionUtils.max(tmpLL ? i - 1 : 0, tmpRU ? j - 1 : 0, 0);
+                    tmpLimit = FunctionUtils.min(tmpLU ? i + 2 : complexity, tmpRL ? j + 2 : complexity, complexity);
                 }
                 tmpVal = ComplexNumber.ZERO;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
@@ -548,8 +549,8 @@ public final class MultiplyBoth extends MatrixOperation {
 
             for (int j = 0; j < tmpColDim; j++) {
                 if (tmpPrune) {
-                    tmpFirst = MatrixUtils.max(tmpLL ? i - 1 : 0, tmpRU ? j - 1 : 0, 0);
-                    tmpLimit = MatrixUtils.min(tmpLU ? i + 2 : complexity, tmpRL ? j + 2 : complexity, complexity);
+                    tmpFirst = FunctionUtils.max(tmpLL ? i - 1 : 0, tmpRU ? j - 1 : 0, 0);
+                    tmpLimit = FunctionUtils.min(tmpLU ? i + 2 : complexity, tmpRL ? j + 2 : complexity, complexity);
                 }
                 tmpVal = PrimitiveMath.ZERO;
                 for (int c = tmpFirst; c < tmpLimit; c++) {

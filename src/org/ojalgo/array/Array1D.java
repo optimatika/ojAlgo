@@ -31,6 +31,7 @@ import java.util.RandomAccess;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Iterator1D;
+import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -38,290 +39,143 @@ import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * Array1D
- * 
+ *
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
         Access1D.Visitable<N>, RandomAccess, Serializable {
 
-    public static interface Factory<N extends Number> extends Access1D.Factory<Array1D<N>> {
+    public static abstract class Factory<N extends Number> implements Access1D.Factory<Array1D<N>> {
 
-        Array1D<N> wrap(final BasicArray<N> aSimple);
+        public Array1D<N> copy(final Access1D<?> source) {
+
+            final long tmpCount = source.count();
+
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpCount);
+
+            for (long i = 0L; i < tmpCount; i++) {
+                tmpDelegate.set(i, source.get(i));
+            }
+
+            return tmpDelegate.asArray1D();
+        }
+
+        public Array1D<N> copy(final double... source) {
+
+            final int tmpLength = source.length;
+
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpLength);
+
+            for (int i = 0; i < tmpLength; i++) {
+                tmpDelegate.set(i, source[i]);
+            }
+
+            return tmpDelegate.asArray1D();
+        }
+
+        public final Array1D<N> copy(final List<? extends Number> source) {
+
+            final int tmpSize = source.size();
+
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpSize);
+
+            for (int i = 0; i < tmpSize; i++) {
+                tmpDelegate.set(i, source.get(i));
+            }
+
+            return tmpDelegate.asArray1D();
+        }
+
+        public final Array1D<N> copy(final Number... source) {
+
+            final int tmpLength = source.length;
+
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpLength);
+
+            for (int i = 0; i < tmpLength; i++) {
+                tmpDelegate.set(i, source[i]);
+            }
+
+            return tmpDelegate.asArray1D();
+        }
+
+        public final Array1D<N> makeRandom(final long count, final RandomNumber distribution) {
+
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(count);
+
+            for (int i = 0; i < count; i++) {
+                tmpDelegate.set(i, distribution);
+            }
+
+            return tmpDelegate.asArray1D();
+        }
+
+        public final Array1D<N> makeZero(final long count) {
+            return this.delegate().makeZero(count).asArray1D();
+        }
+
+        public final Array1D<N> wrap(final BasicArray<N> array) {
+            return array.asArray1D();
+        }
+
+        abstract BasicArray.BasicFactory<N> delegate();
 
     }
 
-    public static final Array1D.Factory<BigDecimal> BIG = new Array1D.Factory<BigDecimal>() {
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
-        public Array1D<BigDecimal> copy(final Access1D<?> source) {
-
-            final int tmpSize = (int) source.count();
-
-            final BigDecimal[] tmpArray = new BigDecimal[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toBigDecimal(source.get(i));
-            }
-
-            return new BigArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<BigDecimal> copy(final double... source) {
-
-            final int tmpSize = source.length;
-
-            final BigDecimal[] tmpArray = new BigDecimal[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toBigDecimal(source[i]);
-            }
-
-            return new BigArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<BigDecimal> copy(final List<? extends Number> source) {
-
-            final int tmpSize = source.size();
-
-            final BigDecimal[] tmpArray = new BigDecimal[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toBigDecimal(source.get(i));
-            }
-
-            return new BigArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<BigDecimal> copy(final Number... source) {
-
-            final int tmpSize = source.length;
-
-            final BigDecimal[] tmpArray = new BigDecimal[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toBigDecimal(source[i]);
-            }
-
-            return new BigArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<BigDecimal> makeRandom(final long count, final RandomNumber distribution) {
-
-            final BigDecimal[] tmpArray = new BigDecimal[(int) count];
-            for (int i = 0; i < count; i++) {
-                tmpArray[i] = TypeUtils.toBigDecimal(distribution);
-            }
-
-            return new BigArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<BigDecimal> makeZero(final long count) {
-            return new BigArray((int) count).asArray1D();
-        }
-
-        public Array1D<BigDecimal> wrap(final BasicArray<BigDecimal> aSimple) {
-            return aSimple.asArray1D();
+        @Override
+        BasicFactory<BigDecimal> delegate() {
+            return BasicArray.BIG;
         }
 
     };
 
-    public static final Array1D.Factory<ComplexNumber> COMPLEX = new Array1D.Factory<ComplexNumber>() {
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
-        public Array1D<ComplexNumber> copy(final Access1D<?> source) {
-
-            final int tmpSize = (int) source.count();
-
-            final ComplexNumber[] tmpArray = new ComplexNumber[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toComplexNumber(source.get(i));
-            }
-
-            return new ComplexArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<ComplexNumber> copy(final double... source) {
-
-            final int tmpSize = source.length;
-
-            final ComplexNumber[] tmpArray = new ComplexNumber[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toComplexNumber(source[i]);
-            }
-
-            return new ComplexArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<ComplexNumber> copy(final List<? extends Number> source) {
-
-            final int tmpSize = source.size();
-
-            final ComplexNumber[] tmpArray = new ComplexNumber[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toComplexNumber(source.get(i));
-            }
-
-            return new ComplexArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<ComplexNumber> copy(final Number... source) {
-
-            final int tmpSize = source.length;
-
-            final ComplexNumber[] tmpArray = new ComplexNumber[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toComplexNumber(source[i]);
-            }
-
-            return new ComplexArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<ComplexNumber> makeRandom(final long count, final RandomNumber distribution) {
-
-            final ComplexNumber[] tmpArray = new ComplexNumber[(int) count];
-            for (int i = 0; i < count; i++) {
-                tmpArray[i] = TypeUtils.toComplexNumber(distribution);
-            }
-
-            return new ComplexArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<ComplexNumber> makeZero(final long count) {
-            return new ComplexArray((int) count).asArray1D();
-        }
-
-        public Array1D<ComplexNumber> wrap(final BasicArray<ComplexNumber> aSimple) {
-            return aSimple.asArray1D();
+        @Override
+        BasicFactory<ComplexNumber> delegate() {
+            return BasicArray.COMPLEX;
         }
 
     };
 
-    public static final Array1D.Factory<Double> PRIMITIVE = new Array1D.Factory<Double>() {
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
+        @Override
         public Array1D<Double> copy(final Access1D<?> source) {
 
-            final int tmpSize = (int) source.count();
+            final long tmpCount = source.count();
 
-            final double[] tmpArray = new double[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = source.doubleValue(i);
+            final BasicArray<Double> tmpDelegate = this.delegate().makeToBeFilled(tmpCount);
+
+            for (long i = 0L; i < tmpCount; i++) {
+                tmpDelegate.set(i, source.doubleValue(i));
             }
 
-            return new PrimitiveArray(tmpArray).asArray1D();
+            return tmpDelegate.asArray1D();
         }
 
+        @Override
         public Array1D<Double> copy(final double... source) {
-            return new PrimitiveArray(ArrayUtils.copyOf(source)).asArray1D();
+            return new PrimitiveArray(source).asArray1D();
         }
 
-        public Array1D<Double> copy(final List<? extends Number> source) {
-
-            final int tmpSize = source.size();
-
-            final double[] tmpArray = new double[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = source.get(i).doubleValue();
-            }
-
-            return new PrimitiveArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<Double> copy(final Number... source) {
-
-            final int tmpSize = source.length;
-
-            final double[] tmpArray = new double[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = source[i].doubleValue();
-            }
-
-            return new PrimitiveArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<Double> makeRandom(final long count, final RandomNumber distribution) {
-
-            final double[] tmpArray = new double[(int) count];
-            for (int i = 0; i < count; i++) {
-                tmpArray[i] = distribution.doubleValue();
-            }
-
-            return new PrimitiveArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<Double> makeZero(final long count) {
-            return new PrimitiveArray((int) count).asArray1D();
-        }
-
-        public Array1D<Double> wrap(final BasicArray<Double> aSimple) {
-            return aSimple.asArray1D();
+        @Override
+        BasicFactory<Double> delegate() {
+            return BasicArray.PRIMITIVE;
         }
 
     };
 
-    public static final Array1D.Factory<RationalNumber> RATIONAL = new Array1D.Factory<RationalNumber>() {
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
-        public Array1D<RationalNumber> copy(final Access1D<?> source) {
-
-            final int tmpSize = (int) source.count();
-
-            final RationalNumber[] tmpArray = new RationalNumber[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toRationalNumber(source.get(i));
-            }
-
-            return new RationalArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<RationalNumber> copy(final double... source) {
-
-            final int tmpSize = source.length;
-
-            final RationalNumber[] tmpArray = new RationalNumber[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toRationalNumber(source[i]);
-            }
-
-            return new RationalArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<RationalNumber> copy(final List<? extends Number> source) {
-
-            final int tmpSize = source.size();
-
-            final RationalNumber[] tmpArray = new RationalNumber[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toRationalNumber(source.get(i));
-            }
-
-            return new RationalArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<RationalNumber> copy(final Number... source) {
-
-            final int tmpSize = source.length;
-
-            final RationalNumber[] tmpArray = new RationalNumber[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpArray[i] = TypeUtils.toRationalNumber(source[i]);
-            }
-
-            return new RationalArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<RationalNumber> makeRandom(final long count, final RandomNumber distribution) {
-
-            final RationalNumber[] tmpArray = new RationalNumber[(int) count];
-            for (int i = 0; i < count; i++) {
-                tmpArray[i] = TypeUtils.toRationalNumber(distribution);
-            }
-
-            return new RationalArray(tmpArray).asArray1D();
-        }
-
-        public Array1D<RationalNumber> makeZero(final long count) {
-            return new RationalArray((int) count).asArray1D();
-        }
-
-        public Array1D<RationalNumber> wrap(final BasicArray<RationalNumber> aSimple) {
-            return aSimple.asArray1D();
+        @Override
+        BasicFactory<RationalNumber> delegate() {
+            return BasicArray.RATIONAL;
         }
 
     };
@@ -490,8 +344,12 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return myDelegate.get(myFirst + (myStep * index));
     }
 
+    /**
+     * @deprecated v36 Use {@link #indexOfLargestInRange(long,long)} instead
+     */
+    @Deprecated
     public long getIndexOfLargestInRange(final long first, final long limit) {
-        return (myDelegate.getIndexOfLargest(myFirst + (myStep * first), myFirst + (myStep * limit), myStep) - myFirst) / myStep;
+        return this.indexOfLargestInRange(first, limit);
     }
 
     @Override
@@ -511,6 +369,14 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
             }
         }
         return -1;
+    }
+
+    public long indexOfLargest() {
+        return this.indexOfLargestInRange(myFirst, myLimit);
+    }
+
+    public long indexOfLargestInRange(final long first, final long limit) {
+        return (myDelegate.indexOfLargest(myFirst + (myStep * first), myFirst + (myStep * limit), myStep) - myFirst) / myStep;
     }
 
     /**

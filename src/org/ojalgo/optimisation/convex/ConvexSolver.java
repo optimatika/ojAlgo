@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.quadratic;
+package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.PrimitiveFunction.*;
 
@@ -67,9 +67,9 @@ import org.ojalgo.type.IndexSelector;
  * 
  * @author apete
  */
-public abstract class QuadraticSolver extends BaseSolver {
+public abstract class ConvexSolver extends BaseSolver {
 
-    public static final class Builder extends AbstractBuilder<QuadraticSolver.Builder, QuadraticSolver> {
+    public static final class Builder extends AbstractBuilder<ConvexSolver.Builder, ConvexSolver> {
 
         public Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
             super(Q, C);
@@ -83,7 +83,7 @@ public abstract class QuadraticSolver extends BaseSolver {
 
             super(aModel);
 
-            QuadraticSolver.copy(aModel, this);
+            ConvexSolver.copy(aModel, this);
         }
 
         Builder(final MatrixStore<Double> C) {
@@ -94,12 +94,12 @@ public abstract class QuadraticSolver extends BaseSolver {
             super(aMtrxArr);
         }
 
-        Builder(final QuadraticSolver.Builder matrices) {
+        Builder(final ConvexSolver.Builder matrices) {
             super(matrices);
         }
 
         @Override
-        public QuadraticSolver build(final Optimisation.Options options) {
+        public ConvexSolver build(final Optimisation.Options options) {
 
             this.validate();
 
@@ -118,17 +118,17 @@ public abstract class QuadraticSolver extends BaseSolver {
         }
 
         @Override
-        public QuadraticSolver.Builder equalities(final MatrixStore<Double> AE, final MatrixStore<Double> BE) {
+        public ConvexSolver.Builder equalities(final MatrixStore<Double> AE, final MatrixStore<Double> BE) {
             return super.equalities(AE, BE);
         }
 
         @Override
-        public QuadraticSolver.Builder inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI) {
+        public ConvexSolver.Builder inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI) {
             return super.inequalities(AI, BI);
         }
 
         @Override
-        public QuadraticSolver.Builder inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI, final ModelEntity<?>[] originatingEntities) {
+        public ConvexSolver.Builder inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI, final ModelEntity<?>[] originatingEntities) {
             return super.inequalities(AI, BI, originatingEntities);
         }
 
@@ -141,15 +141,15 @@ public abstract class QuadraticSolver extends BaseSolver {
 
     static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
-    public static QuadraticSolver make(final ExpressionsBasedModel aModel) {
+    public static ConvexSolver make(final ExpressionsBasedModel aModel) {
 
-        final QuadraticSolver.Builder tmpBuilder = new QuadraticSolver.Builder(aModel);
+        final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(aModel);
 
         return tmpBuilder.build();
     }
 
     @SuppressWarnings("unchecked")
-    static void copy(final ExpressionsBasedModel sourceModel, final QuadraticSolver.Builder destinationBuilder) {
+    static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
         final List<Variable> tmpFreeVariables = sourceModel.getFreeVariables();
         final Set<Index> tmpFixedVariables = sourceModel.getFixedVariables();
@@ -319,7 +319,7 @@ public abstract class QuadraticSolver extends BaseSolver {
         destinationBuilder.setKickStarter(tmpKickStarter);
     }
 
-    protected QuadraticSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final QuadraticSolver.Builder matrices) {
+    protected ConvexSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
         super(aModel, solverOptions, matrices);
     }
 

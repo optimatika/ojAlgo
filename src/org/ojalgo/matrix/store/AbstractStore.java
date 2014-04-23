@@ -57,6 +57,10 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         myColDim = columnsCount;
     }
 
+    public MatrixStore<N> add(final MatrixStore<N> addend) {
+        return new SuperimposedStore<>(this, addend);
+    }
+
     @SuppressWarnings("unchecked")
     public N aggregateAll(final Aggregator aggregator) {
 
@@ -71,8 +75,8 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return new MatrixStore.Builder<N>(this);
     }
 
-    public PhysicalStore<N> conjugate() {
-        return this.factory().conjugate(this);
+    public MatrixStore<N> conjugate() {
+        return new ConjugatedStore<>(this);
     }
 
     public PhysicalStore<N> copy() {
@@ -200,13 +204,21 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return retVal;
     }
 
+    public final MatrixStore<N> negate() {
+        return new ModificationStore<>(this, this.factory().function().negate());
+    }
+
+    public MatrixStore<N> scale(final N scalar) {
+        return new ModificationStore<>(this, this.factory().function().multiply().first(scalar));
+    }
+
     @Override
     public final String toString() {
         return MatrixUtils.toString(this);
     }
 
-    public PhysicalStore<N> transpose() {
-        return this.factory().transpose(this);
+    public MatrixStore<N> transpose() {
+        return new TransposedStore<>(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

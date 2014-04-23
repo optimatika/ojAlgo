@@ -21,48 +21,220 @@
  */
 package org.ojalgo.array;
 
+import java.math.BigDecimal;
+
+import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessUtils;
+import org.ojalgo.array.DenseArray.DenseFactory;
+import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * Huge array - only deals with long indices. Delegates to its segments, localises indices for them.
- * 
+ *
  * @author apete
  */
-final class SegmentedArray<N extends Number> extends BasicArray<N> {
+public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
-    public static SegmentedArray<Double> makePrimitive(final long count) {
+    static abstract class SegmentedFactory<N extends Number> extends BasicFactory<N> {
 
-        final long mySegmentSize = (32L * 1024L) / 16L;
-
-        final int tmpNumberOfSegments = (int) (count / mySegmentSize);
-
-        @SuppressWarnings("unchecked")
-        final SparseArray<Double>[] mySegments = new SparseArray[tmpNumberOfSegments + 1];
-        for (int s = 0; s < tmpNumberOfSegments; s++) {
-            mySegments[s] = SparseArray.make(mySegmentSize);
+        @Override
+        final SegmentedFactory<N> getSegmentedFactory() {
+            return this;
         }
-        mySegments[tmpNumberOfSegments] = SparseArray.make(count - (mySegmentSize * tmpNumberOfSegments));
 
-        return new SegmentedArray<Double>(count, mySegments);
+        @Override
+        final SegmentedArray<N> makeStructuredZero(final long... structure) {
+
+            final SparseFactory<N> segementFactory = this.getSparseFactory();
+
+            final long totalCount = AccessUtils.count(structure);
+
+            final long tmpElementSize = this.getElementSize();
+            final long tmpTotalCount = AccessUtils.count(structure);
+
+            long retVal = 1; // NumberOfUniformSegments
+            long tmpSegmentSize = tmpTotalCount;
+
+            final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpTotalCount));
+
+            for (int i = 0; i < structure.length; i++) {
+                final long tmpNoS = retVal * structure[i];
+                final long tmpSS = tmpSegmentSize / structure[i];
+                if (tmpNoS <= tmpMaxNumberOfSegments) {
+                    retVal = tmpNoS;
+                    tmpSegmentSize = tmpSS;
+                }
+            }
+
+            final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(tmpElementSize);
+            final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
+            while ((tmpSegmentSize >= tmpCacheDim) && ((retVal * tmpUnits) <= tmpMaxNumberOfSegments)) {
+                retVal = retVal * tmpUnits;
+                tmpSegmentSize = tmpSegmentSize / tmpUnits;
+            }
+            final long tmpCalculateNumberOfUniformSegments = retVal;
+            final int numberOfUniformSegments = (int) tmpCalculateNumberOfUniformSegments;
+
+            final long tmpSize = totalCount / numberOfUniformSegments;
+            final int tmpRemainder = (int) (totalCount % numberOfUniformSegments);
+
+            final int tmpTotalNumberOfSegments = tmpRemainder == 0 ? numberOfUniformSegments : numberOfUniformSegments + 1;
+
+            @SuppressWarnings("unchecked")
+            final SparseArray<N>[] tmpSegments = new SparseArray[tmpTotalNumberOfSegments];
+            for (int s = 0; s < numberOfUniformSegments; s++) {
+                tmpSegments[s] = segementFactory.make(tmpSize);
+            }
+            if (tmpRemainder != 0) {
+                tmpSegments[numberOfUniformSegments] = segementFactory.make(tmpRemainder);
+            }
+
+            return new SegmentedArray<N>(tmpSegments);
+        }
+
+        @Override
+        final SegmentedArray<N> makeToBeFilled(final long... structure) {
+
+            final DenseFactory<N> segementFactory = this.getDenseFactory();
+
+            final long totalCount = AccessUtils.count(structure);
+
+            final long tmpElementSize = this.getElementSize();
+            final long tmpTotalCount = AccessUtils.count(structure);
+
+            long retVal = 1; // NumberOfUniformSegments
+            long tmpSegmentSize = tmpTotalCount;
+
+            final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpTotalCount));
+
+            for (int i = 0; i < structure.length; i++) {
+                final long tmpNoS = retVal * structure[i];
+                final long tmpSS = tmpSegmentSize / structure[i];
+                if (tmpNoS <= tmpMaxNumberOfSegments) {
+                    retVal = tmpNoS;
+                    tmpSegmentSize = tmpSS;
+                }
+            }
+
+            final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(tmpElementSize);
+            final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
+            while ((tmpSegmentSize >= tmpCacheDim) && ((retVal * tmpUnits) <= tmpMaxNumberOfSegments)) {
+                retVal = retVal * tmpUnits;
+                tmpSegmentSize = tmpSegmentSize / tmpUnits;
+            }
+            final long tmpCalculateNumberOfUniformSegments = retVal;
+            final int numberOfUniformSegments = (int) tmpCalculateNumberOfUniformSegments;
+
+            final int tmpSize = (int) (totalCount / numberOfUniformSegments);
+            final int tmpRemainder = (int) (totalCount % numberOfUniformSegments);
+
+            final int tmpTotalNumberOfSegments = tmpRemainder == 0 ? numberOfUniformSegments : numberOfUniformSegments + 1;
+
+            @SuppressWarnings("unchecked")
+            final DenseArray<N>[] tmpSegments = new DenseArray[tmpTotalNumberOfSegments];
+            for (int s = 0; s < numberOfUniformSegments; s++) {
+                tmpSegments[s] = segementFactory.make(tmpSize);
+            }
+            if (tmpRemainder != 0) {
+                tmpSegments[numberOfUniformSegments] = segementFactory.make(tmpRemainder);
+            }
+
+            return new SegmentedArray<N>(tmpSegments);
+        }
+
     }
 
-    private final long myCount;
+    static final SegmentedFactory<BigDecimal> BIG = new SegmentedFactory<BigDecimal>() {
+
+        @Override
+        DenseFactory<BigDecimal> getDenseFactory() {
+            return BigArray.FACTORY;
+        }
+
+        @Override
+        SparseFactory<BigDecimal> getSparseFactory() {
+            return SparseArray.BIG;
+        }
+
+    };
+
+    static final SegmentedFactory<ComplexNumber> COMPLEX = new SegmentedFactory<ComplexNumber>() {
+
+        @Override
+        DenseFactory<ComplexNumber> getDenseFactory() {
+            return ComplexArray.FACTORY;
+        }
+
+        @Override
+        SparseFactory<ComplexNumber> getSparseFactory() {
+            return SparseArray.COMPLEX;
+        }
+
+    };
+
+    static final SegmentedFactory<Double> PRIMITIVE = new SegmentedFactory<Double>() {
+
+        @Override
+        DenseFactory<Double> getDenseFactory() {
+            return PrimitiveArray.FACTORY;
+        }
+
+        @Override
+        SparseFactory<Double> getSparseFactory() {
+            return SparseArray.PRIMITIVE;
+        }
+
+    };
+
+    static final SegmentedFactory<RationalNumber> RATIONAL = new SegmentedFactory<RationalNumber>() {
+
+        @Override
+        DenseFactory<RationalNumber> getDenseFactory() {
+            return RationalArray.FACTORY;
+        }
+
+        @Override
+        SparseFactory<RationalNumber> getSparseFactory() {
+            return SparseArray.RATIONAL;
+        }
+
+    };
+
+    public static SegmentedArray<BigDecimal> makeBig(final long count) {
+        return BIG.makeStructuredZero(count);
+    }
+
+    public static SegmentedArray<ComplexNumber> makeComplex(final long count) {
+        return COMPLEX.makeStructuredZero(count);
+    }
+
+    public static SegmentedArray<Double> makePrimitive(final long count) {
+        return PRIMITIVE.makeStructuredZero(count);
+    }
+
+    public static SegmentedArray<RationalNumber> makeRational(final long count) {
+        return RATIONAL.makeStructuredZero(count);
+    }
 
     private final BasicArray<N>[] mySegments;
 
+    /**
+     * All segments except the last one are assumed to (must) be of equal length. The last segment cannot be longer than
+     * the others.
+     */
     private final long mySegmentSize;
 
-    SegmentedArray(final long count, final SparseArray<N>[] segments) {
+    SegmentedArray(final BasicArray<N>[] segments) {
 
         super();
-
-        myCount = count;
 
         mySegments = segments;
         mySegmentSize = segments[0].count();
@@ -71,7 +243,8 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     @Override
     public long count() {
-        return myCount;
+        final int tmpVal = mySegments.length - 1;
+        return (mySegments[0].count() * tmpVal) + mySegments[tmpVal].count();
     }
 
     public double doubleValue(final long index) {
@@ -135,10 +308,6 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
         mySegments[(int) (index / mySegmentSize)].set(index % mySegmentSize, value);
     }
 
-    private boolean isZeroModified(final UnaryFunction<N> function) {
-        return !TypeUtils.isZero(function.invoke(PrimitiveMath.ZERO));
-    }
-
     @Override
     protected void exchange(final long firstA, final long firstB, final long step, final long count) {
 
@@ -179,18 +348,6 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    protected void fill(final Access1D<?> values) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void fill(final long first, final long limit, final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     protected void fill(final long first, final long limit, final long step, final N value) {
 
         if (step <= mySegmentSize) {
@@ -224,32 +381,53 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    protected long getIndexOfLargest(final long first, final long limit, final long step) {
-        // TODO Auto-generated method stub
-        return 0;
+    protected long indexOfLargest(final long first, final long limit, final long step) {
+
+        double tmpVal = PrimitiveMath.ZERO;
+        long retVal = Long.MIN_VALUE;
+
+        for (long tmpIndex = first; tmpIndex < limit; tmpIndex += step) {
+            if (this.doubleValue(tmpIndex) > tmpVal) {
+                tmpVal = Math.abs(this.doubleValue(tmpIndex));
+                retVal = tmpIndex;
+            }
+        }
+
+        return retVal;
     }
 
     @Override
     protected boolean isZeros(final long first, final long limit, final long step) {
-        // TODO Auto-generated method stub
-        return false;
+        boolean retVal = true;
+        for (long i = first; retVal && (i < limit); i += step) {
+            retVal &= this.isZero(i);
+        }
+        return retVal;
     }
 
     @Override
     protected void modify(final long first, final long limit, final long step, final Access1D<N> left, final BinaryFunction<N> function) {
-        final int tmpFirst = (int) (first / mySegmentSize);
-        final int tmpLast = (int) (limit / mySegmentSize);
-        for (int s = tmpFirst; s <= tmpLast; s++) {
-            mySegments[s].modify(first, limit, step, left, function);
+        if (this.isPrimitive()) {
+            for (long l = first; l < limit; l += step) {
+                this.set(l, function.invoke(left.doubleValue(l), this.doubleValue(l)));
+            }
+        } else {
+            for (long l = first; l < limit; l += step) {
+                this.set(l, function.invoke(left.get(l), this.get(l)));
+            }
         }
     }
 
     @Override
     protected void modify(final long first, final long limit, final long step, final BinaryFunction<N> function, final Access1D<N> right) {
-        final int tmpFirst = (int) (first / mySegmentSize);
-        final int tmpLast = (int) (limit / mySegmentSize);
-        for (int s = tmpFirst; s <= tmpLast; s++) {
-            mySegments[s].modify(first, limit, step, function, right);
+        if (this.isPrimitive()) {
+            for (long l = first; l < limit; l += step) {
+                this.set(l, function.invoke(this.doubleValue(l), right.doubleValue(l)));
+            }
+        } else {
+            for (long l = first; l < limit; l += step) {
+                this.set(l, function.invoke(this.get(l), right.get(l)));
+            }
         }
     }
 

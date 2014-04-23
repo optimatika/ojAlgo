@@ -30,7 +30,7 @@ public final class SecondOrderApproximation<N extends Number> extends Approximat
 
     private final CompoundFunction<N> myDelegate;
 
-    public SecondOrderApproximation(final MultiaryFunction<N> function, final Access1D<N> point) {
+    public SecondOrderApproximation(final MultiaryFunction.TwiceDifferentiable<N> function, final Access1D<N> point) {
 
         super(function, point);
 

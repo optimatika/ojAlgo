@@ -99,6 +99,11 @@ public final class ZeroStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
+    public MatrixStore<N> add(final MatrixStore<N> addend) {
+        return addend;
+    }
+
+    @Override
     public PhysicalStore<N> conjugate() {
         return this.factory().makeZero(this.getColDim(), this.getRowDim());
     }
@@ -137,6 +142,11 @@ public final class ZeroStore<N extends Number> extends FactoryStore<N> {
     @Override
     public ZeroStore<N> multiplyRight(final Access1D<N> rightMtrx) {
         return new ZeroStore<N>(this.factory(), this.getRowDim(), (int) (rightMtrx.count() / this.getColDim()));
+    }
+
+    @Override
+    public MatrixStore<N> scale(final N scalar) {
+        return this;
     }
 
     public Scalar<N> toScalar(final long row, final long column) {

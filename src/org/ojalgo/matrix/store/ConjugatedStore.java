@@ -26,7 +26,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * ConjugatedStore
- *
+ * 
  * @author apete
  */
 public final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
@@ -36,13 +36,8 @@ public final class ConjugatedStore<N extends Number> extends TransjugatedStore<N
     }
 
     @Override
-    public PhysicalStore<N> conjugate() {
-        return this.getBase().copy();
-    }
-
-    @Override
-    public PhysicalStore<N> copy() {
-        return this.getBase().conjugate();
+    public MatrixStore<N> conjugate() {
+        return this.getBase();
     }
 
     public N get(final long aRow, final long aCol) {

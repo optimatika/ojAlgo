@@ -26,7 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.List;
 import java.util.Set;
 
-import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
@@ -163,7 +163,7 @@ public abstract class LinearSolver extends BaseSolver {
                 + tmpVarsNegUp.size();
         final int tmpTotalVarCount = tmpProblVarCount + tmpSlackVarCount;
 
-        final int[] tmpBasis = MatrixUtils.makeIncreasingRange(-tmpConstraiCount, tmpConstraiCount);
+        final int[] tmpBasis = AccessUtils.makeIncreasingRange(-tmpConstraiCount, tmpConstraiCount);
 
         final Optimisation.Result tmpKickStarter = new Optimisation.Result(Optimisation.State.UNEXPLORED, Double.NaN, ZeroStore.makePrimitive(tmpTotalVarCount,
                 1));
