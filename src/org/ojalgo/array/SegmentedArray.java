@@ -26,12 +26,9 @@ import java.math.BigDecimal;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-<<<<<<< HEAD
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
-=======
->>>>>>> FETCH_HEAD
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -46,7 +43,6 @@ import org.ojalgo.scalar.Scalar;
  */
 public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
-<<<<<<< HEAD
     static abstract class SegmentedFactory<N extends Number> extends BasicFactory<N> {
 
         @Override
@@ -55,7 +51,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         }
 
         @Override
-        final SegmentedArray<N> makeZero(final long... structure) {
+        final SegmentedArray<N> makeStructuredZero(final long... structure) {
 
             final SparseFactory<N> segementFactory = this.getSparseFactory();
 
@@ -63,12 +59,12 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
             final long tmpElementSize = this.getElementSize();
             final long tmpTotalCount = AccessUtils.count(structure);
-            
+
             long retVal = 1; // NumberOfUniformSegments
             long tmpSegmentSize = tmpTotalCount;
-            
+
             final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpTotalCount));
-            
+
             for (int i = 0; i < structure.length; i++) {
                 final long tmpNoS = retVal * structure[i];
                 final long tmpSS = tmpSegmentSize / structure[i];
@@ -77,7 +73,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
                     tmpSegmentSize = tmpSS;
                 }
             }
-            
+
             final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(tmpElementSize);
             final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
             while ((tmpSegmentSize >= tmpCacheDim) && ((retVal * tmpUnits) <= tmpMaxNumberOfSegments)) {
@@ -113,12 +109,12 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
             final long tmpElementSize = this.getElementSize();
             final long tmpTotalCount = AccessUtils.count(structure);
-            
+
             long retVal = 1; // NumberOfUniformSegments
             long tmpSegmentSize = tmpTotalCount;
-            
+
             final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpTotalCount));
-            
+
             for (int i = 0; i < structure.length; i++) {
                 final long tmpNoS = retVal * structure[i];
                 final long tmpSS = tmpSegmentSize / structure[i];
@@ -127,7 +123,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
                     tmpSegmentSize = tmpSS;
                 }
             }
-            
+
             final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(tmpElementSize);
             final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
             while ((tmpSegmentSize >= tmpCacheDim) && ((retVal * tmpUnits) <= tmpMaxNumberOfSegments)) {
@@ -213,19 +209,19 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     };
 
     public static SegmentedArray<BigDecimal> makeBig(final long count) {
-        return BIG.makeZero(count);
+        return BIG.makeStructuredZero(count);
     }
 
     public static SegmentedArray<ComplexNumber> makeComplex(final long count) {
-        return COMPLEX.makeZero(count);
+        return COMPLEX.makeStructuredZero(count);
     }
 
     public static SegmentedArray<Double> makePrimitive(final long count) {
-        return PRIMITIVE.makeZero(count);
+        return PRIMITIVE.makeStructuredZero(count);
     }
 
     public static SegmentedArray<RationalNumber> makeRational(final long count) {
-        return RATIONAL.makeZero(count);
+        return RATIONAL.makeStructuredZero(count);
     }
 
     private final BasicArray<N>[] mySegments;
@@ -234,49 +230,6 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
      * All segments except the last one are assumed to (must) be of equal length. The last segment cannot be longer than
      * the others.
      */
-=======
-    public static SegmentedArray<Double> makePrimitive(final long... structure) {
-
-        final long tmpTotalCount = AccessUtils.count(structure);
-
-        final long tmpBalance = (long) Math.sqrt(tmpTotalCount);
-
-        long tmpUniformSegmentSize = tmpTotalCount;
-        int tmpNumberOfUniformSegments = 1;
-
-        if (structure.length == 1) {
-            tmpUniformSegmentSize = tmpUniformSegmentSize / tmpBalance;
-            tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpBalance);
-        } else {
-            for (int i = 0; i < structure.length; i++) {
-                final long tmpSS = tmpUniformSegmentSize / structure[i];
-                final long tmpNoS = tmpNumberOfUniformSegments * structure[i];
-                if ((tmpNoS <= tmpBalance) && (tmpSS >= tmpBalance)) {
-                    tmpUniformSegmentSize = tmpSS;
-                    tmpNumberOfUniformSegments = (int) tmpNoS;
-                }
-            }
-        }
-
-        final long tmpCountDiff = tmpTotalCount - (tmpUniformSegmentSize * tmpNumberOfUniformSegments);
-
-        final int tmpTotalNumberOfSegments = tmpCountDiff == 0L ? tmpNumberOfUniformSegments : tmpNumberOfUniformSegments + 1;
-
-        @SuppressWarnings("unchecked")
-        final SparseArray<Double>[] tmpSegments = new SparseArray[tmpTotalNumberOfSegments];
-        for (int s = 0; s < tmpNumberOfUniformSegments; s++) {
-            tmpSegments[s] = SparseArray.makePrimitive(tmpUniformSegmentSize);
-        }
-        if (tmpCountDiff != 0L) {
-            tmpSegments[tmpNumberOfUniformSegments] = SparseArray.makePrimitive(tmpCountDiff);
-        }
-
-        return new SegmentedArray<Double>(tmpTotalCount, tmpSegments);
-    }
-
-    private final long myCount;
-    private final BasicArray<N>[] mySegments;
->>>>>>> FETCH_HEAD
     private final long mySegmentSize;
 
     SegmentedArray(final BasicArray<N>[] segments) {

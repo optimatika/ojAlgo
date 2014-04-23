@@ -142,7 +142,7 @@ Access2D.Visitable<N>, Serializable {
 
         public final Array2D<N> makeEye(final long rows, final long columns) {
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeZero(rows, columns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeStructuredZero(rows, columns);
 
             final long tmpLimit = Math.min(rows, columns);
 
@@ -169,7 +169,7 @@ Access2D.Visitable<N>, Serializable {
         }
 
         public final Array2D<N> makeZero(final long rows, final long columns) {
-            return this.delegate().makeZero(rows, columns).asArray2D(rows);
+            return this.delegate().makeStructuredZero(rows, columns).asArray2D(rows);
         }
 
         public final Array2D<N> rows(final Access1D<?>... source) {

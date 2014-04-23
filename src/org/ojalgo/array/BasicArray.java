@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Iterator;
+import java.util.List;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
@@ -36,6 +37,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.netio.ASCII;
+import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -56,7 +58,62 @@ import org.ojalgo.scalar.Scalar;
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
 Access1D.Visitable<N>, Serializable {
 
-    static abstract class BasicFactory<N extends Number> extends Object {
+    static abstract class BasicFactory<N extends Number> extends Object implements Access1D.Factory<BasicArray<N>> {
+
+        public final BasicArray<N> copy(final Access1D<?> source) {
+            final long tmpCount = source.count();
+            final BasicArray<N> retVal = this.makeToBeFilled(tmpCount);
+            for (long i = 0L; i < tmpCount; i++) {
+                retVal.set(i, source.doubleValue(i));
+            }
+            return retVal;
+        }
+
+        public final BasicArray<N> copy(final double... source) {
+            final int tmpLength = source.length;
+            final BasicArray<N> retVal = this.makeToBeFilled(tmpLength);
+            for (int i = 0; i < tmpLength; i++) {
+                retVal.set(i, source[i]);
+            }
+            return retVal;
+        }
+
+        public final BasicArray<N> copy(final List<? extends Number> source) {
+            final int tmpSize = source.size();
+            final BasicArray<N> retVal = this.makeToBeFilled(tmpSize);
+            for (int i = 0; i < tmpSize; i++) {
+                retVal.set(i, source.get(i));
+            }
+            return retVal;
+        }
+
+        public final BasicArray<N> copy(final Number... source) {
+            final int tmpLength = source.length;
+            final BasicArray<N> retVal = this.makeToBeFilled(tmpLength);
+            for (int i = 0; i < tmpLength; i++) {
+                retVal.set(i, source[i]);
+            }
+            return retVal;
+        }
+
+        public final BasicArray<N> makeRandom(final long count, final RandomNumber distribution) {
+            final BasicArray<N> retVal = this.makeToBeFilled(count);
+            for (long i = 0L; i < count; i++) {
+                retVal.set(i, distribution.doubleValue());
+            }
+            return retVal;
+        }
+
+        public final BasicArray<N> makeZero(final long count) {
+            if (count > Integer.MAX_VALUE) {
+                return this.getSegmentedFactory().makeStructuredZero(count);
+            } else if (count > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize())) {
+                return this.getSparseFactory().makeStructuredZero(count);
+            } else {
+                return this.getDenseFactory().makeStructuredZero(count);
+            }
+
+        }
 
         abstract DenseArray.DenseFactory<N> getDenseFactory();
 
@@ -68,6 +125,20 @@ Access1D.Visitable<N>, Serializable {
 
         abstract SparseArray.SparseFactory<N> getSparseFactory();
 
+        BasicArray<N> makeStructuredZero(final long... structure) {
+
+            final long tmpTotal = AccessUtils.count(structure);
+
+            if (tmpTotal > Integer.MAX_VALUE) {
+                return this.getSegmentedFactory().makeStructuredZero(structure);
+            } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize())) {
+                return this.getSparseFactory().makeStructuredZero(structure);
+            } else {
+                return this.getDenseFactory().makeStructuredZero(structure);
+            }
+
+        }
+
         BasicArray<N> makeToBeFilled(final long... structure) {
 
             final long tmpTotal = AccessUtils.count(structure);
@@ -76,20 +147,6 @@ Access1D.Visitable<N>, Serializable {
                 return this.getSegmentedFactory().makeToBeFilled(structure);
             } else {
                 return this.getDenseFactory().makeToBeFilled(structure);
-            }
-
-        }
-
-        BasicArray<N> makeZero(final long... structure) {
-
-            final long tmpTotal = AccessUtils.count(structure);
-
-            if (tmpTotal > Integer.MAX_VALUE) {
-                return this.getSegmentedFactory().makeZero(structure);
-            } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize())) {
-                return this.getSparseFactory().makeZero(structure);
-            } else {
-                return this.getDenseFactory().makeZero(structure);
             }
 
         }

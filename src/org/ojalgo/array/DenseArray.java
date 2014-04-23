@@ -48,7 +48,7 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         abstract DenseArray<N> make(int size);
 
         @Override
-        final DenseArray<N> makeZero(final long... structure) {
+        final DenseArray<N> makeStructuredZero(final long... structure) {
             return this.make((int) AccessUtils.count(structure));
         }
 

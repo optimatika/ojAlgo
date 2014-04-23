@@ -44,7 +44,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>,
-AccessAnyD.Visitable<N>, Serializable {
+        AccessAnyD.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
 
@@ -75,7 +75,7 @@ AccessAnyD.Visitable<N>, Serializable {
         }
 
         public final ArrayAnyD<N> makeZero(final long... structure) {
-            return this.delegate().makeZero(structure).asArrayAnyD(structure);
+            return this.delegate().makeStructuredZero(structure).asArrayAnyD(structure);
         }
 
         abstract BasicArray.BasicFactory<N> delegate();

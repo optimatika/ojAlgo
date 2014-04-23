@@ -206,23 +206,11 @@
         </jar>
 
         <tar destfile="${tmp.ojalgo}.tar.gz" compression="gzip">
-
-            <tarfileset dir="${path.DevProj}${file.separator}${dir.doc}" includes="*.txt" />
-
             <tarfileset dir="${path.dist}" includes="*.jar" />
-
-            <tarfileset dir="${path.doc}" prefix="${dir.doc}" />
-
         </tar>
 
         <zip destfile="${tmp.ojalgo}.zip" level="9">
-
-            <zipfileset dir="${path.DevProj}${file.separator}${dir.doc}" includes="*.txt" />
-
             <zipfileset dir="${path.dist}" includes="*.jar" />
-
-            <zipfileset dir="${path.doc}" prefix="${dir.doc}" />
-
         </zip>
 
         <propertyfile file="build.properties">

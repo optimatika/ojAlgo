@@ -47,7 +47,6 @@ import org.ojalgo.type.TypeUtils;
  * @author apete
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
-<<<<<<< HEAD
 
     static abstract class SparseFactory<N extends Number> extends BasicFactory<N> {
 
@@ -59,12 +58,12 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         abstract SparseArray<N> make(long count);
 
         @Override
-        final SparseArray<N> makeToBeFilled(final long... structure) {
+        final SparseArray<N> makeStructuredZero(final long... structure) {
             return this.make(AccessUtils.count(structure));
         }
 
         @Override
-        final SparseArray<N> makeZero(final long... structure) {
+        final SparseArray<N> makeToBeFilled(final long... structure) {
             return this.make(AccessUtils.count(structure));
         }
 
@@ -161,23 +160,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return new SparseArray<>(count, new PrimitiveArray(INITIAL_CAPACITY), PrimitiveScalar.ZERO);
     }
 
-=======
-
-    private static final int INITIAL_CAPACITY = 7;
-
-    public static SparseArray<BigDecimal> makeBig(final long count) {
-        return new SparseArray<>(count, new BigArray(INITIAL_CAPACITY), BigScalar.ZERO);
-    }
-
-    public static SparseArray<ComplexNumber> makeComplex(final long count) {
-        return new SparseArray<>(count, new ComplexArray(INITIAL_CAPACITY), ComplexNumber.ZERO);
-    }
-
-    public static SparseArray<Double> makePrimitive(final long count) {
-        return new SparseArray<>(count, new PrimitiveArray(INITIAL_CAPACITY), PrimitiveScalar.ZERO);
-    }
-
->>>>>>> FETCH_HEAD
     public static SparseArray<RationalNumber> makeRational(final long count) {
         return new SparseArray<>(count, new RationalArray(INITIAL_CAPACITY), RationalNumber.ZERO);
     }
@@ -327,7 +309,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         if (tmpIndex >= 0) {
             // Existing value, just update
 
-            //values[tmpIndex] = value;
+            // values[tmpIndex] = value;
             myValues.set(tmpIndex, value);
 
         } else {
@@ -342,7 +324,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
                 for (int i = myActualLength; i > tmpInsInd; i--) {
                     tmpOldIndeces[i] = tmpOldIndeces[i - 1];
-                    //      values[i] = values[i - 1];
+                    // values[i] = values[i - 1];
                     myValues.set(i, myValues.doubleValue(i - 1));
                 }
                 tmpOldIndeces[tmpInsInd] = index;
@@ -387,7 +369,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         if (tmpIndex >= 0) {
             // Existing value, just update
 
-            //values[tmpIndex] = value;
+            // values[tmpIndex] = value;
             myValues.set(tmpIndex, value);
 
         } else {
@@ -402,7 +384,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
                 for (int i = myActualLength; i > tmpInsInd; i--) {
                     tmpOldIndeces[i] = tmpOldIndeces[i - 1];
-                    //      values[i] = values[i - 1];
+                    // values[i] = values[i - 1];
                     myValues.set(i, myValues.get(i - 1));
                 }
                 tmpOldIndeces[tmpInsInd] = index;
@@ -420,11 +402,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = tmpOldIndeces[i];
-                    //   tmpValues[i] = values[i];
+                    // tmpValues[i] = values[i];
                     tmpValues.set(i, myValues.get(i));
                 }
                 tmpIndices[tmpInsInd] = index;
-                //  tmpValues[tmpInsInd] = value;
+                // tmpValues[tmpInsInd] = value;
                 tmpValues.set(tmpInsInd, value);
                 for (int i = tmpInsInd; i < tmpOldIndeces.length; i++) {
                     tmpIndices[i + 1] = tmpOldIndeces[i];
@@ -544,33 +526,63 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     @Override
     protected void modify(final long first, final long limit, final long step, final Access1D<N> left, final BinaryFunction<N> function) {
-        for (int i = 0; i < myIndices.length; i++) {
-            final long tmpIndex = myIndices[i];
-            if ((tmpIndex >= first) && (tmpIndex < limit)) {
-                if (((tmpIndex - first) % step) == 0L) {
-                    myValues.modify(i, left, function);
+
+        final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO);
+
+        if (TypeUtils.isZero(tmpZeroValue)) {
+
+            for (int i = 0; i < myIndices.length; i++) {
+                final long tmpIndex = myIndices[i];
+                if ((tmpIndex >= first) && (tmpIndex < limit)) {
+                    if (((tmpIndex - first) % step) == 0L) {
+                        myValues.modify(i, left, function);
+                    }
                 }
             }
+
+        } else {
+
+            throw new IllegalArgumentException("SparseArray zero modification!");
         }
     }
 
     @Override
     protected void modify(final long first, final long limit, final long step, final BinaryFunction<N> function, final Access1D<N> right) {
-        for (int i = 0; i < myIndices.length; i++) {
-            final long tmpIndex = myIndices[i];
-            if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
-                myValues.modify(i, function, right);
+
+        final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO);
+
+        if (TypeUtils.isZero(tmpZeroValue)) {
+
+            for (int i = 0; i < myIndices.length; i++) {
+                final long tmpIndex = myIndices[i];
+                if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
+                    myValues.modify(i, function, right);
+                }
             }
+
+        } else {
+
+            throw new IllegalArgumentException("SparseArray zero modification!");
         }
     }
 
     @Override
     protected void modify(final long first, final long limit, final long step, final UnaryFunction<N> function) {
-        for (int i = 0; i < myIndices.length; i++) {
-            final long tmpIndex = myIndices[i];
-            if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
-                myValues.modify(i, function);
+
+        final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO);
+
+        if (TypeUtils.isZero(tmpZeroValue)) {
+
+            for (int i = 0; i < myIndices.length; i++) {
+                final long tmpIndex = myIndices[i];
+                if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
+                    myValues.modify(i, function);
+                }
             }
+
+        } else {
+
+            throw new IllegalArgumentException("SparseArray zero modification!");
         }
     }
 
@@ -611,13 +623,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return retVal;
     }
 
-<<<<<<< HEAD
-=======
-    final int first(final long first) {
-        return this.index(first);
-    }
-
->>>>>>> FETCH_HEAD
     final int index(final long index) {
         return Arrays.binarySearch(myIndices, 0, myActualLength, index);
     }
@@ -627,15 +632,4 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myValues.isPrimitive();
     }
 
-<<<<<<< HEAD
-=======
-    final int limit(final long limit) {
-        return this.index(Math.min(myCount, limit));
-    }
-
-    final int step(final long step) {
-        return (int) step;
-    }
-
->>>>>>> FETCH_HEAD
 }
