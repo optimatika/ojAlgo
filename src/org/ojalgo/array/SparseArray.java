@@ -137,8 +137,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         @Override
         SegmentedFactory<RationalNumber> getSegmentedFactory() {
-            // TODO Auto-generated method stub
-            return null;
+            return SegmentedArray.RATIONAL;
         }
 
         @Override
