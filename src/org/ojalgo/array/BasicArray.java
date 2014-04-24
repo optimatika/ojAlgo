@@ -56,7 +56,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-Access1D.Visitable<N>, Serializable {
+        Access1D.Visitable<N>, Serializable {
 
     static abstract class BasicFactory<N extends Number> extends Object implements Access1D.Factory<BasicArray<N>> {
 
