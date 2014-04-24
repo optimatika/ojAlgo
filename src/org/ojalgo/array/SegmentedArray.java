@@ -76,7 +76,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
             final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(tmpElementSize);
             final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
-            while ((tmpSegmentSize >= tmpCacheDim) && ((retVal * tmpUnits) <= tmpMaxNumberOfSegments)) {
+            while ((tmpUnits != 1L) && (tmpSegmentSize >= tmpCacheDim) && ((retVal * tmpUnits) <= tmpMaxNumberOfSegments)) {
                 retVal = retVal * tmpUnits;
                 tmpSegmentSize = tmpSegmentSize / tmpUnits;
             }
@@ -126,7 +126,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
             final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(tmpElementSize);
             final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
-            while ((tmpSegmentSize >= tmpCacheDim) && ((retVal * tmpUnits) <= tmpMaxNumberOfSegments)) {
+            while ((tmpUnits != 1L) && (tmpSegmentSize >= tmpCacheDim) && ((retVal * tmpUnits) <= tmpMaxNumberOfSegments)) {
                 retVal = retVal * tmpUnits;
                 tmpSegmentSize = tmpSegmentSize / tmpUnits;
             }
