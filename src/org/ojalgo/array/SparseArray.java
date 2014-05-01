@@ -34,9 +34,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
@@ -148,19 +146,23 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     };
 
     public static SparseArray<BigDecimal> makeBig(final long count) {
-        return new SparseArray<>(count, new BigArray(INITIAL_CAPACITY), BigScalar.ZERO);
+        return new SparseArray<>(count, BigArray.FACTORY);
     }
 
     public static SparseArray<ComplexNumber> makeComplex(final long count) {
-        return new SparseArray<>(count, new ComplexArray(INITIAL_CAPACITY), ComplexNumber.ZERO);
+        return new SparseArray<>(count, ComplexArray.FACTORY);
     }
 
     public static SparseArray<Double> makePrimitive(final long count) {
-        return new SparseArray<>(count, new PrimitiveArray(INITIAL_CAPACITY), PrimitiveScalar.ZERO);
+        return new SparseArray<>(count, PrimitiveArray.FACTORY);
     }
 
     public static SparseArray<RationalNumber> makeRational(final long count) {
-        return new SparseArray<>(count, new RationalArray(INITIAL_CAPACITY), RationalNumber.ZERO);
+        return new SparseArray<>(count, RationalArray.FACTORY);
+    }
+
+    public static final SegmentedArray<Double> makeSegmented(final int size) {
+        return SegmentedArray.PRIMITIVE.makeSegmented(PRIMITIVE, size);
     }
 
     /**
@@ -175,18 +177,18 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
 
-    SparseArray(final long count, final DenseArray<N> values, final Scalar<N> zero) {
+    SparseArray(final long count, final DenseFactory<N> factory) {
 
         super();
 
         myCount = count;
 
-        myIndices = new long[values.size()];
-        myValues = values;
+        myIndices = new long[INITIAL_CAPACITY];
+        myValues = factory.make(INITIAL_CAPACITY);
 
-        myZeroScalar = zero;
-        myZeroNumber = zero.getNumber();
-        myZeroValue = zero.doubleValue();
+        myZeroScalar = factory.zero();
+        myZeroNumber = myZeroScalar.getNumber();
+        myZeroValue = myZeroNumber.doubleValue();
     }
 
     public final long count() {
@@ -597,10 +599,14 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     @Override
     protected void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
+        boolean tmpOnlyOnce = true;
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];
             if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
                 myValues.visit(i, visitor);
+            } else if (tmpOnlyOnce) {
+                visitor.invoke(myZeroValue);
+                tmpOnlyOnce = false;
             }
         }
     }

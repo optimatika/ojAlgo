@@ -32,11 +32,12 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.RationalNumber}.
- *
+ * 
  * @see PrimitiveArray
  * @author apete
  */
@@ -75,6 +76,11 @@ public class RationalArray extends DenseArray<RationalNumber> {
         @Override
         RationalArray wrap(final RationalNumber[] data) {
             return RationalArray.wrap(data);
+        }
+
+        @Override
+        Scalar<RationalNumber> zero() {
+            return RationalNumber.ZERO;
         }
     };
 

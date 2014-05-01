@@ -40,7 +40,7 @@ import org.ojalgo.type.TypeUtils;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.math.BigDecimal}.
- *
+ * 
  * @see PrimitiveArray
  * @author apete
  */
@@ -79,6 +79,11 @@ public class BigArray extends DenseArray<BigDecimal> {
         @Override
         BigArray wrap(final BigDecimal[] data) {
             return BigArray.wrap(data);
+        }
+
+        @Override
+        Scalar<BigDecimal> zero() {
+            return BigScalar.ZERO;
         }
 
     };

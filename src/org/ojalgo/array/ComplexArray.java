@@ -34,11 +34,12 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.ComplexNumber}.
- *
+ * 
  * @see PrimitiveArray
  * @author apete
  */
@@ -77,6 +78,11 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
         @Override
         ComplexArray wrap(final ComplexNumber[] data) {
             return ComplexArray.wrap(data);
+        }
+
+        @Override
+        Scalar<ComplexNumber> zero() {
+            return ComplexNumber.ZERO;
         }
 
     };

@@ -38,7 +38,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * Huge array - only deals with long indices. Delegates to its segments, localises indices for them.
- *
+ * 
  * @author apete
  */
 public final class SegmentedArray<N extends Number> extends BasicArray<N> {
@@ -50,104 +50,44 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
             return this;
         }
 
-        @Override
-        final SegmentedArray<N> makeStructuredZero(final long... structure) {
+        final SegmentedArray<N> makeSegmented(final BasicFactory<N> segmentFactory, final long... structure) {
 
-            final SparseFactory<N> segementFactory = this.getSparseFactory();
+            final long tmpCount = AccessUtils.count(structure);
 
-            final long totalCount = AccessUtils.count(structure);
+            int tmpNumberOfUniformSegments = 1; // NumberOfUniformSegments
+            long tmpUniformSegmentSize = tmpCount;
 
-            final long tmpElementSize = this.getElementSize();
-            final long tmpTotalCount = AccessUtils.count(structure);
-
-            long retVal = 1; // NumberOfUniformSegments
-            long tmpSegmentSize = tmpTotalCount;
-
-            final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpTotalCount));
+            final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpCount));
 
             for (int i = 0; i < structure.length; i++) {
-                final long tmpNoS = retVal * structure[i];
-                final long tmpSS = tmpSegmentSize / structure[i];
+                final long tmpNoS = (tmpNumberOfUniformSegments * structure[i]);
+                final long tmpSS = tmpUniformSegmentSize / structure[i];
                 if (tmpNoS <= tmpMaxNumberOfSegments) {
-                    retVal = tmpNoS;
-                    tmpSegmentSize = tmpSS;
+                    tmpNumberOfUniformSegments = (int) tmpNoS;
+                    tmpUniformSegmentSize = tmpSS;
                 }
             }
 
-            final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(tmpElementSize);
+            final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize());
             final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
-            while ((tmpUnits != 1L) && (tmpSegmentSize >= tmpCacheDim) && ((retVal * tmpUnits) <= tmpMaxNumberOfSegments)) {
-                retVal = retVal * tmpUnits;
-                tmpSegmentSize = tmpSegmentSize / tmpUnits;
-            }
-            final long tmpCalculateNumberOfUniformSegments = retVal;
-            final int numberOfUniformSegments = (int) tmpCalculateNumberOfUniformSegments;
-
-            final long tmpSize = totalCount / numberOfUniformSegments;
-            final int tmpRemainder = (int) (totalCount % numberOfUniformSegments);
-
-            final int tmpTotalNumberOfSegments = tmpRemainder == 0 ? numberOfUniformSegments : numberOfUniformSegments + 1;
-
-            @SuppressWarnings("unchecked")
-            final SparseArray<N>[] tmpSegments = new SparseArray[tmpTotalNumberOfSegments];
-            for (int s = 0; s < numberOfUniformSegments; s++) {
-                tmpSegments[s] = segementFactory.make(tmpSize);
-            }
-            if (tmpRemainder != 0) {
-                tmpSegments[numberOfUniformSegments] = segementFactory.make(tmpRemainder);
+            while ((tmpUnits != 1L) && (tmpUniformSegmentSize >= tmpCacheDim) && ((tmpNumberOfUniformSegments * tmpUnits) <= tmpMaxNumberOfSegments)) {
+                tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpUnits);
+                tmpUniformSegmentSize = tmpUniformSegmentSize / tmpUnits;
             }
 
-            return new SegmentedArray<N>(tmpSegments);
+            final int tmpShift = (int) (Math.log(tmpUniformSegmentSize) / Math.log(2));
+
+            return new SegmentedArray<N>(tmpCount, tmpShift, segmentFactory);
+        }
+
+        @Override
+        final SegmentedArray<N> makeStructuredZero(final long... structure) {
+            return this.makeSegmented(this.getSparseFactory(), structure);
         }
 
         @Override
         final SegmentedArray<N> makeToBeFilled(final long... structure) {
-
-            final DenseFactory<N> segementFactory = this.getDenseFactory();
-
-            final long totalCount = AccessUtils.count(structure);
-
-            final long tmpElementSize = this.getElementSize();
-            final long tmpTotalCount = AccessUtils.count(structure);
-
-            long retVal = 1; // NumberOfUniformSegments
-            long tmpSegmentSize = tmpTotalCount;
-
-            final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpTotalCount));
-
-            for (int i = 0; i < structure.length; i++) {
-                final long tmpNoS = retVal * structure[i];
-                final long tmpSS = tmpSegmentSize / structure[i];
-                if (tmpNoS <= tmpMaxNumberOfSegments) {
-                    retVal = tmpNoS;
-                    tmpSegmentSize = tmpSS;
-                }
-            }
-
-            final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(tmpElementSize);
-            final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
-            while ((tmpUnits != 1L) && (tmpSegmentSize >= tmpCacheDim) && ((retVal * tmpUnits) <= tmpMaxNumberOfSegments)) {
-                retVal = retVal * tmpUnits;
-                tmpSegmentSize = tmpSegmentSize / tmpUnits;
-            }
-            final long tmpCalculateNumberOfUniformSegments = retVal;
-            final int numberOfUniformSegments = (int) tmpCalculateNumberOfUniformSegments;
-
-            final int tmpSize = (int) (totalCount / numberOfUniformSegments);
-            final int tmpRemainder = (int) (totalCount % numberOfUniformSegments);
-
-            final int tmpTotalNumberOfSegments = tmpRemainder == 0 ? numberOfUniformSegments : numberOfUniformSegments + 1;
-
-            @SuppressWarnings("unchecked")
-            final DenseArray<N>[] tmpSegments = new DenseArray[tmpTotalNumberOfSegments];
-            for (int s = 0; s < numberOfUniformSegments; s++) {
-                tmpSegments[s] = segementFactory.make(tmpSize);
-            }
-            if (tmpRemainder != 0) {
-                tmpSegments[numberOfUniformSegments] = segementFactory.make(tmpRemainder);
-            }
-
-            return new SegmentedArray<N>(tmpSegments);
+            return this.makeSegmented(this.getDenseFactory(), structure);
         }
 
     }
@@ -224,21 +164,40 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return RATIONAL.makeStructuredZero(count);
     }
 
-    private final BasicArray<N>[] mySegments;
+    private final int myIndexBits;
 
+    private final long myIndexMask;
+    private final BasicArray<N>[] mySegments;
     /**
-     * All segments except the last one are assumed to (must) be of equal length. The last segment cannot be longer than
-     * the others.
+     * All segments except the last one are assumed to (must) be of equal length. The last segment
+     * cannot be longer than the others.
      */
     private final long mySegmentSize;
 
-    SegmentedArray(final BasicArray<N>[] segments) {
+    @SuppressWarnings("unchecked")
+    SegmentedArray(final long count, final int indexBits, final BasicFactory<N> segmentFactory) {
 
         super();
 
-        mySegments = segments;
-        mySegmentSize = segments[0].count();
+        final long tmpSegmentSize = 1L << indexBits; // 2^bits
 
+        final int tmpNumberOfUniformSegments = (int) (count / tmpSegmentSize);
+        final long tmpRemainder = count % tmpSegmentSize;
+
+        final int tmpTotalNumberOfSegments = tmpRemainder == 0L ? (int) tmpNumberOfUniformSegments : tmpNumberOfUniformSegments + 1;
+
+        mySegments = (BasicArray<N>[]) new BasicArray<?>[tmpTotalNumberOfSegments];
+        for (int s = 0; s < tmpNumberOfUniformSegments; s++) {
+            mySegments[s] = segmentFactory.makeZero(tmpSegmentSize);
+        }
+        if (tmpRemainder != 0L) {
+            mySegments[tmpNumberOfUniformSegments] = segmentFactory.makeZero(tmpRemainder);
+        }
+
+        mySegmentSize = tmpSegmentSize;
+
+        myIndexBits = indexBits;
+        myIndexMask = tmpSegmentSize - 1L;
     }
 
     @Override
@@ -248,7 +207,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     }
 
     public double doubleValue(final long index) {
-        return mySegments[(int) (index / mySegmentSize)].doubleValue(index % mySegmentSize);
+        return mySegments[(int) (index >> myIndexBits)].doubleValue(index & myIndexMask);
     }
 
     public void fillAll(final N value) {
@@ -273,39 +232,39 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     }
 
     public N get(final long index) {
-        return mySegments[(int) (index / mySegmentSize)].get(index % mySegmentSize);
+        return mySegments[(int) (index >> myIndexBits)].get(index & myIndexMask);
     }
 
     public boolean isAbsolute(final long index) {
-        return mySegments[(int) (index / mySegmentSize)].isAbsolute(index % mySegmentSize);
+        return mySegments[(int) (index >> myIndexBits)].isAbsolute(index & myIndexMask);
     }
 
     public boolean isInfinite(final long index) {
-        return mySegments[(int) (index / mySegmentSize)].isInfinite(index % mySegmentSize);
+        return mySegments[(int) (index >> myIndexBits)].isInfinite(index & myIndexMask);
     }
 
     public boolean isNaN(final long index) {
-        return mySegments[(int) (index / mySegmentSize)].isNaN(index % mySegmentSize);
+        return mySegments[(int) (index >> myIndexBits)].isNaN(index & myIndexMask);
     }
 
     public boolean isPositive(final long index) {
-        return mySegments[(int) (index / mySegmentSize)].isPositive(index % mySegmentSize);
+        return mySegments[(int) (index >> myIndexBits)].isPositive(index & myIndexMask);
     }
 
     public boolean isReal(final long index) {
-        return mySegments[(int) (index / mySegmentSize)].isReal(index % mySegmentSize);
+        return mySegments[(int) (index >> myIndexBits)].isReal(index & myIndexMask);
     }
 
     public boolean isZero(final long index) {
-        return mySegments[(int) (index / mySegmentSize)].isZero(index % mySegmentSize);
+        return mySegments[(int) (index >> myIndexBits)].isZero(index & myIndexMask);
     }
 
     public void set(final long index, final double value) {
-        mySegments[(int) (index / mySegmentSize)].set(index % mySegmentSize, value);
+        mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
     }
 
     public void set(final long index, final Number value) {
-        mySegments[(int) (index / mySegmentSize)].set(index % mySegmentSize, value);
+        mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
     }
 
     @Override
@@ -354,7 +313,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
             // Will use a continuous range of segements
 
             final int tmpFirstSegment = (int) (first / mySegmentSize);
-            final int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
+            final int tmpLastSegemnt = (int) ((limit - 1L) / mySegmentSize);
 
             long tmpFirstInSegment = (first % mySegmentSize);
 
@@ -465,7 +424,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     @Override
     protected Scalar<N> toScalar(final long index) {
-        return mySegments[(int) (index / mySegmentSize)].toScalar(index % mySegmentSize);
+        return mySegments[(int) (index >> myIndexBits)].toScalar(index & myIndexMask);
     }
 
     @Override

@@ -33,7 +33,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * Represents a single dense array - casts long indices to int.
- *
+ * 
  * @author apete
  */
 abstract class DenseArray<N extends Number> extends BasicArray<N> implements RandomAccess {
@@ -56,6 +56,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         final DenseArray<N> makeToBeFilled(final long... structure) {
             return this.make((int) AccessUtils.count(structure));
         }
+
+        abstract Scalar<N> zero();
 
     }
 
@@ -237,7 +239,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     /**
      * @see java.util.Arrays#binarySearch(Object[], Object)
      * @see #sortAscending()
-     * @throws UnsupportedOperationException if the this operation is not supported by this implementation/subclass
+     * @throws UnsupportedOperationException if the this operation is not supported by this
+     *         implementation/subclass
      */
     protected abstract int searchAscending(N number);
 
@@ -250,7 +253,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     /**
      * @see java.util.Arrays#sort(Object[])
      * @see #searchAscending(Number)
-     * @throws UnsupportedOperationException if the this operation is not supported by this implementation/subclass
+     * @throws UnsupportedOperationException if the this operation is not supported by this
+     *         implementation/subclass
      */
     protected abstract void sortAscending();
 

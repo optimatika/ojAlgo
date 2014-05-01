@@ -30,6 +30,7 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -101,6 +102,10 @@ public final class OffHeapArray extends BasicArray<Double> {
         return new OffHeapArray(count);
     }
 
+    public static final SegmentedArray<Double> makeSegmented(final int size) {
+        return SegmentedArray.PRIMITIVE.makeSegmented(FACTORY, size);
+    }
+
     private final long data;
 
     private final long myCount;
@@ -112,6 +117,8 @@ public final class OffHeapArray extends BasicArray<Double> {
         myCount = count;
 
         data = UNSAFE.allocateMemory(Unsafe.ARRAY_DOUBLE_INDEX_SCALE * count);
+
+        this.fillAll(PrimitiveMath.ZERO);
     }
 
     public long count() {
@@ -170,7 +177,7 @@ public final class OffHeapArray extends BasicArray<Double> {
         return data + (index * Unsafe.ARRAY_DOUBLE_INDEX_SCALE);
     }
 
-    private final long offset(final long step) {
+    private final long increment(final long step) {
         return step * Unsafe.ARRAY_DOUBLE_INDEX_SCALE;
     }
 
@@ -197,7 +204,7 @@ public final class OffHeapArray extends BasicArray<Double> {
     protected void fill(final long first, final long limit, final long step, final Double value) {
         final long tmpFirst = this.address(first);
         final long tmpLimit = this.address(limit);
-        final long tmpStep = this.offset(step);
+        final long tmpStep = this.increment(step);
         final double tmpValue = value.doubleValue();
         for (long a = tmpFirst; a < tmpLimit; a += tmpStep) {
             UNSAFE.putDouble(a, tmpValue);
@@ -261,7 +268,7 @@ public final class OffHeapArray extends BasicArray<Double> {
     protected void modify(final long first, final long limit, final long step, final UnaryFunction<Double> function) {
         final long tmpFirst = this.address(first);
         final long tmpLimit = this.address(limit);
-        final long tmpStep = this.offset(step);
+        final long tmpStep = this.increment(step);
         for (long a = tmpFirst; a < tmpLimit; a += tmpStep) {
             UNSAFE.putDouble(a, function.invoke(UNSAFE.getDouble(a)));
         }
@@ -276,7 +283,7 @@ public final class OffHeapArray extends BasicArray<Double> {
     protected void visit(final long first, final long limit, final long step, final VoidFunction<Double> visitor) {
         final long tmpFirst = this.address(first);
         final long tmpLimit = this.address(limit);
-        final long tmpStep = this.offset(step);
+        final long tmpStep = this.increment(step);
         for (long a = tmpFirst; a < tmpLimit; a += tmpStep) {
             visitor.invoke(UNSAFE.getDouble(a));
         }

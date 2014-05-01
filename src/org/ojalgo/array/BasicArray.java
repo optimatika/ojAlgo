@@ -105,14 +105,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         }
 
         public final BasicArray<N> makeZero(final long count) {
-            if (count > Integer.MAX_VALUE) {
-                return this.getSegmentedFactory().makeStructuredZero(count);
-            } else if (count > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize())) {
-                return this.getSparseFactory().makeStructuredZero(count);
-            } else {
-                return this.getDenseFactory().makeStructuredZero(count);
-            }
-
+            return this.makeStructuredZero(count);
         }
 
         abstract DenseArray.DenseFactory<N> getDenseFactory();
@@ -131,8 +124,9 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
             if (tmpTotal > Integer.MAX_VALUE) {
                 return this.getSegmentedFactory().makeStructuredZero(structure);
+
             } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize())) {
-                return this.getSparseFactory().makeStructuredZero(structure);
+                return new SparseArray<N>(tmpTotal, this.getDenseFactory());
             } else {
                 return this.getDenseFactory().makeStructuredZero(structure);
             }

@@ -46,11 +46,11 @@ import org.ojalgo.type.TypeUtils;
  * A one- and/or arbitrary-dimensional array of double.
  * </p>
  * <p>
- * You cannot instantiate a PrimitiveArray directly. You have to either subclass it and implement instantiation code in
- * that subclass, or use one of the static factory methods in {@linkplain Array1D}, {@linkplain Array2D} or
- * {@linkplain ArrayAnyD}.
+ * You cannot instantiate a PrimitiveArray directly. You have to either subclass it and implement
+ * instantiation code in that subclass, or use one of the static factory methods in
+ * {@linkplain Array1D}, {@linkplain Array2D} or {@linkplain ArrayAnyD}.
  * </p>
- *
+ * 
  * @author apete
  */
 public class PrimitiveArray extends DenseArray<Double> {
@@ -90,10 +90,19 @@ public class PrimitiveArray extends DenseArray<Double> {
             return PrimitiveArray.wrap(data);
         }
 
+        @Override
+        Scalar<Double> zero() {
+            return PrimitiveScalar.ZERO;
+        }
+
     };
 
     public static final PrimitiveArray make(final int size) {
         return new PrimitiveArray(size);
+    }
+
+    public static final SegmentedArray<Double> makeSegmented(final int size) {
+        return SegmentedArray.PRIMITIVE.makeSegmented(FACTORY, size);
     }
 
     public static final PrimitiveArray wrap(final double[] data) {
