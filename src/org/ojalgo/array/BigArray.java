@@ -27,8 +27,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.array.SegmentedArray.SegmentedFactory;
-import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -40,21 +38,15 @@ import org.ojalgo.type.TypeUtils;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.math.BigDecimal}.
- * 
+ *
  * @see PrimitiveArray
  * @author apete
  */
 public class BigArray extends DenseArray<BigDecimal> {
 
-    static abstract class BigFactory extends DenseFactory<BigDecimal> {
-
-        abstract BigArray wrap(BigDecimal[] data);
-
-    }
-
     static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(BigDecimal.class);
 
-    static final BigFactory FACTORY = new BigFactory() {
+    static final DenseFactory<BigDecimal> FACTORY = new DenseFactory<BigDecimal>() {
 
         @Override
         long getElementSize() {
@@ -62,23 +54,8 @@ public class BigArray extends DenseArray<BigDecimal> {
         }
 
         @Override
-        SegmentedFactory<BigDecimal> getSegmentedFactory() {
-            return SegmentedArray.BIG;
-        }
-
-        @Override
-        SparseFactory<BigDecimal> getSparseFactory() {
-            return SparseArray.BIG;
-        }
-
-        @Override
         DenseArray<BigDecimal> make(final int size) {
             return BigArray.make(size);
-        }
-
-        @Override
-        BigArray wrap(final BigDecimal[] data) {
-            return BigArray.wrap(data);
         }
 
         @Override
@@ -90,6 +67,10 @@ public class BigArray extends DenseArray<BigDecimal> {
 
     public static final BigArray make(final int size) {
         return new BigArray(size);
+    }
+
+    public static final SegmentedArray<BigDecimal> makeSegmented(final long count) {
+        return SegmentedArray.BIG.makeSegmented(FACTORY, count);
     }
 
     public static final BigArray wrap(final BigDecimal[] data) {

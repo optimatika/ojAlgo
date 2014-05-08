@@ -24,7 +24,6 @@ package org.ojalgo.array;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Iterator;
-import java.util.List;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
@@ -37,7 +36,6 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.netio.ASCII;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -58,66 +56,15 @@ import org.ojalgo.scalar.Scalar;
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
         Access1D.Visitable<N>, Serializable {
 
-    static abstract class BasicFactory<N extends Number> extends Object implements Access1D.Factory<BasicArray<N>> {
-
-        public final BasicArray<N> copy(final Access1D<?> source) {
-            final long tmpCount = source.count();
-            final BasicArray<N> retVal = this.makeToBeFilled(tmpCount);
-            for (long i = 0L; i < tmpCount; i++) {
-                retVal.set(i, source.doubleValue(i));
-            }
-            return retVal;
-        }
-
-        public final BasicArray<N> copy(final double... source) {
-            final int tmpLength = source.length;
-            final BasicArray<N> retVal = this.makeToBeFilled(tmpLength);
-            for (int i = 0; i < tmpLength; i++) {
-                retVal.set(i, source[i]);
-            }
-            return retVal;
-        }
-
-        public final BasicArray<N> copy(final List<? extends Number> source) {
-            final int tmpSize = source.size();
-            final BasicArray<N> retVal = this.makeToBeFilled(tmpSize);
-            for (int i = 0; i < tmpSize; i++) {
-                retVal.set(i, source.get(i));
-            }
-            return retVal;
-        }
-
-        public final BasicArray<N> copy(final Number... source) {
-            final int tmpLength = source.length;
-            final BasicArray<N> retVal = this.makeToBeFilled(tmpLength);
-            for (int i = 0; i < tmpLength; i++) {
-                retVal.set(i, source[i]);
-            }
-            return retVal;
-        }
-
-        public final BasicArray<N> makeRandom(final long count, final RandomNumber distribution) {
-            final BasicArray<N> retVal = this.makeToBeFilled(count);
-            for (long i = 0L; i < count; i++) {
-                retVal.set(i, distribution.doubleValue());
-            }
-            return retVal;
-        }
-
-        public final BasicArray<N> makeZero(final long count) {
-            return this.makeStructuredZero(count);
-        }
+    static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 
         abstract DenseArray.DenseFactory<N> getDenseFactory();
-
-        long getElementSize() {
-            return this.getDenseFactory().getElementSize();
-        }
 
         abstract SegmentedArray.SegmentedFactory<N> getSegmentedFactory();
 
         abstract SparseArray.SparseFactory<N> getSparseFactory();
 
+        @Override
         BasicArray<N> makeStructuredZero(final long... structure) {
 
             final long tmpTotal = AccessUtils.count(structure);
@@ -125,7 +72,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             if (tmpTotal > Integer.MAX_VALUE) {
                 return this.getSegmentedFactory().makeStructuredZero(structure);
 
-            } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize())) {
+            } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getDenseFactory().getElementSize())) {
                 return new SparseArray<N>(tmpTotal, this.getDenseFactory());
             } else {
                 return this.getDenseFactory().makeStructuredZero(structure);
@@ -133,6 +80,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
         }
 
+        @Override
         BasicArray<N> makeToBeFilled(final long... structure) {
 
             final long tmpTotal = AccessUtils.count(structure);

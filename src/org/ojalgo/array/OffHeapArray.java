@@ -27,14 +27,10 @@ import java.lang.reflect.Field;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.array.DenseArray.DenseFactory;
-import org.ojalgo.array.SegmentedArray.SegmentedFactory;
-import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
@@ -43,27 +39,7 @@ import sun.misc.Unsafe;
 
 public final class OffHeapArray extends BasicArray<Double> {
 
-    static final class OffHeapFactory extends BasicFactory<Double> {
-
-        @Override
-        DenseFactory<Double> getDenseFactory() {
-            return PrimitiveArray.FACTORY;
-        }
-
-        @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
-        }
-
-        @Override
-        SegmentedFactory<Double> getSegmentedFactory() {
-            return SegmentedArray.PRIMITIVE;
-        }
-
-        @Override
-        SparseFactory<Double> getSparseFactory() {
-            return SparseArray.PRIMITIVE;
-        }
+    static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
 
         @Override
         BasicArray<Double> makeStructuredZero(final long... structure) {
@@ -75,11 +51,7 @@ public final class OffHeapArray extends BasicArray<Double> {
             return new OffHeapArray(AccessUtils.count(structure));
         }
 
-    }
-
-    static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
-
-    static final OffHeapFactory FACTORY = new OffHeapFactory();
+    };
 
     static Unsafe UNSAFE;
 
@@ -102,8 +74,8 @@ public final class OffHeapArray extends BasicArray<Double> {
         return new OffHeapArray(count);
     }
 
-    public static final SegmentedArray<Double> makeSegmented(final int size) {
-        return SegmentedArray.PRIMITIVE.makeSegmented(FACTORY, size);
+    public static final SegmentedArray<Double> makeSegmented(final long count) {
+        return SegmentedArray.PRIMITIVE.makeSegmented(FACTORY, count);
     }
 
     private final long data;

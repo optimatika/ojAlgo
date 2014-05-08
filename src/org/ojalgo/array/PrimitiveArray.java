@@ -26,8 +26,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.array.SegmentedArray.SegmentedFactory;
-import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
@@ -46,24 +44,18 @@ import org.ojalgo.type.TypeUtils;
  * A one- and/or arbitrary-dimensional array of double.
  * </p>
  * <p>
- * You cannot instantiate a PrimitiveArray directly. You have to either subclass it and implement
- * instantiation code in that subclass, or use one of the static factory methods in
- * {@linkplain Array1D}, {@linkplain Array2D} or {@linkplain ArrayAnyD}.
+ * You cannot instantiate a PrimitiveArray directly. You have to either subclass it and implement instantiation code in
+ * that subclass, or use one of the static factory methods in {@linkplain Array1D}, {@linkplain Array2D} or
+ * {@linkplain ArrayAnyD}.
  * </p>
- * 
+ *
  * @author apete
  */
 public class PrimitiveArray extends DenseArray<Double> {
 
-    static abstract class PrimitiveFactory extends DenseFactory<Double> {
-
-        abstract PrimitiveArray wrap(double[] data);
-
-    }
-
     static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
 
-    static final PrimitiveFactory FACTORY = new PrimitiveFactory() {
+    static final DenseFactory<Double> FACTORY = new DenseFactory<Double>() {
 
         @Override
         long getElementSize() {
@@ -71,23 +63,8 @@ public class PrimitiveArray extends DenseArray<Double> {
         }
 
         @Override
-        SegmentedFactory<Double> getSegmentedFactory() {
-            return SegmentedArray.PRIMITIVE;
-        }
-
-        @Override
-        SparseFactory<Double> getSparseFactory() {
-            return SparseArray.PRIMITIVE;
-        }
-
-        @Override
         DenseArray<Double> make(final int size) {
             return PrimitiveArray.make(size);
-        }
-
-        @Override
-        PrimitiveArray wrap(final double[] data) {
-            return PrimitiveArray.wrap(data);
         }
 
         @Override
@@ -103,6 +80,10 @@ public class PrimitiveArray extends DenseArray<Double> {
 
     public static final SegmentedArray<Double> makeSegmented(final int size) {
         return SegmentedArray.PRIMITIVE.makeSegmented(FACTORY, size);
+    }
+
+    public static final SegmentedArray<Double> makeSegmented(final long count) {
+        return SegmentedArray.PRIMITIVE.makeSegmented(FACTORY, count);
     }
 
     public static final PrimitiveArray wrap(final double[] data) {

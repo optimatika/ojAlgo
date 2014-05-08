@@ -26,8 +26,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.array.SegmentedArray.SegmentedFactory;
-import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -39,21 +37,15 @@ import org.ojalgo.type.TypeUtils;
 
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.ComplexNumber}.
- * 
+ *
  * @see PrimitiveArray
  * @author apete
  */
 public class ComplexArray extends DenseArray<ComplexNumber> {
 
-    static abstract class ComplexFactory extends DenseFactory<ComplexNumber> {
-
-        abstract ComplexArray wrap(ComplexNumber[] data);
-
-    }
-
     static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(ComplexNumber.class);
 
-    static final ComplexFactory FACTORY = new ComplexFactory() {
+    static final DenseFactory<ComplexNumber> FACTORY = new DenseFactory<ComplexNumber>() {
 
         @Override
         long getElementSize() {
@@ -61,23 +53,8 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
         }
 
         @Override
-        SegmentedFactory<ComplexNumber> getSegmentedFactory() {
-            return SegmentedArray.COMPLEX;
-        }
-
-        @Override
-        SparseFactory<ComplexNumber> getSparseFactory() {
-            return SparseArray.COMPLEX;
-        }
-
-        @Override
         DenseArray<ComplexNumber> make(final int size) {
             return ComplexArray.make(size);
-        }
-
-        @Override
-        ComplexArray wrap(final ComplexNumber[] data) {
-            return ComplexArray.wrap(data);
         }
 
         @Override
@@ -89,6 +66,10 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
 
     public static final ComplexArray make(final int size) {
         return new ComplexArray(size);
+    }
+
+    public static final SegmentedArray<ComplexNumber> makeSegmented(final long count) {
+        return SegmentedArray.COMPLEX.makeSegmented(FACTORY, count);
     }
 
     public static final ComplexArray wrap(final ComplexNumber[] data) {

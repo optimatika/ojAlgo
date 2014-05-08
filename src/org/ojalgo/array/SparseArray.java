@@ -29,7 +29,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
-import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -46,12 +45,7 @@ import org.ojalgo.type.TypeUtils;
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
 
-    static abstract class SparseFactory<N extends Number> extends BasicFactory<N> {
-
-        @Override
-        final SparseFactory<N> getSparseFactory() {
-            return this;
-        }
+    static abstract class SparseFactory<N extends Number> extends ArrayFactory<N> {
 
         abstract SparseArray<N> make(long count);
 
@@ -72,16 +66,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final SparseFactory<BigDecimal> BIG = new SparseFactory<BigDecimal>() {
 
         @Override
-        DenseFactory<BigDecimal> getDenseFactory() {
-            return BigArray.FACTORY;
-        }
-
-        @Override
-        SegmentedFactory<BigDecimal> getSegmentedFactory() {
-            return SegmentedArray.BIG;
-        }
-
-        @Override
         SparseArray<BigDecimal> make(final long count) {
             return SparseArray.makeBig(count);
         }
@@ -89,16 +73,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     };
 
     static final SparseFactory<ComplexNumber> COMPLEX = new SparseFactory<ComplexNumber>() {
-
-        @Override
-        DenseFactory<ComplexNumber> getDenseFactory() {
-            return ComplexArray.FACTORY;
-        }
-
-        @Override
-        SegmentedFactory<ComplexNumber> getSegmentedFactory() {
-            return SegmentedArray.COMPLEX;
-        }
 
         @Override
         SparseArray<ComplexNumber> make(final long count) {
@@ -110,16 +84,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final SparseFactory<Double> PRIMITIVE = new SparseFactory<Double>() {
 
         @Override
-        DenseFactory<Double> getDenseFactory() {
-            return PrimitiveArray.FACTORY;
-        }
-
-        @Override
-        SegmentedFactory<Double> getSegmentedFactory() {
-            return SegmentedArray.PRIMITIVE;
-        }
-
-        @Override
         SparseArray<Double> make(final long count) {
             return SparseArray.makePrimitive(count);
         }
@@ -127,16 +91,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     };
 
     static final SparseFactory<RationalNumber> RATIONAL = new SparseFactory<RationalNumber>() {
-
-        @Override
-        DenseFactory<RationalNumber> getDenseFactory() {
-            return RationalArray.FACTORY;
-        }
-
-        @Override
-        SegmentedFactory<RationalNumber> getSegmentedFactory() {
-            return SegmentedArray.RATIONAL;
-        }
 
         @Override
         SparseArray<RationalNumber> make(final long count) {
@@ -149,20 +103,32 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return new SparseArray<>(count, BigArray.FACTORY);
     }
 
+    public static final SegmentedArray<BigDecimal> makeBigSegmented(final long count) {
+        return SegmentedArray.BIG.makeSegmented(BIG, count);
+    }
+
     public static SparseArray<ComplexNumber> makeComplex(final long count) {
         return new SparseArray<>(count, ComplexArray.FACTORY);
+    }
+
+    public static final SegmentedArray<ComplexNumber> makeComplexSegmented(final long count) {
+        return SegmentedArray.COMPLEX.makeSegmented(COMPLEX, count);
     }
 
     public static SparseArray<Double> makePrimitive(final long count) {
         return new SparseArray<>(count, PrimitiveArray.FACTORY);
     }
 
+    public static final SegmentedArray<Double> makePrimitiveSegmented(final long count) {
+        return SegmentedArray.PRIMITIVE.makeSegmented(PRIMITIVE, count);
+    }
+
     public static SparseArray<RationalNumber> makeRational(final long count) {
         return new SparseArray<>(count, RationalArray.FACTORY);
     }
 
-    public static final SegmentedArray<Double> makeSegmented(final int size) {
-        return SegmentedArray.PRIMITIVE.makeSegmented(PRIMITIVE, size);
+    public static final SegmentedArray<RationalNumber> makeRationalSegmented(final long count) {
+        return SegmentedArray.RATIONAL.makeSegmented(RATIONAL, count);
     }
 
     /**

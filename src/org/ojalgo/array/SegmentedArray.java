@@ -38,19 +38,18 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * Huge array - only deals with long indices. Delegates to its segments, localises indices for them.
- * 
+ *
  * @author apete
  */
 public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
-    static abstract class SegmentedFactory<N extends Number> extends BasicFactory<N> {
+    static abstract class SegmentedFactory<N extends Number> extends ArrayFactory<N> {
 
-        @Override
-        final SegmentedFactory<N> getSegmentedFactory() {
-            return this;
-        }
+        abstract DenseArray.DenseFactory<N> getDenseFactory();
 
-        final SegmentedArray<N> makeSegmented(final BasicFactory<N> segmentFactory, final long... structure) {
+        abstract SparseArray.SparseFactory<N> getSparseFactory();
+
+        final SegmentedArray<N> makeSegmented(final ArrayFactory<N> segmentFactory, final long... structure) {
 
             final long tmpCount = AccessUtils.count(structure);
 
@@ -68,7 +67,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
                 }
             }
 
-            final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize());
+            final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getDenseFactory().getElementSize());
             final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
             while ((tmpUnits != 1L) && (tmpUniformSegmentSize >= tmpCacheDim) && ((tmpNumberOfUniformSegments * tmpUnits) <= tmpMaxNumberOfSegments)) {
                 tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpUnits);
@@ -148,34 +147,49 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     };
 
-    public static SegmentedArray<BigDecimal> makeBig(final long count) {
-        return BIG.makeStructuredZero(count);
+    public static SegmentedArray<BigDecimal> makeBigDense(final long count) {
+        return BIG.makeSegmented(BasicArray.BIG, count);
     }
 
-    public static SegmentedArray<ComplexNumber> makeComplex(final long count) {
-        return COMPLEX.makeStructuredZero(count);
+    public static SegmentedArray<BigDecimal> makeBigSparse(final long count) {
+        return BIG.makeSegmented(SparseArray.BIG, count);
     }
 
-    public static SegmentedArray<Double> makePrimitive(final long count) {
-        return PRIMITIVE.makeStructuredZero(count);
+    public static SegmentedArray<ComplexNumber> makeComplexDense(final long count) {
+        return COMPLEX.makeSegmented(BasicArray.COMPLEX, count);
     }
 
-    public static SegmentedArray<RationalNumber> makeRational(final long count) {
-        return RATIONAL.makeStructuredZero(count);
+    public static SegmentedArray<ComplexNumber> makeComplexSparse(final long count) {
+        return COMPLEX.makeSegmented(SparseArray.COMPLEX, count);
+    }
+
+    public static SegmentedArray<Double> makePrimitiveDense(final long count) {
+        return PRIMITIVE.makeSegmented(BasicArray.PRIMITIVE, count);
+    }
+
+    public static SegmentedArray<Double> makePrimitiveSparse(final long count) {
+        return PRIMITIVE.makeSegmented(SparseArray.PRIMITIVE, count);
+    }
+
+    public static SegmentedArray<RationalNumber> makeRationalDense(final long count) {
+        return RATIONAL.makeSegmented(BasicArray.RATIONAL, count);
+    }
+
+    public static SegmentedArray<RationalNumber> makeRationalSparse(final long count) {
+        return RATIONAL.makeSegmented(SparseArray.RATIONAL, count);
     }
 
     private final int myIndexBits;
-
     private final long myIndexMask;
     private final BasicArray<N>[] mySegments;
     /**
-     * All segments except the last one are assumed to (must) be of equal length. The last segment
-     * cannot be longer than the others.
+     * All segments except the last one are assumed to (must) be of equal length. The last segment cannot be longer than
+     * the others.
      */
     private final long mySegmentSize;
 
     @SuppressWarnings("unchecked")
-    SegmentedArray(final long count, final int indexBits, final BasicFactory<N> segmentFactory) {
+    SegmentedArray(final long count, final int indexBits, final ArrayFactory<N> segmentFactory) {
 
         super();
 
