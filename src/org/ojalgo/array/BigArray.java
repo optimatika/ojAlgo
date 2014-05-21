@@ -39,7 +39,6 @@ import org.ojalgo.type.TypeUtils;
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain java.math.BigDecimal}.
  *
- * @see PrimitiveArray
  * @author apete
  */
 public class BigArray extends DenseArray<BigDecimal> {

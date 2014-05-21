@@ -38,7 +38,6 @@ import org.ojalgo.type.TypeUtils;
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.ComplexNumber}.
  *
- * @see PrimitiveArray
  * @author apete
  */
 public class ComplexArray extends DenseArray<ComplexNumber> {

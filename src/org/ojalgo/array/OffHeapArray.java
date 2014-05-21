@@ -37,6 +37,11 @@ import org.ojalgo.type.TypeUtils;
 
 import sun.misc.Unsafe;
 
+/**
+ * Off heap memory array.
+ *
+ * @author apete
+ */
 public final class OffHeapArray extends BasicArray<Double> {
 
     static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {

@@ -36,7 +36,6 @@ import org.ojalgo.type.TypeUtils;
 /**
  * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.RationalNumber}.
  *
- * @see PrimitiveArray
  * @author apete
  */
 public class RationalArray extends DenseArray<RationalNumber> {

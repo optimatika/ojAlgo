@@ -40,14 +40,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
 /**
- * <p>
  * A one- and/or arbitrary-dimensional array of double.
- * </p>
- * <p>
- * You cannot instantiate a PrimitiveArray directly. You have to either subclass it and implement instantiation code in
- * that subclass, or use one of the static factory methods in {@linkplain Array1D}, {@linkplain Array2D} or
- * {@linkplain ArrayAnyD}.
- * </p>
  *
  * @author apete
  */

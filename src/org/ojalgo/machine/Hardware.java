@@ -47,7 +47,7 @@ import org.ojalgo.netio.ASCII;
  * <code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or
  * <code>new MemoryThreads[] { SYSTEM, L1 }</code></li>
  * <ul>
- * 
+ *
  * @author apete
  */
 public final class Hardware extends AbstractMachine implements Comparable<Hardware> {
@@ -228,6 +228,20 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
+     * <li>Core i7-3770 3.4 GHz - 4 cores - 8 threads (whale @ MSC/MSB)
+     * <ul>
+     * <li></li>
+     * <li>1 processor</li>
+     * <li>4 cores per processor</li>
+     * <li>2 threads per core</li>
+     * <li>==>> Total 8 threads</li>
+     * <li></li>
+     * <li>8GB system RAM</li>
+     * <li>8MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
      * </ul>
      */
     static final Hardware X86_64__08 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(11L * K * K * K, 8), new BasicMachine(8L * K * K, 8),
@@ -235,7 +249,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
 
     /**
      * <pre>
-     * "Gulftown" (32 nm) Model: SLBUZ (B1) 
+     * "Gulftown" (32 nm) Model: SLBUZ (B1)
      * Intel Core i7-980 3.33GHz
      * 8/25/2010
      * ref: http://ark.intel.com/products/47932

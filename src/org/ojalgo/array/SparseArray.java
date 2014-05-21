@@ -39,7 +39,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
 /**
- * Sparse array - maps long to int.
+ * Sparse array - maps long indices to a localiced int.
  *
  * @author apete
  */
