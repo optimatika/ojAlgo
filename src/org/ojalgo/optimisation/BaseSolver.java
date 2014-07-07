@@ -398,6 +398,10 @@ public abstract class BaseSolver extends GenericSolver {
             return myKickStarter != null;
         }
 
+        public boolean isX() {
+            return myX != null;
+        }
+
         public void resetLE() {
             if (myLE != null) {
                 myLE.fillAll(PrimitiveMath.ZERO);
@@ -831,6 +835,10 @@ public abstract class BaseSolver extends GenericSolver {
 
     protected boolean hasObjective() {
         return myMatrices.hasObjective();
+    }
+
+    protected boolean isX() {
+        return myMatrices.isX();
     }
 
     protected void resetLE() {

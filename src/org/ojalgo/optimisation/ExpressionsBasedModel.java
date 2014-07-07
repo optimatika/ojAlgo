@@ -28,7 +28,7 @@ import java.util.*;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.integer.OldIntegerSolver;
@@ -83,16 +83,10 @@ import org.ojalgo.type.context.NumberContext;
  * </ul>
  * The plan is that future versions should not have any restrictions like these.
  * </p>
- * 
+ *
  * @author apete
  */
 public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
-
-    private static final String NEW_LINE = "\n";
-
-    private static final String START_END = "############################################\n";
-
-    private static final String OBJ_FUNC_AS_CONSTR_NAME = UUID.randomUUID().toString();
 
     public static ExpressionsBasedModel make(final MathProgSysModel aModel) {
 
@@ -218,6 +212,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
         }
     }
+
+    private static final String NEW_LINE = "\n";
+
+    private static final String START_END = "############################################\n";
+
+    private static final String OBJ_FUNC_AS_CONSTR_NAME = UUID.randomUUID().toString();
 
     private final boolean myWorkCopy;
 
@@ -358,6 +358,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         } else if (this.isAnyExpressionQuadratic()) {
 
             return QuadraticSolver.make(this);
+            //return ConvexSolver.make(this);
 
         } else {
 
@@ -493,24 +494,42 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return Collections.unmodifiableList(myVariables);
     }
 
-    public Access1D<BigDecimal> getVariableValues() {
+    public Optimisation.Result getVariableValues() {
+        return this.getVariableValues(options.slack);
+    }
 
-        final int tmpSize = myVariables.size();
+    /**
+     * Null variable values are replaced with 0.0. If any variable value is null the state is set to INFEASIBLE even if
+     * zero would actually be a feasible value. The objective function value is not calculated for infeasible variable
+     * values.
+     */
+    public Optimisation.Result getVariableValues(final NumberContext validationContext) {
 
-        final Array1D<BigDecimal> retVal = Array1D.BIG.makeZero(tmpSize);
+        final int tmpNumberOfVariables = myVariables.size();
+
+        final Array1D<BigDecimal> tmpSolution = Array1D.BIG.makeZero(tmpNumberOfVariables);
+
+        boolean tmpNoneNull = true;
 
         BigDecimal tmpVal;
-        for (int i = 0; i < tmpSize; i++) {
+        for (int i = 0; i < tmpNumberOfVariables; i++) {
 
             tmpVal = myVariables.get(i).getValue();
+
             if (tmpVal != null) {
-                retVal.set(i, tmpVal);
+                tmpSolution.set(i, tmpVal);
             } else {
-                retVal.set(i, ZERO);
+                tmpSolution.set(i, BigMath.ZERO);
+                tmpNoneNull = false;
             }
         }
 
-        return retVal;
+        if (tmpNoneNull && this.validate(tmpSolution, validationContext)) {
+            final double tmpValue = this.getObjectiveExpression().evaluate(tmpSolution).doubleValue();
+            return new Optimisation.Result(State.FEASIBLE, tmpValue, tmpSolution);
+        } else {
+            return new Optimisation.Result(State.INFEASIBLE, Double.NaN, tmpSolution);
+        }
     }
 
     public int indexOf(final Variable aVariable) {
@@ -842,30 +861,21 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         if (this.isInfeasible()) {
 
-            final Access1D<BigDecimal> tmpSolution = this.getVariableValues();
+            final Optimisation.Result tmpSolution = this.getVariableValues();
 
-            final double tmpValue = PrimitiveMath.NaN;
-            final State tmpState = State.INFEASIBLE;
-
-            retVal = new Result(tmpState, tmpValue, tmpSolution);
+            retVal = new Optimisation.Result(State.INFEASIBLE, tmpSolution);
 
         } else if (this.isFixed()) {
 
-            final Access1D<BigDecimal> tmpSolution = this.getVariableValues();
+            final Optimisation.Result tmpSolution = this.getVariableValues();
 
-            if (this.validate(tmpSolution)) {
+            if (tmpSolution.getState().isFeasible()) {
 
-                final double tmpValue = this.getObjectiveFunction().invoke(tmpSolution);
-                final State tmpState = State.DISTINCT;
-
-                retVal = new Result(tmpState, tmpValue, tmpSolution);
+                retVal = new Result(State.DISTINCT, tmpSolution);
 
             } else {
 
-                final double tmpValue = PrimitiveMath.NaN;
-                final State tmpState = State.INVALID;
-
-                retVal = new Result(tmpState, tmpValue, tmpSolution);
+                retVal = new Result(State.INVALID, tmpSolution);
             }
 
         } else {
@@ -938,7 +948,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public boolean validate(final NumberContext context) {
-        return this.validate(this.getVariableValues(), context);
+        return this.getVariableValues(context).getState().isFeasible();
     }
 
     private void categoriseVariables() {

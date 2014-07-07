@@ -33,7 +33,7 @@ import org.ojalgo.matrix.store.MatrixStore;
  * <li>[this] = [Q][R]</li>
  * </ul>
  * Note: Either Q or R will be square. The interface does not specify which.
- * 
+ *
  * @author apete
  */
 public interface QR<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {

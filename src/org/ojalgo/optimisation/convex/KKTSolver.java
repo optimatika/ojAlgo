@@ -26,12 +26,19 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
-import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.decomposition.LUDecomposition;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.QRDecomposition;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.Builder;
+import org.ojalgo.matrix.store.ZeroStore;
 
+/**
+ * If the KKT system is not solvable, the quadratic optimization problem is unbounded below or infeasible.
+ *
+ * @author apete
+ */
 public final class KKTSolver extends Object {
 
     public static final class Input {
@@ -40,6 +47,16 @@ public final class KKTSolver extends Object {
         private final MatrixStore<Double> myB;
         private final MatrixStore<Double> myC;
         private final MatrixStore<Double> myQ;
+
+        /**
+         * | Q | = | C |
+         *
+         * @param Q
+         * @param C
+         */
+        public Input(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
+            this(Q, C, null, null);
+        }
 
         /**
          * | Q | A<sup>T</sup> | = | C | <br>
@@ -93,6 +110,7 @@ public final class KKTSolver extends Object {
         }
 
     }
+
     public static final class Output {
 
         private final MatrixStore<Double> myL;
@@ -122,108 +140,127 @@ public final class KKTSolver extends Object {
 
     }
 
-    static final int ALTERNATIVE = 2;
-    static final int MODIFIED = 3;
-    static final int PLAIN = 1;
+    private static final double SMALL = Math.sqrt(MACHINE_DOUBLE_ERROR);
 
-    private final Cholesky<Double> myInverterQ;
-    private final LU<Double> myInverterS;
+    private final Cholesky<Double> myCholesky = CholeskyDecomposition.makePrimitive();
+    private final Eigenvalue<Double> myEigenvalue = EigenvalueDecomposition.makePrimitive(true);
+    private final QR<Double> myQR = QRDecomposition.makePrimitive();
 
     public KKTSolver(final KKTSolver.Input template) {
 
         super();
 
-        myInverterQ = CholeskyDecomposition.makePrimitive();
-        myInverterS = LUDecomposition.makePrimitive();
-    }
-
-    @SuppressWarnings("unused")
-    private KKTSolver() {
-
-        super();
-
-        myInverterQ = null;
-        myInverterS = null;
     }
 
     public Output solve(final Input input) {
-        return this.solve(input, PLAIN);
+        return this.solve(input, false);
     }
 
-    Output solve(final Input input, final int model) {
-
-        boolean tmpSolvable = true;
+    public Output solve(final Input input, final boolean validate) {
 
         MatrixStore<Double> tmpQ = input.getQ();
         MatrixStore<Double> tmpC = input.getC();
         final MatrixStore<Double> tmpA = input.getA();
         final MatrixStore<Double> tmpB = input.getB();
 
-        if (model < MODIFIED) {
+        boolean tmpSolvable = true;
 
-            if (model > PLAIN) {
-                tmpQ = tmpQ.add(tmpA.multiplyLeft(tmpA.transpose()));
-                tmpC = tmpC.add(tmpB.multiplyLeft(tmpA.transpose()));
+        if (validate) {
+
+            if ((tmpQ == null) || (tmpC == null)) {
+                throw new IllegalArgumentException("Neither Q nor C may be null!");
             }
 
-            myInverterQ.compute(tmpQ);
-            if (tmpSolvable = myInverterQ.isSolvable()) {
+            if (((tmpA != null) && (tmpB == null)) || ((tmpA == null) && (tmpB != null))) {
+                throw new IllegalArgumentException("One of A and B is null, and the other one is not!");
+            }
 
-                final MatrixStore<Double> tmpInvQAT = myInverterQ.solve(tmpA.transpose());
-                final MatrixStore<Double> tmpInvQC = myInverterQ.solve(tmpC);
+            myCholesky.compute(tmpQ, true);
+            if (!myCholesky.isSPD()) {
+                // Not positive definite. Check if at least positive semidefinite.
+
+                myEigenvalue.compute(tmpQ, true);
+
+                final MatrixStore<Double> tmpD = myEigenvalue.getD();
+
+                final int tmpLength = (int) tmpD.countRows();
+                for (int ij = 0; ij < tmpLength; ij++) {
+                    if (tmpD.doubleValue(ij, ij) < ZERO) {
+                        throw new IllegalArgumentException("Q must be positive semidefinite!");
+                    }
+                }
+            }
+
+            if (tmpA != null) {
+
+                myQR.compute(tmpA);
+                if (myQR.getRank() != tmpA.countRows()) {
+                    throw new IllegalArgumentException("A must have full (row) rank!");
+                }
+            }
+        }
+
+        MatrixStore<Double> tmpX = null;
+        MatrixStore<Double> tmpL = null;
+
+        final double tmpRelativelySmall = SMALL * tmpQ.aggregateAll(Aggregator.LARGEST);
+
+        if ((tmpA == null) || (tmpA.count() == 0L)) {
+            // Unconstrained
+
+            final MatrixStore<Double> tmpModQ = IdentityStore.makePrimitive((int) tmpQ.countRows()).scale(tmpRelativelySmall);
+            tmpQ = tmpQ.add(tmpModQ);
+
+            myQR.compute(tmpQ);
+            if (tmpSolvable = myQR.isSolvable()) {
+                tmpX = myQR.solve(tmpC);
+                tmpL = ZeroStore.makePrimitive(0, 1);
+            }
+
+        } else if ((tmpA.countRows() >= tmpA.countColumns()) && myQR.compute(tmpA) && myQR.isFullColumnRank()) {
+            // Only 1 possible solution
+
+            tmpX = myQR.solve(tmpB);
+
+            myQR.compute(tmpA.transpose());
+
+            //            final MatrixStore<Double> tmpModQ = IdentityStore.makePrimitive((int) tmpQ.countRows()).scale(tmpRelativelySmall);
+            //            tmpQ = tmpQ.add(tmpModQ);
+
+            tmpL = myQR.solve(tmpC).add(tmpQ.multiplyRight(tmpX).negate());
+
+        } else {
+            // Actual optimisation problem
+
+            final MatrixStore<Double> tmpModQ = tmpA.multiplyLeft(tmpA.transpose()).scale(tmpRelativelySmall);
+            final MatrixStore<Double> tmpModC = tmpB.multiplyLeft(tmpA.transpose()).scale(tmpRelativelySmall);
+
+            tmpQ = tmpQ.add(tmpModQ);
+            tmpC = tmpC.add(tmpModC);
+
+            final MatrixStore<Double> tmpModQ2 = IdentityStore.makePrimitive((int) tmpQ.countRows()).scale(tmpRelativelySmall);
+            tmpQ = tmpQ.add(tmpModQ2);
+
+            myCholesky.compute(tmpQ);
+            if (tmpSolvable = myCholesky.isSolvable()) {
+
+                final MatrixStore<Double> tmpInvQAT = myCholesky.solve(tmpA.transpose());
+                final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpC);
 
                 // Negated Schur complement
                 final MatrixStore<Double> tmpS = tmpInvQAT.multiplyLeft(tmpA);
 
-                myInverterS.compute(tmpS);
-                if (tmpSolvable = myInverterS.isSolvable()) {
+                myQR.compute(tmpS);
+                if (tmpSolvable = myQR.isSolvable()) {
 
-                    final MatrixStore<Double> tmpL = myInverterS.solve(tmpInvQC.multiplyLeft(tmpA).add(tmpB.negate()));
-                    final MatrixStore<Double> tmpX = myInverterQ.solve(tmpC.add(tmpL.multiplyLeft(tmpA.transpose()).negate()));
-
-                    return new Output(tmpX, tmpL, tmpSolvable);
-
-                } else {
-
-                    return this.solve(input, MODIFIED);
+                    tmpL = myQR.solve(tmpInvQC.multiplyLeft(tmpA).add(tmpB.negate()));
+                    tmpX = myCholesky.solve(tmpC.add(tmpL.multiplyLeft(tmpA.transpose()).negate()));
                 }
-
-            } else {
-
-                return this.solve(input, model + 1);
-            }
-
-        } else {
-
-            final double tmpLargest = tmpQ.aggregateAll(Aggregator.LARGEST);
-            final double tmpRelativelySmall = MACHINE_DOUBLE_ERROR * tmpLargest;
-            final double tmpPracticalLimit = MACHINE_DOUBLE_ERROR + IS_ZERO;
-            final double tmpSmallToAdd = Math.max(tmpRelativelySmall, tmpPracticalLimit);
-
-            final MatrixStore<Double> tmpModQ = IdentityStore.makePrimitive((int) tmpQ.countRows()).scale(tmpSmallToAdd);
-
-            final MatrixStore<Double> tmpKKT = input.getKKT().builder().superimpose(tmpModQ).build();
-            final MatrixStore<Double> tmpRHS = input.getRHS();
-
-            myInverterS.compute(tmpKKT);
-            if (tmpSolvable = myInverterS.isSolvable()) {
-
-                final MatrixStore<Double> tmpXL = myInverterS.solve(tmpRHS);
-
-                final int tmpSplit = (int) tmpQ.countColumns();
-
-                final Builder<Double> tmpX = tmpXL.builder().rows(0, tmpSplit);
-                final Builder<Double> tmpL = tmpXL.builder().rows(tmpSplit, (int) tmpKKT.countColumns());
-
-                return new Output(tmpX.build(), tmpL.build(), tmpSolvable);
-
-            } else {
-
-                return new Output(null, null, tmpSolvable);
             }
 
         }
 
+        return new Output(tmpX, tmpL, tmpSolvable);
     }
 
 }

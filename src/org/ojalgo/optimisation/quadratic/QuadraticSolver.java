@@ -323,7 +323,7 @@ public abstract class QuadraticSolver extends BaseSolver {
         super(aModel, solverOptions, matrices);
     }
 
-    public final Optimisation.Result solve(final Optimisation.Result kickStart) {
+    public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
 
         try {
 
@@ -334,7 +334,7 @@ public abstract class QuadraticSolver extends BaseSolver {
             }
 
             if (tmpContinue) {
-                tmpContinue = this.initialise(kickStart);
+                tmpContinue = this.initialise(kickStarter);
             }
 
             if (tmpContinue) {

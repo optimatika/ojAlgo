@@ -151,7 +151,7 @@ final class SimplexTableauSolver extends LinearSolver {
         }
     }
 
-    public Result solve(final Result kickStart) {
+    public Result solve(final Result kickStarter) {
 
         while (this.needsAnotherIteration()) {
 

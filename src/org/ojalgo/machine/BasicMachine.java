@@ -1,10 +1,8 @@
 package org.ojalgo.machine;
 
 /**
- * How much memory, and how many threads share that memory.
- * Used to describe either total system resources (system RAM and
- * total number of threads handled by the processors) or a cache
- * (processor's L1, L2 or L3 cache).
+ * How much memory, and how many threads share that memory. Used to describe either total system resources (system RAM
+ * and total number of threads handled by the processors) or a cache (processor's L1, L2 or L3 cache).
  *
  * @author apete
  */
@@ -20,12 +18,12 @@ public class BasicMachine {
     public final long memory;
     public final int threads;
 
-    public BasicMachine(final long aMemory, final int aThreads) {
+    public BasicMachine(final long memory, final int threads) {
 
         super();
 
-        memory = aMemory;
-        threads = aThreads;
+        this.memory = memory;
+        this.threads = threads;
     }
 
     @SuppressWarnings("unused")
@@ -33,6 +31,7 @@ public class BasicMachine {
         this(0L, 0);
     }
 
+    @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
@@ -53,6 +52,7 @@ public class BasicMachine {
         return true;
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

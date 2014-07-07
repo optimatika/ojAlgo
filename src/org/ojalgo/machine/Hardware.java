@@ -52,6 +52,51 @@ import org.ojalgo.netio.ASCII;
  */
 public final class Hardware extends AbstractMachine implements Comparable<Hardware> {
 
+    public static Hardware makeSimple() {
+        return Hardware.makeSimple(VirtualMachine.getArchitecture(), VirtualMachine.getMemory(), VirtualMachine.getThreads());
+    }
+
+    public static Hardware makeSimple(final String systemArchitecture, final long systemMemory, final int systemThreads) {
+
+        if (systemThreads > 8) {
+            // Assume hyperthreading, L3 cache and more than 1 CPU
+
+            final BasicMachine tmpL1Machine = new BasicMachine(32L * K, 2); //Hyperthreading
+
+            final BasicMachine tmpL2Machine = new BasicMachine(256L * K, tmpL1Machine.threads);
+
+            final BasicMachine tmpL3Machine = new BasicMachine(4L * K * K, systemThreads / ((systemThreads + 7) / 8)); //More than 1 CPU
+
+            final BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
+
+            return new Hardware(systemArchitecture, new BasicMachine[] { tmpSystemMachine, tmpL3Machine, tmpL2Machine, tmpL1Machine });
+
+        } else if (systemThreads >= 4) {
+            // Assume hyperthreading, L3 cache but only 1 CPU
+
+            final BasicMachine tmpL1Machine = new BasicMachine(32L * K, 2); //Hyperthreading
+
+            final BasicMachine tmpL2Machine = new BasicMachine(256L * K, tmpL1Machine.threads);
+
+            final BasicMachine tmpL3Machine = new BasicMachine(3L * K * K, systemThreads);
+
+            final BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
+
+            return new Hardware(systemArchitecture, new BasicMachine[] { tmpSystemMachine, tmpL3Machine, tmpL2Machine, tmpL1Machine });
+
+        } else {
+            // No hyperthreading, no L3 cache and 1 CPU
+
+            final BasicMachine tmpL1Machine = new BasicMachine(32L * K, 1); //No hyperthreading
+
+            final BasicMachine tmpL2Machine = new BasicMachine(2L * K * K, tmpL1Machine.threads);
+
+            final BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
+
+            return new Hardware(systemArchitecture, new BasicMachine[] { tmpSystemMachine, tmpL2Machine, tmpL1Machine });
+        }
+    }
+
     /**
      * Should contain all available hardware in ascending "power" order.
      */
@@ -65,7 +110,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>1 processor</li>
      * <li>1 core per processor</li>
      * <li>1 thread per core</li>
-     * <li>==>> Total 2 threads</li>
+     * <li>==>> Total 1 threads</li>
      * <li></li>
      * <li>1.25GB system RAM</li>
      * <li>512kB L2 cache per processor</li>
@@ -85,7 +130,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>1 processor</li>
      * <li>1 core per processor</li>
      * <li>1 thread per core</li>
-     * <li>==>> Total 2 threads</li>
+     * <li>==>> Total 1 threads</li>
      * <li></li>
      * <li>1GB system RAM</li>
      * <li>1MB L2 cache per processor</li>
@@ -305,51 +350,6 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
         PREDEFINED.add(X86_64__08);
         PREDEFINED.add(X86_64__12);
         PREDEFINED.add(X86_64__16);
-    }
-
-    public static Hardware makeSimple() {
-        return Hardware.makeSimple(VirtualMachine.getArchitecture(), VirtualMachine.getMemory(), VirtualMachine.getThreads());
-    }
-
-    public static Hardware makeSimple(final String systemArchitecture, final long systemMemory, final int systemThreads) {
-
-        if (systemThreads > 8) {
-            // Assume hyperthreading, L3 cache and more than 1 CPU
-
-            final BasicMachine tmpL1Machine = new BasicMachine(32L * K, 2); //Hyperthreading
-
-            final BasicMachine tmpL2Machine = new BasicMachine(256L * K, tmpL1Machine.threads);
-
-            final BasicMachine tmpL3Machine = new BasicMachine(4L * K * K, systemThreads / ((systemThreads + 7) / 8)); //More than 1 CPU
-
-            final BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
-
-            return new Hardware(systemArchitecture, new BasicMachine[] { tmpSystemMachine, tmpL3Machine, tmpL2Machine, tmpL1Machine });
-
-        } else if (systemThreads >= 4) {
-            // Assume hyperthreading, L3 cache but only 1 CPU
-
-            final BasicMachine tmpL1Machine = new BasicMachine(32L * K, 2); //Hyperthreading
-
-            final BasicMachine tmpL2Machine = new BasicMachine(256L * K, tmpL1Machine.threads);
-
-            final BasicMachine tmpL3Machine = new BasicMachine(3L * K * K, systemThreads);
-
-            final BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
-
-            return new Hardware(systemArchitecture, new BasicMachine[] { tmpSystemMachine, tmpL3Machine, tmpL2Machine, tmpL1Machine });
-
-        } else {
-            // No hyperthreading, no L3 cache and 1 CPU
-
-            final BasicMachine tmpL1Machine = new BasicMachine(32L * K, 1); //No hyperthreading
-
-            final BasicMachine tmpL2Machine = new BasicMachine(2L * K * K, tmpL1Machine.threads);
-
-            final BasicMachine tmpSystemMachine = new BasicMachine(systemMemory, systemThreads);
-
-            return new Hardware(systemArchitecture, new BasicMachine[] { tmpSystemMachine, tmpL2Machine, tmpL1Machine });
-        }
     }
 
     private final BasicMachine[] myLevels;

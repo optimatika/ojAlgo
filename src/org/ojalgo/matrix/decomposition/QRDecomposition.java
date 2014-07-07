@@ -40,7 +40,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
  * {@linkplain #makeBig()}, {@linkplain #makeComplex()}, {@linkplain #makePrimitive()} or {@linkplain #makeJama()}.
- * 
+ *
  * @author apete
  */
 public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N> implements QR<N> {
@@ -246,7 +246,7 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
 
     /**
      * Solve [A]*[X]=[B] by first solving [Q]*[Y]=[B] and then [R]*[X]=[Y]. [X] minimises the 2-norm of [Q]*[R]*[X]-[B].
-     * 
+     *
      * @param rhs The right hand side [B]
      * @return [X] "preallocated" is used to form the results, but the solution is in the returned MatrixStore.
      * @see org.ojalgo.matrix.decomposition.AbstractDecomposition#solve(Access2D,

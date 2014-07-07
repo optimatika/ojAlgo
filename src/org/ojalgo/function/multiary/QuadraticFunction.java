@@ -35,7 +35,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * [x]<sup>T</sup>[Q][x]
- * 
+ *
  * @author apete
  */
 public final class QuadraticFunction<N extends Number> extends AbstractMultiary<N, QuadraticFunction<N>> implements MultiaryFunction.Quadratic<N> {
@@ -89,7 +89,6 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
     @Override
     public MatrixStore<N> getHessian(final Access1D<?> arg) {
         return myFactors.builder().superimpose(0, 0, myFactors.builder().conjugate().build()).build();
-
     }
 
     @Override

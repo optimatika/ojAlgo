@@ -29,11 +29,6 @@ import org.ojalgo.netio.BasicLogger;
 
 public final class VirtualMachine extends AbstractMachine {
 
-    private static final String AMD64 = "amd64";
-    private static final String I386 = "i386";
-    private static final String X86 = "x86";
-    private static final String X86_64 = "x86_64";
-
     public static String getArchitecture() {
 
         // http://fantom.org/sidewalk/topic/756
@@ -57,12 +52,20 @@ public final class VirtualMachine extends AbstractMachine {
         return Runtime.getRuntime().availableProcessors();
     }
 
+    private static final String AMD64 = "amd64";
+
+    private static final String I386 = "i386";
+
+    private static final String X86 = "x86";
+
+    private static final String X86_64 = "x86_64";
+
     private final Hardware myHardware;
     private final Runtime myRuntime;
 
-    private VirtualMachine(final String anArchitecture, final BasicMachine[] someLevels) {
+    private VirtualMachine(final String architecture, final BasicMachine[] levels) {
 
-        super(anArchitecture, someLevels);
+        super(architecture, levels);
 
         myHardware = null;
         myRuntime = null;
@@ -70,12 +73,12 @@ public final class VirtualMachine extends AbstractMachine {
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    VirtualMachine(final Hardware aHardware, final Runtime aRuntime) {
+    VirtualMachine(final Hardware hardware, final Runtime runtime) {
 
-        super(aHardware, aRuntime);
+        super(hardware, runtime);
 
-        myHardware = aHardware;
-        myRuntime = aRuntime;
+        myHardware = hardware;
+        myRuntime = runtime;
     }
 
     public void collectGarbage() {
@@ -90,8 +93,8 @@ public final class VirtualMachine extends AbstractMachine {
             myRuntime.gc();
             try {
                 Thread.sleep(8L);
-            } catch (final InterruptedException anException) {
-                BasicLogger.error(anException.getMessage());
+            } catch (final InterruptedException exception) {
+                BasicLogger.error(exception.getMessage());
             }
             tmpIsFree = myRuntime.freeMemory();
         } while (tmpIsFree > tmpWasFree);

@@ -31,7 +31,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * This class adapts JAMA's QRDecomposition to ojAlgo's {@linkplain QR} interface.
- * 
+ *
  * @author apete
  */
 public final class JamaQR extends JamaAbstractDecomposition implements QR<Double> {
@@ -128,6 +128,11 @@ public final class JamaQR extends JamaAbstractDecomposition implements QR<Double
 
     public void reset() {
         myDelegate = null;
+    }
+
+    public MatrixStore<Double> solveConjugated(final Access2D<Double> rhs) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override

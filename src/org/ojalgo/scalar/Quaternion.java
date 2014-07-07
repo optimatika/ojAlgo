@@ -28,6 +28,8 @@ import java.util.Iterator;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -174,11 +176,12 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
     public Quaternion add(final double arg) {
 
         final double tmpScalar = myScalar + arg;
-        final double tmpI = i;
-        final double tmpJ = j;
-        final double tmpK = k;
 
-        return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
+        if (myRealForSure) {
+            return new Quaternion(tmpScalar);
+        } else {
+            return new Quaternion(tmpScalar, i, j, k);
+        }
     }
 
     public Quaternion add(final Quaternion arg) {
@@ -196,6 +199,18 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
 
             return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
         }
+    }
+
+    public MatrixStore<ComplexNumber> asComplex2D() {
+
+        final ComplexDenseStore retVal = ComplexDenseStore.FACTORY.makeZero(2L, 2L);
+
+        retVal.set(0L, new ComplexNumber(myScalar, i));
+        retVal.set(1L, new ComplexNumber(-j, k));
+        retVal.set(2L, new ComplexNumber(j, k));
+        retVal.set(3L, new ComplexNumber(myScalar, -i));
+
+        return retVal;
     }
 
     public int compareTo(final Quaternion reference) {
@@ -250,7 +265,7 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
     /**
      * Will calculate <code>this * reciprocal(arg)</code> which is <bold>not</bold> the same as
      * <code>reciprocal(arg) * this</code>.
-     * 
+     *
      * @see org.ojalgo.scalar.Scalar#divide(java.lang.Number)
      */
     public Quaternion divide(final Quaternion arg) {
@@ -508,11 +523,12 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
     public Quaternion subtract(final double arg) {
 
         final double tmpScalar = myScalar - arg;
-        final double tmpI = i;
-        final double tmpJ = j;
-        final double tmpK = k;
 
-        return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
+        if (myRealForSure) {
+            return new Quaternion(tmpScalar);
+        } else {
+            return new Quaternion(tmpScalar, i, j, k);
+        }
     }
 
     public Quaternion subtract(final Quaternion arg) {

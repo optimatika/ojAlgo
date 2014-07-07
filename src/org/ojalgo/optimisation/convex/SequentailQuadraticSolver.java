@@ -43,7 +43,7 @@ public class SequentailQuadraticSolver extends GenericSolver {
         myUpperConstraints = aModel.selectExpressionsQuadraticUpper();
     }
 
-    public Result solve(final Result kickStart) {
+    public Result solve(final Result kickStarter) {
         // TODO Auto-generated method stub
         return null;
     }

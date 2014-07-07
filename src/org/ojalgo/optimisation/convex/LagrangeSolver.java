@@ -1,35 +1,35 @@
-/* 
+/*
  * Copyright 1997-2014 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE. 
+ * SOFTWARE.
  */
 package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
-import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 
@@ -40,36 +40,6 @@ public final class LagrangeSolver extends ConvexSolver {
 
     LagrangeSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
         super(aModel, solverOptions, matrices);
-    }
-
-    private void extractSolution(final KKTSolver.Output output) {
-        this.getX().fillMatching(output.getX());
-        this.getLE().fillMatching(output.getL());
-    }
-
-    private KKTSolver.Input makeInput(final int patchLevel) {
-
-        MatrixStore<Double> tmpQ = this.getQ();
-        MatrixStore<Double> tmpC = this.getC();
-        final MatrixStore<Double> tmpA = this.getAE();
-        final MatrixStore<Double> tmpB = this.getBE();
-
-        if ((patchLevel > 0) && (tmpA != null) && (tmpA.countRows() > 0L)) {
-            tmpQ = tmpQ.add(tmpA.multiplyLeft(tmpA.transpose()));
-            tmpC = tmpC.add(tmpB.multiplyLeft(tmpA.transpose()));
-        }
-
-        if (patchLevel > 1) {
-
-            final double tmpLargest = tmpQ.aggregateAll(Aggregator.LARGEST);
-            final double tmpRelativelySmall = MACHINE_DOUBLE_ERROR * tmpLargest;
-            final double tmpPracticalLimit = MACHINE_DOUBLE_ERROR + IS_ZERO;
-            final double tmpSmallToAdd = Math.max(tmpRelativelySmall, tmpPracticalLimit);
-
-            tmpQ = tmpQ.add(IdentityStore.makePrimitive((int) tmpQ.countRows()).scale(tmpSmallToAdd));
-        }
-
-        return new KKTSolver.Input(tmpQ, tmpC, tmpA, tmpB);
     }
 
     @Override
@@ -85,20 +55,56 @@ public final class LagrangeSolver extends ConvexSolver {
     @Override
     protected void performIteration() {
 
-        final KKTSolver.Input tmpInput = this.makeInput(0);
-        final KKTSolver tmpSolver = new KKTSolver(tmpInput);
-        final KKTSolver.Output tmpOutput = tmpSolver.solve(tmpInput);
+        final MatrixStore<Double> tmpQ = this.getQ();
+        final MatrixStore<Double> tmpC = this.getC();
+        final MatrixStore<Double> tmpA = this.getAE();
+        final MatrixStore<Double> tmpB = this.getBE();
 
-        if (tmpOutput.isSolvable()) {
+        if (this.isX()) {
 
-            this.setState(State.OPTIMAL);
-            this.extractSolution(tmpOutput);
+            final PhysicalStore<Double> tmpX = this.getX();
+
+            final KKTSolver.Input tmpInput = new KKTSolver.Input(tmpQ, tmpC.add(tmpQ.multiplyRight(tmpX).negate()), tmpA, tmpB.add(tmpA.multiplyRight(tmpX)
+                    .negate()));
+
+            final KKTSolver tmpSolver = new KKTSolver(tmpInput);
+
+            final KKTSolver.Output tmpOutput = tmpSolver.solve(tmpInput, options.validate);
+
+            if (tmpOutput.isSolvable()) {
+
+                this.setState(State.OPTIMAL);
+                tmpX.fillMatching(tmpX, PrimitiveFunction.ADD, tmpOutput.getX());
+                this.getLE().fillMatching(tmpOutput.getL());
+
+            } else {
+
+                this.setState(State.INFEASIBLE);
+
+            }
 
         } else {
 
-            this.setState(State.INFEASIBLE);
-            this.resetX();
+            final KKTSolver.Input tmpInput = new KKTSolver.Input(tmpQ, tmpC, tmpA, tmpB);
+
+            final KKTSolver tmpSolver = new KKTSolver(tmpInput);
+
+            final KKTSolver.Output tmpOutput = tmpSolver.solve(tmpInput);
+
+            if (tmpOutput.isSolvable()) {
+
+                this.setState(State.OPTIMAL);
+                this.getX().fillMatching(tmpOutput.getX());
+                this.getLE().fillMatching(tmpOutput.getL());
+
+            } else {
+
+                this.setState(State.INFEASIBLE);
+                this.resetX();
+            }
+
         }
+
     }
 
     @Override

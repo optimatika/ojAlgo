@@ -91,10 +91,10 @@ public final class NewIntegerSolver extends IntegerSolver {
         //options.debug = System.out;
     }
 
-    public Result solve(final Result kickStart) {
+    public Result solve(final Result kickStarter) {
 
-        if (kickStart != null) {
-            this.markInteger(null, kickStart);
+        if (kickStarter != null) {
+            this.markInteger(null, kickStarter);
         }
 
         this.resetIterationsCount();

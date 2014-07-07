@@ -40,12 +40,12 @@ import org.ojalgo.optimisation.Optimisation;
 /**
  * @author apete
  */
-public final class LagrangeSolver2 extends ConvexSolver {
+public final class LagrangeSolverOld extends ConvexSolver {
 
     private final LU<Double> myLU = LUDecomposition.makePrimitive();
     private final SingularValue<Double> mySingularValue = SingularValueDecomposition.makePrimitive();
 
-    LagrangeSolver2(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
+    LagrangeSolverOld(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
         super(aModel, solverOptions, matrices);
     }
 

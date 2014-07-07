@@ -25,11 +25,11 @@ import org.ojalgo.type.IntCount;
 
 abstract class AbstractMachine extends BasicMachine {
 
-    static final long K = 1024L;
-
     static long elements(final long availableMemory, final long elementSize) {
         return (availableMemory - 16L) / elementSize;
     }
+
+    static final long K = 1024L;
 
     public final String architecture;//x86_64
 
@@ -46,9 +46,9 @@ abstract class AbstractMachine extends BasicMachine {
      */
     public final int units;
 
-    private AbstractMachine(final long aMemory, final int aThreads) {
+    private AbstractMachine(final long memory, final int threads) {
 
-        super(aMemory, aThreads);
+        super(memory, threads);
 
         throw new IllegalArgumentException();
     }
@@ -66,17 +66,14 @@ abstract class AbstractMachine extends BasicMachine {
     }
 
     /**
-     * <code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code>
-     * or
-     * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code>
-     * or in worst case
-     * <code>new MemoryThreads[] { SYSTEM, L1 }</code>
+     * <code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or
+     * in worst case <code>new MemoryThreads[] { SYSTEM, L1 }</code>
      */
-    protected AbstractMachine(final String anArchitecture, final BasicMachine[] levels) {
+    protected AbstractMachine(final String architecture, final BasicMachine[] levels) {
 
         super(levels[0].memory, levels[0].threads);
 
-        architecture = anArchitecture;
+        this.architecture = architecture;
 
         cores = threads / levels[levels.length - 1].threads;
 

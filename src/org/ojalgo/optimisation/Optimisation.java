@@ -41,7 +41,7 @@ public interface Optimisation {
 
     /**
      * Constraint
-     * 
+     *
      * @author apete
      */
     public static interface Constraint extends Optimisation {
@@ -94,7 +94,7 @@ public interface Optimisation {
 
     /**
      * Objective
-     * 
+     *
      * @author apete
      */
     public static interface Objective extends Optimisation {
@@ -347,7 +347,7 @@ public interface Optimisation {
         }
 
         public int size() {
-            return (int) mySolution.count();
+            return (int) this.count();
         }
 
         @Override
@@ -365,14 +365,14 @@ public interface Optimisation {
      * <p>
      * A solver internally works with primitive double.
      * </p>
-     * 
+     *
      * @author apete
      */
     public static interface Solver extends Optimisation {
 
         Optimisation.Result solve();
 
-        Optimisation.Result solve(Optimisation.Result kickStart);
+        Optimisation.Result solve(Optimisation.Result kickStarter);
 
     }
 
