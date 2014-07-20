@@ -59,7 +59,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * A {@linkplain BigDecimal} implementation of {@linkplain PhysicalStore}.
- * 
+ *
  * @author apete
  */
 public final class BigDenseStore extends BigArray implements PhysicalStore<BigDecimal>, DecompositionStore<BigDecimal> {
@@ -80,6 +80,34 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
         void invoke(BigDecimal[] product, BigDecimal[] left, int complexity, Access1D<BigDecimal> right);
 
+    }
+
+    static BigDenseStore cast(final Access1D<BigDecimal> mtrx) {
+        if (mtrx instanceof BigDenseStore) {
+            return (BigDenseStore) mtrx;
+        } else if (mtrx instanceof Access2D<?>) {
+            return FACTORY.copy((Access2D<?>) mtrx);
+        } else {
+            return FACTORY.columns(mtrx);
+        }
+    }
+
+    static Householder.Big cast(final Householder<BigDecimal> aTransf) {
+        if (aTransf instanceof Householder.Big) {
+            return (Householder.Big) aTransf;
+        } else if (aTransf instanceof DecompositionStore.HouseholderReference<?>) {
+            return ((DecompositionStore.HouseholderReference<BigDecimal>) aTransf).getBigWorker().copy(aTransf);
+        } else {
+            return new Householder.Big(aTransf);
+        }
+    }
+
+    static Rotation.Big cast(final Rotation<BigDecimal> aTransf) {
+        if (aTransf instanceof Rotation.Big) {
+            return (Rotation.Big) aTransf;
+        } else {
+            return new Rotation.Big(aTransf);
+        }
     }
 
     public static final DecompositionStore.Factory<BigDecimal, BigDenseStore> FACTORY = new DecompositionStore.Factory<BigDecimal, BigDenseStore>() {
@@ -307,34 +335,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
             return retVal;
         }
     };
-
-    static BigDenseStore cast(final Access1D<BigDecimal> mtrx) {
-        if (mtrx instanceof BigDenseStore) {
-            return (BigDenseStore) mtrx;
-        } else if (mtrx instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) mtrx);
-        } else {
-            return FACTORY.columns(mtrx);
-        }
-    }
-
-    static Householder.Big cast(final Householder<BigDecimal> aTransf) {
-        if (aTransf instanceof Householder.Big) {
-            return (Householder.Big) aTransf;
-        } else if (aTransf instanceof DecompositionStore.HouseholderReference<?>) {
-            return ((DecompositionStore.HouseholderReference<BigDecimal>) aTransf).getBigWorker().copy(aTransf);
-        } else {
-            return new Householder.Big(aTransf);
-        }
-    }
-
-    static Rotation.Big cast(final Rotation<BigDecimal> aTransf) {
-        if (aTransf instanceof Rotation.Big) {
-            return (Rotation.Big) aTransf;
-        } else {
-            return new Rotation.Big(aTransf);
-        }
-    }
 
     private final BigMultiplyBoth multiplyBoth;
     private final BigMultiplyLeft multiplyLeft;
@@ -952,6 +952,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, aBody, onesOnDiagonal, zerosAboveDiagonal);
         }
+    }
+
+    public MatrixStore<BigDecimal> subtract(final MatrixStore<BigDecimal> subtrahend) {
+        return this.add(subtrahend.negate());
     }
 
     public Scalar<BigDecimal> toScalar(final long row, final long column) {

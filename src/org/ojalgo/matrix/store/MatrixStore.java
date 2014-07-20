@@ -400,6 +400,8 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
 
     MatrixStore<N> scale(N scalar);
 
+    MatrixStore<N> subtract(MatrixStore<N> subtrahend);
+
     Scalar<N> toScalar(long row, long column);
 
     /**

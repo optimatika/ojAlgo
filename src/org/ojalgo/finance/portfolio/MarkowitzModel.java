@@ -37,6 +37,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
@@ -85,7 +86,7 @@ import org.ojalgo.type.TypeUtils;
  * <p>
  * To get the optimal asset weighs you simply call {@link #getWeights()} or {@link #getAssetWeights()}.
  * </p>
- * 
+ *
  * @author apete
  */
 public final class MarkowitzModel extends EquilibriumModel {
@@ -197,7 +198,7 @@ public final class MarkowitzModel extends EquilibriumModel {
      * <p>
      * Setting a target return is not recommnded. It's much better to modify the risk aversion factor.
      * </p>
-     * 
+     *
      * @see #setTargetVariance(BigDecimal)
      */
     public final void setTargetReturn(final BigDecimal targetReturn) {
@@ -225,7 +226,7 @@ public final class MarkowitzModel extends EquilibriumModel {
      * <p>
      * Setting a target variance is not recommnded. It's much better to modify the risk aversion factor.
      * </p>
-     * 
+     *
      * @see #setTargetReturn(BigDecimal)
      */
     public final void setTargetVariance(final BigDecimal targetVariance) {
@@ -298,7 +299,8 @@ public final class MarkowitzModel extends EquilibriumModel {
             tmpExpr.lower(tmpValue.lower).upper(tmpValue.upper);
         }
 
-        //retVal.options.debug(QuadraticSolver.class);
+        //retVal.options.debug(QuadraticSolver.class);        
+        retVal.options.debug(ConvexSolver.class);
 
         return retVal;
     }
@@ -310,7 +312,7 @@ public final class MarkowitzModel extends EquilibriumModel {
         if (myTargetReturn != null) {
 
             myOptimisationModel = this.generateOptimisationModel(this.getRiskAversion().toBigDecimal().multiply(THOUSAND), myTargetReturn, null);
-            retVal = myOptimisationModel.getDefaultSolver().solve();
+            retVal = myOptimisationModel.minimise();
 
         } else if (myTargetVariance != null) {
 
@@ -329,7 +331,7 @@ public final class MarkowitzModel extends EquilibriumModel {
             BigDecimal tmpTargetDiff = null;
 
             myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
-            retVal = myOptimisationModel.getDefaultSolver().solve();
+            retVal = myOptimisationModel.minimise();
 
             tmpReturn = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).toBigDecimal();
             tmpVariance = this.calculatePortfolioVariance(retVal).toBigDecimal();
@@ -343,7 +345,7 @@ public final class MarkowitzModel extends EquilibriumModel {
                 tmpRiskAversion = tmpRiskAversion.multiply(TEN);
 
                 myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
-                retVal = myOptimisationModel.getDefaultSolver().solve();
+                retVal = myOptimisationModel.minimise();
 
                 tmpReturn = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).toBigDecimal();
                 tmpVariance = this.calculatePortfolioVariance(retVal).toBigDecimal();
@@ -360,7 +362,7 @@ public final class MarkowitzModel extends EquilibriumModel {
                 tmpRiskAversion = tmpRiskAversion.multiply(TENTH);
 
                 myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
-                retVal = myOptimisationModel.getDefaultSolver().solve();
+                retVal = myOptimisationModel.minimise();
 
                 tmpReturn = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).toBigDecimal();
                 tmpVariance = this.calculatePortfolioVariance(retVal).toBigDecimal();
@@ -377,7 +379,7 @@ public final class MarkowitzModel extends EquilibriumModel {
                 tmpRiskAversion = tmpHighRiskAversion.add(tmpLowRiskAversion).multiply(HALF);
 
                 myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
-                retVal = myOptimisationModel.getDefaultSolver().solve();
+                retVal = myOptimisationModel.minimise();
 
                 if (retVal != null) {
 
@@ -415,7 +417,7 @@ public final class MarkowitzModel extends EquilibriumModel {
         } else {
 
             myOptimisationModel = this.generateOptimisationModel(this.getRiskAversion().toBigDecimal(), null, null);
-            retVal = myOptimisationModel.getDefaultSolver().solve();
+            retVal = myOptimisationModel.minimise();
         }
 
         if (retVal.getState().isFeasible()) {

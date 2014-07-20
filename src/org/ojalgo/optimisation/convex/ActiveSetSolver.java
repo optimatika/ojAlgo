@@ -30,6 +30,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.store.AboveBelowStore;
+import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RowsStore;
@@ -98,6 +99,40 @@ public final class ActiveSetSolver extends ConvexSolver {
         final PhysicalStore<Double> tmpX = this.getX();
 
         return new KKTSolver.Input(tmpSubQ, tmpSubC.add(tmpSubQ.multiplyRight(tmpX).negate()), tmpSubAE, ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1));
+    }
+
+    private boolean isFeasible(final boolean onlyExcluded) {
+
+        boolean retVal = true;
+
+        if (!onlyExcluded) {
+
+            final MatrixStore<Double> tmpSE = this.getSE();
+            for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
+                final double tmpVal = tmpSE.doubleValue(i);
+                if (!options.slack.isZero(tmpVal)) {
+                    retVal = false;
+                }
+            }
+
+            final MatrixStore<Double> tmpSIincl = this.getSI(myActivator.getIncluded());
+            for (int i = 0; retVal && (i < tmpSIincl.countRows()); i++) {
+                final double tmpVal = tmpSIincl.doubleValue(i);
+                if (!options.slack.isZero(tmpVal)) {
+                    retVal = false;
+                }
+            }
+        }
+
+        final MatrixStore<Double> tmpSIexcl = this.getSI(myActivator.getExcluded());
+        for (int i = 0; retVal && (i < tmpSIexcl.countRows()); i++) {
+            final double tmpVal = tmpSIexcl.doubleValue(i);
+            if ((tmpVal < 0.0) && !options.slack.isZero(tmpVal)) {
+                retVal = false;
+            }
+        }
+
+        return retVal;
     }
 
     /**
@@ -197,85 +232,121 @@ public final class ActiveSetSolver extends ConvexSolver {
     }
 
     @Override
-    protected boolean initialise(final Result kickStart) {
+    protected boolean initialise(final Result kickStarter) {
+
+        final MatrixStore<Double> tmpQ = this.getQ();
+        final MatrixStore<Double> tmpC = this.getC();
+        final MatrixStore<Double> tmpAE = this.getAE();
+        final MatrixStore<Double> tmpBE = this.getBE();
+        final MatrixStore<Double> tmpAI = this.getAI();
+        final MatrixStore<Double> tmpBI = this.getBI();
 
         myActivator.excludeAll();
 
-        if (kickStart != null) {
+        boolean tmpFeasible = false;
 
-            this.fillX(kickStart);
+        if (kickStarter != null) {
 
-            if (kickStart.isActiveSetDefined()) {
-                final int[] tmpActiveSet = kickStart.getActiveSet();
-                myActivator.include(tmpActiveSet);
+            this.fillX(kickStarter);
+
+        } else {
+
+            final KKTSolver.Input tmpUnconstrInput = new KKTSolver.Input(tmpQ, tmpC, tmpAE, tmpBE);
+            final KKTSolver tmpUnconstrSolver = this.getDelegateSolver(tmpUnconstrInput);
+            final Output tmpUnconstrOutput = tmpUnconstrSolver.solve(tmpUnconstrInput);
+
+            if (tmpUnconstrOutput.isSolvable()) {
+                this.fillX(tmpUnconstrOutput.getX());
+                tmpFeasible = this.isFeasible(true);
+            } else {
+                this.resetX();
+                tmpFeasible = this.isFeasible(false);
+            }
+        }
+
+        if (!tmpFeasible) {
+
+            final MatrixStore<Double> tmpLinC = tmpQ.multiplyRight(this.getX()).subtract(tmpC);
+
+            final int tmpVars = (int) tmpC.countRows();
+            final int tmpIneqs = (int) tmpAI.countRows();
+
+            final LinearSolver.Builder tmpLinBuilder = new LinearSolver.Builder(tmpLinC.builder().below(tmpLinC.negate()).below(tmpIneqs).build());
+
+            if ((tmpAE != null) && (tmpAE.count() > 0L)) {
+
+                final MatrixStore.Builder<Double> tmpBuilderAE = tmpAE.builder().right(tmpAE.negate()).right(tmpIneqs);
+                tmpBuilderAE.below(tmpAI.builder().right(tmpAI.negate()).right(IdentityStore.makePrimitive(tmpIneqs)).build());
+
+                final PhysicalStore<Double> tmpCopyAE = tmpBuilderAE.build().copy();
+                final PhysicalStore<Double> tmpCopyBE = tmpBE.builder().below(tmpBI).build().copy();
+
+                for (int i = 0; i < tmpCopyBE.countRows(); i++) {
+                    if (tmpCopyBE.doubleValue(i) < 0.0) {
+                        tmpCopyAE.modifyRow(i, 0, PrimitiveFunction.NEGATE);
+                        tmpCopyBE.modifyRow(i, 0, PrimitiveFunction.NEGATE);
+                    }
+                }
+
+                tmpLinBuilder.equalities(tmpCopyAE, tmpCopyBE);
+            }
+
+            final LinearSolver tmpLinSolver = tmpLinBuilder.build();
+
+            final Result tmpLinResult = tmpLinSolver.solve();
+
+            tmpFeasible = tmpLinResult.getState().isFeasible();
+
+            for (int i = 0; tmpFeasible && (i < tmpVars); i++) {
+                this.setX(i, tmpLinResult.doubleValue(i) - tmpLinResult.doubleValue(tmpVars + i));
+            }
+        }
+
+        if (tmpFeasible) {
+
+            this.setState(State.FEASIBLE);
+
+            if ((kickStarter != null) && kickStarter.isActiveSetDefined()) {
+                myActivator.include(kickStarter.getActiveSet());
             }
 
             final int[] tmpIncluded = myActivator.getIncluded();
-
-            final MatrixStore<Double> tmpSlack = this.getSI(tmpIncluded);
-
-            for (int i = 0; i < tmpSlack.countRows(); i++) {
-                final double tmpVal = tmpSlack.doubleValue(i);
+            final MatrixStore<Double> tmpSIincl = this.getSI(tmpIncluded);
+            for (int i = 0; i < tmpIncluded.length; i++) {
+                final double tmpVal = tmpSIincl.doubleValue(i);
                 if (!options.slack.isZero(tmpVal)) {
                     myActivator.exclude(tmpIncluded[i]);
                 }
             }
 
-        } else if (this.getModel() != null) {
-
-            final LinearSolver tmpLinearSolver = LinearSolver.make(this.getModel());
-            final Result tmpResult = tmpLinearSolver.solve(kickStart);
-
-            if (tmpResult.getState().isFeasible()) {
-
-                this.fillX(tmpResult);
-
-                if (this.isDebug()) {
-                    this.debug("Initial E-slack: {}", this.getSE().copy());
-                    this.debug("Initial I-included-slack: {}", this.getSI(myActivator.getIncluded()).copy());
-                    this.debug("Initial I-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy());
+            final int[] tmpExcluded = myActivator.getExcluded();
+            final MatrixStore<Double> tmpSIexcl = this.getSI(tmpExcluded);
+            for (int i = 0; i < tmpExcluded.length; i++) {
+                final double tmpVal = tmpSIexcl.doubleValue(i);
+                if (options.slack.isZero(tmpVal)) {
+                    myActivator.include(tmpExcluded[i]);
                 }
-
-                final int[] tmpExcluded = myActivator.getExcluded();
-
-                final MatrixStore<Double> tmpSlack = this.getSI(tmpExcluded);
-
-                for (int i = 0; i < tmpSlack.countRows(); i++) {
-                    final double tmpVal = tmpSlack.doubleValue(i);
-                    if (options.slack.isZero(tmpVal)) {
-                        myActivator.include(tmpExcluded[i]);
-                    }
-                }
-
-                this.setState(State.FEASIBLE);
-
-                final int[] tmpIncluded = myActivator.getIncluded();
-
-                //                final int tmpIneg = this.countVariables() - this.countEqualityConstraints();
-                //                while (myActivator.countIncluded() >= tmpIneg) {
-                //                    myActivator.shrink();
-                //                }
-
-                //                final QR<Double> tmpQR = QRDecomposition.makePrimitive();
-                //                tmpQR.compute(this.getAI().builder().row(tmpIncluded).build());
-                //                final MatrixStore<Double> tmpLagr = tmpQR.solve(this.getC().builder().superimpose(this.getQ().multiplyRight(this.getX()).negate()).build());
-                //
-                //                for (int i = 0; i < tmpIncluded.length; i++) {
-                //                    if (tmpLagr.doubleValue(i) < PrimitiveMath.ZERO) {
-                //                        myActivator.exclude(tmpIncluded[i]);
-                //                    }
-                //                }
-
-            } else {
-
-                this.resetX();
-
-                this.setState(State.INFEASIBLE);
             }
 
+        } else {
+
+            this.setState(State.INFEASIBLE);
+
+            this.resetX();
         }
 
-        return true;
+        if (this.isDebug()) {
+            this.debug("Initial solution: {}", this.getX().copy());
+            if (tmpAE != null) {
+                this.debug("Initial E-slack: {}", this.getSE().copy());
+            }
+            if (tmpAI != null) {
+                this.debug("Initial I-included-slack: {}", this.getSI(myActivator.getIncluded()).copy());
+                this.debug("Initial I-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy());
+            }
+        }
+
+        return this.getState().isFeasible();
     }
 
     @Override
@@ -410,13 +481,13 @@ public final class ActiveSetSolver extends ConvexSolver {
                     }
                 }
 
-                if (myConstraintToInclude >= 0) {
-                    if (tmpStepLength >= PrimitiveMath.ONE) {
-                        this.getX().maxpy(PrimitiveMath.ONE, tmpSubX);
-                    } else if (tmpStepLength > PrimitiveMath.ZERO) {
-                        this.getX().maxpy(tmpStepLength, tmpSubX);
-                    }
+                //if (myConstraintToInclude >= 0) {
+                if (tmpStepLength >= PrimitiveMath.ONE) {
+                    this.getX().maxpy(PrimitiveMath.ONE, tmpSubX);
+                } else if (tmpStepLength > PrimitiveMath.ZERO) {
+                    this.getX().maxpy(tmpStepLength, tmpSubX);
                 }
+                //}
             }
 
             if (options.validate && (this.getModel() != null)) {

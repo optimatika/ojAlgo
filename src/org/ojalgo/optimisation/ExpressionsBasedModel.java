@@ -31,10 +31,10 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.optimisation.Expression.Index;
+import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.OldIntegerSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.optimisation.mps.MathProgSysModel;
-import org.ojalgo.optimisation.quadratic.QuadraticSolver;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -357,8 +357,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         } else if (this.isAnyExpressionQuadratic()) {
 
-            return QuadraticSolver.make(this);
-            //return ConvexSolver.make(this);
+            //return QuadraticSolver.make(this);
+            return ConvexSolver.make(this);
 
         } else {
 

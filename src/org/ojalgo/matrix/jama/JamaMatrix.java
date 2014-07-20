@@ -59,12 +59,10 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * This class adapts JAMA's Matrix to ojAlgo's {@linkplain BasicMatrix} and {@linkplain PhysicalStore} interfaces.
- * 
+ *
  * @author apete
  */
 public final class JamaMatrix extends Object implements BasicMatrix<Double>, PhysicalStore<Double>, Serializable {
-
-    public static final JamaFactory FACTORY = new JamaFactory();
 
     public static Access2D.Builder<JamaMatrix> getBuilder(final int aLength) {
         return FACTORY.getBuilder(aLength);
@@ -107,6 +105,8 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
             return new Rotation.Primitive(aTransf);
         }
     }
+
+    public static final JamaFactory FACTORY = new JamaFactory();
 
     private final Matrix myDelegate;
 
@@ -875,6 +875,10 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
 
     public JamaMatrix subtract(final Access2D<?> aMtrx) {
         return new JamaMatrix(myDelegate.minus(JamaMatrix.convert(aMtrx)));
+    }
+
+    public MatrixStore<Double> subtract(final MatrixStore<Double> subtrahend) {
+        return this.add(subtrahend.negate());
     }
 
     public JamaMatrix subtract(final Number value) {

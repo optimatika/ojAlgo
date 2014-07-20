@@ -30,7 +30,6 @@ import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.QRDecomposition;
-import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.ZeroStore;
 
@@ -140,7 +139,8 @@ public final class KKTSolver extends Object {
 
     }
 
-    private static final double SMALL = Math.sqrt(MACHINE_DOUBLE_ERROR);
+    private static final double DIAGONAL = Math.sqrt(MACHINE_DOUBLE_ERROR) / 1000.0;
+    private static final double CONSTR = Math.sqrt(MACHINE_DOUBLE_ERROR) / 1000.0;
 
     private final Cholesky<Double> myCholesky = CholeskyDecomposition.makePrimitive();
     private final Eigenvalue<Double> myEigenvalue = EigenvalueDecomposition.makePrimitive(true);
@@ -193,7 +193,7 @@ public final class KKTSolver extends Object {
 
             if (tmpA != null) {
 
-                myQR.compute(tmpA);
+                myQR.compute(tmpA.transpose());
                 if (myQR.getRank() != tmpA.countRows()) {
                     throw new IllegalArgumentException("A must have full (row) rank!");
                 }
@@ -203,13 +203,8 @@ public final class KKTSolver extends Object {
         MatrixStore<Double> tmpX = null;
         MatrixStore<Double> tmpL = null;
 
-        final double tmpRelativelySmall = SMALL * tmpQ.aggregateAll(Aggregator.LARGEST);
-
         if ((tmpA == null) || (tmpA.count() == 0L)) {
             // Unconstrained
-
-            final MatrixStore<Double> tmpModQ = IdentityStore.makePrimitive((int) tmpQ.countRows()).scale(tmpRelativelySmall);
-            tmpQ = tmpQ.add(tmpModQ);
 
             myQR.compute(tmpQ);
             if (tmpSolvable = myQR.isSolvable()) {
@@ -217,29 +212,36 @@ public final class KKTSolver extends Object {
                 tmpL = ZeroStore.makePrimitive(0, 1);
             }
 
-        } else if ((tmpA.countRows() >= tmpA.countColumns()) && myQR.compute(tmpA) && myQR.isFullColumnRank()) {
+        } else if ((tmpA.countRows() >= tmpA.countColumns()) && myQR.compute(tmpA) && (tmpSolvable = myQR.isSolvable())) {
             // Only 1 possible solution
 
             tmpX = myQR.solve(tmpB);
 
             myQR.compute(tmpA.transpose());
 
-            //            final MatrixStore<Double> tmpModQ = IdentityStore.makePrimitive((int) tmpQ.countRows()).scale(tmpRelativelySmall);
-            //            tmpQ = tmpQ.add(tmpModQ);
-
             tmpL = myQR.solve(tmpC).add(tmpQ.multiplyRight(tmpX).negate());
 
         } else {
             // Actual optimisation problem
 
-            final MatrixStore<Double> tmpModQ = tmpA.multiplyLeft(tmpA.transpose()).scale(tmpRelativelySmall);
-            final MatrixStore<Double> tmpModC = tmpB.multiplyLeft(tmpA.transpose()).scale(tmpRelativelySmall);
+            final Double tmpLargest = tmpQ.aggregateAll(Aggregator.LARGEST);
+            final double tmpRelativelySmallDiagonal = DIAGONAL * tmpLargest;
+            final double tmpRelativelySmallConstraints = CONSTR * tmpLargest;
 
-            tmpQ = tmpQ.add(tmpModQ);
-            tmpC = tmpC.add(tmpModC);
+            for (int ij = 0; ij < (int) tmpQ.countRows(); ij++) {
+                if (tmpQ.isZero(ij, ij)) {
+                    tmpQ = tmpQ.builder().superimpose(ij, ij, tmpRelativelySmallDiagonal).build();
+                }
+            }
 
-            final MatrixStore<Double> tmpModQ2 = IdentityStore.makePrimitive((int) tmpQ.countRows()).scale(tmpRelativelySmall);
-            tmpQ = tmpQ.add(tmpModQ2);
+            if (tmpA.countRows() >= 2L) {
+
+                final MatrixStore<Double> tmpModQ = tmpA.multiplyLeft(tmpA.transpose()).scale(tmpRelativelySmallConstraints);
+                final MatrixStore<Double> tmpModC = tmpB.multiplyLeft(tmpA.transpose()).scale(tmpRelativelySmallConstraints);
+
+                tmpQ = tmpQ.add(tmpModQ);
+                tmpC = tmpC.add(tmpModC);
+            }
 
             myCholesky.compute(tmpQ);
             if (tmpSolvable = myCholesky.isSolvable()) {

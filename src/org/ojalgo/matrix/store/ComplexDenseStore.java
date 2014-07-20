@@ -55,7 +55,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * A {@linkplain ComplexNumber} implementation of {@linkplain PhysicalStore}.
- * 
+ *
  * @author apete
  */
 public final class ComplexDenseStore extends ComplexArray implements PhysicalStore<ComplexNumber>, DecompositionStore<ComplexNumber> {
@@ -76,6 +76,34 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         void invoke(ComplexNumber[] product, ComplexNumber[] left, int complexity, Access1D<ComplexNumber> right);
 
+    }
+
+    static ComplexDenseStore cast(final Access1D<ComplexNumber> mtrx) {
+        if (mtrx instanceof ComplexDenseStore) {
+            return (ComplexDenseStore) mtrx;
+        } else if (mtrx instanceof Access2D<?>) {
+            return FACTORY.copy((Access2D<?>) mtrx);
+        } else {
+            return FACTORY.columns(mtrx);
+        }
+    }
+
+    static Householder.Complex cast(final Householder<ComplexNumber> aTransf) {
+        if (aTransf instanceof Householder.Complex) {
+            return (Householder.Complex) aTransf;
+        } else if (aTransf instanceof DecompositionStore.HouseholderReference<?>) {
+            return ((DecompositionStore.HouseholderReference<ComplexNumber>) aTransf).getComplexWorker().copy(aTransf);
+        } else {
+            return new Householder.Complex(aTransf);
+        }
+    }
+
+    static Rotation.Complex cast(final Rotation<ComplexNumber> aTransf) {
+        if (aTransf instanceof Rotation.Complex) {
+            return (Rotation.Complex) aTransf;
+        } else {
+            return new Rotation.Complex(aTransf);
+        }
     }
 
     public static final DecompositionStore.Factory<ComplexNumber, ComplexDenseStore> FACTORY = new DecompositionStore.Factory<ComplexNumber, ComplexDenseStore>() {
@@ -308,34 +336,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             return retVal;
         }
     };
-
-    static ComplexDenseStore cast(final Access1D<ComplexNumber> mtrx) {
-        if (mtrx instanceof ComplexDenseStore) {
-            return (ComplexDenseStore) mtrx;
-        } else if (mtrx instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) mtrx);
-        } else {
-            return FACTORY.columns(mtrx);
-        }
-    }
-
-    static Householder.Complex cast(final Householder<ComplexNumber> aTransf) {
-        if (aTransf instanceof Householder.Complex) {
-            return (Householder.Complex) aTransf;
-        } else if (aTransf instanceof DecompositionStore.HouseholderReference<?>) {
-            return ((DecompositionStore.HouseholderReference<ComplexNumber>) aTransf).getComplexWorker().copy(aTransf);
-        } else {
-            return new Householder.Complex(aTransf);
-        }
-    }
-
-    static Rotation.Complex cast(final Rotation<ComplexNumber> aTransf) {
-        if (aTransf instanceof Rotation.Complex) {
-            return (Rotation.Complex) aTransf;
-        } else {
-            return new Rotation.Complex(aTransf);
-        }
-    }
 
     private final ComplexMultiplyBoth multiplyBoth;
 
@@ -977,6 +977,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, aBody, onesOnDiagonal, zerosAboveDiagonal);
         }
+    }
+
+    public MatrixStore<ComplexNumber> subtract(final MatrixStore<ComplexNumber> subtrahend) {
+        return this.add(subtrahend.negate());
     }
 
     public Scalar<ComplexNumber> toScalar(final long row, final long column) {
