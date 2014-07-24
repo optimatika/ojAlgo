@@ -141,6 +141,13 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         myDelegate = new Matrix(aRaw, aRaw.length, aRaw[0].length);
     }
 
+    JamaMatrix(final double[][] data, final int rows, final int columns) {
+
+        super();
+
+        myDelegate = new Matrix(data, rows, columns);
+    }
+
     JamaMatrix(final Matrix aDelegate) {
 
         super();

@@ -30,10 +30,10 @@ public abstract class OptimisationUtils {
 
     static final NumberContext DISPLAY = NumberContext.getGeneral(6);
 
-    static int getAdjustmentFactorExponent(final AggregatorFunction<?> aLargestAggr, final AggregatorFunction<?> aSmallestAggr) {
+    static int getAdjustmentFactorExponent(final AggregatorFunction<?> largest, final AggregatorFunction<?> smallest) {
 
-        final double tmpLargestValue = aLargestAggr.doubleValue();
-        final double tmpSmallestValue = aSmallestAggr.doubleValue();
+        final double tmpLargestValue = largest.doubleValue();
+        final double tmpSmallestValue = smallest.doubleValue();
 
         final double tmpLargestExp = tmpLargestValue >= IS_ZERO ? Math.log10(tmpLargestValue) : ZERO;
         final double tmpSmallestExp = tmpSmallestValue >= IS_ZERO ? Math.log10(tmpSmallestValue) : -TWELFTH;

@@ -139,8 +139,6 @@ public abstract class ConvexSolver extends BaseSolver {
 
     }
 
-    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
-
     public static ConvexSolver make(final ExpressionsBasedModel aModel) {
 
         final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(aModel);
@@ -316,9 +314,11 @@ public abstract class ConvexSolver extends BaseSolver {
             tmpKickStarter.activeSet(tmpSelector.getIncluded());
         }
 
-        // destinationBuilder.setKickStarter(tmpKickStarter);
-        destinationBuilder.setKickStarter(null);
+        destinationBuilder.setKickStarter(tmpKickStarter);
+        //destinationBuilder.setKickStarter(null);
     }
+
+    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     protected ConvexSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
         super(aModel, solverOptions, matrices);

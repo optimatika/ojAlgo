@@ -30,6 +30,7 @@ import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.QRDecomposition;
+import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.ZeroStore;
 
@@ -108,6 +109,10 @@ public final class KKTSolver extends Object {
             }
         }
 
+        final boolean isConstrained() {
+            return (myA != null) && (myA.count() > 0L);
+        }
+
     }
 
     public static final class Output {
@@ -139,8 +144,8 @@ public final class KKTSolver extends Object {
 
     }
 
-    private static final double DIAGONAL = Math.sqrt(MACHINE_DOUBLE_ERROR) / 1000.0;
-    private static final double CONSTR = Math.sqrt(MACHINE_DOUBLE_ERROR) / 1000.0;
+    private static final double SMALL = MACHINE_DOUBLE_ERROR / 10.0; //1000.0
+    private static final double SCALE = 100_000.0; //1000.0
 
     private final Cholesky<Double> myCholesky = CholeskyDecomposition.makePrimitive();
     private final Eigenvalue<Double> myEigenvalue = EigenvalueDecomposition.makePrimitive(true);
@@ -203,45 +208,35 @@ public final class KKTSolver extends Object {
         MatrixStore<Double> tmpX = null;
         MatrixStore<Double> tmpL = null;
 
-        if ((tmpA == null) || (tmpA.count() == 0L)) {
+        if (!input.isConstrained() && myQR.compute(tmpQ) && (tmpSolvable = myQR.isSolvable())) {
             // Unconstrained
 
-            myQR.compute(tmpQ);
-            if (tmpSolvable = myQR.isSolvable()) {
-                tmpX = myQR.solve(tmpC);
-                tmpL = ZeroStore.makePrimitive(0, 1);
-            }
+            tmpX = myQR.solve(tmpC);
+            tmpL = ZeroStore.makePrimitive(0, 1);
 
-        } else if ((tmpA.countRows() >= tmpA.countColumns()) && myQR.compute(tmpA) && (tmpSolvable = myQR.isSolvable())) {
+        } else if (input.isConstrained() && (tmpA.countRows() >= tmpA.countColumns()) && myQR.compute(tmpA) && (tmpSolvable = myQR.isSolvable())) {
             // Only 1 possible solution
 
             tmpX = myQR.solve(tmpB);
 
-            myQR.compute(tmpA.transpose());
+            myQR.compute(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculöated  myQR.compute(tmpA).
 
-            tmpL = myQR.solve(tmpC).add(tmpQ.multiplyRight(tmpX).negate());
+            tmpL = myQR.solve(tmpC).subtract(tmpQ.multiplyRight(tmpX));
 
         } else {
             // Actual optimisation problem
 
-            final Double tmpLargest = tmpQ.aggregateAll(Aggregator.LARGEST);
-            final double tmpRelativelySmallDiagonal = DIAGONAL * tmpLargest;
-            final double tmpRelativelySmallConstraints = CONSTR * tmpLargest;
+            final double tmpLargest = tmpQ.aggregateAll(Aggregator.LARGEST);
+            final double tmpRelativelySmall = tmpLargest * SMALL;
 
-            for (int ij = 0; ij < (int) tmpQ.countRows(); ij++) {
-                if (tmpQ.isZero(ij, ij)) {
-                    tmpQ = tmpQ.builder().superimpose(ij, ij, tmpRelativelySmallDiagonal).build();
-                }
+            MatrixStore<Double> tmpModQ = IdentityStore.makePrimitive((int) tmpQ.countRows()).scale(tmpRelativelySmall);
+            MatrixStore<Double> tmpModC = ZeroStore.makePrimitive((int) tmpQ.countRows(), 1);
+            if (input.isConstrained()) {
+                tmpModQ = tmpModQ.add(tmpA.multiplyLeft(tmpA.transpose()));
+                tmpModC = tmpB.multiplyLeft(tmpA.transpose());
             }
-
-            if (tmpA.countRows() >= 2L) {
-
-                final MatrixStore<Double> tmpModQ = tmpA.multiplyLeft(tmpA.transpose()).scale(tmpRelativelySmallConstraints);
-                final MatrixStore<Double> tmpModC = tmpB.multiplyLeft(tmpA.transpose()).scale(tmpRelativelySmallConstraints);
-
-                tmpQ = tmpQ.add(tmpModQ);
-                tmpC = tmpC.add(tmpModC);
-            }
+            tmpQ = tmpQ.add(tmpModQ.scale(SCALE));
+            tmpC = tmpC.add(tmpModC.scale(SCALE));
 
             myCholesky.compute(tmpQ);
             if (tmpSolvable = myCholesky.isSolvable()) {
@@ -264,5 +259,4 @@ public final class KKTSolver extends Object {
 
         return new Output(tmpX, tmpL, tmpSolvable);
     }
-
 }

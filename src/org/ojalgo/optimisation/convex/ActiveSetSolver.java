@@ -98,7 +98,7 @@ public final class ActiveSetSolver extends ConvexSolver {
 
         final PhysicalStore<Double> tmpX = this.getX();
 
-        return new KKTSolver.Input(tmpSubQ, tmpSubC.add(tmpSubQ.multiplyRight(tmpX).negate()), tmpSubAE, ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1));
+        return new KKTSolver.Input(tmpSubQ, tmpSubC.subtract(tmpSubQ.multiplyRight(tmpX)), tmpSubAE, ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1));
     }
 
     private boolean isFeasible(final boolean onlyExcluded) {
@@ -259,6 +259,15 @@ public final class ActiveSetSolver extends ConvexSolver {
                 this.fillX(tmpUnconstrOutput.getX());
                 tmpFeasible = this.isFeasible(true);
             } else {
+                //                for (int i = 0; i < tmpC.countRows(); i++) {
+                //                    final double tmpNumer = tmpC.doubleValue(i);
+                //                    final double tmpDenom = tmpQ.doubleValue(i, i);
+                //                    if (options.problem.isZero(tmpDenom)) {
+                //                        this.setX(i, 0.0);
+                //                    } else {
+                //                        this.setX(i, tmpNumer / tmpDenom);
+                //                    }
+                //                }
                 this.resetX();
                 tmpFeasible = this.isFeasible(false);
             }
@@ -266,20 +275,38 @@ public final class ActiveSetSolver extends ConvexSolver {
 
         if (!tmpFeasible) {
 
-            final MatrixStore<Double> tmpLinC = tmpQ.multiplyRight(this.getX()).subtract(tmpC);
+            final MatrixStore<Double> tmpLinearC = tmpQ.multiplyRight(this.getX()).subtract(tmpC);
 
-            final int tmpVars = (int) tmpC.countRows();
-            final int tmpIneqs = (int) tmpAI.countRows();
+            final int tmpNumberOfVariables = (int) tmpC.countRows();
+            final int tmpNumberOfEqualities = tmpAE != null ? (int) tmpAE.countRows() : 0;
+            final int tmpNumberOfInequalities = tmpAI != null ? (int) tmpAI.countRows() : 0;
 
-            final LinearSolver.Builder tmpLinBuilder = new LinearSolver.Builder(tmpLinC.builder().below(tmpLinC.negate()).below(tmpIneqs).build());
+            final LinearSolver.Builder tmpLinBuilder = new LinearSolver.Builder(tmpLinearC.builder().below(tmpLinearC.negate()).below(tmpNumberOfInequalities)
+                    .build());
 
-            if ((tmpAE != null) && (tmpAE.count() > 0L)) {
+            MatrixStore<Double> tmpLinearAE = null;
+            MatrixStore<Double> tmpLinearBE = null;
 
-                final MatrixStore.Builder<Double> tmpBuilderAE = tmpAE.builder().right(tmpAE.negate()).right(tmpIneqs);
-                tmpBuilderAE.below(tmpAI.builder().right(tmpAI.negate()).right(IdentityStore.makePrimitive(tmpIneqs)).build());
+            if (tmpNumberOfEqualities > 0) {
+                tmpLinearAE = tmpAE.builder().right(tmpAE.negate()).right(tmpNumberOfInequalities).build();
+                tmpLinearBE = tmpBE;
+            }
 
-                final PhysicalStore<Double> tmpCopyAE = tmpBuilderAE.build().copy();
-                final PhysicalStore<Double> tmpCopyBE = tmpBE.builder().below(tmpBI).build().copy();
+            if (tmpNumberOfInequalities > 0) {
+                final MatrixStore<Double> tmpLinAI = tmpAI.builder().right(tmpAI.negate()).right(IdentityStore.makePrimitive(tmpNumberOfInequalities)).build();
+                if (tmpLinearAE != null) {
+                    tmpLinearAE = tmpLinearAE.builder().below(tmpLinAI).build();
+                    tmpLinearBE = tmpLinearBE.builder().below(tmpBI).build();
+                } else {
+                    tmpLinearAE = tmpLinAI;
+                    tmpLinearBE = tmpBI;
+                }
+            }
+
+            if (tmpLinearAE != null) {
+
+                final PhysicalStore<Double> tmpCopyAE = tmpLinearAE.copy();
+                final PhysicalStore<Double> tmpCopyBE = tmpLinearBE.copy();
 
                 for (int i = 0; i < tmpCopyBE.countRows(); i++) {
                     if (tmpCopyBE.doubleValue(i) < 0.0) {
@@ -291,14 +318,14 @@ public final class ActiveSetSolver extends ConvexSolver {
                 tmpLinBuilder.equalities(tmpCopyAE, tmpCopyBE);
             }
 
-            final LinearSolver tmpLinSolver = tmpLinBuilder.build();
+            final LinearSolver tmpLinearSolver = tmpLinBuilder.build();
 
-            final Result tmpLinResult = tmpLinSolver.solve();
+            final Result tmpLinearResult = tmpLinearSolver.solve();
 
-            tmpFeasible = tmpLinResult.getState().isFeasible();
+            tmpFeasible = tmpLinearResult.getState().isFeasible();
 
-            for (int i = 0; tmpFeasible && (i < tmpVars); i++) {
-                this.setX(i, tmpLinResult.doubleValue(i) - tmpLinResult.doubleValue(tmpVars + i));
+            for (int i = 0; tmpFeasible && (i < tmpNumberOfVariables); i++) {
+                this.setX(i, tmpLinearResult.doubleValue(i) - tmpLinearResult.doubleValue(tmpNumberOfVariables + i));
             }
         }
 
@@ -407,6 +434,11 @@ public final class ActiveSetSolver extends ConvexSolver {
     @Override
     protected void performIteration() {
 
+        if (this.isDebug()) {
+            this.debug("\nPerformIteration");
+            this.debug(myActivator.toString());
+        }
+
         myNeedsAnotherIteration = false;
         myConstraintToInclude = -1;
 
@@ -447,8 +479,11 @@ public final class ActiveSetSolver extends ConvexSolver {
                 }
             }
 
+            this.debug("Current: {}", this.getX());
+            this.debug("Step: {}", tmpSubX);
+
             final double tmpFrobNormX = tmpSubX.aggregateAll(Aggregator.NORM2);
-            if (tmpFrobNormX > 1.0E-10) {
+            if (!options.solution.isZero(tmpFrobNormX)) {
 
                 final int[] tmpExcluded = myActivator.getExcluded();
 
@@ -458,21 +493,21 @@ public final class ActiveSetSolver extends ConvexSolver {
                 tmpStepLengths.fillMatching(tmpStepLengths, PrimitiveFunction.DIVIDE, tmpDenom);
 
                 if (this.isDebug()) {
-                    this.debug("Current: {}", this.getX());
-                    this.debug("Step: {}", tmpSubX);
-                    this.debug("Slack: {}", tmpNumer);
-                    this.debug("Scaler: {}", tmpDenom);
-                    this.debug("Looking for the largest possible step length (smallest positive scalar among these: {}).", tmpStepLengths.toString());
+                    this.debug("Slack (numerator): {}", tmpNumer);
+                    this.debug("Scaler (denominator): {}", tmpDenom);
+                    this.debug("Looking for the largest possible step length (smallest positive scalar) among these: {}).", tmpStepLengths.toString());
                 }
 
-                double tmpStepLength = PrimitiveMath.POSITIVE_INFINITY;
+                double tmpStepLength = PrimitiveMath.ONE;
                 for (int i = 0; i < tmpExcluded.length; i++) {
 
                     final double tmpN = tmpNumer.doubleValue(i);
                     final double tmpD = tmpDenom.doubleValue(i);
                     final double tmpVal = tmpN / tmpD;
 
-                    if ((tmpD > PrimitiveMath.ZERO) && !options.slack.isZero(tmpD) && (tmpVal >= PrimitiveMath.ZERO) && (tmpVal < tmpStepLength)) {
+                    //if ((tmpVal < tmpStepLength) && (tmpVal >= PrimitiveMath.ZERO) && (tmpD > PrimitiveMath.ZERO) && !options.slack.isZero(tmpD)) {
+                    if ((tmpD > PrimitiveMath.ZERO) && (tmpVal < tmpStepLength)) {
+                        // TODO Förmodligen problem när/om den möjliga steglängden är mycket nära 0.0 (kanske visas som ett mycket litet negativt tal).
                         tmpStepLength = tmpVal;
                         myConstraintToInclude = tmpExcluded[i];
                         if (this.isDebug()) {
@@ -481,13 +516,10 @@ public final class ActiveSetSolver extends ConvexSolver {
                     }
                 }
 
-                //if (myConstraintToInclude >= 0) {
-                if (tmpStepLength >= PrimitiveMath.ONE) {
-                    this.getX().maxpy(PrimitiveMath.ONE, tmpSubX);
-                } else if (tmpStepLength > PrimitiveMath.ZERO) {
-                    this.getX().maxpy(tmpStepLength, tmpSubX);
-                }
-                //}
+                this.getX().maxpy(tmpStepLength, tmpSubX);
+
+            } else if (this.isDebug()) {
+                this.debug("Step (too small): {}", tmpSubX);
             }
 
             if (options.validate && (this.getModel() != null)) {
@@ -531,6 +563,17 @@ public final class ActiveSetSolver extends ConvexSolver {
             throw new IllegalArgumentException("Not able to solve this problem!");
         }
 
+        if (this.isDebug()) {
+            this.debug("Post iteration solution: {}", this.getX().copy());
+            if (this.getAE() != null) {
+                this.debug("Post iteration E-slack: {}", this.getSE().copy());
+            }
+            if (this.getAI() != null) {
+                this.debug("Post iteration I-included-slack: {}", this.getSI(myActivator.getIncluded()).copy());
+                this.debug("Post iteration I-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy());
+            }
+        }
+        final int i = 2 + 2;
     }
 
     @Override

@@ -37,7 +37,6 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
@@ -299,8 +298,8 @@ public final class MarkowitzModel extends EquilibriumModel {
             tmpExpr.lower(tmpValue.lower).upper(tmpValue.upper);
         }
 
-        //retVal.options.debug(QuadraticSolver.class);        
-        retVal.options.debug(ConvexSolver.class);
+        //retVal.options.debug(QuadraticSolver.class);
+        //retVal.options.debug(ConvexSolver.class);
 
         return retVal;
     }

@@ -44,7 +44,7 @@ import org.ojalgo.scalar.Scalar.Factory;
 /**
  * Implements both {@linkplain BasicMatrix.Factory} and {@linkplain PhysicalStore.Factory}, and creates
  * {@linkplain JamaMatrix} instances.
- * 
+ *
  * @author apete
  */
 public final class JamaFactory extends Object implements BasicMatrix.Factory<JamaMatrix>, PhysicalStore.Factory<Double, JamaMatrix> {
@@ -146,7 +146,7 @@ public final class JamaFactory extends Object implements BasicMatrix.Factory<Jam
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new JamaMatrix(retVal, tmpRowDim, tmpColDim);
     }
 
     public FunctionSet<Double> function() {

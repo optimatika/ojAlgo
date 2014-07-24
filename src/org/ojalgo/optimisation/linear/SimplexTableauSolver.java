@@ -45,7 +45,7 @@ import org.ojalgo.optimisation.Variable;
 
 /**
  * SimplexTableauSolver
- * 
+ *
  * @author apete
  */
 final class SimplexTableauSolver extends LinearSolver {
@@ -129,7 +129,8 @@ final class SimplexTableauSolver extends LinearSolver {
             tmpTableauBuilder.above(matrices.getAE(), matrices.getBE());
         }
         tmpTableauBuilder.below(1);
-        myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
+        //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
+        myTransposedTableau = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.build());
 
         final Result tmpKickStarter = matrices.getKickStarter();
         final int[] tmpBasis = tmpKickStarter != null ? tmpKickStarter.getBasis() : null;
