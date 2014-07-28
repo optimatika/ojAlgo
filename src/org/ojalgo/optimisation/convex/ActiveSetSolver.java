@@ -44,13 +44,18 @@ import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.IndexSelector;
 
 /**
+ * Solves optimisation problems of the form:
+ * <p>
+ * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
+ * when [AE][X] == [BE]<br>
+ * and [AI][X] <= [BI]
+ * </p>
+ *
  * @author apete
  */
-public final class ActiveSetSolver extends ConvexSolver {
+final class ActiveSetSolver extends ConvexSolver {
 
     private final IndexSelector myActivator;
-
-    private transient KKTSolver myDelegateSolver = null;
 
     private int myConstraintToInclude = -1;
     private boolean myNeedsAnotherIteration = false;
@@ -72,33 +77,6 @@ public final class ActiveSetSolver extends ConvexSolver {
         options.iterations_abort = tmpIterationsLimit;
 
         // BasicLogger.logDebug("AS solver innequalities: " + this.countInequalityConstraints());
-    }
-
-    private KKTSolver.Input buildDelegateSolverInput() {
-
-        MatrixStore<Double> tmpSubAE = null;
-        final MatrixStore<Double> tmpSubQ = this.getQ();
-        final MatrixStore<Double> tmpSubC = this.getC();
-
-        final int[] tmpActivator = myActivator.getIncluded();
-
-        if (tmpActivator.length == 0) {
-            if (this.hasEqualityConstraints()) {
-                tmpSubAE = this.getAE();
-            } else {
-                tmpSubAE = ZeroStore.makePrimitive(0, (int) tmpSubC.countRows());
-            }
-        } else {
-            if (this.hasEqualityConstraints()) {
-                tmpSubAE = new AboveBelowStore<Double>(this.getAE(), new RowsStore<Double>(this.getAI(), tmpActivator));
-            } else {
-                tmpSubAE = new RowsStore<Double>(this.getAI(), tmpActivator);
-            }
-        }
-
-        final PhysicalStore<Double> tmpX = this.getX();
-
-        return new KKTSolver.Input(tmpSubQ, tmpSubC.subtract(tmpSubQ.multiplyRight(tmpX)), tmpSubAE, ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1));
     }
 
     private boolean isFeasible(final boolean onlyExcluded) {
@@ -555,12 +533,15 @@ public final class ActiveSetSolver extends ConvexSolver {
 
             this.performIteration();
 
+        } else if (this.isFeasible(false)) {
+
+            this.setState(State.FEASIBLE);
+
         } else {
 
             this.resetX();
             this.setState(State.INFEASIBLE);
 
-            throw new IllegalArgumentException("Not able to solve this problem!");
         }
 
         if (this.isDebug()) {
@@ -577,19 +558,31 @@ public final class ActiveSetSolver extends ConvexSolver {
     }
 
     @Override
-    protected boolean validate() {
+    KKTSolver.Input buildDelegateSolverInput() {
 
-        final boolean retVal = true;
-        this.setState(State.VALID);
+        MatrixStore<Double> tmpSubAE = null;
+        final MatrixStore<Double> tmpSubQ = this.getQ();
+        final MatrixStore<Double> tmpSubC = this.getC();
 
-        return retVal;
-    }
+        final int[] tmpActivator = myActivator.getIncluded();
 
-    KKTSolver getDelegateSolver(final KKTSolver.Input templeate) {
-        if (myDelegateSolver == null) {
-            myDelegateSolver = new KKTSolver(templeate);
+        if (tmpActivator.length == 0) {
+            if (this.hasEqualityConstraints()) {
+                tmpSubAE = this.getAE();
+            } else {
+                tmpSubAE = ZeroStore.makePrimitive(0, (int) tmpSubC.countRows());
+            }
+        } else {
+            if (this.hasEqualityConstraints()) {
+                tmpSubAE = new AboveBelowStore<Double>(this.getAE(), new RowsStore<Double>(this.getAI(), tmpActivator));
+            } else {
+                tmpSubAE = new RowsStore<Double>(this.getAI(), tmpActivator);
+            }
         }
-        return myDelegateSolver;
+
+        final PhysicalStore<Double> tmpX = this.getX();
+
+        return new KKTSolver.Input(tmpSubQ, tmpSubC.subtract(tmpSubQ.multiplyRight(tmpX)), tmpSubAE, ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1));
     }
 
 }

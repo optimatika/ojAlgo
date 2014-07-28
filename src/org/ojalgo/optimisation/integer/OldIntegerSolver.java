@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.RecursiveTask;
 
-import org.ojalgo.RecoverableCondition;
 import org.ojalgo.concurrent.DaemonPoolExecutor;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -43,7 +42,7 @@ import org.ojalgo.type.TypeUtils;
 
 /**
  * IntegerSolver
- * 
+ *
  * @author apete
  */
 public final class OldIntegerSolver extends IntegerSolver {
@@ -106,11 +105,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             ExpressionsBasedModel tmpModel = this.getModel();
             final Optimisation.Result tmpResult = tmpModel.solve();
 
-            try {
-                OldIntegerSolver.this.incrementIterationsCount();
-            } catch (final RecoverableCondition exception) {
-                return false;
-            }
+            OldIntegerSolver.this.incrementIterationsCount();
 
             if (tmpResult.getState().isOptimal()) {
                 if (OldIntegerSolver.this.isDebug()) {

@@ -21,6 +21,10 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.convex.KKTSolver.Input;
@@ -28,20 +32,46 @@ import org.ojalgo.optimisation.convex.KKTSolver.Input;
 /**
  * Solves optimisation problems of the form:
  * <p>
- * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]
+ * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
+ * when [AE][X] == [BE]
  * </p>
  *
  * @author apete
  */
-final class UnconstrainedSolver extends ConvexSolver {
+final class QPESolver extends ConvexSolver {
 
-    UnconstrainedSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
+    private boolean myFeasible = false;
+
+    QPESolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
         super(aModel, solverOptions, matrices);
     }
 
+    private boolean isFeasible() {
+
+        boolean retVal = true;
+
+        final MatrixStore<Double> tmpSE = this.getSE();
+        for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
+            final double tmpVal = tmpSE.doubleValue(i);
+            if (!options.slack.isZero(tmpVal)) {
+                retVal = false;
+            }
+        }
+
+        return retVal;
+    }
+
     @Override
-    protected boolean initialise(final Result kickStart) {
-        this.resetX();
+    protected boolean initialise(final Result kickStarter) {
+
+        if (kickStarter != null) {
+            this.fillX(kickStarter);
+            myFeasible = this.isFeasible();
+        } else {
+            this.resetX();
+            myFeasible = false; // Could still be feasible, but doesn't matter...
+        }
+
         return true;
     }
 
@@ -62,18 +92,39 @@ final class UnconstrainedSolver extends ConvexSolver {
         if (tmpOutput.isSolvable()) {
 
             this.setState(State.OPTIMAL);
-            this.fillX(tmpOutput.getX());
+            this.getX().fillMatching(this.getX(), PrimitiveFunction.ADD, tmpOutput.getX());
+            this.getLE().fillMatching(tmpOutput.getL());
+
+        } else if (myFeasible) {
+
+            this.setState(State.FEASIBLE);
 
         } else {
 
-            this.setState(State.INVALID);
+            this.setState(State.INFEASIBLE);
             this.resetX();
         }
     }
 
     @Override
     Input buildDelegateSolverInput() {
-        return new KKTSolver.Input(this.getQ(), this.getC());
+
+        final MatrixStore<Double> tmpQ = this.getQ();
+        final MatrixStore<Double> tmpC = this.getC();
+        final MatrixStore<Double> tmpA = this.getAE();
+
+        if (myFeasible) {
+
+            final PhysicalStore<Double> tmpX = this.getX();
+
+            return new KKTSolver.Input(tmpQ, tmpC.subtract(tmpQ.multiplyRight(tmpX)), tmpA, ZeroStore.makePrimitive((int) tmpA.countRows(), 1));
+
+        } else {
+
+            final MatrixStore<Double> tmpB = this.getBE();
+
+            return new KKTSolver.Input(tmpQ, tmpC, tmpA, tmpB);
+        }
     }
 
 }

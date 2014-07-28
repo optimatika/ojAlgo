@@ -109,7 +109,7 @@ public abstract class ConvexSolver extends BaseSolver {
                 return new ActiveSetSolver(tmpModel, options, this);
             } else if (this.hasEqualityConstraints()) {
                 //return new LagrangeSolver2(tmpModel, options, this);
-                return new LagrangeSolver(tmpModel, options, this);
+                return new QPESolver(tmpModel, options, this);
                 //return new NullspaceSolver(tmpModel, options, this);
             } else {
                 return new UnconstrainedSolver(tmpModel, options, this);
@@ -318,6 +318,8 @@ public abstract class ConvexSolver extends BaseSolver {
         //destinationBuilder.setKickStarter(null);
     }
 
+    private transient KKTSolver myDelegateSolver = null;
+
     static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     protected ConvexSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
@@ -326,41 +328,27 @@ public abstract class ConvexSolver extends BaseSolver {
 
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
 
-        try {
+        boolean tmpContinue = true;
 
-            boolean tmpContinue = true;
+        if (options.validate) {
+            tmpContinue = this.validate();
+        }
 
-            if (options.validate) {
-                tmpContinue = this.validate();
-            }
+        if (tmpContinue) {
+            tmpContinue = this.initialise(kickStarter);
+        }
 
-            if (tmpContinue) {
-                tmpContinue = this.initialise(kickStarter);
-            }
+        if (tmpContinue) {
 
-            if (tmpContinue) {
+            this.resetIterationsCount();
 
-                this.resetIterationsCount();
+            do {
 
-                do {
+                this.performIteration();
 
-                    this.performIteration();
+                this.incrementIterationsCount();
 
-                    this.incrementIterationsCount();
-
-                } while (!this.getState().isFailure() && this.needsAnotherIteration() && this.isIterationAllowed());
-            }
-
-        } catch (final Exception exception) {
-
-            if (this.isDebug()) {
-                this.debug(exception);
-            }
-
-            this.setState(State.FAILED);
-            this.resetX();
-            this.resetLI();
-            this.resetLE();
+            } while (!this.getState().isFailure() && this.needsAnotherIteration() && this.isIterationAllowed());
         }
 
         return this.buildResult();
@@ -399,6 +387,21 @@ public abstract class ConvexSolver extends BaseSolver {
     }
 
     abstract protected void performIteration();
+
+    @Override
+    protected final boolean validate() {
+        this.setState(State.VALID);
+        return true;
+    }
+
+    abstract KKTSolver.Input buildDelegateSolverInput();
+
+    final KKTSolver getDelegateSolver(final KKTSolver.Input templeate) {
+        if (myDelegateSolver == null) {
+            myDelegateSolver = new KKTSolver(templeate);
+        }
+        return myDelegateSolver;
+    }
 
     final MatrixStore<Double> getSolutionLE() {
         return this.getLE();

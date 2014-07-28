@@ -31,7 +31,6 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.RecoverableCondition;
 import org.ojalgo.concurrent.DaemonPoolExecutor;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -44,7 +43,7 @@ import org.ojalgo.type.TypeUtils;
 
 /**
  * IntegerSolver
- * 
+ *
  * @author apete
  */
 public final class NewIntegerSolver extends IntegerSolver {
@@ -198,11 +197,7 @@ public final class NewIntegerSolver extends IntegerSolver {
         ExpressionsBasedModel tmpModel = NewIntegerSolver.this.makeNodeModel(nodeKey);
         final Optimisation.Result tmpResult = tmpModel.solve();
 
-        try {
-            NewIntegerSolver.this.incrementIterationsCount();
-        } catch (final RecoverableCondition exception) {
-            normal &= false;
-        }
+        NewIntegerSolver.this.incrementIterationsCount();
 
         if (tmpResult.getState().isOptimal()) {
             if (NewIntegerSolver.this.isDebug()) {

@@ -24,7 +24,6 @@ package org.ojalgo.optimisation;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.multiary.MultiaryFunction;
@@ -144,15 +143,8 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
      * Should be called after a completed iteration. The iterations count is not "1" untill the first iteration is
      * completed.
      */
-    protected final int incrementIterationsCount() throws RecoverableCondition {
-
-        final int retVal = myIterationsCount.incrementAndGet();
-
-        if (retVal > options.iterations_abort) {
-            throw new RecoverableCondition("Too many iterations!");
-        }
-
-        return retVal;
+    protected final int incrementIterationsCount() {
+        return myIterationsCount.incrementAndGet();
     }
 
     protected abstract boolean initialise(Result kickStart);
@@ -206,7 +198,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
      * false the implementation should set the state to either {@linkplain Optimisation.State#VALID} or
      * {@linkplain Optimisation.State#INVALID} (or possibly {@linkplain Optimisation.State#FAILED}). Typically the
      * method should be called at the very beginning of the solve-method.
-     * 
+     *
      * @return Is the solver instance valid?
      */
     protected abstract boolean validate();
