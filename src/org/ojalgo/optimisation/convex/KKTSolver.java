@@ -148,13 +148,15 @@ public final class KKTSolver extends Object {
 
     }
 
+    private static final double SCALE = 1.0;
+
     private static final double SMALL = PrimitiveMath.MACHINE_DOUBLE_ERROR * 10; // ≈1.0E-15
+
+    private transient PrimitiveDenseStore myCalculationC = null;
+    private transient PrimitiveDenseStore myCalculationQ = null;
 
     private final Cholesky<Double> myCholesky;
     private final QR<Double> myQR;
-
-    private transient PrimitiveDenseStore myCalculationQ = null;
-    private transient PrimitiveDenseStore myCalculationC = null;
 
     public KKTSolver() {
 
@@ -216,8 +218,8 @@ public final class KKTSolver extends Object {
             final PrimitiveDenseStore tmpCalcQ = this.getCalculationQ(tmpQ);
             final PrimitiveDenseStore tmpCalcC = this.getCalculationC(tmpC);
 
-            tmpCalcQ.maxpy(1.0, tmpA.multiplyLeft(tmpA.transpose()));
-            tmpCalcC.maxpy(1.0, tmpB.multiplyLeft(tmpA.transpose()));
+            tmpCalcQ.maxpy(SCALE, tmpA.multiplyLeft(tmpA.transpose()));
+            tmpCalcC.maxpy(SCALE, tmpB.multiplyLeft(tmpA.transpose()));
             while (!myCholesky.compute(tmpCalcQ)) {
                 tmpCalcQ.modifyDiagonal(0, 0, PrimitiveFunction.ADD.second(SMALL * tmpCalcQ.aggregateAll(Aggregator.LARGEST)));
             }
@@ -235,7 +237,14 @@ public final class KKTSolver extends Object {
 
                     tmpL = myQR.solve(tmpInvQC.multiplyLeft(tmpA).add(tmpB.negate()));
                     tmpX = myCholesky.solve(tmpCalcC.add(tmpL.multiplyLeft(tmpA.transpose()).negate()));
+                } else {
+                    //                    BasicLogger.debug("Negated Schur complement QR");
+                    //                    BasicLogger.debug("Q", myQR.getQ());
+                    //                    BasicLogger.debug("R", myQR.getR());
                 }
+            } else {
+                //                BasicLogger.debug("Q Cholesky");
+                //                BasicLogger.debug("L", myCholesky.getL());
             }
 
         }

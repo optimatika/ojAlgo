@@ -28,7 +28,6 @@ import java.util.HashSet;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.store.AboveBelowStore;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -58,7 +57,6 @@ final class ActiveSetSolver extends ConvexSolver {
     private final IndexSelector myActivator;
 
     private int myConstraintToInclude = -1;
-    private boolean myNeedsAnotherIteration = false;
 
     ActiveSetSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder aBuilder) {
 
@@ -380,13 +378,8 @@ final class ActiveSetSolver extends ConvexSolver {
         if (tmpToExclude == -1) {
             if (tmpToInclude == -1) {
                 // Suggested to do nothing
-                if (myNeedsAnotherIteration) {
-                    this.setState(State.APPROXIMATE);
-                    return true;
-                } else {
-                    this.setState(State.OPTIMAL);
-                    return false;
-                }
+                this.setState(State.OPTIMAL);
+                return false;
             } else {
                 // Only suggested to include
                 myActivator.include(tmpToInclude);
@@ -409,6 +402,7 @@ final class ActiveSetSolver extends ConvexSolver {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void performIteration() {
 
@@ -417,7 +411,6 @@ final class ActiveSetSolver extends ConvexSolver {
             this.debug(myActivator.toString());
         }
 
-        myNeedsAnotherIteration = false;
         myConstraintToInclude = -1;
 
         final Input tmpInput = this.buildDelegateSolverInput();
@@ -431,37 +424,19 @@ final class ActiveSetSolver extends ConvexSolver {
         final int tmpCountActiveInequalityConstraints = tmpIncluded.length;
 
         if (tmpOutput.isSolvable()) {
+            // Subproblem solved successfully
 
             final MatrixStore<Double> tmpSubX = tmpOutput.getX();
             final MatrixStore<Double> tmpSubL = tmpOutput.getL();
 
-            if (options.validate) {
-                if (this.isDebug()) {
-
-                    final MatrixStore<Double> tmpSubXL = tmpSubX.builder().below(tmpSubL).build().copy(); // Copy avoid problem when/if "L" has 0 rows.
-                    final PhysicalStore<Double> tmpSubSlack = tmpInput.getRHS().copy();
-                    tmpSubSlack.fillMatching(tmpSubSlack, PrimitiveFunction.SUBTRACT, tmpInput.getKKT().multiplyRight(tmpSubXL));
-
-                    final double tmpLargest = tmpSubSlack.aggregateAll(Aggregator.LARGEST);
-
-                    if (tmpLargest > Math.sqrt(PrimitiveMath.IS_ZERO)) {
-                        this.debug("KKT slack: {}", tmpSubSlack);
-                        this.debug("KKT X: {}", tmpSubX);
-                        if ((this.getAE() != null) && (this.getAE().count() != 0L)) {
-                            this.debug("KKT AE*X: {}", this.getAE().multiplyRight(tmpSubX));
-                        }
-                        if ((this.getAI() != null) && (this.getAI().count() != 0L)) {
-                            this.debug("KKT AI*X: {}", this.getAI().multiplyRight(tmpSubX));
-                        }
-                    }
-                }
+            if (this.isDebug()) {
+                this.debug("Current: {}", this.getX());
+                this.debug("Step: {}", tmpSubX);
             }
-
-            this.debug("Current: {}", this.getX());
-            this.debug("Step: {}", tmpSubX);
 
             final double tmpFrobNormX = tmpSubX.aggregateAll(Aggregator.NORM2);
             if (!options.solution.isZero(tmpFrobNormX)) {
+                // Non-zero solution
 
                 final int[] tmpExcluded = myActivator.getExcluded();
 
@@ -483,9 +458,8 @@ final class ActiveSetSolver extends ConvexSolver {
                     final double tmpD = tmpDenom.doubleValue(i);
                     final double tmpVal = tmpN / tmpD;
 
-                    //if ((tmpVal < tmpStepLength) && (tmpVal >= PrimitiveMath.ZERO) && (tmpD > PrimitiveMath.ZERO) && !options.slack.isZero(tmpD)) {
-                    if ((tmpD > PrimitiveMath.ZERO) && (tmpVal < tmpStepLength)) {
-                        // TODO Förmodligen problem när/om den möjliga steglängden är mycket nära 0.0 (kanske visas som ett mycket litet negativt tal).
+                    if ((tmpD > PrimitiveMath.ZERO) && (tmpVal >= PrimitiveMath.ZERO) && (tmpVal < tmpStepLength)
+                            && !options.solution.isSmallComparedTo(tmpFrobNormX, tmpD)) {
                         tmpStepLength = tmpVal;
                         myConstraintToInclude = tmpExcluded[i];
                         if (this.isDebug()) {
@@ -494,18 +468,18 @@ final class ActiveSetSolver extends ConvexSolver {
                     }
                 }
 
-                this.getX().maxpy(tmpStepLength, tmpSubX);
+                if (tmpStepLength > PrimitiveMath.ZERO) {
+                    this.getX().maxpy(tmpStepLength, tmpSubX);
+                }
+
+                this.setState(State.APPROXIMATE);
 
             } else if (this.isDebug()) {
-                this.debug("Step (too small): {}", tmpSubX);
-            }
+                // Zero solution
 
-            if (options.validate && (this.getModel() != null)) {
-                if (!this.getModel().validate(BigMatrix.FACTORY.columns(this.getX()))) {
-                    if (this.isDebug()) {
-                        this.debug("Solution not feasible {}: ", this.getX());
-                    }
-                }
+                this.debug("Step too small!");
+
+                this.setState(State.FEASIBLE);
             }
 
             for (int i = 0; i < tmpCountEqualityConstraints; i++) {
@@ -516,45 +490,44 @@ final class ActiveSetSolver extends ConvexSolver {
                 this.setLI(tmpIncluded[i], tmpSubL.doubleValue(tmpCountEqualityConstraints + i));
             }
 
-            this.setState(State.APPROXIMATE);
-
         } else if (tmpCountActiveInequalityConstraints >= 1) {
-
-            if ((myActivator.countIncluded() > 2) && myActivator.isLastIncluded()) {
-                myActivator.revertLastInclusion();
-            }
+            // Subproblem NOT solved successfully
+            // At least 1 active inequality
 
             myActivator.shrink();
 
             if (this.isDebug()) {
                 this.debug("Did shrink!");
-                this.debug(myActivator.toString());
             }
 
             this.performIteration();
 
         } else if (this.isFeasible(false)) {
+            // Subproblem NOT solved successfully
+            // No active inequality
+            // Feasible current solution
 
             this.setState(State.FEASIBLE);
 
         } else {
+            // Subproblem NOT solved successfully
+            // No active inequality
+            // Not feasible current solution
 
-            this.resetX();
             this.setState(State.INFEASIBLE);
-
         }
 
         if (this.isDebug()) {
-            this.debug("Post iteration solution: {}", this.getX().copy());
+            this.debug("Post iteration");
+            this.debug("\tSolution: {}", this.getX().copy());
             if (this.getAE() != null) {
-                this.debug("Post iteration E-slack: {}", this.getSE().copy());
+                this.debug("\tE-slack: {}", this.getSE().copy());
             }
             if (this.getAI() != null) {
-                this.debug("Post iteration I-included-slack: {}", this.getSI(myActivator.getIncluded()).copy());
-                this.debug("Post iteration I-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy());
+                this.debug("\tI-included-slack: {}", this.getSI(myActivator.getIncluded()).copy());
+                this.debug("\tI-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy());
             }
         }
-        final int i = 2 + 2;
     }
 
     @Override
