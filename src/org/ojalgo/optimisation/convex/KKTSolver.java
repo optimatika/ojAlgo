@@ -148,7 +148,7 @@ public final class KKTSolver extends Object {
 
     }
 
-    private static final double SCALE = 1.0;
+    private static final double SCALE = 1.0E2;
 
     private static final double SMALL = PrimitiveMath.MACHINE_DOUBLE_ERROR * 10; // ≈1.0E-15
 

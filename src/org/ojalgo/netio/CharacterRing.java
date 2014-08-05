@@ -1,0 +1,187 @@
+/*
+ * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.ojalgo.netio;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.io.Writer;
+import java.nio.CharBuffer;
+
+/**
+ * A circular char buffer - an {@linkplain Appendable} {@linkplain CharSequence} that always hold exactly 65536
+ * characters. Whenever you append something the oldest entry gets overwritten.
+ *
+ * @author apete
+ */
+public class CharacterRing implements CharSequence, Appendable, Serializable {
+
+    static final class RingStream extends OutputStream {
+
+        private final CharacterRing myRing;
+
+        RingStream(final CharacterRing ring) {
+
+            super();
+
+            myRing = ring;
+        }
+
+        @Override
+        public void write(final int b) throws IOException {
+            myRing.append((char) b);
+        }
+
+    }
+
+    static final class RingWriter extends Writer {
+
+        private final CharacterRing myRing;
+
+        RingWriter(final CharacterRing ring) {
+
+            super(ring);
+
+            myRing = ring;
+        }
+
+        @Override
+        public void close() throws IOException {
+            ;
+        }
+
+        @Override
+        public void flush() throws IOException {
+            ;
+        }
+
+        @Override
+        public void write(final char[] cbuf, final int off, final int len) throws IOException {
+            for (int i = 0; i < len; i++) {
+                myRing.append(cbuf[off + i]);
+            }
+        }
+
+    }
+
+    public static void main(final String... strings) {
+
+        final int tmpMinValue = -Character.MIN_VALUE;
+        final char tmpB = (char) tmpMinValue;
+
+        System.out.println(Character.MIN_VALUE);
+        System.out.println(Character.MAX_VALUE);
+        System.out.println((int) Character.MIN_VALUE);
+        System.out.println((int) Character.MAX_VALUE);
+        System.out.println(Character.MIN_VALUE);
+        System.out.println(Character.MAX_VALUE);
+        System.out.println((int) Character.MIN_VALUE);
+        System.out.println((int) Character.MAX_VALUE);
+
+        final CharacterRing tmpRing = new CharacterRing();
+
+        try {
+            tmpRing.append("Anders");
+            tmpRing.append(ASCII.LF);
+            tmpRing.append("Peterson");
+            tmpRing.append(ASCII.HT);
+            tmpRing.append(ASCII.NBSP);
+            tmpRing.append(ASCII.HT);
+            tmpRing.append(ASCII.NULL);
+            System.out.println("Length: " + tmpRing.toString().length());
+            System.out.println(tmpRing.toString());
+        } catch (final IOException anException1) {
+            // TODO Auto-generated catch block
+            anException1.printStackTrace();
+        }
+
+        //        for (;;) {
+        //            try {
+        //                tmpRing.append(ASCII.NBSP);
+        //            } catch (final IOException anException) {
+        //                anException.printStackTrace();
+        //                break;
+        //            }
+        //        }
+
+    }
+
+    public static final int length = Character.MAX_VALUE + 1;
+
+    private final char[] myCharacters;
+    private char myCursor = 0;
+
+    public CharacterRing() {
+
+        super();
+
+        myCharacters = new char[length];
+        myCursor = 0;
+    }
+
+    public CharacterRing append(final char c) throws IOException {
+        myCharacters[myCursor++] = c;
+        return this;
+    }
+
+    public CharacterRing append(final CharSequence csq) throws IOException {
+        return this.append(csq, 0, csq.length());
+    }
+
+    public CharacterRing append(final CharSequence csq, final int start, final int end) throws IOException {
+        for (int i = start; i < end; i++) {
+            this.append(csq.charAt(i));
+        }
+        return this;
+    }
+
+    public OutputStream asOutputStream() {
+        return new RingStream(this);
+    }
+
+    public Writer asWriter() {
+        return new RingWriter(this);
+    }
+
+    public char charAt(final int index) {
+        return myCharacters[(myCursor + index) % length];
+    }
+
+    public int length() {
+        return length;
+    }
+
+    public CharSequence subSequence(final int start, final int end) {
+        return CharBuffer.wrap(this, start, end);
+    }
+
+    @Override
+    public String toString() {
+
+        final char tmpCursor = myCursor;
+
+        final String tmpFirstPart = String.valueOf(myCharacters, tmpCursor, length - tmpCursor);
+        final String tmpSecondPart = String.valueOf(myCharacters, 0, tmpCursor);
+
+        return tmpFirstPart + tmpSecondPart;
+    }
+}

@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright 1997-2014 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -64,7 +64,7 @@ import org.ojalgo.type.IndexSelector;
  * Alternatively you can directly call {@linkplain ExpressionsBasedModel#getDefaultSolver()} or even
  * {@linkplain ExpressionsBasedModel#minimise()} or {@linkplain ExpressionsBasedModel#maximise()} on the model.
  * </p>
- * 
+ *
  * @author apete
  */
 public abstract class QuadraticSolver extends BaseSolver {
@@ -138,8 +138,6 @@ public abstract class QuadraticSolver extends BaseSolver {
         }
 
     }
-
-    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     public static QuadraticSolver make(final ExpressionsBasedModel aModel) {
 
@@ -319,6 +317,8 @@ public abstract class QuadraticSolver extends BaseSolver {
         destinationBuilder.setKickStarter(tmpKickStarter);
     }
 
+    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
+
     protected QuadraticSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final QuadraticSolver.Builder matrices) {
         super(aModel, solverOptions, matrices);
     }
@@ -353,7 +353,7 @@ public abstract class QuadraticSolver extends BaseSolver {
         } catch (final Exception exception) {
 
             if (this.isDebug()) {
-                this.debug(exception);
+                this.debug(exception.toString());
             }
 
             this.setState(State.FAILED);

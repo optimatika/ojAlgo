@@ -181,9 +181,8 @@ final class SimplexTableauSolver extends LinearSolver {
         return myTransposedTableau.count() <= 512L;
     }
 
-    private final void logDebugTableau(final String aMessage) {
-        this.debug(aMessage + "; Basics: " + Arrays.toString(myBasis));
-        this.debug(myTransposedTableau.transpose());
+    private final void logDebugTableau(final String message) {
+        this.debug(message + "; Basics: " + Arrays.toString(myBasis), myTransposedTableau.transpose());
     }
 
     /**

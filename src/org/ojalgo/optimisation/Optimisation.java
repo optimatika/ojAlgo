@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation;
 
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -115,14 +114,15 @@ public interface Optimisation {
 
         /**
          * Which {@linkplain Solver} to debug. Null means ALL solvers. This setting is only relevant if
-         * {@link #debug_stream} has been set.
+         * {@link #debug_appender} has been set.
          */
         public Class<? extends Optimisation.Solver> debug_solver = null;
 
         /**
-         * If this is null nothing is printed, if it is not null then debug statements are printed to that PrintStream.
+         * If this is null nothing is printed, if it is not null then debug statements are printed to that
+         * {@linkplain BasicLogger.Appender}.
          */
-        public PrintStream debug_stream = null;
+        public BasicLogger.Appender debug_appender = null;
 
         /**
          * Used to determine if a variable value is integer or not.
@@ -211,7 +211,7 @@ public interface Optimisation {
         }
 
         public void debug(final Class<? extends Optimisation.Solver> solver) {
-            debug_stream = BasicLogger.DEBUG;
+            debug_appender = BasicLogger.DEBUG;
             debug_solver = solver;
             validate = true;
         }
