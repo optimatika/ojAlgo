@@ -107,8 +107,10 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
             tmpRing.append(ASCII.NBSP);
             tmpRing.append(ASCII.HT);
             tmpRing.append(ASCII.NULL);
-            System.out.println("Length: " + tmpRing.toString().length());
-            System.out.println(tmpRing.toString());
+            final String tmpString = tmpRing.toString();
+            System.out.println("Length: " + tmpString.length());
+            System.out.println(tmpString);
+
         } catch (final IOException anException1) {
             // TODO Auto-generated catch block
             anException1.printStackTrace();
@@ -164,6 +166,44 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
 
     public char charAt(final int index) {
         return myCharacters[(myCursor + index) % length];
+    }
+
+    public int indexOfFirst(final char c) {
+
+        int retVal = -1;
+
+        final char tmpCursor = myCursor;
+        for (int i = tmpCursor; (retVal < 0) && (i < length); i++) {
+            if (myCharacters[i] == c) {
+                retVal = i - tmpCursor;
+            }
+        }
+        for (int i = 0; (retVal < 0) && (i < tmpCursor); i++) {
+            if (myCharacters[i] == c) {
+                retVal = i + tmpCursor;
+            }
+        }
+
+        return retVal;
+    }
+
+    public int indexOfLast(final char c) {
+
+        int retVal = -1;
+
+        final char tmpCursor = myCursor;
+        for (int i = tmpCursor - 1; (retVal < 0) && (i >= 0); i--) {
+            if (myCharacters[i] == c) {
+                retVal = i + tmpCursor;
+            }
+        }
+        for (int i = length - 1; (retVal < 0) && (i >= tmpCursor); i--) {
+            if (myCharacters[i] == c) {
+                retVal = i - tmpCursor;
+            }
+        }
+
+        return retVal;
     }
 
     public int length() {

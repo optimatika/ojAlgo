@@ -40,15 +40,16 @@ import org.ojalgo.random.RandomNumber;
 /**
  * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix} interface
  * and have a constructor that takes a MatrixStore as input.
- * 
+ *
  * @author apete
  */
 final class MatrixFactory<N extends Number, I extends BasicMatrix<N>> implements BasicMatrix.Factory<I> {
 
-    class MatrixBuilder implements Access2D.Builder<I> {
+    final class MatrixBuilder implements Access2D.Builder<I> {
 
         private final PhysicalStore<N> myPhysicalStore;
         private final PhysicalStore.Factory<N, ?> myFactory;
+        private boolean mySafe = true;
 
         @SuppressWarnings("unused")
         private MatrixBuilder() {
@@ -73,6 +74,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix<N>> implements
 
         @Override
         public I build() {
+            mySafe = false;
             return MatrixFactory.this.instantiate(myPhysicalStore);
         }
 
@@ -89,42 +91,74 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix<N>> implements
         }
 
         public final MatrixBuilder fillAll(final Number aNmbr) {
-            myPhysicalStore.fillAll(myFactory.scalar().cast(aNmbr));
+            if (mySafe) {
+                myPhysicalStore.fillAll(myFactory.scalar().cast(aNmbr));
+            } else {
+                throw new IllegalStateException();
+            }
             return this;
         }
 
         public final MatrixBuilder fillColumn(final long aRow, final long aCol, final Number aNmbr) {
-            myPhysicalStore.fillColumn((int) aRow, (int) aCol, myFactory.scalar().cast(aNmbr));
+            if (mySafe) {
+                myPhysicalStore.fillColumn((int) aRow, (int) aCol, myFactory.scalar().cast(aNmbr));
+            } else {
+                throw new IllegalStateException();
+            }
             return this;
         }
 
         public final MatrixBuilder fillDiagonal(final long aRow, final long aCol, final Number aNmbr) {
-            myPhysicalStore.fillDiagonal((int) aRow, (int) aCol, myFactory.scalar().cast(aNmbr));
+            if (mySafe) {
+                myPhysicalStore.fillDiagonal((int) aRow, (int) aCol, myFactory.scalar().cast(aNmbr));
+            } else {
+                throw new IllegalStateException();
+            }
             return this;
         }
 
         public final MatrixBuilder fillRow(final long aRow, final long aCol, final Number aNmbr) {
-            myPhysicalStore.fillRow((int) aRow, (int) aCol, myFactory.scalar().cast(aNmbr));
+            if (mySafe) {
+                myPhysicalStore.fillRow((int) aRow, (int) aCol, myFactory.scalar().cast(aNmbr));
+            } else {
+                throw new IllegalStateException();
+            }
             return this;
         }
 
         public final MatrixBuilder set(final long index, final double aNmbr) {
-            myPhysicalStore.set(index, aNmbr);
+            if (mySafe) {
+                myPhysicalStore.set(index, aNmbr);
+            } else {
+                throw new IllegalStateException();
+            }
             return this;
         }
 
         public final MatrixBuilder set(final long aRow, final long aCol, final double aNmbr) {
-            myPhysicalStore.set(aRow, aCol, aNmbr);
+            if (mySafe) {
+                myPhysicalStore.set(aRow, aCol, aNmbr);
+            } else {
+                throw new IllegalStateException();
+            }
             return this;
         }
 
         public final MatrixBuilder set(final long aRow, final long aCol, final Number aNmbr) {
-            myPhysicalStore.set(aRow, aCol, myFactory.scalar().cast(aNmbr));
+            if (mySafe) {
+                myPhysicalStore.set(aRow, aCol, myFactory.scalar().cast(aNmbr));
+            } else {
+                throw new IllegalStateException();
+            }
             return this;
         }
 
         public final MatrixBuilder set(final long index, final Number aNmbr) {
-            myPhysicalStore.set(index, myFactory.scalar().cast(aNmbr));
+            if (mySafe) {
+                myPhysicalStore.set(index, myFactory.scalar().cast(aNmbr));
+            } else {
+                throw new IllegalStateException();
+            }
             return this;
         }
 
