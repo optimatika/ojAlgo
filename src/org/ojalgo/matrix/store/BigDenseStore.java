@@ -82,31 +82,31 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     }
 
-    static BigDenseStore cast(final Access1D<BigDecimal> mtrx) {
-        if (mtrx instanceof BigDenseStore) {
-            return (BigDenseStore) mtrx;
-        } else if (mtrx instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) mtrx);
+    static BigDenseStore cast(final Access1D<BigDecimal> matrix) {
+        if (matrix instanceof BigDenseStore) {
+            return (BigDenseStore) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return FACTORY.copy((Access2D<?>) matrix);
         } else {
-            return FACTORY.columns(mtrx);
+            return FACTORY.columns(matrix);
         }
     }
 
-    static Householder.Big cast(final Householder<BigDecimal> aTransf) {
-        if (aTransf instanceof Householder.Big) {
-            return (Householder.Big) aTransf;
-        } else if (aTransf instanceof DecompositionStore.HouseholderReference<?>) {
-            return ((DecompositionStore.HouseholderReference<BigDecimal>) aTransf).getBigWorker().copy(aTransf);
+    static Householder.Big cast(final Householder<BigDecimal> transformation) {
+        if (transformation instanceof Householder.Big) {
+            return (Householder.Big) transformation;
+        } else if (transformation instanceof DecompositionStore.HouseholderReference<?>) {
+            return ((DecompositionStore.HouseholderReference<BigDecimal>) transformation).getBigWorker().copy(transformation);
         } else {
-            return new Householder.Big(aTransf);
+            return new Householder.Big(transformation);
         }
     }
 
-    static Rotation.Big cast(final Rotation<BigDecimal> aTransf) {
-        if (aTransf instanceof Rotation.Big) {
-            return (Rotation.Big) aTransf;
+    static Rotation.Big cast(final Rotation<BigDecimal> transformation) {
+        if (transformation instanceof Rotation.Big) {
+            return (Rotation.Big) transformation;
         } else {
-            return new Rotation.Big(aTransf);
+            return new Rotation.Big(transformation);
         }
     }
 
@@ -967,16 +967,16 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return MatrixUtils.toString(this);
     }
 
-    public void transformLeft(final Householder<BigDecimal> aTransf, final int aFirstCol) {
+    public void transformLeft(final Householder<BigDecimal> transformation, final int firstColumn) {
 
-        final Householder.Big tmpTransf = BigDenseStore.cast(aTransf);
+        final Householder.Big tmpTransf = BigDenseStore.cast(transformation);
 
         final BigDecimal[] tmpData = data;
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        if ((tmpColDim - aFirstCol) > HouseholderLeft.THRESHOLD) {
+        if ((tmpColDim - firstColumn) > HouseholderLeft.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -987,17 +987,17 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
             };
 
-            tmpConquerer.invoke(aFirstCol, tmpColDim, HouseholderLeft.THRESHOLD);
+            tmpConquerer.invoke(firstColumn, tmpColDim, HouseholderLeft.THRESHOLD);
 
         } else {
 
-            HouseholderLeft.invoke(tmpData, tmpRowDim, aFirstCol, tmpColDim, tmpTransf);
+            HouseholderLeft.invoke(tmpData, tmpRowDim, firstColumn, tmpColDim, tmpTransf);
         }
     }
 
-    public void transformLeft(final Rotation<BigDecimal> aTransf) {
+    public void transformLeft(final Rotation<BigDecimal> transformation) {
 
-        final Rotation.Big tmpTransf = BigDenseStore.cast(aTransf);
+        final Rotation.Big tmpTransf = BigDenseStore.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1019,16 +1019,16 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
-    public void transformRight(final Householder<BigDecimal> aTransf, final int aFirstRow) {
+    public void transformRight(final Householder<BigDecimal> transformation, final int firstRow) {
 
-        final Householder.Big tmpTransf = BigDenseStore.cast(aTransf);
+        final Householder.Big tmpTransf = BigDenseStore.cast(transformation);
 
         final BigDecimal[] tmpData = data;
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        if ((tmpRowDim - aFirstRow) > HouseholderRight.THRESHOLD) {
+        if ((tmpRowDim - firstRow) > HouseholderRight.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -1039,17 +1039,17 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
             };
 
-            tmpConquerer.invoke(aFirstRow, tmpRowDim, HouseholderRight.THRESHOLD);
+            tmpConquerer.invoke(firstRow, tmpRowDim, HouseholderRight.THRESHOLD);
 
         } else {
 
-            HouseholderRight.invoke(tmpData, aFirstRow, tmpRowDim, tmpColDim, tmpTransf);
+            HouseholderRight.invoke(tmpData, firstRow, tmpRowDim, tmpColDim, tmpTransf);
         }
     }
 
-    public void transformRight(final Rotation<BigDecimal> aTransf) {
+    public void transformRight(final Rotation<BigDecimal> transformation) {
 
-        final Rotation.Big tmpTransf = BigDenseStore.cast(aTransf);
+        final Rotation.Big tmpTransf = BigDenseStore.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1071,8 +1071,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
-    public void transformSymmetric(final Householder<BigDecimal> aTransf) {
-        HouseholderHermitian.invoke(data, BigDenseStore.cast(aTransf), new BigDecimal[(int) aTransf.count()]);
+    public void transformSymmetric(final Householder<BigDecimal> transformation) {
+        HouseholderHermitian.invoke(data, BigDenseStore.cast(transformation), new BigDecimal[(int) transformation.count()]);
     }
 
     public MatrixStore<BigDecimal> transpose() {

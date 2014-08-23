@@ -84,31 +84,261 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     }
 
-    static PrimitiveDenseStore cast(final Access1D<Double> mtrx) {
-        if (mtrx instanceof PrimitiveDenseStore) {
-            return (PrimitiveDenseStore) mtrx;
-        } else if (mtrx instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) mtrx);
+    public static final DecompositionStore.Factory<Double, PrimitiveDenseStore> FACTORY = new DecompositionStore.Factory<Double, PrimitiveDenseStore>() {
+
+        public AggregatorCollection<Double> aggregator() {
+            return PrimitiveAggregator.getCollection();
+        }
+
+        public PrimitiveDenseStore columns(final Access1D<?>... source) {
+
+            final int tmpRowDim = (int) source[0].count();
+            final int tmpColDim = source.length;
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            Access1D<?> tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpColumn.doubleValue(i);
+                }
+            }
+
+            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public PrimitiveDenseStore columns(final double[]... source) {
+
+            final int tmpRowDim = source[0].length;
+            final int tmpColDim = source.length;
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            double[] tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpColumn[i];
+                }
+            }
+
+            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public PrimitiveDenseStore columns(final List<? extends Number>... source) {
+
+            final int tmpRowDim = source[0].size();
+            final int tmpColDim = source.length;
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            List<? extends Number> tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpColumn.get(i).doubleValue();
+                }
+            }
+
+            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public PrimitiveDenseStore columns(final Number[]... source) {
+
+            final int tmpRowDim = source[0].length;
+            final int tmpColDim = source.length;
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            Number[] tmpColumn;
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpColumn = source[j];
+                for (int i = 0; i < tmpRowDim; i++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpColumn[i].doubleValue();
+                }
+            }
+
+            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public PrimitiveDenseStore conjugate(final Access2D<?> source) {
+            return this.transpose(source);
+        }
+
+        public PrimitiveDenseStore copy(final Access2D<?> source) {
+
+            final PrimitiveDenseStore retVal = new PrimitiveDenseStore((int) source.countRows(), (int) source.countColumns());
+
+            retVal.fillMatching(source);
+
+            return retVal;
+        }
+
+        public FunctionSet<Double> function() {
+            return PrimitiveFunction.getSet();
+        }
+
+        public PrimitiveArray makeArray(final int length) {
+            return PrimitiveArray.make(length);
+        }
+
+        public PrimitiveDenseStore makeEye(final long rows, final long columns) {
+
+            final PrimitiveDenseStore retVal = this.makeZero(rows, columns);
+
+            retVal.myUtility.fillDiagonal(0, 0, PrimitiveMath.ONE);
+
+            return retVal;
+        }
+
+        public Householder.Primitive makeHouseholder(final int length) {
+            return new Householder.Primitive(length);
+        }
+
+        public PrimitiveDenseStore makeRandom(final long rows, final long columns, final RandomNumber distribution) {
+
+            final int tmpRowDim = (int) rows;
+            final int tmpColDim = (int) columns;
+
+            final int tmpLength = tmpRowDim * tmpColDim;
+
+            final double[] tmpData = new double[tmpLength];
+
+            for (int i = 0; i < tmpLength; i++) {
+                tmpData[i] = distribution.doubleValue();
+            }
+
+            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public Rotation.Primitive makeRotation(final int low, final int high, final double cos, final double sin) {
+            return new Rotation.Primitive(low, high, cos, sin);
+        }
+
+        public Rotation.Primitive makeRotation(final int low, final int high, final Double cos, final Double sin) {
+            return this.makeRotation(low, high, cos != null ? cos.doubleValue() : Double.NaN, sin != null ? sin.doubleValue() : Double.NaN);
+        }
+
+        public PrimitiveDenseStore makeZero(final long rows, final long columns) {
+            return new PrimitiveDenseStore((int) rows, (int) columns);
+        }
+
+        public PrimitiveDenseStore rows(final Access1D<?>... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = (int) source[0].count();
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            Access1D<?> tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpRow.doubleValue(j);
+                }
+            }
+
+            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public PrimitiveDenseStore rows(final double[]... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].length;
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            double[] tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpRow[j];
+                }
+            }
+
+            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public PrimitiveDenseStore rows(final List<? extends Number>... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].size();
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            List<? extends Number> tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpRow.get(j).doubleValue();
+                }
+            }
+
+            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public PrimitiveDenseStore rows(final Number[]... source) {
+
+            final int tmpRowDim = source.length;
+            final int tmpColDim = source[0].length;
+
+            final double[] tmpData = new double[tmpRowDim * tmpColDim];
+
+            Number[] tmpRow;
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpRow = source[i];
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpData[i + (tmpRowDim * j)] = tmpRow[j].doubleValue();
+                }
+            }
+
+            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
+        }
+
+        public PrimitiveDenseStore transpose(final Access2D<?> source) {
+
+            final PrimitiveDenseStore retVal = new PrimitiveDenseStore((int) source.countColumns(), (int) source.countRows());
+
+            retVal.fillTransposed(source);
+
+            return retVal;
+        }
+    };
+
+    static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
+
+    static final long SHALLOW_SIZE = MemoryEstimator.estimateObject(PrimitiveDenseStore.class);
+
+    static PrimitiveDenseStore cast(final Access1D<Double> matrix) {
+        if (matrix instanceof PrimitiveDenseStore) {
+            return (PrimitiveDenseStore) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return FACTORY.copy((Access2D<?>) matrix);
         } else {
-            return FACTORY.columns(mtrx);
+            return FACTORY.columns(matrix);
         }
     }
 
-    static Householder.Primitive cast(final Householder<Double> aTransf) {
-        if (aTransf instanceof Householder.Primitive) {
-            return (Householder.Primitive) aTransf;
-        } else if (aTransf instanceof DecompositionStore.HouseholderReference<?>) {
-            return ((DecompositionStore.HouseholderReference<Double>) aTransf).getPrimitiveWorker().copy(aTransf);
+    static Householder.Primitive cast(final Householder<Double> transformation) {
+        if (transformation instanceof Householder.Primitive) {
+            return (Householder.Primitive) transformation;
+        } else if (transformation instanceof DecompositionStore.HouseholderReference<?>) {
+            return ((DecompositionStore.HouseholderReference<Double>) transformation).getPrimitiveWorker().copy(transformation);
         } else {
-            return new Householder.Primitive(aTransf);
+            return new Householder.Primitive(transformation);
         }
     }
 
-    static Rotation.Primitive cast(final Rotation<Double> aTransf) {
-        if (aTransf instanceof Rotation.Primitive) {
-            return (Rotation.Primitive) aTransf;
+    static Rotation.Primitive cast(final Rotation<Double> transformation) {
+        if (transformation instanceof Rotation.Primitive) {
+            return (Rotation.Primitive) transformation;
         } else {
-            return new Rotation.Primitive(aTransf);
+            return new Rotation.Primitive(transformation);
         }
     }
 
@@ -243,13 +473,13 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
                             if (Math.abs(x) > (Math.abs(z) + Math.abs(q))) {
                                 aMtrxH[(i + 1) + (tmpDiagDim * (ij - 1))] = ((-ra - (w * aMtrxH[i + (tmpDiagDim * (ij - 1))])) + (q * aMtrxH[i
-                                                                                                                                             + (tmpDiagDim * ij)]))
-                                                                                                                                             / x;
+                                        + (tmpDiagDim * ij)]))
+                                        / x;
                                 aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-sa - (w * aMtrxH[i + (tmpDiagDim * ij)]) - (q * aMtrxH[i + (tmpDiagDim * (ij - 1))]))
                                         / x;
                             } else {
                                 final ComplexNumber tmpX1 = ComplexNumber.makeRectangular((-r - (y * aMtrxH[i + (tmpDiagDim * (ij - 1))])), (-s - (y * aMtrxH[i
-                                                                                                                                                              + (tmpDiagDim * ij)])));
+                                        + (tmpDiagDim * ij)])));
                                 final ComplexNumber tmpY1 = ComplexNumber.makeRectangular(z, q);
 
                                 final ComplexNumber tmpZ1 = tmpX1.divide(tmpY1);
@@ -639,236 +869,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         return new double[][] { tmpMainDiagonal, tmpOffDiagonal };
     }
-
-    public static final DecompositionStore.Factory<Double, PrimitiveDenseStore> FACTORY = new DecompositionStore.Factory<Double, PrimitiveDenseStore>() {
-
-        public AggregatorCollection<Double> aggregator() {
-            return PrimitiveAggregator.getCollection();
-        }
-
-        public PrimitiveDenseStore columns(final Access1D<?>... source) {
-
-            final int tmpRowDim = (int) source[0].count();
-            final int tmpColDim = source.length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            Access1D<?> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpColumn.doubleValue(i);
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore columns(final double[]... source) {
-
-            final int tmpRowDim = source[0].length;
-            final int tmpColDim = source.length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            double[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpColumn[i];
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore columns(final List<? extends Number>... source) {
-
-            final int tmpRowDim = source[0].size();
-            final int tmpColDim = source.length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            List<? extends Number> tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpColumn.get(i).doubleValue();
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore columns(final Number[]... source) {
-
-            final int tmpRowDim = source[0].length;
-            final int tmpColDim = source.length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            Number[] tmpColumn;
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpColumn = source[j];
-                for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpColumn[i].doubleValue();
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore conjugate(final Access2D<?> source) {
-            return this.transpose(source);
-        }
-
-        public PrimitiveDenseStore copy(final Access2D<?> source) {
-
-            final PrimitiveDenseStore retVal = new PrimitiveDenseStore((int) source.countRows(), (int) source.countColumns());
-
-            retVal.fillMatching(source);
-
-            return retVal;
-        }
-
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
-        public PrimitiveArray makeArray(final int length) {
-            return PrimitiveArray.make(length);
-        }
-
-        public PrimitiveDenseStore makeEye(final long rows, final long columns) {
-
-            final PrimitiveDenseStore retVal = this.makeZero(rows, columns);
-
-            retVal.myUtility.fillDiagonal(0, 0, PrimitiveMath.ONE);
-
-            return retVal;
-        }
-
-        public Householder.Primitive makeHouseholder(final int length) {
-            return new Householder.Primitive(length);
-        }
-
-        public PrimitiveDenseStore makeRandom(final long rows, final long columns, final RandomNumber distribution) {
-
-            final int tmpRowDim = (int) rows;
-            final int tmpColDim = (int) columns;
-
-            final int tmpLength = tmpRowDim * tmpColDim;
-
-            final double[] tmpData = new double[tmpLength];
-
-            for (int i = 0; i < tmpLength; i++) {
-                tmpData[i] = distribution.doubleValue();
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public Rotation.Primitive makeRotation(final int low, final int high, final double cos, final double sin) {
-            return new Rotation.Primitive(low, high, cos, sin);
-        }
-
-        public Rotation.Primitive makeRotation(final int low, final int high, final Double cos, final Double sin) {
-            return this.makeRotation(low, high, cos != null ? cos.doubleValue() : Double.NaN, sin != null ? sin.doubleValue() : Double.NaN);
-        }
-
-        public PrimitiveDenseStore makeZero(final long rows, final long columns) {
-            return new PrimitiveDenseStore((int) rows, (int) columns);
-        }
-
-        public PrimitiveDenseStore rows(final Access1D<?>... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = (int) source[0].count();
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            Access1D<?> tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpRow.doubleValue(j);
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore rows(final double[]... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            double[] tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpRow[j];
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore rows(final List<? extends Number>... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].size();
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            List<? extends Number> tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpRow.get(j).doubleValue();
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public PrimitiveDenseStore rows(final Number[]... source) {
-
-            final int tmpRowDim = source.length;
-            final int tmpColDim = source[0].length;
-
-            final double[] tmpData = new double[tmpRowDim * tmpColDim];
-
-            Number[] tmpRow;
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpRow = source[i];
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = tmpRow[j].doubleValue();
-                }
-            }
-
-            return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
-        }
-
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
-        }
-
-        public PrimitiveDenseStore transpose(final Access2D<?> source) {
-
-            final PrimitiveDenseStore retVal = new PrimitiveDenseStore((int) source.countColumns(), (int) source.countRows());
-
-            retVal.fillTransposed(source);
-
-            return retVal;
-        }
-    };
-
-    static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
-
-    static final long SHALLOW_SIZE = MemoryEstimator.estimateObject(PrimitiveDenseStore.class);
 
     private final PrimitiveMultiplyBoth multiplyBoth;
 
@@ -1586,16 +1586,16 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return MatrixUtils.toString(this);
     }
 
-    public void transformLeft(final Householder<Double> aTransf, final int aFirstCol) {
+    public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
 
-        final Householder.Primitive tmpTransf = PrimitiveDenseStore.cast(aTransf);
+        final Householder.Primitive tmpTransf = PrimitiveDenseStore.cast(transformation);
 
         final double[] tmpData = data;
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        if ((tmpColDim - aFirstCol) > HouseholderLeft.THRESHOLD) {
+        if ((tmpColDim - firstColumn) > HouseholderLeft.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -1606,17 +1606,17 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
             };
 
-            tmpConquerer.invoke(aFirstCol, tmpColDim, HouseholderLeft.THRESHOLD);
+            tmpConquerer.invoke(firstColumn, tmpColDim, HouseholderLeft.THRESHOLD);
 
         } else {
 
-            HouseholderLeft.invoke(tmpData, tmpRowDim, aFirstCol, tmpColDim, tmpTransf);
+            HouseholderLeft.invoke(tmpData, tmpRowDim, firstColumn, tmpColDim, tmpTransf);
         }
     }
 
-    public void transformLeft(final Rotation<Double> aTransf) {
+    public void transformLeft(final Rotation<Double> transformation) {
 
-        final Rotation.Primitive tmpTransf = PrimitiveDenseStore.cast(aTransf);
+        final Rotation.Primitive tmpTransf = PrimitiveDenseStore.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1638,16 +1638,16 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public void transformRight(final Householder<Double> aTransf, final int aFirstRow) {
+    public void transformRight(final Householder<Double> transformation, final int firstRow) {
 
-        final Householder.Primitive tmpTransf = PrimitiveDenseStore.cast(aTransf);
+        final Householder.Primitive tmpTransf = PrimitiveDenseStore.cast(transformation);
 
         final double[] tmpData = data;
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        if ((tmpRowDim - aFirstRow) > HouseholderRight.THRESHOLD) {
+        if ((tmpRowDim - firstRow) > HouseholderRight.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -1658,17 +1658,17 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
             };
 
-            tmpConquerer.invoke(aFirstRow, tmpRowDim, HouseholderRight.THRESHOLD);
+            tmpConquerer.invoke(firstRow, tmpRowDim, HouseholderRight.THRESHOLD);
 
         } else {
 
-            HouseholderRight.invoke(tmpData, aFirstRow, tmpRowDim, tmpColDim, tmpTransf);
+            HouseholderRight.invoke(tmpData, firstRow, tmpRowDim, tmpColDim, tmpTransf);
         }
     }
 
-    public void transformRight(final Rotation<Double> aTransf) {
+    public void transformRight(final Rotation<Double> transformation) {
 
-        final Rotation.Primitive tmpTransf = PrimitiveDenseStore.cast(aTransf);
+        final Rotation.Primitive tmpTransf = PrimitiveDenseStore.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1690,8 +1690,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public void transformSymmetric(final Householder<Double> aTransf) {
-        HouseholderHermitian.invoke(data, PrimitiveDenseStore.cast(aTransf), new double[(int) aTransf.count()]);
+    public void transformSymmetric(final Householder<Double> transformation) {
+        HouseholderHermitian.invoke(data, PrimitiveDenseStore.cast(transformation), new double[(int) transformation.count()]);
     }
 
     public MatrixStore<Double> transpose() {

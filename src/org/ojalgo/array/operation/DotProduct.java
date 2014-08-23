@@ -19,50 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function;
+package org.ojalgo.array.operation;
 
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.type.TypeUtils;
 
-public abstract class FunctionUtils {
+public abstract class DotProduct {
 
-    public static <N extends Number> boolean isZeroModified(final UnaryFunction<N> function) {
-        return !TypeUtils.isZero(function.invoke(PrimitiveMath.ZERO));
-    }
-
-    public static int max(final int... values) {
-        int retVal = Integer.MIN_VALUE;
-        for (int i = values.length; i-- != 0;) {
-            retVal = values[i] > retVal ? values[i] : retVal;
+    public static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int count) {
+        double retVal = PrimitiveMath.ZERO;
+        for (int i = 0; i < count; i++) {
+            retVal += array1[offset1 + i] * array2[offset2 + i];
         }
         return retVal;
     }
 
-    public static int max(final int a, final int b) {
-        return Math.max(a, b);
-    }
-
-    public static int max(final int a, final int b, final int c) {
-        return Math.max(Math.max(a, b), c);
-    }
-
-    public static int min(final int... values) {
-        int retVal = Integer.MAX_VALUE;
-        for (int i = values.length; i-- != 0;) {
-            retVal = values[i] < retVal ? values[i] : retVal;
-        }
-        return retVal;
-    }
-
-    public static int min(final int a, final int b) {
-        return Math.min(a, b);
-    }
-
-    public static int min(final int a, final int b, final int c) {
-        return Math.min(Math.min(a, b), c);
-    }
-
-    private FunctionUtils() {
+    private DotProduct() {
         super();
     }
 

@@ -78,31 +78,31 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     }
 
-    static ComplexDenseStore cast(final Access1D<ComplexNumber> mtrx) {
-        if (mtrx instanceof ComplexDenseStore) {
-            return (ComplexDenseStore) mtrx;
-        } else if (mtrx instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) mtrx);
+    static ComplexDenseStore cast(final Access1D<ComplexNumber> matrix) {
+        if (matrix instanceof ComplexDenseStore) {
+            return (ComplexDenseStore) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return FACTORY.copy((Access2D<?>) matrix);
         } else {
-            return FACTORY.columns(mtrx);
+            return FACTORY.columns(matrix);
         }
     }
 
-    static Householder.Complex cast(final Householder<ComplexNumber> aTransf) {
-        if (aTransf instanceof Householder.Complex) {
-            return (Householder.Complex) aTransf;
-        } else if (aTransf instanceof DecompositionStore.HouseholderReference<?>) {
-            return ((DecompositionStore.HouseholderReference<ComplexNumber>) aTransf).getComplexWorker().copy(aTransf);
+    static Householder.Complex cast(final Householder<ComplexNumber> transformation) {
+        if (transformation instanceof Householder.Complex) {
+            return (Householder.Complex) transformation;
+        } else if (transformation instanceof DecompositionStore.HouseholderReference<?>) {
+            return ((DecompositionStore.HouseholderReference<ComplexNumber>) transformation).getComplexWorker().copy(transformation);
         } else {
-            return new Householder.Complex(aTransf);
+            return new Householder.Complex(transformation);
         }
     }
 
-    static Rotation.Complex cast(final Rotation<ComplexNumber> aTransf) {
-        if (aTransf instanceof Rotation.Complex) {
-            return (Rotation.Complex) aTransf;
+    static Rotation.Complex cast(final Rotation<ComplexNumber> transformation) {
+        if (transformation instanceof Rotation.Complex) {
+            return (Rotation.Complex) transformation;
         } else {
-            return new Rotation.Complex(aTransf);
+            return new Rotation.Complex(transformation);
         }
     }
 
@@ -992,16 +992,16 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return MatrixUtils.toString(this);
     }
 
-    public void transformLeft(final Householder<ComplexNumber> aTransf, final int aFirstCol) {
+    public void transformLeft(final Householder<ComplexNumber> transformation, final int firstColumn) {
 
-        final Householder.Complex tmpTransf = ComplexDenseStore.cast(aTransf);
+        final Householder.Complex tmpTransf = ComplexDenseStore.cast(transformation);
 
         final ComplexNumber[] tmpData = data;
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        if ((tmpColDim - aFirstCol) > HouseholderLeft.THRESHOLD) {
+        if ((tmpColDim - firstColumn) > HouseholderLeft.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -1012,17 +1012,17 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
             };
 
-            tmpConquerer.invoke(aFirstCol, tmpColDim, HouseholderLeft.THRESHOLD);
+            tmpConquerer.invoke(firstColumn, tmpColDim, HouseholderLeft.THRESHOLD);
 
         } else {
 
-            HouseholderLeft.invoke(tmpData, tmpRowDim, aFirstCol, tmpColDim, tmpTransf);
+            HouseholderLeft.invoke(tmpData, tmpRowDim, firstColumn, tmpColDim, tmpTransf);
         }
     }
 
-    public void transformLeft(final Rotation<ComplexNumber> aTransf) {
+    public void transformLeft(final Rotation<ComplexNumber> transformation) {
 
-        final Rotation.Complex tmpTransf = ComplexDenseStore.cast(aTransf);
+        final Rotation.Complex tmpTransf = ComplexDenseStore.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1044,16 +1044,16 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
-    public void transformRight(final Householder<ComplexNumber> aTransf, final int aFirstRow) {
+    public void transformRight(final Householder<ComplexNumber> transformation, final int firstRow) {
 
-        final Householder.Complex tmpTransf = ComplexDenseStore.cast(aTransf);
+        final Householder.Complex tmpTransf = ComplexDenseStore.cast(transformation);
 
         final ComplexNumber[] tmpData = data;
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        if ((tmpRowDim - aFirstRow) > HouseholderRight.THRESHOLD) {
+        if ((tmpRowDim - firstRow) > HouseholderRight.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
@@ -1064,17 +1064,17 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
             };
 
-            tmpConquerer.invoke(aFirstRow, tmpRowDim, HouseholderRight.THRESHOLD);
+            tmpConquerer.invoke(firstRow, tmpRowDim, HouseholderRight.THRESHOLD);
 
         } else {
 
-            HouseholderRight.invoke(tmpData, aFirstRow, tmpRowDim, tmpColDim, tmpTransf);
+            HouseholderRight.invoke(tmpData, firstRow, tmpRowDim, tmpColDim, tmpTransf);
         }
     }
 
-    public void transformRight(final Rotation<ComplexNumber> aTransf) {
+    public void transformRight(final Rotation<ComplexNumber> transformation) {
 
-        final Rotation.Complex tmpTransf = ComplexDenseStore.cast(aTransf);
+        final Rotation.Complex tmpTransf = ComplexDenseStore.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1096,8 +1096,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
-    public void transformSymmetric(final Householder<ComplexNumber> aTransf) {
-        HouseholderHermitian.invoke(data, ComplexDenseStore.cast(aTransf), new ComplexNumber[(int) aTransf.count()]);
+    public void transformSymmetric(final Householder<ComplexNumber> transformation) {
+        HouseholderHermitian.invoke(data, ComplexDenseStore.cast(transformation), new ComplexNumber[(int) transformation.count()]);
     }
 
     public MatrixStore<ComplexNumber> transpose() {

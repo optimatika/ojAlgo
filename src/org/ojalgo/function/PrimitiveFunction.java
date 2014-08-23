@@ -27,12 +27,9 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.type.TypeUtils;
 
 /**
- * Only the primitive parameter (double) methods are actually implemented.
- * The methods with the reference type parameters (Double) should delegate
- * to the primitive methods (and do nothing else).
- * 
- * The various implementations should delegate as much as possible to
- * {@link java.lang.Math} and/or built-in Java operators.
+ * Only the primitive parameter (double) methods are actually implemented. The methods with the reference type
+ * parameters (Double) should delegate to the primitive methods (and do nothing else). The various implementations
+ * should delegate as much as possible to {@link java.lang.Math} and/or built-in Java operators.
  *
  * @author apete
  */
@@ -198,7 +195,17 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
         @Override
         public final double invoke(final double arg1, final double arg2) {
-            return Math.hypot(arg1, arg2);
+            double retVal;
+            if (Math.abs(arg1) > Math.abs(arg2)) {
+                retVal = arg2 / arg1;
+                retVal = Math.abs(arg1) * Math.sqrt(ONE + (retVal * retVal));
+            } else if (arg2 != ZERO) {
+                retVal = arg1 / arg2;
+                retVal = Math.abs(arg2) * Math.sqrt(ONE + (retVal * retVal));
+            } else {
+                retVal = ZERO;
+            }
+            return retVal;
         }
 
     };

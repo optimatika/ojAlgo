@@ -960,26 +960,26 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         return Double.toString(myDelegate.get(row, column));
     }
 
-    public void transformLeft(final Householder<Double> aTransf, final int aFirstCol) {
+    public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
 
         final double[][] tmpArray = myDelegate.getArray();
         final int tmpRowDim = myDelegate.getRowDimension();
         final int tmpColDim = myDelegate.getColumnDimension();
 
-        final int tmpFirst = aTransf.first();
+        final int tmpFirst = transformation.first();
 
-        final double[] tmpWorkCopy = new double[(int) aTransf.count()];
+        final double[] tmpWorkCopy = new double[(int) transformation.count()];
 
         double tmpScale;
-        for (int j = aFirstCol; j < tmpColDim; j++) {
+        for (int j = firstColumn; j < tmpColDim; j++) {
             tmpScale = ZERO;
             for (int i = tmpFirst; i < tmpRowDim; i++) {
                 tmpScale += tmpWorkCopy[i] * tmpArray[i][j];
             }
             double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
-            final int tmpSize = (int) aTransf.count();
-            for (int i1 = aTransf.first(); i1 < tmpSize; i1++) {
-                tmpVal = aTransf.doubleValue(i1);
+            final int tmpSize = (int) transformation.count();
+            for (int i1 = transformation.first(); i1 < tmpSize; i1++) {
+                tmpVal = transformation.doubleValue(i1);
                 tmpVal2 += tmpVal * tmpVal;
                 tmpWorkCopy[i1] = tmpVal;
             }
@@ -990,9 +990,9 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         }
     }
 
-    public void transformLeft(final Rotation<Double> aTransf) {
+    public void transformLeft(final Rotation<Double> transformation) {
 
-        final Rotation.Primitive tmpTransf = JamaMatrix.cast(aTransf);
+        final Rotation.Primitive tmpTransf = JamaMatrix.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;
@@ -1026,26 +1026,26 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         }
     }
 
-    public void transformRight(final Householder<Double> aTransf, final int aFirstRow) {
+    public void transformRight(final Householder<Double> transformation, final int firstRow) {
 
         final double[][] tmpArray = myDelegate.getArray();
         final int tmpRowDim = myDelegate.getRowDimension();
         final int tmpColDim = myDelegate.getColumnDimension();
 
-        final int tmpFirst = aTransf.first();
+        final int tmpFirst = transformation.first();
 
-        final double[] tmpWorkCopy = new double[(int) aTransf.count()];
+        final double[] tmpWorkCopy = new double[(int) transformation.count()];
 
         double tmpScale;
-        for (int i = aFirstRow; i < tmpRowDim; i++) {
+        for (int i = firstRow; i < tmpRowDim; i++) {
             tmpScale = ZERO;
             for (int j = tmpFirst; j < tmpColDim; j++) {
                 tmpScale += tmpWorkCopy[j] * tmpArray[i][j];
             }
             double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
-            final int tmpSize = (int) aTransf.count();
-            for (int i1 = aTransf.first(); i1 < tmpSize; i1++) {
-                tmpVal = aTransf.doubleValue(i1);
+            final int tmpSize = (int) transformation.count();
+            for (int i1 = transformation.first(); i1 < tmpSize; i1++) {
+                tmpVal = transformation.doubleValue(i1);
                 tmpVal2 += tmpVal * tmpVal;
                 tmpWorkCopy[i1] = tmpVal;
             }
@@ -1056,9 +1056,9 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         }
     }
 
-    public void transformRight(final Rotation<Double> aTransf) {
+    public void transformRight(final Rotation<Double> transformation) {
 
-        final Rotation.Primitive tmpTransf = JamaMatrix.cast(aTransf);
+        final Rotation.Primitive tmpTransf = JamaMatrix.cast(transformation);
 
         final int tmpLow = tmpTransf.low;
         final int tmpHigh = tmpTransf.high;

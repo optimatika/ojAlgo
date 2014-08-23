@@ -147,7 +147,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
     @Deprecated
     void raxpy(final N aSclrA, final int aRowX, final int aRowY, final int aFirstCol);
 
-    void transformLeft(Householder<N> aTransf, int aFirstCol);
+    void transformLeft(Householder<N> transformation, int firstColumn);
 
     /**
      * <p>
@@ -164,9 +164,9 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * 
      * @see #transformRight(Rotation)
      */
-    void transformLeft(Rotation<N> aTransf);
+    void transformLeft(Rotation<N> transformation);
 
-    void transformRight(Householder<N> aTransf, int aFirstRow);
+    void transformRight(Householder<N> transformation, int firstRow);
 
     /**
      * <p>
@@ -182,6 +182,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * 
      * @see #transformLeft(Rotation)
      */
-    void transformRight(Rotation<N> aTransf);
+    void transformRight(Rotation<N> transformation);
 
 }
