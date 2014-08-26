@@ -31,8 +31,8 @@ public abstract class FunctionUtils {
     }
 
     public static int max(final int... values) {
-        int retVal = Integer.MIN_VALUE;
-        for (int i = values.length; i-- != 0;) {
+        int retVal = values[0];
+        for (int i = values.length; i-- != 1;) {
             retVal = values[i] > retVal ? values[i] : retVal;
         }
         return retVal;
@@ -46,9 +46,13 @@ public abstract class FunctionUtils {
         return Math.max(Math.max(a, b), c);
     }
 
+    public static int max(final int a, final int b, final int c, final int d) {
+        return Math.max(Math.max(a, b), Math.max(c, d));
+    }
+
     public static int min(final int... values) {
-        int retVal = Integer.MAX_VALUE;
-        for (int i = values.length; i-- != 0;) {
+        int retVal = values[0];
+        for (int i = values.length; i-- != 1;) {
             retVal = values[i] < retVal ? values[i] : retVal;
         }
         return retVal;
@@ -60,6 +64,10 @@ public abstract class FunctionUtils {
 
     public static int min(final int a, final int b, final int c) {
         return Math.min(Math.min(a, b), c);
+    }
+
+    public static int min(final int a, final int b, final int c, final int d) {
+        return Math.min(Math.min(a, b), Math.min(c, d));
     }
 
     private FunctionUtils() {

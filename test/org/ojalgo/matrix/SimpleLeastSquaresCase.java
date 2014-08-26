@@ -1,0 +1,104 @@
+/* 
+ * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.ojalgo.matrix;
+
+import org.ojalgo.TestUtils;
+
+/**
+ * An overdetermined equation system described in Scientific Computing An Introductory Survey II By Micheal T. Heath
+ * Example 3.1
+ * 
+ * @author apete
+ */
+public class SimpleLeastSquaresCase extends BasicMatrixTest {
+
+    public static BigMatrix getBody() {
+        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 }, { -1.0, 1.0, 0.0 },
+                { -1.0, 0.0, 1.0 }, { 0.0, -1.0, 1.0 } });
+        return tmpMtrx.enforce(DEFINITION);
+    }
+
+    public static BigMatrix getFactorR() {
+        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { -1.7321, 0.5774, 0.5774 }, { 0.0, -1.6330, 0.8165 }, { 0.0, 0.0, -1.4142 } });
+        return tmpMtrx.enforce(DEFINITION);
+    }
+
+    public static BigMatrix getRHS() {
+        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1237 }, { 1941 }, { 2417 }, { 711 }, { 1177 }, { 475 } });
+        return tmpMtrx.enforce(DEFINITION);
+    }
+
+    public static BigMatrix getSolution() {
+        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1236 }, { 1943 }, { 2416 } });
+        return tmpMtrx.enforce(DEFINITION);
+    }
+
+    public static BigMatrix getTransformedRHS() {
+        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 376 }, { -1200 }, { -3417 } });
+        return tmpMtrx.enforce(DEFINITION);
+    }
+
+    public SimpleLeastSquaresCase() {
+        super();
+    }
+
+    public SimpleLeastSquaresCase(final String arg0) {
+        super(arg0);
+    }
+
+    @Override
+    public void testData() {
+
+        myExpMtrx = SimpleLeastSquaresCase.getTransformedRHS();
+        myActMtrx = SimpleLeastSquaresCase.getFactorR().multiplyRight(SimpleLeastSquaresCase.getSolution());
+
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+    }
+
+    @Override
+    public void testProblem() {
+
+        // Solve
+
+        myExpMtrx = SimpleLeastSquaresCase.getSolution();
+        myActMtrx = SimpleLeastSquaresCase.getBody().solve(SimpleLeastSquaresCase.getRHS());
+
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+
+        DEFINITION = TestUtils.EQUALS.newScale(4);
+        EVALUATION = TestUtils.EQUALS.newScale(0); // TODO Something must be wrong here!
+
+        myBigAA = SimpleLeastSquaresCase.getFactorR();
+        myBigAX = SimpleLeastSquaresCase.getSolution();
+        myBigAB = SimpleLeastSquaresCase.getTransformedRHS();
+
+        myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+        myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
+
+        super.setUp();
+    }
+
+}

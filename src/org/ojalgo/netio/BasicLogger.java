@@ -355,9 +355,9 @@ public abstract class BasicLogger {
 
         private final PrintStream myStream;
 
-        public PrintStreamAppender(final PrintStream appender) {
+        public PrintStreamAppender(final PrintStream stream) {
             super();
-            myStream = appender;
+            myStream = stream;
         }
 
         /**
@@ -727,6 +727,12 @@ public abstract class BasicLogger {
 
     }
 
+    public static Appender DEBUG = new PrintStreamAppender(System.out);
+
+    public static Appender ERROR = new PrintStreamAppender(System.err);
+
+    static final NumberContext MATRIX_ELEMENT_CONTEXT = NumberContext.getGeneral(6);
+
     public static void debug() {
         BasicLogger.println(DEBUG);
     }
@@ -844,11 +850,6 @@ public abstract class BasicLogger {
             }
         }
     }
-
-    public static Appender DEBUG = new PrintStreamAppender(System.out);
-    public static Appender ERROR = new PrintStreamAppender(System.err);
-
-    static final NumberContext MATRIX_ELEMENT_CONTEXT = NumberContext.getGeneral(6);
 
     private BasicLogger() {
         super();

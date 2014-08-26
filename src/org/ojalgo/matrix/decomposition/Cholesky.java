@@ -22,8 +22,8 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.decomposition.task.DeterminantTask;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.task.DeterminantTask;
 
 /**
  * Cholesky: [A] = [L][L]<sup>T</sup>

@@ -83,50 +83,6 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
 
     }
 
-    public static void main(final String... strings) {
-
-        final int tmpMinValue = -Character.MIN_VALUE;
-        final char tmpB = (char) tmpMinValue;
-
-        System.out.println(Character.MIN_VALUE);
-        System.out.println(Character.MAX_VALUE);
-        System.out.println((int) Character.MIN_VALUE);
-        System.out.println((int) Character.MAX_VALUE);
-        System.out.println(Character.MIN_VALUE);
-        System.out.println(Character.MAX_VALUE);
-        System.out.println((int) Character.MIN_VALUE);
-        System.out.println((int) Character.MAX_VALUE);
-
-        final CharacterRing tmpRing = new CharacterRing();
-
-        try {
-            tmpRing.append("Anders");
-            tmpRing.append(ASCII.LF);
-            tmpRing.append("Peterson");
-            tmpRing.append(ASCII.HT);
-            tmpRing.append(ASCII.NBSP);
-            tmpRing.append(ASCII.HT);
-            tmpRing.append(ASCII.NULL);
-            final String tmpString = tmpRing.toString();
-            System.out.println("Length: " + tmpString.length());
-            System.out.println(tmpString);
-
-        } catch (final IOException anException1) {
-            // TODO Auto-generated catch block
-            anException1.printStackTrace();
-        }
-
-        //        for (;;) {
-        //            try {
-        //                tmpRing.append(ASCII.NBSP);
-        //            } catch (final IOException anException) {
-        //                anException.printStackTrace();
-        //                break;
-        //            }
-        //        }
-
-    }
-
     public static final int length = Character.MAX_VALUE + 1;
 
     private final char[] myCharacters;

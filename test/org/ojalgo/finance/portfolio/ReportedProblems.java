@@ -1,0 +1,217 @@
+/*
+ * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package org.ojalgo.finance.portfolio;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.ojalgo.TestUtils;
+import org.ojalgo.access.Access2D.Builder;
+import org.ojalgo.access.AccessUtils;
+import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.BigFunction;
+import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.State;
+import org.ojalgo.optimisation.convex.ConvexSolver;
+
+public class ReportedProblems extends FinancePortfolioTests {
+
+    public ReportedProblems() {
+        super();
+    }
+
+    public ReportedProblems(final String someName) {
+        super(someName);
+    }
+
+    /**
+     * The user got, constraint breaking, negative portfolio weights. The model is "wrong" - should not have negative
+     * excess returns - but he still should not get a constraint breaking solution.
+     */
+    public void testP20090115() {
+
+        final int assetNum = 7;
+
+        final double[][] assets_return = {
+                { -1.5905837442343828E-4, -0.03062360801781757, -0.029857534032853142, -0.011811692726036832, -0.017972310602803136, 0.017338003502626997, 0.0 },
+                { -0.02757158006362653, -0.02562704471101405, -0.011751538891997735, -0.024915062287655786, -0.01684088269454123, 0.013585351447135364, 0.0 },
+                { -0.00699300699300693, -0.033802816901408676, -0.04675196850393671, -0.021166752710376546, -0.007911392405063583, 0.03827751196172254, 0.0 },
+                { -0.007626310772164015, 0.0038424591738713027, 0.02488038277511978, 0.025210084033613675, -0.02003642987249557, -0.09758364312267642, 0.0 },
+                { -0.03965053763440893, 0.021693491952414375, 0.01643835616438392, -0.007412398921833087, 0.01765105227427014, -0.010006671114076025, 0.0 },
+                { -0.017821782178217872, 0.005040322580645311, 0.006018054162487363, 9.008107296569024E-4, 0.002999999999999824, -0.01196410767696908, 0.0 },
+                { 2.630552127527583E-4, 2.5867028174649627E-4, 2.3866431891514327E-4, 1.9564035993080523E-4, 2.351016690966669E-4, 1.9070675120065465E-4, 0.0 } };
+
+        final P20090115 tm = new P20090115();
+        final BasicMatrix covariances = tm.getCovariances(assets_return);
+        final BasicMatrix expectedExcessReturns = tm.getExpectedExcessReturns(assets_return); // Why not negate?
+        final BigDecimal riskAversion = new BigDecimal(1.0);
+
+        final MarketEquilibrium marketEquilibrium = new MarketEquilibrium(covariances, riskAversion);
+        final MarkowitzModel markowitzModel = new MarkowitzModel(marketEquilibrium, expectedExcessReturns);
+
+        for (int i = 0; i < assetNum; i++) {
+            markowitzModel.setLowerLimit(i, new BigDecimal(0.0));
+            markowitzModel.setUpperLimit(i, new BigDecimal(1.0));
+        }
+        final List<BigDecimal> re = markowitzModel.getWeights();
+
+        for (final BigDecimal tmpBigDecimal : re) {
+            if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
+                TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
+            }
+        }
+    }
+
+    /**
+     * A user claimed he got constraint breaking weights using these figures.
+     */
+    public void testP20110614() {
+
+        final BasicMatrix tmpCovars = PrimitiveMatrix.getBuilder(3, 3).set(0, 0, 0.04).set(0, 1, 0.01).set(0, 2, 0.02).set(1, 0, 0.01).set(1, 1, 0.09)
+                .set(1, 2, 0.01).set(2, 0, 0.02).set(2, 1, 0.01).set(2, 2, 0.16).build();
+        final BasicMatrix tmpReturs = PrimitiveMatrix.getBuilder(3, 1).set(0, 0, 0.10).set(1, 0, 0.15).set(2, 0, 0.18).build();
+
+        final MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovars);
+
+        final MarkowitzModel tmpMarkowitz = new MarkowitzModel(tmpME, tmpReturs);
+
+        for (int i = 1; i < 10; i++) {
+
+            tmpMarkowitz.setRiskAversion(new BigDecimal(i));
+
+            final List<BigDecimal> tmpWeights = tmpMarkowitz.getWeights();
+
+            for (final BigDecimal tmpBigDecimal : tmpWeights) {
+                if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
+                    TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
+                }
+            }
+        }
+
+        // As the Markowitz model built it the problem
+
+        final MatrixStore<Double> tmpQ = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, 1.0, 2.0 }, { 1.0, 9.0, 1.0 }, { 2.0, 1.0, 16.0 } });
+        final MatrixStore<Double> tmpC = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 10.0 }, { 15.0 }, { 18.0 } });
+
+        final MatrixStore<Double> tmpAE = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0 } });
+        final MatrixStore<Double> tmpBE = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0 } });
+
+        MatrixStore<Double> tmpAI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } });
+        MatrixStore<Double> tmpBI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 } });
+
+        final MatrixStore<Double> tmpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.5217391304347826 }, { 0.4782608695652173 } });
+
+        ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
+
+        ConvexSolver tmpSolver = tmpBuilder.build();
+        tmpSolver.options.debug(ConvexSolver.class);
+        Optimisation.Result tmpResult = tmpSolver.solve();
+        //  BasicMatrix tmpSolution = tmpResult.getSolution();
+
+        TestUtils.assertEquals(tmpX, tmpResult, TestUtils.EQUALS.newScale(6));
+
+        // As (I believe) the user built it
+        //
+        // The only *problem* I found was that he did not set lower limits
+        // on the portfolio weights, which you have to do. No problem with
+        // ojAlgo.
+
+        tmpAI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+        tmpBI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 1.0 } });
+
+        tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
+        tmpSolver = tmpBuilder.build();
+        tmpResult = tmpSolver.solve();
+
+        // Should NOT be equal in this case!
+        TestUtils.assertFalse(AccessUtils.equals(tmpX, tmpResult, TestUtils.EQUALS.newScale(6)));
+
+        // No problem with both the lower and upper limits set.
+
+        tmpAI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 },
+                { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+        tmpBI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
+
+        tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
+        tmpSolver = tmpBuilder.build();
+        tmpResult = tmpSolver.solve();
+
+        TestUtils.assertEquals(tmpX, tmpResult, TestUtils.EQUALS.newScale(6));
+    }
+
+    /**
+     * we have a problem with MarkowitzModel. I have produced a little source that explain the problem. We have set 3
+     * different TargetReturn on the same data.. With targets near to the best end worst target return, the
+     * MarkowitzModel works fine. With targets within the interval of best and worst return, seem that the
+     * MarkowitzModel is not able to find a correct list of weights. If you try this program and use target of 0.08 or
+     * 0.13 or 0.12 you can see a correct solution. With a target of 0.10 MarkowitzModel is not able to find a valid
+     * solution.
+     */
+    public void testP20130329() {
+
+        final BasicMatrix<BigDecimal> tmpCovariances = BigMatrix.FACTORY
+                .rows(new double[][] { { 0.00360000, 0.001800000000 }, { 0.001800000000, 0.00090000 } });
+
+        final MarketEquilibrium tmpMarketEquilibrium = new MarketEquilibrium(tmpCovariances, BigMath.THOUSAND);
+
+        final Builder<BigMatrix> tmpExcessReturnsBuilder = BigMatrix.FACTORY.getBuilder(2, 1);
+        tmpExcessReturnsBuilder.set(0, 0, 0.1400);
+        tmpExcessReturnsBuilder.set(1, 0, 0.0800);
+        final BasicMatrix<BigDecimal> tmpExcessReturns = tmpExcessReturnsBuilder.build();
+
+        final MarkowitzModel tmpMarkowitzModel = new MarkowitzModel(tmpMarketEquilibrium, tmpExcessReturns);
+        tmpMarkowitzModel.setLowerLimit(0, BigMath.ZERO);
+        tmpMarkowitzModel.setUpperLimit(0, BigMath.ONE);
+        tmpMarkowitzModel.setLowerLimit(1, BigMath.ZERO);
+        tmpMarkowitzModel.setUpperLimit(1, BigMath.ONE);
+        tmpMarkowitzModel.setShortingAllowed(false);
+
+        for (int t = 8; t <= 14; t++) {
+
+            final BigDecimal tmpTargetReturn = BigFunction.DIVIDE.invoke(new BigDecimal(t), BigMath.HUNDRED);
+            tmpMarkowitzModel.setTargetReturn(tmpTargetReturn);
+
+            final List<BigDecimal> tmpWeights = tmpMarkowitzModel.getWeights();
+
+            final State tmpOptimisationState = tmpMarkowitzModel.getOptimisationState();
+
+            //BasicLogger.debug("State {} {}", tmpOptimisationState, tmpWeights);
+
+            TestUtils.assertTrue("Optimisation State", tmpOptimisationState.isOptimal());
+
+            TestUtils.assertTrue("Asset0 >= 0.0", tmpWeights.get(0).signum() >= 0);
+            TestUtils.assertTrue("Asset1 >= 0.0", tmpWeights.get(1).signum() >= 0);
+
+            TestUtils.assertTrue("Asset0 <= 1.0", tmpWeights.get(0).compareTo(BigMath.ONE) <= 0);
+            TestUtils.assertTrue("Asset1 <= 1.0", tmpWeights.get(1).compareTo(BigMath.ONE) <= 0);
+
+            TestUtils.assertEquals("Asset0 + Asset1 == 1.0", 1.0, tmpWeights.get(0).add(tmpWeights.get(1)).doubleValue(), 0.0001);
+        }
+
+    }
+
+}

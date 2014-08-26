@@ -25,9 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyLeft;
 import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyLeft;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyLeft;
@@ -699,8 +697,6 @@ public final class MultiplyLeft extends MatrixOperation {
         final int tmpRowDim = product.length / tmpColDim;
 
         final BigDecimal[] tmpLeftRow = new BigDecimal[complexity];
-        int tmpIndex;
-        BigDecimal tmpVal;
 
         for (int i = firstRow; i < rowLimit; i++) {
 
@@ -708,13 +704,8 @@ public final class MultiplyLeft extends MatrixOperation {
                 tmpLeftRow[c] = left.get(i + (c * tmpRowDim));
             }
 
-            tmpIndex = 0;
             for (int j = 0; j < tmpColDim; j++) {
-                tmpVal = BigMath.ZERO;
-                for (int c = 0; c < complexity; c++) {
-                    tmpVal = BigFunction.ADD.invoke(tmpVal, BigFunction.MULTIPLY.invoke(tmpLeftRow[c], right[tmpIndex++]));
-                }
-                product[i + (j * tmpRowDim)] = tmpVal;
+                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, complexity);
             }
         }
     }
@@ -726,8 +717,6 @@ public final class MultiplyLeft extends MatrixOperation {
         final int tmpRowDim = product.length / tmpColDim;
 
         final ComplexNumber[] tmpLeftRow = new ComplexNumber[complexity];
-        int tmpIndex;
-        ComplexNumber tmpVal;
 
         for (int i = firstRow; i < rowLimit; i++) {
 
@@ -735,13 +724,8 @@ public final class MultiplyLeft extends MatrixOperation {
                 tmpLeftRow[c] = left.get(i + (c * tmpRowDim));
             }
 
-            tmpIndex = 0;
             for (int j = 0; j < tmpColDim; j++) {
-                tmpVal = ComplexNumber.ZERO;
-                for (int c = 0; c < complexity; c++) {
-                    tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right[tmpIndex++]));
-                }
-                product[i + (j * tmpRowDim)] = tmpVal;
+                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, complexity);
             }
         }
     }
@@ -752,8 +736,6 @@ public final class MultiplyLeft extends MatrixOperation {
         final int tmpRowDim = product.length / tmpColDim;
 
         final double[] tmpLeftRow = new double[complexity];
-        int tmpIndex;
-        double tmpVal;
 
         for (int i = firstRow; i < rowLimit; i++) {
 
@@ -761,13 +743,8 @@ public final class MultiplyLeft extends MatrixOperation {
                 tmpLeftRow[c] = left.doubleValue(i + (c * tmpRowDim));
             }
 
-            tmpIndex = 0;
             for (int j = 0; j < tmpColDim; j++) {
-                tmpVal = PrimitiveMath.ZERO;
-                for (int c = 0; c < complexity; c++) {
-                    tmpVal += tmpLeftRow[c] * right[tmpIndex++];
-                }
-                product[i + (j * tmpRowDim)] = tmpVal;
+                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, complexity);
             }
         }
     }

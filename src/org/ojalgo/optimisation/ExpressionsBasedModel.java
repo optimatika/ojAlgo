@@ -34,7 +34,6 @@ import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.integer.OldIntegerSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
-import org.ojalgo.optimisation.mps.MathProgSysModel;
 import org.ojalgo.type.context.NumberContext;
 
 /**

@@ -23,9 +23,9 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.decomposition.task.SolverTask;
-import org.ojalgo.matrix.decomposition.task.InverterTask;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.task.InverterTask;
+import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.type.context.NumberContext;
 
 /**

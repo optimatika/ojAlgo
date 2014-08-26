@@ -22,11 +22,11 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.decomposition.task.DeterminantTask;
 import org.ojalgo.matrix.store.ColumnsStore;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RowsStore;
+import org.ojalgo.matrix.task.DeterminantTask;
 
 /**
  * LU: [A] = [L][U]

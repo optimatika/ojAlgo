@@ -23,8 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.decomposition.task.DeterminantTask;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
