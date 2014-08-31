@@ -28,6 +28,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.BigMath;
@@ -1029,7 +1030,7 @@ public class ReportedProblems extends OptimisationConvexTests {
 
         final double[] expectedSolution = new double[] { -0.4, 0.12, -0.0196, -2.45785 };
         final double tmpExpValue = tmpObj.invoke(ArrayUtils.wrapAccess1D(expectedSolution));
-        final double tmpActValue = tmpObj.invoke(result);
+        final double tmpActValue = tmpObj.invoke(AccessUtils.asPrimitive1D(result));
 
         final MatrixStore<Double> tmpExpSlack = JamaBI.subtract(JamaAI.multiplyRight(ArrayUtils.wrapAccess1D(expectedSolution)));
         final MatrixStore<Double> tmpActSlack = JamaBI.subtract(JamaAI.multiplyRight((Access1D) PrimitiveDenseStore.FACTORY.columns(result)));
@@ -1060,8 +1061,8 @@ public class ReportedProblems extends OptimisationConvexTests {
         TestUtils.assertTrue(tmpModel.validate(tmpActualResult));
 
         final TwiceDifferentiable<Double> tmpObjective = tmpModel.getObjectiveFunction();
-        final double tmpExpObjFuncVal = tmpObjective.invoke(expected);
-        final double tmpActObjFuncVal = tmpObjective.invoke(tmpActualResult);
+        final double tmpExpObjFuncVal = tmpObjective.invoke(AccessUtils.asPrimitive1D(expected));
+        final double tmpActObjFuncVal = tmpObjective.invoke(AccessUtils.asPrimitive1D(tmpActualResult));
         TestUtils.assertEquals(tmpExpObjFuncVal, tmpActObjFuncVal);
 
         TestUtils.assertEquals(expected, tmpActualResult);

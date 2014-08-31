@@ -21,10 +21,407 @@
  */
 package org.ojalgo.access;
 
+import java.math.BigDecimal;
+import java.util.Iterator;
+
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 public abstract class AccessUtils {
+
+    public static Access1D<BigDecimal> asBig1D(final Access1D<?> access) {
+        return new Access1D<BigDecimal>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public BigDecimal get(final long index) {
+                return TypeUtils.toBigDecimal(access.get(index));
+            }
+
+            public Iterator<BigDecimal> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+        };
+    }
+
+    public static Access2D<BigDecimal> asBig2D(final Access2D<?> access) {
+        return new Access2D<BigDecimal>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public long countColumns() {
+                return access.countColumns();
+            }
+
+            public long countRows() {
+                return access.countRows();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public double doubleValue(final long row, final long column) {
+                return access.doubleValue(row, column);
+            }
+
+            public BigDecimal get(final long index) {
+                return TypeUtils.toBigDecimal(access.get(index));
+            }
+
+            public BigDecimal get(final long row, final long column) {
+                return TypeUtils.toBigDecimal(access.get(row, column));
+            }
+
+            public Iterator<BigDecimal> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+        };
+    }
+
+    public static AccessAnyD<BigDecimal> asBigAnyD(final AccessAnyD<?> access) {
+        return new AccessAnyD<BigDecimal>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public long count(final int dimension) {
+                return access.count(dimension);
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public double doubleValue(final long[] reference) {
+                return access.doubleValue(reference);
+            }
+
+            public BigDecimal get(final long index) {
+                return TypeUtils.toBigDecimal(access.get(index));
+            }
+
+            public BigDecimal get(final long[] reference) {
+                return TypeUtils.toBigDecimal(access.get(reference));
+            }
+
+            public Iterator<BigDecimal> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+            public long[] structure() {
+                return access.structure();
+            }
+
+        };
+    }
+
+    public static Access1D<ComplexNumber> asComplex1D(final Access1D<?> access) {
+        return new Access1D<ComplexNumber>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public ComplexNumber get(final long index) {
+                return TypeUtils.toComplexNumber(access.get(index));
+            }
+
+            public Iterator<ComplexNumber> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+        };
+    }
+
+    public static Access2D<ComplexNumber> asComplex2D(final Access2D<?> access) {
+        return new Access2D<ComplexNumber>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public long countColumns() {
+                return access.countColumns();
+            }
+
+            public long countRows() {
+                return access.countRows();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public double doubleValue(final long row, final long column) {
+                return access.doubleValue(row, column);
+            }
+
+            public ComplexNumber get(final long index) {
+                return TypeUtils.toComplexNumber(access.get(index));
+            }
+
+            public ComplexNumber get(final long row, final long column) {
+                return TypeUtils.toComplexNumber(access.get(row, column));
+            }
+
+            public Iterator<ComplexNumber> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+        };
+    }
+
+    public static AccessAnyD<ComplexNumber> asComplexAnyD(final AccessAnyD<?> access) {
+        return new AccessAnyD<ComplexNumber>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public long count(final int dimension) {
+                return access.count(dimension);
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public double doubleValue(final long[] reference) {
+                return access.doubleValue(reference);
+            }
+
+            public ComplexNumber get(final long index) {
+                return TypeUtils.toComplexNumber(access.get(index));
+            }
+
+            public ComplexNumber get(final long[] reference) {
+                return TypeUtils.toComplexNumber(access.get(reference));
+            }
+
+            public Iterator<ComplexNumber> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+            public long[] structure() {
+                return access.structure();
+            }
+
+        };
+    }
+
+    public static Access1D<Double> asPrimitive1D(final Access1D<?> access) {
+        return new Access1D<Double>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public Double get(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public Iterator<Double> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+        };
+    }
+
+    public static Access2D<Double> asPrimitive2D(final Access2D<?> access) {
+        return new Access2D<Double>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public long countColumns() {
+                return access.countColumns();
+            }
+
+            public long countRows() {
+                return access.countRows();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public double doubleValue(final long row, final long column) {
+                return access.doubleValue(row, column);
+            }
+
+            public Double get(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public Double get(final long row, final long column) {
+                return access.doubleValue(row, column);
+            }
+
+            public Iterator<Double> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+        };
+    }
+
+    public static AccessAnyD<Double> asPrimitiveAnyD(final AccessAnyD<?> access) {
+        return new AccessAnyD<Double>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public long count(final int dimension) {
+                return access.count(dimension);
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public double doubleValue(final long[] reference) {
+                return access.doubleValue(reference);
+            }
+
+            public Double get(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public Double get(final long[] reference) {
+                return access.doubleValue(reference);
+            }
+
+            public Iterator<Double> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+            public long[] structure() {
+                return access.structure();
+            }
+
+        };
+    }
+
+    public static Access1D<RationalNumber> asRational1D(final Access1D<?> access) {
+        return new Access1D<RationalNumber>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public RationalNumber get(final long index) {
+                return TypeUtils.toRationalNumber(access.get(index));
+            }
+
+            public Iterator<RationalNumber> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+        };
+    }
+
+    public static Access2D<RationalNumber> asRational2D(final Access2D<?> access) {
+        return new Access2D<RationalNumber>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public long countColumns() {
+                return access.countColumns();
+            }
+
+            public long countRows() {
+                return access.countRows();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public double doubleValue(final long row, final long column) {
+                return access.doubleValue(row, column);
+            }
+
+            public RationalNumber get(final long index) {
+                return TypeUtils.toRationalNumber(access.get(index));
+            }
+
+            public RationalNumber get(final long row, final long column) {
+                return TypeUtils.toRationalNumber(access.get(row, column));
+            }
+
+            public Iterator<RationalNumber> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+        };
+    }
+
+    public static AccessAnyD<RationalNumber> asRationalAnyD(final AccessAnyD<?> access) {
+        return new AccessAnyD<RationalNumber>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public long count(final int dimension) {
+                return access.count(dimension);
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public double doubleValue(final long[] reference) {
+                return access.doubleValue(reference);
+            }
+
+            public RationalNumber get(final long index) {
+                return TypeUtils.toRationalNumber(access.get(index));
+            }
+
+            public RationalNumber get(final long[] reference) {
+                return TypeUtils.toRationalNumber(access.get(reference));
+            }
+
+            public Iterator<RationalNumber> iterator() {
+                return new Iterator1D<>(this);
+            }
+
+            public long[] structure() {
+                return access.structure();
+            }
+
+        };
+    }
 
     public static int column(final int index, final int structure) {
         return index / structure;

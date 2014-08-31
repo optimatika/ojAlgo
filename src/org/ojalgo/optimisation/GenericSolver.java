@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
@@ -110,7 +111,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
 
     protected final double evaluateFunction(final Access1D<?> solution) {
         if ((myFunction != null) && (solution != null) && (myFunction.arity() == solution.count())) {
-            return myFunction.invoke(solution);
+            return myFunction.invoke(AccessUtils.asPrimitive1D(solution));
         } else {
             return Double.NaN;
         }
@@ -121,7 +122,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
      */
     protected abstract MatrixStore<Double> extractSolution();
 
-    protected final MatrixStore<Double> getGradient(final Access1D<?> solution) {
+    protected final MatrixStore<Double> getGradient(final Access1D<Double> solution) {
         return myFunction.getGradient(solution);
     }
 

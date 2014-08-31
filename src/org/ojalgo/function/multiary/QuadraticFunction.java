@@ -82,21 +82,21 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
     }
 
     @Override
-    public MatrixStore<N> getGradient(final Access1D<?> arg) {
-        return this.getHessian(arg).multiplyRight(this.quadratic().factory().columns(arg));
+    public MatrixStore<N> getGradient(final Access1D<N> arg) {
+        return this.getHessian(arg).multiplyRight(arg);
     }
 
     @Override
-    public MatrixStore<N> getHessian(final Access1D<?> arg) {
-        return myFactors.builder().superimpose(0, 0, myFactors.builder().conjugate().build()).build();
+    public MatrixStore<N> getHessian(final Access1D<N> arg) {
+        return myFactors.builder().superimpose(0, 0, myFactors.conjugate()).build();
     }
 
     @Override
-    public N invoke(final Access1D<?> arg) {
+    public N invoke(final Access1D<N> arg) {
 
         Scalar<N> retVal = this.getScalarConstant();
 
-        retVal = retVal.add(myFactors.multiplyRight(this.quadratic().factory().columns(arg)).multiplyLeft(this.quadratic().factory().rows(arg)).get(0, 0));
+        retVal = retVal.add(myFactors.multiplyRight(arg).multiplyLeft(arg).get(0, 0));
 
         return retVal.getNumber();
     }

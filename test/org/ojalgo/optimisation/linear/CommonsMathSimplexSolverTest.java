@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
@@ -42,7 +43,7 @@ import org.ojalgo.optimisation.Variable;
 
 /**
  * Contains the same test cases found in: org.apache.commons.math3.optimization.linear.SimplexSolverTest
- * 
+ *
  * @author apete
  */
 public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
@@ -160,7 +161,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         public double getValue() {
             final Access1D<?> tmpAccess = ArrayUtils.wrapAccess1D(this.getPoint());
-            return myObjFunc.getObjectiveFunction().invoke(tmpAccess) + myObjFunc.getConstant();
+            return myObjFunc.getObjectiveFunction().invoke(AccessUtils.asPrimitive1D(tmpAccess)) + myObjFunc.getConstant();
         }
     }
 
@@ -182,7 +183,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Compares two numbers given some amount of allowed error.
-         * 
+         *
          * @param x the first number
          * @param y the second number
          * @param eps the amount of error to allow when checking for equality
@@ -206,7 +207,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * {@code (maxUlps - 1)} (or fewer) floating point numbers between them, i.e. two adjacent floating point
          * numbers are considered equal. Adapted from <a
          * href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce Dawson</a>
-         * 
+         *
          * @param x first value
          * @param y second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and {@code y}.
@@ -227,7 +228,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Returns true iff they are equal as defined by {@link #equals(double,double,int) equals(x, y, 1)}.
-         * 
+         *
          * @param x first value
          * @param y second value
          * @return {@code true} if the values are equal.
@@ -239,7 +240,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Returns {@code true} if there is no double value strictly between the arguments or the difference between
          * them is within the range of allowed error (inclusive).
-         * 
+         *
          * @param x First value.
          * @param y Second value.
          * @param eps Amount of allowed absolute error.
@@ -255,7 +256,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * are considered equal if there are {@code (maxUlps - 1)} (or fewer) floating point numbers between them, i.e.
          * two adjacent floating point numbers are considered equal. Adapted from <a
          * href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce Dawson</a>
-         * 
+         *
          * @param x first value
          * @param y second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and {@code y}.
@@ -281,7 +282,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Returns true iff they are equal as defined by {@link #equals(float,float,int) equals(x, y, 1)}.
-         * 
+         *
          * @param x first value
          * @param y second value
          * @return {@code true} if the values are equal.
@@ -292,7 +293,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Returns true if both arguments are equal or within the range of allowed error (inclusive).
-         * 
+         *
          * @param x first value
          * @param y second value
          * @param eps the amount of absolute error to allow.
@@ -308,7 +309,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * are considered equal if there are {@code (maxUlps - 1)} (or fewer) floating point numbers between them, i.e.
          * two adjacent floating point numbers are considered equal. Adapted from <a
          * href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce Dawson</a>
-         * 
+         *
          * @param x first value
          * @param y second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and {@code y}.
@@ -336,7 +337,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Returns true if both arguments are NaN or neither is NaN and they are equal as defined by
          * {@link #equals(double,double) equals(x, y, 1)}.
-         * 
+         *
          * @param x first value
          * @param y second value
          * @return {@code true} if the values are equal or both are NaN.
@@ -348,7 +349,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Returns true if both arguments are NaN or are equal or within the range of allowed error (inclusive).
-         * 
+         *
          * @param x first value
          * @param y second value
          * @param eps the amount of absolute error to allow.
@@ -362,7 +363,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Returns true if both arguments are NaN or if they are equal as defined by {@link #equals(double,double,int)
          * equals(x, y, maxUlps)}.
-         * 
+         *
          * @param x first value
          * @param y second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and {@code y}.
@@ -377,7 +378,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Returns true if both arguments are NaN or neither is NaN and they are equal as defined by
          * {@link #equals(float,float) equals(x, y, 1)}.
-         * 
+         *
          * @param x first value
          * @param y second value
          * @return {@code true} if the values are equal or both are NaN.
@@ -389,7 +390,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Returns true if both arguments are NaN or are equal or within the range of allowed error (inclusive).
-         * 
+         *
          * @param x first value
          * @param y second value
          * @param eps the amount of absolute error to allow.
@@ -403,7 +404,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Returns true if both arguments are NaN or if they are equal as defined by {@link #equals(float,float,int)
          * equals(x, y, maxUlps)}.
-         * 
+         *
          * @param x first value
          * @param y second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and {@code y}.
@@ -417,16 +418,16 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Computes a number {@code delta} close to {@code originalDelta} with the property that
-         * 
+         *
          * <pre>
          * <code>
          *   x + delta - x
          * </code>
          * </pre>
-         * 
+         *
          * is exactly machine-representable. This is useful when computing numerical derivatives, in order to reduce
          * roundoff errors.
-         * 
+         *
          * @param x Value.
          * @param originalDelta Offset value.
          * @return a number {@code delta} so that {@code x + delta} and {@code x} differ by a representable floating
@@ -439,7 +440,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Rounds the given value to the specified number of decimal places. The value is rounded using the
          * {@link BigDecimal#ROUND_HALF_UP} method.
-         * 
+         *
          * @param x Value to round.
          * @param scale Number of digits to the right of the decimal point.
          * @return the rounded value.
@@ -453,7 +454,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * Rounds the given value to the specified number of decimal places. The value is rounded using the given method
          * which is any method defined in {@link BigDecimal}. If {@code x} is infinite or {@code NaN}, then the value of
          * {@code x} is returned unchanged, regardless of the other parameters.
-         * 
+         *
          * @param x Value to round.
          * @param scale Number of digits to the right of the decimal point.
          * @param roundingMethod Rounding method as defined in {@link BigDecimal}.
@@ -478,7 +479,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Rounds the given value to the specified number of decimal places. The value is rounded using the
          * {@link BigDecimal#ROUND_HALF_UP} method.
-         * 
+         *
          * @param x Value to round.
          * @param scale Number of digits to the right of the decimal point.
          * @return the rounded value.
@@ -491,7 +492,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Rounds the given value to the specified number of decimal places. The value is rounded using the given method
          * which is any method defined in {@link BigDecimal}.
-         * 
+         *
          * @param x Value to round.
          * @param scale Number of digits to the right of the decimal point.
          * @param roundingMethod Rounding method as defined in {@link BigDecimal}.
@@ -507,7 +508,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Rounds the given non-negative value to the "nearest" integer. Nearest is determined by the rounding method
          * specified. Rounding methods are defined in {@link BigDecimal}.
-         * 
+         *
          * @param unscaled Value to round.
          * @param sign Sign of the original, scaled value.
          * @param roundingMethod Rounding method, as defined in {@link BigDecimal}.
@@ -610,7 +611,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Simple constructor.
-         * 
+         *
          * @param stringValue display string for the relationship
          */
         private Relationship(final String stringValue) {
@@ -619,7 +620,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         /**
          * Get the relationship obtained when multiplying all coefficients by -1.
-         * 
+         *
          * @return relationship obtained when multiplying all coefficients by -1
          */
         public Relationship oppositeRelationship() {
@@ -1081,7 +1082,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         TestUtils.assertEquals(0.0, solution.getPoint()[2], .0000001);
         TestUtils.assertEquals(0.0, solution.getPoint()[3], .0000001);
         TestUtils.assertEquals(0.0, solution.getPoint()[4], .0000001);
-        TestUtils.assertEquals(1438556.7491409, solution.getValue(), .000001); // TODO 2013-12-01 Minskade delta från .0000001 till .000001 
+        TestUtils.assertEquals(1438556.7491409, solution.getValue(), .000001); // TODO 2013-12-01 Minskade delta från .0000001 till .000001
     }
 
     public void testSimplexSolver() {

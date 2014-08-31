@@ -41,7 +41,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class SegmentedArray<N extends Number> extends BasicArray<N> {
+final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     static abstract class SegmentedFactory<N extends Number> extends ArrayFactory<N> {
 

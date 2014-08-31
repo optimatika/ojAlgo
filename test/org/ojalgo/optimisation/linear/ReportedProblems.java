@@ -145,13 +145,11 @@ public class ReportedProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(tmpFullSolution, BigMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5), TestUtils.EQUALS.newScale(6));
 
         final BigDecimal tmpEvenValue = TestUtils.EQUALS.newScale(6).enforce(
-                TypeUtils.toBigDecimal(tmpEvenObjective.toFunction().invoke(BigMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2).toBigStore())));
+                TypeUtils.toBigDecimal(tmpEvenObjective.toFunction().invoke(PrimitiveMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2))));
         final BigDecimal tmpOddValue = TestUtils.EQUALS.newScale(6).enforce(
-                TypeUtils.toBigDecimal(tmpOddObjective.toFunction().invoke(BigMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2).toBigStore())));
-        final BigDecimal tmpFullValue = TestUtils.EQUALS.newScale(6)
-                .enforce(
-                        TypeUtils.toBigDecimal(tmpFullObjective.toFunction().invoke(
-                                BigMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5).toBigStore())));
+                TypeUtils.toBigDecimal(tmpOddObjective.toFunction().invoke(PrimitiveMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2))));
+        final BigDecimal tmpFullValue = TestUtils.EQUALS.newScale(6).enforce(
+                TypeUtils.toBigDecimal(tmpFullObjective.toFunction().invoke(PrimitiveMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5))));
 
         TestUtils.assertEquals(0, tmpFullValue.compareTo(tmpEvenValue.add(tmpOddValue)));
         TestUtils.assertEquals(0, tmpClaimedValue.compareTo(tmpFullValue));

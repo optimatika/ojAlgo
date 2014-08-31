@@ -56,7 +56,7 @@ public interface MultiaryFunction<N extends Number> extends Function<N> {
 
     /**
      * Twice (Continuously) Differentiable Multiary Function
-     * 
+     *
      * @author apete
      */
     public static interface TwiceDifferentiable<N extends Number> extends MultiaryFunction<N> {
@@ -72,7 +72,7 @@ public interface MultiaryFunction<N extends Number> extends Function<N> {
          * are the partial derivatives of f: The first-order approximation of f at a point x ∈ int dom f can be
          * expressed as (the affine function of z) f(x) + ∇f(x)T (z − x).
          */
-        MatrixStore<N> getGradient(Access1D<?> arg);
+        MatrixStore<N> getGradient(Access1D<N> arg);
 
         /**
          * The Hessian matrix or Hessian is a square matrix of second-order partial derivatives of a function. It
@@ -80,7 +80,7 @@ public interface MultiaryFunction<N extends Number> extends Function<N> {
          * The second-order approximation of f, at or near x, is the quadratic function of z defined by f(z) = f(x) +
          * ∇f(x)T (z − x) + (1/2)(z − x)T ∇2f(x)(z − x)
          */
-        MatrixStore<N> getHessian(Access1D<?> arg);
+        MatrixStore<N> getHessian(Access1D<N> arg);
 
         FirstOrderApproximation<N> toFirstOrderApproximation(final Access1D<N> point);
 
@@ -90,6 +90,6 @@ public interface MultiaryFunction<N extends Number> extends Function<N> {
 
     int arity();
 
-    N invoke(Access1D<?> arg);
+    N invoke(Access1D<N> arg);
 
 }

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.RecursiveTask;
 
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.concurrent.DaemonPoolExecutor;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -359,7 +360,7 @@ public final class OldIntegerSolver extends IntegerSolver {
 
     int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey) {
 
-        final MatrixStore<Double> tmpGradient = this.getGradient(nodeResult);
+        final MatrixStore<Double> tmpGradient = this.getGradient(AccessUtils.asPrimitive1D(nodeResult));
 
         int retVal = -1;
 

@@ -36,7 +36,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * [c]<sup>T</sup>[x]
- * 
+ *
  * @author apete
  */
 public final class LinearFunction<N extends Number> extends AbstractMultiary<N, LinearFunction<N>> implements MultiaryFunction.Linear<N> {
@@ -88,21 +88,21 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
     }
 
     @Override
-    public MatrixStore<N> getGradient(final Access1D<?> arg) {
-        return myFactors.builder().transpose().build();
+    public MatrixStore<N> getGradient(final Access1D<N> arg) {
+        return myFactors.transpose();
     }
 
     @Override
-    public MatrixStore<N> getHessian(final Access1D<?> arg) {
+    public MatrixStore<N> getHessian(final Access1D<N> arg) {
         return new ZeroStore<N>(myFactors.factory(), this.arity(), this.arity());
     }
 
     @Override
-    public N invoke(final Access1D<?> arg) {
+    public N invoke(final Access1D<N> arg) {
 
         Scalar<N> retVal = this.getScalarConstant();
 
-        retVal = retVal.add(myFactors.multiplyRight(myFactors.factory().columns(arg)).get(0, 0));
+        retVal = retVal.add(myFactors.multiplyRight(arg).get(0, 0));
 
         return retVal.getNumber();
     }

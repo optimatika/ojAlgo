@@ -42,7 +42,7 @@ import sun.misc.Unsafe;
  *
  * @author apete
  */
-public final class OffHeapArray extends BasicArray<Double> {
+final class OffHeapArray extends BasicArray<Double> {
 
     static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
 

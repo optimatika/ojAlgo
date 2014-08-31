@@ -27,9 +27,15 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.multiary.FirstOrderApproximation;
+import org.ojalgo.function.multiary.LinearFunction;
+import org.ojalgo.function.multiary.MultiaryFunction;
+import org.ojalgo.function.multiary.QuadraticFunction;
+import org.ojalgo.function.multiary.SecondOrderApproximation;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -138,6 +144,65 @@ public abstract class ConvexSolver extends BaseSolver {
         }
 
     }
+
+    static final class ObjectiveFunction implements MultiaryFunction.TwiceDifferentiable<Double>, MultiaryFunction.Convex<Double>,
+    MultiaryFunction.Quadratic<Double>, MultiaryFunction.Linear<Double> {
+
+        private final LinearFunction<Double> myLinear;
+        private final QuadraticFunction<Double> myQuadratic;
+
+        public ObjectiveFunction(final int arity) {
+
+            super();
+
+            myQuadratic = QuadraticFunction.makePrimitive(arity);
+            myLinear = LinearFunction.makePrimitive(arity);
+        }
+
+        @SuppressWarnings("unused")
+        private ObjectiveFunction() {
+            this(0);
+        }
+
+        public int arity() {
+            return myLinear.arity();
+        }
+
+        public MatrixStore<Double> getGradient(final Access1D<Double> arg) {
+            return this.quadratic().multiplyRight(arg).subtract(this.linear());
+        }
+
+        public MatrixStore<Double> getHessian(final Access1D<Double> arg) {
+            return myQuadratic.quadratic();
+        }
+
+        public Double invoke(final Access1D<Double> arg) {
+
+            final double tmpQPart = myQuadratic.invoke(arg).doubleValue();
+            final double tmpLPart = myLinear.invoke(arg).doubleValue();
+
+            return (tmpQPart * 0.5) - tmpLPart;
+        }
+
+        public PhysicalStore<Double> linear() {
+            return myLinear.linear();
+        }
+
+        public PhysicalStore<Double> quadratic() {
+            return myQuadratic.quadratic();
+        }
+
+        public FirstOrderApproximation<Double> toFirstOrderApproximation(final Access1D<Double> point) {
+            return new FirstOrderApproximation<>(this, point);
+        }
+
+        public SecondOrderApproximation<Double> toSecondOrderApproximation(final Access1D<Double> point) {
+            return new SecondOrderApproximation<>(this, point);
+        }
+
+    }
+
+    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     public static ConvexSolver make(final ExpressionsBasedModel aModel) {
 
@@ -319,8 +384,6 @@ public abstract class ConvexSolver extends BaseSolver {
     }
 
     private transient KKTSolver myDelegateSolver = null;
-
-    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     protected ConvexSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
         super(aModel, solverOptions, matrices);
