@@ -51,7 +51,7 @@ import org.ojalgo.type.format.NumberStyle;
  * with trailing zeros and more digits than the precision allows. It is also possible to define a context with a scale
  * that is larger than the precision. This is NOT how precision and scale is used with numeric types in databases.
  * </p>
- * 
+ *
  * @author apete
  */
 public final class NumberContext extends FormatContext<Number> {
@@ -178,10 +178,6 @@ public final class NumberContext extends FormatContext<Number> {
         return style != null ? style.getFormat(locale) : DEFAULT_STYLE.getFormat(locale);
     }
 
-    private static double error(final int exponent) {
-        return (PrimitiveMath.HALF * Math.pow(PrimitiveMath.TEN, -exponent)) + PrimitiveMath.MACHINE_DOUBLE_ERROR;
-    }
-
     private final double myError;
     private final MathContext myMathContext;
     private final int myPrecision;
@@ -201,10 +197,10 @@ public final class NumberContext extends FormatContext<Number> {
         super(format);
 
         myPrecision = precision;
-        myPrecisionError = NumberContext.error(precision);
+        myPrecisionError = Math.pow(PrimitiveMath.TEN, 1 - precision);
 
         myScale = scale;
-        myScaleError = NumberContext.error(scale);
+        myScaleError = PrimitiveMath.HALF * Math.pow(PrimitiveMath.TEN, -scale);
         myScaleFactor = PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, scale);
 
         myRoundingMode = roundingMode;
@@ -214,7 +210,7 @@ public final class NumberContext extends FormatContext<Number> {
         final int tmpMax = Math.max(precision, scale);
         final int tmpMin = Math.min(precision, scale);
         final int tmpErrExp = Math.min((tmpMax + 2) / 2, tmpMin);
-        myError = NumberContext.error(tmpErrExp);
+        myError = (PrimitiveMath.HALF * Math.pow(PrimitiveMath.TEN, -tmpErrExp)) + PrimitiveMath.MACHINE_DOUBLE_ERROR;
     }
 
     public NumberContext(final int precision, final int scale, final RoundingMode roundingMode) {

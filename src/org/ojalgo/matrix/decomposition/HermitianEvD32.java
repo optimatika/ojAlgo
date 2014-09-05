@@ -78,6 +78,8 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
 
     }
 
+    private static final double EPSILON = Math.pow(2.0, -52.0);
+
     static Array1D<Double> toDiagonal(final DiagonalAccess<?> aTridiagonal, final DecompositionStore<?> transformationAccumulator) {
 
         //   BasicLogger.logDebug("Tridiagonal={}", aTridiagonal.toString());
@@ -114,7 +116,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
 
             // Find small subdiagonal element
             tmpMagnitude = Math.max(tmpMagnitude, Math.abs(tmpMainDiagData[l]) + Math.abs(tmpOffDiagData[l]));
-            tmpLocalEpsilon = PrimitiveMath.MACHINE_DOUBLE_ERROR * tmpMagnitude;
+            tmpLocalEpsilon = EPSILON * tmpMagnitude;
 
             m = l;
             while (m < tmpDim) {
