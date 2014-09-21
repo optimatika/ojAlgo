@@ -5,3 +5,5 @@
 hotspot.log
 jitwatch.log
 .DS_Store
+
+*.log
