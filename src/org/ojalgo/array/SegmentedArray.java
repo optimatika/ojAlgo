@@ -41,7 +41,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-final class SegmentedArray<N extends Number> extends BasicArray<N> {
+public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     static abstract class SegmentedFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -253,20 +253,8 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return mySegments[(int) (index >> myIndexBits)].isAbsolute(index & myIndexMask);
     }
 
-    public boolean isInfinite(final long index) {
-        return mySegments[(int) (index >> myIndexBits)].isInfinite(index & myIndexMask);
-    }
-
-    public boolean isNaN(final long index) {
-        return mySegments[(int) (index >> myIndexBits)].isNaN(index & myIndexMask);
-    }
-
     public boolean isPositive(final long index) {
         return mySegments[(int) (index >> myIndexBits)].isPositive(index & myIndexMask);
-    }
-
-    public boolean isReal(final long index) {
-        return mySegments[(int) (index >> myIndexBits)].isReal(index & myIndexMask);
     }
 
     public boolean isZero(final long index) {

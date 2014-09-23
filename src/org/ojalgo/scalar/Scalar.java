@@ -62,7 +62,7 @@ import org.ojalgo.type.context.NumberContext;
  * A division ring is a ring in which division is possible. Division rings differ from fields only in that their
  * multiplication is not required to be commutative.
  * </p>
- * 
+ *
  * @author apete
  * @see <a href="http://en.wikipedia.org/wiki/Operation_%28mathematics%29">Operation</a>
  * @see <a href="http://en.wikipedia.org/wiki/Group_%28mathematics%29">Group</a>
@@ -162,54 +162,19 @@ public interface Scalar<N extends Number> extends Comparable<N> {
     Scalar<N> invert();
 
     /**
-     * @return true if this is equal to its own norm (non-negative real part and no imaginary part); otherwise false.
+     * @return true if this is equal to its own norm, modulus or absolute value (non-negative real part and no imaginary
+     *         part); otherwise false.
      * @see #isAbsolute()
-     * @see #isInfinite()
-     * @see #isNaN()
-     * @see #isReal()
      * @see #isPositive()
      * @see #isZero()
      */
     boolean isAbsolute();
 
     /**
-     * Not relevant for all implementations. It's essntially {@linkplain Double#isInfinite(double)}.
-     * 
+     * Defined as {@link #isAbsolute()} and not {@link #isZero()}. Note that the exact definition/behaviour of
+     * {@link #isZero()} is specific to the implementation.
+     *
      * @see #isAbsolute()
-     * @see #isInfinite()
-     * @see #isNaN()
-     * @see #isReal()
-     * @see #isPositive()
-     * @see #isZero()
-     * @deprecated v36 Only plan to keep {@link #isAbsolute()} and {@link #isZero()}.
-     */
-    @Deprecated
-    boolean isInfinite();
-
-    /**
-     * Not relevant for all implementations. It's essntially {@linkplain Double#isNaN(double)}.
-     * 
-     * @see #isAbsolute()
-     * @see #isInfinite()
-     * @see #isNaN()
-     * @see #isReal()
-     * @see #isPositive()
-     * @see #isZero()
-     * @deprecated v36 Only plan to keep {@link #isAbsolute()} and {@link #isZero()}.
-     */
-    @Deprecated
-    boolean isNaN();
-
-    /**
-     * Defined as {@link #isAbsolute()} but not {@link #isZero()}. A small range of values around zero are treated as
-     * zeros. Values within that range are not "positive". Very small positive values are not recognised as positive -
-     * they're zero.
-     * 
-     * @return true if the real part is strictly positive (not zero) and the imaginary part negligible; otherwise false.
-     * @see #isAbsolute()
-     * @see #isInfinite()
-     * @see #isNaN()
-     * @see #isReal()
      * @see #isPositive()
      * @see #isZero()
      * @deprecated v36 Only plan to keep {@link #isAbsolute()} and {@link #isZero()}.
@@ -218,29 +183,13 @@ public interface Scalar<N extends Number> extends Comparable<N> {
     boolean isPositive();
 
     /**
-     * @return true if there is the imaginary part is negligible; otherwise false.
-     * @see #isAbsolute()
-     * @see #isInfinite()
-     * @see #isNaN()
-     * @see #isReal()
-     * @see #isPositive()
-     * @see #isZero()
-     * @deprecated v36 Only plan to keep {@link #isAbsolute()} and {@link #isZero()}.
-     */
-    @Deprecated
-    boolean isReal();
-
-    /**
-     * Typically a small range around zero should be interpreted as zero. The exact size of that range depends on the
-     * characteristics/capabillities of the specific implementation. The potential exactness of {@link BigScalar} and
-     * {@link RationalNumber} should be reflected here as having small(er) zero-intevalls. Should never test for just
-     * exact zero <code>==0.0</code>.
-     * 
+     * Is this scalar (practically) zero or not. Typically a small range around zero needs to be interpreted as zero.
+     * The exact size of that range depends on the characteristics/capabillities of the specific implementation. The
+     * potential exactness of for instance {@link BigScalar} or {@link RationalNumber} should be reflected here as
+     * having small(er), or empty, zero-intevalls.
+     *
      * @return true if the norm, modulus or absolute value is (practically) zero; otherwise false.
      * @see #isAbsolute()
-     * @see #isInfinite()
-     * @see #isNaN()
-     * @see #isReal()
      * @see #isPositive()
      * @see #isZero()
      */
@@ -279,14 +228,14 @@ public interface Scalar<N extends Number> extends Comparable<N> {
 
     /**
      * this = signum(this) * norm(this)
-     * 
+     *
      * @return norm(this)
      */
     double norm();
 
     /**
      * this = signum(this) * norm(this)
-     * 
+     *
      * @return signum(this)
      */
     Scalar<N> signum();

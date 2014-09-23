@@ -494,21 +494,20 @@ public abstract class AccessUtils {
 
         boolean retVal = tmpLength == accessB.count();
 
-        final double tmpError = context.error();
-
         if ((accessA.get(0) instanceof ComplexNumber) && (accessB.get(0) instanceof ComplexNumber)) {
 
             final Access1D<ComplexNumber> tmpAccessA = (Access1D<ComplexNumber>) accessA;
             final Access1D<ComplexNumber> tmpAccessB = (Access1D<ComplexNumber>) accessB;
 
             for (int i = 0; retVal && (i < tmpLength); i++) {
-                retVal &= (tmpAccessA.get(i).subtract(tmpAccessB.get(i))).norm() <= tmpError;
+                retVal &= context.isSmallError(tmpAccessA.get(i).doubleValue(), tmpAccessB.get(i).doubleValue());
+                retVal &= context.isSmallError(tmpAccessA.get(i).i, tmpAccessB.get(i).i);
             }
 
         } else {
 
             for (int i = 0; retVal && (i < tmpLength); i++) {
-                retVal &= Math.abs(accessA.doubleValue(i) - accessB.doubleValue(i)) <= tmpError;
+                retVal &= context.isSmallError(accessA.doubleValue(i), accessB.doubleValue(i));
             }
         }
 

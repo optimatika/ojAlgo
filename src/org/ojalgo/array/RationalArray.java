@@ -245,23 +245,8 @@ public class RationalArray extends DenseArray<RationalNumber> {
     }
 
     @Override
-    protected final boolean isInfinite(final int index) {
-        return RationalNumber.isInfinite(data[index]);
-    }
-
-    @Override
-    protected final boolean isNaN(final int index) {
-        return RationalNumber.isNaN(data[index]);
-    }
-
-    @Override
     protected final boolean isPositive(final int index) {
         return RationalNumber.isPositive(data[index]);
-    }
-
-    @Override
-    protected final boolean isReal(final int index) {
-        return RationalNumber.IS_REAL;
     }
 
     @Override

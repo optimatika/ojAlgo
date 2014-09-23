@@ -50,7 +50,7 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
 
     static final NumberContext CNTXT_CPLX_DECOMP = TestUtils.EQUALS.newScale(5);
     static final NumberContext CNTXT_CPLX_VALUES = TestUtils.EQUALS.newScale(7);
-    static final NumberContext CNTXT_REAL_DECOMP = TestUtils.EQUALS.newScale(6);
+    static final NumberContext CNTXT_REAL_DECOMP = TestUtils.EQUALS.newScale(6).newPrecision(4);
     static final NumberContext CNTXT_REAL_VALUES = TestUtils.EQUALS.newScale(10);
 
     public SingularValueTest() {
@@ -225,11 +225,11 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
         this.testRecreation(tmpOriginal);
     }
 
-    private void doTestTypes(final BasicMatrix aStore) {
+    private void doTestTypes(final BasicMatrix<?> original) {
 
-        final PhysicalStore<BigDecimal> tmpBigStore = aStore.toBigStore();
-        final PhysicalStore<ComplexNumber> tmpComplexStore = aStore.toComplexStore();
-        final PhysicalStore<Double> tmpPrimitiveStore = aStore.toPrimitiveStore();
+        final PhysicalStore<BigDecimal> tmpBigStore = original.toBigStore();
+        final PhysicalStore<ComplexNumber> tmpComplexStore = original.toComplexStore();
+        final PhysicalStore<Double> tmpPrimitiveStore = original.toPrimitiveStore();
 
         BIG.compute(tmpBigStore);
         COMPLEX.compute(tmpComplexStore);

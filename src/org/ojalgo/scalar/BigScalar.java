@@ -60,9 +60,6 @@ public final class BigScalar extends AbstractScalar<BigDecimal> implements Enfor
 
     };
 
-    public static final boolean IS_INFINITE = false;
-    public static final boolean IS_NOT_A_NUMBER = false;
-    public static final boolean IS_REAL = true;
     public static final BigScalar ONE = new BigScalar(BigMath.ONE);
     public static final NumberContext PRECISION = NumberContext.getMath(MathContext.DECIMAL128).newScale(32);
     public static final BigScalar ZERO = new BigScalar();
@@ -76,6 +73,7 @@ public final class BigScalar extends AbstractScalar<BigDecimal> implements Enfor
     }
 
     public static boolean isZero(final BigDecimal value) {
+//        return ZERO.compareTo(value) == 0;
         return PRECISION.enforce(value).signum() == 0;
     }
 
@@ -187,20 +185,8 @@ public final class BigScalar extends AbstractScalar<BigDecimal> implements Enfor
         return BigScalar.isAbsolute(myNumber);
     }
 
-    public boolean isInfinite() {
-        return BigScalar.IS_INFINITE;
-    }
-
-    public boolean isNaN() {
-        return BigScalar.IS_NOT_A_NUMBER;
-    }
-
     public boolean isPositive() {
         return BigScalar.isPositive(myNumber);
-    }
-
-    public boolean isReal() {
-        return BigScalar.IS_REAL;
     }
 
     public boolean isZero() {

@@ -29,7 +29,7 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
     /**
      * This interface mimics {@linkplain Fillable}, but methods return the builder instance instead, and then adds the
      * {@link #build()} method.
-     * 
+     *
      * @author apete
      */
     public interface Builder<I extends AccessAnyD<?>> extends StructureAnyD, Access1D.Builder<I> {
@@ -50,32 +50,11 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         boolean isAbsolute(long[] reference);
 
         /**
-         * @see Scalar#isInfinite()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long[])} and {@link #isZero(long[])}.
-         */
-        @Deprecated
-        boolean isInfinite(long[] reference);
-
-        /**
-         * @see Scalar#isNaN()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long[])} and {@link #isZero(long[])}.
-         */
-        @Deprecated
-        boolean isNaN(long[] reference);
-
-        /**
          * @see Scalar#isPositive()
          * @deprecated v36 Only plan to keep {@link #isAbsolute(long[])} and {@link #isZero(long[])}.
          */
         @Deprecated
         boolean isPositive(long[] reference);
-
-        /**
-         * @see Scalar#isReal()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long[])} and {@link #isZero(long[])}.
-         */
-        @Deprecated
-        boolean isReal(long[] reference);
 
         /**
          * @see Scalar#isZero()

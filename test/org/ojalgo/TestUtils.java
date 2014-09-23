@@ -92,8 +92,8 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final double expected, final ComplexNumber actual, final NumberContext context) {
-        Assert.assertEquals("ComplexNumber.re", expected, actual.doubleValue(), context.error());
-        Assert.assertEquals("ComplexNumber.im", PrimitiveMath.ZERO, actual.i, context.error());
+        TestUtils.assertEquals("ComplexNumber.re", expected, actual.doubleValue(), context);
+        TestUtils.assertEquals("ComplexNumber.im", PrimitiveMath.ZERO, actual.i, context);
     }
 
     public static void assertEquals(final double expected, final double actual) {
@@ -212,7 +212,12 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final String message, final double expected, final double actual, final NumberContext context) {
-        TestUtils.assertEquals(message, Double.valueOf(expected), Double.valueOf(actual), context);
+        // TestUtils.assertEquals(message, Double.valueOf(expected), Double.valueOf(actual), context);
+        if (Double.isNaN(expected) && Double.isNaN(actual)) {
+
+        } else if (!context.isSmallError(expected, actual)) {
+            Assert.fail(Assert.format(message, expected, actual));
+        }
     }
 
     public static void assertEquals(final String message, final int expected, final int actual) {

@@ -50,32 +50,11 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         boolean isAbsolute(long index);
 
         /**
-         * @see Scalar#isInfinite()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long)} and {@link #isZero(long)}.
-         */
-        @Deprecated
-        boolean isInfinite(long index);
-
-        /**
-         * @see Scalar#isNaN()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long)} and {@link #isZero(long)}.
-         */
-        @Deprecated
-        boolean isNaN(long index);
-
-        /**
          * @see Scalar#isPositive()
          * @deprecated v36 Only plan to keep {@link #isAbsolute(long)} and {@link #isZero(long)}.
          */
         @Deprecated
         boolean isPositive(long index);
-
-        /**
-         * @see Scalar#isReal()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long)} and {@link #isZero(long)}.
-         */
-        @Deprecated
-        boolean isReal(long index);
 
         /**
          * @see Scalar#isZero()

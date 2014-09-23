@@ -60,7 +60,7 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
             TestUtils.fail(SOLUTION_NOT_VALID);
         }
 
-        TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION.error());
+        TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION);
     }
 
     public void _testSemiContOrg() {
@@ -80,6 +80,6 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
             TestUtils.fail(SOLUTION_NOT_VALID);
         }
 
-        TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION.error());
+        TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION);
     }
 }

@@ -42,7 +42,7 @@ import org.ojalgo.type.CalendarDateUnit;
 
 /**
  * RandomNumberTest
- * 
+ *
  * @author apete
  */
 public class GeometricBrownianMotionTest extends RandomProcessTests {
@@ -99,7 +99,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
 
     public void testDistributionConsistency() {
 
-        final double tmpError = TestUtils.EQUALS.newScale(9).error();
+        final double tmpError = TestUtils.EQUALS.newScale(9).epsilon();
 
         GeometricBrownianMotion tmpProcess;
         LogNormal tmpDistribution;

@@ -33,12 +33,12 @@ import org.ojalgo.matrix.jama.JamaSingularValue;
 
 /**
  * MatrixDecompositionPackageTests
- * 
+ *
  * @author apete
  */
 public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     public static final Bidiagonal<?>[] getBidiagonalAll() {
         return new Bidiagonal<?>[] { new BidiagonalDecomposition.Big(), BidiagonalDecomposition.makeComplex(), BidiagonalDecomposition.makePrimitive() };
@@ -128,7 +128,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     @SuppressWarnings("unchecked")
     public static final SingularValue<Double>[] getSingularValuePrimitive() {
-        return (SingularValue<Double>[]) new SingularValue<?>[] { new JamaSingularValue(), /*new SVDold30.Primitive(),*/new SVDnew32.Primitive() };
+        return (SingularValue<Double>[]) new SingularValue<?>[] { new JamaSingularValue(), /* new SVDold30.Primitive(), */new SVDnew32.Primitive() };
     }
 
     public static final Tridiagonal<?>[] getTridiagonalAll() {

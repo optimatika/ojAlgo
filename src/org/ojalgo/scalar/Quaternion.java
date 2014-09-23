@@ -77,11 +77,11 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
     }
 
     public static boolean isInfinite(final Quaternion value) {
-        return value.isInfinite();
+        return Double.isInfinite(value.doubleValue()) || Double.isInfinite(value.i) || Double.isInfinite(value.j) || Double.isInfinite(value.k) || Double.isInfinite(value.norm());
     }
 
     public static boolean isNaN(final Quaternion value) {
-        return value.isNaN();
+        return Double.isNaN(value.doubleValue()) || Double.isNaN(value.i) || Double.isNaN(value.j) || Double.isNaN(value.k);
     }
 
     public static boolean isPositive(final Quaternion value) {
@@ -421,14 +421,6 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
 
     public boolean isAbsolute() {
         return this.isReal() && (myScalar >= PrimitiveMath.ZERO);
-    }
-
-    public boolean isInfinite() {
-        return Double.isInfinite(myScalar) || Double.isInfinite(i) || Double.isInfinite(j) || Double.isInfinite(k) || Double.isInfinite(this.norm());
-    }
-
-    public boolean isNaN() {
-        return Double.isNaN(myScalar) || Double.isNaN(i) || Double.isNaN(j) || Double.isNaN(k);
     }
 
     public boolean isPositive() {

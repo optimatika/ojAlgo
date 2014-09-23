@@ -44,7 +44,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>,
-        AccessAnyD.Visitable<N>, Serializable {
+AccessAnyD.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
 
@@ -231,39 +231,12 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return myDelegate.isZeros(0L, myDelegate.count(), 1L);
     }
 
-    public boolean isInfinite(final long index) {
-        return myDelegate.isInfinite(index);
-    }
-
-    public boolean isInfinite(final long[] reference) {
-        return myDelegate.isInfinite(AccessUtils.index(myStructure, reference));
-    }
-
-    public boolean isNaN(final long index) {
-        return myDelegate.isNaN(index);
-    }
-
-    public boolean isNaN(final long[] reference) {
-        return myDelegate.isNaN(AccessUtils.index(myStructure, reference));
-    }
-
     public boolean isPositive(final long index) {
         return myDelegate.isPositive(index);
     }
 
     public boolean isPositive(final long[] reference) {
         return myDelegate.isPositive(AccessUtils.index(myStructure, reference));
-    }
-
-    public boolean isReal(final long index) {
-        return myDelegate.isReal(index);
-    }
-
-    /**
-     * @see Scalar#isReal()
-     */
-    public boolean isReal(final long[] reference) {
-        return myDelegate.isReal(AccessUtils.index(myStructure, reference));
     }
 
     public boolean isZero(final long index) {

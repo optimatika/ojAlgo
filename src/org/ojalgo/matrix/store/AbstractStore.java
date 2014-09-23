@@ -130,36 +130,12 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return this.toScalar(row, column).isAbsolute();
     }
 
-    public boolean isInfinite(final long index) {
-        return this.toScalar(index).isInfinite();
-    }
-
-    public boolean isInfinite(final long row, final long column) {
-        return this.toScalar(row, column).isInfinite();
-    }
-
-    public boolean isNaN(final long index) {
-        return this.toScalar(index).isNaN();
-    }
-
-    public boolean isNaN(final long row, final long column) {
-        return this.toScalar(row, column).isNaN();
-    }
-
     public boolean isPositive(final long index) {
         return this.toScalar(index).isPositive();
     }
 
     public boolean isPositive(final long row, final long column) {
         return this.toScalar(row, column).isPositive();
-    }
-
-    public boolean isReal(final long index) {
-        return this.toScalar(index).isReal();
-    }
-
-    public boolean isReal(final long row, final long column) {
-        return this.toScalar(row, column).isReal();
     }
 
     public boolean isZero(final long index) {

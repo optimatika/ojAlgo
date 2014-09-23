@@ -90,31 +90,10 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     }
 
     /**
-     * @see Scalar#isInfinite()
-     */
-    public final boolean isInfinite(final long index) {
-        return this.isInfinite((int) index);
-    }
-
-    /**
-     * @see Scalar#isNaN()
-     */
-    public final boolean isNaN(final long index) {
-        return this.isNaN((int) index);
-    }
-
-    /**
      * @see Scalar#isPositive()
      */
     public final boolean isPositive(final long index) {
         return this.isPositive((int) index);
-    }
-
-    /**
-     * @see Scalar#isReal()
-     */
-    public final boolean isReal(final long index) {
-        return this.isReal((int) index);
     }
 
     /**
@@ -169,24 +148,9 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     protected abstract boolean isAbsolute(int index);
 
     /**
-     * @see Scalar#isInfinite()
-     */
-    protected abstract boolean isInfinite(int index);
-
-    /**
-     * @see Scalar#isNaN()
-     */
-    protected abstract boolean isNaN(int index);
-
-    /**
      * @see Scalar#isPositive()
      */
     protected abstract boolean isPositive(int index);
-
-    /**
-     * @see Scalar#isReal()
-     */
-    protected abstract boolean isReal(int index);
 
     /**
      * @see Scalar#isZero()

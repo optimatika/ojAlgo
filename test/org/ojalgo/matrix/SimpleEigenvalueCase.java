@@ -28,7 +28,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 
 /**
  * Gilbert Strang, Linear Algebra and its Applications III, Chapter 5
- * 
+ *
  * @author apete
  */
 public class SimpleEigenvalueCase extends BasicMatrixTest {
@@ -80,16 +80,17 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final BasicMatrix tmpMtrx = SimpleEigenvalueCase.getMatrixV().divideElements(PrimitiveMatrix.FACTORY.copy(tmpV));
+        final BigMatrix tmpExpV = SimpleEigenvalueCase.getMatrixV();
+        final PrimitiveMatrix tmpActV = PrimitiveMatrix.FACTORY.copy(tmpV);
 
+        final BasicMatrix tmpMtrx = tmpExpV.divideElements(tmpActV);
         double tmpExp;
         double tmpAct;
-        final double tmpErr = EVALUATION.error();
         for (int j = 0; j < tmpMtrx.countColumns(); j++) {
             tmpExp = tmpMtrx.doubleValue(0, j);
             for (int i = 0; i < tmpMtrx.countRows(); i++) {
                 tmpAct = tmpMtrx.doubleValue(i, j);
-                TestUtils.assertEquals(tmpExp, tmpAct, tmpErr);
+                TestUtils.assertEquals(tmpExp, tmpAct, EVALUATION);
             }
         }
 

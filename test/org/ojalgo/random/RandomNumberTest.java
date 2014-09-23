@@ -29,10 +29,11 @@ import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.type.TypeUtils;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * RandomNumberTest
- * 
+ *
  * @author apete
  * @author Chris Lucas
  */
@@ -98,7 +99,7 @@ public class RandomNumberTest extends RandomTests {
 
         double tmpStdDevCount;
         double tmpConfidence;
-        double tmpError = TestUtils.EQUALS.newScale(12).error();
+        double tmpError = TestUtils.EQUALS.newScale(12).epsilon();
 
         tmpStdDevCount = ZERO;
         tmpConfidence = ZERO;
@@ -130,7 +131,7 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals(tmpConfidence, RandomUtils.erf(tmpStdDevCount / SQRT_TWO), tmpError);
         TestUtils.assertEquals(-tmpConfidence, RandomUtils.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
 
-        tmpError = TestUtils.EQUALS.newScale(8).error();
+        tmpError = TestUtils.EQUALS.newScale(8).epsilon();
 
         tmpStdDevCount = SIX;
         tmpConfidence = 0.999999998027;
@@ -158,45 +159,39 @@ public class RandomNumberTest extends RandomTests {
 
         double tmpConfidenceLevel;
         double tmpExpected;
-        double tmpError = TestUtils.EQUALS.newScale(5).error();
+        final NumberContext tmpNewScale = TestUtils.EQUALS.newScale(5).newPrecision(2);
 
         tmpConfidenceLevel = 0.80;
         tmpExpected = 1.28155;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpError);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.90;
         tmpExpected = 1.64485;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpError);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.95;
         tmpExpected = 1.95996;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpError);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.98;
         tmpExpected = 2.32635;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpError);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.99;
         tmpExpected = 2.57583;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpError);
-
-        tmpError = TestUtils.EQUALS.newScale(3).error();
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.995;
         tmpExpected = 2.80703;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpError);
-
-        tmpError = TestUtils.EQUALS.newScale(1).error();
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.998;
         tmpExpected = 3.09023;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpError);
-
-        tmpError = TestUtils.EQUALS.newScale(0).error();
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
 
         tmpConfidenceLevel = 0.999;
         tmpExpected = 3.29052;
-        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpError);
+        TestUtils.assertEquals(tmpExpected, SQRT_TWO * RandomUtils.erfi(tmpConfidenceLevel), tmpNewScale);
     }
 
     public void testErlang() {
@@ -260,10 +255,12 @@ public class RandomNumberTest extends RandomTests {
             TestUtils.assertTrue("-" + n, Double.isNaN(RandomUtils.gamma(NEG * n)));
         }
 
+        final NumberContext tmpEval = new NumberContext(10, 10);
+
         // Positive half integer
-        for (int n = 0; n < n; n++) {
+        for (int n = 0; n < 10; n++) {
             TestUtils.assertEquals(n + ".5", (SQRT_PI * RandomUtils.factorial(2 * n)) / (Math.pow(FOUR, n) * RandomUtils.factorial(n)),
-                    RandomUtils.gamma(n + HALF), IS_ZERO);
+                    RandomUtils.gamma(n + HALF), tmpEval);
         }
 
     }

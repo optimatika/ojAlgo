@@ -46,7 +46,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-        Access1D.Visitable<N>, RandomAccess, Serializable {
+Access1D.Visitable<N>, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access1D.Factory<Array1D<N>> {
 
@@ -344,14 +344,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return myDelegate.get(myFirst + (myStep * index));
     }
 
-    /**
-     * @deprecated v36 Use {@link #indexOfLargestInRange(long,long)} instead
-     */
-    @Deprecated
-    public long getIndexOfLargestInRange(final long first, final long limit) {
-        return this.indexOfLargestInRange(first, limit);
-    }
-
     @Override
     public int indexOf(final Object obj) {
         final int tmpLength = (int) length;
@@ -395,14 +387,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return length == 0;
     }
 
-    public boolean isInfinite(final long index) {
-        return myDelegate.isInfinite(myFirst + (myStep * index));
-    }
-
-    public boolean isNaN(final long index) {
-        return myDelegate.isNaN(myFirst + (myStep * index));
-    }
-
     /**
      * @see Scalar#isPositive()
      */
@@ -412,13 +396,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public boolean isRangeZeros(final long first, final long limit) {
         return myDelegate.isZeros((myFirst + (myStep * first)), (myFirst + (myStep * limit)), myStep);
-    }
-
-    /**
-     * @see Scalar#isReal()
-     */
-    public boolean isReal(final long index) {
-        return myDelegate.isReal(myFirst + (myStep * index));
     }
 
     /**

@@ -757,24 +757,12 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return myUtility.isAbsolute(row, column);
     }
 
-    public boolean isInfinite(final long row, final long column) {
-        return myUtility.isInfinite(row, column);
-    }
-
     public boolean isLowerLeftShaded() {
         return false;
     }
 
-    public boolean isNaN(final long row, final long column) {
-        return myUtility.isNaN(row, column);
-    }
-
     public boolean isPositive(final long row, final long column) {
         return myUtility.isPositive(row, column);
-    }
-
-    public boolean isReal(final long row, final long column) {
-        return myUtility.isReal(row, column);
     }
 
     public boolean isUpperRightShaded() {

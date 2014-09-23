@@ -58,7 +58,6 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
 
     };
 
-    public static final boolean IS_REAL = true;
     public static final PrimitiveScalar NaN = new PrimitiveScalar(PrimitiveMath.NaN);
     public static final PrimitiveScalar NEGATIVE_INFINITY = new PrimitiveScalar(PrimitiveMath.NEGATIVE_INFINITY);
     public static final PrimitiveScalar ONE = new PrimitiveScalar(PrimitiveMath.ONE);
@@ -193,20 +192,8 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
         return PrimitiveScalar.isAbsolute(myValue);
     }
 
-    public boolean isInfinite() {
-        return PrimitiveScalar.isInfinite(myValue);
-    }
-
-    public boolean isNaN() {
-        return PrimitiveScalar.isNaN(myValue);
-    }
-
     public boolean isPositive() {
         return PrimitiveScalar.isPositive(myValue);
-    }
-
-    public boolean isReal() {
-        return PrimitiveScalar.IS_REAL;
     }
 
     public boolean isZero() {

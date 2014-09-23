@@ -473,13 +473,13 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
                             if (Math.abs(x) > (Math.abs(z) + Math.abs(q))) {
                                 aMtrxH[(i + 1) + (tmpDiagDim * (ij - 1))] = ((-ra - (w * aMtrxH[i + (tmpDiagDim * (ij - 1))])) + (q * aMtrxH[i
-                                        + (tmpDiagDim * ij)]))
-                                        / x;
+                                                                                                                                             + (tmpDiagDim * ij)]))
+                                                                                                                                             / x;
                                 aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-sa - (w * aMtrxH[i + (tmpDiagDim * ij)]) - (q * aMtrxH[i + (tmpDiagDim * (ij - 1))]))
                                         / x;
                             } else {
                                 final ComplexNumber tmpX1 = ComplexNumber.makeRectangular((-r - (y * aMtrxH[i + (tmpDiagDim * (ij - 1))])), (-s - (y * aMtrxH[i
-                                        + (tmpDiagDim * ij)])));
+                                                                                                                                                              + (tmpDiagDim * ij)])));
                                 final ComplexNumber tmpY1 = ComplexNumber.makeRectangular(z, q);
 
                                 final ComplexNumber tmpZ1 = tmpX1.divide(tmpY1);
@@ -1376,24 +1376,12 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return myUtility.isAbsolute(row, column);
     }
 
-    public boolean isInfinite(final long row, final long column) {
-        return myUtility.isInfinite(row, column);
-    }
-
     public boolean isLowerLeftShaded() {
         return false;
     }
 
-    public boolean isNaN(final long row, final long column) {
-        return myUtility.isNaN(row, column);
-    }
-
     public boolean isPositive(final long row, final long column) {
         return myUtility.isPositive(row, column);
-    }
-
-    public boolean isReal(final long row, final long column) {
-        return myUtility.isReal(row, column);
     }
 
     public boolean isUpperRightShaded() {

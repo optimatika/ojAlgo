@@ -111,8 +111,8 @@ public class SVDbyEvD extends AbstractMatrixDecompositionTest {
             final double tmpExpected = theSingularValues.doubleValue(ij);
             final double tmpLeftSqrt = Math.sqrt(Math.abs(tmpLeftD.doubleValue(ij, ij)));
             final double tmpRightSqrt = Math.sqrt(Math.abs(tmpRightD.doubleValue(ij, ij)));
-            TestUtils.assertEquals("Left " + ij, tmpExpected, tmpLeftSqrt, TestUtils.EQUALS.newScale(6).error());
-            TestUtils.assertEquals("Right " + ij, tmpExpected, tmpRightSqrt, TestUtils.EQUALS.newScale(6).error());
+            TestUtils.assertEquals("Left " + ij, tmpExpected, tmpLeftSqrt, TestUtils.EQUALS.newScale(6));
+            TestUtils.assertEquals("Right " + ij, tmpExpected, tmpRightSqrt, TestUtils.EQUALS.newScale(6));
         }
 
         // So far...

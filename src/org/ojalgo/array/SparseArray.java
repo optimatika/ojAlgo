@@ -43,7 +43,7 @@ import org.ojalgo.type.TypeUtils;
  *
  * @author apete
  */
-final class SparseArray<N extends Number> extends BasicArray<N> {
+public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     static abstract class SparseFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -218,39 +218,12 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public boolean isInfinite(final long index) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.isInfinite(tmpIndex);
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isNaN(final long index) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.isNaN(tmpIndex);
-        } else {
-            return false;
-        }
-    }
-
     public boolean isPositive(final long index) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
             return myValues.isPositive(tmpIndex);
         } else {
             return false;
-        }
-    }
-
-    public boolean isReal(final long index) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.isReal(tmpIndex);
-        } else {
-            return true;
         }
     }
 

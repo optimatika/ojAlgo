@@ -350,7 +350,7 @@ final class SimplexTableauSolver extends LinearSolver {
         int retVal = -1;
 
         double tmpVal;
-        double tmpMinVal = myPoint.isPhase2() ? -options.problem.error() : ZERO;
+        double tmpMinVal = myPoint.isPhase2() ? -options.problem.epsilon() : ZERO;
         //double tmpMinVal = ZERO;
 
         int tmpCol;

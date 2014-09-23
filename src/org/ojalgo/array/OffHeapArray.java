@@ -42,7 +42,7 @@ import sun.misc.Unsafe;
  *
  * @author apete
  */
-final class OffHeapArray extends BasicArray<Double> {
+public final class OffHeapArray extends BasicArray<Double> {
 
     static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
 
@@ -122,20 +122,8 @@ final class OffHeapArray extends BasicArray<Double> {
         return PrimitiveScalar.isAbsolute(UNSAFE.getDouble(this.address(index)));
     }
 
-    public boolean isInfinite(final long index) {
-        return PrimitiveScalar.isInfinite(UNSAFE.getDouble(this.address(index)));
-    }
-
-    public boolean isNaN(final long index) {
-        return PrimitiveScalar.isNaN(UNSAFE.getDouble(this.address(index)));
-    }
-
     public boolean isPositive(final long index) {
         return PrimitiveScalar.isPositive(UNSAFE.getDouble(this.address(index)));
-    }
-
-    public boolean isReal(final long index) {
-        return PrimitiveScalar.IS_REAL;
     }
 
     public boolean isZero(final long index) {

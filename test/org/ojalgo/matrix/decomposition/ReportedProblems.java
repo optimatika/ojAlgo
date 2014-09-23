@@ -141,7 +141,7 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
      */
     public void testP20110223() {
 
-        final NumberContext tmpEqualsNumberContext = TestUtils.EQUALS.newScale(12);
+        final NumberContext tmpEqualsNumberContext = TestUtils.EQUALS.newScale(11);
 
         final int tmpDim = 99;
         final PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
@@ -194,7 +194,8 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
                 BasicLogger.debug("Original", tmpHermitian);
                 BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
             }
-            TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), TestUtils.EQUALS.newScale(5));
+            TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), TestUtils.EQUALS.newScale(5)
+                    .newPrecision(8));
             if (tmpDecomposition.isSolvable()) {
                 tmpActual = tmpDecomposition.solve(tmpHermitian);
                 if (MatrixDecompositionTests.DEBUG) {

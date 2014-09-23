@@ -88,11 +88,11 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
     }
 
     public static boolean isInfinite(final ComplexNumber value) {
-        return value.isInfinite();
+        return Double.isInfinite(value.doubleValue()) || Double.isInfinite(value.i);
     }
 
     public static boolean isNaN(final ComplexNumber value) {
-        return value.isNaN();
+        return Double.isNaN(value.doubleValue()) || Double.isNaN(value.i);
     }
 
     public static boolean isPositive(final ComplexNumber value) {
@@ -377,14 +377,6 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
 
     public boolean isAbsolute() {
         return this.isReal() && (myRealValue >= PrimitiveMath.ZERO);
-    }
-
-    public boolean isInfinite() {
-        return Double.isInfinite(myRealValue) || Double.isInfinite(i);
-    }
-
-    public boolean isNaN() {
-        return Double.isNaN(myRealValue) || Double.isNaN(i);
     }
 
     public boolean isPositive() {

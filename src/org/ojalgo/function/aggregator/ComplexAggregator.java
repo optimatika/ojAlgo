@@ -383,7 +383,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public ComplexNumber getNumber() {
-                    if (myNumber.isInfinite()) {
+                    if (ComplexNumber.isInfinite(myNumber)) {
                         return ComplexNumber.ZERO;
                     } else {
                         return myNumber;
@@ -436,7 +436,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public ComplexNumber getNumber() {
-                    if (myNumber.isInfinite()) {
+                    if (ComplexNumber.isInfinite(myNumber)) {
                         return ComplexNumber.ZERO;
                     } else {
                         return myNumber;

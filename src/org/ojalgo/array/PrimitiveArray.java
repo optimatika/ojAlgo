@@ -430,23 +430,8 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
-    protected final boolean isInfinite(final int index) {
-        return PrimitiveScalar.isInfinite(data[index]);
-    }
-
-    @Override
-    protected final boolean isNaN(final int index) {
-        return PrimitiveScalar.isNaN(data[index]);
-    }
-
-    @Override
     protected final boolean isPositive(final int index) {
         return PrimitiveScalar.isPositive(data[index]);
-    }
-
-    @Override
-    protected final boolean isReal(final int index) {
-        return PrimitiveScalar.IS_REAL;
     }
 
     @Override

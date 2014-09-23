@@ -248,23 +248,8 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
     }
 
     @Override
-    protected final boolean isInfinite(final int index) {
-        return ComplexNumber.isInfinite(data[index]);
-    }
-
-    @Override
-    protected final boolean isNaN(final int index) {
-        return ComplexNumber.isNaN(data[index]);
-    }
-
-    @Override
     protected final boolean isPositive(final int index) {
         return ComplexNumber.isPositive(data[index]);
-    }
-
-    @Override
-    protected final boolean isReal(final int index) {
-        return ComplexNumber.isReal(data[index]);
     }
 
     @Override

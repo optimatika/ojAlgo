@@ -87,6 +87,18 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
+    private static final String NEW_LINE = "\n";
+    private static final String OBJ_FUNC_AS_CONSTR_NAME = UUID.randomUUID().toString();
+    private static final String START_END = "############################################\n";
+
+    static final Comparator<Expression> CE = new Comparator<Expression>() {
+
+        public int compare(final Expression o1, final Expression o2) {
+            return Integer.compare(o2.countLinearFactors(), o1.countLinearFactors());
+        }
+
+    };
+
     public static ExpressionsBasedModel make(final MathProgSysModel aModel) {
 
         final MathProgSysModel.Column[] tmpActCols = aModel.getActivatorVariableColumns();
@@ -212,16 +224,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
-    private static final String NEW_LINE = "\n";
-
-    private static final String START_END = "############################################\n";
-
-    private static final String OBJ_FUNC_AS_CONSTR_NAME = UUID.randomUUID().toString();
-
-    private final boolean myWorkCopy;
-
     private final HashMap<String, Expression> myExpressions = new HashMap<String, Expression>();
     private final HashSet<Index> myFixedVariables = new HashSet<Index>();
+
     private transient int[] myFreeIndices = null;
     private transient List<Variable> myFreeVariables = null;
     private transient int[] myIntegerIndices = null;
@@ -232,7 +237,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private transient MultiaryFunction.TwiceDifferentiable<Double> myObjectiveFunction = null;
     private transient int[] myPositiveIndices = null;
     private transient List<Variable> myPositiveVariables = null;
+
     private final ArrayList<Variable> myVariables = new ArrayList<Variable>();
+    private final boolean myWorkCopy;
 
     public ExpressionsBasedModel() {
 
@@ -691,6 +698,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
         }
 
+        //Collections.sort(retVal, CE);
         return Collections.unmodifiableList(retVal);
     }
 
@@ -707,6 +715,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
         }
 
+        //Collections.sort(retVal, CE);
         return Collections.unmodifiableList(retVal);
     }
 
@@ -723,6 +732,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
         }
 
+        //Collections.sort(retVal, CE);
         return Collections.unmodifiableList(retVal);
     }
 
@@ -739,6 +749,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
         }
 
+        //Collections.sort(retVal, CE);
         return Collections.unmodifiableList(retVal);
     }
 
@@ -755,6 +766,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
         }
 
+        //Collections.sort(retVal, CE);
         return Collections.unmodifiableList(retVal);
     }
 
@@ -771,6 +783,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             }
         }
 
+        //Collections.sort(retVal, CE);
         return Collections.unmodifiableList(retVal);
     }
 

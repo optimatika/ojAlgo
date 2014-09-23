@@ -153,14 +153,6 @@ public final class JamaFactory extends Object implements BasicMatrix.Factory<Jam
         return PrimitiveFunction.getSet();
     }
 
-    /**
-     * @deprecated Use {@link #aggregator()} instead
-     */
-    @Deprecated
-    public AggregatorCollection<Double> getAggregatorCollection() {
-        return this.aggregator();
-    }
-
     public Access2D.Builder<JamaMatrix> getBuilder(final int count) {
         return this.getBuilder(count, 1);
     }
@@ -242,46 +234,6 @@ public final class JamaFactory extends Object implements BasicMatrix.Factory<Jam
         };
     }
 
-    /**
-     * @deprecated Use {@link #function()} instead
-     */
-    @Deprecated
-    public FunctionSet<Double> getFunctionSet() {
-        return this.function();
-    }
-
-    /**
-     * @deprecated v35 Use {@link #scalar()} instead.
-     */
-    @Deprecated
-    public Double getNumber(final double value) {
-        return this.scalar().cast(value);
-    }
-
-    /**
-     * @deprecated v35 Use {@link #scalar()} instead.
-     */
-    @Deprecated
-    public Double getNumber(final Number value) {
-        return this.scalar().cast(value);
-    }
-
-    /**
-     * @deprecated v35 Use {@link #scalar()} instead.
-     */
-    @Deprecated
-    public Scalar<Double> getStaticOne() {
-        return this.scalar().one();
-    }
-
-    /**
-     * @deprecated v35 Use {@link #scalar()} instead.
-     */
-    @Deprecated
-    public Scalar<Double> getStaticZero() {
-        return this.scalar().zero();
-    }
-
     public BasicArray<Double> makeArray(final int length) {
         return PrimitiveArray.make(length);
     }
@@ -290,7 +242,7 @@ public final class JamaFactory extends Object implements BasicMatrix.Factory<Jam
 
         final JamaMatrix retVal = this.makeZero(rows, columns);
 
-        retVal.fillDiagonal(0, 0, this.getStaticOne().getNumber());
+        retVal.fillDiagonal(0, 0, this.scalar().one().getNumber());
 
         return retVal;
     }
@@ -406,22 +358,6 @@ public final class JamaFactory extends Object implements BasicMatrix.Factory<Jam
 
     public Factory<Double> scalar() {
         return PrimitiveScalar.FACTORY;
-    }
-
-    /**
-     * @deprecated v35 Use {@link #scalar()} instead.
-     */
-    @Deprecated
-    public Scalar<Double> toScalar(final double value) {
-        return this.scalar().convert(value);
-    }
-
-    /**
-     * @deprecated v35 Use {@link #scalar()} instead.
-     */
-    @Deprecated
-    public Scalar<Double> toScalar(final Number value) {
-        return this.scalar().convert(value);
     }
 
     public JamaMatrix transpose(final Access2D<?> source) {
