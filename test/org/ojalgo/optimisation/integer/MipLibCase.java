@@ -35,7 +35,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
 
     protected static final String COMPOSITION_NOT_VALID = " Composition not valid!";
     protected static final String PATH = "./test/org/ojalgo/optimisation/integer/";
-    protected static final NumberContext PRECISION = TestUtils.EQUALS.newScale(6);
+    protected static final NumberContext PRECISION = new NumberContext(7, 6);
     protected static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
     protected static void assertMinMaxVal(final String modelName, final BigDecimal expMinVal, final BigDecimal expMaxVal, final boolean relax,

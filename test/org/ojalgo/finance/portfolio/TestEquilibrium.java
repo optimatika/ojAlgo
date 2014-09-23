@@ -36,6 +36,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.StandardType;
+import org.ojalgo.type.context.NumberContext;
 
 public class TestEquilibrium extends FinancePortfolioTests {
 
@@ -169,7 +170,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
         TestUtils.assertEquals(tmpGeneratedWeights, tmpEquilibrium.calculateAssetWeights(tmpMatchingReturns), StandardType.PERCENT);
 
         final FixedWeightsPortfolio tmpFW = new FixedWeightsPortfolio(tmpEquilibrium, tmpGeneratedWeights);
-        TestUtils.assertEquals(tmpMatchingReturns, tmpFW.getAssetReturns(), TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpMatchingReturns, tmpFW.getAssetReturns(), new NumberContext(7, 6));
 
         final FixedReturnsPortfolio tmpFR = new FixedReturnsPortfolio(tmpEquilibrium, tmpMatchingReturns);
         TestUtils.assertEquals(tmpGeneratedWeights, tmpFR.getAssetWeights(), StandardType.PERCENT);

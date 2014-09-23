@@ -32,7 +32,7 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
 
     private static final String COMPOSITION_NOT_VALID = " Composition not valid!";
     private static final String PATH = "./src/org/ojalgo/optimisation/linear/mps/";
-    private static final NumberContext PRECISION = TestUtils.EQUALS.newScale(6);
+    private static final NumberContext PRECISION = new NumberContext(7, 6);
     private static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
     public LpsolveSemiContCase() {

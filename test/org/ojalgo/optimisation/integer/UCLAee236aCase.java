@@ -42,7 +42,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class UCLAee236aCase extends OptimisationIntegerTests {
 
-    static final NumberContext PRECISION = TestUtils.EQUALS.newPrecision(4).newScale(2);
+    static final NumberContext PRECISION = new NumberContext(4, 2);
 
     static ExpressionsBasedModel makeOriginalRootModel() {
 

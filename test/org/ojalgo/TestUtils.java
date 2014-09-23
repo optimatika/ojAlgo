@@ -52,7 +52,7 @@ import org.ojalgo.type.context.NumberContext;
 @SuppressWarnings("deprecation")
 public abstract class TestUtils {
 
-    public static final NumberContext EQUALS = new NumberContext(7, 14, RoundingMode.HALF_EVEN);
+    private static final NumberContext EQUALS = new NumberContext(7, 14, RoundingMode.HALF_EVEN);
 
     public static void assertBounds(final Number lower, final Access1D<?> values, final Number upper, final NumberContext precision) {
         for (final Number tmpValue : values) {
@@ -72,7 +72,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final Access1D<?> expected, final Access1D<?> actual) {
-        TestUtils.assertEquals("Access1D<?> != Access1D<?>", expected, actual, EQUALS);
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final Access1D<?> expected, final Access1D<?> actual, final NumberContext context) {
@@ -84,7 +84,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final ComplexNumber expected, final ComplexNumber actual) {
-        TestUtils.assertEquals("ComplexNumber != ComplexNumber", expected, actual, EQUALS);
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final ComplexNumber expected, final ComplexNumber actual, final NumberContext context) {
@@ -97,7 +97,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final double expected, final double actual) {
-        TestUtils.assertEquals("double != double", expected, actual, EQUALS);
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final double expected, final double actual, final double delta) {
@@ -165,7 +165,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final Number expected, final Number actual) {
-        TestUtils.assertEquals("Number != Number", expected, actual, EQUALS);
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final Number expected, final Number actual, final NumberContext context) {
@@ -177,7 +177,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final Quaternion expected, final Quaternion actual) {
-        TestUtils.assertEquals("Quaternion != Quaternion", expected, actual, EQUALS);
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final Quaternion expected, final Quaternion actual, final NumberContext context) {

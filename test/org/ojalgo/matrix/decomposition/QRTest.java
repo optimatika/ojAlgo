@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete
@@ -72,9 +73,9 @@ public class QRTest extends AbstractMatrixDecompositionTest {
             BasicLogger.debug("Should be A", tmpDecomp.getR());
         }
 
-        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, TestUtils.EQUALS.newScale(6));
-        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.makeEye(4, 4), tmpDecomp.getQ(), TestUtils.EQUALS.newScale(6));
-        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp.getR(), TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp, new NumberContext(7, 6));
+        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.makeEye(4, 4), tmpDecomp.getQ(), new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomp.getR(), new NumberContext(7, 6));
     }
 
     public void testHermitian() {
@@ -143,14 +144,14 @@ public class QRTest extends AbstractMatrixDecompositionTest {
             BasicLogger.debug("Forward R", tmpForwardR);
         }
 
-        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, new NumberContext(7, 6));
 
-        TestUtils.assertEquals(tmpDecompQ, tmpNowQ, TestUtils.EQUALS.newScale(6));
-        TestUtils.assertEquals(tmpDecompQ, tmpForwardQ, TestUtils.EQUALS.newScale(6));
-        TestUtils.assertEquals(tmpDecompQ, tmpReverseQ, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpDecompQ, tmpNowQ, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpDecompQ, tmpForwardQ, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpDecompQ, tmpReverseQ, new NumberContext(7, 6));
 
-        TestUtils.assertEquals(tmpDecompR, tmpNowR, TestUtils.EQUALS.newScale(6));
-        TestUtils.assertEquals(tmpDecompR, tmpForwardR, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpDecompR, tmpNowR, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpDecompR, tmpForwardR, new NumberContext(7, 6));
     }
 
     public void testP20030422Case() {
@@ -185,11 +186,11 @@ public class QRTest extends AbstractMatrixDecompositionTest {
             BasicLogger.debug("Primitive R", tmpPrimitiveR);
         }
 
-        TestUtils.assertEquals(tmpOriginal.toBigStore(), tmpBigDecomp, TestUtils.EQUALS);
+        TestUtils.assertEquals(tmpOriginal.toBigStore(), tmpBigDecomp, new NumberContext(7, 14));
         ;
-        TestUtils.assertEquals(tmpOriginal.toComplexStore(), tmpComplexDecomp, TestUtils.EQUALS);
+        TestUtils.assertEquals(tmpOriginal.toComplexStore(), tmpComplexDecomp, new NumberContext(7, 14));
         ;
-        TestUtils.assertEquals(tmpOriginal.toPrimitiveStore(), tmpPrimitiveDecomp, TestUtils.EQUALS);
+        TestUtils.assertEquals(tmpOriginal.toPrimitiveStore(), tmpPrimitiveDecomp, new NumberContext(7, 14));
         ;
 
     }

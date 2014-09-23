@@ -51,7 +51,7 @@ public class TestSolveAndInvert extends AbstractMatrixDecompositionTest {
 
     public void testInverseOfRandomCase() {
 
-        final NumberContext tmpEqualsNumberContext = TestUtils.EQUALS.newScale(10);
+        final NumberContext tmpEqualsNumberContext = new NumberContext(7, 10);
 
         final int tmpDim = 99;
         final PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
@@ -95,16 +95,16 @@ public class TestSolveAndInvert extends AbstractMatrixDecompositionTest {
 
         aDecomp.compute(aBody);
 
-        TestUtils.assertEquals(aSolution, aDecomp.solve(aRHS), TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(aSolution, aDecomp.solve(aRHS), new NumberContext(7, 6));
 
         final MatrixStore<Double> tmpI = aBody.factory().makeEye(aBody.countRows(), aBody.countColumns());
 
         final MatrixStore<Double> tmpExpectedInverse = aDecomp.solve(tmpI);
         aDecomp.reset();
         aDecomp.compute(aBody);
-        TestUtils.assertEquals(tmpExpectedInverse, aDecomp.getInverse(), TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpExpectedInverse, aDecomp.getInverse(), new NumberContext(7, 6));
 
-        TestUtils.assertEquals(tmpI, aBody.multiplyLeft(tmpExpectedInverse), TestUtils.EQUALS.newScale(6));
-        TestUtils.assertEquals(tmpI, aBody.multiplyRight(tmpExpectedInverse), TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpI, aBody.multiplyLeft(tmpExpectedInverse), new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpI, aBody.multiplyRight(tmpExpectedInverse), new NumberContext(7, 6));
     }
 }

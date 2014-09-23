@@ -83,7 +83,7 @@ public class P20061119Case extends BasicMatrixTest {
     @Override
     protected void setUp() throws Exception {
 
-        DEFINITION = TestUtils.EQUALS.newScale(2);
+        DEFINITION = new NumberContext(7, 2);
         EVALUATION = NumberContext.getGeneral(8).newPrecision(14);
 
         myBigAA = P20061119Case.getProblematic();

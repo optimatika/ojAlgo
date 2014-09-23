@@ -26,6 +26,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.type.context.NumberContext;
 
 public class ReportedProblems extends AbstractMatrixStoreTest {
 
@@ -90,19 +91,19 @@ public class ReportedProblems extends AbstractMatrixStoreTest {
         tmpExpected = tmpMtrxC.copy();
         tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB);
         tmpActual = tmpMtrxC.copy();
-        TestUtils.assertEquals(tmpExpected, tmpActual, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
 
         tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB.builder().transpose().build());
         tmpExpected = tmpMtrxC.copy();
         tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB.builder().transpose().build());
         tmpActual = tmpMtrxC.copy();
-        TestUtils.assertEquals(tmpExpected, tmpActual, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
 
         tmpMtrxC.fillByMultiplying(tmpMtrxA.builder().transpose().build(), tmpMtrxB);
         tmpExpected = tmpMtrxC.copy();
         tmpMtrxC.fillByMultiplying(tmpMtrxA.builder().transpose().build(), tmpMtrxB);
         tmpActual = tmpMtrxC.copy();
-        TestUtils.assertEquals(tmpExpected, tmpActual, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
     }
 
 }

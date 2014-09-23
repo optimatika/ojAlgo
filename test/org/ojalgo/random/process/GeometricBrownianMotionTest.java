@@ -39,6 +39,7 @@ import org.ojalgo.random.SampleSet;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.series.primitive.DataSeries;
 import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * RandomNumberTest
@@ -99,7 +100,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
 
     public void testDistributionConsistency() {
 
-        final double tmpError = TestUtils.EQUALS.newScale(9).epsilon();
+        final double tmpError = new NumberContext(7, 9).epsilon();
 
         GeometricBrownianMotion tmpProcess;
         LogNormal tmpDistribution;

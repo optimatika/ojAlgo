@@ -43,13 +43,13 @@ import org.ojalgo.type.context.NumberContext;
  * There are also various papers and presentations derived from that original paper available (on the Internet). To some
  * extent those are also used.
  * </p>
- * 
+ *
  * @author apete
  */
 public class BlackLittermanTest extends FinancePortfolioTests {
 
-    private static final NumberContext DEF_CNTXT = TestUtils.EQUALS.newScale(6);
-    private static final NumberContext EVAL_CNTXT = TestUtils.EQUALS.newPrecision(2).newScale(2);
+    private static final NumberContext DEF_CNTXT = new NumberContext(7, 6);
+    private static final NumberContext EVAL_CNTXT = new NumberContext(2, 2);
 
     public static String[] getAssetNames() {
         return new String[] { "US Bonds", "Int Bonds", "US Large Growth", "US Large Value", "US Small Growth", "US Small Value", "Int Dev Equity",

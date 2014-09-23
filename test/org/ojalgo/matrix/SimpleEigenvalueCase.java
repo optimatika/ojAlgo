@@ -25,6 +25,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.jama.JamaEigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Gilbert Strang, Linear Algebra and its Applications III, Chapter 5
@@ -100,8 +101,8 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
     @Override
     protected void setUp() throws Exception {
 
-        DEFINITION = TestUtils.EQUALS.newScale(1);
-        EVALUATION = TestUtils.EQUALS.newScale(3);
+        DEFINITION = new NumberContext(7, 14);
+        EVALUATION = new NumberContext(7, 3);
 
         myBigAA = SimpleEigenvalueCase.getOriginal();
         myBigAX = SimpleEigenvalueCase.getMatrixV();

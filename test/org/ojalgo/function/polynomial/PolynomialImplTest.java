@@ -58,7 +58,7 @@ public class PolynomialImplTest extends FunctionPolynomialTests {
 
             tmpPoly.estimate(ArrayUtils.wrapAccess1D(x), ArrayUtils.wrapAccess1D(y));
 
-            final NumberContext tmpEquals = TestUtils.EQUALS;
+            final NumberContext tmpEquals = new NumberContext(7, 14);
             for (int i = 0; i < tmpSamples; i++) {
                 TestUtils.assertEquals(y[i], tmpPoly.invoke(x[i]), tmpEquals);
             }

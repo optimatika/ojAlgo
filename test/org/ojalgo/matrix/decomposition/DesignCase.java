@@ -90,7 +90,7 @@ public class DesignCase extends AbstractMatrixDecompositionTest {
 
         tmpDecomposition.compute(tmpOriginalMatrix);
 
-        TestUtils.assertTrue(MatrixUtils.equals(tmpOriginalMatrix, tmpDecomposition, TestUtils.EQUALS.newScale(6)));
+        TestUtils.assertTrue(MatrixUtils.equals(tmpOriginalMatrix, tmpDecomposition, new NumberContext(7, 6)));
     }
 
     /**
@@ -143,7 +143,7 @@ public class DesignCase extends AbstractMatrixDecompositionTest {
         tmpNewDecomp.getQ1();
         tmpNewDecomp.getQ2();
 
-        TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, new NumberContext(7, 6));
     }
 
     private void doTestSolveInverse(final MatrixDecomposition<Double> aDecomp, final MatrixStore<Double> aMtrx) {

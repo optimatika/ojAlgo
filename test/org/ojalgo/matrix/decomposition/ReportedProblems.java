@@ -54,12 +54,12 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
         tmpSVD.compute(tmpA);
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("D", tmpSVD.getD(), TestUtils.EQUALS.newScale(6));
-            BasicLogger.debug("Q1", tmpSVD.getQ1(), TestUtils.EQUALS.newScale(6));
-            BasicLogger.debug("Q2", tmpSVD.getQ2(), TestUtils.EQUALS.newScale(6));
+            BasicLogger.debug("D", tmpSVD.getD(), new NumberContext(7, 6));
+            BasicLogger.debug("Q1", tmpSVD.getQ1(), new NumberContext(7, 6));
+            BasicLogger.debug("Q2", tmpSVD.getQ2(), new NumberContext(7, 6));
         }
 
-        TestUtils.assertEquals(tmpA, tmpSVD, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpA, tmpSVD, new NumberContext(7, 6));
     }
 
     /**
@@ -72,7 +72,7 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
         final QR<Double> tmpQR = QRDecomposition.makePrimitive();
         tmpQR.compute(tmpA);
 
-        TestUtils.assertEquals(tmpA, tmpQR, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
     }
 
     /**
@@ -88,7 +88,7 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
         final QR<Double> tmpQR = QRDecomposition.makePrimitive();
         tmpQR.compute(tmpA);
 
-        TestUtils.assertEquals(tmpA, tmpQR, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
     }
 
     public void testP20100512a() {
@@ -99,7 +99,7 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
         final Eigenvalue<Double> tmpPrimitive = EigenvalueDecomposition.makePrimitive();
         tmpPrimitive.compute(tmpA);
 
-        TestUtils.assertEquals(tmpA, tmpPrimitive, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpA, tmpPrimitive, new NumberContext(7, 6));
     }
 
     public void testP20100512b() {
@@ -110,7 +110,7 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
         final Eigenvalue<Double> tmpPrimitive = EigenvalueDecomposition.makePrimitive();
         tmpPrimitive.compute(tmpA, false);
 
-        TestUtils.assertEquals(tmpA, tmpPrimitive, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpA, tmpPrimitive, new NumberContext(7, 6));
     }
 
     public void testP20110126() {
@@ -124,14 +124,14 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
 
         tmpDecomp.compute(tmpA);
 
-        TestUtils.assertEquals(tmpA, tmpDecomp, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpA, tmpDecomp, new NumberContext(7, 6));
 
         final MatrixStore<Double> tmpExpected = tmpDecomp.solve(tmpI);
 
         tmpDecomp.compute(tmpA);
         final MatrixStore<Double> tmpActual = tmpDecomp.getInverse();
 
-        TestUtils.assertEquals(tmpExpected, tmpActual, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
     }
 
     /**
@@ -141,7 +141,7 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
      */
     public void testP20110223() {
 
-        final NumberContext tmpEqualsNumberContext = TestUtils.EQUALS.newScale(11);
+        final NumberContext tmpEqualsNumberContext = new NumberContext(7, 11);
 
         final int tmpDim = 99;
         final PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
@@ -194,14 +194,13 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
                 BasicLogger.debug("Original", tmpHermitian);
                 BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
             }
-            TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), TestUtils.EQUALS.newScale(5)
-                    .newPrecision(8));
+            TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), new NumberContext(8, 5));
             if (tmpDecomposition.isSolvable()) {
                 tmpActual = tmpDecomposition.solve(tmpHermitian);
                 if (MatrixDecompositionTests.DEBUG) {
                     BasicLogger.debug("Actual", tmpActual);
                 }
-                TestUtils.assertEquals("Solving: " + tmpDecomposition.toString(), tmpExpected, tmpActual, TestUtils.EQUALS.newScale(6));
+                TestUtils.assertEquals("Solving: " + tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
             }
         }
     }
@@ -235,13 +234,13 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
                 BasicLogger.debug("Original", tmpTall);
                 BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
             }
-            TestUtils.assertEquals(tmpDecomposition.toString(), tmpTall, tmpDecomposition.reconstruct(), TestUtils.EQUALS.newScale(5));
+            TestUtils.assertEquals(tmpDecomposition.toString(), tmpTall, tmpDecomposition.reconstruct(), new NumberContext(7, 5));
             if (tmpDecomposition.isSolvable()) {
                 tmpActual = tmpDecomposition.solve(tmpTall);
                 if (MatrixDecompositionTests.DEBUG) {
                     BasicLogger.debug("Actual", tmpActual);
                 }
-                TestUtils.assertEquals(tmpDecomposition.toString(), tmpExpected, tmpActual, TestUtils.EQUALS.newScale(6));
+                TestUtils.assertEquals(tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
             }
         }
     }

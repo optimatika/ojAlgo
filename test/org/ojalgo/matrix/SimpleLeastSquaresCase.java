@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright 1997-2014 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,11 +22,12 @@
 package org.ojalgo.matrix;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * An overdetermined equation system described in Scientific Computing An Introductory Survey II By Micheal T. Heath
  * Example 3.1
- * 
+ *
  * @author apete
  */
 public class SimpleLeastSquaresCase extends BasicMatrixTest {
@@ -88,8 +89,8 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     @Override
     protected void setUp() throws Exception {
 
-        DEFINITION = TestUtils.EQUALS.newScale(4);
-        EVALUATION = TestUtils.EQUALS.newScale(0); // TODO Something must be wrong here!
+        DEFINITION = new NumberContext(7, 4);
+        EVALUATION = new NumberContext(7, 0); // TODO Something must be wrong here!
 
         myBigAA = SimpleLeastSquaresCase.getFactorR();
         myBigAX = SimpleLeastSquaresCase.getSolution();

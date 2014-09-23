@@ -516,7 +516,7 @@ public class ReportedProblems extends OptimisationConvexTests {
                 -0.01750000000000, 0.01750000000000, 0.13427356981778, 0.50000000000000, -0.14913060410765, 0.06986475572103, -0.08535020176844,
                 0.00284500680371 }));
 
-        TestUtils.assertEquals(tmpMatlabResult, tmpResult, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpMatlabResult, tmpResult, new NumberContext(7, 6));
     }
 
     /**
@@ -588,7 +588,7 @@ public class ReportedProblems extends OptimisationConvexTests {
 
         final BasicMatrix tmpColumns = BigMatrix.FACTORY.columns(tmpResult);
 
-        TestUtils.assertEquals(tmpMatlabSolution, tmpColumns, TestUtils.EQUALS);
+        TestUtils.assertEquals(tmpMatlabSolution, tmpColumns, new NumberContext(7, 14));
     }
 
     /**
@@ -667,7 +667,7 @@ public class ReportedProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
         final PhysicalStore<BigDecimal> tmpSolution = BigMatrix.FACTORY.columns(tmpResult).toBigStore();
-        tmpSolution.modifyAll(TestUtils.EQUALS.newScale(6).getBigEnforceFunction());
+        tmpSolution.modifyAll(new NumberContext(7, 6).getBigEnforceFunction());
         for (final BigDecimal tmpBigDecimal : tmpSolution.asList()) {
             if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
@@ -818,11 +818,11 @@ public class ReportedProblems extends OptimisationConvexTests {
         final Result tmpResult = tmpModel.minimise();
         final double tmpObjFuncVal = tmpResult.getValue();
 
-        TestUtils.assertEquals(-5.281249989, tmpObjFuncVal, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(-5.281249989, tmpObjFuncVal, new NumberContext(7, 6));
 
         final double[] tmpExpected = new double[] { -1.1875, 1.5625, 0.375, 2.5625 };
         for (int i = 0; i < tmpExpected.length; i++) {
-            TestUtils.assertEquals(tmpExpected[i], tmpVariables[i].getValue().doubleValue(), TestUtils.EQUALS.newScale(6));
+            TestUtils.assertEquals(tmpExpected[i], tmpVariables[i].getValue().doubleValue(), new NumberContext(7, 6));
         }
 
     }
@@ -930,7 +930,7 @@ public class ReportedProblems extends OptimisationConvexTests {
         final LinearSolver tmpLinSolver = LinearSolver.make(model);
         final Optimisation.Result tmpLinResult = tmpLinSolver.solve();
 
-        TestUtils.assertTrue(model.validate(tmpLinResult, TestUtils.EQUALS.newScale(6)));
+        TestUtils.assertTrue(model.validate(tmpLinResult, new NumberContext(7, 6)));
         TestUtils.assertStateNotLessThanFeasible(tmpLinResult);
     }
 
@@ -1127,7 +1127,7 @@ public class ReportedProblems extends OptimisationConvexTests {
             }
         }
 
-        final NumberContext tmpContext = TestUtils.EQUALS.newScale(4);
+        final NumberContext tmpContext = new NumberContext(7, 4);
 
         for (int m = 0; m < tmpMatrices.length; m++) {
             if (m != 3) {

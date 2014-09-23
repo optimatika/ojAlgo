@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20050125Case;
@@ -88,7 +87,7 @@ public class EigenvalueTest extends AbstractMatrixDecompositionTest {
 
         final PhysicalStore<Double> tmpOriginalMatrix = P20050125Case.getProblematic().toPrimitiveStore();
 
-        TestUtils.assertTrue(MatrixUtils.isHermitian((Access2D<?>) tmpOriginalMatrix));
+        TestUtils.assertTrue(MatrixUtils.isHermitian(tmpOriginalMatrix));
 
         final Eigenvalue<Double>[] tmpDecomps = MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric();
         for (int d = 0; d < tmpDecomps.length; d++) {
@@ -114,7 +113,7 @@ public class EigenvalueTest extends AbstractMatrixDecompositionTest {
         }
 
         for (int d = 0; d < tmpDecomps.length; d++) {
-            TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomps[d], TestUtils.EQUALS.newScale(6));
+            TestUtils.assertEquals(tmpOriginalMatrix, tmpDecomps[d], new NumberContext(7, 6));
         }
     }
 
@@ -130,7 +129,7 @@ public class EigenvalueTest extends AbstractMatrixDecompositionTest {
 
         final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
 
-        EigenvalueTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, TestUtils.EQUALS.newScale(6));
+        EigenvalueTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 6));
     }
 
 }

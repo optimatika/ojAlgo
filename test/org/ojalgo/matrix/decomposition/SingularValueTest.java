@@ -48,10 +48,10 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
     private static final BasicMatrix SQUARE = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
     private static final BasicMatrix TALL = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 7));
 
-    static final NumberContext CNTXT_CPLX_DECOMP = TestUtils.EQUALS.newScale(5);
-    static final NumberContext CNTXT_CPLX_VALUES = TestUtils.EQUALS.newScale(7);
-    static final NumberContext CNTXT_REAL_DECOMP = TestUtils.EQUALS.newScale(6).newPrecision(4);
-    static final NumberContext CNTXT_REAL_VALUES = TestUtils.EQUALS.newScale(10);
+    static final NumberContext CNTXT_CPLX_DECOMP = new NumberContext(7, 5);
+    static final NumberContext CNTXT_CPLX_VALUES = new NumberContext(7, 7);
+    static final NumberContext CNTXT_REAL_DECOMP = new NumberContext(4, 6);
+    static final NumberContext CNTXT_REAL_VALUES = new NumberContext(7, 10);
 
     public SingularValueTest() {
         super();
@@ -125,7 +125,7 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
                 BasicLogger.debug("Q2", tmpBidiagonal.getQ2());
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
             }
-            TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, TestUtils.EQUALS.newScale(6));
+            TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, new NumberContext(7, 6));
         }
 
         for (int s = 0; s < tmpScales.length; s++) {
@@ -146,14 +146,14 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
                 BasicLogger.debug("Expected = {}", tmpExpectedSingularValues);
                 BasicLogger.debug("Actual = {}", tmpActualSingularValues);
             }
-            TestUtils.assertEquals(tmpExpectedSingularValues, tmpActualSingularValues, TestUtils.EQUALS.newScale(6));
+            TestUtils.assertEquals(tmpExpectedSingularValues, tmpActualSingularValues, new NumberContext(7, 6));
 
             final MatrixStore<ComplexNumber> tmpReconstructed = tmpSVD.reconstruct();
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug("Original", tmpOriginalMtrx);
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
             }
-            TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, TestUtils.EQUALS.newScale(6));
+            TestUtils.assertEquals(tmpOriginalMtrx, tmpReconstructed, new NumberContext(7, 6));
         }
 
     }
@@ -168,10 +168,10 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
 
         final MatrixStore<ComplexNumber> tmpReconstructed = tmpDecomposition.reconstruct();
 
-        if (!AccessUtils.equals(tmpOriginal, tmpReconstructed, TestUtils.EQUALS.newScale(6))) {
+        if (!AccessUtils.equals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6))) {
             BasicLogger.error("Recreation failed for: {}", tmpDecomposition.getClass().getName());
         }
-        if (!MatrixUtils.equals(tmpOriginal, tmpDecomposition, TestUtils.EQUALS.newScale(6))) {
+        if (!MatrixUtils.equals(tmpOriginal, tmpDecomposition, new NumberContext(7, 6))) {
             BasicLogger.error("Decomposition not correct for: {}", tmpDecomposition.getClass().getName());
         }
         if (MatrixDecompositionTests.DEBUG) {
@@ -187,8 +187,8 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
             BasicLogger.debug("Diff", tmpCopy);
         }
 
-        TestUtils.assertEquals(tmpOriginal, tmpReconstructed, TestUtils.EQUALS.newScale(6));
-        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, new NumberContext(7, 6));
 
     }
 
@@ -336,10 +336,10 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
 
             tmpImpls[i].compute(aMtrx);
             final MatrixStore<Double> tmpReconstructed = MatrixUtils.reconstruct(tmpImpls[i]);
-            if (!AccessUtils.equals(aMtrx, tmpReconstructed, TestUtils.EQUALS.newScale(6))) {
+            if (!AccessUtils.equals(aMtrx, tmpReconstructed, new NumberContext(7, 6))) {
                 BasicLogger.error("Recreation failed for: {}", tmpImpls[i].getClass().getName());
             }
-            if (!MatrixUtils.equals(aMtrx, tmpImpls[i], TestUtils.EQUALS.newScale(6))) {
+            if (!MatrixUtils.equals(aMtrx, tmpImpls[i], new NumberContext(7, 6))) {
                 BasicLogger.error("Decomposition not correct for: {}", tmpImpls[i].getClass().getName());
             }
             if (MatrixDecompositionTests.DEBUG) {

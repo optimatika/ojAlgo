@@ -45,7 +45,7 @@ public class DegenerateLUCase extends AbstractMatrixDecompositionTest {
 
     public void testBig() {
 
-        final NumberContext tmpEvalContext = TestUtils.EQUALS.newScale(4);
+        final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
         final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
@@ -64,7 +64,7 @@ public class DegenerateLUCase extends AbstractMatrixDecompositionTest {
 
     public void testComplex() {
 
-        final NumberContext tmpEvalContext = TestUtils.EQUALS.newScale(4);
+        final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
         final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
@@ -83,7 +83,7 @@ public class DegenerateLUCase extends AbstractMatrixDecompositionTest {
 
     public void testDensePrimitive() {
 
-        final NumberContext tmpEvalContext = TestUtils.EQUALS.newScale(4);
+        final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
         final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
@@ -102,7 +102,7 @@ public class DegenerateLUCase extends AbstractMatrixDecompositionTest {
 
     public void testJama() {
 
-        final NumberContext tmpEvalContext = TestUtils.EQUALS.newScale(4);
+        final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
         final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
@@ -121,7 +121,7 @@ public class DegenerateLUCase extends AbstractMatrixDecompositionTest {
 
     public void testRawPrimitive() {
 
-        final NumberContext tmpEvalContext = TestUtils.EQUALS.newScale(4);
+        final NumberContext tmpEvalContext = new NumberContext(7, 4);
 
         final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());

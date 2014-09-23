@@ -99,7 +99,7 @@ public class RandomNumberTest extends RandomTests {
 
         double tmpStdDevCount;
         double tmpConfidence;
-        double tmpError = TestUtils.EQUALS.newScale(12).epsilon();
+        double tmpError = new NumberContext(7, 12).epsilon();
 
         tmpStdDevCount = ZERO;
         tmpConfidence = ZERO;
@@ -131,7 +131,7 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals(tmpConfidence, RandomUtils.erf(tmpStdDevCount / SQRT_TWO), tmpError);
         TestUtils.assertEquals(-tmpConfidence, RandomUtils.erf(-tmpStdDevCount / SQRT_TWO), tmpError);
 
-        tmpError = TestUtils.EQUALS.newScale(8).epsilon();
+        tmpError = new NumberContext(7, 8).epsilon();
 
         tmpStdDevCount = SIX;
         tmpConfidence = 0.999999998027;
@@ -159,7 +159,7 @@ public class RandomNumberTest extends RandomTests {
 
         double tmpConfidenceLevel;
         double tmpExpected;
-        final NumberContext tmpNewScale = TestUtils.EQUALS.newScale(5).newPrecision(2);
+        final NumberContext tmpNewScale = new NumberContext(2, 5);
 
         tmpConfidenceLevel = 0.80;
         tmpExpected = 1.28155;

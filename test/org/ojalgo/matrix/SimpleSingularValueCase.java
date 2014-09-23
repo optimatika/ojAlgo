@@ -26,10 +26,11 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.jama.JamaSingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Gilbert Strang, Linear Algebra and its Applications III, Example 1 in Appendix A
- * 
+ *
  * @author apete
  */
 public class SimpleSingularValueCase extends BasicMatrixTest {
@@ -87,8 +88,8 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
     @Override
     protected void setUp() throws Exception {
 
-        DEFINITION = TestUtils.EQUALS.newScale(1);
-        EVALUATION = TestUtils.EQUALS.newScale(9);
+        DEFINITION = new NumberContext(7, 1);
+        EVALUATION = new NumberContext(7, 9);
 
         myBigAA = SimpleSingularValueCase.getMatrixQ1();
         myBigAX = SimpleSingularValueCase.getMatrixD();
