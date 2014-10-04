@@ -34,7 +34,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.UpperTriangularStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -204,12 +203,12 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
 
         int retVal = 0;
 
-        final int tmpLength = (int) Math.min(this.getInPlace().countRows(), this.getInPlace().countColumns());
+        final DecompositionStore<N> tmpInPlace = this.getInPlace();
 
-        Scalar<N> tmpVal;
+        final int tmpLength = (int) Math.min(tmpInPlace.countRows(), tmpInPlace.countColumns());
+
         for (int ij = 0; ij < tmpLength; ij++) {
-            tmpVal = this.getInPlace().toScalar(ij, ij);
-            if (!tmpVal.isZero()) {
+            if (!tmpInPlace.isZero(ij, ij)) {
                 retVal++;
             }
         }

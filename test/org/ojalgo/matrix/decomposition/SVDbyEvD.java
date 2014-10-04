@@ -32,7 +32,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class SVDbyEvD extends AbstractMatrixDecompositionTest {
+public class SVDbyEvD extends MatrixDecompositionTests {
 
     public SVDbyEvD() {
         super();

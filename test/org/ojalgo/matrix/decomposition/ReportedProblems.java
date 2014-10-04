@@ -32,7 +32,7 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-public class ReportedProblems extends AbstractMatrixDecompositionTest {
+public class ReportedProblems extends MatrixDecompositionTests {
 
     public ReportedProblems() {
         super();
@@ -181,11 +181,11 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
 
         @SuppressWarnings("unchecked")
         final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { BidiagonalDecomposition.makeComplex(),
-            CholeskyDecomposition.makeComplex(), EigenvalueDecomposition.makeComplex()/*
-                                                                                           * , HessenbergDecomposition.
-                                                                                           * makeComplex()
-                                                                                           */, LUDecomposition.makeComplex(), QRDecomposition.makeComplex(),
-                SingularValueDecomposition.makeComplex() /* , TridiagonalDecomposition.makeComplex() */};
+                CholeskyDecomposition.makeComplex(), EigenvalueDecomposition.makeComplex()/*
+             * , HessenbergDecomposition.
+             * makeComplex()
+             */, LUDecomposition.makeComplex(), QRDecomposition.makeComplex(),
+             SingularValueDecomposition.makeComplex() /* , TridiagonalDecomposition.makeComplex() */};
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.compute(tmpHermitian);
@@ -218,14 +218,14 @@ public class ReportedProblems extends AbstractMatrixDecompositionTest {
 
         @SuppressWarnings("unchecked")
         final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { BidiagonalDecomposition.makeComplex()/*
-                                                                                                                                       * ,
-                                                                                                                                       * LUDecomposition
-                                                                                                                                       * .
-                                                                                                                                       * makeComplex
-                                                                                                                                       * (
-                                                                                                                                       * )
-                                                                                                                                       */,
-                QRDecomposition.makeComplex(), SingularValueDecomposition.makeComplex() };
+         * ,
+         * LUDecomposition
+         * .
+         * makeComplex
+         * (
+         * )
+         */,
+         QRDecomposition.makeComplex(), SingularValueDecomposition.makeComplex() };
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.compute(tmpTall);

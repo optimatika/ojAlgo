@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.jama;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -29,7 +30,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * This class adapts JAMA's LUDecomposition to ojAlgo's {@linkplain LU} interface.
- * 
+ *
  * @author apete
  */
 public final class JamaLU extends JamaAbstractDecomposition implements LU<Double> {
@@ -82,7 +83,7 @@ public final class JamaLU extends JamaAbstractDecomposition implements LU<Double
         final int tmpMinDim = (int) Math.min(tmpU.countRows(), tmpU.countColumns());
 
         for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpU.toScalar(ij, ij).isZero()) {
+            if (!tmpU.toScalar(ij, ij).isSmall(PrimitiveMath.ONE)) {
                 retVal++;
             }
         }

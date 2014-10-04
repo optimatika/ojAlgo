@@ -588,7 +588,7 @@ public class ReportedProblems extends OptimisationConvexTests {
 
         final BasicMatrix tmpColumns = BigMatrix.FACTORY.columns(tmpResult);
 
-        TestUtils.assertEquals(tmpMatlabSolution, tmpColumns, new NumberContext(7, 14));
+        TestUtils.assertEquals(tmpMatlabSolution, tmpColumns, new NumberContext(7, 11));
     }
 
     /**
@@ -1127,7 +1127,7 @@ public class ReportedProblems extends OptimisationConvexTests {
             }
         }
 
-        final NumberContext tmpContext = new NumberContext(7, 4);
+        final NumberContext tmpContext = new NumberContext(6, 4);
 
         for (int m = 0; m < tmpMatrices.length; m++) {
             if (m != 3) {

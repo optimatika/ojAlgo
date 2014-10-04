@@ -46,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
  * {@linkplain #makeBig()}, {@linkplain #makeComplex()}, {@linkplain #makePrimitive()} or {@linkplain #makeJama()}.
- * 
+ *
  * @author apete
  */
 public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LU<N> {
@@ -220,14 +220,12 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
 
         final DecompositionStore<N> tmpStore = this.getInPlace();
 
-        final int tmpMinDim = (int) Math.min(tmpStore.countRows(), tmpStore.countColumns());
+        final int tmpMinDim = this.getMinDim();
+
         for (int ij = 0; ij < tmpMinDim; ij++) {
             if (!tmpStore.isZero(ij, ij)) {
                 retVal++;
             }
-            //            if (!TypeUtils.isZero(tmpStore.doubleValue(ij, ij), PrimitiveMath.IS_ZERO)) {
-            //                retVal++;
-            //            }
         }
 
         return retVal;
@@ -290,19 +288,19 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
 
     /**
      * Solves [this][X] = [aRHS] by first solving
-     * 
+     *
      * <pre>
      * [L][Y] = [aRHS]
      * </pre>
-     * 
+     *
      * and then
-     * 
+     *
      * <pre>
      * [U][X] = [Y]
      * </pre>
-     * 
+     *
      * .
-     * 
+     *
      * @param rhs The right hand side
      * @return [X] The solution will be written to "preallocated" and then returned.
      * @see org.ojalgo.matrix.decomposition.AbstractDecomposition#solve(Access2D,

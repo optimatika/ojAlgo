@@ -33,7 +33,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class HessenbergTest extends AbstractMatrixDecompositionTest {
+public class HessenbergTest extends MatrixDecompositionTests {
 
     public HessenbergTest() {
         super();

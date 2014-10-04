@@ -38,7 +38,6 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.scalar.Scalar.Factory;
 
 /**
@@ -199,24 +198,6 @@ public final class JamaFactory extends Object implements BasicMatrix.Factory<Jam
                 return this;
             }
 
-            public int getColDim() {
-                return tmpDelegate.getColDim();
-            }
-
-            public int getRowDim() {
-                return tmpDelegate.getRowDim();
-            }
-
-            public Builder<JamaMatrix> set(final long index, final double aNmbr) {
-                tmpDelegate.set(index, aNmbr);
-                return this;
-            }
-
-            public Builder<JamaMatrix> set(final long aRow, final long aCol, final double aNmbr) {
-                tmpDelegate.set((int) aRow, (int) aCol, aNmbr);
-                return this;
-            }
-
             public Builder<JamaMatrix> set(final long aRow, final long aCol, final Number aNmbr) {
                 tmpDelegate.set((int) aRow, (int) aCol, aNmbr);
                 return this;
@@ -229,6 +210,16 @@ public final class JamaFactory extends Object implements BasicMatrix.Factory<Jam
 
             public int size() {
                 return tmpDelegate.getRowDim() * tmpDelegate.getColDim();
+            }
+
+            public Access1D.Builder<JamaMatrix> set(final long index, final double value) {
+                tmpDelegate.set(index, value);
+                return this;
+            }
+
+            public Builder<JamaMatrix> set(final long row, final long column, final double value) {
+                tmpDelegate.set((int) row, (int) column, value);
+                return this;
             }
 
         };

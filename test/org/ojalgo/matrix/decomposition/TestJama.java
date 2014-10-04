@@ -40,7 +40,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public class TestJama extends AbstractMatrixDecompositionTest {
+public class TestJama extends MatrixDecompositionTests {
 
     private static Cholesky<Double> CHOLESKY = new JamaCholesky();
     private static Eigenvalue<Double> EIGENVALUE = new JamaEigenvalue.General();

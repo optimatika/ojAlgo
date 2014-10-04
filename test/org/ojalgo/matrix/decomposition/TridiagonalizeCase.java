@@ -37,7 +37,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class TridiagonalizeCase extends AbstractMatrixDecompositionTest {
+public class TridiagonalizeCase extends MatrixDecompositionTests {
 
     public TridiagonalizeCase() {
         super();

@@ -251,7 +251,7 @@ public class RationalArray extends DenseArray<RationalNumber> {
 
     @Override
     protected final boolean isZero(final int index) {
-        return data[index].isZero();
+        return RationalNumber.isZero(data[index]);
     }
 
     @Override

@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class DesignCase extends AbstractMatrixDecompositionTest {
+public class DesignCase extends MatrixDecompositionTests {
 
     public DesignCase() {
         super();

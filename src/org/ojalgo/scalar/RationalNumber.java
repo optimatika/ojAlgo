@@ -64,7 +64,6 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
     public static final RationalNumber NEGATIVE_INFINITY = new RationalNumber(BigInteger.ONE.negate(), BigInteger.ZERO);
     public static final RationalNumber ONE = new RationalNumber(BigInteger.ONE, BigInteger.ONE);
     public static final RationalNumber POSITIVE_INFINITY = new RationalNumber(BigInteger.ONE, BigInteger.ZERO);
-    public static final NumberContext PRECISION = NumberContext.getMath(MathContext.DECIMAL128).newScale(32);
     public static final RationalNumber TWO = new RationalNumber(BigInteger.ONE.add(BigInteger.ONE), BigInteger.ONE);
     public static final RationalNumber ZERO = new RationalNumber(BigInteger.ZERO, BigInteger.ONE);
 
@@ -136,11 +135,15 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
     }
 
     public static boolean isPositive(final RationalNumber value) {
-        return value.isPositive();
+        return (value.getNumerator().signum() > 0) && (value.getDenominator().signum() > 0);
+    }
+
+    public static boolean isSmall(final double reference, final RationalNumber value) {
+        return value.isSmall(reference);
     }
 
     public static boolean isZero(final RationalNumber value) {
-        return value.isZero();
+        return (value.getNumerator().signum() == 0) && (value.getDenominator().signum() != 0);
     }
 
     private static String toString(final RationalNumber aNmbr) {
@@ -381,12 +384,8 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
         return (myNumerator.signum() >= 0) && (myDenominator.signum() > 0);
     }
 
-    public boolean isPositive() {
-        return (myNumerator.signum() > 0) && (myDenominator.signum() > 0);
-    }
-
-    public boolean isZero() {
-        return (myNumerator.signum() == 0) && (myDenominator.signum() != 0);
+    public boolean isSmall(final double reference) {
+        return AbstractScalar.BIG.isSmallComparedTo(reference, this.doubleValue());
     }
 
     @Override
@@ -432,7 +431,7 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
     }
 
     public RationalNumber signum() {
-        if (this.isZero()) {
+        if (RationalNumber.isZero(this)) {
             return ZERO;
         } else if (this.sign() == -1) {
             return ONE.negate();
@@ -468,7 +467,7 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
 
     public BigDecimal toBigDecimal() {
         if (myDecimal == null) {
-            myDecimal = this.toBigDecimal(PRECISION.getMathContext());
+            myDecimal = this.toBigDecimal(AbstractScalar.BIG.getMathContext());
         }
         return myDecimal;
     }

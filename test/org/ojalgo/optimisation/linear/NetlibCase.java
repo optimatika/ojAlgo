@@ -49,8 +49,8 @@ public class NetlibCase extends OptimisationLinearTests {
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
         final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
 
-        //        tmpModel.options.problem = new NumberContext(16, 8, RoundingMode.HALF_EVEN);
-        //        tmpModel.options.solution = new NumberContext(16, 10, RoundingMode.HALF_EVEN);
+        //tmpModel.options.problem = new NumberContext(32, 8, RoundingMode.HALF_EVEN);
+        //tmpModel.options.solution = new NumberContext(16, 10, RoundingMode.HALF_EVEN);
 
         tmpModel.options.debug(LinearSolver.class);
 

@@ -73,11 +73,11 @@ public class StrategyMixer extends OptimisationIntegerTests {
         final Uniform tmpGen = new Uniform();
 
         final FinancePortfolio tmpStrat1 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
-        .normalise();
+                .normalise();
         final FinancePortfolio tmpStrat2 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
-        .normalise();
+                .normalise();
         final FinancePortfolio tmpStrat3 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
-        .normalise();
+                .normalise();
 
         final PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
 

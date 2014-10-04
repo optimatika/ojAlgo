@@ -399,7 +399,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final RationalNumber anArg) {
-                    if (!anArg.isZero()) {
+                    if (!RationalNumber.isZero(anArg)) {
                         myNumber = RationalFunction.MIN.invoke(myNumber, ABS.invoke(anArg));
                     }
                 }

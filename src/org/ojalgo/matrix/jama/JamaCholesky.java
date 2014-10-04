@@ -23,6 +23,7 @@ package org.ojalgo.matrix.jama;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -31,7 +32,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * This class adapts JAMA's CholeskyDecomposition to ojAlgo's {@linkplain Cholesky} interface.
- * 
+ *
  * @author apete
  */
 public final class JamaCholesky extends JamaAbstractDecomposition implements Cholesky<Double> {
@@ -149,7 +150,7 @@ public final class JamaCholesky extends JamaAbstractDecomposition implements Cho
         final int tmpMinDim = (int) tmpD.countRows();
 
         for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpD.toScalar(ij, ij).isZero()) {
+            if (!tmpD.toScalar(ij, ij).isSmall(PrimitiveMath.ONE)) {
                 retVal++;
             }
         }
@@ -181,7 +182,7 @@ public final class JamaCholesky extends JamaAbstractDecomposition implements Cho
         final int tmpMinDim = (int) tmpD.countRows();
 
         for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
-            retVal &= !tmpD.toScalar(ij, ij).isZero();
+            retVal &= !tmpD.toScalar(ij, ij).isSmall(PrimitiveMath.ONE);
         }
 
         return !retVal;
@@ -203,7 +204,7 @@ public final class JamaCholesky extends JamaAbstractDecomposition implements Cho
         final int tmpMinDim = (int) tmpD.countRows();
 
         for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
-            retVal &= !tmpD.toScalar(ij, ij).isZero();
+            retVal &= !tmpD.toScalar(ij, ij).isSmall(PrimitiveMath.ONE);
         }
 
         return retVal;

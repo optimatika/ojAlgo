@@ -254,7 +254,7 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
 
     @Override
     protected final boolean isZero(final int index) {
-        return data[index].isZero();
+        return ComplexNumber.isZero(data[index]);
     }
 
     @Override

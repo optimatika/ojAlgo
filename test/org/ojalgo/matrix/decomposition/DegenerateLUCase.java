@@ -33,7 +33,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class DegenerateLUCase extends AbstractMatrixDecompositionTest {
+public class DegenerateLUCase extends MatrixDecompositionTests {
 
     public DegenerateLUCase() {
         super();

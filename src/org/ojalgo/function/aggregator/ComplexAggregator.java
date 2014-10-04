@@ -395,7 +395,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final ComplexNumber anArg) {
-                    if (!anArg.isZero()) {
+                    if (!ComplexNumber.isZero(anArg)) {
                         myNumber = ComplexFunction.MIN.invoke(myNumber, ABS.invoke(anArg));
                     }
                 }

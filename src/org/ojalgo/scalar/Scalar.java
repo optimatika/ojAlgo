@@ -50,8 +50,8 @@ import org.ojalgo.type.context.NumberContext;
  * commutative then the group is called an abelian group or simply a commutative group.
  * </p>
  * <p>
- * A ring is a commutative {@linkplain Group} (add operation) with a second binary operation (multiply) that is
- * distributive over the commutative group operation and is associative.
+ * A ring is a commutative Group (add operation) with a second binary operation (multiply) that is distributive over the
+ * commutative group operation and is associative.
  * </p>
  * <p>
  * A field is a commutative ring (even the multiplication operation) with notions of addition, subtraction,
@@ -165,34 +165,15 @@ public interface Scalar<N extends Number> extends Comparable<N> {
      * @return true if this is equal to its own norm, modulus or absolute value (non-negative real part and no imaginary
      *         part); otherwise false.
      * @see #isAbsolute()
-     * @see #isPositive()
-     * @see #isZero()
      */
     boolean isAbsolute();
 
-    /**
-     * Defined as {@link #isAbsolute()} and not {@link #isZero()}. Note that the exact definition/behaviour of
-     * {@link #isZero()} is specific to the implementation.
-     *
-     * @see #isAbsolute()
-     * @see #isPositive()
-     * @see #isZero()
-     * @deprecated v36 Only plan to keep {@link #isAbsolute()} and {@link #isZero()}.
-     */
-    @Deprecated
-    boolean isPositive();
+    boolean isSmall(double reference);
 
     /**
-     * Is this scalar (practically) zero or not. Typically a small range around zero needs to be interpreted as zero.
-     * The exact size of that range depends on the characteristics/capabillities of the specific implementation. The
-     * potential exactness of for instance {@link BigScalar} or {@link RationalNumber} should be reflected here as
-     * having small(er), or empty, zero-intevalls.
-     *
-     * @return true if the norm, modulus or absolute value is (practically) zero; otherwise false.
-     * @see #isAbsolute()
-     * @see #isPositive()
-     * @see #isZero()
+     * @deprecated v37 Use {@link #isSmall(double)} instead.
      */
+    @Deprecated
     boolean isZero();
 
     /**

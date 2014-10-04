@@ -53,7 +53,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
 
     public static String[] getAssetNames() {
         return new String[] { "US Bonds", "Int Bonds", "US Large Growth", "US Large Value", "US Small Growth", "US Small Value", "Int Dev Equity",
-                "Int Emerg Equity" };
+        "Int Emerg Equity" };
     }
 
     public static BasicMatrix getCAPMReturns() {
@@ -177,7 +177,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     }
 
     public static BigDecimal getRiskAversionFactor() {
-        return BlackLittermanTest.DEF_CNTXT.enforce(new BigDecimal(3.07));
+        return BlackLittermanTest.DEF_CNTXT.enforce(BigDecimal.valueOf(3.07));
     }
 
     public static BasicMatrix getVarianceOfInvestorViewPortfolios() {
@@ -188,7 +188,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
     }
 
     public static BigDecimal getWeightOnViews() {
-        return BlackLittermanTest.DEF_CNTXT.enforce(new BigDecimal(0.025));
+        return BlackLittermanTest.DEF_CNTXT.enforce(BigDecimal.valueOf(0.025));
     }
 
     private static BasicMatrix make(final double[][] anArray) {

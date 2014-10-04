@@ -34,7 +34,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class BidiagonalTest extends AbstractMatrixDecompositionTest {
+public class BidiagonalTest extends MatrixDecompositionTests {
 
     public BidiagonalTest() {
         super();

@@ -37,7 +37,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-public class SingularValueTest extends AbstractMatrixDecompositionTest {
+public class SingularValueTest extends MatrixDecompositionTests {
 
     private static final SingularValue<BigDecimal> BIG = SingularValueDecomposition.makeBig();
     private static final SingularValue<ComplexNumber> COMPLEX = SingularValueDecomposition.makeComplex();
@@ -231,10 +231,10 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
         final PhysicalStore<ComplexNumber> tmpComplexStore = original.toComplexStore();
         final PhysicalStore<Double> tmpPrimitiveStore = original.toPrimitiveStore();
 
-        BIG.compute(tmpBigStore);
-        COMPLEX.compute(tmpComplexStore);
-        JAMA.compute(tmpPrimitiveStore);
-        DIRECT.compute(tmpPrimitiveStore);
+        BIG.compute(original);
+        COMPLEX.compute(original);
+        JAMA.compute(original);
+        DIRECT.compute(original);
 
         final Array1D<Double> tmpBigSingularValues = BIG.getSingularValues();
         final Array1D<Double> tmpComplexSingularValues = COMPLEX.getSingularValues();
@@ -242,10 +242,10 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
         final Array1D<Double> tmpDirectSingularValues = DIRECT.getSingularValues();
 
         UnaryFunction<Double> tmpPrimitiveRoundFunction = CNTXT_REAL_VALUES.getPrimitiveRoundFunction();
-        tmpBigSingularValues.modifyAll(tmpPrimitiveRoundFunction);
-        tmpComplexSingularValues.modifyAll(tmpPrimitiveRoundFunction);
-        tmpJamaSingularValues.modifyAll(tmpPrimitiveRoundFunction);
-        tmpDirectSingularValues.modifyAll(tmpPrimitiveRoundFunction);
+        //        tmpBigSingularValues.modifyAll(tmpPrimitiveRoundFunction);
+        //        tmpComplexSingularValues.modifyAll(tmpPrimitiveRoundFunction);
+        //        tmpJamaSingularValues.modifyAll(tmpPrimitiveRoundFunction);
+        //        tmpDirectSingularValues.modifyAll(tmpPrimitiveRoundFunction);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
@@ -253,7 +253,14 @@ public class SingularValueTest extends AbstractMatrixDecompositionTest {
             BasicLogger.debug("Cmplx S: {}.", tmpComplexSingularValues);
             BasicLogger.debug("Jama  S: {}.", tmpJamaSingularValues);
             BasicLogger.debug("Direc S: {}.", tmpDirectSingularValues);
+        }
 
+        if (MatrixDecompositionTests.DEBUG) {
+            BasicLogger.debug();
+            BasicLogger.debug("Big   rank: {}.", BIG.getRank());
+            BasicLogger.debug("Cmplx rank: {}.", COMPLEX.getRank());
+            BasicLogger.debug("Jama  rank: {}.", JAMA.getRank());
+            BasicLogger.debug("Direc rank: {}.", DIRECT.getRank());
         }
 
         if (MatrixDecompositionTests.DEBUG) {

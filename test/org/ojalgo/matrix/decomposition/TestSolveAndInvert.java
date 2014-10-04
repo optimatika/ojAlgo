@@ -33,7 +33,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class TestSolveAndInvert extends AbstractMatrixDecompositionTest {
+public class TestSolveAndInvert extends MatrixDecompositionTests {
 
     static MatrixDecomposition<Double>[] getAllSquare() {
         return (MatrixDecomposition<Double>[]) new MatrixDecomposition<?>[] { LUDecomposition.makePrimitive(), LUDecomposition.makeJama(),

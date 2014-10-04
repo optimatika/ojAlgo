@@ -39,7 +39,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class QRTest extends AbstractMatrixDecompositionTest {
+public class QRTest extends MatrixDecompositionTests {
 
     private static final int DIMENSION = 4;
 

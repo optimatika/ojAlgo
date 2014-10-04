@@ -148,13 +148,13 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     /**
-     * The scale will be set to the same as the precision.
+     * The scale will be undefined/unlimited.
      */
     public static NumberContext getMath(final MathContext context) {
 
         final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
         final int tmpPrecision = context.getPrecision();
-        final int tmpScale = tmpPrecision;
+        final int tmpScale = DEFAULT_SCALE;
         final RoundingMode tmpRoundingMode = context.getRoundingMode();
 
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);

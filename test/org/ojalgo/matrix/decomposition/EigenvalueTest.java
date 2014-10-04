@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class EigenvalueTest extends AbstractMatrixDecompositionTest {
+public class EigenvalueTest extends MatrixDecompositionTests {
 
     static final class EvD {
 

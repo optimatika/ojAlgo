@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class SchurTest extends AbstractMatrixDecompositionTest {
+public class SchurTest extends MatrixDecompositionTests {
 
     private static void doTest(final PhysicalStore<Double> originalMatrix, final Array1D<ComplexNumber> expectedDiagonal, final NumberContext accuracyContext) {
 
