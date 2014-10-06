@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
@@ -143,7 +144,7 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
     }
 
     public static boolean isZero(final RationalNumber value) {
-        return (value.getNumerator().signum() == 0) && (value.getDenominator().signum() != 0);
+        return ((value.getNumerator().signum() == 0) && (value.getDenominator().signum() != 0)) || RationalNumber.isSmall(PrimitiveMath.ONE, value);
     }
 
     private static String toString(final RationalNumber aNmbr) {

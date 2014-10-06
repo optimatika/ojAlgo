@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function;
 
-public interface NullaryFunction<N extends Number> extends Function<N> {
+public interface NullaryFunction<N extends Number> extends BasicFunction<N> {
 
     double doubleValue();
 

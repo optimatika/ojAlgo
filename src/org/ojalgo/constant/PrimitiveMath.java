@@ -67,37 +67,41 @@ public abstract class PrimitiveMath {
 
     /**
      * ≈ 1.6E-291
+     * 
+     * @deprecated v37 Will at least be renamed
      */
+    @Deprecated
     public static final double TINY = Math.pow(2.0, -966.0);
     /**
      * ≈ 5.96E-8
      *
-     * @deprecated
+     * @deprecated v37
      */
     @Deprecated
     public static final float MACHINE_FLOAT_ERROR;
     /**
      * ≈ 1.11E-16
      *
-     * @deprecated Use {@link #MACHINE_EPSILON} instead.
+     * @deprecated v37 Use {@link #MACHINE_EPSILON} instead.
      */
     @Deprecated
     public static final double MACHINE_DOUBLE_ERROR;
     /**
      * ≈ 3.33E-15
      *
-     * @Deprecated Bad idea!
+     * @deprecated v37 Bad idea!
      */
+    @Deprecated
     public static final double IS_ZERO = 1E-14 / THREE;
     public static final double POSITIVE_INFINITY = Double.POSITIVE_INFINITY;
     public static final double NEGATIVE_INFINITY = Double.NEGATIVE_INFINITY;
     /**
-     * @deprecated Use {@link #MACHINE_LARGEST} instead.
+     * @deprecated v37 Use {@link #MACHINE_LARGEST} instead.
      */
     @Deprecated
     public static final double MAX_VALUE = Double.MAX_VALUE;
     /**
-     * @deprecated Use {@link #MACHINE_SMALLEST} instead.
+     * @deprecated v37 Use {@link #MACHINE_SMALLEST} instead.
      */
     @Deprecated
     public static final double MIN_VALUE = Double.MIN_VALUE;
@@ -110,8 +114,8 @@ public abstract class PrimitiveMath {
     public static final double MACHINE_EPSILON = Math.pow(2.0, -52.0);
 
     private static final int[] PRIME = new int[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103,
-        107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263,
-        269, 271 };
+            107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263,
+            269, 271 };
 
     public static final int[] POWERS_OF_2 = new int[] { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 
@@ -144,8 +148,8 @@ public abstract class PrimitiveMath {
         MACHINE_DOUBLE_ERROR = Math.max(tmpAddD, tmpSubD);
     }
 
-    public static final int getPrimeNumber(final int anIndex) {
-        return PRIME[anIndex];
+    public static final int getPrimeNumber(final int index) {
+        return PRIME[index];
     }
 
     private PrimitiveMath() {

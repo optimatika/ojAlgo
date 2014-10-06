@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function;
 
-public interface UnaryFunction<N extends Number> extends Function<N> {
+public interface UnaryFunction<N extends Number> extends BasicFunction<N> {
 
     double invoke(double arg);
 

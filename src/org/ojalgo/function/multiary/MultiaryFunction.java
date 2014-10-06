@@ -22,11 +22,11 @@
 package org.ojalgo.function.multiary;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.Function;
+import org.ojalgo.function.BasicFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-public interface MultiaryFunction<N extends Number> extends Function<N> {
+public interface MultiaryFunction<N extends Number> extends BasicFunction<N> {
 
     public static interface Constant<N extends Number, F extends Constant<N, ?>> extends MultiaryFunction<N> {
 
