@@ -64,7 +64,7 @@ public class KKTSolverTest extends FunctionalityTest {
         // LagrangeSolver
         tmpMatrices[4] = BigMatrix.FACTORY.rows(new double[][] { { 2.0 }, { 3.0 }, { 4.0 } });
 
-        this.doTest(tmpMatrices, true, TestUtils.EQUALS);
+        this.doTest(tmpMatrices, true, new NumberContext(7, 14));
 
     }
 
@@ -108,7 +108,7 @@ public class KKTSolverTest extends FunctionalityTest {
         // LagrangeSolver
         tmpMatrices[4] = tmpMatrices[3];
 
-        this.doTest(tmpMatrices, false, TestUtils.EQUALS.newScale(8)); // A not full row rank
+        this.doTest(tmpMatrices, false, new NumberContext(7, 8)); // A not full row rank
     }
 
     /**
@@ -152,7 +152,7 @@ public class KKTSolverTest extends FunctionalityTest {
         // LagrangeSolver
         tmpMatrices[4] = BigMatrix.FACTORY.rows(new double[][] { { 0.0000 }, { 0.0000 }, { 0.0000 }, { 0.0000 }, { 0.8709 }, { 0.0000 }, { 0.1291 } });
 
-        this.doTest(tmpMatrices, true, TestUtils.EQUALS.newScale(2));
+        this.doTest(tmpMatrices, true, new NumberContext(3, 3));
     }
 
     /**
@@ -183,7 +183,7 @@ public class KKTSolverTest extends FunctionalityTest {
         final BasicMatrix tmpLHS = tmpMatrices[0].multiplyRight(tmpMatrices[4]);
         final BasicMatrix tmpRHS = tmpMatrices[1];
 
-        this.doTest(tmpMatrices, false, TestUtils.EQUALS); // A not full row rank
+        this.doTest(tmpMatrices, false, new NumberContext(7, 14)); // A not full row rank
     }
 
     /**
@@ -210,7 +210,7 @@ public class KKTSolverTest extends FunctionalityTest {
         // LagrangeSolver
         tmpMatrices[4] = BigMatrix.FACTORY.rows(new double[][] { { 0.25 }, { 0.25 }, { 0.25 }, { 0.25 }, { 0.0 } });
 
-        this.doTest(tmpMatrices, false, TestUtils.EQUALS.newScale(7)); // A not full row rank
+        this.doTest(tmpMatrices, false, new NumberContext(7, 7)); // A not full row rank
     }
 
     /**
@@ -239,7 +239,7 @@ public class KKTSolverTest extends FunctionalityTest {
         tmpMatrices[4] = BigMatrix.FACTORY.rows(new double[][] { { 0.4506664080256741780 }, { 0.4388067927187100669 }, { 0.0737389738732712572 },
                 { 0.0367878253823444979 }, { 0.0000000000000000000 } });
 
-        this.doTest(tmpMatrices, false, TestUtils.EQUALS.newScale(4)); // A not full row rank
+        this.doTest(tmpMatrices, false, new NumberContext(7, 4)); // A not full row rank
     }
 
     public void testTMA4180() {
@@ -252,14 +252,14 @@ public class KKTSolverTest extends FunctionalityTest {
 
         Access2D<?> tmpX = ArrayUtils.wrapAccess2D(new double[][] { { 0 }, { 5 } });
 
-        this.doTest(new Access2D<?>[] { tmpA, tmpB, tmpQ, tmpC, tmpX }, true, TestUtils.EQUALS.newScale(6));
+        this.doTest(new Access2D<?>[] { tmpA, tmpB, tmpQ, tmpC, tmpX }, true, new NumberContext(7, 6));
 
         tmpA = ArrayUtils.wrapAccess2D(new double[][] { { 3, 1 } });
         tmpB = ArrayUtils.wrapAccess2D(new double[][] { { 6 } });
 
         tmpX = ArrayUtils.wrapAccess2D(new double[][] { { 2.0 / 5.0 }, { 24.0 / 5.0 } });
 
-        this.doTest(new Access2D<?>[] { tmpA, tmpB, tmpQ, tmpC, tmpX }, true, TestUtils.EQUALS.newScale(6));
+        this.doTest(new Access2D<?>[] { tmpA, tmpB, tmpQ, tmpC, tmpX }, true, new NumberContext(7, 6));
     }
 
     /**

@@ -37,12 +37,12 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * http://www.ee.ucla.edu/ee236a/lectures/intlp.pdf
- * 
+ *
  * @author apete
  */
 public class UCLAee236aCase extends OptimisationIntegerTests {
 
-    static final NumberContext PRECISION = TestUtils.EQUALS.newScale(2);
+    static final NumberContext PRECISION = new NumberContext(2, 2);
 
     static ExpressionsBasedModel makeOriginalRootModel() {
 
@@ -125,7 +125,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
         // The lecture notes states -10.56, but I get -10.55. One of us is rounding incorrectly...
-        TestUtils.assertEquals(-10.55, tmpModel.minimise().getValue(), PRECISION.error());
+        TestUtils.assertEquals(-10.55, tmpModel.minimise().getValue(), PRECISION);
     }
 
     /**
@@ -144,7 +144,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
-        TestUtils.assertEquals(-10.43, tmpModel.minimise().getValue(), PRECISION.error());
+        TestUtils.assertEquals(-10.43, tmpModel.minimise().getValue(), PRECISION);
     }
 
     /**
@@ -163,7 +163,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
-        TestUtils.assertEquals(-10.00, tmpModel.minimise().getValue(), PRECISION.error());
+        TestUtils.assertEquals(-10.00, tmpModel.minimise().getValue(), PRECISION);
     }
 
     /**
@@ -183,7 +183,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
-        TestUtils.assertEquals(-10.00, tmpModel.minimise().getValue(), PRECISION.error());
+        TestUtils.assertEquals(-10.00, tmpModel.minimise().getValue(), PRECISION);
     }
 
     /**
@@ -207,7 +207,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
-        TestUtils.assertEquals(-9.00, tmpModel.minimise().getValue(), PRECISION.error());
+        TestUtils.assertEquals(-9.00, tmpModel.minimise().getValue(), PRECISION);
     }
 
     /**
@@ -228,7 +228,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
-        TestUtils.assertEquals(-9.75, tmpModel.minimise().getValue(), PRECISION.error());
+        TestUtils.assertEquals(-9.75, tmpModel.minimise().getValue(), PRECISION);
     }
 
     /**
@@ -265,7 +265,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
-        TestUtils.assertEquals(-9.00, tmpModel.minimise().getValue(), PRECISION.error());
+        TestUtils.assertEquals(-9.00, tmpModel.minimise().getValue(), PRECISION);
     }
 
     /**
@@ -287,7 +287,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
-        TestUtils.assertEquals(-9.33, tmpModel.minimise().getValue(), PRECISION.error());
+        TestUtils.assertEquals(-9.33, tmpModel.minimise().getValue(), PRECISION);
     }
 
     /**
@@ -310,7 +310,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
-        TestUtils.assertEquals(-9.00, tmpModel.minimise().getValue(), PRECISION.error());
+        TestUtils.assertEquals(-9.00, tmpModel.minimise().getValue(), PRECISION);
     }
 
     /**
@@ -351,7 +351,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(tmpExpX, tmpResult, PRECISION);
 
-        TestUtils.assertEquals(-8.00, tmpModel.minimise().getValue(), PRECISION.error());
+        TestUtils.assertEquals(-8.00, tmpModel.minimise().getValue(), PRECISION);
     }
 
     /**

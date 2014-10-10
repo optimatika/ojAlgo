@@ -1,23 +1,23 @@
-/* 
+/*
  * Copyright 1997-2014 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE. 
+ * SOFTWARE.
  */
 package org.ojalgo.optimisation.convex;
 
@@ -28,14 +28,12 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * GenericQPSolverTest
- * 
+ *
  * @author apete
  */
 public abstract class GenericQPSolverTest extends OptimisationConvexTests {
@@ -52,7 +50,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     private ConvexSolver.Builder myBuilderE;
     private ConvexSolver.Builder myBuilderI;
 
-    private final NumberContext myEvaluationContext = NumberContext.getGeneral(6);
+    private final NumberContext myEvaluationContext = new NumberContext(6, 6);
 
     public GenericQPSolverTest() {
         super();
@@ -94,7 +92,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
             tmpSlack.fillMatching(tmpSlack, PrimitiveFunction.SUBTRACT, myAI.multiplyRight(myXI));
 
             for (int i = 0; i < tmpSlack.countRows(); i++) {
-                TestUtils.assertTrue(tmpSlack.doubleValue(i, 0) > -myEvaluationContext.error());
+                TestUtils.assertTrue(tmpSlack.doubleValue(i, 0) > -myEvaluationContext.epsilon());
             }
         }
     }

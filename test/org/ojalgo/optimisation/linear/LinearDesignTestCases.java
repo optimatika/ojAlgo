@@ -198,7 +198,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.74 }, { 0.45 }, { 1.0 } });
         final PhysicalStore<Double> tmpActX = tmpSolution.selectRows(new int[] { 0, 1, 2 }).toPrimitiveStore();
-        tmpActX.modifyAll(TestUtils.EQUALS.newScale(2).getPrimitiveRoundFunction());
+        tmpActX.modifyAll(new NumberContext(7, 2).getPrimitiveRoundFunction());
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }
@@ -439,7 +439,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         BasicLogger.debug(tmpResult.toString());
 
-        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, NumberContext.getGeneral(8));
+        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, new NumberContext(8, 8));
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());
     }
 

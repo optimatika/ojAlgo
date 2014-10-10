@@ -22,7 +22,6 @@
 package org.ojalgo.scalar;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
@@ -58,12 +57,10 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
 
     };
 
-    public static final boolean IS_REAL = true;
     public static final PrimitiveScalar NaN = new PrimitiveScalar(PrimitiveMath.NaN);
     public static final PrimitiveScalar NEGATIVE_INFINITY = new PrimitiveScalar(PrimitiveMath.NEGATIVE_INFINITY);
     public static final PrimitiveScalar ONE = new PrimitiveScalar(PrimitiveMath.ONE);
     public static final PrimitiveScalar POSITIVE_INFINITY = new PrimitiveScalar(PrimitiveMath.POSITIVE_INFINITY);
-    public static final NumberContext PRECISION = NumberContext.getMath(MathContext.DECIMAL64).newScale(15);
     public static final PrimitiveScalar ZERO = new PrimitiveScalar(PrimitiveMath.ZERO);
 
     public static boolean isAbsolute(final double value) {
@@ -78,12 +75,16 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
         return Double.isNaN(value);
     }
 
+    public static boolean isSmall(final double comparedTo, final double value) {
+        return AbstractScalar.PRIMITIVE.isSmall(comparedTo, value);
+    }
+
     public static boolean isPositive(final double value) {
-        return (value > PrimitiveMath.ZERO) && !PRECISION.isZero(value);
+        return (value > PrimitiveMath.ZERO) && !AbstractScalar.PRIMITIVE.isZero(value);
     }
 
     public static boolean isZero(final double value) {
-        return PRECISION.isZero(value);
+        return AbstractScalar.PRIMITIVE.isSmall(PrimitiveMath.ONE, value);
     }
 
     private final double myValue;
@@ -193,24 +194,8 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
         return PrimitiveScalar.isAbsolute(myValue);
     }
 
-    public boolean isInfinite() {
-        return PrimitiveScalar.isInfinite(myValue);
-    }
-
-    public boolean isNaN() {
-        return PrimitiveScalar.isNaN(myValue);
-    }
-
-    public boolean isPositive() {
-        return PrimitiveScalar.isPositive(myValue);
-    }
-
-    public boolean isReal() {
-        return PrimitiveScalar.IS_REAL;
-    }
-
-    public boolean isZero() {
-        return PrimitiveScalar.isZero(myValue);
+    public boolean isSmall(final double comparedTo) {
+        return PrimitiveScalar.isSmall(comparedTo, myValue);
     }
 
     @Override
@@ -247,7 +232,7 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
     }
 
     public BigDecimal toBigDecimal() {
-        return new BigDecimal(myValue, PRECISION.getMathContext());
+        return new BigDecimal(myValue, AbstractScalar.PRIMITIVE.getMathContext());
     }
 
     @Override

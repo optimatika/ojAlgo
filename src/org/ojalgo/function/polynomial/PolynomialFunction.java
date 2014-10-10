@@ -24,8 +24,8 @@ package org.ojalgo.function.polynomial;
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.Function.Differentiable;
-import org.ojalgo.function.Function.Integratable;
+import org.ojalgo.function.BasicFunction.Differentiable;
+import org.ojalgo.function.BasicFunction.Integratable;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.NumberSeries;
 

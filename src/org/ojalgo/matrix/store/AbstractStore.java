@@ -28,6 +28,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Iterator1D;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -130,44 +131,36 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return this.toScalar(row, column).isAbsolute();
     }
 
-    public boolean isInfinite(final long index) {
-        return this.toScalar(index).isInfinite();
-    }
-
-    public boolean isInfinite(final long row, final long column) {
-        return this.toScalar(row, column).isInfinite();
-    }
-
-    public boolean isNaN(final long index) {
-        return this.toScalar(index).isNaN();
-    }
-
-    public boolean isNaN(final long row, final long column) {
-        return this.toScalar(row, column).isNaN();
-    }
-
     public boolean isPositive(final long index) {
-        return this.toScalar(index).isPositive();
+        final Scalar<N> tmpScalar = this.toScalar(index);
+        return tmpScalar.isAbsolute() && !tmpScalar.isSmall(PrimitiveMath.ONE);
     }
 
     public boolean isPositive(final long row, final long column) {
-        return this.toScalar(row, column).isPositive();
+        final Scalar<N> tmpScalar = this.toScalar(row, column);
+        return tmpScalar.isAbsolute() && !tmpScalar.isSmall(PrimitiveMath.ONE);
     }
 
-    public boolean isReal(final long index) {
-        return this.toScalar(index).isReal();
+    /**
+     * @see org.ojalgo.access.Access1D.Elements#isSmall(long, double)
+     */
+    public boolean isSmall(final long index, final double comparedTo) {
+        return this.toScalar(index).isSmall(comparedTo);
     }
 
-    public boolean isReal(final long row, final long column) {
-        return this.toScalar(row, column).isReal();
+    /**
+     * @see org.ojalgo.access.Access2D.Elements#isSmall(long, long, double)
+     */
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return this.toScalar(row, column).isSmall(comparedTo);
     }
 
     public boolean isZero(final long index) {
-        return this.toScalar(index).isZero();
+        return this.toScalar(index).isSmall(PrimitiveMath.ONE);
     }
 
     public boolean isZero(final long row, final long column) {
-        return this.toScalar(row, column).isZero();
+        return this.toScalar(row, column).isSmall(PrimitiveMath.ONE);
     }
 
     public final Iterator<N> iterator() {

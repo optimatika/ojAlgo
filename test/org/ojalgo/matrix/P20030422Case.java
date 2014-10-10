@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright 1997-2014 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,10 +22,11 @@
 package org.ojalgo.matrix;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * The problem was/is to calculate a numerically correct (6 decimals) inverse. Reported to jama@nist.gov
- * 
+ *
  * @author apete
  * @see org.ojalgo.matrix.P20030512Case
  */
@@ -70,8 +71,8 @@ public class P20030422Case extends BasicMatrixTest {
     @Override
     protected void setUp() throws Exception {
 
-        DEFINITION = TestUtils.EQUALS.newScale(6);
-        EVALUATION = TestUtils.EQUALS.newScale(3);
+        DEFINITION = new NumberContext(7, 6);
+        EVALUATION = new NumberContext(7, 3);
 
         myBigAA = P20030422Case.getProblematic();
         myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);

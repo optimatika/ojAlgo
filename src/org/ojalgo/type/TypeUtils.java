@@ -109,10 +109,18 @@ public abstract class TypeUtils {
         return retVal;
     }
 
+    /**
+     * @deprecated v37
+     */
+    @Deprecated
     public static boolean isZero(final double value) {
         return TypeUtils.isZero(value, PrimitiveMath.IS_ZERO);
     }
 
+    /**
+     * @deprecated v37
+     */
+    @Deprecated
     public static boolean isZero(final double value, final double tolerance) {
         return (Math.abs(value) <= tolerance);
     }
@@ -132,7 +140,7 @@ public abstract class TypeUtils {
     /**
      * If the input {@linkplain java.lang.Number} is a {@linkplain java.math.BigDecimal} it is passed through unaltered.
      * Otherwise an equivalent BigDecimal is created.
-     * 
+     *
      * @param number Any Number
      * @return A corresponding BigDecimal
      */

@@ -43,14 +43,14 @@ import org.ojalgo.type.context.NumberContext;
  * (2009-04-13, years later) Unfortunately I forgot to document what those other problems were. I assume the matrix is
  * just generally numerically difficult.
  * </p>
- * 
+ *
  * @author apete
  */
 public class P20061119Case extends BasicMatrixTest {
 
-    public static BasicMatrix<BigDecimal> getProblematic() {
+    public static BigMatrix getProblematic() {
 
-        final BasicMatrix<BigDecimal> retVal = BigMatrix.FACTORY.rows(new double[][] { { 9.28, 0.48, -2.72, 1.28, -8.32 }, { 4.48, 0.68, -6.52, 2.48, -1.12 },
+        final BigMatrix retVal = BigMatrix.FACTORY.rows(new double[][] { { 9.28, 0.48, -2.72, 1.28, -8.32 }, { 4.48, 0.68, -6.52, 2.48, -1.12 },
                 { -8.32, -0.12, 8.68, -2.32, 2.08 }, { 7.68, 0.88, -10.32, 3.68, -1.92 }, { -13.12, -1.92, 10.88, -5.12, 9.28 } });
 
         return retVal.enforce(DEFINITION);
@@ -72,10 +72,10 @@ public class P20061119Case extends BasicMatrixTest {
     @Override
     public void testProblem() {
 
-        final BasicMatrix tmpMatrix = P20061119Case.getProblematic();
+        final BasicMatrix<BigDecimal> tmpMatrix = P20061119Case.getProblematic();
 
         final Eigenvalue<Double> tmpEigenvalue = new JamaEigenvalue.General();
-        tmpEigenvalue.compute(tmpMatrix.toPrimitiveStore());
+        tmpEigenvalue.compute(tmpMatrix);
 
         TestUtils.assertEquals(tmpMatrix.toPrimitiveStore(), tmpEigenvalue, EVALUATION);
     }
@@ -83,10 +83,10 @@ public class P20061119Case extends BasicMatrixTest {
     @Override
     protected void setUp() throws Exception {
 
-        DEFINITION = TestUtils.EQUALS.newScale(2);
-        EVALUATION = NumberContext.getGeneral(8);
+        DEFINITION = new NumberContext(7, 2);
+        EVALUATION = NumberContext.getGeneral(8).newPrecision(14);
 
-        myBigAA = BigMatrix.FACTORY.copy(P20061119Case.getProblematic());
+        myBigAA = P20061119Case.getProblematic();
         myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);
         myBigAB = myBigAA;
 

@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.BigMath;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.finance.FinanceUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
@@ -37,7 +38,7 @@ import org.ojalgo.type.TypeUtils;
  * MarketEquilibrium translates between the market portfolio weights and the equilibrium excess returns. The only things
  * needed to do those translations are the covariance matrix and the risk aversion factor - that's what you need to
  * supply when you instantiate this class.
- * 
+ *
  * @see #calculateAssetReturns(BasicMatrix)
  * @see #calculateAssetWeights(BasicMatrix)
  * @author apete
@@ -230,9 +231,9 @@ public class MarketEquilibrium {
 
         Scalar<?> retVal = myCovariances.multiplyRight(assetWeights).solve(assetReturns).toScalar(0, 0);
 
-        if (retVal.isZero()) {
+        if (retVal.isSmall(PrimitiveMath.ONE)) {
             retVal = BigScalar.ONE;
-        } else if (!retVal.isPositive()) {
+        } else if (!retVal.isAbsolute()) {
             retVal = retVal.negate();
         }
 

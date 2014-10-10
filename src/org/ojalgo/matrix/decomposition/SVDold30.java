@@ -53,7 +53,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * Samma som orginalet, but without QR. Instead Householder directly. Wasn't faster. Try going directly to bidiagonal
  * instead. Based SVDold2, but with GenericRotaion replaced with Rotation.
- * 
+ *
  * @author apete
  */
 abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueDecomposition<N> {
@@ -141,10 +141,10 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
             final ComplexNumber cg; // cos Givens
             final ComplexNumber sg; // sin Givens
 
-            if (y.isZero()) {
+            if (ComplexNumber.isZero(y)) {
                 cg = x.signum();
                 sg = ComplexNumber.ZERO;
-            } else if (x.isZero()) {
+            } else if (ComplexNumber.isZero(x)) {
                 sg = y.signum();
                 cg = ComplexNumber.ZERO;
             } else if (y.compareTo(x) == 1) {

@@ -29,13 +29,14 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Checks that {@linkplain org.ojalgo.function.BigFunction}, {@linkplain org.ojalgo.function.ComplexFunction},
  * {@linkplain org.ojalgo.function.PrimitiveFunction} and {@linkplain org.ojalgo.function.RationalFunction} members
  * produce equal results for simple cases. Cannot test complex valued arguments or results, and cannot require the
  * precision of BigDecimal or RationalNumber.
- * 
+ *
  * @author apete
  */
 public class CompareImplementations extends FunctionTests {
@@ -403,28 +404,28 @@ public class CompareImplementations extends FunctionTests {
     void assertBinary(final BinaryFunction<BigDecimal> big, final BinaryFunction<ComplexNumber> complex, final BinaryFunction<Double> primitive,
             final BinaryFunction<RationalNumber> rational, final double arg1, final double arg2) {
 
-        TestUtils.assertEquals("Big vs Complex", big.invoke(arg1, arg2), complex.invoke(arg1, arg2), TestUtils.EQUALS);
-        TestUtils.assertEquals("Complex vs Primitive", complex.invoke(arg1, arg2), primitive.invoke(arg1, arg2), TestUtils.EQUALS);
-        TestUtils.assertEquals("Primitive vs Rational", primitive.invoke(arg1, arg2), rational.invoke(arg1, arg2), TestUtils.EQUALS);
-        TestUtils.assertEquals("Rational vs Big", rational.invoke(arg1, arg2), big.invoke(arg1, arg2), TestUtils.EQUALS);
+        TestUtils.assertEquals("Big vs Complex", big.invoke(arg1, arg2), complex.invoke(arg1, arg2), new NumberContext(7, 14));
+        TestUtils.assertEquals("Complex vs Primitive", complex.invoke(arg1, arg2), primitive.invoke(arg1, arg2), new NumberContext(7, 14));
+        TestUtils.assertEquals("Primitive vs Rational", primitive.invoke(arg1, arg2), rational.invoke(arg1, arg2), new NumberContext(7, 14));
+        TestUtils.assertEquals("Rational vs Big", rational.invoke(arg1, arg2), big.invoke(arg1, arg2), new NumberContext(7, 14));
     }
 
     void assertParameter(final ParameterFunction<BigDecimal> big, final ParameterFunction<ComplexNumber> complex, final ParameterFunction<Double> primitive,
             final ParameterFunction<RationalNumber> rational, final double arg, final int param) {
 
-        TestUtils.assertEquals("Big vs Complex", big.invoke(arg, param), complex.invoke(arg, param), TestUtils.EQUALS);
-        TestUtils.assertEquals("Complex vs Primitive", complex.invoke(arg, param), primitive.invoke(arg, param), TestUtils.EQUALS);
-        TestUtils.assertEquals(primitive.invoke(arg, param), rational.invoke(arg, param), TestUtils.EQUALS);
-        TestUtils.assertEquals("Rational vs Big", rational.invoke(arg, param), big.invoke(arg, param), TestUtils.EQUALS);
+        TestUtils.assertEquals("Big vs Complex", big.invoke(arg, param), complex.invoke(arg, param), new NumberContext(7, 14));
+        TestUtils.assertEquals("Complex vs Primitive", complex.invoke(arg, param), primitive.invoke(arg, param), new NumberContext(7, 14));
+        TestUtils.assertEquals(primitive.invoke(arg, param), rational.invoke(arg, param), new NumberContext(7, 14));
+        TestUtils.assertEquals("Rational vs Big", rational.invoke(arg, param), big.invoke(arg, param), new NumberContext(7, 14));
     }
 
     void assertUnary(final UnaryFunction<BigDecimal> big, final UnaryFunction<ComplexNumber> complex, final UnaryFunction<Double> primitive,
             final UnaryFunction<RationalNumber> rational, final double arg) {
 
-        TestUtils.assertEquals("Big vs Complex", big.invoke(arg), complex.invoke(arg), TestUtils.EQUALS);
-        TestUtils.assertEquals("Complex vs Primitive", complex.invoke(arg), primitive.invoke(arg), TestUtils.EQUALS);
-        TestUtils.assertEquals("Primitive vs Rational", primitive.invoke(arg), rational.invoke(arg), TestUtils.EQUALS);
-        TestUtils.assertEquals("Rational vs Big", rational.invoke(arg), big.invoke(arg), TestUtils.EQUALS);
+        TestUtils.assertEquals("Big vs Complex", big.invoke(arg), complex.invoke(arg), new NumberContext(7, 14));
+        TestUtils.assertEquals("Complex vs Primitive", complex.invoke(arg), primitive.invoke(arg), new NumberContext(7, 14));
+        TestUtils.assertEquals("Primitive vs Rational", primitive.invoke(arg), rational.invoke(arg), new NumberContext(7, 14));
+        TestUtils.assertEquals("Rational vs Big", rational.invoke(arg), big.invoke(arg), new NumberContext(7, 14));
     }
 
 }

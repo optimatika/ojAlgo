@@ -249,23 +249,8 @@ public class BigArray extends DenseArray<BigDecimal> {
     }
 
     @Override
-    protected final boolean isInfinite(final int index) {
-        return BigScalar.IS_INFINITE;
-    }
-
-    @Override
-    protected final boolean isNaN(final int index) {
-        return BigScalar.IS_NOT_A_NUMBER;
-    }
-
-    @Override
     protected final boolean isPositive(final int index) {
         return BigScalar.isPositive(data[index]);
-    }
-
-    @Override
-    protected final boolean isReal(final int index) {
-        return BigScalar.IS_REAL;
     }
 
     @Override
@@ -381,6 +366,11 @@ public class BigArray extends DenseArray<BigDecimal> {
     @Override
     DenseArray<BigDecimal> newInstance(final int capacity) {
         return new BigArray(capacity);
+    }
+
+    @Override
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return BigScalar.isSmall(comparedTo, data[index]);
     }
 
 }

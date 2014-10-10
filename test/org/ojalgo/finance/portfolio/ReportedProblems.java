@@ -37,6 +37,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.type.context.NumberContext;
 
 public class ReportedProblems extends FinancePortfolioTests {
 
@@ -132,7 +133,7 @@ public class ReportedProblems extends FinancePortfolioTests {
         Optimisation.Result tmpResult = tmpSolver.solve();
         //  BasicMatrix tmpSolution = tmpResult.getSolution();
 
-        TestUtils.assertEquals(tmpX, tmpResult, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpX, tmpResult, new NumberContext(7, 6));
 
         // As (I believe) the user built it
         //
@@ -148,7 +149,7 @@ public class ReportedProblems extends FinancePortfolioTests {
         tmpResult = tmpSolver.solve();
 
         // Should NOT be equal in this case!
-        TestUtils.assertFalse(AccessUtils.equals(tmpX, tmpResult, TestUtils.EQUALS.newScale(6)));
+        TestUtils.assertFalse(AccessUtils.equals(tmpX, tmpResult, new NumberContext(7, 6)));
 
         // No problem with both the lower and upper limits set.
 
@@ -160,7 +161,7 @@ public class ReportedProblems extends FinancePortfolioTests {
         tmpSolver = tmpBuilder.build();
         tmpResult = tmpSolver.solve();
 
-        TestUtils.assertEquals(tmpX, tmpResult, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpX, tmpResult, new NumberContext(7, 6));
     }
 
     /**

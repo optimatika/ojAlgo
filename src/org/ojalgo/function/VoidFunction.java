@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function;
 
-public interface VoidFunction<N extends Number> extends Function<N> {
+public interface VoidFunction<N extends Number> extends BasicFunction<N> {
 
     void invoke(double arg);
 

@@ -66,6 +66,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     }
 
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return myUtility.isSmall(row, column, comparedTo);
+    }
+
     public static interface ComplexMultiplyLeft {
 
         void invoke(ComplexNumber[] product, Access1D<ComplexNumber> left, int complexity, ComplexNumber[] right);
@@ -782,24 +786,12 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return myUtility.isAbsolute(row, column);
     }
 
-    public boolean isInfinite(final long row, final long column) {
-        return myUtility.isInfinite(row, column);
-    }
-
     public boolean isLowerLeftShaded() {
         return false;
     }
 
-    public boolean isNaN(final long row, final long column) {
-        return myUtility.isNaN(row, column);
-    }
-
     public boolean isPositive(final long row, final long column) {
         return myUtility.isPositive(row, column);
-    }
-
-    public boolean isReal(final long row, final long column) {
-        return myUtility.isReal(row, column);
     }
 
     public boolean isUpperRightShaded() {

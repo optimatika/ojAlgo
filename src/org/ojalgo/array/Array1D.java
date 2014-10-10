@@ -344,14 +344,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return myDelegate.get(myFirst + (myStep * index));
     }
 
-    /**
-     * @deprecated v36 Use {@link #indexOfLargestInRange(long,long)} instead
-     */
-    @Deprecated
-    public long getIndexOfLargestInRange(final long first, final long limit) {
-        return this.indexOfLargestInRange(first, limit);
-    }
-
     @Override
     public int indexOf(final Object obj) {
         final int tmpLength = (int) length;
@@ -395,14 +387,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return length == 0;
     }
 
-    public boolean isInfinite(final long index) {
-        return myDelegate.isInfinite(myFirst + (myStep * index));
-    }
-
-    public boolean isNaN(final long index) {
-        return myDelegate.isNaN(myFirst + (myStep * index));
-    }
-
     /**
      * @see Scalar#isPositive()
      */
@@ -414,11 +398,8 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return myDelegate.isZeros((myFirst + (myStep * first)), (myFirst + (myStep * limit)), myStep);
     }
 
-    /**
-     * @see Scalar#isReal()
-     */
-    public boolean isReal(final long index) {
-        return myDelegate.isReal(myFirst + (myStep * index));
+    public boolean isSmall(final long index, final double comparedTo) {
+        return myDelegate.isSmall(myFirst + (myStep * index), comparedTo);
     }
 
     /**

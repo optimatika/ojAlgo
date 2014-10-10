@@ -245,28 +245,13 @@ public class RationalArray extends DenseArray<RationalNumber> {
     }
 
     @Override
-    protected final boolean isInfinite(final int index) {
-        return RationalNumber.isInfinite(data[index]);
-    }
-
-    @Override
-    protected final boolean isNaN(final int index) {
-        return RationalNumber.isNaN(data[index]);
-    }
-
-    @Override
     protected final boolean isPositive(final int index) {
         return RationalNumber.isPositive(data[index]);
     }
 
     @Override
-    protected final boolean isReal(final int index) {
-        return RationalNumber.IS_REAL;
-    }
-
-    @Override
     protected final boolean isZero(final int index) {
-        return data[index].isZero();
+        return RationalNumber.isZero(data[index]);
     }
 
     @Override
@@ -383,4 +368,8 @@ public class RationalArray extends DenseArray<RationalNumber> {
         return new RationalArray(capacity);
     }
 
+    @Override
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return RationalNumber.isSmall(comparedTo, data[index]);
+    }
 }

@@ -28,11 +28,12 @@ import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * There was a problem with the solve() method in the Jama Cholesky decomposition - it simply wasn't correct. (This case
  * tests that BigMatrix doesn't have the same problem.) Problem reported to jama(a)nist.gov
- * 
+ *
  * @author apete
  */
 public class P20050125Case extends BasicMatrixTest {
@@ -78,8 +79,8 @@ public class P20050125Case extends BasicMatrixTest {
     @Override
     protected void setUp() throws Exception {
 
-        DEFINITION = TestUtils.EQUALS.newScale(9);
-        EVALUATION = TestUtils.EQUALS.newScale(6);
+        DEFINITION = new NumberContext(7, 9);
+        EVALUATION = new NumberContext(7, 6);
 
         myBigAA = P20050125Case.getProblematic();
         myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);

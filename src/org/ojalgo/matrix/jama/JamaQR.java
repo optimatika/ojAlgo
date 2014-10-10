@@ -92,8 +92,12 @@ public final class JamaQR extends JamaAbstractDecomposition implements QR<Double
         final MatrixStore<Double> tmpR = this.getR();
         final int tmpMinDim = (int) Math.min(tmpR.countRows(), tmpR.countColumns());
 
+        final AggregatorFunction<Double> tmpLargest = PrimitiveAggregator.LARGEST.get();
+        tmpR.visitDiagonal(0L, 0L, tmpLargest);
+        final double tmpLargestValue = tmpLargest.doubleValue();
+
         for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpR.toScalar(ij, ij).isZero()) {
+            if (!tmpR.isSmall(ij, ij, tmpLargestValue)) {
                 retVal++;
             }
         }

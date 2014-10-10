@@ -33,7 +33,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RowsStore;
 import org.ojalgo.type.context.NumberContext;
 
-public class CompareJamaAndPrimitive extends AbstractMatrixDecompositionTest {
+public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
     private static NumberContext COMPARE_CONTEXT = NumberContext.getGeneral(8);
     private static Cholesky<Double> JAMA_CHOLESKY = CholeskyDecomposition.makeJama();

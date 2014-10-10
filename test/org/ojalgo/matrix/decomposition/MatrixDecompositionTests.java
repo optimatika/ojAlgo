@@ -25,6 +25,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.ojalgo.FunctionalityTest;
+import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.jama.JamaCholesky;
 import org.ojalgo.matrix.jama.JamaEigenvalue;
 import org.ojalgo.matrix.jama.JamaLU;
@@ -33,12 +34,12 @@ import org.ojalgo.matrix.jama.JamaSingularValue;
 
 /**
  * MatrixDecompositionPackageTests
- * 
+ *
  * @author apete
  */
 public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     public static final Bidiagonal<?>[] getBidiagonalAll() {
         return new Bidiagonal<?>[] { new BidiagonalDecomposition.Big(), BidiagonalDecomposition.makeComplex(), BidiagonalDecomposition.makePrimitive() };
@@ -128,7 +129,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     @SuppressWarnings("unchecked")
     public static final SingularValue<Double>[] getSingularValuePrimitive() {
-        return (SingularValue<Double>[]) new SingularValue<?>[] { new JamaSingularValue(), /*new SVDold30.Primitive(),*/new SVDnew32.Primitive() };
+        return (SingularValue<Double>[]) new SingularValue<?>[] { new JamaSingularValue(), /* new SVDold30.Primitive(), */new SVDnew32.Primitive() };
     }
 
     public static final Tridiagonal<?>[] getTridiagonalAll() {
@@ -149,6 +150,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
         suite.addTestSuite(DesignCase.class);
         suite.addTestSuite(EigenvalueTest.class);
         suite.addTestSuite(HessenbergTest.class);
+        suite.addTestSuite(LUTest.class);
         suite.addTestSuite(QRTest.class);
         suite.addTestSuite(ReportedProblems.class);
         suite.addTestSuite(SchurTest.class);
@@ -157,6 +159,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
         suite.addTestSuite(TestJama.class);
         suite.addTestSuite(TestSolveAndInvert.class);
         suite.addTestSuite(TridiagonalizeCase.class);
+        suite.addTestSuite(VerySmallCase.class);
         //$JUnit-END$
         return suite;
     }
@@ -168,4 +171,13 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     protected MatrixDecompositionTests(final String name) {
         super(name);
     }
+
+    @Override
+    protected void setUp() throws Exception {
+
+        super.setUp();
+
+        TestUtils.minimiseAllBranchLimits();
+    }
+
 }

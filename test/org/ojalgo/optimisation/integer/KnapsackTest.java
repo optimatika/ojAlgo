@@ -31,11 +31,12 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Here is a junit test. Currently, tests 1 and 4 fail and the others pass. I don't understand what is causing the
  * problem, but in the test cases that fail, the binary variables are being set to values other than 0 or 1.
- * 
+ *
  * @author Luke
  */
 public class KnapsackTest extends OptimisationIntegerTests {
@@ -81,7 +82,7 @@ public class KnapsackTest extends OptimisationIntegerTests {
 
     public void testVaryingMaxWeight0() {
         model = new KnapsackProblemBuilder(3d).addItem(20, 2).addItem(30, 4).build();
-//        model.options.debug(IntegerSolver.class);
+        //        model.options.debug(IntegerSolver.class);
         model.maximise();
         //Expected: just first item
         this.assertOne(model.getVariables().get(0));
@@ -128,11 +129,11 @@ public class KnapsackTest extends OptimisationIntegerTests {
     }
 
     void assertOne(final Variable v) {
-        TestUtils.assertEquals(BigMath.ONE, v.getValue(), TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(BigMath.ONE, v.getValue(), new NumberContext(7, 6));
     }
 
     void assertZero(final Variable v) {
-        TestUtils.assertEquals(BigMath.ZERO, v.getValue(), TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(BigMath.ZERO, v.getValue(), new NumberContext(7, 6));
     }
 
 }

@@ -32,13 +32,12 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
  * {@linkplain #makeBig()}, {@linkplain #makeComplex()}, {@linkplain #makePrimitive()}, {@linkplain #makeAlternative()}
  * or {@linkplain #makeJama()}.
- * 
+ *
  * @author apete
  */
 public abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends AbstractDecomposition<N> implements SingularValue<N> {
@@ -297,10 +296,10 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
         int retVal = tmpSingularValues.size();
 
         // Tolerance based on min-dim but should be max-dim
-        final double tmpTolerance = retVal * tmpSingularValues.doubleValue(0) * PrimitiveMath.MACHINE_DOUBLE_ERROR;
+        final double tmpTolerance = retVal * tmpSingularValues.doubleValue(0) * PrimitiveMath.MACHINE_EPSILON;
 
         for (int i = retVal - 1; i >= 0; i--) {
-            if (TypeUtils.isZero(tmpSingularValues.doubleValue(i), tmpTolerance)) {
+            if (tmpSingularValues.doubleValue(i) <= tmpTolerance) {
                 retVal--;
             } else {
                 return retVal;

@@ -41,7 +41,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
  * {@linkplain #makeBig()}, {@linkplain #makeComplex()} or {@linkplain #makePrimitive()}.
- * 
+ *
  * @author apete
  */
 public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
@@ -86,14 +86,14 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
                 final int tmpLimit = tmpSuperdiagonal.size();
                 for (int i = 0; i < tmpLimit; i++) {
 
-                    if (!tmpMainDiagonal.isReal(i)) {
+                    if (!tmpMainDiagonal.get(i).isReal()) {
                         final ComplexNumber tmpSignum = tmpMainDiagonal.get(i).signum();
                         tmpMainDiagonal.set(i, tmpMainDiagonal.get(i).divide(tmpSignum));
                         tmpSuperdiagonal.set(i, tmpSuperdiagonal.get(i).divide(tmpSignum));
                         tmpInitDiagQ1.set(i, tmpSignum);
                     }
 
-                    if (!tmpSuperdiagonal.isReal(i)) {
+                    if (!tmpSuperdiagonal.get(i).isReal()) {
                         final ComplexNumber tmpSignum = tmpSuperdiagonal.get(i).signum();
                         tmpSuperdiagonal.set(i, tmpSuperdiagonal.get(i).divide(tmpSignum));
                         tmpMainDiagonal.set(i + 1, tmpMainDiagonal.get(i + 1).divide(tmpSignum));
@@ -101,7 +101,7 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
                     }
                 }
 
-                if (!tmpMainDiagonal.isReal(tmpLimit)) {
+                if (!tmpMainDiagonal.get(tmpLimit).isReal()) {
                     final ComplexNumber tmpSignum = tmpMainDiagonal.get(tmpLimit).signum();
                     tmpMainDiagonal.set(tmpLimit, tmpMainDiagonal.get(tmpLimit).divide(tmpSignum));
                     tmpInitDiagQ1.set(tmpLimit, tmpSignum);
@@ -115,14 +115,14 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
                 final int tmpLimit = tmpSubdiagonal.size();
                 for (int i = 0; i < tmpLimit; i++) {
 
-                    if (!tmpMainDiagonal.isReal(i)) {
+                    if (!tmpMainDiagonal.get(i).isReal()) {
                         final ComplexNumber tmpSignum = tmpMainDiagonal.get(i).signum();
                         tmpMainDiagonal.set(i, tmpMainDiagonal.get(i).divide(tmpSignum));
                         tmpSubdiagonal.set(i, tmpSubdiagonal.get(i).divide(tmpSignum));
                         tmpInitDiagQ2.set(i, tmpSignum.conjugate());
                     }
 
-                    if (!tmpSubdiagonal.isReal(i)) {
+                    if (!tmpSubdiagonal.get(i).isReal()) {
                         final ComplexNumber tmpSignum = tmpSubdiagonal.get(i).signum();
                         tmpSubdiagonal.set(i, tmpSubdiagonal.get(i).divide(tmpSignum));
                         tmpMainDiagonal.set(i + 1, tmpMainDiagonal.get(i + 1).divide(tmpSignum));
@@ -130,7 +130,7 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
                     }
                 }
 
-                if (!tmpMainDiagonal.isReal(tmpLimit)) {
+                if (!tmpMainDiagonal.get(tmpLimit).isReal()) {
                     final ComplexNumber tmpSignum = tmpMainDiagonal.get(tmpLimit).signum();
                     tmpMainDiagonal.set(tmpLimit, tmpMainDiagonal.get(tmpLimit).divide(tmpSignum));
                     tmpInitDiagQ2.set(tmpLimit, tmpSignum.conjugate());
@@ -353,7 +353,7 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
                 for (int i = 0; i < tmpLim; i++) {
                     aMtrxV.set(i, j,
                             ((aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j)) + (aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j)))
-                                    / tmpSingular);
+                            / tmpSingular);
                 }
                 aMtrxV.set(tmpLim, j, (aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j)) / tmpSingular);
             }
@@ -378,7 +378,7 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
                 for (int i = 0; i < tmpLim; i++) {
                     retVal.set(i, j,
                             ((aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j)) + (aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j)))
-                                    / tmpSingular);
+                            / tmpSingular);
                 }
                 retVal.set(tmpLim, j, (aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j)) / tmpSingular);
             }

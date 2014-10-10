@@ -82,34 +82,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     }
 
-    static BigDenseStore cast(final Access1D<BigDecimal> matrix) {
-        if (matrix instanceof BigDenseStore) {
-            return (BigDenseStore) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) matrix);
-        } else {
-            return FACTORY.columns(matrix);
-        }
-    }
-
-    static Householder.Big cast(final Householder<BigDecimal> transformation) {
-        if (transformation instanceof Householder.Big) {
-            return (Householder.Big) transformation;
-        } else if (transformation instanceof DecompositionStore.HouseholderReference<?>) {
-            return ((DecompositionStore.HouseholderReference<BigDecimal>) transformation).getBigWorker().copy(transformation);
-        } else {
-            return new Householder.Big(transformation);
-        }
-    }
-
-    static Rotation.Big cast(final Rotation<BigDecimal> transformation) {
-        if (transformation instanceof Rotation.Big) {
-            return (Rotation.Big) transformation;
-        } else {
-            return new Rotation.Big(transformation);
-        }
-    }
-
     public static final DecompositionStore.Factory<BigDecimal, BigDenseStore> FACTORY = new DecompositionStore.Factory<BigDecimal, BigDenseStore>() {
 
         public AggregatorCollection<BigDecimal> aggregator() {
@@ -335,6 +307,34 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
             return retVal;
         }
     };
+
+    static BigDenseStore cast(final Access1D<BigDecimal> matrix) {
+        if (matrix instanceof BigDenseStore) {
+            return (BigDenseStore) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return FACTORY.copy((Access2D<?>) matrix);
+        } else {
+            return FACTORY.columns(matrix);
+        }
+    }
+
+    static Householder.Big cast(final Householder<BigDecimal> transformation) {
+        if (transformation instanceof Householder.Big) {
+            return (Householder.Big) transformation;
+        } else if (transformation instanceof DecompositionStore.HouseholderReference<?>) {
+            return ((DecompositionStore.HouseholderReference<BigDecimal>) transformation).getBigWorker().copy(transformation);
+        } else {
+            return new Householder.Big(transformation);
+        }
+    }
+
+    static Rotation.Big cast(final Rotation<BigDecimal> transformation) {
+        if (transformation instanceof Rotation.Big) {
+            return (Rotation.Big) transformation;
+        } else {
+            return new Rotation.Big(transformation);
+        }
+    }
 
     private final BigMultiplyBoth multiplyBoth;
     private final BigMultiplyLeft multiplyLeft;
@@ -757,24 +757,16 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return myUtility.isAbsolute(row, column);
     }
 
-    public boolean isInfinite(final long row, final long column) {
-        return myUtility.isInfinite(row, column);
-    }
-
     public boolean isLowerLeftShaded() {
         return false;
-    }
-
-    public boolean isNaN(final long row, final long column) {
-        return myUtility.isNaN(row, column);
     }
 
     public boolean isPositive(final long row, final long column) {
         return myUtility.isPositive(row, column);
     }
 
-    public boolean isReal(final long row, final long column) {
-        return myUtility.isReal(row, column);
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return myUtility.isSmall(row, column, comparedTo);
     }
 
     public boolean isUpperRightShaded() {

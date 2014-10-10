@@ -21,9 +21,15 @@
  */
 package org.ojalgo.scalar;
 
+import java.math.MathContext;
+
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class AbstractScalar<N extends Number> extends Number implements Scalar<N> {
+
+    static final NumberContext BIG = NumberContext.getMath(MathContext.DECIMAL128);
+    static final NumberContext PRIMITIVE = NumberContext.getMath(MathContext.DECIMAL64);
 
     AbstractScalar() {
         super();
@@ -31,6 +37,14 @@ abstract class AbstractScalar<N extends Number> extends Number implements Scalar
 
     public final String toPlainString(final NumberContext context) {
         return context.enforce(this.toBigDecimal()).toPlainString();
+    }
+
+    /**
+     * @deprecated v37
+     */
+    @Deprecated
+    public final boolean isZero() {
+        return this.isSmall(PrimitiveMath.ONE);
     }
 
 }

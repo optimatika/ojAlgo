@@ -31,7 +31,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * Found a problem with calculating the Frobenius norm for complex matrices.
- * 
+ *
  * @author apete
  */
 public class P20050827Case extends BasicMatrixTest {
@@ -89,11 +89,11 @@ public class P20050827Case extends BasicMatrixTest {
         final Scalar<ComplexNumber> tmpSmallTrace = tmpSmall.getTrace();
 
         for (int ij = 0; ij < 3; ij++) {
-            TestUtils.assertTrue(tmpSmall.toScalar(ij, ij).toString(), tmpSmall.toScalar(ij, ij).isReal());
+            TestUtils.assertTrue(tmpSmall.toScalar(ij, ij).toString(), tmpSmall.get(ij, ij).isReal());
         }
 
         for (int ij = 0; ij < 5; ij++) {
-            TestUtils.assertTrue(tmpBig.toScalar(ij, ij).toString(), tmpBig.toScalar(ij, ij).isReal());
+            TestUtils.assertTrue(tmpBig.toScalar(ij, ij).toString(), tmpBig.get(ij, ij).isReal());
         }
 
         TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpBigTrace.getNumber(), tmpSmallTrace.getNumber(), EVALUATION);
@@ -118,7 +118,7 @@ public class P20050827Case extends BasicMatrixTest {
     protected void setUp() throws Exception {
 
         DEFINITION = NumberContext.getGeneral(12);
-        EVALUATION = NumberContext.getGeneral(6);
+        EVALUATION = NumberContext.getGeneral(6).newPrecision(12);
 
         myBigAA = BigMatrix.FACTORY.copy(P20050827Case.getProblematic());
         myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);

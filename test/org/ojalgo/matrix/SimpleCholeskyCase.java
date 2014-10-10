@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright 1997-2014 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,10 +26,11 @@ import java.math.BigDecimal;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * This problem is taken from example 2.21 of the Scientific Computing, An Introductory Survey.
- * 
+ *
  * @author apete
  */
 public class SimpleCholeskyCase extends BasicMatrixTest {
@@ -44,7 +45,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
 
     /**
      * This matrix is taken from example 2.21 of the Scientific Computing, An Introductory Survey
-     * 
+     *
      * @return The data00 value
      */
     public static BigMatrix getOriginal() {
@@ -115,8 +116,8 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     @Override
     protected void setUp() throws Exception {
 
-        DEFINITION = TestUtils.EQUALS.newScale(4);
-        EVALUATION = TestUtils.EQUALS.newScale(3);
+        DEFINITION = new NumberContext(7, 4);
+        EVALUATION = new NumberContext(4, 3);
 
         myBigAA = SimpleCholeskyCase.getFactorL();
         myBigAX = SimpleCholeskyCase.getFactorR();

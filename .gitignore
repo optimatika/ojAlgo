@@ -2,6 +2,5 @@
 /dist
 /target
 **CVS**
-hotspot.log
-jitwatch.log
+*.log
 .DS_Store

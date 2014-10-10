@@ -30,7 +30,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 /**
  * Discovered problems with calculating the LU decompositions for fat and/or tall matrices. Problems were found with all
  * three implementations (including Jama).
- * 
+ *
  * @author apete
  */
 public class P20071019Case extends BasicMatrixTest {
@@ -85,6 +85,8 @@ public class P20071019Case extends BasicMatrixTest {
 
     @Override
     protected void setUp() throws Exception {
+
+        EVALUATION = EVALUATION.newPrecision(14);
 
         myBigAA = P20071019Case.getFatProblematic().multiplyRight(P20071019Case.getTallProblematic()).enforce(DEFINITION);
         myBigAX = BasicMatrixTest.getIdentity(myBigAA.countColumns(), myBigAA.countColumns(), DEFINITION);

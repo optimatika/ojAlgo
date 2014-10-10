@@ -25,6 +25,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.type.context.NumberContext;
 
 public class PolynomialImplTest extends FunctionPolynomialTests {
 
@@ -57,9 +58,9 @@ public class PolynomialImplTest extends FunctionPolynomialTests {
 
             tmpPoly.estimate(ArrayUtils.wrapAccess1D(x), ArrayUtils.wrapAccess1D(y));
 
-            final double tmpIsZero = PrimitiveMath.TEN * Math.sqrt(PrimitiveMath.IS_ZERO);
+            final NumberContext tmpEquals = new NumberContext(7, 14);
             for (int i = 0; i < tmpSamples; i++) {
-                TestUtils.assertEquals(y[i], tmpPoly.invoke(x[i]), tmpIsZero);
+                TestUtils.assertEquals(y[i], tmpPoly.invoke(x[i]), tmpEquals);
             }
         }
     }

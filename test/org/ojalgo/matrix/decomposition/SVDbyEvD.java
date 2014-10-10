@@ -27,11 +27,12 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete
  */
-public class SVDbyEvD extends AbstractMatrixDecompositionTest {
+public class SVDbyEvD extends MatrixDecompositionTests {
 
     public SVDbyEvD() {
         super();
@@ -90,29 +91,29 @@ public class SVDbyEvD extends AbstractMatrixDecompositionTest {
         final MatrixStore<Double> tmpLeftD = tmpEigenvalue.getD();
         final MatrixStore<Double> tmpLeftV = tmpEigenvalue.getV();
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Left D", tmpLeftD, TestUtils.EQUALS.newScale(6));
-            BasicLogger.debug("Left V", tmpLeftV, TestUtils.EQUALS.newScale(6));
+            BasicLogger.debug("Left D", tmpLeftD, new NumberContext(7, 6));
+            BasicLogger.debug("Left V", tmpLeftV, new NumberContext(7, 6));
         }
         // Check that the eigenvalue decomposition of the "left" matrix is correct
-        TestUtils.assertEquals(tmpLeftA, tmpEigenvalue, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpLeftA, tmpEigenvalue, new NumberContext(7, 6));
 
         tmpEigenvalue.compute(tmpRightA, false);
         final MatrixStore<Double> tmpRightD = tmpEigenvalue.getD();
         final MatrixStore<Double> tmpRightV = tmpEigenvalue.getV();
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Right D", tmpRightD, TestUtils.EQUALS.newScale(6));
-            BasicLogger.debug("Right V", tmpRightV, TestUtils.EQUALS.newScale(6));
+            BasicLogger.debug("Right D", tmpRightD, new NumberContext(7, 6));
+            BasicLogger.debug("Right V", tmpRightV, new NumberContext(7, 6));
         }
         // Check that the eigenvalue decomposition of the "right" matrix is correct
-        TestUtils.assertEquals(tmpRightA, tmpEigenvalue, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpRightA, tmpEigenvalue, new NumberContext(7, 6));
 
         // Check that the, left and right, singular values are correct
         for (int ij = 0; ij < theSingularValues.length; ij++) {
             final double tmpExpected = theSingularValues.doubleValue(ij);
             final double tmpLeftSqrt = Math.sqrt(Math.abs(tmpLeftD.doubleValue(ij, ij)));
             final double tmpRightSqrt = Math.sqrt(Math.abs(tmpRightD.doubleValue(ij, ij)));
-            TestUtils.assertEquals("Left " + ij, tmpExpected, tmpLeftSqrt, TestUtils.EQUALS.newScale(6).error());
-            TestUtils.assertEquals("Right " + ij, tmpExpected, tmpRightSqrt, TestUtils.EQUALS.newScale(6).error());
+            TestUtils.assertEquals("Left " + ij, tmpExpected, tmpLeftSqrt, new NumberContext(7, 6));
+            TestUtils.assertEquals("Right " + ij, tmpExpected, tmpRightSqrt, new NumberContext(7, 6));
         }
 
         // So far...
@@ -123,12 +124,12 @@ public class SVDbyEvD extends AbstractMatrixDecompositionTest {
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
             BasicLogger.debug("Experimental  S: {}.", tmpExperimental.getSingularValues());
-            BasicLogger.debug("D", tmpExperimental.getD(), TestUtils.EQUALS.newScale(6));
-            BasicLogger.debug("Q1", tmpExperimental.getQ1(), TestUtils.EQUALS.newScale(6));
-            BasicLogger.debug("Q2", tmpExperimental.getQ2(), TestUtils.EQUALS.newScale(6));
+            BasicLogger.debug("D", tmpExperimental.getD(), new NumberContext(7, 6));
+            BasicLogger.debug("Q1", tmpExperimental.getQ1(), new NumberContext(7, 6));
+            BasicLogger.debug("Q2", tmpExperimental.getQ2(), new NumberContext(7, 6));
         }
 
-        TestUtils.assertEquals(aMtrxA, tmpExperimental, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(aMtrxA, tmpExperimental, new NumberContext(7, 6));
     }
 
 }

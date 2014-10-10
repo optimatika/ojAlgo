@@ -163,8 +163,11 @@ public interface Optimisation {
         /**
          * Problem parameters; constraints and objectives The numbers used to state/describe the problem, incl. when/if
          * these are transformed during the solution algorithm.
+         * <ul>
+         * <li>2014-09-29: Changed from 11,9 to 12,8</li>
+         * </ul>
          */
-        public NumberContext problem = new NumberContext(11, 9, RoundingMode.HALF_EVEN);
+        public NumberContext problem = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 
         /**
          * Used to determine if a constraint is violated or not. Essentially this context determines if the various

@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * @author apete
  */
-public class SchurTest extends AbstractMatrixDecompositionTest {
+public class SchurTest extends MatrixDecompositionTests {
 
     private static void doTest(final PhysicalStore<Double> originalMatrix, final Array1D<ComplexNumber> expectedDiagonal, final NumberContext accuracyContext) {
 
@@ -87,7 +87,7 @@ public class SchurTest extends AbstractMatrixDecompositionTest {
 
         final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33 });
 
-        SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, TestUtils.EQUALS.newScale(6));
+        SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 6));
     }
 
     /**
@@ -102,7 +102,7 @@ public class SchurTest extends AbstractMatrixDecompositionTest {
         final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { ComplexNumber.makeReal(tmp00),
                 ComplexNumber.makeReal(tmp11), ComplexNumber.makeReal(tmp22) });
 
-        SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, TestUtils.EQUALS.newScale(3));
+        SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 3));
 
         final PhysicalStore<Double> tmpExpectedQ = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.49857, 0.76469, 0.40825 },
                 { 0.57405, 0.061628, -0.81650 }, { 0.64953, -0.64144, 0.40825 } });
@@ -122,7 +122,7 @@ public class SchurTest extends AbstractMatrixDecompositionTest {
 
         final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
 
-        SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, TestUtils.EQUALS.newScale(6));
+        SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 6));
     }
 
     /**
@@ -139,6 +139,6 @@ public class SchurTest extends AbstractMatrixDecompositionTest {
                 ComplexNumber.makeReal(tmp11) });
         final PhysicalStore<Double> tmpExpectedU = PrimitiveDenseStore.FACTORY.rows(new double[][] { { tmp00, 9 }, { 0.0, tmp11 } });
 
-        SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, TestUtils.EQUALS.newScale(5));
+        SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 5));
     }
 }

@@ -28,11 +28,12 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete
  */
-public class HessenbergTest extends AbstractMatrixDecompositionTest {
+public class HessenbergTest extends MatrixDecompositionTests {
 
     public HessenbergTest() {
         super();
@@ -61,8 +62,7 @@ public class HessenbergTest extends AbstractMatrixDecompositionTest {
         BasicLogger.debug();
         BasicLogger.debug("Original: ", aMatrix);
         BasicLogger.debug("Q get: ", aDecomposition.getQ());
-        BasicLogger
-                .debug("Q do: ", aDecomposition.doQ(this.makeEye((int) aMatrix.countRows(), (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))));
+        BasicLogger.debug("Q do: ", aDecomposition.doQ(this.makeEye((int) aMatrix.countRows(), (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))));
         BasicLogger.debug("H: ", aDecomposition.getH());
         BasicLogger.debug("Reconstructed: ", MatrixUtils.reconstruct(aDecomposition));
     }
@@ -72,25 +72,24 @@ public class HessenbergTest extends AbstractMatrixDecompositionTest {
         final HessenbergDecomposition<Double> tmpDecomposition = (HessenbergDecomposition<Double>) HessenbergDecomposition.makePrimitive();
         tmpDecomposition.compute(aMatrix);
 
-        if (!MatrixUtils.equals(aMatrix, tmpDecomposition, TestUtils.EQUALS.newScale(6))) {
+        if (!MatrixUtils.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Not equals!");
         }
 
         final MatrixStore<Double> tmpReconstructed = MatrixUtils.reconstruct(tmpDecomposition);
-        if (!AccessUtils.equals(aMatrix, tmpReconstructed, TestUtils.EQUALS.newScale(6))) {
+        if (!AccessUtils.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Failed to reconstruct!");
         }
 
-        if (!AccessUtils.equals(tmpDecomposition.getQ(),
-                tmpDecomposition.doQ(this.makeEye((int) aMatrix.countRows(), (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))),
-                TestUtils.EQUALS.newScale(6))) {
+        if (!AccessUtils.equals(tmpDecomposition.getQ(), tmpDecomposition.doQ(this.makeEye((int) aMatrix.countRows(),
+                (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))), new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("get and do Q are different!");
         }
 
-        TestUtils.assertEquals(aMatrix, tmpDecomposition, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(aMatrix, tmpDecomposition, new NumberContext(7, 6));
     }
 
     private PrimitiveDenseStore makeEye(final int aRowDim, final int aColDim) {

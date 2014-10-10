@@ -37,6 +37,7 @@ import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.ComplexMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.jama.JamaMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -448,9 +449,12 @@ public class ReportedProblems extends OptimisationConvexTests {
 
         this.doP20081014(PrimitiveMatrix.FACTORY);
 
+        this.doP20081014(JamaMatrix.FACTORY);
+
         this.doP20081014(BigMatrix.FACTORY);
 
-        this.doP20081014(JamaMatrix.FACTORY);
+        this.doP20081014(ComplexMatrix.FACTORY);
+
     }
 
     /**
@@ -512,7 +516,7 @@ public class ReportedProblems extends OptimisationConvexTests {
                 -0.01750000000000, 0.01750000000000, 0.13427356981778, 0.50000000000000, -0.14913060410765, 0.06986475572103, -0.08535020176844,
                 0.00284500680371 }));
 
-        TestUtils.assertEquals(tmpMatlabResult, tmpResult, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpMatlabResult, tmpResult, new NumberContext(7, 6));
     }
 
     /**
@@ -584,7 +588,7 @@ public class ReportedProblems extends OptimisationConvexTests {
 
         final BasicMatrix tmpColumns = BigMatrix.FACTORY.columns(tmpResult);
 
-        TestUtils.assertEquals(tmpMatlabSolution, tmpColumns, TestUtils.EQUALS);
+        TestUtils.assertEquals(tmpMatlabSolution, tmpColumns, new NumberContext(7, 11));
     }
 
     /**
@@ -663,7 +667,7 @@ public class ReportedProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
         final PhysicalStore<BigDecimal> tmpSolution = BigMatrix.FACTORY.columns(tmpResult).toBigStore();
-        tmpSolution.modifyAll(TestUtils.EQUALS.newScale(6).getBigEnforceFunction());
+        tmpSolution.modifyAll(new NumberContext(7, 6).getBigEnforceFunction());
         for (final BigDecimal tmpBigDecimal : tmpSolution.asList()) {
             if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
@@ -814,11 +818,11 @@ public class ReportedProblems extends OptimisationConvexTests {
         final Result tmpResult = tmpModel.minimise();
         final double tmpObjFuncVal = tmpResult.getValue();
 
-        TestUtils.assertEquals(-5.281249989, tmpObjFuncVal, TestUtils.EQUALS.newScale(6).error());
+        TestUtils.assertEquals(-5.281249989, tmpObjFuncVal, new NumberContext(7, 6));
 
         final double[] tmpExpected = new double[] { -1.1875, 1.5625, 0.375, 2.5625 };
         for (int i = 0; i < tmpExpected.length; i++) {
-            TestUtils.assertEquals(tmpExpected[i], tmpVariables[i].getValue().doubleValue(), TestUtils.EQUALS.newScale(6).error());
+            TestUtils.assertEquals(tmpExpected[i], tmpVariables[i].getValue().doubleValue(), new NumberContext(7, 6));
         }
 
     }
@@ -926,7 +930,7 @@ public class ReportedProblems extends OptimisationConvexTests {
         final LinearSolver tmpLinSolver = LinearSolver.make(model);
         final Optimisation.Result tmpLinResult = tmpLinSolver.solve();
 
-        TestUtils.assertTrue(model.validate(tmpLinResult, TestUtils.EQUALS.newScale(6)));
+        TestUtils.assertTrue(model.validate(tmpLinResult, new NumberContext(7, 6)));
         TestUtils.assertStateNotLessThanFeasible(tmpLinResult);
     }
 
@@ -1078,62 +1082,73 @@ public class ReportedProblems extends OptimisationConvexTests {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private void doP20081014(final BasicMatrix.Factory<? extends BasicMatrix<?>> factory) {
 
-        final BasicMatrix[] system = new BasicMatrix[6];
-        // {[AE], [be], [Q], [c], [AI], [bi]}
+        final BasicMatrix[] tmpSystem = new BasicMatrix[6];
+        // {[AE], [BE], [Q], [C], [AI], [BI]}
 
-        final double[][] AE = new double[][] {
+        final double[][] tmpAE = new double[][] {
                 { -0.0729971273939726, -0.31619624199405116, -0.14365990081105298, -3.4914813388431334E-15, 0.9963066090106673, 0.9989967493404447, 1.0, 0.0,
                     0.0 },
                     { -2.5486810808521023E-16, 3.6687950405257466, 3.2047109656515507, 1.0, 0.08586699506600544, 0.04478275122437895, 0.0, 1.0, 0.0 },
                     { -7.646043242556307E-15, -107.21808503782593, -97.434268076846, 30.0, -11.54276933307617, 7.647488207332634, 0.0, 0, 1.0 } };
-        system[0] = factory.rows(AE); // AE
+        tmpSystem[0] = factory.rows(tmpAE); // AE
 
-        system[1] = factory.rows(new double[][] { { 10.461669614447484 }, { -0.5328532701990767 }, { 15.782527136201711 } }); // be
+        final double[][] tmpBE = new double[][] { { 10.461669614447484 }, { -0.5328532701990767 }, { 15.782527136201711 } };
+        tmpSystem[1] = factory.rows(tmpBE); // BE
 
-        system[2] = factory.makeEye(9, 9); // Q
-        system[2] = system[2].add(3, 3, 10 - 1);
-        system[2] = system[2].add(4, 4, 10 - 1);
-        system[2] = system[2].add(5, 5, 10 - 1);
-        system[2] = system[2].add(6, 6, 1000000000 - 1);
-        system[2] = system[2].add(7, 7, 1000000000 - 1);
-        system[2] = system[2].add(8, 8, 1000000000 - 1);
+        BasicMatrix<?> tmpQ = factory.makeEye(9, 9);
+        tmpQ = tmpQ.add(3, 3, 10 - 1);
+        tmpQ = tmpQ.add(4, 4, 10 - 1);
+        tmpQ = tmpQ.add(5, 5, 10 - 1);
+        tmpQ = tmpQ.add(6, 6, 1000000000 - 1);
+        tmpQ = tmpQ.add(7, 7, 1000000000 - 1);
+        tmpQ = tmpQ.add(8, 8, 1000000000 - 1);
+        tmpSystem[2] = tmpQ; // Q
 
-        system[3] = factory.rows(new double[][] { { 0 }, { 0 }, { 0 }, { 1 }, { 1 }, { 1 }, { 0 }, { 0 }, { 0 } }); // c
+        final double[][] tmpC = new double[][] { { 0 }, { 0 }, { 0 }, { 1 }, { 1 }, { 1 }, { 0 }, { 0 }, { 0 } };
+        tmpSystem[3] = factory.rows(tmpC); // C
 
-        final double[][] Ain = new double[18][9];
+        final double[][] tmpAI = new double[18][9];
         for (int i = 0; i < 9; i++) {
-            Ain[i][i] = 1;
-            Ain[i + 9][i] = -1;
+            tmpAI[i][i] = 1;
+            tmpAI[i + 9][i] = -1;
         }
-        system[4] = factory.rows(Ain); // AI
+        tmpSystem[4] = factory.rows(tmpAI); // AI
 
-        final double[][] bin = new double[][] { { 0 }, { 0.0175 }, { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 }, { 0 }, { 0.0175 },
+        final double[][] tmpBI = new double[][] { { 0 }, { 0.0175 }, { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 }, { 0 }, { 0.0175 },
                 { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 } };
-        system[5] = factory.rows(bin);
+        tmpSystem[5] = factory.rows(tmpBI); // BI
 
-        final MatrixStore<Double>[] retVal = new MatrixStore[system.length];
-        for (int i = 0; i < retVal.length; i++) {
-            if (system[i] != null) {
-                if (i == 3) {
-                    retVal[i] = system[i].negate().toPrimitiveStore();
-                } else {
-                    retVal[i] = system[i].toPrimitiveStore();
-                }
+        final MatrixStore<Double>[] tmpMatrices = new MatrixStore[tmpSystem.length];
+        for (int i = 0; i < tmpMatrices.length; i++) {
+            if (i == 3) {
+                tmpMatrices[i] = tmpSystem[i].negate().toPrimitiveStore();
+            } else {
+                tmpMatrices[i] = tmpSystem[i].toPrimitiveStore();
             }
         }
 
-        final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(retVal); // bi
-        final ConvexSolver as = tmpBuilder.build();
-        final Optimisation.Result tmpResult = as.solve();
+        final NumberContext tmpContext = new NumberContext(6, 4);
+
+        for (int m = 0; m < tmpMatrices.length; m++) {
+            if (m != 3) {
+                TestUtils.assertEquals(Integer.toString(m), tmpSystem[m], tmpMatrices[m], tmpContext);
+            } else {
+                TestUtils.assertEquals(Integer.toString(m), tmpSystem[m].negate(), tmpMatrices[m], tmpContext);
+            }
+        }
+
+        final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(tmpMatrices); // bi
+        final ConvexSolver tmpSolver = tmpBuilder.build();
+        final Optimisation.Result tmpResult = tmpSolver.solve();
 
         TestUtils.assertTrue("Results not feasible!", tmpResult.getState().isFeasible());
 
         TestUtils.assertStateNotLessThanFeasible(tmpResult);
 
-        final PrimitiveDenseStore tmpMatlabResult = PrimitiveDenseStore.FACTORY.columns(new double[] { 0.00000000000000, -0.01750000000000, -0.01750000000000,
-                0.88830035195990, 4.56989525276369, 5.00000000000000, 0.90562154243124, -1.91718419629399, 0.06390614020590 });
+        final BasicMatrix<?> tmpMatlabResult = factory.columns(new double[] { 0.00000000000000, -0.01750000000000, -0.01750000000000, 0.88830035195990,
+                4.56989525276369, 5.00000000000000, 0.90562154243124, -1.91718419629399, 0.06390614020590 });
 
-        TestUtils.assertEquals(tmpMatlabResult, tmpResult, TestUtils.EQUALS.newScale(4));
+        TestUtils.assertEquals(tmpMatlabResult, tmpResult, tmpContext);
     }
 
 }

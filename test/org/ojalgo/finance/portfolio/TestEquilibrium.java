@@ -36,6 +36,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.StandardType;
+import org.ojalgo.type.context.NumberContext;
 
 public class TestEquilibrium extends FinancePortfolioTests {
 
@@ -140,6 +141,8 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
     public void testRandomProblemsComparedToEquilibrium() {
 
+        final NumberContext tmpWeightsContext = StandardType.PERCENT.newPrecision(6);
+
         final int tmpDim = 9;
 
         final Uniform tmpRndmCorrelation = new Uniform(-0.5, 1.0);
@@ -166,13 +169,13 @@ public class TestEquilibrium extends FinancePortfolioTests {
         @SuppressWarnings("unchecked")
         final PrimitiveMatrix tmpGeneratedWeights = PrimitiveMatrix.FACTORY.columns(tmpNormalisedWeights);
         final BasicMatrix<?> tmpMatchingReturns = tmpEquilibrium.calculateAssetReturns(tmpGeneratedWeights);
-        TestUtils.assertEquals(tmpGeneratedWeights, tmpEquilibrium.calculateAssetWeights(tmpMatchingReturns), StandardType.PERCENT);
+        TestUtils.assertEquals(tmpGeneratedWeights, tmpEquilibrium.calculateAssetWeights(tmpMatchingReturns), tmpWeightsContext);
 
         final FixedWeightsPortfolio tmpFW = new FixedWeightsPortfolio(tmpEquilibrium, tmpGeneratedWeights);
-        TestUtils.assertEquals(tmpMatchingReturns, tmpFW.getAssetReturns(), TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpMatchingReturns, tmpFW.getAssetReturns(), tmpWeightsContext);
 
         final FixedReturnsPortfolio tmpFR = new FixedReturnsPortfolio(tmpEquilibrium, tmpMatchingReturns);
-        TestUtils.assertEquals(tmpGeneratedWeights, tmpFR.getAssetWeights(), StandardType.PERCENT);
+        TestUtils.assertEquals(tmpGeneratedWeights, tmpFR.getAssetWeights(), tmpWeightsContext);
 
         final BlackLittermanModel tmpBLM = new BlackLittermanModel(tmpEquilibrium, tmpGeneratedWeights);
         for (int i = 0; i < tmpDim; i++) {
@@ -187,10 +190,10 @@ public class TestEquilibrium extends FinancePortfolioTests {
             final BigDecimal tmpViewReturn = tmpMatchingReturns.toBigDecimal(i, 0);
             tmpBLM.addViewWithScaledConfidence(tmpViewAssetWeights, tmpViewReturn, BigMath.ONE);
         }
-        TestUtils.assertEquals(tmpGeneratedWeights, tmpBLM.getAssetWeights(), StandardType.PERCENT);
+        TestUtils.assertEquals(tmpGeneratedWeights, tmpBLM.getAssetWeights(), tmpWeightsContext);
 
         final MarkowitzModel tmpMM = new MarkowitzModel(tmpEquilibrium, tmpMatchingReturns);
         final BasicMatrix<?> tmpActual = tmpMM.getAssetWeights();
-        TestUtils.assertEquals(tmpGeneratedWeights, tmpActual, StandardType.PERCENT);
+        TestUtils.assertEquals(tmpGeneratedWeights, tmpActual, tmpWeightsContext);
     }
 }

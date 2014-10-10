@@ -37,14 +37,14 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * SimpleDecompositionCases
- * 
+ *
  * @author apete
  */
-public class TestJama extends AbstractMatrixDecompositionTest {
+public class TestJama extends MatrixDecompositionTests {
 
     private static Cholesky<Double> CHOLESKY = new JamaCholesky();
     private static Eigenvalue<Double> EIGENVALUE = new JamaEigenvalue.General();
-    private static NumberContext EVAL_CNTXT = NumberContext.getGeneral(8);
+    private static NumberContext EVAL_CNTXT = NumberContext.getGeneral(8).newPrecision(15);
     private static LU<Double> LU = new JamaLU();
     private static QR<Double> QR = new JamaQR();
     private static SingularValue<Double> SINGULAR_VALUE = new JamaSingularValue();

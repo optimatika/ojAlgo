@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function;
 
-public abstract class BinaryFunction<N extends Number> implements Function<N> {
+public abstract class BinaryFunction<N extends Number> implements BasicFunction<N> {
 
     /**
      * A {@linkplain BinaryFunction} with a set/fixed first argument.

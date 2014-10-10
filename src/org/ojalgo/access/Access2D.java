@@ -33,7 +33,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     /**
      * This interface mimics {@linkplain Fillable}, but methods return the builder instance instead, and then adds the
      * {@link #build()} method.
-     * 
+     *
      * @author apete
      */
     public interface Builder<I extends Access2D<?>> extends Structure2D, Access1D.Builder<I> {
@@ -60,20 +60,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         boolean isAbsolute(long row, long column);
 
         /**
-         * @see Scalar#isInfinite()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long,long)} and {@link #isZero(long,long)}.
-         */
-        @Deprecated
-        boolean isInfinite(long row, long column);
-
-        /**
-         * @see Scalar#isNaN()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long,long)} and {@link #isZero(long,long)}.
-         */
-        @Deprecated
-        boolean isNaN(long row, long column);
-
-        /**
          * @see Scalar#isPositive()
          * @deprecated v36 Only plan to keep {@link #isAbsolute(long,long)} and {@link #isZero(long,long)}.
          */
@@ -81,16 +67,16 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         boolean isPositive(long row, long column);
 
         /**
-         * @see Scalar#isReal()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long,long)} and {@link #isZero(long,long)}.
+         * @see Scalar#isZero()
+         * @deprecated v37
          */
         @Deprecated
-        boolean isReal(long row, long column);
+        boolean isZero(long row, long column);
 
         /**
-         * @see Scalar#isZero()
+         * @see Scalar#isSmall(double)
          */
-        boolean isZero(long row, long column);
+        boolean isSmall(long row, long column, double comparedTo);
 
     }
 
@@ -167,7 +153,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     /**
      * Extracts one element of this matrix as a double.
-     * 
+     *
      * @param row A row index.
      * @param column A column index.
      * @return One matrix element

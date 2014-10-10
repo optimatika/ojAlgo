@@ -383,7 +383,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public ComplexNumber getNumber() {
-                    if (myNumber.isInfinite()) {
+                    if (ComplexNumber.isInfinite(myNumber)) {
                         return ComplexNumber.ZERO;
                     } else {
                         return myNumber;
@@ -395,7 +395,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final ComplexNumber anArg) {
-                    if (!anArg.isZero()) {
+                    if (!ComplexNumber.isZero(anArg)) {
                         myNumber = ComplexFunction.MIN.invoke(myNumber, ABS.invoke(anArg));
                     }
                 }
@@ -436,7 +436,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public ComplexNumber getNumber() {
-                    if (myNumber.isInfinite()) {
+                    if (ComplexNumber.isInfinite(myNumber)) {
                         return ComplexNumber.ZERO;
                     } else {
                         return myNumber;

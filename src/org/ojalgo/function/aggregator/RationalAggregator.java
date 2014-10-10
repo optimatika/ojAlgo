@@ -383,7 +383,7 @@ public abstract class RationalAggregator {
                 }
 
                 public RationalNumber getNumber() {
-                    if (myNumber.isInfinite()) {
+                    if (RationalNumber.isInfinite(myNumber)) {
                         return RationalNumber.ZERO;
                     } else {
                         return myNumber;
@@ -399,7 +399,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final RationalNumber anArg) {
-                    if (!anArg.isZero()) {
+                    if (!RationalNumber.isZero(anArg)) {
                         myNumber = RationalFunction.MIN.invoke(myNumber, ABS.invoke(anArg));
                     }
                 }
@@ -437,7 +437,7 @@ public abstract class RationalAggregator {
                 }
 
                 public RationalNumber getNumber() {
-                    if (myNumber.isInfinite()) {
+                    if (RationalNumber.isInfinite(myNumber)) {
                         return RationalNumber.ZERO;
                     } else {
                         return myNumber;

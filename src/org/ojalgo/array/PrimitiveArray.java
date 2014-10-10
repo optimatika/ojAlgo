@@ -430,23 +430,8 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
-    protected final boolean isInfinite(final int index) {
-        return PrimitiveScalar.isInfinite(data[index]);
-    }
-
-    @Override
-    protected final boolean isNaN(final int index) {
-        return PrimitiveScalar.isNaN(data[index]);
-    }
-
-    @Override
     protected final boolean isPositive(final int index) {
         return PrimitiveScalar.isPositive(data[index]);
-    }
-
-    @Override
-    protected final boolean isReal(final int index) {
-        return PrimitiveScalar.IS_REAL;
     }
 
     @Override
@@ -561,6 +546,11 @@ public class PrimitiveArray extends DenseArray<Double> {
     @Override
     DenseArray<Double> newInstance(final int capacity) {
         return new PrimitiveArray(capacity);
+    }
+
+    @Override
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return PrimitiveScalar.isSmall(comparedTo, data[index]);
     }
 
 }

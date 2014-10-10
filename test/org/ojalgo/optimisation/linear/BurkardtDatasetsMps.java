@@ -35,7 +35,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
     private static final String COMPOSITION_NOT_VALID = " Composition not valid!";
     private static final String PATH = "./test/org/ojalgo/optimisation/linear/";
-    private static final NumberContext PRECISION = TestUtils.EQUALS.newScale(6);
+    private static final NumberContext PRECISION = new NumberContext(7, 6);
     private static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
     public BurkardtDatasetsMps() {
@@ -70,7 +70,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
         final BigDecimal tmpExpVal = new BigDecimal("225494.96316238446"); // Stated to be .22549496316e+6
         final double tmpActVal = tmpModel.minimise().getValue();
 
-        TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION.error());
+        TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION);
 
         if (!tmpModel.validate(PRECISION)) {
             TestUtils.fail(SOLUTION_NOT_VALID);
@@ -93,7 +93,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
         final BigDecimal tmpExpVal = new BigDecimal("-.46475314286e+3");
         final double tmpActVal = tmpModel.minimise().getValue();
-        TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION.error());
+        TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION);
 
         if (!tmpModel.validate(PRECISION)) {
             TestUtils.fail(SOLUTION_NOT_VALID);
@@ -190,7 +190,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
         final double tmpExpVal = tmpExpModel.minimise().getValue();
         final double tmpActVal = tmpActModel.minimise().getValue();
-        TestUtils.assertEquals(tmpExpVal, tmpActVal, PRECISION.error());
+        TestUtils.assertEquals(tmpExpVal, tmpActVal, PRECISION);
 
         final Access1D<BigDecimal> tmpExpSolution = tmpExpModel.getVariableValues();
         final Access1D<BigDecimal> tmpActSolution = tmpActModel.getVariableValues();
@@ -199,7 +199,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
         TestUtils.assertEquals(tmpVariables.length, tmpActSolution.count());
 
         for (int i = 0; i < tmpVariables.length; i++) {
-            TestUtils.assertEquals(tmpVariables[i].getName(), tmpExpSolution.doubleValue(i), tmpActSolution.doubleValue(i), PRECISION.error());
+            TestUtils.assertEquals(tmpVariables[i].getName(), tmpExpSolution.doubleValue(i), tmpActSolution.doubleValue(i), PRECISION);
         }
 
         if (!tmpExpModel.validate(PRECISION)) {
@@ -219,7 +219,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
         if (aExpMinVal != null) {
 
-            TestUtils.assertEquals(aExpMinVal.doubleValue(), aModel.minimise().getValue(), PRECISION.error());
+            TestUtils.assertEquals(aExpMinVal.doubleValue(), aModel.minimise().getValue(), PRECISION);
 
             if (!aModel.validate(PRECISION)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
@@ -228,7 +228,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
         if (aExpMaxVal != null) {
 
-            TestUtils.assertEquals(aExpMaxVal.doubleValue(), aModel.maximise().getValue(), PRECISION.error());
+            TestUtils.assertEquals(aExpMaxVal.doubleValue(), aModel.maximise().getValue(), PRECISION);
 
             if (!aModel.validate(PRECISION)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);

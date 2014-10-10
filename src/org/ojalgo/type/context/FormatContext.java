@@ -30,7 +30,7 @@ import org.ojalgo.netio.ASCII;
 
 /**
  * Abstract base class for {@linkplain TypeContext} implementations backed by {@linkplain Format}.
- * 
+ *
  * @author apete
  */
 abstract class FormatContext<T> implements TypeContext<T>, Serializable {

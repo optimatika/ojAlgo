@@ -32,11 +32,12 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete
  */
-public class TridiagonalizeCase extends AbstractMatrixDecompositionTest {
+public class TridiagonalizeCase extends MatrixDecompositionTests {
 
     public TridiagonalizeCase() {
         super();
@@ -111,9 +112,9 @@ public class TridiagonalizeCase extends AbstractMatrixDecompositionTest {
         tmpComplexDecomp.compute(tmpComplexA);
         tmpPrimitiveDecomp.compute(tmpPrimitiveA);
 
-        TestUtils.assertEquals(tmpBigA, tmpBigDecomp, TestUtils.EQUALS);
-        TestUtils.assertEquals(tmpComplexA, tmpComplexDecomp, TestUtils.EQUALS);
-        TestUtils.assertEquals(tmpPrimitiveA, tmpPrimitiveDecomp, TestUtils.EQUALS);
+        TestUtils.assertEquals(tmpBigA, tmpBigDecomp, new NumberContext(7, 14));
+        TestUtils.assertEquals(tmpComplexA, tmpComplexDecomp, new NumberContext(7, 14));
+        TestUtils.assertEquals(tmpPrimitiveA, tmpPrimitiveDecomp, new NumberContext(7, 14));
 
         if (MatrixDecompositionTests.DEBUG) {
 
@@ -126,10 +127,10 @@ public class TridiagonalizeCase extends AbstractMatrixDecompositionTest {
             BasicLogger.debug("Primitive D", tmpPrimitiveDecomp.getD());
         }
 
-        TestUtils.assertEquals(tmpPrimitiveDecomp.getD(), PrimitiveDenseStore.FACTORY.copy(tmpBigDecomp.getD()), TestUtils.EQUALS);
+        TestUtils.assertEquals(tmpPrimitiveDecomp.getD(), PrimitiveDenseStore.FACTORY.copy(tmpBigDecomp.getD()), new NumberContext(7, 14));
         // TODO        JUnitUtils.assertEquals(tmpPrimitiveDecomp.getD(), PrimitiveDenseStore.FACTORY.copy(tmpComplexDecomp.getD()), JUnitUtils.EQUALS);
 
-        TestUtils.assertEquals(tmpPrimitiveDecomp.getQ(), PrimitiveDenseStore.FACTORY.copy(tmpBigDecomp.getQ()), TestUtils.EQUALS);
+        TestUtils.assertEquals(tmpPrimitiveDecomp.getQ(), PrimitiveDenseStore.FACTORY.copy(tmpBigDecomp.getQ()), new NumberContext(7, 14));
         // TODO        JUnitUtils.assertEquals(tmpPrimitiveDecomp.getQ(), PrimitiveDenseStore.FACTORY.copy(tmpComplexDecomp.getQ()), JUnitUtils.EQUALS);
     }
 
@@ -153,8 +154,8 @@ public class TridiagonalizeCase extends AbstractMatrixDecompositionTest {
 
         tmpDecomp.compute(aMtrxA);
 
-        TestUtils.assertEquals(aMtrxD, tmpDecomp.getD(), TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(aMtrxD, tmpDecomp.getD(), new NumberContext(7, 6));
 
-        TestUtils.assertEquals(aMtrxA, tmpDecomp, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(aMtrxA, tmpDecomp, new NumberContext(7, 6));
     }
 }

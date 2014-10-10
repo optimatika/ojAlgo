@@ -455,4 +455,14 @@ final class TransposedDecompositionStore<N extends Number> implements Decomposit
     public void visitRow(final long row, final long column, final VoidFunction<N> visitor) {
         myDelegate.visitColumn(column, row, visitor);
     }
+
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean isSmall(final long index, final double comparedTo) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

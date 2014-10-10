@@ -390,22 +390,6 @@ Access2D.Visitable<N>, Serializable {
         return myDelegate.get(row + (column * myRowsCount));
     }
 
-    /**
-     * @deprecated v36 Use {@link #indexOfLargestInColumn(long,long)} instead
-     */
-    @Deprecated
-    public long getIndexOfLargestInColumn(final long row, final long column) {
-        return this.indexOfLargestInColumn(row, column);
-    }
-
-    /**
-     * @deprecated v36 Use {@link #indexOfLargestInRow(long,long)} instead
-     */
-    @Deprecated
-    public long getIndexOfLargestInRow(final long row, final long column) {
-        return this.indexOfLargestInRow(row, column);
-    }
-
     @Override
     public int hashCode() {
         return (int) (myRowsCount * myColumnsCount * myDelegate.hashCode());
@@ -445,22 +429,6 @@ Access2D.Visitable<N>, Serializable {
         return myDelegate.isZeros(row + (column * myRowsCount), row + tmpCount + ((column + tmpCount) * myRowsCount), 1L + myRowsCount);
     }
 
-    public boolean isInfinite(final long index) {
-        return myDelegate.isInfinite(index);
-    }
-
-    public boolean isInfinite(final long row, final long column) {
-        return myDelegate.isInfinite(row + (column * myRowsCount));
-    }
-
-    public boolean isNaN(final long index) {
-        return myDelegate.isNaN(index);
-    }
-
-    public boolean isNaN(final long row, final long column) {
-        return myDelegate.isNaN(row + (column * myRowsCount));
-    }
-
     public boolean isPositive(final long index) {
         return myDelegate.isPositive(index);
     }
@@ -469,16 +437,16 @@ Access2D.Visitable<N>, Serializable {
         return myDelegate.isPositive(row + (column * myRowsCount));
     }
 
-    public boolean isReal(final long index) {
-        return myDelegate.isReal(index);
-    }
-
-    public boolean isReal(final long row, final long column) {
-        return myDelegate.isReal(row + (column * myRowsCount));
-    }
-
     public boolean isRowZeros(final long row, final long column) {
         return myDelegate.isZeros(row + (column * myRowsCount), row + (myColumnsCount * myRowsCount), myRowsCount);
+    }
+
+    public boolean isSmall(final long index, final double comparedTo) {
+        return myDelegate.isSmall(index, comparedTo);
+    }
+
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return myDelegate.isSmall(row + (column * myRowsCount), comparedTo);
     }
 
     public boolean isZero(final long index) {

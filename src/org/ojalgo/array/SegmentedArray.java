@@ -253,20 +253,12 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return mySegments[(int) (index >> myIndexBits)].isAbsolute(index & myIndexMask);
     }
 
-    public boolean isInfinite(final long index) {
-        return mySegments[(int) (index >> myIndexBits)].isInfinite(index & myIndexMask);
-    }
-
-    public boolean isNaN(final long index) {
-        return mySegments[(int) (index >> myIndexBits)].isNaN(index & myIndexMask);
-    }
-
     public boolean isPositive(final long index) {
         return mySegments[(int) (index >> myIndexBits)].isPositive(index & myIndexMask);
     }
 
-    public boolean isReal(final long index) {
-        return mySegments[(int) (index >> myIndexBits)].isReal(index & myIndexMask);
+    public boolean isSmall(final long index, final double comparedTo) {
+        return mySegments[(int) (index >> myIndexBits)].isSmall(index & myIndexMask, comparedTo);
     }
 
     public boolean isZero(final long index) {

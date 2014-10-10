@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function;
 
-public abstract class ParameterFunction<N extends Number> implements Function<N> {
+public abstract class ParameterFunction<N extends Number> implements BasicFunction<N> {
 
     /**
      * A {@linkplain ParameterFunction} with a set/fixed parameter.

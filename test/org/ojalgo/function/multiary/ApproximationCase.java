@@ -26,6 +26,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
+import org.ojalgo.type.context.NumberContext;
 
 public class ApproximationCase extends FunctionMultiaryTests {
 
@@ -52,7 +53,7 @@ public class ApproximationCase extends FunctionMultiaryTests {
 
         final PhysicalStore<Double> tmpX = PrimitiveDenseStore.FACTORY.makeRandom(tmpArity, 1, new Uniform(-10, 20));
 
-        TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), TestUtils.EQUALS);
+        TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), new NumberContext(7, 14));
     }
 
     public void testSecondOrderApproximation() {

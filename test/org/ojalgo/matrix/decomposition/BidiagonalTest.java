@@ -29,11 +29,12 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete
  */
-public class BidiagonalTest extends AbstractMatrixDecompositionTest {
+public class BidiagonalTest extends MatrixDecompositionTests {
 
     public BidiagonalTest() {
         super();
@@ -77,8 +78,8 @@ public class BidiagonalTest extends AbstractMatrixDecompositionTest {
             BasicLogger.debug("Q2 orthogonal (right)", tmpQ2.multiplyRight(tmpQ2.conjugate()));
         }
 
-        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, TestUtils.EQUALS.newScale(4));
-        TestUtils.assertEquals(tmpOriginal, tmpReconstructed, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(tmpOriginal, tmpDecomposition, new NumberContext(7, 4));
+        TestUtils.assertEquals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6));
     }
 
     public void testFatEye() {
@@ -146,23 +147,23 @@ public class BidiagonalTest extends AbstractMatrixDecompositionTest {
         final BidiagonalDecomposition<Double> tmpDecomposition = (BidiagonalDecomposition<Double>) BidiagonalDecomposition.makePrimitive();
         tmpDecomposition.compute(aMatrix);
 
-        if (!MatrixUtils.equals(aMatrix, tmpDecomposition, TestUtils.EQUALS.newScale(6))) {
+        if (!MatrixUtils.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Not equals, easy!");
         }
 
-        if (!MatrixUtils.equals(aMatrix, tmpDecomposition, TestUtils.EQUALS.newScale(6))) {
+        if (!MatrixUtils.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Not equals, hard!");
         }
 
         final MatrixStore<Double> tmpReconstructed = MatrixUtils.reconstruct(tmpDecomposition);
-        if (!AccessUtils.equals(aMatrix, tmpReconstructed, TestUtils.EQUALS.newScale(6))) {
+        if (!AccessUtils.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Failed to reconstruct!");
         }
 
-        TestUtils.assertEquals(aMatrix, tmpDecomposition, TestUtils.EQUALS.newScale(6));
+        TestUtils.assertEquals(aMatrix, tmpDecomposition, new NumberContext(7, 6));
     }
 
     private PrimitiveDenseStore makeEye(final int aRowDim, final int aColDim) {

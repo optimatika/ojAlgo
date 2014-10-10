@@ -52,7 +52,7 @@ import org.ojalgo.type.context.NumberContext;
 @SuppressWarnings("deprecation")
 public abstract class TestUtils {
 
-    public static final NumberContext EQUALS = new NumberContext(7, 14, RoundingMode.HALF_EVEN);
+    private static final NumberContext EQUALS = new NumberContext(7, 14, RoundingMode.HALF_EVEN);
 
     public static void assertBounds(final Number lower, final Access1D<?> values, final Number upper, final NumberContext precision) {
         for (final Number tmpValue : values) {
@@ -72,7 +72,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final Access1D<?> expected, final Access1D<?> actual) {
-        TestUtils.assertEquals("Access1D<?> != Access1D<?>", expected, actual, EQUALS);
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final Access1D<?> expected, final Access1D<?> actual, final NumberContext context) {
@@ -84,7 +84,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final ComplexNumber expected, final ComplexNumber actual) {
-        TestUtils.assertEquals("ComplexNumber != ComplexNumber", expected, actual, EQUALS);
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final ComplexNumber expected, final ComplexNumber actual, final NumberContext context) {
@@ -92,12 +92,12 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final double expected, final ComplexNumber actual, final NumberContext context) {
-        Assert.assertEquals("ComplexNumber.re", expected, actual.doubleValue(), context.error());
-        Assert.assertEquals("ComplexNumber.im", PrimitiveMath.ZERO, actual.i, context.error());
+        TestUtils.assertEquals("ComplexNumber.re", expected, actual.doubleValue(), context);
+        TestUtils.assertEquals("ComplexNumber.im", PrimitiveMath.ZERO, actual.i, context);
     }
 
     public static void assertEquals(final double expected, final double actual) {
-        TestUtils.assertEquals("double != double", expected, actual, EQUALS);
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final double expected, final double actual, final double delta) {
@@ -165,7 +165,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final Number expected, final Number actual) {
-        TestUtils.assertEquals("Number != Number", expected, actual, EQUALS);
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final Number expected, final Number actual, final NumberContext context) {
@@ -177,7 +177,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final Quaternion expected, final Quaternion actual) {
-        TestUtils.assertEquals("Quaternion != Quaternion", expected, actual, EQUALS);
+        TestUtils.assertEquals(expected, actual, EQUALS);
     }
 
     public static void assertEquals(final Quaternion expected, final Quaternion actual, final NumberContext context) {
@@ -212,7 +212,12 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final String message, final double expected, final double actual, final NumberContext context) {
-        TestUtils.assertEquals(message, Double.valueOf(expected), Double.valueOf(actual), context);
+        // TestUtils.assertEquals(message, Double.valueOf(expected), Double.valueOf(actual), context);
+        if (Double.isNaN(expected) && Double.isNaN(actual)) {
+
+        } else if (!!context.isDifferent(expected, actual)) {
+            Assert.fail(Assert.format(message, expected, actual));
+        }
     }
 
     public static void assertEquals(final String message, final int expected, final int actual) {
@@ -230,17 +235,37 @@ public abstract class TestUtils {
             final ComplexNumber tmpExpected = TypeUtils.toComplexNumber(expected);
             final ComplexNumber tmpActual = TypeUtils.toComplexNumber(actual);
 
-            TestUtils.assertEquals(message + " (real part)", tmpExpected.doubleValue(), tmpActual.doubleValue(), context);
-            TestUtils.assertEquals(message + " (imaginary part)", tmpExpected.i, tmpActual.i, context);
+            if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
+                Assert.failNotEquals(message + " (real)", expected, actual);
+            }
+            if (!!context.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
+                Assert.failNotEquals(message + " (imaginary)", expected, actual);
+            }
+
+        } else if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
+
+            final Quaternion tmpExpected = TypeUtils.toQuaternion(expected);
+            final Quaternion tmpActual = TypeUtils.toQuaternion(actual);
+
+            if (!!context.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
+                Assert.failNotEquals(message + " (scalar)", expected, actual);
+            }
+            if (!!context.isDifferent(tmpExpected.i, tmpActual.i)) {
+                Assert.failNotEquals(message + " (i)", expected, actual);
+            }
+            if (!!context.isDifferent(tmpExpected.j, tmpActual.j)) {
+                Assert.failNotEquals(message + " (j)", expected, actual);
+            }
+            if (!!context.isDifferent(tmpExpected.k, tmpActual.k)) {
+                Assert.failNotEquals(message + " (k)", expected, actual);
+            }
 
         } else {
 
-            final BigDecimal tmpExpected = TypeUtils.toBigDecimal(expected, context);
-            final BigDecimal tmpActual = TypeUtils.toBigDecimal(actual, context);
-
-            Assert.assertEquals(message, tmpExpected, tmpActual);
+            if (!!context.isDifferent(expected.doubleValue(), actual.doubleValue())) {
+                Assert.failNotEquals(message, expected, actual);
+            }
         }
-
     }
 
     public static void assertEquals(final String message, final Object expected, final Object actual) {

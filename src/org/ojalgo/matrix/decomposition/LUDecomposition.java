@@ -46,7 +46,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
  * {@linkplain #makeBig()}, {@linkplain #makeComplex()}, {@linkplain #makePrimitive()} or {@linkplain #makeJama()}.
- * 
+ *
  * @author apete
  */
 public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LU<N> {
@@ -218,16 +218,18 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
 
         int retVal = 0;
 
-        final DecompositionStore<N> tmpStore = this.getInPlace();
+        final DecompositionStore<N> tmpInPlace = this.getInPlace();
 
-        final int tmpMinDim = (int) Math.min(tmpStore.countRows(), tmpStore.countColumns());
+        final AggregatorFunction<N> tmpLargest = this.getAggregatorCollection().largest();
+        tmpInPlace.visitDiagonal(0L, 0L, tmpLargest);
+        final double tmpLargestValue = tmpLargest.doubleValue();
+
+        final int tmpMinDim = this.getMinDim();
+
         for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpStore.isZero(ij, ij)) {
+            if (!tmpInPlace.isSmall(ij, ij, tmpLargestValue)) {
                 retVal++;
             }
-            //            if (!TypeUtils.isZero(tmpStore.doubleValue(ij, ij), PrimitiveMath.IS_ZERO)) {
-            //                retVal++;
-            //            }
         }
 
         return retVal;
@@ -290,19 +292,19 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
 
     /**
      * Solves [this][X] = [aRHS] by first solving
-     * 
+     *
      * <pre>
      * [L][Y] = [aRHS]
      * </pre>
-     * 
+     *
      * and then
-     * 
+     *
      * <pre>
      * [U][X] = [Y]
      * </pre>
-     * 
+     *
      * .
-     * 
+     *
      * @param rhs The right hand side
      * @return [X] The solution will be written to "preallocated" and then returned.
      * @see org.ojalgo.matrix.decomposition.AbstractDecomposition#solve(Access2D,
@@ -351,7 +353,8 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
             }
 
             // Do the calculations...
-            if (!tmpInPlace.isZero(ij, ij)) {
+            // if (!tmpInPlace.isZero(ij, ij)) {
+            if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
 
                 // Calculate multipliers and copy to local column
                 // Current column, below the diagonal

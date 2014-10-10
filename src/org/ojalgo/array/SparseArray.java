@@ -218,24 +218,6 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public boolean isInfinite(final long index) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.isInfinite(tmpIndex);
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isNaN(final long index) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.isNaN(tmpIndex);
-        } else {
-            return false;
-        }
-    }
-
     public boolean isPositive(final long index) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
@@ -245,10 +227,10 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public boolean isReal(final long index) {
+    public boolean isSmall(final long index, final double comparedTo) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
-            return myValues.isReal(tmpIndex);
+            return myValues.isSmall(tmpIndex, comparedTo);
         } else {
             return true;
         }

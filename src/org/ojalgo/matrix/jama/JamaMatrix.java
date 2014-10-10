@@ -64,6 +64,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class JamaMatrix extends Object implements BasicMatrix<Double>, PhysicalStore<Double>, Serializable {
 
+    public static final JamaFactory FACTORY = new JamaFactory();
+
     public static Access2D.Builder<JamaMatrix> getBuilder(final int aLength) {
         return FACTORY.getBuilder(aLength);
     }
@@ -105,8 +107,6 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
             return new Rotation.Primitive(aTransf);
         }
     }
-
-    public static final JamaFactory FACTORY = new JamaFactory();
 
     private final Matrix myDelegate;
 
@@ -594,26 +594,8 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         return this.isSymmetric();
     }
 
-    public boolean isInfinite(final long index) {
-        final int tmpRowDim = myDelegate.getRowDimension();
-        return PrimitiveScalar.isInfinite(myDelegate.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
-    }
-
-    public boolean isInfinite(final long row, final long column) {
-        return PrimitiveScalar.isInfinite(this.doubleValue(row, column));
-    }
-
     public boolean isLowerLeftShaded() {
         return false;
-    }
-
-    public boolean isNaN(final long index) {
-        final int tmpRowDim = myDelegate.getRowDimension();
-        return PrimitiveScalar.isNaN(myDelegate.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
-    }
-
-    public boolean isNaN(final long row, final long column) {
-        return PrimitiveScalar.isNaN(this.doubleValue(row, column));
     }
 
     public boolean isPositive(final long index) {
@@ -625,16 +607,17 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         return PrimitiveScalar.isPositive(this.doubleValue(row, column));
     }
 
-    public boolean isReal(final long index) {
-        return PrimitiveScalar.IS_REAL;
-    }
-
-    public boolean isReal(final long row, final long column) {
-        return PrimitiveScalar.IS_REAL;
-    }
-
     public boolean isScalar() {
         return (myDelegate.getRowDimension() == 1) && (myDelegate.getColumnDimension() == 1);
+    }
+
+    public boolean isSmall(final long index, final double comparedTo) {
+        final int tmpRowDim = myDelegate.getRowDimension();
+        return PrimitiveScalar.isSmall(comparedTo, myDelegate.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
+    }
+
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return PrimitiveScalar.isSmall(comparedTo, this.doubleValue(row, column));
     }
 
     public boolean isSquare() {

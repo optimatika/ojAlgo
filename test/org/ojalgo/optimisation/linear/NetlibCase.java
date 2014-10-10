@@ -29,7 +29,7 @@ public class NetlibCase extends OptimisationLinearTests {
 
     private static final String COMPOSITION_NOT_VALID = " Composition not valid!";
     private static final String PATH = "./test/org/ojalgo/optimisation/linear/";
-    private static final NumberContext PRECISION = TestUtils.EQUALS.newScale(6);
+    private static final NumberContext PRECISION = new NumberContext(7, 6);
     private static final String SOLUTION_NOT_VALID = "Solution not valid!";
 
     public NetlibCase() {
@@ -49,8 +49,10 @@ public class NetlibCase extends OptimisationLinearTests {
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
         final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
 
-        //  tmpModel.options.problem = new NumberContext(16, 8, RoundingMode.HALF_EVEN);
-        //   tmpModel.options.solution = new NumberContext(16, 10, RoundingMode.HALF_EVEN);
+        //tmpModel.options.problem = new NumberContext(32, 8, RoundingMode.HALF_EVEN);
+        //tmpModel.options.solution = new NumberContext(16, 10, RoundingMode.HALF_EVEN);
+
+        tmpModel.options.debug(LinearSolver.class);
 
         this.assertMinMaxVal(tmpModel, new BigDecimal("-3.0812149846E+01"), null);
     }
@@ -111,7 +113,7 @@ public class NetlibCase extends OptimisationLinearTests {
 
         if (aExpMinVal != null) {
 
-            TestUtils.assertEquals(aExpMinVal.doubleValue(), aModel.minimise().getValue(), PRECISION.error());
+            TestUtils.assertEquals(aExpMinVal.doubleValue(), aModel.minimise().getValue(), PRECISION);
 
             if (!aModel.validate(PRECISION)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
@@ -120,7 +122,7 @@ public class NetlibCase extends OptimisationLinearTests {
 
         if (aExpMaxVal != null) {
 
-            TestUtils.assertEquals(aExpMaxVal.doubleValue(), aModel.maximise().getValue(), PRECISION.error());
+            TestUtils.assertEquals(aExpMaxVal.doubleValue(), aModel.maximise().getValue(), PRECISION);
 
             if (!aModel.validate(PRECISION)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
