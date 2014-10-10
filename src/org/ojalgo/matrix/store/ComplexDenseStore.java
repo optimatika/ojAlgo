@@ -66,6 +66,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     }
 
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return myUtility.isSmall(row, column, comparedTo);
+    }
+
     public static interface ComplexMultiplyLeft {
 
         void invoke(ComplexNumber[] product, Access1D<ComplexNumber> left, int complexity, ComplexNumber[] right);

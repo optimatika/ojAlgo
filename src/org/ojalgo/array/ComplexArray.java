@@ -369,4 +369,9 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
         return new ComplexArray(capacity);
     }
 
+    @Override
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return ComplexNumber.isSmall(comparedTo, data[index]);
+    }
+
 }

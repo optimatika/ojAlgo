@@ -90,7 +90,7 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     protected void setUp() throws Exception {
 
         DEFINITION = new NumberContext(7, 4);
-        EVALUATION = new NumberContext(7, 0); // TODO Something must be wrong here!
+        EVALUATION = new NumberContext(4, 4); // TODO Something must be wrong here!
 
         myBigAA = SimpleLeastSquaresCase.getFactorR();
         myBigAX = SimpleLeastSquaresCase.getSolution();

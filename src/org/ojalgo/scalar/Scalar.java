@@ -169,10 +169,10 @@ public interface Scalar<N extends Number> extends Comparable<N> {
     boolean isAbsolute();
 
     /**
-     * @param reference
+     * @param comparedTo
      * @return true if this scalar is small compared to the magnitude of the input reference value.
      */
-    boolean isSmall(double reference);
+    boolean isSmall(double comparedTo);
 
     /**
      * @deprecated v37 Use {@link #isSmall(double)} instead.

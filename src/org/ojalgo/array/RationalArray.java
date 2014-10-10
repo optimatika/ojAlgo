@@ -368,4 +368,8 @@ public class RationalArray extends DenseArray<RationalNumber> {
         return new RationalArray(capacity);
     }
 
+    @Override
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return RationalNumber.isSmall(comparedTo, data[index]);
+    }
 }

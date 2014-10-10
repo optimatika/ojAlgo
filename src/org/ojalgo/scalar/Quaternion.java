@@ -91,8 +91,8 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
         return value.isReal();
     }
 
-    public static boolean isSmall(final double reference, final Quaternion value) {
-        return value.isSmall(reference);
+    public static boolean isSmall(final double comparedTo, final Quaternion value) {
+        return value.isSmall(comparedTo);
     }
 
     public static boolean isZero(final Quaternion value) {
@@ -426,21 +426,21 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
         if (myRealForSure) {
             return myScalar >= PrimitiveMath.ZERO;
         } else {
-            return AbstractScalar.PRIMITIVE.isSmallError(myScalar, this.norm());
+            return !AbstractScalar.PRIMITIVE.isDifferent(myScalar, this.norm());
         }
     }
 
     public boolean isPure() {
-        return myPureForSure || AbstractScalar.PRIMITIVE.isSmallComparedTo(this.norm(), myScalar);
+        return myPureForSure || AbstractScalar.PRIMITIVE.isSmall(this.norm(), myScalar);
     }
 
     public boolean isReal() {
         final NumberContext tmpCntxt = AbstractScalar.PRIMITIVE;
-        return myRealForSure || (tmpCntxt.isSmallComparedTo(myScalar, i) && tmpCntxt.isSmallComparedTo(myScalar, j) && tmpCntxt.isSmallComparedTo(myScalar, k));
+        return myRealForSure || (tmpCntxt.isSmall(myScalar, i) && tmpCntxt.isSmall(myScalar, j) && tmpCntxt.isSmall(myScalar, k));
     }
 
-    public boolean isSmall(final double reference) {
-        return AbstractScalar.PRIMITIVE.isSmallComparedTo(reference, this.norm());
+    public boolean isSmall(final double comparedTo) {
+        return AbstractScalar.PRIMITIVE.isSmall(comparedTo, this.norm());
     }
 
     public Iterator<Double> iterator() {

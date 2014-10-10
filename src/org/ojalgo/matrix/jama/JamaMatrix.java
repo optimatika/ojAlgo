@@ -64,6 +64,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class JamaMatrix extends Object implements BasicMatrix<Double>, PhysicalStore<Double>, Serializable {
 
+    public static final JamaFactory FACTORY = new JamaFactory();
+
     public static Access2D.Builder<JamaMatrix> getBuilder(final int aLength) {
         return FACTORY.getBuilder(aLength);
     }
@@ -105,8 +107,6 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
             return new Rotation.Primitive(aTransf);
         }
     }
-
-    public static final JamaFactory FACTORY = new JamaFactory();
 
     private final Matrix myDelegate;
 
@@ -609,6 +609,15 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
 
     public boolean isScalar() {
         return (myDelegate.getRowDimension() == 1) && (myDelegate.getColumnDimension() == 1);
+    }
+
+    public boolean isSmall(final long index, final double comparedTo) {
+        final int tmpRowDim = myDelegate.getRowDimension();
+        return PrimitiveScalar.isSmall(comparedTo, myDelegate.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
+    }
+
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return PrimitiveScalar.isSmall(comparedTo, this.doubleValue(row, column));
     }
 
     public boolean isSquare() {

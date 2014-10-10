@@ -165,7 +165,7 @@ public class ReportedProblems extends OptimisationIntegerTests {
 
         BasicLogger.debug(tmpResult.toString());
 
-        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, NumberContext.getGeneral(8));
+        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, new NumberContext(8, 8));
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());
     }
 
@@ -241,7 +241,7 @@ public class ReportedProblems extends OptimisationIntegerTests {
 
         BasicLogger.debug(tmpResult.toString());
 
-        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, NumberContext.getGeneral(8));
+        TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, new NumberContext(8, 8));
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());
     }
 

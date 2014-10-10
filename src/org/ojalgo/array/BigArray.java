@@ -368,4 +368,9 @@ public class BigArray extends DenseArray<BigDecimal> {
         return new BigArray(capacity);
     }
 
+    @Override
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return BigScalar.isSmall(comparedTo, data[index]);
+    }
+
 }

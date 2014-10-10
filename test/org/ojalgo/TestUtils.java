@@ -215,7 +215,7 @@ public abstract class TestUtils {
         // TestUtils.assertEquals(message, Double.valueOf(expected), Double.valueOf(actual), context);
         if (Double.isNaN(expected) && Double.isNaN(actual)) {
 
-        } else if (!context.isSmallError(expected, actual)) {
+        } else if (!!context.isDifferent(expected, actual)) {
             Assert.fail(Assert.format(message, expected, actual));
         }
     }
@@ -235,17 +235,37 @@ public abstract class TestUtils {
             final ComplexNumber tmpExpected = TypeUtils.toComplexNumber(expected);
             final ComplexNumber tmpActual = TypeUtils.toComplexNumber(actual);
 
-            TestUtils.assertEquals(message + " (real part)", tmpExpected.doubleValue(), tmpActual.doubleValue(), context);
-            TestUtils.assertEquals(message + " (imaginary part)", tmpExpected.i, tmpActual.i, context);
+            if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
+                Assert.failNotEquals(message + " (real)", expected, actual);
+            }
+            if (!!context.isDifferent(tmpExpected.getImaginary(), tmpActual.getImaginary())) {
+                Assert.failNotEquals(message + " (imaginary)", expected, actual);
+            }
+
+        } else if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
+
+            final Quaternion tmpExpected = TypeUtils.toQuaternion(expected);
+            final Quaternion tmpActual = TypeUtils.toQuaternion(actual);
+
+            if (!!context.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
+                Assert.failNotEquals(message + " (scalar)", expected, actual);
+            }
+            if (!!context.isDifferent(tmpExpected.i, tmpActual.i)) {
+                Assert.failNotEquals(message + " (i)", expected, actual);
+            }
+            if (!!context.isDifferent(tmpExpected.j, tmpActual.j)) {
+                Assert.failNotEquals(message + " (j)", expected, actual);
+            }
+            if (!!context.isDifferent(tmpExpected.k, tmpActual.k)) {
+                Assert.failNotEquals(message + " (k)", expected, actual);
+            }
 
         } else {
 
-            final BigDecimal tmpExpected = TypeUtils.toBigDecimal(expected, context);
-            final BigDecimal tmpActual = TypeUtils.toBigDecimal(actual, context);
-
-            Assert.assertEquals(message, tmpExpected, tmpActual);
+            if (!!context.isDifferent(expected.doubleValue(), actual.doubleValue())) {
+                Assert.failNotEquals(message, expected, actual);
+            }
         }
-
     }
 
     public static void assertEquals(final String message, final Object expected, final Object actual) {

@@ -224,7 +224,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         for (int i = 0; i < tmpResult.size(); i++) {
             final double tmpValue = tmpResult.doubleValue(i);
-            TestUtils.assertTrue(tmpOptions.integer.isSmallError(0.0, tmpValue) || tmpOptions.integer.isSmallError(1.0, tmpValue));
+            TestUtils.assertTrue(!tmpOptions.integer.isDifferent(0.0, tmpValue) || !tmpOptions.integer.isDifferent(1.0, tmpValue));
         }
 
     }
@@ -362,7 +362,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         for (int i = 0; i < tmpResult.size(); i++) {
             final double tmpValue = tmpResult.doubleValue(i);
-            TestUtils.assertTrue(tmpOptions.integer.isSmallError(0.0, tmpValue) || tmpOptions.integer.isSmallError(1.0, tmpValue));
+            TestUtils.assertTrue(!tmpOptions.integer.isDifferent(0.0, tmpValue) || !tmpOptions.integer.isDifferent(1.0, tmpValue));
         }
 
     }

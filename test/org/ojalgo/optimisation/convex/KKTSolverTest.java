@@ -152,7 +152,7 @@ public class KKTSolverTest extends FunctionalityTest {
         // LagrangeSolver
         tmpMatrices[4] = BigMatrix.FACTORY.rows(new double[][] { { 0.0000 }, { 0.0000 }, { 0.0000 }, { 0.0000 }, { 0.8709 }, { 0.0000 }, { 0.1291 } });
 
-        this.doTest(tmpMatrices, true, new NumberContext(7, 2));
+        this.doTest(tmpMatrices, true, new NumberContext(3, 3));
     }
 
     /**

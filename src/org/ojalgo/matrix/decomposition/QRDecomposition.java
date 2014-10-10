@@ -205,10 +205,14 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
 
         final DecompositionStore<N> tmpInPlace = this.getInPlace();
 
-        final int tmpLength = (int) Math.min(tmpInPlace.countRows(), tmpInPlace.countColumns());
+        final AggregatorFunction<N> tmpLargest = this.getAggregatorCollection().largest();
+        tmpInPlace.visitDiagonal(0L, 0L, tmpLargest);
+        final double tmpLargestValue = tmpLargest.doubleValue();
 
-        for (int ij = 0; ij < tmpLength; ij++) {
-            if (!tmpInPlace.isZero(ij, ij)) {
+        final int tmpMinDim = this.getMinDim();
+
+        for (int ij = 0; ij < tmpMinDim; ij++) {
+            if (!tmpInPlace.isSmall(ij, ij, tmpLargestValue)) {
                 retVal++;
             }
         }

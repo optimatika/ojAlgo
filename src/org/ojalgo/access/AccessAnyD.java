@@ -61,6 +61,11 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
          */
         boolean isZero(long[] reference);
 
+        /**
+         * @see Scalar#isSmall(double)
+         */
+        boolean isSmall(long[] reference, double comparedTo);
+
     }
 
     public interface Factory<I extends AccessAnyD<?>> {

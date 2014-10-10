@@ -50,7 +50,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     private ConvexSolver.Builder myBuilderE;
     private ConvexSolver.Builder myBuilderI;
 
-    private final NumberContext myEvaluationContext = NumberContext.getGeneral(6);
+    private final NumberContext myEvaluationContext = new NumberContext(6, 6);
 
     public GenericQPSolverTest() {
         super();

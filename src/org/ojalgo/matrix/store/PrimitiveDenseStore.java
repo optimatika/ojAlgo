@@ -72,6 +72,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     }
 
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return myUtility.isSmall(row, column, comparedTo);
+    }
+
     public static interface PrimitiveMultiplyLeft {
 
         void invoke(double[] product, Access1D<?> left, int complexity, double[] right);
@@ -473,13 +477,13 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
                             if (Math.abs(x) > (Math.abs(z) + Math.abs(q))) {
                                 aMtrxH[(i + 1) + (tmpDiagDim * (ij - 1))] = ((-ra - (w * aMtrxH[i + (tmpDiagDim * (ij - 1))])) + (q * aMtrxH[i
-                                                                                                                                             + (tmpDiagDim * ij)]))
-                                                                                                                                             / x;
+                                        + (tmpDiagDim * ij)]))
+                                        / x;
                                 aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-sa - (w * aMtrxH[i + (tmpDiagDim * ij)]) - (q * aMtrxH[i + (tmpDiagDim * (ij - 1))]))
                                         / x;
                             } else {
                                 final ComplexNumber tmpX1 = ComplexNumber.makeRectangular((-r - (y * aMtrxH[i + (tmpDiagDim * (ij - 1))])), (-s - (y * aMtrxH[i
-                                                                                                                                                              + (tmpDiagDim * ij)])));
+                                        + (tmpDiagDim * ij)])));
                                 final ComplexNumber tmpY1 = ComplexNumber.makeRectangular(z, q);
 
                                 final ComplexNumber tmpZ1 = tmpX1.divide(tmpY1);

@@ -405,14 +405,14 @@ final class SimplexTableauSolver extends LinearSolver {
             // Should always be >=0.0, but very small numbers may "accidentally" get a negative sign.
             tmpNumer = Math.abs(myTransposedTableau.doubleValue(tmpNumerCol, i));
 
-            if (options.problem.isSmallComparedTo(tmpNumer, tmpDenom)) {
+            if (options.problem.isSmall(tmpNumer, tmpDenom)) {
 
                 tmpRatio = MACHINE_LARGEST;
 
             } else {
 
                 if (tmpSpecialCase) {
-                    if (options.problem.isSmallComparedTo(tmpDenom, tmpNumer)) {
+                    if (options.problem.isSmall(tmpDenom, tmpNumer)) {
                         tmpRatio = MACHINE_EPSILON;
                     } else {
                         tmpRatio = MACHINE_LARGEST;

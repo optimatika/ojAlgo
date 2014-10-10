@@ -141,6 +141,20 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return tmpScalar.isAbsolute() && !tmpScalar.isSmall(PrimitiveMath.ONE);
     }
 
+    /**
+     * @see org.ojalgo.access.Access1D.Elements#isSmall(long, double)
+     */
+    public boolean isSmall(final long index, final double comparedTo) {
+        return this.toScalar(index).isSmall(comparedTo);
+    }
+
+    /**
+     * @see org.ojalgo.access.Access2D.Elements#isSmall(long, long, double)
+     */
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return this.toScalar(row, column).isSmall(comparedTo);
+    }
+
     public boolean isZero(final long index) {
         return this.toScalar(index).isSmall(PrimitiveMath.ONE);
     }

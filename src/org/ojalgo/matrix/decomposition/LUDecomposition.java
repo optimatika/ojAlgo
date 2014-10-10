@@ -218,12 +218,16 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
 
         int retVal = 0;
 
-        final DecompositionStore<N> tmpStore = this.getInPlace();
+        final DecompositionStore<N> tmpInPlace = this.getInPlace();
+
+        final AggregatorFunction<N> tmpLargest = this.getAggregatorCollection().largest();
+        tmpInPlace.visitDiagonal(0L, 0L, tmpLargest);
+        final double tmpLargestValue = tmpLargest.doubleValue();
 
         final int tmpMinDim = this.getMinDim();
 
         for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpStore.isZero(ij, ij)) {
+            if (!tmpInPlace.isSmall(ij, ij, tmpLargestValue)) {
                 retVal++;
             }
         }
@@ -349,7 +353,8 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
             }
 
             // Do the calculations...
-            if (!tmpInPlace.isZero(ij, ij)) {
+            // if (!tmpInPlace.isZero(ij, ij)) {
+            if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
 
                 // Calculate multipliers and copy to local column
                 // Current column, below the diagonal

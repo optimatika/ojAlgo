@@ -139,8 +139,8 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
         return (value.getNumerator().signum() > 0) && (value.getDenominator().signum() > 0);
     }
 
-    public static boolean isSmall(final double reference, final RationalNumber value) {
-        return value.isSmall(reference);
+    public static boolean isSmall(final double comparedTo, final RationalNumber value) {
+        return value.isSmall(comparedTo);
     }
 
     public static boolean isZero(final RationalNumber value) {
@@ -385,8 +385,8 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
         return (myNumerator.signum() >= 0) && (myDenominator.signum() > 0);
     }
 
-    public boolean isSmall(final double reference) {
-        return AbstractScalar.BIG.isSmallComparedTo(reference, this.doubleValue());
+    public boolean isSmall(final double comparedTo) {
+        return AbstractScalar.BIG.isSmall(comparedTo, this.doubleValue());
     }
 
     @Override

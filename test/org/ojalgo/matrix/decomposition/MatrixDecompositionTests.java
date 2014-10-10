@@ -159,6 +159,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
         suite.addTestSuite(TestJama.class);
         suite.addTestSuite(TestSolveAndInvert.class);
         suite.addTestSuite(TridiagonalizeCase.class);
+        suite.addTestSuite(VerySmallCase.class);
         //$JUnit-END$
         return suite;
     }

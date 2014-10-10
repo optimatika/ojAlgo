@@ -239,6 +239,14 @@ AccessAnyD.Visitable<N>, Serializable {
         return myDelegate.isPositive(AccessUtils.index(myStructure, reference));
     }
 
+    public boolean isSmall(final long index, final double comparedTo) {
+        return myDelegate.isSmall(index, comparedTo);
+    }
+
+    public boolean isSmall(final long[] reference, final double comparedTo) {
+        return myDelegate.isSmall(AccessUtils.index(myStructure, reference), comparedTo);
+    }
+
     public boolean isZero(final long index) {
         return myDelegate.isZero(index);
     }

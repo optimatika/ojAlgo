@@ -58,8 +58,15 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
         /**
          * @see Scalar#isZero()
+         * @deprecated v37
          */
+        @Deprecated
         boolean isZero(long index);
+
+        /**
+         * @see Scalar#isSmall(double)
+         */
+        boolean isSmall(long index, double comparedTo);
 
     }
 

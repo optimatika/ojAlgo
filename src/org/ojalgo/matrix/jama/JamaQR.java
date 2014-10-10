@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.jama;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
@@ -93,8 +92,12 @@ public final class JamaQR extends JamaAbstractDecomposition implements QR<Double
         final MatrixStore<Double> tmpR = this.getR();
         final int tmpMinDim = (int) Math.min(tmpR.countRows(), tmpR.countColumns());
 
+        final AggregatorFunction<Double> tmpLargest = PrimitiveAggregator.LARGEST.get();
+        tmpR.visitDiagonal(0L, 0L, tmpLargest);
+        final double tmpLargestValue = tmpLargest.doubleValue();
+
         for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpR.toScalar(ij, ij).isSmall(PrimitiveMath.ONE)) {
+            if (!tmpR.isSmall(ij, ij, tmpLargestValue)) {
                 retVal++;
             }
         }

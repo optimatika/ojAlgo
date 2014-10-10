@@ -25,7 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 /**
  * Certain waiting times. Rounding errors.
- * 
+ *
  * @author apete
  */
 public class Uniform extends AbstractContinuous {
@@ -33,10 +33,10 @@ public class Uniform extends AbstractContinuous {
     private static final long serialVersionUID = -8198257914507986404L;
 
     /**
-     * @return An integer: 0 <= ? < aLimit
+     * @return An integer: 0 <= ? < limit
      */
-    public static int randomInteger(final int aLimit) {
-        return (int) Math.floor(aLimit * Math.random());
+    public static int randomInteger(final int limit) {
+        return (int) Math.floor(limit * Math.random());
     }
 
     /**

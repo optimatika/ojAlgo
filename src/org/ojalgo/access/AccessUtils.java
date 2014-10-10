@@ -500,14 +500,14 @@ public abstract class AccessUtils {
             final Access1D<ComplexNumber> tmpAccessB = (Access1D<ComplexNumber>) accessB;
 
             for (int i = 0; retVal && (i < tmpLength); i++) {
-                retVal &= context.isSmallError(tmpAccessA.get(i).doubleValue(), tmpAccessB.get(i).doubleValue());
-                retVal &= context.isSmallError(tmpAccessA.get(i).i, tmpAccessB.get(i).i);
+                retVal &= !context.isDifferent(tmpAccessA.get(i).getReal(), tmpAccessB.get(i).getReal());
+                retVal &= !context.isDifferent(tmpAccessA.get(i).i, tmpAccessB.get(i).i);
             }
 
         } else {
 
             for (int i = 0; retVal && (i < tmpLength); i++) {
-                retVal &= context.isSmallError(accessA.doubleValue(i), accessB.doubleValue(i));
+                retVal &= !context.isDifferent(accessA.doubleValue(i), accessB.doubleValue(i));
             }
         }
 

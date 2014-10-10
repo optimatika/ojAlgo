@@ -257,6 +257,10 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return mySegments[(int) (index >> myIndexBits)].isPositive(index & myIndexMask);
     }
 
+    public boolean isSmall(final long index, final double comparedTo) {
+        return mySegments[(int) (index >> myIndexBits)].isSmall(index & myIndexMask, comparedTo);
+    }
+
     public boolean isZero(final long index) {
         return mySegments[(int) (index >> myIndexBits)].isZero(index & myIndexMask);
     }

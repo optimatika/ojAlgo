@@ -22,7 +22,8 @@
 package org.ojalgo.matrix.jama;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -82,8 +83,12 @@ public final class JamaLU extends JamaAbstractDecomposition implements LU<Double
         final MatrixStore<Double> tmpU = this.getU();
         final int tmpMinDim = (int) Math.min(tmpU.countRows(), tmpU.countColumns());
 
+        final AggregatorFunction<Double> tmpLargest = PrimitiveAggregator.LARGEST.get();
+        tmpU.visitDiagonal(0L, 0L, tmpLargest);
+        final double tmpLargestValue = tmpLargest.doubleValue();
+
         for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpU.toScalar(ij, ij).isSmall(PrimitiveMath.ONE)) {
+            if (!tmpU.isSmall(ij, ij, tmpLargestValue)) {
                 retVal++;
             }
         }

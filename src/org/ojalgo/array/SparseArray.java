@@ -227,6 +227,15 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    public boolean isSmall(final long index, final double comparedTo) {
+        final int tmpIndex = this.index(index);
+        if (tmpIndex >= 0) {
+            return myValues.isSmall(tmpIndex, comparedTo);
+        } else {
+            return true;
+        }
+    }
+
     public boolean isZero(final long index) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {

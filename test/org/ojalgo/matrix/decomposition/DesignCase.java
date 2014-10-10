@@ -116,7 +116,7 @@ public class DesignCase extends MatrixDecompositionTests {
         tmpNullspaceSVD.modifyAll(PrimitiveFunction.DIVIDE.second(tmpScaleSVD));
 
         final PrimitiveDenseStore tmpExpected = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, -26, 16 });
-        final NumberContext tmpPrecision = NumberContext.getGeneral(8);
+        final NumberContext tmpPrecision = new NumberContext(14, 8);
 
         TestUtils.assertEquals(tmpExpected, tmpNullspaceQR, tmpPrecision);
         TestUtils.assertEquals(tmpExpected, tmpNullspaceSVD, tmpPrecision);

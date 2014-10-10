@@ -71,8 +71,8 @@ public final class BigScalar extends AbstractScalar<BigDecimal> implements Enfor
         return (value.signum() > 0) && !BigScalar.isZero(value);
     }
 
-    public static boolean isSmall(final double reference, final BigDecimal value) {
-        return (value.signum() == 0) || AbstractScalar.BIG.isSmallComparedTo(reference, value.doubleValue());
+    public static boolean isSmall(final double comparedTo, final BigDecimal value) {
+        return (value.signum() == 0) || AbstractScalar.BIG.isSmall(comparedTo, value.doubleValue());
     }
 
     public static boolean isZero(final BigDecimal value) {
@@ -187,8 +187,8 @@ public final class BigScalar extends AbstractScalar<BigDecimal> implements Enfor
         return BigScalar.isAbsolute(myNumber);
     }
 
-    public boolean isSmall(final double reference) {
-        return AbstractScalar.BIG.isSmallComparedTo(reference, this.doubleValue());
+    public boolean isSmall(final double comparedTo) {
+        return AbstractScalar.BIG.isSmall(comparedTo, this.doubleValue());
     }
 
     @Override
@@ -236,4 +236,5 @@ public final class BigScalar extends AbstractScalar<BigDecimal> implements Enfor
     public String toString(final NumberContext context) {
         return context.enforce(myNumber).toString();
     }
+
 }

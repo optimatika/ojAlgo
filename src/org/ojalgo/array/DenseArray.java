@@ -103,6 +103,13 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         return this.isZero((int) index);
     }
 
+    /**
+     * @see Scalar#isSmall(double)
+     */
+    public final boolean isSmall(final long index, final double comparedTo) {
+        return this.isSmall((int) index, comparedTo);
+    }
+
     public final void set(final long index, final double value) {
         this.set((int) index, value);
     }
@@ -151,6 +158,11 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
      * @see Scalar#isPositive()
      */
     protected abstract boolean isPositive(int index);
+
+    /**
+     * @see Scalar#isSmall()
+     */
+    protected abstract boolean isSmall(int index, double comparedTo);
 
     /**
      * @see Scalar#isZero()

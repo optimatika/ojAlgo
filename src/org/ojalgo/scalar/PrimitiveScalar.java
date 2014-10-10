@@ -75,8 +75,8 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
         return Double.isNaN(value);
     }
 
-    public static boolean isSmall(final double reference, final double value) {
-        return AbstractScalar.PRIMITIVE.isSmallComparedTo(reference, value);
+    public static boolean isSmall(final double comparedTo, final double value) {
+        return AbstractScalar.PRIMITIVE.isSmall(comparedTo, value);
     }
 
     public static boolean isPositive(final double value) {
@@ -84,7 +84,7 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
     }
 
     public static boolean isZero(final double value) {
-        return AbstractScalar.PRIMITIVE.isSmallComparedTo(PrimitiveMath.ONE, value);
+        return AbstractScalar.PRIMITIVE.isSmall(PrimitiveMath.ONE, value);
     }
 
     private final double myValue;
@@ -194,8 +194,8 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
         return PrimitiveScalar.isAbsolute(myValue);
     }
 
-    public boolean isSmall(final double reference) {
-        return PrimitiveScalar.isSmall(reference, myValue);
+    public boolean isSmall(final double comparedTo) {
+        return PrimitiveScalar.isSmall(comparedTo, myValue);
     }
 
     @Override

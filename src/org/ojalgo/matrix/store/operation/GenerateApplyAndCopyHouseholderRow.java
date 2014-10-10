@@ -35,16 +35,16 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
 
     public static int THRESHOLD = 128;
 
-    public static boolean invoke(final BigDecimal[] aData, final int aRowDim, final int aRow, final int aCol, final Householder.Big aDestination) {
+    public static boolean invoke(final BigDecimal[] data, final int structure, final int row, final int col, final Householder.Big destination) {
 
-        final int tmpColDim = aData.length / aRowDim;
+        final int tmpColDim = data.length / structure;
 
-        final BigDecimal[] tmpVector = aDestination.vector;
-        aDestination.first = aCol;
+        final BigDecimal[] tmpVector = destination.vector;
+        destination.first = col;
 
         BigDecimal tmpNormInf = BigMath.ZERO;
-        for (int j = aCol; j < tmpColDim; j++) {
-            tmpNormInf = tmpNormInf.max((tmpVector[j] = aData[aRow + (j * aRowDim)]).abs());
+        for (int j = col; j < tmpColDim; j++) {
+            tmpNormInf = tmpNormInf.max((tmpVector[j] = data[row + (j * structure)]).abs());
         }
 
         boolean retVal = tmpNormInf.signum() != 0;
@@ -52,7 +52,7 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
         BigDecimal tmpNorm2 = BigMath.ZERO;
 
         if (retVal) {
-            for (int j = aCol + 1; j < tmpColDim; j++) {
+            for (int j = col + 1; j < tmpColDim; j++) {
                 tmpVal = BigFunction.DIVIDE.invoke(tmpVector[j], tmpNormInf);
                 tmpNorm2 = BigFunction.ADD.invoke(tmpNorm2, BigFunction.MULTIPLY.invoke(tmpVal, tmpVal));
                 tmpVector[j] = tmpVal;
@@ -62,40 +62,40 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
 
         if (retVal) {
 
-            BigDecimal tmpScale = BigFunction.DIVIDE.invoke(tmpVector[aCol], tmpNormInf);
+            BigDecimal tmpScale = BigFunction.DIVIDE.invoke(tmpVector[col], tmpNormInf);
             tmpNorm2 = BigFunction.ADD.invoke(tmpNorm2, BigFunction.MULTIPLY.invoke(tmpScale, tmpScale));
             tmpNorm2 = BigFunction.SQRT.invoke(tmpNorm2);
 
             if (tmpScale.signum() != 1) {
-                aData[(aRow + (aCol * aRowDim))] = tmpNorm2.multiply(tmpNormInf);
+                data[(row + (col * structure))] = tmpNorm2.multiply(tmpNormInf);
                 tmpScale = BigFunction.SUBTRACT.invoke(tmpScale, tmpNorm2);
             } else {
-                aData[(aRow + (aCol * aRowDim))] = tmpNorm2.negate().multiply(tmpNormInf);
+                data[(row + (col * structure))] = tmpNorm2.negate().multiply(tmpNormInf);
                 tmpScale = BigFunction.ADD.invoke(tmpScale, tmpNorm2);
             }
 
-            tmpVector[aCol] = BigMath.ONE;
+            tmpVector[col] = BigMath.ONE;
 
-            for (int j = aCol + 1; j < tmpColDim; j++) {
-                aData[aRow + (j * aRowDim)] = tmpVector[j] = BigFunction.DIVIDE.invoke(tmpVector[j], tmpScale);
+            for (int j = col + 1; j < tmpColDim; j++) {
+                data[row + (j * structure)] = tmpVector[j] = BigFunction.DIVIDE.invoke(tmpVector[j], tmpScale);
             }
 
-            aDestination.beta = BigFunction.DIVIDE.invoke(tmpScale.abs(), tmpNorm2);
+            destination.beta = BigFunction.DIVIDE.invoke(tmpScale.abs(), tmpNorm2);
         }
 
         return retVal;
     }
 
-    public static boolean invoke(final ComplexNumber[] aData, final int aRowDim, final int aRow, final int aCol, final Householder.Complex aDestination) {
+    public static boolean invoke(final ComplexNumber[] data, final int structure, final int row, final int col, final Householder.Complex destination) {
 
-        final int tmpColDim = aData.length / aRowDim;
+        final int tmpColDim = data.length / structure;
 
-        final ComplexNumber[] tmpVector = aDestination.vector;
-        aDestination.first = aCol;
+        final ComplexNumber[] tmpVector = destination.vector;
+        destination.first = col;
 
         double tmpNormInf = PrimitiveMath.ZERO;
-        for (int j = aCol; j < tmpColDim; j++) {
-            tmpNormInf = Math.max(tmpNormInf, (tmpVector[j] = aData[aRow + (j * aRowDim)]).norm());
+        for (int j = col; j < tmpColDim; j++) {
+            tmpNormInf = Math.max(tmpNormInf, (tmpVector[j] = data[row + (j * structure)]).norm());
         }
 
         boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
@@ -103,7 +103,7 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
         double tmpNorm2 = PrimitiveMath.ZERO;
 
         if (retVal) {
-            for (int j = aCol + 1; j < tmpColDim; j++) {
+            for (int j = col + 1; j < tmpColDim; j++) {
                 tmpVal = tmpVector[j].divide(tmpNormInf);
                 tmpNorm2 += tmpVal.norm() * tmpVal.norm();
                 tmpVector[j] = tmpVal;
@@ -113,35 +113,35 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
 
         if (retVal) {
 
-            ComplexNumber tmpScale = tmpVector[aCol].divide(tmpNormInf);
+            ComplexNumber tmpScale = tmpVector[col].divide(tmpNormInf);
             tmpNorm2 += tmpScale.norm() * tmpScale.norm();
             tmpNorm2 = Math.sqrt(tmpNorm2);
 
-            aData[(aRow + (aCol * aRowDim))] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
+            data[(row + (col * structure))] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
             tmpScale = tmpScale.subtract(ComplexNumber.makePolar(tmpNorm2, tmpScale.phase()));
 
-            tmpVector[aCol] = ComplexNumber.ONE;
+            tmpVector[col] = ComplexNumber.ONE;
 
-            for (int j = aCol + 1; j < tmpColDim; j++) {
-                aData[aRow + (j * aRowDim)] = tmpVector[j] = ComplexFunction.DIVIDE.invoke(tmpVector[j], tmpScale).conjugate();
+            for (int j = col + 1; j < tmpColDim; j++) {
+                data[row + (j * structure)] = tmpVector[j] = ComplexFunction.DIVIDE.invoke(tmpVector[j], tmpScale).conjugate();
             }
 
-            aDestination.beta = ComplexNumber.makeReal(tmpScale.norm() / tmpNorm2);
+            destination.beta = ComplexNumber.makeReal(tmpScale.norm() / tmpNorm2);
         }
 
         return retVal;
     }
 
-    public static boolean invoke(final double[] aData, final int aRowDim, final int aRow, final int aCol, final Householder.Primitive aDestination) {
+    public static boolean invoke(final double[] data, final int structure, final int row, final int col, final Householder.Primitive destination) {
 
-        final int tmpColDim = aData.length / aRowDim;
+        final int tmpColDim = data.length / structure;
 
-        final double[] tmpVector = aDestination.vector;
-        aDestination.first = aCol;
+        final double[] tmpVector = destination.vector;
+        destination.first = col;
 
         double tmpNormInf = PrimitiveMath.ZERO; // Copy row and calculate its infinity-norm.
-        for (int j = aCol; j < tmpColDim; j++) {
-            tmpNormInf = Math.max(tmpNormInf, Math.abs(tmpVector[j] = aData[aRow + (j * aRowDim)]));
+        for (int j = col; j < tmpColDim; j++) {
+            tmpNormInf = Math.max(tmpNormInf, Math.abs(tmpVector[j] = data[row + (j * structure)]));
         }
 
         boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
@@ -149,7 +149,7 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
         double tmpNorm2 = PrimitiveMath.ZERO;
 
         if (retVal) {
-            for (int j = aCol + 1; j < tmpColDim; j++) {
+            for (int j = col + 1; j < tmpColDim; j++) {
                 tmpVal = tmpVector[j] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
@@ -158,25 +158,25 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
 
         if (retVal) {
 
-            double tmpScale = tmpVector[aCol] / tmpNormInf;
+            double tmpScale = tmpVector[col] / tmpNormInf;
             tmpNorm2 += tmpScale * tmpScale;
             tmpNorm2 = Math.sqrt(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
             if (tmpScale <= PrimitiveMath.ZERO) {
-                aData[(aRow + (aCol * aRowDim))] = tmpNorm2 * tmpNormInf;
+                data[(row + (col * structure))] = tmpNorm2 * tmpNormInf;
                 tmpScale -= tmpNorm2;
             } else {
-                aData[(aRow + (aCol * aRowDim))] = -tmpNorm2 * tmpNormInf;
+                data[(row + (col * structure))] = -tmpNorm2 * tmpNormInf;
                 tmpScale += tmpNorm2;
             }
 
-            tmpVector[aCol] = PrimitiveMath.ONE;
+            tmpVector[col] = PrimitiveMath.ONE;
 
-            for (int j = aCol + 1; j < tmpColDim; j++) {
-                aData[aRow + (j * aRowDim)] = tmpVector[j] /= tmpScale;
+            for (int j = col + 1; j < tmpColDim; j++) {
+                data[row + (j * structure)] = tmpVector[j] /= tmpScale;
             }
 
-            aDestination.beta = Math.abs(tmpScale) / tmpNorm2;
+            destination.beta = Math.abs(tmpScale) / tmpNorm2;
         }
 
         return retVal;

@@ -126,8 +126,12 @@ public final class OffHeapArray extends BasicArray<Double> {
         return PrimitiveScalar.isPositive(UNSAFE.getDouble(this.address(index)));
     }
 
+    public boolean isSmall(final long index, final double comparedTo) {
+        return PrimitiveScalar.isSmall(UNSAFE.getDouble(this.address(index)), comparedTo);
+    }
+
     public boolean isZero(final long index) {
-        return PrimitiveScalar.isAbsolute(UNSAFE.getDouble(this.address(index)));
+        return PrimitiveScalar.isZero(UNSAFE.getDouble(this.address(index)));
     }
 
     public void set(final long index, final double value) {

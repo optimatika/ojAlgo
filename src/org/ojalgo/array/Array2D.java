@@ -46,7 +46,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.Fillable<N>, Access2D.Iterable2D<N>, Access2D.Modifiable<N>,
-        Access2D.Visitable<N>, Serializable {
+Access2D.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access2D.Factory<Array2D<N>> {
 
@@ -439,6 +439,14 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public boolean isRowZeros(final long row, final long column) {
         return myDelegate.isZeros(row + (column * myRowsCount), row + (myColumnsCount * myRowsCount), myRowsCount);
+    }
+
+    public boolean isSmall(final long index, final double comparedTo) {
+        return myDelegate.isSmall(index, comparedTo);
+    }
+
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return myDelegate.isSmall(row + (column * myRowsCount), comparedTo);
     }
 
     public boolean isZero(final long index) {

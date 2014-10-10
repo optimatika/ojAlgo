@@ -548,4 +548,9 @@ public class PrimitiveArray extends DenseArray<Double> {
         return new PrimitiveArray(capacity);
     }
 
+    @Override
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return PrimitiveScalar.isSmall(comparedTo, data[index]);
+    }
+
 }

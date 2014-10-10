@@ -117,7 +117,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     protected void setUp() throws Exception {
 
         DEFINITION = new NumberContext(7, 4);
-        EVALUATION = new NumberContext(7, 3);
+        EVALUATION = new NumberContext(4, 3);
 
         myBigAA = SimpleCholeskyCase.getFactorL();
         myBigAX = SimpleCholeskyCase.getFactorR();

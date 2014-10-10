@@ -46,7 +46,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-Access1D.Visitable<N>, RandomAccess, Serializable {
+        Access1D.Visitable<N>, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access1D.Factory<Array1D<N>> {
 
@@ -396,6 +396,10 @@ Access1D.Visitable<N>, RandomAccess, Serializable {
 
     public boolean isRangeZeros(final long first, final long limit) {
         return myDelegate.isZeros((myFirst + (myStep * first)), (myFirst + (myStep * limit)), myStep);
+    }
+
+    public boolean isSmall(final long index, final double comparedTo) {
+        return myDelegate.isSmall(myFirst + (myStep * index), comparedTo);
     }
 
     /**

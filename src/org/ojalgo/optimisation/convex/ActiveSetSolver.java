@@ -459,7 +459,7 @@ final class ActiveSetSolver extends ConvexSolver {
                     final double tmpVal = tmpN / tmpD;
 
                     if ((tmpD > PrimitiveMath.ZERO) && (tmpVal >= PrimitiveMath.ZERO) && (tmpVal < tmpStepLength)
-                            && !options.solution.isSmallComparedTo(tmpFrobNormX, tmpD)) {
+                            && !options.solution.isSmall(tmpFrobNormX, tmpD)) {
                         tmpStepLength = tmpVal;
                         myConstraintToInclude = tmpExcluded[i];
                         if (this.isDebug()) {

@@ -36,7 +36,6 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.format.NumberStyle;
 
 /**
@@ -178,10 +177,15 @@ public final class NumberContext extends FormatContext<Number> {
         return style != null ? style.getFormat(locale) : DEFAULT_STYLE.getFormat(locale);
     }
 
+    private static boolean isZero(final double value, final double tolerance) {
+        return (Math.abs(value) <= tolerance);
+    }
+
     private final double myEpsilon;
     private final MathContext myMathContext;
     private final double myRoundingFactor;
     private final int myScale;
+
     private final double myZeroError;
 
     public NumberContext() {
@@ -212,12 +216,12 @@ public final class NumberContext extends FormatContext<Number> {
 
     }
 
-    public NumberContext(final int precision, final int scale, final RoundingMode mode) {
-        this(DEFAULT_STYLE.getFormat(), precision, scale, mode);
-    }
-
     public NumberContext(final int precision, final int scale) {
         this(DEFAULT_STYLE.getFormat(), precision, scale, DEFAULT_MATH.getRoundingMode());
+    }
+
+    public NumberContext(final int precision, final int scale, final RoundingMode mode) {
+        this(DEFAULT_STYLE.getFormat(), precision, scale, mode);
     }
 
     public NumberContext(final int scale, final RoundingMode mode) {
@@ -433,20 +437,36 @@ public final class NumberContext extends FormatContext<Number> {
         return result;
     }
 
-    public boolean isSmallComparedTo(final double reference, final double value) {
-        if (TypeUtils.isZero(reference, myZeroError)) {
-            return TypeUtils.isZero(value, myZeroError);
+    public boolean isDifferent(final double expected, final double actual) {
+        return !this.isSmall(expected, actual - expected);
+    }
+
+    public boolean isSmall(final double comparedTo, final double value) {
+        if (NumberContext.isZero(comparedTo, myZeroError)) {
+            return NumberContext.isZero(value, myZeroError);
         } else {
-            return TypeUtils.isZero(value / reference, myEpsilon);
+            return NumberContext.isZero(value / comparedTo, myEpsilon);
         }
     }
 
+    /**
+     * @deprecated v37 Use {@link #isSmall(double,double)} instead
+     */
+    @Deprecated
+    public boolean isSmallComparedTo(final double reference, final double value) {
+        return this.isSmall(reference, value);
+    }
+
+    /**
+     * @deprecated v37 Use {@link #isAsExpected(double,double)} instead
+     */
+    @Deprecated
     public boolean isSmallError(final double expected, final double actual) {
-        return this.isSmallComparedTo(expected, actual - expected);
+        return !this.isDifferent(expected, actual);
     }
 
     public boolean isZero(final double value) {
-        return TypeUtils.isZero(value, myZeroError);
+        return NumberContext.isZero(value, myZeroError);
     }
 
     public NumberContext newFormat(final NumberStyle style, final Locale locale) {

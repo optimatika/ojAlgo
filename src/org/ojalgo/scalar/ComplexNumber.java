@@ -102,8 +102,8 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
         return value.isReal();
     }
 
-    public static boolean isSmall(final double reference, final ComplexNumber value) {
-        return value.isSmall(reference);
+    public static boolean isSmall(final double comparedTo, final ComplexNumber value) {
+        return value.isSmall(comparedTo);
     }
 
     public static boolean isZero(final ComplexNumber value) {
@@ -382,16 +382,16 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
         if (myRealForSure) {
             return myRealValue >= PrimitiveMath.ZERO;
         } else {
-            return AbstractScalar.PRIMITIVE.isSmallError(myRealValue, this.norm());
+            return !AbstractScalar.PRIMITIVE.isDifferent(myRealValue, this.norm());
         }
     }
 
     public boolean isReal() {
-        return myRealForSure || AbstractScalar.PRIMITIVE.isSmallComparedTo(myRealValue, i);
+        return myRealForSure || AbstractScalar.PRIMITIVE.isSmall(myRealValue, i);
     }
 
-    public boolean isSmall(final double reference) {
-        return AbstractScalar.PRIMITIVE.isSmallComparedTo(reference, this.norm());
+    public boolean isSmall(final double comparedTo) {
+        return AbstractScalar.PRIMITIVE.isSmall(comparedTo, this.norm());
     }
 
     public Iterator<Double> iterator() {
