@@ -38,7 +38,6 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.TransposedStore;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<N> {
@@ -207,12 +206,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
                 } while (Math.abs(tmpOffDiagData[l]) > tmpLocalEpsilon); // Check for convergence
             } // End if (m > l)
 
-            final double tmpEigenvalue = tmpMainDiagData[l] + tmpShift;
-            if (TypeUtils.isZero(tmpEigenvalue)) {
-                tmpMainDiagData[l] = PrimitiveMath.ZERO;
-            } else {
-                tmpMainDiagData[l] = tmpEigenvalue;
-            }
+            tmpMainDiagData[l] = tmpMainDiagData[l] + tmpShift;
             tmpOffDiagData[l] = PrimitiveMath.ZERO;
         } // End main loop - l
 

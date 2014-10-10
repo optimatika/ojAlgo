@@ -111,33 +111,33 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
     }
 
     public static ComplexNumber makePolar(final double modulus, final double argument) {
-        double tmpArg = argument % PrimitiveMath.TWO_PI;
-        if (tmpArg < PrimitiveMath.ZERO) {
-            tmpArg += PrimitiveMath.TWO_PI;
+
+        double tmpStdArg = argument % PrimitiveMath.TWO_PI;
+        if (tmpStdArg < PrimitiveMath.ZERO) {
+            tmpStdArg += PrimitiveMath.TWO_PI;
         }
-        if (TypeUtils.isZero(tmpArg, ARGUMENT_TOLERANCE)) {
+
+        if (tmpStdArg <= ARGUMENT_TOLERANCE) {
+
             return new ComplexNumber(modulus);
-        } else if (TypeUtils.isZero(tmpArg - PrimitiveMath.PI, ARGUMENT_TOLERANCE)) {
+
+        } else if (Math.abs(tmpStdArg - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+
             return new ComplexNumber(-modulus);
+
         } else {
 
             double tmpRe = PrimitiveMath.ZERO;
-
             if (modulus != PrimitiveMath.ZERO) {
-
-                final double tmpCos = Math.cos(tmpArg);
-
+                final double tmpCos = Math.cos(tmpStdArg);
                 if (tmpCos != PrimitiveMath.ZERO) {
                     tmpRe = modulus * tmpCos;
                 }
             }
 
             double tmpIm = PrimitiveMath.ZERO;
-
             if (modulus != PrimitiveMath.ZERO) {
-
-                final double tmpSin = Math.sin(tmpArg);
-
+                final double tmpSin = Math.sin(tmpStdArg);
                 if (tmpSin != PrimitiveMath.ZERO) {
                     tmpIm = modulus * tmpSin;
                 }

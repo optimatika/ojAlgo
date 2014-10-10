@@ -29,6 +29,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete
@@ -42,6 +43,8 @@ public class VerySmallCase extends MatrixDecompositionTests {
     public VerySmallCase(final String arg0) {
         super(arg0);
     }
+
+    static final NumberContext PRECISION = new NumberContext().newPrecision(12);
 
     static MatrixStore<Double> getVerySmall() {
 
@@ -67,38 +70,38 @@ public class VerySmallCase extends MatrixDecompositionTests {
         final LU<Double> tmpPrimitive = LUDecomposition.makePrimitive();
         final LU<Double> tmpJama = LUDecomposition.makeJama();
 
-        TestUtils.assertTrue("Big compute()", tmpBig.compute(tmpProblematic));
-        TestUtils.assertTrue("Complex compute()", tmpComplex.compute(tmpProblematic));
-        TestUtils.assertTrue("Primitive compute()", tmpPrimitive.compute(tmpProblematic));
-        TestUtils.assertTrue("Jama compute()", tmpJama.compute(tmpProblematic));
+        TestUtils.assertTrue("Big.compute()", tmpBig.compute(tmpProblematic));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.compute(tmpProblematic));
+        TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.compute(tmpProblematic));
+        TestUtils.assertTrue("Jama.compute()", tmpJama.compute(tmpProblematic));
 
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Big L", tmpBig.getL());
-            BasicLogger.debug("Complex L", tmpComplex.getL());
-            BasicLogger.debug("Primitive L", tmpPrimitive.getL());
-            BasicLogger.debug("Jama L", tmpJama.getL());
+            BasicLogger.debug("Big.L", tmpBig.getL());
+            BasicLogger.debug("Complex.L", tmpComplex.getL());
+            BasicLogger.debug("Primitive.L", tmpPrimitive.getL());
+            BasicLogger.debug("Jama.L", tmpJama.getL());
         }
 
-        TestUtils.assertEquals("LU.L Big vs Complex", tmpBig.getL(), tmpComplex.getL());
-        TestUtils.assertEquals("LU.L Complex vs Primitive", tmpComplex.getL(), tmpPrimitive.getL());
-        TestUtils.assertEquals("LU.L Primitive vs Jama", tmpPrimitive.getL(), tmpJama.getL());
+        TestUtils.assertEquals("L Big vs Complex", tmpBig.getL(), tmpComplex.getL(), PRECISION);
+        TestUtils.assertEquals("L Complex vs Primitive", tmpComplex.getL(), tmpPrimitive.getL(), PRECISION);
+        TestUtils.assertEquals("L Primitive vs Jama", tmpPrimitive.getL(), tmpJama.getL(), PRECISION);
 
-        TestUtils.assertEquals("LU.U Big vs Complex", tmpBig.getU(), tmpComplex.getU());
-        TestUtils.assertEquals("LU.U Complex vs Primitive", tmpComplex.getU(), tmpPrimitive.getU());
-        TestUtils.assertEquals("LU.U Primitive vs Jama", tmpPrimitive.getU(), tmpJama.getU());
+        TestUtils.assertEquals("U Big vs Complex", tmpBig.getU(), tmpComplex.getU(), PRECISION);
+        TestUtils.assertEquals("U Complex vs Primitive", tmpComplex.getU(), tmpPrimitive.getU(), PRECISION);
+        TestUtils.assertEquals("U Primitive vs Jama", tmpPrimitive.getU(), tmpJama.getU(), PRECISION);
 
-        TestUtils.assertEquals("LU.reconstruct() Big", tmpProblematic, tmpBig.reconstruct());
-        TestUtils.assertEquals("LU.reconstruct() Complex", tmpProblematic, tmpComplex.reconstruct());
-        TestUtils.assertEquals("LU.reconstruct() Primitive", tmpProblematic, tmpPrimitive.reconstruct());
-        TestUtils.assertEquals("LU.reconstruct() Jama", tmpProblematic, tmpJama.reconstruct());
+        TestUtils.assertEquals("Big.reconstruct()", tmpProblematic, tmpBig.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Complex.reconstruct()", tmpProblematic, tmpComplex.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Primitive.reconstruct()", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Jama.reconstruct()", tmpProblematic, tmpJama.reconstruct(), PRECISION);
 
         final SingularValue<Double> tmpSVD = SingularValueDecomposition.makeJama();
         tmpSVD.compute(tmpProblematic);
 
-        TestUtils.assertEquals("LU.rank SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
-        TestUtils.assertEquals("LU.rank SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
-        TestUtils.assertEquals("LU.rank SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
-        TestUtils.assertEquals("LU.rank SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
+        TestUtils.assertEquals("rank() SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
+        TestUtils.assertEquals("rank() SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
+        TestUtils.assertEquals("rank() SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
+        TestUtils.assertEquals("rank() SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
 
     }
 
@@ -111,10 +114,10 @@ public class VerySmallCase extends MatrixDecompositionTests {
         final QR<Double> tmpPrimitive = QRDecomposition.makePrimitive();
         final QR<Double> tmpJama = QRDecomposition.makeJama();
 
-        TestUtils.assertTrue("Big compute()", tmpBig.compute(tmpProblematic));
-        TestUtils.assertTrue("Complex compute()", tmpComplex.compute(tmpProblematic));
-        TestUtils.assertTrue("Primitive compute()", tmpPrimitive.compute(tmpProblematic));
-        TestUtils.assertTrue("Jama compute()", tmpJama.compute(tmpProblematic));
+        TestUtils.assertTrue("Big.compute()", tmpBig.compute(tmpProblematic));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.compute(tmpProblematic));
+        TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.compute(tmpProblematic));
+        TestUtils.assertTrue("Jama.compute()", tmpJama.compute(tmpProblematic));
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Big Q", tmpBig.getQ());
@@ -123,33 +126,62 @@ public class VerySmallCase extends MatrixDecompositionTests {
             BasicLogger.debug("Jama Q", tmpJama.getQ());
         }
 
+        TestUtils.assertEquals("QR.reconstruct() Big", tmpProblematic, tmpBig.reconstruct(), PRECISION);
+        TestUtils.assertEquals("QR.reconstruct() Complex", tmpProblematic, tmpComplex.reconstruct(), PRECISION);
+        TestUtils.assertEquals("QR.reconstruct() Primitive", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
+        TestUtils.assertEquals("QR.reconstruct() Jama", tmpProblematic, tmpJama.reconstruct(), PRECISION);
+
+        final SingularValue<Double> tmpSVD = SingularValueDecomposition.makeJama();
+        tmpSVD.compute(tmpProblematic);
+
+        TestUtils.assertEquals("rank() SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
+        TestUtils.assertEquals("rank() SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
+        TestUtils.assertEquals("rank() SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
+        TestUtils.assertEquals("rank() SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
+
+    }
+
+    public void testEvD() {
+
+        final MatrixStore<Double> tmpProblematic = VerySmallCase.getVerySmall();
+
+        final Eigenvalue<BigDecimal> tmpBig = EigenvalueDecomposition.makeBig();
+        final Eigenvalue<ComplexNumber> tmpComplex = EigenvalueDecomposition.makeComplex();
+        final Eigenvalue<Double> tmpPrimitive = EigenvalueDecomposition.makePrimitive();
+        final Eigenvalue<Double> tmpJama = EigenvalueDecomposition.makeJama();
+
+        TestUtils.assertTrue("Big.compute()", tmpBig.compute(tmpProblematic));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.compute(tmpProblematic));
+        TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.compute(tmpProblematic));
+        TestUtils.assertTrue("Jama.compute()", tmpJama.compute(tmpProblematic));
+
         if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Big R", tmpBig.getR());
-            BasicLogger.debug("Complex R", tmpComplex.getR());
-            BasicLogger.debug("Primitive R", tmpPrimitive.getR());
-            BasicLogger.debug("Jama R", tmpJama.getR());
+            BasicLogger.debug("Big: {}", tmpBig.getEigenvalues());
+            BasicLogger.debug("Complex: {}", tmpComplex.getEigenvalues());
+            BasicLogger.debug("Primitive: {}", tmpPrimitive.getEigenvalues());
+            BasicLogger.debug("Jama: {}", tmpJama.getEigenvalues());
         }
 
         // TestUtils.assertEquals("QR.Q Big vs Complex", tmpBig.getQ(), tmpComplex.getQ());
         // TestUtils.assertEquals("QR.Q Complex vs Primitive", tmpComplex.getQ(), tmpPrimitive.getQ());
         // TestUtils.assertEquals("QR.Q Primitive vs Jama", tmpPrimitive.getQ(), tmpJama.getQ());
 
-        TestUtils.assertEquals("QR.R Big vs Complex", tmpBig.getR(), tmpComplex.getR());
-        TestUtils.assertEquals("QR.R Complex vs Primitive", tmpComplex.getR(), tmpPrimitive.getR());
-        TestUtils.assertEquals("QR.R Primitive vs Jama", tmpPrimitive.getR(), tmpJama.getR());
+        TestUtils.assertEquals("EvD Big vs Complex", tmpBig.getEigenvalues().get(0), tmpComplex.getEigenvalues().get(0), PRECISION);
+        TestUtils.assertEquals("EvD Complex vs Primitive", tmpComplex.getEigenvalues().get(0), tmpPrimitive.getEigenvalues().get(0), PRECISION);
+        TestUtils.assertEquals("EvD Primitive vs Jama", tmpPrimitive.getEigenvalues().get(0), tmpJama.getEigenvalues().get(0), PRECISION);
 
-        TestUtils.assertEquals("QR.reconstruct() Big", tmpProblematic, tmpBig.reconstruct());
-        TestUtils.assertEquals("QR.reconstruct() Complex", tmpProblematic, tmpComplex.reconstruct());
-        TestUtils.assertEquals("QR.reconstruct() Primitive", tmpProblematic, tmpPrimitive.reconstruct());
-        TestUtils.assertEquals("QR.reconstruct() Jama", tmpProblematic, tmpJama.reconstruct());
+        TestUtils.assertEquals("Big.reconstruct()", tmpProblematic, tmpBig.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Complex.reconstruct()", tmpProblematic, tmpComplex.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Primitive.reconstruct()", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Jama.reconstruct()", tmpProblematic, tmpJama.reconstruct(), PRECISION);
 
-        final SingularValue<Double> tmpSVD = SingularValueDecomposition.makeJama();
-        tmpSVD.compute(tmpProblematic);
+        TestUtils.assertEquals("trace() Big vs Complex", tmpBig.getTrace(), tmpComplex.getTrace(), PRECISION);
+        TestUtils.assertEquals("trace() Complex vs Primitive", tmpComplex.getTrace(), tmpPrimitive.getTrace(), PRECISION);
+        TestUtils.assertEquals("trace() Primitive vs Jama", tmpPrimitive.getTrace(), tmpJama.getTrace(), PRECISION);
 
-        TestUtils.assertEquals("QR.rank SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
-        TestUtils.assertEquals("QR.rank SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());
-        TestUtils.assertEquals("QR.rank SVD vs Primitive", tmpSVD.getRank(), tmpPrimitive.getRank());
-        TestUtils.assertEquals("QR.rank SVD vs Jama", tmpSVD.getRank(), tmpJama.getRank());
+        TestUtils.assertEquals("det() Big vs Complex", tmpBig.getDeterminant(), tmpComplex.getDeterminant(), PRECISION);
+        TestUtils.assertEquals("det() Complex vs Primitive", tmpComplex.getDeterminant(), tmpPrimitive.getDeterminant(), PRECISION);
+        TestUtils.assertEquals("det() Primitive vs Jama", tmpPrimitive.getDeterminant(), tmpJama.getDeterminant(), PRECISION);
 
     }
 

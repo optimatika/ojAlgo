@@ -32,7 +32,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
@@ -300,7 +299,7 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
         final double tmpTolerance = retVal * tmpSingularValues.doubleValue(0) * PrimitiveMath.MACHINE_EPSILON;
 
         for (int i = retVal - 1; i >= 0; i--) {
-            if (TypeUtils.isZero(tmpSingularValues.doubleValue(i), tmpTolerance)) {
+            if (tmpSingularValues.doubleValue(i) <= tmpTolerance) {
                 retVal--;
             } else {
                 return retVal;

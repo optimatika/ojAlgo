@@ -44,8 +44,8 @@ public abstract class RandomUtils {
      * For the Lanczos approximation of the gamma function
      */
     private static final double[] L9 = { 0.99999999999980993227684700473478, 676.520368121885098567009190444019, -1259.13921672240287047156078755283,
-            771.3234287776530788486528258894, -176.61502916214059906584551354, 12.507343278686904814458936853, -0.13857109526572011689554707,
-            9.984369578019570859563e-6, 1.50563273514931155834e-7 };
+        771.3234287776530788486528258894, -176.61502916214059906584551354, 12.507343278686904814458936853, -0.13857109526572011689554707,
+        9.984369578019570859563e-6, 1.50563273514931155834e-7 };
 
     /**
      * @param aSumOfValues The sum of all values in a sample set
@@ -122,7 +122,7 @@ public abstract class RandomUtils {
      */
     public static double gamma(final double arg) {
 
-        if ((arg <= ZERO) && (Math.abs(arg % ONE) < IS_ZERO)) {
+        if ((arg <= ZERO) && (Math.abs(arg % ONE) < MACHINE_EPSILON)) {
 
             return NaN;
 

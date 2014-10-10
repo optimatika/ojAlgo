@@ -43,7 +43,7 @@ import org.ojalgo.type.TypeUtils;
  *
  * @author apete
  */
-public final class SparseArray<N extends Number> extends BasicArray<N> {
+final class SparseArray<N extends Number> extends BasicArray<N> {
 
     static abstract class SparseFactory<N extends Number> extends ArrayFactory<N> {
 
