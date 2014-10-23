@@ -28,9 +28,9 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 
-public abstract class DotProduct {
+abstract class DotProduct extends MatrixOperation {
 
-    public static BigDecimal invoke(final BigDecimal[] array1, final int offset1, final BigDecimal[] array2, final int offset2, final int count) {
+    static BigDecimal invoke(final BigDecimal[] array1, final int offset1, final BigDecimal[] array2, final int offset2, final int count) {
         BigDecimal retVal = BigMath.ZERO;
         for (int i = 0; i < count; i++) {
             retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
@@ -38,7 +38,7 @@ public abstract class DotProduct {
         return retVal;
     }
 
-    public static ComplexNumber invoke(final ComplexNumber[] array1, final int offset1, final ComplexNumber[] array2, final int offset2, final int count) {
+    static ComplexNumber invoke(final ComplexNumber[] array1, final int offset1, final ComplexNumber[] array2, final int offset2, final int count) {
         ComplexNumber retVal = ComplexNumber.ZERO;
         for (int i = 0; i < count; i++) {
             retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
@@ -46,7 +46,7 @@ public abstract class DotProduct {
         return retVal;
     }
 
-    public static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int count) {
+    static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int count) {
         double retVal = PrimitiveMath.ZERO;
         for (int i = 0; i < count; i++) {
             retVal += array1[offset1 + i] * array2[offset2 + i];
@@ -54,7 +54,7 @@ public abstract class DotProduct {
         return retVal;
     }
 
-    public static RationalNumber invoke(final RationalNumber[] array1, final int offset1, final RationalNumber[] array2, final int offset2, final int count) {
+    static RationalNumber invoke(final RationalNumber[] array1, final int offset1, final RationalNumber[] array2, final int offset2, final int count) {
         RationalNumber retVal = RationalNumber.ZERO;
         for (int i = 0; i < count; i++) {
             retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));

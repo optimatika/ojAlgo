@@ -69,12 +69,12 @@ public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
         this.set(tmpQR.solve(tmpRHS));
     }
 
-    public RationalNumber integrate(final RationalNumber aFromPoint, final RationalNumber aToPoint) {
+    public RationalNumber integrate(final RationalNumber fromPoint, final RationalNumber toPoint) {
 
         final PolynomialFunction<RationalNumber> tmpPrim = this.buildPrimitive();
 
-        final RationalNumber tmpFromVal = tmpPrim.invoke(aFromPoint);
-        final RationalNumber tmpToVal = tmpPrim.invoke(aToPoint);
+        final RationalNumber tmpFromVal = tmpPrim.invoke(fromPoint);
+        final RationalNumber tmpToVal = tmpPrim.invoke(toPoint);
 
         return tmpToVal.subtract(tmpFromVal);
     }

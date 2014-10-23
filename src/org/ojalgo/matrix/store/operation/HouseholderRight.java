@@ -31,6 +31,8 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public final class HouseholderRight extends MatrixOperation {
 
+    public static final HouseholderRight SETUP = new HouseholderRight();
+
     public static int THRESHOLD = 128;
 
     public static void invoke(final BigDecimal[] aData, final int aFirstRow, final int aRowLimit, final int aColDim, final Householder.Big aHouseholder) {
@@ -113,6 +115,11 @@ public final class HouseholderRight extends MatrixOperation {
 
     private HouseholderRight() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

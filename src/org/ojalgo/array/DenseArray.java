@@ -22,6 +22,7 @@
 package org.ojalgo.array;
 
 import java.util.RandomAccess;
+import java.util.Spliterator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
@@ -58,6 +59,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     }
 
+    static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
+
     DenseArray() {
         super();
     }
@@ -86,21 +89,7 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
      * @see Scalar#isAbsolute()
      */
     public final boolean isAbsolute(final long index) {
-        return this.isZero((int) index);
-    }
-
-    /**
-     * @see Scalar#isPositive()
-     */
-    public final boolean isPositive(final long index) {
-        return this.isPositive((int) index);
-    }
-
-    /**
-     * @see Scalar#isZero()
-     */
-    public final boolean isZero(final long index) {
-        return this.isZero((int) index);
+        return this.isAbsolute((int) index);
     }
 
     /**
@@ -116,6 +105,17 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     public final void set(final long index, final Number number) {
         this.set((int) index, number);
+    }
+
+    private final boolean isSmall(final int first, final int limit, final int step, final double comparedTo) {
+
+        boolean retVal = true;
+
+        for (int i = first; retVal && (i < limit); i += step) {
+            retVal &= this.isSmall(i, comparedTo);
+        }
+
+        return retVal;
     }
 
     protected abstract double doubleValue(final int index);
@@ -150,30 +150,18 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     }
 
     /**
-     * @see Scalar#isAbsolute()
-     */
-    protected abstract boolean isAbsolute(int index);
-
-    /**
-     * @see Scalar#isPositive()
-     */
-    protected abstract boolean isPositive(int index);
-
-    /**
      * @see Scalar#isSmall()
      */
     protected abstract boolean isSmall(int index, double comparedTo);
 
     /**
-     * @see Scalar#isZero()
+     * @see Scalar#isAbsolute()
      */
-    protected abstract boolean isZero(int index);
-
-    protected abstract boolean isZeros(int first, int limit, int step);
+    protected abstract boolean isAbsolute(int index);
 
     @Override
-    protected final boolean isZeros(final long first, final long limit, final long step) {
-        return this.isZeros((int) first, (int) limit, (int) step);
+    protected final boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
+        return this.isSmall((int) first, (int) limit, (int) step, comparedTo);
     }
 
     protected abstract void modify(int index, Access1D<N> left, BinaryFunction<N> function);

@@ -21,12 +21,11 @@
  */
 package org.ojalgo.matrix.store.operation;
 
+import org.ojalgo.OjAlgoUtils;
 
 /**
- * 
- * aData array to be updated
- * aRowDim, aFirstCol & aColLimit (or aFirstRow, aRowLimit & aColDim) as needed.
- * other, operation specific, arguments in logical order
+ * aData array to be updated aRowDim, aFirstCol & aColLimit (or aFirstRow, aRowLimit & aColDim) as needed. other,
+ * operation specific, arguments in logical order
  *
  * @author apete
  */
@@ -34,6 +33,12 @@ abstract class MatrixOperation {
 
     protected MatrixOperation() {
         super();
+    }
+
+    public abstract int threshold();
+
+    public int workers() {
+        return OjAlgoUtils.ENVIRONMENT.threads;
     }
 
 }

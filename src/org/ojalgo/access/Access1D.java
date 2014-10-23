@@ -22,7 +22,10 @@
 package org.ojalgo.access;
 
 import java.util.List;
+import java.util.stream.BaseStream;
+import java.util.stream.StreamSupport;
 
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
@@ -50,23 +53,18 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         boolean isAbsolute(long index);
 
         /**
-         * @see Scalar#isPositive()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long)} and {@link #isZero(long)}.
+         * @see Scalar#isSmall(double)
          */
-        @Deprecated
-        boolean isPositive(long index);
+        boolean isSmall(long index, double comparedTo);
 
         /**
          * @see Scalar#isZero()
          * @deprecated v37
          */
         @Deprecated
-        boolean isZero(long index);
-
-        /**
-         * @see Scalar#isSmall(double)
-         */
-        boolean isSmall(long index, double comparedTo);
+        default boolean isZero(final long index) {
+            return this.isSmall(index, PrimitiveMath.ONE);
+        }
 
     }
 
@@ -117,5 +115,9 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     double doubleValue(long index);
 
     N get(long index);
+
+    default BaseStream<N, ? extends BaseStream<N, ?>> stream(final boolean parallel) {
+        return StreamSupport.stream(this.spliterator(), parallel);
+    }
 
 }

@@ -31,6 +31,8 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public final class SubstituteForwards extends MatrixOperation {
 
+    public static final SubstituteForwards SETUP = new SubstituteForwards();
+
     public static int THRESHOLD = 16;
 
     public static void invoke(final BigDecimal[] aData, final int aRowDim, final int aFirstCol, final int aColLimit, final Access2D<BigDecimal> aBody,
@@ -128,6 +130,11 @@ public final class SubstituteForwards extends MatrixOperation {
 
     private SubstituteForwards() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

@@ -23,6 +23,7 @@ package org.ojalgo.access;
 
 import java.util.List;
 
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
@@ -60,23 +61,18 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         boolean isAbsolute(long row, long column);
 
         /**
-         * @see Scalar#isPositive()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long,long)} and {@link #isZero(long,long)}.
+         * @see Scalar#isSmall(double)
          */
-        @Deprecated
-        boolean isPositive(long row, long column);
+        boolean isSmall(long row, long column, double comparedTo);
 
         /**
          * @see Scalar#isZero()
          * @deprecated v37
          */
         @Deprecated
-        boolean isZero(long row, long column);
-
-        /**
-         * @see Scalar#isSmall(double)
-         */
-        boolean isSmall(long row, long column, double comparedTo);
+        default boolean isZero(final long row, final long column) {
+            return this.isSmall(row, column, PrimitiveMath.ONE);
+        }
 
     }
 

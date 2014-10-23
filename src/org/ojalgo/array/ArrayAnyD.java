@@ -30,6 +30,7 @@ import org.ojalgo.access.AccessAnyD;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.BasicArray.BasicFactory;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -44,7 +45,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>,
-AccessAnyD.Visitable<N>, Serializable {
+        AccessAnyD.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
 
@@ -228,15 +229,7 @@ AccessAnyD.Visitable<N>, Serializable {
     }
 
     public boolean isAllZeros() {
-        return myDelegate.isZeros(0L, myDelegate.count(), 1L);
-    }
-
-    public boolean isPositive(final long index) {
-        return myDelegate.isPositive(index);
-    }
-
-    public boolean isPositive(final long[] reference) {
-        return myDelegate.isPositive(AccessUtils.index(myStructure, reference));
+        return myDelegate.isSmall(0L, myDelegate.count(), 1L, PrimitiveMath.ONE);
     }
 
     public boolean isSmall(final long index, final double comparedTo) {
@@ -247,17 +240,6 @@ AccessAnyD.Visitable<N>, Serializable {
         return myDelegate.isSmall(AccessUtils.index(myStructure, reference), comparedTo);
     }
 
-    public boolean isZero(final long index) {
-        return myDelegate.isZero(index);
-    }
-
-    /**
-     * @see Scalar#isZero()
-     */
-    public boolean isZero(final long[] reference) {
-        return myDelegate.isZero(AccessUtils.index(myStructure, reference));
-    }
-
     public boolean isZeros(final long[] first, final int dimension) {
 
         final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
@@ -266,7 +248,7 @@ AccessAnyD.Visitable<N>, Serializable {
         final long tmpStep = AccessUtils.step(myStructure, dimension);
         final long tmpLimit = tmpFirst * tmpStep * tmpCount;
 
-        return myDelegate.isZeros(tmpFirst, tmpLimit, tmpStep);
+        return myDelegate.isSmall(tmpFirst, tmpLimit, tmpStep, PrimitiveMath.ONE);
     }
 
     public Iterator<N> iterator() {

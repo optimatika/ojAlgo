@@ -28,10 +28,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.RandomAccess;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.BasicArray.BasicFactory;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -46,7 +49,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-        Access1D.Visitable<N>, RandomAccess, Serializable {
+Access1D.Visitable<N>, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access1D.Factory<Array1D<N>> {
 
@@ -379,7 +382,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     }
 
     public boolean isAllZeros() {
-        return myDelegate.isZeros(myFirst, myLimit, myStep);
+        return myDelegate.isSmall(myFirst, myLimit, myStep, PrimitiveMath.ONE);
     }
 
     @Override
@@ -387,26 +390,15 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return length == 0;
     }
 
-    /**
-     * @see Scalar#isPositive()
-     */
-    public boolean isPositive(final long index) {
-        return myDelegate.isPositive(myFirst + (myStep * index));
-    }
-
     public boolean isRangeZeros(final long first, final long limit) {
-        return myDelegate.isZeros((myFirst + (myStep * first)), (myFirst + (myStep * limit)), myStep);
+        return myDelegate.isSmall((myFirst + (myStep * first)), (myFirst + (myStep * limit)), myStep, PrimitiveMath.ONE);
     }
 
+    /**
+     * @see Scalar#isSmall(double)
+     */
     public boolean isSmall(final long index, final double comparedTo) {
         return myDelegate.isSmall(myFirst + (myStep * index), comparedTo);
-    }
-
-    /**
-     * @see Scalar#isZero()
-     */
-    public boolean isZero(final long index) {
-        return myDelegate.isZero(myFirst + (myStep * index));
     }
 
     @Override
@@ -570,6 +562,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
             throw new UnsupportedOperationException();
         }
+    }
+
+    public Spliterator<N> spliterator() {
+        return Spliterators.spliterator(this, Spliterator.ORDERED | Spliterator.IMMUTABLE);
     }
 
     @Override

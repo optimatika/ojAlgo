@@ -65,12 +65,12 @@ public class PrimitivePolynomial extends AbstractPolynomial<Double> {
         this.set(tmpQR.solve(tmpRHS));
     }
 
-    public Double integrate(final Double aFromPoint, final Double aToPoint) {
+    public Double integrate(final Double fromPoint, final Double toPoint) {
 
         final PolynomialFunction<Double> tmpPrim = this.buildPrimitive();
 
-        final double tmpFromVal = tmpPrim.invoke(aFromPoint.doubleValue());
-        final double tmpToVal = tmpPrim.invoke(aToPoint.doubleValue());
+        final double tmpFromVal = tmpPrim.invoke(fromPoint.doubleValue());
+        final double tmpToVal = tmpPrim.invoke(toPoint.doubleValue());
 
         return tmpToVal - tmpFromVal;
     }

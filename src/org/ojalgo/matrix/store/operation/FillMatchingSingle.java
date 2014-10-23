@@ -29,6 +29,8 @@ import org.ojalgo.type.TypeUtils;
 
 public final class FillMatchingSingle extends MatrixOperation {
 
+    public static final FillMatchingSingle SETUP = new FillMatchingSingle();
+
     public static int THRESHOLD = 64;
 
     public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int limitColumn,
@@ -65,6 +67,11 @@ public final class FillMatchingSingle extends MatrixOperation {
 
     private FillMatchingSingle() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

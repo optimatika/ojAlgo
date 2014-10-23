@@ -29,6 +29,8 @@ import org.ojalgo.type.TypeUtils;
 
 public final class FillTransposed extends MatrixOperation {
 
+    public static final FillTransposed SETUP = new FillTransposed();
+
     public static int THRESHOLD = 128;
 
     public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
@@ -60,6 +62,11 @@ public final class FillTransposed extends MatrixOperation {
 
     private FillTransposed() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

@@ -790,16 +790,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return false;
     }
 
-    public boolean isPositive(final long row, final long column) {
-        return myUtility.isPositive(row, column);
-    }
-
     public boolean isUpperRightShaded() {
         return false;
-    }
-
-    public boolean isZero(final long row, final long column) {
-        return myUtility.isZero(row, column);
     }
 
     public void maxpy(final ComplexNumber aSclrA, final MatrixStore<ComplexNumber> aMtrxX) {

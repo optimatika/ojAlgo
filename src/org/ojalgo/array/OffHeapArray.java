@@ -33,7 +33,6 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 import sun.misc.Unsafe;
 
@@ -122,16 +121,8 @@ public final class OffHeapArray extends BasicArray<Double> {
         return PrimitiveScalar.isAbsolute(UNSAFE.getDouble(this.address(index)));
     }
 
-    public boolean isPositive(final long index) {
-        return PrimitiveScalar.isPositive(UNSAFE.getDouble(this.address(index)));
-    }
-
     public boolean isSmall(final long index, final double comparedTo) {
         return PrimitiveScalar.isSmall(UNSAFE.getDouble(this.address(index)), comparedTo);
-    }
-
-    public boolean isZero(final long index) {
-        return PrimitiveScalar.isZero(UNSAFE.getDouble(this.address(index)));
     }
 
     public void set(final long index, final double value) {
@@ -204,12 +195,12 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     @Override
-    protected boolean isZeros(final long first, final long limit, final long step) {
+    protected boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
 
         boolean retVal = true;
 
         for (long i = first; retVal && (i < limit); i += step) {
-            retVal &= TypeUtils.isZero(this.doubleValue(i));
+            retVal &= PrimitiveScalar.isSmall(comparedTo, this.doubleValue(i));
         }
 
         return retVal;

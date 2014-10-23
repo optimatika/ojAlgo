@@ -73,12 +73,12 @@ public class BigPolynomial extends AbstractPolynomial<BigDecimal> {
         this.set(tmpQR.solve(tmpRHS));
     }
 
-    public BigDecimal integrate(final BigDecimal aFromPoint, final BigDecimal aToPoint) {
+    public BigDecimal integrate(final BigDecimal fromPoint, final BigDecimal toPoint) {
 
         final PolynomialFunction<BigDecimal> tmpPrim = this.buildPrimitive();
 
-        final BigDecimal tmpFromVal = tmpPrim.invoke(aFromPoint);
-        final BigDecimal tmpToVal = tmpPrim.invoke(aToPoint);
+        final BigDecimal tmpFromVal = tmpPrim.invoke(fromPoint);
+        final BigDecimal tmpToVal = tmpPrim.invoke(toPoint);
 
         return tmpToVal.subtract(tmpFromVal);
     }

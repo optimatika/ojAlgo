@@ -27,10 +27,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.Future;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.concurrent.DaemonPoolExecutor;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -233,7 +232,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
                 BasicLogger.debug();
                 BasicLogger.debug(NewIntegerSolver.this.toString());
-                BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
+                // BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
 
             } else {
                 if (NewIntegerSolver.this.isDebug()) {
@@ -257,8 +256,8 @@ public final class NewIntegerSolver extends IntegerSolver {
                     this.add(tmpLowerBranchTask);
                     this.add(tmpUpperBranchTask);
 
-                    if (DaemonPoolExecutor.INSTANCE.getActiveThreadCount() < OjAlgoUtils.ENVIRONMENT.threads) {
-                        DaemonPoolExecutor.INSTANCE.submit(new NodeWorker());
+                    if (DaemonPoolExecutor.isDaemonAvailable()) {
+                        DaemonPoolExecutor.invoke(new NodeWorker());
                     }
 
                     normal &= true;
@@ -464,7 +463,7 @@ public final class NewIntegerSolver extends IntegerSolver {
             NewIntegerSolver.this.add(new NodeKey(tmpIntegerModel));
         }
 
-        final ForkJoinTask<Boolean> tmpFuture = DaemonPoolExecutor.INSTANCE.submit(new NodeWorker());
+        final Future<Boolean> tmpFuture = DaemonPoolExecutor.invoke(new NodeWorker());
 
         try {
             normal = normal && tmpFuture.get();

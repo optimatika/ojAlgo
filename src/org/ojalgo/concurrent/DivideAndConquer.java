@@ -21,110 +21,69 @@
  */
 package org.ojalgo.concurrent;
 
-import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.ojalgo.OjAlgoUtils;
+import org.ojalgo.ProgrammingError;
 
 /**
  * @author apete
  */
 public abstract class DivideAndConquer extends Object {
 
-    abstract class Task extends ForkJoinTask<Void> {
-
-        Task() {
-            super();
-        }
-
-        @Override
-        public final Void getRawResult() {
-            return null;
-        }
-
-        @Override
-        protected final void setRawResult(final Void value) {
-        }
-
-    }
-
-    static int INITIAL = OjAlgoUtils.ENVIRONMENT.threads;
-
-    static int adjustThreshold(final int threshold, final int count) {
-        return Math.max(1, (threshold * threshold) / count);
-    }
-
-    static boolean shouldDivideFurther(final int count, final int threshold, final int workers) {
-        return (count > threshold) && (workers > 1);
-    }
-
     public DivideAndConquer() {
         super();
     }
 
     /**
-    * Asynchronous execution - start it, and forget about it.
-    * 
-    * @param first The first index, in a range, to include.
-    * @param limit The first index NOT to include - last (excl.) index in a range.
-    */
-    public final void execute(final int first, final int limit, final int threshold) {
-
-        DaemonPoolExecutor.INSTANCE.execute(new Task() {
-
-            @Override
-            protected boolean exec() {
-                DivideAndConquer.this.divide(first, limit, DivideAndConquer.adjustThreshold(threshold, limit - first), INITIAL);
-                return true;
-            }
-
-        });
-    }
-
-    /**
      * Synchronous execution - wait until it's finished.
-     * 
+     *
      * @param first The first index, in a range, to include.
      * @param limit The first index NOT to include - last (excl.) index in a range.
+     * @param threshold
      */
     public final void invoke(final int first, final int limit, final int threshold) {
-
-        DaemonPoolExecutor.INSTANCE.invoke(new Task() {
-
-            @Override
-            protected boolean exec() {
-                DivideAndConquer.this.divide(first, limit, DivideAndConquer.adjustThreshold(threshold, limit - first), INITIAL);
-                return true;
-            }
-
-        });
+        final int tmpThreshold = Math.max(1, (threshold * threshold) / (limit - first));
+        final int tmpWorkers = OjAlgoUtils.ENVIRONMENT.threads;
+        this.divide(first, limit, tmpThreshold, tmpWorkers);
     }
 
     protected abstract void conquer(final int first, final int limit);
 
-    protected final void divide(final int first, final int limit, final int threshold, final int workers) {
+    final void divide(final int first, final int limit, final int threshold, final int workers) {
 
         final int tmpCount = limit - first;
 
-        if (DivideAndConquer.shouldDivideFurther(tmpCount, threshold, workers)) {
+        if ((tmpCount > threshold) && (workers > 1)) {
 
             final int tmpSplit = first + (tmpCount / 2);
             final int tmpWorkers = workers / 2;
 
-            final Task tmpForkedTask = new Task() {
+            final Future<Void> tmpFirstPart = DaemonPoolExecutor.INSTANCE.submit(new Callable<Void>() {
 
-                @Override
-                protected boolean exec() {
+                public Void call() {
                     DivideAndConquer.this.divide(first, tmpSplit, threshold, tmpWorkers);
-                    return true;
+                    return null;
                 }
+            });
 
-            };
+            final Future<Void> tmpSecondPart = DaemonPoolExecutor.INSTANCE.submit(new Callable<Void>() {
 
-            tmpForkedTask.fork();
+                public Void call() {
+                    DivideAndConquer.this.divide(tmpSplit, limit, threshold, tmpWorkers);
+                    return null;
+                }
+            });
 
-            this.divide(tmpSplit, limit, threshold, tmpWorkers);
-
-            tmpForkedTask.join();
+            try {
+                tmpFirstPart.get();
+                tmpSecondPart.get();
+            } catch (final InterruptedException | ExecutionException exception) {
+                exception.printStackTrace();
+                throw new ProgrammingError(exception);
+            }
 
         } else {
 

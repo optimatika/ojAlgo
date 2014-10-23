@@ -24,6 +24,7 @@ package org.ojalgo.function.aggregator;
 import static org.ojalgo.function.ComplexFunction.*;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
@@ -395,7 +396,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final ComplexNumber anArg) {
-                    if (!ComplexNumber.isZero(anArg)) {
+                    if (!ComplexNumber.isSmall(PrimitiveMath.ONE, anArg)) {
                         myNumber = ComplexFunction.MIN.invoke(myNumber, ABS.invoke(anArg));
                     }
                 }

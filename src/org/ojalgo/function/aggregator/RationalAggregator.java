@@ -24,6 +24,7 @@ package org.ojalgo.function.aggregator;
 import static org.ojalgo.function.RationalFunction.*;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.RationalFunction;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -399,7 +400,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final RationalNumber anArg) {
-                    if (!RationalNumber.isZero(anArg)) {
+                    if (!RationalNumber.isSmall(PrimitiveMath.ONE, anArg)) {
                         myNumber = RationalFunction.MIN.invoke(myNumber, ABS.invoke(anArg));
                     }
                 }

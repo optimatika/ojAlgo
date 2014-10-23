@@ -33,6 +33,8 @@ import org.ojalgo.type.TypeUtils;
 
 public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation {
 
+    public static final GenerateApplyAndCopyHouseholderColumn SETUP = new GenerateApplyAndCopyHouseholderColumn();
+
     public static int THRESHOLD = 128;
 
     public static boolean invoke(final BigDecimal[] data, final int structure, final int row, final int col, final Householder.Big destination) {
@@ -184,6 +186,11 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
 
     private GenerateApplyAndCopyHouseholderColumn() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

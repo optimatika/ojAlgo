@@ -761,20 +761,12 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return false;
     }
 
-    public boolean isPositive(final long row, final long column) {
-        return myUtility.isPositive(row, column);
-    }
-
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return myUtility.isSmall(row, column, comparedTo);
     }
 
     public boolean isUpperRightShaded() {
         return false;
-    }
-
-    public boolean isZero(final long row, final long column) {
-        return myUtility.isZero(row, column);
     }
 
     public void maxpy(final BigDecimal aSclrA, final MatrixStore<BigDecimal> aMtrxX) {

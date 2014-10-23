@@ -54,7 +54,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-        Access1D.Visitable<N>, Serializable {
+Access1D.Visitable<N>, Serializable {
 
     static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -261,7 +261,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     protected abstract long indexOfLargest(long first, long limit, long step);
 
-    protected abstract boolean isZeros(long first, long limit, long step);
+    protected abstract boolean isSmall(long first, long limit, long step, double comparedTo);
 
     protected abstract void modify(long first, long limit, long step, Access1D<N> left, BinaryFunction<N> function);
 

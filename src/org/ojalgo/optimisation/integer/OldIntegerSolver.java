@@ -28,10 +28,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.concurrent.DaemonPoolExecutor;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -140,7 +140,7 @@ public final class OldIntegerSolver extends IntegerSolver {
                         OldIntegerSolver.this.debug(OldIntegerSolver.this.getBestResultSoFar().toString());
                         BasicLogger.debug();
                         BasicLogger.debug(OldIntegerSolver.this.toString());
-                        BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
+                        // BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
                     }
 
                 } else {
@@ -280,7 +280,7 @@ public final class OldIntegerSolver extends IntegerSolver {
 
         final BranchAndBoundNodeTask tmpNodeTask = new BranchAndBoundNodeTask();
 
-        final boolean tmpNormalExit = DaemonPoolExecutor.INSTANCE.invoke(tmpNodeTask);
+        final boolean tmpNormalExit = ForkJoinPool.commonPool().invoke(tmpNodeTask);
 
         Optimisation.Result retVal = this.getBestResultSoFar();
 

@@ -32,6 +32,7 @@ import org.ojalgo.access.ColumnsIterator;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.RowsIterator;
 import org.ojalgo.array.BasicArray.BasicFactory;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -46,7 +47,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.Fillable<N>, Access2D.Iterable2D<N>, Access2D.Modifiable<N>,
-Access2D.Visitable<N>, Serializable {
+        Access2D.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access2D.Factory<Array2D<N>> {
 
@@ -415,30 +416,22 @@ Access2D.Visitable<N>, Serializable {
     }
 
     public boolean isAllZeros() {
-        return myDelegate.isZeros(0L, this.count(), 1L);
+        return myDelegate.isSmall(0L, this.count(), 1L, PrimitiveMath.ONE);
     }
 
     public boolean isColumnZeros(final long row, final long column) {
-        return myDelegate.isZeros(row + (column * myRowsCount), myRowsCount + (column * myRowsCount), 1L);
+        return myDelegate.isSmall(row + (column * myRowsCount), myRowsCount + (column * myRowsCount), 1L, PrimitiveMath.ONE);
     }
 
     public boolean isDiagonalZeros(final long row, final long column) {
 
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
 
-        return myDelegate.isZeros(row + (column * myRowsCount), row + tmpCount + ((column + tmpCount) * myRowsCount), 1L + myRowsCount);
-    }
-
-    public boolean isPositive(final long index) {
-        return myDelegate.isPositive(index);
-    }
-
-    public boolean isPositive(final long row, final long column) {
-        return myDelegate.isPositive(row + (column * myRowsCount));
+        return myDelegate.isSmall(row + (column * myRowsCount), row + tmpCount + ((column + tmpCount) * myRowsCount), 1L + myRowsCount, PrimitiveMath.ONE);
     }
 
     public boolean isRowZeros(final long row, final long column) {
-        return myDelegate.isZeros(row + (column * myRowsCount), row + (myColumnsCount * myRowsCount), myRowsCount);
+        return myDelegate.isSmall(row + (column * myRowsCount), row + (myColumnsCount * myRowsCount), myRowsCount, PrimitiveMath.ONE);
     }
 
     public boolean isSmall(final long index, final double comparedTo) {
@@ -447,14 +440,6 @@ Access2D.Visitable<N>, Serializable {
 
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return myDelegate.isSmall(row + (column * myRowsCount), comparedTo);
-    }
-
-    public boolean isZero(final long index) {
-        return myDelegate.isZero(index);
-    }
-
-    public boolean isZero(final long row, final long column) {
-        return myDelegate.isZero(row + (column * myRowsCount));
     }
 
     public Iterator<N> iterator() {

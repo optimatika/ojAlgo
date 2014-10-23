@@ -24,6 +24,10 @@ package org.ojalgo.array;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
+import java.util.Spliterator.OfDouble;
+import java.util.Spliterators;
+import java.util.stream.DoubleStream;
+import java.util.stream.StreamSupport;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
@@ -37,7 +41,6 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * A one- and/or arbitrary-dimensional array of double.
@@ -363,6 +366,14 @@ public class PrimitiveArray extends DenseArray<Double> {
         return Arrays.hashCode(data);
     }
 
+    public OfDouble spliterator() {
+        return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
+    }
+
+    public DoubleStream stream(final boolean parallel) {
+        return StreamSupport.doubleStream(this.spliterator(), parallel);
+    }
+
     protected final double[] copyOfData() {
         return ArrayUtils.copyOf(data);
     }
@@ -425,30 +436,13 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
-    protected final boolean isAbsolute(final int index) {
+    protected boolean isAbsolute(final int index) {
         return PrimitiveScalar.isAbsolute(data[index]);
     }
 
     @Override
-    protected final boolean isPositive(final int index) {
-        return PrimitiveScalar.isPositive(data[index]);
-    }
-
-    @Override
-    protected final boolean isZero(final int index) {
-        return TypeUtils.isZero(data[index]);
-    }
-
-    @Override
-    protected final boolean isZeros(final int first, final int limit, final int step) {
-
-        boolean retVal = true;
-
-        for (int i = first; retVal && (i < limit); i += step) {
-            retVal &= TypeUtils.isZero(data[i]);
-        }
-
-        return retVal;
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return PrimitiveScalar.isSmall(comparedTo, data[index]);
     }
 
     @Override
@@ -548,9 +542,8 @@ public class PrimitiveArray extends DenseArray<Double> {
         return new PrimitiveArray(capacity);
     }
 
-    @Override
-    protected boolean isSmall(final int index, final double comparedTo) {
-        return PrimitiveScalar.isSmall(comparedTo, data[index]);
+    OfDouble split() {
+        return Spliterators.spliterator(data, 0);
     }
 
 }

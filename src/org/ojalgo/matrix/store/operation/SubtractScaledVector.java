@@ -28,7 +28,7 @@ import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * y -= ax
- * 
+ *
  * @param data y-data
  * @param dataBaseIndex y-column base index
  * @param vector x-data
@@ -38,6 +38,8 @@ import org.ojalgo.scalar.ComplexNumber;
  * @param limit Index limit
  */
 public final class SubtractScaledVector extends MatrixOperation {
+
+    public static final SubtractScaledVector SETUP = new SubtractScaledVector();
 
     public static int THRESHOLD = 128;
 
@@ -64,6 +66,11 @@ public final class SubtractScaledVector extends MatrixOperation {
 
     private SubtractScaledVector() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

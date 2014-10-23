@@ -66,12 +66,12 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
         this.set(tmpQR.solve(tmpRHS));
     }
 
-    public ComplexNumber integrate(final ComplexNumber aFromPoint, final ComplexNumber aToPoint) {
+    public ComplexNumber integrate(final ComplexNumber fromPoint, final ComplexNumber toPoint) {
 
         final PolynomialFunction<ComplexNumber> tmpPrim = this.buildPrimitive();
 
-        final ComplexNumber tmpFromVal = tmpPrim.invoke(aFromPoint);
-        final ComplexNumber tmpToVal = tmpPrim.invoke(aToPoint);
+        final ComplexNumber tmpFromVal = tmpPrim.invoke(fromPoint);
+        final ComplexNumber tmpToVal = tmpPrim.invoke(toPoint);
 
         return tmpToVal.subtract(tmpFromVal);
     }

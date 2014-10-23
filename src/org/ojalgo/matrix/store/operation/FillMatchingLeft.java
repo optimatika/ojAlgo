@@ -23,6 +23,8 @@ package org.ojalgo.matrix.store.operation;
 
 public final class FillMatchingLeft extends MatrixOperation {
 
+    public static final FillMatchingLeft SETUP = new FillMatchingLeft();
+
     /**
      * 2013-10-22: Was set to 128 (based on calibration) but I saw a dip in relative performance (java matrix benchmark)
      * at size 200. So I cahnged it to 256.
@@ -31,6 +33,11 @@ public final class FillMatchingLeft extends MatrixOperation {
 
     private FillMatchingLeft() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

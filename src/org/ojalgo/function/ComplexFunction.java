@@ -27,27 +27,25 @@ import org.ojalgo.type.TypeUtils;
 
 public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
-    static abstract class Binary extends BinaryFunction<ComplexNumber> {
+    public static interface Binary extends BinaryFunction<ComplexNumber> {
 
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
+        default double invoke(final double arg1, final double arg2) {
             return this.invoke(ComplexNumber.makeReal(arg1), ComplexNumber.makeReal(arg2)).doubleValue();
         }
 
     }
 
-    static abstract class Parameter extends ParameterFunction<ComplexNumber> {
+    public static interface Parameter extends ParameterFunction<ComplexNumber> {
 
-        @Override
-        public final double invoke(final double arg, final int param) {
+        default double invoke(final double arg, final int param) {
             return this.invoke(ComplexNumber.makeReal(arg), param).doubleValue();
         }
 
     }
 
-    static abstract class Unary implements UnaryFunction<ComplexNumber> {
+    public static interface Unary extends UnaryFunction<ComplexNumber> {
 
-        public final double invoke(final double arg) {
+        default double invoke(final double arg) {
             return this.invoke(ComplexNumber.makeReal(arg)).doubleValue();
         }
 
@@ -218,14 +216,6 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return POWER.invoke(arg, -1);
-        }
-
-    };
-
-    public static final UnaryFunction<ComplexNumber> SQRT1PX2 = new Unary() {
-
-        public final ComplexNumber invoke(final ComplexNumber arg) {
-            return SQRT.invoke(ComplexNumber.ONE.add(arg.multiply(arg)));
         }
 
     };
@@ -406,6 +396,14 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
             final double retArg = arg.phase() * PrimitiveMath.HALF;
 
             return ComplexNumber.makePolar(retMod, retArg);
+        }
+
+    };
+
+    public static final UnaryFunction<ComplexNumber> SQRT1PX2 = new Unary() {
+
+        public final ComplexNumber invoke(final ComplexNumber arg) {
+            return SQRT.invoke(ComplexNumber.ONE.add(arg.multiply(arg)));
         }
 
     };

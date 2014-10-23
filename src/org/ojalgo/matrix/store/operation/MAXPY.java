@@ -29,6 +29,8 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public final class MAXPY extends MatrixOperation {
 
+    public static final MAXPY SETUP = new MAXPY();
+
     public static int THRESHOLD = 128;
 
     public static void invoke(final BigDecimal[] aData, final int aRowDim, final int aFirstCol, final int aColLimit, final BigDecimal aScale,
@@ -65,6 +67,11 @@ public final class MAXPY extends MatrixOperation {
 
     private MAXPY() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

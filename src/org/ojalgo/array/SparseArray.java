@@ -43,7 +43,7 @@ import org.ojalgo.type.TypeUtils;
  *
  * @author apete
  */
-final class SparseArray<N extends Number> extends BasicArray<N> {
+public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     static abstract class SparseFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -215,15 +215,6 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
             return myValues.isAbsolute(tmpIndex);
         } else {
             return true;
-        }
-    }
-
-    public boolean isPositive(final long index) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.isPositive(tmpIndex);
-        } else {
-            return false;
         }
     }
 
@@ -457,23 +448,6 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    protected boolean isZeros(final long first, final long limit, final long step) {
-
-        boolean retVal = true;
-
-        for (int i = 0; retVal && (i < myIndices.length); i++) {
-            final long tmpIndex = myIndices[i];
-            if ((tmpIndex >= first) && (tmpIndex < limit)) {
-                if (((tmpIndex - first) % step) == 0L) {
-                    retVal &= myValues.isZero(i);
-                }
-            }
-        }
-
-        return retVal;
-    }
-
-    @Override
     protected void modify(final long first, final long limit, final long step, final Access1D<N> left, final BinaryFunction<N> function) {
 
         final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO);
@@ -583,6 +557,23 @@ final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     boolean isPrimitive() {
         return myValues.isPrimitive();
+    }
+
+    @Override
+    protected boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
+
+        boolean retVal = true;
+
+        for (int i = 0; retVal && (i < myIndices.length); i++) {
+            final long tmpIndex = myIndices[i];
+            if ((tmpIndex >= first) && (tmpIndex < limit)) {
+                if (((tmpIndex - first) % step) == 0L) {
+                    retVal &= myValues.isSmall(i, comparedTo);
+                }
+            }
+        }
+
+        return retVal;
     }
 
 }

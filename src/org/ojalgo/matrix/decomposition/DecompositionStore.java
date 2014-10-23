@@ -41,7 +41,7 @@ import org.ojalgo.scalar.ComplexNumber;
  * <p>
  * Do not use it for anything else!
  * </p>
- * 
+ *
  * @author apete
  */
 public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
@@ -226,7 +226,7 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      * solution).</li>
      * <li>[A] is upper/right triangular</li>
      * </ul>
-     * 
+     *
      * @param aBody The equation system body parameters [A]
      * @param conjugated true if the upper/right part of aBody is actually stored in the lower/left part of the matrix,
      *        and the elements conjugated.
@@ -240,7 +240,7 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      * solution).</li>
      * <li>[A] is lower/left triangular</li>
      * </ul>
-     * 
+     *
      * @param aBody The equation system body parameters [A]
      * @param onesOnDiagonal true if aBody as ones on the diagonal
      */

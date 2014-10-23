@@ -25,6 +25,8 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
@@ -179,6 +181,10 @@ public class BigArray extends DenseArray<BigDecimal> {
         return Arrays.hashCode(data);
     }
 
+    public Spliterator<BigDecimal> spliterator() {
+        return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
+    }
+
     protected final BigDecimal[] copyOfData() {
         return ArrayUtils.copyOf(data);
     }
@@ -244,30 +250,13 @@ public class BigArray extends DenseArray<BigDecimal> {
     }
 
     @Override
-    protected final boolean isAbsolute(final int index) {
+    protected boolean isAbsolute(final int index) {
         return BigScalar.isAbsolute(data[index]);
     }
 
     @Override
-    protected final boolean isPositive(final int index) {
-        return BigScalar.isPositive(data[index]);
-    }
-
-    @Override
-    protected final boolean isZero(final int index) {
-        return BigScalar.isZero(data[index]);
-    }
-
-    @Override
-    protected final boolean isZeros(final int first, final int limit, final int step) {
-
-        boolean retVal = true;
-
-        for (int i = first; retVal && (i < limit); i += step) {
-            retVal &= this.isZero(i);
-        }
-
-        return retVal;
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return BigScalar.isSmall(comparedTo, data[index]);
     }
 
     @Override
@@ -366,11 +355,6 @@ public class BigArray extends DenseArray<BigDecimal> {
     @Override
     DenseArray<BigDecimal> newInstance(final int capacity) {
         return new BigArray(capacity);
-    }
-
-    @Override
-    protected boolean isSmall(final int index, final double comparedTo) {
-        return BigScalar.isSmall(comparedTo, data[index]);
     }
 
 }

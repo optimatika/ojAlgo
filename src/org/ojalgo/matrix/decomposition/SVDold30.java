@@ -141,10 +141,10 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
             final ComplexNumber cg; // cos Givens
             final ComplexNumber sg; // sin Givens
 
-            if (ComplexNumber.isZero(y)) {
+            if (ComplexNumber.isSmall(PrimitiveMath.ONE, y)) {
                 cg = x.signum();
                 sg = ComplexNumber.ZERO;
-            } else if (ComplexNumber.isZero(x)) {
+            } else if (ComplexNumber.isSmall(PrimitiveMath.ONE, x)) {
                 sg = y.signum();
                 cg = ComplexNumber.ZERO;
             } else if (y.compareTo(x) == 1) {
@@ -351,7 +351,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
 
         this.getSingularValues().sortDescending();
 
-        myFutureQ1 = DaemonPoolExecutor.INSTANCE.submit(new Callable<PhysicalStore<N>>() {
+        myFutureQ1 = DaemonPoolExecutor.invoke(new Callable<PhysicalStore<N>>() {
 
             public PhysicalStore<N> call() throws Exception {
 
@@ -368,7 +368,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
             }
         });
 
-        myFutureQ2 = DaemonPoolExecutor.INSTANCE.submit(new Callable<PhysicalStore<N>>() {
+        myFutureQ2 = DaemonPoolExecutor.invoke(new Callable<PhysicalStore<N>>() {
 
             public PhysicalStore<N> call() throws Exception {
 

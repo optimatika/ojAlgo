@@ -41,7 +41,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-final class SegmentedArray<N extends Number> extends BasicArray<N> {
+public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     static abstract class SegmentedFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -253,16 +253,8 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return mySegments[(int) (index >> myIndexBits)].isAbsolute(index & myIndexMask);
     }
 
-    public boolean isPositive(final long index) {
-        return mySegments[(int) (index >> myIndexBits)].isPositive(index & myIndexMask);
-    }
-
     public boolean isSmall(final long index, final double comparedTo) {
         return mySegments[(int) (index >> myIndexBits)].isSmall(index & myIndexMask, comparedTo);
-    }
-
-    public boolean isZero(final long index) {
-        return mySegments[(int) (index >> myIndexBits)].isZero(index & myIndexMask);
     }
 
     public void set(final long index, final double value) {
@@ -362,10 +354,10 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    protected boolean isZeros(final long first, final long limit, final long step) {
+    protected boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
         boolean retVal = true;
         for (long i = first; retVal && (i < limit); i += step) {
-            retVal &= this.isZero(i);
+            retVal &= this.isSmall(i, comparedTo);
         }
         return retVal;
     }

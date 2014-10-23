@@ -22,6 +22,7 @@
 package org.ojalgo.scalar;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
@@ -30,7 +31,7 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class BigScalar extends AbstractScalar<BigDecimal> implements Enforceable<BigScalar> {
+public final class BigScalar extends Number implements Scalar<BigDecimal>, Enforceable<BigScalar> {
 
     public static final Scalar.Factory<BigDecimal> FACTORY = new Scalar.Factory<BigDecimal>() {
 
@@ -63,20 +64,14 @@ public final class BigScalar extends AbstractScalar<BigDecimal> implements Enfor
     public static final BigScalar ONE = new BigScalar(BigMath.ONE);
     public static final BigScalar ZERO = new BigScalar();
 
+    static final NumberContext CONTEXT = NumberContext.getMath(MathContext.DECIMAL128);
+
     public static boolean isAbsolute(final BigDecimal value) {
         return value.signum() >= 0;
     }
 
-    public static boolean isPositive(final BigDecimal value) {
-        return (value.signum() > 0) && !BigScalar.isZero(value);
-    }
-
     public static boolean isSmall(final double comparedTo, final BigDecimal value) {
-        return (value.signum() == 0) || AbstractScalar.BIG.isSmall(comparedTo, value.doubleValue());
-    }
-
-    public static boolean isZero(final BigDecimal value) {
-        return BigScalar.isSmall(PrimitiveMath.ONE, value);
+        return (value.signum() == 0) || BigScalar.CONTEXT.isSmall(comparedTo, value.doubleValue());
     }
 
     private final BigDecimal myNumber;
@@ -119,7 +114,7 @@ public final class BigScalar extends AbstractScalar<BigDecimal> implements Enfor
     }
 
     public BigScalar divide(final BigDecimal arg) {
-        return new BigScalar(myNumber.divide(arg, AbstractScalar.BIG.getMathContext()));
+        return new BigScalar(myNumber.divide(arg, BigScalar.CONTEXT.getMathContext()));
     }
 
     public Scalar<BigDecimal> divide(final double arg) {
@@ -188,7 +183,7 @@ public final class BigScalar extends AbstractScalar<BigDecimal> implements Enfor
     }
 
     public boolean isSmall(final double comparedTo) {
-        return AbstractScalar.BIG.isSmall(comparedTo, this.doubleValue());
+        return BigScalar.CONTEXT.isSmall(comparedTo, this.doubleValue());
     }
 
     @Override

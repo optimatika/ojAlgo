@@ -285,16 +285,6 @@ final class TransposedDecompositionStore<N extends Number> implements Decomposit
         return myDelegate.isLowerLeftShaded();
     }
 
-    public boolean isZero(final long index) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public boolean isZero(final long row, final long column) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
     public Iterator<N> iterator() {
         // TODO Auto-generated method stub
         return null;

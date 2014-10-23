@@ -19,32 +19,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.scalar;
+package org.ojalgo.concurrent;
 
-import java.math.MathContext;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.type.context.NumberContext;
+final class DaemonFactory implements ThreadFactory {
 
-abstract class AbstractScalar<N extends Number> extends Number implements Scalar<N> {
+    static final DaemonFactory INSTANCE = new DaemonFactory();
 
-    static final NumberContext BIG = NumberContext.getMath(MathContext.DECIMAL128);
-    static final NumberContext PRIMITIVE = NumberContext.getMath(MathContext.DECIMAL64);
+    private static final String OJALGO_DAEMON_GROUP = "ojAlgo-daemon-group";
+    private static final String PREFIX = "ojAlgo-daemon-";
+    private static final int PRIORITY = Thread.NORM_PRIORITY - 1;
 
-    AbstractScalar() {
+    private final AtomicInteger myNextThreadID = new AtomicInteger(1);
+    private final ThreadGroup myThreadGroup;
+
+    private DaemonFactory() {
+
         super();
+
+        myThreadGroup = new ThreadGroup(OJALGO_DAEMON_GROUP);
     }
 
-    public final String toPlainString(final NumberContext context) {
-        return context.enforce(this.toBigDecimal()).toPlainString();
-    }
+    public Thread newThread(final Runnable runnable) {
 
-    /**
-     * @deprecated v37
-     */
-    @Deprecated
-    public final boolean isZero() {
-        return this.isSmall(PrimitiveMath.ONE);
+        final String tmpName = PREFIX + myNextThreadID.getAndIncrement();
+
+        final Thread retVal = new Thread(myThreadGroup, runnable, tmpName);
+
+        retVal.setDaemon(true);
+        retVal.setPriority(PRIORITY);
+
+        return retVal;
     }
 
 }

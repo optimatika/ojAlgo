@@ -33,7 +33,7 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class Quaternion extends AbstractScalar<Quaternion> implements Enforceable<Quaternion>, Access2D<Double> {
+public final class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double> {
 
     public static final Scalar.Factory<Quaternion> FACTORY = new Scalar.Factory<Quaternion>() {
 
@@ -83,20 +83,12 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
         return Double.isNaN(value.doubleValue()) || Double.isNaN(value.i) || Double.isNaN(value.j) || Double.isNaN(value.k);
     }
 
-    public static boolean isPositive(final Quaternion value) {
-        return value.isAbsolute() && !AbstractScalar.PRIMITIVE.isZero(value.norm());
-    }
-
     public static boolean isReal(final Quaternion value) {
         return value.isReal();
     }
 
     public static boolean isSmall(final double comparedTo, final Quaternion value) {
         return value.isSmall(comparedTo);
-    }
-
-    public static boolean isZero(final Quaternion value) {
-        return AbstractScalar.PRIMITIVE.isZero(value.norm());
     }
 
     public static Quaternion makeReal(final double arg1) {
@@ -426,21 +418,21 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
         if (myRealForSure) {
             return myScalar >= PrimitiveMath.ZERO;
         } else {
-            return !AbstractScalar.PRIMITIVE.isDifferent(myScalar, this.norm());
+            return !PrimitiveScalar.CONTEXT.isDifferent(myScalar, this.norm());
         }
     }
 
     public boolean isPure() {
-        return myPureForSure || AbstractScalar.PRIMITIVE.isSmall(this.norm(), myScalar);
+        return myPureForSure || PrimitiveScalar.CONTEXT.isSmall(this.norm(), myScalar);
     }
 
     public boolean isReal() {
-        final NumberContext tmpCntxt = AbstractScalar.PRIMITIVE;
+        final NumberContext tmpCntxt = PrimitiveScalar.CONTEXT;
         return myRealForSure || (tmpCntxt.isSmall(myScalar, i) && tmpCntxt.isSmall(myScalar, j) && tmpCntxt.isSmall(myScalar, k));
     }
 
     public boolean isSmall(final double comparedTo) {
-        return AbstractScalar.PRIMITIVE.isSmall(comparedTo, this.norm());
+        return PrimitiveScalar.CONTEXT.isSmall(comparedTo, this.norm());
     }
 
     public Iterator<Double> iterator() {
@@ -538,7 +530,7 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
     }
 
     public BigDecimal toBigDecimal() {
-        return new BigDecimal(myScalar, AbstractScalar.PRIMITIVE.getMathContext());
+        return new BigDecimal(myScalar, PrimitiveScalar.CONTEXT.getMathContext());
     }
 
     /**
@@ -582,10 +574,10 @@ public final class Quaternion extends AbstractScalar<Quaternion> implements Enfo
 
         final StringBuilder retVal = new StringBuilder("(");
 
-        final BigDecimal tmpScalar = context.enforce(new BigDecimal(myScalar, AbstractScalar.PRIMITIVE.getMathContext()));
-        final BigDecimal tmpI = context.enforce(new BigDecimal(i, AbstractScalar.PRIMITIVE.getMathContext()));
-        final BigDecimal tmpJ = context.enforce(new BigDecimal(j, AbstractScalar.PRIMITIVE.getMathContext()));
-        final BigDecimal tmpK = context.enforce(new BigDecimal(k, AbstractScalar.PRIMITIVE.getMathContext()));
+        final BigDecimal tmpScalar = context.enforce(new BigDecimal(myScalar, PrimitiveScalar.CONTEXT.getMathContext()));
+        final BigDecimal tmpI = context.enforce(new BigDecimal(i, PrimitiveScalar.CONTEXT.getMathContext()));
+        final BigDecimal tmpJ = context.enforce(new BigDecimal(j, PrimitiveScalar.CONTEXT.getMathContext()));
+        final BigDecimal tmpK = context.enforce(new BigDecimal(k, PrimitiveScalar.CONTEXT.getMathContext()));
 
         retVal.append(tmpScalar.toString());
 

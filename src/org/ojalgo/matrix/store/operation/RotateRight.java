@@ -28,6 +28,8 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public final class RotateRight extends MatrixOperation {
 
+    public static final RotateRight SETUP = new RotateRight();
+
     public static int THRESHOLD = 128;
 
     public static void invoke(final BigDecimal[] aData, final int aRowDim, final int aColA, final int aColB, final BigDecimal aCos, final BigDecimal aSin) {
@@ -96,6 +98,11 @@ public final class RotateRight extends MatrixOperation {
 
     private RotateRight() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

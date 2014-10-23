@@ -28,16 +28,18 @@ import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * <b>c</b>olumn <b>a</b> <b>x</b> <b>p</b>lus <b>y</b>
- * 
+ *
  * @param aData y-data
  * @param aBaseDataIndex y-column base index
  * @param aMultipliers x-data
  * @param aBaseMultiplierIndex x-column base index
  * @param aScalar a
  * @param first First index
- * @param aLimit Index limit 
+ * @param aLimit Index limit
  */
 public final class CAXPY extends MatrixOperation {
+
+    public static final CAXPY SETUP = new CAXPY();
 
     public static int THRESHOLD = Integer.MAX_VALUE;
 
@@ -65,6 +67,11 @@ public final class CAXPY extends MatrixOperation {
 
     private CAXPY() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

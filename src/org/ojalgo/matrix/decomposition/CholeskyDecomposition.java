@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
@@ -39,7 +40,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
  * {@linkplain #makeBig()}, {@linkplain #makeComplex()}, {@linkplain #makePrimitive()} or {@linkplain #makeJama()}.
- * 
+ *
  * @author apete
  */
 public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Cholesky<N> {
@@ -129,7 +130,7 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
         final int tmpColDim = this.getColDim();
         final int tmpMinDim = Math.min(tmpRowDim, tmpColDim);
 
-        // true if (Hermitian) Positive Definite 
+        // true if (Hermitian) Positive Definite
         boolean tmpPositiveDefinite = tmpRowDim == tmpColDim;
 
         final BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
@@ -145,7 +146,7 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
         for (int ij = 0; tmpPositiveDefinite && (ij < tmpMinDim); ij++) {
 
             // Do the calculations...
-            if (tmpInPlace.isPositive(ij, ij)) {
+            if (tmpInPlace.doubleValue(ij, ij) > PrimitiveMath.ZERO) {
 
                 tmpInPlace.modifyOne(ij, ij, tmpSqrtFunc);
 
@@ -220,19 +221,19 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
 
     /**
      * Solves [this][X] = [aRHS] by first solving
-     * 
+     *
      * <pre>
      * [L][Y] = [aRHS]
      * </pre>
-     * 
+     *
      * and then
-     * 
+     *
      * <pre>
      * [U][X] = [Y]
      * </pre>
-     * 
+     *
      * .
-     * 
+     *
      * @param rhs The right hand side
      * @return [X] The solution will be written to "preallocated" and then returned.
      * @see org.ojalgo.matrix.decomposition.AbstractDecomposition#solve(Access2D,

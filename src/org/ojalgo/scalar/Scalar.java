@@ -23,6 +23,7 @@ package org.ojalgo.scalar;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -178,7 +179,9 @@ public interface Scalar<N extends Number> extends Comparable<N> {
      * @deprecated v37 Use {@link #isSmall(double)} instead.
      */
     @Deprecated
-    boolean isZero();
+    default boolean isZero() {
+        return this.isSmall(PrimitiveMath.ONE);
+    }
 
     /**
      * @see #add(double)
@@ -251,7 +254,9 @@ public interface Scalar<N extends Number> extends Comparable<N> {
 
     BigDecimal toBigDecimal();
 
-    String toPlainString(NumberContext context);
+    default String toPlainString(final NumberContext context) {
+        return context.enforce(this.toBigDecimal()).toPlainString();
+    }
 
     String toString(NumberContext context);
 

@@ -22,6 +22,8 @@
 package org.ojalgo.array;
 
 import java.util.Arrays;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
@@ -175,6 +177,10 @@ public class RationalArray extends DenseArray<RationalNumber> {
         return Arrays.hashCode(data);
     }
 
+    public Spliterator<RationalNumber> spliterator() {
+        return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
+    }
+
     protected final RationalNumber[] copyOfData() {
         return ArrayUtils.copyOf(data);
     }
@@ -240,42 +246,23 @@ public class RationalArray extends DenseArray<RationalNumber> {
     }
 
     @Override
-    protected final boolean isAbsolute(final int index) {
+    protected boolean isAbsolute(final int index) {
         return RationalNumber.isAbsolute(data[index]);
     }
 
     @Override
-    protected final boolean isPositive(final int index) {
-        return RationalNumber.isPositive(data[index]);
-    }
-
-    @Override
-    protected final boolean isZero(final int index) {
-        return RationalNumber.isZero(data[index]);
-    }
-
-    @Override
-    protected final boolean isZeros(final int first, final int limit, final int step) {
-
-        boolean retVal = true;
-
-        for (int i = first; retVal && (i < limit); i += step) {
-            retVal &= this.isZero(i);
-        }
-
-        return retVal;
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return RationalNumber.isSmall(comparedTo, data[index]);
     }
 
     @Override
     protected void modify(final int index, final Access1D<RationalNumber> left, final BinaryFunction<RationalNumber> function) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     protected void modify(final int index, final BinaryFunction<RationalNumber> function, final Access1D<RationalNumber> right) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -366,10 +353,5 @@ public class RationalArray extends DenseArray<RationalNumber> {
     @Override
     DenseArray<RationalNumber> newInstance(final int capacity) {
         return new RationalArray(capacity);
-    }
-
-    @Override
-    protected boolean isSmall(final int index, final double comparedTo) {
-        return RationalNumber.isSmall(comparedTo, data[index]);
     }
 }

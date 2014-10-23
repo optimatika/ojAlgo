@@ -34,6 +34,8 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public final class MultiplyRight extends MatrixOperation {
 
+    public static final MultiplyRight SETUP = new MultiplyRight();
+
     public static int THRESHOLD = 32;
 
     static final BigMultiplyRight BIG = new BigMultiplyRight() {
@@ -787,6 +789,11 @@ public final class MultiplyRight extends MatrixOperation {
 
     private MultiplyRight() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

@@ -598,15 +598,6 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         return false;
     }
 
-    public boolean isPositive(final long index) {
-        final int tmpRowDim = myDelegate.getRowDimension();
-        return PrimitiveScalar.isPositive(myDelegate.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
-    }
-
-    public boolean isPositive(final long row, final long column) {
-        return PrimitiveScalar.isPositive(this.doubleValue(row, column));
-    }
-
     public boolean isScalar() {
         return (myDelegate.getRowDimension() == 1) && (myDelegate.getColumnDimension() == 1);
     }
@@ -638,15 +629,6 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
 
     public boolean isVector() {
         return ((this.getColDim() == 1) || (this.getRowDim() == 1));
-    }
-
-    public boolean isZero(final long index) {
-        final int tmpRowDim = myDelegate.getRowDimension();
-        return PrimitiveScalar.isZero(myDelegate.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
-    }
-
-    public boolean isZero(final long row, final long column) {
-        return PrimitiveScalar.isZero(this.doubleValue(row, column));
     }
 
     public final Iterator<Double> iterator() {
