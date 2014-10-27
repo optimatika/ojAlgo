@@ -124,7 +124,7 @@ public abstract class FinanceUtils {
      * @param timeSeriesCollection
      * @return Annualised covariances
      */
-    public static <V extends Number> BasicMatrix<?> makeCovarianceMatrix(final Collection<CalendarDateSeries<V>> timeSeriesCollection) {
+    public static <V extends Number> BasicMatrix makeCovarianceMatrix(final Collection<CalendarDateSeries<V>> timeSeriesCollection) {
 
         final CoordinationSet<V> tmpCoordinator = new CoordinationSet<V>(timeSeriesCollection).prune();
 
@@ -279,7 +279,7 @@ public abstract class FinanceUtils {
 
     /**
      * GrowthRate = ln(GrowthFactor)
-     * 
+     *
      * @param growthFactor A growth factor per unit (day, week, month, year...)
      * @param growthFactorUnit A growth factor unit
      * @return Annualised return (percentage per year)
@@ -291,7 +291,7 @@ public abstract class FinanceUtils {
 
     /**
      * AnnualReturn = exp(GrowthRate * GrowthRateUnitsPerYear) - 1.0
-     * 
+     *
      * @param growthRate A growth rate per unit (day, week, month, year...)
      * @param growthRateUnit A growth rate unit
      * @return Annualised return (percentage per year)
@@ -386,7 +386,7 @@ public abstract class FinanceUtils {
 
     /**
      * GrowthFactor = exp(GrowthRate)
-     * 
+     *
      * @param annualReturn Annualised return (percentage per year)
      * @param growthFactorUnit A growth factor unit
      * @return A growth factor per unit (day, week, month, year...)
@@ -399,7 +399,7 @@ public abstract class FinanceUtils {
 
     /**
      * GrowthRate = ln(1.0 + InterestRate) / GrowthRateUnitsPerYear
-     * 
+     *
      * @param annualReturn Annualised return (percentage per year)
      * @param growthRateUnit A growth rate unit
      * @return A growth rate per unit (day, week, month, year...)

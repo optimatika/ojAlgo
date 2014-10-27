@@ -225,7 +225,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
         this.testRecreation(tmpOriginal);
     }
 
-    private void doTestTypes(final BasicMatrix<?> original) {
+    private void doTestTypes(final BasicMatrix original) {
 
         final PhysicalStore<BigDecimal> tmpBigStore = original.toBigStore();
         final PhysicalStore<ComplexNumber> tmpComplexStore = original.toComplexStore();

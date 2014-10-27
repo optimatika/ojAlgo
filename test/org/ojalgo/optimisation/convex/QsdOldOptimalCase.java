@@ -38,9 +38,9 @@ public class QsdOldOptimalCase extends GenericQPSolverTest {
     }
 
     @Override
-    protected BasicMatrix<?>[] getMatrices() {
+    protected BasicMatrix[] getMatrices() {
 
-        final BasicMatrix<?>[] retVal = new BigMatrix[8];
+        final BasicMatrix[] retVal = new BigMatrix[8];
 
         // Equations/Equalities
         retVal[0] = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.0738, 0.1288, 0.069575 },

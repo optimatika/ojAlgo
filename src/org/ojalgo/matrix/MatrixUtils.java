@@ -225,7 +225,7 @@ public abstract class MatrixUtils {
         // Check that Q is orthogonal/unitary...
     }
 
-    public static <N extends Number> int hashCode(final BasicMatrix<N> matrix) {
+    public static <N extends Number> int hashCode(final BasicMatrix matrix) {
         return AccessUtils.hashCode(matrix);
     }
 
@@ -442,7 +442,7 @@ public abstract class MatrixUtils {
         return retVal.toString();
     }
 
-    public static Access2D<BigDecimal> wrapBigAccess2D(final BasicMatrix<?> matrix) {
+    public static Access2D<BigDecimal> wrapBigAccess2D(final BasicMatrix matrix) {
         return new Access2D<BigDecimal>() {
 
             public long count() {
@@ -484,7 +484,7 @@ public abstract class MatrixUtils {
         };
     }
 
-    public static Access2D<ComplexNumber> wrapComplexAccess2D(final BasicMatrix<?> matrix) {
+    public static Access2D<ComplexNumber> wrapComplexAccess2D(final BasicMatrix matrix) {
         return new Access2D<ComplexNumber>() {
 
             public long count() {
@@ -526,7 +526,7 @@ public abstract class MatrixUtils {
         };
     }
 
-    public static Access2D<Double> wrapPrimitiveAccess2D(final BasicMatrix<?> matrix) {
+    public static Access2D<Double> wrapPrimitiveAccess2D(final BasicMatrix matrix) {
         return new Access2D<Double>() {
 
             public long count() {

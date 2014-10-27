@@ -27,7 +27,6 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -62,7 +61,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class JamaMatrix extends Object implements BasicMatrix<Double>, PhysicalStore<Double>, Serializable {
+public final class JamaMatrix extends Object implements PhysicalStore<Double>, Serializable {
 
     public static final JamaFactory FACTORY = new JamaFactory();
 
@@ -562,7 +561,7 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
 
     @Override
     public final int hashCode() {
-        return MatrixUtils.hashCode((BasicMatrix) this);
+        return MatrixUtils.hashCode(this);
     }
 
     public JamaMatrix invert() {
@@ -616,7 +615,7 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
     }
 
     public boolean isSymmetric() {
-        return this.isSquare() && this.equals((BasicMatrix) this.transpose(), NumberContext.getGeneral(6));
+        return this.isSquare() && this.equals(this.transpose(), NumberContext.getGeneral(6));
     }
 
     public boolean isTall() {
@@ -878,34 +877,8 @@ public final class JamaMatrix extends Object implements BasicMatrix<Double>, Phy
         return ComplexDenseStore.FACTORY.copy(this);
     }
 
-    public List<BasicMatrix<Double>> toListOfColumns() {
-
-        final int tmpColDim = this.getColDim();
-
-        final List<BasicMatrix<Double>> retVal = new ArrayList<BasicMatrix<Double>>(tmpColDim);
-
-        for (int j = 0; j < tmpColDim; j++) {
-            retVal.add(j, this.selectColumns(new int[] { j }));
-        }
-
-        return retVal;
-    }
-
     public List<Double> toListOfElements() {
         return this.toPrimitiveStore().asList();
-    }
-
-    public List<BasicMatrix<Double>> toListOfRows() {
-
-        final int tmpRowDim = this.getRowDim();
-
-        final List<BasicMatrix<Double>> retVal = new ArrayList<BasicMatrix<Double>>(tmpRowDim);
-
-        for (int i = 0; i < tmpRowDim; i++) {
-            retVal.add(i, this.selectRows(new int[] { i }));
-        }
-
-        return retVal;
     }
 
     public JamaMatrix toPrimitiveStore() {

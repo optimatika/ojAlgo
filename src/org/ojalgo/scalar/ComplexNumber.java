@@ -144,7 +144,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
     }
 
     public static ComplexNumber makeRectangular(final double real, final double imaginary) {
-        if (TypeUtils.isZero(imaginary)) {
+        if (PrimitiveScalar.CONTEXT.isSmall(real, imaginary)) {
             return new ComplexNumber(real);
         } else {
             return new ComplexNumber(real, imaginary);

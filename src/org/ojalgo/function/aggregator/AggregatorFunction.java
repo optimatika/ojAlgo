@@ -32,9 +32,9 @@ public interface AggregatorFunction<N extends Number> extends VoidFunction<N> {
 
     int intValue();
 
-    void merge(N anArg);
+    void merge(N result);
 
-    N merge(N aResult1, N aResult2);
+    N merge(N result1, N result2);
 
     AggregatorFunction<N> reset();
 

@@ -51,10 +51,10 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * ArbitraryMatrix
- * 
+ *
  * @author apete
  */
-abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extends Object implements BasicMatrix<N>, Serializable {
+abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends Object implements BasicMatrix, Serializable {
 
     private transient Eigenvalue<N> myEigenvalue = null;
     private transient int myHashCode = 0;
@@ -82,7 +82,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
 
     public I add(final Access2D<?> aMtrx) {
 
-        MatrixError.throwIfNotEqualDimensions(this, aMtrx);
+        MatrixError.throwIfNotEqualDimensions(myStore, aMtrx);
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
 
@@ -156,7 +156,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
 
     public I divideElements(final Access2D<?> aMtrx) {
 
-        MatrixError.throwIfNotEqualDimensions(this, aMtrx);
+        MatrixError.throwIfNotEqualDimensions(myStore, aMtrx);
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), (int) this.myStore.countColumns());
 
@@ -174,7 +174,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
     }
 
     public boolean equals(final Access2D<?> aMtrx, final NumberContext aCntxt) {
-        return AccessUtils.equals(this, aMtrx, aCntxt);
+        return AccessUtils.equals(myStore, aMtrx, aCntxt);
     }
 
     @Override
@@ -333,7 +333,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
     @Override
     public int hashCode() {
         if (myHashCode == 0) {
-            myHashCode = MatrixUtils.hashCode(this);
+            myHashCode = MatrixUtils.hashCode(myStore);
         }
         return myHashCode;
     }
@@ -366,7 +366,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
     }
 
     public boolean isHermitian() {
-        return this.isSquare() && this.equals(this.conjugate(), NumberContext.getGeneral(6));
+        return this.isSquare() && myStore.equals(myStore.conjugate(), NumberContext.getGeneral(6));
     }
 
     public boolean isScalar() {
@@ -378,7 +378,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
     }
 
     public boolean isSymmetric() {
-        return this.isSquare() && this.equals(this.transpose(), NumberContext.getGeneral(6));
+        return this.isSquare() && myStore.equals(myStore.transpose(), NumberContext.getGeneral(6));
     }
 
     public boolean isTall() {
@@ -389,29 +389,29 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
         return (((int) this.myStore.countColumns() == 1) || (this.countRows() == 1));
     }
 
-    public Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
+    public Iterator<Number> iterator() {
+        return new Iterator1D<Number>(myStore);
     }
 
     public I mergeColumns(final Access2D<?> aMtrx) {
 
-        MatrixError.throwIfNotEqualColumnDimensions(this, aMtrx);
+        MatrixError.throwIfNotEqualColumnDimensions(myStore, aMtrx);
 
         return this.getFactory().instantiate(new AboveBelowStore<N>(myStore, this.getStoreFrom(aMtrx)));
     }
 
     public I mergeRows(final Access2D<?> aMtrx) {
 
-        MatrixError.throwIfNotEqualRowDimensions(this, aMtrx);
+        MatrixError.throwIfNotEqualRowDimensions(myStore, aMtrx);
 
         return this.getFactory().instantiate(new LeftRightStore<N>(myStore, this.getStoreFrom(aMtrx)));
     }
 
-    public I modify(final UnaryFunction<N> aFunc) {
+    public I modify(final UnaryFunction<? extends Number> aFunc) {
 
         final PhysicalStore<N> retVal = myStore.copy();
 
-        retVal.modifyAll(aFunc);
+        retVal.modifyAll((UnaryFunction<N>) aFunc);
 
         return this.getFactory().instantiate(retVal);
     }
@@ -427,7 +427,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
 
     public I multiplyElements(final Access2D<?> aMtrx) {
 
-        MatrixError.throwIfNotEqualDimensions(this, aMtrx);
+        MatrixError.throwIfNotEqualDimensions(myStore, aMtrx);
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), (int) this.myStore.countColumns());
 
@@ -438,19 +438,19 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
 
     public I multiplyLeft(final Access2D<?> aMtrx) {
 
-        MatrixError.throwIfMultiplicationNotPossible(aMtrx, this);
+        MatrixError.throwIfMultiplicationNotPossible(aMtrx, myStore);
 
         return this.getFactory().instantiate(myStore.multiplyLeft(this.getStoreFrom(aMtrx)));
     }
 
     public I multiplyRight(final Access2D<?> aMtrx) {
 
-        MatrixError.throwIfMultiplicationNotPossible(this, aMtrx);
+        MatrixError.throwIfMultiplicationNotPossible(myStore, aMtrx);
 
         return this.getFactory().instantiate(myStore.multiplyRight(this.getStoreFrom(aMtrx)));
     }
 
-    public Scalar<N> multiplyVectors(final Access2D<?> aVctr) {
+    public Scalar<?> multiplyVectors(final Access2D<?> aVctr) {
         if (this.countRows() == 1) {
             return this.multiplyRight(aVctr.countColumns() == 1 ? aVctr : new TransposedStore<>(this.getStoreFrom(aVctr))).toScalar(0, 0);
         } else if (this.countColumns() == 1) {
@@ -524,11 +524,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
         return ComplexDenseStore.FACTORY.copy(this);
     }
 
-    public List<BasicMatrix<N>> toListOfColumns() {
+    public List<BasicMatrix> toListOfColumns() {
 
         final int tmpColDim = (int) this.countColumns();
 
-        final List<BasicMatrix<N>> retVal = new ArrayList<BasicMatrix<N>>(tmpColDim);
+        final List<BasicMatrix> retVal = new ArrayList<BasicMatrix>(tmpColDim);
 
         for (int j = 0; j < tmpColDim; j++) {
             retVal.add(j, this.selectColumns(j));
@@ -541,11 +541,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix<N>> extend
         return myStore.copy().asList();
     }
 
-    public List<BasicMatrix<N>> toListOfRows() {
+    public List<BasicMatrix> toListOfRows() {
 
         final int tmpRowDim = (int) this.countRows();
 
-        final List<BasicMatrix<N>> retVal = new ArrayList<BasicMatrix<N>>(tmpRowDim);
+        final List<BasicMatrix> retVal = new ArrayList<BasicMatrix>(tmpRowDim);
 
         for (int i = 0; i < tmpRowDim; i++) {
             retVal.add(i, this.selectRows(i));

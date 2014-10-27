@@ -60,12 +60,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    myCount += anArg.intValue();
+                public void merge(final Double result) {
+                    myCount += result.intValue();
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return (double) (aResult1.intValue() + aResult2.intValue());
+                public Double merge(final Double result1, final Double result2) {
+                    return (double) (result1.intValue() + result2.intValue());
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -108,12 +108,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    this.invoke(anArg.doubleValue());
+                public void merge(final Double result) {
+                    this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return Math.max(aResult1, aResult2);
+                public Double merge(final Double result1, final Double result2) {
+                    return Math.max(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -156,12 +156,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    this.invoke(anArg.doubleValue());
+                public void merge(final Double result) {
+                    this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return Math.max(aResult1, aResult2);
+                public Double merge(final Double result1, final Double result2) {
+                    return Math.max(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -204,12 +204,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    this.invoke(anArg.doubleValue());
+                public void merge(final Double result) {
+                    this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return Math.abs(aResult1) + Math.abs(aResult2);
+                public Double merge(final Double result1, final Double result2) {
+                    return Math.abs(result1) + Math.abs(result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -254,12 +254,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    this.invoke(anArg.doubleValue());
+                public void merge(final Double result) {
+                    this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return Math.hypot(aResult1, aResult2);
+                public Double merge(final Double result1, final Double result2) {
+                    return Math.hypot(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -302,12 +302,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    this.invoke(anArg.doubleValue());
+                public void merge(final Double result) {
+                    this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return aResult1 * aResult2;
+                public Double merge(final Double result1, final Double result2) {
+                    return result1 * result2;
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -350,12 +350,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    myValue *= anArg;
+                public void merge(final Double result) {
+                    myValue *= result;
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return aResult1 * aResult2;
+                public Double merge(final Double result1, final Double result2) {
+                    return result1 * result2;
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -405,12 +405,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    this.invoke(anArg.doubleValue());
+                public void merge(final Double result) {
+                    this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return Math.min(aResult1, aResult2);
+                public Double merge(final Double result1, final Double result2) {
+                    return Math.min(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -457,12 +457,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    this.invoke(anArg.doubleValue());
+                public void merge(final Double result) {
+                    this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return Math.min(aResult1, aResult2);
+                public Double merge(final Double result1, final Double result2) {
+                    return Math.min(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -505,12 +505,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    this.invoke(anArg.doubleValue());
+                public void merge(final Double result) {
+                    this.invoke(result.doubleValue());
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return aResult1 + aResult2;
+                public Double merge(final Double result1, final Double result2) {
+                    return result1 + result2;
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -553,12 +553,12 @@ public abstract class PrimitiveAggregator {
                     this.invoke(anArg.doubleValue());
                 }
 
-                public void merge(final Double anArg) {
-                    myValue += anArg;
+                public void merge(final Double result) {
+                    myValue += result;
                 }
 
-                public Double merge(final Double aResult1, final Double aResult2) {
-                    return aResult1 + aResult2;
+                public Double merge(final Double result1, final Double result2) {
+                    return result1 + result2;
                 }
 
                 public AggregatorFunction<Double> reset() {

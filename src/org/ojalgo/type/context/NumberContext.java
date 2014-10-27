@@ -449,22 +449,6 @@ public final class NumberContext extends FormatContext<Number> {
         }
     }
 
-    /**
-     * @deprecated v37 Use {@link #isSmall(double,double)} instead
-     */
-    @Deprecated
-    public boolean isSmallComparedTo(final double reference, final double value) {
-        return this.isSmall(reference, value);
-    }
-
-    /**
-     * @deprecated v37 Use {@link #isAsExpected(double,double)} instead
-     */
-    @Deprecated
-    public boolean isSmallError(final double expected, final double actual) {
-        return !this.isDifferent(expected, actual);
-    }
-
     public boolean isZero(final double value) {
         return NumberContext.isZero(value, myZeroError);
     }

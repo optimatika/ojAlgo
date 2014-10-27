@@ -62,12 +62,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    myCount += anArg.intValue();
+                public void merge(final ComplexNumber result) {
+                    myCount += result.intValue();
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return ADD.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -111,12 +111,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    this.invoke(anArg);
+                public void merge(final ComplexNumber result) {
+                    this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return ComplexFunction.MAX.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return ComplexFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -158,12 +158,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    this.invoke(anArg);
+                public void merge(final ComplexNumber result) {
+                    this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return ComplexFunction.MAX.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return ComplexFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -206,12 +206,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    this.invoke(anArg);
+                public void merge(final ComplexNumber result) {
+                    this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return ADD.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -255,12 +255,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    this.invoke(anArg);
+                public void merge(final ComplexNumber result) {
+                    this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return HYPOT.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return HYPOT.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -303,12 +303,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    this.invoke(anArg);
+                public void merge(final ComplexNumber result) {
+                    this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return MULTIPLY.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return MULTIPLY.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -351,12 +351,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    myNumber = myNumber.multiply(anArg);
+                public void merge(final ComplexNumber result) {
+                    myNumber = myNumber.multiply(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return MULTIPLY.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return MULTIPLY.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -405,12 +405,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    this.invoke(anArg);
+                public void merge(final ComplexNumber result) {
+                    this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return ComplexFunction.MIN.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return ComplexFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -456,12 +456,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    this.invoke(anArg);
+                public void merge(final ComplexNumber result) {
+                    this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return ComplexFunction.MIN.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return ComplexFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -504,12 +504,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    this.invoke(anArg);
+                public void merge(final ComplexNumber result) {
+                    this.invoke(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return ADD.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {
@@ -552,12 +552,12 @@ public abstract class ComplexAggregator {
                     this.invoke(ComplexNumber.makeReal(anArg));
                 }
 
-                public void merge(final ComplexNumber anArg) {
-                    myNumber = myNumber.add(anArg);
+                public void merge(final ComplexNumber result) {
+                    myNumber = myNumber.add(result);
                 }
 
-                public ComplexNumber merge(final ComplexNumber aResult1, final ComplexNumber aResult2) {
-                    return ADD.invoke(aResult1, aResult2);
+                public ComplexNumber merge(final ComplexNumber result1, final ComplexNumber result2) {
+                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<ComplexNumber> reset() {

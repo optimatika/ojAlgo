@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.jama.JamaMatrix;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
@@ -72,11 +71,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
     BasicMatrix myExpMtrx;
     Number myExpNmbr;
     Scalar<?> myExpSclr;
-    BasicMatrix myJamaAA;
-    BasicMatrix myJamaAB;
-    BasicMatrix myJamaAX;
-    BasicMatrix myJamaI;
-    BasicMatrix myJamaSafe;
     Number myNmbr;
     BasicMatrix myPrimitiveAA;
     BasicMatrix myPrimitiveAB;
@@ -105,9 +99,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.add(myPrimitiveSafe);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.add(myJamaSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
-
     }
 
     /**
@@ -126,8 +117,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.add(tmpRow, tmpCol, myNmbr);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.add(tmpRow, tmpCol, myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -143,8 +132,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.add(myNmbr);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.add(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -160,8 +147,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.conjugate();
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.conjugate();
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     abstract public void testData();
@@ -179,8 +164,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.divideElements(myPrimitiveSafe);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.divideElements(myJamaSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -196,8 +179,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.divide(myNmbr);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.divide(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -216,8 +197,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = new Double(myPrimitiveAA.doubleValue(tmpRow, tmpCol));
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = new Double(myJamaAA.doubleValue(tmpRow, tmpCol));
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -233,8 +212,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActInt = (int) myPrimitiveAA.countColumns();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActInt = (int) myJamaAA.countColumns();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -256,8 +233,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.selectColumns(tmpArr);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.selectColumns(tmpArr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -273,9 +248,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
             final int tmpExpCondMag = (int) Math.round(Math.log10(myBigAA.getCondition().doubleValue()));
 
             int tmpActCondMag = (int) Math.round(Math.log10(myPrimitiveAA.getCondition().doubleValue()));
-            TestUtils.assertEquals(tmpExpCondMag, tmpActCondMag);
-
-            tmpActCondMag = (int) Math.round(Math.log10(myJamaAA.getCondition().doubleValue()));
             TestUtils.assertEquals(tmpExpCondMag, tmpActCondMag);
 
             tmpActCondMag = (int) Math.round(Math.log10(myComplexAA.getCondition().doubleValue()));
@@ -298,8 +270,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
             myActNmbr = myPrimitiveAA.getDeterminant().getNumber();
             TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-            myActNmbr = myJamaAA.getDeterminant().getNumber();
-            TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
         }
     }
 
@@ -310,7 +280,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         if (myBigAA.isSquare()) {
 
-            final List<ComplexNumber> tmpExpStore = myJamaAA.getEigenvalues();
+            final List<ComplexNumber> tmpExpStore = myPrimitiveAA.getEigenvalues();
             List<ComplexNumber> tmpActStore;
 
             if (MatrixUtils.isHermitian(myBigAA.toPrimitiveStore())) {
@@ -326,10 +296,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
                 }
             }
 
-            tmpActStore = myPrimitiveAA.getEigenvalues();
-            for (int i = 0; i < tmpExpStore.size(); i++) {
-                TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-            }
         }
     }
 
@@ -346,8 +312,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.getFrobeniusNorm().getNumber();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.getFrobeniusNorm().getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -363,8 +327,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.getInfinityNorm().getNumber();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.getInfinityNorm().getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -382,8 +344,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.getKyFanNorm(tmpDegree).getNumber();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.getKyFanNorm(tmpDegree).getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -399,8 +359,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.getOneNorm().getNumber();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.getOneNorm().getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -416,8 +374,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.getOperatorNorm().getNumber();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.getOperatorNorm().getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -433,8 +389,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActInt = myPrimitiveAA.getRank();
         TestUtils.assertEquals(myExpInt, myActInt);
 
-        myActInt = myJamaAA.getRank();
-        TestUtils.assertEquals(myExpInt, myActInt);
     }
 
     /**
@@ -450,8 +404,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActInt = (int) myPrimitiveAA.countRows();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActInt = (int) myJamaAA.countRows();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -473,8 +425,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.selectRows(tmpArr);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.selectRows(tmpArr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -491,14 +441,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         tmpActStore = myPrimitiveAA.getSingularValues();
         if (MatrixTests.DEBUG) {
             BasicLogger.debug("Primitive SVs: {}", tmpActStore);
-        }
-        for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-        }
-
-        tmpActStore = myJamaAA.getSingularValues();
-        if (MatrixTests.DEBUG) {
-            BasicLogger.debug("Jama SVs: {}", tmpActStore);
         }
         for (int i = 0; i < tmpExpStore.size(); i++) {
             TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
@@ -526,8 +468,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.getTrace().getNumber();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.getTrace().getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -543,8 +483,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.getTraceNorm().getNumber();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.getTraceNorm().getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -590,8 +528,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
             myActMtrx = myPrimitiveAA.invert();
             TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-            myActMtrx = myJamaAA.invert();
-            TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
         }
     }
 
@@ -608,8 +544,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActBool = myPrimitiveAA.isEmpty();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActBool = myJamaAA.isEmpty();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -625,8 +559,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActBool = myPrimitiveAA.isFat();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActBool = myJamaAA.isFat();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -642,8 +574,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActBool = myPrimitiveAA.isFullRank();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActBool = myJamaAA.isFullRank();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -659,8 +589,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActBool = myPrimitiveAA.isHermitian();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActBool = myJamaAA.isHermitian();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -676,8 +604,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActBool = myPrimitiveAA.isSquare();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActBool = myJamaAA.isSquare();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -693,8 +619,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActBool = myPrimitiveAA.isSymmetric();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActBool = myJamaAA.isSymmetric();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -710,8 +634,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActBool = myPrimitiveAA.isTall();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActBool = myJamaAA.isTall();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -727,8 +649,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActBool = myPrimitiveAA.isVector();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActBool = myJamaAA.isVector();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -744,8 +664,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.mergeColumns(myPrimitiveSafe);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.mergeColumns(myJamaSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -761,8 +679,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.mergeRows(myPrimitiveSafe);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.mergeRows(myJamaSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -778,8 +694,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.multiplyElements(myPrimitiveSafe);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.multiplyElements(myJamaSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -795,8 +709,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAX.multiplyLeft(myPrimitiveAA);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAX.multiplyLeft(myJamaAA);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -812,8 +724,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.multiply(myNmbr);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.multiply(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -829,8 +739,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.multiplyRight(myPrimitiveAX);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.multiplyRight(myJamaAX);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -848,8 +756,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.selectColumns(tmpCol).multiplyVectors(myPrimitiveSafe.selectColumns(tmpCol)).getNumber();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.selectColumns(tmpCol).multiplyVectors(myJamaSafe.selectColumns(tmpCol)).getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -865,8 +771,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.negate();
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.negate();
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     abstract public void testProblem();
@@ -884,8 +788,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActInt = (int) myPrimitiveAA.count();
         TestUtils.assertEquals(myExpBool, myActBool);
 
-        myActInt = (int) myJamaAA.count();
-        TestUtils.assertEquals(myExpBool, myActBool);
     }
 
     /**
@@ -903,8 +805,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
             myActMtrx = myPrimitiveAA.solve(myPrimitiveAB);
             TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-            myActMtrx = myJamaAA.solve(myJamaAB);
-            TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
         }
     }
 
@@ -921,8 +821,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.subtract(myPrimitiveSafe);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.subtract(myJamaSafe);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -938,8 +836,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.subtract(myNmbr);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.subtract(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -958,8 +854,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.toBigDecimal(tmpRow, tmpCol);
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.toBigDecimal(tmpRow, tmpCol);
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -976,8 +870,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         tmpActStore = myPrimitiveAA.toBigStore();
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = myJamaAA.toBigStore();
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
     }
 
     /**
@@ -996,8 +888,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.toComplexNumber(tmpRow, tmpCol);
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.toComplexNumber(tmpRow, tmpCol);
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -1014,8 +904,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         tmpActStore = myPrimitiveAA.toComplexStore();
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = myJamaAA.toComplexStore();
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
     }
 
     /**
@@ -1036,10 +924,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
             TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
         }
 
-        tmpActStore = myJamaAA.toListOfColumns();
-        for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-        }
     }
 
     /**
@@ -1071,14 +955,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
             }
         }
 
-        tmpActStore = myJamaAA.toListOfElements();
-        TestUtils.assertEquals(tmpExpStore.get(tmpFirstIndex), tmpActStore.get(tmpFirstIndex), EVALUATION);
-        TestUtils.assertEquals(tmpExpStore.get(tmpLastIndex), tmpActStore.get(tmpLastIndex), EVALUATION);
-        if (myBigAA.isVector()) {
-            for (int i = 0; i < tmpExpStore.size(); i++) {
-                TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-            }
-        }
     }
 
     /**
@@ -1099,10 +975,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
             TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
         }
 
-        tmpActStore = myJamaAA.toListOfRows();
-        for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-        }
     }
 
     /**
@@ -1119,8 +991,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         tmpActStore = myPrimitiveAA.toPrimitiveStore();
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = myJamaAA.toPrimitiveStore();
-        TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
     }
 
     /**
@@ -1139,8 +1009,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.toScalar(tmpRow, tmpCol).getNumber();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.toScalar(tmpRow, tmpCol).getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     /**
@@ -1156,8 +1024,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActMtrx = myPrimitiveAA.transpose();
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myJamaAA.transpose();
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     private void testGetVectorNormInt(final int tmpDegree) {
@@ -1170,8 +1036,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myActNmbr = myPrimitiveAA.getVectorNorm(tmpDegree).getNumber();
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myJamaAA.getVectorNorm(tmpDegree).getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
     }
 
     protected final BasicMatrix getBigAA() {
@@ -1235,12 +1099,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         myComplexAB = ComplexMatrix.FACTORY.copy(myBigAB);
         myComplexI = ComplexMatrix.FACTORY.copy(myBigI);
         myComplexSafe = ComplexMatrix.FACTORY.copy(myBigSafe);
-
-        myJamaAA = JamaMatrix.FACTORY.copy(myBigAA);
-        myJamaAX = JamaMatrix.FACTORY.copy(myBigAX);
-        myJamaAB = JamaMatrix.FACTORY.copy(myBigAB);
-        myJamaI = JamaMatrix.FACTORY.copy(myBigI);
-        myJamaSafe = JamaMatrix.FACTORY.copy(myBigSafe);
 
         myNmbr = new BigDecimal(Math.random());
     }

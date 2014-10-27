@@ -96,7 +96,7 @@ public final class MarkowitzModel extends EquilibriumModel {
     private static final String VARIANCE = "Variance";
 
     private final HashMap<int[], LowerUpper> myConstraints = new HashMap<int[], LowerUpper>();
-    private final BasicMatrix<?> myExpectedExcessReturns;
+    private final BasicMatrix myExpectedExcessReturns;
     private transient ExpressionsBasedModel myOptimisationModel;
     private transient State myOptimisationState = State.UNEXPLORED;
     private boolean myShortingAllowed = false;
@@ -104,7 +104,7 @@ public final class MarkowitzModel extends EquilibriumModel {
     private BigDecimal myTargetVariance;
     private final Variable[] myVariables;
 
-    public MarkowitzModel(final BasicMatrix<?> covarianceMatrix, final BasicMatrix<?> expectedExcessReturns) {
+    public MarkowitzModel(final BasicMatrix covarianceMatrix, final BasicMatrix expectedExcessReturns) {
         this(new MarketEquilibrium(covarianceMatrix), expectedExcessReturns);
     }
 
@@ -122,7 +122,7 @@ public final class MarkowitzModel extends EquilibriumModel {
         }
     }
 
-    public MarkowitzModel(final MarketEquilibrium marketEquilibrium, final BasicMatrix<?> expectedExcessReturns) {
+    public MarkowitzModel(final MarketEquilibrium marketEquilibrium, final BasicMatrix expectedExcessReturns) {
 
         super(marketEquilibrium);
 
@@ -262,7 +262,7 @@ public final class MarkowitzModel extends EquilibriumModel {
         final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
 
         final Expression tmpVarianceExpression = retVal.addExpression(VARIANCE);
-        final BasicMatrix<?> tmpCovariances = this.getCovariances();
+        final BasicMatrix tmpCovariances = this.getCovariances();
         for (int j = 0; j < tmpVariables.length; j++) {
             for (int i = 0; i < tmpVariables.length; i++) {
                 tmpVarianceExpression.setQuadraticFactor(i, j, tmpCovariances.toBigDecimal(i, j));
@@ -431,7 +431,7 @@ public final class MarkowitzModel extends EquilibriumModel {
     }
 
     @Override
-    protected BasicMatrix<?> calculateAssetReturns() {
+    protected BasicMatrix calculateAssetReturns() {
         return myExpectedExcessReturns;
     }
 
@@ -439,7 +439,7 @@ public final class MarkowitzModel extends EquilibriumModel {
      * Constrained optimisation.
      */
     @Override
-    protected BasicMatrix<?> calculateAssetWeights() {
+    protected BasicMatrix calculateAssetWeights() {
 
         final Optimisation.Result tmpResult = this.optimise();
 
@@ -457,7 +457,7 @@ public final class MarkowitzModel extends EquilibriumModel {
         myOptimisationState = State.UNEXPLORED;
     }
 
-    final Scalar<?> calculatePortfolioReturn(final Access1D<?> weightsVctr, final BasicMatrix<?> returnsVctr) {
+    final Scalar<?> calculatePortfolioReturn(final Access1D<?> weightsVctr, final BasicMatrix returnsVctr) {
         return super.calculatePortfolioReturn(MATRIX_FACTORY.columns(weightsVctr), returnsVctr);
     }
 

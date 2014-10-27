@@ -109,14 +109,14 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     /**
      * @return {[AE],[BE],[Q],[C],[AI],[BI],[X only E constraints],[X both E and I constraints]}
      */
-    abstract protected BasicMatrix<?>[] getMatrices();
+    abstract protected BasicMatrix[] getMatrices();
 
     @Override
     protected void setUp() throws Exception {
 
         super.setUp();
 
-        final BasicMatrix<?>[] tmpMatrices = this.getMatrices();
+        final BasicMatrix[] tmpMatrices = this.getMatrices();
 
         if (tmpMatrices[0] != null) {
             myAE = tmpMatrices[0].enforce(StandardType.DECIMAL_064).toPrimitiveStore();

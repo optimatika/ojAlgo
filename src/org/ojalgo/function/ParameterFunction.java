@@ -21,7 +21,9 @@
  */
 package org.ojalgo.function;
 
-public interface ParameterFunction<N extends Number> extends BasicFunction<N> {
+import java.util.function.BiFunction;
+
+public interface ParameterFunction<N extends Number> extends BasicFunction<N>, BiFunction<N, Integer, N> {
 
     /**
      * A {@linkplain ParameterFunction} with a set/fixed parameter.
@@ -67,6 +69,10 @@ public interface ParameterFunction<N extends Number> extends BasicFunction<N> {
     public abstract double invoke(double arg, int param);
 
     public abstract N invoke(N arg, int param);
+
+    default N apply(final N arg, final Integer param) {
+        return this.invoke(arg, param);
+    }
 
     default UnaryFunction<N> parameter(final int param) {
         return new FixedParameter<N>(this, param);

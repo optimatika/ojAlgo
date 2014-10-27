@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;

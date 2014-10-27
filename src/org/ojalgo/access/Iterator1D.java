@@ -26,10 +26,10 @@ import java.util.Iterator;
 public final class Iterator1D<N extends Number> implements Iterator<N> {
 
     private long cursor = 0L;
-    private final Access1D<N> myAccess;
+    private final Access1D<? extends N> myAccess;
     private final long myCount;
 
-    public Iterator1D(final Access1D<N> access) {
+    public Iterator1D(final Access1D<? extends N> access) {
 
         super();
 

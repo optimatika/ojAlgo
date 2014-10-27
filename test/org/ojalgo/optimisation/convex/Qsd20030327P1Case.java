@@ -40,9 +40,9 @@ public class Qsd20030327P1Case extends GenericQPSolverTest {
     }
 
     @Override
-    protected BasicMatrix<?>[] getMatrices() {
+    protected BasicMatrix[] getMatrices() {
 
-        final BasicMatrix<?>[] retVal = new BigMatrix[8];
+        final BasicMatrix[] retVal = new BigMatrix[8];
 
         // Equations/Equalities
         retVal[0] = BigMatrix.FACTORY

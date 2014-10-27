@@ -43,7 +43,7 @@ import org.ojalgo.random.RandomNumber;
  *
  * @author apete
  */
-final class MatrixFactory<N extends Number, I extends BasicMatrix<N>> implements BasicMatrix.Factory<I> {
+final class MatrixFactory<N extends Number, I extends BasicMatrix> implements BasicMatrix.Factory<I> {
 
     final class MatrixBuilder implements Access2D.Builder<I> {
 

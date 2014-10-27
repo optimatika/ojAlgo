@@ -100,7 +100,6 @@ final class ColumnsMatrix implements Access2D<Double>, Access2D.Fillable<Double>
 
     public void fillAll(final Double value) {
         // TODO Auto-generated method stub
-
     }
 
     public void fillColumn(final long row, final long column, final Double value) {
@@ -110,17 +109,14 @@ final class ColumnsMatrix implements Access2D<Double>, Access2D.Fillable<Double>
 
     public void fillDiagonal(final long row, final long column, final Double value) {
         // TODO Auto-generated method stub
-
     }
 
     public void fillRange(final long first, final long limit, final Double value) {
         // TODO Auto-generated method stub
-
     }
 
     public void fillRow(final long row, final long column, final Double value) {
         // TODO Auto-generated method stub
-
     }
 
     public Double get(final long index) {

@@ -52,7 +52,7 @@ public class MarketEquilibrium {
     /**
      * Calculates the portfolio return using the input asset weights and returns.
      */
-    public static Scalar<?> calculatePortfolioReturn(final BasicMatrix<?> assetWeights, final BasicMatrix<?> assetReturns) {
+    public static Scalar<?> calculatePortfolioReturn(final BasicMatrix assetWeights, final BasicMatrix assetReturns) {
         return assetWeights.multiplyVectors(assetReturns);
     }
 
@@ -75,18 +75,18 @@ public class MarketEquilibrium {
     }
 
     private final String[] myAssetKeys;
-    private final BasicMatrix<?> myCovariances;
+    private final BasicMatrix myCovariances;
     private BigDecimal myRiskAversion;
 
-    public MarketEquilibrium(final BasicMatrix<?> covarianceMatrix) {
+    public MarketEquilibrium(final BasicMatrix covarianceMatrix) {
         this(covarianceMatrix, DEFAULT_RISK_AVERSION);
     }
 
-    public MarketEquilibrium(final BasicMatrix<?> covarianceMatrix, final Number riskAversionFactor) {
+    public MarketEquilibrium(final BasicMatrix covarianceMatrix, final Number riskAversionFactor) {
         this(MarketEquilibrium.makeSymbols((int) covarianceMatrix.countRows()), covarianceMatrix, riskAversionFactor);
     }
 
-    public MarketEquilibrium(final String[] assetNamesOrKeys, final BasicMatrix<?> covarianceMatrix) {
+    public MarketEquilibrium(final String[] assetNamesOrKeys, final BasicMatrix covarianceMatrix) {
 
         super();
 
@@ -95,7 +95,7 @@ public class MarketEquilibrium {
         myRiskAversion = DEFAULT_RISK_AVERSION;
     }
 
-    public MarketEquilibrium(final String[] assetNamesOrKeys, final BasicMatrix<?> covarianceMatrix, final Number riskAversionFactor) {
+    public MarketEquilibrium(final String[] assetNamesOrKeys, final BasicMatrix covarianceMatrix, final Number riskAversionFactor) {
 
         super();
 
@@ -120,8 +120,8 @@ public class MarketEquilibrium {
      * If the input vector of asset weights are the weights of the market portfolio, then the ouput is the equilibrium
      * excess returns.
      */
-    public BasicMatrix<?> calculateAssetReturns(final BasicMatrix<?> assetWeights) {
-        final BasicMatrix<?> tmpAssetWeights = myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0 ? assetWeights : assetWeights.multiply(myRiskAversion);
+    public BasicMatrix calculateAssetReturns(final BasicMatrix assetWeights) {
+        final BasicMatrix tmpAssetWeights = myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0 ? assetWeights : assetWeights.multiply(myRiskAversion);
         return myCovariances.multiplyRight(tmpAssetWeights);
     }
 
@@ -129,8 +129,8 @@ public class MarketEquilibrium {
      * If the input vector of returns are the equilibrium excess returns then the output is the market portfolio
      * weights. This is unconstrained optimisation - there are no constraints on the resulting instrument weights.
      */
-    public BasicMatrix<?> calculateAssetWeights(final BasicMatrix<?> assetReturns) {
-        final BasicMatrix<?> tmpAssetWeights = myCovariances.solve(assetReturns);
+    public BasicMatrix calculateAssetWeights(final BasicMatrix assetReturns) {
+        final BasicMatrix tmpAssetWeights = myCovariances.solve(assetReturns);
         if (myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0) {
             return tmpAssetWeights;
         } else {
@@ -141,10 +141,10 @@ public class MarketEquilibrium {
     /**
      * Calculates the portfolio variance using the input instrument weights.
      */
-    public Scalar<?> calculatePortfolioVariance(final BasicMatrix<?> assetWeights) {
+    public Scalar<?> calculatePortfolioVariance(final BasicMatrix assetWeights) {
 
-        BasicMatrix<?> tmpLeft;
-        BasicMatrix<?> tmpRight;
+        BasicMatrix tmpLeft;
+        BasicMatrix tmpRight;
 
         if (assetWeights.countColumns() == 1L) {
             tmpLeft = assetWeights.transpose();
@@ -161,7 +161,7 @@ public class MarketEquilibrium {
      * Will set the risk aversion factor to the best fit for an observed pair of market portfolio asset weights and
      * equilibrium/historical excess returns.
      */
-    public void calibrate(final BasicMatrix<?> assetWeights, final BasicMatrix<?> assetReturns) {
+    public void calibrate(final BasicMatrix assetWeights, final BasicMatrix assetReturns) {
 
         final Scalar<?> tmpImpliedRiskAversion = this.calculateImpliedRiskAversion(assetWeights, assetReturns);
 
@@ -194,7 +194,7 @@ public class MarketEquilibrium {
         return ArrayUtils.copyOf(myAssetKeys);
     }
 
-    public BasicMatrix<?> getCovariances() {
+    public BasicMatrix getCovariances() {
         return myCovariances;
     }
 
@@ -219,7 +219,7 @@ public class MarketEquilibrium {
         return (int) Math.min(myCovariances.countRows(), myCovariances.countColumns());
     }
 
-    public BasicMatrix<?> toCorrelations() {
+    public BasicMatrix toCorrelations() {
         return FinanceUtils.toCorrelations(myCovariances, false);
     }
 
@@ -227,7 +227,7 @@ public class MarketEquilibrium {
      * Will calculate the risk aversion factor that is the best fit for an observed pair of market portfolio weights and
      * equilibrium/historical excess returns.
      */
-    Scalar<?> calculateImpliedRiskAversion(final BasicMatrix<?> assetWeights, final BasicMatrix<?> assetReturns) {
+    Scalar<?> calculateImpliedRiskAversion(final BasicMatrix assetWeights, final BasicMatrix assetReturns) {
 
         Scalar<?> retVal = myCovariances.multiplyRight(assetWeights).solve(assetReturns).toScalar(0, 0);
 

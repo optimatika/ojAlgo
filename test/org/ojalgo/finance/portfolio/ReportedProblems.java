@@ -174,7 +174,7 @@ public class ReportedProblems extends FinancePortfolioTests {
      */
     public void testP20130329() {
 
-        final BasicMatrix<BigDecimal> tmpCovariances = BigMatrix.FACTORY
+        final BasicMatrix tmpCovariances = BigMatrix.FACTORY
                 .rows(new double[][] { { 0.00360000, 0.001800000000 }, { 0.001800000000, 0.00090000 } });
 
         final MarketEquilibrium tmpMarketEquilibrium = new MarketEquilibrium(tmpCovariances, BigMath.THOUSAND);
@@ -182,7 +182,7 @@ public class ReportedProblems extends FinancePortfolioTests {
         final Builder<BigMatrix> tmpExcessReturnsBuilder = BigMatrix.FACTORY.getBuilder(2, 1);
         tmpExcessReturnsBuilder.set(0, 0, 0.1400);
         tmpExcessReturnsBuilder.set(1, 0, 0.0800);
-        final BasicMatrix<BigDecimal> tmpExcessReturns = tmpExcessReturnsBuilder.build();
+        final BasicMatrix tmpExcessReturns = tmpExcessReturnsBuilder.build();
 
         final MarkowitzModel tmpMarkowitzModel = new MarkowitzModel(tmpMarketEquilibrium, tmpExcessReturns);
         tmpMarkowitzModel.setLowerLimit(0, BigMath.ZERO);

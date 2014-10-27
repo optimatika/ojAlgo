@@ -47,7 +47,7 @@ public class KKTSolverTest extends FunctionalityTest {
      */
     public void testMostBasicCase() {
 
-        final BasicMatrix<?>[] tmpMatrices = new BigMatrix[5];
+        final BasicMatrix[] tmpMatrices = new BigMatrix[5];
 
         // Equations/Equalities
         tmpMatrices[0] = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
@@ -73,7 +73,7 @@ public class KKTSolverTest extends FunctionalityTest {
      */
     public void testQsd20030327P1Case() {
 
-        final BasicMatrix<?>[] tmpMatrices = new BigMatrix[5];
+        final BasicMatrix[] tmpMatrices = new BigMatrix[5];
 
         // Equations/Equalities
         tmpMatrices[0] = BigMatrix.FACTORY.rows(new double[][] { { 1, 1, 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 1, 0 },
@@ -116,7 +116,7 @@ public class KKTSolverTest extends FunctionalityTest {
      */
     public void testQsd20030409P1Case() {
 
-        final BasicMatrix<?>[] tmpMatrices = new BigMatrix[5];
+        final BasicMatrix[] tmpMatrices = new BigMatrix[5];
 
         // Equations/Equalities
         tmpMatrices[0] = BigMatrix.FACTORY.rows(new double[][] { { 1, 1, 1, 1, 1, 1, 1 }, { 0, 1, 0, 0, 0, 0, 0 }, { 0, 0, 1, 0, 0, 0, 0 },
@@ -160,7 +160,7 @@ public class KKTSolverTest extends FunctionalityTest {
      */
     public void testQsdOldFundOfFundsCase() {
 
-        final BasicMatrix<?>[] tmpMatrices = new BigMatrix[5];
+        final BasicMatrix[] tmpMatrices = new BigMatrix[5];
 
         // Equations/Equalities
         tmpMatrices[0] = BigMatrix.FACTORY
@@ -191,7 +191,7 @@ public class KKTSolverTest extends FunctionalityTest {
      */
     public void testQsdOldNormalCase() {
 
-        final BasicMatrix<?>[] tmpMatrices = new BigMatrix[5];
+        final BasicMatrix[] tmpMatrices = new BigMatrix[5];
 
         // Equations/Equalities
         tmpMatrices[0] = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.0738, 0.1288, 0.069575 },
@@ -218,7 +218,7 @@ public class KKTSolverTest extends FunctionalityTest {
      */
     public void testQsdOldOptimalCase() {
 
-        final BasicMatrix<?>[] tmpMatrices = new BigMatrix[5];
+        final BasicMatrix[] tmpMatrices = new BigMatrix[5];
 
         // Equations/Equalities
         tmpMatrices[0] = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.0738, 0.1288, 0.069575 },

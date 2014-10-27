@@ -29,6 +29,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
@@ -145,12 +146,11 @@ public class ReportedProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(tmpOddSolution, BigMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2), new NumberContext(7, 6));
         TestUtils.assertEquals(tmpFullSolution, BigMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5), new NumberContext(7, 6));
 
-        final BigDecimal tmpEvenValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpEvenObjective.toFunction().invoke(
-                PrimitiveMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2))));
+        final BigDecimal tmpEvenValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpEvenObjective.toFunction().invoke(PrimitiveMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2).toPrimitiveStore())));
         final BigDecimal tmpOddValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpOddObjective.toFunction().invoke(
-                PrimitiveMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2))));
+                PrimitiveMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2).toPrimitiveStore())));
         final BigDecimal tmpFullValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpFullObjective.toFunction().invoke(
-                PrimitiveMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5))));
+                PrimitiveMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5).toPrimitiveStore())));
 
         TestUtils.assertEquals(0, tmpFullValue.compareTo(tmpEvenValue.add(tmpOddValue)));
         TestUtils.assertEquals(0, tmpClaimedValue.compareTo(tmpFullValue));

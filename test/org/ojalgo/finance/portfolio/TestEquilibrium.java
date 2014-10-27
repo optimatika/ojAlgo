@@ -122,7 +122,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
         super(newName);
     }
 
-    public BasicMatrix<?> getACovariances(final double[][] returns) {
+    public BasicMatrix getACovariances(final double[][] returns) {
 
         final int row = returns.length;
         final int col = returns[0].length;
@@ -168,7 +168,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
         @SuppressWarnings("unchecked")
         final PrimitiveMatrix tmpGeneratedWeights = PrimitiveMatrix.FACTORY.columns(tmpNormalisedWeights);
-        final BasicMatrix<?> tmpMatchingReturns = tmpEquilibrium.calculateAssetReturns(tmpGeneratedWeights);
+        final BasicMatrix tmpMatchingReturns = tmpEquilibrium.calculateAssetReturns(tmpGeneratedWeights);
         TestUtils.assertEquals(tmpGeneratedWeights, tmpEquilibrium.calculateAssetWeights(tmpMatchingReturns), tmpWeightsContext);
 
         final FixedWeightsPortfolio tmpFW = new FixedWeightsPortfolio(tmpEquilibrium, tmpGeneratedWeights);
@@ -193,7 +193,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
         TestUtils.assertEquals(tmpGeneratedWeights, tmpBLM.getAssetWeights(), tmpWeightsContext);
 
         final MarkowitzModel tmpMM = new MarkowitzModel(tmpEquilibrium, tmpMatchingReturns);
-        final BasicMatrix<?> tmpActual = tmpMM.getAssetWeights();
+        final BasicMatrix tmpActual = tmpMM.getAssetWeights();
         TestUtils.assertEquals(tmpGeneratedWeights, tmpActual, tmpWeightsContext);
     }
 }

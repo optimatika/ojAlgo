@@ -46,7 +46,7 @@ import org.ojalgo.scalar.Scalar.Factory;
  *
  * @author apete
  */
-public final class JamaFactory extends Object implements BasicMatrix.Factory<JamaMatrix>, PhysicalStore.Factory<Double, JamaMatrix> {
+public final class JamaFactory extends Object implements PhysicalStore.Factory<Double, JamaMatrix> {
 
     JamaFactory() {
         super();
