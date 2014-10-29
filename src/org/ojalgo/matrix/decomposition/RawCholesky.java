@@ -19,14 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -35,15 +35,15 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class JamaCholesky extends JamaAbstractDecomposition implements Cholesky<Double> {
+public final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
-    private CholeskyDecomposition myDelegate;
+    private JamaCholesky myDelegate;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
      * {@linkplain org.ojalgo.matrix.decomposition.CholeskyDecomposition#makeJama()} instead.
      */
-    public JamaCholesky() {
+    public RawCholesky() {
         super();
     }
 
@@ -64,15 +64,15 @@ public final class JamaCholesky extends JamaAbstractDecomposition implements Cho
         return MatrixUtils.equals(aStore, this, context);
     }
 
-    public JamaMatrix getD() {
+    public RawStore getD() {
 
-        final Matrix tmpL = myDelegate.getL();
+        final RawStore tmpL = myDelegate.getL();
 
         final int tmpRowDim = tmpL.getRowDimension();
         final int tmpColDim = tmpL.getColumnDimension();
         final int tmpMinDim = Math.min(tmpRowDim, tmpColDim);
 
-        final JamaMatrix retVal = new JamaMatrix(new Matrix(tmpRowDim, tmpColDim));
+        final RawStore retVal = new RawStore(new RawStore(tmpRowDim, tmpColDim));
 
         double tmpVal;
         for (int ij = 0; ij < tmpMinDim; ij++) {
@@ -97,22 +97,22 @@ public final class JamaCholesky extends JamaAbstractDecomposition implements Cho
     }
 
     @Override
-    public JamaMatrix getInverse() {
+    public RawStore getInverse() {
         return this.solve(this.makeEyeStore(myDelegate.getL().getRowDimension(), myDelegate.getL().getColumnDimension()));
     }
 
-    public JamaMatrix getL() {
-        return new JamaMatrix(myDelegate.getL());
+    public RawStore getL() {
+        return new RawStore(myDelegate.getL());
     }
 
-    public JamaMatrix getOldL() {
+    public RawStore getOldL() {
 
-        final Matrix tmpL = myDelegate.getL();
+        final RawStore tmpL = myDelegate.getL();
 
         final int tmpRowDim = tmpL.getRowDimension();
         final int tmpColDim = tmpL.getColumnDimension();
 
-        final JamaMatrix retVal = new JamaMatrix(new Matrix(tmpRowDim, tmpColDim));
+        final RawStore retVal = new RawStore(new RawStore(tmpRowDim, tmpColDim));
 
         double tmpDiagVal;
         for (int j = 0; j < tmpColDim; j++) {
@@ -125,11 +125,11 @@ public final class JamaCholesky extends JamaAbstractDecomposition implements Cho
         return retVal;
     }
 
-    public JamaMatrix getOldU() {
+    public RawStore getOldU() {
         return this.getOldL().transpose();
     }
 
-    public JamaMatrix getP() {
+    public RawStore getP() {
         return this.makeEyeStore(myDelegate.getL().getRowDimension(), myDelegate.getL().getRowDimension());
         //return MatrixUtils.makeIdentity(PrimitiveDenseStore.FACTORY, myDelegate.getL().getRowDimension());
     }
@@ -138,8 +138,8 @@ public final class JamaCholesky extends JamaAbstractDecomposition implements Cho
         return AccessUtils.makeIncreasingRange(0, this.getOldL().getRowDim());
     }
 
-    public JamaMatrix getR() {
-        return new JamaMatrix(myDelegate.getL().transpose());
+    public RawStore getR() {
+        return new RawStore(myDelegate.getL().transpose());
     }
 
     public int getRank() {
@@ -158,7 +158,7 @@ public final class JamaCholesky extends JamaAbstractDecomposition implements Cho
         return retVal;
     }
 
-    public JamaMatrix getRowEchelonForm() {
+    public RawStore getRowEchelonForm() {
         return this.getOldU();
     }
 
@@ -224,13 +224,13 @@ public final class JamaCholesky extends JamaAbstractDecomposition implements Cho
     }
 
     @Override
-    boolean compute(final Matrix aDelegate) {
-        myDelegate = new CholeskyDecomposition(aDelegate);
+    boolean compute(final RawStore aDelegate) {
+        myDelegate = new JamaCholesky(aDelegate);
         return myDelegate.isSPD();
     }
 
     @Override
-    Matrix solve(final Matrix aRHS) {
+    RawStore solve(final RawStore aRHS) {
         return myDelegate.solve(aRHS);
     }
 

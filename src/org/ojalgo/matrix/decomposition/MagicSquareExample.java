@@ -1,8 +1,10 @@
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.decomposition;
 
 import java.util.Date;
 
-/** Example of use of Matrix Class, featuring magic squares. **/
+import org.ojalgo.matrix.store.RawStore;
+
+/** Example of use of RawStore Class, featuring magic squares. **/
 
 class MagicSquareExample {
 
@@ -32,7 +34,7 @@ class MagicSquareExample {
 
     /** Generate magic square test matrix. **/
 
-    public static Matrix magic(final int n) {
+    public static RawStore magic(final int n) {
 
         final double[][] M = new double[n][n];
 
@@ -65,7 +67,7 @@ class MagicSquareExample {
         } else {
             final int p = n / 2;
             final int k = (n - 2) / 4;
-            final Matrix A = MagicSquareExample.magic(p);
+            final RawStore A = MagicSquareExample.magic(p);
             for (int j = 0; j < p; j++) {
                 for (int i = 0; i < p; i++) {
                     final double aij = A.get(i, j);
@@ -94,25 +96,20 @@ class MagicSquareExample {
             M[k][k] = M[k + p][k];
             M[k + p][k] = t;
         }
-        return new Matrix(M);
+        return new RawStore(M);
     }
 
     public static void main(final String argv[]) {
 
-        /* 
-         | Tests LU, QR, SVD and symmetric Eig decompositions.
-         |
-         |   n       = order of magic square.
-         |   trace   = diagonal sum, should be the magic sum, (n^3 + n)/2.
-         |   max_eig = maximum eigenvalue of (A + A')/2, should equal trace.
-         |   rank    = linear algebraic rank,
-         |             should equal n if n is odd, be less than n if n is even.
-         |   cond    = L_2 condition number, ratio of singular values.
-         |   lu_res  = test of LU factorization, norm1(L*U-A(p,:))/(n*eps).
-         |   qr_res  = test of QR factorization, norm1(Q*R-A)/(n*eps).
+        /*
+         * | Tests LU, QR, SVD and symmetric Eig decompositions. | | n = order of magic square. | trace = diagonal sum,
+         * should be the magic sum, (n^3 + n)/2. | max_eig = maximum eigenvalue of (A + A')/2, should equal trace. |
+         * rank = linear algebraic rank, | should equal n if n is odd, be less than n if n is even. | cond = L_2
+         * condition number, ratio of singular values. | lu_res = test of LU factorization, norm1(L*U-A(p,:))/(n*eps). |
+         * qr_res = test of QR factorization, norm1(Q*R-A)/(n*eps).
          */
 
-        MagicSquareExample.print("\n    Test of Matrix Class, using magic squares.\n");
+        MagicSquareExample.print("\n    Test of RawStore Class, using magic squares.\n");
         MagicSquareExample.print("    See MagicSquareExample.main() for an explanation.\n");
         MagicSquareExample.print("\n      n     trace       max_eig   rank        cond      lu_res      qr_res\n\n");
 
@@ -121,12 +118,12 @@ class MagicSquareExample {
         for (int n = 3; n <= 32; n++) {
             MagicSquareExample.print(MagicSquareExample.fixedWidthIntegertoString(n, 7));
 
-            final Matrix M = MagicSquareExample.magic(n);
+            final RawStore M = MagicSquareExample.magic(n);
 
             final int t = (int) M.trace();
             MagicSquareExample.print(MagicSquareExample.fixedWidthIntegertoString(t, 10));
 
-            final EigenvalueDecomposition E = new EigenvalueDecomposition(M.plus(M.transpose()).times(0.5));
+            final JamaEigenvalue E = new JamaEigenvalue(M.plus(M.transpose()).times(0.5));
             final double[] d = E.getRealEigenvalues();
             MagicSquareExample.print(MagicSquareExample.fixedWidthDoubletoString(d[n - 1], 14, 3));
 
@@ -136,16 +133,16 @@ class MagicSquareExample {
             final double c = M.cond();
             MagicSquareExample.print(c < (1 / eps) ? MagicSquareExample.fixedWidthDoubletoString(c, 12, 3) : "         Inf");
 
-            final LUDecomposition LU = new LUDecomposition(M);
-            final Matrix L = LU.getL();
-            final Matrix U = LU.getU();
+            final JamaLU LU = new JamaLU(M);
+            final RawStore L = LU.getL();
+            final RawStore U = LU.getU();
             final int[] p = LU.getPivot();
-            Matrix R = L.times(U).minus(M.getMatrix(p, 0, n - 1));
+            RawStore R = L.times(U).minus(M.getMatrix(p, 0, n - 1));
             double res = R.norm1() / (n * eps);
             MagicSquareExample.print(MagicSquareExample.fixedWidthDoubletoString(res, 12, 3));
 
-            final QRDecomposition QR = new QRDecomposition(M);
-            final Matrix Q = QR.getQ();
+            final JamaQR QR = new JamaQR(M);
+            final RawStore Q = QR.getQ();
             R = QR.getR();
             R = Q.times(R).minus(M);
             res = R.norm1() / (n * eps);

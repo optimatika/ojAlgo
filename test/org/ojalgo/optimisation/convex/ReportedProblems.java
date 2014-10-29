@@ -40,10 +40,10 @@ import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.ComplexMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
-import org.ojalgo.matrix.jama.JamaMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.TransposedStore;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -995,18 +995,18 @@ public class ReportedProblems extends OptimisationConvexTests {
     public void testP20140522() {
 
         final double[][] q = new double[][] { { 49.0, 31.0, 17.0, 6.0 }, { 31.0, 25.0, 13.0, 5.0 }, { 17.0, 13.0, 11.0, 3.5 }, { 6.0, 5.0, 3.5, 4.0 } };
-        final JamaMatrix JamaQ = JamaMatrix.FACTORY.rows(q);
+        final RawStore JamaQ = RawStore.FACTORY.rows(q);
 
         final double[] c = new double[] { 195.0, 59.0, -1.8, -11.7 };
-        final JamaMatrix JamaC = JamaMatrix.FACTORY.columns(c);
+        final RawStore JamaC = RawStore.FACTORY.columns(c);
 
         final double[][] ai = new double[][] { { 1.0, 0.0, 0.0, 0.0 }, { -1.0, 0.0, 0.0, 0.0 }, { 1.0, 1.0, 0.0, 0.0 }, { -1.0, -1.0, 0.0, 0.0 },
                 { 1.0, 1.0, 1.0, 0.0 }, { -1.0, -1.0, -1.0, 0.0 }, { 0.1, 0.0, 0.0, 0.0 }, { 0.01, 0.0, 0.0, 0.0 }, { 0.18, 0.1, 0.0, 0.0 },
                 { -0.01, 0.0, 0.0, 0.0 }, { -0.183, -0.1, 0.0, 0.0 }, { 0.0283, 0.01, 0.0, 0.0 }, { 0.25, 0.183, 0.1, 0.0 } };
-        final JamaMatrix JamaAI = JamaMatrix.FACTORY.rows(ai);
+        final RawStore JamaAI = RawStore.FACTORY.rows(ai);
 
         final double[] bi = new double[] { 0.13, 0.87, 0.18, 0.82, 0.23, 0.77, -0.04, 99.67, -0.06, 100.33, 1.06, 99.62, -0.08 };
-        final JamaMatrix JamaBI = JamaMatrix.FACTORY.columns(bi);
+        final RawStore JamaBI = RawStore.FACTORY.columns(bi);
 
         org.ojalgo.optimisation.Optimisation.Result result = null;
 

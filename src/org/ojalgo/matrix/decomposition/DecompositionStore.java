@@ -203,17 +203,17 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
 
     Array2D<N> asArray2D();
 
-    Array1D<ComplexNumber> computeInPlaceSchur(PhysicalStore<N> aTransformationCollector, boolean eigenvalue);
+    Array1D<ComplexNumber> computeInPlaceSchur(PhysicalStore<N> transformationCollector, boolean eigenvalue);
 
-    void divideAndCopyColumn(int aRow, int aCol, BasicArray<N> aDestination);
+    void divideAndCopyColumn(int row, int column, BasicArray<N> destination);
 
-    boolean generateApplyAndCopyHouseholderColumn(final int aRow, final int aCol, final Householder<N> aDestination);
+    boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<N> destination);
 
-    boolean generateApplyAndCopyHouseholderRow(final int aRow, final int aCol, final Householder<N> aDestination);
+    boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<N> destination);
 
-    int getIndexOfLargestInColumn(final int aRow, final int aCol);
+    int getIndexOfLargestInColumn(final int row, final int column);
 
-    void negateColumn(int aCol);
+    void negateColumn(int column);
 
     void rotateRight(int aLow, int aHigh, double aCos, double aSin);
 
@@ -227,11 +227,11 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      * <li>[A] is upper/right triangular</li>
      * </ul>
      *
-     * @param aBody The equation system body parameters [A]
+     * @param body The equation system body parameters [A]
      * @param conjugated true if the upper/right part of aBody is actually stored in the lower/left part of the matrix,
      *        and the elements conjugated.
      */
-    void substituteBackwards(Access2D<N> aBody, boolean conjugated);
+    void substituteBackwards(Access2D<N> body, boolean conjugated);
 
     /**
      * Will solve the equation system [A][X]=[B] where:
@@ -241,12 +241,12 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      * <li>[A] is lower/left triangular</li>
      * </ul>
      *
-     * @param aBody The equation system body parameters [A]
+     * @param body The equation system body parameters [A]
      * @param onesOnDiagonal true if aBody as ones on the diagonal
      */
-    void substituteForwards(Access2D<N> aBody, boolean onesOnDiagonal, boolean zerosAboveDiagonal);
+    void substituteForwards(Access2D<N> body, boolean onesOnDiagonal, boolean zerosAboveDiagonal);
 
-    void transformSymmetric(Householder<N> aTransf);
+    void transformSymmetric(Householder<N> transformation);
 
     void tred2(BasicArray<N> mainDiagonal, BasicArray<N> offDiagonal, boolean yesvecs);
 

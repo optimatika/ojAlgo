@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.jama.JamaEigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
@@ -93,11 +92,11 @@ public abstract class EigenvalueDecomposition<N extends Number> extends Abstract
     }
 
     public static final Eigenvalue<Double> makeJama() {
-        return new JamaEigenvalue.General();
+        return new RawEigenvalue.General();
     }
 
     public static final Eigenvalue<Double> makeJama(final boolean symmetric) {
-        return symmetric ? new JamaEigenvalue.Symmetric() : new JamaEigenvalue.Nonsymmetric();
+        return symmetric ? new RawEigenvalue.Symmetric() : new RawEigenvalue.Nonsymmetric();
     }
 
     public static final Eigenvalue<Double> makePrimitive() {

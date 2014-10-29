@@ -29,7 +29,6 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.jama.JamaCholesky;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -98,7 +97,7 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
     }
 
     public static final Cholesky<Double> makeJama() {
-        return new JamaCholesky();
+        return new RawCholesky();
     }
 
     public static final Cholesky<Double> makePrimitive() {

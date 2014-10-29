@@ -31,7 +31,6 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.jama.JamaLU;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.LowerTriangularStore;
@@ -152,7 +151,7 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
     }
 
     public static final LU<Double> makeJama() {
-        return new JamaLU();
+        return new RawLU();
     }
 
     public static final LU<Double> makePrimitive() {

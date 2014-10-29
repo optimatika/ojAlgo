@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
@@ -28,74 +28,74 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * This class adapts JAMA's EigenvalueDecomposition to ojAlgo's {@linkplain Eigenvalue} interface.
- * 
+ *
  * @author apete
  */
-public abstract class JamaEigenvalue extends JamaAbstractDecomposition implements Eigenvalue<Double> {
+public abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Double> {
 
-    public static final class General extends JamaEigenvalue {
+    public static final class General extends RawEigenvalue {
 
         public General() {
             super();
         }
 
         @Override
-        boolean compute(final Matrix aDelegate) {
+        boolean compute(final RawStore aDelegate) {
 
-            this.setDelegate(new EigenvalueDecomposition(aDelegate));
+            this.setDelegate(new JamaEigenvalue(aDelegate));
 
             return true;
         }
     }
 
-    public static final class Nonsymmetric extends JamaEigenvalue {
+    public static final class Nonsymmetric extends RawEigenvalue {
 
         public Nonsymmetric() {
             super();
         }
 
         @Override
-        boolean compute(final Matrix aDelegate) {
+        boolean compute(final RawStore aDelegate) {
 
-            this.setDelegate(new EigenvalueDecomposition(aDelegate, false));
+            this.setDelegate(new JamaEigenvalue(aDelegate, false));
 
             return true;
         }
     }
 
-    public static final class Symmetric extends JamaEigenvalue {
+    public static final class Symmetric extends RawEigenvalue {
 
         public Symmetric() {
             super();
         }
 
         @Override
-        boolean compute(final Matrix aDelegate) {
+        boolean compute(final RawStore aDelegate) {
 
-            this.setDelegate(new EigenvalueDecomposition(aDelegate, true));
+            this.setDelegate(new JamaEigenvalue(aDelegate, true));
 
             return true;
         }
     }
 
-    private EigenvalueDecomposition myDelegate;
+    private JamaEigenvalue myDelegate;
 
-    private JamaMatrix myInverse;
+    private RawStore myInverse;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
      * {@linkplain org.ojalgo.matrix.decomposition.EigenvalueDecomposition#makeJama()} instead.
      */
 
-    protected JamaEigenvalue() {
+    protected RawEigenvalue() {
         super();
     }
 
@@ -112,8 +112,8 @@ public abstract class JamaEigenvalue extends JamaAbstractDecomposition implement
         return MatrixUtils.equals(aStore, this, context);
     }
 
-    public JamaMatrix getD() {
-        return new JamaMatrix(myDelegate.getD());
+    public RawStore getD() {
+        return new RawStore(myDelegate.getD());
     }
 
     public Double getDeterminant() {
@@ -142,14 +142,14 @@ public abstract class JamaEigenvalue extends JamaAbstractDecomposition implement
     }
 
     @Override
-    public JamaMatrix getInverse() {
+    public RawStore getInverse() {
 
         if (myInverse == null) {
 
-            final double[][] tmpQ1 = this.getV().getDelegate().getArray();
+            final double[][] tmpQ1 = this.getV().data;
             final double[] tmpEigen = myDelegate.getRealEigenvalues();
 
-            final Matrix tmpMtrx = new Matrix(tmpEigen.length, tmpQ1.length);
+            final RawStore tmpMtrx = new RawStore(tmpEigen.length, tmpQ1.length);
 
             for (int i = 0; i < tmpEigen.length; i++) {
                 if (TypeUtils.isZero(tmpEigen[i])) {
@@ -163,7 +163,7 @@ public abstract class JamaEigenvalue extends JamaAbstractDecomposition implement
                 }
             }
 
-            myInverse = new JamaMatrix(this.getV().getDelegate().times(tmpMtrx));
+            myInverse = new RawStore(this.getV().times(tmpMtrx));
         }
 
         return myInverse;
@@ -178,8 +178,8 @@ public abstract class JamaEigenvalue extends JamaAbstractDecomposition implement
         return tmpVisitor.getNumber();
     }
 
-    public JamaMatrix getV() {
-        return new JamaMatrix(myDelegate.getV());
+    public RawStore getV() {
+        return new RawStore(myDelegate.getV());
     }
 
     public boolean isAspectRatioNormal() {
@@ -216,7 +216,7 @@ public abstract class JamaEigenvalue extends JamaAbstractDecomposition implement
     }
 
     @Override
-    public JamaMatrix solve(final Access2D<Double> rhs) {
+    public RawStore solve(final Access2D<Double> rhs) {
         return this.getInverse().multiplyRight((Access1D<Double>) rhs);
     }
 
@@ -225,12 +225,12 @@ public abstract class JamaEigenvalue extends JamaAbstractDecomposition implement
         return myDelegate.toString();
     }
 
-    final void setDelegate(final EigenvalueDecomposition newDelegate) {
+    final void setDelegate(final JamaEigenvalue newDelegate) {
         myDelegate = newDelegate;
     }
 
     @Override
-    Matrix solve(final Matrix aRHS) {
+    RawStore solve(final RawStore aRHS) {
         // TODO Auto-generated method stub
         return null;
     }

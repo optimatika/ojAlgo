@@ -27,7 +27,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.jama.JamaSingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
@@ -87,7 +86,7 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
     }
 
     public static final SingularValue<Double> makeJama() {
-        return new JamaSingularValue();
+        return new RawSingularValue();
     }
 
     public static final SingularValue<Double> makePrimitive() {

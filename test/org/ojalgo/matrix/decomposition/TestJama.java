@@ -27,11 +27,6 @@ import org.ojalgo.matrix.SimpleEigenvalueCase;
 import org.ojalgo.matrix.SimpleLUCase;
 import org.ojalgo.matrix.SimpleQRCase;
 import org.ojalgo.matrix.SimpleSingularValueCase;
-import org.ojalgo.matrix.jama.JamaCholesky;
-import org.ojalgo.matrix.jama.JamaEigenvalue;
-import org.ojalgo.matrix.jama.JamaLU;
-import org.ojalgo.matrix.jama.JamaQR;
-import org.ojalgo.matrix.jama.JamaSingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.type.context.NumberContext;
 
@@ -42,12 +37,12 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class TestJama extends MatrixDecompositionTests {
 
-    private static Cholesky<Double> CHOLESKY = new JamaCholesky();
-    private static Eigenvalue<Double> EIGENVALUE = new JamaEigenvalue.General();
+    private static Cholesky<Double> CHOLESKY = new RawCholesky();
+    private static Eigenvalue<Double> EIGENVALUE = new RawEigenvalue.General();
     private static NumberContext EVAL_CNTXT = NumberContext.getGeneral(8).newPrecision(15);
-    private static LU<Double> LU = new JamaLU();
-    private static QR<Double> QR = new JamaQR();
-    private static SingularValue<Double> SINGULAR_VALUE = new JamaSingularValue();
+    private static LU<Double> LU = new RawLU();
+    private static QR<Double> QR = new RawQR();
+    private static SingularValue<Double> SINGULAR_VALUE = new RawSingularValue();
 
     public TestJama() {
         super();

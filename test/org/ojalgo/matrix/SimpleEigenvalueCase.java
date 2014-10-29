@@ -23,7 +23,7 @@ package org.ojalgo.matrix;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.jama.JamaEigenvalue;
+import org.ojalgo.matrix.decomposition.RawEigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.type.context.NumberContext;
 
@@ -70,7 +70,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
     @Override
     public void testProblem() {
 
-        final Eigenvalue<Double> tmpEigen = new JamaEigenvalue.General();
+        final Eigenvalue<Double> tmpEigen = new RawEigenvalue.General();
         tmpEigen.compute(SimpleEigenvalueCase.getOriginal().toPrimitiveStore());
 
         final MatrixStore<Double> tmpV = tmpEigen.getV();

@@ -19,13 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.store;
 
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.function.FunctionSet;
@@ -33,7 +32,6 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorCollection;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.BasicMatrix;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.random.RandomNumber;
@@ -42,13 +40,13 @@ import org.ojalgo.scalar.Scalar.Factory;
 
 /**
  * Implements both {@linkplain BasicMatrix.Factory} and {@linkplain PhysicalStore.Factory}, and creates
- * {@linkplain JamaMatrix} instances.
+ * {@linkplain RawStore} instances.
  *
  * @author apete
  */
-public final class JamaFactory extends Object implements PhysicalStore.Factory<Double, JamaMatrix> {
+final class RawFactory extends Object implements PhysicalStore.Factory<Double, RawStore> {
 
-    JamaFactory() {
+    RawFactory() {
         super();
     }
 
@@ -56,7 +54,7 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
         return PrimitiveAggregator.getCollection();
     }
 
-    public JamaMatrix columns(final Access1D<?>... source) {
+    public RawStore columns(final Access1D<?>... source) {
 
         final int tmpRowDim = (int) source[0].count();
         final int tmpColDim = source.length;
@@ -71,10 +69,10 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new RawStore(retVal);
     }
 
-    public JamaMatrix columns(final double[]... source) {
+    public RawStore columns(final double[]... source) {
 
         final int tmpRowDim = source[0].length;
         final int tmpColDim = source.length;
@@ -89,10 +87,10 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new RawStore(retVal);
     }
 
-    public JamaMatrix columns(final List<? extends Number>... source) {
+    public RawStore columns(final List<? extends Number>... source) {
 
         final int tmpRowDim = source[0].size();
         final int tmpColDim = source.length;
@@ -107,10 +105,10 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new RawStore(retVal);
     }
 
-    public JamaMatrix columns(final Number[]... source) {
+    public RawStore columns(final Number[]... source) {
 
         final int tmpRowDim = source[0].length;
         final int tmpColDim = source.length;
@@ -125,14 +123,14 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new RawStore(retVal);
     }
 
-    public JamaMatrix conjugate(final Access2D<?> source) {
+    public RawStore conjugate(final Access2D<?> source) {
         return this.transpose(source);
     }
 
-    public JamaMatrix copy(final Access2D<?> source) {
+    public RawStore copy(final Access2D<?> source) {
 
         final int tmpRowDim = (int) source.countRows();
         final int tmpColDim = (int) source.countColumns();
@@ -145,93 +143,20 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal, tmpRowDim, tmpColDim);
+        return new RawStore(retVal, tmpRowDim, tmpColDim);
     }
 
     public FunctionSet<Double> function() {
         return PrimitiveFunction.getSet();
     }
 
-    public Access2D.Builder<JamaMatrix> getBuilder(final int count) {
-        return this.getBuilder(count, 1);
-    }
-
-    public Access2D.Builder<JamaMatrix> getBuilder(final int rows, final int columns) {
-
-        final JamaMatrix tmpDelegate = this.makeZero(rows, columns);
-
-        return new Builder<JamaMatrix>() {
-
-            public JamaMatrix build() {
-                return tmpDelegate;
-            }
-
-            public long count() {
-                return this.size();
-            }
-
-            public long countColumns() {
-                return tmpDelegate.getColDim();
-            }
-
-            public long countRows() {
-                return tmpDelegate.getRowDim();
-            }
-
-            public Access1D.Builder<JamaMatrix> fillAll(final Number aNmbr) {
-                tmpDelegate.fillAll(aNmbr.doubleValue());
-                return this;
-            }
-
-            public Builder<JamaMatrix> fillColumn(final long aRow, final long aCol, final Number aNmbr) {
-                tmpDelegate.fillColumn(rows, columns, aNmbr.doubleValue());
-                return this;
-            }
-
-            public Builder<JamaMatrix> fillDiagonal(final long aRow, final long aCol, final Number aNmbr) {
-                tmpDelegate.fillDiagonal(rows, columns, aNmbr.doubleValue());
-                return this;
-            }
-
-            public Builder<JamaMatrix> fillRow(final long aRow, final long aCol, final Number aNmbr) {
-                tmpDelegate.fillRow(rows, columns, aNmbr.doubleValue());
-                return this;
-            }
-
-            public Builder<JamaMatrix> set(final long aRow, final long aCol, final Number aNmbr) {
-                tmpDelegate.set((int) aRow, (int) aCol, aNmbr);
-                return this;
-            }
-
-            public Builder<JamaMatrix> set(final long index, final Number aNmbr) {
-                tmpDelegate.set(index, aNmbr);
-                return this;
-            }
-
-            public int size() {
-                return tmpDelegate.getRowDim() * tmpDelegate.getColDim();
-            }
-
-            public Access1D.Builder<JamaMatrix> set(final long index, final double value) {
-                tmpDelegate.set(index, value);
-                return this;
-            }
-
-            public Builder<JamaMatrix> set(final long row, final long column, final double value) {
-                tmpDelegate.set((int) row, (int) column, value);
-                return this;
-            }
-
-        };
-    }
-
     public BasicArray<Double> makeArray(final int length) {
         return PrimitiveArray.make(length);
     }
 
-    public JamaMatrix makeEye(final long rows, final long columns) {
+    public RawStore makeEye(final long rows, final long columns) {
 
-        final JamaMatrix retVal = this.makeZero(rows, columns);
+        final RawStore retVal = this.makeZero(rows, columns);
 
         retVal.fillDiagonal(0, 0, this.scalar().one().getNumber());
 
@@ -242,7 +167,7 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
         return new Householder.Primitive(length);
     }
 
-    public JamaMatrix makeRandom(final long rows, final long columns, final RandomNumber distribution) {
+    public RawStore makeRandom(final long rows, final long columns, final RandomNumber distribution) {
 
         final double[][] retVal = new double[(int) rows][(int) columns];
 
@@ -252,7 +177,7 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new RawStore(retVal);
     }
 
     public Rotation<Double> makeRotation(final int low, final int high, final double cos, final double sin) {
@@ -263,11 +188,11 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
         return new Rotation.Primitive(low, high, cos, sin);
     }
 
-    public JamaMatrix makeZero(final long rows, final long columns) {
-        return new JamaMatrix(new double[(int) rows][(int) columns]);
+    public RawStore makeZero(final long rows, final long columns) {
+        return new RawStore(new double[(int) rows][(int) columns]);
     }
 
-    public JamaMatrix rows(final Access1D<?>... source) {
+    public RawStore rows(final Access1D<?>... source) {
 
         final int tmpRowDim = source.length;
         final int tmpColDim = (int) source[0].count();
@@ -284,10 +209,10 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new RawStore(retVal);
     }
 
-    public JamaMatrix rows(final double[]... source) {
+    public RawStore rows(final double[]... source) {
 
         final int tmpRowDim = source.length;
         final int tmpColDim = source[0].length;
@@ -304,10 +229,10 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new RawStore(retVal);
     }
 
-    public JamaMatrix rows(final List<? extends Number>... source) {
+    public RawStore rows(final List<? extends Number>... source) {
 
         final int tmpRowDim = source.length;
         final int tmpColDim = source[0].size();
@@ -324,10 +249,10 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new RawStore(retVal);
     }
 
-    public JamaMatrix rows(final Number[]... source) {
+    public RawStore rows(final Number[]... source) {
 
         final int tmpRowDim = source.length;
         final int tmpColDim = source[0].length;
@@ -344,14 +269,14 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new RawStore(retVal);
     }
 
     public Factory<Double> scalar() {
         return PrimitiveScalar.FACTORY;
     }
 
-    public JamaMatrix transpose(final Access2D<?> source) {
+    public RawStore transpose(final Access2D<?> source) {
 
         final int tmpRowDim = (int) source.countColumns();
         final int tmpColDim = (int) source.countRows();
@@ -364,7 +289,7 @@ public final class JamaFactory extends Object implements PhysicalStore.Factory<D
             }
         }
 
-        return new JamaMatrix(retVal);
+        return new RawStore(retVal);
     }
 
 }

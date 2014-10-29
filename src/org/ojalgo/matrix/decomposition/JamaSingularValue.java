@@ -1,62 +1,53 @@
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.decomposition;
 
-/** Singular Value Decomposition.
-<P>
-For an m-by-n matrix A with m >= n, the singular value decomposition is
-an m-by-n orthogonal matrix U, an n-by-n diagonal matrix S, and
-an n-by-n orthogonal matrix V so that A = U*S*V'.
-<P>
-The singular values, sigma[k] = S[k][k], are ordered so that
-sigma[0] >= sigma[1] >= ... >= sigma[n-1].
-<P>
-The singular value decompostion always exists, so the constructor will
-never fail.  The matrix condition number and the effective numerical
-rank can be computed from this decomposition.
-*/
+import org.ojalgo.matrix.store.RawStore;
 
-class SingularValueDecomposition implements java.io.Serializable {
+/**
+ * Singular Value Decomposition.
+ * <P>
+ * For an m-by-n matrix A with m >= n, the singular value decomposition is an m-by-n orthogonal matrix U, an n-by-n
+ * diagonal matrix S, and an n-by-n orthogonal matrix V so that A = U*S*V'.
+ * <P>
+ * The singular values, sigma[k] = S[k][k], are ordered so that sigma[0] >= sigma[1] >= ... >= sigma[n-1].
+ * <P>
+ * The singular value decompostion always exists, so the constructor will never fail. The matrix condition number and
+ * the effective numerical rank can be computed from this decomposition.
+ */
+class JamaSingularValue implements java.io.Serializable {
 
-    /* ------------------------
-       Class variables
-     * ------------------------ */
-
-    /** Arrays for internal storage of U and V.
-    @serial internal storage of U.
-    @serial internal storage of V.
-    */
-    private final double[][] U, V;
-
-    /** Array for internal storage of singular values.
-    @serial internal storage of singular values.
-    */
-    private final double[] s;
-
-    /** Row and column dimensions.
-    @serial row dimension.
-    @serial column dimension.
-    */
+    /**
+     * Row and column dimensions.
+     *
+     * @serial row dimension.
+     * @serial column dimension.
+     */
     private final int m, n;
 
-    /* ------------------------
-       Constructor
-     * ------------------------ */
+    /**
+     * Array for internal storage of singular values.
+     *
+     * @serial internal storage of singular values.
+     */
+    private final double[] s;
 
-    private static final long serialVersionUID = 1;
+    /**
+     * Arrays for internal storage of U and V.
+     *
+     * @serial internal storage of U.
+     * @serial internal storage of V.
+     */
+    private final double[][] U, V;
 
-    /* ------------------------
-       Public Methods
-     * ------------------------ */
-
-    /** Construct the singular value decomposition
-        Structure to access U, S and V.
-    @param Arg    Rectangular matrix
-    */
-
-    public SingularValueDecomposition(final Matrix Arg) {
+    /**
+     * Construct the singular value decomposition Structure to access U, S and V.
+     *
+     * @param Arg Rectangular matrix
+     */
+    JamaSingularValue(final RawStore Arg) {
         this(Arg, true, true);
     }
 
-    public SingularValueDecomposition(final Matrix Arg, final boolean wantu, final boolean wantv) {
+    JamaSingularValue(final RawStore Arg, final boolean wantu, final boolean wantv) {
 
         // Derived from LINPACK code.
         // Initialize.
@@ -64,11 +55,10 @@ class SingularValueDecomposition implements java.io.Serializable {
         m = Arg.getRowDimension();
         n = Arg.getColumnDimension();
 
-        /* Apparently the failing cases are only a proper subset of (m<n), 
-        so let's not throw error.  Correct fix to come later?
-        if (m<n) {
-        throw new IllegalArgumentException("Jama SVD only works for m >= n"); }
-        */
+        /*
+         * Apparently the failing cases are only a proper subset of (m<n), so let's not throw error. Correct fix to come
+         * later? if (m<n) { throw new IllegalArgumentException("Jama SVD only works for m >= n"); }
+         */
         final int nu = Math.min(m, n);
         s = new double[Math.min(m + 1, n)];
         U = new double[m][nu];
@@ -477,21 +467,23 @@ class SingularValueDecomposition implements java.io.Serializable {
         }
     }
 
-    /** Two norm condition number
-    @return     max(S)/min(S)
-    */
-
-    public double cond() {
+    /**
+     * Two norm condition number
+     *
+     * @return max(S)/min(S)
+     */
+    double cond() {
         return s[0] / s[Math.min(m, n) - 1];
     }
 
-    /** Return the diagonal matrix of singular values
-    @return     S
-    */
-
-    public Matrix getS() {
-        final Matrix X = new Matrix(n, n);
-        final double[][] S = X.getArray();
+    /**
+     * Return the diagonal matrix of singular values
+     *
+     * @return S
+     */
+    RawStore getS() {
+        final RawStore X = new RawStore(n, n);
+        final double[][] S = X.data;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 S[i][j] = 0.0;
@@ -501,43 +493,48 @@ class SingularValueDecomposition implements java.io.Serializable {
         return X;
     }
 
-    /** Return the one-dimensional array of singular values
-    @return     diagonal of S.
-    */
-
-    public double[] getSingularValues() {
+    /**
+     * Return the one-dimensional array of singular values
+     *
+     * @return diagonal of S.
+     */
+    double[] getSingularValues() {
         return s;
     }
 
-    /** Return the left singular vectors
-    @return     U
-    */
-
-    public Matrix getU() {
-        return new Matrix(U, m, Math.min(m + 1, n));
+    /**
+     * Return the left singular vectors
+     *
+     * @return U
+     */
+    RawStore getU() {
+        return new RawStore(U, m, Math.min(m + 1, n));
     }
 
-    /** Return the right singular vectors
-    @return     V
-    */
-
-    public Matrix getV() {
-        return new Matrix(V, n, n);
+    /**
+     * Return the right singular vectors
+     *
+     * @return V
+     */
+    RawStore getV() {
+        return new RawStore(V, n, n);
     }
 
-    /** Two norm
-    @return     max(S)
-    */
-
-    public double norm2() {
+    /**
+     * Two norm
+     *
+     * @return max(S)
+     */
+    double norm2() {
         return s[0];
     }
 
-    /** Effective numerical matrix rank
-     @return     Number of nonnegligible singular values.
+    /**
+     * Effective numerical matrix rank
+     *
+     * @return Number of nonnegligible singular values.
      */
-
-    public int rank() {
+    int rank() {
         final double eps = Math.pow(2.0, -52.0);
         final double tol = Math.max(m, n) * s[0] * eps;
         int r = 0;

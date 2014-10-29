@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.jama.JamaQR;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -100,7 +99,7 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
     }
 
     public static final QR<Double> makeJama() {
-        return new JamaQR();
+        return new RawQR();
     }
 
     public static final QR<Double> makePrimitive() {

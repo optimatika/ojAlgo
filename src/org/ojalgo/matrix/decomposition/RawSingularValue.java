@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
@@ -27,33 +27,27 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * This class adapts JAMA's SingularValueDecomposition to ojAlgo's
- * {@linkplain SingularValue} interface.
- * 
- * speed: 52.641s
- * 
+ * This class adapts JAMA's SingularValueDecomposition to ojAlgo's {@linkplain SingularValue} interface. speed: 52.641s
  *
  * @author apete
  */
-public final class JamaSingularValue extends JamaAbstractDecomposition implements SingularValue<Double> {
+public final class RawSingularValue extends RawDecomposition implements SingularValue<Double> {
 
-    private SingularValueDecomposition myDelegate;
+    private JamaSingularValue myDelegate;
+    private RawStore myPseudoinverse;
     private boolean myTransposed;
-    private JamaMatrix myPseudoinverse;
 
     /**
-     * Not recommended to use this constructor directly.
-     * Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.SingularValueDecomposition#makeJama()}
-     * instead.
+     * Not recommended to use this constructor directly. Consider using the static factory method
+     * {@linkplain org.ojalgo.matrix.decomposition.SingularValueDecomposition#makeJama()} instead.
      */
-    public JamaSingularValue() {
+    public RawSingularValue() {
         super();
     }
 
@@ -61,7 +55,7 @@ public final class JamaSingularValue extends JamaAbstractDecomposition implement
 
         this.reset();
 
-        final Matrix tmpCast = JamaAbstractDecomposition.cast(matrix);
+        final RawStore tmpCast = RawDecomposition.cast(matrix);
 
         return this.compute(tmpCast, singularValuesOnly);
     }
@@ -74,8 +68,8 @@ public final class JamaSingularValue extends JamaAbstractDecomposition implement
         return myDelegate.cond();
     }
 
-    public JamaMatrix getD() {
-        return new JamaMatrix(myDelegate.getS());
+    public RawStore getD() {
+        return new RawStore(myDelegate.getS());
     }
 
     public double getFrobeniusNorm() {
@@ -94,14 +88,14 @@ public final class JamaSingularValue extends JamaAbstractDecomposition implement
     }
 
     @Override
-    public JamaMatrix getInverse() {
+    public RawStore getInverse() {
 
         if (myPseudoinverse == null) {
 
-            final double[][] tmpQ1 = this.getQ1().getDelegate().getArray();
+            final double[][] tmpQ1 = this.getQ1().data;
             final double[] tmpSingular = myDelegate.getSingularValues();
 
-            final Matrix tmpMtrx = new Matrix(tmpSingular.length, tmpQ1.length);
+            final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
 
             for (int i = 0; i < tmpSingular.length; i++) {
                 if (TypeUtils.isZero(tmpSingular[i])) {
@@ -115,7 +109,7 @@ public final class JamaSingularValue extends JamaAbstractDecomposition implement
                 }
             }
 
-            myPseudoinverse = new JamaMatrix(this.getQ2().getDelegate().times(tmpMtrx));
+            myPseudoinverse = new RawStore(this.getQ2().times(tmpMtrx));
         }
 
         return myPseudoinverse;
@@ -139,12 +133,12 @@ public final class JamaSingularValue extends JamaAbstractDecomposition implement
         return this.getSingularValues().get(0);
     }
 
-    public JamaMatrix getQ1() {
-        return new JamaMatrix(myTransposed ? myDelegate.getV() : myDelegate.getU());
+    public RawStore getQ1() {
+        return new RawStore(myTransposed ? myDelegate.getV() : myDelegate.getU());
     }
 
-    public JamaMatrix getQ2() {
-        return new JamaMatrix(myTransposed ? myDelegate.getU() : myDelegate.getV());
+    public RawStore getQ2() {
+        return new RawStore(myTransposed ? myDelegate.getU() : myDelegate.getV());
     }
 
     public int getRank() {
@@ -191,11 +185,10 @@ public final class JamaSingularValue extends JamaAbstractDecomposition implement
     }
 
     /**
-     * Internally this implementation uses the pseudoinverse that is recreated 
-     * with every call. 
+     * Internally this implementation uses the pseudoinverse that is recreated with every call.
      */
     @Override
-    public JamaMatrix solve(final Access2D<Double> rhs) {
+    public RawStore solve(final Access2D<Double> rhs) {
         return this.getInverse().multiplyRight((Access1D<Double>) rhs);
     }
 
@@ -205,13 +198,13 @@ public final class JamaSingularValue extends JamaAbstractDecomposition implement
     }
 
     @Override
-    boolean compute(final Matrix aDelegate) {
+    boolean compute(final RawStore aDelegate) {
         return this.compute(aDelegate, false);
     }
 
-    boolean compute(final Matrix aDelegate, final boolean singularValuesOnly) {
+    boolean compute(final RawStore aDelegate, final boolean singularValuesOnly) {
 
-        Matrix tmpMtrx;
+        RawStore tmpMtrx;
 
         if (aDelegate.getColumnDimension() <= aDelegate.getRowDimension()) {
             myTransposed = false;
@@ -221,13 +214,13 @@ public final class JamaSingularValue extends JamaAbstractDecomposition implement
             tmpMtrx = aDelegate.transpose();
         }
 
-        myDelegate = new SingularValueDecomposition(tmpMtrx, !singularValuesOnly, !singularValuesOnly);
+        myDelegate = new JamaSingularValue(tmpMtrx, !singularValuesOnly, !singularValuesOnly);
 
         return this.isComputed();
     }
 
     @Override
-    Matrix solve(final Matrix aRHS) {
+    RawStore solve(final RawStore aRHS) {
         ProgrammingError.throwForIllegalInvocation();
         return null;
     }

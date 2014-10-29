@@ -1,4 +1,4 @@
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.decomposition;
 
 class Maths {
 

@@ -19,32 +19,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.ArrayUtils;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
-import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * JamaAbstractDecomposition
- * 
+ *
  * @author apete
  */
-abstract class JamaAbstractDecomposition implements MatrixDecomposition<Double> {
+abstract class RawDecomposition implements MatrixDecomposition<Double> {
 
-    static Matrix cast(final Access2D<?> aStore) {
-        if (aStore instanceof JamaMatrix) {
-            return ((JamaMatrix) aStore).getDelegate();
+    static RawStore cast(final Access2D<?> aStore) {
+        if (aStore instanceof RawStore) {
+            return ((RawStore) aStore);
         } else {
-            return new Matrix(ArrayUtils.toRawCopyOf(aStore));
+            return new RawStore(ArrayUtils.toRawCopyOf(aStore));
         }
     }
 
-    protected JamaAbstractDecomposition() {
+    protected RawDecomposition() {
         super();
     }
 
@@ -52,18 +51,18 @@ abstract class JamaAbstractDecomposition implements MatrixDecomposition<Double> 
 
         this.reset();
 
-        return this.compute(JamaAbstractDecomposition.cast(aStore));
+        return this.compute(RawDecomposition.cast(aStore));
     }
 
     public final boolean equals(final MatrixDecomposition<Double> other, final NumberContext context) {
         return AccessUtils.equals(this.reconstruct(), other.reconstruct(), context);
     }
 
-    public abstract JamaMatrix getInverse();
+    public abstract RawStore getInverse();
 
     /**
      * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
-     * 
+     *
      * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#getInverse(org.ojalgo.matrix.decomposition.DecompositionStore)
      */
     public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
@@ -88,8 +87,8 @@ abstract class JamaAbstractDecomposition implements MatrixDecomposition<Double> 
         return null;
     }
 
-    public JamaMatrix solve(final Access2D<Double> rhs) {
-        return new JamaMatrix(this.solve(JamaAbstractDecomposition.cast(rhs)));
+    public RawStore solve(final Access2D<Double> rhs) {
+        return new RawStore(this.solve(RawDecomposition.cast(rhs)));
     }
 
     public final MatrixStore<Double> solve(final Access2D<Double> body, final Access2D<Double> rhs) {
@@ -104,19 +103,19 @@ abstract class JamaAbstractDecomposition implements MatrixDecomposition<Double> 
 
     /**
      * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #solve(Access2D)}.
-     * 
+     *
      * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#solve(Access2D,
      *      org.ojalgo.matrix.decomposition.DecompositionStore)
      */
-    public final JamaMatrix solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
+    public final RawStore solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
         return this.solve(rhs);
     }
 
-    protected JamaMatrix makeEyeStore(final int aRowDim, final int aColDim) {
-        return new JamaMatrix(Matrix.identity(aRowDim, aColDim));
+    protected RawStore makeEyeStore(final int aRowDim, final int aColDim) {
+        return new RawStore(RawStore.identity(aRowDim, aColDim));
     }
 
-    abstract boolean compute(Matrix aDelegate);
+    abstract boolean compute(RawStore aDelegate);
 
-    abstract Matrix solve(Matrix aRHS);
+    abstract RawStore solve(RawStore aRHS);
 }

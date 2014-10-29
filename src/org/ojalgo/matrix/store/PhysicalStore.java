@@ -85,7 +85,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * @deprecated v32 Let me know if you need this
      */
     @Deprecated
-    void caxpy(final N aSclrA, final int aColX, final int aColY, final int aFirstRow);
+    void caxpy(final N scalarA, final int columnX, final int columnY, final int firstRow);
 
     void exchangeColumns(int aColA, int aColB);
 
@@ -132,9 +132,9 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * @deprecated v32 Let me know if you need this
      */
     @Deprecated
-    void maxpy(final N aSclrA, final MatrixStore<N> aMtrxX);
+    void maxpy(final N scalarA, final MatrixStore<N> matrixX);
 
-    void modifyOne(long row, long column, UnaryFunction<N> func);
+    void modifyOne(long row, long column, UnaryFunction<N> function);
 
     /**
      * <p>
@@ -145,7 +145,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * @deprecated v32 Let me know if you need this
      */
     @Deprecated
-    void raxpy(final N aSclrA, final int aRowX, final int aRowY, final int aFirstCol);
+    void raxpy(final N scalarA, final int rowX, final int rowY, final int firstColumn);
 
     void transformLeft(Householder<N> transformation, int firstColumn);
 

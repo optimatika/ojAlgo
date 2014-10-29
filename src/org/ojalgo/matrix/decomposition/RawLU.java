@@ -19,14 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -34,15 +34,15 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class JamaLU extends JamaAbstractDecomposition implements LU<Double> {
+public final class RawLU extends RawDecomposition implements LU<Double> {
 
-    private LUDecomposition myDelegate;
+    private JamaLU myDelegate;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
      * {@linkplain org.ojalgo.matrix.decomposition.LUDecomposition#makeJama()} instead.
      */
-    public JamaLU() {
+    public RawLU() {
         super();
     }
 
@@ -64,12 +64,12 @@ public final class JamaLU extends JamaAbstractDecomposition implements LU<Double
     }
 
     @Override
-    public JamaMatrix getInverse() {
+    public RawStore getInverse() {
         return this.solve(this.makeEyeStore(myDelegate.getL().getRowDimension(), myDelegate.getU().getColumnDimension()));
     }
 
-    public JamaMatrix getL() {
-        return new JamaMatrix(myDelegate.getL());
+    public RawStore getL() {
+        return new RawStore(myDelegate.getL());
     }
 
     public int[] getPivotOrder() {
@@ -101,8 +101,8 @@ public final class JamaLU extends JamaAbstractDecomposition implements LU<Double
         return null;
     }
 
-    public JamaMatrix getU() {
-        return new JamaMatrix(myDelegate.getU());
+    public RawStore getU() {
+        return new RawStore(myDelegate.getU());
     }
 
     public boolean isAspectRatioNormal() {
@@ -139,15 +139,15 @@ public final class JamaLU extends JamaAbstractDecomposition implements LU<Double
     }
 
     @Override
-    boolean compute(final Matrix aDelegate) {
+    boolean compute(final RawStore aDelegate) {
 
-        myDelegate = new LUDecomposition(aDelegate);
+        myDelegate = new JamaLU(aDelegate);
 
         return this.isComputed();
     }
 
     @Override
-    Matrix solve(final Matrix aRHS) {
+    RawStore solve(final RawStore aRHS) {
         return myDelegate.solve(aRHS);
     }
 

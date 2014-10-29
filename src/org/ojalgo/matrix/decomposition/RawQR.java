@@ -19,14 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -34,15 +34,15 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class JamaQR extends JamaAbstractDecomposition implements QR<Double> {
+public final class RawQR extends RawDecomposition implements QR<Double> {
 
-    private QRDecomposition myDelegate;
+    private JamaQR myDelegate;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
      * {@linkplain org.ojalgo.matrix.decomposition.QRDecomposition#makeJama()} instead.
      */
-    public JamaQR() {
+    public RawQR() {
         super();
     }
 
@@ -73,16 +73,16 @@ public final class JamaQR extends JamaAbstractDecomposition implements QR<Double
     }
 
     @Override
-    public JamaMatrix getInverse() {
+    public RawStore getInverse() {
         return this.solve(this.makeEyeStore(myDelegate.getQ().getRowDimension(), myDelegate.getR().getColumnDimension()));
     }
 
-    public JamaMatrix getQ() {
-        return new JamaMatrix(myDelegate.getQ());
+    public RawStore getQ() {
+        return new RawStore(myDelegate.getQ());
     }
 
-    public JamaMatrix getR() {
-        return new JamaMatrix(myDelegate.getR());
+    public RawStore getR() {
+        return new RawStore(myDelegate.getR());
     }
 
     public int getRank() {
@@ -145,15 +145,15 @@ public final class JamaQR extends JamaAbstractDecomposition implements QR<Double
     }
 
     @Override
-    boolean compute(final Matrix aDelegate) {
+    boolean compute(final RawStore aDelegate) {
 
-        myDelegate = new QRDecomposition(aDelegate);
+        myDelegate = new JamaQR(aDelegate);
 
         return this.isComputed();
     }
 
     @Override
-    Matrix solve(final Matrix aRHS) {
+    RawStore solve(final RawStore aRHS) {
         return myDelegate.solve(aRHS);
     }
 

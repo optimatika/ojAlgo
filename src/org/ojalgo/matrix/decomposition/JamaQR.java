@@ -1,56 +1,48 @@
-package org.ojalgo.matrix.jama;
+package org.ojalgo.matrix.decomposition;
 
-/** QR Decomposition.
-<P>
-   For an m-by-n matrix A with m >= n, the QR decomposition is an m-by-n
-   orthogonal matrix Q and an n-by-n upper triangular matrix R so that
-   A = Q*R.
-<P>
-   The QR decompostion always exists, even if the matrix does not have
-   full rank, so the constructor will never fail.  The primary use of the
-   QR decomposition is in the least squares solution of nonsquare systems
-   of simultaneous linear equations.  This will fail if isFullRank()
-   returns false.
-*/
+import org.ojalgo.matrix.store.RawStore;
 
-class QRDecomposition implements java.io.Serializable {
+/**
+ * QR Decomposition.
+ * <P>
+ * For an m-by-n matrix A with m >= n, the QR decomposition is an m-by-n orthogonal matrix Q and an n-by-n upper
+ * triangular matrix R so that A = Q*R.
+ * <P>
+ * The QR decompostion always exists, even if the matrix does not have full rank, so the constructor will never fail.
+ * The primary use of the QR decomposition is in the least squares solution of nonsquare systems of simultaneous linear
+ * equations. This will fail if isFullRank() returns false.
+ */
+class JamaQR implements java.io.Serializable {
 
-    /* ------------------------
-       Class variables
-     * ------------------------ */
-
-    /** Array for internal storage of decomposition.
-    @serial internal array storage.
-    */
-    private final double[][] QR;
-
-    /** Row and column dimensions.
-    @serial column dimension.
-    @serial row dimension.
-    */
+    /**
+     * Row and column dimensions.
+     *
+     * @serial column dimension.
+     * @serial row dimension.
+     */
     private final int m, n;
 
-    /** Array for internal storage of diagonal of R.
-    @serial diagonal of R.
-    */
+    /**
+     * Array for internal storage of decomposition.
+     *
+     * @serial internal array storage.
+     */
+    private final double[][] QR;
+
+    /**
+     * Array for internal storage of diagonal of R.
+     *
+     * @serial diagonal of R.
+     */
     private final double[] Rdiag;
 
-    /* ------------------------
-       Constructor
-     * ------------------------ */
-
-    private static final long serialVersionUID = 1;
-
-    /* ------------------------
-       Public Methods
-     * ------------------------ */
-
-    /** QR Decomposition, computed by Householder reflections.
-        Structure to access R and the Householder vectors and compute Q.
-    @param A    Rectangular matrix
-    */
-
-    public QRDecomposition(final Matrix A) {
+    /**
+     * QR Decomposition, computed by Householder reflections. Structure to access R and the Householder vectors and
+     * compute Q.
+     *
+     * @param A Rectangular matrix
+     */
+    JamaQR(final RawStore A) {
         // Initialize.
         QR = A.getArrayCopy();
         m = A.getRowDimension();
@@ -91,13 +83,14 @@ class QRDecomposition implements java.io.Serializable {
         }
     }
 
-    /** Return the Householder vectors
-    @return     Lower trapezoidal matrix whose columns define the reflections
-    */
-
-    public Matrix getH() {
-        final Matrix X = new Matrix(m, n);
-        final double[][] H = X.getArray();
+    /**
+     * Return the Householder vectors
+     *
+     * @return Lower trapezoidal matrix whose columns define the reflections
+     */
+    RawStore getH() {
+        final RawStore X = new RawStore(m, n);
+        final double[][] H = X.data;
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 if (i >= j) {
@@ -110,13 +103,14 @@ class QRDecomposition implements java.io.Serializable {
         return X;
     }
 
-    /** Generate and return the (economy-sized) orthogonal factor
-    @return     Q
-    */
-
-    public Matrix getQ() {
-        final Matrix X = new Matrix(m, n);
-        final double[][] Q = X.getArray();
+    /**
+     * Generate and return the (economy-sized) orthogonal factor
+     *
+     * @return Q
+     */
+    RawStore getQ() {
+        final RawStore X = new RawStore(m, n);
+        final double[][] Q = X.data;
         for (int k = n - 1; k >= 0; k--) {
             for (int i = 0; i < m; i++) {
                 Q[i][k] = 0.0;
@@ -138,13 +132,14 @@ class QRDecomposition implements java.io.Serializable {
         return X;
     }
 
-    /** Return the upper triangular factor
-    @return     R
-    */
-
-    public Matrix getR() {
-        final Matrix X = new Matrix(n, n);
-        final double[][] R = X.getArray();
+    /**
+     * Return the upper triangular factor
+     *
+     * @return R
+     */
+    RawStore getR() {
+        final RawStore X = new RawStore(n, n);
+        final double[][] R = X.data;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (i < j) {
@@ -159,11 +154,12 @@ class QRDecomposition implements java.io.Serializable {
         return X;
     }
 
-    /** Is the matrix full rank?
-    @return     true if R, and hence A, has full rank.
-    */
-
-    public boolean isFullRank() {
+    /**
+     * Is the matrix full rank?
+     *
+     * @return true if R, and hence A, has full rank.
+     */
+    boolean isFullRank() {
         for (int j = 0; j < n; j++) {
             if (Rdiag[j] == 0) {
                 return false;
@@ -172,19 +168,20 @@ class QRDecomposition implements java.io.Serializable {
         return true;
     }
 
-    /** Least squares solution of A*X = B
-     @param B    A Matrix with as many rows as A and any number of columns.
-     @return     X that minimizes the two norm of Q*R*X-B.
-     @exception  IllegalArgumentException  Matrix row dimensions must agree.
-     @exception  RuntimeException  Matrix is rank deficient.
+    /**
+     * Least squares solution of A*X = B
+     *
+     * @param B A RawStore with as many rows as A and any number of columns.
+     * @return X that minimizes the two norm of Q*R*X-B.
+     * @exception IllegalArgumentException RawStore row dimensions must agree.
+     * @exception RuntimeException RawStore is rank deficient.
      */
-
-    public Matrix solve(final Matrix B) {
+    RawStore solve(final RawStore B) {
         if (B.getRowDimension() != m) {
-            throw new IllegalArgumentException("Matrix row dimensions must agree.");
+            throw new IllegalArgumentException("RawStore row dimensions must agree.");
         }
         if (!this.isFullRank()) {
-            throw new RuntimeException("Matrix is rank deficient.");
+            throw new RuntimeException("RawStore is rank deficient.");
         }
 
         // Copy right hand side
@@ -215,6 +212,6 @@ class QRDecomposition implements java.io.Serializable {
                 }
             }
         }
-        return (new Matrix(X, n, nx).getMatrix(0, n - 1, 0, nx - 1));
+        return (new RawStore(X, n, nx).getMatrix(0, n - 1, 0, nx - 1));
     }
 }

@@ -26,11 +26,6 @@ import junit.framework.TestSuite;
 
 import org.ojalgo.FunctionalityTest;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.jama.JamaCholesky;
-import org.ojalgo.matrix.jama.JamaEigenvalue;
-import org.ojalgo.matrix.jama.JamaLU;
-import org.ojalgo.matrix.jama.JamaQR;
-import org.ojalgo.matrix.jama.JamaSingularValue;
 
 /**
  * MatrixDecompositionPackageTests
@@ -57,7 +52,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     @SuppressWarnings("unchecked")
     public static final Cholesky<Double>[] getCholeskyPrimitive() {
-        return (Cholesky<Double>[]) new Cholesky<?>[] { new JamaCholesky(), new CholeskyDecomposition.Primitive() };
+        return (Cholesky<Double>[]) new Cholesky<?>[] { new RawCholesky(), new CholeskyDecomposition.Primitive() };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllGeneral() {
@@ -74,17 +69,17 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new JamaEigenvalue.General(), new GeneralEvD.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.General(), new GeneralEvD.Primitive() };
     }
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveNonsymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new JamaEigenvalue.Nonsymmetric(), new NonsymmetricEvD.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.Nonsymmetric(), new NonsymmetricEvD.Primitive() };
     }
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveSymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new JamaEigenvalue.Symmetric(), new HermitianEvD32.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.Symmetric(), new HermitianEvD32.Primitive() };
     }
 
     public static final Hessenberg<?>[] getHessenbergAll() {
@@ -102,7 +97,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     @SuppressWarnings("unchecked")
     public static final LU<Double>[] getLUPrimitive() {
-        return (LU<Double>[]) new LU<?>[] { new JamaLU(), new LUDecomposition.Primitive() };
+        return (LU<Double>[]) new LU<?>[] { new RawLU(), new LUDecomposition.Primitive() };
     }
 
     public static final QR<?>[] getQRAll() {
@@ -111,7 +106,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     @SuppressWarnings("unchecked")
     public static final QR<Double>[] getQRPrimitive() {
-        return (QR<Double>[]) new QR<?>[] { new JamaQR(), new QRDecomposition.Primitive() };
+        return (QR<Double>[]) new QR<?>[] { new RawQR(), new QRDecomposition.Primitive() };
     }
 
     public static final Schur<?>[] getSchurAll() {
@@ -124,12 +119,12 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final SingularValue<?>[] getSingularValueAll() {
-        return new SingularValue<?>[] { new SVDold30.Big(), new SVDold30.Complex(), new JamaSingularValue(), new SVDold30.Primitive(), new SVDnew32.Primitive() };
+        return new SingularValue<?>[] { new SVDold30.Big(), new SVDold30.Complex(), new RawSingularValue(), new SVDold30.Primitive(), new SVDnew32.Primitive() };
     }
 
     @SuppressWarnings("unchecked")
     public static final SingularValue<Double>[] getSingularValuePrimitive() {
-        return (SingularValue<Double>[]) new SingularValue<?>[] { new JamaSingularValue(), /* new SVDold30.Primitive(), */new SVDnew32.Primitive() };
+        return (SingularValue<Double>[]) new SingularValue<?>[] { new RawSingularValue(), /* new SVDold30.Primitive(), */new SVDnew32.Primitive() };
     }
 
     public static final Tridiagonal<?>[] getTridiagonalAll() {
