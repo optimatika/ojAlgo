@@ -72,7 +72,7 @@ class JamaEigenvalue implements java.io.Serializable {
      */
     JamaEigenvalue(final RawStore Arg) {
         final double[][] A = Arg.data;
-        n = Arg.getColumnDimension();
+        n = (int) Arg.countColumns();
         V = new double[n][n];
         d = new double[n];
         e = new double[n];
@@ -117,7 +117,7 @@ class JamaEigenvalue implements java.io.Serializable {
 
     JamaEigenvalue(final RawStore Arg, final boolean issymmetric) {
         final double[][] A = Arg.data;
-        n = Arg.getColumnDimension();
+        n = (int) Arg.countColumns();
         V = new double[n][n];
         d = new double[n];
         e = new double[n];

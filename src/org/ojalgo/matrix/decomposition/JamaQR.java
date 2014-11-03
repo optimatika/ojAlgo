@@ -44,9 +44,9 @@ class JamaQR implements java.io.Serializable {
      */
     JamaQR(final RawStore A) {
         // Initialize.
-        QR = A.getArrayCopy();
-        m = A.getRowDimension();
-        n = A.getColumnDimension();
+        QR = A.copyOfData();
+        m = (int) A.countRows();
+        n = (int) A.countColumns();
         Rdiag = new double[n];
 
         // Main loop.
@@ -177,7 +177,7 @@ class JamaQR implements java.io.Serializable {
      * @exception RuntimeException RawStore is rank deficient.
      */
     RawStore solve(final RawStore B) {
-        if (B.getRowDimension() != m) {
+        if ((int) B.countRows() != m) {
             throw new IllegalArgumentException("RawStore row dimensions must agree.");
         }
         if (!this.isFullRank()) {
@@ -185,8 +185,8 @@ class JamaQR implements java.io.Serializable {
         }
 
         // Copy right hand side
-        final int nx = B.getColumnDimension();
-        final double[][] X = B.getArrayCopy();
+        final int nx = (int) B.countColumns();
+        final double[][] X = B.copyOfData();
 
         // Compute Y = transpose(Q)*B
         for (int k = 0; k < n; k++) {

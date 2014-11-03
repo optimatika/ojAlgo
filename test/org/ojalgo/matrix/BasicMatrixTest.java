@@ -200,7 +200,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#getColDim()
+     * @see org.ojalgo.matrix.BasicMatrix#getNumberOfColumns()
      */
     public void testGetColDim() {
 

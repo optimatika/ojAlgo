@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * AbstractDecomposition
- * 
+ *
  * @author apete
  */
 abstract class AbstractDecomposition<N extends Number> implements MatrixDecomposition<N> {
@@ -109,16 +109,16 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
         return this.solve(rhs, preallocated);
     }
 
-    protected final boolean aspectRatioNormal(final boolean aFlag) {
-        return (myAspectRatioNormal = aFlag);
+    protected final boolean aspectRatioNormal(final boolean value) {
+        return (myAspectRatioNormal = value);
     }
 
-    protected final boolean computed(final boolean aState) {
-        return (myComputed = aState);
+    protected final boolean computed(final boolean state) {
+        return (myComputed = state);
     }
 
-    protected final DecompositionStore<N> copy(final Access2D<?> aSource) {
-        return myFactory.copy(aSource);
+    protected final DecompositionStore<N> copy(final Access2D<?> source) {
+        return myFactory.copy(source);
     }
 
     protected final AggregatorCollection<N> getAggregatorCollection() {

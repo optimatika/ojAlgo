@@ -151,6 +151,11 @@ public interface BasicMatrix extends Access2D<Number> {
      */
     BasicMatrix getColumnsRange(final int aFirst, final int aLimit);
 
+    /**
+     * Matrix condition (2-norm)
+     *
+     * @return ratio of largest to smallest singular value.
+     */
     Scalar<?> getCondition();
 
     /**
@@ -313,7 +318,7 @@ public interface BasicMatrix extends Access2D<Number> {
     boolean isFat();
 
     /**
-     * @return true if {@linkplain #getRank()} == min({@linkplain #getRowDim()},{@linkplain #getColDim()})
+     * @return true if {@linkplain #getRank()} == min({@linkplain #getRowDim()},{@linkplain #getNumberOfColumns()})
      */
     boolean isFullRank();
 

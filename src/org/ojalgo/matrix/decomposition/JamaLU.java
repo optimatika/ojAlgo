@@ -70,9 +70,9 @@ class JamaLU implements java.io.Serializable {
 
         // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
 
-        LU = A.getArrayCopy();
-        m = A.getRowDimension();
-        n = A.getColumnDimension();
+        LU = A.copyOfData();
+        m = (int) A.countRows();
+        n = (int) A.countColumns();
         d = Math.min(m, n);
         piv = new int[m];
         for (int i = 0; i < m; i++) {
@@ -246,7 +246,7 @@ class JamaLU implements java.io.Serializable {
      * @exception RuntimeException RawStore is singular.
      */
     RawStore solve(final RawStore B) {
-        if (B.getRowDimension() != m) {
+        if ((int) B.countRows() != m) {
             throw new IllegalArgumentException("RawStore row dimensions must agree.");
         }
         if (!this.isNonsingular()) {
@@ -254,7 +254,7 @@ class JamaLU implements java.io.Serializable {
         }
 
         // Copy right hand side with pivoting
-        final int nx = B.getColumnDimension();
+        final int nx = (int) B.countColumns();
         final RawStore Xmat = B.getMatrix(piv, 0, nx - 1);
         final double[][] X = Xmat.data;
 

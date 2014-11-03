@@ -70,18 +70,18 @@ abstract class InPlaceDecomposition<N extends Number> extends AbstractDecomposit
         return myRowDim;
     }
 
-    final DecompositionStore<N> setInPlace(final Access2D<?> aStore) {
+    final DecompositionStore<N> setInPlace(final Access2D<?> matrix) {
 
-        final int tmpRowDim = (int) aStore.countRows();
-        final int tmpColDim = (int) aStore.countColumns();
+        final int tmpRowDim = (int) matrix.countRows();
+        final int tmpColDim = (int) matrix.countColumns();
 
         if ((myInPlace != null) && (myRowDim == tmpRowDim) && (myColDim == tmpColDim)) {
 
-            myInPlace.fillMatching(aStore);
+            myInPlace.fillMatching(matrix);
 
         } else {
 
-            myInPlace = this.copy(aStore);
+            myInPlace = this.copy(matrix);
 
             myRowDim = tmpRowDim;
             myColDim = tmpColDim;

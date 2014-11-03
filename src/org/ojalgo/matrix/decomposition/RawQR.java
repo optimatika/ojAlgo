@@ -74,7 +74,7 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
 
     @Override
     public RawStore getInverse() {
-        return this.solve(this.makeEyeStore(myDelegate.getQ().getRowDimension(), myDelegate.getR().getColumnDimension()));
+        return this.solve(this.makeEyeStore((int) myDelegate.getQ().countRows(), (int) myDelegate.getR().countColumns()));
     }
 
     public RawStore getQ() {
@@ -106,7 +106,7 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     public boolean isAspectRatioNormal() {
-        return myDelegate.getQ().getRowDimension() >= myDelegate.getR().getColumnDimension();
+        return (int) myDelegate.getQ().countRows() >= (int) myDelegate.getR().countColumns();
 
     }
 

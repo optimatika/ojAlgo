@@ -65,7 +65,7 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
 
     @Override
     public RawStore getInverse() {
-        return this.solve(this.makeEyeStore(myDelegate.getL().getRowDimension(), myDelegate.getU().getColumnDimension()));
+        return this.solve(this.makeEyeStore((int) myDelegate.getL().countRows(), (int) myDelegate.getU().countColumns()));
     }
 
     public RawStore getL() {
@@ -106,7 +106,7 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public boolean isAspectRatioNormal() {
-        return myDelegate.getL().getRowDimension() >= myDelegate.getU().getColumnDimension();
+        return (int) myDelegate.getL().countRows() >= (int) myDelegate.getU().countColumns();
     }
 
     public boolean isComputed() {
@@ -122,7 +122,7 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public boolean isSquareAndNotSingular() {
-        return (myDelegate != null) && (myDelegate.getL().getRowDimension() == myDelegate.getU().getColumnDimension()) && myDelegate.isNonsingular();
+        return (myDelegate != null) && ((int) myDelegate.getL().countRows() == (int) myDelegate.getU().countColumns()) && myDelegate.isNonsingular();
     }
 
     public MatrixStore<Double> reconstruct() {

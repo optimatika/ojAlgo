@@ -51,9 +51,9 @@ class JamaSingularValue implements java.io.Serializable {
 
         // Derived from LINPACK code.
         // Initialize.
-        final double[][] A = Arg.getArrayCopy();
-        m = Arg.getRowDimension();
-        n = Arg.getColumnDimension();
+        final double[][] A = Arg.copyOfData();
+        m = (int) Arg.countRows();
+        n = (int) Arg.countColumns();
 
         /*
          * Apparently the failing cases are only a proper subset of (m<n), so let's not throw error. Correct fix to come

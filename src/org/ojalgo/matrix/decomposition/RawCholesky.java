@@ -68,8 +68,8 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
 
         final RawStore tmpL = myDelegate.getL();
 
-        final int tmpRowDim = tmpL.getRowDimension();
-        final int tmpColDim = tmpL.getColumnDimension();
+        final int tmpRowDim = (int) tmpL.countRows();
+        final int tmpColDim = (int) tmpL.countColumns();
         final int tmpMinDim = Math.min(tmpRowDim, tmpColDim);
 
         final RawStore retVal = new RawStore(new RawStore(tmpRowDim, tmpColDim));
@@ -77,7 +77,9 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         double tmpVal;
         for (int ij = 0; ij < tmpMinDim; ij++) {
             tmpVal = tmpL.get(ij, ij);
-            retVal.update(ij, ij, tmpVal * tmpVal);
+            final int row = ij;
+            final int column = ij;
+            retVal.set(row, column, ((Number) (tmpVal * tmpVal)).doubleValue());
         }
 
         return retVal;
@@ -98,7 +100,7 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
 
     @Override
     public RawStore getInverse() {
-        return this.solve(this.makeEyeStore(myDelegate.getL().getRowDimension(), myDelegate.getL().getColumnDimension()));
+        return this.solve(this.makeEyeStore((int) myDelegate.getL().countRows(), (int) myDelegate.getL().countColumns()));
     }
 
     public RawStore getL() {
@@ -109,8 +111,8 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
 
         final RawStore tmpL = myDelegate.getL();
 
-        final int tmpRowDim = tmpL.getRowDimension();
-        final int tmpColDim = tmpL.getColumnDimension();
+        final int tmpRowDim = (int) tmpL.countRows();
+        final int tmpColDim = (int) tmpL.countColumns();
 
         final RawStore retVal = new RawStore(new RawStore(tmpRowDim, tmpColDim));
 
@@ -118,7 +120,9 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         for (int j = 0; j < tmpColDim; j++) {
             tmpDiagVal = tmpL.get(j, j);
             for (int i = j; i < tmpRowDim; i++) {
-                retVal.update(i, j, tmpL.get(i, j) / tmpDiagVal);
+                final int row = i;
+                final int column = j;
+                retVal.set(row, column, ((Number) (tmpL.get(i, j) / tmpDiagVal)).doubleValue());
             }
         }
 
@@ -130,12 +134,12 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
     }
 
     public RawStore getP() {
-        return this.makeEyeStore(myDelegate.getL().getRowDimension(), myDelegate.getL().getRowDimension());
+        return this.makeEyeStore((int) myDelegate.getL().countRows(), (int) myDelegate.getL().countRows());
         //return MatrixUtils.makeIdentity(PrimitiveDenseStore.FACTORY, myDelegate.getL().getRowDimension());
     }
 
     public int[] getPivotOrder() {
-        return AccessUtils.makeIncreasingRange(0, this.getOldL().getRowDim());
+        return AccessUtils.makeIncreasingRange(0, (int) this.getOldL().countRows());
     }
 
     public RawStore getR() {

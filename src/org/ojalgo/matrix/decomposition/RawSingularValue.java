@@ -206,7 +206,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
 
         RawStore tmpMtrx;
 
-        if (aDelegate.getColumnDimension() <= aDelegate.getRowDimension()) {
+        if ((int) aDelegate.countColumns() <= (int) aDelegate.countRows()) {
             myTransposed = false;
             tmpMtrx = aDelegate;
         } else {

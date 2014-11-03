@@ -68,9 +68,9 @@ class JamaCholesky implements java.io.Serializable {
 
         // Initialize.
         final double[][] A = Arg.data;
-        n = Arg.getRowDimension();
+        n = (int) Arg.countRows();
         L = new double[n][n];
-        isspd = (Arg.getColumnDimension() == n);
+        isspd = ((int) Arg.countColumns() == n);
         // Main loop.
         for (int j = 0; j < n; j++) {
             final double[] Lrowj = L[j];
@@ -121,7 +121,7 @@ class JamaCholesky implements java.io.Serializable {
      * @exception RuntimeException Matrix is not symmetric positive definite.
      */
     RawStore solve(final RawStore B) {
-        if (B.getRowDimension() != n) {
+        if ((int) B.countRows() != n) {
             throw new IllegalArgumentException("Matrix row dimensions must agree.");
         }
         if (!isspd) {
@@ -129,8 +129,8 @@ class JamaCholesky implements java.io.Serializable {
         }
 
         // Copy right hand side.
-        final double[][] X = B.getArrayCopy();
-        final int nx = B.getColumnDimension();
+        final double[][] X = B.copyOfData();
+        final int nx = (int) B.countColumns();
 
         // Solve L*Y = B;
         for (int k = 0; k < n; k++) {

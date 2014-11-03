@@ -35,11 +35,19 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class RawDecomposition implements MatrixDecomposition<Double> {
 
-    static RawStore cast(final Access2D<?> aStore) {
-        if (aStore instanceof RawStore) {
-            return ((RawStore) aStore);
+    static RawStore cast(final Access2D<?> access) {
+        if (access instanceof RawStore) {
+            return ((RawStore) access);
         } else {
-            return new RawStore(ArrayUtils.toRawCopyOf(aStore));
+            return new RawStore(ArrayUtils.toRawCopyOf(access));
+        }
+    }
+
+    static double[][] extract(final Access2D<?> access) {
+        if (access instanceof RawStore) {
+            return ((RawStore) access).data;
+        } else {
+            return ArrayUtils.toRawCopyOf(access);
         }
     }
 
@@ -112,7 +120,7 @@ abstract class RawDecomposition implements MatrixDecomposition<Double> {
     }
 
     protected RawStore makeEyeStore(final int aRowDim, final int aColDim) {
-        return new RawStore(RawStore.identity(aRowDim, aColDim));
+        return new RawStore(RawStore.FACTORY.makeEye(aRowDim, aColDim));
     }
 
     abstract boolean compute(RawStore aDelegate);
