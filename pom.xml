@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<projekt>
+<project>
+    <modelVersion>4.0.0</modelVersion>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>35</version>
+    <packaging>jar</packaging>
+    <version>37</version>
     <name>oj! Algorithms</name>
     <organization>
     	<url>http://optimatika.se/</url>
@@ -10,4 +12,22 @@
     </organization>
     <url>http://ojalgo.org/</url>
     <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation; particularly (but certainly not exclusively) suitable for the financial domain. </description>
-</projekt>
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+	        <artifactId>maven-compiler-plugin</artifactId>
+		<version>3.0</version>
+	        <configuration>
+	            <source>1.8</source>
+	            <target>1.8</target>
+	        </configuration>
+	    </plugin>
+        </plugins>
+    </build>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+</project>
