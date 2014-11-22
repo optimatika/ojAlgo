@@ -73,13 +73,17 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return (value.signum() == 0) || BigScalar.CONTEXT.isSmall(comparedTo, value.doubleValue());
     }
 
+    public static BigScalar valueOf(final double value) {
+        return new BigScalar(BigDecimal.valueOf(value));
+    }
+
     private final BigDecimal myNumber;
 
-    public BigScalar(final BigDecimal aNmbr) {
+    public BigScalar(final BigDecimal number) {
 
         super();
 
-        myNumber = aNmbr;
+        myNumber = number;
     }
 
     public BigScalar(final Number aNmbr) {
@@ -116,7 +120,7 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return new BigScalar(myNumber.divide(arg, BigScalar.CONTEXT.getMathContext()));
     }
 
-    public Scalar<BigDecimal> divide(final double arg) {
+    public BigScalar divide(final double arg) {
         return this.divide(new BigDecimal(arg));
     }
 
@@ -194,7 +198,7 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return new BigScalar(myNumber.multiply(arg));
     }
 
-    public Scalar<BigDecimal> multiply(final double arg) {
+    public BigScalar multiply(final double arg) {
         return this.multiply(new BigDecimal(arg));
     }
 
@@ -214,7 +218,7 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return new BigScalar(myNumber.subtract(arg));
     }
 
-    public Scalar<BigDecimal> subtract(final double arg) {
+    public BigScalar subtract(final double arg) {
         return this.subtract(new BigDecimal(arg));
     }
 

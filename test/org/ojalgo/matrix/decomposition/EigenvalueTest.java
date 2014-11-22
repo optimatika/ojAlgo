@@ -121,7 +121,7 @@ public class EigenvalueTest extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpOriginalMatrix = P20061119Case.getProblematic().toPrimitiveStore();
 
-        final ComplexNumber tmp00 = ComplexNumber.makeReal(26.14421883828456);
+        final ComplexNumber tmp00 = ComplexNumber.valueOf(26.14421883828456);
         final ComplexNumber tmp11 = ComplexNumber.makeRectangular(2.727890580857718, 3.6223578444417908);
         final ComplexNumber tmp22 = tmp11.conjugate();
         final ComplexNumber tmp33 = ComplexNumber.ZERO;

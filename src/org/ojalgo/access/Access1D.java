@@ -21,6 +21,7 @@
  */
 package org.ojalgo.access;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.BaseStream;
 import java.util.stream.StreamSupport;
@@ -115,6 +116,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     double doubleValue(long index);
 
     N get(long index);
+
+    default Iterator<N> iterator() {
+        return new Iterator1D<>(this);
+    }
 
     default BaseStream<N, ? extends BaseStream<N, ?>> stream(final boolean parallel) {
         return StreamSupport.stream(this.spliterator(), parallel);

@@ -128,7 +128,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
                 data[i + tmpColBase] = tmpVector[i] = ComplexFunction.DIVIDE.invoke(tmpVector[i], tmpScale);
             }
 
-            destination.beta = ComplexNumber.makeReal(tmpScale.norm() / tmpNorm2);
+            destination.beta = ComplexNumber.valueOf(tmpScale.norm() / tmpNorm2);
         }
 
         return retVal;

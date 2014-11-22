@@ -281,23 +281,21 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
         @Override
         public final double invoke(final double arg, int param) {
 
-            double retVal = ONE;
-
             if (param < 0) {
 
-                retVal = INVERT.invoke(POWER.invoke(arg, -param));
+                return INVERT.invoke(POWER.invoke(arg, -param));
 
             } else {
 
+                double retVal = ONE;
+
                 while (param > 0) {
-
                     retVal = retVal * arg;
-
                     param--;
                 }
-            }
 
-            return retVal;
+                return retVal;
+            }
         }
 
     };

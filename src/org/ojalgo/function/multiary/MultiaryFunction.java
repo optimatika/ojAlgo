@@ -21,12 +21,14 @@
  */
 package org.ojalgo.function.multiary;
 
+import java.util.function.Function;
+
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-public interface MultiaryFunction<N extends Number> extends BasicFunction<N> {
+public interface MultiaryFunction<N extends Number> extends BasicFunction<N>, Function<Access1D<N>, N> {
 
     public static interface Constant<N extends Number, F extends Constant<N, ?>> extends MultiaryFunction<N> {
 
@@ -86,6 +88,10 @@ public interface MultiaryFunction<N extends Number> extends BasicFunction<N> {
 
         SecondOrderApproximation<N> toSecondOrderApproximation(final Access1D<N> point);
 
+    }
+
+    default N apply(final Access1D<N> arg) {
+        return this.invoke(arg);
     }
 
     int arity();

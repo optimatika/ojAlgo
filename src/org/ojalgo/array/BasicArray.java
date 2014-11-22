@@ -37,6 +37,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 
@@ -54,7 +55,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-Access1D.Visitable<N>, Serializable {
+        Access1D.Visitable<N>, Serializable {
 
     static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -129,6 +130,25 @@ Access1D.Visitable<N>, Serializable {
         @Override
         SparseFactory<ComplexNumber> getSparseFactory() {
             return SparseArray.COMPLEX;
+        }
+
+    };
+
+    static final BasicFactory<Quaternion> QUATERNION = new BasicFactory<Quaternion>() {
+
+        @Override
+        DenseFactory<Quaternion> getDenseFactory() {
+            return QuaternionArray.FACTORY;
+        }
+
+        @Override
+        SegmentedFactory<Quaternion> getSegmentedFactory() {
+            return SegmentedArray.QUATERNION;
+        }
+
+        @Override
+        SparseFactory<Quaternion> getSparseFactory() {
+            return SparseArray.QUATERNION;
         }
 
     };

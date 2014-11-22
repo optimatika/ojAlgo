@@ -84,6 +84,10 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
 
     private final double myValue;
 
+    public static PrimitiveScalar valueOf(final double value) {
+        return new PrimitiveScalar(value);
+    }
+
     public PrimitiveScalar(final double aVal) {
 
         super();
@@ -106,7 +110,7 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
         myValue = PrimitiveMath.ZERO;
     }
 
-    public Scalar<Double> add(final double arg) {
+    public PrimitiveScalar add(final double arg) {
         return new PrimitiveScalar(myValue + arg);
     }
 

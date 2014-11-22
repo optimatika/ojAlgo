@@ -87,11 +87,11 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
     @Deprecated
     void caxpy(final N scalarA, final int columnX, final int columnY, final int firstRow);
 
-    void exchangeColumns(int aColA, int aColB);
+    void exchangeColumns(int colA, int colB);
 
-    void exchangeRows(int aRowA, int aRowB);
+    void exchangeRows(int rowA, int rowB);
 
-    void fillByMultiplying(final Access1D<N> leftMtrx, final Access1D<N> rightMtrx);
+    void fillByMultiplying(final Access1D<N> leftMatrix, final Access1D<N> rightMatrix);
 
     void fillConjugated(Access2D<? extends Number> source);
 

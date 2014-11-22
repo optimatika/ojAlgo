@@ -57,6 +57,10 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
     }
 
+    public static RationalFunction getSet() {
+        return SET;
+    }
+
     public static final UnaryFunction<RationalNumber> ABS = new Unary() {
 
         public final RationalNumber invoke(final RationalNumber arg) {
@@ -317,7 +321,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
         @Override
         public final RationalNumber invoke(final RationalNumber arg1, final RationalNumber arg2) {
-            return RationalFunction.EXP.invoke(arg2.multiply(RationalFunction.LOG.invoke(arg1)));
+            return EXP.invoke(LOG.invoke(arg1).multiply(arg2));
         }
     };
 
@@ -457,10 +461,6 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     };
 
     private static final RationalFunction SET = new RationalFunction();
-
-    public static RationalFunction getSet() {
-        return SET;
-    }
 
     private RationalFunction() {
         super();

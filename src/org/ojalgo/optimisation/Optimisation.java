@@ -322,6 +322,9 @@ public interface Optimisation {
             return myState;
         }
 
+        /**
+         * Objective Function Value
+         */
         public double getValue() {
             return myValue;
         }

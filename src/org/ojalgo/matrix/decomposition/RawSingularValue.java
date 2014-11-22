@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -109,7 +108,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
                 }
             }
 
-            myPseudoinverse = new RawStore(this.getQ2().times(tmpMtrx));
+            myPseudoinverse = new RawStore(this.getQ2().multiplyRight(tmpMtrx));
         }
 
         return myPseudoinverse;
@@ -189,7 +188,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
      */
     @Override
     public RawStore solve(final Access2D<Double> rhs) {
-        return this.getInverse().multiplyRight((Access1D<Double>) rhs);
+        return this.getInverse().multiplyRight(rhs);
     }
 
     @Override

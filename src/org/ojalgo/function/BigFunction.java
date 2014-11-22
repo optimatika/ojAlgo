@@ -62,6 +62,10 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     }
 
+    public static BigFunction getSet() {
+        return SET;
+    }
+
     public static final UnaryFunction<BigDecimal> ABS = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
@@ -264,7 +268,17 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg1, final BigDecimal arg2) {
-            return BigDecimal.valueOf(PrimitiveFunction.POW.invoke(arg1.doubleValue(), arg2.doubleValue()));
+            if (arg1.signum() == 0) {
+                return ZERO;
+            } else if (arg2.signum() == 0) {
+                return ONE;
+            } else if (arg2.compareTo(ONE) == 0) {
+                return arg1;
+            } else if (arg1.signum() == -1) {
+                throw new IllegalArgumentException();
+            } else {
+                return EXP.invoke(LOG.invoke(arg1).multiply(arg2));
+            }
         }
 
     };
@@ -398,13 +412,9 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
         }
 
     };
-
     private static final MathContext CONTEXT = MathContext.DECIMAL128;
-    private static final BigFunction SET = new BigFunction();
 
-    public static BigFunction getSet() {
-        return SET;
-    }
+    private static final BigFunction SET = new BigFunction();
 
     private BigFunction() {
         super();

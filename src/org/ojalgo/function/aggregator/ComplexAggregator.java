@@ -45,7 +45,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public ComplexNumber getNumber() {
-                    return ComplexNumber.makeReal(myCount);
+                    return ComplexNumber.valueOf(myCount);
                 }
 
                 public int intValue() {
@@ -59,7 +59,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -108,7 +108,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -155,7 +155,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -203,7 +203,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -239,7 +239,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public ComplexNumber getNumber() {
-                    return ComplexNumber.makeReal(Math.sqrt(myNumber.norm()));
+                    return ComplexNumber.valueOf(Math.sqrt(myNumber.norm()));
                 }
 
                 public int intValue() {
@@ -252,7 +252,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -300,7 +300,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -348,7 +348,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -402,7 +402,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -453,7 +453,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -501,7 +501,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {
@@ -549,7 +549,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(ComplexNumber.makeReal(anArg));
+                    this.invoke(ComplexNumber.valueOf(anArg));
                 }
 
                 public void merge(final ComplexNumber result) {

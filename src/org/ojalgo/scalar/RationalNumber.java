@@ -32,6 +32,10 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
 
 public final class RationalNumber extends Number implements Scalar<RationalNumber>, Enforceable<RationalNumber> {
 
+    public static RationalNumber valueOf(final double value) {
+        return new RationalNumber(BigDecimal.valueOf(value));
+    }
+
     public static final Scalar.Factory<RationalNumber> FACTORY = new Scalar.Factory<RationalNumber>() {
 
         public RationalNumber cast(final double value) {

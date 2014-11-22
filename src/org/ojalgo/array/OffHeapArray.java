@@ -41,6 +41,7 @@ import sun.misc.Unsafe;
  *
  * @author apete
  */
+@SuppressWarnings("restriction")
 public final class OffHeapArray extends BasicArray<Double> {
 
     static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {

@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -163,7 +162,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
                 }
             }
 
-            myInverse = new RawStore(this.getV().times(tmpMtrx));
+            myInverse = new RawStore(this.getV().multiplyRight(tmpMtrx));
         }
 
         return myInverse;
@@ -217,7 +216,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
 
     @Override
     public RawStore solve(final Access2D<Double> rhs) {
-        return this.getInverse().multiplyRight((Access1D<Double>) rhs);
+        return this.getInverse().multiplyRight(rhs);
     }
 
     @Override

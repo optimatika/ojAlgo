@@ -248,7 +248,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
 
         public Rotation.Complex makeRotation(final int low, final int high, final double cos, final double sin) {
-            return this.makeRotation(low, high, ComplexNumber.makeReal(cos), ComplexNumber.makeReal(sin));
+            return this.makeRotation(low, high, ComplexNumber.valueOf(cos), ComplexNumber.valueOf(sin));
         }
 
         public ComplexDenseStore makeZero(final long rows, final long columns) {
@@ -562,12 +562,12 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
-    public void exchangeColumns(final int aColA, final int aColB) {
-        myUtility.exchangeColumns(aColA, aColB);
+    public void exchangeColumns(final int colA, final int colB) {
+        myUtility.exchangeColumns(colA, colB);
     }
 
-    public void exchangeRows(final int aRowA, final int aRowB) {
-        myUtility.exchangeRows(aRowA, aRowB);
+    public void exchangeRows(final int rowA, final int rowB) {
+        myUtility.exchangeRows(rowA, rowB);
     }
 
     public PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> factory() {

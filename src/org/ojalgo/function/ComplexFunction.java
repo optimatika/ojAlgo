@@ -30,7 +30,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static interface Binary extends BinaryFunction<ComplexNumber> {
 
         default double invoke(final double arg1, final double arg2) {
-            return this.invoke(ComplexNumber.makeReal(arg1), ComplexNumber.makeReal(arg2)).doubleValue();
+            return this.invoke(ComplexNumber.valueOf(arg1), ComplexNumber.valueOf(arg2)).doubleValue();
         }
 
     }
@@ -38,7 +38,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static interface Parameter extends ParameterFunction<ComplexNumber> {
 
         default double invoke(final double arg, final int param) {
-            return this.invoke(ComplexNumber.makeReal(arg), param).doubleValue();
+            return this.invoke(ComplexNumber.valueOf(arg), param).doubleValue();
         }
 
     }
@@ -46,15 +46,27 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static interface Unary extends UnaryFunction<ComplexNumber> {
 
         default double invoke(final double arg) {
-            return this.invoke(ComplexNumber.makeReal(arg)).doubleValue();
+            return this.invoke(ComplexNumber.valueOf(arg)).doubleValue();
         }
 
+    }
+
+    public static ComplexFunction getSet() {
+        return SET;
+    }
+
+    private static ComplexNumber doInvSinAndCosPart1(final ComplexNumber aNumber) {
+        return SQRT.invoke(ComplexNumber.ONE.subtract(ComplexFunction.POWER.invoke(aNumber, 2)));
+    }
+
+    private static ComplexNumber doInvSinAndCosPart2(final ComplexNumber aNumber) {
+        return LOG.invoke(aNumber).multiply(ComplexNumber.I).negate();
     }
 
     public static final UnaryFunction<ComplexNumber> ABS = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return ComplexNumber.makeReal(arg.norm());
+            return ComplexNumber.valueOf(arg.norm());
         }
 
     };
@@ -183,7 +195,8 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final double retMod = Math.exp(arg.doubleValue());
+            final double tmpDoubleValue = arg.doubleValue();
+            final double retMod = Math.exp(tmpDoubleValue);
             final double retArg = arg.i;
 
             return ComplexNumber.makePolar(retMod, retArg);
@@ -207,7 +220,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
-            return ComplexNumber.makeReal(Math.hypot(arg1.norm(), arg2.norm()));
+            return ComplexNumber.valueOf(Math.hypot(arg1.norm(), arg2.norm()));
         }
 
     };
@@ -224,7 +237,8 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final double retRe = Math.log(arg.norm());
+            final double tmpNorm = arg.norm();
+            final double retRe = Math.log(tmpNorm);
             final double retIm = arg.phase();
 
             return ComplexNumber.makeRectangular(retRe, retIm);
@@ -313,7 +327,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
-            return ComplexFunction.EXP.invoke(arg2.multiply(ComplexFunction.LOG.invoke(arg1)));
+            return EXP.invoke(LOG.invoke(arg1).multiply(arg2));
         }
 
     };
@@ -459,18 +473,6 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     };
 
     private static final ComplexFunction SET = new ComplexFunction();
-
-    public static ComplexFunction getSet() {
-        return SET;
-    }
-
-    private static ComplexNumber doInvSinAndCosPart1(final ComplexNumber aNumber) {
-        return SQRT.invoke(ComplexNumber.ONE.subtract(ComplexFunction.POWER.invoke(aNumber, 2)));
-    }
-
-    private static ComplexNumber doInvSinAndCosPart2(final ComplexNumber aNumber) {
-        return LOG.invoke(aNumber).multiply(ComplexNumber.I).negate();
-    }
 
     private ComplexFunction() {
         super();

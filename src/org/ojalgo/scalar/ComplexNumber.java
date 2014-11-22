@@ -44,7 +44,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 
         public ComplexNumber cast(final double value) {
-            return ComplexNumber.makeReal(value);
+            return ComplexNumber.valueOf(value);
         }
 
         public ComplexNumber cast(final Number number) {
@@ -52,7 +52,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         }
 
         public ComplexNumber convert(final double value) {
-            return ComplexNumber.makeReal(value);
+            return ComplexNumber.valueOf(value);
         }
 
         public ComplexNumber convert(final Number number) {
@@ -71,10 +71,10 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
 
     public static final ComplexNumber I = ComplexNumber.makeRectangular(PrimitiveMath.ZERO, PrimitiveMath.ONE);
     public static final ComplexNumber INFINITY = ComplexNumber.makePolar(Double.POSITIVE_INFINITY, PrimitiveMath.ZERO);
-    public static final ComplexNumber NEG = ComplexNumber.makeReal(PrimitiveMath.NEG);
-    public static final ComplexNumber ONE = ComplexNumber.makeReal(PrimitiveMath.ONE);
-    public static final ComplexNumber TWO = ComplexNumber.makeReal(PrimitiveMath.TWO);
-    public static final ComplexNumber ZERO = ComplexNumber.makeReal(PrimitiveMath.ZERO);
+    public static final ComplexNumber NEG = ComplexNumber.valueOf(PrimitiveMath.NEG);
+    public static final ComplexNumber ONE = ComplexNumber.valueOf(PrimitiveMath.ONE);
+    public static final ComplexNumber TWO = ComplexNumber.valueOf(PrimitiveMath.TWO);
+    public static final ComplexNumber ZERO = ComplexNumber.valueOf(PrimitiveMath.ZERO);
 
     private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
     private static final String LEFT = "(";
@@ -100,6 +100,14 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
 
     public static boolean isSmall(final double comparedTo, final ComplexNumber value) {
         return value.isSmall(comparedTo);
+    }
+
+    /**
+     * @deprecated v38
+     */
+    @Deprecated
+    public static ComplexNumber makeReal(final double value) {
+        return ComplexNumber.valueOf(value);
     }
 
     public static ComplexNumber makePolar(final double modulus, final double argument) {
@@ -139,8 +147,8 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         }
     }
 
-    public static ComplexNumber makeReal(final double real) {
-        return new ComplexNumber(real);
+    public static ComplexNumber valueOf(final double value) {
+        return new ComplexNumber(value);
     }
 
     public static ComplexNumber makeRectangular(final double real, final double imaginary) {

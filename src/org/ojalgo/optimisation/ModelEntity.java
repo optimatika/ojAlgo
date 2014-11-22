@@ -200,14 +200,14 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
         return myUpperLimit != null;
     }
 
-    public final ME level(final Number aLowerAndUpperLimit) {
-        return this.lower(aLowerAndUpperLimit).upper(aLowerAndUpperLimit);
+    public final ME level(final Number level) {
+        return this.lower(level).upper(level);
     }
 
     @SuppressWarnings("unchecked")
-    public final ME lower(final Number lowerLimit) {
-        if (lowerLimit != null) {
-            myLowerLimit = TypeUtils.toBigDecimal(lowerLimit);
+    public final ME lower(final Number lower) {
+        if (lower != null) {
+            myLowerLimit = TypeUtils.toBigDecimal(lower);
         } else {
             myLowerLimit = null;
         }
@@ -225,9 +225,9 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     @SuppressWarnings("unchecked")
-    public final ME upper(final Number upperLimit) {
-        if (upperLimit != null) {
-            myUpperLimit = TypeUtils.toBigDecimal(upperLimit);
+    public final ME upper(final Number upper) {
+        if (upper != null) {
+            myUpperLimit = TypeUtils.toBigDecimal(upper);
         } else {
             myUpperLimit = null;
         }
@@ -235,8 +235,8 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     }
 
     @SuppressWarnings("unchecked")
-    public final ME weight(final Number contributionWeight) {
-        final BigDecimal tmpWeight = TypeUtils.toBigDecimal(contributionWeight);
+    public final ME weight(final Number weight) {
+        final BigDecimal tmpWeight = TypeUtils.toBigDecimal(weight);
         if ((tmpWeight != null) && (tmpWeight.signum() != 0)) {
             myContributionWeight = tmpWeight;
         } else {

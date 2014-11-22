@@ -315,7 +315,7 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
 
     @Override
     protected final void set(final int index, final double value) {
-        data[index] = ComplexNumber.makeReal(value);
+        data[index] = ComplexNumber.valueOf(value);
     }
 
     @Override

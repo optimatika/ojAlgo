@@ -188,7 +188,7 @@ public interface Householder<N extends Number> extends Access1D<N> {
                 tmpVector[i] = tmpNmbr;
             }
 
-            beta = ComplexNumber.makeReal(PrimitiveMath.TWO / tmpVal2);
+            beta = ComplexNumber.valueOf(PrimitiveMath.TWO / tmpVal2);
 
             return this;
         }

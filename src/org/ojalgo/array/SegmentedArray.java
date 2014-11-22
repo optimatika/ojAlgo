@@ -33,6 +33,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 
@@ -133,6 +134,20 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     };
 
+    static final SegmentedFactory<Quaternion> QUATERNION = new SegmentedFactory<Quaternion>() {
+
+        @Override
+        DenseFactory<Quaternion> getDenseFactory() {
+            return QuaternionArray.FACTORY;
+        }
+
+        @Override
+        SparseFactory<Quaternion> getSparseFactory() {
+            return SparseArray.QUATERNION;
+        }
+
+    };
+
     static final SegmentedFactory<RationalNumber> RATIONAL = new SegmentedFactory<RationalNumber>() {
 
         @Override
@@ -169,6 +184,14 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     public static SegmentedArray<Double> makePrimitiveSparse(final long count) {
         return PRIMITIVE.makeSegmented(SparseArray.PRIMITIVE, count);
+    }
+
+    public static SegmentedArray<Quaternion> makeQuaternionDense(final long count) {
+        return QUATERNION.makeSegmented(BasicArray.QUATERNION, count);
+    }
+
+    public static SegmentedArray<Quaternion> makeQuaternionSparse(final long count) {
+        return QUATERNION.makeSegmented(SparseArray.QUATERNION, count);
     }
 
     public static SegmentedArray<RationalNumber> makeRationalDense(final long count) {

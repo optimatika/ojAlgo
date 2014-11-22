@@ -21,6 +21,11 @@
  */
 package org.ojalgo.function;
 
+/**
+ * A predefined/standard set of functions.
+ *
+ * @author apete
+ */
 public abstract class FunctionSet<N extends Number> {
 
     protected FunctionSet() {

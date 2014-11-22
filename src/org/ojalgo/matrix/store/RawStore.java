@@ -51,11 +51,6 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.RawCholesky;
-import org.ojalgo.matrix.decomposition.RawEigenvalue;
-import org.ojalgo.matrix.decomposition.RawLU;
-import org.ojalgo.matrix.decomposition.RawQR;
-import org.ojalgo.matrix.decomposition.RawSingularValue;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.random.RandomNumber;
@@ -429,6 +424,19 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
+    private static RawStore convert(final Access2D<?> elements) {
+
+        RawStore retVal = null;
+
+        if (elements instanceof RawStore) {
+            retVal = ((RawStore) elements);
+        } else {
+            retVal = new RawStore(ArrayUtils.toRawCopyOf(elements), (int) elements.countRows(), (int) elements.countColumns());
+        }
+
+        return retVal;
+    }
+
     private static double[][] extract(final Access1D<?> elements, final int structure) {
 
         double[][] retVal = null;
@@ -458,19 +466,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
                     tmpRow[j] = elements.doubleValue(i + (j * structure));
                 }
             }
-        }
-
-        return retVal;
-    }
-
-    private static RawStore convert(final Access2D<?> elements) {
-
-        RawStore retVal = null;
-
-        if (elements instanceof RawStore) {
-            retVal = ((RawStore) elements);
-        } else {
-            retVal = new RawStore(ArrayUtils.toRawCopyOf(elements), (int) elements.countRows(), (int) elements.countColumns());
         }
 
         return retVal;
@@ -610,45 +605,11 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         myNumberOfColumns = numberOfColumns;
     }
 
-    public RawStore add(final Access2D<?> aMtrx) {
-        final RawStore B = RawStore.convert(aMtrx);
-        this.checkMatrixDimensions(B);
-        final RawStore X = new RawStore(data.length, myNumberOfColumns);
-        final double[][] C = X.data;
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < myNumberOfColumns; j++) {
-                C[i][j] = data[i][j] + B.data[i][j];
-            }
-        }
-        return X;
-    }
-
-    public RawStore add(final int row, final int column, final Access2D<?> aMtrx) {
-
-        final double[][] tmpArrayCopy = this.copyOfData();
-
-        double[] tmpLocalRowRef;
-        for (int i = 0; i < aMtrx.countRows(); i++) {
-            tmpLocalRowRef = tmpArrayCopy[row + i];
-            for (int j = 0; j < aMtrx.countColumns(); j++) {
-                tmpLocalRowRef[column + j] = aMtrx.doubleValue(i, j);
-            }
-        }
-
-        return new RawStore(tmpArrayCopy);
-    }
-
-    public RawStore add(final int row, final int column, final Number aNmbr) {
-
-        final double[][] tmpArrayCopy = this.copyOfData();
-        tmpArrayCopy[row][column] += aNmbr.doubleValue();
-
-        return new RawStore(tmpArrayCopy);
-    }
-
     public MatrixStore<Double> add(final MatrixStore<Double> addend) {
         final RawStore B = RawStore.convert(addend);
-        this.checkMatrixDimensions(B);
+        if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
+            throw new IllegalArgumentException("RawStore dimensions must agree.");
+        }
         final RawStore X = new RawStore(data.length, myNumberOfColumns);
         final double[][] C = X.data;
         for (int i = 0; i < data.length; i++) {
@@ -665,7 +626,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
         this.visitAll(tmpVisitor);
 
-        return tmpVisitor.doubleValue();
+        return tmpVisitor.getNumber();
     }
 
     public List<Double> asList() {
@@ -704,7 +665,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         final double tmpValA = scalarA.doubleValue();
         final double[][] tmpArray = data;
 
-        final int tmpRowDim = (int) this.countRows();
+        final int tmpRowDim = data.length;
 
         for (int i = firstRow; i < tmpRowDim; i++) {
             tmpArray[i][columnY] += tmpValA * tmpArray[i][columnX];
@@ -730,6 +691,20 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return new RawStore(this.copyOfData(), myNumberOfColumns);
     }
 
+    /**
+     * Copy the internal two-dimensional array.
+     *
+     * @return Two-dimensional array copy of matrix elements.
+     */
+    public double[][] copyOfData() {
+        final int tmpLength = data.length;
+        final double[][] retVal = new double[tmpLength][];
+        for (int i = 0; i < tmpLength; i++) {
+            retVal[i] = ArrayUtils.copyOf(data[i]);
+        }
+        return retVal;
+    }
+
     public long count() {
         return data.length * myNumberOfColumns;
     }
@@ -743,7 +718,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public double doubleValue(final long anInd) {
-        return this.get(AccessUtils.row((int) anInd, (int) this.countRows()), AccessUtils.column((int) anInd, (int) this.countRows()));
+        return this.get(AccessUtils.row((int) anInd, data.length), AccessUtils.column((int) anInd, data.length));
     }
 
     public double doubleValue(final long row, final long column) {
@@ -766,12 +741,12 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    public void exchangeColumns(final int aColA, final int aColB) {
-        ArrayUtils.exchangeColumns(data, aColA, aColB);
+    public void exchangeColumns(final int colA, final int colB) {
+        ArrayUtils.exchangeColumns(data, colA, colB);
     }
 
-    public void exchangeRows(final int aRowA, final int aRowB) {
-        ArrayUtils.exchangeRows(data, aRowA, aRowB);
+    public void exchangeRows(final int rowA, final int rowB) {
+        ArrayUtils.exchangeRows(data, rowA, rowB);
     }
 
     public PhysicalStore.Factory<Double, RawStore> factory() {
@@ -782,19 +757,32 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.fillAll(data, aNmbr);
     }
 
-    public void fillByMultiplying(final Access1D<Double> aLeftArg, final Access1D<Double> aRightArg) {
+    public void fillByMultiplying(final Access1D<Double> leftMatrix, final Access1D<Double> rightMatrix) {
+        final double[][] tmpLeft = RawStore.extract(leftMatrix, data.length);
+        final double[][] tmpRight = RawStore.extract(rightMatrix, (int) (leftMatrix.count() / data.length));
+        RawStore.multiply(data, tmpLeft, tmpRight);
+    }
 
-        final RawStore tmpLeft = RawStore.convert(aLeftArg, (int) this.countRows());
-        final RawStore tmpRight = RawStore.convert(aRightArg, (int) tmpLeft.countColumns());
+    private static void multiply(final double[][] product, final double[][] left, final double[][] right) {
 
-        try {
-            for (int i = 0; i <= ((int) this.countRows() - 1); i++) {
-                for (int j = 0; j <= ((int) this.countColumns() - 1); j++) {
-                    data[i][j] = tmpLeft.times(tmpRight).get(i - 0, j - 0);
-                }
+        final int tmpRowsCount = product.length;
+        final int tmpComplexity = right.length;
+        final int tmpColsCount = right[0].length;
+
+        double[] tmpRow;
+        final double[] tmpColumn = new double[tmpComplexity];
+        for (int j = 0; j < tmpColsCount; j++) {
+            for (int k = 0; k < tmpComplexity; k++) {
+                tmpColumn[k] = right[k][j];
             }
-        } catch (final ArrayIndexOutOfBoundsException e) {
-            throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+            for (int i = 0; i < tmpRowsCount; i++) {
+                tmpRow = left[i];
+                double tmpVal = 0.0;
+                for (int k = 0; k < tmpComplexity; k++) {
+                    tmpVal += tmpRow[k] * tmpColumn[k];
+                }
+                product[i][j] = tmpVal;
+            }
         }
     }
 
@@ -814,10 +802,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
         final double[][] tmpDelegateArray = data;
 
-        final int tmpRowDim = (int) this.countRows();
+        final int tmpRowDim = data.length;
 
         for (int i = 0; i < tmpRowDim; i++) {
-            for (int j = 0; j < (int) this.countColumns(); j++) {
+            for (int j = 0; j < myNumberOfColumns; j++) {
                 tmpDelegateArray[i][j] = source.doubleValue(i + (j * tmpRowDim));
             }
         }
@@ -826,89 +814,96 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     public void fillMatching(final Access1D<Double> leftArg, final BinaryFunction<Double> function, final Access1D<Double> rightArg) {
         if (leftArg == this) {
             if (function == ADD) {
-                final RawStore B = RawStore.convert(rightArg, (int) this.countRows());
-                this.checkMatrixDimensions(B);
+                final RawStore B = RawStore.convert(rightArg, data.length);
+                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
+                    throw new IllegalArgumentException("RawStore dimensions must agree.");
+                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = data[i][j] + B.data[i][j];
                     }
                 }
-                final RawStore plusEquals = this;
             } else if (function == DIVIDE) {
-                final RawStore B = RawStore.convert(rightArg, (int) this.countRows());
-                this.checkMatrixDimensions(B);
+                final RawStore B = RawStore.convert(rightArg, data.length);
+                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
+                    throw new IllegalArgumentException("RawStore dimensions must agree.");
+                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = data[i][j] / B.data[i][j];
                     }
                 }
-                final RawStore arrayRightDivideEquals = this;
             } else if (function == MULTIPLY) {
-                final RawStore B = RawStore.convert(rightArg, (int) this.countRows());
-                this.checkMatrixDimensions(B);
+                final RawStore B = RawStore.convert(rightArg, data.length);
+                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
+                    throw new IllegalArgumentException("RawStore dimensions must agree.");
+                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = data[i][j] * B.data[i][j];
                     }
                 }
-                final RawStore arrayTimesEquals = this;
             } else if (function == SUBTRACT) {
-                final RawStore B = RawStore.convert(rightArg, (int) this.countRows());
-                this.checkMatrixDimensions(B);
+                final RawStore B = RawStore.convert(rightArg, data.length);
+                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
+                    throw new IllegalArgumentException("RawStore dimensions must agree.");
+                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = data[i][j] - B.data[i][j];
                     }
                 }
-                final RawStore minusEquals = this;
             } else {
-                ArrayUtils.fillMatching(data, data, function, RawStore.convert(rightArg, (int) this.countRows()).data);
+                ArrayUtils.fillMatching(data, data, function, RawStore.convert(rightArg, data.length).data);
             }
         } else if (rightArg == this) {
             if (function == ADD) {
-                final RawStore B = RawStore.convert(leftArg, (int) this.countRows());
-                this.checkMatrixDimensions(B);
+                final RawStore B = RawStore.convert(leftArg, data.length);
+                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
+                    throw new IllegalArgumentException("RawStore dimensions must agree.");
+                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = data[i][j] + B.data[i][j];
                     }
                 }
-                final RawStore plusEquals = this;
             } else if (function == DIVIDE) {
-                final RawStore B = RawStore.convert(leftArg, (int) this.countRows());
-                this.checkMatrixDimensions(B);
+                final RawStore B = RawStore.convert(leftArg, data.length);
+                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
+                    throw new IllegalArgumentException("RawStore dimensions must agree.");
+                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = B.data[i][j] / data[i][j];
                     }
+
                 }
-                final RawStore arrayLeftDivideEquals = this;
             } else if (function == MULTIPLY) {
-                final RawStore B = RawStore.convert(leftArg, (int) this.countRows());
-                this.checkMatrixDimensions(B);
+                final RawStore B = RawStore.convert(leftArg, data.length);
+                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
+                    throw new IllegalArgumentException("RawStore dimensions must agree.");
+                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
                         data[i][j] = data[i][j] * B.data[i][j];
                     }
                 }
-                final RawStore arrayTimesEquals = this;
             } else if (function == SUBTRACT) {
-                ArrayUtils.fillMatching(data, RawStore.convert(leftArg, (int) this.countRows()).data, function, data);
+                ArrayUtils.fillMatching(data, RawStore.convert(leftArg, data.length).data, function, data);
             } else {
-                ArrayUtils.fillMatching(data, RawStore.convert(leftArg, (int) this.countRows()).data, function, data);
+                ArrayUtils.fillMatching(data, RawStore.convert(leftArg, data.length).data, function, data);
             }
         } else {
-            ArrayUtils.fillMatching(data, RawStore.convert(leftArg, (int) this.countRows()).data, function,
-                    RawStore.convert(rightArg, (int) this.countRows()).data);
+            ArrayUtils.fillMatching(data, RawStore.convert(leftArg, data.length).data, function, RawStore.convert(rightArg, data.length).data);
         }
     }
 
     public void fillMatching(final Access1D<Double> aLeftArg, final BinaryFunction<Double> function, final Double aRightArg) {
-        ArrayUtils.fillMatching(data, RawStore.convert(aLeftArg, (int) this.countRows()).data, function, aRightArg);
+        ArrayUtils.fillMatching(data, RawStore.convert(aLeftArg, data.length).data, function, aRightArg);
     }
 
     public void fillMatching(final Double aLeftArg, final BinaryFunction<Double> function, final Access1D<Double> aRightArg) {
-        ArrayUtils.fillMatching(data, aLeftArg, function, RawStore.convert(aRightArg, (int) this.countRows()).data);
+        ArrayUtils.fillMatching(data, aLeftArg, function, RawStore.convert(aRightArg, data.length).data);
     }
 
     public void fillRange(final long first, final long limit, final Double value) {
@@ -923,10 +918,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
         final double[][] tmpDelegateArray = data;
 
-        final int tmpRowDim = (int) this.countRows();
+        final int tmpRowDim = data.length;
 
         for (int i = 0; i < tmpRowDim; i++) {
-            for (int j = 0; j < (int) this.countColumns(); j++) {
+            for (int j = 0; j < myNumberOfColumns; j++) {
                 tmpDelegateArray[i][j] = source.doubleValue(j, i);
             }
         }
@@ -938,20 +933,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public Double get(final long row, final long column) {
         return data[(int) row][(int) column];
-    }
-
-    /**
-     * Copy the internal two-dimensional array.
-     *
-     * @return Two-dimensional array copy of matrix elements.
-     */
-    public double[][] copyOfData() {
-        final int tmpLength = data.length;
-        final double[][] retVal = new double[tmpLength][];
-        for (int i = 0; i < tmpLength; i++) {
-            retVal[i] = ArrayUtils.copyOf(data[i]);
-        }
-        return retVal;
     }
 
     /**
@@ -1003,28 +984,13 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return X;
     }
 
-    /**
-     * Make a one-dimensional row packed copy of the internal array.
-     *
-     * @return RawStore elements packed in a one-dimensional array by rows.
-     */
-    public double[] getRowPackedCopy() {
-        final double[] vals = new double[data.length * myNumberOfColumns];
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < myNumberOfColumns; j++) {
-                vals[(i * myNumberOfColumns) + j] = data[i][j];
-            }
-        }
-        return vals;
-    }
-
     @Override
     public int hashCode() {
         return MatrixUtils.hashCode(this);
     }
 
     public boolean isAbsolute(final long index) {
-        final int tmpRowDim = (int) this.countRows();
+        final int tmpRowDim = data.length;
         return PrimitiveScalar.isAbsolute(this.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
     }
 
@@ -1037,7 +1003,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public boolean isSmall(final long index, final double comparedTo) {
-        final int tmpRowDim = (int) this.countRows();
+        final int tmpRowDim = data.length;
         return PrimitiveScalar.isSmall(comparedTo, this.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
     }
 
@@ -1058,8 +1024,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         final double tmpValA = aSclrA;
         final double[][] tmpArray = data;
 
-        final int tmpRowDim = (int) this.countRows();
-        final int tmpColDim = (int) this.countColumns();
+        final int tmpRowDim = data.length;
+        final int tmpColDim = myNumberOfColumns;
 
         for (int i = 0; i < tmpRowDim; i++) {
             for (int j = 0; j < tmpColDim; j++) {
@@ -1078,11 +1044,11 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public void modifyDiagonal(final long row, final long column, final UnaryFunction<Double> function) {
 
-        final long tmpCount = Math.min((int) this.countRows() - row, (int) this.countColumns() - column);
+        final long tmpCount = Math.min(data.length - row, myNumberOfColumns - column);
 
-        final int tmpFirst = (int) (row + (column * (int) this.countRows()));
-        final int tmpLimit = (int) (row + tmpCount + ((column + tmpCount) * (int) this.countRows()));
-        final int tmpStep = 1 + (int) this.countRows();
+        final int tmpFirst = (int) (row + (column * data.length));
+        final int tmpLimit = (int) (row + tmpCount + ((column + tmpCount) * data.length));
+        final int tmpStep = 1 + data.length;
 
         for (int ij = tmpFirst; ij < tmpLimit; ij += tmpStep) {
             this.set(ij, function.invoke(this.doubleValue(ij)));
@@ -1110,60 +1076,44 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public RawStore multiplyLeft(final Access1D<Double> leftMtrx) {
-        return RawStore.convert(leftMtrx, (int) (leftMtrx.count() / (int) this.countRows())).times(this);
+
+        final int tmpComplexity = data.length;
+        final int tmpColDim = myNumberOfColumns;
+        final int tmpRowDim = (int) (leftMtrx.count() / tmpComplexity);
+
+        final RawStore retVal = new RawStore(tmpRowDim, tmpColDim);
+
+        final double[][] tmpLeft = RawStore.extract(leftMtrx, tmpComplexity);
+
+        RawStore.multiply(retVal.data, tmpLeft, data);
+
+        return retVal;
     }
 
     public RawStore multiplyRight(final Access1D<Double> rightMtrx) {
-        final RawStore tmpConvert = RawStore.convert(rightMtrx, (int) this.countColumns());
-        if (tmpConvert.data.length != myNumberOfColumns) {
-            throw new IllegalArgumentException("RawStore inner dimensions must agree.");
-        }
-        final RawStore X = new RawStore(data.length, tmpConvert.myNumberOfColumns);
-        final double[][] C = X.data;
-        final double[] Bcolj = new double[myNumberOfColumns];
-        for (int j = 0; j < tmpConvert.myNumberOfColumns; j++) {
-            for (int k = 0; k < myNumberOfColumns; k++) {
-                Bcolj[k] = tmpConvert.data[k][j];
-            }
-            for (int i = 0; i < data.length; i++) {
-                final double[] Arowi = data[i];
-                double s = 0;
-                for (int k = 0; k < myNumberOfColumns; k++) {
-                    s += Arowi[k] * Bcolj[k];
-                }
-                C[i][j] = s;
-            }
-        }
 
-        return X;
+        final int tmpRowDim = data.length;
+        final int tmpComplexity = myNumberOfColumns;
+        final int tmpColDim = (int) (rightMtrx.count() / tmpComplexity);
+
+        final RawStore retVal = new RawStore(tmpRowDim, tmpColDim);
+
+        final double[][] tmpRight = RawStore.extract(rightMtrx, tmpComplexity);
+
+        RawStore.multiply(retVal.data, data, tmpRight);
+
+        return retVal;
     }
 
     public RawStore negate() {
-        final RawStore X = new RawStore(data.length, myNumberOfColumns);
-        final double[][] C = X.data;
+        final RawStore retVal = new RawStore(data.length, myNumberOfColumns);
+        final double[][] C = retVal.data;
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < myNumberOfColumns; j++) {
                 C[i][j] = -data[i][j];
             }
         }
-        return X;
-    }
-
-    /**
-     * One norm
-     *
-     * @return maximum column sum.
-     */
-    public double norm1() {
-        double f = 0;
-        for (int j = 0; j < myNumberOfColumns; j++) {
-            double s = 0;
-            for (int i = 0; i < data.length; i++) {
-                s += Math.abs(data[i][j]);
-            }
-            f = Math.max(f, s);
-        }
-        return f;
+        return retVal;
     }
 
     public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {
@@ -1171,7 +1121,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         final double tmpValA = scalarA.doubleValue();
         final double[][] tmpArray = data;
 
-        final int tmpColDim = (int) this.countColumns();
+        final int tmpColDim = myNumberOfColumns;
 
         for (int j = firstColumn; j < tmpColDim; j++) {
             tmpArray[rowY][j] += tmpValA * tmpArray[rowX][j];
@@ -1191,7 +1141,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public void set(final long index, final double value) {
-        data[AccessUtils.row(index, (int) this.countRows())][AccessUtils.column(index, (int) this.countRows())] = value;
+        data[AccessUtils.row(index, data.length)][AccessUtils.column(index, data.length)] = value;
     }
 
     public void set(final long row, final long column, final double aNmbr) {
@@ -1203,45 +1153,15 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public void set(final long index, final Number value) {
-        data[AccessUtils.row(index, (int) this.countRows())][AccessUtils.column(index, (int) this.countRows())] = value.doubleValue();
+        data[AccessUtils.row(index, data.length)][AccessUtils.column(index, data.length)] = value.doubleValue();
     }
 
     public MatrixStore<Double> subtract(final MatrixStore<Double> subtrahend) {
         return this.add(subtrahend.negate());
     }
 
-    /**
-     * Linear algebraic matrix multiplication, A * B
-     *
-     * @param B another matrix
-     * @return RawStore product, A * B
-     * @exception IllegalArgumentException RawStore inner dimensions must agree.
-     */
-    public RawStore times(final RawStore B) {
-        if (B.data.length != myNumberOfColumns) {
-            throw new IllegalArgumentException("RawStore inner dimensions must agree.");
-        }
-        final RawStore X = new RawStore(data.length, B.myNumberOfColumns);
-        final double[][] C = X.data;
-        final double[] Bcolj = new double[myNumberOfColumns];
-        for (int j = 0; j < B.myNumberOfColumns; j++) {
-            for (int k = 0; k < myNumberOfColumns; k++) {
-                Bcolj[k] = B.data[k][j];
-            }
-            for (int i = 0; i < data.length; i++) {
-                final double[] Arowi = data[i];
-                double s = 0;
-                for (int k = 0; k < myNumberOfColumns; k++) {
-                    s += Arowi[k] * Bcolj[k];
-                }
-                C[i][j] = s;
-            }
-        }
-        return X;
-    }
-
     public PrimitiveScalar toScalar(final long row, final long column) {
-        return new PrimitiveScalar(this.get((int) row, (int) column));
+        return new PrimitiveScalar(this.doubleValue(row, column));
     }
 
     @Override
@@ -1252,8 +1172,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     public void transformLeft(final Householder<Double> transformation, final int firstColumn) {
 
         final double[][] tmpArray = data;
-        final int tmpRowDim = (int) this.countRows();
-        final int tmpColDim = (int) this.countColumns();
+        final int tmpRowDim = data.length;
+        final int tmpColDim = myNumberOfColumns;
 
         final int tmpFirst = transformation.first();
 
@@ -1318,8 +1238,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     public void transformRight(final Householder<Double> transformation, final int firstRow) {
 
         final double[][] tmpArray = data;
-        final int tmpRowDim = (int) this.countRows();
-        final int tmpColDim = (int) this.countColumns();
+        final int tmpRowDim = data.length;
+        final int tmpColDim = myNumberOfColumns;
 
         final int tmpFirst = transformation.first();
 
@@ -1387,14 +1307,13 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
      * @return A'
      */
     public RawStore transpose() {
-        final RawStore X = new RawStore(myNumberOfColumns, data.length);
-        final double[][] C = X.data;
+        final RawStore retVal = new RawStore(myNumberOfColumns, data.length);
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < myNumberOfColumns; j++) {
-                C[j][i] = data[i][j];
+                retVal.data[j][i] = data[i][j];
             }
         }
-        return X;
+        return retVal;
     }
 
     public void visitAll(final VoidFunction<Double> visitor) {
@@ -1415,43 +1334,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public void visitRow(final long row, final long column, final VoidFunction<Double> visitor) {
         ArrayUtils.visitRow(data, (int) row, (int) column, visitor);
-    }
-
-    /** Check if size(A) == size(B) **/
-    private void checkMatrixDimensions(final RawStore B) {
-        if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
-            throw new IllegalArgumentException("RawStore dimensions must agree.");
-        }
-    }
-
-    RawCholesky getCholeskyDecomposition() {
-        final RawCholesky retVal = new RawCholesky();
-        retVal.compute(this);
-        return retVal;
-    }
-
-    RawEigenvalue getEigenvalueDecomposition() {
-        final RawEigenvalue retVal = MatrixUtils.isHermitian(this) ? new RawEigenvalue.Symmetric() : new RawEigenvalue.Nonsymmetric();
-        retVal.compute(this);
-        return retVal;
-    }
-
-    RawLU getLUDecomposition() {
-        final RawLU retVal = new RawLU();
-        retVal.compute(this);
-        return retVal;
-    }
-
-    RawQR getQRDecomposition() {
-        final RawQR retVal = new RawQR();
-        retVal.compute(this);
-        return retVal;
-    }
-
-    RawSingularValue getSingularValueDecomposition() {
-        final RawSingularValue retVal = new RawSingularValue();
-        retVal.compute(this);
-        return retVal;
     }
 
 }

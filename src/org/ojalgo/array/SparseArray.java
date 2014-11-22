@@ -34,6 +34,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
@@ -90,6 +91,15 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     };
 
+    static final SparseFactory<Quaternion> QUATERNION = new SparseFactory<Quaternion>() {
+
+        @Override
+        SparseArray<Quaternion> make(final long count) {
+            return SparseArray.makeQuaternion(count);
+        }
+
+    };
+
     static final SparseFactory<RationalNumber> RATIONAL = new SparseFactory<RationalNumber>() {
 
         @Override
@@ -121,6 +131,14 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public static final SegmentedArray<Double> makePrimitiveSegmented(final long count) {
         return SegmentedArray.PRIMITIVE.makeSegmented(PRIMITIVE, count);
+    }
+
+    public static SparseArray<Quaternion> makeQuaternion(final long count) {
+        return new SparseArray<>(count, QuaternionArray.FACTORY);
+    }
+
+    public static final SegmentedArray<Quaternion> makeQuaternionSegmented(final long count) {
+        return SegmentedArray.QUATERNION.makeSegmented(QUATERNION, count);
     }
 
     public static SparseArray<RationalNumber> makeRational(final long count) {
@@ -448,6 +466,23 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
+    protected boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
+
+        boolean retVal = true;
+
+        for (int i = 0; retVal && (i < myIndices.length); i++) {
+            final long tmpIndex = myIndices[i];
+            if ((tmpIndex >= first) && (tmpIndex < limit)) {
+                if (((tmpIndex - first) % step) == 0L) {
+                    retVal &= myValues.isSmall(i, comparedTo);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    @Override
     protected void modify(final long first, final long limit, final long step, final Access1D<N> left, final BinaryFunction<N> function) {
 
         final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO);
@@ -557,23 +592,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     boolean isPrimitive() {
         return myValues.isPrimitive();
-    }
-
-    @Override
-    protected boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
-
-        boolean retVal = true;
-
-        for (int i = 0; retVal && (i < myIndices.length); i++) {
-            final long tmpIndex = myIndices[i];
-            if ((tmpIndex >= first) && (tmpIndex < limit)) {
-                if (((tmpIndex - first) % step) == 0L) {
-                    retVal &= myValues.isSmall(i, comparedTo);
-                }
-            }
-        }
-
-        return retVal;
     }
 
 }

@@ -38,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
- * Lets you construct optimisation problems by combining mathematical expressions (in terms of variables). Each
+ * Lets you construct optimisation problems by combining (mathematical) expressions in terms of variables. Each
  * expression or variable can be a constraint and/or contribute to the objective function. An expression or variable is
  * turned into a constraint by setting a lower and/or upper limit. Use {@linkplain ModelEntity#lower(BigDecimal)},
  * {@linkplain ModelEntity#upper(BigDecimal)} or {@linkplain ModelEntity#level(BigDecimal)}. An expression or variable
@@ -87,6 +87,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
+    private static final String OBJECTIVE = "Generated/Aggregated Objective";
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_NAME = UUID.randomUUID().toString();
     private static final String START_END = "############################################\n";
@@ -424,7 +425,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         if (myObjectiveExpression == null) {
 
-            myObjectiveExpression = new Expression("Obj Expr", this);
+            myObjectiveExpression = new Expression(OBJECTIVE, this);
 
             Variable tmpVariable;
             for (int i = 0; i < myVariables.size(); i++) {
