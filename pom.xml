@@ -4,7 +4,7 @@
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
     <packaging>jar</packaging>
-    <version>37</version>
+    <version>38-SNAPSHOT</version>
     <name>oj! Algorithms</name>
     <organization>
     	<url>http://optimatika.se/</url>
