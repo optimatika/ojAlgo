@@ -25,14 +25,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.RandomAccess;
 import java.util.Spliterator;
 import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -49,7 +47,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-Access1D.Visitable<N>, RandomAccess, Serializable {
+        Access1D.Visitable<N>, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access1D.Factory<Array1D<N>> {
 
@@ -399,11 +397,6 @@ Access1D.Visitable<N>, RandomAccess, Serializable {
      */
     public boolean isSmall(final long index, final double comparedTo) {
         return myDelegate.isSmall(myFirst + (myStep * index), comparedTo);
-    }
-
-    @Override
-    public final Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     public void modifyAll(final UnaryFunction<N> function) {

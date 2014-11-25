@@ -24,11 +24,9 @@ package org.ojalgo.array;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import org.ojalgo.access.AccessAnyD;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -45,7 +43,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>,
-        AccessAnyD.Visitable<N>, Serializable {
+AccessAnyD.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
 
@@ -249,10 +247,6 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         final long tmpLimit = tmpFirst * tmpStep * tmpCount;
 
         return myDelegate.isSmall(tmpFirst, tmpLimit, tmpStep, PrimitiveMath.ONE);
-    }
-
-    public Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     public void modifyAll(final UnaryFunction<N> function) {

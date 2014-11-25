@@ -22,12 +22,10 @@
 package org.ojalgo.matrix;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionUtils;
@@ -473,10 +471,6 @@ public abstract class MatrixUtils {
                 return matrix.toBigDecimal((int) aRow, (int) aCol);
             }
 
-            public Iterator<BigDecimal> iterator() {
-                return new Iterator1D<BigDecimal>(this);
-            }
-
             public int size() {
                 return (int) matrix.count();
             }
@@ -515,10 +509,6 @@ public abstract class MatrixUtils {
                 return matrix.toComplexNumber((int) aRow, (int) aCol);
             }
 
-            public Iterator<ComplexNumber> iterator() {
-                return new Iterator1D<ComplexNumber>(this);
-            }
-
             public int size() {
                 return (int) matrix.count();
             }
@@ -555,10 +545,6 @@ public abstract class MatrixUtils {
 
             public Double get(final long aRow, final long aCol) {
                 return matrix.doubleValue(aRow, aCol);
-            }
-
-            public Iterator<Double> iterator() {
-                return new Iterator1D<Double>(this);
             }
 
             public int size() {

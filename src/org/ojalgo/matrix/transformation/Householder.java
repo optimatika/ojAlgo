@@ -22,10 +22,8 @@
 package org.ojalgo.matrix.transformation;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
@@ -112,10 +110,6 @@ public interface Householder<N extends Number> extends Access1D<N> {
 
         public BigDecimal get(final long index) {
             return vector[(int) index];
-        }
-
-        public final Iterator<BigDecimal> iterator() {
-            return new Iterator1D<BigDecimal>(this);
         }
 
         public int size() {
@@ -229,10 +223,6 @@ public interface Householder<N extends Number> extends Access1D<N> {
             return vector[(int) index];
         }
 
-        public final Iterator<ComplexNumber> iterator() {
-            return new Iterator1D<ComplexNumber>(this);
-        }
-
         public int size() {
             return vector.length;
         }
@@ -340,10 +330,6 @@ public interface Householder<N extends Number> extends Access1D<N> {
 
         public Double get(final long index) {
             return vector[(int) index];
-        }
-
-        public final Iterator<Double> iterator() {
-            return new Iterator1D<Double>(this);
         }
 
         public int size() {

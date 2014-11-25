@@ -56,12 +56,14 @@ public class CompareImplementations extends FunctionTests {
 
     public void testACOS() {
 
-        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS,
-                AROUND_ZERO.doubleValue());
-
-        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, ONE);
-        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, ZERO);
         this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, NEG);
+        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, NEG / SQRT_TWO);
+        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, -HALF);
+        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, ZERO);
+        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, HALF);
+        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, ONE / SQRT_TWO);
+        this.assertUnary(BigFunction.ACOS, ComplexFunction.ACOS, PrimitiveFunction.ACOS, QuaternionFunction.ACOS, RationalFunction.ACOS, ONE);
+
     }
 
     public void testACOSH() {

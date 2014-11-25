@@ -23,13 +23,11 @@ package org.ojalgo.array;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.ColumnsIterator;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.RowsIterator;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.constant.PrimitiveMath;
@@ -47,7 +45,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.Fillable<N>, Access2D.Iterable2D<N>, Access2D.Modifiable<N>,
-        Access2D.Visitable<N>, Serializable {
+Access2D.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access2D.Factory<Array2D<N>> {
 
@@ -440,10 +438,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return myDelegate.isSmall(row + (column * myRowsCount), comparedTo);
-    }
-
-    public Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     public void modifyAll(final UnaryFunction<N> function) {

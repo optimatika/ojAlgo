@@ -55,14 +55,6 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
         return SET;
     }
 
-    private static Quaternion doInvSinAndCosPart1(final Quaternion aNumber) {
-        return SQRT.invoke(Quaternion.ONE.subtract(QuaternionFunction.POWER.invoke(aNumber, 2)));
-    }
-
-    private static Quaternion doInvSinAndCosPart2(final Quaternion aNumber) {
-        return LOG.invoke(aNumber).multiply(Quaternion.I).negate();
-    }
-
     public static final UnaryFunction<Quaternion> ABS = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
@@ -75,11 +67,17 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
         public final Quaternion invoke(final Quaternion arg) {
 
-            Quaternion tmpNmbr = QuaternionFunction.doInvSinAndCosPart1(arg);
+            final Quaternion tmpMultiply = arg.multiply(arg);
+            final Quaternion tmpSubtract = Quaternion.ONE.subtract(tmpMultiply);
+            final Quaternion tmpSqrt = SQRT.invoke(tmpSubtract);
 
-            tmpNmbr = arg.add(Quaternion.I.multiply(tmpNmbr));
+            final Quaternion tmpNmbr = arg.subtract(arg.getPureVersor().multiply(tmpSqrt));
+            final Quaternion tmpAlt = arg.subtract(tmpSqrt.multiply(arg.getPureVersor()));
 
-            return QuaternionFunction.doInvSinAndCosPart2(tmpNmbr);
+            return LOG.invoke(tmpNmbr).multiply(arg.getPureVersor());
+            //return arg.getPureVersor().multiply(LOG.invoke(tmpNmbr));
+
+            //  return arg.getPureVersor().multiply(ACOSH.invoke(arg));
         }
 
     };
@@ -87,10 +85,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     public static final UnaryFunction<Quaternion> ACOSH = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
-
-            final Quaternion tmpNmbr = arg.multiply(arg).subtract(PrimitiveMath.ONE);
-
-            return QuaternionFunction.LOG.invoke(arg.add(QuaternionFunction.SQRT.invoke(tmpNmbr)));
+            return LOG.invoke(arg.add(SQRT.invoke(arg.multiply(arg).subtract(PrimitiveMath.ONE))));
         }
 
     };
@@ -108,11 +103,12 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
         public final Quaternion invoke(final Quaternion arg) {
 
-            Quaternion tmpNmbr = QuaternionFunction.doInvSinAndCosPart1(arg);
+            Quaternion tmpNmbr = SQRT.invoke(Quaternion.ONE.subtract(POWER.invoke(arg, 2)));
 
             tmpNmbr = Quaternion.I.multiply(arg).add(tmpNmbr);
+            final Quaternion aNumber = tmpNmbr;
 
-            return QuaternionFunction.doInvSinAndCosPart2(tmpNmbr);
+            return LOG.invoke(aNumber).multiply(Quaternion.I).negate();
         }
 
     };
@@ -123,7 +119,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
             final Quaternion tmpNmbr = arg.multiply(arg).add(PrimitiveMath.ONE);
 
-            return QuaternionFunction.LOG.invoke(arg.add(QuaternionFunction.SQRT.invoke(tmpNmbr)));
+            return LOG.invoke(arg.add(SQRT.invoke(tmpNmbr)));
         }
 
     };
@@ -134,7 +130,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
             final Quaternion tmpNmbr = Quaternion.I.add(arg).divide(Quaternion.I.subtract(arg));
 
-            return QuaternionFunction.LOG.invoke(tmpNmbr).multiply(Quaternion.I).divide(PrimitiveMath.TWO);
+            return LOG.invoke(tmpNmbr).multiply(Quaternion.I).divide(PrimitiveMath.TWO);
         }
 
     };
@@ -145,7 +141,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
             final Quaternion tmpNmbr = arg.add(PrimitiveMath.ONE).divide(Quaternion.ONE.subtract(arg));
 
-            return QuaternionFunction.LOG.invoke(tmpNmbr).divide(PrimitiveMath.TWO);
+            return LOG.invoke(tmpNmbr).divide(PrimitiveMath.TWO);
         }
 
     };
@@ -169,7 +165,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     public static final UnaryFunction<Quaternion> COS = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
-            return QuaternionFunction.COSH.invoke(arg.multiply(Quaternion.I));
+            return COSH.invoke(arg.multiply(Quaternion.I));
         }
 
     };
@@ -177,7 +173,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     public static final UnaryFunction<Quaternion> COSH = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
-            return (QuaternionFunction.EXP.invoke(arg).add(QuaternionFunction.EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
+            return (EXP.invoke(arg).add(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
         }
 
     };
@@ -195,20 +191,16 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
         public final Quaternion invoke(final Quaternion arg) {
 
-            final double tmpExpScalar = Math.exp(arg.scalar());
-
-            final double tmpVectorLength = arg.getVectorLength();
-
+            final double tmpNorm = Math.exp(arg.scalar());
             final double[] tmpUnitVector = arg.getUnitVector();
+            final double tmpPhase = arg.getVectorLength();
 
-            final double tmpVectorScalar = tmpExpScalar * Math.sin(tmpVectorLength);
+            return Quaternion.makePolar(tmpNorm, tmpUnitVector, tmpPhase);
 
-            final double tmpScalar = tmpExpScalar * Math.cos(tmpVectorLength);
-            final double tmpI = tmpUnitVector[0] * tmpVectorScalar;
-            final double tmpJ = tmpUnitVector[1] * tmpVectorScalar;
-            final double tmpK = tmpUnitVector[2] * tmpVectorScalar;
-
-            return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
+            // final double tmpNorm = Math.exp(arg.doubleValue());
+            // final double tmpPhase = arg.i;
+            //
+            // return ComplexNumber.makePolar(tmpNorm, tmpPhase);
         }
 
     };
@@ -242,18 +234,22 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
         public final Quaternion invoke(final Quaternion arg) {
 
-            final double tmpScalar = arg.scalar();
-            final double[] tmpVector = arg.getUnitVector();
             final double tmpNorm = arg.norm();
+            final double[] tmpUnitVector = arg.getUnitVector();
 
-            final double tmpVectScale = Math.acos(tmpScalar / tmpNorm);
+            final double tmpPhase = Math.acos(arg.scalar() / tmpNorm);
 
-            final double retScalar = Math.log(tmpNorm);
-            final double retI = tmpVectScale > 0 ? tmpVector[0] * tmpVectScale : tmpVector[0];
-            final double retJ = tmpVectScale > 0 ? tmpVector[1] * tmpVectScale : tmpVector[1];
-            final double retK = tmpVectScale > 0 ? tmpVector[2] * tmpVectScale : tmpVector[2];
+            final double tmpScalar = Math.log(tmpNorm);
+            final double tmpI = tmpPhase != 0 ? tmpUnitVector[0] * tmpPhase : tmpUnitVector[0];
+            final double tmpJ = tmpPhase != 0 ? tmpUnitVector[1] * tmpPhase : tmpUnitVector[1];
+            final double tmpK = tmpPhase != 0 ? tmpUnitVector[2] * tmpPhase : tmpUnitVector[2];
 
-            return new Quaternion(retScalar, retI, retJ, retK);
+            return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
+
+            // final double tmpRe = Math.log(arg.norm());
+            // final double tmpIm = arg.phase();
+            //
+            // return new ComplexNumber(tmpRe, tmpIm);
         }
 
     };
@@ -389,7 +385,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     public static final UnaryFunction<Quaternion> SIN = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
-            return QuaternionFunction.SINH.invoke(arg.multiply(Quaternion.I)).multiply(Quaternion.I.negate());
+            return SINH.invoke(arg.multiply(Quaternion.I)).multiply(Quaternion.I.negate());
         }
 
     };
@@ -397,7 +393,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     public static final UnaryFunction<Quaternion> SINH = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
-            return (QuaternionFunction.EXP.invoke(arg).subtract(QuaternionFunction.EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
+            return (EXP.invoke(arg).subtract(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
         }
 
     };
@@ -430,7 +426,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     public static final UnaryFunction<Quaternion> TAN = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
-            return QuaternionFunction.TANH.invoke(arg.multiply(Quaternion.I)).multiply(Quaternion.I.negate());
+            return TANH.invoke(arg.multiply(Quaternion.I)).multiply(Quaternion.I.negate());
         }
 
     };
@@ -441,8 +437,8 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
             Quaternion retVal;
 
-            final Quaternion tmpPlus = QuaternionFunction.EXP.invoke(arg);
-            final Quaternion tmpMinus = QuaternionFunction.EXP.invoke(arg.negate());
+            final Quaternion tmpPlus = EXP.invoke(arg);
+            final Quaternion tmpMinus = EXP.invoke(arg.negate());
 
             final Quaternion tmpDividend = tmpPlus.subtract(tmpMinus);
             final Quaternion tmpDivisor = tmpPlus.add(tmpMinus);

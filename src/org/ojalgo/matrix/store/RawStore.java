@@ -28,14 +28,12 @@ import java.io.BufferedReader;
 import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.util.AbstractList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.PrimitiveArray;
@@ -1013,10 +1011,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public boolean isUpperRightShaded() {
         return false;
-    }
-
-    public Iterator<Double> iterator() {
-        return new Iterator1D<Double>(this);
     }
 
     public void maxpy(final Double aSclrA, final MatrixStore<Double> aMtrxX) {

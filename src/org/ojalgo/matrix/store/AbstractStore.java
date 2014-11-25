@@ -22,12 +22,10 @@
 package org.ojalgo.matrix.store;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -142,10 +140,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
      */
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return this.toScalar(row, column).isSmall(comparedTo);
-    }
-
-    public final Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     /**

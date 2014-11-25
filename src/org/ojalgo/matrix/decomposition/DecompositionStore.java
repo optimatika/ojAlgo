@@ -21,10 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.util.Iterator;
-
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
@@ -166,10 +163,6 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
             } else {
                 return myStore.asArray2D().isRowZeros(row, col + 1);
             }
-        }
-
-        public final Iterator<N> iterator() {
-            return new Iterator1D<N>(this);
         }
 
         @Override

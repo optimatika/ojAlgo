@@ -422,8 +422,9 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     aMtrxH[(ij - 1) + (tmpDiagDim * ij)] = -(aMtrxH[ij + (tmpDiagDim * ij)] - p) / aMtrxH[ij + (tmpDiagDim * (ij - 1))];
                 } else {
 
-                    final ComplexNumber tmpX = ComplexNumber.makeRectangular(PrimitiveMath.ZERO, (-aMtrxH[(ij - 1) + (tmpDiagDim * ij)]));
-                    final ComplexNumber tmpY = ComplexNumber.makeRectangular((aMtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] - p), q);
+                    final ComplexNumber tmpX = new ComplexNumber(PrimitiveMath.ZERO, (-aMtrxH[(ij - 1) + (tmpDiagDim * ij)]));
+                    final double imaginary = q;
+                    final ComplexNumber tmpY = new ComplexNumber((aMtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] - p), imaginary);
 
                     final ComplexNumber tmpZ = tmpX.divide(tmpY);
 
@@ -449,8 +450,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     } else {
                         l = i;
                         if (tmpOffDiagonal[i] == 0) {
-                            final ComplexNumber tmpX = ComplexNumber.makeRectangular((-ra), (-sa));
-                            final ComplexNumber tmpY = ComplexNumber.makeRectangular(w, q);
+                            final ComplexNumber tmpX = new ComplexNumber((-ra), (-sa));
+                            final double real = w;
+                            final double imaginary = q;
+                            final ComplexNumber tmpY = new ComplexNumber(real, imaginary);
 
                             final ComplexNumber tmpZ = tmpX.divide(tmpY);
 
@@ -467,8 +470,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                                 vr = PrimitiveMath.MACHINE_DOUBLE_ERROR * aNorm1 * (Math.abs(w) + Math.abs(q) + Math.abs(x) + Math.abs(y) + Math.abs(z));
                             }
 
-                            final ComplexNumber tmpX = ComplexNumber.makeRectangular((((x * r) - (z * ra)) + (q * sa)), ((x * s) - (z * sa) - (q * ra)));
-                            final ComplexNumber tmpY = ComplexNumber.makeRectangular(vr, vi);
+                            final ComplexNumber tmpX = new ComplexNumber((((x * r) - (z * ra)) + (q * sa)), ((x * s) - (z * sa) - (q * ra)));
+                            final double real = vr;
+                            final double imaginary = vi;
+                            final ComplexNumber tmpY = new ComplexNumber(real, imaginary);
 
                             final ComplexNumber tmpZ = tmpX.divide(tmpY);
 
@@ -482,9 +487,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                                 aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-sa - (w * aMtrxH[i + (tmpDiagDim * ij)]) - (q * aMtrxH[i + (tmpDiagDim * (ij - 1))]))
                                         / x;
                             } else {
-                                final ComplexNumber tmpX1 = ComplexNumber.makeRectangular((-r - (y * aMtrxH[i + (tmpDiagDim * (ij - 1))])), (-s - (y * aMtrxH[i
-                                        + (tmpDiagDim * ij)])));
-                                final ComplexNumber tmpY1 = ComplexNumber.makeRectangular(z, q);
+                                final ComplexNumber tmpX1 = new ComplexNumber((-r - (y * aMtrxH[i + (tmpDiagDim * (ij - 1))])), (-s - (y * aMtrxH[i
+                                + (tmpDiagDim * ij)])));
+                                final double real1 = z;
+                                final double imaginary1 = q;
+                                final ComplexNumber tmpY1 = new ComplexNumber(real1, imaginary1);
 
                                 final ComplexNumber tmpZ1 = tmpX1.divide(tmpY1);
 
@@ -1121,7 +1128,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         final ComplexNumber[] tmpRaw = retVal.data;
 
         for (int i = 0; i < tmpLength; i++) {
-            tmpRaw[i] = ComplexNumber.makeRectangular(aRawReal[i], aRawImag[i]);
+            tmpRaw[i] = new ComplexNumber(aRawReal[i], aRawImag[i]);
         }
 
         return Array1D.COMPLEX.wrap(retVal);

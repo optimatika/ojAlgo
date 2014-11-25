@@ -23,12 +23,10 @@ package org.ojalgo.array;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Iterator;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
@@ -55,7 +53,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-        Access1D.Visitable<N>, Serializable {
+Access1D.Visitable<N>, Serializable {
 
     static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -193,10 +191,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     protected BasicArray() {
         super();
-    }
-
-    public Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     public void modifyAll(final UnaryFunction<N> function) {

@@ -23,11 +23,9 @@ package org.ojalgo.array;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -252,11 +250,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         } else {
             return true;
         }
-    }
-
-    @Override
-    public Iterator<N> iterator() {
-        return new Iterator1D<>(this);
     }
 
     @Override

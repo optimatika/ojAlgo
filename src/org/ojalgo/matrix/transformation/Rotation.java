@@ -222,7 +222,6 @@ public abstract class Rotation<N extends Number> extends Object {
     }
 
     public final int high;
-
     public final int low;
 
     @SuppressWarnings("unused")

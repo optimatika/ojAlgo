@@ -22,11 +22,9 @@
 package org.ojalgo.random;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
@@ -259,10 +257,6 @@ public final class SampleSet implements Access1D<Double> {
         }
 
         return myVariance;
-    }
-
-    public Iterator<Double> iterator() {
-        return new Iterator1D<Double>(this);
     }
 
     public void reset() {

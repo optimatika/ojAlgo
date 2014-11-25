@@ -22,13 +22,11 @@
 package org.ojalgo.array;
 
 import java.lang.reflect.Array;
-import java.util.Iterator;
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -319,10 +317,6 @@ public abstract class ArrayUtils {
                 return aRaw[(int) index];
             }
 
-            public final Iterator<Double> iterator() {
-                return new Iterator1D<Double>(this);
-            }
-
         };
     }
 
@@ -341,10 +335,6 @@ public abstract class ArrayUtils {
                 return aList.get((int) index);
             }
 
-            public final Iterator<N> iterator() {
-                return new Iterator1D<N>(this);
-            }
-
         };
     }
 
@@ -361,10 +351,6 @@ public abstract class ArrayUtils {
 
             public N get(final long index) {
                 return aRaw[(int) index];
-            }
-
-            public final Iterator<N> iterator() {
-                return new Iterator1D<N>(this);
             }
 
         };
@@ -402,10 +388,6 @@ public abstract class ArrayUtils {
                 return aRaw[(int) aRow][(int) aCol];
             }
 
-            public Iterator<Double> iterator() {
-                return new Iterator1D<Double>(this);
-            }
-
         };
     }
 
@@ -439,10 +421,6 @@ public abstract class ArrayUtils {
 
             public N get(final long aRow, final long aCol) {
                 return aRaw[(int) aRow][(int) aCol];
-            }
-
-            public Iterator<N> iterator() {
-                return new Iterator1D<N>(this);
             }
 
         };

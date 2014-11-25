@@ -24,11 +24,9 @@ package org.ojalgo.optimisation;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
@@ -346,10 +344,6 @@ public interface Optimisation {
 
         public boolean isBasisDefined() {
             return myBasis != null;
-        }
-
-        public Iterator<BigDecimal> iterator() {
-            return new Iterator1D<BigDecimal>(this);
         }
 
         public int size() {
