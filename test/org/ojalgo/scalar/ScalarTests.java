@@ -39,6 +39,7 @@ public abstract class ScalarTests extends FunctionalityTest {
         final TestSuite suite = new TestSuite(ScalarTests.class.getPackage().getName());
         //$JUnit-BEGIN$
         suite.addTestSuite(FundamentalScalarTest.class);
+        suite.addTestSuite(QuaternionTest.class);
         suite.addTestSuite(RationalScalarTest.class);
         //$JUnit-END$
         return suite;

@@ -93,18 +93,20 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         return value.isSmall(comparedTo);
     }
 
-    public static Quaternion makePolar(final double norm, final double[] unitVector, final double phase) {
+    public static Quaternion makePolar(final double norm, final double[] unit, final double angle) {
 
-        double tmpStdPhase = phase % PrimitiveMath.TWO_PI;
-        if (tmpStdPhase < PrimitiveMath.ZERO) {
-            tmpStdPhase += PrimitiveMath.TWO_PI;
+        double tmpAngle = angle % PrimitiveMath.TWO_PI;
+        if (tmpAngle < PrimitiveMath.ZERO) {
+            tmpAngle += PrimitiveMath.TWO_PI;
         }
 
-        if (tmpStdPhase <= ARGUMENT_TOLERANCE) {
+        //  BasicLogger.debug("Koordinater: {} {} {}", norm, Arrays.toString(unitVector), phase);
+
+        if (tmpAngle <= ARGUMENT_TOLERANCE) {
 
             return new Quaternion(norm);
 
-        } else if (Math.abs(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+        } else if (Math.abs(tmpAngle - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
 
             return new Quaternion(-norm);
 
@@ -112,7 +114,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
 
             double tmpScalar = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpCos = Math.cos(tmpStdPhase);
+                final double tmpCos = Math.cos(tmpAngle);
                 if (tmpCos != PrimitiveMath.ZERO) {
                     tmpScalar = norm * tmpCos;
                 }
@@ -122,21 +124,17 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
             double tmpJ = PrimitiveMath.ZERO;
             double tmpK = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpSin = Math.sin(tmpStdPhase);
+                final double tmpSin = Math.sin(tmpAngle);
                 if (tmpSin != PrimitiveMath.ZERO) {
-                    tmpI = unitVector[0] * norm * tmpSin;
-                    tmpJ = unitVector[1] * norm * tmpSin;
-                    tmpK = unitVector[2] * norm * tmpSin;
+                    tmpI = unit[0] * norm * tmpSin;
+                    tmpJ = unit[1] * norm * tmpSin;
+                    tmpK = unit[2] * norm * tmpSin;
                 }
             }
 
             return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
         }
 
-    }
-
-    public static Quaternion makePolar(final double norm, final Quaternion pure) {
-        return Quaternion.makePolar(norm, pure.unit(), pure.norm());
     }
 
     /**
@@ -205,6 +203,34 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         this.k = k;
     }
 
+    public Quaternion(final double scalar, final double[] vector) {
+
+        super();
+
+        myScalar = scalar;
+
+        myRealForSure = false;
+        myPureForSure = false;
+
+        i = vector[0];
+        j = vector[1];
+        k = vector[2];
+    }
+
+    public Quaternion(final double[] vector) {
+
+        super();
+
+        myScalar = PrimitiveMath.ZERO;
+
+        myRealForSure = false;
+        myPureForSure = true;
+
+        i = vector[0];
+        j = vector[1];
+        k = vector[2];
+    }
+
     Quaternion() {
 
         super();
@@ -243,6 +269,10 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
 
             return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
         }
+    }
+
+    public double angle() {
+        return Math.acos(myScalar / this.norm());
     }
 
     public MatrixStore<ComplexNumber> asComplex2D() {
@@ -448,10 +478,6 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         return this;
     }
 
-    public Quaternion getPurePart() {
-        return new Quaternion(i, j, k);
-    }
-
     /**
      * @return A normalised Quaternion with the real/scalar part "removed".
      */
@@ -465,10 +491,6 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
             return IJK;
         }
 
-    }
-
-    public Quaternion getRealPart() {
-        return new Quaternion(myScalar);
     }
 
     public double getVectorLength() {
@@ -585,10 +607,6 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
 
     public double norm() {
         return Math.sqrt(this.calculateSumOfSquaresAll());
-    }
-
-    public double angle() {
-        return Math.acos(myScalar / this.norm());
     }
 
     public double scalar() {
