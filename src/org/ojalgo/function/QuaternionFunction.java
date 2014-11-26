@@ -67,17 +67,15 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
         public final Quaternion invoke(final Quaternion arg) {
 
-            final Quaternion tmpMultiply = arg.multiply(arg);
-            final Quaternion tmpSubtract = Quaternion.ONE.subtract(tmpMultiply);
-            final Quaternion tmpSqrt = SQRT.invoke(tmpSubtract);
+            //            final Quaternion tmpSqrt = SQRT.invoke(Quaternion.ONE.subtract(arg.multiply(arg)));
+            //
+            //            final Quaternion tmpNmbr1 = arg.subtract(arg.getPureVersor().multiply(tmpSqrt));
+            //
+            //            final Quaternion tmpLog1 = LOG.invoke(tmpNmbr1);
+            //
+            //            return tmpLog1.multiply(arg.getPureVersor()).negate();
 
-            final Quaternion tmpNmbr = arg.subtract(arg.getPureVersor().multiply(tmpSqrt));
-            final Quaternion tmpAlt = arg.subtract(tmpSqrt.multiply(arg.getPureVersor()));
-
-            return LOG.invoke(tmpNmbr).multiply(arg.getPureVersor());
-            //return arg.getPureVersor().multiply(LOG.invoke(tmpNmbr));
-
-            //  return arg.getPureVersor().multiply(ACOSH.invoke(arg));
+            return arg.getPureVersor().negate().multiply(ACOSH.invoke(arg));
         }
 
     };
@@ -191,11 +189,20 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
         public final Quaternion invoke(final Quaternion arg) {
 
-            final double tmpNorm = Math.exp(arg.scalar());
-            final double[] tmpUnitVector = arg.getUnitVector();
-            final double tmpPhase = arg.getVectorLength();
+            if (arg.isReal()) {
 
-            return Quaternion.makePolar(tmpNorm, tmpUnitVector, tmpPhase);
+                final double tmpScalar = Math.exp(arg.scalar());
+
+                return new Quaternion(tmpScalar);
+
+            } else {
+
+                final double tmpNorm = Math.exp(arg.scalar());
+                final double[] tmpUnit = arg.unit();
+                final double tmpPhase = arg.getVectorLength();
+
+                return Quaternion.makePolar(tmpNorm, tmpUnit, tmpPhase);
+            }
 
             // final double tmpNorm = Math.exp(arg.doubleValue());
             // final double tmpPhase = arg.i;
@@ -235,21 +242,15 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
         public final Quaternion invoke(final Quaternion arg) {
 
             final double tmpNorm = arg.norm();
-            final double[] tmpUnitVector = arg.getUnitVector();
-
+            final double[] tmpUnitVector = arg.unit();
             final double tmpPhase = Math.acos(arg.scalar() / tmpNorm);
 
             final double tmpScalar = Math.log(tmpNorm);
-            final double tmpI = tmpPhase != 0 ? tmpUnitVector[0] * tmpPhase : tmpUnitVector[0];
-            final double tmpJ = tmpPhase != 0 ? tmpUnitVector[1] * tmpPhase : tmpUnitVector[1];
-            final double tmpK = tmpPhase != 0 ? tmpUnitVector[2] * tmpPhase : tmpUnitVector[2];
+            final double tmpI = tmpUnitVector[0] * tmpPhase;
+            final double tmpJ = tmpUnitVector[1] * tmpPhase;
+            final double tmpK = tmpUnitVector[2] * tmpPhase;
 
             return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
-
-            // final double tmpRe = Math.log(arg.norm());
-            // final double tmpIm = arg.phase();
-            //
-            // return new ComplexNumber(tmpRe, tmpIm);
         }
 
     };

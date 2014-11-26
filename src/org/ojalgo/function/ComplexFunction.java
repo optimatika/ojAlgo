@@ -67,13 +67,13 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final ComplexNumber tmpMultiply = arg.multiply(arg);
-            final ComplexNumber tmpSubtract = ComplexNumber.ONE.subtract(tmpMultiply);
-            final ComplexNumber tmpSqrt = SQRT.invoke(tmpSubtract);
+            final ComplexNumber tmpSqrt = SQRT.invoke(ComplexNumber.ONE.subtract(arg.multiply(arg)));
 
             final ComplexNumber tmpNmbr = arg.add(ComplexNumber.I.multiply(tmpSqrt));
 
-            return LOG.invoke(tmpNmbr).multiply(ComplexNumber.I).negate();
+            final ComplexNumber tmpLog = LOG.invoke(tmpNmbr);
+
+            return tmpLog.multiply(ComplexNumber.I).negate();
         }
 
     };

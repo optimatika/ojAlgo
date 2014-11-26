@@ -62,7 +62,6 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
     };
 
     public static final Quaternion I = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
-    public static final Quaternion IJK = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ONE, PrimitiveMath.ONE).versor();
     public static final Quaternion J = new Quaternion(PrimitiveMath.ZERO, PrimitiveMath.ONE, PrimitiveMath.ZERO);
     public static final Quaternion K = new Quaternion(PrimitiveMath.ZERO, PrimitiveMath.ZERO, PrimitiveMath.ONE);
     public static final Quaternion NEG = new Quaternion(PrimitiveMath.NEG);
@@ -70,6 +69,8 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
     public static final Quaternion ZERO = new Quaternion();
 
     private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
+
+    static final Quaternion IJK = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ONE, PrimitiveMath.ONE).versor();
 
     public static boolean isAbsolute(final Quaternion value) {
         return value.isAbsolute();
@@ -132,6 +133,10 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
             return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
         }
 
+    }
+
+    public static Quaternion makePolar(final double norm, final Quaternion pure) {
+        return Quaternion.makePolar(norm, pure.unit(), pure.norm());
     }
 
     /**
@@ -443,13 +448,27 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         return this;
     }
 
-    public double[] getUnitVector() {
-        final double tmpVectorLength = this.getVectorLength();
-        if (tmpVectorLength > 0.0) {
-            return new double[] { i / tmpVectorLength, j / tmpVectorLength, k / tmpVectorLength };
+    public Quaternion getPurePart() {
+        return new Quaternion(i, j, k);
+    }
+
+    /**
+     * @return A normalised Quaternion with the real/scalar part "removed".
+     */
+    public Quaternion getPureVersor() {
+
+        final double tmpLength = this.getVectorLength();
+
+        if (tmpLength > 0.0) {
+            return new Quaternion(i / tmpLength, j / tmpLength, k / tmpLength);
         } else {
-            return new double[] { 0.0, 0.0, 0.0 };
+            return IJK;
         }
+
+    }
+
+    public Quaternion getRealPart() {
+        return new Quaternion(myScalar);
     }
 
     public double getVectorLength() {
@@ -568,7 +587,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         return Math.sqrt(this.calculateSumOfSquaresAll());
     }
 
-    public double phase() {
+    public double angle() {
         return Math.acos(myScalar / this.norm());
     }
 
@@ -678,24 +697,21 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         return retVal.toString();
     }
 
+    public double[] unit() {
+        final double tmpLength = this.getVectorLength();
+        if (tmpLength > 0.0) {
+            return new double[] { i / tmpLength, j / tmpLength, k / tmpLength };
+        } else {
+            return IJK.vector();
+        }
+    }
+
     public double[] vector() {
         return new double[] { i, j, k };
     }
 
     public Quaternion versor() {
         return this.divide(this.norm());
-    }
-
-    public Quaternion getPureVersor() {
-
-        final double tmpLength = Math.sqrt(this.calculateSumOfSquaresVector());
-
-        if (tmpLength > 0.0) {
-            return new Quaternion(0.0, i / tmpLength, j / tmpLength, k / tmpLength);
-        } else {
-            return IJK;
-        }
-
     }
 
     private double calculateSumOfSquaresAll() {
