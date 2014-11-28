@@ -21,27 +21,40 @@
  */
 package org.ojalgo.function.aggregator;
 
-import org.ojalgo.function.VoidFunction;
-import org.ojalgo.scalar.Scalar;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 
-public interface AggregatorFunction<N extends Number> extends VoidFunction<N> {
+public final class AggregationResults<N extends Number> implements Supplier<N>, IntSupplier, LongSupplier, DoubleSupplier {
 
-    double doubleValue();
+    private final double myDoubleValue;
+    private final int myIntValue;
+    private final long myLongValue;
+    private final N myValue;
 
-    N getNumber();
-
-    int intValue();
-
-    void merge(N result);
-
-    N merge(N result1, N result2);
-
-    AggregatorFunction<N> reset();
-
-    default AggregationResults<N> snapshot() {
-        return new AggregationResults<N>(this.getNumber(), this.doubleValue(), this.intValue(), this.intValue());
+    AggregationResults(final N value, final double doubleValue, final long longValue, final int intValue) {
+        super();
+        myValue = value;
+        myDoubleValue = doubleValue;
+        myLongValue = longValue;
+        myIntValue = intValue;
     }
 
-    Scalar<N> toScalar();
+    public N get() {
+        return myValue;
+    }
+
+    public double getAsDouble() {
+        return myDoubleValue;
+    }
+
+    public int getAsInt() {
+        return myIntValue;
+    }
+
+    public long getAsLong() {
+        return myLongValue;
+    }
 
 }

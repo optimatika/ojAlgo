@@ -62,7 +62,7 @@ import org.ojalgo.type.IndexSelector;
  * Alternatively you can directly call {@linkplain ExpressionsBasedModel#getDefaultSolver()} or even
  * {@linkplain ExpressionsBasedModel#minimise()} or {@linkplain ExpressionsBasedModel#maximise()} on the model.
  * </p>
- * 
+ *
  * @author apete
  */
 public abstract class LinearSolver extends BaseSolver {
