@@ -36,7 +36,7 @@ import java.util.Set;
 
 /**
  * Mathematical Programming System (MPS) Model
- * 
+ *
  * @author apete
  */
 public final class MathProgSysModel extends AbstractModel<GenericSolver> {
@@ -396,7 +396,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         super();
 
-        this.setMinimisation(true);
+        this.setMinimisation();
     }
 
     @Override
@@ -572,7 +572,9 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         case OBJSENSE:
 
             if (myFields[0].equals("MAX")) {
-                this.setMaximisation(true);
+                this.setMaximisation();
+            } else {
+                this.setMinimisation();
             }
 
             break;

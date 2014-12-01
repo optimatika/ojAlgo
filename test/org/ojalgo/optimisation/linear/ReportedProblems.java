@@ -64,13 +64,13 @@ public class ReportedProblems extends OptimisationLinearTests {
         final Variable[] tmpEvenVars = new Variable[] { tmpX2.copy(), tmpX4.copy(), tmpX6.copy() };
 
         final ExpressionsBasedModel tmpFullModel = new ExpressionsBasedModel(tmpFullVars);
-        tmpFullModel.setMaximisation(true);
+        tmpFullModel.setMaximisation();
 
         final ExpressionsBasedModel tmpOddModel = new ExpressionsBasedModel(tmpOddVars);
-        tmpOddModel.setMaximisation(true);
+        tmpOddModel.setMaximisation();
 
         final ExpressionsBasedModel tmpEvenModel = new ExpressionsBasedModel(tmpEvenVars);
-        tmpEvenModel.setMaximisation(true);
+        tmpEvenModel.setMaximisation();
 
         //        tmpFullModel.options.debug(LinearSolver.class);
         //        tmpOddModel.options.debug(LinearSolver.class);
@@ -179,7 +179,7 @@ public class ReportedProblems extends OptimisationLinearTests {
         final Variable[] tmpVariables = new Variable[] { new Variable("X").lower(ZERO).weight(ONE), new Variable("Y").lower(ZERO).weight(ZERO),
                 new Variable("Z").lower(ZERO).weight(ZERO) };
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpModel.setMinimisation(true);
+        tmpModel.setMinimisation();
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         tmpExprC1.level(ZERO);

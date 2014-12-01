@@ -151,7 +151,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
                 new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR), new Variable("YTWO+").weight(FOUR).lower(ZERO).upper(ONE),
                 new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null) };
         final ExpressionsBasedModel tmpExpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpExpModel.setMinimisation(true);
+        tmpExpModel.setMinimisation();
         final int tmpLength = tmpExpModel.countVariables();
 
         final Expression retVal = tmpExpModel.addExpression("LIM1");

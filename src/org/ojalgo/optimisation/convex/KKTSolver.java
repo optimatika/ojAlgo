@@ -150,7 +150,7 @@ public final class KKTSolver extends Object {
 
     private static final double SCALE = 1.0E2;
 
-    private static final double SMALL = PrimitiveMath.MACHINE_DOUBLE_ERROR * 10; // ≈1.0E-15
+    private static final double SMALL = PrimitiveMath.MACHINE_EPSILON * 10; // ≈1.0E-15
 
     private transient PrimitiveDenseStore myCalculationC = null;
     private transient PrimitiveDenseStore myCalculationQ = null;
@@ -205,7 +205,7 @@ public final class KKTSolver extends Object {
 
             tmpX = myQR.solve(tmpB);
 
-            myQR.compute(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculöated  myQR.compute(tmpA).
+            myQR.compute(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculated  myQR.compute(tmpA).
 
             tmpL = myQR.solve(tmpC).subtract(tmpQ.multiplyRight(tmpX));
 

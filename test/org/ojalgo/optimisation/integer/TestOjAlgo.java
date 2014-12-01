@@ -67,7 +67,7 @@ public class TestOjAlgo {
         //c3.setLinearFactor(0, new BigDecimal(-1));
         //c3.setLinearFactor(2, ONE);
 
-        model.setMinimisation(true);
+        model.setMinimisation();
         final GenericSolver tmpSolver = model.getDefaultSolver();
         final Optimisation.Result tmpResult = tmpSolver.solve();
 

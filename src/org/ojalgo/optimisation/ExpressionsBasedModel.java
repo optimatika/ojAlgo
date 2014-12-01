@@ -299,11 +299,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
-    public Expression addExpression(final String aName) {
+    public Expression addExpression(final String name) {
 
-        final Expression retVal = new Expression(aName, this);
+        final Expression retVal = new Expression(name, this);
 
-        myExpressions.put(aName, retVal);
+        myExpressions.put(name, retVal);
 
         return retVal;
     }
@@ -659,7 +659,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public Optimisation.Result maximise() {
 
-        this.setMaximisation(true);
+        this.setMaximisation();
 
         final Result tmpSolverResult = this.solve();
 
@@ -668,7 +668,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public Optimisation.Result minimise() {
 
-        this.setMinimisation(true);
+        this.setMinimisation();
 
         final Result tmpSolverResult = this.solve();
 
@@ -866,6 +866,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return Collections.unmodifiableList(retVal);
     }
 
+    /**
+     * The general recommendation is to NOT call this method directly. Instead you should use/call {@link #maximise()}
+     * or {@link #minimise()}. If you do use this method you must first set {@link #setMinimisation()} or
+     * {@link #setMaximisation()}. Also note that with this method the solver solution is not written back to the
+     * model (or validated by the model).
+     */
     public Optimisation.Result solve() {
 
         Optimisation.Result retVal = null;

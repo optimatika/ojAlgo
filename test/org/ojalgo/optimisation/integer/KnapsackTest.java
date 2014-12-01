@@ -71,7 +71,7 @@ public class KnapsackTest extends OptimisationIntegerTests {
             }
             tmpTotalWeightExpr.lower(ZERO).upper(maxWeight);
 
-            retVal.setMaximisation(true);
+            retVal.setMaximisation();
 
             return retVal;
         }

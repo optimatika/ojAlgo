@@ -50,7 +50,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
                 new Variable("X2").lower(ZERO).weight(THREE.negate()).integer(true) };
 
         final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
-        retVal.setMinimisation(true);
+        retVal.setMinimisation();
 
         final Expression tmpExprC1 = retVal.addExpression("C1");
         for (int i = 0; i < retVal.countVariables(); i++) {

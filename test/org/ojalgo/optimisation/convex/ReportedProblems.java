@@ -21,6 +21,8 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import static org.ojalgo.constant.BigMath.*;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -64,6 +66,45 @@ public class ReportedProblems extends OptimisationConvexTests {
 
     public ReportedProblems(final String someName) {
         super(someName);
+    }
+
+    /**
+     * Just make sure an obviously infeasible problem is recognised as such - this has been a problem in the past
+     */
+    public void testInfeasibleCase() {
+
+        final Variable[] tmpVariables = new Variable[] { new Variable("X1").lower(ONE).upper(TWO).weight(ONE),
+                new Variable("X2").lower(ONE).upper(TWO).weight(TWO), new Variable("X3").lower(ONE).upper(TWO).weight(THREE) };
+
+        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+
+        final Expression tmpExprQ = tmpModel.addExpression("Q1");
+        for (int i = 0; i < tmpModel.countVariables(); i++) {
+            for (int j = 0; j < tmpModel.countVariables(); j++) {
+                tmpExprQ.setQuadraticFactor(i, i, Math.random());
+            }
+        } // May not be positive definite, but infeasibillity should be realised before that becomes a problem
+        tmpExprQ.weight(TEN);
+
+        // tmpModel.options.debug(ConvexSolver.class);
+
+        final Expression tmpExprC1 = tmpModel.addExpression("C1");
+        for (int i = 0; i < tmpModel.countVariables(); i++) {
+            tmpExprC1.setLinearFactor(i, ONE);
+        }
+        tmpExprC1.upper(TWO);
+
+        Optimisation.Result tmpResult = tmpModel.maximise();
+
+        TestUtils.assertFalse(tmpResult.getState().isFeasible());
+
+        tmpExprC1.upper(null);
+        tmpExprC1.lower(SEVEN);
+
+        tmpResult = tmpModel.maximise();
+
+        TestUtils.assertFalse(tmpResult.getState().isFeasible());
+
     }
 
     /**
@@ -781,7 +822,7 @@ public class ReportedProblems extends OptimisationConvexTests {
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
         final Expression tmpObjExpr = tmpModel.addExpression("Objective");
-        tmpModel.setMinimisation(true);
+        tmpModel.setMinimisation();
         tmpObjExpr.setQuadraticFactor(2, 2, BigMath.HALF);
         tmpObjExpr.setQuadraticFactor(3, 3, BigMath.TWO);
         tmpObjExpr.setQuadraticFactor(2, 3, BigMath.TWO.negate());
@@ -912,7 +953,7 @@ public class ReportedProblems extends OptimisationConvexTests {
             v.lower(BigMath.ZERO).upper(BigMath.HUNDREDTH);
         }
 
-        model.setMinimisation(true);
+        model.setMinimisation();
 
         final ConvexSolver.Builder tmpQuadBuilder = new ConvexSolver.Builder(model);
         final ConvexSolver tmpQuadSolver = tmpQuadBuilder.build();
@@ -1036,7 +1077,7 @@ public class ReportedProblems extends OptimisationConvexTests {
         final double tmpActValue = tmpObj.invoke(AccessUtils.asPrimitive1D(result));
 
         final MatrixStore<Double> tmpExpSlack = JamaBI.subtract(JamaAI.multiplyRight(ArrayUtils.wrapAccess1D(expectedSolution)));
-        final MatrixStore<Double> tmpActSlack = JamaBI.subtract(JamaAI.multiplyRight((Access1D) PrimitiveDenseStore.FACTORY.columns(result)));
+        final MatrixStore<Double> tmpActSlack = JamaBI.subtract(JamaAI.multiplyRight(PrimitiveDenseStore.FACTORY.columns(result)));
 
         for (int i = 0; i < numElm; i++) {
             TestUtils.assertEquals(expectedSolution[i], result.doubleValue(i), 1e-4);

@@ -168,7 +168,7 @@ class P20130225 {
                 expresion3.level(new BigDecimal(5));
             }
 
-            model.setMinimisation(true);
+            model.setMinimisation();
             final Optimisation.Result result = model.getDefaultSolver().solve();
 
             System.out.println(result);

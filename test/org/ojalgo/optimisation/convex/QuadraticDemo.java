@@ -181,7 +181,7 @@ class QuadraticDemo {
                 v.lower(BigMath.ZERO).upper(BigMath.ONE.divide(BigMath.HUNDRED));
             }
             System.out.println(model);
-            model.setMinimisation(true);
+            model.setMinimisation();
             final ConvexSolver solver = QuadraticDemo.createConvexSolver(model);
             final double start = System.currentTimeMillis();
             final Optimisation.Result res = solver.solve();
