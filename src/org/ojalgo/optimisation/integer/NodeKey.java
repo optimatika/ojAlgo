@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -39,23 +40,46 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     private final int[] myLowerBounds;
     private final int[] myUpperBounds;
 
-    final long sequence = GENERATOR.getAndIncrement();
-    final long parent;
-    final int index;
+    /**
+     * How much the branched on variable must be displaced because of the new constraint introduced with this node (each
+     * node introduces precisely 1 new upper or lower bound).
+     */
     final double displacement;
+    /**
+     * The index of the branched on variable.
+     */
+    final int index;
+    /**
+     * The objective function value of the parent node.
+     */
     final double objective;
+    /**
+     * Parent node sequence number.
+     */
+    final long parent;
+    /**
+     * Node sequennce number to keep track of in which order the nodes were created.
+     */
+    final long sequence = GENERATOR.getAndIncrement();
 
-    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parent, final int index, final double displacement, final double objective) {
+    @SuppressWarnings("unused")
+    private NodeKey() {
+        this(null);
+        ProgrammingError.throwForIllegalInvocation();
+    }
+
+    private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int indexBranchedOn,
+            final double branchVariableDisplacement, final double parentObjectiveFunctionValue) {
 
         super();
 
         myLowerBounds = lowerBounds;
         myUpperBounds = upperBounds;
 
-        this.parent = parent;
-        this.index = index;
-        this.displacement = displacement;
-        this.objective = objective;
+        parent = parentSequenceNumber;
+        index = indexBranchedOn;
+        displacement = branchVariableDisplacement;
+        objective = parentObjectiveFunctionValue;
     }
 
     NodeKey(final ExpressionsBasedModel integerModel) {

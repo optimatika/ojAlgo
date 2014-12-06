@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -39,6 +40,7 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
@@ -90,9 +92,10 @@ import org.ojalgo.type.TypeUtils;
  */
 public final class MarkowitzModel extends EquilibriumModel {
 
-    private static final double _0_000005 = 0.000005;
     private static final String BALANCE = "Balance";
     private static final String RETURN = "Return";
+    private static final NumberContext TARGET_VARIANCE_CONTEXT = NumberContext.getGeneral(7, 14);
+    private static final int TARGET_VARIANCE_ITERATIONS = 50;
     private static final String VARIANCE = "Variance";
 
     private final HashMap<int[], LowerUpper> myConstraints = new HashMap<int[], LowerUpper>();
@@ -310,7 +313,7 @@ public final class MarkowitzModel extends EquilibriumModel {
 
         if (myTargetReturn != null) {
 
-            myOptimisationModel = this.generateOptimisationModel(this.getRiskAversion().toBigDecimal().multiply(THOUSAND), myTargetReturn, null);
+            myOptimisationModel = this.generateOptimisationModel(this.getRiskAversion().toBigDecimal().movePointRight(9), myTargetReturn, null);
             retVal = myOptimisationModel.minimise();
 
         } else if (myTargetVariance != null) {
@@ -341,7 +344,7 @@ public final class MarkowitzModel extends EquilibriumModel {
                 tmpHighRiskAversion = tmpRiskAversion;
                 tmpHighReturn = tmpReturn;
 
-                tmpRiskAversion = tmpRiskAversion.multiply(TEN);
+                tmpRiskAversion = tmpRiskAversion.movePointRight(9);
 
                 myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
                 retVal = myOptimisationModel.minimise();
@@ -358,7 +361,7 @@ public final class MarkowitzModel extends EquilibriumModel {
                 tmpLowRiskAversion = tmpRiskAversion;
                 tmpLowReturn = tmpReturn;
 
-                tmpRiskAversion = tmpRiskAversion.multiply(TENTH);
+                tmpRiskAversion = tmpRiskAversion.movePointLeft(3);
 
                 myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
                 retVal = myOptimisationModel.minimise();
@@ -375,7 +378,7 @@ public final class MarkowitzModel extends EquilibriumModel {
 
             do {
 
-                tmpRiskAversion = tmpHighRiskAversion.add(tmpLowRiskAversion).multiply(HALF);
+                tmpRiskAversion = BigFunction.SQRT.invoke(tmpHighRiskAversion.multiply(tmpLowRiskAversion));
 
                 myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
                 retVal = myOptimisationModel.minimise();
@@ -407,11 +410,14 @@ public final class MarkowitzModel extends EquilibriumModel {
 
                 } else {
 
-                    tmpIterCount = 20;
+                    tmpIterCount = TARGET_VARIANCE_ITERATIONS;
                     tmpTargetDiff = ZERO;
                 }
 
-            } while ((tmpIterCount < 20) && (Math.abs(tmpTargetDiff.doubleValue()) > _0_000005));
+            } while ((tmpIterCount < TARGET_VARIANCE_ITERATIONS)
+                    && !TARGET_VARIANCE_CONTEXT.isSmall(myTargetVariance.doubleValue(), tmpTargetDiff.doubleValue()));
+
+            // BasicLogger.debug("IterCount: " + tmpIterCount);
 
         } else {
 

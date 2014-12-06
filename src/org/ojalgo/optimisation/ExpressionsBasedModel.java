@@ -87,9 +87,9 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
-    private static final String OBJECTIVE = "Generated/Aggregated Objective";
     private static final String NEW_LINE = "\n";
-    private static final String OBJ_FUNC_AS_CONSTR_NAME = UUID.randomUUID().toString();
+    private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
+    private static final String OBJECTIVE = "Generated/Aggregated Objective";
     private static final String START_END = "############################################\n";
 
     static final Comparator<Expression> CE = new Comparator<Expression>() {
@@ -100,12 +100,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     };
 
-    public static ExpressionsBasedModel make(final MathProgSysModel aModel) {
+    public static ExpressionsBasedModel make(final MathProgSysModel mps) {
 
-        final MathProgSysModel.Column[] tmpActCols = aModel.getActivatorVariableColumns();
-        final MathProgSysModel.Column[] tmpNegCols = aModel.getNegativeVariableColumns();
-        final MathProgSysModel.Column[] tmpPosCols = aModel.getPositiveVariableColumns();
-        final MathProgSysModel.Row[] tmpAllRows = aModel.getExpressionRows();
+        final MathProgSysModel.Column[] tmpActCols = mps.getActivatorVariableColumns();
+        final MathProgSysModel.Column[] tmpNegCols = mps.getNegativeVariableColumns();
+        final MathProgSysModel.Column[] tmpPosCols = mps.getPositiveVariableColumns();
+        final MathProgSysModel.Row[] tmpAllRows = mps.getExpressionRows();
 
         Arrays.sort(tmpActCols);
         Arrays.sort(tmpNegCols);
@@ -249,22 +249,22 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myWorkCopy = false;
     }
 
-    public ExpressionsBasedModel(final Collection<? extends Variable> someVariables) {
+    public ExpressionsBasedModel(final Collection<? extends Variable> variables) {
 
         super();
 
-        for (final Variable tmpVariable : someVariables) {
+        for (final Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
         }
 
         myWorkCopy = false;
     }
 
-    public ExpressionsBasedModel(final Variable[] someVariables) {
+    public ExpressionsBasedModel(final Variable[] variables) {
 
         super();
 
-        for (final Variable tmpVariable : someVariables) {
+        for (final Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
         }
 
@@ -308,17 +308,17 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
-    public void addVariable(final Variable aVariable) {
+    public void addVariable(final Variable variable) {
         if (myWorkCopy) {
             throw new IllegalStateException("This model is a copy - its set of variables cannot be modified!");
         } else {
-            myVariables.add(aVariable);
-            aVariable.setIndex(new Expression.Index(myVariables.size() - 1));
+            myVariables.add(variable);
+            variable.setIndex(new Expression.Index(myVariables.size() - 1));
         }
     }
 
-    public void addVariables(final Collection<? extends Variable> someVariables) {
-        for (final Variable tmpVariable : someVariables) {
+    public void addVariables(final Collection<? extends Variable> variables) {
+        for (final Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
         }
     }
@@ -373,8 +373,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
-    public Expression getExpression(final String aName) {
-        return myExpressions.get(aName);
+    public Expression getExpression(final String name) {
+        return myExpressions.get(name);
     }
 
     public Collection<Expression> getExpressions() {
@@ -539,8 +539,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
-    public int indexOf(final Variable aVariable) {
-        return aVariable.getIndex().index;
+    public int indexOf(final Variable variable) {
+        return variable.getIndex().index;
     }
 
     /**
@@ -551,8 +551,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return myFreeIndices[index];
     }
 
-    public int indexOfFreeVariable(final Variable aVariable) {
-        return this.indexOfFreeVariable(this.indexOf(aVariable));
+    public int indexOfFreeVariable(final Variable variable) {
+        return this.indexOfFreeVariable(this.indexOf(variable));
     }
 
     /**
@@ -563,8 +563,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return myIntegerIndices[index];
     }
 
-    public int indexOfIntegerVariable(final Variable aVariable) {
-        return this.indexOfIntegerVariable(aVariable.getIndex().index);
+    public int indexOfIntegerVariable(final Variable variable) {
+        return this.indexOfIntegerVariable(variable.getIndex().index);
     }
 
     /**
@@ -575,8 +575,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return myNegativeIndices[index];
     }
 
-    public int indexOfNegativeVariable(final Variable aVariable) {
-        return this.indexOfNegativeVariable(this.indexOf(aVariable));
+    public int indexOfNegativeVariable(final Variable variable) {
+        return this.indexOfNegativeVariable(this.indexOf(variable));
     }
 
     /**
@@ -587,8 +587,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return myPositiveIndices[index];
     }
 
-    public int indexOfPositiveVariable(final Variable aVariable) {
-        return this.indexOfPositiveVariable(this.indexOf(aVariable));
+    public int indexOfPositiveVariable(final Variable variable) {
+        return this.indexOfPositiveVariable(this.indexOf(variable));
     }
 
     public boolean isAnyExpressionQuadratic() {
@@ -633,10 +633,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public void limitObjective(final BigDecimal lower, final BigDecimal upper) {
 
-        Expression tmpEpression = myExpressions.get(OBJ_FUNC_AS_CONSTR_NAME);
+        Expression tmpEpression = myExpressions.get(OBJ_FUNC_AS_CONSTR_KEY);
         if (tmpEpression == null) {
             tmpEpression = this.getObjectiveExpression().copy(this, false);
-            myExpressions.put(OBJ_FUNC_AS_CONSTR_NAME, tmpEpression);
+            myExpressions.put(OBJ_FUNC_AS_CONSTR_KEY, tmpEpression);
         }
 
         tmpEpression.lower(lower).upper(upper);
@@ -869,8 +869,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     /**
      * The general recommendation is to NOT call this method directly. Instead you should use/call {@link #maximise()}
      * or {@link #minimise()}. If you do use this method you must first set {@link #setMinimisation()} or
-     * {@link #setMaximisation()}. Also note that with this method the solver solution is not written back to the
-     * model (or validated by the model).
+     * {@link #setMaximisation()}. Also note that with this method the solver solution is not written back to the model
+     * (or validated by the model).
      */
     public Optimisation.Result solve() {
 
