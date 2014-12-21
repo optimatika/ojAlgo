@@ -130,6 +130,8 @@ public abstract class IntegerSolver extends GenericSolver {
 
         super(model, solverOptions);
 
+        myModel = model;
+
         myMinimisation = model.isMinimisation();
     }
 
@@ -153,6 +155,16 @@ public abstract class IntegerSolver extends GenericSolver {
 
             return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
         }
+    }
+
+    private final ExpressionsBasedModel myModel;
+
+    protected final ExpressionsBasedModel getModel() {
+        return myModel;
+    }
+
+    protected final boolean isModelSet() {
+        return myModel != null;
     }
 
     protected boolean isGoodEnoughToContinueBranching(final double nonIntegerValue) {

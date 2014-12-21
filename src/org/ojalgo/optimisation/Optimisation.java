@@ -225,9 +225,6 @@ public interface Optimisation {
 
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result>, Serializable {
 
-        private int[] myActiveSet = null;
-        private int[] myBasis = null;
-
         private final Access1D<?> mySolution;
         private final Optimisation.State myState;
         private final double myValue; // Objective Function Value
@@ -252,16 +249,6 @@ public interface Optimisation {
             this(state, result.getValue(), result);
         }
 
-        public Result activeSet(final int[] activeSet) {
-            myActiveSet = activeSet;
-            return this;
-        }
-
-        public Result basis(final int[] basis) {
-            myBasis = basis;
-            return this;
-        }
-
         public int compareTo(final Result reference) {
 
             final double tmpRefValue = reference.getValue();
@@ -279,8 +266,8 @@ public interface Optimisation {
             return mySolution.count();
         }
 
-        public double doubleValue(final long anInd) {
-            return mySolution.doubleValue(anInd);
+        public double doubleValue(final long index) {
+            return mySolution.doubleValue(index);
         }
 
         @Override
@@ -308,14 +295,6 @@ public interface Optimisation {
             return TypeUtils.toBigDecimal(mySolution.get(index));
         }
 
-        public int[] getActiveSet() {
-            return myActiveSet;
-        }
-
-        public int[] getBasis() {
-            return myBasis;
-        }
-
         public Optimisation.State getState() {
             return myState;
         }
@@ -336,14 +315,6 @@ public interface Optimisation {
             temp = Double.doubleToLongBits(myValue);
             result = (prime * result) + (int) (temp ^ (temp >>> 32));
             return result;
-        }
-
-        public boolean isActiveSetDefined() {
-            return myActiveSet != null;
-        }
-
-        public boolean isBasisDefined() {
-            return myBasis != null;
         }
 
         public int size() {
@@ -373,6 +344,16 @@ public interface Optimisation {
         Optimisation.Result solve();
 
         Optimisation.Result solve(Optimisation.Result kickStarter);
+
+    }
+
+    public static interface Integration<M extends Optimisation.Model, S extends Optimisation.Solver> extends Optimisation {
+
+        S build(M model);
+
+        Optimisation.Result toModelState(M model, Optimisation.Result solverState);
+
+        Optimisation.Result extractSolverState(M model);
 
     }
 

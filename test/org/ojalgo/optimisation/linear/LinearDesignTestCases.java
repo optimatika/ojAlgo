@@ -36,7 +36,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
@@ -62,7 +61,6 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
                 new Variable("X3").lower(ZERO).weight(ONE.negate()) };
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpModel.setMaximisation();
 
         final Expression retExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -82,8 +80,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         }
         tmpExprC3.upper(new BigDecimal("30.0"));
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.maximise();
         final BasicMatrix tmpSolution = BigMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 5.0 }, { 4.0 }, { 0.0 } });
@@ -101,7 +98,6 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
                 new Variable("X3").lower(ZERO).weight(ONE) };
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpModel.setMaximisation();
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -115,8 +111,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         }
         tmpExprC2.level(SIX);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.maximise();
         final BasicMatrix tmpSolution = BigMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 8.0 }, { 1.0 }, { 0.0 } });
@@ -133,7 +128,6 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         final Variable[] tmpVariables = new Variable[] { new Variable("X1").lower(ZERO).weight(TEN.add(FIVE)), new Variable("X2").lower(ZERO).weight(TEN) };
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpModel.setMaximisation();
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -153,8 +147,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         }
         tmpExprC3.level(FOUR);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.maximise();
         final BasicMatrix tmpSolution = BigMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2.0 }, { 2.0 } });
@@ -172,7 +165,6 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
                 new Variable("X3").lower(ZERO).weight(ZERO) };
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpModel.setMinimisation();
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -192,8 +184,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         }
         tmpExprC3.level(FIVE);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
         final BasicMatrix tmpSolution = BigMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.74 }, { 0.45 }, { 1.0 } });
@@ -211,7 +202,6 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         final Variable[] tmpVariables = new Variable[] { new Variable("X1").lower(ZERO).weight(TWO), new Variable("X2").lower(ZERO).weight(THREE) };
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpModel.setMinimisation();
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -231,8 +221,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         }
         tmpExprC3.level(TEN);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
         final BasicMatrix tmpSolution = BigMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 5.0 }, { 5.0 } });
@@ -250,10 +239,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
                 new Variable("X3").lower(ZERO).weight(THREE) };
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpModel.setMaximisation();
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.maximise();
 
         TestUtils.assertEquals(State.UNBOUNDED, tmpResult.getState());
     }
@@ -266,7 +253,6 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         final Variable[] tmpVariables = new Variable[] { new Variable("X1").lower(ZERO).weight(TWO), new Variable("X2").lower(ZERO).weight(THREE) };
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpModel.setMinimisation();
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -286,8 +272,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         }
         tmpExprC3.lower(TWELVE);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
         final BasicMatrix tmpSolution = BigMatrix.FACTORY.columns(tmpResult);
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0 }, { 4.0 } });
@@ -305,7 +290,6 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
                 new Variable("X3").lower(ZERO).weight(ONE) };
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpModel.setMaximisation();
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
@@ -325,8 +309,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         }
         tmpExprC3.level(TEN.add(TEN));
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.maximise();
 
         TestUtils.assertTrue(tmpResult.getState().isFeasible());
     }
@@ -353,10 +336,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     public void testMaxOldKnapsackTestModel() {
 
         final ExpressionsBasedModel tmpModel = this.buildOldKnapsackTestModel();
-        tmpModel.setMaximisation();
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.maximise();
         final BasicMatrix tmpSolution = BigMatrix.FACTORY.columns(tmpResult);
 
         final MatrixStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 },
@@ -369,10 +350,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     public void testMinOldKnapsackTestModel() {
 
         final ExpressionsBasedModel tmpModel = this.buildOldKnapsackTestModel();
-        tmpModel.setMinimisation();
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
         final BasicMatrix tmpSolution = BigMatrix.FACTORY.columns(tmpResult);
 
         final MatrixStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.8154 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 },
@@ -451,7 +430,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         TestUtils.assertTrue("Expected Solution Not Valid", tmpModel.validate(tmpExpSol));
 
-        tmpModel.options.debug(LinearSolver.class);
+        // tmpModel.options.debug(LinearSolver.class);
         //tmpModel.options.problem = NumberContext.getGeneral(8);
 
         final Result tmpResult = tmpModel.minimise();

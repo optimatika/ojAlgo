@@ -153,9 +153,9 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         }
     }
 
-    public final void setRiskAversion(final Number aFactor) {
+    public final void setRiskAversion(final Number factor) {
 
-        myMarketEquilibrium.setRiskAversion(aFactor);
+        myMarketEquilibrium.setRiskAversion(factor);
 
         this.reset();
     }
@@ -224,6 +224,10 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         myAssetReturns = null;
         myMeanReturn = null;
         myReturnVariance = null;
+    }
+
+    final boolean isDefaultRiskAversion() {
+        return myMarketEquilibrium.isDefaultRiskAversion();
     }
 
 }

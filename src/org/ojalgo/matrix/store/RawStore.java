@@ -57,7 +57,7 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * This class adapts JAMA's RawStore to ojAlgo's {@linkplain BasicMatrix} and {@linkplain PhysicalStore} interfaces.
+ * Uses double[][] internally.
  *
  * @author apete
  */

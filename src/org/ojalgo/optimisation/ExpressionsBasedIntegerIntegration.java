@@ -21,52 +21,25 @@
  */
 package org.ojalgo.optimisation;
 
-import java.io.Serializable;
+import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
+import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.integer.IntegerSolver;
+import org.ojalgo.optimisation.integer.OldIntegerSolver;
 
-abstract class AbstractModel<S extends Optimisation.Solver> implements Optimisation.Model, Serializable {
+final class ExpressionsBasedIntegerIntegration extends Integration<IntegerSolver> {
 
-    public final Optimisation.Options options;
-
-    private boolean myMinimisation = true;
-
-    protected AbstractModel() {
-
-        super();
-
-        options = new Optimisation.Options();
+    public IntegerSolver build(final ExpressionsBasedModel model) {
+        //return NewIntegerSolver.make(model);
+        return OldIntegerSolver.make(model);
     }
 
-    protected AbstractModel(final Optimisation.Options someOptions) {
-
-        super();
-
-        options = someOptions;
+    public Result toModelState(final ExpressionsBasedModel model, final Result solverState) {
+        return solverState;
     }
 
-    public abstract void destroy();
-
-    public final boolean isMaximisation() {
-        return !this.isMinimisation();
-    }
-
-    public final boolean isMinimisation() {
-        return myMinimisation;
-    }
-
-    public final void setMaximisation() {
-        this.setMaximisation(true);
-    }
-
-    public final void setMinimisation() {
-        this.setMinimisation(true);
-    }
-
-    protected final void setMaximisation(final boolean maximisation) {
-        this.setMinimisation(!maximisation);
-    }
-
-    protected final void setMinimisation(final boolean minimisation) {
-        myMinimisation = minimisation;
+    public Result extractSolverState(final ExpressionsBasedModel model) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -52,7 +52,7 @@ public class NetlibCase extends OptimisationLinearTests {
         //tmpModel.options.problem = new NumberContext(32, 8, RoundingMode.HALF_EVEN);
         //tmpModel.options.solution = new NumberContext(16, 10, RoundingMode.HALF_EVEN);
 
-        tmpModel.options.debug(LinearSolver.class);
+        // tmpModel.options.debug(LinearSolver.class);
 
         this.assertMinMaxVal(tmpModel, new BigDecimal("-3.0812149846E+01"), null);
     }

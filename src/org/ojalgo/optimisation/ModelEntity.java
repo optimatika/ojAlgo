@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright 1997-2014 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,18 +24,18 @@ package org.ojalgo.optimisation;
 import java.math.BigDecimal;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * Model entities are identified and compared by their names only. Any/all other members/attributes are NOT part of
  * equals(), hashCode() or compareTo().
- * 
+ *
  * @author apete
  */
 public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
 
-    private boolean myActiveInequalityConstraint = false;
     private BigDecimal myContributionWeight = null;
     private BigDecimal myLowerLimit = null;
     private final String myName;
@@ -56,17 +56,15 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
         myLowerLimit = entityToCopy.getLowerLimit();
         myUpperLimit = entityToCopy.getUpperLimit();
-
-        myActiveInequalityConstraint = entityToCopy.isActiveInequalityConstraint();
     }
 
-    protected ModelEntity(final String aName) {
+    protected ModelEntity(final String name) {
 
         super();
 
-        myName = aName;
+        myName = name;
 
-        ProgrammingError.throwIfNull(aName);
+        ProgrammingError.throwIfNull(name);
     }
 
     public final int compareTo(final ME obj) {
@@ -147,10 +145,6 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
     @Override
     public final int hashCode() {
         return myName.hashCode();
-    }
-
-    public final boolean isActiveInequalityConstraint() {
-        return this.isConstraint() && !this.isEqualityConstraint() && myActiveInequalityConstraint;
     }
 
     /**
@@ -278,38 +272,38 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
     protected abstract int getAdjustmentExponent();
 
-    protected final boolean validate() {
+    protected boolean validate(final BasicLogger.Appender appender) {
 
         boolean retVal = true;
 
         if ((myLowerLimit != null) && (myUpperLimit != null)) {
             if ((myLowerLimit.compareTo(myUpperLimit) == 1) || (myUpperLimit.compareTo(myLowerLimit) == -1)) {
-                //BasicLogger.logError(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
+                appender.println(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
                 retVal = false;
             }
         }
 
         if ((myContributionWeight != null) && (myContributionWeight.signum() == 0)) {
-            //BasicLogger.logError(this.toString() + " The contribution weight (if it exists) should not be zero!");
+            appender.println(this.toString() + " The contribution weight (if it exists) should not be zero!");
             retVal = false;
         }
 
         return retVal;
     }
 
-    protected boolean validate(final BigDecimal value, final NumberContext context) {
+    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Appender appender) {
 
         boolean retVal = true;
 
         BigDecimal tmpLimit = null;
 
         if (((tmpLimit = this.getLowerLimit()) != null) && ((context.enforce(value.subtract(tmpLimit)).signum() == -1))) {
-            //BasicLogger.logError(value + " ! " + this.toString());
+            appender.println(value + " ! " + this.toString());
             retVal = false;
         }
 
         if (((tmpLimit = this.getUpperLimit()) != null) && ((context.enforce(value.subtract(tmpLimit)).signum() == 1))) {
-            //BasicLogger.logError(value + " ! " + this.toString());
+            appender.println(value + " ! " + this.toString());
             retVal = false;
         }
 
@@ -362,10 +356,6 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
             return myUpperLimit;
         }
-    }
-
-    final void setActiveInequalityConstraint(final boolean activeConstraint) {
-        myActiveInequalityConstraint = activeConstraint;
     }
 
 }

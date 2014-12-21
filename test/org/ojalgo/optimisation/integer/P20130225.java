@@ -15,7 +15,6 @@ import org.ojalgo.optimisation.Variable;
  */
 
 /**
- *
  * @author fran
  */
 class P20130225 {
@@ -168,8 +167,7 @@ class P20130225 {
                 expresion3.level(new BigDecimal(5));
             }
 
-            model.setMinimisation();
-            final Optimisation.Result result = model.getDefaultSolver().solve();
+            final Optimisation.Result result = model.minimise();
 
             System.out.println(result);
 
@@ -184,33 +182,33 @@ class P20130225 {
     }
 
     static ExpressionsBasedModel makeModel() {
-    
+
         final double alpha = 0.1;
-        final TreeMap preCalculateCosts = preCalculateCosts();
+        final TreeMap preCalculateCosts = P20130225.preCalculateCosts();
         final TreeMap variablesStation = new TreeMap();
         final TreeMap variablesUVStation = new TreeMap();
         final ArrayList allVariables = new ArrayList();
-    
+
         for (int i = 0; i < preCalculateCosts.size(); i++) {
             final double[] costs = (double[]) preCalculateCosts.get(i);
             // Cost function = Min(sum(C_i_j*X_i_j + alpha*(sum(Ui + Vi))
             final int availableDocks = costs.length;
             final Variable u = new Variable("U_" + i).lower(new BigDecimal(0)).weight(new BigDecimal(alpha));
             final Variable v = new Variable("V_" + i).lower(new BigDecimal(0)).weight(new BigDecimal(alpha));
-    
+
             allVariables.add(u);
             allVariables.add(v);
             final ArrayList uvVariables = new ArrayList();
             uvVariables.add(u);
             uvVariables.add(v);
             variablesUVStation.put(i, uvVariables);
-    
+
             for (int j = 0; j < availableDocks; j++) {
-    
+
                 final double cost = costs[j];
-    
+
                 final Variable variable = new Variable("X_" + i + "_" + j).binary().weight(new BigDecimal(cost));
-    
+
                 if (variablesStation.containsKey(i)) {
                     final ArrayList vars = (ArrayList) variablesStation.get(i);
                     vars.add(variable);
@@ -223,7 +221,7 @@ class P20130225 {
             }
         }
         final ExpressionsBasedModel tmpIntegerModel = new ExpressionsBasedModel(allVariables);
-    
+
         // Exp_total_bikes = sum(j*X_i_j) <= 91;
         final Expression expresion1 = tmpIntegerModel.addExpression("Exp_total_bikes");
         for (int i = 0; i < tmpIntegerModel.countVariables(); i++) {
@@ -235,16 +233,16 @@ class P20130225 {
             }
         }
         expresion1.upper(new BigDecimal(91));
-    
+
         for (int i = 0; i < preCalculateCosts.size(); i++) {
             // Exp_i = sum(X_i_j) = 1
             final ArrayList varsStation = (ArrayList) variablesStation.get(i);
-    
+
             final Expression expresion2 = tmpIntegerModel.addExpression("Exp_" + i);
             expresion2.setLinearFactorsSimple(varsStation);
             expresion2.level(new BigDecimal(1));
         }
-    
+
         for (int i = 0; i < preCalculateCosts.size(); i++) {
             // Exp_UV_i = Ui - Vi + sum(j*X_i_j) = 5
             final Expression expresion3 = tmpIntegerModel.addExpression("Exp_UV_" + i);

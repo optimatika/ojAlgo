@@ -159,8 +159,8 @@ public final class OldIntegerSolver extends IntegerSolver {
                         tmpModel.destroy();
                         tmpModel = null;
 
-                        final BranchAndBoundNodeTask tmpLowerBranchTask = this.createLowerBranch(tmpBranchIndex, tmpVariableValue, tmpResult);
-                        final BranchAndBoundNodeTask tmpUpperBranchTask = this.createUpperBranch(tmpBranchIndex, tmpVariableValue, tmpResult);
+                        final BranchAndBoundNodeTask tmpLowerBranchTask = this.createLowerBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
+                        final BranchAndBoundNodeTask tmpUpperBranchTask = this.createUpperBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
 
                         //   return tmpLowerBranchTask.compute() && tmpUpperBranchTask.compute();
 
@@ -192,18 +192,16 @@ public final class OldIntegerSolver extends IntegerSolver {
             return true;
         }
 
-        BranchAndBoundNodeTask createLowerBranch(final int branchIndex, final double nonIntegerValue, final Optimisation.Result nodeResult) {
+        BranchAndBoundNodeTask createLowerBranch(final int branchIndex, final double nonIntegerValue, final double parentObjectiveValue) {
 
-            final double tmpParentValue = nodeResult.getValue();
-            final NodeKey tmpKey = myKey.createLowerBranch(branchIndex, nonIntegerValue, tmpParentValue);
+            final NodeKey tmpKey = myKey.createLowerBranch(branchIndex, nonIntegerValue, parentObjectiveValue);
 
             return new BranchAndBoundNodeTask(tmpKey);
         }
 
-        BranchAndBoundNodeTask createUpperBranch(final int branchIndex, final double nonIntegerValue, final Optimisation.Result nodeResult) {
+        BranchAndBoundNodeTask createUpperBranch(final int branchIndex, final double nonIntegerValue, final double parentObjectiveValue) {
 
-            final double tmpParentValue = nodeResult.getValue();
-            final NodeKey tmpKey = myKey.createUpperBranch(branchIndex, nonIntegerValue, tmpParentValue);
+            final NodeKey tmpKey = myKey.createUpperBranch(branchIndex, nonIntegerValue, parentObjectiveValue);
 
             return new BranchAndBoundNodeTask(tmpKey);
         }
@@ -248,7 +246,7 @@ public final class OldIntegerSolver extends IntegerSolver {
     }
 
     public static OldIntegerSolver make(final ExpressionsBasedModel model) {
-        return new OldIntegerSolver(model, null);
+        return new OldIntegerSolver(model, model.options);
     }
 
     private final Set<NodeKey> myExploredNodes = Collections.synchronizedSet(new HashSet<NodeKey>());

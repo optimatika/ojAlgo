@@ -130,9 +130,9 @@ public class ReportedProblems extends FinancePortfolioTests {
         ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
 
         ConvexSolver tmpSolver = tmpBuilder.build();
-        tmpSolver.options.debug(ConvexSolver.class);
+        // tmpSolver.options.debug(ConvexSolver.class);
         Optimisation.Result tmpResult = tmpSolver.solve();
-        //  BasicMatrix tmpSolution = tmpResult.getSolution();
+        // BasicMatrix tmpSolution = tmpResult.getSolution();
 
         TestUtils.assertEquals(tmpX, tmpResult, new NumberContext(7, 6));
 

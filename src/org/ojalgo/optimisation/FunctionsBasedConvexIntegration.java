@@ -19,61 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.convex;
+package org.ojalgo.optimisation;
 
-import java.util.List;
+import org.ojalgo.optimisation.FunctionsBasedModel.Integration;
+import org.ojalgo.optimisation.Optimisation.Result;
+import org.ojalgo.optimisation.convex.ConvexSolver;
 
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.optimisation.Expression;
-import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.GenericSolver;
+final class FunctionsBasedConvexIntegration extends Integration<ConvexSolver> {
 
-public class SequentailQuadraticSolver extends GenericSolver {
-
-    List<Expression> myEqualityConstraints;
-    List<Expression> myLowerConstraints;
-    List<Expression> myUpperConstraints;
-
-    public SequentailQuadraticSolver(final ExpressionsBasedModel aModel, final Options solverOptions) {
-
-        super(aModel, solverOptions);
-
-        myEqualityConstraints = aModel.selectExpressionsQuadraticEquality();
-        myLowerConstraints = aModel.selectExpressionsQuadraticLower();
-        myUpperConstraints = aModel.selectExpressionsQuadraticUpper();
-    }
-
-    public Result solve(final Result kickStarter) {
+    public ConvexSolver build(final FunctionsBasedModel model) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
-    protected MatrixStore<Double> extractSolution() {
+    public Result toModelState(final FunctionsBasedModel model, final Result solverState) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
-    protected boolean initialise(final Result kickStart) {
-        return false;
+    public Result extractSolverState(final FunctionsBasedModel model) {
         // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected boolean needsAnotherIteration() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    protected boolean validate() {
-
-        final boolean retVal = true;
-        this.setState(State.VALID);
-
-        return retVal;
+        return null;
     }
 
 }

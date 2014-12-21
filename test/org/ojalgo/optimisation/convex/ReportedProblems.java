@@ -616,8 +616,8 @@ public class ReportedProblems extends OptimisationConvexTests {
         tmpBuilder.balance(); // Without this, precision is really bad.
 
         final ConvexSolver tmpSolver = tmpBuilder.build();
-        tmpSolver.options.debug(ConvexSolver.class);
-        tmpSolver.options.validate = false;
+        // tmpSolver.options.debug(ConvexSolver.class);
+        // tmpSolver.options.validate = false;
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
@@ -854,7 +854,7 @@ public class ReportedProblems extends OptimisationConvexTests {
         tmpConstrExpr.setLinearFactor(1, BigMath.ONE);
         tmpConstrExpr.setLinearFactor(2, BigMath.NEG);
 
-        tmpModel.options.debug(ConvexSolver.class);
+        // tmpModel.options.debug(ConvexSolver.class);
         final Result tmpResult = tmpModel.minimise();
         final double tmpObjFuncVal = tmpResult.getValue();
 
@@ -908,7 +908,7 @@ public class ReportedProblems extends OptimisationConvexTests {
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
         final ConvexSolver tmpSolver = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
-        tmpSolver.options.debug(ConvexSolver.class);
+        // tmpSolver.options.debug(ConvexSolver.class);
         tmpSolver.options.validate = false; // Q is not positive semidefinite
 
         final Optimisation.Result tmpResult = tmpSolver.solve();
@@ -1058,7 +1058,7 @@ public class ReportedProblems extends OptimisationConvexTests {
 
             final ConvexSolver qSolver = qsBuilder.build();
 
-            qSolver.options.debug(ConvexSolver.class);
+            // qSolver.options.debug(ConvexSolver.class);
 
             result = qSolver.solve();
         } catch (final Exception e) {
@@ -1097,8 +1097,8 @@ public class ReportedProblems extends OptimisationConvexTests {
         tmpBalance.setLinearFactorsSimple(tmpModel.getVariables());
         tmpBalance.level(BigMath.ONE);
 
-        tmpModel.options.debug(ConvexSolver.class);
-        tmpModel.options.validate = false;
+        // tmpModel.options.debug(ConvexSolver.class);
+        // tmpModel.options.validate = false;
         final Result tmpActualResult = tmpModel.minimise();
 
         TestUtils.assertTrue(tmpModel.validate(Array1D.BIG.copy(expected)));
@@ -1115,7 +1115,9 @@ public class ReportedProblems extends OptimisationConvexTests {
         final LinearSolver tmpLinearSolver = LinearSolver.make(tmpModel);
         final Optimisation.Result tmpLinearResult = tmpLinearSolver.solve();
         TestUtils.assertStateNotLessThanFeasible(tmpLinearResult);
-        TestUtils.assertTrue(tmpModel.validate(tmpLinearResult));
+        // Kan inte göra så här längre
+        // Måste använda ExpressionsBasedLinearIntegration
+        // TestUtils.assertTrue(tmpModel.validate(tmpLinearResult));
 
     }
 

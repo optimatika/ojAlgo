@@ -31,7 +31,7 @@ import java.util.Map;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.BigFunction;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -93,15 +93,17 @@ import org.ojalgo.type.context.NumberContext;
 public final class MarkowitzModel extends EquilibriumModel {
 
     private static final String BALANCE = "Balance";
-    private static final String RETURN = "Return";
-    private static final NumberContext TARGET_VARIANCE_CONTEXT = NumberContext.getGeneral(7, 14);
-    private static final int TARGET_VARIANCE_ITERATIONS = 50;
+    private static final double INIT = Math.sqrt(PrimitiveMath.TEN);
+    private static final double MAX = PrimitiveMath.HUNDRED * PrimitiveMath.HUNDRED;
+    private static final double MIN = PrimitiveMath.HUNDREDTH;
+    private static final NumberContext TARGET_CONTEXT = NumberContext.getGeneral(7, 14);
     private static final String VARIANCE = "Variance";
 
     private final HashMap<int[], LowerUpper> myConstraints = new HashMap<int[], LowerUpper>();
     private final BasicMatrix myExpectedExcessReturns;
     private transient ExpressionsBasedModel myOptimisationModel;
     private transient State myOptimisationState = State.UNEXPLORED;
+    private transient Expression myOptimisationVariance;
     private boolean myShortingAllowed = false;
     private BigDecimal myTargetReturn;
     private BigDecimal myTargetVariance;
@@ -252,177 +254,135 @@ public final class MarkowitzModel extends EquilibriumModel {
         return myOptimisationModel.toString();
     }
 
-    private ExpressionsBasedModel generateOptimisationModel(final BigDecimal riskAversion, final BigDecimal lowerReturnLimit, final BigDecimal upperReturnLimit) {
+    private ExpressionsBasedModel generateOptimisationModel(final double riskAversion) {
 
-        final Variable[] tmpVariables = new Variable[myVariables.length];
-        for (int i = 0; i < tmpVariables.length; i++) {
-            tmpVariables[i] = myVariables[i].copy();
-            if (!myShortingAllowed && ((myVariables[i].getLowerLimit() == null) || (myVariables[i].getLowerLimit().signum() == -1))) {
-                tmpVariables[i].lower(ZERO);
-            }
-        }
+        if ((myOptimisationModel == null) || (myOptimisationVariance == null)) {
 
-        final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
-
-        final Expression tmpVarianceExpression = retVal.addExpression(VARIANCE);
-        final BasicMatrix tmpCovariances = this.getCovariances();
-        for (int j = 0; j < tmpVariables.length; j++) {
+            final Variable[] tmpVariables = new Variable[myVariables.length];
             for (int i = 0; i < tmpVariables.length; i++) {
-                tmpVarianceExpression.setQuadraticFactor(i, j, tmpCovariances.toBigDecimal(i, j));
+                tmpVariables[i] = myVariables[i].copy();
+                if (!myShortingAllowed && ((myVariables[i].getLowerLimit() == null) || (myVariables[i].getLowerLimit().signum() == -1))) {
+                    tmpVariables[i].lower(ZERO);
+                }
             }
-        }
-        tmpVarianceExpression.weight(riskAversion.multiply(HALF));
 
-        final Expression tmpBalanceExpression = retVal.addExpression(BALANCE);
-        for (int i = 0; i < tmpVariables.length; i++) {
-            tmpBalanceExpression.setLinearFactor(i, ONE);
-        }
-        tmpBalanceExpression.level(ONE);
+            myOptimisationModel = new ExpressionsBasedModel(tmpVariables);
 
-        if ((lowerReturnLimit != null) || (upperReturnLimit != null)) {
+            myOptimisationVariance = myOptimisationModel.addExpression(VARIANCE);
+            final BasicMatrix tmpCovariances = this.getCovariances();
+            for (int j = 0; j < tmpVariables.length; j++) {
+                for (int i = 0; i < tmpVariables.length; i++) {
+                    myOptimisationVariance.setQuadraticFactor(i, j, tmpCovariances.toBigDecimal(i, j));
+                }
+            }
 
-            final Expression tmpReturnExpression = retVal.addExpression(RETURN);
+            final Expression tmpBalanceExpression = myOptimisationModel.addExpression(BALANCE);
             for (int i = 0; i < tmpVariables.length; i++) {
-                tmpReturnExpression.setLinearFactor(i, myExpectedExcessReturns.toBigDecimal(i, 0));
+                tmpBalanceExpression.setLinearFactor(i, ONE);
             }
-            tmpReturnExpression.lower(lowerReturnLimit);
-            tmpReturnExpression.upper(upperReturnLimit);
+            tmpBalanceExpression.level(ONE);
+
+            for (final Map.Entry<int[], LowerUpper> tmpConstraintSet : myConstraints.entrySet()) {
+
+                final int[] tmpKey = tmpConstraintSet.getKey();
+                final LowerUpper tmpValue = tmpConstraintSet.getValue();
+
+                final Expression tmpExpr = myOptimisationModel.addExpression(Arrays.toString(tmpKey));
+                for (int i = 0; i < tmpKey.length; i++) {
+                    tmpExpr.setLinearFactor(tmpKey[i], ONE);
+                }
+                tmpExpr.lower(tmpValue.lower).upper(tmpValue.upper);
+            }
         }
 
-        for (final Map.Entry<int[], LowerUpper> tmpConstraintSet : myConstraints.entrySet()) {
+        myOptimisationVariance.weight(riskAversion / 2.0);
 
-            final int[] tmpKey = tmpConstraintSet.getKey();
-            final LowerUpper tmpValue = tmpConstraintSet.getValue();
-
-            final Expression tmpExpr = retVal.addExpression(Arrays.toString(tmpKey));
-            for (int i = 0; i < tmpKey.length; i++) {
-                tmpExpr.setLinearFactor(tmpKey[i], ONE);
-            }
-            tmpExpr.lower(tmpValue.lower).upper(tmpValue.upper);
-        }
-
-        //retVal.options.debug(QuadraticSolver.class);
-        //retVal.options.debug(ConvexSolver.class);
-
-        return retVal;
+        return myOptimisationModel;
     }
 
     private Optimisation.Result optimise() {
 
         Optimisation.Result retVal;
 
-        if (myTargetReturn != null) {
+        if ((myTargetReturn != null) || (myTargetVariance != null)) {
 
-            myOptimisationModel = this.generateOptimisationModel(this.getRiskAversion().toBigDecimal().movePointRight(9), myTargetReturn, null);
-            retVal = myOptimisationModel.minimise();
+            retVal = this.generateOptimisationModel(0.0).minimise();
 
-        } else if (myTargetVariance != null) {
+            if (retVal.getState().isFeasible()) {
 
-            BigDecimal tmpRiskAversion = this.getRiskAversion().toBigDecimal();
-            BigDecimal tmpReturn = null;
-            BigDecimal tmpVariance = null;
-
-            BigDecimal tmpLowRiskAversion = null;
-            BigDecimal tmpLowReturn = null;
-            BigDecimal tmpLowVariance = null;
-
-            BigDecimal tmpHighRiskAversion = null;
-            BigDecimal tmpHighReturn = null;
-            BigDecimal tmpHighVariance = null;
-
-            BigDecimal tmpTargetDiff = null;
-
-            myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
-            retVal = myOptimisationModel.minimise();
-
-            tmpReturn = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).toBigDecimal();
-            tmpVariance = this.calculatePortfolioVariance(retVal).toBigDecimal();
-            tmpTargetDiff = tmpVariance.subtract(myTargetVariance);
-
-            if (tmpTargetDiff.signum() > 0) {
-
-                tmpHighRiskAversion = tmpRiskAversion;
-                tmpHighReturn = tmpReturn;
-
-                tmpRiskAversion = tmpRiskAversion.movePointRight(9);
-
-                myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
-                retVal = myOptimisationModel.minimise();
-
-                tmpReturn = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).toBigDecimal();
-                tmpVariance = this.calculatePortfolioVariance(retVal).toBigDecimal();
-                tmpTargetDiff = tmpVariance.subtract(myTargetVariance);
-
-                tmpLowRiskAversion = tmpRiskAversion;
-                tmpLowReturn = tmpReturn;
-
-            } else {
-
-                tmpLowRiskAversion = tmpRiskAversion;
-                tmpLowReturn = tmpReturn;
-
-                tmpRiskAversion = tmpRiskAversion.movePointLeft(3);
-
-                myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
-                retVal = myOptimisationModel.minimise();
-
-                tmpReturn = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).toBigDecimal();
-                tmpVariance = this.calculatePortfolioVariance(retVal).toBigDecimal();
-                tmpTargetDiff = tmpVariance.subtract(myTargetVariance);
-
-                tmpHighRiskAversion = tmpRiskAversion;
-                tmpHighReturn = tmpReturn;
-            }
-
-            int tmpIterCount = 0;
-
-            do {
-
-                tmpRiskAversion = BigFunction.SQRT.invoke(tmpHighRiskAversion.multiply(tmpLowRiskAversion));
-
-                myOptimisationModel = this.generateOptimisationModel(tmpRiskAversion, tmpLowReturn, tmpHighReturn);
-                retVal = myOptimisationModel.minimise();
-
-                if (retVal != null) {
-
-                    tmpReturn = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).toBigDecimal();
-                    tmpVariance = this.calculatePortfolioVariance(retVal).toBigDecimal();
-                    tmpTargetDiff = tmpVariance.subtract(myTargetVariance);
-
-                    if (tmpTargetDiff.signum() < 0) {
-                        tmpLowRiskAversion = tmpRiskAversion;
-                        tmpLowReturn = tmpReturn;
-                        tmpLowVariance = tmpVariance;
-                    } else if (tmpTargetDiff.signum() > 0) {
-                        tmpHighRiskAversion = tmpRiskAversion;
-                        tmpHighReturn = tmpReturn;
-                        tmpHighVariance = tmpVariance;
-                    }
-
-                    tmpIterCount++;
-
-                    //                        BasicLogger.logDebug();
-                    //                        BasicLogger.logDebug("Iter:   {}", tmpIterCount);
-                    //                        BasicLogger.logDebug("Low:    {}", tmpLowVariance);
-                    //                        BasicLogger.logDebug("Target: {}", myTargetVariance);
-                    //                        BasicLogger.logDebug("High:   {}", tmpHighVariance);
-                    //                        BasicLogger.logDebug("Diff:   {}", tmpTargetDiff);
-
+                final double tmpTargetValue;
+                if (myTargetVariance != null) {
+                    tmpTargetValue = myTargetVariance.doubleValue();
+                } else if (myTargetReturn != null) {
+                    tmpTargetValue = myTargetReturn.doubleValue();
                 } else {
+                    tmpTargetValue = ONE.doubleValue();
+                }
+                double tmpTargetDiff = ZERO.doubleValue();
+                double tmpTargetNow = ZERO.doubleValue();
+                double tmpTargetLast = ZERO.doubleValue();
 
-                    tmpIterCount = TARGET_VARIANCE_ITERATIONS;
-                    tmpTargetDiff = ZERO;
+                double tmpCurrent;
+                double tmpLow;
+                double tmpHigh;
+                if (this.isDefaultRiskAversion()) {
+                    tmpCurrent = INIT;
+                    tmpLow = MAX;
+                    tmpHigh = MIN;
+                } else {
+                    tmpCurrent = this.getRiskAversion().doubleValue();
+                    tmpLow = tmpCurrent * INIT;
+                    tmpHigh = tmpCurrent / INIT;
                 }
 
-            } while ((tmpIterCount < TARGET_VARIANCE_ITERATIONS)
-                    && !TARGET_VARIANCE_CONTEXT.isSmall(myTargetVariance.doubleValue(), tmpTargetDiff.doubleValue()));
+                int tmpIterCount = 0;
 
-            // BasicLogger.debug("IterCount: " + tmpIterCount);
+                do {
+
+                    retVal = this.generateOptimisationModel(tmpCurrent).minimise();
+
+                    if (retVal != null) {
+
+                        tmpTargetLast = tmpTargetNow;
+                        if (myTargetVariance != null) {
+                            tmpTargetNow = this.calculatePortfolioVariance(retVal).doubleValue();
+                            tmpTargetDiff = tmpTargetNow - tmpTargetValue;
+                        } else if (myTargetReturn != null) {
+                            tmpTargetNow = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).doubleValue();
+                            tmpTargetDiff = tmpTargetNow - tmpTargetValue;
+                        } else {
+                            tmpTargetDiff = ZERO.doubleValue();
+                        }
+
+                        if (tmpTargetDiff < 0.0) {
+                            tmpLow = tmpCurrent;
+                        } else if (tmpTargetDiff > 0.0) {
+                            tmpHigh = tmpCurrent;
+                        }
+                        tmpCurrent = Math.sqrt(tmpLow * tmpHigh);
+
+                        tmpIterCount++;
+
+                        //                        BasicLogger.debug();
+                        //                        BasicLogger.debug("Iter:   {}", tmpIterCount);
+                        //                        BasicLogger.debug("RAF:   {}", tmpCurrent);
+                        //                        BasicLogger.debug("Last: {}", tmpTargetLast);
+                        //                        BasicLogger.debug("Now: {}", tmpTargetNow);
+                        //                        BasicLogger.debug("Target: {}", tmpTargetValue);
+                        //                        BasicLogger.debug("Diff:   {}", tmpTargetDiff);
+
+                    } else {
+
+                        tmpTargetDiff = ZERO.doubleValue();
+                    }
+
+                } while (!TARGET_CONTEXT.isSmall(tmpTargetValue, tmpTargetDiff) && TARGET_CONTEXT.isDifferent(tmpTargetLast, tmpTargetNow));
+            }
 
         } else {
 
-            myOptimisationModel = this.generateOptimisationModel(this.getRiskAversion().toBigDecimal(), null, null);
-            retVal = myOptimisationModel.minimise();
+            retVal = this.generateOptimisationModel(this.getRiskAversion().doubleValue()).minimise();
+
         }
 
         if (retVal.getState().isFeasible()) {
@@ -460,6 +420,7 @@ public final class MarkowitzModel extends EquilibriumModel {
         super.reset();
 
         myOptimisationModel = null;
+        myOptimisationVariance = null;
         myOptimisationState = State.UNEXPLORED;
     }
 

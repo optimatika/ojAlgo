@@ -223,13 +223,17 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
     }
 
+    public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<MathProgSysModel, S> {
+
+    }
+
     public static final class Row extends ModelEntity<MathProgSysModel.Row> {
 
         public final RowType type;
 
-        public Row(final String aName, final RowType aType) {
+        public Row(final String name, final RowType aType) {
 
-            super(aName);
+            super(name);
 
             type = aType;
 
@@ -437,8 +441,9 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return tmpSelection.toArray(new Row[tmpSelection.size()]);
     }
 
-    public GenericSolver getDefaultSolver() {
-        return ExpressionsBasedModel.make(this).getDefaultSolver();
+    private GenericSolver getDefaultSolver() {
+        //   return ExpressionsBasedModel.make(this).getDefaultSolver();
+        return null;
     }
 
     public Row[] getExpressionRows() {

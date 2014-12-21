@@ -37,7 +37,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
 
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);
-    private final ExpressionsBasedModel myModel;
     private long myResetTime;
     private State myState = State.UNEXPLORED;
 
@@ -54,7 +53,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         super();
 
         if (model != null) {
-            myModel = model;
             myFunction = model.getObjectiveFunction();
             if (solverOptions != null) {
                 options = solverOptions;
@@ -62,7 +60,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
                 options = model.options;
             }
         } else {
-            myModel = model;
             myFunction = null;
             if (solverOptions != null) {
                 options = solverOptions;
@@ -126,10 +123,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         return myFunction.getGradient(solution);
     }
 
-    protected final ExpressionsBasedModel getModel() {
-        return myModel;
-    }
-
     protected final State getState() {
         return myState;
     }
@@ -170,10 +163,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         //        }
 
         return tmpTimeOk && tmpIterationOk;
-    }
-
-    protected final boolean isModelSet() {
-        return myModel != null;
     }
 
     protected abstract boolean needsAnotherIteration();

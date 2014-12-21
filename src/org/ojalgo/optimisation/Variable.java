@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright 1997-2014 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,11 +28,12 @@ import java.math.BigDecimal;
 import org.ojalgo.function.aggregator.AggregatorCollection;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.BigAggregator;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
 /**
  * Variable
- * 
+ *
  * @author apete
  */
 public final class Variable extends ModelEntity<Variable> {
@@ -172,11 +173,11 @@ public final class Variable extends ModelEntity<Variable> {
         myAdjustmentExponent = Integer.MIN_VALUE;
     }
 
-    public boolean validate(final NumberContext context) {
+    protected boolean validate(final NumberContext context, final BasicLogger.Appender appender) {
 
         if (myValue != null) {
 
-            return this.validate(myValue, context);
+            return this.validate(myValue, context, appender);
 
         } else {
 
@@ -241,15 +242,15 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    protected boolean validate(final BigDecimal value, final NumberContext context) {
+    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Appender appender) {
 
-        boolean retVal = super.validate(value, context);
+        boolean retVal = super.validate(value, context, appender);
 
         if (retVal && myInteger) {
             try {
                 context.enforce(value).longValueExact();
             } catch (final ArithmeticException ex) {
-                //BasicLogger.logError(value + " ! Integer: " + this.getName());
+                appender.println(value + " ! Integer: " + this.getName());
                 retVal = false;
             }
         }

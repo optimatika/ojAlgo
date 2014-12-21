@@ -30,10 +30,10 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.BasicLogger.GenericAppender;
+import org.ojalgo.netio.CharacterRing;
 import org.ojalgo.optimisation.Expression.Index;
-import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.integer.OldIntegerSolver;
-import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -87,6 +87,10 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
+    public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
+
+    }
+
     private static final String NEW_LINE = "\n";
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
@@ -99,6 +103,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
     };
+
+    private final ExpressionsBasedConvexIntegration myConvexSolverIntegration = new ExpressionsBasedConvexIntegration();
+    private final ExpressionsBasedLinearIntegration myLinearSolverIntegration = new ExpressionsBasedLinearIntegration();
+    private final ExpressionsBasedIntegerIntegration myIntegerSolverIntegration = new ExpressionsBasedIntegerIntegration();
 
     public static ExpressionsBasedModel make(final MathProgSysModel mps) {
 
@@ -225,9 +233,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
+    private transient BasicLogger.Appender myAppender = null;
+    private final CharacterRing myBuffer = new CharacterRing();
     private final HashMap<String, Expression> myExpressions = new HashMap<String, Expression>();
     private final HashSet<Index> myFixedVariables = new HashSet<Index>();
-
     private transient int[] myFreeIndices = null;
     private transient List<Variable> myFreeVariables = null;
     private transient int[] myIntegerIndices = null;
@@ -238,7 +247,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private transient MultiaryFunction.TwiceDifferentiable<Double> myObjectiveFunction = null;
     private transient int[] myPositiveIndices = null;
     private transient List<Variable> myPositiveVariables = null;
-
     private final ArrayList<Variable> myVariables = new ArrayList<Variable>();
     private final boolean myWorkCopy;
 
@@ -353,23 +361,21 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myFixedVariables.clear();
     }
 
-    public GenericSolver getDefaultSolver() {
+    private GenericSolver getDefaultSolver() {
 
         this.flushCaches();
 
         if (this.isAnyVariableInteger()) {
 
-            return OldIntegerSolver.make(this);
-            //return NewIntegerSolver.make(this);
+            return myIntegerSolverIntegration.build(this);
 
         } else if (this.isAnyExpressionQuadratic()) {
 
-            //return QuadraticSolver.make(this);
-            return ConvexSolver.make(this);
+            return myConvexSolverIntegration.build(this);
 
         } else {
 
-            return LinearSolver.make(this);
+            return myLinearSolverIntegration.build(this);
         }
     }
 
@@ -591,20 +597,18 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return this.indexOfPositiveVariable(this.indexOf(variable));
     }
 
+    /**
+     * Objective or any constraint has quadratic part.
+     */
     public boolean isAnyExpressionQuadratic() {
 
         boolean retVal = false;
 
-        // final int tmpLength = myExpressions.size();
-
-        //        for (int i = 0; !retVal && (i < tmpLength); i++) {
-        //            retVal |= myExpressions.get(i).hasQuadratic();
-        //        }
-
-        String tmpType;
+        String tmpExpressionKey;
         for (final Iterator<String> tmpIterator = myExpressions.keySet().iterator(); !retVal && tmpIterator.hasNext();) {
-            tmpType = tmpIterator.next();
-            retVal |= myExpressions.get(tmpType).isAnyQuadraticFactorNonZero();
+            tmpExpressionKey = tmpIterator.next();
+            final Expression tmpExpression = myExpressions.get(tmpExpressionKey);
+            retVal |= tmpExpression.isAnyQuadraticFactorNonZero() && (tmpExpression.isConstraint() || tmpExpression.isObjective());
         }
 
         return retVal;
@@ -640,21 +644,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         tmpEpression.lower(lower).upper(upper);
-    }
-
-    public void markActiveInequalityConstraints(final Collection<ModelEntity<?>> activeInequalityEntities) {
-
-        for (final Variable tmpVariable : myVariables) {
-            tmpVariable.setActiveInequalityConstraint(false);
-        }
-
-        for (final Expression tmpExpression : myExpressions.values()) {
-            tmpExpression.setActiveInequalityConstraint(false);
-        }
-
-        for (final ModelEntity<?> tmpModelEntity : activeInequalityEntities) {
-            tmpModelEntity.setActiveInequalityConstraint(true);
-        }
     }
 
     public Optimisation.Result maximise() {
@@ -903,9 +892,18 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
             retVal = tmpSolver.solve();
 
-            //            if (options.validate && retVal.getState().isFeasible() && !this.validate(retVal)) {
-            //                retVal = new Optimisation.Result(Optimisation.State.FAILED, retVal);
-            //            }
+            if (this.isAnyVariableInteger()) {
+
+                retVal = myIntegerSolverIntegration.toModelState(this, retVal);
+
+            } else if (this.isAnyExpressionQuadratic()) {
+
+                retVal = myConvexSolverIntegration.toModelState(this, retVal);
+
+            } else {
+
+                retVal = myLinearSolverIntegration.toModelState(this, retVal);
+            }
 
         }
 
@@ -935,11 +933,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         boolean retVal = true;
 
         for (final Variable tmpVariable : myVariables) {
-            retVal &= tmpVariable.validate();
+            retVal &= tmpVariable.validate(this.appender());
         }
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            retVal &= tmpExpression.validate();
+            retVal &= tmpExpression.validate(this.appender());
         }
 
         return retVal;
@@ -956,11 +954,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         boolean retVal = tmpSize == solution.count();
 
         for (int i = 0; retVal && (i < tmpSize); i++) {
-            retVal &= myVariables.get(i).validate(solution.get(i), context);
+            retVal &= myVariables.get(i).validate(solution.get(i), context, this.appender());
         }
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            retVal &= retVal && tmpExpression.validate(solution, context);
+            retVal &= retVal && tmpExpression.validate(solution, context, this.appender());
         }
 
         return retVal;
@@ -1072,6 +1070,13 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     boolean addFixedVariable(final Index index) {
         return myFixedVariables.add(index);
+    }
+
+    BasicLogger.Appender appender() {
+        if (myAppender == null) {
+            myAppender = new GenericAppender(myBuffer);
+        }
+        return myAppender;
     }
 
     boolean isFixed() {

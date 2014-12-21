@@ -202,9 +202,9 @@ public class MarketEquilibrium {
         return new BigScalar(myRiskAversion);
     }
 
-    public void setRiskAversion(final Number aFactor) {
+    public void setRiskAversion(final Number factor) {
 
-        final BigDecimal tmpFactor = TypeUtils.toBigDecimal(aFactor);
+        final BigDecimal tmpFactor = TypeUtils.toBigDecimal(factor);
 
         if (tmpFactor.signum() == 0) {
             myRiskAversion = DEFAULT_RISK_AVERSION;
@@ -238,6 +238,10 @@ public class MarketEquilibrium {
         }
 
         return retVal;
+    }
+
+    boolean isDefaultRiskAversion() {
+        return myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0;
     }
 
 }

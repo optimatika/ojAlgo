@@ -35,6 +35,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.TypeUtils;
 
@@ -194,13 +195,13 @@ public final class PortfolioMixer {
             }
         }
 
-        //        tmpModel.options.debug_stream = BasicLogger.DEBUG;
-        //        tmpModel.options.debug_solver = IntegerSolver.class;
+        tmpModel.options.debug(GenericSolver.class);
+        tmpModel.options.validate = false;
 
         tmpModel.minimise();
 
-        //        BasicLogger.logDebug(tmpModel.toString());
-        //        BasicLogger.logDebug(Arrays.toString(tmpVariables));
+        //        BasicLogger.debug(tmpModel.toString());
+        //        BasicLogger.debug(Arrays.toString(tmpVariables));
 
         final ArrayList<BigDecimal> retVal = new ArrayList<BigDecimal>(tmpNumberOfComponents);
         for (int v = 0; v < tmpNumberOfComponents; v++) {

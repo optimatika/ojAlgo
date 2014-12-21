@@ -1,23 +1,23 @@
-/* 
+/*
  * Copyright 1997-2014 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE. 
+ * SOFTWARE.
  */
 package org.ojalgo.optimisation.convex;
 
@@ -33,8 +33,6 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
 
 /**
  * @author pauslaender
@@ -92,9 +90,9 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         if (numberOfVars < 6) {
             throw new IllegalArgumentException("numberOfVars must be >= 6 !!!");
         }
-        // 
-        // variables 
-        // 
+        //
+        // variables
+        //
         vars = new Variable[numberOfVars];
         vars[0] = new Variable("x0").lower(new BigDecimal(00.0)).upper(new BigDecimal(15.0));
         vars[1] = new Variable("x1").lower(new BigDecimal(17.0)).upper(new BigDecimal(27.0));
@@ -105,9 +103,9 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         for (int i = 6; i < numberOfVars; ++i) {
             vars[i] = new Variable("x" + i).level(BigMath.ZERO);
         }
-        // 
-        // minimise distance to this point 
-        // 
+        //
+        // minimise distance to this point
+        //
         point = new BigDecimal[numberOfVars];
         point[0] = new BigDecimal(1.0);
         point[1] = new BigDecimal(25.0);
@@ -118,13 +116,13 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         for (int i = 6; i < numberOfVars; ++i) {
             point[i] = new BigDecimal(0.0);
         }
-        // 
-        // model 
-        // 
+        //
+        // model
+        //
         model = new ExpressionsBasedModel(vars);
-        // 
-        // objective function 
-        // 
+        //
+        // objective function
+        //
         {
             final int tmpLength = model.countVariables();
 
@@ -141,9 +139,9 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
             final Expression e = retVal;
             e.weight(BigMath.HALF);
         }
-        // 
-        // sum(xi) = 100.0 
-        // 
+        //
+        // sum(xi) = 100.0
+        //
         {
             final int tmpLength = model.countVariables();
 
@@ -155,18 +153,18 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
             final Expression e = retVal;
             e.level(BigMath.HUNDRED);
         }
-        // 
-        // x1 + x2 <= 45 
-        // 
+        //
+        // x1 + x2 <= 45
+        //
         {
             final Expression e = model.addExpression("x1 + x2 <= 45.0");
             e.setLinearFactor(1, BigMath.ONE);
             e.setLinearFactor(2, BigMath.ONE);
             e.lower(BigMath.ZERO).upper(new BigDecimal(45.0));
         }
-        // 
-        // x4 - 2*x5 = 0 
-        // 
+        //
+        // x4 - 2*x5 = 0
+        //
         {
             final Expression e = model.addExpression("x4 - 2*x5 = 0");
             e.setLinearFactor(4, BigMath.ONE);
@@ -177,11 +175,11 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
 
     void solve() {
 
-        final ConvexSolver solver = new ConvexSolver.Builder(model).build();
-        final Optimisation.Result result = solver.solve();
+        //  final ConvexSolver solver = new ConvexSolver.Builder(model).build();
+        final Optimisation.Result result = model.minimise();
 
         if (BigMatrix.FACTORY.columns(result) != null) {
-            final boolean validated = model.validate(result, solver.options.slack);
+            final boolean validated = model.validate(result, model.options.slack);
             if (result.getState().isFeasible()) {
                 final String message = "State: " + result.getState() + ", validated: " + validated;
                 TestUtils.assertTrue(message, validated);

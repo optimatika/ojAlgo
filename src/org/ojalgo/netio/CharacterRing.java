@@ -26,6 +26,10 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.Writer;
 import java.nio.CharBuffer;
+import java.util.Arrays;
+
+import org.ojalgo.netio.BasicLogger.Appender;
+import org.ojalgo.netio.BasicLogger.GenericAppender;
 
 /**
  * A circular char buffer - an {@linkplain Appendable} {@linkplain CharSequence} that always hold exactly 65536
@@ -112,6 +116,10 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         return this;
     }
 
+    public Appender asAppender() {
+        return new GenericAppender(this);
+    }
+
     public OutputStream asOutputStream() {
         return new RingStream(this);
     }
@@ -122,6 +130,11 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
 
     public char charAt(final int index) {
         return myCharacters[(myCursor + index) % length];
+    }
+
+    public void clear() {
+        Arrays.fill(myCharacters, ASCII.NULL);
+        myCursor = 0;
     }
 
     public int indexOfFirst(final char c) {
@@ -180,4 +193,5 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
 
         return tmpFirstPart + tmpSecondPart;
     }
+
 }

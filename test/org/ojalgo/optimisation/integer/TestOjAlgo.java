@@ -28,7 +28,6 @@ import java.math.BigDecimal;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 
@@ -67,9 +66,7 @@ public class TestOjAlgo {
         //c3.setLinearFactor(0, new BigDecimal(-1));
         //c3.setLinearFactor(2, ONE);
 
-        model.setMinimisation();
-        final GenericSolver tmpSolver = model.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = model.minimise();
 
         BasicLogger.debug(tmpResult.toString());
     }

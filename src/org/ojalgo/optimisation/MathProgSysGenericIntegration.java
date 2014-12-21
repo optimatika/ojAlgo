@@ -21,52 +21,23 @@
  */
 package org.ojalgo.optimisation;
 
-import java.io.Serializable;
+import org.ojalgo.optimisation.MathProgSysModel.Integration;
 
-abstract class AbstractModel<S extends Optimisation.Solver> implements Optimisation.Model, Serializable {
+final class MathProgSysGenericIntegration extends Integration<GenericSolver> {
 
-    public final Optimisation.Options options;
-
-    private boolean myMinimisation = true;
-
-    protected AbstractModel() {
-
-        super();
-
-        options = new Optimisation.Options();
+    public GenericSolver build(final MathProgSysModel model) {
+        // return ExpressionsBasedModel.make(model).getDefaultSolver();
+        return null;
     }
 
-    protected AbstractModel(final Optimisation.Options someOptions) {
-
-        super();
-
-        options = someOptions;
+    public Result toModelState(final MathProgSysModel model, final Result solverState) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    public abstract void destroy();
-
-    public final boolean isMaximisation() {
-        return !this.isMinimisation();
-    }
-
-    public final boolean isMinimisation() {
-        return myMinimisation;
-    }
-
-    public final void setMaximisation() {
-        this.setMaximisation(true);
-    }
-
-    public final void setMinimisation() {
-        this.setMinimisation(true);
-    }
-
-    protected final void setMaximisation(final boolean maximisation) {
-        this.setMinimisation(!maximisation);
-    }
-
-    protected final void setMinimisation(final boolean minimisation) {
-        myMinimisation = minimisation;
+    public Result extractSolverState(final MathProgSysModel model) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

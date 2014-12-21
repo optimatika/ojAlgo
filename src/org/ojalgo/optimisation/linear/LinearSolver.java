@@ -67,6 +67,10 @@ import org.ojalgo.type.IndexSelector;
  */
 public abstract class LinearSolver extends BaseSolver {
 
+    public static LinearSolver.Builder getBuilder() {
+        return new LinearSolver.Builder();
+    }
+
     public static final class Builder extends AbstractBuilder<LinearSolver.Builder, LinearSolver> {
 
         public Builder(final MatrixStore<Double> C) {
@@ -76,9 +80,7 @@ public abstract class LinearSolver extends BaseSolver {
         }
 
         Builder() {
-
             super();
-
         }
 
         Builder(final BaseSolver.AbstractBuilder<LinearSolver.Builder, LinearSolver> matrices) {
@@ -87,11 +89,11 @@ public abstract class LinearSolver extends BaseSolver {
 
         }
 
-        Builder(final ExpressionsBasedModel aModel) {
+        Builder(final ExpressionsBasedModel model) {
 
-            super(aModel);
+            super(model);
 
-            LinearSolver.copy(aModel, this);
+            LinearSolver.copy(model, this);
         }
 
         Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
@@ -129,14 +131,14 @@ public abstract class LinearSolver extends BaseSolver {
 
     static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
-    public static LinearSolver make(final ExpressionsBasedModel aModel) {
+    public static LinearSolver make(final ExpressionsBasedModel model) {
 
-        final LinearSolver.Builder tmpBuilder = new LinearSolver.Builder(aModel);
+        final LinearSolver.Builder tmpBuilder = new LinearSolver.Builder(model);
 
         return tmpBuilder.build();
     }
 
-    static void copy(final ExpressionsBasedModel sourceModel, final LinearSolver.Builder destinationBuilder) {
+    public static void copy(final ExpressionsBasedModel sourceModel, final LinearSolver.Builder destinationBuilder) {
 
         final boolean tmpMaximisation = sourceModel.isMaximisation();
 
@@ -167,7 +169,6 @@ public abstract class LinearSolver extends BaseSolver {
 
         final Optimisation.Result tmpKickStarter = new Optimisation.Result(Optimisation.State.UNEXPLORED, Double.NaN, ZeroStore.makePrimitive(tmpTotalVarCount,
                 1));
-        tmpKickStarter.basis(tmpBasis);
 
         final PhysicalStore<Double> tmpC = FACTORY.makeZero(tmpTotalVarCount, 1);
         final PhysicalStore<Double> tmpAE = FACTORY.makeZero(tmpConstraiCount, tmpTotalVarCount);

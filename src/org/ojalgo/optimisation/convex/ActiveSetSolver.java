@@ -23,8 +23,6 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import java.util.HashSet;
-
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -32,14 +30,15 @@ import org.ojalgo.matrix.store.AboveBelowStore;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RowsStore;
 import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.convex.KKTSolver.Input;
 import org.ojalgo.optimisation.convex.KKTSolver.Output;
 import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.random.Uniform;
 import org.ojalgo.type.IndexSelector;
 
 /**
@@ -177,32 +176,6 @@ final class ActiveSetSolver extends ConvexSolver {
     }
 
     @Override
-    protected Result buildResult() {
-
-        final Result retVal = super.buildResult();
-
-        final ExpressionsBasedModel tmpModel = this.getModel();
-
-        if (tmpModel != null) {
-
-            // BasicLogger.logDebug("A S Iterations: " + this.countIterations());
-
-            final HashSet<ModelEntity<?>> tmpActiveInequalityEntities = new HashSet<>();
-
-            final ModelEntity<?>[] tmpInequalityEntities = this.getInequalityEnities();
-            final int[] tmpActiveIndeces = myActivator.getIncluded();
-
-            for (final int tmpIndexOfActive : tmpActiveIndeces) {
-                tmpActiveInequalityEntities.add(tmpInequalityEntities[tmpIndexOfActive]);
-            }
-
-            tmpModel.markActiveInequalityConstraints(tmpActiveInequalityEntities);
-        }
-
-        return retVal;
-    }
-
-    @Override
     protected MatrixStore<Double> extractSolution() {
         return super.extractSolution();
     }
@@ -251,7 +224,13 @@ final class ActiveSetSolver extends ConvexSolver {
 
         if (!tmpFeasible) {
 
-            final MatrixStore<Double> tmpLinearC = tmpQ.multiplyRight(this.getX()).subtract(tmpC);
+            //final MatrixStore<Double> tmpLinearC = tmpQ.multiplyRight(this.getX()).subtract(tmpC);
+            //final MatrixStore<Double> tmpLinearC = tmpC;
+            //final MatrixStore<Double> tmpLinearC = ZeroStore.makePrimitive((int) tmpC.countRows(), (int) tmpC.countColumns());
+            final PrimitiveDenseStore tmpLinearC = PrimitiveDenseStore.FACTORY.makeRandom((int) tmpC.countRows(), (int) tmpC.countColumns(), new Uniform());
+            for (int i = 0; i < tmpLinearC.count(); i++) {
+                tmpLinearC.set(i, 1.0 + i);
+            }
 
             final int tmpNumberOfVariables = (int) tmpC.countRows();
             final int tmpNumberOfEqualities = tmpAE != null ? (int) tmpAE.countRows() : 0;
@@ -308,10 +287,6 @@ final class ActiveSetSolver extends ConvexSolver {
         if (tmpFeasible) {
 
             this.setState(State.FEASIBLE);
-
-            if ((kickStarter != null) && kickStarter.isActiveSetDefined()) {
-                myActivator.include(kickStarter.getActiveSet());
-            }
 
             final int[] tmpIncluded = myActivator.getIncluded();
             final MatrixStore<Double> tmpSIincl = this.getSI(tmpIncluded);
@@ -416,6 +391,10 @@ final class ActiveSetSolver extends ConvexSolver {
         final Input tmpInput = this.buildDelegateSolverInput();
         final KKTSolver tmpSolver = this.getDelegateSolver(tmpInput);
         final Output tmpOutput = tmpSolver.solve(tmpInput, options.validate);
+
+        if (this.isDebug()) {
+            this.debug("X/L: {}", tmpOutput);
+        }
 
         final int[] tmpIncluded = myActivator.getIncluded();
 
