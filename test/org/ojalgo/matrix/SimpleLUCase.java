@@ -62,7 +62,7 @@ public class SimpleLUCase extends BasicMatrixTest {
     public void testData() {
 
         myExpMtrx = SimpleLUCase.getOrginal();
-        myActMtrx = SimpleLUCase.getMtrxL().multiplyRight(SimpleLUCase.getMtrxU());
+        myActMtrx = SimpleLUCase.getMtrxL().multiply(SimpleLUCase.getMtrxU());
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }

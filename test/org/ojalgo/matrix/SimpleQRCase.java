@@ -65,7 +65,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         myExpMtrx = SimpleQRCase.getOriginal();
         final BigMatrix tmpFactorQ = SimpleQRCase.getFactorQ();
         final BigMatrix tmpFactorR = SimpleQRCase.getFactorR();
-        myActMtrx = tmpFactorQ.multiplyRight(tmpFactorR);
+        myActMtrx = tmpFactorQ.multiply(tmpFactorR);
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
@@ -82,7 +82,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         final MatrixStore<BigDecimal> tmpR = tmpQR.getR();
 
         myExpMtrx = SimpleQRCase.getOriginal();
-        myActMtrx = BigMatrix.FACTORY.copy(tmpQ.multiplyRight(tmpR));
+        myActMtrx = BigMatrix.FACTORY.copy(tmpQ.multiply(tmpR));
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 

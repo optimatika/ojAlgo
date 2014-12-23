@@ -162,7 +162,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
                 }
             }
 
-            myInverse = new RawStore(this.getV().multiplyRight(tmpMtrx));
+            myInverse = new RawStore(this.getV().multiply(tmpMtrx));
         }
 
         return myInverse;
@@ -216,7 +216,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
 
     @Override
     public RawStore solve(final Access2D<Double> rhs) {
-        return this.getInverse().multiplyRight(rhs);
+        return this.getInverse().multiply(rhs);
     }
 
     @Override

@@ -25,7 +25,6 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.ZeroStore;
-import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.convex.KKTSolver.Input;
 
@@ -42,8 +41,8 @@ final class QPESolver extends ConvexSolver {
 
     private boolean myFeasible = false;
 
-    QPESolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
-        super(aModel, solverOptions, matrices);
+    QPESolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+        super(matrices, solverOptions);
     }
 
     private boolean isFeasible() {
@@ -117,7 +116,7 @@ final class QPESolver extends ConvexSolver {
 
             final PhysicalStore<Double> tmpX = this.getX();
 
-            return new KKTSolver.Input(tmpQ, tmpC.subtract(tmpQ.multiplyRight(tmpX)), tmpA, ZeroStore.makePrimitive((int) tmpA.countRows(), 1));
+            return new KKTSolver.Input(tmpQ, tmpC.subtract(tmpQ.multiply(tmpX)), tmpA, ZeroStore.makePrimitive((int) tmpA.countRows(), 1));
 
         } else {
 

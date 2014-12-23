@@ -72,7 +72,7 @@ abstract class DelegatingStore<N extends Number> extends LogicalStore<N> {
         }
 
         public MatrixStore<N> call() throws Exception {
-            return myThisStore.multiplyRight(myRightStore);
+            return myThisStore.multiply(myRightStore);
         }
 
     }

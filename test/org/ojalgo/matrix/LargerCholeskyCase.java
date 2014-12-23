@@ -39,7 +39,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     public static BigMatrix getOriginal() {
 
         BasicMatrix tmpMtrx = PrimitiveMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 9));
-        tmpMtrx = tmpMtrx.multiplyRight(tmpMtrx.transpose());
+        tmpMtrx = tmpMtrx.multiply(tmpMtrx.transpose());
 
         return BigMatrix.FACTORY.copy(tmpMtrx);
     }

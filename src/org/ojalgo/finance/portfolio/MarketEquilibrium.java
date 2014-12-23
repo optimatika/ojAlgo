@@ -122,7 +122,7 @@ public class MarketEquilibrium {
      */
     public BasicMatrix calculateAssetReturns(final BasicMatrix assetWeights) {
         final BasicMatrix tmpAssetWeights = myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0 ? assetWeights : assetWeights.multiply(myRiskAversion);
-        return myCovariances.multiplyRight(tmpAssetWeights);
+        return myCovariances.multiply(tmpAssetWeights);
     }
 
     /**
@@ -154,7 +154,7 @@ public class MarketEquilibrium {
             tmpRight = assetWeights.transpose();
         }
 
-        return myCovariances.multiplyRight(tmpRight).multiplyLeft(tmpLeft).toScalar(0, 0);
+        return myCovariances.multiply(tmpRight).multiplyLeft(tmpLeft).toScalar(0, 0);
     }
 
     /**
@@ -229,7 +229,7 @@ public class MarketEquilibrium {
      */
     Scalar<?> calculateImpliedRiskAversion(final BasicMatrix assetWeights, final BasicMatrix assetReturns) {
 
-        Scalar<?> retVal = myCovariances.multiplyRight(assetWeights).solve(assetReturns).toScalar(0, 0);
+        Scalar<?> retVal = myCovariances.multiply(assetWeights).solve(assetReturns).toScalar(0, 0);
 
         if (retVal.isSmall(PrimitiveMath.ONE)) {
             retVal = BigScalar.ONE;

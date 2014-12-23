@@ -369,6 +369,16 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix modify(UnaryFunction<? extends Number> aFunc);
 
     /**
+     * Matrix multiplication: [this][aMtrx] <br>
+     * The column dimension of the left matrix must equal the row dimension of the right matrix.
+     *
+     * @param right The right matrix.
+     * @return The product.
+     * @see org.ojalgo.matrix.BasicMatrix#multiplyLeft(BasicMatrix)
+     */
+    BasicMatrix multiply(Access2D<?> right);
+
+    /**
      * Multiplies the elements of this matrix with aNmbr.
      *
      * @param aNmbr What to multiply with.
@@ -390,19 +400,13 @@ public interface BasicMatrix extends Access2D<Number> {
      *
      * @param aMtrx The left matrix.
      * @return The product.
-     * @see org.ojalgo.matrix.BasicMatrix#multiplyRight(BasicMatrix)
+     * @see org.ojalgo.matrix.BasicMatrix#multiply(BasicMatrix)
      */
     BasicMatrix multiplyLeft(Access2D<?> aMtrx);
 
-    /**
-     * Matrix multiplication: [this][aMtrx] <br>
-     * The column dimension of the left matrix must equal the row dimension of the right matrix.
-     *
-     * @param aMtrx The right matrix.
-     * @return The product.
-     * @see org.ojalgo.matrix.BasicMatrix#multiplyLeft(BasicMatrix)
-     */
-    BasicMatrix multiplyRight(Access2D<?> aMtrx);
+    default BasicMatrix multiplyRight(final Access2D<?> right) {
+        return this.multiply(right);
+    }
 
     /**
      * Assumes that both [this] and [aVctr] have row or column dimension, doesn't matter which, equal to 1. The two

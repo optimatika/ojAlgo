@@ -234,13 +234,13 @@ public final class BlackLittermanModel extends EquilibriumModel {
 
         final BasicMatrix tmpCovariances = this.getCovariances();
 
-        final BasicMatrix tmpRightParenthesis = tmpViewReturns.subtract(tmpViewPortfolios.multiplyRight(tmpCovariances).multiplyRight(myOriginalWeights));
+        final BasicMatrix tmpRightParenthesis = tmpViewReturns.subtract(tmpViewPortfolios.multiply(tmpCovariances).multiply(myOriginalWeights));
 
         final BasicMatrix tmpViewsTransposed = tmpViewPortfolios.transpose();
 
-        final BasicMatrix tmpLeftParenthesis = tmpViewVariances.add(tmpViewPortfolios.multiplyRight(tmpCovariances).multiplyRight(tmpViewsTransposed));
+        final BasicMatrix tmpLeftParenthesis = tmpViewVariances.add(tmpViewPortfolios.multiply(tmpCovariances).multiply(tmpViewsTransposed));
 
-        return myOriginalWeights.add(tmpViewsTransposed.multiplyRight(tmpLeftParenthesis.solve(tmpRightParenthesis)));
+        return myOriginalWeights.add(tmpViewsTransposed.multiply(tmpLeftParenthesis.solve(tmpRightParenthesis)));
     }
 
     protected final BasicMatrix getOriginalReturns() {
@@ -340,7 +340,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
 
         BasicMatrix tmpVal = this.getCovariances();
 
-        tmpVal = tmpVal.multiplyRight(aWeightsMtrx);
+        tmpVal = tmpVal.multiply(aWeightsMtrx);
 
         return tmpVal.multiplyLeft(aWeightsMtrx.transpose()).toBigDecimal(0, 0);
     }

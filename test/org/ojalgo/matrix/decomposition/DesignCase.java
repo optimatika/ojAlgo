@@ -50,7 +50,7 @@ public class DesignCase extends MatrixDecompositionTests {
 
         final PhysicalStore<ComplexNumber> tmpRandomComplexStore = MatrixUtils.makeRandomComplexStore(4, 9);
         final PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
-        final MatrixStore<Double> tmpMtrx = tmpVctr.multiplyRight(tmpVctr.transpose());
+        final MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
 
         this.doTestSolveInverse(CholeskyDecomposition.makePrimitive(), tmpMtrx);
     }
@@ -59,7 +59,7 @@ public class DesignCase extends MatrixDecompositionTests {
 
         final PhysicalStore<ComplexNumber> tmpRandomComplexStore = MatrixUtils.makeRandomComplexStore(4, 9);
         final PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
-        final MatrixStore<Double> tmpMtrx = tmpVctr.multiplyRight(tmpVctr.transpose());
+        final MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
 
         this.doTestSolveInverse(LUDecomposition.makePrimitive(), tmpMtrx);
     }
@@ -75,7 +75,7 @@ public class DesignCase extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpX = tmpQR.solve(tmpB).copy();
 
         BasicLogger.debug("Straigt X: " + tmpX.toString());
-        tmpB.fillMatching(tmpB, PrimitiveFunction.SUBTRACT, tmpA.multiplyRight(tmpX));
+        tmpB.fillMatching(tmpB, PrimitiveFunction.SUBTRACT, tmpA.multiply(tmpX));
         BasicLogger.debug("Residual B: " + tmpB.toString());
 
     }
@@ -170,8 +170,8 @@ public class DesignCase extends MatrixDecompositionTests {
         }
 
         TestUtils.assertEquals("Not inverted/solved correctly!", tmpDirInv, tmpSolInv);
-        TestUtils.assertEquals("Not inverted correctly!", aMtrx, tmpDirInv.multiplyLeft(aMtrx).multiplyRight(aMtrx));
-        TestUtils.assertEquals("Not solved correctly!", aMtrx, tmpSolInv.multiplyLeft(aMtrx).multiplyRight(aMtrx));
+        TestUtils.assertEquals("Not inverted correctly!", aMtrx, tmpDirInv.multiplyLeft(aMtrx).multiply(aMtrx));
+        TestUtils.assertEquals("Not solved correctly!", aMtrx, tmpSolInv.multiplyLeft(aMtrx).multiply(aMtrx));
 
     }
 }

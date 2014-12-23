@@ -443,16 +443,16 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(myStore.multiplyLeft(this.getStoreFrom(aMtrx)));
     }
 
-    public I multiplyRight(final Access2D<?> aMtrx) {
+    public I multiply(final Access2D<?> right) {
 
-        MatrixError.throwIfMultiplicationNotPossible(myStore, aMtrx);
+        MatrixError.throwIfMultiplicationNotPossible(myStore, right);
 
-        return this.getFactory().instantiate(myStore.multiplyRight(this.getStoreFrom(aMtrx)));
+        return this.getFactory().instantiate(myStore.multiply(this.getStoreFrom(right)));
     }
 
     public Scalar<?> multiplyVectors(final Access2D<?> aVctr) {
         if (this.countRows() == 1) {
-            return this.multiplyRight(aVctr.countColumns() == 1 ? aVctr : new TransposedStore<>(this.getStoreFrom(aVctr))).toScalar(0, 0);
+            return this.multiply(aVctr.countColumns() == 1 ? aVctr : new TransposedStore<>(this.getStoreFrom(aVctr))).toScalar(0, 0);
         } else if (this.countColumns() == 1) {
             return this.multiplyLeft(aVctr.countRows() == 1 ? aVctr : new TransposedStore<>(this.getStoreFrom(aVctr))).toScalar(0, 0);
         } else {

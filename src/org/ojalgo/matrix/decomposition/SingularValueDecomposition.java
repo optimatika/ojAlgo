@@ -357,7 +357,7 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
     }
 
     public MatrixStore<N> solve(final Access2D<N> rhs) {
-        return this.getInverse().multiplyRight(rhs);
+        return this.getInverse().multiply(rhs);
     }
 
     public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {

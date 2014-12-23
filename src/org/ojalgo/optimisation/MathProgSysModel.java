@@ -347,10 +347,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
     }
 
-    private static final String COMMENT = "*";
-    private static final String EMPTY = "";
-    private static final String SPACE = " ";
-
     public static MathProgSysModel makeFromFile(final File aFile) {
 
         String tmpLine;
@@ -388,6 +384,11 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         return retVal;
     }
+
+    private static final String COMMENT = "*";
+    private static final String EMPTY = "";
+
+    private static final String SPACE = " ";
 
     private final HashMap<String, Column> myColumns = new HashMap<String, Column>();
     private final int[] myFieldLimits = new int[] { 3, 12, 22, 36, 47, 61 };
@@ -439,11 +440,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         }
 
         return tmpSelection.toArray(new Row[tmpSelection.size()]);
-    }
-
-    private GenericSolver getDefaultSolver() {
-        //   return ExpressionsBasedModel.make(this).getDefaultSolver();
-        return null;
     }
 
     public Row[] getExpressionRows() {

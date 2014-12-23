@@ -243,7 +243,7 @@ public final class KKTSolver extends Object {
                 tmpSolve = tmpSVD.solve(tmpC);
             }
 
-            tmpL = tmpSolve.subtract(tmpQ.multiplyRight(tmpX));
+            tmpL = tmpSolve.subtract(tmpQ.multiply(tmpX));
 
         } else {
             // Actual optimisation problem

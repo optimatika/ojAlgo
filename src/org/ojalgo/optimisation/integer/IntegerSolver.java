@@ -23,12 +23,18 @@ package org.ojalgo.optimisation.integer;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessUtils;
+import org.ojalgo.function.multiary.MultiaryFunction;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 
 public abstract class IntegerSolver extends GenericSolver {
+
+    private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
 
     final class NodeStatistics {
 
@@ -126,13 +132,23 @@ public abstract class IntegerSolver extends GenericSolver {
     private final boolean myMinimisation;
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
 
-    public IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
+    @SuppressWarnings("unused")
+    private IntegerSolver(final Options solverOptions) {
+        this(null, solverOptions);
+    }
 
-        super(model, solverOptions);
+    protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
+
+        super(solverOptions);
 
         myModel = model;
+        myFunction = model.getObjectiveFunction();
 
         myMinimisation = model.isMinimisation();
+    }
+
+    protected final boolean isFunctionSet() {
+        return myFunction != null;
     }
 
     protected int countIntegerSolutions() {
@@ -226,6 +242,19 @@ public abstract class IntegerSolver extends GenericSolver {
         }
 
         myIntegerSolutionsCount.incrementAndGet();
+    }
+
+    protected final MatrixStore<Double> getGradient(final Access1D<Double> solution) {
+        return myFunction.getGradient(solution);
+    }
+
+    @Override
+    protected final double evaluateFunction(final Access1D<?> solution) {
+        if ((myFunction != null) && (solution != null) && (myFunction.arity() == solution.count())) {
+            return myFunction.invoke(AccessUtils.asPrimitive1D(solution));
+        } else {
+            return Double.NaN;
+        }
     }
 
 }

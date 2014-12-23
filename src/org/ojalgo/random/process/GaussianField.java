@@ -137,13 +137,13 @@ public final class GaussianField<K extends Comparable<K>> {
         final MatrixStore<Double> tmpM2differenses = this.getM2differenses();
 
         final PrimitiveDenseStore tmpLocations = FACTORY.makeZero(tmpM1.countRows(), tmpM1.countColumns());
-        tmpLocations.fillMatching(tmpM1, ADD, tmpRegCoef.multiplyRight(tmpM2differenses));
+        tmpLocations.fillMatching(tmpM1, ADD, tmpRegCoef.multiply(tmpM2differenses));
 
         final MatrixStore<Double> tmpC11 = this.getC11(evaluationPoint);
         final MatrixStore<Double> tmpC21 = this.getC21(evaluationPoint);
 
         final PrimitiveDenseStore tmpCovariances = FACTORY.makeZero(tmpC11.countRows(), tmpC11.countColumns());
-        tmpCovariances.fillMatching(tmpC11, SUBTRACT, tmpRegCoef.multiplyRight(tmpC21));
+        tmpCovariances.fillMatching(tmpC11, SUBTRACT, tmpRegCoef.multiply(tmpC21));
 
         if (cleanCovariances) {
 
@@ -163,7 +163,7 @@ public final class GaussianField<K extends Comparable<K>> {
                 }
             }
 
-            tmpCovariances.fillMatching(tmpD.multiplyLeft(tmpV).multiplyRight(tmpV.builder().transpose().build()));
+            tmpCovariances.fillMatching(tmpD.multiplyLeft(tmpV).multiply(tmpV.builder().transpose().build()));
         }
 
         return new Normal1D(tmpLocations, tmpCovariances);

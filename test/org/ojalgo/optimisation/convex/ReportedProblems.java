@@ -953,11 +953,7 @@ public class ReportedProblems extends OptimisationConvexTests {
             v.lower(BigMath.ZERO).upper(BigMath.HUNDREDTH);
         }
 
-        model.setMinimisation();
-
-        final ConvexSolver.Builder tmpQuadBuilder = new ConvexSolver.Builder(model);
-        final ConvexSolver tmpQuadSolver = tmpQuadBuilder.build();
-        final Optimisation.Result tmpQuadResult = tmpQuadSolver.solve();
+        final Optimisation.Result tmpQuadResult = model.minimise();
 
         TestUtils.assertStateNotLessThanOptimal(tmpQuadResult);
 
@@ -1049,7 +1045,7 @@ public class ReportedProblems extends OptimisationConvexTests {
         final double[] bi = new double[] { 0.13, 0.87, 0.18, 0.82, 0.23, 0.77, -0.04, 99.67, -0.06, 100.33, 1.06, 99.62, -0.08 };
         final RawStore JamaBI = RawStore.FACTORY.columns(bi);
 
-        org.ojalgo.optimisation.Optimisation.Result result = null;
+        Optimisation.Result result = null;
 
         try {
 
@@ -1076,8 +1072,8 @@ public class ReportedProblems extends OptimisationConvexTests {
         final double tmpExpValue = tmpObj.invoke(ArrayUtils.wrapAccess1D(expectedSolution));
         final double tmpActValue = tmpObj.invoke(AccessUtils.asPrimitive1D(result));
 
-        final MatrixStore<Double> tmpExpSlack = JamaBI.subtract(JamaAI.multiplyRight(ArrayUtils.wrapAccess1D(expectedSolution)));
-        final MatrixStore<Double> tmpActSlack = JamaBI.subtract(JamaAI.multiplyRight(PrimitiveDenseStore.FACTORY.columns(result)));
+        final MatrixStore<Double> tmpExpSlack = JamaBI.subtract(JamaAI.multiply(ArrayUtils.wrapAccess1D(expectedSolution)));
+        final MatrixStore<Double> tmpActSlack = JamaBI.subtract(JamaAI.multiply(PrimitiveDenseStore.FACTORY.columns(result)));
 
         for (int i = 0; i < numElm; i++) {
             TestUtils.assertEquals(expectedSolution[i], result.doubleValue(i), 1e-4);

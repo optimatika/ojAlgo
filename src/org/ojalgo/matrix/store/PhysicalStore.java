@@ -170,7 +170,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
 
     /**
      * <p>
-     * As in {@link MatrixStore#multiplyRight(MatrixStore)} where the right/parameter matrix is a plane rotation.
+     * As in {@link MatrixStore#multiply(MatrixStore)} where the right/parameter matrix is a plane rotation.
      * </p>
      * <p>
      * Multiplying by a plane rotation from the right means that [this] gets two of its columns updated to new

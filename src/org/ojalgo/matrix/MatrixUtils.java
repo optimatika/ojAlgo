@@ -71,7 +71,7 @@ public abstract class MatrixUtils {
         if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
 
             tmpThis = tmpQ1;
-            tmpThat = tmpConjugatedQ1.multiplyLeft(tmpQ1).multiplyRight(tmpQ1);
+            tmpThat = tmpConjugatedQ1.multiplyLeft(tmpQ1).multiply(tmpQ1);
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
@@ -80,7 +80,7 @@ public abstract class MatrixUtils {
         if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
 
             tmpThis = tmpQ2;
-            tmpThat = tmpConjugatedQ2.multiplyLeft(tmpQ2).multiplyRight(tmpQ2);
+            tmpThat = tmpConjugatedQ2.multiplyLeft(tmpQ2).multiply(tmpQ2);
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
@@ -94,7 +94,7 @@ public abstract class MatrixUtils {
 
         final MatrixStore<N> tmpL = decomposition.getL();
 
-        retVal = AccessUtils.equals(tmpL.multiplyRight(tmpL.builder().conjugate().build()), matrix, context);
+        retVal = AccessUtils.equals(tmpL.multiply(tmpL.builder().conjugate().build()), matrix, context);
 
         return retVal;
     }
@@ -105,7 +105,7 @@ public abstract class MatrixUtils {
         final MatrixStore<N> tmpV = decomposition.getV();
 
         // Check that [A][V] == [V][D] ([A] == [V][D][V]<sup>T</sup> is not always true)
-        final MatrixStore<N> tmpStore1 = matrix.multiplyRight(tmpV);
+        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpV);
         final MatrixStore<N> tmpStore2 = tmpD.multiplyLeft(tmpV);
 
         return AccessUtils.equals(tmpStore1, tmpStore2, context);
@@ -116,7 +116,7 @@ public abstract class MatrixUtils {
         final MatrixStore<N> tmpH = decomposition.getH();
         final MatrixStore<N> tmpQ = decomposition.getQ();
 
-        final MatrixStore<N> tmpStore1 = matrix.multiplyRight(tmpQ);
+        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
         final MatrixStore<N> tmpStore2 = tmpH.multiplyLeft(tmpQ);
 
         return AccessUtils.equals(tmpStore1, tmpStore2, context);
@@ -128,7 +128,7 @@ public abstract class MatrixUtils {
         final MatrixStore<N> tmpU = decomposition.getU();
         final int[] tmpPivotOrder = decomposition.getPivotOrder();
 
-        return AccessUtils.equals(matrix.builder().row(tmpPivotOrder).build(), tmpL.multiplyRight(tmpU), context);
+        return AccessUtils.equals(matrix.builder().row(tmpPivotOrder).build(), tmpL.multiply(tmpU), context);
     }
 
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
@@ -136,7 +136,7 @@ public abstract class MatrixUtils {
         final MatrixStore<N> tmpQ = decomposition.getQ();
         final MatrixStore<N> tmpR = decomposition.getR();
 
-        final MatrixStore<N> tmpStore = tmpQ.multiplyRight(tmpR);
+        final MatrixStore<N> tmpStore = tmpQ.multiply(tmpR);
 
         return AccessUtils.equals(tmpStore, matrix, context);
     }
@@ -147,7 +147,7 @@ public abstract class MatrixUtils {
         final MatrixStore<N> tmpQ = decomposition.getQ();
 
         // Check that [A][Q] == [Q][U] ([A] == [Q][U][Q]<sup>T</sup> is not always true)
-        final MatrixStore<N> tmpStore1 = matrix.multiplyRight(tmpQ);
+        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
         final MatrixStore<N> tmpStore2 = tmpU.multiplyLeft(tmpQ);
 
         return AccessUtils.equals(tmpStore1, tmpStore2, context);
@@ -170,7 +170,7 @@ public abstract class MatrixUtils {
         // Check that [A][Q2] == [Q1][D]
         if (retVal) {
 
-            tmpThis = matrix.multiplyRight(tmpQ2);
+            tmpThis = matrix.multiply(tmpQ2);
             tmpThat = tmpD.multiplyLeft(tmpQ1);
 
             retVal &= tmpThis.equals(tmpThat, context);
@@ -180,7 +180,7 @@ public abstract class MatrixUtils {
         if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
 
             tmpThis = tmpQ1.factory().makeEye(tmpRowDim, tmpRowDim);
-            tmpThat = tmpQ1.builder().conjugate().build().multiplyRight(tmpQ1);
+            tmpThat = tmpQ1.builder().conjugate().build().multiply(tmpQ1);
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
@@ -196,7 +196,7 @@ public abstract class MatrixUtils {
 
         // Check the pseudoinverse.
         if (retVal) {
-            retVal &= matrix.equals(decomposition.getInverse().multiplyRight(matrix).multiplyLeft(matrix), context);
+            retVal &= matrix.equals(decomposition.getInverse().multiply(matrix).multiplyLeft(matrix), context);
         }
 
         // Check that the singular values are sorted in descending order
@@ -274,7 +274,7 @@ public abstract class MatrixUtils {
 
         final MatrixStore<N> tmpConjugate = matrix.builder().conjugate().build();
 
-        return matrix.multiplyLeft(tmpConjugate).equals(matrix.multiplyRight(tmpConjugate));
+        return matrix.multiplyLeft(tmpConjugate).equals(matrix.multiply(tmpConjugate));
     }
 
     public static final boolean isUpperRightShaded(final Access1D<?> anAccess) {
@@ -329,45 +329,45 @@ public abstract class MatrixUtils {
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final Bidiagonal<N> decomposition) {
-        return decomposition.getD().multiplyLeft(decomposition.getQ1()).multiplyRight(decomposition.getQ2().conjugate());
+        return decomposition.getD().multiplyLeft(decomposition.getQ1()).multiply(decomposition.getQ2().conjugate());
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
         final MatrixStore<N> tmpL = decomposition.getL();
-        return tmpL.multiplyRight(tmpL.conjugate());
+        return tmpL.multiply(tmpL.conjugate());
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {
         final MatrixStore<N> tmpV = decomposition.getV();
-        return decomposition.getD().multiplyLeft(tmpV).multiplyRight(tmpV.conjugate());
+        return decomposition.getD().multiplyLeft(tmpV).multiply(tmpV.conjugate());
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final Hessenberg<N> decomposition) {
         final MatrixStore<N> tmpQ = decomposition.getQ();
         final MatrixStore<N> tmpH = decomposition.getH();
-        return tmpH.multiplyLeft(tmpQ).multiplyRight(tmpQ.transpose());
+        return tmpH.multiplyLeft(tmpQ).multiply(tmpQ.transpose());
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final LU<N> decomposition) {
-        return decomposition.getL().multiplyRight(decomposition.getU()).builder().row(decomposition.getPivotOrder()).build();
+        return decomposition.getL().multiply(decomposition.getU()).builder().row(decomposition.getPivotOrder()).build();
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final QR<N> decomposition) {
-        return decomposition.getQ().multiplyRight(decomposition.getR());
+        return decomposition.getQ().multiply(decomposition.getR());
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final Schur<N> decomposition) {
         final MatrixStore<N> tmpQ = decomposition.getQ();
-        return decomposition.getU().multiplyLeft(tmpQ).multiplyRight(tmpQ.builder().transpose().build());
+        return decomposition.getU().multiplyLeft(tmpQ).multiply(tmpQ.builder().transpose().build());
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final SingularValue<N> decomposition) {
-        return decomposition.getQ1().multiplyRight(decomposition.getD()).multiplyRight(decomposition.getQ2().conjugate());
+        return decomposition.getQ1().multiply(decomposition.getD()).multiply(decomposition.getQ2().conjugate());
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final Tridiagonal<N> decomposition) {
         final MatrixStore<N> tmpQ = decomposition.getQ();
-        return decomposition.getD().multiplyLeft(tmpQ).multiplyRight(tmpQ.conjugate());
+        return decomposition.getD().multiplyLeft(tmpQ).multiply(tmpQ.conjugate());
     }
 
     public static void setAllOperationThresholds(final int aValue) {

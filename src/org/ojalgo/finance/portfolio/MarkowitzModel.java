@@ -59,8 +59,8 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  * <p>
  * The total weights of all assets will always be 100%, but shorting can be allowed or not according to your preference.
- * ( {@linkplain #setShortingAllowed(boolean)} ) In addition you may set lower and upper limits on any individual
- * instrument. ( {@linkplain #setLowerLimit(int, BigDecimal)} and {@linkplain #setUpperLimit(int, BigDecimal)} )
+ * ( {@linkplain #setShortingAllowed(boolean)} ) In addition you may set lower and upper limits on any individual asset.
+ * ( {@linkplain #setLowerLimit(int, BigDecimal)} and {@linkplain #setUpperLimit(int, BigDecimal)} )
  * </p>
  * <p>
  * Risk-free asset: That means there is no excess return and zero variance. Don't (try to) include a risk-free asset
@@ -192,15 +192,15 @@ public final class MarkowitzModel extends EquilibriumModel {
      * </p>
      * <p>
      * Setting the target return implies that you disregard the risk aversion factor and want the minimum risk portfolio
-     * with return that is equal to or greater than the target.
+     * with return that is equal to or as close to the target as possible.
      * </p>
      * <p>
-     * By setting the target return too high it is possible to define an infeasible optimisation problem. It is in fact
-     * (in combination with setting lower and upper bounds on the instrument weights) very easy to do so without
-     * realising it.
+     * There is a performance penalty for setting a target return as the underlying optimisation model has to be solved
+     * several (many) times with different pararmeters (different risk aversion factors).
      * </p>
      * <p>
-     * Setting a target return is not recommnded. It's much better to modify the risk aversion factor.
+     * Setting a target return (or variance) is not recommnded. It's much better to simply modify the risk aversion
+     * factor.
      * </p>
      *
      * @see #setTargetVariance(BigDecimal)
@@ -218,10 +218,6 @@ public final class MarkowitzModel extends EquilibriumModel {
      * <p>
      * Setting the target variance implies that you disregard the risk aversion factor and want the maximum return
      * portfolio with risk that is equal to or as close to the target as possible.
-     * </p>
-     * <p>
-     * A target variance isn't an infeasibility risk the way a return target is. The algorithm will return a solution,
-     * but there is no guaranty the portfolio variance is equal to or less than the target (as one may expect).
      * </p>
      * <p>
      * There is a performance penalty for setting a target variance as the underlying optimisation model has to be

@@ -42,7 +42,7 @@ public class P20050125Case extends BasicMatrixTest {
 
     public static BasicMatrix getProblematic() {
         final BasicMatrix tmpMtrx = BigMatrix.FACTORY.makeRandom(DIM, DIM * DIM, new Uniform());
-        return tmpMtrx.multiplyRight(tmpMtrx.transpose());
+        return tmpMtrx.multiply(tmpMtrx.transpose());
     }
 
     public P20050125Case() {
@@ -71,7 +71,7 @@ public class P20050125Case extends BasicMatrixTest {
         final MatrixStore<BigDecimal> tmpInv = tmpDelegate.solve(myBigI.toBigStore());
 
         final MatrixStore<BigDecimal> tmpExpMtrx = myBigI.toBigStore();
-        final MatrixStore<BigDecimal> tmpActMtrx = myBigAA.toBigStore().multiplyRight(tmpInv);
+        final MatrixStore<BigDecimal> tmpActMtrx = myBigAA.toBigStore().multiply(tmpInv);
 
         TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVALUATION);
     }

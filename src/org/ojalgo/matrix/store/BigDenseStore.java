@@ -848,7 +848,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return retVal;
     }
 
-    public MatrixStore<BigDecimal> multiplyRight(final Access1D<BigDecimal> right) {
+    public MatrixStore<BigDecimal> multiply(final Access1D<BigDecimal> right) {
 
         final BigDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 

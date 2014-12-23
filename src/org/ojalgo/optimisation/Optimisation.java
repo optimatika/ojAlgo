@@ -75,6 +75,16 @@ public interface Optimisation {
 
     }
 
+    public static interface Integration<M extends Optimisation.Model, S extends Optimisation.Solver> extends Optimisation {
+
+        S build(M model);
+
+        Optimisation.Result extractSolverState(M model);
+
+        Optimisation.Result toModelState(M model, Optimisation.Result solverState);
+
+    }
+
     public static interface Model extends Optimisation {
 
         Optimisation.Result maximise();
@@ -111,16 +121,16 @@ public interface Optimisation {
     public static final class Options implements Optimisation, Cloneable {
 
         /**
-         * Which {@linkplain Solver} to debug. Null means ALL solvers. This setting is only relevant if
-         * {@link #debug_appender} has been set.
-         */
-        public Class<? extends Optimisation.Solver> debug_solver = null;
-
-        /**
          * If this is null nothing is printed, if it is not null then debug statements are printed to that
          * {@linkplain BasicLogger.Appender}.
          */
         public BasicLogger.Appender debug_appender = null;
+
+        /**
+         * Which {@linkplain Solver} to debug. Null means ALL solvers. This setting is only relevant if
+         * {@link #debug_appender} has been set.
+         */
+        public Class<? extends Optimisation.Solver> debug_solver = null;
 
         /**
          * Used to determine if a variable value is integer or not.
@@ -341,19 +351,11 @@ public interface Optimisation {
      */
     public static interface Solver extends Optimisation {
 
-        Optimisation.Result solve();
+        default Optimisation.Result solve() {
+            return this.solve(null);
+        };
 
         Optimisation.Result solve(Optimisation.Result kickStarter);
-
-    }
-
-    public static interface Integration<M extends Optimisation.Model, S extends Optimisation.Solver> extends Optimisation {
-
-        S build(M model);
-
-        Optimisation.Result toModelState(M model, Optimisation.Result solverState);
-
-        Optimisation.Result extractSolverState(M model);
 
     }
 

@@ -76,7 +76,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
         myExpMtrx = tmpA;
-        myActMtrx = tmpL.multiplyRight(tmpR);
+        myActMtrx = tmpL.multiply(tmpR);
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }

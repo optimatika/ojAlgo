@@ -265,7 +265,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
         }
 
         public final Builder<N> multiplyRight(final Access1D<N> rightMtrx) {
-            myStore = myStore.multiplyRight(rightMtrx);
+            myStore = myStore.multiply(rightMtrx);
             return this;
         }
 
@@ -392,9 +392,13 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
      */
     boolean isUpperRightShaded();
 
+    MatrixStore<N> multiply(Access1D<N> right);
+
     MatrixStore<N> multiplyLeft(Access1D<N> leftMtrx);
 
-    MatrixStore<N> multiplyRight(Access1D<N> rightMtrx);
+    default MatrixStore<N> multiplyRight(final Access1D<N> right) {
+        return this.multiply(right);
+    }
 
     MatrixStore<N> negate();
 

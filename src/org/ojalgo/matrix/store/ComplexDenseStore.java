@@ -873,7 +873,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return retVal;
     }
 
-    public MatrixStore<ComplexNumber> multiplyRight(final Access1D<ComplexNumber> right) {
+    public MatrixStore<ComplexNumber> multiply(final Access1D<ComplexNumber> right) {
 
         final ComplexDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 

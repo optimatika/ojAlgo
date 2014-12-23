@@ -76,12 +76,12 @@ public class P20050827Case extends BasicMatrixTest {
         TestUtils.assertEquals(5, tmpProblematic.countColumns());
 
         // 5x5
-        final ComplexMatrix tmpBig = tmpProblematic.conjugate().multiplyRight(tmpProblematic);
+        final ComplexMatrix tmpBig = tmpProblematic.conjugate().multiply(tmpProblematic);
         TestUtils.assertEquals(5, tmpBig.countRows());
         TestUtils.assertEquals(5, tmpBig.countColumns());
 
         // 3x3
-        final ComplexMatrix tmpSmall = tmpProblematic.multiplyRight(tmpProblematic.conjugate());
+        final ComplexMatrix tmpSmall = tmpProblematic.multiply(tmpProblematic.conjugate());
         TestUtils.assertEquals(3, tmpSmall.countRows());
         TestUtils.assertEquals(3, tmpSmall.countColumns());
 
@@ -104,7 +104,7 @@ public class P20050827Case extends BasicMatrixTest {
 
         final ComplexMatrix tmpProblematic = P20050827Case.getProblematic();
 
-        final ComplexMatrix tmpMtrx = tmpProblematic.multiplyRight(tmpProblematic.conjugate());
+        final ComplexMatrix tmpMtrx = tmpProblematic.multiply(tmpProblematic.conjugate());
         final ComplexNumber tmpVal = tmpMtrx.getTrace().getNumber();
         final ComplexNumber tmpExpected = ComplexFunction.ROOT.invoke(tmpVal, 2);
         final ComplexNumber tmpActual = tmpProblematic.getFrobeniusNorm().getNumber();

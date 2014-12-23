@@ -75,7 +75,7 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
 
             TestUtils.assertEquals(tmpExpected, tmpActual, tmpEqualsNumberContext);
             TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyLeft(tmpActual), tmpEqualsNumberContext);
-            TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyRight(tmpActual), tmpEqualsNumberContext);
+            TestUtils.assertEquals(tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
         }
     }
 
@@ -105,6 +105,6 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpExpectedInverse, aDecomp.getInverse(), new NumberContext(7, 6));
 
         TestUtils.assertEquals(tmpI, aBody.multiplyLeft(tmpExpectedInverse), new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpI, aBody.multiplyRight(tmpExpectedInverse), new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpI, aBody.multiply(tmpExpectedInverse), new NumberContext(7, 6));
     }
 }

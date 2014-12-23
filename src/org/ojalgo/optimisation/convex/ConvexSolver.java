@@ -26,6 +26,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.util.List;
 import java.util.Set;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -35,7 +36,6 @@ import org.ojalgo.optimisation.BaseSolver;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 
@@ -68,23 +68,16 @@ public abstract class ConvexSolver extends BaseSolver {
 
     public static final class Builder extends AbstractBuilder<ConvexSolver.Builder, ConvexSolver> {
 
-        Builder() {
-            super();
-        }
-
         public Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
             super(Q, C);
         }
 
-        Builder(final ConvexSolver.Builder matrices) {
-            super(matrices);
+        Builder() {
+            super();
         }
 
-        Builder(final ExpressionsBasedModel model) {
-
-            super(model);
-
-            ConvexSolver.copy(model, this);
+        Builder(final ConvexSolver.Builder matrices) {
+            super(matrices);
         }
 
         Builder(final MatrixStore<Double> C) {
@@ -100,16 +93,14 @@ public abstract class ConvexSolver extends BaseSolver {
 
             this.validate();
 
-            final ExpressionsBasedModel tmpModel = this.getModel();
-
             if (this.hasInequalityConstraints()) {
-                return new ActiveSetSolver(tmpModel, options, this);
+                return new ActiveSetSolver(this, options);
             } else if (this.hasEqualityConstraints()) {
                 //return new LagrangeSolver2(tmpModel, options, this);
-                return new QPESolver(tmpModel, options, this);
+                return new QPESolver(this, options);
                 //return new NullspaceSolver(tmpModel, options, this);
             } else {
-                return new UnconstrainedSolver(tmpModel, options, this);
+                return new UnconstrainedSolver(this, options);
             }
 
         }
@@ -125,18 +116,11 @@ public abstract class ConvexSolver extends BaseSolver {
         }
 
         @Override
-        public ConvexSolver.Builder inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI, final ModelEntity<?>[] originatingEntities) {
-            return super.inequalities(AI, BI, originatingEntities);
-        }
-
-        @Override
         protected Builder objective(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
             return super.objective(Q, C);
         }
 
     }
-
-    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
@@ -236,8 +220,6 @@ public abstract class ConvexSolver extends BaseSolver {
 
         if ((tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim) > 0) {
 
-            final ModelEntity<?>[] tmpEntities = new ModelEntity<?>[tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim];
-
             final PhysicalStore<Double> tmpUAI = FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim, tmpFreeVarDim);
             final PhysicalStore<Double> tmpUBI = FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim, 1);
 
@@ -251,7 +233,6 @@ public abstract class ConvexSolver extends BaseSolver {
                         }
                     }
                     tmpUBI.set(i, 0, tmpExpression.getCompensatedUpperLimit(tmpFixedVariables));
-                    tmpEntities[i] = tmpExpression;
                 }
             }
 
@@ -260,7 +241,6 @@ public abstract class ConvexSolver extends BaseSolver {
                     final Variable tmpVariable = tmpUpVar.get(i);
                     tmpUAI.set(tmpUpExprDim + i, sourceModel.indexOfFreeVariable(tmpVariable), tmpVariable.getAdjustmentFactor());
                     tmpUBI.set(tmpUpExprDim + i, 0, tmpVariable.getAdjustedUpperLimit());
-                    tmpEntities[tmpUpExprDim + i] = tmpVariable;
                 }
             }
 
@@ -277,7 +257,6 @@ public abstract class ConvexSolver extends BaseSolver {
                         }
                     }
                     tmpLBI.set(i, 0, -tmpExpression.getCompensatedLowerLimit(tmpFixedVariables));
-                    tmpEntities[tmpUpExprDim + tmpUpVarDim + i] = tmpExpression;
                 }
             }
 
@@ -286,27 +265,14 @@ public abstract class ConvexSolver extends BaseSolver {
                     final Variable tmpVariable = tmpLoVar.get(i);
                     tmpLAI.set(tmpLoExprDim + i, sourceModel.indexOfFreeVariable(tmpVariable), -tmpVariable.getAdjustmentFactor());
                     tmpLBI.set(tmpLoExprDim + i, 0, -tmpVariable.getAdjustedLowerLimit());
-                    tmpEntities[tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + i] = tmpVariable;
                 }
             }
 
             final MatrixStore<Double> tmpAI = tmpLAI.builder().above(tmpUAI).build();
             final MatrixStore<Double> tmpBI = tmpLBI.builder().above(tmpUBI).build();
 
-            destinationBuilder.inequalities(tmpAI, tmpBI, tmpEntities);
-
-            //            final IndexSelector tmpSelector = new IndexSelector(tmpEntities.length);
-            //            for (int i = 0; i < tmpEntities.length; i++) {
-            //                if (tmpEntities[i].isActiveInequalityConstraint()) {
-            //                    tmpSelector.include(i);
-            //                }
-            //            }
-
-            //tmpKickStarter.activeSet(tmpSelector.getIncluded());
+            destinationBuilder.inequalities(tmpAI, tmpBI);
         }
-
-        //destinationBuilder.setKickStarter(tmpKickStarter);
-        //destinationBuilder.setKickStarter(null);
     }
 
     public static ConvexSolver.Builder getBuilder() {
@@ -315,15 +281,19 @@ public abstract class ConvexSolver extends BaseSolver {
 
     public static ConvexSolver make(final ExpressionsBasedModel model) {
 
-        final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(model);
+        final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder();
+
+        ConvexSolver.copy(model, tmpBuilder);
 
         return tmpBuilder.build();
     }
 
+    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
+
     private transient KKTSolver myDelegateSolver = null;
 
-    protected ConvexSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
-        super(aModel, solverOptions, matrices);
+    protected ConvexSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+        super(matrices, solverOptions);
     }
 
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
@@ -388,5 +358,13 @@ public abstract class ConvexSolver extends BaseSolver {
 
     final MatrixStore<Double> getSolutionX() {
         return this.getX();
+    }
+
+    @Override
+    protected double evaluateFunction(final Access1D<?> solution) {
+
+        final MatrixStore<Double> tmpX = this.getSolutionX();
+
+        return this.getQ().multiply(tmpX).multiplyLeft(tmpX.transpose()).scale(0.5).subtract(this.getC().multiplyLeft(tmpX.transpose())).doubleValue(0L);
     }
 }

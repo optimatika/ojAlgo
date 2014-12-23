@@ -108,7 +108,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
                 }
             }
 
-            myPseudoinverse = new RawStore(this.getQ2().multiplyRight(tmpMtrx));
+            myPseudoinverse = new RawStore(this.getQ2().multiply(tmpMtrx));
         }
 
         return myPseudoinverse;
@@ -188,7 +188,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
      */
     @Override
     public RawStore solve(final Access2D<Double> rhs) {
-        return this.getInverse().multiplyRight(rhs);
+        return this.getInverse().multiply(rhs);
     }
 
     @Override

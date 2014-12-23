@@ -157,14 +157,14 @@ public class ReportedProblems extends MatrixDecompositionTests {
 
         TestUtils.assertEquals(tmpExpected, tmpActual, tmpEqualsNumberContext);
         TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyLeft(tmpActual), tmpEqualsNumberContext);
-        TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyRight(tmpActual), tmpEqualsNumberContext);
+        TestUtils.assertEquals(tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
 
         tmpTestDecomp.compute(tmpRandom);
         tmpActual = tmpTestDecomp.getInverse();
 
         TestUtils.assertEquals(tmpExpected, tmpActual, tmpEqualsNumberContext);
         TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyLeft(tmpActual), tmpEqualsNumberContext);
-        TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyRight(tmpActual), tmpEqualsNumberContext);
+        TestUtils.assertEquals(tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
     }
 
     /**
@@ -175,7 +175,7 @@ public class ReportedProblems extends MatrixDecompositionTests {
         final int tmpDim = Uniform.randomInteger(2, 6);
 
         final PhysicalStore<ComplexNumber> tmpSquare = MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim);
-        final MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiplyRight(tmpSquare);
+        final MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
         final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
         MatrixStore<ComplexNumber> tmpActual;
 

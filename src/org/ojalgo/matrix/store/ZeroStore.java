@@ -140,8 +140,8 @@ public final class ZeroStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public ZeroStore<N> multiplyRight(final Access1D<N> rightMtrx) {
-        return new ZeroStore<N>(this.factory(), this.getRowDim(), (int) (rightMtrx.count() / this.getColDim()));
+    public ZeroStore<N> multiply(final Access1D<N> right) {
+        return new ZeroStore<N>(this.factory(), this.getRowDim(), (int) (right.count() / this.getColDim()));
     }
 
     @Override

@@ -1084,15 +1084,15 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
-    public RawStore multiplyRight(final Access1D<Double> rightMtrx) {
+    public RawStore multiply(final Access1D<Double> right) {
 
         final int tmpRowDim = data.length;
         final int tmpComplexity = myNumberOfColumns;
-        final int tmpColDim = (int) (rightMtrx.count() / tmpComplexity);
+        final int tmpColDim = (int) (right.count() / tmpComplexity);
 
         final RawStore retVal = new RawStore(tmpRowDim, tmpColDim);
 
-        final double[][] tmpRight = RawStore.extract(rightMtrx, tmpComplexity);
+        final double[][] tmpRight = RawStore.extract(right, tmpComplexity);
 
         RawStore.multiply(retVal.data, data, tmpRight);
 

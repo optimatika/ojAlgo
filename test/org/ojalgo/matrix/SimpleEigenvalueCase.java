@@ -60,9 +60,9 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
     @Override
     public void testData() {
 
-        myExpMtrx = SimpleEigenvalueCase.getOriginal().multiplyRight(SimpleEigenvalueCase.getMatrixV());
+        myExpMtrx = SimpleEigenvalueCase.getOriginal().multiply(SimpleEigenvalueCase.getMatrixV());
 
-        myActMtrx = SimpleEigenvalueCase.getMatrixV().multiplyRight(SimpleEigenvalueCase.getMatrixD());
+        myActMtrx = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
@@ -106,7 +106,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
 
         myBigAA = SimpleEigenvalueCase.getOriginal();
         myBigAX = SimpleEigenvalueCase.getMatrixV();
-        myBigAB = SimpleEigenvalueCase.getMatrixV().multiplyRight(SimpleEigenvalueCase.getMatrixD());
+        myBigAB = SimpleEigenvalueCase.getMatrixV().multiply(SimpleEigenvalueCase.getMatrixD());
 
         myBigI = BasicMatrixTest.getIdentity(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
         myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);

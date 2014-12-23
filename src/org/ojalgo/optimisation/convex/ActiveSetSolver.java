@@ -33,7 +33,6 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RowsStore;
 import org.ojalgo.matrix.store.ZeroStore;
-import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.convex.KKTSolver.Input;
 import org.ojalgo.optimisation.convex.KKTSolver.Output;
@@ -57,9 +56,9 @@ final class ActiveSetSolver extends ConvexSolver {
 
     private int myConstraintToInclude = -1;
 
-    ActiveSetSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder aBuilder) {
+    ActiveSetSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
-        super(aModel, solverOptions, aBuilder);
+        super(matrices, solverOptions);
 
         if (this.hasInequalityConstraints()) {
             myActivator = new IndexSelector(this.countInequalityConstraints());
@@ -299,7 +298,8 @@ final class ActiveSetSolver extends ConvexSolver {
 
             final int[] tmpExcluded = myActivator.getExcluded();
             final MatrixStore<Double> tmpSIexcl = this.getSI(tmpExcluded);
-            for (int i = 0; i < tmpExcluded.length; i++) {
+            final int tmpMaxToAct = this.countVariables() - this.countEqualityConstraints();
+            for (int i = 0; (i < tmpExcluded.length) && (myActivator.countIncluded() < tmpMaxToAct); i++) {
                 final double tmpVal = tmpSIexcl.doubleValue(i);
                 if (options.slack.isZero(tmpVal)) {
                     myActivator.include(tmpExcluded[i]);
@@ -420,7 +420,7 @@ final class ActiveSetSolver extends ConvexSolver {
                 final int[] tmpExcluded = myActivator.getExcluded();
 
                 final MatrixStore<Double> tmpNumer = this.getSI(tmpExcluded);
-                final MatrixStore<Double> tmpDenom = this.getAI().builder().row(tmpExcluded).build().multiplyRight(tmpSubX);
+                final MatrixStore<Double> tmpDenom = this.getAI().builder().row(tmpExcluded).build().multiply(tmpSubX);
                 final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
                 tmpStepLengths.fillMatching(tmpStepLengths, PrimitiveFunction.DIVIDE, tmpDenom);
 
@@ -534,7 +534,7 @@ final class ActiveSetSolver extends ConvexSolver {
 
         final PhysicalStore<Double> tmpX = this.getX();
 
-        return new KKTSolver.Input(tmpSubQ, tmpSubC.subtract(tmpSubQ.multiplyRight(tmpX)), tmpSubAE, ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1));
+        return new KKTSolver.Input(tmpSubQ, tmpSubC.subtract(tmpSubQ.multiply(tmpX)), tmpSubAE, ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1));
     }
 
 }

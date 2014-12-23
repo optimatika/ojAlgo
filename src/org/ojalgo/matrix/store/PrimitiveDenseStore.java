@@ -1478,7 +1478,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return retVal;
     }
 
-    public MatrixStore<Double> multiplyRight(final Access1D<Double> right) {
+    public MatrixStore<Double> multiply(final Access1D<Double> right) {
 
         final PrimitiveDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 

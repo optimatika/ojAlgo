@@ -35,7 +35,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.TypeUtils;
 
@@ -195,8 +194,8 @@ public final class PortfolioMixer {
             }
         }
 
-        tmpModel.options.debug(GenericSolver.class);
-        tmpModel.options.validate = false;
+        //        tmpModel.options.debug(GenericSolver.class);
+        //        tmpModel.options.validate = false;
 
         tmpModel.minimise();
 

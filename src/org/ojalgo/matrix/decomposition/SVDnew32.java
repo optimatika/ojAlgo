@@ -343,7 +343,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
     @Override
     public final MatrixStore<N> solve(final Access2D<N> rhs) {
-        return this.getInverse().multiplyRight(rhs);
+        return this.getInverse().multiply(rhs);
     }
 
     @Override

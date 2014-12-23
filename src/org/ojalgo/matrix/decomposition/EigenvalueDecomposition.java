@@ -173,7 +173,7 @@ public abstract class EigenvalueDecomposition<N extends Number> extends Abstract
     }
 
     public final MatrixStore<N> solve(final Access2D<N> rhs) {
-        return this.getInverse().multiplyRight(rhs);
+        return this.getInverse().multiply(rhs);
     }
 
     public final MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {

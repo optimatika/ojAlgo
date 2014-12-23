@@ -83,7 +83,6 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
 
     MatrixStore<Double> solveLinear() {
 
-        final LinearSolver tmpSolver = new LinearSolver.Builder(linearModel).build();
         final Optimisation.Result tmpResult = linearModel.minimise();
 
         final boolean validated = linearModel.validate(tmpResult, linearModel.options.slack);

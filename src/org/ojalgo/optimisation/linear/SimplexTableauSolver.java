@@ -27,6 +27,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -35,7 +36,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.ZeroStore;
-import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -109,9 +109,9 @@ final class SimplexTableauSolver extends LinearSolver {
     private final PivotPoint myPoint;
     private final PrimitiveDenseStore myTransposedTableau;
 
-    SimplexTableauSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final LinearSolver.Builder matrices) {
+    SimplexTableauSolver(final LinearSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
-        super(aModel, solverOptions, matrices);
+        super(matrices, solverOptions);
 
         myPoint = new PivotPoint(this);
 
@@ -127,7 +127,6 @@ final class SimplexTableauSolver extends LinearSolver {
         //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
         myTransposedTableau = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.build());
 
-        final Result tmpKickStarter = matrices.getKickStarter();
         final int[] tmpBasis = null;
         if ((tmpBasis != null) && (tmpBasis.length == tmpConstraintsCount)) {
             myBasis = tmpBasis;
@@ -178,6 +177,11 @@ final class SimplexTableauSolver extends LinearSolver {
 
     private final void logDebugTableau(final String message) {
         this.debug(message + "; Basics: " + Arrays.toString(myBasis), myTransposedTableau.transpose());
+    }
+
+    @Override
+    protected double evaluateFunction(final Access1D<?> solution) {
+        return myPoint.objective();
     }
 
     /**

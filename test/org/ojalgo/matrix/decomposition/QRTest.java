@@ -49,7 +49,7 @@ public class QRTest extends MatrixDecompositionTests {
      */
     private static MatrixStore<ComplexNumber> makeHermitianMatrix() {
         final PhysicalStore<ComplexNumber> tmpBase = MatrixUtils.makeRandomComplexStore(DIMENSION, DIMENSION);
-        return tmpBase.multiplyRight(tmpBase.conjugate());
+        return tmpBase.multiply(tmpBase.conjugate());
     }
 
     public QRTest() {

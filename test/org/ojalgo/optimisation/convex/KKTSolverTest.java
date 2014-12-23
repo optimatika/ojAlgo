@@ -184,7 +184,7 @@ public class KKTSolverTest extends FunctionalityTest {
         // LagrangeSolver
         tmpMatrices[4] = BigMatrix.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 1.0 }, { 0.0 }, { 0.0 } });
 
-        final BasicMatrix tmpLHS = tmpMatrices[0].multiplyRight(tmpMatrices[4]);
+        final BasicMatrix tmpLHS = tmpMatrices[0].multiply(tmpMatrices[4]);
         final BasicMatrix tmpRHS = tmpMatrices[1];
 
         this.doTest(tmpMatrices, false, new NumberContext(7, 14)); // A not full row rank
@@ -323,7 +323,7 @@ public class KKTSolverTest extends FunctionalityTest {
 
         TestUtils.assertEquals(tmpX, tmpFullX, context);
 
-        final KKTSolver.Input tmpStepInput = new KKTSolver.Input(tmpQ, tmpC.add(tmpQ.multiplyRight(tmpFullX).negate()), tmpA,
+        final KKTSolver.Input tmpStepInput = new KKTSolver.Input(tmpQ, tmpC.add(tmpQ.multiply(tmpFullX).negate()), tmpA,
                 tmpB != null ? ZeroStore.makePrimitive((int) tmpB.countRows(), (int) tmpB.countColumns()) : null);
 
         final KKTSolver.Output tmpStepOutput = tmpSolver.solve(tmpStepInput, validate);

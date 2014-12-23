@@ -70,7 +70,7 @@ public class SimpleLeastSquaresCase extends BasicMatrixTest {
     public void testData() {
 
         myExpMtrx = SimpleLeastSquaresCase.getTransformedRHS();
-        myActMtrx = SimpleLeastSquaresCase.getFactorR().multiplyRight(SimpleLeastSquaresCase.getSolution());
+        myActMtrx = SimpleLeastSquaresCase.getFactorR().multiply(SimpleLeastSquaresCase.getSolution());
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }

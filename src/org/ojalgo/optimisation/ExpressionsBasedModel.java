@@ -91,23 +91,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
-    private static final String NEW_LINE = "\n";
-    private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
-    private static final String OBJECTIVE = "Generated/Aggregated Objective";
-    private static final String START_END = "############################################\n";
-
-    static final Comparator<Expression> CE = new Comparator<Expression>() {
-
-        public int compare(final Expression o1, final Expression o2) {
-            return Integer.compare(o2.countLinearFactors(), o1.countLinearFactors());
-        }
-
-    };
-
-    private final ExpressionsBasedConvexIntegration myConvexSolverIntegration = new ExpressionsBasedConvexIntegration();
-    private final ExpressionsBasedLinearIntegration myLinearSolverIntegration = new ExpressionsBasedLinearIntegration();
-    private final ExpressionsBasedIntegerIntegration myIntegerSolverIntegration = new ExpressionsBasedIntegerIntegration();
-
     public static ExpressionsBasedModel make(final MathProgSysModel mps) {
 
         final MathProgSysModel.Column[] tmpActCols = mps.getActivatorVariableColumns();
@@ -233,13 +216,29 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
+    private static final String NEW_LINE = "\n";
+    private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
+
+    private static final String OBJECTIVE = "Generated/Aggregated Objective";
+
+    private static final String START_END = "############################################\n";
+    static final Comparator<Expression> CE = new Comparator<Expression>() {
+
+        public int compare(final Expression o1, final Expression o2) {
+            return Integer.compare(o2.countLinearFactors(), o1.countLinearFactors());
+        }
+
+    };
     private transient BasicLogger.Appender myAppender = null;
+
     private final CharacterRing myBuffer = new CharacterRing();
+
     private final HashMap<String, Expression> myExpressions = new HashMap<String, Expression>();
     private final HashSet<Index> myFixedVariables = new HashSet<Index>();
     private transient int[] myFreeIndices = null;
     private transient List<Variable> myFreeVariables = null;
     private transient int[] myIntegerIndices = null;
+
     private transient List<Variable> myIntegerVariables = null;
     private transient int[] myNegativeIndices = null;
     private transient List<Variable> myNegativeVariables = null;
@@ -359,24 +358,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myVariables.clear();
 
         myFixedVariables.clear();
-    }
-
-    private GenericSolver getDefaultSolver() {
-
-        this.flushCaches();
-
-        if (this.isAnyVariableInteger()) {
-
-            return myIntegerSolverIntegration.build(this);
-
-        } else if (this.isAnyExpressionQuadratic()) {
-
-            return myConvexSolverIntegration.build(this);
-
-        } else {
-
-            return myLinearSolverIntegration.build(this);
-        }
     }
 
     public Expression getExpression(final String name) {
@@ -888,23 +869,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         } else {
 
-            final GenericSolver tmpSolver = this.getDefaultSolver();
+            this.flushCaches();
 
+            final Integration<?> tmpIntegration = this.getIntegration();
+            final Solver tmpSolver = tmpIntegration.build(this);
             retVal = tmpSolver.solve();
-
-            if (this.isAnyVariableInteger()) {
-
-                retVal = myIntegerSolverIntegration.toModelState(this, retVal);
-
-            } else if (this.isAnyExpressionQuadratic()) {
-
-                retVal = myConvexSolverIntegration.toModelState(this, retVal);
-
-            } else {
-
-                retVal = myLinearSolverIntegration.toModelState(this, retVal);
-            }
-
+            retVal = tmpIntegration.toModelState(this, retVal);
         }
 
         return retVal;
@@ -1023,6 +993,17 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myPositiveVariables = Collections.unmodifiableList(myPositiveVariables);
         myNegativeVariables = Collections.unmodifiableList(myNegativeVariables);
         myIntegerVariables = Collections.unmodifiableList(myIntegerVariables);
+    }
+
+    private ExpressionsBasedModel.Integration<?> getIntegration() {
+
+        if (this.isAnyVariableInteger()) {
+            return new ExpressionsBasedIntegerIntegration();
+        } else if (this.isAnyExpressionQuadratic()) {
+            return new ExpressionsBasedConvexIntegration();
+        } else {
+            return new ExpressionsBasedLinearIntegration();
+        }
     }
 
     private Optimisation.Result handleResult(final Result solverResult) {

@@ -79,11 +79,11 @@ public final class AboveBelowStore<N extends Number> extends DelegatingStore<N> 
     }
 
     @Override
-    public MatrixStore<N> multiplyRight(final Access1D<N> rightMtrx) {
+    public MatrixStore<N> multiply(final Access1D<N> right) {
 
-        final Future<MatrixStore<N>> tmpBaseFuture = this.executeMultiplyRightOnBase(rightMtrx);
+        final Future<MatrixStore<N>> tmpBaseFuture = this.executeMultiplyRightOnBase(right);
 
-        final MatrixStore<N> tmpLower = myBelow.multiplyRight(rightMtrx);
+        final MatrixStore<N> tmpLower = myBelow.multiply(right);
 
         try {
             return new AboveBelowStore<N>(tmpBaseFuture.get(), tmpLower);
