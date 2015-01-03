@@ -102,7 +102,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
 
-        return ExpressionsBasedModel.make(tmpMPS);
+        return tmpMPS.getExpressionsBasedModel();
     }
 
     public MarketShareCase() {

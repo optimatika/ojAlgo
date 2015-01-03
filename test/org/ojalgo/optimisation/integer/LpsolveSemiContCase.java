@@ -46,7 +46,7 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
 
         final File tmpFile = new File(PATH + "lpsolve_sc_not.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         final Optimisation.Result tmpSolution = tmpModel.minimise(); // vet ej om in eller max
 
@@ -66,7 +66,7 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
 
         final File tmpFile = new File(PATH + "lpsolve_sc_org.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         final Optimisation.Result tmpSolution = tmpModel.minimise(); // vet ej om in eller max
 

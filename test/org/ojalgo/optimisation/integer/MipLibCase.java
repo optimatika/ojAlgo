@@ -43,7 +43,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
 
         final File tmpFile = new File(PATH + modelName);
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         if (relax) {
             tmpModel.relax(true);

@@ -70,13 +70,11 @@ Access1D.Visitable<N>, Serializable {
 
             if (tmpTotal > Integer.MAX_VALUE) {
                 return this.getSegmentedFactory().makeStructuredZero(structure);
-
             } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getDenseFactory().getElementSize())) {
                 return new SparseArray<N>(tmpTotal, this.getDenseFactory());
             } else {
                 return this.getDenseFactory().makeStructuredZero(structure);
             }
-
         }
 
         @Override

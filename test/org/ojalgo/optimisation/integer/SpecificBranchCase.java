@@ -44,7 +44,7 @@ public final class SpecificBranchCase extends MipLibCase {
 
         final File tmpFile = new File(MipLibCase.PATH + "vpm2.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         TestUtils.assertTrue(tmpModel.validate());
 

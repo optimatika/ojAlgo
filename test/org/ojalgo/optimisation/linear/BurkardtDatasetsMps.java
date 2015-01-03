@@ -61,7 +61,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
         final File tmpFile = new File(PATH + "adlittle.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         //tmpModel.options.debug(LinearSolver.class);
 
@@ -87,7 +87,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
         final File tmpFile = new File(PATH + "afiro.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         TestUtils.assertTrue(tmpModel.validate());
 
@@ -108,7 +108,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
         final File tmpFile = new File(PATH + "empstest.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         this.assertMinMaxVal(tmpModel, null, null);
     }
@@ -122,7 +122,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
         final File tmpFile = new File(PATH + "maros.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         this.assertMinMaxVal(tmpModel, BigFunction.DIVIDE.invoke(new BigDecimal("385"), THREE), new BigDecimal("197.5"));
     }
@@ -135,7 +135,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
         final File tmpFile = new File(PATH + "nazareth.mps");
         final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         this.assertMinMaxVal(tmpModel, null, BigFunction.DIVIDE.invoke(HUNDRED.add(TEN), THREE));
     }

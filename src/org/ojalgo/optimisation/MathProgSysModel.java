@@ -353,7 +353,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
      *  G    greater than or equal
      *  N    objective
      *  N    no restriction
-     * 
+     *
      * row type       sign of r       h          u
      * ----------------------------------------------
      *    G            + or -         b        b + |r|
@@ -375,15 +375,16 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     private static final int[] FIELD_LIMITS = new int[] { 3, 12, 22, 36, 47, 61 };
     private static final String SPACE = " ";
 
-    public static MathProgSysModel makeFromFile(final File aFile) {
+    public static MathProgSysModel makeFromFile(final File file) {
+
+        final MathProgSysModel retVal = new MathProgSysModel();
 
         String tmpLine;
         FileSection tmpSection = null;
-        final MathProgSysModel retVal = new MathProgSysModel();
 
         try {
 
-            final BufferedReader tmpBufferedFileReader = new BufferedReader(new FileReader(aFile));
+            final BufferedReader tmpBufferedFileReader = new BufferedReader(new FileReader(file));
 
             //readLine is a bit quirky :
             //it returns the content of a line MINUS the newline.
@@ -448,24 +449,31 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return myName;
     }
 
+    /**
+     * Will disregard the OBJSENSE and maximise.
+     *
+     * @see org.ojalgo.optimisation.Optimisation.Model#maximise()
+     */
     public Optimisation.Result maximise() {
-        if (this.isMaximisation()) {
-            return myDelegate.maximise();
-        } else {
-            throw new IllegalStateException("Model was declared as a minimisation problem!");
-        }
-    }
-
-    public Optimisation.Result minimise() {
-        if (this.isMinimisation()) {
-            return myDelegate.minimise();
-        } else {
-            throw new IllegalStateException("Model was declared as a maximisation problem!");
-        }
+        return myDelegate.maximise();
     }
 
     /**
-     * If the OBJSENSE was specified in the file it ius used otherwise the default is to minimise.
+     * Will disregard the OBJSENSE and minimise.
+     *
+     * @see org.ojalgo.optimisation.Optimisation.Model#minimise()
+     */
+    public Optimisation.Result minimise() {
+        return myDelegate.minimise();
+    }
+
+    /**
+     * <p>
+     * If the OBJSENSE was specified in the file it is used otherwise the default is to minimise.
+     * </p>
+     * <p>
+     * The solution (variable values) are in the order the columns were defined in the MPS-file.
+     * </p>
      */
     public Optimisation.Result solve() {
         if (this.isMaximisation()) {
@@ -490,15 +498,15 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return myDelegate.validate(solution, context);
     }
 
-    private void extractFields(final String aLine) {
+    private void extractFields(final String line) {
 
-        final int tmpLength = aLine.length();
+        final int tmpLength = line.length();
 
         int tmpFirst = 0;
         int tmpLimit = tmpFirst;
         for (int i = 0; i < myFields.length; i++) {
             tmpLimit = Math.min(FIELD_LIMITS[i], tmpLength);
-            myFields[i] = aLine.substring(tmpFirst, tmpLimit).trim();
+            myFields[i] = line.substring(tmpFirst, tmpLimit).trim();
             tmpFirst = tmpLimit;
         }
     }
