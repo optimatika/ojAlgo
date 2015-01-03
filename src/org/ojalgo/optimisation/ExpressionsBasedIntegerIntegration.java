@@ -22,24 +22,61 @@
 package org.ojalgo.optimisation;
 
 import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
-import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.integer.IntegerSolver;
-import org.ojalgo.optimisation.integer.OldIntegerSolver;
 
 final class ExpressionsBasedIntegerIntegration extends Integration<IntegerSolver> {
 
     public IntegerSolver build(final ExpressionsBasedModel model) {
-        //return NewIntegerSolver.make(model);
-        return OldIntegerSolver.make(model);
+        return IntegerSolver.make(model);
     }
 
-    public Result toModelState(final ExpressionsBasedModel model, final Result solverState) {
+    public Capabilities getCapabilities() {
+        return new Capabilities() {
+
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#integerVariables()
+             */
+            public boolean integerVariables() {
+                return true;
+            }
+
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearConstraints()
+             */
+            public boolean linearConstraints() {
+                return true;
+            }
+
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearObjective()
+             */
+            public boolean linearObjective() {
+                return true;
+            }
+
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#quadraticConstraints()
+             */
+            public boolean quadraticConstraints() {
+                return true;
+            }
+
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#quadraticObjective()
+             */
+            public boolean quadraticObjective() {
+                return true;
+            }
+
+        };
+    }
+
+    public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
         return solverState;
     }
 
-    public Result extractSolverState(final ExpressionsBasedModel model) {
-        // TODO Auto-generated method stub
-        return null;
+    public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+        return modelState;
     }
 
 }

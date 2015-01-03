@@ -579,13 +579,6 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    protected boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final BasicLogger.Appender appender) {
-
-        final BigDecimal tmpValue = this.evaluate(solution);
-
-        return this.validate(tmpValue, context, appender);
-    }
-
     private final BigDecimal convert(final BigDecimal value, final boolean adjusted) {
 
         if (value != null) {
@@ -692,6 +685,13 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         return myAdjustmentExponent;
+    }
+
+    protected boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final BasicLogger.Appender appender) {
+
+        final BigDecimal tmpValue = this.evaluate(solution);
+
+        return this.validate(tmpValue, context, appender);
     }
 
     void appendToString(final StringBuilder aStringBuilder, final Access1D<BigDecimal> aCurrentState) {

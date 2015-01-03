@@ -104,7 +104,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             }
 
             ExpressionsBasedModel tmpModel = this.getModel();
-            final Optimisation.Result tmpResult = tmpModel.solve();
+            final Optimisation.Result tmpResult = tmpModel.solve(OldIntegerSolver.this.getBestResultSoFar());
 
             OldIntegerSolver.this.incrementIterationsCount();
 
@@ -245,10 +245,6 @@ public final class OldIntegerSolver extends IntegerSolver {
 
     }
 
-    public static OldIntegerSolver make(final ExpressionsBasedModel model) {
-        return new OldIntegerSolver(model, model.options);
-    }
-
     private final Set<NodeKey> myExploredNodes = Collections.synchronizedSet(new HashSet<NodeKey>());
     private final int[] myIntegerIndeces;
 
@@ -270,9 +266,10 @@ public final class OldIntegerSolver extends IntegerSolver {
 
     public Result solve(final Result kickStarter) {
 
-        if (kickStarter != null) {
-            this.markInteger(null, kickStarter);
-        }
+        // Must verify that it actually is an integer solution
+        //        if ((kickStarter != null) && kickStarter.getState().isFeasible()) {
+        //            this.markInteger(null, kickStarter);
+        //        }
 
         this.resetIterationsCount();
 

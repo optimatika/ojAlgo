@@ -958,12 +958,9 @@ public class ReportedProblems extends OptimisationConvexTests {
         TestUtils.assertStateNotLessThanOptimal(tmpQuadResult);
 
         // In addition I test that the LinearSolver can determine feasibility
-
-        // for (int v = 0; v < tmpVariables.length; v++) {
-        // tmpVariables[v].weight(new BigDecimal(v));
-        // }
-
-        final LinearSolver tmpLinSolver = LinearSolver.make(model);
+        final LinearSolver.Builder tmpBuilder = LinearSolver.getBuilder();
+        LinearSolver.copy(model, tmpBuilder);
+        final LinearSolver tmpLinSolver = tmpBuilder.build();
         final Optimisation.Result tmpLinResult = tmpLinSolver.solve();
 
         TestUtils.assertTrue(model.validate(tmpLinResult, new NumberContext(7, 6)));
@@ -1106,9 +1103,12 @@ public class ReportedProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(tmpExpObjFuncVal, tmpActObjFuncVal);
 
         TestUtils.assertEquals(expected, tmpActualResult);
+        final LinearSolver.Builder tmpBuilder = LinearSolver.getBuilder();
+
+        LinearSolver.copy(tmpModel, tmpBuilder);
 
         // Test that the LinearSolver can determine feasibility
-        final LinearSolver tmpLinearSolver = LinearSolver.make(tmpModel);
+        final LinearSolver tmpLinearSolver = tmpBuilder.build();
         final Optimisation.Result tmpLinearResult = tmpLinearSolver.solve();
         TestUtils.assertStateNotLessThanFeasible(tmpLinearResult);
         // Kan inte göra så här längre

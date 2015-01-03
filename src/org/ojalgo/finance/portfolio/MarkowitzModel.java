@@ -26,7 +26,6 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.ojalgo.ProgrammingError;
@@ -39,7 +38,6 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -92,6 +90,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class MarkowitzModel extends EquilibriumModel {
 
+    private static final double _0_0 = ZERO.doubleValue();
     private static final String BALANCE = "Balance";
     private static final double INIT = Math.sqrt(PrimitiveMath.TEN);
     private static final double MAX = PrimitiveMath.HUNDRED * PrimitiveMath.HUNDRED;
@@ -302,21 +301,31 @@ public final class MarkowitzModel extends EquilibriumModel {
 
         if ((myTargetReturn != null) || (myTargetVariance != null)) {
 
-            retVal = this.generateOptimisationModel(0.0).minimise();
+            final double tmpTargetValue;
+            if (myTargetVariance != null) {
+                tmpTargetValue = myTargetVariance.doubleValue();
+            } else if (myTargetReturn != null) {
+                tmpTargetValue = myTargetReturn.doubleValue();
+            } else {
+                tmpTargetValue = _0_0;
+            }
 
-            if (retVal.getState().isFeasible()) {
+            retVal = this.generateOptimisationModel(_0_0).minimise();
 
-                final double tmpTargetValue;
-                if (myTargetVariance != null) {
-                    tmpTargetValue = myTargetVariance.doubleValue();
-                } else if (myTargetReturn != null) {
-                    tmpTargetValue = myTargetReturn.doubleValue();
-                } else {
-                    tmpTargetValue = ONE.doubleValue();
-                }
-                double tmpTargetDiff = ZERO.doubleValue();
-                double tmpTargetNow = ZERO.doubleValue();
-                double tmpTargetLast = ZERO.doubleValue();
+            double tmpTargetNow = _0_0;
+            double tmpTargetDiff = _0_0;
+            double tmpTargetLast = _0_0;
+
+            if (myTargetVariance != null) {
+                tmpTargetLast = this.calculatePortfolioVariance(retVal).doubleValue();
+            } else if (myTargetReturn != null) {
+                tmpTargetLast = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).doubleValue();
+            } else {
+                tmpTargetLast = tmpTargetValue;
+            }
+
+            if (retVal.getState().isFeasible() && (tmpTargetValue < tmpTargetLast)) {
+                // tmpTargetLast at this pount is at max possible target value
 
                 double tmpCurrent;
                 double tmpLow;
@@ -331,46 +340,34 @@ public final class MarkowitzModel extends EquilibriumModel {
                     tmpHigh = tmpCurrent / INIT;
                 }
 
-                int tmpIterCount = 0;
-
                 do {
 
                     retVal = this.generateOptimisationModel(tmpCurrent).minimise();
 
-                    if (retVal != null) {
-
-                        tmpTargetLast = tmpTargetNow;
-                        if (myTargetVariance != null) {
-                            tmpTargetNow = this.calculatePortfolioVariance(retVal).doubleValue();
-                            tmpTargetDiff = tmpTargetNow - tmpTargetValue;
-                        } else if (myTargetReturn != null) {
-                            tmpTargetNow = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).doubleValue();
-                            tmpTargetDiff = tmpTargetNow - tmpTargetValue;
-                        } else {
-                            tmpTargetDiff = ZERO.doubleValue();
-                        }
-
-                        if (tmpTargetDiff < 0.0) {
-                            tmpLow = tmpCurrent;
-                        } else if (tmpTargetDiff > 0.0) {
-                            tmpHigh = tmpCurrent;
-                        }
-                        tmpCurrent = Math.sqrt(tmpLow * tmpHigh);
-
-                        tmpIterCount++;
-
-                        //                        BasicLogger.debug();
-                        //                        BasicLogger.debug("Iter:   {}", tmpIterCount);
-                        //                        BasicLogger.debug("RAF:   {}", tmpCurrent);
-                        //                        BasicLogger.debug("Last: {}", tmpTargetLast);
-                        //                        BasicLogger.debug("Now: {}", tmpTargetNow);
-                        //                        BasicLogger.debug("Target: {}", tmpTargetValue);
-                        //                        BasicLogger.debug("Diff:   {}", tmpTargetDiff);
-
+                    tmpTargetLast = tmpTargetNow;
+                    if (myTargetVariance != null) {
+                        tmpTargetNow = this.calculatePortfolioVariance(retVal).doubleValue();
+                    } else if (myTargetReturn != null) {
+                        tmpTargetNow = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).doubleValue();
                     } else {
-
-                        tmpTargetDiff = ZERO.doubleValue();
+                        tmpTargetNow = tmpTargetValue;
                     }
+                    tmpTargetDiff = tmpTargetNow - tmpTargetValue;
+
+                    if (tmpTargetDiff < _0_0) {
+                        tmpLow = tmpCurrent;
+                    } else if (tmpTargetDiff > _0_0) {
+                        tmpHigh = tmpCurrent;
+                    }
+                    tmpCurrent = Math.sqrt(tmpLow * tmpHigh);
+
+                    //                        BasicLogger.debug();
+                    //                        BasicLogger.debug("Iter:   {}", tmpIterCount);
+                    //                        BasicLogger.debug("RAF:   {}", tmpCurrent);
+                    //                        BasicLogger.debug("Last: {}", tmpTargetLast);
+                    //                        BasicLogger.debug("Now: {}", tmpTargetNow);
+                    //                        BasicLogger.debug("Target: {}", tmpTargetValue);
+                    //                        BasicLogger.debug("Diff:   {}", tmpTargetDiff);
 
                 } while (!TARGET_CONTEXT.isSmall(tmpTargetValue, tmpTargetDiff) && TARGET_CONTEXT.isDifferent(tmpTargetLast, tmpTargetNow));
             }
@@ -381,13 +378,13 @@ public final class MarkowitzModel extends EquilibriumModel {
 
         }
 
-        if (retVal.getState().isFeasible()) {
-            final List<Variable> tmpVariables = myOptimisationModel.getVariables();
-            for (int v = 0; v < tmpVariables.size(); v++) {
-                final BigDecimal tmpBigDecimal = TypeUtils.toBigDecimal(retVal.get(v), WEIGHT_CONTEXT);
-                tmpVariables.get(v).setValue(tmpBigDecimal);
-            }
-        }
+        //        if (retVal.getState().isFeasible()) {
+        //            final List<Variable> tmpVariables = myOptimisationModel.getVariables();
+        //            for (int v = 0; v < tmpVariables.size(); v++) {
+        //                final BigDecimal tmpBigDecimal = TypeUtils.toBigDecimal(retVal.get(v), WEIGHT_CONTEXT);
+        //                tmpVariables.get(v).setValue(tmpBigDecimal);
+        //            }
+        //        }
 
         return retVal;
     }

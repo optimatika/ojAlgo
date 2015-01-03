@@ -21,12 +21,9 @@
  */
 package org.ojalgo.optimisation;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 
-import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -42,41 +39,58 @@ final class ExpressionsBasedConvexIntegration extends Integration<ConvexSolver> 
         return tmpBuilder.build(model.options);
     }
 
-    public Result toModelState(final ExpressionsBasedModel model, final Result solverState) {
+    public Capabilities getCapabilities() {
+        return new Capabilities() {
 
-        final List<Variable> tmpFreeVariables = model.getFreeVariables();
-        final Set<Index> tmpFixedVariables = model.getFixedVariables();
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearConstraints()
+             */
+            public boolean linearConstraints() {
+                return true;
+            }
 
-        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpFixedVariables.size() + tmpFreeVariables.size(), 1);
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#quadraticObjective()
+             */
+            public boolean quadraticObjective() {
+                return true;
+            }
 
-        for (final Index tmpVariable : tmpFixedVariables) {
-            retVal.set(tmpVariable.index, 0, model.getVariable(tmpVariable.index).getValue().doubleValue());
-        }
-
-        for (int i = 0; i < tmpFreeVariables.size(); i++) {
-            final Variable tmpVariable = tmpFreeVariables.get(i);
-            final int tmpIndexOf = model.indexOf(tmpVariable);
-            retVal.set(tmpIndexOf, 0, solverState.doubleValue(i));
-
-        }
-
-        return new Result(solverState.getState(), solverState.getValue(), retVal);
+        };
     }
 
-    public Result extractSolverState(final ExpressionsBasedModel model) {
+    public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
-        final List<Variable> tmpFreeVariables = model.getFreeVariables();
-        final int tmpSize = tmpFreeVariables.size();
+        final PrimitiveArray tmpModelSolution = PrimitiveArray.make(model.countVariables());
 
-        final Array1D<Double> tmpModelSolution = Array1D.PRIMITIVE.makeZero(tmpSize);
-        for (int i = 0; i < tmpSize; i++) {
-            final BigDecimal tmpValue = tmpFreeVariables.get(i).getValue();
-            if (tmpValue != null) {
-                tmpModelSolution.set(i, tmpValue.doubleValue());
-            }
+        for (final Index tmpFixed : model.getFixedVariables()) {
+            tmpModelSolution.set(tmpFixed.index, model.getVariable(tmpFixed.index).getValue().doubleValue());
         }
 
-        return new Optimisation.Result(Optimisation.State.UNEXPLORED, Double.NaN, tmpModelSolution);
+        final List<Variable> tmpFreeVariables = model.getFreeVariables();
+        for (int f = 0; f < tmpFreeVariables.size(); f++) {
+            final Variable tmpVariable = tmpFreeVariables.get(f);
+            final int tmpIndex = model.indexOf(tmpVariable);
+            tmpModelSolution.set(tmpIndex, solverState.doubleValue(f));
+        }
+
+        return new Result(solverState.getState(), solverState.getValue(), tmpModelSolution);
+    }
+
+    public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+
+        final List<Variable> tmpFreeVariables = model.getFreeVariables();
+
+        final PrimitiveArray tmpSolverSolution = PrimitiveArray.make(tmpFreeVariables.size());
+        final double[] tmpData = tmpSolverSolution.data;
+
+        for (int i = 0; i < tmpData.length; i++) {
+            final Variable tmpVariable = tmpFreeVariables.get(i);
+            final int tmpIndex = model.indexOf(tmpVariable);
+            tmpData[i] = modelState.doubleValue(tmpIndex);
+        }
+
+        return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);
     }
 
 }

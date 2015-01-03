@@ -279,15 +279,6 @@ public abstract class ConvexSolver extends BaseSolver {
         return new ConvexSolver.Builder();
     }
 
-    public static ConvexSolver make(final ExpressionsBasedModel model) {
-
-        final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder();
-
-        ConvexSolver.copy(model, tmpBuilder);
-
-        return tmpBuilder.build();
-    }
-
     static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     private transient KKTSolver myDelegateSolver = null;

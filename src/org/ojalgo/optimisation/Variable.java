@@ -173,18 +173,6 @@ public final class Variable extends ModelEntity<Variable> {
         myAdjustmentExponent = Integer.MIN_VALUE;
     }
 
-    protected boolean validate(final NumberContext context, final BasicLogger.Appender appender) {
-
-        if (myValue != null) {
-
-            return this.validate(myValue, context, appender);
-
-        } else {
-
-            return false;
-        }
-    }
-
     @Override
     protected void appendMiddlePart(final StringBuilder aStringBuilder) {
 
@@ -256,6 +244,18 @@ public final class Variable extends ModelEntity<Variable> {
         }
 
         return retVal;
+    }
+
+    protected boolean validate(final NumberContext context, final BasicLogger.Appender appender) {
+
+        if (myValue != null) {
+
+            return this.validate(myValue, context, appender);
+
+        } else {
+
+            return false;
+        }
     }
 
     Expression.Index getIndex() {

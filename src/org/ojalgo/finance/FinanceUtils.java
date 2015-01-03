@@ -329,7 +329,7 @@ public abstract class FinanceUtils {
             final PhysicalStore<Double> tmpD = tmpEvD.getD().copy();
 
             final double tmpLargest = tmpD.doubleValue(0, 0);
-            final double tmpLimit = Math.max(PrimitiveMath.MACHINE_DOUBLE_ERROR * tmpLargest, 1E-12);
+            final double tmpLimit = Math.max(PrimitiveMath.MACHINE_EPSILON * tmpLargest, 1E-12);
 
             for (int ij = 0; ij < tmpSize; ij++) {
                 if (tmpD.doubleValue(ij, ij) < tmpLimit) {
@@ -339,7 +339,7 @@ public abstract class FinanceUtils {
 
             final MatrixStore<Double> tmpLeft = tmpV;
             final MatrixStore<Double> tmpMiddle = tmpD;
-            final MatrixStore<Double> tmpRight = tmpLeft.builder().transpose().build();
+            final MatrixStore<Double> tmpRight = tmpLeft.transpose();
 
             tmpCovariances = tmpMiddle.multiplyLeft(tmpLeft).multiply(tmpRight);
         }

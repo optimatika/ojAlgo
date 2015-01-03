@@ -69,9 +69,7 @@ public abstract class LinearSolver extends BaseSolver {
     public static final class Builder extends AbstractBuilder<LinearSolver.Builder, LinearSolver> {
 
         public Builder(final MatrixStore<Double> C) {
-
             super(C);
-
         }
 
         Builder() {
@@ -79,21 +77,15 @@ public abstract class LinearSolver extends BaseSolver {
         }
 
         Builder(final BaseSolver.AbstractBuilder<LinearSolver.Builder, LinearSolver> matrices) {
-
             super(matrices);
-
         }
 
         Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
-
             super(Q, C);
-
         }
 
         Builder(final MatrixStore<Double>[] aMtrxArr) {
-
             super(aMtrxArr);
-
         }
 
         @Override
@@ -426,15 +418,6 @@ public abstract class LinearSolver extends BaseSolver {
 
     public static LinearSolver.Builder getBuilder() {
         return new LinearSolver.Builder();
-    }
-
-    public static LinearSolver make(final ExpressionsBasedModel model) {
-
-        final LinearSolver.Builder tmpBuilder = new LinearSolver.Builder();
-
-        LinearSolver.copy(model, tmpBuilder);
-
-        return tmpBuilder.build();
     }
 
     static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;

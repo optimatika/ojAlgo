@@ -89,121 +89,25 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<ExpressionsBasedModel, S> {
 
+        /**
+         * @see org.ojalgo.optimisation.Optimisation.Integration#extractSolverState(org.ojalgo.optimisation.Optimisation.Model)
+         */
+        public final Result extractSolverState(final ExpressionsBasedModel model) {
+            return this.toSolverState(model.getVariableValues(), model);
+        }
+
     }
 
+    /**
+     * This method is no longer needed. Just use the {@linkplain MathProgSysModel} the same way you would use the
+     * {@linkplain ExpressionsBasedModel}. If you absolutely must have an {@linkplain ExpressionsBasedModel} then simply
+     * call {@linkplain MathProgSysModel#getExpressionsBasedModel()}.
+     *
+     * @deprecated v38
+     */
+    @Deprecated
     public static ExpressionsBasedModel make(final MathProgSysModel mps) {
-
-        final MathProgSysModel.Column[] tmpActCols = mps.getActivatorVariableColumns();
-        final MathProgSysModel.Column[] tmpNegCols = mps.getNegativeVariableColumns();
-        final MathProgSysModel.Column[] tmpPosCols = mps.getPositiveVariableColumns();
-        final MathProgSysModel.Row[] tmpAllRows = mps.getExpressionRows();
-
-        Arrays.sort(tmpActCols);
-        Arrays.sort(tmpNegCols);
-        Arrays.sort(tmpPosCols);
-        Arrays.sort(tmpAllRows);
-
-        final int tmpCountActCols = tmpActCols.length;
-        final int tmpCountNegCols = tmpNegCols.length;
-        final int tmpCountPosCols = tmpPosCols.length;
-        final int tmpCountAllRows = tmpAllRows.length;
-
-        // Define various local variables
-        MathProgSysModel.Row tmpRow;
-        MathProgSysModel.Column tmpCol;
-        Variable tmpVar;
-        Expression tmpExpr;
-        int tmpIndex;
-
-        // Create the LinearModel variables
-        final Variable[] tmpVariables = new Variable[tmpCountActCols + tmpCountNegCols + tmpCountPosCols];
-        for (int i = 0; i < tmpCountActCols; i++) {
-
-            tmpCol = tmpActCols[i];
-            tmpVar = Variable.makeBinary(tmpCol.getNameForActivator());
-
-            tmpVariables[i] = tmpVar;
-        }
-        for (int i = 0; i < tmpCountNegCols; i++) {
-
-            tmpCol = tmpNegCols[i];
-            tmpVar = new Variable(tmpCol.getNameForNegativePart());
-
-            final BigDecimal tmpLowerLimit = (tmpCol.isUpperLimitSet() && !tmpCol.needsActivator()) ? tmpCol.getUpperLimit().negate().max(ZERO) : ZERO;
-            final BigDecimal tmpUpperLimit = tmpCol.isLowerLimitSet() ? tmpCol.getLowerLimit().negate() : null;
-
-            tmpVar.lower(tmpLowerLimit).upper(tmpUpperLimit).integer(tmpCol.isInteger());
-
-            tmpVariables[tmpCountActCols + i] = tmpVar;
-        }
-        for (int i = 0; i < tmpCountPosCols; i++) {
-
-            tmpCol = tmpPosCols[i];
-            tmpVar = new Variable(tmpCol.getNameForPositivePart());
-
-            final BigDecimal tmpLowerLimit = (tmpCol.isLowerLimitSet() && !tmpCol.needsActivator()) ? tmpCol.getLowerLimit().max(ZERO) : ZERO;
-            final BigDecimal tmpUpperLimit = tmpCol.getUpperLimit();
-
-            tmpVar.lower(tmpLowerLimit).upper(tmpUpperLimit).integer(tmpCol.isInteger());
-
-            tmpVariables[tmpCountActCols + tmpCountNegCols + i] = tmpVar;
-        }
-
-        // Instantiate the LinearModel
-        final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
-
-        final Expression[] tmpExpressions = new Expression[tmpCountAllRows];
-        final String[] tmpExpressionNames = new String[tmpCountAllRows];
-
-        for (int i = 0; i < tmpCountAllRows; i++) {
-            tmpRow = tmpAllRows[i];
-            tmpExpr = retVal.addExpression(tmpRow.getName());
-            tmpExpr.lower(tmpRow.getLowerLimit());
-            tmpExpr.upper(tmpRow.getUpperLimit());
-            tmpExpr.weight(tmpRow.getContributionWeight());
-            tmpExpressions[i] = tmpExpr;
-            tmpExpressionNames[i] = tmpExpr.getName();
-        }
-
-        final Expression[] tmpActExpressions = new Expression[tmpCountActCols];
-        final String[] tmpActExpressionNames = new String[tmpCountActCols];
-
-        for (int i = 0; i < tmpCountActCols; i++) {
-            tmpCol = tmpActCols[i];
-            tmpExpr = retVal.addExpression(tmpCol.getName());
-            tmpExpr.lower(ZERO);
-            tmpActExpressions[i] = tmpExpr;
-            tmpActExpressionNames[i] = tmpExpr.getName();
-
-            tmpIndex = Arrays.binarySearch(tmpPosCols, tmpCol);
-            if (tmpIndex != -1) {
-                tmpExpr.setLinearFactor(i, tmpCol.getLowerLimit().negate());
-                tmpExpr.setLinearFactor(tmpCountActCols + tmpCountNegCols + tmpIndex, ONE);
-            }
-        }
-
-        for (int i = 0; i < tmpCountNegCols; i++) {
-            tmpCol = tmpNegCols[i];
-            tmpVar = tmpVariables[tmpCountActCols + i];
-            for (final String tmpRowKey : tmpCol.getElementKeys()) {
-                tmpIndex = Arrays.binarySearch(tmpExpressionNames, tmpRowKey);
-                if (tmpIndex != -1) {
-                    tmpExpressions[tmpIndex].setLinearFactor(tmpCountActCols + i, tmpCol.getRowValue(tmpRowKey).negate());
-                }
-            }
-        }
-        for (int i = 0; i < tmpCountPosCols; i++) {
-            tmpCol = tmpPosCols[i];
-            tmpVar = tmpVariables[tmpCountActCols + tmpCountNegCols + i];
-            for (final String tmpRowKey : tmpCol.getElementKeys()) {
-                tmpIndex = Arrays.binarySearch(tmpExpressionNames, tmpRowKey);
-                if (tmpIndex != -1) {
-                    tmpExpressions[tmpIndex].setLinearFactor(tmpCountActCols + tmpCountNegCols + i, tmpCol.getRowValue(tmpRowKey));
-                }
-            }
-        }
-
-        return retVal;
+        return mps.getExpressionsBasedModel();
     }
 
     static final void presolve(final ExpressionsBasedModel model) {
@@ -278,9 +182,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myWorkCopy = false;
     }
 
-    @SuppressWarnings("unused")
-    private ExpressionsBasedModel(final Options someOptions) {
-        this();
+    ExpressionsBasedModel(final Options someOptions) {
+
+        super(someOptions);
+
+        myWorkCopy = false;
     }
 
     ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean workCopy) {
@@ -631,7 +537,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         this.setMaximisation();
 
-        final Result tmpSolverResult = this.solve();
+        final Result tmpSolverResult = this.solve(this.getVariableValues());
 
         return this.handleResult(tmpSolverResult);
     }
@@ -640,7 +546,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         this.setMinimisation();
 
-        final Result tmpSolverResult = this.solve();
+        final Result tmpSolverResult = this.solve(this.getVariableValues());
 
         return this.handleResult(tmpSolverResult);
     }
@@ -842,7 +748,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      * {@link #setMaximisation()}. Also note that with this method the solver solution is not written back to the model
      * (or validated by the model).
      */
-    public Optimisation.Result solve() {
+    public Optimisation.Result solve(final Optimisation.Result initialSolution) {
 
         Optimisation.Result retVal = null;
 
@@ -873,8 +779,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
             final Integration<?> tmpIntegration = this.getIntegration();
             final Solver tmpSolver = tmpIntegration.build(this);
-            retVal = tmpSolver.solve();
-            retVal = tmpIntegration.toModelState(this, retVal);
+            retVal = tmpIntegration.toSolverState(initialSolution, this);
+            retVal = tmpSolver.solve(retVal);
+            retVal = tmpIntegration.toModelState(retVal, this);
         }
 
         return retVal;
@@ -995,8 +902,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myIntegerVariables = Collections.unmodifiableList(myIntegerVariables);
     }
 
-    private ExpressionsBasedModel.Integration<?> getIntegration() {
-
+    ExpressionsBasedModel.Integration<?> getIntegration() {
         if (this.isAnyVariableInteger()) {
             return new ExpressionsBasedIntegerIntegration();
         } else if (this.isAnyExpressionQuadratic()) {

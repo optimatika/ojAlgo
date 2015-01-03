@@ -21,14 +21,9 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-
 import java.util.List;
-import java.util.Set;
 
-import org.ojalgo.access.AccessUtils;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.ZeroStore;
+import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
 import org.ojalgo.optimisation.linear.LinearSolver;
@@ -44,134 +39,74 @@ final class ExpressionsBasedLinearIntegration extends Integration<LinearSolver> 
         return tmpBuilder.build(model.options);
     }
 
-    public Result toModelState(final ExpressionsBasedModel model, final Result solverState) {
+    public Capabilities getCapabilities() {
+        return new Capabilities() {
 
-        final List<Variable> tmpFreeVariables = model.getFreeVariables();
-        final Set<Index> tmpFixedVariables = model.getFixedVariables();
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearConstraints()
+             */
+            public boolean linearConstraints() {
+                return true;
+            }
 
-        final PrimitiveDenseStore tmpModelSolution = PrimitiveDenseStore.FACTORY.makeZero(tmpFixedVariables.size() + tmpFreeVariables.size(), 1);
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearObjective()
+             */
+            public boolean linearObjective() {
+                return true;
+            }
 
-        final int tmpModelSolutionSize = (int) tmpModelSolution.count();
-        final int tmpVariablesSize = model.getVariables().size();
-        if (tmpModelSolutionSize != tmpVariablesSize) {
-            throw new IllegalStateException();
+        };
+    }
+
+    public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+
+        final PrimitiveArray tmpModelSolution = PrimitiveArray.make(model.countVariables());
+
+        for (final Index tmpFixed : model.getFixedVariables()) {
+            tmpModelSolution.set(tmpFixed.index, model.getVariable(tmpFixed.index).getValue().doubleValue());
         }
 
-        for (final Index tmpFixed : tmpFixedVariables) {
-            tmpModelSolution.set(tmpFixed.index, 0, model.getVariable(tmpFixed.index).getValue().doubleValue());
+        final List<Variable> tmpPositives = model.getPositiveVariables();
+        for (int p = 0; p < tmpPositives.size(); p++) {
+            final Variable tmpVariable = tmpPositives.get(p);
+            final int tmpIndex = model.indexOf(tmpVariable);
+            tmpModelSolution.set(tmpIndex, solverState.doubleValue(p));
         }
 
-        final List<Variable> tmpPositive = model.getPositiveVariables();
-        for (int p = 0; p < tmpPositive.size(); p++) {
-            final int tmpIndex = model.indexOf(tmpPositive.get(p));
-            tmpModelSolution.set(tmpIndex, 0, solverState.doubleValue(p));
-        }
-
-        final List<Variable> tmpNegative = model.getNegativeVariables();
-        for (int n = 0; n < tmpNegative.size(); n++) {
-            final int tmpIndex = model.indexOf(tmpNegative.get(n));
-            tmpModelSolution.set(tmpIndex, 0, tmpModelSolution.doubleValue(tmpIndex) - solverState.doubleValue(tmpPositive.size() + n));
+        final List<Variable> tmpNegatives = model.getNegativeVariables();
+        for (int n = 0; n < tmpNegatives.size(); n++) {
+            final Variable tmpVariable = tmpNegatives.get(n);
+            final int tmpIndex = model.indexOf(tmpVariable);
+            tmpModelSolution.set(tmpIndex, tmpModelSolution.doubleValue(tmpIndex) - solverState.doubleValue(tmpPositives.size() + n));
         }
 
         return new Result(solverState.getState(), solverState.getValue(), tmpModelSolution);
     }
 
-    public Result extractSolverState(final ExpressionsBasedModel model) {
+    public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
 
-        final List<Variable> tmpPosVariables = model.getPositiveVariables();
-        final List<Variable> tmpNegVariables = model.getNegativeVariables();
-        final Set<Index> tmpFixVariables = model.getFixedVariables();
+        final List<Variable> tmpPositives = model.getPositiveVariables();
+        final List<Variable> tmpNegatives = model.getNegativeVariables();
 
-        final List<Expression> tmpExprsEq = model.selectExpressionsLinearEquality();
-        final List<Expression> tmpExprsLo = model.selectExpressionsLinearLower();
-        final List<Expression> tmpExprsUp = model.selectExpressionsLinearUpper();
+        final int tmpCountPositives = tmpPositives.size();
+        final int tmpCountNegatives = tmpNegatives.size();
 
-        final List<Variable> tmpVarsPosLo = model.selectVariablesPositiveLower();
-        final List<Variable> tmpVarsPosUp = model.selectVariablesPositiveUpper();
+        final PrimitiveArray tmpSolverSolution = PrimitiveArray.make(tmpCountPositives + tmpCountNegatives);
 
-        final List<Variable> tmpVarsNegLo = model.selectVariablesNegativeLower();
-        final List<Variable> tmpVarsNegUp = model.selectVariablesNegativeUpper();
-
-        final int tmpConstraiCount = tmpExprsEq.size() + tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size()
-                + tmpVarsNegLo.size() + tmpVarsNegUp.size();
-        final int tmpProblVarCount = tmpPosVariables.size() + tmpNegVariables.size();
-        final int tmpSlackVarCount = tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size()
-                + tmpVarsNegUp.size();
-        final int tmpTotalVarCount = tmpProblVarCount + tmpSlackVarCount;
-
-        final int[] tmpBasis = AccessUtils.makeIncreasingRange(-tmpConstraiCount, tmpConstraiCount);
-
-        final Optimisation.Result tmpKickStarter = new Optimisation.Result(Optimisation.State.UNEXPLORED, Double.NaN, ZeroStore.makePrimitive(tmpTotalVarCount,
-                1));
-
-        final int tmpPosVarsBaseIndex = 0;
-        final int tmpNegVarsBaseIndex = tmpPosVarsBaseIndex + tmpPosVariables.size();
-        final int tmpSlaVarsBaseIndex = tmpNegVarsBaseIndex + tmpNegVariables.size();
-
-        int tmpConstrBaseIndex = 0;
-        final int tmpCurrentSlackVarIndex = tmpSlaVarsBaseIndex;
-
-        final int tmpExprsEqLength = tmpExprsEq.size();
-
-        tmpConstrBaseIndex += tmpExprsEqLength;
-
-        final int tmpExprsLoLength = tmpExprsLo.size();
-        for (int c = 0; c < tmpExprsLoLength; c++) {
-
-            final Expression tmpExpr = tmpExprsLo.get(c);
-            final double tmpRHS = tmpExpr.getCompensatedLowerLimit(tmpFixVariables);
-
-            if (tmpRHS < ZERO) {
-
-                tmpBasis[tmpConstrBaseIndex + c] = tmpCurrentSlackVarIndex;
-
-            } else {
-
-            }
+        for (int p = 0; p < tmpCountPositives; p++) {
+            final Variable tmpVariable = tmpPositives.get(p);
+            final int tmpIndex = model.indexOf(tmpVariable);
+            tmpSolverSolution.set(p, Math.max(modelState.doubleValue(tmpIndex), 0.0));
         }
-        tmpConstrBaseIndex += tmpExprsLoLength;
 
-        final int tmpExprsUpLength = tmpExprsUp.size();
-        for (int c = 0; c < tmpExprsUpLength; c++) {
-
-            final Expression tmpExpr = tmpExprsUp.get(c);
-            final double tmpRHS = tmpExpr.getCompensatedUpperLimit(tmpFixVariables);
-
-            if (tmpRHS < ZERO) {
-
-            } else {
-
-                tmpBasis[tmpConstrBaseIndex + c] = tmpCurrentSlackVarIndex;
-
-            }
+        for (int n = 0; n < tmpCountNegatives; n++) {
+            final Variable tmpVariable = tmpNegatives.get(n);
+            final int tmpIndex = model.indexOf(tmpVariable);
+            tmpSolverSolution.set(tmpCountPositives + n, Math.max(-modelState.doubleValue(tmpIndex), 0.0));
         }
-        tmpConstrBaseIndex += tmpExprsUpLength;
 
-        final int tmpVarsPosLoLength = tmpVarsPosLo.size();
-
-        tmpConstrBaseIndex += tmpVarsPosLoLength;
-
-        final int tmpVarsPosUpLength = tmpVarsPosUp.size();
-        for (int c = 0; c < tmpVarsPosUpLength; c++) {
-
-            tmpBasis[tmpConstrBaseIndex + c] = tmpCurrentSlackVarIndex;
-
-        }
-        tmpConstrBaseIndex += tmpVarsPosUpLength;
-
-        final int tmpVarsNegLoLength = tmpVarsNegLo.size();
-        for (int c = 0; c < tmpVarsNegLoLength; c++) {
-
-            tmpBasis[tmpConstrBaseIndex + c] = tmpCurrentSlackVarIndex;
-
-        }
-        tmpConstrBaseIndex += tmpVarsNegLoLength;
-
-        final int tmpVarsNegUpLength = tmpVarsNegUp.size();
-
-        tmpConstrBaseIndex += tmpVarsNegUpLength;
-
-        return tmpKickStarter;
+        return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);
     }
 
 }

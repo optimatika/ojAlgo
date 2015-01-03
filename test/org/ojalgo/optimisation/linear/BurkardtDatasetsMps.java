@@ -18,11 +18,11 @@ import java.io.File;
 import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.MathProgSysModel;
+import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
@@ -147,70 +147,62 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
      */
     public void testMPStestprob() {
 
-        final Variable[] tmpVariables = new Variable[] { new Variable("YTWO-").weight(FOUR.negate()).lower(ZERO).upper(ONE),
-                new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR), new Variable("YTWO+").weight(FOUR).lower(ZERO).upper(ONE),
-                new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null) };
+        final Variable tmpXONE = new Variable("XONE").weight(ONE).lower(ZERO).upper(FOUR);
+        final Variable tmpYTWO = new Variable("YTWO").weight(FOUR).lower(NEG).upper(ONE);
+        final Variable tmpZTHREE = new Variable("ZTHREE").weight(NINE).lower(ZERO).upper(null);
+
+        final Variable[] tmpVariables = new Variable[] { tmpXONE, tmpYTWO, tmpZTHREE };
+
         final ExpressionsBasedModel tmpExpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpExpModel.setMinimisation();
-        final int tmpLength = tmpExpModel.countVariables();
 
-        final Expression retVal = tmpExpModel.addExpression("LIM1");
-
-        for (int i1 = 0; i1 < tmpLength; i1++) {
-            retVal.setLinearFactor(i1, new BigDecimal[] { ONE.negate(), ONE, ONE, ZERO }[i1]);
+        final Expression tmpLIM1 = tmpExpModel.addExpression("LIM1");
+        for (int v = 0; v < tmpVariables.length; v++) {
+            tmpLIM1.setLinearFactor(v, new BigDecimal[] { ONE, ONE, ZERO }[v]);
         }
-        final Expression tmpAddWeightExpression = retVal;
-        tmpAddWeightExpression.upper(FIVE);
-        final int tmpLength1 = tmpExpModel.countVariables();
+        tmpLIM1.upper(FIVE);
 
-        final Expression retVal1 = tmpExpModel.addExpression("LIM2");
-
-        for (int i1 = 0; i1 < tmpLength1; i1++) {
-            retVal1.setLinearFactor(i1, new BigDecimal[] { ZERO, ONE, ZERO, ONE }[i1]);
+        final Expression tmpLIM2 = tmpExpModel.addExpression("LIM2");
+        for (int v = 0; v < tmpVariables.length; v++) {
+            tmpLIM2.setLinearFactor(v, new BigDecimal[] { ONE, ZERO, ONE }[v]);
         }
-        final Expression tmpAddWeightExpression2 = retVal1;
-        tmpAddWeightExpression2.lower(TEN);
-        final int tmpLength2 = tmpExpModel.countVariables();
+        tmpLIM2.lower(TEN);
 
-        final Expression retVal2 = tmpExpModel.addExpression("MYEQN");
-
-        for (int i1 = 0; i1 < tmpLength2; i1++) {
-            retVal2.setLinearFactor(i1, new BigDecimal[] { ONE, ZERO, ONE.negate(), ONE }[i1]);
+        final Expression tmpMYEQN = tmpExpModel.addExpression("MYEQN");
+        for (int v = 0; v < tmpVariables.length; v++) {
+            tmpMYEQN.setLinearFactor(v, new BigDecimal[] { ZERO, ONE.negate(), ONE }[v]);
         }
-        final Expression tmpAddWeightExpression3 = retVal2;
-        tmpAddWeightExpression3.level(SEVEN);
+        tmpMYEQN.level(SEVEN);
 
         TestUtils.assertTrue(tmpExpModel.validate());
 
         final File tmpFile = new File(PATH + "testprob.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpActModel = ExpressionsBasedModel.make(tmpMPS);
+        final MathProgSysModel tmpActModel = MathProgSysModel.makeFromFile(tmpFile);
 
         TestUtils.assertTrue(tmpActModel.validate());
 
-        final double tmpExpVal = tmpExpModel.minimise().getValue();
-        final double tmpActVal = tmpActModel.minimise().getValue();
-        TestUtils.assertEquals(tmpExpVal, tmpActVal, PRECISION);
+        final Result tmpExpMinRes = tmpExpModel.minimise();
+        final Result tmpActMinRes = tmpActModel.minimise();
 
-        final Access1D<BigDecimal> tmpExpSolution = tmpExpModel.getVariableValues();
-        final Access1D<BigDecimal> tmpActSolution = tmpActModel.getVariableValues();
+        TestUtils.assertEquals(tmpExpMinRes.getValue(), tmpActMinRes.getValue(), PRECISION);
 
-        TestUtils.assertEquals(tmpVariables.length, tmpExpSolution.count());
-        TestUtils.assertEquals(tmpVariables.length, tmpActSolution.count());
+        TestUtils.assertEquals(tmpVariables.length, tmpExpMinRes.count());
+        TestUtils.assertEquals(tmpVariables.length, tmpActMinRes.count());
+
+        TestUtils.assertEquals(tmpExpMinRes, tmpActMinRes, PRECISION);
 
         for (int i = 0; i < tmpVariables.length; i++) {
-            TestUtils.assertEquals(tmpVariables[i].getName(), tmpExpSolution.doubleValue(i), tmpActSolution.doubleValue(i), PRECISION);
+            TestUtils.assertEquals(tmpVariables[i].getName(), tmpExpMinRes.doubleValue(i), tmpActMinRes.doubleValue(i), PRECISION);
         }
 
-        if (!tmpExpModel.validate(PRECISION)) {
+        if (!tmpExpModel.validate(tmpExpMinRes, PRECISION)) {
             TestUtils.fail(SOLUTION_NOT_VALID);
         }
 
-        if (!tmpActModel.validate(PRECISION)) {
+        if (!tmpActModel.validate(tmpActMinRes, PRECISION)) {
             TestUtils.fail(SOLUTION_NOT_VALID);
         }
 
-        this.assertMinMaxVal(tmpActModel, new BigDecimal("54"), new BigDecimal("80"));
+        this.assertMinMaxVal(tmpActModel.getExpressionsBasedModel(), new BigDecimal("54"), new BigDecimal("80"));
     }
 
     private void assertMinMaxVal(final ExpressionsBasedModel aModel, final BigDecimal aExpMinVal, final BigDecimal aExpMaxVal) {

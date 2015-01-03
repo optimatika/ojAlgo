@@ -19,10 +19,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation;
+package org.ojalgo.finance.portfolio;
 
-public enum FileSection {
+import org.ojalgo.matrix.BasicMatrix;
 
-    BOUNDS(), COLUMNS(), ENDATA(), NAME(), OBJNAME(), OBJSENSE(), RANGES(), RHS(), ROWS(), SOS();
+ final class BlackLittermanContext implements FinancePortfolio.Context {
+
+    public BlackLittermanContext() {
+        super();
+    }
+
+    public double calculatePortfolioReturn(final FinancePortfolio weightsPortfolio) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public double calculatePortfolioVariance(final FinancePortfolio weightsPortfolio) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public BasicMatrix getAssetReturns() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public BasicMatrix getAssetVolatilities() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public BasicMatrix getCorrelations() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public BasicMatrix getCovariances() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public int size() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
 }

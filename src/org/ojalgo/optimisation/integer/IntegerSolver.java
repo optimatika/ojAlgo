@@ -257,4 +257,9 @@ public abstract class IntegerSolver extends GenericSolver {
         }
     }
 
+    public static OldIntegerSolver make(final ExpressionsBasedModel model) {
+        return new OldIntegerSolver(model, model.options);
+        //return new NewIntegerSolver(model, model.options);
+    }
+
 }

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 
@@ -58,6 +59,8 @@ public class DesignCase extends OptimisationIntegerTests {
         tmpBudgetCost.setLinearFactor(tmpVariables.get(1), 3);
         tmpBudgetCost.setLinearFactor(tmpVariables.get(2), 5);
         tmpBudgetCost.setLinearFactor(tmpVariables.get(3), 2);
+
+        //tmpModel.options.debug(GenericSolver.class);
 
         final Result tmpResult = tmpModel.maximise();
 

@@ -61,10 +61,6 @@ public final class NewIntegerSolver extends IntegerSolver {
         }
     }
 
-    public static NewIntegerSolver make(final ExpressionsBasedModel model) {
-        return new NewIntegerSolver(model, null);
-    }
-
     private final PriorityBlockingQueue<NodeKey> myNodesToTry = new PriorityBlockingQueue<>();
 
     private final int[] myIntegerIndeces;
@@ -91,9 +87,10 @@ public final class NewIntegerSolver extends IntegerSolver {
 
     public Result solve(final Result kickStarter) {
 
-        if (kickStarter != null) {
-            this.markInteger(null, kickStarter);
-        }
+        // Must verify that it actually is an integer solution
+        //        if ((kickStarter != null) && kickStarter.getState().isFeasible()) {
+        //            this.markInteger(null, kickStarter);
+        //        }
 
         this.resetIterationsCount();
 
@@ -194,7 +191,7 @@ public final class NewIntegerSolver extends IntegerSolver {
         }
 
         ExpressionsBasedModel tmpModel = NewIntegerSolver.this.makeNodeModel(nodeKey);
-        final Optimisation.Result tmpResult = tmpModel.solve();
+        final Optimisation.Result tmpResult = tmpModel.solve(NewIntegerSolver.this.getBestResultSoFar());
 
         NewIntegerSolver.this.incrementIterationsCount();
 
@@ -391,10 +388,10 @@ public final class NewIntegerSolver extends IntegerSolver {
         final ExpressionsBasedModel tmpIntegerModel = NewIntegerSolver.this.getModel();
         final List<Variable> tmpIntegerVariables = tmpIntegerModel.getIntegerVariables();
         NodeKey myKey;
-        myKey = new NodeKey(NewIntegerSolver.this.getModel());
+        myKey = new NodeKey(tmpIntegerModel);
 
         final ExpressionsBasedModel tmpRootModel = NewIntegerSolver.this.makeNodeModel(myKey);
-        final Result tmpRootResult = tmpRootModel.solve();
+        final Result tmpRootResult = tmpRootModel.solve(tmpIntegerModel.getVariableValues());
         final double tmpRootValue = tmpRootResult.getValue();
 
         double tmpMinValue = PrimitiveMath.MAX_VALUE;
@@ -411,7 +408,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
             final NodeKey tmpLowerNodeKey = myKey.createLowerBranch(i, tmpVariableValue, tmpRootValue);
             final ExpressionsBasedModel tmpLowerModel = NewIntegerSolver.this.makeNodeModel(tmpLowerNodeKey);
-            final Result tmpLowerResult = tmpLowerModel.solve();
+            final Result tmpLowerResult = tmpLowerModel.solve(tmpRootResult);
             final double tmpLowerValue = tmpLowerResult.getValue();
 
             if (tmpLowerValue < tmpMinValue) {
@@ -423,7 +420,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
             final NodeKey tmpUpperNodeKey = myKey.createUpperBranch(i, tmpVariableValue, tmpRootValue);
             final ExpressionsBasedModel tmpUpperModel = NewIntegerSolver.this.makeNodeModel(tmpUpperNodeKey);
-            final Result tmpUpperResult = tmpUpperModel.solve();
+            final Result tmpUpperResult = tmpUpperModel.solve(tmpRootResult);
             final double tmpUpperValue = tmpUpperResult.getValue();
 
             if (tmpUpperValue < tmpMinValue) {

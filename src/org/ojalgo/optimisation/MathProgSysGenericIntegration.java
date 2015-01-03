@@ -26,18 +26,50 @@ import org.ojalgo.optimisation.MathProgSysModel.Integration;
 final class MathProgSysGenericIntegration extends Integration<GenericSolver> {
 
     public GenericSolver build(final MathProgSysModel model) {
-        // return ExpressionsBasedModel.make(model).getDefaultSolver();
-        return null;
-    }
-
-    public Result toModelState(final MathProgSysModel model, final Result solverState) {
-        // TODO Auto-generated method stub
-        return null;
+        final ExpressionsBasedModel tmpDelegate = model.getExpressionsBasedModel();
+        return (GenericSolver) tmpDelegate.getIntegration().build(tmpDelegate);
     }
 
     public Result extractSolverState(final MathProgSysModel model) {
-        // TODO Auto-generated method stub
-        return null;
+        final ExpressionsBasedModel tmpDelegate = model.getExpressionsBasedModel();
+        return tmpDelegate.getIntegration().extractSolverState(tmpDelegate);
+    }
+
+    public Capabilities getCapabilities() {
+        return new Capabilities() {
+
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#integerVariables()
+             */
+            public boolean integerVariables() {
+                return true;
+            }
+
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearConstraints()
+             */
+            public boolean linearConstraints() {
+                return true;
+            }
+
+            /**
+             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearObjective()
+             */
+            public boolean linearObjective() {
+                return true;
+            }
+
+        };
+    }
+
+    public Result toModelState(final Result solverState, final MathProgSysModel model) {
+        final ExpressionsBasedModel tmpDelegate = model.getExpressionsBasedModel();
+        return tmpDelegate.getIntegration().toModelState(solverState, tmpDelegate);
+    }
+
+    public Result toSolverState(final Result modelState, final MathProgSysModel model) {
+        final ExpressionsBasedModel tmpDelegate = model.getExpressionsBasedModel();
+        return tmpDelegate.getIntegration().toSolverState(modelState, tmpDelegate);
     }
 
 }

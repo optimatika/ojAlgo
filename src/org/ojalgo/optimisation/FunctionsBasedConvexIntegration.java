@@ -22,7 +22,6 @@
 package org.ojalgo.optimisation;
 
 import org.ojalgo.optimisation.FunctionsBasedModel.Integration;
-import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 
 final class FunctionsBasedConvexIntegration extends Integration<ConvexSolver> {
@@ -32,12 +31,23 @@ final class FunctionsBasedConvexIntegration extends Integration<ConvexSolver> {
         return null;
     }
 
-    public Result toModelState(final FunctionsBasedModel model, final Result solverState) {
+    public Result extractSolverState(final FunctionsBasedModel model) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Result extractSolverState(final FunctionsBasedModel model) {
+    public Capabilities getCapabilities() {
+        return new Capabilities() {
+
+        };
+    }
+
+    public Result toModelState(final Result solverState, final FunctionsBasedModel model) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Result toSolverState(final Result modelState, final FunctionsBasedModel model) {
         // TODO Auto-generated method stub
         return null;
     }

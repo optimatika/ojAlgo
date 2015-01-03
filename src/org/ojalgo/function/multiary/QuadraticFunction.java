@@ -34,7 +34,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * [x]<sup>T</sup>[Q][x]
+ * [x]<sup>T</sup>[Q][x] + c
  *
  * @author apete
  */
