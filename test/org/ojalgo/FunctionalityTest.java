@@ -29,6 +29,7 @@ import org.ojalgo.matrix.MatrixTests;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 import org.ojalgo.matrix.store.MatrixStoreTests;
 import org.ojalgo.matrix.task.MatrixTaskTests;
+import org.ojalgo.optimisation.OptimisationTests;
 import org.ojalgo.optimisation.convex.OptimisationConvexTests;
 import org.ojalgo.optimisation.integer.OptimisationIntegerTests;
 import org.ojalgo.optimisation.linear.OptimisationLinearTests;
@@ -63,6 +64,7 @@ public abstract class FunctionalityTest extends TestCase {
         suite.addTest(MatrixDecompositionTests.suite());
         suite.addTest(MatrixTaskTests.suite());
         suite.addTest(MatrixStoreTests.suite());
+        suite.addTest(OptimisationTests.suite());
         suite.addTest(OptimisationConvexTests.suite());
         suite.addTest(OptimisationIntegerTests.suite());
         suite.addTest(OptimisationLinearTests.suite());

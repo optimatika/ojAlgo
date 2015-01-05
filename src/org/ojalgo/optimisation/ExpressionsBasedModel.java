@@ -98,6 +98,21 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
+    private static final String NEW_LINE = "\n";
+
+    private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
+
+    private static final String OBJECTIVE = "Generated/Aggregated Objective";
+    private static final String START_END = "############################################\n";
+
+    static final Comparator<Expression> CE = new Comparator<Expression>() {
+
+        public int compare(final Expression o1, final Expression o2) {
+            return Integer.compare(o2.countLinearFactors(), o1.countLinearFactors());
+        }
+
+    };
+
     /**
      * This method is no longer needed. Just use the {@linkplain MathProgSysModel} the same way you would use the
      * {@linkplain ExpressionsBasedModel}. If you absolutely must have an {@linkplain ExpressionsBasedModel} then simply
@@ -120,19 +135,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
-    private static final String NEW_LINE = "\n";
-    private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
-
-    private static final String OBJECTIVE = "Generated/Aggregated Objective";
-
-    private static final String START_END = "############################################\n";
-    static final Comparator<Expression> CE = new Comparator<Expression>() {
-
-        public int compare(final Expression o1, final Expression o2) {
-            return Integer.compare(o2.countLinearFactors(), o1.countLinearFactors());
-        }
-
-    };
     private transient BasicLogger.Appender myAppender = null;
 
     private final CharacterRing myBuffer = new CharacterRing();
@@ -182,13 +184,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myWorkCopy = false;
     }
 
-    ExpressionsBasedModel(final Options someOptions) {
-
-        super(someOptions);
-
-        myWorkCopy = false;
-    }
-
     ExpressionsBasedModel(final ExpressionsBasedModel modelToCopy, final boolean workCopy) {
 
         super(modelToCopy.options);
@@ -210,6 +205,13 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
             myFixedVariables.addAll(modelToCopy.getFixedVariables());
         }
+    }
+
+    ExpressionsBasedModel(final Options someOptions) {
+
+        super(someOptions);
+
+        myWorkCopy = false;
     }
 
     public Expression addExpression(final String name) {
@@ -384,6 +386,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         return myPositiveVariables;
+    }
+
+    public String getValidationMessages() {
+        return myBuffer.toString();
     }
 
     public Variable getVariable(final int index) {
@@ -902,16 +908,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myIntegerVariables = Collections.unmodifiableList(myIntegerVariables);
     }
 
-    ExpressionsBasedModel.Integration<?> getIntegration() {
-        if (this.isAnyVariableInteger()) {
-            return new ExpressionsBasedIntegerIntegration();
-        } else if (this.isAnyExpressionQuadratic()) {
-            return new ExpressionsBasedConvexIntegration();
-        } else {
-            return new ExpressionsBasedLinearIntegration();
-        }
-    }
-
     private Optimisation.Result handleResult(final Result solverResult) {
 
         final NumberContext tmpSolutionContext = options.solution;
@@ -964,6 +960,16 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             myAppender = new GenericAppender(myBuffer);
         }
         return myAppender;
+    }
+
+    ExpressionsBasedModel.Integration<?> getIntegration() {
+        if (this.isAnyVariableInteger()) {
+            return new ExpressionsBasedIntegerIntegration();
+        } else if (this.isAnyExpressionQuadratic()) {
+            return new ExpressionsBasedConvexIntegration();
+        } else {
+            return new ExpressionsBasedLinearIntegration();
+        }
     }
 
     boolean isFixed() {

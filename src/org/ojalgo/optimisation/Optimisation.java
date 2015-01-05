@@ -113,14 +113,29 @@ public interface Optimisation {
 
     public static interface Integration<M extends Optimisation.Model, S extends Optimisation.Solver> extends Optimisation {
 
+        /**
+         * An integration must be able to instantiate a solver that can handle (any) model instance.
+         */
         S build(M model);
 
+        /**
+         * Extract state from the model and convert it to solver state.
+         */
         Optimisation.Result extractSolverState(M model);
 
+        /**
+         * The capabilities of this model solver combination.
+         */
         Capabilities getCapabilities();
 
+        /**
+         * Convert solver state to model state.
+         */
         Optimisation.Result toModelState(Optimisation.Result solverState, M model);
 
+        /**
+         * Convert model state to solver state.
+         */
         Optimisation.Result toSolverState(Optimisation.Result modelState, M model);
 
     }
