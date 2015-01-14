@@ -27,6 +27,7 @@ import java.util.stream.BaseStream;
 import java.util.stream.StreamSupport;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
@@ -89,7 +90,11 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
         void fillAll(N value);
 
+        void fillAll(NullaryFunction<N> supplier);
+
         void fillRange(long first, long limit, N value);
+
+        void fillRange(long first, long limit, NullaryFunction<N> supplier);
 
         void set(long index, double value);
 

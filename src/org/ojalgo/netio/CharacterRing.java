@@ -100,15 +100,18 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         myCursor = 0;
     }
 
+    @Override
     public CharacterRing append(final char c) throws IOException {
         myCharacters[myCursor++] = c;
         return this;
     }
 
+    @Override
     public CharacterRing append(final CharSequence csq) throws IOException {
         return this.append(csq, 0, csq.length());
     }
 
+    @Override
     public CharacterRing append(final CharSequence csq, final int start, final int end) throws IOException {
         for (int i = start; i < end; i++) {
             this.append(csq.charAt(i));
@@ -128,6 +131,7 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         return new RingWriter(this);
     }
 
+    @Override
     public char charAt(final int index) {
         return myCharacters[(myCursor + index) % length];
     }
@@ -175,10 +179,12 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         return retVal;
     }
 
+    @Override
     public int length() {
         return length;
     }
 
+    @Override
     public CharSequence subSequence(final int start, final int end) {
         return CharBuffer.wrap(this, start, end);
     }

@@ -28,13 +28,13 @@ import org.ojalgo.constant.PrimitiveMath;
 
 /**
  * ScientificNumberTest
- * 
+ *
  * @author apete
  */
 public class RationalScalarTest extends ScalarTests {
 
     private double myAct;
-    private final double myDiff = PrimitiveMath.MACHINE_DOUBLE_ERROR;
+    private final double myDiff = PrimitiveMath.MACHINE_EPSILON;
     private double myExp;
 
     public void testAdd() {

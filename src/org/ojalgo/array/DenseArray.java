@@ -27,6 +27,7 @@ import java.util.Spliterator;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -77,8 +78,16 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         this.fill(0, this.size(), 1, number);
     }
 
+    public final void fillAll(final NullaryFunction<N> supplier) {
+        this.fill(0, this.size(), 1, supplier);
+    }
+
     public final void fillRange(final long first, final long limit, final N number) {
         this.fill(first, limit, 1L, number);
+    }
+
+    public final void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        this.fill(first, limit, 1L, supplier);
     }
 
     public final N get(final long index) {
@@ -133,11 +142,18 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     protected abstract void fill(int first, int limit, int step, N value);
 
+    protected abstract void fill(int first, int limit, int step, NullaryFunction<N> supplier);
+
     protected abstract void fill(final int first, final int limit, final N left, final BinaryFunction<N> function, final Access1D<N> right);
 
     @Override
     protected final void fill(final long first, final long limit, final long step, final N value) {
         this.fill((int) first, (int) limit, (int) step, value);
+    }
+
+    @Override
+    protected final void fill(final long first, final long limit, final long step, final NullaryFunction<N> supplier) {
+        this.fill((int) first, (int) limit, (int) step, supplier);
     }
 
     protected abstract N get(final int index);
@@ -150,14 +166,14 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     }
 
     /**
-     * @see Scalar#isSmall()
-     */
-    protected abstract boolean isSmall(int index, double comparedTo);
-
-    /**
      * @see Scalar#isAbsolute()
      */
     protected abstract boolean isAbsolute(int index);
+
+    /**
+     * @see Scalar#isSmall()
+     */
+    protected abstract boolean isSmall(int index, double comparedTo);
 
     @Override
     protected final boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {

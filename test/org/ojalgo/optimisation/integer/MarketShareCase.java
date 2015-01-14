@@ -100,7 +100,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         final File tmpFile = new File(MipLibCase.PATH + "markshare_5_0.mps");
 
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
 
         return tmpMPS.getExpressionsBasedModel();
     }

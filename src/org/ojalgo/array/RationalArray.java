@@ -27,6 +27,7 @@ import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -99,9 +100,15 @@ public class RationalArray extends DenseArray<RationalNumber> {
         }
     }
 
-    protected static void fill(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final RationalNumber aNmbr) {
+    protected static void fill(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final RationalNumber value) {
         for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aNmbr;
+            aData[i] = value;
+        }
+    }
+
+    protected static void fill(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final NullaryFunction<RationalNumber> supplier) {
+        for (int i = aFirst; i < aLimit; i += aStep) {
+            aData[i] = supplier.invoke();
         }
     }
 
@@ -214,6 +221,11 @@ public class RationalArray extends DenseArray<RationalNumber> {
     @Override
     protected final void fill(final int first, final int limit, final int step, final RationalNumber value) {
         RationalArray.fill(data, first, limit, step, value);
+    }
+
+    @Override
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<RationalNumber> supplier) {
+        RationalArray.fill(data, first, limit, step, supplier);
     }
 
     @Override

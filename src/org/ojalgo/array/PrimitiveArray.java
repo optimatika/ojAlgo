@@ -30,14 +30,10 @@ import java.util.stream.DoubleStream;
 import java.util.stream.StreamSupport;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.*;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.ParameterFunction.FixedParameter;
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -189,9 +185,15 @@ public class PrimitiveArray extends DenseArray<Double> {
         }
     }
 
-    protected static void fill(final double[] data, final int first, final int limit, final int step, final double aVal) {
+    protected static void fill(final double[] data, final int first, final int limit, final int step, final double value) {
         for (int i = first; i < limit; i += step) {
-            data[i] = aVal;
+            data[i] = value;
+        }
+    }
+
+    protected static void fill(final double[] data, final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = supplier.doubleValue();
         }
     }
 
@@ -410,6 +412,11 @@ public class PrimitiveArray extends DenseArray<Double> {
     @Override
     protected final void fill(final int first, final int limit, final int step, final Double value) {
         PrimitiveArray.fill(data, first, limit, step, value);
+    }
+
+    @Override
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+        PrimitiveArray.fill(data, first, limit, step, supplier);
     }
 
     @Override

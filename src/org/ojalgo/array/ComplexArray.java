@@ -29,6 +29,7 @@ import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -105,6 +106,12 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
     protected static void fill(final ComplexNumber[] data, final int first, final int limit, final int step, final ComplexNumber value) {
         for (int i = first; i < limit; i += step) {
             data[i] = value;
+        }
+    }
+
+    protected static void fill(final ComplexNumber[] data, final int first, final int limit, final int step, final NullaryFunction<ComplexNumber> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = supplier.invoke();
         }
     }
 
@@ -223,6 +230,11 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
     @Override
     protected final void fill(final int first, final int limit, final int step, final ComplexNumber value) {
         ComplexArray.fill(data, first, limit, step, value);
+    }
+
+    @Override
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<ComplexNumber> supplier) {
+        ComplexArray.fill(data, first, limit, step, supplier);
     }
 
     @Override

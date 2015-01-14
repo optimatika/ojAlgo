@@ -21,46 +21,50 @@
  */
 package org.ojalgo.array;
 
-import java.util.Arrays;
+import java.nio.DoubleBuffer;
 
-import org.junit.Assert;
-import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.TestUtils;
+import org.ojalgo.random.Uniform;
 
-public class SetGetTest extends BasicArrayTest {
+/**
+ * AbstractArrayTest
+ *
+ * @author apete
+ */
+public class BufferArrayTest extends ArrayTests {
 
-    public SetGetTest() {
+    public BufferArrayTest() {
         super();
     }
 
-    public SetGetTest(final String aName) {
+    public BufferArrayTest(final String aName) {
         super(aName);
     }
 
-    @Override
-    void doTest(final BasicArray<Double> array) {
+    public void testRandomGetSet() {
 
-        for (int i = 0; i < INDICES.length; i++) {
-            array.set(INDICES[i], 1.0);
-        }
+        final int tmpCount = 5000;
 
-        for (long i = 0; i < COUNT; i++) {
+        final MyTestArray tmpTest = new MyTestArray(null, null);
 
-            final int tmpIndex = Arrays.binarySearch(INDICES, i);
+        final DoubleBuffer tmpAllocate = DoubleBuffer.allocate(tmpCount);
+        final MyTestArray tmpArray = MyTestArray.wrap(tmpAllocate);
 
-            if (tmpIndex >= 0) {
+        TestUtils.assertEquals(tmpCount, tmpArray.count());
 
-                Assert.assertEquals(i, INDICES[tmpIndex]);
+        final Uniform tmpUniform = new Uniform();
 
-                Assert.assertEquals(1.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
+        for (int i = 0; i < 100; i++) {
 
-            } else {
+            final long tmpIndex = Uniform.randomInteger(tmpCount);
 
-                Assert.assertEquals(0.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
-            }
-        }
+            final double tmpExpected = tmpUniform.doubleValue();
 
-        for (int i = 0; i < INDICES.length; i++) {
-            Assert.assertEquals(1.0, array.doubleValue(INDICES[i]), PrimitiveMath.MACHINE_EPSILON);
+            tmpArray.set(tmpIndex, tmpExpected);
+
+            final double tmpActual = tmpArray.doubleValue(tmpIndex);
+
+            TestUtils.assertEquals(tmpExpected, tmpActual);
         }
 
     }

@@ -40,6 +40,7 @@ import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -469,6 +470,29 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
+    private static void multiply(final double[][] product, final double[][] left, final double[][] right) {
+
+        final int tmpRowsCount = product.length;
+        final int tmpComplexity = right.length;
+        final int tmpColsCount = right[0].length;
+
+        double[] tmpRow;
+        final double[] tmpColumn = new double[tmpComplexity];
+        for (int j = 0; j < tmpColsCount; j++) {
+            for (int k = 0; k < tmpComplexity; k++) {
+                tmpColumn[k] = right[k][j];
+            }
+            for (int i = 0; i < tmpRowsCount; i++) {
+                tmpRow = left[i];
+                double tmpVal = 0.0;
+                for (int k = 0; k < tmpComplexity; k++) {
+                    tmpVal += tmpRow[k] * tmpColumn[k];
+                }
+                product[i][j] = tmpVal;
+            }
+        }
+    }
+
     static Rotation.Primitive cast(final Rotation<Double> aTransf) {
         if (aTransf instanceof Rotation.Primitive) {
             return (Rotation.Primitive) aTransf;
@@ -751,8 +775,12 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return FACTORY;
     }
 
-    public void fillAll(final Double aNmbr) {
-        ArrayUtils.fillAll(data, aNmbr);
+    public void fillAll(final Double value) {
+        ArrayUtils.fillAll(data, value);
+    }
+
+    public void fillAll(final NullaryFunction<Double> supplier) {
+        ArrayUtils.fillAll(data, supplier);
     }
 
     public void fillByMultiplying(final Access1D<Double> leftMatrix, final Access1D<Double> rightMatrix) {
@@ -761,39 +789,24 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         RawStore.multiply(data, tmpLeft, tmpRight);
     }
 
-    private static void multiply(final double[][] product, final double[][] left, final double[][] right) {
-
-        final int tmpRowsCount = product.length;
-        final int tmpComplexity = right.length;
-        final int tmpColsCount = right[0].length;
-
-        double[] tmpRow;
-        final double[] tmpColumn = new double[tmpComplexity];
-        for (int j = 0; j < tmpColsCount; j++) {
-            for (int k = 0; k < tmpComplexity; k++) {
-                tmpColumn[k] = right[k][j];
-            }
-            for (int i = 0; i < tmpRowsCount; i++) {
-                tmpRow = left[i];
-                double tmpVal = 0.0;
-                for (int k = 0; k < tmpComplexity; k++) {
-                    tmpVal += tmpRow[k] * tmpColumn[k];
-                }
-                product[i][j] = tmpVal;
-            }
-        }
+    public void fillColumn(final long row, final long column, final Double value) {
+        ArrayUtils.fillColumn(data, (int) row, (int) column, value);
     }
 
-    public void fillColumn(final long row, final long column, final Double aNmbr) {
-        ArrayUtils.fillColumn(data, (int) row, (int) column, aNmbr);
+    public void fillColumn(final long row, final long column, final NullaryFunction<Double> supplier) {
+        ArrayUtils.fillColumn(data, (int) row, (int) column, supplier);
     }
 
     public void fillConjugated(final Access2D<? extends Number> source) {
         this.fillTransposed(source);
     }
 
-    public void fillDiagonal(final long row, final long column, final Double aNmbr) {
-        ArrayUtils.fillDiagonal(data, (int) row, (int) column, aNmbr);
+    public void fillDiagonal(final long row, final long column, final Double value) {
+        ArrayUtils.fillDiagonal(data, (int) row, (int) column, value);
+    }
+
+    public void fillDiagonal(final long row, final long column, final NullaryFunction<Double> supplier) {
+        ArrayUtils.fillDiagonal(data, (int) row, (int) column, supplier);
     }
 
     public void fillMatching(final Access1D<? extends Number> source) {
@@ -908,8 +921,16 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.fillRange(data, (int) first, (int) limit, value);
     }
 
-    public void fillRow(final long row, final long column, final Double aNmbr) {
-        ArrayUtils.fillRow(data, (int) row, (int) column, aNmbr);
+    public void fillRange(final long first, final long limit, final NullaryFunction<Double> supplier) {
+        ArrayUtils.fillRange(data, (int) first, (int) limit, supplier);
+    }
+
+    public void fillRow(final long row, final long column, final Double value) {
+        ArrayUtils.fillRow(data, (int) row, (int) column, value);
+    }
+
+    public void fillRow(final long row, final long column, final NullaryFunction<Double> supplier) {
+        ArrayUtils.fillRow(data, (int) row, (int) column, supplier);
     }
 
     public void fillTransposed(final Access2D<? extends Number> source) {
@@ -1069,21 +1090,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.modifyRow(data, (int) row, (int) column, function);
     }
 
-    public RawStore multiplyLeft(final Access1D<Double> leftMtrx) {
-
-        final int tmpComplexity = data.length;
-        final int tmpColDim = myNumberOfColumns;
-        final int tmpRowDim = (int) (leftMtrx.count() / tmpComplexity);
-
-        final RawStore retVal = new RawStore(tmpRowDim, tmpColDim);
-
-        final double[][] tmpLeft = RawStore.extract(leftMtrx, tmpComplexity);
-
-        RawStore.multiply(retVal.data, tmpLeft, data);
-
-        return retVal;
-    }
-
     public RawStore multiply(final Access1D<Double> right) {
 
         final int tmpRowDim = data.length;
@@ -1095,6 +1101,21 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         final double[][] tmpRight = RawStore.extract(right, tmpComplexity);
 
         RawStore.multiply(retVal.data, data, tmpRight);
+
+        return retVal;
+    }
+
+    public RawStore multiplyLeft(final Access1D<Double> leftMtrx) {
+
+        final int tmpComplexity = data.length;
+        final int tmpColDim = myNumberOfColumns;
+        final int tmpRowDim = (int) (leftMtrx.count() / tmpComplexity);
+
+        final RawStore retVal = new RawStore(tmpRowDim, tmpColDim);
+
+        final double[][] tmpLeft = RawStore.extract(leftMtrx, tmpComplexity);
+
+        RawStore.multiply(retVal.data, tmpLeft, data);
 
         return retVal;
     }
@@ -1138,12 +1159,12 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         data[AccessUtils.row(index, data.length)][AccessUtils.column(index, data.length)] = value;
     }
 
-    public void set(final long row, final long column, final double aNmbr) {
-        data[(int) row][(int) column] = aNmbr;
+    public void set(final long row, final long column, final double value) {
+        data[(int) row][(int) column] = value;
     }
 
-    public void set(final long row, final long column, final Number aNmbr) {
-        data[(int) row][(int) column] = aNmbr.doubleValue();
+    public void set(final long row, final long column, final Number value) {
+        data[(int) row][(int) column] = value.doubleValue();
     }
 
     public void set(final long index, final Number value) {

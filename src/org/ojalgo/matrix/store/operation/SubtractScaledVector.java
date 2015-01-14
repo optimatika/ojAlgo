@@ -29,7 +29,7 @@ import org.ojalgo.scalar.ComplexNumber;
 /**
  * y -= ax
  *
- * @param data y-data
+ * @param myBuffer y-data
  * @param dataBaseIndex y-column base index
  * @param vector x-data
  * @param vectorBaseIndex x-column base index

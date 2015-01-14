@@ -34,6 +34,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
@@ -330,10 +331,20 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         myDelegate.fill(myFirst, myLimit, myStep, value);
     }
 
+    public void fillAll(final NullaryFunction<N> supplier) {
+        myDelegate.fill(myFirst, myLimit, myStep, supplier);
+    }
+
     public void fillRange(final long first, final long limit, final N value) {
         final long tmpFirst = myFirst + (myStep * first);
         final long tmpLimit = myFirst + (myStep * limit);
         myDelegate.fill(tmpFirst, tmpLimit, myStep, value);
+    }
+
+    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        final long tmpFirst = myFirst + (myStep * first);
+        final long tmpLimit = myFirst + (myStep * limit);
+        myDelegate.fill(tmpFirst, tmpLimit, myStep, supplier);
     }
 
     @Override

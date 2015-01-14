@@ -38,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * Orginalet, sedan ett tag Based on SVDnew2, but with transposing so that calculations are always made on a matrix that
  * "isAspectRationNormal". Based on SVDnew5, but with Rotation replaced by the new alternative.
- * 
+ *
  * @author apete
  */
 abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueDecomposition<N> {
@@ -261,7 +261,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
                 if (k == -1) {
                     break;
                 }
-                if (Math.abs(e[k]) <= (PrimitiveMath.TINY + (PrimitiveMath.MACHINE_DOUBLE_ERROR * (Math.abs(s[k]) + Math.abs(s[k + 1]))))) {
+                if (Math.abs(e[k]) <= (PrimitiveMath.TINY + (PrimitiveMath.MACHINE_EPSILON * (Math.abs(s[k]) + Math.abs(s[k + 1]))))) {
                     e[k] = PrimitiveMath.ZERO;
                     break;
                 }
@@ -275,7 +275,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
                         break;
                     }
                     final double t = (ks != p ? Math.abs(e[ks]) : PrimitiveMath.ZERO) + (ks != (k + 1) ? Math.abs(e[ks - 1]) : PrimitiveMath.ZERO);
-                    if (Math.abs(s[ks]) <= (PrimitiveMath.TINY + (PrimitiveMath.MACHINE_DOUBLE_ERROR * t))) {
+                    if (Math.abs(s[ks]) <= (PrimitiveMath.TINY + (PrimitiveMath.MACHINE_EPSILON * t))) {
                         s[ks] = PrimitiveMath.ZERO;
                         break;
                     }

@@ -29,6 +29,7 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -211,8 +212,36 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
+    public void fillAll(final NullaryFunction<N> supplier) {
+
+        if (TypeUtils.isZero(supplier.doubleValue())) {
+
+            myValues.fillAll(myZeroNumber);
+
+        } else {
+
+            // Bad idea...
+
+            final int tmpSize = (int) this.count();
+
+            if (tmpSize != myIndices.length) {
+                myIndices = AccessUtils.makeIncreasingRange(0L, tmpSize);
+                myValues = myValues.newInstance(tmpSize);
+                myActualLength = tmpSize;
+            }
+
+            myValues.fillAll(supplier);
+        }
+    }
+
+    @Override
     public void fillRange(final long first, final long limit, final N value) {
         this.fill(first, limit, 1L, value);
+    }
+
+    @Override
+    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        this.fill(first, limit, 1L, supplier);
     }
 
     @Override
@@ -433,6 +462,28 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         } else {
             for (int i = tmpFirst; i < tmpLimit; i++) {
                 myValues.set(i, value);
+            }
+        }
+    }
+
+    @Override
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<N> supplier) {
+        int tmpFirst = this.index(first);
+        if (tmpFirst < 0) {
+            tmpFirst = -tmpFirst + 1;
+        }
+        int tmpLimit = this.index(limit);
+        if (tmpLimit < 0) {
+            tmpLimit = -tmpLimit + 1;
+        }
+        if (this.isPrimitive()) {
+            final double tmpValue = supplier.doubleValue();
+            for (int i = tmpFirst; i < tmpLimit; i++) {
+                myValues.set(i, tmpValue);
+            }
+        } else {
+            for (int i = tmpFirst; i < tmpLimit; i++) {
+                myValues.set(i, supplier.invoke());
             }
         }
     }

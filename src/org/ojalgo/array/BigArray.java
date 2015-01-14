@@ -30,6 +30,7 @@ import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -106,6 +107,12 @@ public class BigArray extends DenseArray<BigDecimal> {
     protected static void fill(final BigDecimal[] data, final int first, final int limit, final int step, final BigDecimal number) {
         for (int i = first; i < limit; i += step) {
             data[i] = number;
+        }
+    }
+
+    protected static void fill(final BigDecimal[] data, final int first, final int limit, final int step, final NullaryFunction<BigDecimal> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = supplier.invoke();
         }
     }
 
@@ -224,6 +231,11 @@ public class BigArray extends DenseArray<BigDecimal> {
     @Override
     protected final void fill(final int first, final int limit, final int step, final BigDecimal value) {
         BigArray.fill(data, first, limit, step, value);
+    }
+
+    @Override
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<BigDecimal> supplier) {
+        BigArray.fill(data, first, limit, step, supplier);
     }
 
     @Override

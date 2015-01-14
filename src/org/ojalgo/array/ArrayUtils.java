@@ -28,6 +28,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -79,27 +80,51 @@ public abstract class ArrayUtils {
         rawArray[aRowB] = tmpRow;
     }
 
-    public static void fillAll(final double[][] rawArray, final double aNmbr) {
+    public static void fillAll(final double[][] rawArray, final double value) {
         final int tmpLength = rawArray.length;
         for (int i = 0; i < tmpLength; i++) {
             final int tmpInnerLength = rawArray[i].length;
             for (int j = 0; j < tmpInnerLength; j++) {
-                rawArray[i][j] = aNmbr;
+                rawArray[i][j] = value;
             }
         }
     }
 
-    public static void fillColumn(final double[][] rawArray, final int aRow, final int aCol, final double aNmbr) {
+    public static void fillAll(final double[][] rawArray, final NullaryFunction<?> supplier) {
         final int tmpLength = rawArray.length;
-        for (int i = aRow; i < tmpLength; i++) {
-            rawArray[i][aCol] = aNmbr;
+        for (int i = 0; i < tmpLength; i++) {
+            final int tmpInnerLength = rawArray[i].length;
+            for (int j = 0; j < tmpInnerLength; j++) {
+                rawArray[i][j] = supplier.doubleValue();
+            }
         }
     }
 
-    public static void fillDiagonal(final double[][] rawArray, final int aRow, final int aCol, final double aNmbr) {
+    public static void fillColumn(final double[][] rawArray, final int row, final int column, final double value) {
         final int tmpLength = rawArray.length;
-        for (int ij = 0; ((aRow + ij) < tmpLength) && ((aCol + ij) < rawArray[aRow + ij].length); ij++) {
-            rawArray[aRow + ij][aCol + ij] = aNmbr;
+        for (int i = row; i < tmpLength; i++) {
+            rawArray[i][column] = value;
+        }
+    }
+
+    public static void fillColumn(final double[][] rawArray, final int row, final int column, final NullaryFunction<?> supplier) {
+        final int tmpLength = rawArray.length;
+        for (int i = row; i < tmpLength; i++) {
+            rawArray[i][column] = supplier.doubleValue();
+        }
+    }
+
+    public static void fillDiagonal(final double[][] rawArray, final int row, final int column, final double value) {
+        final int tmpLength = rawArray.length;
+        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < rawArray[row + ij].length); ij++) {
+            rawArray[row + ij][column + ij] = value;
+        }
+    }
+
+    public static void fillDiagonal(final double[][] rawArray, final int row, final int column, final NullaryFunction<?> supplier) {
+        final int tmpLength = rawArray.length;
+        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < rawArray[row + ij].length); ij++) {
+            rawArray[row + ij][column + ij] = supplier.doubleValue();
         }
     }
 
@@ -147,10 +172,28 @@ public abstract class ArrayUtils {
         }
     }
 
-    public static void fillRow(final double[][] rawArray, final int aRow, final int aCol, final double aNmbr) {
-        final int tmpLength = rawArray[aRow].length;
-        for (int j = aCol; j < tmpLength; j++) {
-            rawArray[aRow][j] = aNmbr;
+    public static void fillRange(final double[][] rawArray, final int first, final int limit, final NullaryFunction<?> supplier) {
+
+        final int tmpLength = rawArray.length;
+
+        for (int index = first; index < limit; index++) {
+            final int tmpRow = AccessUtils.row(index, tmpLength);
+            final int tmpColumn = AccessUtils.column(index, tmpLength);
+            rawArray[tmpRow][tmpColumn] = supplier.doubleValue();
+        }
+    }
+
+    public static void fillRow(final double[][] rawArray, final int row, final int column, final double value) {
+        final int tmpLength = rawArray[row].length;
+        for (int j = column; j < tmpLength; j++) {
+            rawArray[row][j] = value;
+        }
+    }
+
+    public static void fillRow(final double[][] rawArray, final int row, final int column, final NullaryFunction<?> supplier) {
+        final int tmpLength = rawArray[row].length;
+        for (int j = column; j < tmpLength; j++) {
+            rawArray[row][j] = supplier.doubleValue();
         }
     }
 
@@ -164,24 +207,24 @@ public abstract class ArrayUtils {
         }
     }
 
-    public static void modifyColumn(final double[][] rawArray, final int aRow, final int aCol, final UnaryFunction<?> aFunc) {
+    public static void modifyColumn(final double[][] rawArray, final int row, final int column, final UnaryFunction<?> aFunc) {
         final int tmpLength = rawArray.length;
-        for (int i = aRow; i < tmpLength; i++) {
-            rawArray[i][aCol] = aFunc.invoke(rawArray[i][aCol]);
+        for (int i = row; i < tmpLength; i++) {
+            rawArray[i][column] = aFunc.invoke(rawArray[i][column]);
         }
     }
 
-    public static void modifyDiagonal(final double[][] rawArray, final int aRow, final int aCol, final UnaryFunction<?> aFunc) {
+    public static void modifyDiagonal(final double[][] rawArray, final int row, final int column, final UnaryFunction<?> aFunc) {
         final int tmpLength = rawArray.length;
-        for (int ij = 0; ((aRow + ij) < tmpLength) && ((aCol + ij) < rawArray[aRow + ij].length); ij++) {
-            rawArray[aRow + ij][aCol + ij] = aFunc.invoke(rawArray[aRow + ij][aCol + ij]);
+        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < rawArray[row + ij].length); ij++) {
+            rawArray[row + ij][column + ij] = aFunc.invoke(rawArray[row + ij][column + ij]);
         }
     }
 
-    public static void modifyRow(final double[][] rawArray, final int aRow, final int aCol, final UnaryFunction<?> aFunc) {
-        final int tmpLength = rawArray[aRow].length;
-        for (int j = aCol; j < tmpLength; j++) {
-            rawArray[aRow][j] = aFunc.invoke(rawArray[aRow][j]);
+    public static void modifyRow(final double[][] rawArray, final int row, final int column, final UnaryFunction<?> aFunc) {
+        final int tmpLength = rawArray[row].length;
+        for (int j = column; j < tmpLength; j++) {
+            rawArray[row][j] = aFunc.invoke(rawArray[row][j]);
         }
     }
 
@@ -274,17 +317,17 @@ public abstract class ArrayUtils {
         }
     }
 
-    public static void visitColumn(final double[][] rawArray, final int aRow, final int aCol, final VoidFunction<?> visitor) {
-        final int tmpLength = rawArray[aRow].length;
-        for (int j = aCol; j < tmpLength; j++) {
-            visitor.invoke(rawArray[aRow][j]);
+    public static void visitColumn(final double[][] rawArray, final int row, final int column, final VoidFunction<?> visitor) {
+        final int tmpLength = rawArray[row].length;
+        for (int j = column; j < tmpLength; j++) {
+            visitor.invoke(rawArray[row][j]);
         }
     }
 
-    public static void visitDiagonal(final double[][] rawArray, final int aRow, final int aCol, final VoidFunction<?> visitor) {
+    public static void visitDiagonal(final double[][] rawArray, final int row, final int column, final VoidFunction<?> visitor) {
         final int tmpLength = rawArray.length;
-        for (int ij = 0; ((aRow + ij) < tmpLength) && ((aCol + ij) < rawArray[aRow + ij].length); ij++) {
-            visitor.invoke(rawArray[aRow + ij][aCol + ij]);
+        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < rawArray[row + ij].length); ij++) {
+            visitor.invoke(rawArray[row + ij][column + ij]);
         }
     }
 
@@ -295,10 +338,10 @@ public abstract class ArrayUtils {
         }
     }
 
-    public static void visitRow(final double[][] rawArray, final int aRow, final int aCol, final VoidFunction<?> visitor) {
+    public static void visitRow(final double[][] rawArray, final int row, final int column, final VoidFunction<?> visitor) {
         final int tmpLength = rawArray.length;
-        for (int i = aRow; i < tmpLength; i++) {
-            visitor.invoke(rawArray[i][aCol]);
+        for (int i = row; i < tmpLength; i++) {
+            visitor.invoke(rawArray[i][column]);
         }
     }
 
@@ -375,8 +418,8 @@ public abstract class ArrayUtils {
                 return aRaw[AccessUtils.row((int) index, aRaw.length)][AccessUtils.column((int) index, aRaw.length)];
             }
 
-            public double doubleValue(final long aRow, final long aCol) {
-                return aRaw[(int) aRow][(int) aCol];
+            public double doubleValue(final long row, final long column) {
+                return aRaw[(int) row][(int) column];
             }
 
             public Double get(final long index) {
@@ -384,8 +427,8 @@ public abstract class ArrayUtils {
 
             }
 
-            public Double get(final long aRow, final long aCol) {
-                return aRaw[(int) aRow][(int) aCol];
+            public Double get(final long row, final long column) {
+                return aRaw[(int) row][(int) column];
             }
 
         };
@@ -410,8 +453,8 @@ public abstract class ArrayUtils {
                 return aRaw[AccessUtils.row((int) index, aRaw.length)][AccessUtils.column((int) index, aRaw.length)].doubleValue();
             }
 
-            public double doubleValue(final long aRow, final long aCol) {
-                return aRaw[(int) aRow][(int) aCol].doubleValue();
+            public double doubleValue(final long row, final long column) {
+                return aRaw[(int) row][(int) column].doubleValue();
             }
 
             public N get(final long index) {
@@ -419,8 +462,8 @@ public abstract class ArrayUtils {
                 return null;
             }
 
-            public N get(final long aRow, final long aCol) {
-                return aRaw[(int) aRow][(int) aCol];
+            public N get(final long row, final long column) {
+                return aRaw[(int) row][(int) column];
             }
 
         };

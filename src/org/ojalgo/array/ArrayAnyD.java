@@ -30,6 +30,7 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
@@ -43,7 +44,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>,
-AccessAnyD.Visitable<N>, Serializable {
+        AccessAnyD.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
 
@@ -183,12 +184,20 @@ AccessAnyD.Visitable<N>, Serializable {
         }
     }
 
-    public void fillAll(final N number) {
-        myDelegate.fill(0L, this.count(), 1L, number);
+    public void fillAll(final N value) {
+        myDelegate.fill(0L, this.count(), 1L, value);
+    }
+
+    public void fillAll(final NullaryFunction<N> supplier) {
+        myDelegate.fill(0L, this.count(), 1L, supplier);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
         myDelegate.fill(first, limit, 1L, value);
+    }
+
+    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        myDelegate.fill(first, limit, 1L, supplier);
     }
 
     public void fillSet(final long[] first, final int dimension, final N number) {

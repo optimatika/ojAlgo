@@ -30,6 +30,7 @@ import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -253,6 +254,12 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    public void fillAll(final NullaryFunction<N> supplier) {
+        for (final BasicArray<N> tmpSegment : mySegments) {
+            tmpSegment.fillAll(supplier);
+        }
+    }
+
     public void fillRange(final long first, final long limit, final N value) {
 
         final int tmpFirstSegment = (int) (first / mySegmentSize);
@@ -265,6 +272,21 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
             tmpFirstInSegment = 0L;
         }
         mySegments[tmpLastSegemnt].fillRange(tmpFirstInSegment, limit - (tmpLastSegemnt * mySegmentSize), value);
+
+    }
+
+    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+
+        final int tmpFirstSegment = (int) (first / mySegmentSize);
+        final int tmpLastSegemnt = (int) ((limit - 1) / mySegmentSize);
+
+        long tmpFirstInSegment = (first % mySegmentSize);
+
+        for (int s = tmpFirstSegment; s < tmpLastSegemnt; s++) {
+            mySegments[s].fillRange(tmpFirstInSegment, mySegmentSize, supplier);
+            tmpFirstInSegment = 0L;
+        }
+        mySegments[tmpLastSegemnt].fillRange(tmpFirstInSegment, limit - (tmpLastSegemnt * mySegmentSize), supplier);
 
     }
 
@@ -356,6 +378,38 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
             for (long i = first; i < limit; i += step) {
                 this.set(i, value);
+            }
+        }
+    }
+
+    @Override
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<N> supplier) {
+
+        if (step <= mySegmentSize) {
+            // Will use a continuous range of segements
+
+            final int tmpFirstSegment = (int) (first / mySegmentSize);
+            final int tmpLastSegemnt = (int) ((limit - 1L) / mySegmentSize);
+
+            long tmpFirstInSegment = (first % mySegmentSize);
+
+            for (int s = tmpFirstSegment; s < tmpLastSegemnt; s++) {
+                mySegments[s].fill(tmpFirstInSegment, mySegmentSize, step, supplier);
+                final long tmpRemainder = (mySegmentSize - tmpFirstInSegment) % step;
+                tmpFirstInSegment = tmpRemainder == 0L ? 0L : step - tmpRemainder;
+            }
+            mySegments[tmpLastSegemnt].fill(tmpFirstInSegment, limit - (tmpLastSegemnt * mySegmentSize), step, supplier);
+
+        } else if (this.isPrimitive()) {
+
+            for (long i = first; i < limit; i += step) {
+                this.set(i, supplier.doubleValue());
+            }
+
+        } else {
+
+            for (long i = first; i < limit; i += step) {
+                this.set(i, supplier.invoke());
             }
         }
     }

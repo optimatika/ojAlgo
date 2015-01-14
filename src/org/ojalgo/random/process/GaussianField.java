@@ -51,7 +51,7 @@ import org.ojalgo.type.keyvalue.ComparableToDouble;
  * generalization, as well as the underlying implementation, of {@linkplain GaussianProcess}. Prior to calling
  * {@linkplain #getDistribution(boolean, double)} you must call {@linkplain #addObservation(double, double)} one or more
  * times.
- * 
+ *
  * @author apete
  */
 public final class GaussianField<K extends Comparable<K>> {
@@ -154,7 +154,7 @@ public final class GaussianField<K extends Comparable<K>> {
             final PhysicalStore<Double> tmpD = tmpEvD.getD().copy();
 
             final double tmpLargest = tmpD.doubleValue(0, 0);
-            final double tmpLimit = Math.max(PrimitiveMath.MACHINE_DOUBLE_ERROR * tmpLargest, 1E-12);
+            final double tmpLimit = Math.max(PrimitiveMath.MACHINE_EPSILON * tmpLargest, 1E-12);
 
             final int tmpLength = (int) Math.min(tmpD.countRows(), tmpD.countColumns());
             for (int ij = 0; ij < tmpLength; ij++) {

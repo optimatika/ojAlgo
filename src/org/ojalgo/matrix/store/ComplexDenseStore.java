@@ -36,6 +36,7 @@ import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -66,10 +67,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     }
 
-    public boolean isSmall(final long row, final long column, final double comparedTo) {
-        return myUtility.isSmall(row, column, comparedTo);
-    }
-
     public static interface ComplexMultiplyLeft {
 
         void invoke(ComplexNumber[] product, Access1D<ComplexNumber> left, int complexity, ComplexNumber[] right);
@@ -80,34 +77,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         void invoke(ComplexNumber[] product, ComplexNumber[] left, int complexity, Access1D<ComplexNumber> right);
 
-    }
-
-    static ComplexDenseStore cast(final Access1D<ComplexNumber> matrix) {
-        if (matrix instanceof ComplexDenseStore) {
-            return (ComplexDenseStore) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return FACTORY.copy((Access2D<?>) matrix);
-        } else {
-            return FACTORY.columns(matrix);
-        }
-    }
-
-    static Householder.Complex cast(final Householder<ComplexNumber> transformation) {
-        if (transformation instanceof Householder.Complex) {
-            return (Householder.Complex) transformation;
-        } else if (transformation instanceof DecompositionStore.HouseholderReference<?>) {
-            return ((DecompositionStore.HouseholderReference<ComplexNumber>) transformation).getComplexWorker().copy(transformation);
-        } else {
-            return new Householder.Complex(transformation);
-        }
-    }
-
-    static Rotation.Complex cast(final Rotation<ComplexNumber> transformation) {
-        if (transformation instanceof Rotation.Complex) {
-            return (Rotation.Complex) transformation;
-        } else {
-            return new Rotation.Complex(transformation);
-        }
     }
 
     public static final DecompositionStore.Factory<ComplexNumber, ComplexDenseStore> FACTORY = new DecompositionStore.Factory<ComplexNumber, ComplexDenseStore>() {
@@ -341,6 +310,34 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     };
 
+    static ComplexDenseStore cast(final Access1D<ComplexNumber> matrix) {
+        if (matrix instanceof ComplexDenseStore) {
+            return (ComplexDenseStore) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return FACTORY.copy((Access2D<?>) matrix);
+        } else {
+            return FACTORY.columns(matrix);
+        }
+    }
+
+    static Householder.Complex cast(final Householder<ComplexNumber> transformation) {
+        if (transformation instanceof Householder.Complex) {
+            return (Householder.Complex) transformation;
+        } else if (transformation instanceof DecompositionStore.HouseholderReference<?>) {
+            return ((DecompositionStore.HouseholderReference<ComplexNumber>) transformation).getComplexWorker().copy(transformation);
+        } else {
+            return new Householder.Complex(transformation);
+        }
+    }
+
+    static Rotation.Complex cast(final Rotation<ComplexNumber> transformation) {
+        if (transformation instanceof Rotation.Complex) {
+            return (Rotation.Complex) transformation;
+        } else {
+            return new Rotation.Complex(transformation);
+        }
+    }
+
     private final ComplexMultiplyBoth multiplyBoth;
 
     private final ComplexMultiplyLeft multiplyLeft;
@@ -350,6 +347,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     private final int myColDim;
 
     private final int myRowDim;
+
     private final Array2D<ComplexNumber> myUtility;
 
     ComplexDenseStore(final ComplexNumber[] anArray) {
@@ -589,8 +587,12 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
-    public void fillColumn(final long aRow, final long aCol, final ComplexNumber aNmbr) {
-        myUtility.fillColumn(aRow, aCol, aNmbr);
+    public void fillColumn(final long row, final long column, final ComplexNumber value) {
+        myUtility.fillColumn(row, column, value);
+    }
+
+    public void fillColumn(final long row, final long column, final NullaryFunction<ComplexNumber> supplier) {
+        myUtility.fillColumn(row, column, supplier);
     }
 
     public void fillConjugated(final Access2D<? extends Number> source) {
@@ -617,8 +619,12 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
-    public void fillDiagonal(final long aRow, final long aCol, final ComplexNumber aNmbr) {
-        myUtility.fillDiagonal(aRow, aCol, aNmbr);
+    public void fillDiagonal(final long row, final long column, final ComplexNumber value) {
+        myUtility.fillDiagonal(row, column, value);
+    }
+
+    public void fillDiagonal(final long row, final long column, final NullaryFunction<ComplexNumber> supplier) {
+        myUtility.fillDiagonal(row, column, supplier);
     }
 
     public void fillMatching(final Access1D<? extends Number> source) {
@@ -717,8 +723,12 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
-    public void fillRow(final long aRow, final long aCol, final ComplexNumber aNmbr) {
-        myUtility.fillRow(aRow, aCol, aNmbr);
+    public void fillRow(final long row, final long column, final ComplexNumber value) {
+        myUtility.fillRow(row, column, value);
+    }
+
+    public void fillRow(final long row, final long column, final NullaryFunction<ComplexNumber> supplier) {
+        myUtility.fillRow(row, column, supplier);
     }
 
     public void fillTransposed(final Access2D<? extends Number> source) {
@@ -788,6 +798,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public boolean isLowerLeftShaded() {
         return false;
+    }
+
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return myUtility.isSmall(row, column, comparedTo);
     }
 
     public boolean isUpperRightShaded() {
@@ -864,20 +878,20 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myUtility.modifyRow(row, column, function);
     }
 
-    public MatrixStore<ComplexNumber> multiplyLeft(final Access1D<ComplexNumber> left) {
-
-        final ComplexDenseStore retVal = FACTORY.makeZero(left.count() / myRowDim, myColDim);
-
-        retVal.multiplyLeft.invoke(retVal.data, left, myRowDim, data);
-
-        return retVal;
-    }
-
     public MatrixStore<ComplexNumber> multiply(final Access1D<ComplexNumber> right) {
 
         final ComplexDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
         retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+
+        return retVal;
+    }
+
+    public MatrixStore<ComplexNumber> multiplyLeft(final Access1D<ComplexNumber> left) {
+
+        final ComplexDenseStore retVal = FACTORY.makeZero(left.count() / myRowDim, myColDim);
+
+        retVal.multiplyLeft.invoke(retVal.data, left, myRowDim, data);
 
         return retVal;
     }

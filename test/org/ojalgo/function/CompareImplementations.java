@@ -132,7 +132,7 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, -TWO);
         this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, -E);
         this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, -PI);
-        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, MIN_VALUE);
+        this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, MACHINE_SMALLEST);
     }
 
     public void testATANH() {

@@ -39,6 +39,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -580,16 +581,24 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
-    public void fillColumn(final long aRow, final long aCol, final BigDecimal aNmbr) {
-        myUtility.fillColumn(aRow, aCol, aNmbr);
+    public void fillColumn(final long row, final long column, final BigDecimal value) {
+        myUtility.fillColumn(row, column, value);
+    }
+
+    public void fillColumn(final long row, final long column, final NullaryFunction<BigDecimal> supplier) {
+        myUtility.fillColumn(row, column, supplier);
     }
 
     public void fillConjugated(final Access2D<? extends Number> source) {
         FillConjugated.invoke(data, myRowDim, 0, myColDim, source);
     }
 
-    public void fillDiagonal(final long aRow, final long aCol, final BigDecimal aNmbr) {
-        myUtility.fillDiagonal(aRow, aCol, aNmbr);
+    public void fillDiagonal(final long row, final long column, final BigDecimal value) {
+        myUtility.fillDiagonal(row, column, value);
+    }
+
+    public void fillDiagonal(final long row, final long column, final NullaryFunction<BigDecimal> supplier) {
+        myUtility.fillDiagonal(row, column, supplier);
     }
 
     public void fillMatching(final Access1D<? extends Number> source) {
@@ -688,8 +697,12 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
-    public void fillRow(final long aRow, final long aCol, final BigDecimal aNmbr) {
-        myUtility.fillRow(aRow, aCol, aNmbr);
+    public void fillRow(final long row, final long column, final BigDecimal value) {
+        myUtility.fillRow(row, column, value);
+    }
+
+    public void fillRow(final long row, final long column, final NullaryFunction<BigDecimal> supplier) {
+        myUtility.fillRow(row, column, supplier);
     }
 
     public void fillTransposed(final Access2D<? extends Number> source) {
@@ -839,20 +852,20 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myUtility.modifyRow(row, column, function);
     }
 
-    public MatrixStore<BigDecimal> multiplyLeft(final Access1D<BigDecimal> left) {
-
-        final BigDenseStore retVal = FACTORY.makeZero(left.count() / myRowDim, myColDim);
-
-        retVal.multiplyLeft.invoke(retVal.data, left, myRowDim, data);
-
-        return retVal;
-    }
-
     public MatrixStore<BigDecimal> multiply(final Access1D<BigDecimal> right) {
 
         final BigDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
         retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+
+        return retVal;
+    }
+
+    public MatrixStore<BigDecimal> multiplyLeft(final Access1D<BigDecimal> left) {
+
+        final BigDenseStore retVal = FACTORY.makeZero(left.count() / myRowDim, myColDim);
+
+        retVal.multiplyLeft.invoke(retVal.data, left, myRowDim, data);
 
         return retVal;
     }

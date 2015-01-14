@@ -26,7 +26,7 @@ import org.ojalgo.function.PrimitiveFunction;
 
 public class PrimitivePrefixTest extends ConstantTests {
 
-    private final double myTolerance = PrimitiveMath.MACHINE_DOUBLE_ERROR;
+    private final double myTolerance = PrimitiveMath.MACHINE_EPSILON;
 
     public PrimitivePrefixTest() {
         super();

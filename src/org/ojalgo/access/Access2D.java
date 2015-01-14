@@ -24,6 +24,7 @@ package org.ojalgo.access;
 import java.util.List;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
@@ -110,9 +111,15 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         void fillColumn(long row, long column, N value);
 
+        void fillColumn(long row, long column, NullaryFunction<N> supplier);
+
         void fillDiagonal(long row, long column, N value);
 
+        void fillDiagonal(long row, long column, NullaryFunction<N> supplier);
+
         void fillRow(long row, long column, N value);
+
+        void fillRow(long row, long column, NullaryFunction<N> supplier);
 
         void set(long row, long column, double value);
 

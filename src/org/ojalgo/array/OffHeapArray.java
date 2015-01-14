@@ -24,11 +24,13 @@ package org.ojalgo.array;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.lang.reflect.Field;
+import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -253,6 +255,27 @@ public final class OffHeapArray extends BasicArray<Double> {
     @Override
     boolean isPrimitive() {
         return true;
+    }
+
+    public Iterator<Double> iterator() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void fillAll(final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void fillRange(final long first, final long limit, final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
     }
 
 }

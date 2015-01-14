@@ -60,7 +60,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     public void testMPSadlittle() {
 
         final File tmpFile = new File(PATH + "adlittle.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         //tmpModel.options.debug(LinearSolver.class);
@@ -86,7 +86,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     public void testMPSafiro() {
 
         final File tmpFile = new File(PATH + "afiro.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         TestUtils.assertTrue(tmpModel.validate());
@@ -107,7 +107,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     public void testMPSempstest() {
 
         final File tmpFile = new File(PATH + "empstest.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         this.assertMinMaxVal(tmpModel, null, null);
@@ -121,7 +121,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     public void testMPSmaros() {
 
         final File tmpFile = new File(PATH + "maros.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         this.assertMinMaxVal(tmpModel, BigFunction.DIVIDE.invoke(new BigDecimal("385"), THREE), new BigDecimal("197.5"));
@@ -134,7 +134,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     public void testMPSnazareth() {
 
         final File tmpFile = new File(PATH + "nazareth.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         this.assertMinMaxVal(tmpModel, null, BigFunction.DIVIDE.invoke(HUNDRED.add(TEN), THREE));
@@ -176,7 +176,7 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
         TestUtils.assertTrue(tmpExpModel.validate());
 
         final File tmpFile = new File(PATH + "testprob.mps");
-        final MathProgSysModel tmpActModel = MathProgSysModel.makeFromFile(tmpFile);
+        final MathProgSysModel tmpActModel = MathProgSysModel.make(tmpFile);
 
         TestUtils.assertTrue(tmpActModel.validate());
 

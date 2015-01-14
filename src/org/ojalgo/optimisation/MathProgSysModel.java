@@ -353,7 +353,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
      *  G    greater than or equal
      *  N    objective
      *  N    no restriction
-     *
+     * 
      * row type       sign of r       h          u
      * ----------------------------------------------
      *    G            + or -         b        b + |r|
@@ -375,7 +375,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     private static final int[] FIELD_LIMITS = new int[] { 3, 12, 22, 36, 47, 61 };
     private static final String SPACE = " ";
 
-    public static MathProgSysModel makeFromFile(final File file) {
+    public static MathProgSysModel make(final File file) {
 
         final MathProgSysModel retVal = new MathProgSysModel();
 
@@ -414,6 +414,14 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
+    /**
+     * @deprecated v38 Use {@link #make(File)} instead
+     */
+    @Deprecated
+    public static MathProgSysModel makeFromFile(final File file) {
+        return MathProgSysModel.make(file);
+    }
+
     private final HashMap<String, Column> myColumns = new HashMap<String, Column>();
     private final ExpressionsBasedModel myDelegate;
     private final String[] myFields = new String[6];
@@ -438,6 +446,11 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         myColumns.clear();
     }
 
+    @Override
+    public boolean equals(final Object obj) {
+        return myDelegate.equals(obj);
+    }
+
     /**
      * @return The delegate {@linkplain ExpressionsBasedModel}
      */
@@ -447,6 +460,11 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
     public String getName() {
         return myName;
+    }
+
+    @Override
+    public int hashCode() {
+        return myDelegate.hashCode();
     }
 
     /**
@@ -481,6 +499,11 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         } else {
             return myDelegate.minimise();
         }
+    }
+
+    @Override
+    public String toString() {
+        return myDelegate.toString();
     }
 
     public boolean validate() {

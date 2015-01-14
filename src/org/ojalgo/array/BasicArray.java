@@ -31,6 +31,7 @@ import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.netio.ASCII;
@@ -53,7 +54,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-Access1D.Visitable<N>, Serializable {
+        Access1D.Visitable<N>, Serializable {
 
     static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -270,6 +271,8 @@ Access1D.Visitable<N>, Serializable {
     protected abstract void exchange(long firstA, long firstB, long step, long count);
 
     protected abstract void fill(long first, long limit, long step, N value);
+
+    protected abstract void fill(long first, long limit, long step, NullaryFunction<N> supplier);
 
     protected abstract long indexOfLargest(long first, long limit, long step);
 

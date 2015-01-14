@@ -394,10 +394,10 @@ public final class NewIntegerSolver extends IntegerSolver {
         final Result tmpRootResult = tmpRootModel.solve(tmpIntegerModel.getVariableValues());
         final double tmpRootValue = tmpRootResult.getValue();
 
-        double tmpMinValue = PrimitiveMath.MAX_VALUE;
-        double tmpMaxValue = -PrimitiveMath.MAX_VALUE;
+        double tmpMinValue = PrimitiveMath.MACHINE_LARGEST;
+        double tmpMaxValue = -PrimitiveMath.MACHINE_LARGEST;
 
-        final double tmpBestValue = tmpRootModel.isMinimisation() ? PrimitiveMath.MAX_VALUE : -PrimitiveMath.MAX_VALUE;
+        final double tmpBestValue = tmpRootModel.isMinimisation() ? PrimitiveMath.MACHINE_LARGEST : -PrimitiveMath.MACHINE_LARGEST;
 
         final double[] tmpSignificance = new double[tmpIntegerVariables.size()];
 
