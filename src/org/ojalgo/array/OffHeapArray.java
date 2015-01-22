@@ -278,4 +278,9 @@ public final class OffHeapArray extends BasicArray<Double> {
 
     }
 
+    public void modifyOne(final long index, final UnaryFunction<Double> function) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

@@ -499,6 +499,14 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.modify(0L, this.count(), 1L, function, aRightArg.getDelegate());
     }
 
+    public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
+        myDelegate.modifyOne(row + (column * myRowsCount), function);
+    }
+
+    public void modifyOne(final long index, final UnaryFunction<N> function) {
+        myDelegate.modifyOne(index, function);
+    }
+
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
         myDelegate.modify(first, limit, 1L, function);
     }

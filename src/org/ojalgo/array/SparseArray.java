@@ -638,4 +638,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myValues.isPrimitive();
     }
 
+    public void modifyOne(final long index, final UnaryFunction<N> function) {
+        this.set(index, function.invoke(this.get(index)));
+    }
+
 }

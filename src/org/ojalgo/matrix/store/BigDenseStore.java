@@ -400,6 +400,14 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         multiplyRight = MultiplyRight.getBig(myRowDim, myColDim);
     }
 
+    public void accept(final Access2D<BigDecimal> supplied) {
+        for (long j = 0; j < supplied.countColumns(); j++) {
+            for (long i = 0; i < supplied.countRows(); i++) {
+                this.set(i, j, supplied.get(i, j));
+            }
+        }
+    }
+
     public MatrixStore<BigDecimal> add(final MatrixStore<BigDecimal> addend) {
         return new SuperimposedStore<>(this, addend);
     }
@@ -880,6 +888,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void raxpy(final BigDecimal scalarA, final int rowX, final int rowY, final int firstColumn) {
         RAXPY.invoke(data, rowY, data, rowX, scalarA, firstColumn, myColDim);
+    }
+
+    public MatrixStore.ElementsConsumer<BigDecimal> region(final int row, final int column) {
+        return new PhysicalStore.ConsumerRegion<BigDecimal>(this, row, column);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

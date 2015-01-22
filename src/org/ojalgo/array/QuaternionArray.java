@@ -272,12 +272,12 @@ public class QuaternionArray extends DenseArray<Quaternion> {
 
     @Override
     protected void modify(final int index, final Access1D<Quaternion> left, final BinaryFunction<Quaternion> function) {
-        // TODO Auto-generated method stub
+        data[index] = function.invoke(left.get(index), data[index]);
     }
 
     @Override
     protected void modify(final int index, final BinaryFunction<Quaternion> function, final Access1D<Quaternion> right) {
-        // TODO Auto-generated method stub
+        data[index] = function.invoke(data[index], right.get(index));
     }
 
     @Override
@@ -366,6 +366,11 @@ public class QuaternionArray extends DenseArray<Quaternion> {
     @Override
     DenseArray<Quaternion> newInstance(final int capacity) {
         return new QuaternionArray(capacity);
+    }
+
+    @Override
+    protected void modifyOne(final int index, final UnaryFunction<Quaternion> function) {
+        data[index] = function.invoke(data[index]);
     }
 
 }

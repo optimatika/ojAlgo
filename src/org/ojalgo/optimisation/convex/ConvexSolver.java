@@ -116,7 +116,7 @@ public abstract class ConvexSolver extends BaseSolver {
         }
 
         @Override
-        protected Builder objective(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
+        public Builder objective(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
             return super.objective(Q, C);
         }
 

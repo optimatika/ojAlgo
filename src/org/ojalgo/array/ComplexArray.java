@@ -272,12 +272,12 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
 
     @Override
     protected void modify(final int index, final Access1D<ComplexNumber> left, final BinaryFunction<ComplexNumber> function) {
-        // TODO Auto-generated method stub
+        data[index] = function.invoke(left.get(index), data[index]);
     }
 
     @Override
     protected void modify(final int index, final BinaryFunction<ComplexNumber> function, final Access1D<ComplexNumber> right) {
-        // TODO Auto-generated method stub
+        data[index] = function.invoke(data[index], right.get(index));
     }
 
     @Override
@@ -368,6 +368,11 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
     @Override
     DenseArray<ComplexNumber> newInstance(final int capacity) {
         return new ComplexArray(capacity);
+    }
+
+    @Override
+    protected void modifyOne(final int index, final UnaryFunction<ComplexNumber> function) {
+        data[index] = function.invoke(data[index]);
     }
 
 }

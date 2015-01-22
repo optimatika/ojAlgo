@@ -339,15 +339,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     private final ComplexMultiplyBoth multiplyBoth;
-
     private final ComplexMultiplyLeft multiplyLeft;
-
     private final ComplexMultiplyRight multiplyRight;
-
     private final int myColDim;
-
     private final int myRowDim;
-
     private final Array2D<ComplexNumber> myUtility;
 
     ComplexDenseStore(final ComplexNumber[] anArray) {
@@ -404,6 +399,14 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         multiplyBoth = MultiplyBoth.getComplex(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getComplex(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getComplex(myRowDim, myColDim);
+    }
+
+    public void accept(final Access2D<ComplexNumber> supplied) {
+        for (long j = 0; j < supplied.countColumns(); j++) {
+            for (long i = 0; i < supplied.countRows(); i++) {
+                this.set(i, j, supplied.get(i, j));
+            }
+        }
     }
 
     public MatrixStore<ComplexNumber> add(final MatrixStore<ComplexNumber> addend) {
@@ -906,6 +909,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public void raxpy(final ComplexNumber scalarA, final int rowX, final int rowY, final int firstColumn) {
         RAXPY.invoke(data, rowY, data, rowX, scalarA, firstColumn, myColDim);
+    }
+
+    public MatrixStore.ElementsConsumer<ComplexNumber> region(final int row, final int column) {
+        return new PhysicalStore.ConsumerRegion<ComplexNumber>(this, row, column);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

@@ -109,13 +109,31 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     public interface Fillable<N extends Number> extends Structure2D, Access1D.Fillable<N> {
 
+        default void fillColumn(final long row, final long column, final Access1D<N> values) {
+            for (long i = 0L; i < values.count(); i++) {
+                this.set(row + i, column, values.get(i));
+            }
+        }
+
         void fillColumn(long row, long column, N value);
 
         void fillColumn(long row, long column, NullaryFunction<N> supplier);
 
+        default void fillDiagonal(final long row, final long column, final Access1D<N> values) {
+            for (long ij = 0L; ij < values.count(); ij++) {
+                this.set(row + ij, column + ij, values.get(ij));
+            }
+        }
+
         void fillDiagonal(long row, long column, N value);
 
         void fillDiagonal(long row, long column, NullaryFunction<N> supplier);
+
+        default void fillRow(final long row, final long column, final Access1D<N> values) {
+            for (long j = 0L; j < values.count(); j++) {
+                this.set(row, column + j, values.get(j));
+            }
+        }
 
         void fillRow(long row, long column, N value);
 
@@ -139,6 +157,8 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         void modifyColumn(long row, long column, UnaryFunction<N> function);
 
         void modifyDiagonal(long row, long column, UnaryFunction<N> function);
+
+        void modifyOne(long row, long column, UnaryFunction<N> function);
 
         void modifyRow(long row, long column, UnaryFunction<N> function);
 

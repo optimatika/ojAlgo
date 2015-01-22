@@ -26,9 +26,11 @@ import java.util.List;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorCollection;
 import org.ojalgo.matrix.transformation.Householder;
@@ -43,10 +45,150 @@ import org.ojalgo.scalar.Scalar;
  * <p>
  * This interface and its implementations are central to ojAlgo.
  * </p>
- * 
+ *
  * @author apete
  */
-public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2D.Fillable<N>, Access2D.Modifiable<N> {
+public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixStore.ElementsConsumer<N> {
+
+    public static final class ConsumerRegion<N extends Number> implements MatrixStore.ElementsConsumer<N> {
+
+        private final MatrixStore.ElementsConsumer<N> myDelegate;
+        private final int myRow, myColumn; // origin/offset
+
+        ConsumerRegion(final MatrixStore.ElementsConsumer<N> delegate, final int row, final int column) {
+            super();
+            myDelegate = delegate;
+            myRow = row;
+            myColumn = column;
+        }
+
+        public void accept(final Access2D<N> supplied) {
+            for (long j = 0; j < supplied.countColumns(); j++) {
+                for (long i = 0; i < supplied.countRows(); i++) {
+                    myDelegate.set(myRow + i, myColumn + j, supplied.get(i, j));
+                }
+            }
+        }
+
+        public long count() {
+            return this.countRows() * this.countColumns();
+        }
+
+        public long countColumns() {
+            return myDelegate.countColumns() - myColumn;
+        }
+
+        public long countRows() {
+            return myDelegate.countRows() - myRow;
+        }
+
+        public void fillAll(final N value) {
+            for (long j = myColumn; j < myDelegate.countColumns(); j++) {
+                myDelegate.fillColumn(myRow, j, value);
+            }
+        }
+
+        public void fillAll(final NullaryFunction<N> supplier) {
+            for (long j = myColumn; j < myDelegate.countColumns(); j++) {
+                myDelegate.fillColumn(myRow, j, supplier);
+            }
+        }
+
+        public void fillColumn(final long row, final long column, final N value) {
+            myDelegate.fillColumn(myRow + row, myColumn + column, value);
+        }
+
+        public void fillColumn(final long row, final long column, final NullaryFunction<N> supplier) {
+            myDelegate.fillColumn(myRow + row, myColumn + column, supplier);
+        }
+
+        public void fillDiagonal(final long row, final long column, final N value) {
+            myDelegate.fillDiagonal(myRow + row, myColumn + column, value);
+        }
+
+        public void fillDiagonal(final long row, final long column, final NullaryFunction<N> supplier) {
+            myDelegate.fillDiagonal(myRow + row, myColumn + column, supplier);
+        }
+
+        public void fillRange(final long first, final long limit, final N value) {
+            final long tmpStructure = this.countRows();
+            for (long index = first; index < limit; index++) {
+                myDelegate.set(myRow + AccessUtils.row(index, tmpStructure), myColumn + AccessUtils.column(index, tmpStructure), value);
+            }
+        }
+
+        public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+            final long tmpStructure = this.countRows();
+            for (long index = first; index < limit; index++) {
+                myDelegate.set(myRow + AccessUtils.row(index, tmpStructure), myColumn + AccessUtils.column(index, tmpStructure), supplier.get());
+            }
+        }
+
+        public void fillRow(final long row, final long column, final N value) {
+            myDelegate.fillRow(myRow + row, myColumn + column, value);
+        }
+
+        public void fillRow(final long row, final long column, final NullaryFunction<N> supplier) {
+            myDelegate.fillRow(myRow + row, myColumn + column, supplier);
+        }
+
+        public void modifyAll(final UnaryFunction<N> function) {
+            for (long j = myColumn; j < myDelegate.countColumns(); j++) {
+                myDelegate.modifyColumn(myRow, j, function);
+            }
+        }
+
+        public void modifyColumn(final long row, final long column, final UnaryFunction<N> function) {
+            myDelegate.modifyColumn(myRow + row, myColumn + column, function);
+        }
+
+        public void modifyDiagonal(final long row, final long column, final UnaryFunction<N> function) {
+            myDelegate.modifyDiagonal(myRow + row, myColumn + column, function);
+        }
+
+        public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
+            final long tmpStructure = this.countRows();
+            for (long index = first; index < limit; index++) {
+                myDelegate.modifyOne(myRow + AccessUtils.row(index, tmpStructure), myColumn + AccessUtils.column(index, tmpStructure), function);
+            }
+        }
+
+        public void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
+            myDelegate.modifyRow(myRow + row, myColumn + column, function);
+        }
+
+        public MatrixStore.ElementsConsumer<N> region(final int row, final int column) {
+            return new ConsumerRegion<N>(this, row, column);
+        }
+
+        public void set(final long index, final double value) {
+            final long tmpStructure = this.countRows();
+            myDelegate.set(myRow + AccessUtils.row(index, tmpStructure), myColumn + AccessUtils.column(index, tmpStructure), value);
+        }
+
+        public void set(final long row, final long column, final double value) {
+            myDelegate.set(myRow + row, myColumn + column, value);
+        }
+
+        public void set(final long row, final long column, final Number value) {
+            myDelegate.set(myRow + row, myColumn + column, value);
+        }
+
+        public void set(final long index, final Number value) {
+            final long tmpStructure = this.countRows();
+            myDelegate.set(myRow + AccessUtils.row(index, tmpStructure), myColumn + AccessUtils.column(index, tmpStructure), value);
+        }
+
+        public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
+            myDelegate.modifyOne(myRow + row, myColumn + column, function);
+        }
+
+        public void modifyOne(final long index, final UnaryFunction<N> function) {
+            final long tmpStructure = this.countRows();
+            myDelegate.modifyOne(myRow + AccessUtils.row(index, tmpStructure), myColumn + AccessUtils.column(index, tmpStructure), function);
+        }
+
+    }
 
     public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Access2D.Factory<I>, Serializable {
 
@@ -81,7 +223,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * <b>c</b>olumn <b>a</b> * <b>x</b> <b>p</b>lus <b>y</b>
      * </p>
      * [this(*,aColY)] = aSclrA [this(*,aColX)] + [this(*,aColY)]
-     * 
+     *
      * @deprecated v32 Let me know if you need this
      */
     @Deprecated
@@ -128,20 +270,18 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * <b>m</b>atrix <b>a</b> * <b>x</b> <b>p</b>lus <b>y</b>
      * </p>
      * [this] = aSclrA [aMtrxX] + [this]
-     * 
+     *
      * @deprecated v32 Let me know if you need this
      */
     @Deprecated
     void maxpy(final N scalarA, final MatrixStore<N> matrixX);
-
-    void modifyOne(long row, long column, UnaryFunction<N> function);
 
     /**
      * <p>
      * <b>r</b>ow <b>a</b> * <b>x</b> <b>p</b>lus <b>y</b>
      * </p>
      * [this(aRowY,*)] = aSclrA [this(aRowX,*)] + [this(aRowY,*)]
-     * 
+     *
      * @deprecated v32 Let me know if you need this
      */
     @Deprecated
@@ -161,7 +301,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * There are two ways to transpose/invert a rotation. Either you negate the angle or you interchange the two indeces
      * that define the rotation plane.
      * </p>
-     * 
+     *
      * @see #transformRight(Rotation)
      */
     void transformLeft(Rotation<N> transformation);
@@ -179,7 +319,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
      * <p>
      * There result is undefined if the two input indeces are the same (in which case the rotation plane is undefined).
      * </p>
-     * 
+     *
      * @see #transformLeft(Rotation)
      */
     void transformRight(Rotation<N> transformation);

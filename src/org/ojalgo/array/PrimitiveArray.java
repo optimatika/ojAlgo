@@ -454,14 +454,12 @@ public class PrimitiveArray extends DenseArray<Double> {
 
     @Override
     protected void modify(final int index, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-
+        data[index] = function.invoke(left.doubleValue(index), data[index]);
     }
 
     @Override
     protected void modify(final int index, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        // TODO Auto-generated method stub
-
+        data[index] = function.invoke(data[index], right.doubleValue(index));
     }
 
     @Override
@@ -551,6 +549,11 @@ public class PrimitiveArray extends DenseArray<Double> {
 
     OfDouble split() {
         return Spliterators.spliterator(data, 0);
+    }
+
+    @Override
+    protected void modifyOne(final int index, final UnaryFunction<Double> function) {
+        data[index] = function.invoke(data[index]);
     }
 
 }

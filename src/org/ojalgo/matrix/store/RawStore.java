@@ -627,6 +627,14 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         myNumberOfColumns = numberOfColumns;
     }
 
+    public void accept(final Access2D<Double> supplied) {
+        for (long j = 0; j < supplied.countColumns(); j++) {
+            for (long i = 0; i < supplied.countRows(); i++) {
+                this.set(i, j, supplied.doubleValue(i, j));
+            }
+        }
+    }
+
     public MatrixStore<Double> add(final MatrixStore<Double> addend) {
         final RawStore B = RawStore.convert(addend);
         if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
@@ -1080,6 +1088,15 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         this.set(row, column, tmpValue);
     }
 
+    public void modifyOne(final long index, final UnaryFunction<Double> function) {
+
+        double tmpValue = this.doubleValue(index);
+
+        tmpValue = function.invoke(tmpValue);
+
+        this.set(index, tmpValue);
+    }
+
     public void modifyRange(final long first, final long limit, final UnaryFunction<Double> function) {
         for (long index = first; index < limit; index++) {
             this.set(index, function.invoke(this.doubleValue(index)));
@@ -1142,6 +1159,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
             tmpArray[rowY][j] += tmpValA * tmpArray[rowX][j];
 
         }
+    }
+
+    public MatrixStore.ElementsConsumer<Double> region(final int row, final int column) {
+        return new PhysicalStore.ConsumerRegion<Double>(this, row, column);
     }
 
     public RawStore scale(final Double scalar) {

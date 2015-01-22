@@ -440,6 +440,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         }
     }
 
+    public void modifyOne(final long index, final UnaryFunction<N> function) {
+        myDelegate.modifyOne(myFirst + (myStep * index), function);
+    }
+
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
         final long tmpFirst = myFirst + (myStep * first);
         final long tmpLimit = myFirst + (myStep * limit);

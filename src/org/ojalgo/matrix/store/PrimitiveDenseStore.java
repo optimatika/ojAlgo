@@ -880,13 +880,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     private final PrimitiveMultiplyBoth multiplyBoth;
-
     private final PrimitiveMultiplyLeft multiplyLeft;
-
     private final PrimitiveMultiplyRight multiplyRight;
     private final int myColDim;
     private final int myRowDim;
-
     private final Array2D<Double> myUtility;
 
     PrimitiveDenseStore(final double[] anArray) {
@@ -943,6 +940,14 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
+    }
+
+    public void accept(final Access2D<Double> supplied) {
+        for (long j = 0; j < supplied.countColumns(); j++) {
+            for (long i = 0; i < supplied.countRows(); i++) {
+                this.set(i, j, supplied.doubleValue(i, j));
+            }
+        }
     }
 
     public MatrixStore<Double> add(final MatrixStore<Double> addend) {
@@ -1516,6 +1521,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {
         RAXPY.invoke(data, rowY, data, rowX, scalarA, firstColumn, myColDim);
+    }
+
+    public MatrixStore.ElementsConsumer<Double> region(final int row, final int column) {
+        return new PhysicalStore.ConsumerRegion<Double>(this, row, column);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

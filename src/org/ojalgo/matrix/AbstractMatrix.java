@@ -72,11 +72,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    AbstractMatrix(final MatrixStore<N> aStore) {
+    AbstractMatrix(final MatrixStore<N> store) {
 
         super();
 
-        myStore = aStore;
+        myStore = store;
         myPhysicalFactory = this.getFactory().getPhysicalFactory();
     }
 

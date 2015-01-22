@@ -108,6 +108,10 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         return this.isSmall((int) index, comparedTo);
     }
 
+    public final void modifyOne(final long index, final UnaryFunction<N> function) {
+        this.modifyOne((int) index, function);
+    }
+
     public final void set(final long index, final double value) {
         this.set((int) index, value);
     }
@@ -212,6 +216,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     protected final void modify(final long first, final long limit, final long step, final UnaryFunction<N> function) {
         this.modify((int) first, (int) limit, (int) step, function);
     }
+
+    protected abstract void modifyOne(final int index, final UnaryFunction<N> function);
 
     /**
      * @see java.util.Arrays#binarySearch(Object[], Object)

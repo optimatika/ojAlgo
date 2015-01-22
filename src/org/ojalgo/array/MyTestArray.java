@@ -340,4 +340,10 @@ public class MyTestArray extends DenseArray<Double> {
 
     }
 
+    @Override
+    protected void modifyOne(final int index, final UnaryFunction<Double> function) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

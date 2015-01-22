@@ -141,6 +141,27 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         myCursor = 0;
     }
 
+    public void flush(final Appendable target) {
+        try {
+            final int tmpCursor = myCursor;
+            char tmpChar;
+            for (int i = tmpCursor; i < length; i++) {
+                tmpChar = myCharacters[i];
+                if (tmpChar != ASCII.NULL) {
+                    target.append(tmpChar);
+                }
+            }
+            for (int i = 0; i < tmpCursor; i++) {
+                tmpChar = myCharacters[i];
+                if (tmpChar != ASCII.NULL) {
+                    target.append(tmpChar);
+                }
+            }
+        } catch (final IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
     public int indexOfFirst(final char c) {
 
         int retVal = -1;

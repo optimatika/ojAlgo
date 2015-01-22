@@ -269,12 +269,12 @@ public class RationalArray extends DenseArray<RationalNumber> {
 
     @Override
     protected void modify(final int index, final Access1D<RationalNumber> left, final BinaryFunction<RationalNumber> function) {
-        // TODO Auto-generated method stub
+        data[index] = function.invoke(left.get(index), data[index]);
     }
 
     @Override
     protected void modify(final int index, final BinaryFunction<RationalNumber> function, final Access1D<RationalNumber> right) {
-        // TODO Auto-generated method stub
+        data[index] = function.invoke(data[index], right.get(index));
     }
 
     @Override
@@ -366,4 +366,10 @@ public class RationalArray extends DenseArray<RationalNumber> {
     DenseArray<RationalNumber> newInstance(final int capacity) {
         return new RationalArray(capacity);
     }
+
+    @Override
+    protected void modifyOne(final int index, final UnaryFunction<RationalNumber> function) {
+        data[index] = function.invoke(data[index]);
+    }
+
 }

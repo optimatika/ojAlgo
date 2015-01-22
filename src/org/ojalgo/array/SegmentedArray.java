@@ -539,4 +539,10 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return mySegments[0].isPrimitive();
     }
 
+    public void modifyOne(final long index, final UnaryFunction<N> function) {
+        final BasicArray<N> tmpSegment = mySegments[(int) (index >> myIndexBits)];
+        final long tmpIndex = index & myIndexMask;
+        tmpSegment.set(tmpIndex, function.invoke(tmpSegment.get(tmpIndex)));
+    }
+
 }

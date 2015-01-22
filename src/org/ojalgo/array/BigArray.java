@@ -273,12 +273,12 @@ public class BigArray extends DenseArray<BigDecimal> {
 
     @Override
     protected void modify(final int index, final Access1D<BigDecimal> left, final BinaryFunction<BigDecimal> function) {
-        // TODO Auto-generated method stub
+        data[index] = function.invoke(left.get(index), data[index]);
     }
 
     @Override
     protected void modify(final int index, final BinaryFunction<BigDecimal> function, final Access1D<BigDecimal> right) {
-        // TODO Auto-generated method stub
+        data[index] = function.invoke(data[index], right.get(index));
     }
 
     @Override
@@ -313,6 +313,11 @@ public class BigArray extends DenseArray<BigDecimal> {
 
     @Override
     protected void modify(final int index, final UnaryFunction<BigDecimal> function) {
+        data[index] = function.invoke(data[index]);
+    }
+
+    @Override
+    protected void modifyOne(final int index, final UnaryFunction<BigDecimal> function) {
         data[index] = function.invoke(data[index]);
     }
 

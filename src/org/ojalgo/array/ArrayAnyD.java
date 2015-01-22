@@ -270,6 +270,14 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         myDelegate.modify(0L, this.count(), 1L, function, right.getDelegate());
     }
 
+    public void modifyOne(final long index, final UnaryFunction<N> function) {
+        myDelegate.modifyOne(index, function);
+    }
+
+    public void modifyOne(final long[] reference, final UnaryFunction<N> function) {
+        myDelegate.modifyOne(AccessUtils.index(myStructure, reference), function);
+    }
+
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
         myDelegate.modify(first, limit, 1L, function);
     }

@@ -106,6 +106,8 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
         void modifyAll(UnaryFunction<N> function);
 
+        void modifyOne(long index, UnaryFunction<N> function);
+
         void modifyRange(long first, long limit, UnaryFunction<N> function);
 
     }
