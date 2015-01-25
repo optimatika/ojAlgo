@@ -232,7 +232,7 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
     }
 
     private Scalar<N> toScalar(final long index) {
-        return this.toScalar(AccessUtils.row((int) index, myRowDim), AccessUtils.column((int) index, myRowDim));
+        return this.toScalar(AccessUtils.row(index, myRowDim), AccessUtils.column(index, myRowDim));
     }
 
     protected final int getColDim() {

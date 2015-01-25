@@ -32,15 +32,17 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * This class adapts JAMA's QRDecomposition to ojAlgo's {@linkplain QR} interface.
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public final class RawQR extends RawDecomposition implements QR<Double> {
 
     private JamaQR myDelegate;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.QRDecomposition#makeJama()} instead.
+     * {@linkplain org.ojalgo.matrix.decomposition.QR#makeJama()} instead.
      */
     public RawQR() {
         super();

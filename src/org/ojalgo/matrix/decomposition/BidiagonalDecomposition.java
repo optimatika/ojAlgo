@@ -40,10 +40,12 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain #makeBig()}, {@linkplain #makeComplex()} or {@linkplain #makePrimitive()}.
+ * {@linkplain Bidiagonal#makeBig()}, {@linkplain Bidiagonal#makeComplex()} or {@linkplain Bidiagonal#makePrimitive()}.
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
 
     static final class Big extends BidiagonalDecomposition<BigDecimal> {
@@ -156,32 +158,37 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
 
     }
 
+    /**
+     * @deprecated v38 Use {@link Bidiagonal#make(Access2D<N>)} instead
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static final <N extends Number> Bidiagonal<N> make(final Access2D<N> aTypical) {
-
-        final N tmpNumber = aTypical.get(0, 0);
-
-        if (tmpNumber instanceof BigDecimal) {
-            return (Bidiagonal<N>) BidiagonalDecomposition.makeBig();
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (Bidiagonal<N>) BidiagonalDecomposition.makeComplex();
-        } else if (tmpNumber instanceof Double) {
-            return (Bidiagonal<N>) BidiagonalDecomposition.makePrimitive();
-        } else {
-            throw new IllegalArgumentException();
-        }
+        return Bidiagonal.make(aTypical);
     }
 
+    /**
+     * @deprecated v38 Use {@link Bidiagonal#makeBig()} instead
+     */
+    @Deprecated
     public static final Bidiagonal<BigDecimal> makeBig() {
-        return new BidiagonalDecomposition.Big();
+        return Bidiagonal.makeBig();
     }
 
+    /**
+     * @deprecated v38 Use {@link Bidiagonal#makeComplex()} instead
+     */
+    @Deprecated
     public static final Bidiagonal<ComplexNumber> makeComplex() {
-        return new BidiagonalDecomposition.Complex();
+        return Bidiagonal.makeComplex();
     }
 
+    /**
+     * @deprecated v38 Use {@link Bidiagonal#makePrimitive()} instead
+     */
+    @Deprecated
     public static final Bidiagonal<Double> makePrimitive() {
-        return new BidiagonalDecomposition.Primitive();
+        return Bidiagonal.makePrimitive();
     }
 
     private transient DiagonalAccess<N> myDiagonalAccessD;
@@ -353,7 +360,7 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
                 for (int i = 0; i < tmpLim; i++) {
                     aMtrxV.set(i, j,
                             ((aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j)) + (aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j)))
-                            / tmpSingular);
+                                    / tmpSingular);
                 }
                 aMtrxV.set(tmpLim, j, (aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j)) / tmpSingular);
             }
@@ -378,7 +385,7 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
                 for (int i = 0; i < tmpLim; i++) {
                     retVal.set(i, j,
                             ((aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j)) + (aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j)))
-                            / tmpSingular);
+                                    / tmpSingular);
                 }
                 retVal.set(tmpLim, j, (aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j)) / tmpSingular);
             }

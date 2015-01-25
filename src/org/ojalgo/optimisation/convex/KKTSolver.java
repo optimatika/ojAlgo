@@ -28,13 +28,9 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.decomposition.QRDecomposition;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.decomposition.SingularValueDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.ZeroStore;
@@ -189,16 +185,16 @@ public final class KKTSolver extends Object {
 
         super();
 
-        myCholesky = CholeskyDecomposition.makePrimitive();
-        myQR = QRDecomposition.makePrimitive();
+        myCholesky = Cholesky.makePrimitive();
+        myQR = QR.makePrimitive();
     }
 
     public KKTSolver(final KKTSolver.Input template) {
 
         super();
 
-        myCholesky = CholeskyDecomposition.make(template.getQ());
-        myQR = QRDecomposition.makePrimitive();
+        myCholesky = Cholesky.make(template.getQ());
+        myQR = QR.makePrimitive();
     }
 
     public Output solve(final Input input) {
@@ -238,7 +234,7 @@ public final class KKTSolver extends Object {
                 tmpSolve = myQR.solve(tmpC); // Problem here! when A is overdetermined/redundant.
             } else {
                 // This should rarely be necessary...
-                final SingularValue<Double> tmpSVD = SingularValueDecomposition.makePrimitive();
+                final SingularValue<Double> tmpSVD = SingularValue.makePrimitive();
                 tmpSVD.compute(tmpA.transpose());
                 tmpSolve = tmpSVD.solve(tmpC);
             }
@@ -321,7 +317,7 @@ public final class KKTSolver extends Object {
         if (!myCholesky.isSPD()) {
             // Not positive definite. Check if at least positive semidefinite.
 
-            final Eigenvalue<Double> tmpEvD = EigenvalueDecomposition.makePrimitive(true);
+            final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
 
             tmpEvD.compute(tmpQ, true);
 

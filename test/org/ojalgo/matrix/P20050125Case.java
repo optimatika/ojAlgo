@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
@@ -56,7 +55,7 @@ public class P20050125Case extends BasicMatrixTest {
     @Override
     public void testData() {
 
-        final Cholesky<BigDecimal> tmpDelegate = CholeskyDecomposition.makeBig();
+        final Cholesky<BigDecimal> tmpDelegate = Cholesky.makeBig();
         tmpDelegate.compute(myBigAA.toBigStore());
 
         TestUtils.assertEquals(myBigAA.toBigStore(), tmpDelegate, EVALUATION);
@@ -65,7 +64,7 @@ public class P20050125Case extends BasicMatrixTest {
     @Override
     public void testProblem() {
 
-        final Cholesky<BigDecimal> tmpDelegate = CholeskyDecomposition.makeBig();
+        final Cholesky<BigDecimal> tmpDelegate = Cholesky.makeBig();
         tmpDelegate.compute(myBigAA.toBigStore());
 
         final MatrixStore<BigDecimal> tmpInv = tmpDelegate.solve(myBigI.toBigStore());

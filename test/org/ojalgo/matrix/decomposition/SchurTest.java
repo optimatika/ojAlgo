@@ -42,7 +42,7 @@ public class SchurTest extends MatrixDecompositionTests {
 
         MatrixStore<Double> tmpRecreatedMatrix;
 
-        final Schur<Double> tmpSchurDecomp = SchurDecomposition.makePrimitive();
+        final Schur<Double> tmpSchurDecomp = Schur.makePrimitive();
         tmpSchurDecomp.compute(originalMatrix);
 
         final Array1D<ComplexNumber> tmpDiagonal = tmpSchurDecomp.getDiagonal();

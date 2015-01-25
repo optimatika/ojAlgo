@@ -65,10 +65,10 @@ public class VerySmallCase extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpProblematic = VerySmallCase.getVerySmall();
 
-        final LU<BigDecimal> tmpBig = LUDecomposition.makeBig();
-        final LU<ComplexNumber> tmpComplex = LUDecomposition.makeComplex();
-        final LU<Double> tmpPrimitive = LUDecomposition.makePrimitive();
-        final LU<Double> tmpJama = LUDecomposition.makeJama();
+        final LU<BigDecimal> tmpBig = LU.makeBig();
+        final LU<ComplexNumber> tmpComplex = LU.makeComplex();
+        final LU<Double> tmpPrimitive = LU.makePrimitive();
+        final LU<Double> tmpJama = LU.makeJama();
 
         TestUtils.assertTrue("Big.compute()", tmpBig.compute(tmpProblematic));
         TestUtils.assertTrue("Complex.compute()", tmpComplex.compute(tmpProblematic));
@@ -95,7 +95,7 @@ public class VerySmallCase extends MatrixDecompositionTests {
         TestUtils.assertEquals("Primitive.reconstruct()", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
         TestUtils.assertEquals("Jama.reconstruct()", tmpProblematic, tmpJama.reconstruct(), PRECISION);
 
-        final SingularValue<Double> tmpSVD = SingularValueDecomposition.makeJama();
+        final SingularValue<Double> tmpSVD = SingularValue.makeJama();
         tmpSVD.compute(tmpProblematic);
 
         TestUtils.assertEquals("rank() SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
@@ -109,10 +109,10 @@ public class VerySmallCase extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpProblematic = VerySmallCase.getVerySmall();
 
-        final QR<BigDecimal> tmpBig = QRDecomposition.makeBig();
-        final QR<ComplexNumber> tmpComplex = QRDecomposition.makeComplex();
-        final QR<Double> tmpPrimitive = QRDecomposition.makePrimitive();
-        final QR<Double> tmpJama = QRDecomposition.makeJama();
+        final QR<BigDecimal> tmpBig = QR.makeBig();
+        final QR<ComplexNumber> tmpComplex = QR.makeComplex();
+        final QR<Double> tmpPrimitive = QR.makePrimitive();
+        final QR<Double> tmpJama = QR.makeJama();
 
         TestUtils.assertTrue("Big.compute()", tmpBig.compute(tmpProblematic));
         TestUtils.assertTrue("Complex.compute()", tmpComplex.compute(tmpProblematic));
@@ -131,7 +131,7 @@ public class VerySmallCase extends MatrixDecompositionTests {
         TestUtils.assertEquals("QR.reconstruct() Primitive", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
         TestUtils.assertEquals("QR.reconstruct() Jama", tmpProblematic, tmpJama.reconstruct(), PRECISION);
 
-        final SingularValue<Double> tmpSVD = SingularValueDecomposition.makeJama();
+        final SingularValue<Double> tmpSVD = SingularValue.makeJama();
         tmpSVD.compute(tmpProblematic);
 
         TestUtils.assertEquals("rank() SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
@@ -145,10 +145,10 @@ public class VerySmallCase extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpProblematic = VerySmallCase.getVerySmall();
 
-        final Eigenvalue<BigDecimal> tmpBig = EigenvalueDecomposition.makeBig();
-        final Eigenvalue<ComplexNumber> tmpComplex = EigenvalueDecomposition.makeComplex();
-        final Eigenvalue<Double> tmpPrimitive = EigenvalueDecomposition.makePrimitive();
-        final Eigenvalue<Double> tmpJama = EigenvalueDecomposition.makeJama();
+        final Eigenvalue<BigDecimal> tmpBig = Eigenvalue.makeBig();
+        final Eigenvalue<ComplexNumber> tmpComplex = Eigenvalue.makeComplex();
+        final Eigenvalue<Double> tmpPrimitive = Eigenvalue.makePrimitive();
+        final Eigenvalue<Double> tmpJama = Eigenvalue.makeJama();
 
         TestUtils.assertTrue("Big.compute()", tmpBig.compute(tmpProblematic));
         TestUtils.assertTrue("Complex.compute()", tmpComplex.compute(tmpProblematic));

@@ -31,10 +31,8 @@ import java.util.TreeSet;
 
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.decomposition.SingularValueDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
@@ -147,7 +145,7 @@ public final class GaussianField<K extends Comparable<K>> {
 
         if (cleanCovariances) {
 
-            final Eigenvalue<Double> tmpEvD = EigenvalueDecomposition.makePrimitive(true);
+            final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
             tmpEvD.compute(tmpCovariances, false);
 
             final MatrixStore<Double> tmpV = tmpEvD.getV();
@@ -239,7 +237,7 @@ public final class GaussianField<K extends Comparable<K>> {
             }
         }
 
-        final SingularValue<Double> retVal = SingularValueDecomposition.makePrimitive();
+        final SingularValue<Double> retVal = SingularValue.makePrimitive();
 
         retVal.compute(tmpMatrix);
 

@@ -36,17 +36,17 @@ import org.ojalgo.type.context.NumberContext;
 public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
     private static NumberContext COMPARE_CONTEXT = NumberContext.getGeneral(8);
-    private static Cholesky<Double> JAMA_CHOLESKY = CholeskyDecomposition.makeJama();
-    private static Eigenvalue<Double> JAMA_EvD = EigenvalueDecomposition.makeJama();
-    private static LU<Double> JAMA_LU = LUDecomposition.makeJama();
-    private static QR<Double> JAMA_QR = QRDecomposition.makeJama();
-    private static SingularValue<Double> JAMA_SVD = SingularValueDecomposition.makeJama();
-    private static Cholesky<Double> PRIMITIVE_CHOLESKY = CholeskyDecomposition.makePrimitive();
-    private static LU<Double> PRIMITIVE_DENSE_LU = LUDecomposition.makePrimitive();
-    private static Eigenvalue<Double> PRIMITIVE_EvD = EigenvalueDecomposition.makePrimitive();
-    private static QR<Double> PRIMITIVE_QR = QRDecomposition.makePrimitive();
-    private static LU<Double> PRIMITIVE_RAW_LU = LUDecomposition.makePrimitive();
-    private static SingularValue<Double> PRIMITIVE_SVD = SingularValueDecomposition.makePrimitive();
+    private static Cholesky<Double> JAMA_CHOLESKY = Cholesky.makeJama();
+    private static Eigenvalue<Double> JAMA_EvD = Eigenvalue.makeJama();
+    private static LU<Double> JAMA_LU = LU.makeJama();
+    private static QR<Double> JAMA_QR = QR.makeJama();
+    private static SingularValue<Double> JAMA_SVD = SingularValue.makeJama();
+    private static Cholesky<Double> PRIMITIVE_CHOLESKY = Cholesky.makePrimitive();
+    private static LU<Double> PRIMITIVE_DENSE_LU = LU.makePrimitive();
+    private static Eigenvalue<Double> PRIMITIVE_EvD = Eigenvalue.makePrimitive();
+    private static QR<Double> PRIMITIVE_QR = QR.makePrimitive();
+    private static LU<Double> PRIMITIVE_RAW_LU = LU.makePrimitive();
+    private static SingularValue<Double> PRIMITIVE_SVD = SingularValue.makePrimitive();
 
     public CompareJamaAndPrimitive() {
         super();

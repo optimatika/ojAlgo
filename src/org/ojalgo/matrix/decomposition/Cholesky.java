@@ -21,9 +21,12 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.math.BigDecimal;
+
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.task.DeterminantTask;
+import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * Cholesky: [A] = [L][L]<sup>T</sup>
@@ -35,17 +38,53 @@ import org.ojalgo.matrix.task.DeterminantTask;
  * <p>
  * A cholesky decomposition is still/also an LU decomposition where [P][L][D][U] => [R]<sup>T</sup>[R].
  * </p>
- * 
+ *
  * @author apete
  */
 public interface Cholesky<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
+
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> Cholesky<N> make(final Access2D<N> aTypical) {
+
+        final N tmpNumber = aTypical.get(0, 0);
+
+        if (tmpNumber instanceof BigDecimal) {
+            return (Cholesky<N>) Cholesky.makeBig();
+        } else if (tmpNumber instanceof ComplexNumber) {
+            return (Cholesky<N>) Cholesky.makeComplex();
+        } else if (tmpNumber instanceof Double) {
+            if ((aTypical.countColumns() <= 32) || (aTypical.countColumns() >= 46340)) { //64,16,16
+                return (Cholesky<N>) Cholesky.makeJama();
+            } else {
+                return (Cholesky<N>) Cholesky.makePrimitive();
+            }
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static Cholesky<BigDecimal> makeBig() {
+        return new CholeskyDecomposition.Big();
+    }
+
+    public static Cholesky<ComplexNumber> makeComplex() {
+        return new CholeskyDecomposition.Complex();
+    }
+
+    public static Cholesky<Double> makeJama() {
+        return new RawCholesky();
+    }
+
+    public static Cholesky<Double> makePrimitive() {
+        return new CholeskyDecomposition.Primitive();
+    }
 
     /**
      * To use the Cholesky decomposition rather than the LU decomposition the matrix must be symmetric and positive
      * definite. It is recommended that the decomposition algorithm checks for this during calculation. Possibly the
      * matrix could be assumed to be symmetric (to improve performance) but tests should be made to assure the matrix is
      * positive definite.
-     * 
+     *
      * @return true if the tests did not fail.
      */
     public boolean isSPD();

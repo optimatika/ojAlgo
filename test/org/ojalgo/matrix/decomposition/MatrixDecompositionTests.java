@@ -37,7 +37,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     static final boolean DEBUG = true;
 
     public static final Bidiagonal<?>[] getBidiagonalAll() {
-        return new Bidiagonal<?>[] { new BidiagonalDecomposition.Big(), BidiagonalDecomposition.makeComplex(), BidiagonalDecomposition.makePrimitive() };
+        return new Bidiagonal<?>[] { new BidiagonalDecomposition.Big(), Bidiagonal.makeComplex(), Bidiagonal.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -46,8 +46,8 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Cholesky<?>[] getCholeskyAll() {
-        return new Cholesky<?>[] { CholeskyDecomposition.makeBig(), CholeskyDecomposition.makeComplex(), CholeskyDecomposition.makeJama(),
-                CholeskyDecomposition.makePrimitive() };
+        return new Cholesky<?>[] { Cholesky.makeBig(), Cholesky.makeComplex(), Cholesky.makeJama(),
+                Cholesky.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -56,15 +56,15 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllGeneral() {
-        return new Eigenvalue<?>[] { EigenvalueDecomposition.makeJama(), EigenvalueDecomposition.makePrimitive() };
+        return new Eigenvalue<?>[] { Eigenvalue.makeJama(), Eigenvalue.makePrimitive() };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllNonsymmetric() {
-        return new Eigenvalue<?>[] { EigenvalueDecomposition.makePrimitive(false) };
+        return new Eigenvalue<?>[] { Eigenvalue.makePrimitive(false) };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllSymmetric() {
-        return new Eigenvalue<?>[] { EigenvalueDecomposition.makePrimitive(true) };
+        return new Eigenvalue<?>[] { Eigenvalue.makePrimitive(true) };
     }
 
     @SuppressWarnings("unchecked")
@@ -83,7 +83,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Hessenberg<?>[] getHessenbergAll() {
-        return new Hessenberg<?>[] { HessenbergDecomposition.makeBig(), HessenbergDecomposition.makeComplex(), HessenbergDecomposition.makePrimitive() };
+        return new Hessenberg<?>[] { Hessenberg.makeBig(), Hessenberg.makeComplex(), Hessenberg.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -92,7 +92,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final LU<?>[] getLUAll() {
-        return new LU<?>[] { LUDecomposition.makeBig(), LUDecomposition.makeComplex(), LUDecomposition.makeJama(), LUDecomposition.makePrimitive() };
+        return new LU<?>[] { LU.makeBig(), LU.makeComplex(), LU.makeJama(), LU.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -101,7 +101,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final QR<?>[] getQRAll() {
-        return new QR<?>[] { QRDecomposition.makeBig(), QRDecomposition.makeComplex(), QRDecomposition.makeJama(), QRDecomposition.makePrimitive() };
+        return new QR<?>[] { QR.makeBig(), QR.makeComplex(), QR.makeJama(), QR.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -110,7 +110,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Schur<?>[] getSchurAll() {
-        return new Schur<?>[] { SchurDecomposition.makePrimitive() };
+        return new Schur<?>[] { Schur.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -128,7 +128,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Tridiagonal<?>[] getTridiagonalAll() {
-        return new Tridiagonal<?>[] { TridiagonalDecomposition.makeBig(), TridiagonalDecomposition.makeComplex(), TridiagonalDecomposition.makePrimitive() };
+        return new Tridiagonal<?>[] { Tridiagonal.makeBig(), Tridiagonal.makeComplex(), Tridiagonal.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")

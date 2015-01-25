@@ -28,7 +28,6 @@ import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.decomposition.QRDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -287,7 +286,7 @@ public class KKTSolverTest extends FunctionalityTest {
 
         final PhysicalStore<Double> tmpActL = this.doTest(new Access2D<?>[] { tmpA, tmpB, tmpQ, tmpC, tmpX }, false, new NumberContext(12, 14)).copy();
 
-        final QR<Double> tmpQR = QRDecomposition.makePrimitive();
+        final QR<Double> tmpQR = QR.makePrimitive();
         tmpQR.compute(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculated  myQR.compute(tmpA).
 
         if (OptimisationConvexTests.DEBUG) {

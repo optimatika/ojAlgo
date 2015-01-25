@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.type.context.NumberContext;
 
@@ -59,7 +58,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     public void testData() {
 
         final MatrixStore<Double> tmpMtrx = LargerCholeskyCase.getOriginal().toPrimitiveStore();
-        final Cholesky<Double> tmpDecomp = CholeskyDecomposition.makeJama();
+        final Cholesky<Double> tmpDecomp = Cholesky.makeJama();
         tmpDecomp.compute(tmpMtrx);
         TestUtils.assertEquals(true, tmpDecomp.isSolvable());
     }
@@ -71,7 +70,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     public void testProblem() {
 
         final BasicMatrix tmpMtrx = LargerCholeskyCase.getOriginal();
-        final Cholesky<Double> tmpDecomp = CholeskyDecomposition.makePrimitive();
+        final Cholesky<Double> tmpDecomp = Cholesky.makePrimitive();
         tmpDecomp.compute(tmpMtrx.toPrimitiveStore());
 
         TestUtils.assertEquals(tmpMtrx.toPrimitiveStore(), tmpDecomp, EVALUATION);
@@ -85,7 +84,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
 
         myBigAB = LargerCholeskyCase.getOriginal();
 
-        final Cholesky<BigDecimal> tmpCholesky = CholeskyDecomposition.makeBig();
+        final Cholesky<BigDecimal> tmpCholesky = Cholesky.makeBig();
         tmpCholesky.compute(myBigAB.toBigStore());
 
         myBigAA = BigMatrix.FACTORY.copy(tmpCholesky.getL());

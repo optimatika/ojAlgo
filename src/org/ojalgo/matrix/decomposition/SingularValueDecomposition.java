@@ -34,63 +34,63 @@ import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain #makeBig()}, {@linkplain #makeComplex()}, {@linkplain #makePrimitive()}, {@linkplain #makeAlternative()}
- * or {@linkplain #makeJama()}.
+ * {@linkplain SingularValue#makeBig()}, {@linkplain SingularValue#makeComplex()},
+ * {@linkplain SingularValue#makePrimitive()}, {@linkplain SingularValue#makeAlternative()} or
+ * {@linkplain SingularValue#makeJama()}.
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends AbstractDecomposition<N> implements SingularValue<N> {
 
+    /**
+     * @deprecated v38 Use {@link SingularValue#make(Access2D<N>)} instead
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static final <N extends Number> SingularValue<N> make(final Access2D<N> aTypical) {
-
-        final N tmpNumber = aTypical.get(0, 0);
-
-        if (tmpNumber instanceof BigDecimal) {
-
-            return (SingularValue<N>) SingularValueDecomposition.makeBig();
-
-        } else if (tmpNumber instanceof ComplexNumber) {
-
-            return (SingularValue<N>) SingularValueDecomposition.makeComplex();
-
-        } else if (tmpNumber instanceof Double) {
-
-            final int tmpMaxDim = (int) Math.max(aTypical.countRows(), aTypical.countColumns());
-
-            if ((tmpMaxDim > 128) && (tmpMaxDim < 46340)) {
-
-                return (SingularValue<N>) SingularValueDecomposition.makePrimitive();
-
-            } else {
-
-                return (SingularValue<N>) SingularValueDecomposition.makeJama();
-            }
-
-        } else {
-
-            throw new IllegalArgumentException();
-        }
+        return SingularValue.make(aTypical);
     }
 
+    /**
+     * @deprecated v38 Use {@link SingularValue#makeAlternative()} instead
+     */
+    @Deprecated
     public static final SingularValue<Double> makeAlternative() {
-        return new SVDold30.Primitive();
+        return SingularValue.makeAlternative();
     }
 
+    /**
+     * @deprecated v38 Use {@link SingularValue#makeBig()} instead
+     */
+    @Deprecated
     public static final SingularValue<BigDecimal> makeBig() {
-        return new SVDnew32.Big();
+        return SingularValue.makeBig();
     }
 
+    /**
+     * @deprecated v38 Use {@link SingularValue#makeComplex()} instead
+     */
+    @Deprecated
     public static final SingularValue<ComplexNumber> makeComplex() {
-        return new SVDnew32.Complex();
+        return SingularValue.makeComplex();
     }
 
+    /**
+     * @deprecated v38 Use {@link SingularValue#makeJama()} instead
+     */
+    @Deprecated
     public static final SingularValue<Double> makeJama() {
-        return new RawSingularValue();
+        return SingularValue.makeJama();
     }
 
+    /**
+     * @deprecated v38 Use {@link SingularValue#makePrimitive()} instead
+     */
+    @Deprecated
     public static final SingularValue<Double> makePrimitive() {
-        return new SVDnew32.Primitive();
+        return SingularValue.makePrimitive();
     }
 
     private final BidiagonalDecomposition<N> myBidiagonal;

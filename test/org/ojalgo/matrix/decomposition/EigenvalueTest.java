@@ -50,7 +50,7 @@ public class EigenvalueTest extends MatrixDecompositionTests {
 
         MatrixStore<Double> tmpRecreatedMatrix;
 
-        final Eigenvalue<Double> tmpDecomposition = EigenvalueDecomposition.makePrimitive();
+        final Eigenvalue<Double> tmpDecomposition = Eigenvalue.makePrimitive();
         tmpDecomposition.compute(originalMatrix);
 
         final Array1D<ComplexNumber> tmpEigenvalues = tmpDecomposition.getEigenvalues();

@@ -25,7 +25,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.decomposition.QRDecomposition;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
@@ -60,7 +59,7 @@ public class PrimitivePolynomial extends AbstractPolynomial<Double> {
             tmpRHS.set(i, 0, tmpY);
         }
 
-        final QR<Double> tmpQR = QRDecomposition.makePrimitive();
+        final QR<Double> tmpQR = QR.makePrimitive();
         tmpQR.compute(tmpBody);
         this.set(tmpQR.solve(tmpRHS));
     }

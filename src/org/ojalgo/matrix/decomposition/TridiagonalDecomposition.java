@@ -40,10 +40,13 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain #makeBig()}, {@linkplain #makeComplex()} or {@linkplain #makePrimitive()}.
- * 
+ * {@linkplain Tridiagonal#makeBig()}, {@linkplain Tridiagonal#makeComplex()} or
+ * {@linkplain Tridiagonal#makePrimitive()}.
+ *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
 
     static final class Big extends TridiagonalDecomposition<BigDecimal> {
@@ -106,32 +109,37 @@ public abstract class TridiagonalDecomposition<N extends Number> extends InPlace
         }
     }
 
+    /**
+     * @deprecated v38 Use {@link Tridiagonal#make(Access2D<N>)} instead
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static final <N extends Number> Tridiagonal<N> make(final Access2D<N> aTypical) {
-
-        final N tmpNumber = aTypical.get(0, 0);
-
-        if (tmpNumber instanceof BigDecimal) {
-            return (Tridiagonal<N>) TridiagonalDecomposition.makeBig();
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (Tridiagonal<N>) TridiagonalDecomposition.makeComplex();
-        } else if (tmpNumber instanceof Double) {
-            return (Tridiagonal<N>) TridiagonalDecomposition.makePrimitive();
-        } else {
-            throw new IllegalArgumentException();
-        }
+        return Tridiagonal.make(aTypical);
     }
 
+    /**
+     * @deprecated v38 Use {@link Tridiagonal#makeBig()} instead
+     */
+    @Deprecated
     public static final Tridiagonal<BigDecimal> makeBig() {
-        return new TridiagonalDecomposition.Big();
+        return Tridiagonal.makeBig();
     }
 
+    /**
+     * @deprecated v38 Use {@link Tridiagonal#makeComplex()} instead
+     */
+    @Deprecated
     public static final Tridiagonal<ComplexNumber> makeComplex() {
-        return new TridiagonalDecomposition.Complex();
+        return Tridiagonal.makeComplex();
     }
 
+    /**
+     * @deprecated v38 Use {@link Tridiagonal#makePrimitive()} instead
+     */
+    @Deprecated
     public static final Tridiagonal<Double> makePrimitive() {
-        return new TridiagonalDecomposition.Primitive();
+        return Tridiagonal.makePrimitive();
     }
 
     private transient MatrixStore<N> myD = null;

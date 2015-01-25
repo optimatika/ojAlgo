@@ -30,11 +30,13 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * You create instances of (some subclass of) this class by calling
- * the static factory method {@linkplain #makePrimitive()}.
+ * You create instances of (some subclass of) this class by calling the static factory method
+ * {@linkplain Schur#makePrimitive()}.
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Schur<N> {
 
     public static final class SchurResult<N extends Number> extends Object {
@@ -73,20 +75,21 @@ public abstract class SchurDecomposition<N extends Number> extends InPlaceDecomp
 
     }
 
+    /**
+     * @deprecated v38 Use {@link Schur#make(Access2D<N>)} instead
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static final <N extends Number> Schur<N> make(final Access2D<N> aTypical) {
-
-        final N tmpNumber = aTypical.get(0, 0);
-
-        if (tmpNumber instanceof Double) {
-            return (Schur<N>) SchurDecomposition.makePrimitive();
-        } else {
-            throw new IllegalArgumentException();
-        }
+        return Schur.make(aTypical);
     }
 
+    /**
+     * @deprecated v38 Use {@link Schur#makePrimitive()} instead
+     */
+    @Deprecated
     public static final Schur<Double> makePrimitive() {
-        return new Primitive();
+        return Schur.makePrimitive();
     }
 
     private Array1D<ComplexNumber> myDiagonal;

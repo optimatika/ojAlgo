@@ -38,10 +38,13 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain #makeBig()}, {@linkplain #makeComplex()}, {@linkplain #makePrimitive()} or {@linkplain #makeJama()}.
+ * {@linkplain Cholesky#makeBig()}, {@linkplain Cholesky#makeComplex()}, {@linkplain Cholesky#makePrimitive()} or
+ * {@linkplain Cholesky#makeJama()}.
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Cholesky<N> {
 
     static final class Big extends CholeskyDecomposition<BigDecimal> {
@@ -68,40 +71,45 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
 
     }
 
+    /**
+     * @deprecated v38 Use {@link Cholesky#make(Access2D<N>)} instead
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static final <N extends Number> Cholesky<N> make(final Access2D<N> aTypical) {
-
-        final N tmpNumber = aTypical.get(0, 0);
-
-        if (tmpNumber instanceof BigDecimal) {
-            return (Cholesky<N>) CholeskyDecomposition.makeBig();
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (Cholesky<N>) CholeskyDecomposition.makeComplex();
-        } else if (tmpNumber instanceof Double) {
-            if ((aTypical.countColumns() <= 32) || (aTypical.countColumns() >= 46340)) { //64,16,16
-                return (Cholesky<N>) CholeskyDecomposition.makeJama();
-            } else {
-                return (Cholesky<N>) CholeskyDecomposition.makePrimitive();
-            }
-        } else {
-            throw new IllegalArgumentException();
-        }
+        return Cholesky.make(aTypical);
     }
 
+    /**
+     * @deprecated v38 Use {@link Cholesky#makeBig()} instead
+     */
+    @Deprecated
     public static final Cholesky<BigDecimal> makeBig() {
-        return new CholeskyDecomposition.Big();
+        return Cholesky.makeBig();
     }
 
+    /**
+     * @deprecated v38 Use {@link Cholesky#makeComplex()} instead
+     */
+    @Deprecated
     public static final Cholesky<ComplexNumber> makeComplex() {
-        return new CholeskyDecomposition.Complex();
+        return Cholesky.makeComplex();
     }
 
+    /**
+     * @deprecated v38 Use {@link Cholesky#makeJama()} instead
+     */
+    @Deprecated
     public static final Cholesky<Double> makeJama() {
-        return new RawCholesky();
+        return Cholesky.makeJama();
     }
 
+    /**
+     * @deprecated v38 Use {@link Cholesky#makePrimitive()} instead
+     */
+    @Deprecated
     public static final Cholesky<Double> makePrimitive() {
-        return new CholeskyDecomposition.Primitive();
+        return Cholesky.makePrimitive();
     }
 
     private boolean mySPD = false;

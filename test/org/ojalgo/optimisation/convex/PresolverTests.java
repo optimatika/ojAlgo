@@ -26,7 +26,6 @@ import java.util.Arrays;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.SimpleEquationCase;
 import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.decomposition.LUDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 
 /**
@@ -54,7 +53,7 @@ public class PresolverTests extends OptimisationConvexTests {
 
         final MatrixStore<Double> tmpCombo = tmpBody.mergeColumns(tmpBody).mergeRows(tmpRHS.mergeColumns(tmpRHS)).toPrimitiveStore();
 
-        final LU<Double> tmpLU = LUDecomposition.makePrimitive();
+        final LU<Double> tmpLU = LU.makePrimitive();
 
         tmpLU.compute(tmpCombo);
 

@@ -39,10 +39,10 @@ import org.ojalgo.type.context.NumberContext;
 
 public class SingularValueTest extends MatrixDecompositionTests {
 
-    private static final SingularValue<BigDecimal> BIG = SingularValueDecomposition.makeBig();
-    private static final SingularValue<ComplexNumber> COMPLEX = SingularValueDecomposition.makeComplex();
-    private static final SingularValue<Double> JAMA = SingularValueDecomposition.makeJama();
-    private static final SingularValue<Double> DIRECT = SingularValueDecomposition.makePrimitive();
+    private static final SingularValue<BigDecimal> BIG = SingularValue.makeBig();
+    private static final SingularValue<ComplexNumber> COMPLEX = SingularValue.makeComplex();
+    private static final SingularValue<Double> JAMA = SingularValue.makeJama();
+    private static final SingularValue<Double> DIRECT = SingularValue.makePrimitive();
 
     private static final BasicMatrix FAT = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
     private static final BasicMatrix SQUARE = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
@@ -106,8 +106,8 @@ public class SingularValueTest extends MatrixDecompositionTests {
         final ComplexNumber[] tmpScales = new ComplexNumber[] { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
                 ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0), ComplexNumber.makePolar(1.0, (4.0 * Math.PI) / 3.0) };
 
-        final Bidiagonal<ComplexNumber> tmpBidiagonal = BidiagonalDecomposition.makeComplex();
-        final SingularValue<ComplexNumber> tmpSVD = SingularValueDecomposition.makeComplex();
+        final Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.makeComplex();
+        final SingularValue<ComplexNumber> tmpSVD = SingularValue.makeComplex();
 
         for (int s = 0; s < tmpScales.length; s++) {
 
@@ -162,7 +162,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         final PhysicalStore<ComplexNumber> tmpOriginal = MatrixUtils.makeRandomComplexStore(4, 4);
 
-        final SingularValue<ComplexNumber> tmpDecomposition = SingularValueDecomposition.makeComplex();
+        final SingularValue<ComplexNumber> tmpDecomposition = SingularValue.makeComplex();
 
         tmpDecomposition.compute(tmpOriginal);
 

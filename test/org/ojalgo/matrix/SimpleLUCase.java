@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.decomposition.LUDecomposition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -72,7 +71,7 @@ public class SimpleLUCase extends BasicMatrixTest {
 
         // PLDU
 
-        final LU<BigDecimal> tmpLU = LUDecomposition.makeBig();
+        final LU<BigDecimal> tmpLU = LU.makeBig();
         tmpLU.compute(SimpleLUCase.getOrginal().toBigStore());
 
         tmpLU.equals(SimpleLUCase.getOrginal().toBigStore(), EVALUATION);

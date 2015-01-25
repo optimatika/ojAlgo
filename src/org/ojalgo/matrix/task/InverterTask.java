@@ -26,9 +26,9 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
+import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
-import org.ojalgo.matrix.decomposition.LUDecomposition;
+import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -49,9 +49,9 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
         @Override
         public InverterTask<BigDecimal> make(final MatrixStore<BigDecimal> template, final boolean symmetric) {
             if (symmetric) {
-                return CholeskyDecomposition.make(template);
+                return Cholesky.make(template);
             } else {
-                return LUDecomposition.make(template);
+                return LU.make(template);
             }
         }
 
@@ -62,9 +62,9 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
         @Override
         public InverterTask<ComplexNumber> make(final MatrixStore<ComplexNumber> template, final boolean symmetric) {
             if (symmetric) {
-                return CholeskyDecomposition.make(template);
+                return Cholesky.make(template);
             } else {
-                return LUDecomposition.make(template);
+                return LU.make(template);
             }
         }
 
@@ -87,7 +87,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
                 } else if (tmpDim == 5L) {
                     return AbstractInverter.SYMMETRIC_5X5;
                 } else {
-                    return CholeskyDecomposition.make(template);
+                    return Cholesky.make(template);
                 }
             } else {
                 if (tmpDim == 2L) {
@@ -99,7 +99,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
                 } else if (tmpDim == 5L) {
                     return AbstractInverter.FULL_5X5;
                 } else {
-                    return LUDecomposition.make(template);
+                    return LU.make(template);
                 }
             }
         }

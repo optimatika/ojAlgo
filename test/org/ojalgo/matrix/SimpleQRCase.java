@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.decomposition.QRDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 
 /**
@@ -75,7 +74,7 @@ public class SimpleQRCase extends BasicMatrixTest {
 
         // QR
 
-        final QR<BigDecimal> tmpQR = QRDecomposition.makeBig();
+        final QR<BigDecimal> tmpQR = QR.makeBig();
         tmpQR.compute(SimpleQRCase.getOriginal().toBigStore());
 
         final MatrixStore<BigDecimal> tmpQ = tmpQR.getQ();

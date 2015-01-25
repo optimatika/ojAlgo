@@ -33,15 +33,17 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * This class adapts JAMA's CholeskyDecomposition to ojAlgo's {@linkplain Cholesky} interface.
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     private JamaCholesky myDelegate;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.CholeskyDecomposition#makeJama()} instead.
+     * {@linkplain org.ojalgo.matrix.decomposition.Cholesky#makeJama()} instead.
      */
     public RawCholesky() {
         super();

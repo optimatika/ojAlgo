@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -88,7 +87,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     public void testProblem() {
 
         final BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
-        final Cholesky<BigDecimal> tmpDecomp = CholeskyDecomposition.makeBig();
+        final Cholesky<BigDecimal> tmpDecomp = Cholesky.makeBig();
         tmpDecomp.compute(tmpMtrx.toBigStore());
 
         TestUtils.assertEquals(tmpMtrx.toBigStore(), tmpDecomp, EVALUATION);

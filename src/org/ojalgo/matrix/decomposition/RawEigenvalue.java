@@ -36,8 +36,10 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * This class adapts JAMA's EigenvalueDecomposition to ojAlgo's {@linkplain Eigenvalue} interface.
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Double> {
 
     public static final class General extends RawEigenvalue {
@@ -91,7 +93,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.EigenvalueDecomposition#makeJama()} instead.
+     * {@linkplain org.ojalgo.matrix.decomposition.Eigenvalue#makeJama()} instead.
      */
 
     protected RawEigenvalue() {

@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
@@ -1416,11 +1415,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public boolean isZero(final long row, final long column) {
         return myUtility.isZero(row, column);
-    }
-
-    public Iterator<Double> iterator() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public void maxpy(final Double aSclrA, final MatrixStore<Double> aMtrxX) {

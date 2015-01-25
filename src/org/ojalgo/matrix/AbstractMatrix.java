@@ -37,13 +37,9 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
 import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.decomposition.LUDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.decomposition.QRDecomposition;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.decomposition.SingularValueDecomposition;
 import org.ojalgo.matrix.store.*;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
@@ -627,7 +623,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     private final Eigenvalue<N> getEigenvalue() {
 
         if (myEigenvalue == null) {
-            myEigenvalue = EigenvalueDecomposition.make(myStore);
+            myEigenvalue = Eigenvalue.make(myStore);
         }
 
         return myEigenvalue;
@@ -635,21 +631,21 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     private final LU<N> getLU() {
         if (myLU == null) {
-            myLU = LUDecomposition.make(myStore);
+            myLU = LU.make(myStore);
         }
         return myLU;
     }
 
     private final QR<N> getQR() {
         if (myQR == null) {
-            myQR = QRDecomposition.make(myStore);
+            myQR = QR.make(myStore);
         }
         return myQR;
     }
 
     private final SingularValue<N> getSingularValue() {
         if (mySingularValue == null) {
-            mySingularValue = SingularValueDecomposition.make(myStore);
+            mySingularValue = SingularValue.make(myStore);
         }
         return mySingularValue;
     }

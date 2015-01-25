@@ -32,15 +32,17 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * This class adapts JAMA's LUDecomposition to ojAlgo's {@linkplain LU} interface.
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public final class RawLU extends RawDecomposition implements LU<Double> {
 
     private JamaLU myDelegate;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.LUDecomposition#makeJama()} instead.
+     * {@linkplain org.ojalgo.matrix.decomposition.LU#makeJama()} instead.
      */
     public RawLU() {
         super();

@@ -87,15 +87,15 @@ public interface BasicMatrix extends Access2D<Number> {
      * Do not use this method to populate large dense matrices! Only use it to change a few (a small number) of
      * elements.
      */
-    BasicMatrix add(int aRow, int aCol, Number aNmbr);
+    BasicMatrix add(int aRow, int aCol, Number value);
 
     /**
-     * Adds aNmbr to the elements of this.
+     * Adds value to the elements of this.
      *
-     * @param aNmbr What to add
-     * @return A new matrix whos elements are the sum of this' elements and aNmbr.
+     * @param value What to add
+     * @return A new matrix whos elements are the sum of this' elements and value.
      */
-    BasicMatrix add(Number aNmbr);
+    BasicMatrix add(Number value);
 
     /**
      * For real matrices conjugate() and transpose() are identical. For complex matrices they're not.
@@ -111,12 +111,12 @@ public interface BasicMatrix extends Access2D<Number> {
     Builder<? extends BasicMatrix> copyToBuilder();
 
     /**
-     * Divides the elements of this with aNmbr.
+     * Divides the elements of this with value.
      *
-     * @param aNmbr The denominator.
-     * @return A new matrix whos elements are the elements of this divided with aNmbr.
+     * @param value The denominator.
+     * @return A new matrix whos elements are the elements of this divided with value.
      */
-    BasicMatrix divide(Number aNmbr);
+    BasicMatrix divide(Number value);
 
     /**
      * Divides the elements of this with the elements of aMtrx. The matrices must have equal dimensions.
@@ -379,12 +379,12 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix multiply(Access2D<?> right);
 
     /**
-     * Multiplies the elements of this matrix with aNmbr.
+     * Multiplies the elements of this matrix with value.
      *
-     * @param aNmbr What to multiply with.
-     * @return A new matrix whos elements are the elements of this multiplied with aNmbr.
+     * @param value What to multiply with.
+     * @return A new matrix whos elements are the elements of this multiplied with value.
      */
-    BasicMatrix multiply(Number aNmbr);
+    BasicMatrix multiply(Number value);
 
     /**
      * Multiplies the elements of this matrix with the elements of aMtrx. The matrices must have equal dimensions.
@@ -466,10 +466,10 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix subtract(Access2D<?> aMtrx);
 
     /**
-     * Subtracts aNmbr from the elements of this matrix.
+     * Subtracts value from the elements of this matrix.
      *
      * @param value What to subtract.
-     * @return A new matrix whos elements are the differences between this' elements and aNmbr.
+     * @return A new matrix whos elements are the differences between this' elements and value.
      */
     BasicMatrix subtract(Number value);
 

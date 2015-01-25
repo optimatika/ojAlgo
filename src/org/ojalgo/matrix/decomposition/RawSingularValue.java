@@ -34,8 +34,10 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * This class adapts JAMA's SingularValueDecomposition to ojAlgo's {@linkplain SingularValue} interface. speed: 52.641s
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public final class RawSingularValue extends RawDecomposition implements SingularValue<Double> {
 
     private JamaSingularValue myDelegate;
@@ -44,7 +46,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.SingularValueDecomposition#makeJama()} instead.
+     * {@linkplain org.ojalgo.matrix.decomposition.SingularValue#makeJama()} instead.
      */
     public RawSingularValue() {
         super();
