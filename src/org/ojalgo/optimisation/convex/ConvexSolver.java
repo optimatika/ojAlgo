@@ -23,19 +23,12 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.array.Array1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.multiary.FirstOrderApproximation;
-import org.ojalgo.function.multiary.LinearFunction;
-import org.ojalgo.function.multiary.MultiaryFunction;
-import org.ojalgo.function.multiary.QuadraticFunction;
-import org.ojalgo.function.multiary.SecondOrderApproximation;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -43,13 +36,11 @@ import org.ojalgo.optimisation.BaseSolver;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.type.IndexSelector;
 
 /**
- * QuadraticSolver solves optimisation problems of the form:
+ * ConvexSolver solves optimisation problems of the form:
  * <p>
  * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
  * when [AE][X] == [BE]<br>
@@ -89,13 +80,6 @@ public abstract class ConvexSolver extends BaseSolver {
             super(matrices);
         }
 
-        Builder(final ExpressionsBasedModel aModel) {
-
-            super(aModel);
-
-            ConvexSolver.copy(aModel, this);
-        }
-
         Builder(final MatrixStore<Double> C) {
             super(C);
         }
@@ -109,16 +93,14 @@ public abstract class ConvexSolver extends BaseSolver {
 
             this.validate();
 
-            final ExpressionsBasedModel tmpModel = this.getModel();
-
             if (this.hasInequalityConstraints()) {
-                return new ActiveSetSolver(tmpModel, options, this);
+                return new ActiveSetSolver(this, options);
             } else if (this.hasEqualityConstraints()) {
                 //return new LagrangeSolver2(tmpModel, options, this);
-                return new QPESolver(tmpModel, options, this);
+                return new QPESolver(this, options);
                 //return new NullspaceSolver(tmpModel, options, this);
             } else {
-                return new UnconstrainedSolver(tmpModel, options, this);
+                return new UnconstrainedSolver(this, options);
             }
 
         }
@@ -134,98 +116,26 @@ public abstract class ConvexSolver extends BaseSolver {
         }
 
         @Override
-        public ConvexSolver.Builder inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI, final ModelEntity<?>[] originatingEntities) {
-            return super.inequalities(AI, BI, originatingEntities);
-        }
-
-        @Override
-        protected Builder objective(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
+        public Builder objective(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
             return super.objective(Q, C);
         }
 
     }
 
-    static final class ObjectiveFunction implements MultiaryFunction.TwiceDifferentiable<Double>, MultiaryFunction.Convex<Double>,
-    MultiaryFunction.Quadratic<Double>, MultiaryFunction.Linear<Double> {
-
-        private final LinearFunction<Double> myLinear;
-        private final QuadraticFunction<Double> myQuadratic;
-
-        public ObjectiveFunction(final int arity) {
-
-            super();
-
-            myQuadratic = QuadraticFunction.makePrimitive(arity);
-            myLinear = LinearFunction.makePrimitive(arity);
-        }
-
-        @SuppressWarnings("unused")
-        private ObjectiveFunction() {
-            this(0);
-        }
-
-        public int arity() {
-            return myLinear.arity();
-        }
-
-        public MatrixStore<Double> getGradient(final Access1D<Double> arg) {
-            return this.quadratic().multiplyRight(arg).subtract(this.linear());
-        }
-
-        public MatrixStore<Double> getHessian(final Access1D<Double> arg) {
-            return myQuadratic.quadratic();
-        }
-
-        public Double invoke(final Access1D<Double> arg) {
-
-            final double tmpQPart = myQuadratic.invoke(arg).doubleValue();
-            final double tmpLPart = myLinear.invoke(arg).doubleValue();
-
-            return (tmpQPart * 0.5) - tmpLPart;
-        }
-
-        public PhysicalStore<Double> linear() {
-            return myLinear.linear();
-        }
-
-        public PhysicalStore<Double> quadratic() {
-            return myQuadratic.quadratic();
-        }
-
-        public FirstOrderApproximation<Double> toFirstOrderApproximation(final Access1D<Double> point) {
-            return new FirstOrderApproximation<>(this, point);
-        }
-
-        public SecondOrderApproximation<Double> toSecondOrderApproximation(final Access1D<Double> point) {
-            return new SecondOrderApproximation<>(this, point);
-        }
-
-    }
-
-    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
-
-    public static ConvexSolver make(final ExpressionsBasedModel aModel) {
-
-        final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(aModel);
-
-        return tmpBuilder.build();
-    }
-
-    @SuppressWarnings("unchecked")
-    static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
+    public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
         final List<Variable> tmpFreeVariables = sourceModel.getFreeVariables();
         final Set<Index> tmpFixedVariables = sourceModel.getFixedVariables();
         final int tmpFreeVarDim = tmpFreeVariables.size();
 
-        final Array1D<Double> tmpCurrentSolution = Array1D.PRIMITIVE.makeZero(tmpFreeVarDim);
-        for (int i = 0; i < tmpFreeVariables.size(); i++) {
-            final BigDecimal tmpValue = tmpFreeVariables.get(i).getValue();
-            if (tmpValue != null) {
-                tmpCurrentSolution.set(i, tmpValue.doubleValue());
-            }
-        }
-        final Optimisation.Result tmpKickStarter = new Optimisation.Result(Optimisation.State.UNEXPLORED, Double.NaN, tmpCurrentSolution);
+        //        final Array1D<Double> tmpCurrentSolution = Array1D.PRIMITIVE.makeZero(tmpFreeVarDim);
+        //        for (int i = 0; i < tmpFreeVariables.size(); i++) {
+        //            final BigDecimal tmpValue = tmpFreeVariables.get(i).getValue();
+        //            if (tmpValue != null) {
+        //                tmpCurrentSolution.set(i, tmpValue.doubleValue());
+        //            }
+        //        }
+        //        final Optimisation.Result tmpKickStarter = new Optimisation.Result(Optimisation.State.UNEXPLORED, Double.NaN, tmpCurrentSolution);
 
         // AE & BE
 
@@ -310,8 +220,6 @@ public abstract class ConvexSolver extends BaseSolver {
 
         if ((tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim) > 0) {
 
-            final ModelEntity<?>[] tmpEntities = new ModelEntity<?>[tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim];
-
             final PhysicalStore<Double> tmpUAI = FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim, tmpFreeVarDim);
             final PhysicalStore<Double> tmpUBI = FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim, 1);
 
@@ -325,7 +233,6 @@ public abstract class ConvexSolver extends BaseSolver {
                         }
                     }
                     tmpUBI.set(i, 0, tmpExpression.getCompensatedUpperLimit(tmpFixedVariables));
-                    tmpEntities[i] = tmpExpression;
                 }
             }
 
@@ -334,7 +241,6 @@ public abstract class ConvexSolver extends BaseSolver {
                     final Variable tmpVariable = tmpUpVar.get(i);
                     tmpUAI.set(tmpUpExprDim + i, sourceModel.indexOfFreeVariable(tmpVariable), tmpVariable.getAdjustmentFactor());
                     tmpUBI.set(tmpUpExprDim + i, 0, tmpVariable.getAdjustedUpperLimit());
-                    tmpEntities[tmpUpExprDim + i] = tmpVariable;
                 }
             }
 
@@ -351,7 +257,6 @@ public abstract class ConvexSolver extends BaseSolver {
                         }
                     }
                     tmpLBI.set(i, 0, -tmpExpression.getCompensatedLowerLimit(tmpFixedVariables));
-                    tmpEntities[tmpUpExprDim + tmpUpVarDim + i] = tmpExpression;
                 }
             }
 
@@ -360,33 +265,26 @@ public abstract class ConvexSolver extends BaseSolver {
                     final Variable tmpVariable = tmpLoVar.get(i);
                     tmpLAI.set(tmpLoExprDim + i, sourceModel.indexOfFreeVariable(tmpVariable), -tmpVariable.getAdjustmentFactor());
                     tmpLBI.set(tmpLoExprDim + i, 0, -tmpVariable.getAdjustedLowerLimit());
-                    tmpEntities[tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + i] = tmpVariable;
                 }
             }
 
             final MatrixStore<Double> tmpAI = tmpLAI.builder().above(tmpUAI).build();
             final MatrixStore<Double> tmpBI = tmpLBI.builder().above(tmpUBI).build();
 
-            destinationBuilder.inequalities(tmpAI, tmpBI, tmpEntities);
-
-            final IndexSelector tmpSelector = new IndexSelector(tmpEntities.length);
-            for (int i = 0; i < tmpEntities.length; i++) {
-                if (tmpEntities[i].isActiveInequalityConstraint()) {
-                    tmpSelector.include(i);
-                }
-            }
-
-            tmpKickStarter.activeSet(tmpSelector.getIncluded());
+            destinationBuilder.inequalities(tmpAI, tmpBI);
         }
-
-        destinationBuilder.setKickStarter(tmpKickStarter);
-        //destinationBuilder.setKickStarter(null);
     }
+
+    public static ConvexSolver.Builder getBuilder() {
+        return new ConvexSolver.Builder();
+    }
+
+    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     private transient KKTSolver myDelegateSolver = null;
 
-    protected ConvexSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
-        super(aModel, solverOptions, matrices);
+    protected ConvexSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+        super(matrices, solverOptions);
     }
 
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
@@ -420,33 +318,8 @@ public abstract class ConvexSolver extends BaseSolver {
     @Override
     protected MatrixStore<Double> extractSolution() {
 
-        final ExpressionsBasedModel tmpModel = this.getModel();
+        return this.getSolutionX().copy();
 
-        if (tmpModel != null) {
-
-            final List<Variable> tmpFreeVariables = tmpModel.getFreeVariables();
-            final Set<Index> tmpFixedVariables = tmpModel.getFixedVariables();
-
-            final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpFixedVariables.size() + tmpFreeVariables.size(), 1);
-
-            for (final Index tmpVariable : tmpFixedVariables) {
-                retVal.set(tmpVariable.index, 0, tmpModel.getVariable(tmpVariable.index).getValue().doubleValue());
-            }
-
-            final MatrixStore<Double> tmpSolutionX = this.getSolutionX();
-            for (int i = 0; i < tmpFreeVariables.size(); i++) {
-                final Variable tmpVariable = tmpFreeVariables.get(i);
-                final int tmpIndexOf = tmpModel.indexOf(tmpVariable);
-                retVal.set(tmpIndexOf, 0, tmpSolutionX.doubleValue(i));
-
-            }
-
-            return retVal;
-
-        } else {
-
-            return this.getSolutionX().copy();
-        }
     }
 
     abstract protected void performIteration();
@@ -478,4 +351,11 @@ public abstract class ConvexSolver extends BaseSolver {
         return this.getX();
     }
 
+    @Override
+    protected double evaluateFunction(final Access1D<?> solution) {
+
+        final MatrixStore<Double> tmpX = this.getSolutionX();
+
+        return this.getQ().multiply(tmpX).multiplyLeft(tmpX.transpose()).scale(0.5).subtract(this.getC().multiplyLeft(tmpX.transpose())).doubleValue(0L);
+    }
 }

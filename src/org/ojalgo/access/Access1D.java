@@ -21,8 +21,13 @@
  */
 package org.ojalgo.access;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.BaseStream;
+import java.util.stream.StreamSupport;
 
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
@@ -50,23 +55,18 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         boolean isAbsolute(long index);
 
         /**
-         * @see Scalar#isPositive()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long)} and {@link #isZero(long)}.
+         * @see Scalar#isSmall(double)
          */
-        @Deprecated
-        boolean isPositive(long index);
+        boolean isSmall(long index, double comparedTo);
 
         /**
          * @see Scalar#isZero()
          * @deprecated v37
          */
         @Deprecated
-        boolean isZero(long index);
-
-        /**
-         * @see Scalar#isSmall(double)
-         */
-        boolean isSmall(long index, double comparedTo);
+        default boolean isZero(final long index) {
+            return this.isSmall(index, PrimitiveMath.ONE);
+        }
 
     }
 
@@ -90,7 +90,11 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
         void fillAll(N value);
 
+        void fillAll(NullaryFunction<N> supplier);
+
         void fillRange(long first, long limit, N value);
+
+        void fillRange(long first, long limit, NullaryFunction<N> supplier);
 
         void set(long index, double value);
 
@@ -101,6 +105,8 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     public interface Modifiable<N extends Number> extends Structure1D {
 
         void modifyAll(UnaryFunction<N> function);
+
+        void modifyOne(long index, UnaryFunction<N> function);
 
         void modifyRange(long first, long limit, UnaryFunction<N> function);
 
@@ -117,5 +123,13 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     double doubleValue(long index);
 
     N get(long index);
+
+    default Iterator<N> iterator() {
+        return new Iterator1D<>(this);
+    }
+
+    default BaseStream<N, ? extends BaseStream<N, ?>> stream(final boolean parallel) {
+        return StreamSupport.stream(this.spliterator(), parallel);
+    }
 
 }

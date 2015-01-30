@@ -24,6 +24,8 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Consumer2D;
+import org.ojalgo.access.Supplier2D;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
@@ -265,7 +267,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
         }
 
         public final Builder<N> multiplyRight(final Access1D<N> rightMtrx) {
-            myStore = myStore.multiplyRight(rightMtrx);
+            myStore = myStore.multiply(rightMtrx);
             return this;
         }
 
@@ -354,6 +356,29 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
 
     }
 
+    public static interface ElementsConsumer<N extends Number> extends Consumer2D<Access2D<N>>, Access2D.Fillable<N>, Access2D.Modifiable<N> {
+
+        default void accept(final MatrixStore.ElementsSupplier<N> supplier) {
+            supplier.supplyTo(this);
+        }
+
+        default boolean isAcceptable(final MatrixStore.ElementsSupplier<N> supplier) {
+            return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
+        }
+
+        /**
+         * @return A consumer (sub)region
+         */
+        ElementsConsumer<N> region(int row, int column);
+
+    }
+
+    public static interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixStore<N>> {
+
+        void supplyTo(ElementsConsumer<N> target);
+
+    }
+
     MatrixStore<N> add(MatrixStore<N> addend);
 
     N aggregateAll(Aggregator aggregator);
@@ -392,9 +417,17 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
      */
     boolean isUpperRightShaded();
 
+    MatrixStore<N> multiply(Access1D<N> right);
+
     MatrixStore<N> multiplyLeft(Access1D<N> leftMtrx);
 
-    MatrixStore<N> multiplyRight(Access1D<N> rightMtrx);
+    /**
+     * @deprecated v38
+     */
+    @Deprecated
+    default MatrixStore<N> multiplyRight(final Access1D<N> right) {
+        return this.multiply(right);
+    }
 
     MatrixStore<N> negate();
 

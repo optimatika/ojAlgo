@@ -21,11 +21,9 @@
  */
 package org.ojalgo.matrix;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.jama.JamaEigenvalue;
+import org.ojalgo.matrix.decomposition.RawEigenvalue;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -72,9 +70,9 @@ public class P20061119Case extends BasicMatrixTest {
     @Override
     public void testProblem() {
 
-        final BasicMatrix<BigDecimal> tmpMatrix = P20061119Case.getProblematic();
+        final BasicMatrix tmpMatrix = P20061119Case.getProblematic();
 
-        final Eigenvalue<Double> tmpEigenvalue = new JamaEigenvalue.General();
+        final Eigenvalue<Double> tmpEigenvalue = new RawEigenvalue.General();
         tmpEigenvalue.compute(tmpMatrix);
 
         TestUtils.assertEquals(tmpMatrix.toPrimitiveStore(), tmpEigenvalue, EVALUATION);

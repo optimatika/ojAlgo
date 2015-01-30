@@ -29,15 +29,16 @@ public abstract class OptimisationIntegerTests extends FunctionalityTest {
     public static Test suite() {
         final TestSuite suite = new TestSuite(OptimisationIntegerTests.class.getPackage().getName());
         //$JUnit-BEGIN$
+        suite.addTestSuite(DesignCase.class);
         suite.addTestSuite(KnapsackTest.class);
-        suite.addTestSuite(ReportedProblems.class);
-        suite.addTestSuite(UCLAee236aCase.class);
         //suite.addTestSuite(LpsolveSemiContCase.class);
         suite.addTestSuite(MarketShareCase.class);
         //suite.addTestSuite(MipCase.class);
         suite.addTestSuite(RelaxedLpCase.class);
+        suite.addTestSuite(ReportedProblems.class);
         suite.addTestSuite(SpecificBranchCase.class);
         suite.addTestSuite(StrategyMixer.class);
+        suite.addTestSuite(UCLAee236aCase.class);
         //$JUnit-END$
         return suite;
     }

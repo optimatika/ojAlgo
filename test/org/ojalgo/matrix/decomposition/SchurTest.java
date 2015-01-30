@@ -42,7 +42,7 @@ public class SchurTest extends MatrixDecompositionTests {
 
         MatrixStore<Double> tmpRecreatedMatrix;
 
-        final Schur<Double> tmpSchurDecomp = SchurDecomposition.makePrimitive();
+        final Schur<Double> tmpSchurDecomp = Schur.makePrimitive();
         tmpSchurDecomp.compute(originalMatrix);
 
         final Array1D<ComplexNumber> tmpDiagonal = tmpSchurDecomp.getDiagonal();
@@ -80,10 +80,10 @@ public class SchurTest extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 },
                 { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
-        final ComplexNumber tmp00 = ComplexNumber.makeReal(4.0);
-        final ComplexNumber tmp11 = ComplexNumber.makeReal(3.0);
-        final ComplexNumber tmp22 = ComplexNumber.makeReal(2.0);
-        final ComplexNumber tmp33 = ComplexNumber.makeReal(1.0);
+        final ComplexNumber tmp00 = ComplexNumber.valueOf(4.0);
+        final ComplexNumber tmp11 = ComplexNumber.valueOf(3.0);
+        final ComplexNumber tmp22 = ComplexNumber.valueOf(2.0);
+        final ComplexNumber tmp33 = ComplexNumber.valueOf(1.0);
 
         final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33 });
 
@@ -99,8 +99,8 @@ public class SchurTest extends MatrixDecompositionTests {
         final double tmp00 = 3.0 + Math.sqrt(13.0);
         final double tmp11 = 3.0 - Math.sqrt(13.0);
         final double tmp22 = -1.0;
-        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { ComplexNumber.makeReal(tmp00),
-                ComplexNumber.makeReal(tmp11), ComplexNumber.makeReal(tmp22) });
+        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { ComplexNumber.valueOf(tmp00),
+                ComplexNumber.valueOf(tmp11), ComplexNumber.valueOf(tmp22) });
 
         SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 3));
 
@@ -114,8 +114,8 @@ public class SchurTest extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpOriginalMatrix = P20061119Case.getProblematic().toPrimitiveStore();
 
-        final ComplexNumber tmp00 = ComplexNumber.makeReal(26.14421883828456);
-        final ComplexNumber tmp11 = ComplexNumber.makeRectangular(2.727890580857718, 3.6223578444417908);
+        final ComplexNumber tmp00 = ComplexNumber.valueOf(26.14421883828456);
+        final ComplexNumber tmp11 = new ComplexNumber(2.727890580857718, 3.6223578444417908);
         final ComplexNumber tmp22 = tmp11.conjugate();
         final ComplexNumber tmp33 = ComplexNumber.ZERO;
         final ComplexNumber tmp44 = tmp33;
@@ -135,8 +135,8 @@ public class SchurTest extends MatrixDecompositionTests {
                 { 1 / PrimitiveMath.SQRT_TWO, 1 / PrimitiveMath.SQRT_TWO }, { -1 / PrimitiveMath.SQRT_TWO, 1 / PrimitiveMath.SQRT_TWO } });
         final double tmp00 = -2;
         final double tmp11 = 3.0;
-        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { ComplexNumber.makeReal(tmp00),
-                ComplexNumber.makeReal(tmp11) });
+        final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { ComplexNumber.valueOf(tmp00),
+                ComplexNumber.valueOf(tmp11) });
         final PhysicalStore<Double> tmpExpectedU = PrimitiveDenseStore.FACTORY.rows(new double[][] { { tmp00, 9 }, { 0.0, tmp11 } });
 
         SchurTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 5));

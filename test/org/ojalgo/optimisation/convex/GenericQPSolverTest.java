@@ -80,16 +80,16 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
 
         final MatrixStore<Double> tmpExpected = myBE;
 
-        MatrixStore<Double> tmpActual = myAE.multiplyRight(myXE);
+        MatrixStore<Double> tmpActual = myAE.multiply(myXE);
         AccessUtils.equals(tmpExpected, tmpActual, myEvaluationContext);
 
-        tmpActual = myAE.multiplyRight(myXI);
+        tmpActual = myAE.multiply(myXI);
         TestUtils.assertEquals(tmpExpected, tmpActual, myEvaluationContext);
 
         if ((myAI != null) && (myBI != null)) {
 
             final PhysicalStore<Double> tmpSlack = myBI.copy();
-            tmpSlack.fillMatching(tmpSlack, PrimitiveFunction.SUBTRACT, myAI.multiplyRight(myXI));
+            tmpSlack.fillMatching(tmpSlack, PrimitiveFunction.SUBTRACT, myAI.multiply(myXI));
 
             for (int i = 0; i < tmpSlack.countRows(); i++) {
                 TestUtils.assertTrue(tmpSlack.doubleValue(i, 0) > -myEvaluationContext.epsilon());
@@ -109,14 +109,14 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     /**
      * @return {[AE],[BE],[Q],[C],[AI],[BI],[X only E constraints],[X both E and I constraints]}
      */
-    abstract protected BasicMatrix<?>[] getMatrices();
+    abstract protected BasicMatrix[] getMatrices();
 
     @Override
     protected void setUp() throws Exception {
 
         super.setUp();
 
-        final BasicMatrix<?>[] tmpMatrices = this.getMatrices();
+        final BasicMatrix[] tmpMatrices = this.getMatrices();
 
         if (tmpMatrices[0] != null) {
             myAE = tmpMatrices[0].enforce(StandardType.DECIMAL_064).toPrimitiveStore();

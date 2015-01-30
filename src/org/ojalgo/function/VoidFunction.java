@@ -21,7 +21,18 @@
  */
 package org.ojalgo.function;
 
-public interface VoidFunction<N extends Number> extends BasicFunction<N> {
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+
+public interface VoidFunction<N extends Number> extends BasicFunction<N>, Consumer<N>, DoubleConsumer {
+
+    default void accept(final double arg) {
+        this.invoke(arg);
+    }
+
+    default void accept(final N arg) {
+        this.invoke(arg);
+    }
 
     void invoke(double arg);
 

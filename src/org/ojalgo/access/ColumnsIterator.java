@@ -73,10 +73,6 @@ public class ColumnsIterator<N extends Number> implements Access1D<N>, Iterator<
         return (myCurrentColumn + 1L) < myAccess2D.countColumns();
     }
 
-    public Iterator<N> iterator() {
-        return new Iterator1D<>(this);
-    }
-
     public Access1D<N> next() {
         myCurrentColumn++;
         return this;

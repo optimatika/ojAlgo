@@ -21,9 +21,15 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.math.BigDecimal;
+
 import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.decomposition.QRDecomposition.Big;
+import org.ojalgo.matrix.decomposition.QRDecomposition.Complex;
+import org.ojalgo.matrix.decomposition.QRDecomposition.Primitive;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.task.DeterminantTask;
+import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * QR: [A] = [Q][R] Decomposes [this] into [Q] and [R] where:
@@ -37,6 +43,45 @@ import org.ojalgo.matrix.task.DeterminantTask;
  * @author apete
  */
 public interface QR<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
+
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> QR<N> make(final Access2D<N> aTypical) {
+
+        final N tmpNumber = aTypical.get(0, 0);
+
+        if (tmpNumber instanceof BigDecimal) {
+            return (QR<N>) QR.makeBig();
+        } else if (tmpNumber instanceof ComplexNumber) {
+            return (QR<N>) QR.makeComplex();
+        } else if (tmpNumber instanceof Double) {
+
+            final int tmpMaxDim = (int) Math.max(aTypical.countRows(), aTypical.countColumns());
+
+            if ((tmpMaxDim <= 16) || (tmpMaxDim >= 46340)) { //16,16,8
+                return (QR<N>) QR.makeJama();
+            } else {
+                return (QR<N>) QR.makePrimitive();
+            }
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static QR<BigDecimal> makeBig() {
+        return new Big();
+    }
+
+    public static QR<ComplexNumber> makeComplex() {
+        return new Complex();
+    }
+
+    public static QR<Double> makeJama() {
+        return new RawQR();
+    }
+
+    public static QR<Double> makePrimitive() {
+        return new Primitive();
+    }
 
     /**
      * @param matrix A matrix to decompose

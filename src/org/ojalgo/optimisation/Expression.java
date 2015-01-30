@@ -50,6 +50,7 @@ import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.function.multiary.QuadraticFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -578,13 +579,6 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
-
-        final BigDecimal tmpValue = this.evaluate(solution);
-
-        return this.validate(tmpValue, context);
-    }
-
     private final BigDecimal convert(final BigDecimal value, final boolean adjusted) {
 
         if (value != null) {
@@ -691,6 +685,13 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         return myAdjustmentExponent;
+    }
+
+    protected boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final BasicLogger.Appender appender) {
+
+        final BigDecimal tmpValue = this.evaluate(solution);
+
+        return this.validate(tmpValue, context, appender);
     }
 
     void appendToString(final StringBuilder aStringBuilder, final Access1D<BigDecimal> aCurrentState) {
@@ -876,7 +877,7 @@ public final class Expression extends ModelEntity<Expression> {
                     // This constraint has 0 remaining free variable
                     // It is entirely redundant
 
-                    myInfeasible = !this.validate(tmpFixedValue, myModel.options.slack);
+                    myInfeasible = !this.validate(tmpFixedValue, myModel.options.slack, myModel.appender());
                     if (!myInfeasible) {
                         myRedundant = true;
                         this.level(tmpFixedValue);
@@ -898,7 +899,7 @@ public final class Expression extends ModelEntity<Expression> {
                         final BigDecimal tmpCompensatedLevel = BigFunction.SUBTRACT.invoke(this.getUpperLimit(), tmpFixedValue);
                         final BigDecimal tmpSolutionValue = BigFunction.DIVIDE.invoke(tmpCompensatedLevel, tmpFactor);
 
-                        myInfeasible = !tmpVariable.validate(tmpSolutionValue, myModel.options.slack);
+                        myInfeasible = !tmpVariable.validate(tmpSolutionValue, myModel.options.slack, myModel.appender());
                         if (!myInfeasible) {
                             myRedundant = true;
                             tmpVariable.level(tmpSolutionValue);

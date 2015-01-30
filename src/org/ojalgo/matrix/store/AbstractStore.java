@@ -22,13 +22,10 @@
 package org.ojalgo.matrix.store;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -131,16 +128,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return this.toScalar(row, column).isAbsolute();
     }
 
-    public boolean isPositive(final long index) {
-        final Scalar<N> tmpScalar = this.toScalar(index);
-        return tmpScalar.isAbsolute() && !tmpScalar.isSmall(PrimitiveMath.ONE);
-    }
-
-    public boolean isPositive(final long row, final long column) {
-        final Scalar<N> tmpScalar = this.toScalar(row, column);
-        return tmpScalar.isAbsolute() && !tmpScalar.isSmall(PrimitiveMath.ONE);
-    }
-
     /**
      * @see org.ojalgo.access.Access1D.Elements#isSmall(long, double)
      */
@@ -153,18 +140,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
      */
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return this.toScalar(row, column).isSmall(comparedTo);
-    }
-
-    public boolean isZero(final long index) {
-        return this.toScalar(index).isSmall(PrimitiveMath.ONE);
-    }
-
-    public boolean isZero(final long row, final long column) {
-        return this.toScalar(row, column).isSmall(PrimitiveMath.ONE);
-    }
-
-    public final Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     /**
@@ -183,16 +158,16 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
     }
 
     /**
-     * @see org.ojalgo.matrix.store.MatrixStore#multiplyRight(org.ojalgo.matrix.store.MatrixStore)
+     * @see org.ojalgo.matrix.store.MatrixStore#multiply(org.ojalgo.matrix.store.MatrixStore)
      */
-    public MatrixStore<N> multiplyRight(final Access1D<N> rightMtrx) {
+    public MatrixStore<N> multiply(final Access1D<N> right) {
 
         final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = (int) (rightMtrx.count() / this.getColDim());
+        final int tmpColDim = (int) (right.count() / this.getColDim());
 
         final PhysicalStore<N> retVal = this.factory().makeZero(tmpRowDim, tmpColDim);
 
-        retVal.fillByMultiplying(this, rightMtrx);
+        retVal.fillByMultiplying(this, right);
 
         return retVal;
     }
@@ -257,7 +232,7 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
     }
 
     private Scalar<N> toScalar(final long index) {
-        return this.toScalar(AccessUtils.row((int) index, myRowDim), AccessUtils.column((int) index, myRowDim));
+        return this.toScalar(AccessUtils.row(index, myRowDim), AccessUtils.column(index, myRowDim));
     }
 
     protected final int getColDim() {

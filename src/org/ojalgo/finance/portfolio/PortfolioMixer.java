@@ -194,13 +194,13 @@ public final class PortfolioMixer {
             }
         }
 
-        //        tmpModel.options.debug_stream = BasicLogger.DEBUG;
-        //        tmpModel.options.debug_solver = IntegerSolver.class;
+        //        tmpModel.options.debug(GenericSolver.class);
+        //        tmpModel.options.validate = false;
 
         tmpModel.minimise();
 
-        //        BasicLogger.logDebug(tmpModel.toString());
-        //        BasicLogger.logDebug(Arrays.toString(tmpVariables));
+        //        BasicLogger.debug(tmpModel.toString());
+        //        BasicLogger.debug(Arrays.toString(tmpVariables));
 
         final ArrayList<BigDecimal> retVal = new ArrayList<BigDecimal>(tmpNumberOfComponents);
         for (int v = 0; v < tmpNumberOfComponents; v++) {

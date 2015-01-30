@@ -22,11 +22,9 @@
 package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
@@ -141,10 +139,6 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
 
     public int getRowDim() {
         return myDim;
-    }
-
-    public Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     public DiagonalAccess<N> rows(final int aFirst, final int aLimit) {

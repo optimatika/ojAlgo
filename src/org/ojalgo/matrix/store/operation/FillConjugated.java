@@ -29,6 +29,8 @@ import org.ojalgo.type.TypeUtils;
 
 public final class FillConjugated extends MatrixOperation {
 
+    public static final FillConjugated SETUP = new FillConjugated();
+
     public static int THRESHOLD = 128;
 
     public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int limitColumn, final Access2D<?> source) {
@@ -50,6 +52,11 @@ public final class FillConjugated extends MatrixOperation {
 
     private FillConjugated() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

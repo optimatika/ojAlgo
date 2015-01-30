@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.jama.JamaQR;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -38,10 +37,13 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain #makeBig()}, {@linkplain #makeComplex()}, {@linkplain #makePrimitive()} or {@linkplain #makeJama()}.
+ * {@linkplain QR#makeBig()}, {@linkplain QR#makeComplex()}, {@linkplain QR#makePrimitive()} or
+ * {@linkplain QR#makeJama()}.
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N> implements QR<N> {
 
     static final class Big extends QRDecomposition<BigDecimal> {
@@ -68,43 +70,45 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
 
     }
 
+    /**
+     * @deprecated v38 Use {@link QR#make(Access2D<N>)} instead
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static final <N extends Number> QR<N> make(final Access2D<N> aTypical) {
-
-        final N tmpNumber = aTypical.get(0, 0);
-
-        if (tmpNumber instanceof BigDecimal) {
-            return (QR<N>) QRDecomposition.makeBig();
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (QR<N>) QRDecomposition.makeComplex();
-        } else if (tmpNumber instanceof Double) {
-
-            final int tmpMaxDim = (int) Math.max(aTypical.countRows(), aTypical.countColumns());
-
-            if ((tmpMaxDim <= 16) || (tmpMaxDim >= 46340)) { //16,16,8
-                return (QR<N>) QRDecomposition.makeJama();
-            } else {
-                return (QR<N>) QRDecomposition.makePrimitive();
-            }
-        } else {
-            throw new IllegalArgumentException();
-        }
+        return QR.make(aTypical);
     }
 
+    /**
+     * @deprecated v38 Use {@link QR#makeBig()} instead
+     */
+    @Deprecated
     public static final QR<BigDecimal> makeBig() {
-        return new Big();
+        return QR.makeBig();
     }
 
+    /**
+     * @deprecated v38 Use {@link QR#makeComplex()} instead
+     */
+    @Deprecated
     public static final QR<ComplexNumber> makeComplex() {
-        return new Complex();
+        return QR.makeComplex();
     }
 
+    /**
+     * @deprecated v38 Use {@link QR#makeJama()} instead
+     */
+    @Deprecated
     public static final QR<Double> makeJama() {
-        return new JamaQR();
+        return QR.makeJama();
     }
 
+    /**
+     * @deprecated v38 Use {@link QR#makePrimitive()} instead
+     */
+    @Deprecated
     public static final QR<Double> makePrimitive() {
-        return new Primitive();
+        return QR.makePrimitive();
     }
 
     private boolean myFullSize = false;

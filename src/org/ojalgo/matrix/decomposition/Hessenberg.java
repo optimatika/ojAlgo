@@ -21,14 +21,15 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.math.BigDecimal;
+
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * Hessenberg: [A] = [Q][H][Q]<sup>T</sup>
- * A general square matrix [A] can be decomposed by orthogonal
- * similarity transformations into the form [A]=[Q][H][Q]<sup>T</sup>
- * where
+ * Hessenberg: [A] = [Q][H][Q]<sup>T</sup> A general square matrix [A] can be decomposed by orthogonal similarity
+ * transformations into the form [A]=[Q][H][Q]<sup>T</sup> where
  * <ul>
  * <li>[H] is upper (or lower) hessenberg matrix</li>
  * <li>[Q] is orthogonal/unitary</li>
@@ -37,6 +38,34 @@ import org.ojalgo.matrix.store.MatrixStore;
  * @author apete
  */
 public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
+
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> Hessenberg<N> make(final Access2D<N> aTypical) {
+
+        final N tmpNumber = aTypical.get(0, 0);
+
+        if (tmpNumber instanceof BigDecimal) {
+            return (Hessenberg<N>) Hessenberg.makeBig();
+        } else if (tmpNumber instanceof ComplexNumber) {
+            return (Hessenberg<N>) Hessenberg.makeComplex();
+        } else if (tmpNumber instanceof Double) {
+            return (Hessenberg<N>) Hessenberg.makePrimitive();
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static Hessenberg<BigDecimal> makeBig() {
+        return new HessenbergDecomposition.Big();
+    }
+
+    public static Hessenberg<ComplexNumber> makeComplex() {
+        return new HessenbergDecomposition.Complex();
+    }
+
+    public static Hessenberg<Double> makePrimitive() {
+        return new HessenbergDecomposition.Primitive();
+    }
 
     boolean compute(Access2D<?> matrix, boolean upper);
 

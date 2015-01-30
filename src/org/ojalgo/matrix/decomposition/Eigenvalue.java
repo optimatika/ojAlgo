@@ -21,8 +21,11 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.math.BigDecimal;
+
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
@@ -43,10 +46,79 @@ import org.ojalgo.scalar.ComplexNumber;
  * possible to calculate [V]<sup>-1</sup>. (Check the rank and/or the condition number of [V] to determine the validity
  * of [V][D][V]<sup>-1</sup>.)
  * </p>
- * 
+ *
  * @author apete
  */
 public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
+
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> Eigenvalue<N> make(final Access2D<N> template) {
+
+        final N tmpNumber = template.get(0L, 0L);
+        final long tmpDim = template.countColumns();
+
+        if (tmpNumber instanceof BigDecimal) {
+
+            final boolean tmpSymmetric = MatrixUtils.isHermitian(template);
+
+            return (Eigenvalue<N>) Eigenvalue.makeBig(tmpSymmetric);
+
+        } else if (tmpNumber instanceof ComplexNumber) {
+
+            final boolean tmpHermitian = MatrixUtils.isHermitian(template);
+
+            return (Eigenvalue<N>) Eigenvalue.makeComplex(tmpHermitian);
+
+        } else if (tmpNumber instanceof Double) {
+
+            final boolean tmpSymmetric = MatrixUtils.isHermitian(template);
+
+            if ((tmpDim > 128L) && (tmpDim < 46340L)) {
+
+                return (Eigenvalue<N>) Eigenvalue.makePrimitive(tmpSymmetric);
+
+            } else {
+
+                return (Eigenvalue<N>) Eigenvalue.makeJama(tmpSymmetric);
+            }
+
+        } else {
+
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static Eigenvalue<BigDecimal> makeBig() {
+        return EigenvalueDecomposition.makeBig(true);
+    }
+
+    public static Eigenvalue<BigDecimal> makeBig(final boolean symmetric) {
+        return symmetric ? new HermitianEvD32.Big() : null;
+    }
+
+    public static Eigenvalue<ComplexNumber> makeComplex() {
+        return EigenvalueDecomposition.makeComplex(true);
+    }
+
+    public static Eigenvalue<ComplexNumber> makeComplex(final boolean hermitian) {
+        return hermitian ? new HermitianEvD32.Complex() : null;
+    }
+
+    public static Eigenvalue<Double> makeJama() {
+        return new RawEigenvalue.General();
+    }
+
+    public static Eigenvalue<Double> makeJama(final boolean symmetric) {
+        return symmetric ? new RawEigenvalue.Symmetric() : new RawEigenvalue.Nonsymmetric();
+    }
+
+    public static Eigenvalue<Double> makePrimitive() {
+        return new GeneralEvD.Primitive();
+    }
+
+    public static Eigenvalue<Double> makePrimitive(final boolean symmetric) {
+        return symmetric ? new HermitianEvD32.Primitive() : new NonsymmetricEvD.Primitive();
+    }
 
     /**
      * @param matrix A matrix to decompose
@@ -64,7 +136,7 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, De
      * complex eigenvalues in 2-by-2 blocks.</li>
      * <li>If [A] is complex then [D] is (purely) diagonal with complex eigenvalues.</li>
      * </ul>
-     * 
+     *
      * @return The (block) diagonal eigenvalue matrix.
      */
     MatrixStore<N> getD();
@@ -73,7 +145,7 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, De
      * <p>
      * A matrix' determinant is the product of its eigenvalues.
      * </p>
-     * 
+     *
      * @return The matrix' determinant
      */
     N getDeterminant();
@@ -86,7 +158,7 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, De
      * <p>
      * The eigenvalues in this array should be ordered in descending order - largest (modulus) first.
      * </p>
-     * 
+     *
      * @return The eigenvalues in an ordered array.
      */
     Array1D<ComplexNumber> getEigenvalues();
@@ -94,14 +166,14 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, De
     /**
      * A matrix' trace is the sum of the diagonal elements. It is also the sum of the eigenvalues. This method should
      * return the sum of the eigenvalues.
-     * 
+     *
      * @return The matrix' trace
      */
     ComplexNumber getTrace();
 
     /**
      * The columns of [V] represent the eigenvectors of [A] in the sense that [A][V] = [V][D].
-     * 
+     *
      * @return The eigenvector matrix.
      */
     MatrixStore<N> getV();
@@ -114,7 +186,7 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, De
     /**
      * The eigenvalues in D (and the eigenvectors in V) are not necessarily ordered. This is a property of the
      * algorithm/implementation, not the data.
-     * 
+     *
      * @return true if they are ordered
      */
     boolean isOrdered();

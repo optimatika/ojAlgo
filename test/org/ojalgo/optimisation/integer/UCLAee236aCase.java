@@ -29,7 +29,6 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
@@ -50,7 +49,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
                 new Variable("X2").lower(ZERO).weight(THREE.negate()).integer(true) };
 
         final ExpressionsBasedModel retVal = new ExpressionsBasedModel(tmpVariables);
-        retVal.setMinimisation(true);
+        retVal.setMinimisation();
 
         final Expression tmpExprC1 = retVal.addExpression("C1");
         for (int i = 0; i < retVal.countVariables(); i++) {
@@ -82,7 +81,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel();
 
-        final Optimisation.Result tmpResult = tmpModel.getDefaultSolver().solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
@@ -100,9 +99,10 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         tmpModel.getVariable(1).lower(TWO);
         tmpModel.getVariable(1).upper(TWO);
 
-        final Optimisation.Result tmpResult = tmpModel.getDefaultSolver().solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        //TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        TestUtils.assertStateNotLessThanOptimal(tmpResult);
 
         final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2.0 }, { 2.0 } });
 
@@ -116,7 +116,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
 
-        final Optimisation.Result tmpResult = tmpModel.getDefaultSolver().solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
@@ -136,7 +136,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
         tmpModel.getVariable(0).upper(TWO);
 
-        final Optimisation.Result tmpResult = tmpModel.getDefaultSolver().solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
@@ -155,7 +155,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         final ExpressionsBasedModel tmpModel = UCLAee236aCase.makeOriginalRootModel().relax(true);
         tmpModel.getVariable(0).lower(THREE);
 
-        final Optimisation.Result tmpResult = tmpModel.getDefaultSolver().solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
@@ -175,7 +175,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         tmpModel.getVariable(0).upper(TWO);
         tmpModel.getVariable(1).upper(TWO);
 
-        final Optimisation.Result tmpResult = tmpModel.getDefaultSolver().solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
@@ -199,7 +199,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         //        tmpModel.options.debug_solver = LinearSolver.class;
         //        tmpModel.options.validate = true;
 
-        final Optimisation.Result tmpResult = tmpModel.getDefaultSolver().solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
@@ -219,8 +219,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         tmpModel.getVariable(0).lower(THREE);
         tmpModel.getVariable(1).upper(ONE);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
@@ -240,8 +239,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         tmpModel.getVariable(0).lower(THREE);
         tmpModel.getVariable(1).lower(TWO);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
     }
@@ -256,8 +254,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         tmpModel.getVariable(1).upper(ONE);
         tmpModel.getVariable(0).upper(THREE);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
@@ -278,8 +275,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         tmpModel.getVariable(1).upper(ONE);
         tmpModel.getVariable(0).lower(FOUR);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
@@ -301,8 +297,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         tmpModel.getVariable(0).lower(FOUR);
         tmpModel.getVariable(1).upper(ZERO);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
@@ -324,8 +319,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         tmpModel.getVariable(0).lower(FOUR);
         tmpModel.getVariable(1).lower(ONE);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
     }
@@ -342,10 +336,10 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         tmpModel.getVariable(1).upper(ZERO);
         tmpModel.getVariable(0).upper(FOUR);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
-        TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        //TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
+        TestUtils.assertStateNotLessThanOptimal(tmpResult);
 
         final PrimitiveDenseStore tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.00 }, { 0.00 } });
 
@@ -366,8 +360,7 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
         tmpModel.getVariable(1).upper(ZERO);
         tmpModel.getVariable(0).lower(FIVE);
 
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        final Optimisation.Result tmpResult = tmpModel.minimise();
 
         TestUtils.assertEquals(State.INFEASIBLE, tmpResult.getState());
     }

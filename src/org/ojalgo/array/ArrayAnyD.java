@@ -24,13 +24,13 @@ package org.ojalgo.array;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import org.ojalgo.access.AccessAnyD;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.BasicArray.BasicFactory;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
@@ -44,7 +44,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>,
-AccessAnyD.Visitable<N>, Serializable {
+        AccessAnyD.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
 
@@ -184,12 +184,20 @@ AccessAnyD.Visitable<N>, Serializable {
         }
     }
 
-    public void fillAll(final N number) {
-        myDelegate.fill(0L, this.count(), 1L, number);
+    public void fillAll(final N value) {
+        myDelegate.fill(0L, this.count(), 1L, value);
+    }
+
+    public void fillAll(final NullaryFunction<N> supplier) {
+        myDelegate.fill(0L, this.count(), 1L, supplier);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
         myDelegate.fill(first, limit, 1L, value);
+    }
+
+    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        myDelegate.fill(first, limit, 1L, supplier);
     }
 
     public void fillSet(final long[] first, final int dimension, final N number) {
@@ -228,15 +236,7 @@ AccessAnyD.Visitable<N>, Serializable {
     }
 
     public boolean isAllZeros() {
-        return myDelegate.isZeros(0L, myDelegate.count(), 1L);
-    }
-
-    public boolean isPositive(final long index) {
-        return myDelegate.isPositive(index);
-    }
-
-    public boolean isPositive(final long[] reference) {
-        return myDelegate.isPositive(AccessUtils.index(myStructure, reference));
+        return myDelegate.isSmall(0L, myDelegate.count(), 1L, PrimitiveMath.ONE);
     }
 
     public boolean isSmall(final long index, final double comparedTo) {
@@ -247,17 +247,6 @@ AccessAnyD.Visitable<N>, Serializable {
         return myDelegate.isSmall(AccessUtils.index(myStructure, reference), comparedTo);
     }
 
-    public boolean isZero(final long index) {
-        return myDelegate.isZero(index);
-    }
-
-    /**
-     * @see Scalar#isZero()
-     */
-    public boolean isZero(final long[] reference) {
-        return myDelegate.isZero(AccessUtils.index(myStructure, reference));
-    }
-
     public boolean isZeros(final long[] first, final int dimension) {
 
         final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
@@ -266,11 +255,7 @@ AccessAnyD.Visitable<N>, Serializable {
         final long tmpStep = AccessUtils.step(myStructure, dimension);
         final long tmpLimit = tmpFirst * tmpStep * tmpCount;
 
-        return myDelegate.isZeros(tmpFirst, tmpLimit, tmpStep);
-    }
-
-    public Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
+        return myDelegate.isSmall(tmpFirst, tmpLimit, tmpStep, PrimitiveMath.ONE);
     }
 
     public void modifyAll(final UnaryFunction<N> function) {
@@ -283,6 +268,14 @@ AccessAnyD.Visitable<N>, Serializable {
 
     public void modifyMatching(final BinaryFunction<N> function, final ArrayAnyD<N> right) {
         myDelegate.modify(0L, this.count(), 1L, function, right.getDelegate());
+    }
+
+    public void modifyOne(final long index, final UnaryFunction<N> function) {
+        myDelegate.modifyOne(index, function);
+    }
+
+    public void modifyOne(final long[] reference, final UnaryFunction<N> function) {
+        myDelegate.modifyOne(AccessUtils.index(myStructure, reference), function);
     }
 
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {

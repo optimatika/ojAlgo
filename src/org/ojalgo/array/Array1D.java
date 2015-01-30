@@ -25,14 +25,16 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.RandomAccess;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.BasicArray.BasicFactory;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
@@ -329,10 +331,20 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         myDelegate.fill(myFirst, myLimit, myStep, value);
     }
 
+    public void fillAll(final NullaryFunction<N> supplier) {
+        myDelegate.fill(myFirst, myLimit, myStep, supplier);
+    }
+
     public void fillRange(final long first, final long limit, final N value) {
         final long tmpFirst = myFirst + (myStep * first);
         final long tmpLimit = myFirst + (myStep * limit);
         myDelegate.fill(tmpFirst, tmpLimit, myStep, value);
+    }
+
+    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        final long tmpFirst = myFirst + (myStep * first);
+        final long tmpLimit = myFirst + (myStep * limit);
+        myDelegate.fill(tmpFirst, tmpLimit, myStep, supplier);
     }
 
     @Override
@@ -379,7 +391,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     }
 
     public boolean isAllZeros() {
-        return myDelegate.isZeros(myFirst, myLimit, myStep);
+        return myDelegate.isSmall(myFirst, myLimit, myStep, PrimitiveMath.ONE);
     }
 
     @Override
@@ -387,31 +399,15 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return length == 0;
     }
 
-    /**
-     * @see Scalar#isPositive()
-     */
-    public boolean isPositive(final long index) {
-        return myDelegate.isPositive(myFirst + (myStep * index));
-    }
-
     public boolean isRangeZeros(final long first, final long limit) {
-        return myDelegate.isZeros((myFirst + (myStep * first)), (myFirst + (myStep * limit)), myStep);
+        return myDelegate.isSmall((myFirst + (myStep * first)), (myFirst + (myStep * limit)), myStep, PrimitiveMath.ONE);
     }
 
+    /**
+     * @see Scalar#isSmall(double)
+     */
     public boolean isSmall(final long index, final double comparedTo) {
         return myDelegate.isSmall(myFirst + (myStep * index), comparedTo);
-    }
-
-    /**
-     * @see Scalar#isZero()
-     */
-    public boolean isZero(final long index) {
-        return myDelegate.isZero(myFirst + (myStep * index));
-    }
-
-    @Override
-    public final Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     public void modifyAll(final UnaryFunction<N> function) {
@@ -442,6 +438,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
                 this.set(i, function.invoke(this.get(i), right.get(i)));
             }
         }
+    }
+
+    public void modifyOne(final long index, final UnaryFunction<N> function) {
+        myDelegate.modifyOne(myFirst + (myStep * index), function);
     }
 
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
@@ -570,6 +570,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
             throw new UnsupportedOperationException();
         }
+    }
+
+    public Spliterator<N> spliterator() {
+        return Spliterators.spliterator(this, Spliterator.ORDERED | Spliterator.IMMUTABLE);
     }
 
     @Override

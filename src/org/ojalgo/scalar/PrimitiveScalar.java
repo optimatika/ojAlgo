@@ -22,12 +22,13 @@
 package org.ojalgo.scalar;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class PrimitiveScalar extends AbstractScalar<Double> implements Enforceable<PrimitiveScalar> {
+public final class PrimitiveScalar extends Number implements Scalar<Double>, Enforceable<PrimitiveScalar> {
 
     public static final Scalar.Factory<Double> FACTORY = new Scalar.Factory<Double>() {
 
@@ -63,6 +64,8 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
     public static final PrimitiveScalar POSITIVE_INFINITY = new PrimitiveScalar(PrimitiveMath.POSITIVE_INFINITY);
     public static final PrimitiveScalar ZERO = new PrimitiveScalar(PrimitiveMath.ZERO);
 
+    static final NumberContext CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
+
     public static boolean isAbsolute(final double value) {
         return value >= PrimitiveMath.ZERO;
     }
@@ -76,18 +79,14 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
     }
 
     public static boolean isSmall(final double comparedTo, final double value) {
-        return AbstractScalar.PRIMITIVE.isSmall(comparedTo, value);
-    }
-
-    public static boolean isPositive(final double value) {
-        return (value > PrimitiveMath.ZERO) && !AbstractScalar.PRIMITIVE.isZero(value);
-    }
-
-    public static boolean isZero(final double value) {
-        return AbstractScalar.PRIMITIVE.isSmall(PrimitiveMath.ONE, value);
+        return PrimitiveScalar.CONTEXT.isSmall(comparedTo, value);
     }
 
     private final double myValue;
+
+    public static PrimitiveScalar valueOf(final double value) {
+        return new PrimitiveScalar(value);
+    }
 
     public PrimitiveScalar(final double aVal) {
 
@@ -111,7 +110,7 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
         myValue = PrimitiveMath.ZERO;
     }
 
-    public Scalar<Double> add(final double arg) {
+    public PrimitiveScalar add(final double arg) {
         return new PrimitiveScalar(myValue + arg);
     }
 
@@ -232,7 +231,7 @@ public final class PrimitiveScalar extends AbstractScalar<Double> implements Enf
     }
 
     public BigDecimal toBigDecimal() {
-        return new BigDecimal(myValue, AbstractScalar.PRIMITIVE.getMathContext());
+        return new BigDecimal(myValue, PrimitiveScalar.CONTEXT.getMathContext());
     }
 
     @Override

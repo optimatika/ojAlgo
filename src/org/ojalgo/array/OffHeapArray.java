@@ -24,16 +24,17 @@ package org.ojalgo.array;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.lang.reflect.Field;
+import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 import sun.misc.Unsafe;
 
@@ -42,6 +43,7 @@ import sun.misc.Unsafe;
  *
  * @author apete
  */
+@SuppressWarnings("restriction")
 public final class OffHeapArray extends BasicArray<Double> {
 
     static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
@@ -122,16 +124,8 @@ public final class OffHeapArray extends BasicArray<Double> {
         return PrimitiveScalar.isAbsolute(UNSAFE.getDouble(this.address(index)));
     }
 
-    public boolean isPositive(final long index) {
-        return PrimitiveScalar.isPositive(UNSAFE.getDouble(this.address(index)));
-    }
-
     public boolean isSmall(final long index, final double comparedTo) {
         return PrimitiveScalar.isSmall(UNSAFE.getDouble(this.address(index)), comparedTo);
-    }
-
-    public boolean isZero(final long index) {
-        return PrimitiveScalar.isZero(UNSAFE.getDouble(this.address(index)));
     }
 
     public void set(final long index, final double value) {
@@ -204,12 +198,12 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     @Override
-    protected boolean isZeros(final long first, final long limit, final long step) {
+    protected boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
 
         boolean retVal = true;
 
         for (long i = first; retVal && (i < limit); i += step) {
-            retVal &= TypeUtils.isZero(this.doubleValue(i));
+            retVal &= PrimitiveScalar.isSmall(comparedTo, this.doubleValue(i));
         }
 
         return retVal;
@@ -261,6 +255,32 @@ public final class OffHeapArray extends BasicArray<Double> {
     @Override
     boolean isPrimitive() {
         return true;
+    }
+
+    public Iterator<Double> iterator() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void fillAll(final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void fillRange(final long first, final long limit, final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void modifyOne(final long index, final UnaryFunction<Double> function) {
+        // TODO Auto-generated method stub
+
     }
 
 }

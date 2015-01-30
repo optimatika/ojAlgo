@@ -35,10 +35,12 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain #makeBig()}, {@linkplain #makeComplex()} or {@linkplain #makePrimitive()}.
- * 
+ * {@linkplain Hessenberg#makeBig()}, {@linkplain Hessenberg#makeComplex()} or {@linkplain Hessenberg#makePrimitive()}.
+ *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Hessenberg<N> {
 
     static final class Big extends HessenbergDecomposition<BigDecimal> {
@@ -65,32 +67,37 @@ public abstract class HessenbergDecomposition<N extends Number> extends InPlaceD
 
     }
 
+    /**
+     * @deprecated v38 Use {@link Hessenberg#make(Access2D<N>)} instead
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static final <N extends Number> Hessenberg<N> make(final Access2D<N> aTypical) {
-
-        final N tmpNumber = aTypical.get(0, 0);
-
-        if (tmpNumber instanceof BigDecimal) {
-            return (Hessenberg<N>) HessenbergDecomposition.makeBig();
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (Hessenberg<N>) HessenbergDecomposition.makeComplex();
-        } else if (tmpNumber instanceof Double) {
-            return (Hessenberg<N>) HessenbergDecomposition.makePrimitive();
-        } else {
-            throw new IllegalArgumentException();
-        }
+        return Hessenberg.make(aTypical);
     }
 
+    /**
+     * @deprecated v38 Use {@link Hessenberg#makeBig()} instead
+     */
+    @Deprecated
     public static Hessenberg<BigDecimal> makeBig() {
-        return new HessenbergDecomposition.Big();
+        return Hessenberg.makeBig();
     }
 
+    /**
+     * @deprecated v38 Use {@link Hessenberg#makeComplex()} instead
+     */
+    @Deprecated
     public static Hessenberg<ComplexNumber> makeComplex() {
-        return new HessenbergDecomposition.Complex();
+        return Hessenberg.makeComplex();
     }
 
+    /**
+     * @deprecated v38 Use {@link Hessenberg#makePrimitive()} instead
+     */
+    @Deprecated
     public static Hessenberg<Double> makePrimitive() {
-        return new HessenbergDecomposition.Primitive();
+        return Hessenberg.makePrimitive();
     }
 
     private boolean myUpper = true;

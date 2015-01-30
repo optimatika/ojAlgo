@@ -44,7 +44,7 @@ public final class TransposedStore<N extends Number> extends TransjugatedStore<N
 
         if (leftMtrx instanceof TransposedStore<?>) {
 
-            retVal = this.getBase().multiplyRight(((TransposedStore<N>) leftMtrx).getOriginal());
+            retVal = this.getBase().multiply(((TransposedStore<N>) leftMtrx).getOriginal());
 
             retVal = new TransposedStore<N>(retVal);
 
@@ -57,22 +57,22 @@ public final class TransposedStore<N extends Number> extends TransjugatedStore<N
     }
 
     /**
-     * @see org.ojalgo.matrix.store.MatrixStore#multiplyRight(org.ojalgo.matrix.store.MatrixStore)
+     * @see org.ojalgo.matrix.store.MatrixStore#multiply(org.ojalgo.matrix.store.MatrixStore)
      */
     @Override
-    public MatrixStore<N> multiplyRight(final Access1D<N> rightMtrx) {
+    public MatrixStore<N> multiply(final Access1D<N> right) {
 
         MatrixStore<N> retVal;
 
-        if (rightMtrx instanceof TransposedStore<?>) {
+        if (right instanceof TransposedStore<?>) {
 
-            retVal = this.getBase().multiplyLeft(((TransposedStore<N>) rightMtrx).getOriginal());
+            retVal = this.getBase().multiplyLeft(((TransposedStore<N>) right).getOriginal());
 
             retVal = new TransposedStore<N>(retVal);
 
         } else {
 
-            retVal = super.multiplyRight(rightMtrx);
+            retVal = super.multiply(right);
         }
 
         return retVal;

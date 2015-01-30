@@ -21,12 +21,18 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.math.BigDecimal;
+
 import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.decomposition.LUDecomposition.Big;
+import org.ojalgo.matrix.decomposition.LUDecomposition.Complex;
+import org.ojalgo.matrix.decomposition.LUDecomposition.Primitive;
 import org.ojalgo.matrix.store.ColumnsStore;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RowsStore;
 import org.ojalgo.matrix.task.DeterminantTask;
+import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * LU: [A] = [L][U]
@@ -47,10 +53,49 @@ import org.ojalgo.matrix.task.DeterminantTask;
  * matrices. The primary use of the LU decomposition is in the solution of systems of simultaneous linear equations.
  * That will, however, only work for square non-singular matrices.
  * </p>
- * 
+ *
  * @author apete
  */
 public interface LU<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
+
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> LU<N> make(final Access2D<N> aTypical) {
+
+        final N tmpNumber = aTypical.get(0, 0);
+
+        if (tmpNumber instanceof BigDecimal) {
+            return (LU<N>) LU.makeBig();
+        } else if (tmpNumber instanceof ComplexNumber) {
+            return (LU<N>) LU.makeComplex();
+        } else if (tmpNumber instanceof Double) {
+
+            final int tmpMaxDim = (int) Math.max(aTypical.countRows(), aTypical.countColumns());
+
+            if ((tmpMaxDim <= 32) || (tmpMaxDim >= 46340)) { //16,32,2
+                return (LU<N>) LU.makeJama();
+            } else {
+                return (LU<N>) LU.makePrimitive();
+            }
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static LU<BigDecimal> makeBig() {
+        return new Big();
+    }
+
+    public static LU<ComplexNumber> makeComplex() {
+        return new Complex();
+    }
+
+    public static LU<Double> makeJama() {
+        return new RawLU();
+    }
+
+    public static LU<Double> makePrimitive() {
+        return new Primitive();
+    }
 
     /**
      * The normal {@link #compute(Access2D)} method must handle cases where pivoting is required. If you know that
@@ -77,7 +122,7 @@ public interface LU<N extends Number> extends MatrixDecomposition<N>, Determinan
      * <br>
      * This is the same as [D][U]. Together with the pivotOrder and [L] this constitutes an alternative, more compact,
      * way to express the decomposition.
-     * 
+     *
      * @see #getPivotOrder()
      * @see #getL()
      */

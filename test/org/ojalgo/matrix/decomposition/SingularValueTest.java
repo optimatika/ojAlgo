@@ -39,10 +39,10 @@ import org.ojalgo.type.context.NumberContext;
 
 public class SingularValueTest extends MatrixDecompositionTests {
 
-    private static final SingularValue<BigDecimal> BIG = SingularValueDecomposition.makeBig();
-    private static final SingularValue<ComplexNumber> COMPLEX = SingularValueDecomposition.makeComplex();
-    private static final SingularValue<Double> JAMA = SingularValueDecomposition.makeJama();
-    private static final SingularValue<Double> DIRECT = SingularValueDecomposition.makePrimitive();
+    private static final SingularValue<BigDecimal> BIG = SingularValue.makeBig();
+    private static final SingularValue<ComplexNumber> COMPLEX = SingularValue.makeComplex();
+    private static final SingularValue<Double> JAMA = SingularValue.makeJama();
+    private static final SingularValue<Double> DIRECT = SingularValue.makePrimitive();
 
     private static final BasicMatrix FAT = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
     private static final BasicMatrix SQUARE = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
@@ -106,8 +106,8 @@ public class SingularValueTest extends MatrixDecompositionTests {
         final ComplexNumber[] tmpScales = new ComplexNumber[] { ComplexNumber.makePolar(1.0, 0.0), ComplexNumber.makePolar(1.0, Math.PI / 2.0),
                 ComplexNumber.makePolar(1.0, -Math.PI / 2.0), ComplexNumber.makePolar(1.0, Math.PI / 4.0), ComplexNumber.makePolar(1.0, (4.0 * Math.PI) / 3.0) };
 
-        final Bidiagonal<ComplexNumber> tmpBidiagonal = BidiagonalDecomposition.makeComplex();
-        final SingularValue<ComplexNumber> tmpSVD = SingularValueDecomposition.makeComplex();
+        final Bidiagonal<ComplexNumber> tmpBidiagonal = Bidiagonal.makeComplex();
+        final SingularValue<ComplexNumber> tmpSVD = SingularValue.makeComplex();
 
         for (int s = 0; s < tmpScales.length; s++) {
 
@@ -162,7 +162,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         final PhysicalStore<ComplexNumber> tmpOriginal = MatrixUtils.makeRandomComplexStore(4, 4);
 
-        final SingularValue<ComplexNumber> tmpDecomposition = SingularValueDecomposition.makeComplex();
+        final SingularValue<ComplexNumber> tmpDecomposition = SingularValue.makeComplex();
 
         tmpDecomposition.compute(tmpOriginal);
 
@@ -225,7 +225,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
         this.testRecreation(tmpOriginal);
     }
 
-    private void doTestTypes(final BasicMatrix<?> original) {
+    private void doTestTypes(final BasicMatrix original) {
 
         final PhysicalStore<BigDecimal> tmpBigStore = original.toBigStore();
         final PhysicalStore<ComplexNumber> tmpComplexStore = original.toComplexStore();
@@ -283,10 +283,10 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q1 unitary", BIG.getQ1().builder().conjugate().build().multiplyRight(BIG.getQ1()));
-            BasicLogger.debug("Cmplx Q1 unitary", COMPLEX.getQ1().builder().conjugate().build().multiplyRight(COMPLEX.getQ1()));
-            BasicLogger.debug("Jama  Q1 unitary", JAMA.getQ1().builder().conjugate().build().multiplyRight(JAMA.getQ1()));
-            BasicLogger.debug("Direc Q1 unitary", DIRECT.getQ1().builder().conjugate().build().multiplyRight(DIRECT.getQ1()));
+            BasicLogger.debug("Big   Q1 unitary", BIG.getQ1().builder().conjugate().build().multiply(BIG.getQ1()));
+            BasicLogger.debug("Cmplx Q1 unitary", COMPLEX.getQ1().builder().conjugate().build().multiply(COMPLEX.getQ1()));
+            BasicLogger.debug("Jama  Q1 unitary", JAMA.getQ1().builder().conjugate().build().multiply(JAMA.getQ1()));
+            BasicLogger.debug("Direc Q1 unitary", DIRECT.getQ1().builder().conjugate().build().multiply(DIRECT.getQ1()));
 
         }
 

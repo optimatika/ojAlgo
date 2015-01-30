@@ -34,6 +34,7 @@ import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.convex.ConvexSolver;
@@ -129,9 +130,9 @@ public class ReportedProblems extends FinancePortfolioTests {
         ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
 
         ConvexSolver tmpSolver = tmpBuilder.build();
-        tmpSolver.options.debug(ConvexSolver.class);
+        // tmpSolver.options.debug(ConvexSolver.class);
         Optimisation.Result tmpResult = tmpSolver.solve();
-        //  BasicMatrix tmpSolution = tmpResult.getSolution();
+        // BasicMatrix tmpSolution = tmpResult.getSolution();
 
         TestUtils.assertEquals(tmpX, tmpResult, new NumberContext(7, 6));
 
@@ -174,15 +175,14 @@ public class ReportedProblems extends FinancePortfolioTests {
      */
     public void testP20130329() {
 
-        final BasicMatrix<BigDecimal> tmpCovariances = BigMatrix.FACTORY
-                .rows(new double[][] { { 0.00360000, 0.001800000000 }, { 0.001800000000, 0.00090000 } });
+        final BasicMatrix tmpCovariances = BigMatrix.FACTORY.rows(new double[][] { { 0.00360000, 0.001800000000 }, { 0.001800000000, 0.00090000 } });
 
         final MarketEquilibrium tmpMarketEquilibrium = new MarketEquilibrium(tmpCovariances, BigMath.THOUSAND);
 
         final Builder<BigMatrix> tmpExcessReturnsBuilder = BigMatrix.FACTORY.getBuilder(2, 1);
         tmpExcessReturnsBuilder.set(0, 0, 0.1400);
         tmpExcessReturnsBuilder.set(1, 0, 0.0800);
-        final BasicMatrix<BigDecimal> tmpExcessReturns = tmpExcessReturnsBuilder.build();
+        final BasicMatrix tmpExcessReturns = tmpExcessReturnsBuilder.build();
 
         final MarkowitzModel tmpMarkowitzModel = new MarkowitzModel(tmpMarketEquilibrium, tmpExcessReturns);
         tmpMarkowitzModel.setLowerLimit(0, BigMath.ZERO);
@@ -211,6 +211,71 @@ public class ReportedProblems extends FinancePortfolioTests {
             TestUtils.assertTrue("Asset1 <= 1.0", tmpWeights.get(1).compareTo(BigMath.ONE) <= 0);
 
             TestUtils.assertEquals("Asset0 + Asset1 == 1.0", 1.0, tmpWeights.get(0).add(tmpWeights.get(1)).doubleValue(), 0.0001);
+        }
+
+    }
+
+    /**
+     * <p>
+     * First of all, let me say that I really like ojAlgo so thank you for making it! I do, however, think that you
+     * should make tmpIterCount and _0_000005 variables fields (with getters and setters) in the MarkowitzModel.java
+     * class. We are finding that we get suboptimal solutions with the hard-coded limit of 20 iterations in a mean
+     * variance optimisation (solving for the highest return given a target variance). We are now testing it (against
+     * our own Python model) with a limit of 100. Please let me know what you think when you get a chance.
+     * </p>
+     * <p>
+     * Borrowed test data from {@link #testP20090115()}. </p<
+     */
+    public void testP20141202() {
+
+        final double[][] assets_return = {
+                { -1.5905837442343828E-4, -0.03062360801781757, -0.029857534032853142, -0.011811692726036832, -0.017972310602803136, 0.017338003502626997, 0.0 },
+                { -0.02757158006362653, -0.02562704471101405, -0.011751538891997735, -0.024915062287655786, -0.01684088269454123, 0.013585351447135364, 0.0 },
+                { -0.00699300699300693, -0.033802816901408676, -0.04675196850393671, -0.021166752710376546, -0.007911392405063583, 0.03827751196172254, 0.0 },
+                { -0.007626310772164015, 0.0038424591738713027, 0.02488038277511978, 0.025210084033613675, -0.02003642987249557, -0.09758364312267642, 0.0 },
+                { -0.03965053763440893, 0.021693491952414375, 0.01643835616438392, -0.007412398921833087, 0.01765105227427014, -0.010006671114076025, 0.0 },
+                { -0.017821782178217872, 0.005040322580645311, 0.006018054162487363, 9.008107296569024E-4, 0.002999999999999824, -0.01196410767696908, 0.0 },
+                { 2.630552127527583E-4, 2.5867028174649627E-4, 2.3866431891514327E-4, 1.9564035993080523E-4, 2.351016690966669E-4, 1.9070675120065465E-4, 0.0 } };
+
+        final P20090115 tm = new P20090115();
+        final BasicMatrix tmpCovariances = tm.getCovariances(assets_return);
+        final BasicMatrix tmpExpectedExcessReturns = tm.getExpectedExcessReturns(assets_return).negate();
+
+        final MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovariances).clean();
+        final MarkowitzModel tmpMarkowitz = new MarkowitzModel(tmpME, tmpExpectedExcessReturns);
+
+        final BigDecimal[] tmpRiskAversions = new BigDecimal[] { BigMath.HUNDREDTH, BigMath.TWELFTH, BigMath.EIGHTH, BigMath.HALF, BigMath.ONE, BigMath.TWO,
+                BigMath.EIGHT, BigMath.TWELVE, BigMath.HUNDRED, BigMath.THOUSAND };
+        final double[] tmpPortfolioReturn = new double[tmpRiskAversions.length];
+        final double[] tmpPortfolioVariance = new double[tmpRiskAversions.length];
+
+        final BigDecimal tmpInitialRiskAversion = tmpMarkowitz.getRiskAversion().toBigDecimal();
+
+        for (int ra = 0; ra < tmpRiskAversions.length; ra++) {
+            tmpMarkowitz.setRiskAversion(tmpRiskAversions[ra]);
+            tmpMarkowitz.getWeights();
+            tmpPortfolioReturn[ra] = tmpMarkowitz.getMeanReturn();
+            tmpPortfolioVariance[ra] = tmpMarkowitz.getReturnVariance();
+            if (DEBUG) {
+                BasicLogger.debug("RA: {}\tret: {}\tvar: {}\tweights: {}", tmpRiskAversions[ra], tmpMarkowitz.getMeanReturn(),
+                        tmpMarkowitz.getReturnVariance(), tmpMarkowitz.getWeights());
+            }
+        }
+
+        tmpMarkowitz.setRiskAversion(tmpInitialRiskAversion);
+
+        for (int r = 0; r < tmpPortfolioReturn.length; r++) {
+            tmpMarkowitz.setRiskAversion(tmpInitialRiskAversion);
+            tmpMarkowitz.setTargetReturn(BigDecimal.valueOf(tmpPortfolioReturn[r]));
+            tmpMarkowitz.getWeights();
+            TestUtils.assertEquals("Return: " + tmpRiskAversions[r], tmpPortfolioReturn[r], tmpMarkowitz.getMeanReturn());
+        }
+
+        for (int v = 0; v < tmpPortfolioVariance.length; v++) {
+            tmpMarkowitz.setRiskAversion(tmpInitialRiskAversion);
+            tmpMarkowitz.setTargetVariance(BigDecimal.valueOf(tmpPortfolioVariance[v]));
+            tmpMarkowitz.getWeights();
+            TestUtils.assertEquals("Variance: " + tmpRiskAversions[v], tmpPortfolioVariance[v], tmpMarkowitz.getReturnVariance());
         }
 
     }

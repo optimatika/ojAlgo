@@ -35,7 +35,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * [c]<sup>T</sup>[x]
+ * [l]<sup>T</sup>[x] + c
  *
  * @author apete
  */
@@ -102,7 +102,7 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
 
         Scalar<N> retVal = this.getScalarConstant();
 
-        retVal = retVal.add(myFactors.multiplyRight(arg).get(0, 0));
+        retVal = retVal.add(myFactors.multiply(arg).get(0, 0));
 
         return retVal.getNumber();
     }

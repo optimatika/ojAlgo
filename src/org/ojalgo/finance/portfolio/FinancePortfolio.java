@@ -26,7 +26,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
@@ -39,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * A FinancePortfolio is primarily a set of portfolio asset weights.
- * 
+ *
  * @author apete
  */
 public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
@@ -50,13 +49,13 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
 
         double calculatePortfolioVariance(final FinancePortfolio weightsPortfolio);
 
-        BasicMatrix<?> getAssetReturns();
+        BasicMatrix getAssetReturns();
 
-        BasicMatrix<?> getAssetVolatilities();
+        BasicMatrix getAssetVolatilities();
 
-        BasicMatrix<?> getCorrelations();
+        BasicMatrix getCorrelations();
 
-        BasicMatrix<?> getCovariances();
+        BasicMatrix getCovariances();
 
         int size();
 
@@ -70,8 +69,8 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         super();
     }
 
-    public final int compareTo(final FinancePortfolio ref) {
-        return Double.compare(this.getSharpeRatio(), ref.getSharpeRatio());
+    public final int compareTo(final FinancePortfolio reference) {
+        return Double.compare(this.getSharpeRatio(), reference.getSharpeRatio());
     }
 
     public final GeometricBrownianMotion forecast() {
@@ -84,10 +83,10 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         return GeometricBrownianMotion.make(tmpInitialValue, tmpExpectedValue, tmpValueVariance, tmpHorizon);
     }
 
-    public final double getConformance(final FinancePortfolio aReference) {
+    public final double getConformance(final FinancePortfolio reference) {
 
-        final BasicMatrix<?> tmpMyWeights = MATRIX_FACTORY.columns(this.getWeights());
-        final BasicMatrix<?> tmpRefWeights = MATRIX_FACTORY.columns(aReference.getWeights());
+        final BasicMatrix tmpMyWeights = MATRIX_FACTORY.columns(this.getWeights());
+        final BasicMatrix tmpRefWeights = MATRIX_FACTORY.columns(reference.getWeights());
 
         final double tmpNumerator = tmpMyWeights.multiplyVectors(tmpRefWeights).doubleValue();
         final double tmpDenom1 = Math.sqrt(tmpMyWeights.multiplyVectors(tmpMyWeights).doubleValue());
@@ -97,14 +96,14 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
     }
 
     public final double getLossProbability() {
-        return this.getLossProbability(1.0);
+        return this.getLossProbability(ONE);
     }
 
-    public final double getLossProbability(final Number aTimePeriod) {
+    public final double getLossProbability(final Number timePeriod) {
 
         final GeometricBrownianMotion tmpProc = this.forecast();
 
-        final double tmpDoubleValue = aTimePeriod.doubleValue();
+        final double tmpDoubleValue = timePeriod.doubleValue();
         final double tmpValue = tmpProc.getValue();
 
         return tmpProc.getDistribution(tmpDoubleValue).getDistribution(tmpValue);
@@ -130,9 +129,9 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         return this.getSharpeRatio(null);
     }
 
-    public final double getSharpeRatio(final Number aRiskFreeReturn) {
-        if (aRiskFreeReturn != null) {
-            return (this.getMeanReturn() - aRiskFreeReturn.doubleValue()) / this.getVolatility();
+    public final double getSharpeRatio(final Number riskFreeReturn) {
+        if (riskFreeReturn != null) {
+            return (this.getMeanReturn() - riskFreeReturn.doubleValue()) / this.getVolatility();
         } else {
             return this.getMeanReturn() / this.getVolatility();
         }
@@ -142,19 +141,19 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
      * Value at Risk (VaR) is the maximum loss not exceeded with a given probability defined as the confidence level,
      * over a given period of time.
      */
-    public final double getValueAtRisk(final Number aConfidenceLevel, final Number aTimePeriod) {
+    public final double getValueAtRisk(final Number confidenceLevel, final Number timePeriod) {
 
         final double aReturn = this.getMeanReturn();
         final double aStdDev = this.getVolatility();
 
-        final double tmpConfidenceScale = SQRT_TWO * RandomUtils.erfi(ONE - (TWO * (ONE - aConfidenceLevel.doubleValue())));
-        final double tmpTimePeriod = aTimePeriod.doubleValue();
+        final double tmpConfidenceScale = SQRT_TWO * RandomUtils.erfi(ONE - (TWO * (ONE - confidenceLevel.doubleValue())));
+        final double tmpTimePeriod = timePeriod.doubleValue();
 
         return Math.max((Math.sqrt(tmpTimePeriod) * aStdDev * tmpConfidenceScale) - (tmpTimePeriod * aReturn), ZERO);
     }
 
     public final double getValueAtRisk95() {
-        return this.getValueAtRisk(0.95, PrimitiveMath.ONE);
+        return this.getValueAtRisk(0.95, ONE);
     }
 
     /**

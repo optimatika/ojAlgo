@@ -779,7 +779,7 @@ public abstract class BasicLogger {
         BasicLogger.println(ERROR, message, arguments);
     }
 
-    private static void printmtrx(final Appender appender, final BasicMatrix<?> matrix, final NumberContext context, final boolean plain) {
+    private static void printmtrx(final Appender appender, final BasicMatrix matrix, final NumberContext context, final boolean plain) {
 
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
@@ -842,7 +842,7 @@ public abstract class BasicLogger {
             if (matrix instanceof ComplexMatrix) {
                 BasicLogger.printmtrx(appender, (ComplexMatrix) matrix, context, false);
             } else if (matrix instanceof BasicMatrix) {
-                BasicLogger.printmtrx(appender, (BasicMatrix<?>) matrix, context, true);
+                BasicLogger.printmtrx(appender, (BasicMatrix) matrix, context, true);
             } else if (matrix.get(0, 0) instanceof ComplexNumber) {
                 BasicLogger.printmtrx(appender, ComplexMatrix.FACTORY.copy(matrix), context, false);
             } else {

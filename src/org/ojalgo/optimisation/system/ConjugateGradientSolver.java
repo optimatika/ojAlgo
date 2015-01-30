@@ -48,10 +48,10 @@ public final class ConjugateGradientSolver extends OptimisationSystem {
 
         //  while (false) {
 
-        tmpAlpha = tmpResidual.multiplyLeft(tmpTranspRes).doubleValue(0L) / body.multiplyLeft(tmpTranspDir).multiplyRight(tmpDirection).doubleValue(0L);
+        tmpAlpha = tmpResidual.multiplyLeft(tmpTranspRes).doubleValue(0L) / body.multiplyLeft(tmpTranspDir).multiply(tmpDirection).doubleValue(0L);
 
         retVal.maxpy(tmpAlpha, tmpDirection);
-        tmpResidual.maxpy(-tmpAlpha, body.multiplyRight(tmpDirection));
+        tmpResidual.maxpy(-tmpAlpha, body.multiply(tmpDirection));
 
         //  }
 

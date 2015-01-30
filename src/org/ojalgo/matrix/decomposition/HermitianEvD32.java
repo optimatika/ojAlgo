@@ -416,7 +416,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
         final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.makeZero(tmpDim);
 
         for (int ij = 0; ij < tmpDim; ij++) {
-            retVal.set(ij, ComplexNumber.makeReal(myDiagonalValues.doubleValue(ij)));
+            retVal.set(ij, ComplexNumber.valueOf(myDiagonalValues.doubleValue(ij)));
         }
 
         return retVal;

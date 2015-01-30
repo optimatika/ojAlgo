@@ -22,16 +22,15 @@
 package org.ojalgo.array;
 
 import java.lang.reflect.Array;
-import java.util.Iterator;
 import java.util.List;
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleSupplier;
+import java.util.function.DoubleUnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 
 public abstract class ArrayUtils {
@@ -65,125 +64,164 @@ public abstract class ArrayUtils {
         return retVal;
     }
 
-    public static void exchangeColumns(final double[][] rawArray, final int aColA, final int aColB) {
+    public static void exchangeColumns(final double[][] target, final int columnA, final int columnB) {
         double tmpElem;
-        final int tmpLength = rawArray.length;
+        final int tmpLength = target.length;
         for (int i = 0; i < tmpLength; i++) {
-            tmpElem = rawArray[i][aColA];
-            rawArray[i][aColA] = rawArray[i][aColB];
-            rawArray[i][aColB] = tmpElem;
+            tmpElem = target[i][columnA];
+            target[i][columnA] = target[i][columnB];
+            target[i][columnB] = tmpElem;
         }
     }
 
-    public static void exchangeRows(final double[][] rawArray, final int aRowA, final int aRowB) {
-        final double[] tmpRow = rawArray[aRowA];
-        rawArray[aRowA] = rawArray[aRowB];
-        rawArray[aRowB] = tmpRow;
+    public static void exchangeRows(final double[][] target, final int rowA, final int rowB) {
+        final double[] tmpRow = target[rowA];
+        target[rowA] = target[rowB];
+        target[rowB] = tmpRow;
     }
 
-    public static void fillAll(final double[][] rawArray, final double aNmbr) {
-        final int tmpLength = rawArray.length;
+    public static void fillAll(final double[][] target, final double value) {
+        final int tmpLength = target.length;
         for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = rawArray[i].length;
+            final int tmpInnerLength = target[i].length;
             for (int j = 0; j < tmpInnerLength; j++) {
-                rawArray[i][j] = aNmbr;
+                target[i][j] = value;
             }
         }
     }
 
-    public static void fillColumn(final double[][] rawArray, final int aRow, final int aCol, final double aNmbr) {
-        final int tmpLength = rawArray.length;
-        for (int i = aRow; i < tmpLength; i++) {
-            rawArray[i][aCol] = aNmbr;
-        }
-    }
-
-    public static void fillDiagonal(final double[][] rawArray, final int aRow, final int aCol, final double aNmbr) {
-        final int tmpLength = rawArray.length;
-        for (int ij = 0; ((aRow + ij) < tmpLength) && ((aCol + ij) < rawArray[aRow + ij].length); ij++) {
-            rawArray[aRow + ij][aCol + ij] = aNmbr;
-        }
-    }
-
-    public static void fillMatching(final double[][] anArrayToBeUpdated, final double aLeftFirstArg, final BinaryFunction<Double> aFunc,
-            final double[][] aRightSecondArg) {
-        final int tmpLength = anArrayToBeUpdated.length;
+    public static void fillAll(final double[][] target, final DoubleSupplier supplier) {
+        final int tmpLength = target.length;
         for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = anArrayToBeUpdated[i].length;
+            final int tmpInnerLength = target[i].length;
             for (int j = 0; j < tmpInnerLength; j++) {
-                anArrayToBeUpdated[i][j] = aFunc.invoke(aLeftFirstArg, aRightSecondArg[i][j]);
+                target[i][j] = supplier.getAsDouble();
             }
         }
     }
 
-    public static void fillMatching(final double[][] anArrayToBeUpdated, final double[][] aLeftFirstArg, final BinaryFunction<Double> aFunc,
-            final double aRightSecondArg) {
-        final int tmpLength = anArrayToBeUpdated.length;
+    public static void fillColumn(final double[][] target, final int row, final int column, final double value) {
+        final int tmpLength = target.length;
+        for (int i = row; i < tmpLength; i++) {
+            target[i][column] = value;
+        }
+    }
+
+    public static void fillColumn(final double[][] target, final int row, final int column, final DoubleSupplier supplier) {
+        final int tmpLength = target.length;
+        for (int i = row; i < tmpLength; i++) {
+            target[i][column] = supplier.getAsDouble();
+        }
+    }
+
+    public static void fillDiagonal(final double[][] target, final int row, final int column, final double value) {
+        final int tmpLength = target.length;
+        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < target[row + ij].length); ij++) {
+            target[row + ij][column + ij] = value;
+        }
+    }
+
+    public static void fillDiagonal(final double[][] target, final int row, final int column, final DoubleSupplier supplier) {
+        final int tmpLength = target.length;
+        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < target[row + ij].length); ij++) {
+            target[row + ij][column + ij] = supplier.getAsDouble();
+        }
+    }
+
+    public static void fillMatching(final double[][] target, final double left, final DoubleBinaryOperator function, final double[][] right) {
+        final int tmpLength = target.length;
         for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = anArrayToBeUpdated[i].length;
+            final int tmpInnerLength = target[i].length;
             for (int j = 0; j < tmpInnerLength; j++) {
-                anArrayToBeUpdated[i][j] = aFunc.invoke(aLeftFirstArg[i][j], aRightSecondArg);
+                target[i][j] = function.applyAsDouble(left, right[i][j]);
             }
         }
     }
 
-    public static void fillMatching(final double[][] anArrayToBeUpdated, final double[][] aLeftFirstArg, final BinaryFunction<Double> aFunc,
-            final double[][] aRightSecondArg) {
-        final int tmpLength = anArrayToBeUpdated.length;
+    public static void fillMatching(final double[][] target, final double[][] left, final DoubleBinaryOperator function, final double right) {
+        final int tmpLength = target.length;
         for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = anArrayToBeUpdated[i].length;
+            final int tmpInnerLength = target[i].length;
             for (int j = 0; j < tmpInnerLength; j++) {
-                anArrayToBeUpdated[i][j] = aFunc.invoke(aLeftFirstArg[i][j], aRightSecondArg[i][j]);
+                target[i][j] = function.applyAsDouble(left[i][j], right);
             }
         }
     }
 
-    public static void fillRange(final double[][] rawArray, final int first, final int limit, final double value) {
+    public static void fillMatching(final double[][] target, final double[][] left, final DoubleBinaryOperator function, final double[][] right) {
+        final int tmpLength = target.length;
+        for (int i = 0; i < tmpLength; i++) {
+            final int tmpInnerLength = target[i].length;
+            for (int j = 0; j < tmpInnerLength; j++) {
+                target[i][j] = function.applyAsDouble(left[i][j], right[i][j]);
+            }
+        }
+    }
 
-        final int tmpLength = rawArray.length;
+    public static void fillRange(final double[][] target, final int first, final int limit, final double value) {
+
+        final int tmpLength = target.length;
 
         for (int index = first; index < limit; index++) {
             final int tmpRow = AccessUtils.row(index, tmpLength);
             final int tmpColumn = AccessUtils.column(index, tmpLength);
-            rawArray[tmpRow][tmpColumn] = value;
+            target[tmpRow][tmpColumn] = value;
         }
     }
 
-    public static void fillRow(final double[][] rawArray, final int aRow, final int aCol, final double aNmbr) {
-        final int tmpLength = rawArray[aRow].length;
-        for (int j = aCol; j < tmpLength; j++) {
-            rawArray[aRow][j] = aNmbr;
+    public static void fillRange(final double[][] target, final int first, final int limit, final DoubleSupplier supplier) {
+
+        final int tmpLength = target.length;
+
+        for (int index = first; index < limit; index++) {
+            final int tmpRow = AccessUtils.row(index, tmpLength);
+            final int tmpColumn = AccessUtils.column(index, tmpLength);
+            target[tmpRow][tmpColumn] = supplier.getAsDouble();
         }
     }
 
-    public static void modifyAll(final double[][] rawArray, final UnaryFunction<?> aFunc) {
-        final int tmpLength = rawArray.length;
+    public static void fillRow(final double[][] target, final int row, final int column, final double value) {
+        final int tmpLength = target[row].length;
+        for (int j = column; j < tmpLength; j++) {
+            target[row][j] = value;
+        }
+    }
+
+    public static void fillRow(final double[][] target, final int row, final int column, final DoubleSupplier supplier) {
+        final int tmpLength = target[row].length;
+        for (int j = column; j < tmpLength; j++) {
+            target[row][j] = supplier.getAsDouble();
+        }
+    }
+
+    public static void modifyAll(final double[][] target, final DoubleUnaryOperator function) {
+        final int tmpLength = target.length;
         for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = rawArray[i].length;
+            final int tmpInnerLength = target[i].length;
             for (int j = 0; j < tmpInnerLength; j++) {
-                rawArray[i][j] = aFunc.invoke(rawArray[i][j]);
+                target[i][j] = function.applyAsDouble(target[i][j]);
             }
         }
     }
 
-    public static void modifyColumn(final double[][] rawArray, final int aRow, final int aCol, final UnaryFunction<?> aFunc) {
-        final int tmpLength = rawArray.length;
-        for (int i = aRow; i < tmpLength; i++) {
-            rawArray[i][aCol] = aFunc.invoke(rawArray[i][aCol]);
+    public static void modifyColumn(final double[][] target, final int row, final int column, final DoubleUnaryOperator function) {
+        final int tmpLength = target.length;
+        for (int i = row; i < tmpLength; i++) {
+            target[i][column] = function.applyAsDouble(target[i][column]);
         }
     }
 
-    public static void modifyDiagonal(final double[][] rawArray, final int aRow, final int aCol, final UnaryFunction<?> aFunc) {
-        final int tmpLength = rawArray.length;
-        for (int ij = 0; ((aRow + ij) < tmpLength) && ((aCol + ij) < rawArray[aRow + ij].length); ij++) {
-            rawArray[aRow + ij][aCol + ij] = aFunc.invoke(rawArray[aRow + ij][aCol + ij]);
+    public static void modifyDiagonal(final double[][] target, final int row, final int column, final DoubleUnaryOperator function) {
+        final int tmpLength = target.length;
+        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < target[row + ij].length); ij++) {
+            target[row + ij][column + ij] = function.applyAsDouble(target[row + ij][column + ij]);
         }
     }
 
-    public static void modifyRow(final double[][] rawArray, final int aRow, final int aCol, final UnaryFunction<?> aFunc) {
-        final int tmpLength = rawArray[aRow].length;
-        for (int j = aCol; j < tmpLength; j++) {
-            rawArray[aRow][j] = aFunc.invoke(rawArray[aRow][j]);
+    public static void modifyRow(final double[][] target, final int row, final int column, final DoubleUnaryOperator function) {
+        final int tmpLength = target[row].length;
+        for (int j = column; j < tmpLength; j++) {
+            target[row][j] = function.applyAsDouble(target[row][j]);
         }
     }
 
@@ -266,183 +304,162 @@ public abstract class ArrayUtils {
         return ArrayUtils.toRawCopyOf((Access2D<?>) original);
     }
 
-    public static void visitAll(final double[][] rawArray, final VoidFunction<?> visitor) {
-        final int tmpLength = rawArray.length;
+    public static void visitAll(final double[][] target, final DoubleConsumer visitor) {
+        final int tmpLength = target.length;
         for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = rawArray[i].length;
+            final int tmpInnerLength = target[i].length;
             for (int j = 0; j < tmpInnerLength; j++) {
-                visitor.invoke(rawArray[i][j]);
+                visitor.accept(target[i][j]);
             }
         }
     }
 
-    public static void visitColumn(final double[][] rawArray, final int aRow, final int aCol, final VoidFunction<?> visitor) {
-        final int tmpLength = rawArray[aRow].length;
-        for (int j = aCol; j < tmpLength; j++) {
-            visitor.invoke(rawArray[aRow][j]);
+    public static void visitColumn(final double[][] target, final int row, final int column, final DoubleConsumer visitor) {
+        final int tmpLength = target[row].length;
+        for (int j = column; j < tmpLength; j++) {
+            visitor.accept(target[row][j]);
         }
     }
 
-    public static void visitDiagonal(final double[][] rawArray, final int aRow, final int aCol, final VoidFunction<?> visitor) {
-        final int tmpLength = rawArray.length;
-        for (int ij = 0; ((aRow + ij) < tmpLength) && ((aCol + ij) < rawArray[aRow + ij].length); ij++) {
-            visitor.invoke(rawArray[aRow + ij][aCol + ij]);
+    public static void visitDiagonal(final double[][] target, final int row, final int column, final DoubleConsumer visitor) {
+        final int tmpLength = target.length;
+        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < target[row + ij].length); ij++) {
+            visitor.accept(target[row + ij][column + ij]);
         }
     }
 
-    public static void visitRange(final double[][] rawArray, final int first, final int limit, final VoidFunction<?> visitor) {
-        final int tmpStructure = rawArray.length;
+    public static void visitRange(final double[][] target, final int first, final int limit, final DoubleConsumer visitor) {
+        final int tmpStructure = target.length;
         for (int index = first; index < limit; index++) {
-            visitor.invoke(rawArray[AccessUtils.row(index, tmpStructure)][AccessUtils.column(index, tmpStructure)]);
+            visitor.accept(target[AccessUtils.row(index, tmpStructure)][AccessUtils.column(index, tmpStructure)]);
         }
     }
 
-    public static void visitRow(final double[][] rawArray, final int aRow, final int aCol, final VoidFunction<?> visitor) {
-        final int tmpLength = rawArray.length;
-        for (int i = aRow; i < tmpLength; i++) {
-            visitor.invoke(rawArray[i][aCol]);
+    public static void visitRow(final double[][] target, final int row, final int column, final DoubleConsumer visitor) {
+        final int tmpLength = target.length;
+        for (int i = row; i < tmpLength; i++) {
+            visitor.accept(target[i][column]);
         }
     }
 
-    public static Access1D<Double> wrapAccess1D(final double[] aRaw) {
+    public static Access1D<Double> wrapAccess1D(final double[] target) {
         return new Access1D<Double>() {
 
             public long count() {
-                return aRaw.length;
+                return target.length;
             }
 
             public double doubleValue(final long index) {
-                return aRaw[(int) index];
+                return target[(int) index];
             }
 
             public Double get(final long index) {
-                return aRaw[(int) index];
-            }
-
-            public final Iterator<Double> iterator() {
-                return new Iterator1D<Double>(this);
+                return target[(int) index];
             }
 
         };
     }
 
-    public static <N extends Number> Access1D<N> wrapAccess1D(final List<? extends N> aList) {
+    public static <N extends Number> Access1D<N> wrapAccess1D(final List<? extends N> target) {
         return new Access1D<N>() {
 
             public long count() {
-                return aList.size();
+                return target.size();
             }
 
             public double doubleValue(final long index) {
-                return aList.get((int) index).doubleValue();
+                return target.get((int) index).doubleValue();
             }
 
             public N get(final long index) {
-                return aList.get((int) index);
-            }
-
-            public final Iterator<N> iterator() {
-                return new Iterator1D<N>(this);
+                return target.get((int) index);
             }
 
         };
     }
 
-    public static <N extends Number> Access1D<N> wrapAccess1D(final N[] aRaw) {
+    public static <N extends Number> Access1D<N> wrapAccess1D(final N[] target) {
         return new Access1D<N>() {
 
             public long count() {
-                return aRaw.length;
+                return target.length;
             }
 
             public double doubleValue(final long index) {
-                return aRaw[(int) index].doubleValue();
+                return target[(int) index].doubleValue();
             }
 
             public N get(final long index) {
-                return aRaw[(int) index];
-            }
-
-            public final Iterator<N> iterator() {
-                return new Iterator1D<N>(this);
+                return target[(int) index];
             }
 
         };
     }
 
-    public static Access2D<Double> wrapAccess2D(final double[][] aRaw) {
+    public static Access2D<Double> wrapAccess2D(final double[][] target) {
         return new Access2D<Double>() {
 
             public long count() {
-                return aRaw.length * aRaw[0].length;
+                return target.length * target[0].length;
             }
 
             public long countColumns() {
-                return aRaw[0].length;
+                return target[0].length;
             }
 
             public long countRows() {
-                return aRaw.length;
+                return target.length;
             }
 
             public double doubleValue(final long index) {
-                return aRaw[AccessUtils.row((int) index, aRaw.length)][AccessUtils.column((int) index, aRaw.length)];
+                return target[AccessUtils.row((int) index, target.length)][AccessUtils.column((int) index, target.length)];
             }
 
-            public double doubleValue(final long aRow, final long aCol) {
-                return aRaw[(int) aRow][(int) aCol];
+            public double doubleValue(final long row, final long column) {
+                return target[(int) row][(int) column];
             }
 
             public Double get(final long index) {
-                return aRaw[AccessUtils.row((int) index, aRaw.length)][AccessUtils.column((int) index, aRaw.length)];
+                return target[AccessUtils.row((int) index, target.length)][AccessUtils.column((int) index, target.length)];
 
             }
 
-            public Double get(final long aRow, final long aCol) {
-                return aRaw[(int) aRow][(int) aCol];
-            }
-
-            public Iterator<Double> iterator() {
-                return new Iterator1D<Double>(this);
+            public Double get(final long row, final long column) {
+                return target[(int) row][(int) column];
             }
 
         };
     }
 
-    public static <N extends Number> Access2D<N> wrapAccess2D(final N[][] aRaw) {
+    public static <N extends Number> Access2D<N> wrapAccess2D(final N[][] target) {
         return new Access2D<N>() {
 
             public long count() {
-                return aRaw.length * aRaw[0].length;
+                return target.length * target[0].length;
             }
 
             public long countColumns() {
-                return aRaw[0].length;
+                return target[0].length;
             }
 
             public long countRows() {
-                return aRaw.length;
+                return target.length;
             }
 
             public double doubleValue(final long index) {
-                return aRaw[AccessUtils.row((int) index, aRaw.length)][AccessUtils.column((int) index, aRaw.length)].doubleValue();
+                return target[AccessUtils.row((int) index, target.length)][AccessUtils.column((int) index, target.length)].doubleValue();
             }
 
-            public double doubleValue(final long aRow, final long aCol) {
-                return aRaw[(int) aRow][(int) aCol].doubleValue();
+            public double doubleValue(final long row, final long column) {
+                return target[(int) row][(int) column].doubleValue();
             }
 
             public N get(final long index) {
-                // TODO Auto-generated method stub
-                return null;
+                throw new RuntimeException("Can't do this!");
             }
 
-            public N get(final long aRow, final long aCol) {
-                return aRaw[(int) aRow][(int) aCol];
-            }
-
-            public Iterator<N> iterator() {
-                return new Iterator1D<N>(this);
+            public N get(final long row, final long column) {
+                return target[(int) row][(int) column];
             }
 
         };

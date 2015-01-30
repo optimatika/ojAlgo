@@ -23,20 +23,20 @@ package org.ojalgo.array;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Iterator;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 
@@ -71,13 +71,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
             if (tmpTotal > Integer.MAX_VALUE) {
                 return this.getSegmentedFactory().makeStructuredZero(structure);
-
             } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getDenseFactory().getElementSize())) {
                 return new SparseArray<N>(tmpTotal, this.getDenseFactory());
             } else {
                 return this.getDenseFactory().makeStructuredZero(structure);
             }
-
         }
 
         @Override
@@ -133,6 +131,25 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     };
 
+    static final BasicFactory<Quaternion> QUATERNION = new BasicFactory<Quaternion>() {
+
+        @Override
+        DenseFactory<Quaternion> getDenseFactory() {
+            return QuaternionArray.FACTORY;
+        }
+
+        @Override
+        SegmentedFactory<Quaternion> getSegmentedFactory() {
+            return SegmentedArray.QUATERNION;
+        }
+
+        @Override
+        SparseFactory<Quaternion> getSparseFactory() {
+            return SparseArray.QUATERNION;
+        }
+
+    };
+
     static final BasicFactory<Double> PRIMITIVE = new BasicFactory<Double>() {
 
         @Override
@@ -173,10 +190,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     protected BasicArray() {
         super();
-    }
-
-    public Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     public void modifyAll(final UnaryFunction<N> function) {
@@ -259,9 +272,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     protected abstract void fill(long first, long limit, long step, N value);
 
+    protected abstract void fill(long first, long limit, long step, NullaryFunction<N> supplier);
+
     protected abstract long indexOfLargest(long first, long limit, long step);
 
-    protected abstract boolean isZeros(long first, long limit, long step);
+    protected abstract boolean isSmall(long first, long limit, long step, double comparedTo);
 
     protected abstract void modify(long first, long limit, long step, Access1D<N> left, BinaryFunction<N> function);
 

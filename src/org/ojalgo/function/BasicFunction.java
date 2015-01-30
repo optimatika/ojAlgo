@@ -33,7 +33,7 @@ public interface BasicFunction<N extends Number> {
 
         F buildPrimitive();
 
-        N integrate(N aFromPoint, N aToPoint);
+        N integrate(N fromPoint, N toPoint);
 
     }
 

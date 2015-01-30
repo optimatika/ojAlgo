@@ -200,7 +200,7 @@ public abstract class TypeUtils {
 
             } else {
 
-                retVal = ComplexNumber.makeReal(number.doubleValue());
+                retVal = ComplexNumber.valueOf(number.doubleValue());
             }
         }
 
@@ -226,7 +226,7 @@ public abstract class TypeUtils {
 
             } else if (number instanceof ComplexNumber) {
 
-                retVal = new Quaternion(number.doubleValue(), ((ComplexNumber) number).i);
+                retVal = Quaternion.valueOf((ComplexNumber) number);
 
             } else {
 

@@ -69,7 +69,7 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
     }
 
     public ComplexNumber toComplexNumber(final int row, final int column) {
-        return ComplexNumber.makeReal(this.getStore().doubleValue(row, column));
+        return ComplexNumber.valueOf(this.getStore().doubleValue(row, column));
     }
 
     @Override

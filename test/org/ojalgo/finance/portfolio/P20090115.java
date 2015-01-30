@@ -47,7 +47,7 @@ class P20090115 {
         return sum / (n - 1);
     }
 
-    public BasicMatrix<?> getCovariances(final double[][] returns) {
+    public BasicMatrix getCovariances(final double[][] returns) {
 
         final int row = returns.length;
         final int col = returns[0].length;
@@ -64,7 +64,7 @@ class P20090115 {
         return tmpBuilder.build();
     }
 
-    public BasicMatrix<?> getExpectedExcessReturns(final double[][] returns) {
+    public BasicMatrix getExpectedExcessReturns(final double[][] returns) {
 
         final int row = returns.length;
         final int col = returns[0].length;

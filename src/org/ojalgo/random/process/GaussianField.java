@@ -31,10 +31,8 @@ import java.util.TreeSet;
 
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.decomposition.SingularValueDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
@@ -51,7 +49,7 @@ import org.ojalgo.type.keyvalue.ComparableToDouble;
  * generalization, as well as the underlying implementation, of {@linkplain GaussianProcess}. Prior to calling
  * {@linkplain #getDistribution(boolean, double)} you must call {@linkplain #addObservation(double, double)} one or more
  * times.
- * 
+ *
  * @author apete
  */
 public final class GaussianField<K extends Comparable<K>> {
@@ -137,24 +135,24 @@ public final class GaussianField<K extends Comparable<K>> {
         final MatrixStore<Double> tmpM2differenses = this.getM2differenses();
 
         final PrimitiveDenseStore tmpLocations = FACTORY.makeZero(tmpM1.countRows(), tmpM1.countColumns());
-        tmpLocations.fillMatching(tmpM1, ADD, tmpRegCoef.multiplyRight(tmpM2differenses));
+        tmpLocations.fillMatching(tmpM1, ADD, tmpRegCoef.multiply(tmpM2differenses));
 
         final MatrixStore<Double> tmpC11 = this.getC11(evaluationPoint);
         final MatrixStore<Double> tmpC21 = this.getC21(evaluationPoint);
 
         final PrimitiveDenseStore tmpCovariances = FACTORY.makeZero(tmpC11.countRows(), tmpC11.countColumns());
-        tmpCovariances.fillMatching(tmpC11, SUBTRACT, tmpRegCoef.multiplyRight(tmpC21));
+        tmpCovariances.fillMatching(tmpC11, SUBTRACT, tmpRegCoef.multiply(tmpC21));
 
         if (cleanCovariances) {
 
-            final Eigenvalue<Double> tmpEvD = EigenvalueDecomposition.makePrimitive(true);
+            final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
             tmpEvD.compute(tmpCovariances, false);
 
             final MatrixStore<Double> tmpV = tmpEvD.getV();
             final PhysicalStore<Double> tmpD = tmpEvD.getD().copy();
 
             final double tmpLargest = tmpD.doubleValue(0, 0);
-            final double tmpLimit = Math.max(PrimitiveMath.MACHINE_DOUBLE_ERROR * tmpLargest, 1E-12);
+            final double tmpLimit = Math.max(PrimitiveMath.MACHINE_EPSILON * tmpLargest, 1E-12);
 
             final int tmpLength = (int) Math.min(tmpD.countRows(), tmpD.countColumns());
             for (int ij = 0; ij < tmpLength; ij++) {
@@ -163,7 +161,7 @@ public final class GaussianField<K extends Comparable<K>> {
                 }
             }
 
-            tmpCovariances.fillMatching(tmpD.multiplyLeft(tmpV).multiplyRight(tmpV.builder().transpose().build()));
+            tmpCovariances.fillMatching(tmpD.multiplyLeft(tmpV).multiply(tmpV.builder().transpose().build()));
         }
 
         return new Normal1D(tmpLocations, tmpCovariances);
@@ -239,7 +237,7 @@ public final class GaussianField<K extends Comparable<K>> {
             }
         }
 
-        final SingularValue<Double> retVal = SingularValueDecomposition.makePrimitive();
+        final SingularValue<Double> retVal = SingularValue.makePrimitive();
 
         retVal.compute(tmpMatrix);
 

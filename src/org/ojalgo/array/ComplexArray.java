@@ -24,9 +24,12 @@ package org.ojalgo.array;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -106,6 +109,12 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
         }
     }
 
+    protected static void fill(final ComplexNumber[] data, final int first, final int limit, final int step, final NullaryFunction<ComplexNumber> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data[i] = supplier.invoke();
+        }
+    }
+
     protected static void invoke(final ComplexNumber[] data, final int first, final int limit, final int step, final Access1D<ComplexNumber> left,
             final BinaryFunction<ComplexNumber> function, final Access1D<ComplexNumber> right) {
         for (int i = first; i < limit; i += step) {
@@ -178,6 +187,10 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
         return Arrays.hashCode(data);
     }
 
+    public Spliterator<ComplexNumber> spliterator() {
+        return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
+    }
+
     protected final ComplexNumber[] copyOfData() {
         return ArrayUtils.copyOf(data);
     }
@@ -220,6 +233,11 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
     }
 
     @Override
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<ComplexNumber> supplier) {
+        ComplexArray.fill(data, first, limit, step, supplier);
+    }
+
+    @Override
     protected final ComplexNumber get(final int index) {
         return data[index];
     }
@@ -243,40 +261,23 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
     }
 
     @Override
-    protected final boolean isAbsolute(final int index) {
+    protected boolean isAbsolute(final int index) {
         return ComplexNumber.isAbsolute(data[index]);
     }
 
     @Override
-    protected final boolean isPositive(final int index) {
-        return ComplexNumber.isPositive(data[index]);
-    }
-
-    @Override
-    protected final boolean isZero(final int index) {
-        return ComplexNumber.isZero(data[index]);
-    }
-
-    @Override
-    protected final boolean isZeros(final int first, final int limit, final int step) {
-
-        boolean retVal = true;
-
-        for (int i = first; retVal && (i < limit); i += step) {
-            retVal &= this.isZero(i);
-        }
-
-        return retVal;
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return ComplexNumber.isSmall(comparedTo, data[index]);
     }
 
     @Override
     protected void modify(final int index, final Access1D<ComplexNumber> left, final BinaryFunction<ComplexNumber> function) {
-        // TODO Auto-generated method stub
+        data[index] = function.invoke(left.get(index), data[index]);
     }
 
     @Override
     protected void modify(final int index, final BinaryFunction<ComplexNumber> function, final Access1D<ComplexNumber> right) {
-        // TODO Auto-generated method stub
+        data[index] = function.invoke(data[index], right.get(index));
     }
 
     @Override
@@ -326,7 +327,7 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
 
     @Override
     protected final void set(final int index, final double value) {
-        data[index] = ComplexNumber.makeReal(value);
+        data[index] = ComplexNumber.valueOf(value);
     }
 
     @Override
@@ -370,8 +371,8 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
     }
 
     @Override
-    protected boolean isSmall(final int index, final double comparedTo) {
-        return ComplexNumber.isSmall(comparedTo, data[index]);
+    protected void modifyOne(final int index, final UnaryFunction<ComplexNumber> function) {
+        data[index] = function.invoke(data[index]);
     }
 
 }

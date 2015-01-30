@@ -30,7 +30,11 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class RationalNumber extends AbstractScalar<RationalNumber> implements Enforceable<RationalNumber> {
+public final class RationalNumber extends Number implements Scalar<RationalNumber>, Enforceable<RationalNumber> {
+
+    public static RationalNumber valueOf(final double value) {
+        return new RationalNumber(BigDecimal.valueOf(value));
+    }
 
     public static final Scalar.Factory<RationalNumber> FACTORY = new Scalar.Factory<RationalNumber>() {
 
@@ -135,16 +139,8 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
         return ((value.getNumerator().signum() == 0) && (value.getDenominator().signum() == 0));
     }
 
-    public static boolean isPositive(final RationalNumber value) {
-        return (value.getNumerator().signum() > 0) && (value.getDenominator().signum() > 0);
-    }
-
     public static boolean isSmall(final double comparedTo, final RationalNumber value) {
         return value.isSmall(comparedTo);
-    }
-
-    public static boolean isZero(final RationalNumber value) {
-        return ((value.getNumerator().signum() == 0) && (value.getDenominator().signum() != 0)) || RationalNumber.isSmall(PrimitiveMath.ONE, value);
     }
 
     private static String toString(final RationalNumber aNmbr) {
@@ -386,7 +382,7 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
     }
 
     public boolean isSmall(final double comparedTo) {
-        return AbstractScalar.BIG.isSmall(comparedTo, this.doubleValue());
+        return BigScalar.CONTEXT.isSmall(comparedTo, this.doubleValue());
     }
 
     @Override
@@ -432,7 +428,7 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
     }
 
     public RationalNumber signum() {
-        if (RationalNumber.isZero(this)) {
+        if (RationalNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ZERO;
         } else if (this.sign() == -1) {
             return ONE.negate();
@@ -468,7 +464,7 @@ public final class RationalNumber extends AbstractScalar<RationalNumber> impleme
 
     public BigDecimal toBigDecimal() {
         if (myDecimal == null) {
-            myDecimal = this.toBigDecimal(AbstractScalar.BIG.getMathContext());
+            myDecimal = this.toBigDecimal(BigScalar.CONTEXT.getMathContext());
         }
         return myDecimal;
     }

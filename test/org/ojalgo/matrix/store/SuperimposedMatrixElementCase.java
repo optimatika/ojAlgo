@@ -59,7 +59,7 @@ public class SuperimposedMatrixElementCase extends NonPhysicalTest {
 
         myBigStore = new SuperimposedStore<BigDecimal>(aBase, tmpRowIndex, tmpColumnIndex, new SingleStore<BigDecimal>(aBase.factory(), tmpElement));
         final MatrixStore<ComplexNumber> aBase1 = ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpBase);
-        myComplexStore = new SuperimposedStore<ComplexNumber>(aBase1, tmpRowIndex, tmpColumnIndex, new SingleStore<ComplexNumber>(aBase1.factory(), ComplexNumber.makeReal(tmpElement.doubleValue())));
+        myComplexStore = new SuperimposedStore<ComplexNumber>(aBase1, tmpRowIndex, tmpColumnIndex, new SingleStore<ComplexNumber>(aBase1.factory(), ComplexNumber.valueOf(tmpElement.doubleValue())));
         final MatrixStore<Double> aBase2 = PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpBase);
         myPrimitiveStore = new SuperimposedStore<Double>(aBase2, tmpRowIndex, tmpColumnIndex, new SingleStore<Double>(aBase2.factory(), tmpElement.doubleValue()));
     }

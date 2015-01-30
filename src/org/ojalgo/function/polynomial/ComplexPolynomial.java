@@ -24,7 +24,6 @@ package org.ojalgo.function.polynomial;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.decomposition.QRDecomposition;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -61,17 +60,17 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
             tmpRHS.set(i, 0, tmpY);
         }
 
-        final QR<ComplexNumber> tmpQR = QRDecomposition.makeComplex();
+        final QR<ComplexNumber> tmpQR = QR.makeComplex();
         tmpQR.compute(tmpBody);
         this.set(tmpQR.solve(tmpRHS));
     }
 
-    public ComplexNumber integrate(final ComplexNumber aFromPoint, final ComplexNumber aToPoint) {
+    public ComplexNumber integrate(final ComplexNumber fromPoint, final ComplexNumber toPoint) {
 
         final PolynomialFunction<ComplexNumber> tmpPrim = this.buildPrimitive();
 
-        final ComplexNumber tmpFromVal = tmpPrim.invoke(aFromPoint);
-        final ComplexNumber tmpToVal = tmpPrim.invoke(aToPoint);
+        final ComplexNumber tmpFromVal = tmpPrim.invoke(fromPoint);
+        final ComplexNumber tmpToVal = tmpPrim.invoke(toPoint);
 
         return tmpToVal.subtract(tmpFromVal);
     }

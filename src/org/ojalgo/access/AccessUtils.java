@@ -22,7 +22,6 @@
 package org.ojalgo.access;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
@@ -44,10 +43,6 @@ public abstract class AccessUtils {
 
             public BigDecimal get(final long index) {
                 return TypeUtils.toBigDecimal(access.get(index));
-            }
-
-            public Iterator<BigDecimal> iterator() {
-                return new Iterator1D<>(this);
             }
 
         };
@@ -84,10 +79,6 @@ public abstract class AccessUtils {
                 return TypeUtils.toBigDecimal(access.get(row, column));
             }
 
-            public Iterator<BigDecimal> iterator() {
-                return new Iterator1D<>(this);
-            }
-
         };
     }
 
@@ -118,10 +109,6 @@ public abstract class AccessUtils {
                 return TypeUtils.toBigDecimal(access.get(reference));
             }
 
-            public Iterator<BigDecimal> iterator() {
-                return new Iterator1D<>(this);
-            }
-
             public long[] structure() {
                 return access.structure();
             }
@@ -142,10 +129,6 @@ public abstract class AccessUtils {
 
             public ComplexNumber get(final long index) {
                 return TypeUtils.toComplexNumber(access.get(index));
-            }
-
-            public Iterator<ComplexNumber> iterator() {
-                return new Iterator1D<>(this);
             }
 
         };
@@ -182,10 +165,6 @@ public abstract class AccessUtils {
                 return TypeUtils.toComplexNumber(access.get(row, column));
             }
 
-            public Iterator<ComplexNumber> iterator() {
-                return new Iterator1D<>(this);
-            }
-
         };
     }
 
@@ -216,10 +195,6 @@ public abstract class AccessUtils {
                 return TypeUtils.toComplexNumber(access.get(reference));
             }
 
-            public Iterator<ComplexNumber> iterator() {
-                return new Iterator1D<>(this);
-            }
-
             public long[] structure() {
                 return access.structure();
             }
@@ -240,10 +215,6 @@ public abstract class AccessUtils {
 
             public Double get(final long index) {
                 return access.doubleValue(index);
-            }
-
-            public Iterator<Double> iterator() {
-                return new Iterator1D<>(this);
             }
 
         };
@@ -280,10 +251,6 @@ public abstract class AccessUtils {
                 return access.doubleValue(row, column);
             }
 
-            public Iterator<Double> iterator() {
-                return new Iterator1D<>(this);
-            }
-
         };
     }
 
@@ -314,10 +281,6 @@ public abstract class AccessUtils {
                 return access.doubleValue(reference);
             }
 
-            public Iterator<Double> iterator() {
-                return new Iterator1D<>(this);
-            }
-
             public long[] structure() {
                 return access.structure();
             }
@@ -338,10 +301,6 @@ public abstract class AccessUtils {
 
             public RationalNumber get(final long index) {
                 return TypeUtils.toRationalNumber(access.get(index));
-            }
-
-            public Iterator<RationalNumber> iterator() {
-                return new Iterator1D<>(this);
             }
 
         };
@@ -378,10 +337,6 @@ public abstract class AccessUtils {
                 return TypeUtils.toRationalNumber(access.get(row, column));
             }
 
-            public Iterator<RationalNumber> iterator() {
-                return new Iterator1D<>(this);
-            }
-
         };
     }
 
@@ -410,10 +365,6 @@ public abstract class AccessUtils {
 
             public RationalNumber get(final long[] reference) {
                 return TypeUtils.toRationalNumber(access.get(reference));
-            }
-
-            public Iterator<RationalNumber> iterator() {
-                return new Iterator1D<>(this);
             }
 
             public long[] structure() {

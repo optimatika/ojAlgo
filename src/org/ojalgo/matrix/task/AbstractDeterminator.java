@@ -23,7 +23,6 @@ package org.ojalgo.matrix.task;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.decomposition.LUDecomposition;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
@@ -245,7 +244,7 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
         BasicLogger.debug("Unwrapped", tmpDestination);
 
-        final LU<Double> tmpLU = LUDecomposition.makePrimitive();
+        final LU<Double> tmpLU = LU.makePrimitive();
 
         final long luBefore = System.nanoTime();
         for (int l = 0; l < tmpI; l++) {

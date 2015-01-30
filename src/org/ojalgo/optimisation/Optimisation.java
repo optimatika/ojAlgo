@@ -24,11 +24,9 @@ package org.ojalgo.optimisation;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
@@ -37,6 +35,42 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 public interface Optimisation {
+
+    public static interface Capabilities extends Optimisation {
+
+        default boolean convexConstraints() {
+            return false;
+        }
+
+        default boolean convexObjective() {
+            return false;
+        }
+
+        /**
+         * If this is true then it is assumed that integer variables can be handled in combination with every other
+         * capalility.
+         */
+        default boolean integerVariables() {
+            return false;
+        }
+
+        default boolean linearConstraints() {
+            return this.convexConstraints();
+        }
+
+        default boolean linearObjective() {
+            return this.convexObjective();
+        }
+
+        default boolean quadraticConstraints() {
+            return this.convexConstraints();
+        }
+
+        default boolean quadraticObjective() {
+            return this.convexObjective();
+        }
+
+    }
 
     /**
      * Constraint
@@ -77,6 +111,35 @@ public interface Optimisation {
 
     }
 
+    public static interface Integration<M extends Optimisation.Model, S extends Optimisation.Solver> extends Optimisation {
+
+        /**
+         * An integration must be able to instantiate a solver that can handle (any) model instance.
+         */
+        S build(M model);
+
+        /**
+         * Extract state from the model and convert it to solver state.
+         */
+        Optimisation.Result extractSolverState(M model);
+
+        /**
+         * The capabilities of this model solver combination.
+         */
+        Capabilities getCapabilities();
+
+        /**
+         * Convert solver state to model state.
+         */
+        Optimisation.Result toModelState(Optimisation.Result solverState, M model);
+
+        /**
+         * Convert model state to solver state.
+         */
+        Optimisation.Result toSolverState(Optimisation.Result modelState, M model);
+
+    }
+
     public static interface Model extends Optimisation {
 
         Optimisation.Result maximise();
@@ -113,16 +176,16 @@ public interface Optimisation {
     public static final class Options implements Optimisation, Cloneable {
 
         /**
-         * Which {@linkplain Solver} to debug. Null means ALL solvers. This setting is only relevant if
-         * {@link #debug_appender} has been set.
-         */
-        public Class<? extends Optimisation.Solver> debug_solver = null;
-
-        /**
          * If this is null nothing is printed, if it is not null then debug statements are printed to that
          * {@linkplain BasicLogger.Appender}.
          */
         public BasicLogger.Appender debug_appender = null;
+
+        /**
+         * Which {@linkplain Solver} to debug. Null means ALL solvers. This setting is only relevant if
+         * {@link #debug_appender} has been set.
+         */
+        public Class<? extends Optimisation.Solver> debug_solver = null;
 
         /**
          * Used to determine if a variable value is integer or not.
@@ -227,9 +290,6 @@ public interface Optimisation {
 
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result>, Serializable {
 
-        private int[] myActiveSet = null;
-        private int[] myBasis = null;
-
         private final Access1D<?> mySolution;
         private final Optimisation.State myState;
         private final double myValue; // Objective Function Value
@@ -254,16 +314,6 @@ public interface Optimisation {
             this(state, result.getValue(), result);
         }
 
-        public Result activeSet(final int[] activeSet) {
-            myActiveSet = activeSet;
-            return this;
-        }
-
-        public Result basis(final int[] basis) {
-            myBasis = basis;
-            return this;
-        }
-
         public int compareTo(final Result reference) {
 
             final double tmpRefValue = reference.getValue();
@@ -281,8 +331,8 @@ public interface Optimisation {
             return mySolution.count();
         }
 
-        public double doubleValue(final long anInd) {
-            return mySolution.doubleValue(anInd);
+        public double doubleValue(final long index) {
+            return mySolution.doubleValue(index);
         }
 
         @Override
@@ -310,18 +360,13 @@ public interface Optimisation {
             return TypeUtils.toBigDecimal(mySolution.get(index));
         }
 
-        public int[] getActiveSet() {
-            return myActiveSet;
-        }
-
-        public int[] getBasis() {
-            return myBasis;
-        }
-
         public Optimisation.State getState() {
             return myState;
         }
 
+        /**
+         * Objective Function Value
+         */
         public double getValue() {
             return myValue;
         }
@@ -335,18 +380,6 @@ public interface Optimisation {
             temp = Double.doubleToLongBits(myValue);
             result = (prime * result) + (int) (temp ^ (temp >>> 32));
             return result;
-        }
-
-        public boolean isActiveSetDefined() {
-            return myActiveSet != null;
-        }
-
-        public boolean isBasisDefined() {
-            return myBasis != null;
-        }
-
-        public Iterator<BigDecimal> iterator() {
-            return new Iterator1D<BigDecimal>(this);
         }
 
         public int size() {
@@ -373,7 +406,9 @@ public interface Optimisation {
      */
     public static interface Solver extends Optimisation {
 
-        Optimisation.Result solve();
+        default Optimisation.Result solve() {
+            return this.solve(null);
+        };
 
         Optimisation.Result solve(Optimisation.Result kickStarter);
 

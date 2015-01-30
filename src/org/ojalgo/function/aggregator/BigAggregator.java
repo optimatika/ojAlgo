@@ -63,12 +63,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    myCount += anArg.intValue();
+                public void merge(final BigDecimal result) {
+                    myCount += result.intValue();
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return ADD.invoke(aResult1, aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -112,12 +112,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    this.invoke(anArg);
+                public void merge(final BigDecimal result) {
+                    this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return aResult1.max(aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return result1.max(result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -160,12 +160,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    this.invoke(anArg);
+                public void merge(final BigDecimal result) {
+                    this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return aResult1.max(aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return result1.max(result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -208,12 +208,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    this.invoke(anArg);
+                public void merge(final BigDecimal result) {
+                    this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return ADD.invoke(aResult1, aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -256,12 +256,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    this.invoke(anArg);
+                public void merge(final BigDecimal result) {
+                    this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return HYPOT.invoke(aResult1, aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return HYPOT.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -304,12 +304,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    this.invoke(anArg);
+                public void merge(final BigDecimal result) {
+                    this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return MULTIPLY.invoke(aResult1, aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return MULTIPLY.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -352,12 +352,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    myNumber = MULTIPLY.invoke(myNumber, anArg);
+                public void merge(final BigDecimal result) {
+                    myNumber = MULTIPLY.invoke(myNumber, result);
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return MULTIPLY.invoke(aResult1, aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return MULTIPLY.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -406,12 +406,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    this.invoke(anArg);
+                public void merge(final BigDecimal result) {
+                    this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return BigFunction.MIN.invoke(aResult1, aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return BigFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -458,12 +458,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    this.invoke(anArg);
+                public void merge(final BigDecimal result) {
+                    this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return BigFunction.MIN.invoke(aResult1, aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return BigFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -506,12 +506,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    this.invoke(anArg);
+                public void merge(final BigDecimal result) {
+                    this.invoke(result);
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return ADD.invoke(aResult1, aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {
@@ -554,12 +554,12 @@ public abstract class BigAggregator {
                     this.invoke(new BigDecimal(anArg));
                 }
 
-                public void merge(final BigDecimal anArg) {
-                    myNumber = ADD.invoke(myNumber, anArg);
+                public void merge(final BigDecimal result) {
+                    myNumber = ADD.invoke(myNumber, result);
                 }
 
-                public BigDecimal merge(final BigDecimal aResult1, final BigDecimal aResult2) {
-                    return ADD.invoke(aResult1, aResult2);
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return ADD.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<BigDecimal> reset() {

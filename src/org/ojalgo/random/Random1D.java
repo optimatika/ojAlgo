@@ -26,7 +26,6 @@ import java.util.Random;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.Alternator;
@@ -42,7 +41,7 @@ public class Random1D {
 
         super();
 
-        final Cholesky<Double> tmpCholesky = CholeskyDecomposition.makePrimitive();
+        final Cholesky<Double> tmpCholesky = Cholesky.makePrimitive();
         tmpCholesky.compute(aCorrelationsMatrix);
         myCholeskiedCorrelations = tmpCholesky.getL();
 

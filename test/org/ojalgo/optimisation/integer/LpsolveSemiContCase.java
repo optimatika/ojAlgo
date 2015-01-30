@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.type.context.NumberContext;
@@ -46,10 +45,10 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
     public void _testSemiContNot() {
 
         final File tmpFile = new File(PATH + "lpsolve_sc_not.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpSolution = tmpSolver.solve();
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
+
+        final Optimisation.Result tmpSolution = tmpModel.minimise(); // vet ej om in eller max
 
         TestUtils.assertTrue(tmpModel.validate());
 
@@ -66,10 +65,10 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
     public void _testSemiContOrg() {
 
         final File tmpFile = new File(PATH + "lpsolve_sc_org.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
-        final GenericSolver tmpSolver = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpSolution = tmpSolver.solve();
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
+
+        final Optimisation.Result tmpSolution = tmpModel.minimise(); // vet ej om in eller max
 
         TestUtils.assertTrue(tmpModel.validate());
 

@@ -51,16 +51,16 @@ public class SetGetTest extends BasicArrayTest {
 
                 Assert.assertEquals(i, INDICES[tmpIndex]);
 
-                Assert.assertEquals(1.0, array.doubleValue(i), PrimitiveMath.MACHINE_DOUBLE_ERROR);
+                Assert.assertEquals(1.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
 
             } else {
 
-                Assert.assertEquals(0.0, array.doubleValue(i), PrimitiveMath.MACHINE_DOUBLE_ERROR);
+                Assert.assertEquals(0.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
             }
         }
 
         for (int i = 0; i < INDICES.length; i++) {
-            Assert.assertEquals(1.0, array.doubleValue(INDICES[i]), PrimitiveMath.MACHINE_DOUBLE_ERROR);
+            Assert.assertEquals(1.0, array.doubleValue(INDICES[i]), PrimitiveMath.MACHINE_EPSILON);
         }
 
     }

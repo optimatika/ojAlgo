@@ -21,10 +21,8 @@
  */
 package org.ojalgo.function.polynomial;
 
-import java.util.Iterator;
 import java.util.List;
 
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.series.NumberSeries;
@@ -116,10 +114,6 @@ abstract class AbstractPolynomial<N extends Number> implements PolynomialFunctio
         }
 
         return retVal;
-    }
-
-    public final Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     public final void set(final int aPower, final double aNmbr) {

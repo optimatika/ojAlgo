@@ -38,6 +38,7 @@ import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -72,10 +73,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     }
 
-    public boolean isSmall(final long row, final long column, final double comparedTo) {
-        return myUtility.isSmall(row, column, comparedTo);
-    }
-
     public static interface PrimitiveMultiplyLeft {
 
         void invoke(double[] product, Access1D<?> left, int complexity, double[] right);
@@ -88,7 +85,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     }
 
-    public static final DecompositionStore.Factory<Double, PrimitiveDenseStore> FACTORY = new DecompositionStore.Factory<Double, PrimitiveDenseStore>() {
+    public static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = new DecompositionStore.Factory<Double, PrimitiveDenseStore>() {
 
         public AggregatorCollection<Double> aggregator() {
             return PrimitiveAggregator.getCollection();
@@ -385,7 +382,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                             if (w != PrimitiveMath.ZERO) {
                                 aMtrxH[i + (tmpDiagDim * ij)] = -r / w;
                             } else {
-                                aMtrxH[i + (tmpDiagDim * ij)] = -r / (PrimitiveMath.MACHINE_DOUBLE_ERROR * aNorm1);
+                                aMtrxH[i + (tmpDiagDim * ij)] = -r / (PrimitiveMath.MACHINE_EPSILON * aNorm1);
                             }
 
                             // Solve real equations
@@ -404,7 +401,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
                         // Overflow control
                         t = Math.abs(aMtrxH[i + (tmpDiagDim * ij)]);
-                        if (((PrimitiveMath.MACHINE_DOUBLE_ERROR * t) * t) > 1) {
+                        if (((PrimitiveMath.MACHINE_EPSILON * t) * t) > 1) {
                             for (int j = i; j <= ij; j++) {
                                 aMtrxH[j + (tmpDiagDim * ij)] = aMtrxH[j + (tmpDiagDim * ij)] / t;
                             }
@@ -422,8 +419,9 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     aMtrxH[(ij - 1) + (tmpDiagDim * ij)] = -(aMtrxH[ij + (tmpDiagDim * ij)] - p) / aMtrxH[ij + (tmpDiagDim * (ij - 1))];
                 } else {
 
-                    final ComplexNumber tmpX = ComplexNumber.makeRectangular(PrimitiveMath.ZERO, (-aMtrxH[(ij - 1) + (tmpDiagDim * ij)]));
-                    final ComplexNumber tmpY = ComplexNumber.makeRectangular((aMtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] - p), q);
+                    final ComplexNumber tmpX = new ComplexNumber(PrimitiveMath.ZERO, (-aMtrxH[(ij - 1) + (tmpDiagDim * ij)]));
+                    final double imaginary = q;
+                    final ComplexNumber tmpY = new ComplexNumber((aMtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] - p), imaginary);
 
                     final ComplexNumber tmpZ = tmpX.divide(tmpY);
 
@@ -449,8 +447,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     } else {
                         l = i;
                         if (tmpOffDiagonal[i] == 0) {
-                            final ComplexNumber tmpX = ComplexNumber.makeRectangular((-ra), (-sa));
-                            final ComplexNumber tmpY = ComplexNumber.makeRectangular(w, q);
+                            final ComplexNumber tmpX = new ComplexNumber((-ra), (-sa));
+                            final double real = w;
+                            final double imaginary = q;
+                            final ComplexNumber tmpY = new ComplexNumber(real, imaginary);
 
                             final ComplexNumber tmpZ = tmpX.divide(tmpY);
 
@@ -464,11 +464,13 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                             vr = (((tmpMainDiagonal[i] - p) * (tmpMainDiagonal[i] - p)) + (tmpOffDiagonal[i] * tmpOffDiagonal[i])) - (q * q);
                             vi = (tmpMainDiagonal[i] - p) * 2.0 * q;
                             if ((vr == PrimitiveMath.ZERO) & (vi == PrimitiveMath.ZERO)) {
-                                vr = PrimitiveMath.MACHINE_DOUBLE_ERROR * aNorm1 * (Math.abs(w) + Math.abs(q) + Math.abs(x) + Math.abs(y) + Math.abs(z));
+                                vr = PrimitiveMath.MACHINE_EPSILON * aNorm1 * (Math.abs(w) + Math.abs(q) + Math.abs(x) + Math.abs(y) + Math.abs(z));
                             }
 
-                            final ComplexNumber tmpX = ComplexNumber.makeRectangular((((x * r) - (z * ra)) + (q * sa)), ((x * s) - (z * sa) - (q * ra)));
-                            final ComplexNumber tmpY = ComplexNumber.makeRectangular(vr, vi);
+                            final ComplexNumber tmpX = new ComplexNumber((((x * r) - (z * ra)) + (q * sa)), ((x * s) - (z * sa) - (q * ra)));
+                            final double real = vr;
+                            final double imaginary = vi;
+                            final ComplexNumber tmpY = new ComplexNumber(real, imaginary);
 
                             final ComplexNumber tmpZ = tmpX.divide(tmpY);
 
@@ -482,9 +484,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                                 aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-sa - (w * aMtrxH[i + (tmpDiagDim * ij)]) - (q * aMtrxH[i + (tmpDiagDim * (ij - 1))]))
                                         / x;
                             } else {
-                                final ComplexNumber tmpX1 = ComplexNumber.makeRectangular((-r - (y * aMtrxH[i + (tmpDiagDim * (ij - 1))])), (-s - (y * aMtrxH[i
+                                final ComplexNumber tmpX1 = new ComplexNumber((-r - (y * aMtrxH[i + (tmpDiagDim * (ij - 1))])), (-s - (y * aMtrxH[i
                                         + (tmpDiagDim * ij)])));
-                                final ComplexNumber tmpY1 = ComplexNumber.makeRectangular(z, q);
+                                final double real1 = z;
+                                final double imaginary1 = q;
+                                final ComplexNumber tmpY1 = new ComplexNumber(real1, imaginary1);
 
                                 final ComplexNumber tmpZ1 = tmpX1.divide(tmpY1);
 
@@ -495,7 +499,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
                         // Overflow control
                         t = Math.max(Math.abs(aMtrxH[i + (tmpDiagDim * (ij - 1))]), Math.abs(aMtrxH[i + (tmpDiagDim * ij)]));
-                        if (((PrimitiveMath.MACHINE_DOUBLE_ERROR * t) * t) > 1) {
+                        if (((PrimitiveMath.MACHINE_EPSILON * t) * t) > 1) {
                             for (int j = i; j <= ij; j++) {
                                 aMtrxH[j + (tmpDiagDim * (ij - 1))] = aMtrxH[j + (tmpDiagDim * (ij - 1))] / t;
                                 aMtrxH[j + (tmpDiagDim * ij)] = aMtrxH[j + (tmpDiagDim * ij)] / t;
@@ -643,7 +647,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                 if (s == PrimitiveMath.ZERO) {
                     s = tmpNorm1;
                 }
-                if (Math.abs(aMtrxH[l + (tmpDiagDim * (l - 1))]) < (PrimitiveMath.MACHINE_DOUBLE_ERROR * s)) {
+                if (Math.abs(aMtrxH[l + (tmpDiagDim * (l - 1))]) < (PrimitiveMath.MACHINE_EPSILON * s)) {
                     break;
                 }
                 l--;
@@ -782,7 +786,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     if (m == l) {
                         break;
                     }
-                    if ((Math.abs(aMtrxH[m + (tmpDiagDim * (m - 1))]) * (Math.abs(q) + Math.abs(r))) < (PrimitiveMath.MACHINE_DOUBLE_ERROR * (Math.abs(p) * (Math
+                    if ((Math.abs(aMtrxH[m + (tmpDiagDim * (m - 1))]) * (Math.abs(q) + Math.abs(r))) < (PrimitiveMath.MACHINE_EPSILON * (Math.abs(p) * (Math
                             .abs(aMtrxH[(m - 1) + (tmpDiagDim * (m - 1))]) + Math.abs(z) + Math.abs(aMtrxH[(m + 1) + (tmpDiagDim * (m + 1))]))))) {
                         break;
                     }
@@ -875,13 +879,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     private final PrimitiveMultiplyBoth multiplyBoth;
-
     private final PrimitiveMultiplyLeft multiplyLeft;
     private final PrimitiveMultiplyRight multiplyRight;
     private final int myColDim;
-
     private final int myRowDim;
-
     private final Array2D<Double> myUtility;
 
     PrimitiveDenseStore(final double[] anArray) {
@@ -938,6 +939,14 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
+    }
+
+    public void accept(final Access2D<Double> supplied) {
+        for (long j = 0; j < supplied.countColumns(); j++) {
+            for (long i = 0; i < supplied.countRows(); i++) {
+                this.set(i, j, supplied.doubleValue(i, j));
+            }
+        }
     }
 
     public MatrixStore<Double> add(final MatrixStore<Double> addend) {
@@ -1040,8 +1049,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         CAXPY.invoke(data, aColY * myRowDim, data, aColX * myRowDim, aSclrA, aFirstRow, myRowDim);
     }
 
-    public void caxpy(final Double aSclrA, final int aColX, final int aColY, final int aFirstRow) {
-        CAXPY.invoke(data, aColY * myRowDim, data, aColX * myRowDim, aSclrA.doubleValue(), aFirstRow, myRowDim);
+    public void caxpy(final Double scalarA, final int columnX, final int columnY, final int firstRow) {
+        CAXPY.invoke(data, columnY * myRowDim, data, columnX * myRowDim, scalarA.doubleValue(), firstRow, myRowDim);
     }
 
     public Pivot computeInPlaceLU() {
@@ -1094,7 +1103,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return retVal;
     }
 
-    public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<Double> aTransformationCollector, final boolean eigenvalue) {
+    public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<Double> transformationCollector, final boolean eigenvalue) {
 
         //        final PrimitiveDenseStore tmpThisCopy = this.copy();
         //        final PrimitiveDenseStore tmpCollCopy = (PrimitiveDenseStore) aTransformationCollector.copy();
@@ -1105,7 +1114,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         final double[] tmpData = data;
 
-        final double[] tmpCollectorData = ((PrimitiveDenseStore) aTransformationCollector).data;
+        final double[] tmpCollectorData = ((PrimitiveDenseStore) transformationCollector).data;
 
         PrimitiveDenseStore.doHessenberg(tmpData, tmpCollectorData);
 
@@ -1121,7 +1130,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         final ComplexNumber[] tmpRaw = retVal.data;
 
         for (int i = 0; i < tmpLength; i++) {
-            tmpRaw[i] = ComplexNumber.makeRectangular(aRawReal[i], aRawImag[i]);
+            tmpRaw[i] = new ComplexNumber(aRawReal[i], aRawImag[i]);
         }
 
         return Array1D.COMPLEX.wrap(retVal);
@@ -1143,17 +1152,17 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return myRowDim;
     }
 
-    public void divideAndCopyColumn(final int aRow, final int aCol, final BasicArray<Double> aDestination) {
+    public void divideAndCopyColumn(final int row, final int column, final BasicArray<Double> destination) {
 
         final double[] tmpData = data;
         final int tmpRowDim = myRowDim;
 
-        final double[] tmpDestination = ((PrimitiveArray) aDestination).data;
+        final double[] tmpDestination = ((PrimitiveArray) destination).data;
 
-        int tmpIndex = aRow + (aCol * tmpRowDim);
+        int tmpIndex = row + (column * tmpRowDim);
         final double tmpDenominator = tmpData[tmpIndex];
 
-        for (int i = aRow + 1; i < tmpRowDim; i++) {
+        for (int i = row + 1; i < tmpRowDim; i++) {
             tmpDestination[i] = tmpData[++tmpIndex] /= tmpDenominator;
         }
     }
@@ -1176,12 +1185,12 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public void exchangeColumns(final int aColA, final int aColB) {
-        myUtility.exchangeColumns(aColA, aColB);
+    public void exchangeColumns(final int colA, final int colB) {
+        myUtility.exchangeColumns(colA, colB);
     }
 
-    public void exchangeRows(final int aRowA, final int aRowB) {
-        myUtility.exchangeRows(aRowA, aRowB);
+    public void exchangeRows(final int rowA, final int rowB) {
+        myUtility.exchangeRows(rowA, rowB);
     }
 
     public PhysicalStore.Factory<Double, PrimitiveDenseStore> factory() {
@@ -1203,16 +1212,24 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public void fillColumn(final long aRow, final long aCol, final Double aNmbr) {
-        myUtility.fillColumn(aRow, aCol, aNmbr);
+    public void fillColumn(final long row, final long column, final Double value) {
+        myUtility.fillColumn(row, column, value);
+    }
+
+    public void fillColumn(final long row, final long column, final NullaryFunction<Double> supplier) {
+        myUtility.fillColumn(row, column, supplier);
     }
 
     public void fillConjugated(final Access2D<? extends Number> source) {
         FillConjugated.invoke(data, myRowDim, 0, myColDim, source);
     }
 
-    public void fillDiagonal(final long aRow, final long aCol, final Double aNmbr) {
-        myUtility.fillDiagonal(aRow, aCol, aNmbr);
+    public void fillDiagonal(final long row, final long column, final Double value) {
+        myUtility.fillDiagonal(row, column, value);
+    }
+
+    public void fillDiagonal(final long row, final long column, final NullaryFunction<Double> supplier) {
+        myUtility.fillDiagonal(row, column, supplier);
     }
 
     public void fillMatching(final Access1D<? extends Number> source) {
@@ -1311,8 +1328,12 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public void fillRow(final long aRow, final long aCol, final Double aNmbr) {
-        myUtility.fillRow(aRow, aCol, aNmbr);
+    public void fillRow(final long row, final long column, final Double value) {
+        myUtility.fillRow(row, column, value);
+    }
+
+    public void fillRow(final long row, final long column, final NullaryFunction<Double> supplier) {
+        myUtility.fillRow(row, column, supplier);
     }
 
     public void fillTransposed(final Access2D<? extends Number> source) {
@@ -1339,12 +1360,12 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public boolean generateApplyAndCopyHouseholderColumn(final int aRow, final int aCol, final Householder<Double> aDestination) {
-        return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, aRow, aCol, (Householder.Primitive) aDestination);
+    public boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<Double> destination) {
+        return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column, (Householder.Primitive) destination);
     }
 
-    public boolean generateApplyAndCopyHouseholderRow(final int aRow, final int aCol, final Householder<Double> aDestination) {
-        return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, aRow, aCol, (Householder.Primitive) aDestination);
+    public boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<Double> destination) {
+        return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Primitive) destination);
     }
 
     public Double get(final long aRow, final long aCol) {
@@ -1355,8 +1376,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return myColDim;
     }
 
-    public int getIndexOfLargestInColumn(final int aRow, final int aCol) {
-        return (int) myUtility.indexOfLargestInColumn(aRow, aCol);
+    public int getIndexOfLargestInColumn(final int row, final int column) {
+        return (int) myUtility.indexOfLargestInColumn(row, column);
     }
 
     public int getMaxDim() {
@@ -1384,8 +1405,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return false;
     }
 
-    public boolean isPositive(final long row, final long column) {
-        return myUtility.isPositive(row, column);
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return myUtility.isSmall(row, column, comparedTo);
     }
 
     public boolean isUpperRightShaded() {
@@ -1453,17 +1474,26 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.modifyDiagonal(row, column, function);
     }
 
-    public void modifyOne(final long row, final long column, final UnaryFunction<Double> func) {
+    public void modifyOne(final long row, final long column, final UnaryFunction<Double> function) {
 
         double tmpValue = this.doubleValue(row, column);
 
-        tmpValue = func.invoke(tmpValue);
+        tmpValue = function.invoke(tmpValue);
 
         this.set(row, column, tmpValue);
     }
 
     public void modifyRow(final long row, final long column, final UnaryFunction<Double> function) {
         myUtility.modifyRow(row, column, function);
+    }
+
+    public MatrixStore<Double> multiply(final Access1D<Double> right) {
+
+        final PrimitiveDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
+
+        retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+
+        return retVal;
     }
 
     public MatrixStore<Double> multiplyLeft(final Access1D<Double> left) {
@@ -1475,25 +1505,20 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return retVal;
     }
 
-    public MatrixStore<Double> multiplyRight(final Access1D<Double> right) {
-
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
-
-        retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
-
-        return retVal;
-    }
-
     public MatrixStore<Double> negate() {
         return new ModificationStore<>(this, FACTORY.function().negate());
     }
 
-    public void negateColumn(final int aCol) {
-        myUtility.modifyColumn(0, aCol, PrimitiveFunction.NEGATE);
+    public void negateColumn(final int column) {
+        myUtility.modifyColumn(0, column, PrimitiveFunction.NEGATE);
     }
 
-    public void raxpy(final Double aSclrA, final int aRowX, final int aRowY, final int aFirstCol) {
-        RAXPY.invoke(data, aRowY, data, aRowX, aSclrA, aFirstCol, myColDim);
+    public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {
+        RAXPY.invoke(data, rowY, data, rowX, scalarA, firstColumn, myColDim);
+    }
+
+    public MatrixStore.ElementsConsumer<Double> region(final int row, final int column) {
+        return new PhysicalStore.ConsumerRegion<Double>(this, row, column);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
@@ -1517,7 +1542,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.fillColumn(aCol + 1, aCol, ZERO);
     }
 
-    public void substituteBackwards(final Access2D<Double> aBody, final boolean conjugated) {
+    public void substituteBackwards(final Access2D<Double> body, final boolean conjugated) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1528,7 +1553,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteBackwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, aFirst, aLimit, aBody, conjugated);
+                    SubstituteBackwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, conjugated);
                 }
 
             };
@@ -1537,11 +1562,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         } else {
 
-            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, aBody, conjugated);
+            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, conjugated);
         }
     }
 
-    public void substituteForwards(final Access2D<Double> aBody, final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
+    public void substituteForwards(final Access2D<Double> body, final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1552,7 +1577,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteForwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, aFirst, aLimit, aBody, onesOnDiagonal, zerosAboveDiagonal);
+                    SubstituteForwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, onesOnDiagonal, zerosAboveDiagonal);
                 }
 
             };
@@ -1561,7 +1586,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         } else {
 
-            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, aBody, onesOnDiagonal, zerosAboveDiagonal);
+            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, onesOnDiagonal, zerosAboveDiagonal);
         }
     }
 

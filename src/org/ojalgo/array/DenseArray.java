@@ -22,10 +22,12 @@
 package org.ojalgo.array;
 
 import java.util.RandomAccess;
+import java.util.Spliterator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -58,6 +60,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     }
 
+    static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
+
     DenseArray() {
         super();
     }
@@ -74,8 +78,16 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         this.fill(0, this.size(), 1, number);
     }
 
+    public final void fillAll(final NullaryFunction<N> supplier) {
+        this.fill(0, this.size(), 1, supplier);
+    }
+
     public final void fillRange(final long first, final long limit, final N number) {
         this.fill(first, limit, 1L, number);
+    }
+
+    public final void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        this.fill(first, limit, 1L, supplier);
     }
 
     public final N get(final long index) {
@@ -86,21 +98,7 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
      * @see Scalar#isAbsolute()
      */
     public final boolean isAbsolute(final long index) {
-        return this.isZero((int) index);
-    }
-
-    /**
-     * @see Scalar#isPositive()
-     */
-    public final boolean isPositive(final long index) {
-        return this.isPositive((int) index);
-    }
-
-    /**
-     * @see Scalar#isZero()
-     */
-    public final boolean isZero(final long index) {
-        return this.isZero((int) index);
+        return this.isAbsolute((int) index);
     }
 
     /**
@@ -110,12 +108,27 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         return this.isSmall((int) index, comparedTo);
     }
 
+    public final void modifyOne(final long index, final UnaryFunction<N> function) {
+        this.modifyOne((int) index, function);
+    }
+
     public final void set(final long index, final double value) {
         this.set((int) index, value);
     }
 
     public final void set(final long index, final Number number) {
         this.set((int) index, number);
+    }
+
+    private final boolean isSmall(final int first, final int limit, final int step, final double comparedTo) {
+
+        boolean retVal = true;
+
+        for (int i = first; retVal && (i < limit); i += step) {
+            retVal &= this.isSmall(i, comparedTo);
+        }
+
+        return retVal;
     }
 
     protected abstract double doubleValue(final int index);
@@ -133,11 +146,18 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     protected abstract void fill(int first, int limit, int step, N value);
 
+    protected abstract void fill(int first, int limit, int step, NullaryFunction<N> supplier);
+
     protected abstract void fill(final int first, final int limit, final N left, final BinaryFunction<N> function, final Access1D<N> right);
 
     @Override
     protected final void fill(final long first, final long limit, final long step, final N value) {
         this.fill((int) first, (int) limit, (int) step, value);
+    }
+
+    @Override
+    protected final void fill(final long first, final long limit, final long step, final NullaryFunction<N> supplier) {
+        this.fill((int) first, (int) limit, (int) step, supplier);
     }
 
     protected abstract N get(final int index);
@@ -155,25 +175,13 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     protected abstract boolean isAbsolute(int index);
 
     /**
-     * @see Scalar#isPositive()
-     */
-    protected abstract boolean isPositive(int index);
-
-    /**
      * @see Scalar#isSmall()
      */
     protected abstract boolean isSmall(int index, double comparedTo);
 
-    /**
-     * @see Scalar#isZero()
-     */
-    protected abstract boolean isZero(int index);
-
-    protected abstract boolean isZeros(int first, int limit, int step);
-
     @Override
-    protected final boolean isZeros(final long first, final long limit, final long step) {
-        return this.isZeros((int) first, (int) limit, (int) step);
+    protected final boolean isSmall(final long first, final long limit, final long step, final double comparedTo) {
+        return this.isSmall((int) first, (int) limit, (int) step, comparedTo);
     }
 
     protected abstract void modify(int index, Access1D<N> left, BinaryFunction<N> function);
@@ -208,6 +216,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     protected final void modify(final long first, final long limit, final long step, final UnaryFunction<N> function) {
         this.modify((int) first, (int) limit, (int) step, function);
     }
+
+    protected abstract void modifyOne(final int index, final UnaryFunction<N> function);
 
     /**
      * @see java.util.Arrays#binarySearch(Object[], Object)

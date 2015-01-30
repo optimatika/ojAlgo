@@ -73,10 +73,6 @@ public class RowsIterator<N extends Number> implements Access1D<N>, Iterator<Acc
         return (myCurrentRow + 1L) < myAccess2D.countRows();
     }
 
-    public Iterator<N> iterator() {
-        return new Iterator1D<>(this);
-    }
-
     public Access1D<N> next() {
         myCurrentRow++;
         return this;

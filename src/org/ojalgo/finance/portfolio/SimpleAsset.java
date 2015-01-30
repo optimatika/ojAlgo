@@ -31,7 +31,7 @@ import org.ojalgo.type.TypeUtils;
 
 /**
  * SimpleAsset is used to describe 1 asset (portfolio member).
- * 
+ *
  * @author apete
  */
 public final class SimpleAsset extends FinancePortfolio {

@@ -25,7 +25,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.decomposition.QRDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -150,7 +149,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
         BasicLogger.debug("Unwrapped", tmpSolution);
 
-        final QR<Double> tmpLU = QRDecomposition.makePrimitive();
+        final QR<Double> tmpLU = QR.makePrimitive();
 
         final long luBefore = System.nanoTime();
         for (int l = 0; l < tmpI; l++) {
@@ -392,7 +391,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         final PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.makeZero(tmpCountRows, tmpCountRows);
         tmpBody.fillByMultiplying(tmpTransposed, (Access1D<Double>) body);
 
-        final MatrixStore<Double> tmpRhs = tmpTransposed.multiplyRight((Access1D<Double>) rhs);
+        final MatrixStore<Double> tmpRhs = tmpTransposed.multiply((Access1D<Double>) rhs);
 
         switch (tmpCountRows) {
         case 1:

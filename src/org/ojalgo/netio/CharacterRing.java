@@ -26,6 +26,10 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.Writer;
 import java.nio.CharBuffer;
+import java.util.Arrays;
+
+import org.ojalgo.netio.BasicLogger.Appender;
+import org.ojalgo.netio.BasicLogger.GenericAppender;
 
 /**
  * A circular char buffer - an {@linkplain Appendable} {@linkplain CharSequence} that always hold exactly 65536
@@ -96,20 +100,27 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         myCursor = 0;
     }
 
+    @Override
     public CharacterRing append(final char c) throws IOException {
         myCharacters[myCursor++] = c;
         return this;
     }
 
+    @Override
     public CharacterRing append(final CharSequence csq) throws IOException {
         return this.append(csq, 0, csq.length());
     }
 
+    @Override
     public CharacterRing append(final CharSequence csq, final int start, final int end) throws IOException {
         for (int i = start; i < end; i++) {
             this.append(csq.charAt(i));
         }
         return this;
+    }
+
+    public Appender asAppender() {
+        return new GenericAppender(this);
     }
 
     public OutputStream asOutputStream() {
@@ -120,8 +131,35 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         return new RingWriter(this);
     }
 
+    @Override
     public char charAt(final int index) {
         return myCharacters[(myCursor + index) % length];
+    }
+
+    public void clear() {
+        Arrays.fill(myCharacters, ASCII.NULL);
+        myCursor = 0;
+    }
+
+    public void flush(final Appendable target) {
+        try {
+            final int tmpCursor = myCursor;
+            char tmpChar;
+            for (int i = tmpCursor; i < length; i++) {
+                tmpChar = myCharacters[i];
+                if (tmpChar != ASCII.NULL) {
+                    target.append(tmpChar);
+                }
+            }
+            for (int i = 0; i < tmpCursor; i++) {
+                tmpChar = myCharacters[i];
+                if (tmpChar != ASCII.NULL) {
+                    target.append(tmpChar);
+                }
+            }
+        } catch (final IOException exception) {
+            exception.printStackTrace();
+        }
     }
 
     public int indexOfFirst(final char c) {
@@ -162,10 +200,12 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         return retVal;
     }
 
+    @Override
     public int length() {
         return length;
     }
 
+    @Override
     public CharSequence subSequence(final int start, final int end) {
         return CharBuffer.wrap(this, start, end);
     }
@@ -180,4 +220,5 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
 
         return tmpFirstPart + tmpSecondPart;
     }
+
 }

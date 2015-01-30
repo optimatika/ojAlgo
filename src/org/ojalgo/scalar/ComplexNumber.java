@@ -23,10 +23,8 @@ package org.ojalgo.scalar;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Iterator;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -39,12 +37,93 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  * @author apete
  * @see org.ojalgo.function.ComplexFunction
  */
-public final class ComplexNumber extends AbstractScalar<ComplexNumber> implements Enforceable<ComplexNumber>, Access2D<Double> {
+public final class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double> {
+
+    public static boolean isAbsolute(final ComplexNumber value) {
+        return value.isAbsolute();
+    }
+
+    public static boolean isInfinite(final ComplexNumber value) {
+        return Double.isInfinite(value.doubleValue()) || Double.isInfinite(value.i);
+    }
+
+    public static boolean isNaN(final ComplexNumber value) {
+        return Double.isNaN(value.doubleValue()) || Double.isNaN(value.i);
+    }
+
+    public static boolean isReal(final ComplexNumber value) {
+        return value.isReal();
+    }
+
+    public static boolean isSmall(final double comparedTo, final ComplexNumber value) {
+        return value.isSmall(comparedTo);
+    }
+
+    public static ComplexNumber makePolar(final double norm, final double phase) {
+
+        double tmpStdPhase = phase % PrimitiveMath.TWO_PI;
+        if (tmpStdPhase < PrimitiveMath.ZERO) {
+            tmpStdPhase += PrimitiveMath.TWO_PI;
+        }
+
+        if (tmpStdPhase <= ARGUMENT_TOLERANCE) {
+
+            return new ComplexNumber(norm);
+
+        } else if (Math.abs(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+
+            return new ComplexNumber(-norm);
+
+        } else {
+
+            double tmpRe = PrimitiveMath.ZERO;
+            if (norm != PrimitiveMath.ZERO) {
+                final double tmpCos = Math.cos(tmpStdPhase);
+                if (tmpCos != PrimitiveMath.ZERO) {
+                    tmpRe = norm * tmpCos;
+                }
+            }
+
+            double tmpIm = PrimitiveMath.ZERO;
+            if (norm != PrimitiveMath.ZERO) {
+                final double tmpSin = Math.sin(tmpStdPhase);
+                if (tmpSin != PrimitiveMath.ZERO) {
+                    tmpIm = norm * tmpSin;
+                }
+            }
+
+            return new ComplexNumber(tmpRe, tmpIm);
+        }
+    }
+
+    /**
+     * @deprecated v38
+     */
+    @Deprecated
+    public static ComplexNumber makeReal(final double value) {
+        return ComplexNumber.valueOf(value);
+    }
+
+    /**
+     * @deprecated v38
+     */
+    @Deprecated
+    public static ComplexNumber makeRectangular(final double real, final double imaginary) {
+        if (PrimitiveScalar.CONTEXT.isSmall(real, imaginary)) {
+            return new ComplexNumber(real);
+        } else {
+            return new ComplexNumber(real, imaginary);
+        }
+    }
+
+    public static ComplexNumber valueOf(final double value) {
+        return new ComplexNumber(value);
+    }
 
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 
         public ComplexNumber cast(final double value) {
-            return ComplexNumber.makeReal(value);
+            return ComplexNumber.valueOf(value);
         }
 
         public ComplexNumber cast(final Number number) {
@@ -52,7 +131,7 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
         }
 
         public ComplexNumber convert(final double value) {
-            return ComplexNumber.makeReal(value);
+            return ComplexNumber.valueOf(value);
         }
 
         public ComplexNumber convert(final Number number) {
@@ -69,100 +148,22 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
 
     };
 
-    public static final ComplexNumber I = ComplexNumber.makeRectangular(PrimitiveMath.ZERO, PrimitiveMath.ONE);
+    public static final ComplexNumber I = new ComplexNumber(PrimitiveMath.ZERO, PrimitiveMath.ONE);
     public static final ComplexNumber INFINITY = ComplexNumber.makePolar(Double.POSITIVE_INFINITY, PrimitiveMath.ZERO);
-    public static final ComplexNumber NEG = ComplexNumber.makeReal(PrimitiveMath.NEG);
-    public static final ComplexNumber ONE = ComplexNumber.makeReal(PrimitiveMath.ONE);
-    public static final ComplexNumber TWO = ComplexNumber.makeReal(PrimitiveMath.TWO);
-    public static final ComplexNumber ZERO = ComplexNumber.makeReal(PrimitiveMath.ZERO);
+    public static final ComplexNumber NEG = ComplexNumber.valueOf(PrimitiveMath.NEG);
+    public static final ComplexNumber ONE = ComplexNumber.valueOf(PrimitiveMath.ONE);
+    public static final ComplexNumber TWO = ComplexNumber.valueOf(PrimitiveMath.TWO);
+    public static final ComplexNumber ZERO = ComplexNumber.valueOf(PrimitiveMath.ZERO);
 
-    private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * AbstractScalar.PRIMITIVE.epsilon();
+    private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
     private static final String LEFT = "(";
     private static final String MINUS = " - ";
     private static final String PLUS = " + ";
     private static final String RIGHT = "i)";
 
-    public static boolean isAbsolute(final ComplexNumber value) {
-        return value.isAbsolute();
-    }
-
-    public static boolean isInfinite(final ComplexNumber value) {
-        return Double.isInfinite(value.doubleValue()) || Double.isInfinite(value.i);
-    }
-
-    public static boolean isNaN(final ComplexNumber value) {
-        return Double.isNaN(value.doubleValue()) || Double.isNaN(value.i);
-    }
-
-    public static boolean isPositive(final ComplexNumber value) {
-        return value.isAbsolute() && !ComplexNumber.isZero(value);
-    }
-
-    public static boolean isReal(final ComplexNumber value) {
-        return value.isReal();
-    }
-
-    public static boolean isSmall(final double comparedTo, final ComplexNumber value) {
-        return value.isSmall(comparedTo);
-    }
-
-    public static boolean isZero(final ComplexNumber value) {
-        return AbstractScalar.PRIMITIVE.isZero(value.norm());
-    }
-
-    public static ComplexNumber makePolar(final double modulus, final double argument) {
-
-        double tmpStdArg = argument % PrimitiveMath.TWO_PI;
-        if (tmpStdArg < PrimitiveMath.ZERO) {
-            tmpStdArg += PrimitiveMath.TWO_PI;
-        }
-
-        if (tmpStdArg <= ARGUMENT_TOLERANCE) {
-
-            return new ComplexNumber(modulus);
-
-        } else if (Math.abs(tmpStdArg - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
-
-            return new ComplexNumber(-modulus);
-
-        } else {
-
-            double tmpRe = PrimitiveMath.ZERO;
-            if (modulus != PrimitiveMath.ZERO) {
-                final double tmpCos = Math.cos(tmpStdArg);
-                if (tmpCos != PrimitiveMath.ZERO) {
-                    tmpRe = modulus * tmpCos;
-                }
-            }
-
-            double tmpIm = PrimitiveMath.ZERO;
-            if (modulus != PrimitiveMath.ZERO) {
-                final double tmpSin = Math.sin(tmpStdArg);
-                if (tmpSin != PrimitiveMath.ZERO) {
-                    tmpIm = modulus * tmpSin;
-                }
-            }
-
-            return new ComplexNumber(tmpRe, tmpIm);
-        }
-    }
-
-    public static ComplexNumber makeReal(final double real) {
-        return new ComplexNumber(real);
-    }
-
-    public static ComplexNumber makeRectangular(final double real, final double imaginary) {
-        if (TypeUtils.isZero(imaginary)) {
-            return new ComplexNumber(real);
-        } else {
-            return new ComplexNumber(real, imaginary);
-        }
-    }
-
     public final double i;
 
     private final boolean myRealForSure;
-
     private final double myRealValue;
 
     public ComplexNumber(final double real) {
@@ -293,7 +294,7 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
         final double tmpRe = context.enforce(this.doubleValue());
         final double tmpIm = context.enforce(i);
 
-        return ComplexNumber.makeRectangular(tmpRe, tmpIm);
+        return new ComplexNumber(tmpRe, tmpIm);
     }
 
     @Override
@@ -382,20 +383,16 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
         if (myRealForSure) {
             return myRealValue >= PrimitiveMath.ZERO;
         } else {
-            return !AbstractScalar.PRIMITIVE.isDifferent(myRealValue, this.norm());
+            return !PrimitiveScalar.CONTEXT.isDifferent(this.norm(), myRealValue);
         }
     }
 
     public boolean isReal() {
-        return myRealForSure || AbstractScalar.PRIMITIVE.isSmall(myRealValue, i);
+        return myRealForSure || PrimitiveScalar.CONTEXT.isSmall(myRealValue, i);
     }
 
     public boolean isSmall(final double comparedTo) {
-        return AbstractScalar.PRIMITIVE.isSmall(comparedTo, this.norm());
-    }
-
-    public Iterator<Double> iterator() {
-        return new Iterator1D<>(this);
+        return PrimitiveScalar.CONTEXT.isSmall(comparedTo, this.norm());
     }
 
     /**
@@ -434,7 +431,7 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
     }
 
     public ComplexNumber signum() {
-        if (ComplexNumber.isZero(this)) {
+        if (ComplexNumber.isSmall(PrimitiveMath.ONE, this)) {
             return ComplexNumber.makePolar(PrimitiveMath.ONE, PrimitiveMath.ZERO);
         } else {
             return ComplexNumber.makePolar(PrimitiveMath.ONE, this.phase());
@@ -481,8 +478,8 @@ public final class ComplexNumber extends AbstractScalar<ComplexNumber> implement
 
         final StringBuilder retVal = new StringBuilder(LEFT);
 
-        final BigDecimal tmpRe = context.enforce(new BigDecimal(myRealValue, AbstractScalar.PRIMITIVE.getMathContext()));
-        final BigDecimal tmpIm = context.enforce(new BigDecimal(i, AbstractScalar.PRIMITIVE.getMathContext()));
+        final BigDecimal tmpRe = context.enforce(new BigDecimal(myRealValue, PrimitiveScalar.CONTEXT.getMathContext()));
+        final BigDecimal tmpIm = context.enforce(new BigDecimal(i, PrimitiveScalar.CONTEXT.getMathContext()));
 
         retVal.append(tmpRe.toString());
 

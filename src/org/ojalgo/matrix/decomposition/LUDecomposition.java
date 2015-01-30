@@ -31,7 +31,6 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.jama.JamaLU;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.LowerTriangularStore;
@@ -45,10 +44,13 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain #makeBig()}, {@linkplain #makeComplex()}, {@linkplain #makePrimitive()} or {@linkplain #makeJama()}.
+ * {@linkplain LU#makeBig()}, {@linkplain LU#makeComplex()}, {@linkplain LU#makePrimitive()} or
+ * {@linkplain LU#makeJama()}.
  *
+ * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
+@Deprecated
 public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LU<N> {
 
     public static final class Pivot {
@@ -120,43 +122,45 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
 
     }
 
+    /**
+     * @deprecated v38 Use {@link LU#make(Access2D<N>)} instead
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static final <N extends Number> LU<N> make(final Access2D<N> aTypical) {
-
-        final N tmpNumber = aTypical.get(0, 0);
-
-        if (tmpNumber instanceof BigDecimal) {
-            return (LU<N>) LUDecomposition.makeBig();
-        } else if (tmpNumber instanceof ComplexNumber) {
-            return (LU<N>) LUDecomposition.makeComplex();
-        } else if (tmpNumber instanceof Double) {
-
-            final int tmpMaxDim = (int) Math.max(aTypical.countRows(), aTypical.countColumns());
-
-            if ((tmpMaxDim <= 32) || (tmpMaxDim >= 46340)) { //16,32,2
-                return (LU<N>) LUDecomposition.makeJama();
-            } else {
-                return (LU<N>) LUDecomposition.makePrimitive();
-            }
-        } else {
-            throw new IllegalArgumentException();
-        }
+        return LU.make(aTypical);
     }
 
+    /**
+     * @deprecated v38 Use {@link LU#makeBig()} instead
+     */
+    @Deprecated
     public static final LU<BigDecimal> makeBig() {
-        return new Big();
+        return LU.makeBig();
     }
 
+    /**
+     * @deprecated v38 Use {@link LU#makeComplex()} instead
+     */
+    @Deprecated
     public static final LU<ComplexNumber> makeComplex() {
-        return new Complex();
+        return LU.makeComplex();
     }
 
+    /**
+     * @deprecated v38 Use {@link LU#makeJama()} instead
+     */
+    @Deprecated
     public static final LU<Double> makeJama() {
-        return new JamaLU();
+        return LU.makeJama();
     }
 
+    /**
+     * @deprecated v38 Use {@link LU#makePrimitive()} instead
+     */
+    @Deprecated
     public static final LU<Double> makePrimitive() {
-        return new Primitive();
+        return LU.makePrimitive();
     }
 
     private Pivot myPivot;

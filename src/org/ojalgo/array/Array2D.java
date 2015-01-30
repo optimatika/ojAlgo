@@ -23,16 +23,16 @@ package org.ojalgo.array;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.ColumnsIterator;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.RowsIterator;
 import org.ojalgo.array.BasicArray.BasicFactory;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
@@ -46,7 +46,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.Fillable<N>, Access2D.Iterable2D<N>, Access2D.Modifiable<N>,
-Access2D.Visitable<N>, Serializable {
+        Access2D.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access2D.Factory<Array2D<N>> {
 
@@ -355,10 +355,20 @@ Access2D.Visitable<N>, Serializable {
         myDelegate.fill(0L, this.count(), 1L, value);
     }
 
+    public void fillAll(final NullaryFunction<N> supplier) {
+        myDelegate.fill(0L, this.count(), 1L, supplier);
+    }
+
     public void fillColumn(final long row, final long column, final N value) {
         final long tmpFirst = (row + (column * myRowsCount));
         final long tmpLimit = (myRowsCount + (column * myRowsCount));
         myDelegate.fill(tmpFirst, tmpLimit, 1L, value);
+    }
+
+    public void fillColumn(final long row, final long column, final NullaryFunction<N> supplier) {
+        final long tmpFirst = row + (column * myRowsCount);
+        final long tmpLimit = myRowsCount + (column * myRowsCount);
+        myDelegate.fill(tmpFirst, tmpLimit, 1L, supplier);
     }
 
     public void fillDiagonal(final long row, final long column, final N value) {
@@ -372,14 +382,35 @@ Access2D.Visitable<N>, Serializable {
         myDelegate.fill(tmpFirst, tmpLimit, tmpStep, value);
     }
 
+    public void fillDiagonal(final long row, final long column, final NullaryFunction<N> supplier) {
+
+        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
+
+        final long tmpFirst = row + (column * myRowsCount);
+        final long tmpLimit = row + tmpCount + ((column + tmpCount) * myRowsCount);
+        final long tmpStep = 1L + myRowsCount;
+
+        myDelegate.fill(tmpFirst, tmpLimit, tmpStep, supplier);
+    }
+
     public void fillRange(final long first, final long limit, final N value) {
-        myDelegate.fill((int) first, (int) limit, 1, value);
+        myDelegate.fill(first, limit, 1L, value);
+    }
+
+    public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+        myDelegate.fill(first, limit, 1L, supplier);
     }
 
     public void fillRow(final long row, final long column, final N value) {
-        final int tmpFirst = (int) (row + (column * myRowsCount));
-        final int tmpLimit = (int) (row + (myColumnsCount * myRowsCount));
+        final long tmpFirst = row + (column * myRowsCount);
+        final long tmpLimit = row + (myColumnsCount * myRowsCount);
         myDelegate.fill(tmpFirst, tmpLimit, myRowsCount, value);
+    }
+
+    public void fillRow(final long row, final long column, final NullaryFunction<N> supplier) {
+        final long tmpFirst = row + (column * myRowsCount);
+        final long tmpLimit = row + (myColumnsCount * myRowsCount);
+        myDelegate.fill(tmpFirst, tmpLimit, myRowsCount, supplier);
     }
 
     public N get(final long index) {
@@ -415,30 +446,22 @@ Access2D.Visitable<N>, Serializable {
     }
 
     public boolean isAllZeros() {
-        return myDelegate.isZeros(0L, this.count(), 1L);
+        return myDelegate.isSmall(0L, this.count(), 1L, PrimitiveMath.ONE);
     }
 
     public boolean isColumnZeros(final long row, final long column) {
-        return myDelegate.isZeros(row + (column * myRowsCount), myRowsCount + (column * myRowsCount), 1L);
+        return myDelegate.isSmall(row + (column * myRowsCount), myRowsCount + (column * myRowsCount), 1L, PrimitiveMath.ONE);
     }
 
     public boolean isDiagonalZeros(final long row, final long column) {
 
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
 
-        return myDelegate.isZeros(row + (column * myRowsCount), row + tmpCount + ((column + tmpCount) * myRowsCount), 1L + myRowsCount);
-    }
-
-    public boolean isPositive(final long index) {
-        return myDelegate.isPositive(index);
-    }
-
-    public boolean isPositive(final long row, final long column) {
-        return myDelegate.isPositive(row + (column * myRowsCount));
+        return myDelegate.isSmall(row + (column * myRowsCount), row + tmpCount + ((column + tmpCount) * myRowsCount), 1L + myRowsCount, PrimitiveMath.ONE);
     }
 
     public boolean isRowZeros(final long row, final long column) {
-        return myDelegate.isZeros(row + (column * myRowsCount), row + (myColumnsCount * myRowsCount), myRowsCount);
+        return myDelegate.isSmall(row + (column * myRowsCount), row + (myColumnsCount * myRowsCount), myRowsCount, PrimitiveMath.ONE);
     }
 
     public boolean isSmall(final long index, final double comparedTo) {
@@ -447,18 +470,6 @@ Access2D.Visitable<N>, Serializable {
 
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return myDelegate.isSmall(row + (column * myRowsCount), comparedTo);
-    }
-
-    public boolean isZero(final long index) {
-        return myDelegate.isZero(index);
-    }
-
-    public boolean isZero(final long row, final long column) {
-        return myDelegate.isZero(row + (column * myRowsCount));
-    }
-
-    public Iterator<N> iterator() {
-        return new Iterator1D<N>(this);
     }
 
     public void modifyAll(final UnaryFunction<N> function) {
@@ -486,6 +497,14 @@ Access2D.Visitable<N>, Serializable {
 
     public void modifyMatching(final BinaryFunction<N> function, final Array2D<N> aRightArg) {
         myDelegate.modify(0L, this.count(), 1L, function, aRightArg.getDelegate());
+    }
+
+    public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
+        myDelegate.modifyOne(row + (column * myRowsCount), function);
+    }
+
+    public void modifyOne(final long index, final UnaryFunction<N> function) {
+        myDelegate.modifyOne(index, function);
     }
 
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {

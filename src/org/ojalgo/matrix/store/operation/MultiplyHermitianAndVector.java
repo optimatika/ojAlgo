@@ -29,13 +29,14 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * Multiplies an hermitian (square symmetric) matrix with a vector.
- * Will only read from the lower/left triangular part of the matrix,
- * and will only calculate the lower/left part of the results.
+ * Multiplies an hermitian (square symmetric) matrix with a vector. Will only read from the lower/left triangular part
+ * of the matrix, and will only calculate the lower/left part of the results.
  *
  * @author apete
  */
 public final class MultiplyHermitianAndVector extends MatrixOperation {
+
+    public static final MultiplyHermitianAndVector SETUP = new MultiplyHermitianAndVector();
 
     public static int THRESHOLD = 64;
 
@@ -99,6 +100,11 @@ public final class MultiplyHermitianAndVector extends MatrixOperation {
 
     private MultiplyHermitianAndVector() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

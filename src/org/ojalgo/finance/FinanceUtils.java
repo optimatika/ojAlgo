@@ -40,7 +40,6 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.random.Deterministic;
@@ -124,7 +123,7 @@ public abstract class FinanceUtils {
      * @param timeSeriesCollection
      * @return Annualised covariances
      */
-    public static <V extends Number> BasicMatrix<?> makeCovarianceMatrix(final Collection<CalendarDateSeries<V>> timeSeriesCollection) {
+    public static <V extends Number> BasicMatrix makeCovarianceMatrix(final Collection<CalendarDateSeries<V>> timeSeriesCollection) {
 
         final CoordinationSet<V> tmpCoordinator = new CoordinationSet<V>(timeSeriesCollection).prune();
 
@@ -279,7 +278,7 @@ public abstract class FinanceUtils {
 
     /**
      * GrowthRate = ln(GrowthFactor)
-     * 
+     *
      * @param growthFactor A growth factor per unit (day, week, month, year...)
      * @param growthFactorUnit A growth factor unit
      * @return Annualised return (percentage per year)
@@ -291,7 +290,7 @@ public abstract class FinanceUtils {
 
     /**
      * AnnualReturn = exp(GrowthRate * GrowthRateUnitsPerYear) - 1.0
-     * 
+     *
      * @param growthRate A growth rate per unit (day, week, month, year...)
      * @param growthRateUnit A growth rate unit
      * @return Annualised return (percentage per year)
@@ -322,14 +321,14 @@ public abstract class FinanceUtils {
 
         if (clean) {
 
-            final Eigenvalue<Double> tmpEvD = EigenvalueDecomposition.makePrimitive(true);
+            final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
             tmpEvD.compute(tmpCovariances, false);
 
             final MatrixStore<Double> tmpV = tmpEvD.getV();
             final PhysicalStore<Double> tmpD = tmpEvD.getD().copy();
 
             final double tmpLargest = tmpD.doubleValue(0, 0);
-            final double tmpLimit = Math.max(PrimitiveMath.MACHINE_DOUBLE_ERROR * tmpLargest, 1E-12);
+            final double tmpLimit = Math.max(PrimitiveMath.MACHINE_EPSILON * tmpLargest, 1E-12);
 
             for (int ij = 0; ij < tmpSize; ij++) {
                 if (tmpD.doubleValue(ij, ij) < tmpLimit) {
@@ -339,9 +338,9 @@ public abstract class FinanceUtils {
 
             final MatrixStore<Double> tmpLeft = tmpV;
             final MatrixStore<Double> tmpMiddle = tmpD;
-            final MatrixStore<Double> tmpRight = tmpLeft.builder().transpose().build();
+            final MatrixStore<Double> tmpRight = tmpLeft.transpose();
 
-            tmpCovariances = tmpMiddle.multiplyLeft(tmpLeft).multiplyRight(tmpRight);
+            tmpCovariances = tmpMiddle.multiplyLeft(tmpLeft).multiply(tmpRight);
         }
 
         final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.getBuilder(tmpSize, tmpSize);
@@ -386,7 +385,7 @@ public abstract class FinanceUtils {
 
     /**
      * GrowthFactor = exp(GrowthRate)
-     * 
+     *
      * @param annualReturn Annualised return (percentage per year)
      * @param growthFactorUnit A growth factor unit
      * @return A growth factor per unit (day, week, month, year...)
@@ -399,7 +398,7 @@ public abstract class FinanceUtils {
 
     /**
      * GrowthRate = ln(1.0 + InterestRate) / GrowthRateUnitsPerYear
-     * 
+     *
      * @param annualReturn Annualised return (percentage per year)
      * @param growthRateUnit A growth rate unit
      * @return A growth rate per unit (day, week, month, year...)

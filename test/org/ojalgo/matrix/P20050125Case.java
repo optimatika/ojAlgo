@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
@@ -42,7 +41,7 @@ public class P20050125Case extends BasicMatrixTest {
 
     public static BasicMatrix getProblematic() {
         final BasicMatrix tmpMtrx = BigMatrix.FACTORY.makeRandom(DIM, DIM * DIM, new Uniform());
-        return tmpMtrx.multiplyRight(tmpMtrx.transpose());
+        return tmpMtrx.multiply(tmpMtrx.transpose());
     }
 
     public P20050125Case() {
@@ -56,7 +55,7 @@ public class P20050125Case extends BasicMatrixTest {
     @Override
     public void testData() {
 
-        final Cholesky<BigDecimal> tmpDelegate = CholeskyDecomposition.makeBig();
+        final Cholesky<BigDecimal> tmpDelegate = Cholesky.makeBig();
         tmpDelegate.compute(myBigAA.toBigStore());
 
         TestUtils.assertEquals(myBigAA.toBigStore(), tmpDelegate, EVALUATION);
@@ -65,13 +64,13 @@ public class P20050125Case extends BasicMatrixTest {
     @Override
     public void testProblem() {
 
-        final Cholesky<BigDecimal> tmpDelegate = CholeskyDecomposition.makeBig();
+        final Cholesky<BigDecimal> tmpDelegate = Cholesky.makeBig();
         tmpDelegate.compute(myBigAA.toBigStore());
 
         final MatrixStore<BigDecimal> tmpInv = tmpDelegate.solve(myBigI.toBigStore());
 
         final MatrixStore<BigDecimal> tmpExpMtrx = myBigI.toBigStore();
-        final MatrixStore<BigDecimal> tmpActMtrx = myBigAA.toBigStore().multiplyRight(tmpInv);
+        final MatrixStore<BigDecimal> tmpActMtrx = myBigAA.toBigStore().multiply(tmpInv);
 
         TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVALUATION);
     }

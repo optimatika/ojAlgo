@@ -33,6 +33,11 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.scalar.ComplexNumber;
 
+/**
+ * Constant valued function - always returns the same value.
+ *
+ * @author apete
+ */
 public final class ConstantFunction<N extends Number> extends AbstractMultiary<N, ConstantFunction<N>> {
 
     public static ConstantFunction<BigDecimal> makeBig(final int arity) {

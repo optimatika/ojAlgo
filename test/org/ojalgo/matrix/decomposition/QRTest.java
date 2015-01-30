@@ -49,7 +49,7 @@ public class QRTest extends MatrixDecompositionTests {
      */
     private static MatrixStore<ComplexNumber> makeHermitianMatrix() {
         final PhysicalStore<ComplexNumber> tmpBase = MatrixUtils.makeRandomComplexStore(DIMENSION, DIMENSION);
-        return tmpBase.multiplyRight(tmpBase.conjugate());
+        return tmpBase.multiply(tmpBase.conjugate());
     }
 
     public QRTest() {
@@ -65,7 +65,7 @@ public class QRTest extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 },
                 { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
-        final QR<Double> tmpDecomp = QRDecomposition.makePrimitive();
+        final QR<Double> tmpDecomp = QR.makePrimitive();
         tmpDecomp.compute(tmpOriginalMatrix);
 
         if (MatrixDecompositionTests.DEBUG) {
@@ -87,7 +87,7 @@ public class QRTest extends MatrixDecompositionTests {
             BasicLogger.debug("Original", tmpOriginal);
         }
 
-        final QR<ComplexNumber> tmpDecomposition = QRDecomposition.makeComplex();
+        final QR<ComplexNumber> tmpDecomposition = QR.makeComplex();
         tmpDecomposition.compute(tmpOriginal);
         final MatrixStore<ComplexNumber> tmpDecompQ = tmpDecomposition.getQ();
         final MatrixStore<ComplexNumber> tmpDecompR = tmpDecomposition.getR();
@@ -158,9 +158,9 @@ public class QRTest extends MatrixDecompositionTests {
 
         final BigMatrix tmpOriginal = P20030422Case.getProblematic();
 
-        final QR<BigDecimal> tmpBigDecomp = QRDecomposition.makeBig();
-        final QR<ComplexNumber> tmpComplexDecomp = QRDecomposition.makeComplex();
-        final QR<Double> tmpPrimitiveDecomp = QRDecomposition.makePrimitive();
+        final QR<BigDecimal> tmpBigDecomp = QR.makeBig();
+        final QR<ComplexNumber> tmpComplexDecomp = QR.makeComplex();
+        final QR<Double> tmpPrimitiveDecomp = QR.makePrimitive();
 
         tmpBigDecomp.compute(tmpOriginal);
         tmpComplexDecomp.compute(tmpOriginal);

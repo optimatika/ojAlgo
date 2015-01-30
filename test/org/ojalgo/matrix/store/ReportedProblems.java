@@ -56,7 +56,7 @@ public class ReportedProblems extends AbstractMatrixStoreTest {
         final int hp = 2 * OjAlgoUtils.ENVIRONMENT.threads;
 
         final BasicMatrix eye = PrimitiveMatrix.FACTORY.makeEye(A.countRows(), A.countColumns());
-        final BasicMatrix Aprime = A.subtract(Bu.multiplyRight(K));
+        final BasicMatrix Aprime = A.subtract(Bu.multiply(K));
         BasicMatrix Apow = PrimitiveMatrix.FACTORY.copy(Aprime);
         final BasicMatrix tmp = Aprime.subtract(eye);
         sx = PrimitiveMatrix.FACTORY.copy(eye);
@@ -64,12 +64,12 @@ public class ReportedProblems extends AbstractMatrixStoreTest {
 
         //loop runs hp-2 times, which means the first elements of the matrices must be "hardcoded"
         for (int i = 0; i < (hp - 2); i++) {
-            sx = sx.mergeColumns(tmp.multiplyRight(Apow));
-            Apow = Apow.multiplyRight(Apow);
+            sx = sx.mergeColumns(tmp.multiply(Apow));
+            Apow = Apow.multiply(Apow);
         }
         currentState = PrimitiveMatrix.FACTORY.makeZero(A.countRows(), 1);
         currentState = currentState.add(1.0);
-        r = sx.multiplyRight(currentState);
+        r = sx.multiply(currentState);
     }
 
     /**

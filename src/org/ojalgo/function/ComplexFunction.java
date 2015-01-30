@@ -27,36 +27,38 @@ import org.ojalgo.type.TypeUtils;
 
 public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
-    static abstract class Binary extends BinaryFunction<ComplexNumber> {
+    public static interface Binary extends BinaryFunction<ComplexNumber> {
 
-        @Override
-        public final double invoke(final double arg1, final double arg2) {
-            return this.invoke(ComplexNumber.makeReal(arg1), ComplexNumber.makeReal(arg2)).doubleValue();
+        default double invoke(final double arg1, final double arg2) {
+            return this.invoke(ComplexNumber.valueOf(arg1), ComplexNumber.valueOf(arg2)).doubleValue();
         }
 
     }
 
-    static abstract class Parameter extends ParameterFunction<ComplexNumber> {
+    public static interface Parameter extends ParameterFunction<ComplexNumber> {
 
-        @Override
-        public final double invoke(final double arg, final int param) {
-            return this.invoke(ComplexNumber.makeReal(arg), param).doubleValue();
+        default double invoke(final double arg, final int param) {
+            return this.invoke(ComplexNumber.valueOf(arg), param).doubleValue();
         }
 
     }
 
-    static abstract class Unary implements UnaryFunction<ComplexNumber> {
+    public static interface Unary extends UnaryFunction<ComplexNumber> {
 
-        public final double invoke(final double arg) {
-            return this.invoke(ComplexNumber.makeReal(arg)).doubleValue();
+        default double invoke(final double arg) {
+            return this.invoke(ComplexNumber.valueOf(arg)).doubleValue();
         }
 
+    }
+
+    public static ComplexFunction getSet() {
+        return SET;
     }
 
     public static final UnaryFunction<ComplexNumber> ABS = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return ComplexNumber.makeReal(arg.norm());
+            return ComplexNumber.valueOf(arg.norm());
         }
 
     };
@@ -65,11 +67,13 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            ComplexNumber tmpNmbr = ComplexFunction.doInvSinAndCosPart1(arg);
+            final ComplexNumber tmpSqrt = SQRT.invoke(ComplexNumber.ONE.subtract(arg.multiply(arg)));
 
-            tmpNmbr = arg.add(ComplexNumber.I.multiply(tmpNmbr));
+            final ComplexNumber tmpNmbr = arg.add(ComplexNumber.I.multiply(tmpSqrt));
 
-            return ComplexFunction.doInvSinAndCosPart2(tmpNmbr);
+            final ComplexNumber tmpLog = LOG.invoke(tmpNmbr);
+
+            return tmpLog.multiply(ComplexNumber.I).negate();
         }
 
     };
@@ -77,10 +81,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final UnaryFunction<ComplexNumber> ACOSH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-
-            final ComplexNumber tmpNmbr = arg.multiply(arg).subtract(PrimitiveMath.ONE);
-
-            return ComplexFunction.LOG.invoke(arg.add(ComplexFunction.SQRT.invoke(tmpNmbr)));
+            return LOG.invoke(arg.add(SQRT.invoke(arg.multiply(arg).subtract(PrimitiveMath.ONE))));
         }
 
     };
@@ -98,11 +99,12 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            ComplexNumber tmpNmbr = ComplexFunction.doInvSinAndCosPart1(arg);
+            ComplexNumber tmpNmbr = SQRT.invoke(ComplexNumber.ONE.subtract(POWER.invoke(arg, 2)));
 
             tmpNmbr = ComplexNumber.I.multiply(arg).add(tmpNmbr);
+            final ComplexNumber aNumber = tmpNmbr;
 
-            return ComplexFunction.doInvSinAndCosPart2(tmpNmbr);
+            return LOG.invoke(aNumber).multiply(ComplexNumber.I).negate();
         }
 
     };
@@ -113,7 +115,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
             final ComplexNumber tmpNmbr = arg.multiply(arg).add(PrimitiveMath.ONE);
 
-            return ComplexFunction.LOG.invoke(arg.add(ComplexFunction.SQRT.invoke(tmpNmbr)));
+            return LOG.invoke(arg.add(SQRT.invoke(tmpNmbr)));
         }
 
     };
@@ -124,7 +126,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
             final ComplexNumber tmpNmbr = ComplexNumber.I.add(arg).divide(ComplexNumber.I.subtract(arg));
 
-            return ComplexFunction.LOG.invoke(tmpNmbr).multiply(ComplexNumber.I).divide(PrimitiveMath.TWO);
+            return LOG.invoke(tmpNmbr).multiply(ComplexNumber.I).divide(PrimitiveMath.TWO);
         }
 
     };
@@ -135,7 +137,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
             final ComplexNumber tmpNmbr = arg.add(PrimitiveMath.ONE).divide(ComplexNumber.ONE.subtract(arg));
 
-            return ComplexFunction.LOG.invoke(tmpNmbr).divide(PrimitiveMath.TWO);
+            return LOG.invoke(tmpNmbr).divide(PrimitiveMath.TWO);
         }
 
     };
@@ -159,7 +161,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final UnaryFunction<ComplexNumber> COS = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return ComplexFunction.COSH.invoke(arg.multiply(ComplexNumber.I));
+            return COSH.invoke(arg.multiply(ComplexNumber.I));
         }
 
     };
@@ -167,7 +169,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final UnaryFunction<ComplexNumber> COSH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return (ComplexFunction.EXP.invoke(arg).add(ComplexFunction.EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
+            return (EXP.invoke(arg).add(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
         }
 
     };
@@ -185,10 +187,10 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final double retMod = Math.exp(arg.doubleValue());
-            final double retArg = arg.i;
+            final double tmpNorm = Math.exp(arg.doubleValue());
+            final double tmpPhase = arg.i;
 
-            return ComplexNumber.makePolar(retMod, retArg);
+            return ComplexNumber.makePolar(tmpNorm, tmpPhase);
         }
 
     };
@@ -209,7 +211,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
-            return ComplexNumber.makeReal(Math.hypot(arg1.norm(), arg2.norm()));
+            return ComplexNumber.valueOf(Math.hypot(arg1.norm(), arg2.norm()));
         }
 
     };
@@ -222,22 +224,14 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> SQRT1PX2 = new Unary() {
-
-        public final ComplexNumber invoke(final ComplexNumber arg) {
-            return SQRT.invoke(ComplexNumber.ONE.add(arg.multiply(arg)));
-        }
-
-    };
-
     public static final UnaryFunction<ComplexNumber> LOG = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final double retRe = Math.log(arg.norm());
-            final double retIm = arg.phase();
+            final double tmpRe = Math.log(arg.norm());
+            final double tmpIm = arg.phase();
 
-            return ComplexNumber.makeRectangular(retRe, retIm);
+            return new ComplexNumber(tmpRe, tmpIm);
         }
 
     };
@@ -249,7 +243,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
             final double retRe = Math.log10(arg.norm());
             final double retIm = arg.phase();
 
-            return ComplexNumber.makeRectangular(retRe, retIm);
+            return new ComplexNumber(retRe, retIm);
         }
 
     };
@@ -261,7 +255,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
             final double retRe = Math.log1p(arg.norm());
             final double retIm = arg.phase();
 
-            return ComplexNumber.makeRectangular(retRe, retIm);
+            return new ComplexNumber(retRe, retIm);
         }
 
     };
@@ -323,7 +317,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
-            return ComplexFunction.EXP.invoke(arg2.multiply(ComplexFunction.LOG.invoke(arg1)));
+            return EXP.invoke(LOG.invoke(arg1).multiply(arg2));
         }
 
     };
@@ -369,7 +363,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
         public final ComplexNumber invoke(final ComplexNumber arg, final int param) {
             final double tmpRe = PrimitiveFunction.SCALE.invoke(arg.doubleValue(), param);
             final double tmpIm = PrimitiveFunction.SCALE.invoke(arg.i, param);
-            return ComplexNumber.makeRectangular(tmpRe, tmpIm);
+            return new ComplexNumber(tmpRe, tmpIm);
         }
 
     };
@@ -385,7 +379,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final UnaryFunction<ComplexNumber> SIN = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return ComplexFunction.SINH.invoke(arg.multiply(ComplexNumber.I)).multiply(ComplexNumber.I.negate());
+            return SINH.invoke(arg.multiply(ComplexNumber.I)).multiply(ComplexNumber.I.negate());
         }
 
     };
@@ -393,7 +387,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final UnaryFunction<ComplexNumber> SINH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return (ComplexFunction.EXP.invoke(arg).subtract(ComplexFunction.EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
+            return (EXP.invoke(arg).subtract(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
         }
 
     };
@@ -410,6 +404,14 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
+    public static final UnaryFunction<ComplexNumber> SQRT1PX2 = new Unary() {
+
+        public final ComplexNumber invoke(final ComplexNumber arg) {
+            return SQRT.invoke(ComplexNumber.ONE.add(arg.multiply(arg)));
+        }
+
+    };
+
     public static final BinaryFunction<ComplexNumber> SUBTRACT = new Binary() {
 
         @Override
@@ -422,7 +424,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final UnaryFunction<ComplexNumber> TAN = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return ComplexFunction.TANH.invoke(arg.multiply(ComplexNumber.I)).multiply(ComplexNumber.I.negate());
+            return TANH.invoke(arg.multiply(ComplexNumber.I)).multiply(ComplexNumber.I.negate());
         }
 
     };
@@ -433,8 +435,8 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
             ComplexNumber retVal;
 
-            final ComplexNumber tmpPlus = ComplexFunction.EXP.invoke(arg);
-            final ComplexNumber tmpMinus = ComplexFunction.EXP.invoke(arg.negate());
+            final ComplexNumber tmpPlus = EXP.invoke(arg);
+            final ComplexNumber tmpMinus = EXP.invoke(arg.negate());
 
             final ComplexNumber tmpDividend = tmpPlus.subtract(tmpMinus);
             final ComplexNumber tmpDivisor = tmpPlus.add(tmpMinus);
@@ -461,18 +463,6 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     };
 
     private static final ComplexFunction SET = new ComplexFunction();
-
-    public static ComplexFunction getSet() {
-        return SET;
-    }
-
-    private static ComplexNumber doInvSinAndCosPart1(final ComplexNumber aNumber) {
-        return SQRT.invoke(ComplexNumber.ONE.subtract(ComplexFunction.POWER.invoke(aNumber, 2)));
-    }
-
-    private static ComplexNumber doInvSinAndCosPart2(final ComplexNumber aNumber) {
-        return LOG.invoke(aNumber).multiply(ComplexNumber.I).negate();
-    }
 
     private ComplexFunction() {
         super();

@@ -31,34 +31,6 @@ import org.ojalgo.type.StandardType;
 public abstract class OjAlgoUtils {
 
     /**
-     * This is set for you, but you may want to set it to something different/better.
-     * Create a {@linkplain Hardware} instance and then call {@linkplain Hardware#virtualise()}.
-     */
-    public static VirtualMachine ENVIRONMENT = null;
-
-    static {
-
-        final String tmpArchitecture = VirtualMachine.getArchitecture();
-        final long tmpMemory = VirtualMachine.getMemory();
-        final int tmpThreads = VirtualMachine.getThreads();
-
-        for (final Hardware tmpHardware : Hardware.PREDEFINED) {
-            if (tmpHardware.architecture.equals(tmpArchitecture) && (tmpHardware.threads == tmpThreads) && (tmpHardware.memory >= tmpMemory)) {
-                ENVIRONMENT = tmpHardware.virtualise();
-            }
-        }
-
-        if (ENVIRONMENT == null) {
-            BasicLogger.debug("ojAlgo includes a small set of predefined hardware profiles,");
-            BasicLogger.debug("none of which were deemed suitable for the hardware you're currently using.");
-            BasicLogger.debug("You should set org.ojalgo.OjAlgoUtils.ENVIRONMENT to something that matches the hardware/OS/JVM you're running on.");
-            BasicLogger.debug("Additionally it would be appreciated if you contribute your hardware profile to ojAlgo.");
-            BasicLogger.debug("https://lists.sourceforge.net/lists/listinfo/ojalgo-user");
-            ENVIRONMENT = Hardware.makeSimple(tmpArchitecture, tmpMemory, tmpThreads).virtualise();
-        }
-    }
-
-    /**
      * @see Package#getSpecificationVersion()
      */
     public static String getDate() {
@@ -96,6 +68,35 @@ public abstract class OjAlgoUtils {
         final String tmpManifestValue = OjAlgoUtils.class.getPackage().getImplementationVersion();
 
         return tmpManifestValue != null ? tmpManifestValue : "X.X";
+    }
+
+    /**
+     * This is set for you, but you may want to set it to something different/better. Create a {@linkplain Hardware}
+     * instance and then call {@linkplain Hardware#virtualise()}.
+     */
+    public static VirtualMachine ENVIRONMENT = null;
+
+    static {
+
+        final String tmpArchitecture = VirtualMachine.getArchitecture();
+        final long tmpMemory = VirtualMachine.getMemory();
+        final int tmpThreads = VirtualMachine.getThreads();
+
+        for (final Hardware tmpHardware : Hardware.PREDEFINED) {
+            if (tmpHardware.architecture.equals(tmpArchitecture) && (tmpHardware.threads == tmpThreads) && (tmpHardware.memory >= tmpMemory)) {
+                ENVIRONMENT = tmpHardware.virtualise();
+            }
+        }
+
+        if (ENVIRONMENT == null) {
+            BasicLogger.debug("ojAlgo includes a small set of predefined hardware profiles,");
+            BasicLogger.debug("none of which were deemed suitable for the hardware you're currently using.");
+            BasicLogger.debug("You should set org.ojalgo.OjAlgoUtils.ENVIRONMENT to something that matches the hardware/OS/JVM you're running on.");
+            BasicLogger.debug("Additionally it would be appreciated if you contribute your hardware profile to ojAlgo.");
+            BasicLogger.debug("https://lists.sourceforge.net/lists/listinfo/ojalgo-user");
+            ENVIRONMENT = Hardware.makeSimple(tmpArchitecture, tmpMemory, tmpThreads).virtualise();
+        }
+
     }
 
     private OjAlgoUtils() {

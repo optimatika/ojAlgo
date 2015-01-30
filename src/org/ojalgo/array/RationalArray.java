@@ -22,9 +22,12 @@
 package org.ojalgo.array;
 
 import java.util.Arrays;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -97,9 +100,15 @@ public class RationalArray extends DenseArray<RationalNumber> {
         }
     }
 
-    protected static void fill(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final RationalNumber aNmbr) {
+    protected static void fill(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final RationalNumber value) {
         for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aNmbr;
+            aData[i] = value;
+        }
+    }
+
+    protected static void fill(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final NullaryFunction<RationalNumber> supplier) {
+        for (int i = aFirst; i < aLimit; i += aStep) {
+            aData[i] = supplier.invoke();
         }
     }
 
@@ -175,6 +184,10 @@ public class RationalArray extends DenseArray<RationalNumber> {
         return Arrays.hashCode(data);
     }
 
+    public Spliterator<RationalNumber> spliterator() {
+        return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
+    }
+
     protected final RationalNumber[] copyOfData() {
         return ArrayUtils.copyOf(data);
     }
@@ -211,6 +224,11 @@ public class RationalArray extends DenseArray<RationalNumber> {
     }
 
     @Override
+    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<RationalNumber> supplier) {
+        RationalArray.fill(data, first, limit, step, supplier);
+    }
+
+    @Override
     protected final void fill(final int aFirst, final int aLimit, final RationalNumber aLeftArg, final BinaryFunction<RationalNumber> aFunc,
             final Access1D<RationalNumber> aRightArg) {
         RationalArray.invoke(data, aFirst, aLimit, 1, aLeftArg, aFunc, aRightArg);
@@ -240,42 +258,23 @@ public class RationalArray extends DenseArray<RationalNumber> {
     }
 
     @Override
-    protected final boolean isAbsolute(final int index) {
+    protected boolean isAbsolute(final int index) {
         return RationalNumber.isAbsolute(data[index]);
     }
 
     @Override
-    protected final boolean isPositive(final int index) {
-        return RationalNumber.isPositive(data[index]);
-    }
-
-    @Override
-    protected final boolean isZero(final int index) {
-        return RationalNumber.isZero(data[index]);
-    }
-
-    @Override
-    protected final boolean isZeros(final int first, final int limit, final int step) {
-
-        boolean retVal = true;
-
-        for (int i = first; retVal && (i < limit); i += step) {
-            retVal &= this.isZero(i);
-        }
-
-        return retVal;
+    protected boolean isSmall(final int index, final double comparedTo) {
+        return RationalNumber.isSmall(comparedTo, data[index]);
     }
 
     @Override
     protected void modify(final int index, final Access1D<RationalNumber> left, final BinaryFunction<RationalNumber> function) {
-        // TODO Auto-generated method stub
-
+        data[index] = function.invoke(left.get(index), data[index]);
     }
 
     @Override
     protected void modify(final int index, final BinaryFunction<RationalNumber> function, final Access1D<RationalNumber> right) {
-        // TODO Auto-generated method stub
-
+        data[index] = function.invoke(data[index], right.get(index));
     }
 
     @Override
@@ -369,7 +368,8 @@ public class RationalArray extends DenseArray<RationalNumber> {
     }
 
     @Override
-    protected boolean isSmall(final int index, final double comparedTo) {
-        return RationalNumber.isSmall(comparedTo, data[index]);
+    protected void modifyOne(final int index, final UnaryFunction<RationalNumber> function) {
+        data[index] = function.invoke(data[index]);
     }
+
 }

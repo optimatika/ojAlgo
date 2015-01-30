@@ -21,42 +21,61 @@
  */
 package org.ojalgo.concurrent;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.*;
 
 import org.ojalgo.OjAlgoUtils;
-import org.ojalgo.type.IntCount;
 
-public final class DaemonPoolExecutor extends ForkJoinPool {
+public final class DaemonPoolExecutor extends ThreadPoolExecutor {
 
-    public static final DaemonPoolExecutor INSTANCE = new DaemonPoolExecutor(OjAlgoUtils.ENVIRONMENT.threads);
+    static final DaemonPoolExecutor INSTANCE = new DaemonPoolExecutor(OjAlgoUtils.ENVIRONMENT.cores, Integer.MAX_VALUE, 2L, TimeUnit.SECONDS,
+            new SynchronousQueue<Runnable>(), DaemonFactory.INSTANCE);
 
-    private DaemonPoolExecutor() {
-        super();
+    /**
+     * @see java.util.concurrent.AbstractExecutorService#submit(java.util.concurrent.Callable)
+     */
+    public static <T> Future<T> invoke(final Callable<T> task) {
+        return INSTANCE.submit(task);
     }
 
-    private DaemonPoolExecutor(final int parallelism) {
-        super(parallelism);
+    /**
+     * @see java.util.concurrent.AbstractExecutorService#submit(java.lang.Runnable)
+     */
+    public static Future<?> invoke(final Runnable task) {
+        return INSTANCE.submit(task);
     }
 
-    private DaemonPoolExecutor(final int parallelism, final ForkJoinWorkerThreadFactory factory, final UncaughtExceptionHandler handler, final boolean asyncMode) {
-        super(parallelism, factory, handler, asyncMode);
+    /**
+     * @see java.util.concurrent.AbstractExecutorService#submit(java.lang.Runnable, java.lang.Object)
+     */
+    public static <T> Future<T> invoke(final Runnable task, final T result) {
+        return INSTANCE.submit(task, result);
     }
 
-    public IntCount countActiveDaemons() {
-        return new IntCount(this.getActiveThreadCount());
+    public static boolean isDaemonAvailable() {
+        return INSTANCE.getActiveCount() < OjAlgoUtils.ENVIRONMENT.threads;
     }
 
-    public IntCount countExistingDaemons() {
-        return new IntCount(this.getPoolSize());
+    static final DaemonPoolExecutor makeSingle() {
+        return new DaemonPoolExecutor(1, 1, Long.MAX_VALUE, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), DaemonFactory.INSTANCE);
     }
 
-    public IntCount countIdleDaemons() {
-        return new IntCount(this.getPoolSize() - this.getActiveThreadCount());
+    DaemonPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit, final BlockingQueue<Runnable> workQueue) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
     }
 
-    public boolean isDaemonAvailable() {
-        return this.getPoolSize() > this.getActiveThreadCount();
+    DaemonPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit,
+            final BlockingQueue<Runnable> workQueue, final RejectedExecutionHandler handler) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
+    }
+
+    DaemonPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit,
+            final BlockingQueue<Runnable> workQueue, final ThreadFactory threadFactory) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
+    }
+
+    DaemonPoolExecutor(final int corePoolSize, final int maximumPoolSize, final long keepAliveTime, final TimeUnit unit,
+            final BlockingQueue<Runnable> workQueue, final ThreadFactory threadFactory, final RejectedExecutionHandler handler) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
     }
 
 }

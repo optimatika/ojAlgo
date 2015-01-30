@@ -28,6 +28,8 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public final class RAXPY extends MatrixOperation {
 
+    public static final RAXPY SETUP = new RAXPY();
+
     public static int THRESHOLD = 128;
 
     public static void invoke(final BigDecimal[] aData, final int aDataRow, final BigDecimal[] aMultipliers, final int aMultiplierRow,
@@ -77,6 +79,11 @@ public final class RAXPY extends MatrixOperation {
 
     private RAXPY() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

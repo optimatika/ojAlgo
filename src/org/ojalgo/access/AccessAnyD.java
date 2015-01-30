@@ -21,6 +21,8 @@
  */
 package org.ojalgo.access;
 
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.Scalar;
 
@@ -50,21 +52,16 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         boolean isAbsolute(long[] reference);
 
         /**
-         * @see Scalar#isPositive()
-         * @deprecated v36 Only plan to keep {@link #isAbsolute(long[])} and {@link #isZero(long[])}.
+         * @see Scalar#isSmall(double)
          */
-        @Deprecated
-        boolean isPositive(long[] reference);
+        boolean isSmall(long[] reference, double comparedTo);
 
         /**
          * @see Scalar#isZero()
          */
-        boolean isZero(long[] reference);
-
-        /**
-         * @see Scalar#isSmall(double)
-         */
-        boolean isSmall(long[] reference, double comparedTo);
+        default boolean isZero(final long[] reference) {
+            return this.isSmall(reference, PrimitiveMath.ONE);
+        }
 
     }
 
@@ -87,6 +84,8 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
     }
 
     public interface Modifiable<N extends Number> extends StructureAnyD, Access1D.Modifiable<N> {
+
+        void modifyOne(long[] reference, UnaryFunction<N> function);
 
     }
 

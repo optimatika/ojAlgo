@@ -57,13 +57,13 @@ public final class ImplicitTimeSeries extends PrimitiveTimeSeries {
     }
 
     @Override
-    public ImplicitTimeSeries add(final double aValue) {
-        return new ImplicitTimeSeries(this.first(), this.resolution(), super.add(aValue));
+    public ImplicitTimeSeries add(final double addend) {
+        return new ImplicitTimeSeries(this.first(), this.resolution(), super.add(addend));
     }
 
     @Override
-    public final ImplicitTimeSeries add(final PrimitiveSeries aSeries) {
-        return new ImplicitTimeSeries(this.first(), this.resolution(), super.add(aSeries));
+    public final ImplicitTimeSeries add(final PrimitiveSeries addend) {
+        return new ImplicitTimeSeries(this.first(), this.resolution(), super.add(addend));
     }
 
     @Override
@@ -77,18 +77,18 @@ public final class ImplicitTimeSeries extends PrimitiveTimeSeries {
     }
 
     @Override
-    public final ImplicitTimeSeries differences(final int aPeriod) {
-        return new ImplicitTimeSeries(this.first(), this.resolution(), super.differences(aPeriod));
+    public final ImplicitTimeSeries differences(final int period) {
+        return new ImplicitTimeSeries(this.first(), this.resolution(), super.differences(period));
     }
 
     @Override
-    public ImplicitTimeSeries divide(final double aValue) {
-        return new ImplicitTimeSeries(this.first(), this.resolution(), super.divide(aValue));
+    public ImplicitTimeSeries divide(final double divisor) {
+        return new ImplicitTimeSeries(this.first(), this.resolution(), super.divide(divisor));
     }
 
     @Override
-    public final ImplicitTimeSeries divide(final PrimitiveSeries aSeries) {
-        return new ImplicitTimeSeries(this.first(), this.resolution(), super.divide(aSeries));
+    public final ImplicitTimeSeries divide(final PrimitiveSeries divisor) {
+        return new ImplicitTimeSeries(this.first(), this.resolution(), super.divide(divisor));
     }
 
     @Override
@@ -137,8 +137,8 @@ public final class ImplicitTimeSeries extends PrimitiveTimeSeries {
     }
 
     @Override
-    public ImplicitTimeSeries multiply(final PrimitiveSeries aSeries) {
-        return new ImplicitTimeSeries(this.first(), this.resolution(), super.multiply(aSeries));
+    public ImplicitTimeSeries multiply(final PrimitiveSeries multiplicand) {
+        return new ImplicitTimeSeries(this.first(), this.resolution(), super.multiply(multiplicand));
     }
 
     @Override
@@ -147,8 +147,8 @@ public final class ImplicitTimeSeries extends PrimitiveTimeSeries {
     }
 
     @Override
-    public final ImplicitTimeSeries quotients(final int aPeriod) {
-        return new ImplicitTimeSeries(this.first(), this.resolution(), super.quotients(aPeriod));
+    public final ImplicitTimeSeries quotients(final int period) {
+        return new ImplicitTimeSeries(this.first(), this.resolution(), super.quotients(period));
     }
 
     public final CalendarDateUnit resolution() {
@@ -166,13 +166,13 @@ public final class ImplicitTimeSeries extends PrimitiveTimeSeries {
     }
 
     @Override
-    public ImplicitTimeSeries subtract(final double aValue) {
-        return new ImplicitTimeSeries(this.first(), this.resolution(), super.subtract(aValue));
+    public ImplicitTimeSeries subtract(final double subtrahend) {
+        return new ImplicitTimeSeries(this.first(), this.resolution(), super.subtract(subtrahend));
     }
 
     @Override
-    public ImplicitTimeSeries subtract(final PrimitiveSeries aSeries) {
-        return new ImplicitTimeSeries(this.first(), this.resolution(), super.subtract(aSeries));
+    public ImplicitTimeSeries subtract(final PrimitiveSeries subtrahend) {
+        return new ImplicitTimeSeries(this.first(), this.resolution(), super.subtract(subtrahend));
     }
 
 }

@@ -36,9 +36,9 @@ import org.ojalgo.type.context.NumberContext;
 public class TestSolveAndInvert extends MatrixDecompositionTests {
 
     static MatrixDecomposition<Double>[] getAllSquare() {
-        return (MatrixDecomposition<Double>[]) new MatrixDecomposition<?>[] { LUDecomposition.makePrimitive(), LUDecomposition.makeJama(),
-                QRDecomposition.makePrimitive(), QRDecomposition.makeJama(), SingularValueDecomposition.makePrimitive(), SingularValueDecomposition.makeJama(),
-                SingularValueDecomposition.makeAlternative() };
+        return (MatrixDecomposition<Double>[]) new MatrixDecomposition<?>[] { LU.makePrimitive(), LU.makeJama(),
+                QR.makePrimitive(), QR.makeJama(), SingularValue.makePrimitive(), SingularValue.makeJama(),
+                SingularValue.makeAlternative() };
     }
 
     public TestSolveAndInvert() {
@@ -59,7 +59,7 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
 
         final MatrixDecomposition<Double>[] tmpAllDecomps = TestSolveAndInvert.getAllSquare();
 
-        final MatrixDecomposition<Double> tmpRefDecomps = LUDecomposition.makeJama();
+        final MatrixDecomposition<Double> tmpRefDecomps = LU.makeJama();
         tmpRefDecomps.compute(tmpRandom);
         final MatrixStore<Double> tmpExpected = tmpRefDecomps.getInverse();
 
@@ -75,7 +75,7 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
 
             TestUtils.assertEquals(tmpExpected, tmpActual, tmpEqualsNumberContext);
             TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyLeft(tmpActual), tmpEqualsNumberContext);
-            TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyRight(tmpActual), tmpEqualsNumberContext);
+            TestUtils.assertEquals(tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
         }
     }
 
@@ -105,6 +105,6 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpExpectedInverse, aDecomp.getInverse(), new NumberContext(7, 6));
 
         TestUtils.assertEquals(tmpI, aBody.multiplyLeft(tmpExpectedInverse), new NumberContext(7, 6));
-        TestUtils.assertEquals(tmpI, aBody.multiplyRight(tmpExpectedInverse), new NumberContext(7, 6));
+        TestUtils.assertEquals(tmpI, aBody.multiply(tmpExpectedInverse), new NumberContext(7, 6));
     }
 }

@@ -46,13 +46,13 @@ public class NetlibCase extends OptimisationLinearTests {
     public void testBlend() {
 
         final File tmpFile = new File(PATH + "blend.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         //tmpModel.options.problem = new NumberContext(32, 8, RoundingMode.HALF_EVEN);
         //tmpModel.options.solution = new NumberContext(16, 10, RoundingMode.HALF_EVEN);
 
-        tmpModel.options.debug(LinearSolver.class);
+        // tmpModel.options.debug(LinearSolver.class);
 
         this.assertMinMaxVal(tmpModel, new BigDecimal("-3.0812149846E+01"), null);
     }
@@ -63,8 +63,8 @@ public class NetlibCase extends OptimisationLinearTests {
     public void testBoeing2() {
 
         final File tmpFile = new File(PATH + "boeing2.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         this.assertMinMaxVal(tmpModel, new BigDecimal("-3.1501872802E+02"), null);
     }
@@ -75,8 +75,8 @@ public class NetlibCase extends OptimisationLinearTests {
     public void testKb2() {
 
         final File tmpFile = new File(PATH + "kb2.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         this.assertMinMaxVal(tmpModel, new BigDecimal("-1.74990012991E+03"), null);
     }
@@ -87,8 +87,8 @@ public class NetlibCase extends OptimisationLinearTests {
     public void testSc50b() {
 
         final File tmpFile = new File(PATH + "sc50b.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         this.assertMinMaxVal(tmpModel, new BigDecimal("-7.0000000000E+01"), null);
     }
@@ -99,8 +99,8 @@ public class NetlibCase extends OptimisationLinearTests {
     public void testShare2b() {
 
         final File tmpFile = new File(PATH + "share2b.mps");
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         this.assertMinMaxVal(tmpModel, new BigDecimal("-4.1573224074E+02"), null);
     }

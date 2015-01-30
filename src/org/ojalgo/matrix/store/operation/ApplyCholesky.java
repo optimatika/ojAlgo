@@ -27,6 +27,8 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public final class ApplyCholesky extends MatrixOperation {
 
+    public static final ApplyCholesky SETUP = new ApplyCholesky();
+
     public static int THRESHOLD = 256;
 
     public static void invoke(final BigDecimal[] aData, final int aRowDim, final int aFirstCol, final int aColLimit, final BigDecimal[] multipliers) {
@@ -49,6 +51,11 @@ public final class ApplyCholesky extends MatrixOperation {
 
     private ApplyCholesky() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

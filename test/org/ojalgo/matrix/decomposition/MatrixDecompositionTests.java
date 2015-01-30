@@ -26,11 +26,6 @@ import junit.framework.TestSuite;
 
 import org.ojalgo.FunctionalityTest;
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.jama.JamaCholesky;
-import org.ojalgo.matrix.jama.JamaEigenvalue;
-import org.ojalgo.matrix.jama.JamaLU;
-import org.ojalgo.matrix.jama.JamaQR;
-import org.ojalgo.matrix.jama.JamaSingularValue;
 
 /**
  * MatrixDecompositionPackageTests
@@ -42,7 +37,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     static final boolean DEBUG = true;
 
     public static final Bidiagonal<?>[] getBidiagonalAll() {
-        return new Bidiagonal<?>[] { new BidiagonalDecomposition.Big(), BidiagonalDecomposition.makeComplex(), BidiagonalDecomposition.makePrimitive() };
+        return new Bidiagonal<?>[] { new BidiagonalDecomposition.Big(), Bidiagonal.makeComplex(), Bidiagonal.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -51,44 +46,44 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Cholesky<?>[] getCholeskyAll() {
-        return new Cholesky<?>[] { CholeskyDecomposition.makeBig(), CholeskyDecomposition.makeComplex(), CholeskyDecomposition.makeJama(),
-                CholeskyDecomposition.makePrimitive() };
+        return new Cholesky<?>[] { Cholesky.makeBig(), Cholesky.makeComplex(), Cholesky.makeJama(),
+                Cholesky.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
     public static final Cholesky<Double>[] getCholeskyPrimitive() {
-        return (Cholesky<Double>[]) new Cholesky<?>[] { new JamaCholesky(), new CholeskyDecomposition.Primitive() };
+        return (Cholesky<Double>[]) new Cholesky<?>[] { new RawCholesky(), new CholeskyDecomposition.Primitive() };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllGeneral() {
-        return new Eigenvalue<?>[] { EigenvalueDecomposition.makeJama(), EigenvalueDecomposition.makePrimitive() };
+        return new Eigenvalue<?>[] { Eigenvalue.makeJama(), Eigenvalue.makePrimitive() };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllNonsymmetric() {
-        return new Eigenvalue<?>[] { EigenvalueDecomposition.makePrimitive(false) };
+        return new Eigenvalue<?>[] { Eigenvalue.makePrimitive(false) };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllSymmetric() {
-        return new Eigenvalue<?>[] { EigenvalueDecomposition.makePrimitive(true) };
+        return new Eigenvalue<?>[] { Eigenvalue.makePrimitive(true) };
     }
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new JamaEigenvalue.General(), new GeneralEvD.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.General(), new GeneralEvD.Primitive() };
     }
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveNonsymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new JamaEigenvalue.Nonsymmetric(), new NonsymmetricEvD.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.Nonsymmetric(), new NonsymmetricEvD.Primitive() };
     }
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveSymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new JamaEigenvalue.Symmetric(), new HermitianEvD32.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.Symmetric(), new HermitianEvD32.Primitive() };
     }
 
     public static final Hessenberg<?>[] getHessenbergAll() {
-        return new Hessenberg<?>[] { HessenbergDecomposition.makeBig(), HessenbergDecomposition.makeComplex(), HessenbergDecomposition.makePrimitive() };
+        return new Hessenberg<?>[] { Hessenberg.makeBig(), Hessenberg.makeComplex(), Hessenberg.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -97,25 +92,25 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final LU<?>[] getLUAll() {
-        return new LU<?>[] { LUDecomposition.makeBig(), LUDecomposition.makeComplex(), LUDecomposition.makeJama(), LUDecomposition.makePrimitive() };
+        return new LU<?>[] { LU.makeBig(), LU.makeComplex(), LU.makeJama(), LU.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
     public static final LU<Double>[] getLUPrimitive() {
-        return (LU<Double>[]) new LU<?>[] { new JamaLU(), new LUDecomposition.Primitive() };
+        return (LU<Double>[]) new LU<?>[] { new RawLU(), new LUDecomposition.Primitive() };
     }
 
     public static final QR<?>[] getQRAll() {
-        return new QR<?>[] { QRDecomposition.makeBig(), QRDecomposition.makeComplex(), QRDecomposition.makeJama(), QRDecomposition.makePrimitive() };
+        return new QR<?>[] { QR.makeBig(), QR.makeComplex(), QR.makeJama(), QR.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
     public static final QR<Double>[] getQRPrimitive() {
-        return (QR<Double>[]) new QR<?>[] { new JamaQR(), new QRDecomposition.Primitive() };
+        return (QR<Double>[]) new QR<?>[] { new RawQR(), new QRDecomposition.Primitive() };
     }
 
     public static final Schur<?>[] getSchurAll() {
-        return new Schur<?>[] { SchurDecomposition.makePrimitive() };
+        return new Schur<?>[] { Schur.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -124,16 +119,16 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final SingularValue<?>[] getSingularValueAll() {
-        return new SingularValue<?>[] { new SVDold30.Big(), new SVDold30.Complex(), new JamaSingularValue(), new SVDold30.Primitive(), new SVDnew32.Primitive() };
+        return new SingularValue<?>[] { new SVDold30.Big(), new SVDold30.Complex(), new RawSingularValue(), new SVDold30.Primitive(), new SVDnew32.Primitive() };
     }
 
     @SuppressWarnings("unchecked")
     public static final SingularValue<Double>[] getSingularValuePrimitive() {
-        return (SingularValue<Double>[]) new SingularValue<?>[] { new JamaSingularValue(), /* new SVDold30.Primitive(), */new SVDnew32.Primitive() };
+        return (SingularValue<Double>[]) new SingularValue<?>[] { new RawSingularValue(), /* new SVDold30.Primitive(), */new SVDnew32.Primitive() };
     }
 
     public static final Tridiagonal<?>[] getTridiagonalAll() {
-        return new Tridiagonal<?>[] { TridiagonalDecomposition.makeBig(), TridiagonalDecomposition.makeComplex(), TridiagonalDecomposition.makePrimitive() };
+        return new Tridiagonal<?>[] { Tridiagonal.makeBig(), Tridiagonal.makeComplex(), Tridiagonal.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")

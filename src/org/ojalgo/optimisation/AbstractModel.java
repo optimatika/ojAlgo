@@ -23,7 +23,7 @@ package org.ojalgo.optimisation;
 
 import java.io.Serializable;
 
-public abstract class AbstractModel<S extends Optimisation.Solver> implements Optimisation.Model, Serializable {
+abstract class AbstractModel<S extends Optimisation.Solver> implements Optimisation.Model, Serializable {
 
     public final Optimisation.Options options;
 
@@ -46,19 +46,27 @@ public abstract class AbstractModel<S extends Optimisation.Solver> implements Op
     public abstract void destroy();
 
     public final boolean isMaximisation() {
-        return !myMinimisation;
+        return !this.isMinimisation();
     }
 
     public final boolean isMinimisation() {
         return myMinimisation;
     }
 
-    public final void setMaximisation(final boolean aFlag) {
-        myMinimisation = !aFlag;
+    public final void setMaximisation() {
+        this.setMaximisation(true);
     }
 
-    public final void setMinimisation(final boolean aFlag) {
-        myMinimisation = aFlag;
+    public final void setMinimisation() {
+        this.setMinimisation(true);
+    }
+
+    protected final void setMaximisation(final boolean maximisation) {
+        this.setMinimisation(!maximisation);
+    }
+
+    protected final void setMinimisation(final boolean minimisation) {
+        myMinimisation = minimisation;
     }
 
 }

@@ -71,7 +71,7 @@ public class KnapsackTest extends OptimisationIntegerTests {
             }
             tmpTotalWeightExpr.lower(ZERO).upper(maxWeight);
 
-            retVal.setMaximisation(true);
+            retVal.setMaximisation();
 
             return retVal;
         }
@@ -118,9 +118,7 @@ public class KnapsackTest extends OptimisationIntegerTests {
 
         model = new KnapsackProblemBuilder(5d).addItem(20, 2).addItem(30, 4).build();
 
-        //        model.options.debug_stream = BasicLogger.DEBUG;
-        //        model.options.debug_solver = IntegerSolver.class;
-        //        model.options.validate = true;
+        // model.options.debug(IntegerSolver.class);
 
         model.maximise();
         //Expected: just second item

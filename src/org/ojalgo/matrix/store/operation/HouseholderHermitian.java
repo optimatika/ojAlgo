@@ -34,14 +34,14 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * Performs Householder transformation from both sides simultaneously
- * assuming that [A] is hermitian (square symmetric) [A] = [A]<sup>H</sup>.
- * 
- * Will only read from and write to the lower/left triangular part of [A].
+ * Performs Householder transformation from both sides simultaneously assuming that [A] is hermitian (square symmetric)
+ * [A] = [A]<sup>H</sup>. Will only read from and write to the lower/left triangular part of [A].
  *
  * @author apete
  */
 public final class HouseholderHermitian extends MatrixOperation {
+
+    public static final HouseholderHermitian SETUP = new HouseholderHermitian();
 
     public static int THRESHOLD = 64;
 
@@ -209,20 +209,14 @@ public final class HouseholderHermitian extends MatrixOperation {
 
     public static void tred2j(final double[] z, final double[] d, final double[] e, final boolean yesvecs) {
 
-        /*       
-        Symmetric Householder reduction to tridiagonal form.
-        The original version of this code was taken from JAMA.
-        That code is in turn derived from the Algol procedures tred2
-        by Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
-        Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
-        Fortran subroutine in EISPACK.
-        tred2 is also described in Numerical Recipes. Parameters and
-        variables are names are choosen to match what is used there.
-        
-        z is the original matrix [A] that will be overwritten with [Q]
-        d will hold the main diagonal of the tridiagonal result
-        e will hold the off (super and sub) diagonals of the tridiagonal result
-        */
+        /*
+         * Symmetric Householder reduction to tridiagonal form. The original version of this code was taken from JAMA.
+         * That code is in turn derived from the Algol procedures tred2 by Bowdler, Martin, Reinsch, and Wilkinson,
+         * Handbook for Auto. Comp., Vol.ii-Linear Algebra, and the corresponding Fortran subroutine in EISPACK. tred2
+         * is also described in Numerical Recipes. Parameters and variables are names are choosen to match what is used
+         * there. z is the original matrix [A] that will be overwritten with [Q] d will hold the main diagonal of the
+         * tridiagonal result e will hold the off (super and sub) diagonals of the tridiagonal result
+         */
 
         final int n = d.length;
 
@@ -451,6 +445,11 @@ public final class HouseholderHermitian extends MatrixOperation {
 
     private HouseholderHermitian() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

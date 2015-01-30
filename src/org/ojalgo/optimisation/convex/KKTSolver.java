@@ -23,15 +23,14 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.decomposition.QRDecomposition;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.ZeroStore;
@@ -146,11 +145,35 @@ public final class KKTSolver extends Object {
             return mySolvable;
         }
 
+        /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+
+            final StringBuilder tmpSB = new StringBuilder();
+
+            tmpSB.append(mySolvable);
+
+            if (mySolvable) {
+
+                tmpSB.append(" X=");
+
+                tmpSB.append(Array1D.PRIMITIVE.copy(this.getX()));
+
+                tmpSB.append(" L=");
+
+                tmpSB.append(Array1D.PRIMITIVE.copy(this.getL()));
+            }
+
+            return tmpSB.toString();
+        }
+
     }
 
     private static final double SCALE = 1.0E2;
 
-    private static final double SMALL = PrimitiveMath.MACHINE_DOUBLE_ERROR * 10; // ≈1.0E-15
+    private static final double SMALL = PrimitiveMath.MACHINE_EPSILON * 10; // ≈1.0E-15
 
     private transient PrimitiveDenseStore myCalculationC = null;
     private transient PrimitiveDenseStore myCalculationQ = null;
@@ -162,16 +185,16 @@ public final class KKTSolver extends Object {
 
         super();
 
-        myCholesky = CholeskyDecomposition.makePrimitive();
-        myQR = QRDecomposition.makePrimitive();
+        myCholesky = Cholesky.makePrimitive();
+        myQR = QR.makePrimitive();
     }
 
     public KKTSolver(final KKTSolver.Input template) {
 
         super();
 
-        myCholesky = CholeskyDecomposition.make(template.getQ());
-        myQR = QRDecomposition.makePrimitive();
+        myCholesky = Cholesky.make(template.getQ());
+        myQR = QR.makePrimitive();
     }
 
     public Output solve(final Input input) {
@@ -205,15 +228,24 @@ public final class KKTSolver extends Object {
 
             tmpX = myQR.solve(tmpB);
 
-            myQR.compute(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculöated  myQR.compute(tmpA).
+            final MatrixStore<Double> tmpSolve;
+            if (tmpA.countRows() == tmpA.countColumns()) {
+                myQR.compute(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculated  myQR.compute(tmpA).
+                tmpSolve = myQR.solve(tmpC); // Problem here! when A is overdetermined/redundant.
+            } else {
+                // This should rarely be necessary...
+                final SingularValue<Double> tmpSVD = SingularValue.makePrimitive();
+                tmpSVD.compute(tmpA.transpose());
+                tmpSolve = tmpSVD.solve(tmpC);
+            }
 
-            tmpL = myQR.solve(tmpC).subtract(tmpQ.multiplyRight(tmpX));
+            tmpL = tmpSolve.subtract(tmpQ.multiply(tmpX));
 
         } else {
             // Actual optimisation problem
 
-            final int tmpSize = (int) tmpQ.countRows();
-            final double tmpLargestQ = tmpQ.aggregateAll(Aggregator.LARGEST);
+            //            final int tmpSize = (int) tmpQ.countRows();
+            //            final double tmpLargestQ = tmpQ.aggregateAll(Aggregator.LARGEST);
 
             final PrimitiveDenseStore tmpCalcQ = this.getCalculationQ(tmpQ);
             final PrimitiveDenseStore tmpCalcC = this.getCalculationC(tmpC);
@@ -285,7 +317,7 @@ public final class KKTSolver extends Object {
         if (!myCholesky.isSPD()) {
             // Not positive definite. Check if at least positive semidefinite.
 
-            final Eigenvalue<Double> tmpEvD = EigenvalueDecomposition.makePrimitive(true);
+            final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
 
             tmpEvD.compute(tmpQ, true);
 

@@ -37,6 +37,8 @@ import org.ojalgo.scalar.ComplexNumber;
 
 public final class MultiplyBoth extends MatrixOperation {
 
+    public static final MultiplyBoth SETUP = new MultiplyBoth();
+
     public static int THRESHOLD = 16;
 
     static final BigMultiplyBoth BIG = new BigMultiplyBoth() {
@@ -807,6 +809,11 @@ public final class MultiplyBoth extends MatrixOperation {
 
     private MultiplyBoth() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

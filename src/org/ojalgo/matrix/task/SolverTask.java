@@ -25,11 +25,11 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
+import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
-import org.ojalgo.matrix.decomposition.LUDecomposition;
-import org.ojalgo.matrix.decomposition.QRDecomposition;
-import org.ojalgo.matrix.decomposition.SingularValueDecomposition;
+import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -50,13 +50,13 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
         @Override
         public SolverTask<BigDecimal> make(final MatrixStore<BigDecimal> templateBody, final MatrixStore<BigDecimal> templateRhs, final boolean symmetric) {
             if (symmetric) {
-                return CholeskyDecomposition.make(templateBody);
+                return Cholesky.make(templateBody);
             } else if (templateBody.countRows() == templateBody.countColumns()) {
-                return LUDecomposition.make(templateBody);
+                return LU.make(templateBody);
             } else if (templateBody.countRows() >= templateBody.countColumns()) {
-                return QRDecomposition.make(templateBody);
+                return QR.make(templateBody);
             } else {
-                return SingularValueDecomposition.make(templateBody);
+                return SingularValue.make(templateBody);
             }
         }
 
@@ -68,13 +68,13 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
         public SolverTask<ComplexNumber> make(final MatrixStore<ComplexNumber> templateBody, final MatrixStore<ComplexNumber> templateRhs,
                 final boolean symmetric) {
             if (symmetric) {
-                return CholeskyDecomposition.make(templateBody);
+                return Cholesky.make(templateBody);
             } else if (templateBody.countRows() == templateBody.countColumns()) {
-                return LUDecomposition.make(templateBody);
+                return LU.make(templateBody);
             } else if (templateBody.countRows() >= templateBody.countColumns()) {
-                return QRDecomposition.make(templateBody);
+                return QR.make(templateBody);
             } else {
-                return SingularValueDecomposition.make(templateBody);
+                return SingularValue.make(templateBody);
             }
         }
 
@@ -97,7 +97,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
                 } else if (tmpDim == 5l) {
                     return AbstractSolver.SYMMETRIC_5X5;
                 } else {
-                    return CholeskyDecomposition.make(templateBody);
+                    return Cholesky.make(templateBody);
                 }
             } else {
                 final long tmpDim = templateBody.countColumns();
@@ -113,16 +113,16 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
                     } else if (tmpDim == 5l) {
                         return AbstractSolver.FULL_5X5;
                     } else {
-                        return LUDecomposition.make(templateBody);
+                        return LU.make(templateBody);
                     }
                 } else if (templateBody.countRows() >= tmpDim) {
                     if (tmpDim <= 5) {
                         return AbstractSolver.LEAST_SQUARES;
                     } else {
-                        return QRDecomposition.make(templateBody);
+                        return QR.make(templateBody);
                     }
                 } else {
-                    return SingularValueDecomposition.make(templateBody);
+                    return SingularValue.make(templateBody);
                 }
             }
         }

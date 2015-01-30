@@ -129,6 +129,9 @@ public class StrategyMixer extends OptimisationIntegerTests {
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVars);
 
+        //        tmpModel.options.debug(GenericSolver.class);
+        //        tmpModel.options.validate = false;
+
         final Expression tmpQuadObj = tmpModel.addExpression("Quadratic Objective Part");
         tmpQuadObj.weight(ONE);
         for (int row = 0; row < 3; row++) {
@@ -150,11 +153,7 @@ public class StrategyMixer extends OptimisationIntegerTests {
             tmpActive.lower(ZERO);
             if (OptimisationIntegerTests.DEBUG) {
                 BasicLogger.debug(tmpActive.toString());
-                //BasicLogger.logDebug(tmpActive.getName(), tmpActive.getLinearFunction().getFactors());
             }
-        }
-        if (OptimisationIntegerTests.DEBUG) {
-            //     BasicLogger.logDebug("Quadratic Objective Part", tmpQuadObj.getQuadraticFunction().getFactors());
         }
 
         final Expression tmpHundredPercent = tmpModel.addExpression("100%");
@@ -164,7 +163,6 @@ public class StrategyMixer extends OptimisationIntegerTests {
         tmpHundredPercent.setLinearFactor(2, ONE);
         if (OptimisationIntegerTests.DEBUG) {
             BasicLogger.debug(tmpHundredPercent.toString());
-            //BasicLogger.logDebug(tmpHundredPercent.getName(), tmpHundredPercent.getLinearFunction().getFactors());
         }
 
         final Expression tmpStrategyCount = tmpModel.addExpression("Strategy Count");
@@ -174,7 +172,6 @@ public class StrategyMixer extends OptimisationIntegerTests {
         tmpStrategyCount.setLinearFactor(5, ONE);
         if (OptimisationIntegerTests.DEBUG) {
             BasicLogger.debug(tmpStrategyCount.toString());
-            //BasicLogger.logDebug(tmpStrategyCount.getName(), tmpStrategyCount.getLinearFunction().getFactors());
         }
 
         tmpModel.minimise();

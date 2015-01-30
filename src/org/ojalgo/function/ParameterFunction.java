@@ -21,7 +21,9 @@
  */
 package org.ojalgo.function;
 
-public abstract class ParameterFunction<N extends Number> implements BasicFunction<N> {
+import java.util.function.BiFunction;
+
+public interface ParameterFunction<N extends Number> extends BasicFunction<N>, BiFunction<N, Integer, N> {
 
     /**
      * A {@linkplain ParameterFunction} with a set/fixed parameter.
@@ -38,12 +40,12 @@ public abstract class ParameterFunction<N extends Number> implements BasicFuncti
             this(null, 0);
         }
 
-        FixedParameter(final ParameterFunction<N> aFunc, final int aParam) {
+        FixedParameter(final ParameterFunction<N> function, final int param) {
 
             super();
 
-            myFunction = aFunc;
-            myParameter = aParam;
+            myFunction = function;
+            myParameter = param;
         }
 
         public final ParameterFunction<N> getFunction() {
@@ -54,25 +56,25 @@ public abstract class ParameterFunction<N extends Number> implements BasicFuncti
             return myParameter;
         }
 
-        public final double invoke(final double aFirstArg) {
-            return myFunction.invoke(aFirstArg, myParameter);
+        public final double invoke(final double arg) {
+            return myFunction.invoke(arg, myParameter);
         }
 
-        public final N invoke(final N aFirstArg) {
-            return myFunction.invoke(aFirstArg, myParameter);
+        public final N invoke(final N arg) {
+            return myFunction.invoke(arg, myParameter);
         }
 
-    }
-
-    protected ParameterFunction() {
-        super();
     }
 
     public abstract double invoke(double arg, int param);
 
     public abstract N invoke(N arg, int param);
 
-    public final UnaryFunction<N> parameter(final int param) {
+    default N apply(final N arg, final Integer param) {
+        return this.invoke(arg, param);
+    }
+
+    default UnaryFunction<N> parameter(final int param) {
         return new FixedParameter<N>(this, param);
     }
 

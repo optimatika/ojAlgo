@@ -27,10 +27,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.Future;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.concurrent.DaemonPoolExecutor;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -62,10 +61,6 @@ public final class NewIntegerSolver extends IntegerSolver {
         }
     }
 
-    public static NewIntegerSolver make(final ExpressionsBasedModel model) {
-        return new NewIntegerSolver(model, null);
-    }
-
     private final PriorityBlockingQueue<NodeKey> myNodesToTry = new PriorityBlockingQueue<>();
 
     private final int[] myIntegerIndeces;
@@ -92,9 +87,10 @@ public final class NewIntegerSolver extends IntegerSolver {
 
     public Result solve(final Result kickStarter) {
 
-        if (kickStarter != null) {
-            this.markInteger(null, kickStarter);
-        }
+        // Must verify that it actually is an integer solution
+        //        if ((kickStarter != null) && kickStarter.getState().isFeasible()) {
+        //            this.markInteger(null, kickStarter);
+        //        }
 
         this.resetIterationsCount();
 
@@ -195,7 +191,7 @@ public final class NewIntegerSolver extends IntegerSolver {
         }
 
         ExpressionsBasedModel tmpModel = NewIntegerSolver.this.makeNodeModel(nodeKey);
-        final Optimisation.Result tmpResult = tmpModel.solve();
+        final Optimisation.Result tmpResult = tmpModel.solve(NewIntegerSolver.this.getBestResultSoFar());
 
         NewIntegerSolver.this.incrementIterationsCount();
 
@@ -233,7 +229,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
                 BasicLogger.debug();
                 BasicLogger.debug(NewIntegerSolver.this.toString());
-                BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
+                // BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
 
             } else {
                 if (NewIntegerSolver.this.isDebug()) {
@@ -257,8 +253,8 @@ public final class NewIntegerSolver extends IntegerSolver {
                     this.add(tmpLowerBranchTask);
                     this.add(tmpUpperBranchTask);
 
-                    if (DaemonPoolExecutor.INSTANCE.getActiveThreadCount() < OjAlgoUtils.ENVIRONMENT.threads) {
-                        DaemonPoolExecutor.INSTANCE.submit(new NodeWorker());
+                    if (DaemonPoolExecutor.isDaemonAvailable()) {
+                        DaemonPoolExecutor.invoke(new NodeWorker());
                     }
 
                     normal &= true;
@@ -350,9 +346,15 @@ public final class NewIntegerSolver extends IntegerSolver {
             tmpVariable.lower(tmpLowerBound);
             tmpVariable.upper(tmpUpperBound);
 
-            final BigDecimal tmpValue = tmpVariable.getValue();
+            BigDecimal tmpValue = tmpVariable.getValue();
             if (tmpValue != null) {
-                tmpVariable.setValue(tmpValue.max(tmpLowerBound).min(tmpUpperBound));
+                if (tmpLowerBound != null) {
+                    tmpValue = tmpValue.max(tmpLowerBound);
+                }
+                if (tmpUpperBound != null) {
+                    tmpValue = tmpValue.min(tmpUpperBound);
+                }
+                tmpVariable.setValue(tmpValue);
             }
         }
 
@@ -392,16 +394,16 @@ public final class NewIntegerSolver extends IntegerSolver {
         final ExpressionsBasedModel tmpIntegerModel = NewIntegerSolver.this.getModel();
         final List<Variable> tmpIntegerVariables = tmpIntegerModel.getIntegerVariables();
         NodeKey myKey;
-        myKey = new NodeKey(NewIntegerSolver.this.getModel());
+        myKey = new NodeKey(tmpIntegerModel);
 
         final ExpressionsBasedModel tmpRootModel = NewIntegerSolver.this.makeNodeModel(myKey);
-        final Result tmpRootResult = tmpRootModel.solve();
+        final Result tmpRootResult = tmpRootModel.solve(tmpIntegerModel.getVariableValues());
         final double tmpRootValue = tmpRootResult.getValue();
 
-        double tmpMinValue = PrimitiveMath.MAX_VALUE;
-        double tmpMaxValue = -PrimitiveMath.MAX_VALUE;
+        double tmpMinValue = PrimitiveMath.MACHINE_LARGEST;
+        double tmpMaxValue = -PrimitiveMath.MACHINE_LARGEST;
 
-        final double tmpBestValue = tmpRootModel.isMinimisation() ? PrimitiveMath.MAX_VALUE : -PrimitiveMath.MAX_VALUE;
+        final double tmpBestValue = tmpRootModel.isMinimisation() ? PrimitiveMath.MACHINE_LARGEST : -PrimitiveMath.MACHINE_LARGEST;
 
         final double[] tmpSignificance = new double[tmpIntegerVariables.size()];
 
@@ -412,7 +414,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
             final NodeKey tmpLowerNodeKey = myKey.createLowerBranch(i, tmpVariableValue, tmpRootValue);
             final ExpressionsBasedModel tmpLowerModel = NewIntegerSolver.this.makeNodeModel(tmpLowerNodeKey);
-            final Result tmpLowerResult = tmpLowerModel.solve();
+            final Result tmpLowerResult = tmpLowerModel.solve(tmpRootResult);
             final double tmpLowerValue = tmpLowerResult.getValue();
 
             if (tmpLowerValue < tmpMinValue) {
@@ -424,7 +426,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
             final NodeKey tmpUpperNodeKey = myKey.createUpperBranch(i, tmpVariableValue, tmpRootValue);
             final ExpressionsBasedModel tmpUpperModel = NewIntegerSolver.this.makeNodeModel(tmpUpperNodeKey);
-            final Result tmpUpperResult = tmpUpperModel.solve();
+            final Result tmpUpperResult = tmpUpperModel.solve(tmpRootResult);
             final double tmpUpperValue = tmpUpperResult.getValue();
 
             if (tmpUpperValue < tmpMinValue) {
@@ -464,7 +466,7 @@ public final class NewIntegerSolver extends IntegerSolver {
             NewIntegerSolver.this.add(new NodeKey(tmpIntegerModel));
         }
 
-        final ForkJoinTask<Boolean> tmpFuture = DaemonPoolExecutor.INSTANCE.submit(new NodeWorker());
+        final Future<Boolean> tmpFuture = DaemonPoolExecutor.invoke(new NodeWorker());
 
         try {
             normal = normal && tmpFuture.get();

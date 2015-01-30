@@ -141,13 +141,13 @@ public final class IdentityStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public MatrixStore<N> multiplyRight(final Access1D<N> rightMtrx) {
-        if (this.getColDim() == rightMtrx.count()) {
-            return this.factory().columns(rightMtrx);
-        } else if (rightMtrx instanceof MatrixStore<?>) {
-            return ((MatrixStore<N>) rightMtrx).copy();
+    public MatrixStore<N> multiply(final Access1D<N> right) {
+        if (this.getColDim() == right.count()) {
+            return this.factory().columns(right);
+        } else if (right instanceof MatrixStore<?>) {
+            return ((MatrixStore<N>) right).copy();
         } else {
-            return super.multiplyRight(rightMtrx);
+            return super.multiply(right);
         }
     }
 

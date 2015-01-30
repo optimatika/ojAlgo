@@ -33,6 +33,8 @@ import org.ojalgo.type.TypeUtils;
 
 public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
 
+    public static final GenerateApplyAndCopyHouseholderRow SETUP = new GenerateApplyAndCopyHouseholderRow();
+
     public static int THRESHOLD = 128;
 
     public static boolean invoke(final BigDecimal[] data, final int structure, final int row, final int col, final Householder.Big destination) {
@@ -126,7 +128,7 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
                 data[row + (j * structure)] = tmpVector[j] = ComplexFunction.DIVIDE.invoke(tmpVector[j], tmpScale).conjugate();
             }
 
-            destination.beta = ComplexNumber.makeReal(tmpScale.norm() / tmpNorm2);
+            destination.beta = ComplexNumber.valueOf(tmpScale.norm() / tmpNorm2);
         }
 
         return retVal;
@@ -184,6 +186,11 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
 
     private GenerateApplyAndCopyHouseholderRow() {
         super();
+    }
+
+    @Override
+    public int threshold() {
+        return THRESHOLD;
     }
 
 }

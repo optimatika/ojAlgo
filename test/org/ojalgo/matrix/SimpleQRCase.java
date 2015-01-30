@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.QR;
-import org.ojalgo.matrix.decomposition.QRDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 
 /**
@@ -65,7 +64,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         myExpMtrx = SimpleQRCase.getOriginal();
         final BigMatrix tmpFactorQ = SimpleQRCase.getFactorQ();
         final BigMatrix tmpFactorR = SimpleQRCase.getFactorR();
-        myActMtrx = tmpFactorQ.multiplyRight(tmpFactorR);
+        myActMtrx = tmpFactorQ.multiply(tmpFactorR);
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
@@ -75,14 +74,14 @@ public class SimpleQRCase extends BasicMatrixTest {
 
         // QR
 
-        final QR<BigDecimal> tmpQR = QRDecomposition.makeBig();
+        final QR<BigDecimal> tmpQR = QR.makeBig();
         tmpQR.compute(SimpleQRCase.getOriginal().toBigStore());
 
         final MatrixStore<BigDecimal> tmpQ = tmpQR.getQ();
         final MatrixStore<BigDecimal> tmpR = tmpQR.getR();
 
         myExpMtrx = SimpleQRCase.getOriginal();
-        myActMtrx = BigMatrix.FACTORY.copy(tmpQ.multiplyRight(tmpR));
+        myActMtrx = BigMatrix.FACTORY.copy(tmpQ.multiply(tmpR));
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 

@@ -82,10 +82,10 @@ public class SVDbyEvD extends MatrixDecompositionTests {
     private void doTest(final PhysicalStore<Double> aMtrxA, final Array1D<Double> theSingularValues) {
 
         final MatrixStore<Double> tmpTranspA = aMtrxA.transpose();
-        final MatrixStore<Double> tmpLeftA = aMtrxA.multiplyRight(tmpTranspA);
+        final MatrixStore<Double> tmpLeftA = aMtrxA.multiply(tmpTranspA);
         final MatrixStore<Double> tmpRightA = aMtrxA.multiplyLeft(tmpTranspA);
 
-        final Eigenvalue<Double> tmpEigenvalue = EigenvalueDecomposition.makePrimitive();
+        final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.makePrimitive();
 
         tmpEigenvalue.compute(tmpLeftA, false);
         final MatrixStore<Double> tmpLeftD = tmpEigenvalue.getD();
@@ -118,7 +118,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
 
         // So far...
 
-        final SingularValue<Double> tmpExperimental = SingularValueDecomposition.makePrimitive();
+        final SingularValue<Double> tmpExperimental = SingularValue.makePrimitive();
         tmpExperimental.compute(aMtrxA);
 
         if (MatrixDecompositionTests.DEBUG) {
