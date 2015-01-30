@@ -72,7 +72,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
         //        tmpModel.options.solution = tmpModel.options.solution.newScale(30);
         //        tmpModel.options.solution = tmpModel.options.solution.newPrecision(30);
 
-        //tmpModel.options.debug(IntegerSolver.class);
+        // tmpModel.options.debug(LinearSolver.class);
 
         TestUtils.assertTrue(tmpModel.validate());
 

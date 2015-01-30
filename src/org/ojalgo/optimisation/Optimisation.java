@@ -216,7 +216,7 @@ public interface Optimisation {
         /**
          * Used to compare/check objective function values (incl. temporary, phase 1, objectives).
          */
-        public NumberContext objective = new NumberContext(12, 7, RoundingMode.HALF_EVEN);
+        public NumberContext objective = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 
         /**
          * For display only!

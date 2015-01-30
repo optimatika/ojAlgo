@@ -171,6 +171,16 @@ final class SimplexTableauSolver extends LinearSolver {
         return retVal;
     }
 
+    private boolean isBasicArtificials() {
+        final int tmpLength = myBasis.length;
+        for (int i = 0; i < tmpLength; i++) {
+            if (myBasis[i] < 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private final boolean isTableauPrintable() {
         return myTransposedTableau.count() <= 512L;
     }
@@ -228,7 +238,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             final double tmpPhaseOneValue = myTransposedTableau.doubleValue(this.countVariables(), myPoint.getRowObjective());
 
-            if (options.objective.isZero(tmpPhaseOneValue)) {
+            if (!this.isBasicArtificials() || options.objective.isZero(tmpPhaseOneValue)) {
 
                 if (this.isDebug()) {
                     this.debug("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", this.countBasicArtificials());
