@@ -257,11 +257,21 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     }
 
     BigDecimal getLowerBound(final int index) {
-        return new BigDecimal(myLowerBounds[index]);
+        final int tmpLower = myLowerBounds[index];
+        if (tmpLower != Integer.MIN_VALUE) {
+            return new BigDecimal(tmpLower);
+        } else {
+            return null;
+        }
     }
 
     BigDecimal getUpperBound(final int index) {
-        return new BigDecimal(myUpperBounds[index]);
+        final int tmpUpper = myUpperBounds[index];
+        if (tmpUpper != Integer.MAX_VALUE) {
+            return new BigDecimal(tmpUpper);
+        } else {
+            return null;
+        }
     }
 
 }

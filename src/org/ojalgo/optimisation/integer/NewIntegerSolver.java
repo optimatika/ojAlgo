@@ -346,9 +346,15 @@ public final class NewIntegerSolver extends IntegerSolver {
             tmpVariable.lower(tmpLowerBound);
             tmpVariable.upper(tmpUpperBound);
 
-            final BigDecimal tmpValue = tmpVariable.getValue();
+            BigDecimal tmpValue = tmpVariable.getValue();
             if (tmpValue != null) {
-                tmpVariable.setValue(tmpValue.max(tmpLowerBound).min(tmpUpperBound));
+                if (tmpLowerBound != null) {
+                    tmpValue = tmpValue.max(tmpLowerBound);
+                }
+                if (tmpUpperBound != null) {
+                    tmpValue = tmpValue.min(tmpUpperBound);
+                }
+                tmpVariable.setValue(tmpValue);
             }
         }
 
