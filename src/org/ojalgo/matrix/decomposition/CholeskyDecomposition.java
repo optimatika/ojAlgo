@@ -101,7 +101,7 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
      */
     @Deprecated
     public static final Cholesky<Double> makeJama() {
-        return Cholesky.makeJama();
+        return new RawCholesky();
     }
 
     /**

@@ -46,8 +46,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Cholesky<?>[] getCholeskyAll() {
-        return new Cholesky<?>[] { Cholesky.makeBig(), Cholesky.makeComplex(), Cholesky.makeJama(),
-                Cholesky.makePrimitive() };
+        return new Cholesky<?>[] { Cholesky.makeBig(), Cholesky.makeComplex(), new RawCholesky(), Cholesky.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -56,7 +55,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllGeneral() {
-        return new Eigenvalue<?>[] { Eigenvalue.makeJama(), Eigenvalue.makePrimitive() };
+        return new Eigenvalue<?>[] { new RawEigenvalue.General(), Eigenvalue.makePrimitive() };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllNonsymmetric() {
@@ -92,7 +91,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final LU<?>[] getLUAll() {
-        return new LU<?>[] { LU.makeBig(), LU.makeComplex(), LU.makeJama(), LU.makePrimitive() };
+        return new LU<?>[] { LU.makeBig(), LU.makeComplex(), new RawLU(), LU.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")
@@ -101,7 +100,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final QR<?>[] getQRAll() {
-        return new QR<?>[] { QR.makeBig(), QR.makeComplex(), QR.makeJama(), QR.makePrimitive() };
+        return new QR<?>[] { QR.makeBig(), QR.makeComplex(), new RawQR(), QR.makePrimitive() };
     }
 
     @SuppressWarnings("unchecked")

@@ -131,7 +131,7 @@ public class DesignCase extends MatrixDecompositionTests {
                 { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
         final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE.copy(new double[] { 4.0, 3.0, Math.sqrt(5.0), 0.0 });
 
-        final SingularValue<Double> tmpOldDecomp = SingularValue.makeAlternative();
+        final SingularValue<Double> tmpOldDecomp = new SVDold30.Primitive();
         tmpOldDecomp.compute(tmpOriginalMatrix);
         tmpOldDecomp.getD();
         tmpOldDecomp.getQ1();

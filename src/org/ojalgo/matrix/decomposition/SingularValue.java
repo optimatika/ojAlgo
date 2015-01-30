@@ -47,9 +47,9 @@ import org.ojalgo.scalar.ComplexNumber;
 public interface SingularValue<N extends Number> extends MatrixDecomposition<N> {
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> SingularValue<N> make(final Access2D<N> aTypical) {
+    public static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {
 
-        final N tmpNumber = aTypical.get(0, 0);
+        final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
 
@@ -61,7 +61,7 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N> 
 
         } else if (tmpNumber instanceof Double) {
 
-            final int tmpMaxDim = (int) Math.max(aTypical.countRows(), aTypical.countColumns());
+            final int tmpMaxDim = (int) Math.max(typical.countRows(), typical.countColumns());
 
             if ((tmpMaxDim > 128) && (tmpMaxDim < 46340)) {
 
@@ -69,7 +69,7 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N> 
 
             } else {
 
-                return (SingularValue<N>) SingularValue.makeJama();
+                return (SingularValue<N>) new RawSingularValue();
             }
 
         } else {
@@ -78,20 +78,12 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N> 
         }
     }
 
-    public static SingularValue<Double> makeAlternative() {
-        return new SVDold30.Primitive();
-    }
-
     public static SingularValue<BigDecimal> makeBig() {
         return new SVDnew32.Big();
     }
 
     public static SingularValue<ComplexNumber> makeComplex() {
         return new SVDnew32.Complex();
-    }
-
-    public static SingularValue<Double> makeJama() {
-        return new RawSingularValue();
     }
 
     public static SingularValue<Double> makePrimitive() {

@@ -59,9 +59,9 @@ import org.ojalgo.scalar.ComplexNumber;
 public interface LU<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> LU<N> make(final Access2D<N> aTypical) {
+    public static <N extends Number> LU<N> make(final Access2D<N> typical) {
 
-        final N tmpNumber = aTypical.get(0, 0);
+        final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
             return (LU<N>) LU.makeBig();
@@ -69,10 +69,10 @@ public interface LU<N extends Number> extends MatrixDecomposition<N>, Determinan
             return (LU<N>) LU.makeComplex();
         } else if (tmpNumber instanceof Double) {
 
-            final int tmpMaxDim = (int) Math.max(aTypical.countRows(), aTypical.countColumns());
+            final int tmpMaxDim = (int) Math.max(typical.countRows(), typical.countColumns());
 
             if ((tmpMaxDim <= 32) || (tmpMaxDim >= 46340)) { //16,32,2
-                return (LU<N>) LU.makeJama();
+                return (LU<N>) new RawLU();
             } else {
                 return (LU<N>) LU.makePrimitive();
             }
@@ -87,10 +87,6 @@ public interface LU<N extends Number> extends MatrixDecomposition<N>, Determinan
 
     public static LU<ComplexNumber> makeComplex() {
         return new Complex();
-    }
-
-    public static LU<Double> makeJama() {
-        return new RawLU();
     }
 
     public static LU<Double> makePrimitive() {

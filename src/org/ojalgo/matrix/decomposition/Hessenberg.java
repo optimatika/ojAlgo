@@ -40,9 +40,9 @@ import org.ojalgo.scalar.ComplexNumber;
 public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> Hessenberg<N> make(final Access2D<N> aTypical) {
+    public static <N extends Number> Hessenberg<N> make(final Access2D<N> typical) {
 
-        final N tmpNumber = aTypical.get(0, 0);
+        final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
             return (Hessenberg<N>) Hessenberg.makeBig();

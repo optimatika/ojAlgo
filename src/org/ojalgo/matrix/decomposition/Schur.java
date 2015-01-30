@@ -41,9 +41,9 @@ import org.ojalgo.scalar.ComplexNumber;
 public interface Schur<N extends Number> extends MatrixDecomposition<N> {
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> Schur<N> make(final Access2D<N> aTypical) {
+    public static <N extends Number> Schur<N> make(final Access2D<N> typical) {
 
-        final N tmpNumber = aTypical.get(0, 0);
+        final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof Double) {
             return (Schur<N>) Schur.makePrimitive();

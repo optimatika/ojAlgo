@@ -58,7 +58,7 @@ public class LargerCholeskyCase extends BasicMatrixTest {
     public void testData() {
 
         final MatrixStore<Double> tmpMtrx = LargerCholeskyCase.getOriginal().toPrimitiveStore();
-        final Cholesky<Double> tmpDecomp = Cholesky.makeJama();
+        final Cholesky<Double> tmpDecomp = Cholesky.makePrimitive();
         tmpDecomp.compute(tmpMtrx);
         TestUtils.assertEquals(true, tmpDecomp.isSolvable());
     }

@@ -152,7 +152,7 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
      */
     @Deprecated
     public static final LU<Double> makeJama() {
-        return LU.makeJama();
+        return new RawLU();
     }
 
     /**

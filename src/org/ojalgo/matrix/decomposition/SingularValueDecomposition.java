@@ -58,7 +58,7 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
      */
     @Deprecated
     public static final SingularValue<Double> makeAlternative() {
-        return SingularValue.makeAlternative();
+        return new SVDold30.Primitive();
     }
 
     /**
@@ -82,7 +82,7 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
      */
     @Deprecated
     public static final SingularValue<Double> makeJama() {
-        return SingularValue.makeJama();
+        return new RawSingularValue();
     }
 
     /**

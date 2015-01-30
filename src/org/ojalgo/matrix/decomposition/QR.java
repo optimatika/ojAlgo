@@ -45,9 +45,9 @@ import org.ojalgo.scalar.ComplexNumber;
 public interface QR<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> QR<N> make(final Access2D<N> aTypical) {
+    public static <N extends Number> QR<N> make(final Access2D<N> typical) {
 
-        final N tmpNumber = aTypical.get(0, 0);
+        final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
             return (QR<N>) QR.makeBig();
@@ -55,10 +55,10 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, Determinan
             return (QR<N>) QR.makeComplex();
         } else if (tmpNumber instanceof Double) {
 
-            final int tmpMaxDim = (int) Math.max(aTypical.countRows(), aTypical.countColumns());
+            final int tmpMaxDim = (int) Math.max(typical.countRows(), typical.countColumns());
 
             if ((tmpMaxDim <= 16) || (tmpMaxDim >= 46340)) { //16,16,8
-                return (QR<N>) QR.makeJama();
+                return (QR<N>) new RawQR();
             } else {
                 return (QR<N>) QR.makePrimitive();
             }
@@ -73,10 +73,6 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, Determinan
 
     public static QR<ComplexNumber> makeComplex() {
         return new Complex();
-    }
-
-    public static QR<Double> makeJama() {
-        return new RawQR();
     }
 
     public static QR<Double> makePrimitive() {

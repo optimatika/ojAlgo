@@ -41,7 +41,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
     private static final SingularValue<BigDecimal> BIG = SingularValue.makeBig();
     private static final SingularValue<ComplexNumber> COMPLEX = SingularValue.makeComplex();
-    private static final SingularValue<Double> JAMA = SingularValue.makeJama();
+    private static final SingularValue<Double> JAMA = new RawSingularValue();
     private static final SingularValue<Double> DIRECT = SingularValue.makePrimitive();
 
     private static final BasicMatrix FAT = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));

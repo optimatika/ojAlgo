@@ -32,9 +32,11 @@ import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.integer.OptimisationIntegerData;
+import org.ojalgo.optimisation.integer.P20150127b;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -167,6 +169,24 @@ public class ReportedProblems extends OptimisationLinearTests {
         final State tmpResultState = tmpModel.maximise().getState();
 
         TestUtils.assertFalse("Should be INFEASIBLE", tmpResultState == State.FEASIBLE);
+    }
+
+    /**
+     * Problemet var att en av noderna som IntegerSolver genererade var infeasible, men det misslyckades LinearSolver
+     * med att identifiera och returnerade en felaktig lösning som OPTIMAL. Detta testfall motsvarar
+     */
+    public void testP20150127() {
+
+        final ExpressionsBasedModel tmpModel = P20150127b.getModel(true, true);
+
+        // tmpModel.options.debug(LinearSolver.class);
+        // Kan få testfallet att gå igenom, men dåsmäller andra testfall
+        // tmpModel.options.objective = tmpModel.options.objective.newScale(8);
+
+        final Result tmpResult = tmpModel.minimise();
+
+        TestUtils.assertStateLessThanFeasible(tmpResult); // Should be infeasible
+        TestUtils.assertFalse(tmpModel.validate(tmpResult));
     }
 
     /**

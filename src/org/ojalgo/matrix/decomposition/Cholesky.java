@@ -44,17 +44,17 @@ import org.ojalgo.scalar.ComplexNumber;
 public interface Cholesky<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> Cholesky<N> make(final Access2D<N> aTypical) {
+    public static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
 
-        final N tmpNumber = aTypical.get(0, 0);
+        final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
             return (Cholesky<N>) Cholesky.makeBig();
         } else if (tmpNumber instanceof ComplexNumber) {
             return (Cholesky<N>) Cholesky.makeComplex();
         } else if (tmpNumber instanceof Double) {
-            if ((aTypical.countColumns() <= 32) || (aTypical.countColumns() >= 46340)) { //64,16,16
-                return (Cholesky<N>) Cholesky.makeJama();
+            if ((typical.countColumns() <= 32) || (typical.countColumns() >= 46340)) { //64,16,16
+                return (Cholesky<N>) new RawCholesky();
             } else {
                 return (Cholesky<N>) Cholesky.makePrimitive();
             }
@@ -69,10 +69,6 @@ public interface Cholesky<N extends Number> extends MatrixDecomposition<N>, Dete
 
     public static Cholesky<ComplexNumber> makeComplex() {
         return new CholeskyDecomposition.Complex();
-    }
-
-    public static Cholesky<Double> makeJama() {
-        return new RawCholesky();
     }
 
     public static Cholesky<Double> makePrimitive() {

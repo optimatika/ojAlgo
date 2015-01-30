@@ -107,7 +107,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
         final BasicMatrix tmpMtrxA = BigMatrix.FACTORY.makeZero(SimpleEquationCase.getBody().countRows(), (int) SimpleEquationCase.getBody().countColumns())
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
-        final LU<Double> tmpDoubleDecomp = LU.makeJama();
+        final LU<Double> tmpDoubleDecomp = new RawLU();
         tmpDoubleDecomp.compute(tmpMtrxA.toPrimitiveStore());
         //        System.out.println("A: " + tmpMtrxA.enforce(tmpEvalContext));
         //        System.out.println("P: " + new PrimitiveMatrix(tmpDoubleDecomp.getP()).enforce(tmpEvalContext));

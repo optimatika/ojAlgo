@@ -42,7 +42,6 @@ import org.ojalgo.type.context.NumberContext;
 abstract class AbstractDecomposition<N extends Number> implements MatrixDecomposition<N> {
 
     private boolean myAspectRatioNormal = true;
-
     private boolean myComputed = false;
     private final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
 
@@ -51,11 +50,11 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
         this(null);
     }
 
-    protected AbstractDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
+    protected AbstractDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
 
         super();
 
-        myFactory = aFactory;
+        myFactory = factory;
     }
 
     public final boolean equals(final MatrixDecomposition<N> other, final NumberContext context) {

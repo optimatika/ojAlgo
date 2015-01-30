@@ -38,9 +38,9 @@ import org.ojalgo.scalar.ComplexNumber;
 public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> Tridiagonal<N> make(final Access2D<N> aTypical) {
+    public static <N extends Number> Tridiagonal<N> make(final Access2D<N> typical) {
 
-        final N tmpNumber = aTypical.get(0, 0);
+        final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
             return (Tridiagonal<N>) Tridiagonal.makeBig();

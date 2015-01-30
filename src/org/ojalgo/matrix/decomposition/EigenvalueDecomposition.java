@@ -86,7 +86,7 @@ public abstract class EigenvalueDecomposition<N extends Number> extends Abstract
      */
     @Deprecated
     public static final Eigenvalue<Double> makeJama() {
-        return Eigenvalue.makeJama();
+        return new RawEigenvalue.General();
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class EigenvalueDecomposition<N extends Number> extends Abstract
      */
     @Deprecated
     public static final Eigenvalue<Double> makeJama(final boolean symmetric) {
-        return Eigenvalue.makeJama(symmetric);
+        return symmetric ? new RawEigenvalue.Symmetric() : new RawEigenvalue.Nonsymmetric();
     }
 
     /**

@@ -147,7 +147,7 @@ public class ReportedProblems extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
         final PhysicalStore<Double> tmpIdentity = PrimitiveDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
 
-        final MatrixDecomposition<Double> tmpRefDecomps = LU.makeJama();
+        final MatrixDecomposition<Double> tmpRefDecomps = new RawLU();
         tmpRefDecomps.compute(tmpRandom);
         final MatrixStore<Double> tmpExpected = tmpRefDecomps.getInverse();
 
@@ -180,12 +180,16 @@ public class ReportedProblems extends MatrixDecompositionTests {
         MatrixStore<ComplexNumber> tmpActual;
 
         @SuppressWarnings("unchecked")
-        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.makeComplex(),
-                Cholesky.makeComplex(), Eigenvalue.makeComplex()/*
-             * , HessenbergDecomposition.
-             * makeComplex()
-             */, LU.makeComplex(), QR.makeComplex(),
-             SingularValue.makeComplex() /* , TridiagonalDecomposition.makeComplex() */};
+        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.makeComplex(), Cholesky.makeComplex(),
+                Eigenvalue.makeComplex()/*
+                                         * , HessenbergDecomposition. makeComplex()
+                                         */, LU.makeComplex(), QR.makeComplex(), SingularValue.makeComplex() /*
+                                                                                                              * ,
+                                                                                                              * TridiagonalDecomposition
+                                                                                                              * .
+                                                                                                              * makeComplex
+                                                                                                              * ()
+                                                                                                              */};
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.compute(tmpHermitian);
@@ -218,14 +222,14 @@ public class ReportedProblems extends MatrixDecompositionTests {
 
         @SuppressWarnings("unchecked")
         final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.makeComplex()/*
-         * ,
-         * LUDecomposition
-         * .
-         * makeComplex
-         * (
-         * )
-         */,
-         QR.makeComplex(), SingularValue.makeComplex() };
+                                                                                                                          * ,
+                                                                                                                          * LUDecomposition
+                                                                                                                          * .
+                                                                                                                          * makeComplex
+                                                                                                                          * (
+                                                                                                                          * )
+                                                                                                                          */, QR.makeComplex(),
+                SingularValue.makeComplex() };
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.compute(tmpTall);

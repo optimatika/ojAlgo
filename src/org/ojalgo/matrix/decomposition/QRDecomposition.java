@@ -100,7 +100,7 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
      */
     @Deprecated
     public static final QR<Double> makeJama() {
-        return QR.makeJama();
+        return new RawQR();
     }
 
     /**

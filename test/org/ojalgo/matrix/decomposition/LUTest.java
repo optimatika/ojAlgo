@@ -56,7 +56,7 @@ public class LUTest extends MatrixDecompositionTests {
         final LU<Double> tmpPrimitive = LU.makePrimitive();
         tmpPrimitive.compute(tmpProblematic);
 
-        final LU<Double> tmpJama = LU.makeJama();
+        final LU<Double> tmpJama = new RawLU();
         tmpJama.compute(tmpProblematic);
 
         final NumberContext tmpPrintContext = NumberContext.getGeneral(20);
@@ -75,7 +75,7 @@ public class LUTest extends MatrixDecompositionTests {
             BasicLogger.debug("Jama U", tmpJama.getU(), tmpPrintContext);
         }
 
-        final SingularValue<Double> tmpSVD = SingularValue.makeJama();
+        final SingularValue<Double> tmpSVD = new RawSingularValue();
         tmpSVD.compute(tmpProblematic);
 
         TestUtils.assertEquals("LU.rank SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());

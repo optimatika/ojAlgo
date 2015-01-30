@@ -404,6 +404,10 @@ public interface BasicMatrix extends Access2D<Number> {
      */
     BasicMatrix multiplyLeft(Access2D<?> aMtrx);
 
+    /**
+     * @deprecated v38 Use {@link #multiply(Access2D)} instead.
+     */
+    @Deprecated
     default BasicMatrix multiplyRight(final Access2D<?> right) {
         return this.multiply(right);
     }

@@ -52,26 +52,26 @@ import org.ojalgo.scalar.ComplexNumber;
 public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
 
     @SuppressWarnings("unchecked")
-    public static <N extends Number> Eigenvalue<N> make(final Access2D<N> template) {
+    public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
 
-        final N tmpNumber = template.get(0L, 0L);
-        final long tmpDim = template.countColumns();
+        final N tmpNumber = typical.get(0L, 0L);
+        final long tmpDim = typical.countColumns();
 
         if (tmpNumber instanceof BigDecimal) {
 
-            final boolean tmpSymmetric = MatrixUtils.isHermitian(template);
+            final boolean tmpSymmetric = MatrixUtils.isHermitian(typical);
 
             return (Eigenvalue<N>) Eigenvalue.makeBig(tmpSymmetric);
 
         } else if (tmpNumber instanceof ComplexNumber) {
 
-            final boolean tmpHermitian = MatrixUtils.isHermitian(template);
+            final boolean tmpHermitian = MatrixUtils.isHermitian(typical);
 
             return (Eigenvalue<N>) Eigenvalue.makeComplex(tmpHermitian);
 
         } else if (tmpNumber instanceof Double) {
 
-            final boolean tmpSymmetric = MatrixUtils.isHermitian(template);
+            final boolean tmpSymmetric = MatrixUtils.isHermitian(typical);
 
             if ((tmpDim > 128L) && (tmpDim < 46340L)) {
 
@@ -79,7 +79,7 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, De
 
             } else {
 
-                return (Eigenvalue<N>) Eigenvalue.makeJama(tmpSymmetric);
+                return (Eigenvalue<N>) (tmpSymmetric ? new RawEigenvalue.Symmetric() : new RawEigenvalue.Nonsymmetric());
             }
 
         } else {
@@ -102,14 +102,6 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, De
 
     public static Eigenvalue<ComplexNumber> makeComplex(final boolean hermitian) {
         return hermitian ? new HermitianEvD32.Complex() : null;
-    }
-
-    public static Eigenvalue<Double> makeJama() {
-        return new RawEigenvalue.General();
-    }
-
-    public static Eigenvalue<Double> makeJama(final boolean symmetric) {
-        return symmetric ? new RawEigenvalue.Symmetric() : new RawEigenvalue.Nonsymmetric();
     }
 
     public static Eigenvalue<Double> makePrimitive() {
