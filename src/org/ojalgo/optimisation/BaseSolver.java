@@ -41,8 +41,6 @@ public abstract class BaseSolver extends GenericSolver {
 
     protected static abstract class AbstractBuilder<B extends AbstractBuilder<?, ?>, S extends BaseSolver> implements Cloneable {
 
-        private final ExpressionsBasedModel myModel;
-
         private MatrixStore.Builder<Double> myAE = null;
         private MatrixStore.Builder<Double> myBE = null;
         private MatrixStore.Builder<Double> myQ = null;
@@ -54,21 +52,13 @@ public abstract class BaseSolver extends GenericSolver {
         private PhysicalStore<Double> myLE = null;
         private PhysicalStore<Double> myLI = null;
 
-        private ModelEntity<?>[] myInequalityEnities = null;
-        private Optimisation.Result myKickStarter;
-
         protected AbstractBuilder() {
-
             super();
-
-            myModel = null;
         }
 
         protected AbstractBuilder(final BaseSolver.AbstractBuilder<?, ?> matrices) {
 
             super();
-
-            myModel = null;
 
             if (matrices.hasEqualityConstraints()) {
                 this.equalities(matrices.getAE(), matrices.getBE());
@@ -87,18 +77,9 @@ public abstract class BaseSolver extends GenericSolver {
             }
         }
 
-        protected AbstractBuilder(final ExpressionsBasedModel model) {
-
-            super();
-
-            myModel = model;
-        }
-
         protected AbstractBuilder(final MatrixStore<Double> C) {
 
             super();
-
-            myModel = null;
 
             myAE = null;
             myBE = null;
@@ -113,8 +94,6 @@ public abstract class BaseSolver extends GenericSolver {
         protected AbstractBuilder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
 
             super();
-
-            myModel = null;
 
             myAE = null;
             myBE = null;
@@ -133,8 +112,6 @@ public abstract class BaseSolver extends GenericSolver {
         protected AbstractBuilder(final MatrixStore<Double>[] matrices) {
 
             super();
-
-            myModel = null;
 
             if ((matrices.length >= 2) && (matrices[0] != null) && (matrices[1] != null)) {
                 this.equalities(matrices[0], matrices[1]);
@@ -271,14 +248,6 @@ public abstract class BaseSolver extends GenericSolver {
             }
         }
 
-        public ModelEntity<?>[] getInequalityEnities() {
-            return myInequalityEnities;
-        }
-
-        public Optimisation.Result getKickStarter() {
-            return myKickStarter;
-        }
-
         /**
          * Lagrange multipliers / dual variables for Equalities
          */
@@ -390,14 +359,6 @@ public abstract class BaseSolver extends GenericSolver {
             return (this.getQ() != null) || (this.getC() != null);
         }
 
-        public boolean isInequalityEnitiesSet() {
-            return myInequalityEnities != null;
-        }
-
-        public boolean isKickStarterSet() {
-            return myKickStarter != null;
-        }
-
         public boolean isX() {
             return myX != null;
         }
@@ -418,10 +379,6 @@ public abstract class BaseSolver extends GenericSolver {
             if (myX != null) {
                 myX.fillAll(PrimitiveMath.ZERO);
             }
-        }
-
-        public void setKickStarter(final Optimisation.Result kickStarter) {
-            myKickStarter = kickStarter;
         }
 
         public void setLE(final int index, final double value) {
@@ -613,32 +570,13 @@ public abstract class BaseSolver extends GenericSolver {
             return (B) this;
         }
 
-        protected ExpressionsBasedModel getModel() {
-            return myModel;
-        }
-
-        protected B inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI) {
-            return this.inequalities(AI, BI, null);
-        }
-
         @SuppressWarnings("unchecked")
-        protected B inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI, final ModelEntity<?>[] originatingEntities) {
+        protected B inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI) {
 
             if (myAI != null) {
                 myAI.below(AI);
-                if (originatingEntities != null) {
-                    final ModelEntity<?>[] tmpOldEntities = myInequalityEnities;
-                    myInequalityEnities = new ModelEntity<?>[tmpOldEntities.length + originatingEntities.length];
-                    for (int i = 0; i < tmpOldEntities.length; i++) {
-                        myInequalityEnities[i] = tmpOldEntities[i];
-                    }
-                    for (int i = 0; i < originatingEntities.length; i++) {
-                        myInequalityEnities[tmpOldEntities.length + i] = originatingEntities[i];
-                    }
-                }
             } else {
                 myAI = AI.builder();
-                myInequalityEnities = originatingEntities;
             }
 
             if (myBI != null) {
@@ -738,20 +676,15 @@ public abstract class BaseSolver extends GenericSolver {
     private final BaseSolver.AbstractBuilder<?, ?> myMatrices;
 
     @SuppressWarnings("unused")
-    private BaseSolver(final ExpressionsBasedModel aModel, final Options solverOptions) {
-        this(aModel, solverOptions, null);
+    private BaseSolver(final Options solverOptions) {
+        this(null, solverOptions);
     }
 
-    protected BaseSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final BaseSolver.AbstractBuilder<?, ?> matrices) {
+    protected BaseSolver(final BaseSolver.AbstractBuilder<?, ?> matrices, final Optimisation.Options solverOptions) {
 
-        super(aModel, solverOptions);
+        super(solverOptions);
 
         myMatrices = matrices;
-    }
-
-    @Override
-    public Optimisation.Result solve() {
-        return this.solve(myMatrices.getKickStarter());
     }
 
     @Override
@@ -795,10 +728,6 @@ public abstract class BaseSolver extends GenericSolver {
 
     protected MatrixStore<Double> getC() {
         return myMatrices.getC();
-    }
-
-    protected ModelEntity<?>[] getInequalityEnities() {
-        return myMatrices.getInequalityEnities();
     }
 
     protected PhysicalStore<Double> getLE() {

@@ -10,8 +10,6 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
 import org.ojalgo.type.TypeUtils;
 
 class QuadraticDemo {
@@ -27,6 +25,16 @@ class QuadraticDemo {
         } finally {
             System.exit(0);
         }
+    }
+
+    static ConvexSolver createConvexSolver(final MatrixStore<Double> Q, final MatrixStore<Double> C, final MatrixStore<Double> AE,
+            final MatrixStore<Double> BE, final MatrixStore<Double> AI, final MatrixStore<Double> BI) {
+        //		OptimisationSolver solver = model.getDefaultSolver();
+        final ConvexSolver.Builder builder = new ConvexSolver.Builder(Q, C).equalities(AE, BE).inequalities(AI, BI);
+
+        final ConvexSolver solver = builder.build();
+
+        return solver;
     }
 
     static ExpressionsBasedModel createQuadraticModel(final int size, final MatrixStore<Double> Q, final MatrixStore<Double> C, final MatrixStore<Double> AE,
@@ -110,23 +118,6 @@ class QuadraticDemo {
         return model;
     }
 
-    static ConvexSolver createConvexSolver(final ExpressionsBasedModel model) {
-        //		OptimisationSolver solver = model.getDefaultSolver();
-        final ConvexSolver.Builder builder = new ConvexSolver.Builder(model);
-        final ConvexSolver solver = builder.build();
-        return solver;
-    }
-
-    static ConvexSolver createConvexSolver(final MatrixStore<Double> Q, final MatrixStore<Double> C, final MatrixStore<Double> AE,
-            final MatrixStore<Double> BE, final MatrixStore<Double> AI, final MatrixStore<Double> BI) {
-        //		OptimisationSolver solver = model.getDefaultSolver();
-        final ConvexSolver.Builder builder = new ConvexSolver.Builder(Q, C).equalities(AE, BE).inequalities(AI, BI);
-
-        final ConvexSolver solver = builder.build();
-
-        return solver;
-    }
-
     static void printMatrix(final String name, final double[][] matrix) {
         if (matrix != null) {
             System.out.println(name + "[" + matrix.length + ", " + matrix[0].length + "]");
@@ -157,7 +148,7 @@ class QuadraticDemo {
 
         final MatrixStore<Double> Q = MatrixReader.readMatrix(qs.toString(), 255, 255);
 
-        //MatrixStore<Double> QQ = MatrixReader.readMatrix("U:/ojalgo_test/Q.txt");        
+        //MatrixStore<Double> QQ = MatrixReader.readMatrix("U:/ojalgo_test/Q.txt");
         //for (int row = 0; row < 255; ++row) {
         //    for (int col = 0; col < 255; ++col) {
         //        double qq = QQ.get(row, col);
@@ -181,10 +172,9 @@ class QuadraticDemo {
                 v.lower(BigMath.ZERO).upper(BigMath.ONE.divide(BigMath.HUNDRED));
             }
             System.out.println(model);
-            model.setMinimisation(true);
-            final ConvexSolver solver = QuadraticDemo.createConvexSolver(model);
+
             final double start = System.currentTimeMillis();
-            final Optimisation.Result res = solver.solve();
+            final Optimisation.Result res = model.minimise();
             final double time = (System.currentTimeMillis() - start) / 1000.0D;
             System.out.println(BigMatrix.FACTORY.columns(res));
             System.out.println(res.getState());

@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.system;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.EigenvalueDecomposition;
@@ -42,7 +41,7 @@ public final class EigenvalueSolver extends DecompositionSolver<Eigenvalue<Doubl
 
         boolean retVal = body.countRows() == body.countColumns();
 
-        retVal = retVal && MatrixUtils.isHermitian((Access2D<?>) body);
+        retVal = retVal && MatrixUtils.isHermitian(body);
 
         return retVal;
     }

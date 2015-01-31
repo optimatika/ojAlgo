@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.system;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.CholeskyDecomposition;
@@ -42,7 +41,7 @@ public final class CholeskySolver extends DecompositionSolver<Cholesky<Double>> 
 
         boolean retVal = body.countRows() == body.countColumns();
 
-        retVal = retVal && MatrixUtils.isHermitian((Access2D<?>) body);
+        retVal = retVal && MatrixUtils.isHermitian(body);
 
         retVal = retVal && this.getDecomposition().compute(body, true);
 

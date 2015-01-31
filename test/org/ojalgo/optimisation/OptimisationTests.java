@@ -10,7 +10,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ojalgo.optimisation.integer;
+package org.ojalgo.optimisation;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -18,36 +18,27 @@ import junit.framework.TestSuite;
 import org.ojalgo.FunctionalityTest;
 
 /**
- * OptimisationIntegerPackageTests
+ * OptimisationQuadraticPackageTests
  *
  * @author apete
  */
-public abstract class OptimisationIntegerTests extends FunctionalityTest {
+public abstract class OptimisationTests extends FunctionalityTest {
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     public static Test suite() {
-        final TestSuite suite = new TestSuite(OptimisationIntegerTests.class.getPackage().getName());
+        final TestSuite suite = new TestSuite(OptimisationTests.class.getPackage().getName());
         //$JUnit-BEGIN$
-        suite.addTestSuite(DesignCase.class);
-        suite.addTestSuite(KnapsackTest.class);
-        //suite.addTestSuite(LpsolveSemiContCase.class);
-        suite.addTestSuite(MarketShareCase.class);
-        //suite.addTestSuite(MipCase.class);
-        suite.addTestSuite(RelaxedLpCase.class);
-        suite.addTestSuite(ReportedProblems.class);
-        suite.addTestSuite(SpecificBranchCase.class);
-        suite.addTestSuite(StrategyMixer.class);
-        suite.addTestSuite(UCLAee236aCase.class);
+        suite.addTestSuite(ExpressionsBasedModelTest.class);
         //$JUnit-END$
         return suite;
     }
 
-    protected OptimisationIntegerTests() {
+    protected OptimisationTests() {
         super();
     }
 
-    protected OptimisationIntegerTests(final String name) {
+    protected OptimisationTests(final String name) {
         super(name);
     }
 }

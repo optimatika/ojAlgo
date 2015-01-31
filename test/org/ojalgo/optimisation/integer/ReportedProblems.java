@@ -245,4 +245,45 @@ public class ReportedProblems extends OptimisationIntegerTests {
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());
     }
 
+    public void testP20150127full() {
+
+        final ExpressionsBasedModel tmpModel = P20150127a.getModel();
+
+        final Optimisation.Result tmpResult = tmpModel.minimise();
+
+        // Model should be solvable (e.g. x=201, y=-10)?!
+        TestUtils.assertStateNotLessThanFeasible(tmpResult);
+
+        final BigDecimal tmpSolX = tmpResult.get(0);
+        final BigDecimal tmpSolY = tmpResult.get(1);
+        final int tmpIntX = tmpSolX.setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
+        final int tmpIntY = tmpSolY.setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
+
+        if (DEBUG) {
+            BasicLogger.debug("x = " + tmpSolX + " ~ " + tmpIntX);
+            BasicLogger.debug("y = " + tmpSolY + " ~ " + tmpIntY);
+        }
+
+        TestUtils.assertTrue("Solution not valid!", tmpModel.validate(tmpResult));
+
+        // Verify solution
+        for (final int[] tmpCoeff : P20150127a.getCoefficients()) {
+            final int tmpValue = (tmpCoeff[0] * tmpIntX) + (tmpCoeff[1] * tmpIntY);
+            final BigDecimal tmpExact = tmpSolX.multiply(BigDecimal.valueOf(tmpCoeff[0])).add(tmpSolY.multiply(BigDecimal.valueOf(tmpCoeff[1])));
+            if (tmpValue >= 0) {
+                TestUtils.fail(tmpCoeff[0] + "*x + " + tmpCoeff[1] + "*y = " + tmpValue + " must be negative (exact: " + tmpExact + ")");
+            }
+        }
+    }
+
+    public void testP20150127infeasibleNode() {
+
+        final ExpressionsBasedModel tmpModel = P20150127b.getModel(true, false);
+
+        final Optimisation.Result tmpResult = tmpModel.minimise();
+
+        // Model is infeasible, and must be reported as such
+        TestUtils.assertStateLessThanFeasible(tmpResult);
+    }
+
 }

@@ -25,10 +25,9 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -37,10 +36,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.ZeroStore;
-import org.ojalgo.optimisation.Expression.Index;
-import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.Variable;
 
 /**
  * SimplexTableauSolver
@@ -113,9 +109,9 @@ final class SimplexTableauSolver extends LinearSolver {
     private final PivotPoint myPoint;
     private final PrimitiveDenseStore myTransposedTableau;
 
-    SimplexTableauSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final LinearSolver.Builder matrices) {
+    SimplexTableauSolver(final LinearSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
-        super(aModel, solverOptions, matrices);
+        super(matrices, solverOptions);
 
         myPoint = new PivotPoint(this);
 
@@ -131,8 +127,7 @@ final class SimplexTableauSolver extends LinearSolver {
         //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
         myTransposedTableau = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.build());
 
-        final Result tmpKickStarter = matrices.getKickStarter();
-        final int[] tmpBasis = tmpKickStarter != null ? tmpKickStarter.getBasis() : null;
+        final int[] tmpBasis = null;
         if ((tmpBasis != null) && (tmpBasis.length == tmpConstraintsCount)) {
             myBasis = tmpBasis;
             this.include(tmpBasis);
@@ -176,12 +171,27 @@ final class SimplexTableauSolver extends LinearSolver {
         return retVal;
     }
 
+    private boolean isBasicArtificials() {
+        final int tmpLength = myBasis.length;
+        for (int i = 0; i < tmpLength; i++) {
+            if (myBasis[i] < 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private final boolean isTableauPrintable() {
         return myTransposedTableau.count() <= 512L;
     }
 
     private final void logDebugTableau(final String message) {
         this.debug(message + "; Basics: " + Arrays.toString(myBasis), myTransposedTableau.transpose());
+    }
+
+    @Override
+    protected double evaluateFunction(final Access1D<?> solution) {
+        return myPoint.objective();
     }
 
     /**
@@ -203,43 +213,7 @@ final class SimplexTableauSolver extends LinearSolver {
         }
         final PhysicalStore<Double> tmpTableauSolution = this.getX();
 
-        final ExpressionsBasedModel tmpModel = this.getModel();
-
-        if (tmpModel != null) {
-
-            final List<Variable> tmpFreeVariables = tmpModel.getFreeVariables();
-            final Set<Index> tmpFixedVariables = tmpModel.getFixedVariables();
-
-            final PrimitiveDenseStore tmpModelSolution = PrimitiveDenseStore.FACTORY.makeZero(tmpFixedVariables.size() + tmpFreeVariables.size(), 1);
-
-            final int tmpModelSolutionSize = (int) tmpModelSolution.count();
-            final int tmpVariablesSize = tmpModel.getVariables().size();
-            if (tmpModelSolutionSize != tmpVariablesSize) {
-                throw new IllegalStateException();
-            }
-
-            for (final Index tmpFixed : tmpFixedVariables) {
-                tmpModelSolution.set(tmpFixed.index, 0, tmpModel.getVariable(tmpFixed.index).getValue().doubleValue());
-            }
-
-            final List<Variable> tmpPositive = tmpModel.getPositiveVariables();
-            for (int p = 0; p < tmpPositive.size(); p++) {
-                final int tmpIndex = tmpModel.indexOf(tmpPositive.get(p));
-                tmpModelSolution.set(tmpIndex, 0, tmpTableauSolution.doubleValue(p));
-            }
-
-            final List<Variable> tmpNegative = tmpModel.getNegativeVariables();
-            for (int n = 0; n < tmpNegative.size(); n++) {
-                final int tmpIndex = tmpModel.indexOf(tmpNegative.get(n));
-                tmpModelSolution.set(tmpIndex, 0, tmpModelSolution.doubleValue(tmpIndex) - tmpTableauSolution.doubleValue(tmpPositive.size() + n));
-            }
-
-            return tmpModelSolution;
-
-        } else {
-
-            return tmpTableauSolution;
-        }
+        return tmpTableauSolution;
 
     }
 
@@ -264,7 +238,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
             final double tmpPhaseOneValue = myTransposedTableau.doubleValue(this.countVariables(), myPoint.getRowObjective());
 
-            if (options.objective.isZero(tmpPhaseOneValue)) {
+            if (!this.isBasicArtificials() || options.objective.isZero(tmpPhaseOneValue)) {
 
                 if (this.isDebug()) {
                     this.debug("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", this.countBasicArtificials());
@@ -496,17 +470,6 @@ final class SimplexTableauSolver extends LinearSolver {
                 }
             }
 
-            final ExpressionsBasedModel tmpModel = this.getModel();
-
-            if ((tmpModel != null) && (myPoint.isPhase2())) {
-                final Result tmpResult = this.buildResult();
-                if (!tmpModel.validate(tmpResult, options.slack)) {
-                    if (this.isDebug()) {
-                        this.debug("Model validation failed!\n");
-                    }
-                    this.setState(State.FAILED);
-                }
-            }
         }
     }
 

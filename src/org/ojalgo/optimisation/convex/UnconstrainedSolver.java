@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.convex.KKTSolver.Input;
 
@@ -35,8 +34,8 @@ import org.ojalgo.optimisation.convex.KKTSolver.Input;
  */
 final class UnconstrainedSolver extends ConvexSolver {
 
-    UnconstrainedSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions, final ConvexSolver.Builder matrices) {
-        super(aModel, solverOptions, matrices);
+    UnconstrainedSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+        super(matrices, solverOptions);
     }
 
     @Override

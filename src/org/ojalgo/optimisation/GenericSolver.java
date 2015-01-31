@@ -26,8 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
-import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 
@@ -35,44 +33,30 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
 
     public final Optimisation.Options options;
 
-    private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);
-    private final ExpressionsBasedModel myModel;
     private long myResetTime;
     private State myState = State.UNEXPLORED;
 
     @SuppressWarnings("unused")
     private GenericSolver() {
-        this(null, null);
+        this(null);
     }
 
     /**
-     * @param model
      */
-    protected GenericSolver(final ExpressionsBasedModel model, final Optimisation.Options solverOptions) {
+    protected GenericSolver(final Optimisation.Options solverOptions) {
 
         super();
 
-        if (model != null) {
-            myModel = model;
-            myFunction = model.getObjectiveFunction();
-            if (solverOptions != null) {
-                options = solverOptions;
-            } else {
-                options = model.options;
-            }
+        if (solverOptions != null) {
+            options = solverOptions;
         } else {
-            myModel = model;
-            myFunction = null;
-            if (solverOptions != null) {
-                options = solverOptions;
-            } else {
-                options = new Optimisation.Options();
-            }
+            options = new Optimisation.Options();
         }
+
     }
 
-    public Optimisation.Result solve() {
+    public final Optimisation.Result solve() {
         return this.solve(null);
     }
 
@@ -109,26 +93,12 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         BasicLogger.error(messagePattern, arguments);
     }
 
-    protected final double evaluateFunction(final Access1D<?> solution) {
-        if ((myFunction != null) && (solution != null) && (myFunction.arity() == solution.count())) {
-            return myFunction.invoke(AccessUtils.asPrimitive1D(solution));
-        } else {
-            return Double.NaN;
-        }
-    }
+    protected abstract double evaluateFunction(final Access1D<?> solution);
 
     /**
      * Should be able to feed this to {@link #evaluateFunction(Access1D)}.
      */
     protected abstract MatrixStore<Double> extractSolution();
-
-    protected final MatrixStore<Double> getGradient(final Access1D<Double> solution) {
-        return myFunction.getGradient(solution);
-    }
-
-    protected final ExpressionsBasedModel getModel() {
-        return myModel;
-    }
 
     protected final State getState() {
         return myState;
@@ -146,10 +116,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
 
     protected final boolean isDebug() {
         return (options.debug_appender != null) && ((options.debug_solver == null) || options.debug_solver.isAssignableFrom(this.getClass()));
-    }
-
-    protected final boolean isFunctionSet() {
-        return myFunction != null;
     }
 
     /**
@@ -170,10 +136,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         //        }
 
         return tmpTimeOk && tmpIterationOk;
-    }
-
-    protected final boolean isModelSet() {
-        return myModel != null;
     }
 
     protected abstract boolean needsAnotherIteration();

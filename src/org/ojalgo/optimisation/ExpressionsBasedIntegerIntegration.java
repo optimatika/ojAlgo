@@ -21,8 +21,21 @@
  */
 package org.ojalgo.optimisation;
 
-public enum FileSection {
+import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
+import org.ojalgo.optimisation.integer.IntegerSolver;
 
-    BOUNDS(), COLUMNS(), ENDATA(), NAME(), OBJNAME(), OBJSENSE(), RANGES(), RHS(), ROWS(), SOS();
+final class ExpressionsBasedIntegerIntegration extends Integration<IntegerSolver> {
+
+    public IntegerSolver build(final ExpressionsBasedModel model) {
+        return IntegerSolver.make(model);
+    }
+
+    public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+        return solverState;
+    }
+
+    public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+        return modelState;
+    }
 
 }

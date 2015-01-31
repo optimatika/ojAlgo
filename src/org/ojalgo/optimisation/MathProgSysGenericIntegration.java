@@ -21,28 +21,28 @@
  */
 package org.ojalgo.optimisation;
 
-/**
- * RowType used with the ROWS and RANGES sections.
- *                   
- * type      meaning
- * ---------------------------
- *  E    equality
- *  L    less than or equal
- *  G    greater than or equal
- *  N    objective
- *  N    no restriction
- *  
- * row type       sign of r       h          u
- * ----------------------------------------------
- *    G            + or -         b        b + |r|
- *    L            + or -       b - |r|      b
- *    E              +            b        b + |r|
- *    E              -          b - |r|      b
- *
- * @author apete
- */
-public enum RowType {
+import org.ojalgo.optimisation.MathProgSysModel.Integration;
 
-    E(), G(), L(), N();
+final class MathProgSysGenericIntegration extends Integration<GenericSolver> {
+
+    public GenericSolver build(final MathProgSysModel model) {
+        final ExpressionsBasedModel tmpDelegate = model.getExpressionsBasedModel();
+        return (GenericSolver) tmpDelegate.getIntegration().build(tmpDelegate);
+    }
+
+    public Result extractSolverState(final MathProgSysModel model) {
+        final ExpressionsBasedModel tmpDelegate = model.getExpressionsBasedModel();
+        return tmpDelegate.getIntegration().extractSolverState(tmpDelegate);
+    }
+
+    public Result toModelState(final Result solverState, final MathProgSysModel model) {
+        final ExpressionsBasedModel tmpDelegate = model.getExpressionsBasedModel();
+        return tmpDelegate.getIntegration().toModelState(solverState, tmpDelegate);
+    }
+
+    public Result toSolverState(final Result modelState, final MathProgSysModel model) {
+        final ExpressionsBasedModel tmpDelegate = model.getExpressionsBasedModel();
+        return tmpDelegate.getIntegration().toSolverState(modelState, tmpDelegate);
+    }
 
 }

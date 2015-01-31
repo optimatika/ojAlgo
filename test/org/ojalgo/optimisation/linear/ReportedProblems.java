@@ -31,11 +31,12 @@ import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
-import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.integer.OptimisationIntegerData;
+import org.ojalgo.optimisation.integer.P20150127b;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -63,13 +64,13 @@ public class ReportedProblems extends OptimisationLinearTests {
         final Variable[] tmpEvenVars = new Variable[] { tmpX2.copy(), tmpX4.copy(), tmpX6.copy() };
 
         final ExpressionsBasedModel tmpFullModel = new ExpressionsBasedModel(tmpFullVars);
-        tmpFullModel.setMaximisation(true);
+        //tmpFullModel.setMaximisation();
 
         final ExpressionsBasedModel tmpOddModel = new ExpressionsBasedModel(tmpOddVars);
-        tmpOddModel.setMaximisation(true);
+        //tmpOddModel.setMaximisation();
 
         final ExpressionsBasedModel tmpEvenModel = new ExpressionsBasedModel(tmpEvenVars);
-        tmpEvenModel.setMaximisation(true);
+        //tmpEvenModel.setMaximisation();
 
         //        tmpFullModel.options.debug(LinearSolver.class);
         //        tmpOddModel.options.debug(LinearSolver.class);
@@ -133,9 +134,9 @@ public class ReportedProblems extends OptimisationLinearTests {
 
         // Start validating ojAlgo results
 
-        final Optimisation.Result tmpEvenResult = tmpEvenModel.getDefaultSolver().solve();
-        final Optimisation.Result tmpOddResult = tmpOddModel.getDefaultSolver().solve();
-        final Optimisation.Result tmpFullResult = tmpFullModel.getDefaultSolver().solve();
+        final Optimisation.Result tmpEvenResult = tmpEvenModel.maximise();
+        final Optimisation.Result tmpOddResult = tmpOddModel.maximise();
+        final Optimisation.Result tmpFullResult = tmpFullModel.maximise();
 
         TestUtils.assertEquals(true, tmpEvenModel.validate(tmpEvenResult, new NumberContext(7, 6)));
         TestUtils.assertEquals(true, tmpOddModel.validate(tmpOddResult, new NumberContext(7, 6)));
@@ -146,11 +147,11 @@ public class ReportedProblems extends OptimisationLinearTests {
         TestUtils.assertEquals(tmpFullSolution, BigMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5), new NumberContext(7, 6));
 
         final BigDecimal tmpEvenValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpEvenObjective.toFunction().invoke(
-                PrimitiveMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2))));
+                PrimitiveMatrix.FACTORY.columns(tmpEvenResult).selectRows(0, 1, 2).toPrimitiveStore())));
         final BigDecimal tmpOddValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpOddObjective.toFunction().invoke(
-                PrimitiveMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2))));
+                PrimitiveMatrix.FACTORY.columns(tmpOddResult).selectRows(0, 1, 2).toPrimitiveStore())));
         final BigDecimal tmpFullValue = new NumberContext(7, 6).enforce(TypeUtils.toBigDecimal(tmpFullObjective.toFunction().invoke(
-                PrimitiveMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5))));
+                PrimitiveMatrix.FACTORY.columns(tmpFullResult).selectRows(0, 1, 2, 3, 4, 5).toPrimitiveStore())));
 
         TestUtils.assertEquals(0, tmpFullValue.compareTo(tmpEvenValue.add(tmpOddValue)));
         TestUtils.assertEquals(0, tmpClaimedValue.compareTo(tmpFullValue));
@@ -165,9 +166,27 @@ public class ReportedProblems extends OptimisationLinearTests {
         //tmpModel.relax(); // Relax the integer constraints
         tmpModel.getVariable(1).lower(ONE); // Set branch state
 
-        final State tmpResultState = tmpModel.getDefaultSolver().solve().getState();
+        final State tmpResultState = tmpModel.maximise().getState();
 
         TestUtils.assertFalse("Should be INFEASIBLE", tmpResultState == State.FEASIBLE);
+    }
+
+    /**
+     * Problemet var att en av noderna som IntegerSolver genererade var infeasible, men det misslyckades LinearSolver
+     * med att identifiera och returnerade en felaktig lösning som OPTIMAL. Detta testfall motsvarar
+     */
+    public void testP20150127() {
+
+        final ExpressionsBasedModel tmpModel = P20150127b.getModel(true, true);
+
+        // tmpModel.options.debug(LinearSolver.class);
+        // Kan få testfallet att gå igenom, men dåsmäller andra testfall
+        // tmpModel.options.objective = tmpModel.options.objective.newScale(8);
+
+        final Result tmpResult = tmpModel.minimise();
+
+        TestUtils.assertStateLessThanFeasible(tmpResult); // Should be infeasible
+        TestUtils.assertFalse(tmpModel.validate(tmpResult));
     }
 
     /**
@@ -179,7 +198,6 @@ public class ReportedProblems extends OptimisationLinearTests {
         final Variable[] tmpVariables = new Variable[] { new Variable("X").lower(ZERO).weight(ONE), new Variable("Y").lower(ZERO).weight(ZERO),
                 new Variable("Z").lower(ZERO).weight(ZERO) };
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
-        tmpModel.setMinimisation(true);
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         tmpExprC1.level(ZERO);
@@ -198,9 +216,9 @@ public class ReportedProblems extends OptimisationLinearTests {
         final State tmpExpectedState = State.OPTIMAL;
         final BasicMatrix tmpExpectedSolution = PrimitiveMatrix.FACTORY.makeZero(3, 1);
 
-        final GenericSolver tmpSolver11 = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult11 = tmpSolver11.solve();
-        TestUtils.assertEquals(tmpExpectedState, tmpResult11.getState());
+        final Optimisation.Result tmpResult11 = tmpModel.minimise();
+        //TestUtils.assertEquals(tmpExpectedState, tmpResult11.getState());
+        TestUtils.assertStateNotLessThanOptimal(tmpResult11);
         TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResult11));
 
         tmpExprC2.setLinearFactor(0, NEG);
@@ -209,9 +227,9 @@ public class ReportedProblems extends OptimisationLinearTests {
         tmpExprC3.setLinearFactor(0, ONE);
         tmpExprC3.setLinearFactor(2, NEG);
 
-        final GenericSolver tmpSolverN1 = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResultN1 = tmpSolverN1.solve();
-        TestUtils.assertEquals(tmpExpectedState, tmpResultN1.getState());
+        final Optimisation.Result tmpResultN1 = tmpModel.minimise();
+        //TestUtils.assertEquals(tmpExpectedState, tmpResultN1.getState());
+        TestUtils.assertStateNotLessThanOptimal(tmpResultN1);
         TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResultN1));
 
         tmpExprC2.setLinearFactor(0, ONE);
@@ -220,9 +238,9 @@ public class ReportedProblems extends OptimisationLinearTests {
         tmpExprC3.setLinearFactor(0, NEG);
         tmpExprC3.setLinearFactor(2, ONE);
 
-        final GenericSolver tmpSolver1N = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResult1N = tmpSolver1N.solve();
-        TestUtils.assertEquals(tmpExpectedState, tmpResult1N.getState());
+        final Optimisation.Result tmpResult1N = tmpModel.minimise();
+        //TestUtils.assertEquals(tmpExpectedState, tmpResult1N.getState());
+        TestUtils.assertStateNotLessThanOptimal(tmpResult1N);
         TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResult1N));
 
         tmpExprC2.setLinearFactor(0, NEG);
@@ -231,9 +249,9 @@ public class ReportedProblems extends OptimisationLinearTests {
         tmpExprC3.setLinearFactor(0, NEG);
         tmpExprC3.setLinearFactor(2, ONE);
 
-        final GenericSolver tmpSolverNN = tmpModel.getDefaultSolver();
-        final Optimisation.Result tmpResultNN = tmpSolverNN.solve();
-        TestUtils.assertEquals(tmpExpectedState, tmpResultNN.getState());
+        final Optimisation.Result tmpResultNN = tmpModel.minimise();
+        //TestUtils.assertEquals(tmpExpectedState, tmpResultNN.getState());
+        TestUtils.assertStateNotLessThanOptimal(tmpResultNN);
         TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResultNN));
     }
 

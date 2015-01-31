@@ -104,7 +104,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             }
 
             ExpressionsBasedModel tmpModel = this.getModel();
-            final Optimisation.Result tmpResult = tmpModel.solve();
+            final Optimisation.Result tmpResult = tmpModel.solve(OldIntegerSolver.this.getBestResultSoFar());
 
             OldIntegerSolver.this.incrementIterationsCount();
 
@@ -140,7 +140,7 @@ public final class OldIntegerSolver extends IntegerSolver {
                         OldIntegerSolver.this.debug(OldIntegerSolver.this.getBestResultSoFar().toString());
                         BasicLogger.debug();
                         BasicLogger.debug(OldIntegerSolver.this.toString());
-                        BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
+                        // BasicLogger.debug(DaemonPoolExecutor.INSTANCE.toString());
                     }
 
                 } else {
@@ -159,8 +159,8 @@ public final class OldIntegerSolver extends IntegerSolver {
                         tmpModel.destroy();
                         tmpModel = null;
 
-                        final BranchAndBoundNodeTask tmpLowerBranchTask = this.createLowerBranch(tmpBranchIndex, tmpVariableValue, tmpResult);
-                        final BranchAndBoundNodeTask tmpUpperBranchTask = this.createUpperBranch(tmpBranchIndex, tmpVariableValue, tmpResult);
+                        final BranchAndBoundNodeTask tmpLowerBranchTask = this.createLowerBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
+                        final BranchAndBoundNodeTask tmpUpperBranchTask = this.createUpperBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);
 
                         //   return tmpLowerBranchTask.compute() && tmpUpperBranchTask.compute();
 
@@ -192,18 +192,16 @@ public final class OldIntegerSolver extends IntegerSolver {
             return true;
         }
 
-        BranchAndBoundNodeTask createLowerBranch(final int branchIndex, final double nonIntegerValue, final Optimisation.Result nodeResult) {
+        BranchAndBoundNodeTask createLowerBranch(final int branchIndex, final double nonIntegerValue, final double parentObjectiveValue) {
 
-            final double tmpParentValue = nodeResult.getValue();
-            final NodeKey tmpKey = myKey.createLowerBranch(branchIndex, nonIntegerValue, tmpParentValue);
+            final NodeKey tmpKey = myKey.createLowerBranch(branchIndex, nonIntegerValue, parentObjectiveValue);
 
             return new BranchAndBoundNodeTask(tmpKey);
         }
 
-        BranchAndBoundNodeTask createUpperBranch(final int branchIndex, final double nonIntegerValue, final Optimisation.Result nodeResult) {
+        BranchAndBoundNodeTask createUpperBranch(final int branchIndex, final double nonIntegerValue, final double parentObjectiveValue) {
 
-            final double tmpParentValue = nodeResult.getValue();
-            final NodeKey tmpKey = myKey.createUpperBranch(branchIndex, nonIntegerValue, tmpParentValue);
+            final NodeKey tmpKey = myKey.createUpperBranch(branchIndex, nonIntegerValue, parentObjectiveValue);
 
             return new BranchAndBoundNodeTask(tmpKey);
         }
@@ -226,9 +224,15 @@ public final class OldIntegerSolver extends IntegerSolver {
                 tmpVariable.lower(tmpLowerBound);
                 tmpVariable.upper(tmpUpperBound);
 
-                final BigDecimal tmpValue = tmpVariable.getValue();
+                BigDecimal tmpValue = tmpVariable.getValue();
                 if (tmpValue != null) {
-                    tmpVariable.setValue(tmpValue.max(tmpLowerBound).min(tmpUpperBound));
+                    if (tmpLowerBound != null) {
+                        tmpValue = tmpValue.max(tmpLowerBound);
+                    }
+                    if (tmpUpperBound != null) {
+                        tmpValue = tmpValue.min(tmpUpperBound);
+                    }
+                    tmpVariable.setValue(tmpValue);
                 }
             }
 
@@ -245,10 +249,6 @@ public final class OldIntegerSolver extends IntegerSolver {
             return retVal;
         }
 
-    }
-
-    public static OldIntegerSolver make(final ExpressionsBasedModel model) {
-        return new OldIntegerSolver(model, null);
     }
 
     private final Set<NodeKey> myExploredNodes = Collections.synchronizedSet(new HashSet<NodeKey>());
@@ -272,9 +272,10 @@ public final class OldIntegerSolver extends IntegerSolver {
 
     public Result solve(final Result kickStarter) {
 
-        if (kickStarter != null) {
-            this.markInteger(null, kickStarter);
-        }
+        // Must verify that it actually is an integer solution
+        //        if ((kickStarter != null) && kickStarter.getState().isFeasible()) {
+        //            this.markInteger(null, kickStarter);
+        //        }
 
         this.resetIterationsCount();
 

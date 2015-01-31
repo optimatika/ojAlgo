@@ -31,7 +31,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.BaseSolver;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.Expression.Index;
@@ -62,7 +61,7 @@ import org.ojalgo.type.IndexSelector;
  * Alternatively you can directly call {@linkplain ExpressionsBasedModel#getDefaultSolver()} or even
  * {@linkplain ExpressionsBasedModel#minimise()} or {@linkplain ExpressionsBasedModel#maximise()} on the model.
  * </p>
- * 
+ *
  * @author apete
  */
 public abstract class LinearSolver extends BaseSolver {
@@ -70,40 +69,23 @@ public abstract class LinearSolver extends BaseSolver {
     public static final class Builder extends AbstractBuilder<LinearSolver.Builder, LinearSolver> {
 
         public Builder(final MatrixStore<Double> C) {
-
             super(C);
-
         }
 
         Builder() {
-
             super();
-
         }
 
         Builder(final BaseSolver.AbstractBuilder<LinearSolver.Builder, LinearSolver> matrices) {
-
             super(matrices);
-
-        }
-
-        Builder(final ExpressionsBasedModel aModel) {
-
-            super(aModel);
-
-            LinearSolver.copy(aModel, this);
         }
 
         Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
-
             super(Q, C);
-
         }
 
         Builder(final MatrixStore<Double>[] aMtrxArr) {
-
             super(aMtrxArr);
-
         }
 
         @Override
@@ -111,9 +93,7 @@ public abstract class LinearSolver extends BaseSolver {
 
             this.validate();
 
-            final ExpressionsBasedModel tmpModel = this.getModel();
-
-            return new SimplexTableauSolver(tmpModel, options, this);
+            return new SimplexTableauSolver(this, options);
         }
 
         @Override
@@ -122,21 +102,12 @@ public abstract class LinearSolver extends BaseSolver {
         }
 
         @Override
-        protected Builder objective(final MatrixStore<Double> C) {
+        public Builder objective(final MatrixStore<Double> C) {
             return super.objective(C);
         }
     }
 
-    static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
-
-    public static LinearSolver make(final ExpressionsBasedModel aModel) {
-
-        final LinearSolver.Builder tmpBuilder = new LinearSolver.Builder(aModel);
-
-        return tmpBuilder.build();
-    }
-
-    static void copy(final ExpressionsBasedModel sourceModel, final LinearSolver.Builder destinationBuilder) {
+    public static void copy(final ExpressionsBasedModel sourceModel, final LinearSolver.Builder destinationBuilder) {
 
         final boolean tmpMaximisation = sourceModel.isMaximisation();
 
@@ -164,10 +135,6 @@ public abstract class LinearSolver extends BaseSolver {
         final int tmpTotalVarCount = tmpProblVarCount + tmpSlackVarCount;
 
         final int[] tmpBasis = AccessUtils.makeIncreasingRange(-tmpConstraiCount, tmpConstraiCount);
-
-        final Optimisation.Result tmpKickStarter = new Optimisation.Result(Optimisation.State.UNEXPLORED, Double.NaN, ZeroStore.makePrimitive(tmpTotalVarCount,
-                1));
-        tmpKickStarter.basis(tmpBasis);
 
         final PhysicalStore<Double> tmpC = FACTORY.makeZero(tmpTotalVarCount, 1);
         final PhysicalStore<Double> tmpAE = FACTORY.makeZero(tmpConstraiCount, tmpTotalVarCount);
@@ -447,15 +414,19 @@ public abstract class LinearSolver extends BaseSolver {
         }
         tmpConstrBaseIndex += tmpVarsNegUpLength;
 
-        destinationBuilder.setKickStarter(tmpKickStarter);
     }
+
+    public static LinearSolver.Builder getBuilder() {
+        return new LinearSolver.Builder();
+    }
+
+    static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     private final IndexSelector mySelector;
 
-    protected LinearSolver(final ExpressionsBasedModel aModel, final Optimisation.Options solverOptions,
-            final BaseSolver.AbstractBuilder<LinearSolver.Builder, LinearSolver> matrices) {
+    protected LinearSolver(final BaseSolver.AbstractBuilder<LinearSolver.Builder, LinearSolver> matrices, final Optimisation.Options solverOptions) {
 
-        super(aModel, solverOptions, matrices);
+        super(matrices, solverOptions);
 
         mySelector = new IndexSelector(matrices.countVariables());
     }

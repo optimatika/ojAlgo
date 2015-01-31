@@ -42,8 +42,8 @@ abstract class MipLibCase extends OptimisationIntegerTests {
             final Map<String, BigDecimal> solution) {
 
         final File tmpFile = new File(PATH + modelName);
-        final MathProgSysModel tmpMPS = MathProgSysModel.makeFromFile(tmpFile);
-        final ExpressionsBasedModel tmpModel = ExpressionsBasedModel.make(tmpMPS);
+        final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
+        final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
         if (relax) {
             tmpModel.relax(true);
@@ -72,7 +72,7 @@ abstract class MipLibCase extends OptimisationIntegerTests {
         //        tmpModel.options.solution = tmpModel.options.solution.newScale(30);
         //        tmpModel.options.solution = tmpModel.options.solution.newPrecision(30);
 
-        //tmpModel.options.debug(IntegerSolver.class);
+        // tmpModel.options.debug(LinearSolver.class);
 
         TestUtils.assertTrue(tmpModel.validate());
 

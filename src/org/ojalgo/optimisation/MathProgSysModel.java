@@ -29,127 +29,147 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+
+import org.ojalgo.access.Access1D;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Mathematical Programming System (MPS) Model
- * 
+ *
  * @author apete
  */
 public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
-    public static final class Column extends ModelEntity<MathProgSysModel.Column> {
+    public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<MathProgSysModel, S> {
 
-        private boolean myActivator = false;
+    }
 
-        private final HashMap<String, BigDecimal> myElements = new HashMap<String, BigDecimal>();
-        private boolean myInteger = false;
+    /**
+     * BoundType used with the BOUNDS section.
+     *
+     * <pre>
+     *  type            meaning
+     * ---------------------------------------------------
+     *   LO    lower bound        b <= x (< +inf)
+     *   UP    upper bound        (0 <=) x <= b
+     *   FX    fixed variable     x = b
+     *   FR    free variable      -inf < x < +inf
+     *   MI    lower bound -inf   -inf < x (<= 0)
+     *   PL    upper bound +inf   (0 <=) x < +inf
+     *   BV    binary variable    x = 0 or 1
+     *   LI    integer variable   b <= x (< +inf)
+     *   UI    integer variable   (0 <=) x <= b
+     *   SC    semi-cont variable x = 0 or l <= x <= b
+     *         l is the lower bound on the variable
+     *         If none set then defaults to 1
+     * </pre>
+     *
+     * @author apete
+     */
+    static enum BoundType {
 
-        public Column(final String aName) {
+        BV(), FR(), FX(), LI(), LO(), MI(), PL(), SC(), UI(), UP();
 
-            super(aName);
+    }
+
+    final class Column extends Object {
+
+        private boolean mySemicontinuous = false;
+        private final Variable myVariable;
+
+        Column(final String name) {
+
+            super();
+
+            myVariable = new Variable(name);
+            myDelegate.addVariable(myVariable);
 
             this.bound(BoundType.PL, null);
         }
 
-        protected Column(final Column entityToCopy) {
+        public Column bound(final BoundType type, final BigDecimal value) {
 
-            super(entityToCopy);
-
-            myActivator = entityToCopy.needsActivator();
-            myInteger = entityToCopy.isInteger();
-
-            myElements.putAll(entityToCopy.myElements);
-        }
-
-        public final Column bound(final BoundType aType, final BigDecimal aValue) {
-
-            switch (aType) {
+            switch (type) {
 
             case LO:
 
-                this.lower(aValue);
+                myVariable.lower(value);
 
                 break;
 
             case UP:
 
-                this.upper(aValue);
+                myVariable.upper(value);
 
-                if (!this.isLowerLimitSet()) {
-                    this.lower(ZERO);
+                if (!myVariable.isLowerLimitSet()) {
+                    myVariable.lower(ZERO);
                 }
 
                 break;
 
             case FX:
 
-                this.level(aValue);
+                myVariable.level(value);
 
                 break;
 
             case FR:
 
-                this.level(null);
+                myVariable.level(null);
 
                 break;
 
             case MI:
 
-                this.lower(null);
+                myVariable.lower(null);
 
-                if (!this.isUpperLimitSet()) {
-                    this.upper(ZERO);
+                if (!myVariable.isUpperLimitSet()) {
+                    myVariable.upper(ZERO);
                 }
 
                 break;
 
             case PL:
 
-                this.upper(null);
+                myVariable.upper(null);
 
-                if (!this.isLowerLimitSet()) {
-                    this.lower(ZERO);
+                if (!myVariable.isLowerLimitSet()) {
+                    myVariable.lower(ZERO);
                 }
 
                 break;
 
             case BV:
 
-                this.lower(ZERO).upper(ONE);
-                myInteger = true;
+                myVariable.lower(ZERO).upper(ONE).integer(true);
 
                 break;
 
             case LI:
 
-                this.lower(aValue).upper(null);
-                myInteger = true;
+                myVariable.lower(value).upper(null).integer(true);
 
                 break;
 
             case UI:
 
-                this.upper(aValue);
-                myInteger = true;
+                myVariable.upper(value).integer(true);
 
-                if (!this.isLowerLimitSet()) {
-                    this.lower(ZERO);
+                if (!myVariable.isLowerLimitSet()) {
+                    myVariable.lower(ZERO);
                 }
 
                 break;
 
             case SC:
 
-                myActivator = true;
+                mySemicontinuous = true;
 
-                this.upper(aValue);
+                myVariable.upper(value);
 
-                if (!this.isLowerLimitSet()) {
-                    this.lower(ONE);
+                if (!myVariable.isLowerLimitSet()) {
+                    myVariable.lower(ONE);
                 }
 
                 break;
@@ -162,132 +182,98 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
             return this;
         }
 
-        public Set<String> getElementKeys() {
-            return myElements.keySet();
+        public Column integer(final boolean flag) {
+            myVariable.setInteger(flag);
+            return this;
         }
 
-        public String getNameForActivator() {
-            return this.getName() + "?";
+        public void setRowValue(final String rowName, final BigDecimal value) {
+            myRows.get(rowName).getExpression().setLinearFactor(myVariable, value);
         }
 
-        public String getNameForNegativePart() {
-            if (this.hasPositivePart()) {
-                return this.getName() + "-";
-            } else {
-                return this.getName();
-            }
+        /**
+         * @return the variable
+         */
+        Variable getVariable() {
+            return myVariable;
         }
 
-        public String getNameForPositivePart() {
-            if (this.hasNegativePart()) {
-                return this.getName() + "+";
-            } else {
-                return this.getName();
-            }
-        }
-
-        public BigDecimal getRowValue(final String aRowName) {
-            return myElements.get(aRowName);
-        }
-
-        public boolean hasNegativePart() {
-            final BigDecimal tmpLowerLimit = this.getLowerLimit();
-            return (tmpLowerLimit == null) || (tmpLowerLimit.signum() == -1);
-        }
-
-        public boolean hasPositivePart() {
-            final BigDecimal tmpUpperLimit = this.getUpperLimit();
-            return (tmpUpperLimit == null) || (tmpUpperLimit.signum() == 1);
-        }
-
-        public boolean isInteger() {
-            return myInteger;
-        }
-
-        public boolean needsActivator() {
-            return myActivator;
-        }
-
-        public final void setInteger(final boolean someInteger) {
-            myInteger = someInteger;
-        }
-
-        public BigDecimal setRowValue(final String aRowName, final BigDecimal aValue) {
-            return myElements.put(aRowName, aValue);
-        }
-
-        @Override
-        protected int getAdjustmentExponent() {
-            return 0;
+        boolean isSemicontinuous() {
+            return mySemicontinuous;
         }
 
     }
 
-    public static final class Row extends ModelEntity<MathProgSysModel.Row> {
+    /**
+     * @author apete
+     */
+    static enum ColumnMarker {
 
-        public final RowType type;
+        INTEND(), INTORG();
 
-        public Row(final String aName, final RowType aType) {
+    }
 
-            super(aName);
+    static enum FileSection {
 
-            type = aType;
+        BOUNDS(), COLUMNS(), ENDATA(), NAME(), OBJNAME(), OBJSENSE(), RANGES(), RHS(), ROWS(), SOS();
 
-            if (type == RowType.N) {
-                this.weight(ONE);
+    }
+
+    final class Row extends Object {
+
+        private final Expression myExpression;
+
+        private final RowType myType;
+
+        Row(final String name, final RowType rowType) {
+
+            super();
+
+            myExpression = myDelegate.addExpression(name);
+
+            myType = rowType;
+
+            if (myType == RowType.N) {
+                myExpression.weight(ONE);
             } else {
-                this.weight(null);
+                myExpression.weight(null);
             }
 
             // 0.0 is the default RHS value
             this.rhs(ZERO);
         }
 
-        private Row(final String aName) {
+        public Row range(final BigDecimal value) {
 
-            super(aName);
-
-            type = RowType.N;
-        }
-
-        protected Row(final Row entityToCopy) {
-
-            super(entityToCopy);
-
-            type = entityToCopy.type;
-        }
-
-        public final Row range(final BigDecimal aValue) {
-
-            switch (type) {
+            switch (myType) {
 
             case E:
 
-                final int tmpSignum = aValue.signum();
+                final int tmpSignum = value.signum();
                 if (tmpSignum == 1) {
-                    this.upper(this.getLowerLimit().add(aValue));
+                    myExpression.upper(myExpression.getLowerLimit().add(value));
                 } else if (tmpSignum == -1) {
-                    this.lower(this.getUpperLimit().add(aValue));
+                    myExpression.lower(myExpression.getUpperLimit().add(value));
                 }
 
                 break;
 
             case L:
 
-                this.lower(this.getUpperLimit().subtract(aValue.abs()));
+                myExpression.lower(myExpression.getUpperLimit().subtract(value.abs()));
 
                 break;
 
             case G:
 
-                this.upper(this.getLowerLimit().add(aValue.abs()));
+                myExpression.upper(myExpression.getLowerLimit().add(value.abs()));
 
                 break;
 
             case N:
 
-                this.level(null);
-                this.weight(ONE);
+                myExpression.level(null);
+                myExpression.weight(ONE);
 
                 break;
 
@@ -299,32 +285,32 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
             return this;
         }
 
-        public final Row rhs(final BigDecimal aValue) {
+        public Row rhs(final BigDecimal value) {
 
-            switch (type) {
+            switch (myType) {
 
             case E:
 
-                this.level(aValue);
+                myExpression.level(value);
 
                 break;
 
             case L:
 
-                this.upper(aValue);
+                myExpression.upper(value);
 
                 break;
 
             case G:
 
-                this.lower(aValue);
+                myExpression.lower(value);
 
                 break;
 
             case N:
 
-                this.level(null);
-                this.weight(ONE);
+                myExpression.level(null);
+                myExpression.weight(ONE);
 
                 break;
 
@@ -336,26 +322,69 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
             return this;
         }
 
-        @Override
-        protected int getAdjustmentExponent() {
-            return 0;
+        public void setColumnValue(final String columnName, final BigDecimal value) {
+            myExpression.setLinearFactor(myColumns.get(columnName).getVariable(), value);
         }
+
+        /**
+         * @return the expression
+         */
+        Expression getExpression() {
+            return myExpression;
+        }
+
+        /**
+         * @return the type
+         */
+        RowType getType() {
+            return myType;
+        }
+
+    }
+
+    /**
+     * RowType used with the ROWS and RANGES sections.
+     *
+     * <pre>
+     * type      meaning
+     * ---------------------------
+     *  E    equality
+     *  L    less than or equal
+     *  G    greater than or equal
+     *  N    objective
+     *  N    no restriction
+     * 
+     * row type       sign of r       h          u
+     * ----------------------------------------------
+     *    G            + or -         b        b + |r|
+     *    L            + or -       b - |r|      b
+     *    E              +            b        b + |r|
+     *    E              -          b - |r|      b
+     * </pre>
+     *
+     * @author apete
+     */
+    static enum RowType {
+
+        E(), G(), L(), N();
 
     }
 
     private static final String COMMENT = "*";
     private static final String EMPTY = "";
+    private static final int[] FIELD_LIMITS = new int[] { 3, 12, 22, 36, 47, 61 };
     private static final String SPACE = " ";
 
-    public static MathProgSysModel makeFromFile(final File aFile) {
+    public static MathProgSysModel make(final File file) {
+
+        final MathProgSysModel retVal = new MathProgSysModel();
 
         String tmpLine;
         FileSection tmpSection = null;
-        final MathProgSysModel retVal = new MathProgSysModel();
 
         try {
 
-            final BufferedReader tmpBufferedFileReader = new BufferedReader(new FileReader(aFile));
+            final BufferedReader tmpBufferedFileReader = new BufferedReader(new FileReader(file));
 
             //readLine is a bit quirky :
             //it returns the content of a line MINUS the newline.
@@ -385,155 +414,136 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
+    /**
+     * @deprecated v38 Use {@link #make(File)} instead
+     */
+    @Deprecated
+    public static MathProgSysModel makeFromFile(final File file) {
+        return MathProgSysModel.make(file);
+    }
+
     private final HashMap<String, Column> myColumns = new HashMap<String, Column>();
-    private final int[] myFieldLimits = new int[] { 3, 12, 22, 36, 47, 61 };
+    private final ExpressionsBasedModel myDelegate;
     private final String[] myFields = new String[6];
     private boolean myIntegerMarker = false;
-    private String myNameInFile;
+    private String myName;
+
     private final HashMap<String, Row> myRows = new HashMap<String, Row>();
 
-    public MathProgSysModel() {
+    MathProgSysModel() {
 
         super();
 
-        this.setMinimisation(true);
+        myDelegate = new ExpressionsBasedModel(options);
+
+        this.setMinimisation();
     }
 
     @Override
     public void destroy() {
-        // TODO Auto-generated method stub
+        myDelegate.destroy();
+        myRows.clear();
+        myColumns.clear();
+    }
 
+    @Override
+    public boolean equals(final Object obj) {
+        return myDelegate.equals(obj);
     }
 
     /**
-     * @see #getActivatorVariableColumns()
-     * @see #getNegativeVariableColumns()
-     * @see #getPositiveVariableColumns()
+     * @return The delegate {@linkplain ExpressionsBasedModel}
      */
-    public Column[] getActivatorVariableColumns() {
-
-        final HashSet<Column> tmpSelection = new HashSet<Column>();
-
-        for (final Column tmpColumn : myColumns.values()) {
-            if (tmpColumn.needsActivator()) {
-                tmpSelection.add(tmpColumn);
-            }
-        }
-
-        return tmpSelection.toArray(new Column[tmpSelection.size()]);
+    public ExpressionsBasedModel getExpressionsBasedModel() {
+        return myDelegate;
     }
 
-    public Row[] getConstraintRows() {
-
-        final HashSet<Row> tmpSelection = new HashSet<Row>();
-
-        final Collection<Row> tmpValues = myRows.values();
-        for (final Row tmpRow : tmpValues) {
-            if (tmpRow.isConstraint()) {
-                tmpSelection.add(tmpRow);
-            }
-        }
-
-        return tmpSelection.toArray(new Row[tmpSelection.size()]);
+    public String getName() {
+        return myName;
     }
 
-    public GenericSolver getDefaultSolver() {
-        return ExpressionsBasedModel.make(this).getDefaultSolver();
-    }
-
-    public Row[] getExpressionRows() {
-
-        final Collection<Row> tmpValues = myRows.values();
-
-        return tmpValues.toArray(new Row[tmpValues.size()]);
-    }
-
-    public final String getName() {
-        return myNameInFile;
+    @Override
+    public int hashCode() {
+        return myDelegate.hashCode();
     }
 
     /**
-     * @see #getActivatorVariableColumns()
-     * @see #getNegativeVariableColumns()
-     * @see #getPositiveVariableColumns()
+     * Will disregard the OBJSENSE and maximise.
+     *
+     * @see org.ojalgo.optimisation.Optimisation.Model#maximise()
      */
-    public Column[] getNegativeVariableColumns() {
-
-        final HashSet<Column> tmpSelection = new HashSet<Column>();
-
-        for (final Column tmpColumn : myColumns.values()) {
-            if (tmpColumn.hasNegativePart()) {
-                tmpSelection.add(tmpColumn);
-            }
-        }
-
-        return tmpSelection.toArray(new Column[tmpSelection.size()]);
-    }
-
-    public Row getObjectiveRow() {
-
-        for (final Row tmpRow : myRows.values()) {
-            if (tmpRow.isObjective()) {
-                return tmpRow;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @see #getActivatorVariableColumns()
-     * @see #getNegativeVariableColumns()
-     * @see #getPositiveVariableColumns()
-     */
-    public Column[] getPositiveVariableColumns() {
-
-        final HashSet<Column> tmpSelection = new HashSet<Column>();
-
-        for (final Column tmpColumn : myColumns.values()) {
-            if (tmpColumn.hasPositivePart()) {
-                tmpSelection.add(tmpColumn);
-            }
-        }
-
-        return tmpSelection.toArray(new Column[tmpSelection.size()]);
-    }
-
     public Optimisation.Result maximise() {
-        return ExpressionsBasedModel.make(this).maximise();
+        return myDelegate.maximise();
     }
 
+    /**
+     * Will disregard the OBJSENSE and minimise.
+     *
+     * @see org.ojalgo.optimisation.Optimisation.Model#minimise()
+     */
     public Optimisation.Result minimise() {
-        return ExpressionsBasedModel.make(this).minimise();
+        return myDelegate.minimise();
+    }
+
+    /**
+     * <p>
+     * If the OBJSENSE was specified in the file it is used otherwise the default is to minimise.
+     * </p>
+     * <p>
+     * The solution (variable values) are in the order the columns were defined in the MPS-file.
+     * </p>
+     */
+    public Optimisation.Result solve() {
+        if (this.isMaximisation()) {
+            return myDelegate.maximise();
+        } else {
+            return myDelegate.minimise();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return myDelegate.toString();
     }
 
     public boolean validate() {
-        return true;
+        return myDelegate.validate();
     }
 
-    private void extractFields(final String aLine) {
+    /**
+     * @param solution
+     * @param context
+     * @return
+     * @see org.ojalgo.optimisation.ExpressionsBasedModel#validate(org.ojalgo.access.Access1D,
+     *      org.ojalgo.type.context.NumberContext)
+     */
+    public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
+        return myDelegate.validate(solution, context);
+    }
 
-        final int tmpLength = aLine.length();
+    private void extractFields(final String line) {
+
+        final int tmpLength = line.length();
 
         int tmpFirst = 0;
         int tmpLimit = tmpFirst;
         for (int i = 0; i < myFields.length; i++) {
-            tmpLimit = Math.min(myFieldLimits[i], tmpLength);
-            myFields[i] = aLine.substring(tmpFirst, tmpLimit).trim();
+            tmpLimit = Math.min(FIELD_LIMITS[i], tmpLength);
+            myFields[i] = line.substring(tmpFirst, tmpLimit).trim();
             tmpFirst = tmpLimit;
         }
     }
 
-    FileSection identifySection(final String aLine) {
+    FileSection identifySection(final String line) {
 
-        final int tmpSplit = aLine.indexOf(SPACE);
+        final int tmpSplit = line.indexOf(SPACE);
         String tmpSection;
         String tmpArgument;
         if (tmpSplit != -1) {
-            tmpSection = aLine.substring(0, tmpSplit).trim();
-            tmpArgument = aLine.substring(tmpSplit).trim();
+            tmpSection = line.substring(0, tmpSplit).trim();
+            tmpArgument = line.substring(tmpSplit).trim();
         } else {
-            tmpSection = aLine.trim();
+            tmpSection = line.trim();
             tmpArgument = EMPTY;
         }
 
@@ -545,7 +555,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
         case NAME:
 
-            myNameInFile = tmpArgument;
+            myName = tmpArgument;
 
             break;
 
@@ -557,13 +567,13 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
-    void parseSectionLine(final FileSection aSection, final String aLine) {
+    void parseSectionLine(final FileSection section, final String line) {
 
-        this.extractFields(aLine);
+        this.extractFields(line);
 
         //      BasicLogger.logDebug("{}: {}.", aSection, Arrays.toString(myFields));
 
-        switch (aSection) {
+        switch (section) {
 
         case NAME:
 
@@ -572,7 +582,9 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         case OBJSENSE:
 
             if (myFields[0].equals("MAX")) {
-                this.setMaximisation(true);
+                this.setMaximisation();
+            } else {
+                this.setMinimisation();
             }
 
             break;
@@ -582,9 +594,10 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
             break;
 
         case ROWS:
-            final Row aConstraint = new Row(myFields[1], RowType.valueOf(myFields[0]));
 
-            myRows.put(aConstraint.getName(), aConstraint);
+            final Row tmpRow = new Row(myFields[1], RowType.valueOf(myFields[0]));
+
+            myRows.put(myFields[1], tmpRow);
 
             break;
 
@@ -612,7 +625,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
                 }
 
                 if (myIntegerMarker) {
-                    tmpColumn.setInteger(myIntegerMarker);
+                    tmpColumn.integer(myIntegerMarker);
                 }
 
             }

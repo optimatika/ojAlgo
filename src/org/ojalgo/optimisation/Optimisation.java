@@ -32,6 +32,7 @@ import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
+import org.ojalgo.optimisation.linear.ReportedProblems;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -77,6 +78,30 @@ public interface Optimisation {
 
     }
 
+    public static interface Integration<M extends Optimisation.Model, S extends Optimisation.Solver> extends Optimisation {
+
+        /**
+         * An integration must be able to instantiate a solver that can handle (any) model instance.
+         */
+        S build(M model);
+
+        /**
+         * Extract state from the model and convert it to solver state.
+         */
+        Optimisation.Result extractSolverState(M model);
+
+        /**
+         * Convert solver state to model state.
+         */
+        Optimisation.Result toModelState(Optimisation.Result solverState, M model);
+
+        /**
+         * Convert model state to solver state.
+         */
+        Optimisation.Result toSolverState(Optimisation.Result modelState, M model);
+
+    }
+
     public static interface Model extends Optimisation {
 
         Optimisation.Result maximise();
@@ -113,16 +138,16 @@ public interface Optimisation {
     public static final class Options implements Optimisation, Cloneable {
 
         /**
-         * Which {@linkplain Solver} to debug. Null means ALL solvers. This setting is only relevant if
-         * {@link #debug_appender} has been set.
-         */
-        public Class<? extends Optimisation.Solver> debug_solver = null;
-
-        /**
          * If this is null nothing is printed, if it is not null then debug statements are printed to that
          * {@linkplain BasicLogger.Appender}.
          */
         public BasicLogger.Appender debug_appender = null;
+
+        /**
+         * Which {@linkplain Solver} to debug. Null means ALL solvers. This setting is only relevant if
+         * {@link #debug_appender} has been set.
+         */
+        public Class<? extends Optimisation.Solver> debug_solver = null;
 
         /**
          * Used to determine if a variable value is integer or not.
@@ -151,9 +176,14 @@ public interface Optimisation {
         public double mip_gap = 1.0E-4;
 
         /**
-         * Used to compare/check objective function values (incl. temporary, phase 1, objectives).
+         * Used to compare/check objective function values (incl. temporary, phase 1, objectives). The most importatnt
+         * use of this parameter is, with the linear (simplex) solver, to determine if the phase 1 objective function
+         * value is zero or not. Thus it is used to determine if the problem is feasible or not.
+         * <ul>
+         * <li>2015-01-30: Changed from 12,7 to 12,8 to be able to handle {@linkplain ReportedProblems#testP20150127()}</li>
+         * </ul>
          */
-        public NumberContext objective = new NumberContext(12, 7, RoundingMode.HALF_EVEN);
+        public NumberContext objective = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 
         /**
          * For display only!
@@ -227,9 +257,6 @@ public interface Optimisation {
 
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result>, Serializable {
 
-        private int[] myActiveSet = null;
-        private int[] myBasis = null;
-
         private final Access1D<?> mySolution;
         private final Optimisation.State myState;
         private final double myValue; // Objective Function Value
@@ -254,16 +281,6 @@ public interface Optimisation {
             this(state, result.getValue(), result);
         }
 
-        public Result activeSet(final int[] activeSet) {
-            myActiveSet = activeSet;
-            return this;
-        }
-
-        public Result basis(final int[] basis) {
-            myBasis = basis;
-            return this;
-        }
-
         public int compareTo(final Result reference) {
 
             final double tmpRefValue = reference.getValue();
@@ -281,8 +298,8 @@ public interface Optimisation {
             return mySolution.count();
         }
 
-        public double doubleValue(final long anInd) {
-            return mySolution.doubleValue(anInd);
+        public double doubleValue(final long index) {
+            return mySolution.doubleValue(index);
         }
 
         @Override
@@ -310,18 +327,13 @@ public interface Optimisation {
             return TypeUtils.toBigDecimal(mySolution.get(index));
         }
 
-        public int[] getActiveSet() {
-            return myActiveSet;
-        }
-
-        public int[] getBasis() {
-            return myBasis;
-        }
-
         public Optimisation.State getState() {
             return myState;
         }
 
+        /**
+         * Objective Function Value
+         */
         public double getValue() {
             return myValue;
         }
@@ -337,16 +349,8 @@ public interface Optimisation {
             return result;
         }
 
-        public boolean isActiveSetDefined() {
-            return myActiveSet != null;
-        }
-
-        public boolean isBasisDefined() {
-            return myBasis != null;
-        }
-
         public Iterator<BigDecimal> iterator() {
-            return new Iterator1D<BigDecimal>(this);
+            return new Iterator1D<>(this);
         }
 
         public int size() {
