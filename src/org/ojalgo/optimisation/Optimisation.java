@@ -30,6 +30,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
+import org.ojalgo.optimisation.linear.ReportedProblems;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -214,7 +215,12 @@ public interface Optimisation {
         public double mip_gap = 1.0E-4;
 
         /**
-         * Used to compare/check objective function values (incl. temporary, phase 1, objectives).
+         * Used to compare/check objective function values (incl. temporary, phase 1, objectives). The most importatnt
+         * use of this parameter is, with the linear (simplex) solver, to determine if the phase 1 objective function
+         * value is zero or not. Thus it is used to determine if the problem is feasible or not.
+         * <ul>
+         * <li>2015-01-30: Changed from 12,7 to 12,8 to be able to handle {@linkplain ReportedProblems#testP20150127()}</li>
+         * </ul>
          */
         public NumberContext objective = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 

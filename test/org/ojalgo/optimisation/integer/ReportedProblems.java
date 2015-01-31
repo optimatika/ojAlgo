@@ -282,7 +282,7 @@ public class ReportedProblems extends OptimisationIntegerTests {
 
         final Optimisation.Result tmpResult = tmpModel.minimise();
 
-        // Model is not be solvable, and must be reported as such
+        // Model is infeasible, and must be reported as such
         TestUtils.assertStateLessThanFeasible(tmpResult);
     }
 

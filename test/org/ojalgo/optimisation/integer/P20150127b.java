@@ -18,17 +18,18 @@ import org.ojalgo.optimisation.Variable;
 public class P20150127b {
 
     public static ExpressionsBasedModel getModel(final boolean branch, final boolean old) {
-        final ExpressionsBasedModel model = new ExpressionsBasedModel();
+
+        final ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
         final Variable x = Variable.make("x").integer(true);
         final Variable y = Variable.make("y").integer(true);
-        model.addVariable(x);
-        model.addVariable(y);
+        retVal.addVariable(x);
+        retVal.addVariable(y);
 
         final List<int[]> coefficients = P20150127b.getCoefficients();
         int counter = 0;
         for (final int[] coeff : coefficients) {
-            final Expression c = model.addExpression("inequality_" + ++counter);
+            final Expression c = retVal.addExpression("inequality_" + ++counter);
             // We want coeff[0] * x + coeff[1] * y < 0. Since our
             // solutions are integer, we can do "<= -1".
             c.upper(BigDecimal.ONE.negate());
@@ -44,11 +45,11 @@ public class P20150127b {
             if (old) {
                 // The integer solver used to set this lower limit in place of "no limit"
                 y.lower(Integer.MIN_VALUE);
-                model.relax(true);
+                retVal.relax(true);
             }
         }
 
-        return model;
+        return retVal;
     }
 
     static public void main(final String[] args) throws Exception {
