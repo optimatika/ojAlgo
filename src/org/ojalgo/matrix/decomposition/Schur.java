@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.decomposition.SchurDecomposition.Primitive;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -53,7 +52,7 @@ public interface Schur<N extends Number> extends MatrixDecomposition<N> {
     }
 
     public static Schur<Double> makePrimitive() {
-        return new Primitive();
+        return new SchurDecomposition.Primitive();
     }
 
     Array1D<ComplexNumber> getDiagonal();

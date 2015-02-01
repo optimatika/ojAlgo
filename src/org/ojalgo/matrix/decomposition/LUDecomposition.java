@@ -311,7 +311,7 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
      *
      * @param rhs The right hand side
      * @return [X] The solution will be written to "preallocated" and then returned.
-     * @see org.ojalgo.matrix.decomposition.AbstractDecomposition#solve(Access2D,
+     * @see org.ojalgo.matrix.decomposition.GenericDecomposition#solve(Access2D,
      *      org.ojalgo.matrix.decomposition.DecompositionStore)
      */
     @Override

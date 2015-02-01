@@ -107,13 +107,10 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
         return retVal;
     }
 
+    @Override
     public boolean isAspectRatioNormal() {
         return (int) myDelegate.getQ().countRows() >= (int) myDelegate.getR().countColumns();
 
-    }
-
-    public boolean isComputed() {
-        return myDelegate != null;
     }
 
     public boolean isFullColumnRank() {
@@ -132,6 +129,7 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
         return MatrixUtils.reconstruct(this);
     }
 
+    @Override
     public void reset() {
         myDelegate = null;
     }
@@ -150,6 +148,8 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
     boolean compute(final RawStore aDelegate) {
 
         myDelegate = new JamaQR(aDelegate);
+
+        this.computed(true);
 
         return this.isComputed();
     }

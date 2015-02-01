@@ -34,7 +34,7 @@ public abstract class FinancePortfolioTests extends FunctionalityTest {
         final TestSuite suite = new TestSuite(FinancePortfolioTests.class.getPackage().getName());
         //$JUnit-BEGIN$
         suite.addTestSuite(BlackLittermanTest.class);
-        suite.addTestSuite(ReportedProblems.class);
+        suite.addTestSuite(PortfolioProblems.class);
         suite.addTestSuite(TestEquilibrium.class);
         //$JUnit-END$
         return suite;

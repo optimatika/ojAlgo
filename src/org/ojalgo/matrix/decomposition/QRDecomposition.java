@@ -256,7 +256,7 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
      *
      * @param rhs The right hand side [B]
      * @return [X] "preallocated" is used to form the results, but the solution is in the returned MatrixStore.
-     * @see org.ojalgo.matrix.decomposition.AbstractDecomposition#solve(Access2D,
+     * @see org.ojalgo.matrix.decomposition.GenericDecomposition#solve(Access2D,
      *      org.ojalgo.matrix.decomposition.DecompositionStore)
      */
     @Override

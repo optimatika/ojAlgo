@@ -42,7 +42,7 @@ import org.ojalgo.scalar.ComplexNumber;
  * @author apete
  */
 @Deprecated
-public abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends AbstractDecomposition<N> implements SingularValue<N> {
+public abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
 
     /**
      * @deprecated v38 Use {@link SingularValue#make(Access2D<N>)} instead

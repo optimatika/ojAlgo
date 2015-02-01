@@ -37,13 +37,13 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
-public class ReportedProblems extends OptimisationIntegerTests {
+public class IntegerProblems extends OptimisationIntegerTests {
 
-    public ReportedProblems() {
+    public IntegerProblems() {
         super();
     }
 
-    public ReportedProblems(final String arg0) {
+    public IntegerProblems(final String arg0) {
         super(arg0);
     }
 

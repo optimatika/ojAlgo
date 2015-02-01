@@ -24,9 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.decomposition.QRDecomposition.Big;
-import org.ojalgo.matrix.decomposition.QRDecomposition.Complex;
-import org.ojalgo.matrix.decomposition.QRDecomposition.Primitive;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
@@ -68,15 +65,15 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, Determinan
     }
 
     public static QR<BigDecimal> makeBig() {
-        return new Big();
+        return new QRDecomposition.Big();
     }
 
     public static QR<ComplexNumber> makeComplex() {
-        return new Complex();
+        return new QRDecomposition.Complex();
     }
 
     public static QR<Double> makePrimitive() {
-        return new Primitive();
+        return new QRDecomposition.Primitive();
     }
 
     /**

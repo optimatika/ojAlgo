@@ -362,7 +362,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
     }
 
     /**
-     * A specific node of {@linkplain org.ojalgo.optimisation.integer.ReportedProblems#testP20130409b}. Based on some
+     * A specific node of {@linkplain org.ojalgo.optimisation.integer.IntegerProblems#testP20130409b}. Based on some
      * changes in ExpressionBasedModel and/or IntegerSolver some nodes started to fail as UNBOUNDED. Which seems
      * unreasonable. Must be a problem with either ExpressionBasedModel or LinearSolver. Test case sent in by the user /
      * problem reporter <a href="http://bugzilla.optimatika.se/show_bug.cgi?id=178">BugZilla</a>

@@ -36,7 +36,7 @@ public abstract class OptimisationConvexTests extends FunctionalityTest {
         suite.addTestSuite(QsdOldFundOfFundsCase.class);
         suite.addTestSuite(QsdOldNormalCase.class);
         suite.addTestSuite(QsdOldOptimalCase.class);
-        suite.addTestSuite(ReportedProblems.class);
+        suite.addTestSuite(ConvexProblems.class);
         //$JUnit-END$
         return suite;
     }

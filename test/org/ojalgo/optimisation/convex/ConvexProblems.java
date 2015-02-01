@@ -58,13 +58,13 @@ import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.context.NumberContext;
 
-public class ReportedProblems extends OptimisationConvexTests {
+public class ConvexProblems extends OptimisationConvexTests {
 
-    public ReportedProblems() {
+    public ConvexProblems() {
         super();
     }
 
-    public ReportedProblems(final String someName) {
+    public ConvexProblems(final String someName) {
         super(someName);
     }
 
@@ -632,7 +632,7 @@ public class ReportedProblems extends OptimisationConvexTests {
     }
 
     /**
-     * A lower level version of {@linkplain org.ojalgo.finance.portfolio.ReportedProblems#testP20090115()}. The solver
+     * A lower level version of {@linkplain org.ojalgo.finance.portfolio.PortfolioProblems#testP20090115()}. The solver
      * returns negative, constraint breaking, variables with STATE == OPTIMAL.
      */
     @SuppressWarnings("unchecked")

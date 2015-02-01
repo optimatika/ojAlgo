@@ -40,13 +40,13 @@ import org.ojalgo.optimisation.integer.P20150127b;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
-public class ReportedProblems extends OptimisationLinearTests {
+public class LinearProblems extends OptimisationLinearTests {
 
-    public ReportedProblems() {
+    public LinearProblems() {
         super();
     }
 
-    public ReportedProblems(final String arg0) {
+    public LinearProblems(final String arg0) {
         super(arg0);
     }
 

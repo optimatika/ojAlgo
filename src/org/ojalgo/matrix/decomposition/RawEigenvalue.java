@@ -53,6 +53,8 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
 
             this.setDelegate(new JamaEigenvalue(aDelegate));
 
+            this.computed(true);
+
             return true;
         }
     }
@@ -68,6 +70,8 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
 
             this.setDelegate(new JamaEigenvalue(aDelegate, false));
 
+            this.computed(true);
+
             return true;
         }
     }
@@ -82,6 +86,8 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
         boolean compute(final RawStore aDelegate) {
 
             this.setDelegate(new JamaEigenvalue(aDelegate, true));
+
+            this.computed(true);
 
             return true;
         }
@@ -183,14 +189,6 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
         return new RawStore(myDelegate.getV());
     }
 
-    public boolean isAspectRatioNormal() {
-        return true;
-    }
-
-    public boolean isComputed() {
-        return myDelegate != null;
-    }
-
     public boolean isFullSize() {
         return true;
     }
@@ -211,6 +209,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
         return MatrixUtils.reconstruct(this);
     }
 
+    @Override
     public void reset() {
         myDelegate = null;
         myInverse = null;

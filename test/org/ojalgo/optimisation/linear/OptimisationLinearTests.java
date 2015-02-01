@@ -34,7 +34,7 @@ public abstract class OptimisationLinearTests extends FunctionalityTest {
         suite.addTestSuite(ComPictetPamBamTest.class);
         suite.addTestSuite(LinearDesignTestCases.class);
         suite.addTestSuite(NetlibCase.class);
-        suite.addTestSuite(ReportedProblems.class);
+        suite.addTestSuite(LinearProblems.class);
         //$JUnit-END$
         return suite;
     }

@@ -37,7 +37,7 @@ public abstract class MatrixStoreTests extends FunctionalityTest {
         suite.addTestSuite(IdentityCase.class);
         suite.addTestSuite(MergedColumnsCase.class);
         suite.addTestSuite(MergedRowsCase.class);
-        suite.addTestSuite(ReportedProblems.class);
+        suite.addTestSuite(StoreProblems.class);
         suite.addTestSuite(SelectedColumnsCase.class);
         suite.addTestSuite(SelectedRowsCase.class);
         suite.addTestSuite(SuperimposedMatrixColumnCase.class);

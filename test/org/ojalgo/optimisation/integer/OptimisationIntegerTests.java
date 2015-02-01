@@ -35,7 +35,7 @@ public abstract class OptimisationIntegerTests extends FunctionalityTest {
         suite.addTestSuite(MarketShareCase.class);
         //suite.addTestSuite(MipCase.class);
         suite.addTestSuite(RelaxedLpCase.class);
-        suite.addTestSuite(ReportedProblems.class);
+        suite.addTestSuite(IntegerProblems.class);
         suite.addTestSuite(SpecificBranchCase.class);
         suite.addTestSuite(StrategyMixer.class);
         suite.addTestSuite(UCLAee236aCase.class);

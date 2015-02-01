@@ -32,13 +32,13 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-public class ReportedProblems extends MatrixDecompositionTests {
+public class DecompositionProblems extends MatrixDecompositionTests {
 
-    public ReportedProblems() {
+    public DecompositionProblems() {
         super();
     }
 
-    public ReportedProblems(final String arg0) {
+    public DecompositionProblems(final String arg0) {
         super(arg0);
     }
 

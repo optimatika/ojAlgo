@@ -29,11 +29,9 @@ import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * JamaAbstractDecomposition
- *
  * @author apete
  */
-abstract class RawDecomposition implements MatrixDecomposition<Double> {
+abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
     static RawStore cast(final Access2D<?> access) {
         if (access instanceof RawStore) {

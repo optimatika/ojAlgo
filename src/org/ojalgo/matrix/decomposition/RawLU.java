@@ -107,12 +107,9 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
         return new RawStore(myDelegate.getU());
     }
 
+    @Override
     public boolean isAspectRatioNormal() {
         return (int) myDelegate.getL().countRows() >= (int) myDelegate.getU().countColumns();
-    }
-
-    public boolean isComputed() {
-        return myDelegate != null;
     }
 
     public boolean isFullSize() {
@@ -131,6 +128,7 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
         return MatrixUtils.reconstruct(this);
     }
 
+    @Override
     public void reset() {
         myDelegate = null;
     }
@@ -144,6 +142,8 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
     boolean compute(final RawStore aDelegate) {
 
         myDelegate = new JamaLU(aDelegate);
+
+        this.computed(true);
 
         return this.isComputed();
     }

@@ -41,7 +41,7 @@ public class BufferArrayTest extends ArrayTests {
         super(aName);
     }
 
-    public void _testRandomGetSet() {
+    public void testRandomGetSet() {
 
         final int tmpCount = 5000;
 

@@ -154,14 +154,6 @@ public final class RawSingularValue extends RawDecomposition implements Singular
         return this.getKyFanNorm(myDelegate.getSingularValues().length);
     }
 
-    public boolean isAspectRatioNormal() {
-        return myTransposed;
-    }
-
-    public boolean isComputed() {
-        return myDelegate != null;
-    }
-
     public boolean isFullSize() {
         return false;
     }
@@ -178,6 +170,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
         return MatrixUtils.reconstruct(this);
     }
 
+    @Override
     public void reset() {
 
         myDelegate = null;
@@ -216,6 +209,8 @@ public final class RawSingularValue extends RawDecomposition implements Singular
         }
 
         myDelegate = new JamaSingularValue(tmpMtrx, !singularValuesOnly, !singularValuesOnly);
+
+        this.computed(true);
 
         return this.isComputed();
     }

@@ -168,14 +168,6 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         return this.getOldU();
     }
 
-    public boolean isAspectRatioNormal() {
-        return true;
-    }
-
-    public boolean isComputed() {
-        return myDelegate != null;
-    }
-
     public boolean isFullSize() {
         return true;
     }
@@ -220,6 +212,7 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         return MatrixUtils.reconstruct(this);
     }
 
+    @Override
     public void reset() {
         myDelegate = null;
     }
@@ -232,6 +225,7 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
     @Override
     boolean compute(final RawStore aDelegate) {
         myDelegate = new JamaCholesky(aDelegate);
+        this.computed(true);
         return myDelegate.isSPD();
     }
 

@@ -28,13 +28,13 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.type.context.NumberContext;
 
-public class ReportedProblems extends AbstractMatrixStoreTest {
+public class StoreProblems extends AbstractMatrixStoreTest {
 
-    public ReportedProblems() {
+    public StoreProblems() {
         super();
     }
 
-    public ReportedProblems(final String arg0) {
+    public StoreProblems(final String arg0) {
         super(arg0);
     }
 

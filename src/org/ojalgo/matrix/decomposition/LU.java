@@ -24,9 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.decomposition.LUDecomposition.Big;
-import org.ojalgo.matrix.decomposition.LUDecomposition.Complex;
-import org.ojalgo.matrix.decomposition.LUDecomposition.Primitive;
 import org.ojalgo.matrix.store.ColumnsStore;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -82,15 +79,15 @@ public interface LU<N extends Number> extends MatrixDecomposition<N>, Determinan
     }
 
     public static LU<BigDecimal> makeBig() {
-        return new Big();
+        return new LUDecomposition.Big();
     }
 
     public static LU<ComplexNumber> makeComplex() {
-        return new Complex();
+        return new LUDecomposition.Complex();
     }
 
     public static LU<Double> makePrimitive() {
-        return new Primitive();
+        return new LUDecomposition.Primitive();
     }
 
     /**

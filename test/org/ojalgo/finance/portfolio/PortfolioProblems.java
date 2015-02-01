@@ -40,13 +40,13 @@ import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.type.context.NumberContext;
 
-public class ReportedProblems extends FinancePortfolioTests {
+public class PortfolioProblems extends FinancePortfolioTests {
 
-    public ReportedProblems() {
+    public PortfolioProblems() {
         super();
     }
 
-    public ReportedProblems(final String someName) {
+    public PortfolioProblems(final String someName) {
         super(someName);
     }
 

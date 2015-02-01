@@ -38,7 +38,7 @@ import org.ojalgo.scalar.ComplexNumber;
  * @author apete
  */
 @Deprecated
-public abstract class EigenvalueDecomposition<N extends Number> extends AbstractDecomposition<N> implements Eigenvalue<N> {
+public abstract class EigenvalueDecomposition<N extends Number> extends GenericDecomposition<N> implements Eigenvalue<N> {
 
     /**
      * @deprecated v38 Use {@link Eigenvalue#make(Access2D<N>)} instead

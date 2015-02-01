@@ -146,7 +146,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
         suite.addTestSuite(HessenbergTest.class);
         suite.addTestSuite(LUTest.class);
         suite.addTestSuite(QRTest.class);
-        suite.addTestSuite(ReportedProblems.class);
+        suite.addTestSuite(DecompositionProblems.class);
         suite.addTestSuite(SchurTest.class);
         suite.addTestSuite(SingularValueTest.class);
         suite.addTestSuite(SVDbyEvD.class);
