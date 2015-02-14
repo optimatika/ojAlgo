@@ -43,8 +43,8 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorCollection;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
@@ -87,8 +87,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = new DecompositionStore.Factory<Double, PrimitiveDenseStore>() {
 
-        public AggregatorCollection<Double> aggregator() {
-            return PrimitiveAggregator.getCollection();
+        public AggregatorSet<Double> aggregator() {
+            return PrimitiveAggregator.getSet();
         }
 
         public PrimitiveDenseStore columns(final Access1D<?>... source) {
@@ -1209,6 +1209,14 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             multiplyRight.invoke(tmpProductData, PrimitiveDenseStore.cast(left).data, tmpComplexity, right);
         } else {
             multiplyBoth.invoke(tmpProductData, left, tmpComplexity, right);
+        }
+    }
+
+    public void fillColumn(final long row, final long column, final Access1D<Double> values) {
+        final long tmpOffset = row + (column * myRowDim);
+        final long tmpCount = values.count();
+        for (long i = 0L; i < tmpCount; i++) {
+            this.set(tmpOffset + i, values.doubleValue(i));
         }
     }
 

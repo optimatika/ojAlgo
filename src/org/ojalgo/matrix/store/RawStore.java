@@ -45,8 +45,8 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorCollection;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
@@ -66,8 +66,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public static PhysicalStore.Factory<Double, RawStore> FACTORY = new PhysicalStore.Factory<Double, RawStore>() {
 
-        public AggregatorCollection<Double> aggregator() {
-            return PrimitiveAggregator.getCollection();
+        public AggregatorSet<Double> aggregator() {
+            return PrimitiveAggregator.getSet();
         }
 
         public RawStore columns(final Access1D<?>... source) {
@@ -153,11 +153,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
             final double[][] retVal = new double[tmpRowDim][tmpColDim];
 
-            for (int i = 0; i < tmpRowDim; i++) {
-                for (int j = 0; j < tmpColDim; j++) {
-                    retVal[i][j] = source.doubleValue(i, j);
-                }
-            }
+            MatrixUtils.copy(source, tmpRowDim, tmpColDim, retVal);
 
             return new RawStore(retVal, tmpRowDim, tmpColDim);
         }

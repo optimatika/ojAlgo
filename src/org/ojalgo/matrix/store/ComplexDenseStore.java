@@ -40,8 +40,8 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorCollection;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
@@ -81,8 +81,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public static final DecompositionStore.Factory<ComplexNumber, ComplexDenseStore> FACTORY = new DecompositionStore.Factory<ComplexNumber, ComplexDenseStore>() {
 
-        public AggregatorCollection<ComplexNumber> aggregator() {
-            return ComplexAggregator.getCollection();
+        public AggregatorSet<ComplexNumber> aggregator() {
+            return ComplexAggregator.getSet();
         }
 
         public ComplexDenseStore columns(final Access1D<?>... source) {

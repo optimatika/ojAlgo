@@ -251,7 +251,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
 
     public final N getDeterminant() {
 
-        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getCollection().product();
+        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().product();
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
@@ -317,7 +317,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
 
     public final ComplexNumber getTrace() {
 
-        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getCollection().sum();
+        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
 
         this.getEigenvalues().visitAll(tmpVisitor);
 

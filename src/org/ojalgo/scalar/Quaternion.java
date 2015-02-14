@@ -61,7 +61,10 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
 
     };
 
+    static final Quaternion IJK = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ONE, PrimitiveMath.ONE).versor();
+
     public static final Quaternion I = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
+    public static final Quaternion INFINITY = Quaternion.makePolar(Double.POSITIVE_INFINITY, IJK.vector(), PrimitiveMath.ZERO);
     public static final Quaternion J = new Quaternion(PrimitiveMath.ZERO, PrimitiveMath.ONE, PrimitiveMath.ZERO);
     public static final Quaternion K = new Quaternion(PrimitiveMath.ZERO, PrimitiveMath.ZERO, PrimitiveMath.ONE);
     public static final Quaternion NEG = new Quaternion(PrimitiveMath.NEG);
@@ -69,8 +72,6 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
     public static final Quaternion ZERO = new Quaternion();
 
     private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
-
-    static final Quaternion IJK = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ONE, PrimitiveMath.ONE).versor();
 
     public static boolean isAbsolute(final Quaternion value) {
         return value.isAbsolute();

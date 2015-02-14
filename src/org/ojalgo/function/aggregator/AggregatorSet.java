@@ -22,16 +22,16 @@
 package org.ojalgo.function.aggregator;
 
 /**
- * Do not cache instances of this class! The methods {@linkplain BigAggregator#getCollection()},
- * {@linkplain ComplexAggregator#getCollection()} and {@linkplain PrimitiveAggregator#getCollection()}
+ * Do not cache instances of this class! The methods {@linkplain BigAggregator#getSet()},
+ * {@linkplain ComplexAggregator#getSet()} and {@linkplain PrimitiveAggregator#getSet()}
  * return threadlocal instances, and when you access the individual
  * aggregators they are {@linkplain AggregatorFunction#reset()} for you.
  *
  * @author apete
  */
-public abstract class AggregatorCollection<N extends Number> {
+public abstract class AggregatorSet<N extends Number> {
 
-    protected AggregatorCollection() {
+    protected AggregatorSet() {
         super();
     }
 

@@ -71,11 +71,11 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     public static final SegmentedArray<Double> makeSegmented(final int size) {
-        return SegmentedArray.PRIMITIVE.makeSegmented(FACTORY, size);
+        return SegmentedArray.make(FACTORY, size);
     }
 
     public static final SegmentedArray<Double> makeSegmented(final long count) {
-        return SegmentedArray.PRIMITIVE.makeSegmented(FACTORY, count);
+        return SegmentedArray.make(FACTORY, count);
     }
 
     public static final PrimitiveArray wrap(final double[] data) {

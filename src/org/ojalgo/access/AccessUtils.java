@@ -534,7 +534,7 @@ public abstract class AccessUtils {
     public static long index(final long[] structure, final long[] reference) {
         long retVal = reference[0];
         long tmpFactor = structure[0];
-        final int tmpLength = reference.length;
+        final int tmpLength = Math.min(structure.length, reference.length);
         for (int i = 1; i < tmpLength; i++) {
             retVal += tmpFactor * reference[i];
             tmpFactor *= structure[i];

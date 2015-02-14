@@ -24,6 +24,7 @@ package org.ojalgo.function.aggregator;
 import java.math.BigDecimal;
 
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
 public enum Aggregator {
@@ -139,15 +140,17 @@ public enum Aggregator {
     }
 
     @SuppressWarnings("unchecked")
-    public final <N extends Number> AggregatorFunction<N> getFunction(final Class<?> aType) {
-        if (double.class.isAssignableFrom(aType) || Double.class.isAssignableFrom(aType)) {
+    public final <N extends Number> AggregatorFunction<N> getFunction(final Class<?> scalarType) {
+        if (double.class.isAssignableFrom(scalarType) || Double.class.isAssignableFrom(scalarType)) {
             return (AggregatorFunction<N>) this.getPrimitiveFunction();
-        } else if (ComplexNumber.class.isAssignableFrom(aType)) {
+        } else if (ComplexNumber.class.isAssignableFrom(scalarType)) {
             return (AggregatorFunction<N>) this.getComplexFunction();
-        } else if (BigDecimal.class.isAssignableFrom(aType)) {
+        } else if (BigDecimal.class.isAssignableFrom(scalarType)) {
             return (AggregatorFunction<N>) this.getBigFunction();
-        } else if (RationalNumber.class.isAssignableFrom(aType)) {
+        } else if (RationalNumber.class.isAssignableFrom(scalarType)) {
             return (AggregatorFunction<N>) this.getRationalFunction();
+        } else if (Quaternion.class.isAssignableFrom(scalarType)) {
+            return (AggregatorFunction<N>) this.getQuaternionFunction();
         } else {
             return null;
         }
@@ -200,6 +203,60 @@ public enum Aggregator {
         case SUM2:
 
             return PrimitiveAggregator.SUM2.get().reset();
+
+        default:
+
+            return null;
+        }
+    }
+
+    public final AggregatorFunction<Quaternion> getQuaternionFunction() {
+
+        switch (this) {
+
+        case CARDINALITY:
+
+            return QuaternionAggregator.CARDINALITY.get().reset();
+
+        case LARGEST:
+
+            return QuaternionAggregator.LARGEST.get().reset();
+
+        case MAXIMUM:
+
+            return QuaternionAggregator.MAX.get().reset();
+
+        case MINIMUM:
+
+            return QuaternionAggregator.MIN.get().reset();
+
+        case NORM1:
+
+            return QuaternionAggregator.NORM1.get().reset();
+
+        case NORM2:
+
+            return QuaternionAggregator.NORM2.get().reset();
+
+        case PRODUCT:
+
+            return QuaternionAggregator.PRODUCT.get().reset();
+
+        case PRODUCT2:
+
+            return QuaternionAggregator.PRODUCT2.get().reset();
+
+        case SMALLEST:
+
+            return QuaternionAggregator.SMALLEST.get().reset();
+
+        case SUM:
+
+            return QuaternionAggregator.SUM.get().reset();
+
+        case SUM2:
+
+            return QuaternionAggregator.SUM2.get().reset();
 
         default:
 

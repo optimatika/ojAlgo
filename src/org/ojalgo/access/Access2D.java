@@ -110,7 +110,8 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     public interface Fillable<N extends Number> extends Structure2D, Access1D.Fillable<N> {
 
         default void fillColumn(final long row, final long column, final Access1D<N> values) {
-            for (long i = 0L; i < values.count(); i++) {
+            final long tmpCount = values.count();
+            for (long i = 0L; i < tmpCount; i++) {
                 this.set(row + i, column, values.get(i));
             }
         }

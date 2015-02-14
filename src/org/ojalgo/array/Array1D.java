@@ -39,6 +39,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 
@@ -169,6 +170,15 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         @Override
         BasicFactory<Double> delegate() {
             return BasicArray.PRIMITIVE;
+        }
+
+    };
+
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+
+        @Override
+        BasicFactory<Quaternion> delegate() {
+            return BasicArray.QUATERNION;
         }
 
     };

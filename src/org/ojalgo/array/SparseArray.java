@@ -70,6 +70,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return SparseArray.makeBig(count);
         }
 
+        @Override
+        long getElementSize() {
+            return BigArray.ELEMENT_SIZE;
+        }
+
     };
 
     static final SparseFactory<ComplexNumber> COMPLEX = new SparseFactory<ComplexNumber>() {
@@ -77,6 +82,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         @Override
         SparseArray<ComplexNumber> make(final long count) {
             return SparseArray.makeComplex(count);
+        }
+
+        @Override
+        long getElementSize() {
+            return ComplexArray.ELEMENT_SIZE;
         }
 
     };
@@ -88,6 +98,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return SparseArray.makePrimitive(count);
         }
 
+        @Override
+        long getElementSize() {
+            return PrimitiveArray.ELEMENT_SIZE;
+        }
+
     };
 
     static final SparseFactory<Quaternion> QUATERNION = new SparseFactory<Quaternion>() {
@@ -95,6 +110,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         @Override
         SparseArray<Quaternion> make(final long count) {
             return SparseArray.makeQuaternion(count);
+        }
+
+        @Override
+        long getElementSize() {
+            return QuaternionArray.ELEMENT_SIZE;
         }
 
     };
@@ -106,6 +126,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return SparseArray.makeRational(count);
         }
 
+        @Override
+        long getElementSize() {
+            return RationalArray.ELEMENT_SIZE;
+        }
+
     };
 
     public static SparseArray<BigDecimal> makeBig(final long count) {
@@ -113,7 +138,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static final SegmentedArray<BigDecimal> makeBigSegmented(final long count) {
-        return SegmentedArray.BIG.makeSegmented(BIG, count);
+        return SegmentedArray.make(BIG, count);
     }
 
     public static SparseArray<ComplexNumber> makeComplex(final long count) {
@@ -121,7 +146,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static final SegmentedArray<ComplexNumber> makeComplexSegmented(final long count) {
-        return SegmentedArray.COMPLEX.makeSegmented(COMPLEX, count);
+        return SegmentedArray.make(COMPLEX, count);
     }
 
     public static SparseArray<Double> makePrimitive(final long count) {
@@ -129,7 +154,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static final SegmentedArray<Double> makePrimitiveSegmented(final long count) {
-        return SegmentedArray.PRIMITIVE.makeSegmented(PRIMITIVE, count);
+        return SegmentedArray.make(PRIMITIVE, count);
     }
 
     public static SparseArray<Quaternion> makeQuaternion(final long count) {
@@ -137,7 +162,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static final SegmentedArray<Quaternion> makeQuaternionSegmented(final long count) {
-        return SegmentedArray.QUATERNION.makeSegmented(QUATERNION, count);
+        return SegmentedArray.make(QUATERNION, count);
     }
 
     public static SparseArray<RationalNumber> makeRational(final long count) {
@@ -145,7 +170,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static final SegmentedArray<RationalNumber> makeRationalSegmented(final long count) {
-        return SegmentedArray.RATIONAL.makeSegmented(RATIONAL, count);
+        return SegmentedArray.make(RATIONAL, count);
     }
 
     /**

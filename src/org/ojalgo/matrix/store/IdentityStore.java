@@ -31,7 +31,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * IdentityStore
- * 
+ *
  * @author apete
  */
 public final class IdentityStore<N extends Number> extends FactoryStore<N> {

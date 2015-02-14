@@ -28,7 +28,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.decomposition.*;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -40,6 +39,15 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 public abstract class MatrixUtils {
+
+    public static void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
+        for (int i = 0; i < rows; i++) {
+            final double[] tmpRow = destination[i];
+            for (int j = 0; j < columns; j++) {
+                tmpRow[j] = source.doubleValue(i, j);
+            }
+        }
+    }
 
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Bidiagonal<N> decomposition, final NumberContext context) {
 
@@ -281,22 +289,6 @@ public abstract class MatrixUtils {
         return anAccess instanceof MatrixStore<?> ? ((MatrixStore<?>) anAccess).isUpperRightShaded() : false;
     }
 
-    /**
-     * @deprecated v36 Use {@link AccessUtils#makeDecreasingRange(int,int)} instead
-     */
-    @Deprecated
-    public static int[] makeDecreasingRange(final int first, final int count) {
-        return AccessUtils.makeDecreasingRange(first, count);
-    }
-
-    /**
-     * @deprecated v36 Use {@link AccessUtils#makeIncreasingRange(int,int)} instead
-     */
-    @Deprecated
-    public static int[] makeIncreasingRange(final int first, final int count) {
-        return AccessUtils.makeIncreasingRange(first, count);
-    }
-
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int aRowDim, final int aColDim) {
 
         final PhysicalStore<ComplexNumber> retVal = ComplexDenseStore.FACTORY.makeZero(aRowDim, aColDim);
@@ -310,22 +302,6 @@ public abstract class MatrixUtils {
         }
 
         return retVal;
-    }
-
-    /**
-     * @deprecated v36 Use {@link FunctionUtils#max(int...)} instead
-     */
-    @Deprecated
-    public static int max(final int... values) {
-        return FunctionUtils.max(values);
-    }
-
-    /**
-     * @deprecated v36 Use {@link FunctionUtils#min(int...)} instead
-     */
-    @Deprecated
-    public static int min(final int... values) {
-        return FunctionUtils.min(values);
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final Bidiagonal<N> decomposition) {

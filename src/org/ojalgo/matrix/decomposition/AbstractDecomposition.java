@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.access.Access2D;
+
 /**
  * @author apete
  */
@@ -33,8 +35,12 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
         super();
     }
 
-    public boolean isAspectRatioNormal() {
+    protected final boolean isAspectRatioNormal() {
         return myAspectRatioNormal;
+    }
+
+    public final DecompositionStore<N> preallocate(final Access2D<N> template) {
+        return this.preallocate(template, template);
     }
 
     public final boolean isComputed() {

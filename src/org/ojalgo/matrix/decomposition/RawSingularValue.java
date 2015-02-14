@@ -192,7 +192,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
     }
 
     @Override
-    boolean compute(final RawStore aDelegate) {
+    protected boolean compute(final RawStore aDelegate) {
         return this.compute(aDelegate, false);
     }
 
@@ -219,6 +219,13 @@ public final class RawSingularValue extends RawDecomposition implements Singular
     RawStore solve(final RawStore aRHS) {
         ProgrammingError.throwForIllegalInvocation();
         return null;
+    }
+
+    public final boolean compute(final Access2D<?> matrix) {
+
+        this.reset();
+
+        return this.compute(RawDecomposition.cast(matrix));
     }
 
 }

@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -34,6 +35,7 @@ import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.ZeroStore;
 
@@ -41,16 +43,23 @@ public abstract class BaseSolver extends GenericSolver {
 
     protected static abstract class AbstractBuilder<B extends AbstractBuilder<?, ?>, S extends BaseSolver> implements Cloneable {
 
-        private MatrixStore.Builder<Double> myAE = null;
-        private MatrixStore.Builder<Double> myBE = null;
-        private MatrixStore.Builder<Double> myQ = null;
-        private MatrixStore.Builder<Double> myC = null;
-        private MatrixStore.Builder<Double> myAI = null;
-        private MatrixStore.Builder<Double> myBI = null;
+        static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
-        private DecompositionStore<Double> myX = null;
+        private PhysicalStore<Double> myAE = null;
+        private MatrixStore.Builder<Double> myAEbuilder = null;
+        private PhysicalStore<Double> myAI = null;
+        private MatrixStore.Builder<Double> myAIbuilder = null;
+        private PhysicalStore<Double> myBE = null;
+        private MatrixStore.Builder<Double> myBEbuilder = null;
+        private PhysicalStore<Double> myBI = null;
+        private MatrixStore.Builder<Double> myBIbuilder = null;
+        private PhysicalStore<Double> myC = null;
+        private MatrixStore.Builder<Double> myCbuilder = null;
         private PhysicalStore<Double> myLE = null;
         private PhysicalStore<Double> myLI = null;
+        private PhysicalStore<Double> myQ = null;
+        private MatrixStore.Builder<Double> myQbuilder = null;
+        private DecompositionStore<Double> myX = null;
 
         protected AbstractBuilder() {
             super();
@@ -81,32 +90,14 @@ public abstract class BaseSolver extends GenericSolver {
 
             super();
 
-            myAE = null;
-            myBE = null;
-
-            myQ = null;
-            myC = C.builder();
-
-            myAI = null;
-            myBI = null;
+            this.objective(C);
         }
 
         protected AbstractBuilder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
 
             super();
 
-            myAE = null;
-            myBE = null;
-
-            myQ = Q.builder();
-            if (C != null) {
-                myC = C.builder();
-            } else {
-                myC = ZeroStore.makePrimitive((int) Q.countRows(), 1).builder();
-            }
-
-            myAI = null;
-            myBI = null;
+            this.objective(Q, C);
         }
 
         protected AbstractBuilder(final MatrixStore<Double>[] matrices) {
@@ -197,8 +188,12 @@ public abstract class BaseSolver extends GenericSolver {
          * [AE][X] == [BE]
          */
         public MatrixStore<Double> getAE() {
-            if (myAE != null) {
-                return myAE.build();
+            if (myAEbuilder != null) {
+                if (myAE != null) {
+                    return myAE;
+                } else {
+                    return myAEbuilder.build();
+                }
             } else {
                 return null;
             }
@@ -208,8 +203,12 @@ public abstract class BaseSolver extends GenericSolver {
          * [AI][X] <= [BI]
          */
         public MatrixStore<Double> getAI() {
-            if (myAI != null) {
-                return myAI.build();
+            if (myAIbuilder != null) {
+                if (myAI != null) {
+                    return myAI;
+                } else {
+                    return myAIbuilder.build();
+                }
             } else {
                 return null;
             }
@@ -219,8 +218,12 @@ public abstract class BaseSolver extends GenericSolver {
          * [AE][X] == [BE]
          */
         public MatrixStore<Double> getBE() {
-            if (myBE != null) {
-                return myBE.build();
+            if (myBEbuilder != null) {
+                if (myBE != null) {
+                    return myBE;
+                } else {
+                    return myBEbuilder.build();
+                }
             } else {
                 return null;
             }
@@ -230,8 +233,12 @@ public abstract class BaseSolver extends GenericSolver {
          * [AI][X] <= [BI]
          */
         public MatrixStore<Double> getBI() {
-            if (myBI != null) {
-                return myBI.build();
+            if (myBIbuilder != null) {
+                if (myBI != null) {
+                    return myBI;
+                } else {
+                    return myBIbuilder.build();
+                }
             } else {
                 return null;
             }
@@ -241,8 +248,12 @@ public abstract class BaseSolver extends GenericSolver {
          * Linear objective: [C]
          */
         public MatrixStore<Double> getC() {
-            if (myC != null) {
-                return myC.build();
+            if (myCbuilder != null) {
+                if (myC != null) {
+                    return myC;
+                } else {
+                    return myCbuilder.build();
+                }
             } else {
                 return null;
             }
@@ -284,8 +295,12 @@ public abstract class BaseSolver extends GenericSolver {
          * Quadratic objective: [Q]
          */
         public MatrixStore<Double> getQ() {
-            if (myQ != null) {
-                return myQ.build();
+            if (myQbuilder != null) {
+                if (myQ != null) {
+                    return myQ;
+                } else {
+                    return myQbuilder.build();
+                }
             } else {
                 return null;
             }
@@ -427,34 +442,34 @@ public abstract class BaseSolver extends GenericSolver {
 
         private void balanceEqualityConstraints() {
 
-            final PhysicalStore<Double> tmpBody = this.getAE().copy();
-            final PhysicalStore<Double> tmpRHS = this.getBE().copy();
+            final PhysicalStore<Double> tmpBody = this.cast(this.getAE());
+            final PhysicalStore<Double> tmpRHS = this.cast(this.getBE());
 
             this.balanceRows(tmpBody, tmpRHS, true);
 
-            myAE = tmpBody.builder();
-            myBE = tmpRHS.builder();
+            myAE = tmpBody;
+            myBE = tmpRHS;
 
             this.validate();
         }
 
         private void balanceInequalityConstraints() {
 
-            final PhysicalStore<Double> tmpBody = this.getAI().copy();
-            final PhysicalStore<Double> tmpRHS = this.getBI().copy();
+            final PhysicalStore<Double> tmpBody = this.cast(this.getAI());
+            final PhysicalStore<Double> tmpRHS = this.cast(this.getBI());
 
             this.balanceRows(tmpBody, tmpRHS, false);
 
-            myAI = tmpBody.builder();
-            myBI = tmpRHS.builder();
+            myAI = tmpBody;
+            myBI = tmpRHS;
 
             this.validate();
         }
 
         private double balanceMatrices(final PhysicalStore<Double>[] someMatrices) {
 
-            final AggregatorFunction<Double> tmpLargestAggr = PrimitiveAggregator.getCollection().largest();
-            final AggregatorFunction<Double> tmpSmallestAggr = PrimitiveAggregator.getCollection().smallest();
+            final AggregatorFunction<Double> tmpLargestAggr = PrimitiveAggregator.getSet().largest();
+            final AggregatorFunction<Double> tmpSmallestAggr = PrimitiveAggregator.getSet().smallest();
 
             for (final PhysicalStore<Double> tmpMatrix : someMatrices) {
                 if (tmpMatrix != null) {
@@ -483,15 +498,15 @@ public abstract class BaseSolver extends GenericSolver {
             final PhysicalStore<Double>[] tmpMatrices = (PhysicalStore<Double>[]) new PhysicalStore<?>[2];
 
             if (this.getQ() != null) {
-                tmpMatrices[0] = this.getQ().copy();
+                tmpMatrices[0] = this.cast(this.getQ());
             }
             if (this.getC() != null) {
-                tmpMatrices[1] = this.getC().copy();
+                tmpMatrices[1] = this.cast(this.getC());
             }
 
             this.balanceMatrices(tmpMatrices);
-            myQ = tmpMatrices[0].builder();
-            myC = tmpMatrices[1].builder();
+            myQ = tmpMatrices[0];
+            myC = tmpMatrices[1];
 
             this.validate();
 
@@ -499,8 +514,8 @@ public abstract class BaseSolver extends GenericSolver {
 
         private void balanceRows(final PhysicalStore<Double> tmpBody, final PhysicalStore<Double> tmpRHS, final boolean assertPositiveRHS) {
 
-            final AggregatorFunction<Double> tmpLargestAggr = PrimitiveAggregator.getCollection().largest();
-            final AggregatorFunction<Double> tmpSmallestAggr = PrimitiveAggregator.getCollection().smallest();
+            final AggregatorFunction<Double> tmpLargestAggr = PrimitiveAggregator.getSet().largest();
+            final AggregatorFunction<Double> tmpSmallestAggr = PrimitiveAggregator.getSet().smallest();
 
             double tmpExponent;
             double tmpFactor;
@@ -555,16 +570,24 @@ public abstract class BaseSolver extends GenericSolver {
         @SuppressWarnings("unchecked")
         protected B equalities(final MatrixStore<Double> AE, final MatrixStore<Double> BE) {
 
-            if (myAE != null) {
-                myAE.below(AE);
-            } else {
-                myAE = AE.builder();
+            if ((AE == null) || (BE == null) || (AE.countRows() != BE.countRows())) {
+                throw new IllegalArgumentException();
             }
 
-            if (myBE != null) {
-                myBE.below(BE);
+            if (myAEbuilder != null) {
+                myAEbuilder.below(AE);
+                myAE = null;
             } else {
-                myBE = BE.builder();
+                myAE = this.cast(AE);
+                myAEbuilder = myAE.builder();
+            }
+
+            if (myBEbuilder != null) {
+                myBEbuilder.below(BE);
+                myBE = null;
+            } else {
+                myBE = this.cast(BE);
+                myBEbuilder = BE.builder();
             }
 
             return (B) this;
@@ -573,16 +596,24 @@ public abstract class BaseSolver extends GenericSolver {
         @SuppressWarnings("unchecked")
         protected B inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI) {
 
-            if (myAI != null) {
-                myAI.below(AI);
-            } else {
-                myAI = AI.builder();
+            if ((AI == null) || (BI == null) || (AI.countRows() != BI.countRows())) {
+                throw new IllegalArgumentException();
             }
 
-            if (myBI != null) {
-                myBI.below(BI);
+            if (myAIbuilder != null) {
+                myAIbuilder.below(AI);
+                myAI = null;
             } else {
-                myBI = BI.builder();
+                myAI = this.cast(AI);
+                myAIbuilder = myAI.builder();
+            }
+
+            if (myBIbuilder != null) {
+                myBIbuilder.below(BI);
+                myBI = null;
+            } else {
+                myBI = this.cast(BI);
+                myBIbuilder = BI.builder();
             }
 
             return (B) this;
@@ -591,8 +622,17 @@ public abstract class BaseSolver extends GenericSolver {
         @SuppressWarnings("unchecked")
         protected B objective(final MatrixStore<Double> C) {
 
-            myQ = null;
-            myC = C.builder();
+            if (C == null) {
+                throw new IllegalArgumentException();
+            }
+
+            if (myCbuilder != null) {
+                myCbuilder.below(C);
+                myC = null;
+            } else {
+                myC = this.cast(C);
+                myCbuilder = myC.builder();
+            }
 
             return (B) this;
         }
@@ -600,11 +640,25 @@ public abstract class BaseSolver extends GenericSolver {
         @SuppressWarnings("unchecked")
         protected B objective(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
 
-            myQ = Q.builder();
-            if (C != null) {
-                myC = C.builder();
+            if (Q == null) {
+                throw new IllegalArgumentException();
+            }
+
+            if (myQbuilder != null) {
+                myQbuilder.below(Q);
+                myQ = null;
             } else {
-                myC = ZeroStore.makePrimitive((int) Q.countRows(), 1).builder();
+                myQ = this.cast(Q);
+                myQbuilder = myQ.builder();
+            }
+
+            final MatrixStore<Double> tmpC = C != null ? C : ZeroStore.makePrimitive((int) Q.countRows(), 1);
+            if (myCbuilder != null) {
+                myCbuilder.below(tmpC);
+                myC = null;
+            } else {
+                myC = this.cast(tmpC);
+                myCbuilder = myC.builder();
             }
 
             return (B) this;
@@ -618,8 +672,6 @@ public abstract class BaseSolver extends GenericSolver {
                     throw new ProgrammingError("AE cannot be null!");
                 } else if (this.getAE().countColumns() != this.countVariables()) {
                     throw new ProgrammingError("AE has the wrong number of columns!");
-                } else if (this.getBE() == null) {
-                    myAE = PrimitiveDenseStore.FACTORY.makeZero(this.getAE().countRows(), 1).builder();
                 } else if (this.getAE().countRows() != this.getBE().countRows()) {
                     throw new ProgrammingError("AE and BE do not have the same number of rows!");
                 } else if (this.getBE().countColumns() != 1) {
@@ -638,9 +690,7 @@ public abstract class BaseSolver extends GenericSolver {
                     throw new ProgrammingError("Q has the wrong number of rows and/or columns!");
                 }
 
-                if (this.getC() == null) {
-                    myC = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1).builder();
-                } else if ((this.getC().countRows() != this.countVariables()) || (this.getC().countColumns() != 1)) {
+                if (((this.getC() != null) && (this.getC().countRows() != this.countVariables())) || (this.getC().countColumns() != 1)) {
                     throw new ProgrammingError("C has the wrong number of rows and/or columns!");
                 }
 
@@ -656,8 +706,6 @@ public abstract class BaseSolver extends GenericSolver {
                     throw new ProgrammingError("AI cannot be null!");
                 } else if (this.getAI().countColumns() != this.countVariables()) {
                     throw new ProgrammingError("AI has the wrong number of columns!");
-                } else if (this.getBI() == null) {
-                    myBI = PrimitiveDenseStore.FACTORY.makeZero(this.getAI().countRows(), 1).builder();
                 } else if (this.getAI().countRows() != this.getBI().countRows()) {
                     throw new ProgrammingError("AI and BI do not have the same number of rows!");
                 } else if (this.getBI().countColumns() != 1) {
@@ -669,6 +717,15 @@ public abstract class BaseSolver extends GenericSolver {
                 myAI = null;
                 myBI = null;
             }
+        }
+
+        PhysicalStore<Double> cast(final Access2D<Double> matrix) {
+            if (matrix instanceof PhysicalStore<?>) {
+                return (PhysicalStore<Double>) matrix;
+            } else {
+                return FACTORY.copy(matrix);
+            }
+
         }
 
     }

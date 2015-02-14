@@ -33,6 +33,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
@@ -56,6 +57,11 @@ public final class OffHeapArray extends BasicArray<Double> {
         @Override
         BasicArray<Double> makeToBeFilled(final long... structure) {
             return new OffHeapArray(AccessUtils.count(structure));
+        }
+
+        @Override
+        long getElementSize() {
+            return JavaType.DOUBLE.memory();
         }
 
     };
@@ -82,7 +88,7 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     public static final SegmentedArray<Double> makeSegmented(final long count) {
-        return SegmentedArray.PRIMITIVE.makeSegmented(FACTORY, count);
+        return SegmentedArray.make(FACTORY, count);
     }
 
     private final long data;

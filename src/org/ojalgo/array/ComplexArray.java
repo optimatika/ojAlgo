@@ -71,7 +71,7 @@ public class ComplexArray extends DenseArray<ComplexNumber> {
     }
 
     public static final SegmentedArray<ComplexNumber> makeSegmented(final long count) {
-        return SegmentedArray.COMPLEX.makeSegmented(FACTORY, count);
+        return SegmentedArray.make(FACTORY, count);
     }
 
     public static final ComplexArray wrap(final ComplexNumber[] data) {

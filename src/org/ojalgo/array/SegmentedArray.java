@@ -47,48 +47,23 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     static abstract class SegmentedFactory<N extends Number> extends ArrayFactory<N> {
 
+        @Override
+        long getElementSize() {
+            return this.getDenseFactory().getElementSize();
+        }
+
         abstract DenseArray.DenseFactory<N> getDenseFactory();
 
         abstract SparseArray.SparseFactory<N> getSparseFactory();
 
-        final SegmentedArray<N> makeSegmented(final ArrayFactory<N> segmentFactory, final long... structure) {
-
-            final long tmpCount = AccessUtils.count(structure);
-
-            int tmpNumberOfUniformSegments = 1; // NumberOfUniformSegments
-            long tmpUniformSegmentSize = tmpCount;
-
-            final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpCount));
-
-            for (int i = 0; i < structure.length; i++) {
-                final long tmpNoS = (tmpNumberOfUniformSegments * structure[i]);
-                final long tmpSS = tmpUniformSegmentSize / structure[i];
-                if (tmpNoS <= tmpMaxNumberOfSegments) {
-                    tmpNumberOfUniformSegments = (int) tmpNoS;
-                    tmpUniformSegmentSize = tmpSS;
-                }
-            }
-
-            final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getDenseFactory().getElementSize());
-            final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
-            while ((tmpUnits != 1L) && (tmpUniformSegmentSize >= tmpCacheDim) && ((tmpNumberOfUniformSegments * tmpUnits) <= tmpMaxNumberOfSegments)) {
-                tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpUnits);
-                tmpUniformSegmentSize = tmpUniformSegmentSize / tmpUnits;
-            }
-
-            final int tmpShift = (int) (Math.log(tmpUniformSegmentSize) / Math.log(2));
-
-            return new SegmentedArray<N>(tmpCount, tmpShift, segmentFactory);
-        }
-
         @Override
         final SegmentedArray<N> makeStructuredZero(final long... structure) {
-            return this.makeSegmented(this.getSparseFactory(), structure);
+            return SegmentedArray.make(this.getSparseFactory(), structure);
         }
 
         @Override
         final SegmentedArray<N> makeToBeFilled(final long... structure) {
-            return this.makeSegmented(this.getDenseFactory(), structure);
+            return SegmentedArray.make(this.getDenseFactory(), structure);
         }
 
     }
@@ -164,43 +139,43 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     };
 
     public static SegmentedArray<BigDecimal> makeBigDense(final long count) {
-        return BIG.makeSegmented(BasicArray.BIG, count);
+        return SegmentedArray.make(BasicArray.BIG, count);
     }
 
     public static SegmentedArray<BigDecimal> makeBigSparse(final long count) {
-        return BIG.makeSegmented(SparseArray.BIG, count);
+        return SegmentedArray.make(SparseArray.BIG, count);
     }
 
     public static SegmentedArray<ComplexNumber> makeComplexDense(final long count) {
-        return COMPLEX.makeSegmented(BasicArray.COMPLEX, count);
+        return SegmentedArray.make(BasicArray.COMPLEX, count);
     }
 
     public static SegmentedArray<ComplexNumber> makeComplexSparse(final long count) {
-        return COMPLEX.makeSegmented(SparseArray.COMPLEX, count);
+        return SegmentedArray.make(SparseArray.COMPLEX, count);
     }
 
     public static SegmentedArray<Double> makePrimitiveDense(final long count) {
-        return PRIMITIVE.makeSegmented(BasicArray.PRIMITIVE, count);
+        return SegmentedArray.make(BasicArray.PRIMITIVE, count);
     }
 
     public static SegmentedArray<Double> makePrimitiveSparse(final long count) {
-        return PRIMITIVE.makeSegmented(SparseArray.PRIMITIVE, count);
+        return SegmentedArray.make(SparseArray.PRIMITIVE, count);
     }
 
     public static SegmentedArray<Quaternion> makeQuaternionDense(final long count) {
-        return QUATERNION.makeSegmented(BasicArray.QUATERNION, count);
+        return SegmentedArray.make(BasicArray.QUATERNION, count);
     }
 
     public static SegmentedArray<Quaternion> makeQuaternionSparse(final long count) {
-        return QUATERNION.makeSegmented(SparseArray.QUATERNION, count);
+        return SegmentedArray.make(SparseArray.QUATERNION, count);
     }
 
     public static SegmentedArray<RationalNumber> makeRationalDense(final long count) {
-        return RATIONAL.makeSegmented(BasicArray.RATIONAL, count);
+        return SegmentedArray.make(BasicArray.RATIONAL, count);
     }
 
     public static SegmentedArray<RationalNumber> makeRationalSparse(final long count) {
-        return RATIONAL.makeSegmented(SparseArray.RATIONAL, count);
+        return SegmentedArray.make(SparseArray.RATIONAL, count);
     }
 
     private final int myIndexBits;
@@ -543,6 +518,36 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         final BasicArray<N> tmpSegment = mySegments[(int) (index >> myIndexBits)];
         final long tmpIndex = index & myIndexMask;
         tmpSegment.set(tmpIndex, function.invoke(tmpSegment.get(tmpIndex)));
+    }
+
+    static <N extends Number> SegmentedArray<N> make(final ArrayFactory<N> segmentFactory, final long... structure) {
+    
+        final long tmpCount = AccessUtils.count(structure);
+    
+        int tmpNumberOfUniformSegments = 1; // NumberOfUniformSegments
+        long tmpUniformSegmentSize = tmpCount;
+    
+        final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpCount));
+    
+        for (int i = 0; i < structure.length; i++) {
+            final long tmpNoS = (tmpNumberOfUniformSegments * structure[i]);
+            final long tmpSS = tmpUniformSegmentSize / structure[i];
+            if (tmpNoS <= tmpMaxNumberOfSegments) {
+                tmpNumberOfUniformSegments = (int) tmpNoS;
+                tmpUniformSegmentSize = tmpSS;
+            }
+        }
+    
+        final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(segmentFactory.getElementSize());
+        final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
+        while ((tmpUnits != 1L) && (tmpUniformSegmentSize >= tmpCacheDim) && ((tmpNumberOfUniformSegments * tmpUnits) <= tmpMaxNumberOfSegments)) {
+            tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpUnits);
+            tmpUniformSegmentSize = tmpUniformSegmentSize / tmpUnits;
+        }
+    
+        final int tmpShift = (int) (Math.log(tmpUniformSegmentSize) / Math.log(2));
+    
+        return new SegmentedArray<N>(tmpCount, tmpShift, segmentFactory);
     }
 
 }

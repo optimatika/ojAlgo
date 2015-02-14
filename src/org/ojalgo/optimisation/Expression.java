@@ -40,7 +40,7 @@ import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.aggregator.AggregatorCollection;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.function.multiary.CompoundFunction;
@@ -655,7 +655,7 @@ public final class Expression extends ModelEntity<Expression> {
 
         if (myAdjustmentExponent == Integer.MIN_VALUE) {
 
-            final AggregatorCollection<BigDecimal> tmpCollection = BigAggregator.getCollection();
+            final AggregatorSet<BigDecimal> tmpCollection = BigAggregator.getSet();
             final AggregatorFunction<BigDecimal> tmpLargestAggr = tmpCollection.largest();
             final AggregatorFunction<BigDecimal> tmpSmallestAggr = tmpCollection.smallest();
 

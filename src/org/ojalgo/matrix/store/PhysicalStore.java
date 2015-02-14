@@ -32,7 +32,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.aggregator.AggregatorCollection;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
@@ -63,8 +63,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
         }
 
         public void accept(final Access2D<N> supplied) {
-            for (long j = 0; j < supplied.countColumns(); j++) {
-                for (long i = 0; i < supplied.countRows(); i++) {
+            final long tmpCountRows = supplied.countRows();
+            final long tmpCountColumns = supplied.countColumns();
+            for (long j = 0; j < tmpCountColumns; j++) {
+                for (long i = 0; i < tmpCountRows; i++) {
                     myDelegate.set(myRow + i, myColumn + j, supplied.get(i, j));
                 }
             }
@@ -83,15 +85,22 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
         }
 
         public void fillAll(final N value) {
-            for (long j = myColumn; j < myDelegate.countColumns(); j++) {
+            final long tmpCountColumns = myDelegate.countColumns();
+            for (long j = myColumn; j < tmpCountColumns; j++) {
                 myDelegate.fillColumn(myRow, j, value);
             }
         }
 
         public void fillAll(final NullaryFunction<N> supplier) {
-            for (long j = myColumn; j < myDelegate.countColumns(); j++) {
+            final long tmpCountColumns = myDelegate.countColumns();
+            for (long j = myColumn; j < tmpCountColumns; j++) {
                 myDelegate.fillColumn(myRow, j, supplier);
             }
+        }
+
+        public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
+            // TODO Auto-generated method stub
+            throw new IllegalStateException("Not yet implemented!");
         }
 
         public void fillColumn(final long row, final long column, final N value) {
@@ -146,6 +155,15 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
             myDelegate.modifyDiagonal(myRow + row, myColumn + column, function);
         }
 
+        public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
+            myDelegate.modifyOne(myRow + row, myColumn + column, function);
+        }
+
+        public void modifyOne(final long index, final UnaryFunction<N> function) {
+            final long tmpStructure = this.countRows();
+            myDelegate.modifyOne(myRow + AccessUtils.row(index, tmpStructure), myColumn + AccessUtils.column(index, tmpStructure), function);
+        }
+
         public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
             final long tmpStructure = this.countRows();
             for (long index = first; index < limit; index++) {
@@ -179,20 +197,11 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
             myDelegate.set(myRow + AccessUtils.row(index, tmpStructure), myColumn + AccessUtils.column(index, tmpStructure), value);
         }
 
-        public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
-            myDelegate.modifyOne(myRow + row, myColumn + column, function);
-        }
-
-        public void modifyOne(final long index, final UnaryFunction<N> function) {
-            final long tmpStructure = this.countRows();
-            myDelegate.modifyOne(myRow + AccessUtils.row(index, tmpStructure), myColumn + AccessUtils.column(index, tmpStructure), function);
-        }
-
     }
 
     public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Access2D.Factory<I>, Serializable {
 
-        AggregatorCollection<N> aggregator();
+        AggregatorSet<N> aggregator();
 
         I conjugate(Access2D<?> source);
 
@@ -232,8 +241,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
     void exchangeColumns(int colA, int colB);
 
     void exchangeRows(int rowA, int rowB);
-
-    void fillByMultiplying(final Access1D<N> leftMatrix, final Access1D<N> rightMatrix);
 
     void fillConjugated(Access2D<? extends Number> source);
 

@@ -88,9 +88,10 @@ public final class NewIntegerSolver extends IntegerSolver {
     public Result solve(final Result kickStarter) {
 
         // Must verify that it actually is an integer solution
-        //        if ((kickStarter != null) && kickStarter.getState().isFeasible()) {
-        //            this.markInteger(null, kickStarter);
-        //        }
+        // The kickStarter may be user-supplied
+        if ((kickStarter != null) && kickStarter.getState().isFeasible() && this.getModel().validate(kickStarter)) {
+            this.markInteger(null, kickStarter);
+        }
 
         this.resetIterationsCount();
 

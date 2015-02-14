@@ -35,6 +35,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 
@@ -124,6 +125,15 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     };
 
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+
+        @Override
+        BasicFactory<Quaternion> delegate() {
+            return BasicArray.QUATERNION;
+        }
+
+    };
+
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
@@ -206,7 +216,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         final long tmpFirst = AccessUtils.index(myStructure, first);
         final long tmpStep = AccessUtils.step(myStructure, dimension);
-        final long tmpLimit = tmpFirst * tmpStep * tmpCount;
+        final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         myDelegate.fill(tmpFirst, tmpLimit, tmpStep, number);
     }
@@ -253,7 +263,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         final long tmpFirst = AccessUtils.index(myStructure, first);
         final long tmpStep = AccessUtils.step(myStructure, dimension);
-        final long tmpLimit = tmpFirst * tmpStep * tmpCount;
+        final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         return myDelegate.isSmall(tmpFirst, tmpLimit, tmpStep, PrimitiveMath.ONE);
     }
@@ -288,7 +298,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         final long tmpFirst = AccessUtils.index(myStructure, first);
         final long tmpStep = AccessUtils.step(myStructure, dimension);
-        final long tmpLimit = tmpFirst * tmpStep * tmpCount;
+        final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         myDelegate.modify(tmpFirst, tmpLimit, tmpStep, function);
     }
@@ -319,7 +329,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         final long tmpFirst = AccessUtils.index(myStructure, first);
         final long tmpStep = AccessUtils.step(myStructure, dimension);
-        final long tmpLimit = tmpFirst * tmpStep * tmpCount;
+        final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         return new Array1D<N>(myDelegate, tmpFirst, tmpLimit, tmpStep);
     }
@@ -368,7 +378,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         final long tmpFirst = AccessUtils.index(myStructure, first);
         final long tmpStep = AccessUtils.step(myStructure, dimension);
-        final long tmpLimit = tmpFirst * tmpStep * tmpCount;
+        final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         myDelegate.visit(tmpFirst, tmpLimit, tmpStep, visitor);
     }

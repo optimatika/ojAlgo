@@ -321,11 +321,6 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
         return this.getKyFanNorm(this.getSingularValues().size());
     }
 
-    @Override
-    public final boolean isAspectRatioNormal() {
-        return super.aspectRatioNormal(myBidiagonal.isAspectRatioNormal());
-    }
-
     public final boolean isFullSize() {
         return myFullSize;
     }

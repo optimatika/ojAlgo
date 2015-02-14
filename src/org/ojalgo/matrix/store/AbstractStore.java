@@ -157,21 +157,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return retVal;
     }
 
-    /**
-     * @see org.ojalgo.matrix.store.MatrixStore#multiply(org.ojalgo.matrix.store.MatrixStore)
-     */
-    public MatrixStore<N> multiply(final Access1D<N> right) {
-
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = (int) (right.count() / this.getColDim());
-
-        final PhysicalStore<N> retVal = this.factory().makeZero(tmpRowDim, tmpColDim);
-
-        retVal.fillByMultiplying(this, right);
-
-        return retVal;
-    }
-
     public final MatrixStore<N> negate() {
         return new ModificationStore<>(this, this.factory().function().negate());
     }

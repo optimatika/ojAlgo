@@ -21,18 +21,24 @@
  */
 package org.ojalgo.array;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
-import java.util.Iterator;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.machine.MemoryEstimator;
+import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 
 /**
@@ -40,62 +46,97 @@ import org.ojalgo.scalar.PrimitiveScalar;
  *
  * @author apete
  */
-public class MyTestArray extends DenseArray<Double> {
+public class BufferArray extends DenseArray<Double> {
 
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(double.class);
+    static final long MAX = 1L << 8;
 
-    //    public static final BasicArray<Double> make(final String fileName, final long count) {
-    //
-    //        DoubleBuffer tmpDoubleBuffer = null;
-    //
-    //        try {
-    //
-    //            final RandomAccessFile tmpRandomAccessFile = new RandomAccessFile(fileName + ".array", "rw");
-    //            final FileChannel tmpFileChannel = tmpRandomAccessFile.getChannel();
-    //
-    //            final MappedByteBuffer tmpMappedByteBuffer = tmpFileChannel.map(FileChannel.MapMode.READ_WRITE, 0L, ELEMENT_SIZE * count);
-    //            tmpMappedByteBuffer.order(ByteOrder.nativeOrder());
-    //            tmpDoubleBuffer = tmpMappedByteBuffer.asDoubleBuffer();
-    //
-    //            final DenseFactory<Double> tmpFactory = new DenseFactory<Double>() {
-    //
-    //                long offset = 0L;
-    //
-    //                @Override
-    //                long getElementSize() {
-    //                    return ELEMENT_SIZE;
-    //                }
-    //
-    //                @Override
-    //                DenseArray<Double> make(final int size) {
-    //
-    //                    try {
-    //                        return new BufferArray(tmpFileChannel.map(MapMode.READ_WRITE, offset, size).asDoubleBuffer(), tmpRandomAccessFile);
-    //                    } catch (final IOException exception) {
-    //                        throw new RuntimeException(exception);
-    //                    } finally {
-    //                        offset += size;
-    //                    }
-    //                }
-    //
-    //                @Override
-    //                PrimitiveScalar zero() {
-    //                    return PrimitiveScalar.ZERO;
-    //                }
-    //
-    //            };
-    //
-    //            return new SegmentedArray<Double>(count, 2, tmpFactory);
-    //
-    //        } catch (final FileNotFoundException exception) {
-    //            throw new RuntimeException(exception);
-    //        } catch (final IOException exception) {
-    //            throw new RuntimeException(exception);
-    //        }
-    //    }
+    static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
 
-    public static final MyTestArray wrap(final DoubleBuffer data) {
-        return new MyTestArray(data, null);
+    public static final Array1D<Double> make(final File file, final long count) {
+        return BufferArray.create(file, count).asArray1D();
+    }
+
+    public static final Array2D<Double> make(final File file, final long rows, final long columns) {
+        return BufferArray.create(file, rows, columns).asArray2D(rows);
+    }
+
+    public static final ArrayAnyD<Double> make(final File file, final long... structure) {
+        return BufferArray.create(file, structure).asArrayAnyD(structure);
+    }
+
+    private static BasicArray<Double> create(final File file, final long... structure) {
+
+        final long tmpCount = AccessUtils.count(structure);
+
+        DoubleBuffer tmpDoubleBuffer = null;
+
+        try {
+
+            final RandomAccessFile tmpRandomAccessFile = new RandomAccessFile(file, "rw");
+
+            final FileChannel tmpFileChannel = tmpRandomAccessFile.getChannel();
+
+            final long tmpSize = ELEMENT_SIZE * tmpCount;
+
+            if (tmpCount > MAX) {
+
+                final DenseFactory<Double> tmpFactory = new DenseFactory<Double>() {
+
+                    long offset = 0L;
+
+                    @Override
+                    long getElementSize() {
+                        return ELEMENT_SIZE;
+                    }
+
+                    @Override
+                    DenseArray<Double> make(final int size) {
+
+                        final long tmpSize2 = size * ELEMENT_SIZE;
+                        try {
+
+                            final MappedByteBuffer tmpMap = tmpFileChannel.map(MapMode.READ_WRITE, offset, tmpSize2);
+                            tmpMap.order(ByteOrder.nativeOrder());
+                            return new BufferArray(tmpMap.asDoubleBuffer(), tmpRandomAccessFile);
+                        } catch (final IOException exception) {
+                            throw new RuntimeException(exception);
+                        } finally {
+                            offset += tmpSize2;
+                        }
+                    }
+
+                    @Override
+                    PrimitiveScalar zero() {
+                        return PrimitiveScalar.ZERO;
+                    }
+
+                };
+
+                return SegmentedArray.make(tmpFactory, structure);
+
+            } else {
+
+                final MappedByteBuffer tmpMappedByteBuffer = tmpFileChannel.map(FileChannel.MapMode.READ_WRITE, 0L, tmpSize);
+                tmpMappedByteBuffer.order(ByteOrder.nativeOrder());
+
+                tmpDoubleBuffer = tmpMappedByteBuffer.asDoubleBuffer();
+
+                return new BufferArray(tmpDoubleBuffer, tmpRandomAccessFile);
+            }
+
+        } catch (final FileNotFoundException exception) {
+            throw new RuntimeException(exception);
+        } catch (final IOException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    public static final BasicArray<Double> make(final int capacity) {
+        return new BufferArray(DoubleBuffer.allocate(capacity), null);
+    }
+
+    public static final BufferArray wrap(final DoubleBuffer data) {
+        return new BufferArray(data, null);
     }
 
     protected static void fill(final DoubleBuffer data, final Access1D<?> value) {
@@ -153,25 +194,24 @@ public class MyTestArray extends DenseArray<Double> {
     }
 
     private final DoubleBuffer myBuffer;
+    private final RandomAccessFile myFile;
 
-    //  private final RandomAccessFile myChannel;
-
-    public MyTestArray(final DoubleBuffer buffer, final RandomAccessFile fileChannel) {
+    private BufferArray(final DoubleBuffer buffer, final RandomAccessFile file) {
 
         super();
 
         myBuffer = buffer;
-        //  myChannel = fileChannel;
+        myFile = file;
     }
 
-    public MyTestArray(final int capacity) {
-
-        super();
-
-        myBuffer = DoubleBuffer.allocate(capacity);
-        this.fill(0, capacity, 1, 0.0);
-
-        // myChannel = null;
+    public void close() {
+        if (myFile != null) {
+            try {
+                myFile.close();
+            } catch (final IOException exception) {
+                exception.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -187,7 +227,7 @@ public class MyTestArray extends DenseArray<Double> {
 
     @Override
     protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        MyTestArray.invoke(myBuffer, first, limit, 1, left, function, right);
+        BufferArray.invoke(myBuffer, first, limit, 1, left, function, right);
     }
 
     @Override
@@ -203,7 +243,23 @@ public class MyTestArray extends DenseArray<Double> {
 
     @Override
     protected void fill(final int first, final int limit, final int step, final Double value) {
-        MyTestArray.fill(myBuffer, first, limit, step, value);
+        BufferArray.fill(myBuffer, first, limit, step, value);
+    }
+
+    @Override
+    protected void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+
+        super.finalize();
+
+        if (myFile != null) {
+            this.close();
+        }
     }
 
     @Override
@@ -239,37 +295,43 @@ public class MyTestArray extends DenseArray<Double> {
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        MyTestArray.invoke(myBuffer, first, limit, step, left, function, this);
+        BufferArray.invoke(myBuffer, first, limit, step, left, function, this);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        MyTestArray.invoke(myBuffer, first, limit, step, this, function, right);
+        BufferArray.invoke(myBuffer, first, limit, step, this, function, right);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        MyTestArray.invoke(myBuffer, first, limit, step, this, function, right);
+        BufferArray.invoke(myBuffer, first, limit, step, this, function, right);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        MyTestArray.invoke(myBuffer, first, limit, step, left, function, this);
+        BufferArray.invoke(myBuffer, first, limit, step, left, function, this);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final ParameterFunction<Double> function, final int parameter) {
-        MyTestArray.invoke(myBuffer, first, limit, step, this, function, parameter);
+        BufferArray.invoke(myBuffer, first, limit, step, this, function, parameter);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final UnaryFunction<Double> function) {
-        MyTestArray.invoke(myBuffer, first, limit, step, this, function);
+        BufferArray.invoke(myBuffer, first, limit, step, this, function);
     }
 
     @Override
     protected void modify(final int index, final UnaryFunction<Double> function) {
         myBuffer.put(index, function.invoke(myBuffer.get(index)));
+    }
+
+    @Override
+    protected void modifyOne(final int index, final UnaryFunction<Double> function) {
+        this.set(index, function.invoke(this.doubleValue(index)));
+
     }
 
     @Override
@@ -305,7 +367,7 @@ public class MyTestArray extends DenseArray<Double> {
 
     @Override
     protected final void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        MyTestArray.invoke(myBuffer, first, limit, step, visitor);
+        BufferArray.invoke(myBuffer, first, limit, step, visitor);
     }
 
     @Override
@@ -320,30 +382,8 @@ public class MyTestArray extends DenseArray<Double> {
 
     @Override
     DenseArray<Double> newInstance(final int capacity) {
-        return new MyTestArray(capacity);
-    }
-
-    public void close() throws IOException {
-        //        if (myChannel != null) {
-        //            myChannel.close();
-        //        }
-    }
-
-    public Iterator<Double> iterator() {
-        // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    protected void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void modifyOne(final int index, final UnaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-
+        // return new MyTestArray(capacity);
     }
 
 }

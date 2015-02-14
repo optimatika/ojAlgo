@@ -459,7 +459,7 @@ final class SimplexTableauSolver extends LinearSolver {
             // Right-most column of the tableau
             final Array1D<Double> tmpRHS = this.sliceTableauColumn(myPoint.getColRHS());
 
-            final AggregatorFunction<Double> tmpMinAggr = PrimitiveAggregator.getCollection().minimum();
+            final AggregatorFunction<Double> tmpMinAggr = PrimitiveAggregator.getSet().minimum();
             tmpRHS.visitAll(tmpMinAggr);
             final double tmpMinVal = tmpMinAggr.doubleValue();
 

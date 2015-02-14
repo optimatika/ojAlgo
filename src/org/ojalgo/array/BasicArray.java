@@ -110,6 +110,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return SparseArray.BIG;
         }
 
+        @Override
+        long getElementSize() {
+            return BigArray.ELEMENT_SIZE;
+        }
+
     };
 
     static final BasicFactory<ComplexNumber> COMPLEX = new BasicFactory<ComplexNumber>() {
@@ -127,6 +132,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         @Override
         SparseFactory<ComplexNumber> getSparseFactory() {
             return SparseArray.COMPLEX;
+        }
+
+        @Override
+        long getElementSize() {
+            return ComplexArray.ELEMENT_SIZE;
         }
 
     };
@@ -148,6 +158,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return SparseArray.QUATERNION;
         }
 
+        @Override
+        long getElementSize() {
+            return QuaternionArray.ELEMENT_SIZE;
+        }
+
     };
 
     static final BasicFactory<Double> PRIMITIVE = new BasicFactory<Double>() {
@@ -167,6 +182,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return SparseArray.PRIMITIVE;
         }
 
+        @Override
+        long getElementSize() {
+            return PrimitiveArray.ELEMENT_SIZE;
+        }
+
     };
 
     static final BasicFactory<RationalNumber> RATIONAL = new BasicFactory<RationalNumber>() {
@@ -184,6 +204,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         @Override
         SparseFactory<RationalNumber> getSparseFactory() {
             return SparseArray.RATIONAL;
+        }
+
+        @Override
+        long getElementSize() {
+            return RationalArray.ELEMENT_SIZE;
         }
 
     };

@@ -49,7 +49,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
         }
 
         @Override
-        boolean compute(final RawStore aDelegate) {
+        protected boolean compute(final RawStore aDelegate) {
 
             this.setDelegate(new JamaEigenvalue(aDelegate));
 
@@ -66,7 +66,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
         }
 
         @Override
-        boolean compute(final RawStore aDelegate) {
+        protected boolean compute(final RawStore aDelegate) {
 
             this.setDelegate(new JamaEigenvalue(aDelegate, false));
 
@@ -83,7 +83,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
         }
 
         @Override
-        boolean compute(final RawStore aDelegate) {
+        protected boolean compute(final RawStore aDelegate) {
 
             this.setDelegate(new JamaEigenvalue(aDelegate, true));
 
@@ -125,7 +125,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
 
     public Double getDeterminant() {
 
-        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getCollection().product();
+        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().product();
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
@@ -178,7 +178,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
 
     public ComplexNumber getTrace() {
 
-        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getCollection().sum();
+        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
 
         this.getEigenvalues().visitAll(tmpVisitor);
 
@@ -233,6 +233,13 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
     RawStore solve(final RawStore aRHS) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public final boolean compute(final Access2D<?> matrix) {
+
+        this.reset();
+
+        return this.compute(RawDecomposition.cast(matrix));
     }
 
 }

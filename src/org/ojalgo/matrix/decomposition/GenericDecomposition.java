@@ -26,7 +26,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.aggregator.AggregatorCollection;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.WrapperStore;
 import org.ojalgo.matrix.transformation.Householder;
@@ -79,10 +79,6 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return this.getInverse(preallocated);
     }
 
-    public final DecompositionStore<N> preallocate(final Access2D<N> template) {
-        return this.preallocate(template, template);
-    }
-
     public final MatrixStore<N> solve(final Access2D<N> body, final Access2D<N> rhs) {
         this.compute(body);
         return this.solve(rhs);
@@ -97,7 +93,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.copy(source);
     }
 
-    protected final AggregatorCollection<N> getAggregatorCollection() {
+    protected final AggregatorSet<N> getAggregatorCollection() {
         return myFactory.aggregator();
     }
 

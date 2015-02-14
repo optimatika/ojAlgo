@@ -72,7 +72,7 @@ public class BigArray extends DenseArray<BigDecimal> {
     }
 
     public static final SegmentedArray<BigDecimal> makeSegmented(final long count) {
-        return SegmentedArray.BIG.makeSegmented(FACTORY, count);
+        return SegmentedArray.make(FACTORY, count);
     }
 
     public static final BigArray wrap(final BigDecimal[] data) {

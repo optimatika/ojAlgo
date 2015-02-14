@@ -67,11 +67,15 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
 
     public Double getDeterminant() {
 
-        final AggregatorFunction<Double> tmpAggrFunc = PrimitiveAggregator.getCollection().product();
+        final AggregatorFunction<Double> tmpAggrFunc = PrimitiveAggregator.getSet().product();
 
         this.getR().visitDiagonal(0, 0, tmpAggrFunc);
 
         return tmpAggrFunc.getNumber();
+    }
+
+    public RawStore solve(final Access2D<Double> rhs) {
+        return new RawStore(this.solve(RawDecomposition.cast(rhs)));
     }
 
     @Override
@@ -107,12 +111,6 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
         return retVal;
     }
 
-    @Override
-    public boolean isAspectRatioNormal() {
-        return (int) myDelegate.getQ().countRows() >= (int) myDelegate.getR().countColumns();
-
-    }
-
     public boolean isFullColumnRank() {
         return this.isSolvable();
     }
@@ -134,18 +132,13 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
         myDelegate = null;
     }
 
-    public MatrixStore<Double> solveConjugated(final Access2D<Double> rhs) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     @Override
     public String toString() {
         return myDelegate.toString();
     }
 
     @Override
-    boolean compute(final RawStore aDelegate) {
+    protected boolean compute(final RawStore aDelegate) {
 
         myDelegate = new JamaQR(aDelegate);
 
@@ -157,6 +150,13 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
     @Override
     RawStore solve(final RawStore aRHS) {
         return myDelegate.solve(aRHS);
+    }
+
+    public final boolean compute(final Access2D<?> matrix) {
+
+        this.reset();
+
+        return this.compute(RawDecomposition.cast(matrix));
     }
 
 }

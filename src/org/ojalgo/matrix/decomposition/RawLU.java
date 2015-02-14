@@ -57,6 +57,10 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
         return this.compute(matrix);
     }
 
+    public RawStore solve(final Access2D<Double> rhs) {
+        return new RawStore(this.solve(RawDecomposition.cast(rhs)));
+    }
+
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
         return MatrixUtils.equals(aStore, this, context);
     }
@@ -107,11 +111,6 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
         return new RawStore(myDelegate.getU());
     }
 
-    @Override
-    public boolean isAspectRatioNormal() {
-        return (int) myDelegate.getL().countRows() >= (int) myDelegate.getU().countColumns();
-    }
-
     public boolean isFullSize() {
         return false;
     }
@@ -139,7 +138,9 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     @Override
-    boolean compute(final RawStore aDelegate) {
+    protected boolean compute(final RawStore aDelegate) {
+
+        this.aspectRatioNormal(aDelegate.countRows() >= aDelegate.countColumns());
 
         myDelegate = new JamaLU(aDelegate);
 
@@ -151,6 +152,13 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
     @Override
     RawStore solve(final RawStore aRHS) {
         return myDelegate.solve(aRHS);
+    }
+
+    public final boolean compute(final Access2D<?> matrix) {
+
+        this.reset();
+
+        return this.compute(RawDecomposition.cast(matrix));
     }
 
 }

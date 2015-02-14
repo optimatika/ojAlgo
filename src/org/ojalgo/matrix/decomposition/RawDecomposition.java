@@ -24,16 +24,20 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.ArrayUtils;
+import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
+ * In many ways similar to InPlaceDecomposition but this class is hardwired to work with double[][] data.
+ *
  * @author apete
  */
 abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
-    static RawStore cast(final Access2D<?> access) {
+    protected static RawStore cast(final Access2D<?> access) {
         if (access instanceof RawStore) {
             return ((RawStore) access);
         } else {
@@ -49,22 +53,20 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         }
     }
 
+    private int myColDim;
+    private double[][] myRawInPlaceData;
+    private RawStore myRawInPlaceStore;
+    private int myRowDim;
+
     protected RawDecomposition() {
         super();
-    }
-
-    public final boolean compute(final Access2D<?> aStore) {
-
-        this.reset();
-
-        return this.compute(RawDecomposition.cast(aStore));
     }
 
     public final boolean equals(final MatrixDecomposition<Double> other, final NumberContext context) {
         return AccessUtils.equals(this.reconstruct(), other.reconstruct(), context);
     }
 
-    public abstract RawStore getInverse();
+    public abstract MatrixStore<Double> getInverse();
 
     /**
      * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
@@ -85,16 +87,8 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return this.getInverse(preallocated);
     }
 
-    public final DecompositionStore<Double> preallocate(final Access2D<Double> template) {
-        return this.preallocate(template, template);
-    }
-
     public final DecompositionStore<Double> preallocate(final Access2D<Double> templateBody, final Access2D<Double> templateRHS) {
-        return null;
-    }
-
-    public RawStore solve(final Access2D<Double> rhs) {
-        return new RawStore(this.solve(RawDecomposition.cast(rhs)));
+        return PrimitiveDenseStore.FACTORY.makeZero(templateBody.countRows(), templateRHS.countColumns());
     }
 
     public final MatrixStore<Double> solve(final Access2D<Double> body, final Access2D<Double> rhs) {
@@ -113,15 +107,62 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
      * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#solve(Access2D,
      *      org.ojalgo.matrix.decomposition.DecompositionStore)
      */
-    public final RawStore solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
         return this.solve(rhs);
+    }
+
+    protected abstract boolean compute(RawStore aDelegate);
+
+    protected final int getColDim() {
+        return myColDim;
+    }
+
+    protected final int getMinDim() {
+        return Math.min(myRowDim, myColDim);
+    }
+
+    protected final double[][] getRawInPlaceData() {
+        return myRawInPlaceData;
+    }
+
+    protected final RawStore getRawInPlaceStore() {
+        return myRawInPlaceStore;
+    }
+
+    protected final int getRowDim() {
+        return myRowDim;
     }
 
     protected RawStore makeEyeStore(final int aRowDim, final int aColDim) {
         return new RawStore(RawStore.FACTORY.makeEye(aRowDim, aColDim));
     }
 
-    abstract boolean compute(RawStore aDelegate);
+    protected final double[][] setRawInPlace(final Access2D<?> matrix) {
+
+        final int tmpRowDim = (int) matrix.countRows();
+        final int tmpColDim = (int) matrix.countColumns();
+
+        if ((myRawInPlaceData == null) || (myRowDim != tmpRowDim) || (myColDim != tmpColDim)) {
+
+            myRawInPlaceStore = RawStore.FACTORY.makeZero(tmpRowDim, tmpColDim);
+            myRawInPlaceData = myRawInPlaceStore.data;
+
+            myRowDim = tmpRowDim;
+            myColDim = tmpColDim;
+        }
+
+        this.copy(matrix, tmpRowDim, tmpColDim, myRawInPlaceData);
+
+        this.aspectRatioNormal(tmpRowDim >= tmpColDim);
+        this.computed(false);
+
+        return myRawInPlaceData;
+    }
+
+    void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
+        MatrixUtils.copy(source, rows, columns, destination);
+    }
 
     abstract RawStore solve(RawStore aRHS);
+
 }

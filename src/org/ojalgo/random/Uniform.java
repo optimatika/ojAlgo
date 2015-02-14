@@ -42,15 +42,15 @@ public class Uniform extends AbstractContinuous {
     /**
      * @return An integer: aLower <= ? < aHigher
      */
-    public static int randomInteger(final int aLower, final int aHigher) {
-        return aLower + Uniform.randomInteger(aHigher - aLower);
+    public static int randomInteger(final int lower, final int higher) {
+        return lower + Uniform.randomInteger(higher - lower);
     }
 
     /**
      * @return An integer: 0 <= ? < aLimit
      */
-    public static long randomInteger(final long aLimit) {
-        return (long) Math.floor(aLimit * Math.random());
+    public static long randomInteger(final long limit) {
+        return (long) Math.floor(limit * Math.random());
     }
 
     private final double myLower;
@@ -60,16 +60,16 @@ public class Uniform extends AbstractContinuous {
         this(ZERO, ONE);
     }
 
-    public Uniform(final double aLower, final double aRange) {
+    public Uniform(final double lower, final double range) {
 
         super();
 
-        if (aRange <= ZERO) {
+        if (range <= ZERO) {
             throw new IllegalArgumentException("The range must be larger than 0.0!");
         }
 
-        myLower = aLower;
-        myRange = aRange;
+        myLower = lower;
+        myRange = range;
     }
 
     public double getDistribution(final double aValue) {

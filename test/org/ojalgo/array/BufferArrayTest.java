@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.nio.DoubleBuffer;
-
 import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 
@@ -45,10 +43,7 @@ public class BufferArrayTest extends ArrayTests {
 
         final int tmpCount = 5000;
 
-        final MyTestArray tmpTest = new MyTestArray(null, null);
-
-        final DoubleBuffer tmpAllocate = DoubleBuffer.allocate(tmpCount);
-        final MyTestArray tmpArray = MyTestArray.wrap(tmpAllocate);
+        final BasicArray<Double> tmpArray = BufferArray.make(tmpCount);
 
         TestUtils.assertEquals(tmpCount, tmpArray.count());
 

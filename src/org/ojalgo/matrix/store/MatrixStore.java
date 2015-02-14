@@ -362,6 +362,8 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             supplier.supplyTo(this);
         }
 
+        void fillByMultiplying(final Access1D<N> left, final Access1D<N> right);
+
         default boolean isAcceptable(final MatrixStore.ElementsSupplier<N> supplier) {
             return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
         }
@@ -417,7 +419,22 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
      */
     boolean isUpperRightShaded();
 
-    MatrixStore<N> multiply(Access1D<N> right);
+    default MatrixStore<N> multiply(final Access1D<N> right) {
+
+        final long tmpCountRows = this.countRows();
+        final long tmpCountColumns = right.count() / this.countColumns();
+
+        final PhysicalStore<N> retVal = this.factory().makeZero(tmpCountRows, tmpCountColumns);
+
+        this.multiply(right, retVal);
+
+        return retVal;
+    }
+
+    default PhysicalStore<N> multiply(final Access1D<N> right, final PhysicalStore<N> target) {
+        target.fillByMultiplying(this, right);
+        return target;
+    }
 
     MatrixStore<N> multiplyLeft(Access1D<N> leftMtrx);
 

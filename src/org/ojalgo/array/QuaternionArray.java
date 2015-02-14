@@ -71,7 +71,7 @@ public class QuaternionArray extends DenseArray<Quaternion> {
     }
 
     public static final SegmentedArray<Quaternion> makeSegmented(final long count) {
-        return SegmentedArray.QUATERNION.makeSegmented(FACTORY, count);
+        return SegmentedArray.make(FACTORY, count);
     }
 
     public static final QuaternionArray wrap(final Quaternion[] data) {

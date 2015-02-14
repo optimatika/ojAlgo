@@ -180,6 +180,58 @@ public abstract class BigAggregator {
         }
     };
 
+    public static final ThreadLocal<AggregatorFunction<BigDecimal>> MIN = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
+
+        @Override
+        protected AggregatorFunction<BigDecimal> initialValue() {
+            return new AggregatorFunction<BigDecimal>() {
+
+                private BigDecimal myNumber = VERY_POSITIVE;
+
+                public double doubleValue() {
+                    return this.getNumber().doubleValue();
+                }
+
+                public BigDecimal getNumber() {
+                    if (myNumber.compareTo(VERY_POSITIVE) == 0) {
+                        return ZERO;
+                    } else {
+                        return myNumber;
+                    }
+                }
+
+                public int intValue() {
+                    return this.getNumber().intValue();
+                }
+
+                public void invoke(final BigDecimal anArg) {
+                    myNumber = BigFunction.MIN.invoke(myNumber, anArg);
+                }
+
+                public void invoke(final double anArg) {
+                    this.invoke(new BigDecimal(anArg));
+                }
+
+                public void merge(final BigDecimal result) {
+                    this.invoke(result);
+                }
+
+                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
+                    return BigFunction.MIN.invoke(result1, result2);
+                }
+
+                public AggregatorFunction<BigDecimal> reset() {
+                    myNumber = VERY_POSITIVE;
+                    return this;
+                }
+
+                public Scalar<BigDecimal> toScalar() {
+                    return new BigScalar(this.getNumber());
+                }
+            };
+        }
+    };
+
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> NORM1 = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -426,58 +478,6 @@ public abstract class BigAggregator {
         }
     };
 
-    public static final ThreadLocal<AggregatorFunction<BigDecimal>> MIN = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
-
-        @Override
-        protected AggregatorFunction<BigDecimal> initialValue() {
-            return new AggregatorFunction<BigDecimal>() {
-
-                private BigDecimal myNumber = VERY_POSITIVE;
-
-                public double doubleValue() {
-                    return this.getNumber().doubleValue();
-                }
-
-                public BigDecimal getNumber() {
-                    if (myNumber.compareTo(VERY_POSITIVE) == 0) {
-                        return ZERO;
-                    } else {
-                        return myNumber;
-                    }
-                }
-
-                public int intValue() {
-                    return this.getNumber().intValue();
-                }
-
-                public void invoke(final BigDecimal anArg) {
-                    myNumber = BigFunction.MIN.invoke(myNumber, anArg);
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(new BigDecimal(anArg));
-                }
-
-                public void merge(final BigDecimal result) {
-                    this.invoke(result);
-                }
-
-                public BigDecimal merge(final BigDecimal result1, final BigDecimal result2) {
-                    return BigFunction.MIN.invoke(result1, result2);
-                }
-
-                public AggregatorFunction<BigDecimal> reset() {
-                    myNumber = VERY_POSITIVE;
-                    return this;
-                }
-
-                public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
-                }
-            };
-        }
-    };
-
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> SUM = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
         @Override
@@ -574,7 +574,7 @@ public abstract class BigAggregator {
         }
     };
 
-    private static final AggregatorCollection<BigDecimal> COLLECTION = new AggregatorCollection<BigDecimal>() {
+    private static final AggregatorSet<BigDecimal> SET = new AggregatorSet<BigDecimal>() {
 
         @Override
         public AggregatorFunction<BigDecimal> cardinality() {
@@ -633,8 +633,16 @@ public abstract class BigAggregator {
 
     };
 
-    public static AggregatorCollection<BigDecimal> getCollection() {
-        return COLLECTION;
+    /**
+     * @deprecated v38 Use {@link #getSet()} instead
+     */
+    @Deprecated
+    public static AggregatorSet<BigDecimal> getCollection() {
+        return BigAggregator.getSet();
+    }
+
+    public static AggregatorSet<BigDecimal> getSet() {
+        return SET;
     }
 
     private BigAggregator() {

@@ -22,12 +22,11 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -39,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
 @Deprecated
 public final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
-    private JamaCholesky myDelegate;
+    private boolean mySPD = false;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
@@ -54,158 +53,102 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         return this.getDeterminant();
     }
 
-    public boolean compute(final Access2D<?> matrix, final boolean checkHermitian) {
-        return this.compute(matrix);
+    public boolean compute(final Access2D<?> matrix) {
+
+        this.reset();
+
+        final double[][] tmpRawInPlace = this.setRawInPlace(matrix);
+
+        final int tmpRowDim = this.getRowDim();
+        mySPD = (this.getColDim() == tmpRowDim);
+
+        // Main loop.
+        for (int i = 0; i < tmpRowDim; i++) { // For each row
+            final double[] tmpRowI = tmpRawInPlace[i];
+            double tmpVal = 0.0;
+            for (int k = 0; k < i; k++) { // For each previous row
+                final double[] tmpRowK = tmpRawInPlace[k];
+                double tmpDotProd = DotProduct.invoke(tmpRowI, tmpRowK, k);
+                tmpRowI[k] = tmpDotProd = (tmpRowI[k] - tmpDotProd) / tmpRowK[k];
+                tmpVal += (tmpDotProd * tmpDotProd);
+            }
+            tmpVal = tmpRawInPlace[i][i] - tmpVal;
+            mySPD &= (tmpVal > 0.0);
+            tmpRawInPlace[i][i] = Math.sqrt(Math.max(tmpVal, 0.0));
+        }
+
+        return this.computed(true);
     }
 
-    public boolean computeWithCheck(final MatrixStore<?> aStore) {
-        return this.compute(aStore);
+    public boolean compute(final Access2D<?> matrix, final boolean checkHermitian) {
+
+        if (checkHermitian) {
+            mySPD = MatrixUtils.isHermitian(matrix);
+        }
+
+        if (mySPD) {
+            return this.compute(matrix);
+        } else {
+            return this.computed(false);
+        }
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
         return MatrixUtils.equals(aStore, this, context);
     }
 
-    public RawStore getD() {
+    public Double getDeterminant() {
 
-        final RawStore tmpL = myDelegate.getL();
+        final double[][] tmpData = this.getRawInPlaceData();
 
-        final int tmpRowDim = (int) tmpL.countRows();
-        final int tmpColDim = (int) tmpL.countColumns();
-        final int tmpMinDim = Math.min(tmpRowDim, tmpColDim);
+        final int tmpMinDim = this.getMinDim();
 
-        final RawStore retVal = new RawStore(new RawStore(tmpRowDim, tmpColDim));
-
+        double retVal = 1.0;
         double tmpVal;
         for (int ij = 0; ij < tmpMinDim; ij++) {
-            tmpVal = tmpL.get(ij, ij);
-            final int row = ij;
-            final int column = ij;
-            retVal.set(row, column, ((Number) (tmpVal * tmpVal)).doubleValue());
+            tmpVal = tmpData[ij][ij];
+            retVal *= tmpVal * tmpVal;
         }
 
         return retVal;
-    }
-
-    public Double getDeterminant() {
-
-        final MatrixStore<Double> tmpD = this.getD();
-        final int tmpMinDim = (int) tmpD.countRows();
-
-        Scalar<Double> retVal = tmpD.toScalar(0, 0);
-        for (int ij = 1; ij < tmpMinDim; ij++) {
-            retVal = retVal.multiply(tmpD.get(ij, ij));
-        }
-
-        return retVal.getNumber();
     }
 
     @Override
-    public RawStore getInverse() {
-        return this.solve(this.makeEyeStore((int) myDelegate.getL().countRows(), (int) myDelegate.getL().countColumns()));
+    public MatrixStore<Double> getInverse() {
+        return this.solve(IdentityStore.PRIMITIVE.make(this.getRowDim()));
     }
 
-    public RawStore getL() {
-        return new RawStore(myDelegate.getL());
-    }
-
-    public RawStore getOldL() {
-
-        final RawStore tmpL = myDelegate.getL();
-
-        final int tmpRowDim = (int) tmpL.countRows();
-        final int tmpColDim = (int) tmpL.countColumns();
-
-        final RawStore retVal = new RawStore(new RawStore(tmpRowDim, tmpColDim));
-
-        double tmpDiagVal;
-        for (int j = 0; j < tmpColDim; j++) {
-            tmpDiagVal = tmpL.get(j, j);
-            for (int i = j; i < tmpRowDim; i++) {
-                final int row = i;
-                final int column = j;
-                retVal.set(row, column, ((Number) (tmpL.get(i, j) / tmpDiagVal)).doubleValue());
-            }
-        }
-
-        return retVal;
-    }
-
-    public RawStore getOldU() {
-        return this.getOldL().transpose();
-    }
-
-    public RawStore getP() {
-        return this.makeEyeStore((int) myDelegate.getL().countRows(), (int) myDelegate.getL().countRows());
-        //return MatrixUtils.makeIdentity(PrimitiveDenseStore.FACTORY, myDelegate.getL().getRowDimension());
-    }
-
-    public int[] getPivotOrder() {
-        return AccessUtils.makeIncreasingRange(0, (int) this.getOldL().countRows());
-    }
-
-    public RawStore getR() {
-        return new RawStore(myDelegate.getL().transpose());
-    }
-
-    public int getRank() {
-
-        int retVal = 0;
-
-        final MatrixStore<Double> tmpD = this.getD();
-        final int tmpMinDim = (int) tmpD.countRows();
-
-        for (int ij = 0; ij < tmpMinDim; ij++) {
-            if (!tmpD.toScalar(ij, ij).isSmall(PrimitiveMath.ONE)) {
-                retVal++;
-            }
-        }
-
-        return retVal;
-    }
-
-    public RawStore getRowEchelonForm() {
-        return this.getOldU();
+    public MatrixStore<Double> getL() {
+        return this.getRawInPlaceStore().builder().triangular(false, false).build();
     }
 
     public boolean isFullSize() {
         return true;
     }
 
-    public boolean isSingular() {
-
-        boolean retVal = true;
-
-        final MatrixStore<Double> tmpD = this.getD();
-        final int tmpMinDim = (int) tmpD.countRows();
-
-        for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
-            retVal &= !tmpD.toScalar(ij, ij).isSmall(PrimitiveMath.ONE);
-        }
-
-        return !retVal;
+    public boolean isSolvable() {
+        return this.isComputed() && this.isSPD();
     }
 
-    public boolean isSolvable() {
-        return (myDelegate != null) && myDelegate.isSPD();
+    public MatrixStore<Double> solve(final Access2D<Double> rhs) {
+        return this.solve(rhs, this.preallocate(this.getRawInPlaceStore(), rhs));
+    }
+
+    @Override
+    public final MatrixStore<Double> solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
+
+        preallocated.fillMatching(rhs);
+
+        final RawStore tmpBody = this.getRawInPlaceStore();
+
+        preallocated.substituteForwards(tmpBody, false, false);
+        preallocated.substituteBackwards(tmpBody, true);
+
+        return preallocated;
     }
 
     public boolean isSPD() {
-        return this.isSolvable();
-    }
-
-    public boolean isSquareAndNotSingular() {
-
-        boolean retVal = true;
-
-        final MatrixStore<Double> tmpD = this.getD();
-        final int tmpMinDim = (int) tmpD.countRows();
-
-        for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
-            retVal &= !tmpD.toScalar(ij, ij).isSmall(PrimitiveMath.ONE);
-        }
-
-        return retVal;
+        return mySPD;
     }
 
     public MatrixStore<Double> reconstruct() {
@@ -213,25 +156,25 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
     }
 
     @Override
-    public void reset() {
-        myDelegate = null;
+    void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
+        for (int i = 0; i < rows; i++) {
+            final double[] tmpRow = destination[i];
+            for (int j = 0; j <= i; j++) {
+                tmpRow[j] = source.doubleValue(i, j);
+            }
+        }
     }
 
     @Override
-    public String toString() {
-        return myDelegate.toString();
-    }
-
-    @Override
-    boolean compute(final RawStore aDelegate) {
-        myDelegate = new JamaCholesky(aDelegate);
-        this.computed(true);
-        return myDelegate.isSPD();
+    protected boolean compute(final RawStore aDelegate) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     @Override
     RawStore solve(final RawStore aRHS) {
-        return myDelegate.solve(aRHS);
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

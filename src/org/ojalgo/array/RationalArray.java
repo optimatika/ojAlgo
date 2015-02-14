@@ -68,7 +68,7 @@ public class RationalArray extends DenseArray<RationalNumber> {
     }
 
     public static final SegmentedArray<RationalNumber> makeSegmented(final long count) {
-        return SegmentedArray.RATIONAL.makeSegmented(FACTORY, count);
+        return SegmentedArray.make(FACTORY, count);
     }
 
     public static final RationalArray wrap(final RationalNumber[] data) {

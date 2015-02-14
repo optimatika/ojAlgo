@@ -37,7 +37,7 @@ public final class MipCase extends OptimisationIntegerTests {
 
     /**
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with integer solution 6.0 rather than 1.0 solution after 4h
+     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with integer solution 6.0 rather than 1.0 after 4h
      * expected:<1.0> but was:<5.999999999999929></li>
      * </ul>
      *
@@ -87,7 +87,7 @@ public final class MipCase extends OptimisationIntegerTests {
 
     /**
      * <ul>
-     * <li>2013-11-13: Never attempted</li>
+     * <li>2015-02-08: MacPro (suffice=4h abort=8h) Stopped after 4.75h: expected:<54.76> but was:<220.69></li>
      * </ul>
      *
      * @see RelaxedLpCase#testNeos911880()

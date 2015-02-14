@@ -43,8 +43,8 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorCollection;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
@@ -85,8 +85,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public static final DecompositionStore.Factory<BigDecimal, BigDenseStore> FACTORY = new DecompositionStore.Factory<BigDecimal, BigDenseStore>() {
 
-        public AggregatorCollection<BigDecimal> aggregator() {
-            return BigAggregator.getCollection();
+        public AggregatorSet<BigDecimal> aggregator() {
+            return BigAggregator.getSet();
         }
 
         public BigDenseStore columns(final Access1D<?>... source) {

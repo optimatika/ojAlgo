@@ -178,6 +178,58 @@ public abstract class RationalAggregator {
         }
     };
 
+    public static final ThreadLocal<AggregatorFunction<RationalNumber>> MIN = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
+
+        @Override
+        protected AggregatorFunction<RationalNumber> initialValue() {
+            return new AggregatorFunction<RationalNumber>() {
+
+                private RationalNumber myNumber = RationalNumber.POSITIVE_INFINITY;
+
+                public double doubleValue() {
+                    return this.getNumber().doubleValue();
+                }
+
+                public RationalNumber getNumber() {
+                    if (RationalNumber.isInfinite(myNumber)) {
+                        return RationalNumber.ZERO;
+                    } else {
+                        return myNumber;
+                    }
+                }
+
+                public int intValue() {
+                    return this.getNumber().intValue();
+                }
+
+                public void invoke(final double anArg) {
+                    this.invoke(new RationalNumber(anArg));
+                }
+
+                public void invoke(final RationalNumber anArg) {
+                    myNumber = RationalFunction.MIN.invoke(myNumber, anArg);
+                }
+
+                public void merge(final RationalNumber result) {
+                    this.invoke(result);
+                }
+
+                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
+                    return RationalFunction.MIN.invoke(result1, result2);
+                }
+
+                public AggregatorFunction<RationalNumber> reset() {
+                    myNumber = RationalNumber.POSITIVE_INFINITY;
+                    return this;
+                }
+
+                public Scalar<RationalNumber> toScalar() {
+                    return this.getNumber();
+                }
+            };
+        }
+    };
+
     public static final ThreadLocal<AggregatorFunction<RationalNumber>> NORM1 = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
@@ -425,58 +477,6 @@ public abstract class RationalAggregator {
         }
     };
 
-    public static final ThreadLocal<AggregatorFunction<RationalNumber>> MIN = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
-
-        @Override
-        protected AggregatorFunction<RationalNumber> initialValue() {
-            return new AggregatorFunction<RationalNumber>() {
-
-                private RationalNumber myNumber = RationalNumber.POSITIVE_INFINITY;
-
-                public double doubleValue() {
-                    return this.getNumber().doubleValue();
-                }
-
-                public RationalNumber getNumber() {
-                    if (RationalNumber.isInfinite(myNumber)) {
-                        return RationalNumber.ZERO;
-                    } else {
-                        return myNumber;
-                    }
-                }
-
-                public int intValue() {
-                    return this.getNumber().intValue();
-                }
-
-                public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
-                }
-
-                public void invoke(final RationalNumber anArg) {
-                    myNumber = RationalFunction.MIN.invoke(myNumber, anArg);
-                }
-
-                public void merge(final RationalNumber result) {
-                    this.invoke(result);
-                }
-
-                public RationalNumber merge(final RationalNumber result1, final RationalNumber result2) {
-                    return RationalFunction.MIN.invoke(result1, result2);
-                }
-
-                public AggregatorFunction<RationalNumber> reset() {
-                    myNumber = RationalNumber.POSITIVE_INFINITY;
-                    return this;
-                }
-
-                public Scalar<RationalNumber> toScalar() {
-                    return this.getNumber();
-                }
-            };
-        }
-    };
-
     public static final ThreadLocal<AggregatorFunction<RationalNumber>> SUM = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
         @Override
@@ -573,7 +573,7 @@ public abstract class RationalAggregator {
         }
     };
 
-    private static final AggregatorCollection<RationalNumber> COLLECTION = new AggregatorCollection<RationalNumber>() {
+    private static final AggregatorSet<RationalNumber> SET = new AggregatorSet<RationalNumber>() {
 
         @Override
         public AggregatorFunction<RationalNumber> cardinality() {
@@ -632,8 +632,16 @@ public abstract class RationalAggregator {
 
     };
 
-    public static AggregatorCollection<RationalNumber> getCollection() {
-        return COLLECTION;
+    /**
+     * @deprecated v38 Use {@link #getSet()} instead
+     */
+    @Deprecated
+    public static AggregatorSet<RationalNumber> getCollection() {
+        return RationalAggregator.getSet();
+    }
+
+    public static AggregatorSet<RationalNumber> getSet() {
+        return SET;
     }
 
     private RationalAggregator() {

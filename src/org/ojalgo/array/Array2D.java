@@ -37,6 +37,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 
@@ -268,6 +269,15 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         @Override
         BasicFactory<Double> delegate() {
             return BasicArray.PRIMITIVE;
+        }
+
+    };
+
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+
+        @Override
+        BasicFactory<Quaternion> delegate() {
+            return BasicArray.QUATERNION;
         }
 
     };

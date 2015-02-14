@@ -176,6 +176,58 @@ public abstract class PrimitiveAggregator {
         }
     };
 
+    public static final ThreadLocal<AggregatorFunction<Double>> MIN = new ThreadLocal<AggregatorFunction<Double>>() {
+
+        @Override
+        protected AggregatorFunction<Double> initialValue() {
+            return new AggregatorFunction<Double>() {
+
+                private double myValue = POSITIVE_INFINITY;
+
+                public double doubleValue() {
+                    if (Double.isInfinite(myValue)) {
+                        return ZERO;
+                    } else {
+                        return myValue;
+                    }
+                }
+
+                public Double getNumber() {
+                    return Double.valueOf(this.doubleValue());
+                }
+
+                public int intValue() {
+                    return (int) this.doubleValue();
+                }
+
+                public void invoke(final double anArg) {
+                    myValue = Math.min(myValue, anArg);
+                }
+
+                public void invoke(final Double anArg) {
+                    this.invoke(anArg.doubleValue());
+                }
+
+                public void merge(final Double result) {
+                    this.invoke(result.doubleValue());
+                }
+
+                public Double merge(final Double result1, final Double result2) {
+                    return Math.min(result1, result2);
+                }
+
+                public AggregatorFunction<Double> reset() {
+                    myValue = POSITIVE_INFINITY;
+                    return this;
+                }
+
+                public Scalar<Double> toScalar() {
+                    return new PrimitiveScalar(this.doubleValue());
+                }
+            };
+        }
+    };
+
     public static final ThreadLocal<AggregatorFunction<Double>> NORM1 = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -425,58 +477,6 @@ public abstract class PrimitiveAggregator {
         }
     };
 
-    public static final ThreadLocal<AggregatorFunction<Double>> MIN = new ThreadLocal<AggregatorFunction<Double>>() {
-
-        @Override
-        protected AggregatorFunction<Double> initialValue() {
-            return new AggregatorFunction<Double>() {
-
-                private double myValue = POSITIVE_INFINITY;
-
-                public double doubleValue() {
-                    if (Double.isInfinite(myValue)) {
-                        return ZERO;
-                    } else {
-                        return myValue;
-                    }
-                }
-
-                public Double getNumber() {
-                    return Double.valueOf(this.doubleValue());
-                }
-
-                public int intValue() {
-                    return (int) this.doubleValue();
-                }
-
-                public void invoke(final double anArg) {
-                    myValue = Math.min(myValue, anArg);
-                }
-
-                public void invoke(final Double anArg) {
-                    this.invoke(anArg.doubleValue());
-                }
-
-                public void merge(final Double result) {
-                    this.invoke(result.doubleValue());
-                }
-
-                public Double merge(final Double result1, final Double result2) {
-                    return Math.min(result1, result2);
-                }
-
-                public AggregatorFunction<Double> reset() {
-                    myValue = POSITIVE_INFINITY;
-                    return this;
-                }
-
-                public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
-                }
-            };
-        }
-    };
-
     public static final ThreadLocal<AggregatorFunction<Double>> SUM = new ThreadLocal<AggregatorFunction<Double>>() {
 
         @Override
@@ -573,7 +573,7 @@ public abstract class PrimitiveAggregator {
         }
     };
 
-    private static final AggregatorCollection<Double> COLLECTION = new AggregatorCollection<Double>() {
+    private static final AggregatorSet<Double> SET = new AggregatorSet<Double>() {
 
         @Override
         public AggregatorFunction<Double> cardinality() {
@@ -632,8 +632,16 @@ public abstract class PrimitiveAggregator {
 
     };
 
-    public static AggregatorCollection<Double> getCollection() {
-        return COLLECTION;
+    /**
+     * @deprecated v38 Use {@link #getSet()} instead
+     */
+    @Deprecated
+    public static AggregatorSet<Double> getCollection() {
+        return PrimitiveAggregator.getSet();
+    }
+
+    public static AggregatorSet<Double> getSet() {
+        return SET;
     }
 
     private PrimitiveAggregator() {

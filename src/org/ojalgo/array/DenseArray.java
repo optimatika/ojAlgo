@@ -42,8 +42,6 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     static abstract class DenseFactory<N extends Number> extends ArrayFactory<N> {
 
-        abstract long getElementSize();
-
         abstract DenseArray<N> make(int size);
 
         @Override

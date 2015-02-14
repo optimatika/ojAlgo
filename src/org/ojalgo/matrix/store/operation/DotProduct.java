@@ -28,7 +28,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.RationalNumber;
 
-abstract class DotProduct extends MatrixOperation {
+public abstract class DotProduct extends MatrixOperation {
 
     static BigDecimal invoke(final BigDecimal[] array1, final int offset1, final BigDecimal[] array2, final int offset2, final int count) {
         BigDecimal retVal = BigMath.ZERO;
@@ -50,6 +50,14 @@ abstract class DotProduct extends MatrixOperation {
         double retVal = PrimitiveMath.ZERO;
         for (int i = 0; i < count; i++) {
             retVal += array1[offset1 + i] * array2[offset2 + i];
+        }
+        return retVal;
+    }
+
+    public static double invoke(final double[] array1, final double[] array2, final int count) {
+        double retVal = PrimitiveMath.ZERO;
+        for (int i = 0; i < count; i++) {
+            retVal += array1[i] * array2[i];
         }
         return retVal;
     }

@@ -80,4 +80,6 @@ abstract class ArrayFactory<N extends Number> extends Object implements Access1D
 
     abstract BasicArray<N> makeToBeFilled(final long... structure);
 
+    abstract long getElementSize();
+
 }

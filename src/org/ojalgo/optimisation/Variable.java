@@ -25,7 +25,7 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.function.aggregator.AggregatorCollection;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.netio.BasicLogger;
@@ -204,7 +204,7 @@ public final class Variable extends ModelEntity<Variable> {
 
         if (myAdjustmentExponent == Integer.MIN_VALUE) {
 
-            final AggregatorCollection<BigDecimal> tmpCollection = BigAggregator.getCollection();
+            final AggregatorSet<BigDecimal> tmpCollection = BigAggregator.getSet();
             final AggregatorFunction<BigDecimal> tmpLargestAggr = tmpCollection.largest();
             final AggregatorFunction<BigDecimal> tmpSmallestAggr = tmpCollection.smallest();
 
