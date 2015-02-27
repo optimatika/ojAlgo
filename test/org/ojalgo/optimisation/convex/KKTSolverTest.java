@@ -33,6 +33,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.type.context.NumberContext;
 
 public class KKTSolverTest extends FunctionalityTest {
@@ -304,6 +305,9 @@ public class KKTSolverTest extends FunctionalityTest {
      */
     private MatrixStore<Double> doTest(final Access2D<?>[] matrices, final boolean validate, final NumberContext context) {
 
+        final Optimisation.Options tmpOptions = new Optimisation.Options();
+        tmpOptions.validate = validate;
+
         final MatrixStore<Double> tmpA = matrices[0] != null ? PrimitiveDenseStore.FACTORY.copy(matrices[0]) : null;
         final MatrixStore<Double> tmpB = matrices[1] != null ? PrimitiveDenseStore.FACTORY.copy(matrices[1]) : null;
         final MatrixStore<Double> tmpQ = PrimitiveDenseStore.FACTORY.copy(matrices[2]);
@@ -314,7 +318,7 @@ public class KKTSolverTest extends FunctionalityTest {
 
         final KKTSolver tmpSolver = new KKTSolver(tmpFullInput);
 
-        final KKTSolver.Output tmpFullOutput = tmpSolver.solve(tmpFullInput, validate);
+        final KKTSolver.Output tmpFullOutput = tmpSolver.solve(tmpFullInput, tmpOptions);
         final MatrixStore<Double> tmpFullX = tmpFullOutput.getX();
         final MatrixStore<Double> tmpFullL = tmpFullOutput.getL();
 
@@ -325,7 +329,7 @@ public class KKTSolverTest extends FunctionalityTest {
         final KKTSolver.Input tmpStepInput = new KKTSolver.Input(tmpQ, tmpC.add(tmpQ.multiply(tmpFullX).negate()), tmpA,
                 tmpB != null ? ZeroStore.makePrimitive((int) tmpB.countRows(), (int) tmpB.countColumns()) : null);
 
-        final KKTSolver.Output tmpStepOutput = tmpSolver.solve(tmpStepInput, validate);
+        final KKTSolver.Output tmpStepOutput = tmpSolver.solve(tmpStepInput, tmpOptions);
         final MatrixStore<Double> tmpStepX = tmpStepOutput.getX();
         final MatrixStore<Double> tmpStepL = tmpStepOutput.getL();
 

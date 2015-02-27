@@ -442,10 +442,11 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
-        if (NumberContext.isZero(comparedTo, myZeroError)) {
+        final double tmpComparedTo = Math.abs(comparedTo);
+        if (NumberContext.isZero(tmpComparedTo, myZeroError)) {
             return NumberContext.isZero(value, myZeroError);
         } else {
-            return NumberContext.isZero(value / comparedTo, myEpsilon);
+            return NumberContext.isZero(value / tmpComparedTo, myEpsilon);
         }
     }
 

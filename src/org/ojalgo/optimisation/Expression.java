@@ -40,9 +40,7 @@ import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.BigAggregator;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.ConstantFunction;
 import org.ojalgo.function.multiary.LinearFunction;
@@ -195,13 +193,11 @@ public final class Expression extends ModelEntity<Expression> {
 
     }
 
-    private transient int myAdjustmentExponent = Integer.MIN_VALUE;
     private transient boolean myInfeasible = false;
     private final HashMap<Index, BigDecimal> myLinear;
     private final ExpressionsBasedModel myModel;
     private final HashMap<RowColumn, BigDecimal> myQuadratic;
     private transient boolean myRedundant = false;
-
     private final boolean myShallowCopy;
 
     @SuppressWarnings("unused")
@@ -278,32 +274,6 @@ public final class Expression extends ModelEntity<Expression> {
         }
 
         return retVal;
-    }
-
-    public double evaluateLessThanZero(final Access1D<?> point) {
-
-        final double tmpBody = this.evaluateBody(point);
-
-        if (this.isUpperLimitSet()) {
-            return tmpBody - this.getAdjustedUpperLimit();
-        } else if (this.isLowerLimitSet()) {
-            return this.getAdjustedLowerLimit() - tmpBody;
-        } else {
-            return tmpBody;
-        }
-    }
-
-    public double evaluateMoreThanZero(final Access1D<?> point) {
-
-        final double tmpBody = this.evaluateBody(point);
-
-        if (this.isLowerLimitSet()) {
-            return tmpBody - this.getAdjustedLowerLimit();
-        } else if (this.isUpperLimitSet()) {
-            return this.getAdjustedUpperLimit() - tmpBody;
-        } else {
-            return tmpBody;
-        }
     }
 
     public MatrixStore<Double> getAdjustedGradient(final Access1D<?> point) {
@@ -482,8 +452,6 @@ public final class Expression extends ModelEntity<Expression> {
                 myLinear.remove(aKey);
             }
 
-            myAdjustmentExponent = Integer.MIN_VALUE;
-
         } else {
 
             throw new IllegalArgumentException();
@@ -537,8 +505,6 @@ public final class Expression extends ModelEntity<Expression> {
             } else {
                 myQuadratic.remove(aKey);
             }
-
-            myAdjustmentExponent = Integer.MIN_VALUE;
 
         } else {
 
@@ -650,48 +616,27 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    @Override
-    protected int getAdjustmentExponent() {
-
-        if (myAdjustmentExponent == Integer.MIN_VALUE) {
-
-            final AggregatorSet<BigDecimal> tmpCollection = BigAggregator.getSet();
-            final AggregatorFunction<BigDecimal> tmpLargestAggr = tmpCollection.largest();
-            final AggregatorFunction<BigDecimal> tmpSmallestAggr = tmpCollection.smallest();
-
-            for (final BigDecimal tmpLinearFactor : myLinear.values()) {
-                tmpLargestAggr.invoke(tmpLinearFactor);
-                tmpSmallestAggr.invoke(tmpLinearFactor);
-            }
-
-            for (final BigDecimal tmpQuadraticFactor : myQuadratic.values()) {
-                tmpLargestAggr.invoke(tmpQuadraticFactor);
-                tmpSmallestAggr.invoke(tmpQuadraticFactor);
-            }
-
-            final BigDecimal tmpLowerLimit = this.getLowerLimit();
-            if (tmpLowerLimit != null) {
-                tmpLargestAggr.invoke(tmpLowerLimit);
-                tmpSmallestAggr.invoke(tmpLowerLimit);
-            }
-
-            final BigDecimal tmpUpperLimit = this.getUpperLimit();
-            if (tmpUpperLimit != null) {
-                tmpLargestAggr.invoke(tmpUpperLimit);
-                tmpSmallestAggr.invoke(tmpUpperLimit);
-            }
-
-            myAdjustmentExponent = OptimisationUtils.getAdjustmentFactorExponent(tmpLargestAggr, tmpSmallestAggr);
-        }
-
-        return myAdjustmentExponent;
-    }
-
     protected boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final BasicLogger.Appender appender) {
 
         final BigDecimal tmpValue = this.evaluate(solution);
 
         return this.validate(tmpValue, context, appender);
+    }
+
+    @Override
+    void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
+
+        super.visitAllParameters(largest, smallest);
+
+        for (final BigDecimal tmpLinearFactor : myLinear.values()) {
+            largest.invoke(tmpLinearFactor);
+            smallest.invoke(tmpLinearFactor);
+        }
+
+        for (final BigDecimal tmpQuadraticFactor : myQuadratic.values()) {
+            largest.invoke(tmpQuadraticFactor);
+            smallest.invoke(tmpQuadraticFactor);
+        }
     }
 
     void appendToString(final StringBuilder aStringBuilder, final Access1D<BigDecimal> aCurrentState) {

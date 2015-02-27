@@ -965,11 +965,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                public void conquer(final int aFirst, final int aLimit) {
+                public void conquer(final int first, final int limit) {
 
                     final AggregatorFunction<Double> tmpPartAggr = aggregator.getPrimitiveFunction();
 
-                    PrimitiveDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
+                    PrimitiveDenseStore.this.visit(tmpRowDim * first, tmpRowDim * limit, 1, tmpPartAggr);
 
                     synchronized (tmpMainAggr) {
                         tmpMainAggr.merge(tmpPartAggr.getNumber());
@@ -997,8 +997,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    ApplyCholesky.invoke(tmpData, myRowDim, aFirst, aLimit, tmpColumn);
+                protected void conquer(final int first, final int limit) {
+                    ApplyCholesky.invoke(tmpData, myRowDim, first, limit, tmpColumn);
                 }
             };
 
@@ -1020,8 +1020,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    ApplyLU.invoke(tmpData, myRowDim, aFirst, aLimit, tmpColumn, iterationPoint);
+                protected void conquer(final int first, final int limit) {
+                    ApplyLU.invoke(tmpData, myRowDim, first, limit, tmpColumn, iterationPoint);
                 }
             };
 
@@ -1046,11 +1046,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     public void caxpy(final double aSclrA, final int aColX, final int aColY, final int aFirstRow) {
-        CAXPY.invoke(data, aColY * myRowDim, data, aColX * myRowDim, aSclrA, aFirstRow, myRowDim);
+        AXPY.invoke(data, (aColY * myRowDim) + aFirstRow, 1, aSclrA, data, (aColX * myRowDim) + aFirstRow, 1, myRowDim - aFirstRow);
     }
 
     public void caxpy(final Double scalarA, final int columnX, final int columnY, final int firstRow) {
-        CAXPY.invoke(data, columnY * myRowDim, data, columnX * myRowDim, scalarA.doubleValue(), firstRow, myRowDim);
+        AXPY.invoke(data, (columnY * myRowDim) + firstRow, 1, scalarA.doubleValue(), data, (columnX * myRowDim) + firstRow, 1, myRowDim - firstRow);
     }
 
     public Pivot computeInPlaceLU() {
@@ -1250,8 +1250,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    FillMatchingSingle.invoke(PrimitiveDenseStore.this.data, tmpRowDim, aFirst, aLimit, source);
+                public void conquer(final int first, final int limit) {
+                    FillMatchingSingle.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, source);
                 }
 
             };
@@ -1264,7 +1264,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public void fillMatching(final Access1D<Double> leftArg, final BinaryFunction<Double> func, final Access1D<Double> rightArg) {
+    public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1274,8 +1274,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    PrimitiveDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, leftArg, func, rightArg);
+                protected void conquer(final int first, final int limit) {
+                    PrimitiveDenseStore.this.fill(tmpRowDim * first, tmpRowDim * limit, left, function, right);
                 }
 
             };
@@ -1284,11 +1284,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         } else {
 
-            this.fill(0, tmpRowDim * tmpColDim, leftArg, func, rightArg);
+            this.fill(0, tmpRowDim * tmpColDim, left, function, right);
         }
     }
 
-    public void fillMatching(final Access1D<Double> aLeftArg, final BinaryFunction<Double> aFunc, final Double aRightArg) {
+    public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1298,8 +1298,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    PrimitiveDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
+                protected void conquer(final int first, final int limit) {
+                    PrimitiveDenseStore.this.fill(tmpRowDim * first, tmpRowDim * limit, left, function, right);
                 }
 
             };
@@ -1308,11 +1308,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         } else {
 
-            this.fill(0, tmpRowDim * tmpColDim, aLeftArg, aFunc, aRightArg);
+            this.fill(0, tmpRowDim * tmpColDim, left, function, right);
         }
     }
 
-    public void fillMatching(final Double aLeftArg, final BinaryFunction<Double> aFunc, final Access1D<Double> aRightArg) {
+    public void fillMatching(final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1322,8 +1322,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    PrimitiveDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, aLeftArg, aFunc, aRightArg);
+                protected void conquer(final int first, final int limit) {
+                    PrimitiveDenseStore.this.fill(tmpRowDim * first, tmpRowDim * limit, left, function, right);
                 }
 
             };
@@ -1332,7 +1332,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         } else {
 
-            this.fill(0, tmpRowDim * tmpColDim, aLeftArg, aFunc, aRightArg);
+            this.fill(0, tmpRowDim * tmpColDim, left, function, right);
         }
     }
 
@@ -1354,8 +1354,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    FillTransposed.invoke(PrimitiveDenseStore.this.data, tmpRowDim, aFirst, aLimit, source);
+                public void conquer(final int first, final int limit) {
+                    FillTransposed.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, source);
                 }
 
             };
@@ -1435,8 +1435,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    MAXPY.invoke(PrimitiveDenseStore.this.data, tmpRowDim, aFirst, aLimit, aSclrA, aMtrxX);
+                public void conquer(final int first, final int limit) {
+                    MAXPY.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, aSclrA, aMtrxX);
                 }
 
             };
@@ -1450,7 +1450,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     @Override
-    public void modifyAll(final UnaryFunction<Double> aFunc) {
+    public void modifyAll(final UnaryFunction<Double> function) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1460,8 +1460,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    PrimitiveDenseStore.this.modify(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, aFunc);
+                public void conquer(final int first, final int limit) {
+                    PrimitiveDenseStore.this.modify(tmpRowDim * first, tmpRowDim * limit, 1, function);
                 }
 
             };
@@ -1470,7 +1470,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         } else {
 
-            this.modify(tmpRowDim * 0, tmpRowDim * tmpColDim, 1, aFunc);
+            this.modify(tmpRowDim * 0, tmpRowDim * tmpColDim, 1, function);
         }
     }
 
@@ -1522,7 +1522,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {
-        RAXPY.invoke(data, rowY, data, rowX, scalarA, firstColumn, myColDim);
+        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data, rowX
+                + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
     public MatrixStore.ElementsConsumer<Double> region(final int row, final int column) {
@@ -1560,8 +1561,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteBackwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, conjugated);
+                public void conquer(final int first, final int limit) {
+                    SubstituteBackwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, body, conjugated);
                 }
 
             };
@@ -1584,8 +1585,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteForwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, onesOnDiagonal, zerosAboveDiagonal);
+                public void conquer(final int first, final int limit) {
+                    SubstituteForwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, body, onesOnDiagonal, zerosAboveDiagonal);
                 }
 
             };
@@ -1625,8 +1626,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    HouseholderLeft.invoke(tmpData, tmpRowDim, aFirst, aLimit, tmpTransf);
+                public void conquer(final int first, final int limit) {
+                    HouseholderLeft.invoke(tmpData, tmpRowDim, first, limit, tmpTransf);
                 }
 
             };
@@ -1677,8 +1678,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    HouseholderRight.invoke(tmpData, aFirst, aLimit, tmpColDim, tmpTransf);
+                public void conquer(final int first, final int limit) {
+                    HouseholderRight.invoke(tmpData, first, limit, tmpColDim, tmpTransf);
                 }
 
             };

@@ -47,7 +47,7 @@ import org.ojalgo.optimisation.Variable;
  * and [AI][X] <= [BI]
  * </p>
  * <p>
- * The matrix [Q] is assumed to be symmetric (it must be made that way) and:
+ * The matrix [Q] is assumed to be symmetric (it must be made that way) and positive (semi)definite:
  * <ul>
  * <li>If [Q] is positive semidefinite, then the objective function is convex: In this case the quadratic program has a
  * global minimizer if there exists some feasible vector [X] (satisfying the constraints) and if the objective function
@@ -56,10 +56,9 @@ import org.ojalgo.optimisation.Variable;
  * </ul>
  * </p>
  * <p>
- * You construct instances by using the {@linkplain Builder} class. It will return an appropriate subclass for you. It's
- * recommended that you first create a {@linkplain ExpressionsBasedModel} and feed that to the {@linkplain Builder}.
- * Alternatively you can directly call {@linkplain ExpressionsBasedModel#getDefaultSolver()} or even
- * {@linkplain ExpressionsBasedModel#minimise()} or {@linkplain ExpressionsBasedModel#maximise()} on the model.
+ * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel} and not
+ * worry about solver details. If you do want to instantiate a convex solver directly use the {@linkplain Builder}
+ * class. It will return an appropriate subclass for you.
  * </p>
  *
  * @author apete
@@ -96,13 +95,10 @@ public abstract class ConvexSolver extends BaseSolver {
             if (this.hasInequalityConstraints()) {
                 return new ActiveSetSolver(this, options);
             } else if (this.hasEqualityConstraints()) {
-                //return new LagrangeSolver2(tmpModel, options, this);
                 return new QPESolver(this, options);
-                //return new NullspaceSolver(tmpModel, options, this);
             } else {
                 return new UnconstrainedSolver(this, options);
             }
-
         }
 
         @Override
@@ -332,9 +328,9 @@ public abstract class ConvexSolver extends BaseSolver {
 
     abstract KKTSolver.Input buildDelegateSolverInput();
 
-    final KKTSolver getDelegateSolver(final KKTSolver.Input templeate) {
+    final KKTSolver getDelegateSolver(final KKTSolver.Input template) {
         if (myDelegateSolver == null) {
-            myDelegateSolver = new KKTSolver(templeate);
+            myDelegateSolver = new KKTSolver(template);
         }
         return myDelegateSolver;
     }

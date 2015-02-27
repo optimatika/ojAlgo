@@ -41,11 +41,6 @@ public final class FunctionsBasedModel extends AbstractModel<GenericSolver> {
             super(name);
         }
 
-        @Override
-        protected int getAdjustmentExponent() {
-            return 0;
-        }
-
     }
 
     private final int myNumberOfVariables;

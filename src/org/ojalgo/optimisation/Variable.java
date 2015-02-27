@@ -25,9 +25,6 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
@@ -45,8 +42,6 @@ public final class Variable extends ModelEntity<Variable> {
     public static Variable makeBinary(final String name) {
         return Variable.make(name).binary();
     }
-
-    private transient int myAdjustmentExponent = Integer.MIN_VALUE;
 
     private Expression.Index myIndex = null;
     private boolean myInteger = false;
@@ -123,8 +118,8 @@ public final class Variable extends ModelEntity<Variable> {
         return myValue;
     }
 
-    public Variable integer(final boolean aBool) {
-        this.setInteger(aBool);
+    public Variable integer(final boolean integer) {
+        this.setInteger(integer);
         return this;
     }
 
@@ -132,9 +127,9 @@ public final class Variable extends ModelEntity<Variable> {
 
         boolean retVal = this.isInteger();
 
-        retVal &= this.isLowerConstraint() && this.getLowerLimit().equals(ZERO);
+        retVal &= this.isLowerConstraint() && (this.getLowerLimit().compareTo(ZERO) == 0);
 
-        retVal &= this.isUpperConstraint() && this.getUpperLimit().equals(ONE);
+        retVal &= this.isUpperConstraint() && (this.getUpperLimit().compareTo(ONE) == 0);
 
         return retVal;
     }
@@ -165,12 +160,10 @@ public final class Variable extends ModelEntity<Variable> {
 
     public void setInteger(final boolean aBool) {
         myInteger = aBool;
-        myAdjustmentExponent = Integer.MIN_VALUE;
     }
 
     public void setValue(final BigDecimal aValue) {
         myValue = aValue;
-        myAdjustmentExponent = Integer.MIN_VALUE;
     }
 
     @Override
@@ -197,36 +190,6 @@ public final class Variable extends ModelEntity<Variable> {
 
         myIndex = null;
         myValue = null;
-    }
-
-    @Override
-    protected int getAdjustmentExponent() {
-
-        if (myAdjustmentExponent == Integer.MIN_VALUE) {
-
-            final AggregatorSet<BigDecimal> tmpCollection = BigAggregator.getSet();
-            final AggregatorFunction<BigDecimal> tmpLargestAggr = tmpCollection.largest();
-            final AggregatorFunction<BigDecimal> tmpSmallestAggr = tmpCollection.smallest();
-
-            tmpLargestAggr.invoke(ONE);
-            tmpSmallestAggr.invoke(ONE);
-
-            final BigDecimal tmpLowerLimit = this.getLowerLimit();
-            if (tmpLowerLimit != null) {
-                tmpLargestAggr.invoke(tmpLowerLimit);
-                tmpSmallestAggr.invoke(tmpLowerLimit);
-            }
-
-            final BigDecimal tmpUpperLimit = this.getUpperLimit();
-            if (tmpUpperLimit != null) {
-                tmpLargestAggr.invoke(tmpUpperLimit);
-                tmpSmallestAggr.invoke(tmpUpperLimit);
-            }
-
-            myAdjustmentExponent = OptimisationUtils.getAdjustmentFactorExponent(tmpLargestAggr, tmpSmallestAggr);
-        }
-
-        return myAdjustmentExponent;
     }
 
     @Override

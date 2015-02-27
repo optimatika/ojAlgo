@@ -242,6 +242,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     void exchangeRows(int rowA, int rowB);
 
+    /**
+     * @deprecated v38 Use {@link #conjugate()} or {@link PhysicalStore.Factory#conjugate(Access2D)} instead.
+     */
+    @Deprecated
     void fillConjugated(Access2D<? extends Number> source);
 
     void fillMatching(Access1D<? extends Number> source);
@@ -270,6 +274,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
      */
     void fillMatching(N leftArg, BinaryFunction<N> func, Access1D<N> rightArg);
 
+    /**
+     * @deprecated v38 Use {@link #transpose()} or {@link PhysicalStore.Factory#transpose(Access2D)} instead.
+     */
+    @Deprecated
     void fillTransposed(Access2D<? extends Number> source);
 
     /**

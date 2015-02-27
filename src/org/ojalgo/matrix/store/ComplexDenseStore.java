@@ -506,7 +506,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public void caxpy(final ComplexNumber scalarA, final int columnX, final int columnY, final int firstRow) {
-        CAXPY.invoke(data, columnY * myRowDim, data, columnX * myRowDim, scalarA, firstRow, myRowDim);
+        AXPY.invoke(data, columnY * myRowDim + firstRow, 1, scalarA, data, columnX * myRowDim + firstRow, 1, myRowDim - firstRow);
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<ComplexNumber> transformationCollector, final boolean eigenvalue) {
@@ -908,7 +908,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public void raxpy(final ComplexNumber scalarA, final int rowX, final int rowY, final int firstColumn) {
-        RAXPY.invoke(data, rowY, data, rowX, scalarA, firstColumn, myColDim);
+        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data, rowX + (firstColumn * (data.length / myColDim)),
+        data.length / myColDim, myColDim - firstColumn);
     }
 
     public MatrixStore.ElementsConsumer<ComplexNumber> region(final int row, final int column) {

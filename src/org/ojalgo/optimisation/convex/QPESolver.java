@@ -49,10 +49,10 @@ final class QPESolver extends ConvexSolver {
 
         boolean retVal = true;
 
-        final MatrixStore<Double> tmpSE = this.getSE();
-        for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
-            final double tmpVal = tmpSE.doubleValue(i);
-            if (!options.slack.isZero(tmpVal)) {
+        final MatrixStore<Double> tmpAEX = this.getAEX();
+        final MatrixStore<Double> tmpBE = this.getBE();
+        for (int i = 0; retVal && (i < tmpBE.countRows()); i++) {
+            if (options.slack.isDifferent(tmpBE.doubleValue(i), tmpAEX.doubleValue(i))) {
                 retVal = false;
             }
         }
@@ -86,7 +86,7 @@ final class QPESolver extends ConvexSolver {
 
         final KKTSolver tmpSolver = this.getDelegateSolver(tmpInput);
 
-        final KKTSolver.Output tmpOutput = tmpSolver.solve(tmpInput, options.validate);
+        final KKTSolver.Output tmpOutput = tmpSolver.solve(tmpInput, options);
 
         if (tmpOutput.isSolvable()) {
 

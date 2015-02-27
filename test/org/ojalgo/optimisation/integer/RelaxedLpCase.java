@@ -196,7 +196,7 @@ public final class RelaxedLpCase extends MipLibCase {
     public void testPk1() {
 
         // Solution obtained from lp_solve_5.5.2.0 with relaxed integer constraints
-        // apete$ lp_solve -noint -mps ./pk1.mps 
+        // apete$ lp_solve -noint -mps ./pk1.mps
         final HashMap<String, BigDecimal> tmpSolution = new HashMap<>();
 
         tmpSolution.put("x1", new BigDecimal(0));

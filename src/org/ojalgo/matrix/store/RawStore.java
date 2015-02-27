@@ -698,14 +698,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    /**
-     * Clone the RawStore object.
-     */
-    @Override
-    public RawStore clone() {
-        return this.copy();
-    }
-
     public RawStore conjugate() {
         return this.transpose();
     }
@@ -757,13 +749,13 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(final Object anObject) {
-        if (anObject instanceof MatrixStore) {
-            return this.equals((MatrixStore<Double>) anObject, NumberContext.getGeneral(6));
-        } else if (anObject instanceof BasicMatrix) {
-            return AccessUtils.equals(this, (BasicMatrix) anObject, NumberContext.getGeneral(6));
+    public boolean equals(final Object other) {
+        if (other instanceof MatrixStore) {
+            return this.equals((MatrixStore<Double>) other, NumberContext.getGeneral(6));
+        } else if (other instanceof BasicMatrix) {
+            return AccessUtils.equals(this, (BasicMatrix) other, NumberContext.getGeneral(6));
         } else {
-            return super.equals(anObject);
+            return super.equals(other);
         }
     }
 

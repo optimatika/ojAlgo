@@ -346,35 +346,34 @@ public abstract class MatrixUtils {
         return decomposition.getD().multiplyLeft(tmpQ).multiply(tmpQ.conjugate());
     }
 
-    public static void setAllOperationThresholds(final int aValue) {
-        AggregateAll.THRESHOLD = aValue;
-        ApplyCholesky.THRESHOLD = aValue;
-        ApplyLU.THRESHOLD = aValue;
-        CAXPY.THRESHOLD = aValue;
-        FillMatchingBoth.THRESHOLD = aValue;
-        FillConjugated.THRESHOLD = aValue;
-        FillMatchingLeft.THRESHOLD = aValue;
-        FillMatchingRight.THRESHOLD = aValue;
-        FillMatchingSingle.THRESHOLD = aValue;
-        FillTransposed.THRESHOLD = aValue;
-        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = aValue;
-        GenerateApplyAndCopyHouseholderRow.THRESHOLD = aValue;
-        HermitianRank2Update.THRESHOLD = aValue;
-        HouseholderHermitian.THRESHOLD = aValue;
-        HouseholderLeft.THRESHOLD = aValue;
-        HouseholderRight.THRESHOLD = aValue;
-        MAXPY.THRESHOLD = aValue;
-        ModifyAll.THRESHOLD = aValue;
-        MultiplyBoth.THRESHOLD = aValue;
-        MultiplyHermitianAndVector.THRESHOLD = aValue;
-        MultiplyLeft.THRESHOLD = aValue;
-        MultiplyRight.THRESHOLD = aValue;
-        RAXPY.THRESHOLD = aValue;
-        RotateLeft.THRESHOLD = aValue;
-        RotateRight.THRESHOLD = aValue;
-        SubstituteBackwards.THRESHOLD = aValue;
-        SubstituteForwards.THRESHOLD = aValue;
-        SubtractScaledVector.THRESHOLD = aValue;
+    public static void setAllOperationThresholds(final int value) {
+        AggregateAll.THRESHOLD = value;
+        ApplyCholesky.THRESHOLD = value;
+        ApplyLU.THRESHOLD = value;
+        AXPY.THRESHOLD = value;
+        FillMatchingBoth.THRESHOLD = value;
+        FillConjugated.THRESHOLD = value;
+        FillMatchingLeft.THRESHOLD = value;
+        FillMatchingRight.THRESHOLD = value;
+        FillMatchingSingle.THRESHOLD = value;
+        FillTransposed.THRESHOLD = value;
+        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = value;
+        GenerateApplyAndCopyHouseholderRow.THRESHOLD = value;
+        HermitianRank2Update.THRESHOLD = value;
+        HouseholderHermitian.THRESHOLD = value;
+        HouseholderLeft.THRESHOLD = value;
+        HouseholderRight.THRESHOLD = value;
+        MAXPY.THRESHOLD = value;
+        ModifyAll.THRESHOLD = value;
+        MultiplyBoth.THRESHOLD = value;
+        MultiplyHermitianAndVector.THRESHOLD = value;
+        MultiplyLeft.THRESHOLD = value;
+        MultiplyRight.THRESHOLD = value;
+        RotateLeft.THRESHOLD = value;
+        RotateRight.THRESHOLD = value;
+        SubstituteBackwards.THRESHOLD = value;
+        SubstituteForwards.THRESHOLD = value;
+        SubtractScaledVector.THRESHOLD = value;
     }
 
     public static String toString(final Access2D<?> matrix) {

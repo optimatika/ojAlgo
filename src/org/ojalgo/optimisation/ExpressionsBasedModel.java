@@ -40,10 +40,10 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * Lets you construct optimisation problems by combining (mathematical) expressions in terms of variables. Each
  * expression or variable can be a constraint and/or contribute to the objective function. An expression or variable is
- * turned into a constraint by setting a lower and/or upper limit. Use {@linkplain ModelEntity#lower(BigDecimal)},
- * {@linkplain ModelEntity#upper(BigDecimal)} or {@linkplain ModelEntity#level(BigDecimal)}. An expression or variable
- * is made part of (contributing to) the objective function by setting a contribution weight. Use
- * {@linkplain ModelEntity#weight(BigDecimal)}.
+ * turned into a constraint by setting a lower and/or upper limit. Use {@linkplain ModelEntity#lower(Number)},
+ * {@linkplain ModelEntity#upper(Number)} or {@linkplain ModelEntity#level(Number)}. An expression or variable is made
+ * part of (contributing to) the objective function by setting a contribution weight. Use
+ * {@linkplain ModelEntity#weight(Number)}.
  * </p>
  * <p>
  * You may think of variables as simple (the simplest possible) expressions, and of expressions as weighted combinations
@@ -63,7 +63,9 @@ import org.ojalgo.type.context.NumberContext;
  * </ol>
  * </p>
  * <p>
- * This class actually does something for you compared to using the solvers directly:
+ * When using this class you do not need to worry about which solver will actually be used. The docs of the various
+ * solvers describe requirements on input formats and similar. This is handled for you and should absolutely NOT be
+ * considered here! Compared to using the various solvers directly this class actually does something for you:
  * <ol>
  * <li>You can model your problems without worrying about specific solver requirements.</li>
  * <li>It knows which solver to use.</li>
@@ -136,15 +138,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     private transient BasicLogger.Appender myAppender = null;
-
     private final CharacterRing myBuffer = new CharacterRing();
-
     private final HashMap<String, Expression> myExpressions = new HashMap<String, Expression>();
     private final HashSet<Index> myFixedVariables = new HashSet<Index>();
     private transient int[] myFreeIndices = null;
     private transient List<Variable> myFreeVariables = null;
     private transient int[] myIntegerIndices = null;
-
     private transient List<Variable> myIntegerVariables = null;
     private transient int[] myNegativeIndices = null;
     private transient List<Variable> myNegativeVariables = null;
@@ -804,8 +803,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            tmpExpression.appendToString(retVal, this.getVariableValues());
-            retVal.append(NEW_LINE);
+            if ((tmpExpression.isConstraint() && !tmpExpression.isRedundant()) || tmpExpression.isObjective()) {
+                tmpExpression.appendToString(retVal, this.getVariableValues());
+                retVal.append(NEW_LINE);
+            }
         }
 
         return retVal.append(START_END).toString();

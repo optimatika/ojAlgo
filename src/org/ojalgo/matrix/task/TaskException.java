@@ -26,8 +26,8 @@ import org.ojalgo.RecoverableCondition;
 
 public class TaskException extends RecoverableCondition {
 
-    public TaskException(String aDescription) {
-        super(aDescription);
+    public TaskException(String description) {
+        super(description);
     }
 
 }

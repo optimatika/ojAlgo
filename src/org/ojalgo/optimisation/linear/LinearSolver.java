@@ -56,10 +56,9 @@ import org.ojalgo.type.IndexSelector;
  * Further it is required here that the constraint right hand sides are nonnegative (nonnegative elements in [BE]).
  * </p>
  * <p>
- * You construct instances by using the {@linkplain Builder} class. It will return an appropriate subclass for you. It's
- * recommended that you first create a {@linkplain ExpressionsBasedModel} and feed that to the {@linkplain Builder}.
- * Alternatively you can directly call {@linkplain ExpressionsBasedModel#getDefaultSolver()} or even
- * {@linkplain ExpressionsBasedModel#minimise()} or {@linkplain ExpressionsBasedModel#maximise()} on the model.
+ * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel} and not
+ * worry about solver details. If you do want to instantiate a linear solver directly use the {@linkplain Builder}
+ * class. It will return an appropriate subclass for you.
  * </p>
  *
  * @author apete

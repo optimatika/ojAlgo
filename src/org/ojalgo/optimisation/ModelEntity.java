@@ -21,9 +21,15 @@
  */
 package org.ojalgo.optimisation;
 
+import static org.ojalgo.constant.BigMath.*;
+
 import java.math.BigDecimal;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -36,6 +42,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
 
+    private transient int myAdjustmentExponent = Integer.MIN_VALUE;
     private BigDecimal myContributionWeight = null;
     private BigDecimal myLowerLimit = null;
     private final String myName;
@@ -110,6 +117,9 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         }
     }
 
+    /**
+     * @return Adjusted "1"
+     */
     public final double getAdjustmentFactor() {
         return BigDecimal.ONE.movePointRight(this.getAdjustmentExponent()).doubleValue(); // 10^exponent
     }
@@ -200,6 +210,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
     @SuppressWarnings("unchecked")
     public final ME lower(final Number lower) {
+        myAdjustmentExponent = Integer.MIN_VALUE;
         if (lower != null) {
             myLowerLimit = TypeUtils.toBigDecimal(lower);
         } else {
@@ -220,6 +231,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
     @SuppressWarnings("unchecked")
     public final ME upper(final Number upper) {
+        myAdjustmentExponent = Integer.MIN_VALUE;
         if (upper != null) {
             myUpperLimit = TypeUtils.toBigDecimal(upper);
         } else {
@@ -270,7 +282,22 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         myUpperLimit = null;
     }
 
-    protected abstract int getAdjustmentExponent();
+    protected final int getAdjustmentExponent() {
+
+        if (myAdjustmentExponent == Integer.MIN_VALUE) {
+
+            final AggregatorSet<BigDecimal> tmpSet = BigAggregator.getSet();
+
+            final AggregatorFunction<BigDecimal> tmpLargest = tmpSet.largest();
+            final AggregatorFunction<BigDecimal> tmpSmallest = tmpSet.smallest();
+
+            this.visitAllParameters(tmpLargest, tmpSmallest);
+
+            myAdjustmentExponent = OptimisationUtils.getAdjustmentExponent(tmpLargest.doubleValue(), tmpSmallest.doubleValue());
+        }
+
+        return myAdjustmentExponent;
+    }
 
     protected boolean validate(final BasicLogger.Appender appender) {
 
@@ -355,6 +382,19 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         } else {
 
             return myUpperLimit;
+        }
+    }
+
+    void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
+        largest.invoke(ONE);
+        smallest.invoke(ONE);
+        if (myLowerLimit != null) {
+            largest.invoke(myLowerLimit);
+            smallest.invoke(myLowerLimit);
+        }
+        if (myUpperLimit != null) {
+            largest.invoke(myUpperLimit);
+            smallest.invoke(myUpperLimit);
         }
     }
 

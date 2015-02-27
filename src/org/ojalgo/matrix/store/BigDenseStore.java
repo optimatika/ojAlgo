@@ -505,7 +505,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     }
 
     public void caxpy(final BigDecimal scalarA, final int columnX, final int columnY, final int firstRow) {
-        CAXPY.invoke(data, columnY * myRowDim, data, columnX * myRowDim, scalarA, firstRow, myRowDim);
+        AXPY.invoke(data, columnY * myRowDim + firstRow, 1, scalarA, data, columnX * myRowDim + firstRow, 1, myRowDim - firstRow);
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<BigDecimal> transformationCollector, final boolean eigenvalue) {
@@ -887,7 +887,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     }
 
     public void raxpy(final BigDecimal scalarA, final int rowX, final int rowY, final int firstColumn) {
-        RAXPY.invoke(data, rowY, data, rowX, scalarA, firstColumn, myColDim);
+        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data, rowX + (firstColumn * (data.length / myColDim)),
+        data.length / myColDim, myColDim - firstColumn);
     }
 
     public MatrixStore.ElementsConsumer<BigDecimal> region(final int row, final int column) {

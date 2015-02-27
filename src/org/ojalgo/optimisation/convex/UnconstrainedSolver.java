@@ -56,7 +56,7 @@ final class UnconstrainedSolver extends ConvexSolver {
 
         final KKTSolver tmpSolver = this.getDelegateSolver(tmpInput);
 
-        final KKTSolver.Output tmpOutput = tmpSolver.solve(tmpInput, options.validate);
+        final KKTSolver.Output tmpOutput = tmpSolver.solve(tmpInput, options);
 
         if (tmpOutput.isSolvable()) {
 
