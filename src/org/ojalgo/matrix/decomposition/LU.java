@@ -37,8 +37,8 @@ import org.ojalgo.scalar.ComplexNumber;
  * Decomposes [this] into [L] and [U] (with pivot order information in an int[]) where:
  * </p>
  * <ul>
- * <li>[L] is a unit lower (left) triangular matrix. It has the same number of rows as [this], and ones on the diagonal.
- * </li>
+ * <li>[L] is a unit lower (left) triangular matrix. It has the same number of rows as [this], and ones on the
+ * diagonal.</li>
  * <li>[U] is an upper (right) triangular matrix. It has the same number of columns as [this].</li>
  * <li>[this] = [L][U] (with reordered rows according to the pivot order)</li>
  * </ul>
@@ -46,14 +46,14 @@ import org.ojalgo.scalar.ComplexNumber;
  * Note: The number of columns in [L] and the number of rows in [U] is not specified by this interface.
  * </p>
  * <p>
- * The LU decomposition always exists - the compute method should always succeed - even for non-square and/or singular
- * matrices. The primary use of the LU decomposition is in the solution of systems of simultaneous linear equations.
- * That will, however, only work for square non-singular matrices.
+ * The LU decomposition always exists - the compute method should always succeed - even for non-square and/or
+ * singular matrices. The primary use of the LU decomposition is in the solution of systems of simultaneous
+ * linear equations. That will, however, only work for square non-singular matrices.
  * </p>
  *
  * @author apete
  */
-public interface LU<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
+public interface LU<N extends Number> extends LDU<N>, DeterminantTask<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> LU<N> make(final Access2D<N> typical) {
@@ -91,8 +91,8 @@ public interface LU<N extends Number> extends MatrixDecomposition<N>, Determinan
     }
 
     /**
-     * The normal {@link #compute(Access2D)} method must handle cases where pivoting is required. If you know that
-     * pivoting is not needed you may call this method instead - it's faster.
+     * The normal {@link #compute(Access2D)} method must handle cases where pivoting is required. If you know
+     * that pivoting is not needed you may call this method instead - it's faster.
      */
     boolean computeWithoutPivoting(MatrixStore<?> matrix);
 
@@ -113,8 +113,8 @@ public interface LU<N extends Number> extends MatrixDecomposition<N>, Determinan
     /**
      * http://en.wikipedia.org/wiki/Row_echelon_form <br>
      * <br>
-     * This is the same as [D][U]. Together with the pivotOrder and [L] this constitutes an alternative, more compact,
-     * way to express the decomposition.
+     * This is the same as [D][U]. Together with the pivotOrder and [L] this constitutes an alternative, more
+     * compact, way to express the decomposition.
      *
      * @see #getPivotOrder()
      * @see #getL()

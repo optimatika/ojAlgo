@@ -138,9 +138,9 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     @Override
-    protected boolean compute(final RawStore aDelegate) {
+    protected boolean compute(final RawStore matrix) {
 
-        myDelegate = new JamaQR(aDelegate);
+        myDelegate = new JamaQR(matrix);
 
         this.computed(true);
 
@@ -148,8 +148,8 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     @Override
-    RawStore solve(final RawStore aRHS) {
-        return myDelegate.solve(aRHS);
+    RawStore solve(final RawStore rhs) {
+        return myDelegate.solve(rhs);
     }
 
     public final boolean compute(final Access2D<?> matrix) {

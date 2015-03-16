@@ -37,7 +37,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
     public static abstract class Factory<N extends Number> {
 
         public final InverterTask<N> make(final MatrixStore<N> template) {
-            return this.make(template, MatrixUtils.isHermitian((Access2D<?>) template));
+            return this.make(template, MatrixUtils.isHermitian(template));
         }
 
         public abstract InverterTask<N> make(MatrixStore<N> template, boolean symmetric);
@@ -108,25 +108,27 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     /**
      * The output must be a "right inverse" and a "generalised inverse".
-     * 
+     *
      * @see BasicMatrix#invert()
      */
-    MatrixStore<N> invert(MatrixStore<N> original) throws TaskException;
+    default MatrixStore<N> invert(final MatrixStore<N> original) throws TaskException {
+        return this.invert(original, this.preallocate(original));
+    }
 
     /**
      * <p>
      * Implementiong this method is optional.
      * </p>
      * <p>
-     * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by this interface.
-     * It must be documented for each implementation.
+     * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by this
+     * interface. It must be documented for each implementation.
      * </p>
      * <p>
      * Should produce the same results as calling {@link #getInverse()}.
      * </p>
-     * 
-     * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must assume this
-     *        is modified, but you cannot assume it will contain the full/final/correct solution.
+     *
+     * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
+     *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
      * @return The inverse
      * @throws UnsupportedOperationException When/if this feature is not implemented
      */
@@ -137,9 +139,10 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
      * Implementiong this method is optional.
      * </p>
      * Will create a {@linkplain DecompositionStore} instance suitable for use with
-     * {@link #solve(Access2D, DecompositionStore)}. When solving an equation system [A][X]=[B] ([mxn][nxb]=[mxb]) the
-     * preallocated memory/matrix will typically be either mxb or nxb (if A is square then there is no doubt).
-     * 
+     * {@link #solve(Access2D, DecompositionStore)}. When solving an equation system [A][X]=[B]
+     * ([mxn][nxb]=[mxb]) the preallocated memory/matrix will typically be either mxb or nxb (if A is square
+     * then there is no doubt).
+     *
      * @param templateBody
      * @param templateRHS
      * @return

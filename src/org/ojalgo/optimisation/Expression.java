@@ -316,8 +316,8 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
-    public double getAdjustedLinearFactor(final Index aKey) {
-        return this.getLinearFactor(aKey, true).doubleValue();
+    public double getAdjustedLinearFactor(final Index key) {
+        return this.getLinearFactor(key, true).doubleValue();
     }
 
     public double getAdjustedLinearFactor(final int aVar) {
@@ -332,8 +332,8 @@ public final class Expression extends ModelEntity<Expression> {
         return this.getAdjustedQuadraticFactor(new RowColumn(aVar1, aVar2));
     }
 
-    public double getAdjustedQuadraticFactor(final RowColumn aKey) {
-        return this.getQuadraticFactor(aKey, true).doubleValue();
+    public double getAdjustedQuadraticFactor(final RowColumn key) {
+        return this.getQuadraticFactor(key, true).doubleValue();
     }
 
     public double getAdjustedQuadraticFactor(final Variable aVar1, final Variable aVar2) {
@@ -354,8 +354,8 @@ public final class Expression extends ModelEntity<Expression> {
         return this.convert(this.compensateUpperLimit(fixedVariables), true).doubleValue();
     }
 
-    public BigDecimal getLinearFactor(final Index aKey) {
-        return this.getLinearFactor(aKey, false);
+    public BigDecimal getLinearFactor(final Index key) {
+        return this.getLinearFactor(key, false);
     }
 
     public BigDecimal getLinearFactor(final int aVar) {
@@ -374,8 +374,8 @@ public final class Expression extends ModelEntity<Expression> {
         return this.getQuadraticFactor(new RowColumn(aVar1, aVar2));
     }
 
-    public BigDecimal getQuadraticFactor(final RowColumn aKey) {
-        return this.getQuadraticFactor(aKey, false);
+    public BigDecimal getQuadraticFactor(final RowColumn key) {
+        return this.getQuadraticFactor(key, false);
     }
 
     public BigDecimal getQuadraticFactor(final Variable aRowVar, final Variable aColVar) {
@@ -440,16 +440,16 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    public void setLinearFactor(final Index aKey, final Number aValue) {
+    public void setLinearFactor(final Index key, final Number value) {
 
-        if (aKey != null) {
+        if (key != null) {
 
-            final BigDecimal tmpValue = TypeUtils.toBigDecimal(aValue);
+            final BigDecimal tmpValue = TypeUtils.toBigDecimal(value);
 
             if (tmpValue.signum() != 0) {
-                myLinear.put(aKey, tmpValue);
+                myLinear.put(key, tmpValue);
             } else {
-                myLinear.remove(aKey);
+                myLinear.remove(key);
             }
 
         } else {
@@ -458,12 +458,12 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    public void setLinearFactor(final int aVar, final Number aValue) {
-        this.setLinearFactor(new Index(aVar), aValue);
+    public void setLinearFactor(final int aVar, final Number value) {
+        this.setLinearFactor(new Index(aVar), value);
     }
 
-    public void setLinearFactor(final Variable aVar, final Number aValue) {
-        this.setLinearFactor(aVar.getIndex(), aValue);
+    public void setLinearFactor(final Variable aVar, final Number value) {
+        this.setLinearFactor(aVar.getIndex(), value);
     }
 
     public void setLinearFactors(final List<Variable> variables, final Access1D<?> factors) {
@@ -490,20 +490,20 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    public void setQuadraticFactor(final int aVar1, final int aVar2, final Number aValue) {
-        this.setQuadraticFactor(new RowColumn(aVar1, aVar2), aValue);
+    public void setQuadraticFactor(final int aVar1, final int aVar2, final Number value) {
+        this.setQuadraticFactor(new RowColumn(aVar1, aVar2), value);
     }
 
-    public void setQuadraticFactor(final RowColumn aKey, final Number aValue) {
+    public void setQuadraticFactor(final RowColumn key, final Number value) {
 
-        if (aKey != null) {
+        if (key != null) {
 
-            final BigDecimal tmpValue = TypeUtils.toBigDecimal(aValue);
+            final BigDecimal tmpValue = TypeUtils.toBigDecimal(value);
 
             if (tmpValue.signum() != 0) {
-                myQuadratic.put(aKey, tmpValue);
+                myQuadratic.put(key, tmpValue);
             } else {
-                myQuadratic.remove(aKey);
+                myQuadratic.remove(key);
             }
 
         } else {
@@ -512,8 +512,8 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    public void setQuadraticFactor(final Variable aVar1, final Variable aVar2, final Number aValue) {
-        this.setQuadraticFactor(myModel.indexOf(aVar1), myModel.indexOf(aVar2), aValue);
+    public void setQuadraticFactor(final Variable aVar1, final Variable aVar2, final Number value) {
+        this.setQuadraticFactor(myModel.indexOf(aVar1), myModel.indexOf(aVar2), value);
     }
 
     public void setQuadraticFactors(final List<Variable> variables, final Access2D<?> factors) {

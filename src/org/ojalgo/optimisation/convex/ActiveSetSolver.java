@@ -33,9 +33,10 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RowsStore;
 import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.convex.KKTSolver.Input;
-import org.ojalgo.optimisation.convex.KKTSolver.Output;
 import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.optimisation.system.KKTSolver;
+import org.ojalgo.optimisation.system.KKTSolver.Input;
+import org.ojalgo.optimisation.system.KKTSolver.Output;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.IndexSelector;
 
@@ -178,8 +179,8 @@ final class ActiveSetSolver extends ConvexSolver {
     }
 
     /**
-     * Find minimum (largest negative) slack - for the inactive inequalities - to potentially activate. Negative slack
-     * means the constraint is violated. Need to make sure it is enforced by activating it.
+     * Find minimum (largest negative) slack - for the inactive inequalities - to potentially activate.
+     * Negative slack means the constraint is violated. Need to make sure it is enforced by activating it.
      */
     private int suggestConstraintToInclude() {
         return myConstraintToInclude;
@@ -498,6 +499,11 @@ final class ActiveSetSolver extends ConvexSolver {
             // At least 1 active inequality
 
             myActivator.shrink();
+
+            //            final PhysicalStore<Double> tmpQ = (PhysicalStore<Double>) this.getQ();
+            //            final AggregatorFunction<Double> tmpAggregator = PrimitiveAggregator.getSet().largest();
+            //            tmpQ.visitAll(tmpAggregator);
+            //            tmpQ.modifyDiagonal(0, 0, PrimitiveFunction.ADD.second(1000000 * tmpAggregator.doubleValue() * PrimitiveMath.MACHINE_EPSILON));
 
             if (this.isDebug()) {
                 this.debug("Did shrink!");

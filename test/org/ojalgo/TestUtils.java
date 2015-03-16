@@ -262,7 +262,7 @@ public abstract class TestUtils {
 
         } else {
 
-            if (!!context.isDifferent(expected.doubleValue(), actual.doubleValue())) {
+            if (context.isDifferent(expected.doubleValue(), actual.doubleValue())) {
                 Assert.failNotEquals(message, expected, actual);
             }
         }

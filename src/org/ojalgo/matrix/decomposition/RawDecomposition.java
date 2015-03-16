@@ -87,10 +87,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return this.getInverse(preallocated);
     }
 
-    public final DecompositionStore<Double> preallocate(final Access2D<Double> templateBody, final Access2D<Double> templateRHS) {
-        return PrimitiveDenseStore.FACTORY.makeZero(templateBody.countRows(), templateRHS.countColumns());
-    }
-
     public final MatrixStore<Double> solve(final Access2D<Double> body, final Access2D<Double> rhs) {
         this.compute(body);
         return this.solve(rhs);
@@ -111,7 +107,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return this.solve(rhs);
     }
 
-    protected abstract boolean compute(RawStore aDelegate);
+    protected abstract boolean compute(RawStore matrix);
 
     protected final int getColDim() {
         return myColDim;
@@ -137,6 +133,11 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return new RawStore(RawStore.FACTORY.makeEye(aRowDim, aColDim));
     }
 
+    @Override
+    protected final DecompositionStore<Double> preallocate(final long numberOfRows, final long numberOfColumns) {
+        return PrimitiveDenseStore.FACTORY.makeZero(numberOfRows, numberOfColumns);
+    }
+
     protected final double[][] setRawInPlace(final Access2D<?> matrix) {
 
         final int tmpRowDim = (int) matrix.countRows();
@@ -159,10 +160,13 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return myRawInPlaceData;
     }
 
+    /**
+     * Possible to override to, possibly, only copy part of the matrix (or transpose it)
+     */
     void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
         MatrixUtils.copy(source, rows, columns, destination);
     }
 
-    abstract RawStore solve(RawStore aRHS);
+    abstract RawStore solve(RawStore rhs);
 
 }

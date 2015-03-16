@@ -22,7 +22,8 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.convex.KKTSolver.Input;
+import org.ojalgo.optimisation.system.KKTSolver;
+import org.ojalgo.optimisation.system.KKTSolver.Input;
 
 /**
  * Solves optimisation problems of the form:

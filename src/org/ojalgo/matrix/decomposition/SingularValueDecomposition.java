@@ -325,10 +325,6 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
         return myFullSize;
     }
 
-    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
-        return this.makeZero((int) templateBody.countColumns(), (int) templateRHS.countColumns());
-    }
-
     public MatrixStore<N> reconstruct() {
         return MatrixUtils.reconstruct(this);
     }

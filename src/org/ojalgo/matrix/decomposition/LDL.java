@@ -19,30 +19,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.system;
+package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.task.DeterminantTask;
 
-public final class EigenvalueSolver extends DecompositionSolver<Eigenvalue<Double>> {
+/**
+ * <p>
+ * LDL: [A] = [L][D][L]<sup>H</sup>
+ * </p>
+ * <p>
+ * [A]<sup>H</sup> = [A] = [L][D][L]<sup>H</sup>
+ * </p>
+ * <p>
+ * If [A] is symmetric (but not necessarily positive definite) then it can be decomposed into
+ * [L][D][L]<sup>T</sup> (or [U]<sup>T</sup>[D][U]).
+ * </p>
+ * <ul>
+ * <li>[L] is a unit lower (left) triangular matrix. It has the same dimensions as [this], and ones on the
+ * diagonal.</li>
+ * <li>[D] is a diagonal matrix. It has the same dimensions as [this].</li>
+ * <li>[this] = [L][D][L]<sup>T</sup</li>
+ * </ul>
+ *
+ * @author apete
+ */
+public interface LDL<N extends Number> extends LDU<N>, DeterminantTask<N> {
 
-    public EigenvalueSolver() {
-        super(Eigenvalue.makePrimitive(true));
-    }
+    N getDeterminant();
 
-    private EigenvalueSolver(final Eigenvalue<Double> decomposition) {
-        super(decomposition);
-    }
+    MatrixStore<N> getL();
 
-    @Override
-    protected boolean validate(final MatrixStore<Double> body) {
+    MatrixStore<N> getD();
 
-        boolean retVal = body.countRows() == body.countColumns();
+    int getRank();
 
-        retVal = retVal && MatrixUtils.isHermitian(body);
-
-        return retVal;
-    }
+    boolean isSquareAndNotSingular();
 
 }

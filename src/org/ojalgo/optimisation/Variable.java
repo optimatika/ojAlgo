@@ -26,6 +26,7 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -158,12 +159,12 @@ public final class Variable extends ModelEntity<Variable> {
         return this.integer(false);
     }
 
-    public void setInteger(final boolean aBool) {
-        myInteger = aBool;
+    public void setInteger(final boolean integer) {
+        myInteger = integer;
     }
 
-    public void setValue(final BigDecimal aValue) {
-        myValue = aValue;
+    public void setValue(final Number value) {
+        myValue = TypeUtils.toBigDecimal(value);
     }
 
     @Override

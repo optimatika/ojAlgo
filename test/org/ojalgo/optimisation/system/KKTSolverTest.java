@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.convex;
+package org.ojalgo.optimisation.system;
 
 import org.ojalgo.FunctionalityTest;
 import org.ojalgo.TestUtils;
@@ -34,6 +34,12 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.convex.MostBasicCase;
+import org.ojalgo.optimisation.convex.Qsd20030327P1Case;
+import org.ojalgo.optimisation.convex.Qsd20030409P1Case;
+import org.ojalgo.optimisation.convex.QsdOldFundOfFundsCase;
+import org.ojalgo.optimisation.convex.QsdOldNormalCase;
+import org.ojalgo.optimisation.convex.QsdOldOptimalCase;
 import org.ojalgo.type.context.NumberContext;
 
 public class KKTSolverTest extends FunctionalityTest {
@@ -290,7 +296,7 @@ public class KKTSolverTest extends FunctionalityTest {
         final QR<Double> tmpQR = QR.makePrimitive();
         tmpQR.compute(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculated  myQR.compute(tmpA).
 
-        if (OptimisationConvexTests.DEBUG) {
+        if (OptimisationSystemTests.DEBUG) {
             BasicLogger.debug("Q", tmpQR.getQ());
             BasicLogger.debug("R", tmpQR.getR());
         }
@@ -315,10 +321,9 @@ public class KKTSolverTest extends FunctionalityTest {
         final MatrixStore<Double> tmpX = PrimitiveDenseStore.FACTORY.copy(matrices[4]);
 
         final KKTSolver.Input tmpFullInput = new KKTSolver.Input(tmpQ, tmpC, tmpA, tmpB);
+        final KKTSolver tmpFullSolver = new KKTSolver(tmpFullInput);
 
-        final KKTSolver tmpSolver = new KKTSolver(tmpFullInput);
-
-        final KKTSolver.Output tmpFullOutput = tmpSolver.solve(tmpFullInput, tmpOptions);
+        final KKTSolver.Output tmpFullOutput = tmpFullSolver.solve(tmpFullInput, tmpOptions);
         final MatrixStore<Double> tmpFullX = tmpFullOutput.getX();
         final MatrixStore<Double> tmpFullL = tmpFullOutput.getL();
 
@@ -329,7 +334,8 @@ public class KKTSolverTest extends FunctionalityTest {
         final KKTSolver.Input tmpStepInput = new KKTSolver.Input(tmpQ, tmpC.add(tmpQ.multiply(tmpFullX).negate()), tmpA,
                 tmpB != null ? ZeroStore.makePrimitive((int) tmpB.countRows(), (int) tmpB.countColumns()) : null);
 
-        final KKTSolver.Output tmpStepOutput = tmpSolver.solve(tmpStepInput, tmpOptions);
+        final KKTSolver tmpStepSolver = new KKTSolver(tmpFullInput);
+        final KKTSolver.Output tmpStepOutput = tmpStepSolver.solve(tmpStepInput, tmpOptions);
         final MatrixStore<Double> tmpStepX = tmpStepOutput.getX();
         final MatrixStore<Double> tmpStepL = tmpStepOutput.getL();
 

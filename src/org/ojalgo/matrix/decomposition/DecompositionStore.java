@@ -32,8 +32,9 @@ import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * <p>
- * Only classes that will act as a delegate to a {@linkplain MatrixDecomposition} implementation from this package
- * should implement this interface. The interface specifications are entirely dictated by the classes in this package.
+ * Only classes that will act as a delegate to a {@linkplain MatrixDecomposition} implementation from this
+ * package should implement this interface. The interface specifications are entirely dictated by the classes
+ * in this package.
  * </p>
  * <p>
  * Do not use it for anything else!
@@ -215,27 +216,28 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
     /**
      * Will solve the equation system [A][X]=[B] where:
      * <ul>
-     * <li>[aBody][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with the
-     * solution).</li>
+     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
+     * the solution).</li>
      * <li>[A] is upper/right triangular</li>
      * </ul>
      *
      * @param body The equation system body parameters [A]
-     * @param conjugated true if the upper/right part of aBody is actually stored in the lower/left part of the matrix,
-     *        and the elements conjugated.
+     * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
+     *        matrix, and the elements conjugated.
      */
     void substituteBackwards(Access2D<N> body, boolean conjugated);
 
     /**
      * Will solve the equation system [A][X]=[B] where:
      * <ul>
-     * <li>[aBody][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with the
-     * solution).</li>
+     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
+     * the solution).</li>
      * <li>[A] is lower/left triangular</li>
      * </ul>
      *
      * @param body The equation system body parameters [A]
-     * @param onesOnDiagonal true if aBody as ones on the diagonal
+     * @param onesOnDiagonal true if body as ones on the diagonal
+     * @param zerosAboveDiagonal
      */
     void substituteForwards(Access2D<N> body, boolean onesOnDiagonal, boolean zerosAboveDiagonal);
 

@@ -19,25 +19,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.convex;
+package org.ojalgo.optimisation.system;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.ZeroStore;
-import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.BasicLogger.Appender;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Optimisation.Options;
 
 /**
- * When the KKT matrix is nonsingular, there is a unique optimal primal-dual pair (x,l). If the KKT matrix is singular,
- * but the KKT system is still solvable, any solution yields an optimal pair (x,l). If the KKT system is not solvable,
- * the quadratic optimization problem is unbounded below or infeasible.
+ * When the KKT matrix is nonsingular, there is a unique optimal primal-dual pair (x,l). If the KKT matrix is
+ * singular, but the KKT system is still solvable, any solution yields an optimal pair (x,l). If the KKT
+ * system is not solvable, the quadratic optimization problem is unbounded below or infeasible.
  *
  * @author apete
  */
@@ -170,30 +171,40 @@ public final class KKTSolver extends Object {
 
     }
 
-    private transient PrimitiveDenseStore myCalculationC = null;
-    private transient PrimitiveDenseStore myCalculationQ = null;
+    private static final Options DEFAULT_OPTIONS = new Optimisation.Options();
 
     private final Cholesky<Double> myCholesky;
-    private final QR<Double> myQR;
+    private final LU<Double> myLU;
 
     public KKTSolver() {
 
         super();
 
         myCholesky = Cholesky.makePrimitive();
-        myQR = QR.makePrimitive();
+        myLU = LU.makePrimitive();
     }
 
     public KKTSolver(final KKTSolver.Input template) {
 
         super();
 
-        myCholesky = Cholesky.make(template.getQ());
-        myQR = QR.makePrimitive();
+        final MatrixStore<Double> tmpQ = template.getQ();
+
+        myCholesky = Cholesky.make(tmpQ);
+        myLU = LU.make(tmpQ);
     }
 
     public Output solve(final Input input) {
-        return this.solve(input, new Optimisation.Options());
+        return this.solve(input, DEFAULT_OPTIONS);
+    }
+
+    private transient PrimitiveDenseStore myX = null;
+
+    PrimitiveDenseStore getX(final Input input) {
+        if (myX == null) {
+            myX = PrimitiveDenseStore.FACTORY.makeZero(input.getQ().countRows(), 1L);
+        }
+        return myX;
     }
 
     public Output solve(final Input input, final Optimisation.Options options) {
@@ -204,29 +215,30 @@ public final class KKTSolver extends Object {
         final MatrixStore<Double> tmpB = input.getB();
 
         boolean tmpSolvable = true;
+        final Appender tmpAppender = options.debug_appender;
 
         if (options.validate) {
             this.doValidate(input);
         }
 
-        MatrixStore<Double> tmpX = null;
+        final PrimitiveDenseStore tmpX = this.getX(input);
         MatrixStore<Double> tmpL = null;
 
-        if (!input.isConstrained() && myQR.compute(tmpQ) && (tmpSolvable = myQR.isSolvable())) {
+        if (!input.isConstrained() && myCholesky.compute(tmpQ) && (tmpSolvable = myCholesky.isSolvable())) {
             // Unconstrained
 
-            tmpX = myQR.solve(tmpC);
+            myCholesky.solve(tmpC, tmpX);
             tmpL = ZeroStore.makePrimitive(0, 1);
 
-        } else if (input.isConstrained() && (tmpA.countRows() >= tmpA.countColumns()) && myQR.compute(tmpA) && (tmpSolvable = myQR.isSolvable())) {
+        } else if (input.isConstrained() && (tmpA.countRows() >= tmpA.countColumns()) && myLU.compute(tmpA) && (tmpSolvable = myLU.isSolvable())) {
             // Only 1 possible solution
 
-            tmpX = myQR.solve(tmpB);
+            myLU.solve(tmpB, tmpX);
 
             final MatrixStore<Double> tmpSolve;
             if (tmpA.countRows() == tmpA.countColumns()) {
-                myQR.compute(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculated  myQR.compute(tmpA).
-                tmpSolve = myQR.solve(tmpC); // Problem here! when A is overdetermined/redundant.
+                myLU.compute(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculated  myQR.compute(tmpA).
+                tmpSolve = myLU.solve(tmpC); // Problem here! when A is overdetermined/redundant.
             } else {
                 // This should rarely be necessary...
                 final SingularValue<Double> tmpSVD = SingularValue.makePrimitive();
@@ -239,63 +251,67 @@ public final class KKTSolver extends Object {
         } else {
             // Actual optimisation problem
 
-            final PrimitiveDenseStore tmpCalcQ = this.getCalculationQ(tmpQ);
-            final PrimitiveDenseStore tmpCalcC = this.getCalculationC(tmpC);
-
-            myCholesky.compute(tmpCalcQ);
+            // myCholesky.compute(tmpQ);
+            if (!myCholesky.isComputed()) {
+                myCholesky.compute(tmpQ);
+            }
 
             if (tmpSolvable = myCholesky.isSolvable()) {
 
                 final MatrixStore<Double> tmpInvQAT = myCholesky.solve(tmpA.transpose());
-                final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpCalcC);
+                final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpC);
 
                 // Negated Schur complement
                 final MatrixStore<Double> tmpS = tmpInvQAT.multiplyLeft(tmpA);
 
-                myQR.compute(tmpS);
+                myLU.compute(tmpS);
 
-                if (options.validate) {
-                    BasicLogger.debug("R", myQR.getR());
+                if (tmpSolvable = myLU.isSolvable()) {
+
+                    tmpL = myLU.solve(tmpInvQC.multiplyLeft(tmpA).add(tmpB.negate()));
+                    myCholesky.solve(tmpC.add(tmpL.multiplyLeft(tmpA.transpose()).negate()), tmpX);
+
+                } else if (tmpAppender != null) {
+
+                    tmpAppender.println("Negated Schur complement LU");
+                    tmpAppender.printmtrx("S", tmpS);
+                    tmpAppender.printmtrx("L", myLU.getL());
+                    tmpAppender.printmtrx("U", myLU.getU());
                 }
 
-                if (tmpSolvable = myQR.isSolvable()) {
+            } else if (tmpAppender != null) {
 
-                    tmpL = myQR.solve(tmpInvQC.multiplyLeft(tmpA).add(tmpB.negate()));
-                    tmpX = myCholesky.solve(tmpCalcC.add(tmpL.multiplyLeft(tmpA.transpose()).negate()));
-
-                } else {
-
-                    final SingularValue<Double> tmpSVD = SingularValue.make(tmpS);
-                    tmpSVD.compute(tmpS);
-                    if (myQR.getRank() != tmpSVD.getRank()) {
-                        BasicLogger.debug("SVD and QR have different rank! {} != {}", tmpSVD.getRank(), myQR.getRank());
-                    }
-
-                    BasicLogger.debug("Negated Schur complement QR");
-                    BasicLogger.debug("Q", myQR.getQ());
-                    BasicLogger.debug("R", myQR.getR());
-                }
-            } else {
-                BasicLogger.debug("Q Cholesky");
-                BasicLogger.debug("L", myCholesky.getL());
+                tmpAppender.println("Q Cholesky");
+                tmpAppender.printmtrx("Q", tmpQ);
+                tmpAppender.printmtrx("L", myCholesky.getL());
             }
 
             if (!tmpSolvable) {
                 // Try solving the full system instaed
-                myQR.compute(input.getKKT());
-                if (tmpSolvable = myQR.isSolvable()) {
+                myLU.compute(input.getKKT());
+                if (tmpSolvable = myLU.isSolvable()) {
 
-                    final MatrixStore<Double> tmpXL = myQR.solve(input.getRHS());
-                    tmpX = tmpXL.builder().rows(0, (int) tmpQ.countColumns()).build();
+                    final MatrixStore<Double> tmpXL = myLU.solve(input.getRHS());
+                    // tmpX = tmpXL.builder().rows(0, (int) tmpQ.countColumns()).build();
+                    tmpX.fillMatching(tmpXL.builder().rows(0, (int) tmpQ.countColumns()).build());
                     tmpL = tmpXL.builder().rows((int) tmpQ.countColumns(), (int) tmpXL.count()).build();
 
-                    //                    final double tmpError = tmpB.subtract(tmpA.multiply(tmpX)).aggregateAll(Aggregator.NORM2);
-                    //                    tmpSolvable = tmpError <= 1E-6;
+                    final MatrixStore<Double> tmpAX = tmpA.multiply(tmpX);
+                    for (int i = 0; i < tmpA.countRows(); i++) {
+                        tmpSolvable &= !options.slack.isDifferent(tmpB.doubleValue(i), tmpAX.doubleValue(i));
+                    }
 
-                } else {
-                    BasicLogger.debug("Full KKT System QR");
-                    BasicLogger.debug("Q", myQR.getQ());
-                    BasicLogger.debug("R", myQR.getR());
+                    if (!tmpSolvable && (tmpAppender != null)) {
+                        tmpAppender.printmtrx("B", tmpB, options.slack);
+                        tmpAppender.printmtrx("AX", tmpAX, options.slack);
+                    }
+
+                } else if (tmpAppender != null) {
+
+                    tmpAppender.println("Full KKT System LU");
+                    tmpAppender.printmtrx("KKT", input.getKKT());
+                    tmpAppender.printmtrx("L", myLU.getL());
+                    tmpAppender.printmtrx("U", myLU.getU());
                 }
             }
         }
@@ -329,7 +345,7 @@ public final class KKTSolver extends Object {
         }
 
         if (((tmpA != null) && (tmpB == null)) || ((tmpA == null) && (tmpB != null))) {
-            throw new IllegalArgumentException("One of A and B is null, and the other one is not!");
+            throw new IllegalArgumentException("Either A or B is null, and the other one is not!");
         }
 
         myCholesky.compute(tmpQ, true);
@@ -353,28 +369,11 @@ public final class KKTSolver extends Object {
         }
 
         if (tmpA != null) {
-            myQR.compute(tmpA.transpose());
-            if (myQR.getRank() != tmpA.countRows()) {
+            myLU.compute(tmpA.transpose());
+            if (myLU.getRank() != tmpA.countRows()) {
                 throw new IllegalArgumentException("A must have full (row) rank!");
             }
         }
     }
 
-    final PrimitiveDenseStore getCalculationC(final MatrixStore<Double> inputC) {
-        if ((myCalculationC == null) || (myCalculationC.count() != inputC.count())) {
-            myCalculationC = PrimitiveDenseStore.FACTORY.copy(inputC);
-        } else {
-            myCalculationC.fillMatching(inputC);
-        }
-        return myCalculationC;
-    }
-
-    final PrimitiveDenseStore getCalculationQ(final MatrixStore<Double> inputQ) {
-        if ((myCalculationQ == null) || (myCalculationQ.count() != inputQ.count())) {
-            myCalculationQ = PrimitiveDenseStore.FACTORY.copy(inputQ);
-        } else {
-            myCalculationQ.fillMatching(inputQ);
-        }
-        return myCalculationQ;
-    }
 }

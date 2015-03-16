@@ -42,10 +42,6 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
         throw new UnsupportedOperationException();
     }
 
-    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
-        return this.makeZero((int) templateRHS.countRows(), (int) templateRHS.countColumns());
-    }
-
     public final MatrixStore<N> solve(final Access2D<N> rhs) {
         return this.solve(rhs, this.preallocate(myInPlace, rhs));
     }

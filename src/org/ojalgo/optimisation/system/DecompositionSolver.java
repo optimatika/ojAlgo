@@ -99,8 +99,7 @@ abstract class DecompositionSolver<D extends MatrixDecomposition<Double>> extend
 
     /**
      * Should test that the equation system body meets the requirements for the
-     * {@linkplain MatrixDecomposition#compute(Access2D)} method for the
-     * specific matrix decomposition.
+     * {@linkplain MatrixDecomposition#compute(Access2D)} method for the specific matrix decomposition.
      */
     protected abstract boolean validate(MatrixStore<Double> body);
 

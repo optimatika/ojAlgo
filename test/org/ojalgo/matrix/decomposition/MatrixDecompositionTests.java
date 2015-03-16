@@ -46,16 +46,16 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Cholesky<?>[] getCholeskyAll() {
-        return new Cholesky<?>[] { Cholesky.makeBig(), Cholesky.makeComplex(), new RawCholesky(), Cholesky.makePrimitive() };
+        return new Cholesky<?>[] { Cholesky.makeBig(), Cholesky.makeComplex(), Cholesky.makePrimitive(), new RawCholesky() };
     }
 
     @SuppressWarnings("unchecked")
     public static final Cholesky<Double>[] getCholeskyPrimitive() {
-        return (Cholesky<Double>[]) new Cholesky<?>[] { new RawCholesky(), new CholeskyDecomposition.Primitive() };
+        return (Cholesky<Double>[]) new Cholesky<?>[] { new CholeskyDecomposition.Primitive(), new RawCholesky() };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllGeneral() {
-        return new Eigenvalue<?>[] { new RawEigenvalue.General(), Eigenvalue.makePrimitive() };
+        return new Eigenvalue<?>[] { Eigenvalue.makePrimitive(), new RawEigenvalue.General() };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllNonsymmetric() {
@@ -68,17 +68,17 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.General(), new GeneralEvD.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new GeneralEvD.Primitive(), new RawEigenvalue.General() };
     }
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveNonsymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.Nonsymmetric(), new NonsymmetricEvD.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new NonsymmetricEvD.Primitive(), new RawEigenvalue.Nonsymmetric() };
     }
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveSymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new RawEigenvalue.Symmetric(), new HermitianEvD32.Primitive() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new HermitianEvD32.Primitive(), new RawEigenvalue.Symmetric() };
     }
 
     public static final Hessenberg<?>[] getHessenbergAll() {
@@ -91,21 +91,21 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final LU<?>[] getLUAll() {
-        return new LU<?>[] { LU.makeBig(), LU.makeComplex(), new RawLU(), LU.makePrimitive() };
+        return new LU<?>[] { LU.makeBig(), LU.makeComplex(), LU.makePrimitive(), new RawLU() };
     }
 
     @SuppressWarnings("unchecked")
     public static final LU<Double>[] getLUPrimitive() {
-        return (LU<Double>[]) new LU<?>[] { new RawLU(), new LUDecomposition.Primitive() };
+        return (LU<Double>[]) new LU<?>[] { new LUDecomposition.Primitive(), new RawLU() };
     }
 
     public static final QR<?>[] getQRAll() {
-        return new QR<?>[] { QR.makeBig(), QR.makeComplex(), new RawQR(), QR.makePrimitive() };
+        return new QR<?>[] { QR.makeBig(), QR.makeComplex(), QR.makePrimitive(), new RawQR() };
     }
 
     @SuppressWarnings("unchecked")
     public static final QR<Double>[] getQRPrimitive() {
-        return (QR<Double>[]) new QR<?>[] { new RawQR(), new QRDecomposition.Primitive() };
+        return (QR<Double>[]) new QR<?>[] { new QRDecomposition.Primitive(), new RawQR() };
     }
 
     public static final Schur<?>[] getSchurAll() {
@@ -118,12 +118,14 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final SingularValue<?>[] getSingularValueAll() {
-        return new SingularValue<?>[] { new SVDold30.Big(), new SVDold30.Complex(), new RawSingularValue(), new SVDold30.Primitive(), new SVDnew32.Primitive() };
+        return new SingularValue<?>[] { new SVDold30.Big(), new SVDold30.Complex(), new SVDold30.Primitive(), new SVDnew32.Primitive(), new RawSingularValue() };
     }
 
     @SuppressWarnings("unchecked")
     public static final SingularValue<Double>[] getSingularValuePrimitive() {
-        return (SingularValue<Double>[]) new SingularValue<?>[] { new RawSingularValue(), /* new SVDold30.Primitive(), */new SVDnew32.Primitive() };
+        return (SingularValue<Double>[]) new SingularValue<?>[] { /*
+                                                                   * new SVDold30.Primitive (),
+                                                                   */new SVDnew32.Primitive(), new RawSingularValue() };
     }
 
     public static final Tridiagonal<?>[] getTridiagonalAll() {

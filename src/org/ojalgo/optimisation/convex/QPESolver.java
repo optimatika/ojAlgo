@@ -26,7 +26,8 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.convex.KKTSolver.Input;
+import org.ojalgo.optimisation.system.KKTSolver;
+import org.ojalgo.optimisation.system.KKTSolver.Input;
 
 /**
  * Solves optimisation problems of the form:

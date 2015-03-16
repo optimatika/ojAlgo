@@ -37,19 +37,19 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
     public static abstract class Factory<N extends Number> {
 
-        public final SolverTask<N> make(final MatrixStore<N> templateBody, final MatrixStore<N> templateRhs) {
-            return this.make(templateBody, templateRhs, MatrixUtils.isHermitian(templateBody));
+        public final SolverTask<N> make(final MatrixStore<N> templateBody, final MatrixStore<N> templateRHS) {
+            return this.make(templateBody, templateRHS, MatrixUtils.isHermitian(templateBody));
         }
 
-        public abstract SolverTask<N> make(MatrixStore<N> templateBody, MatrixStore<N> templateRhs, boolean symmetric);
+        public abstract SolverTask<N> make(MatrixStore<N> templateBody, MatrixStore<N> templateRHS, boolean hermitian);
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        public SolverTask<BigDecimal> make(final MatrixStore<BigDecimal> templateBody, final MatrixStore<BigDecimal> templateRhs, final boolean symmetric) {
-            if (symmetric) {
+        public SolverTask<BigDecimal> make(final MatrixStore<BigDecimal> templateBody, final MatrixStore<BigDecimal> templateRHS, final boolean hermitian) {
+            if (hermitian) {
                 return Cholesky.make(templateBody);
             } else if (templateBody.countRows() == templateBody.countColumns()) {
                 return LU.make(templateBody);
@@ -65,9 +65,9 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        public SolverTask<ComplexNumber> make(final MatrixStore<ComplexNumber> templateBody, final MatrixStore<ComplexNumber> templateRhs,
-                final boolean symmetric) {
-            if (symmetric) {
+        public SolverTask<ComplexNumber> make(final MatrixStore<ComplexNumber> templateBody, final MatrixStore<ComplexNumber> templateRHS,
+                final boolean hermitian) {
+            if (hermitian) {
                 return Cholesky.make(templateBody);
             } else if (templateBody.countRows() == templateBody.countColumns()) {
                 return LU.make(templateBody);
@@ -83,8 +83,8 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        public SolverTask<Double> make(final MatrixStore<Double> templateBody, final MatrixStore<Double> templateRhs, final boolean symmetric) {
-            if (symmetric) {
+        public SolverTask<Double> make(final MatrixStore<Double> templateBody, final MatrixStore<Double> templateRHS, final boolean hermitian) {
+            if (hermitian) {
                 final long tmpDim = templateBody.countColumns();
                 if (tmpDim == 1l) {
                     return AbstractSolver.FULL_1X1;
@@ -134,8 +134,9 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * Implementiong this method is optional.
      * </p>
      * Will create a {@linkplain DecompositionStore} instance suitable for use with
-     * {@link #solve(Access2D, DecompositionStore)}. When solving an equation system [A][X]=[B] ([mxn][nxb]=[mxb]) the
-     * preallocated memory/matrix will typically be either mxb or nxb (if A is square then there is no doubt).
+     * {@link #solve(Access2D, DecompositionStore)}. When solving an equation system [A][X]=[B]
+     * ([mxn][nxb]=[mxb]) the preallocated memory/matrix will typically be either mxb or nxb (if A is square
+     * then there is no doubt).
      *
      * @param templateBody
      * @param templateRHS
@@ -147,23 +148,25 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     /**
      * [A][X]=[B] or [body][return]=[rhs]
      */
-    MatrixStore<N> solve(Access2D<N> body, Access2D<N> rhs) throws TaskException;
+    default MatrixStore<N> solve(final Access2D<N> body, final Access2D<N> rhs) throws TaskException {
+        return this.solve(body, rhs, this.preallocate(body, rhs));
+    }
 
     /**
      * <p>
      * Implementiong this method is optional.
      * </p>
      * <p>
-     * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by this interface.
-     * It must be documented for each implementation.
+     * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by this
+     * interface. It must be documented for each implementation.
      * </p>
      * <p>
      * Should produce the same results as calling {@link #solve(Access2D)}.
      * </p>
      *
      * @param rhs The Right Hand Side, wont be modfied
-     * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must assume this
-     *        is modified, but you cannot assume it will contain the full/final/correct solution.
+     * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
+     *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
      * @return The solution
      * @throws UnsupportedOperationException When/if this feature is not implemented
      */

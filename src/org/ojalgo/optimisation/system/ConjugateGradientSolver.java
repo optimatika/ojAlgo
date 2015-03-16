@@ -26,7 +26,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Optimisation;
 
-public final class ConjugateGradientSolver extends OptimisationSystem {
+final class ConjugateGradientSolver extends OptimisationSystem {
 
     public ConjugateGradientSolver() {
         super();

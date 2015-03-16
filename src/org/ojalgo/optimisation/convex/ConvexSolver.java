@@ -38,6 +38,7 @@ import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.system.KKTSolver;
 
 /**
  * ConvexSolver solves optimisation problems of the form:
@@ -49,16 +50,17 @@ import org.ojalgo.optimisation.Variable;
  * <p>
  * The matrix [Q] is assumed to be symmetric (it must be made that way) and positive (semi)definite:
  * <ul>
- * <li>If [Q] is positive semidefinite, then the objective function is convex: In this case the quadratic program has a
- * global minimizer if there exists some feasible vector [X] (satisfying the constraints) and if the objective function
- * is bounded below on the feasible region.</li>
- * <li>If [Q] is positive definite and the problem has a feasible solution, then the global minimizer is unique.</li>
+ * <li>If [Q] is positive semidefinite, then the objective function is convex: In this case the quadratic
+ * program has a global minimizer if there exists some feasible vector [X] (satisfying the constraints) and if
+ * the objective function is bounded below on the feasible region.</li>
+ * <li>If [Q] is positive definite and the problem has a feasible solution, then the global minimizer is
+ * unique.</li>
  * </ul>
  * </p>
  * <p>
- * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel} and not
- * worry about solver details. If you do want to instantiate a convex solver directly use the {@linkplain Builder}
- * class. It will return an appropriate subclass for you.
+ * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel}
+ * and not worry about solver details. If you do want to instantiate a convex solver directly use the
+ * {@linkplain Builder} class. It will return an appropriate subclass for you.
  * </p>
  *
  * @author apete

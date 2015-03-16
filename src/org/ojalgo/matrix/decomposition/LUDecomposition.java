@@ -59,21 +59,21 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
         private int mySign;
         private boolean myModified = false;
 
-        public Pivot(final int aRowDim) {
+        public Pivot(final int numberOfRows) {
 
             super();
 
-            myOrder = AccessUtils.makeIncreasingRange(0, aRowDim);
+            myOrder = AccessUtils.makeIncreasingRange(0, numberOfRows);
             mySign = 1;
         }
 
-        public void change(final int aRow1, final int aRow2) {
+        public void change(final int row1, final int row2) {
 
-            if (aRow1 != aRow2) {
+            if (row1 != row2) {
 
-                final int temp = myOrder[aRow1];
-                myOrder[aRow1] = myOrder[aRow2];
-                myOrder[aRow2] = temp;
+                final int tmpRow = myOrder[row1];
+                myOrder[row1] = myOrder[row2];
+                myOrder[row2] = tmpRow;
 
                 mySign = -mySign;
 
@@ -88,7 +88,7 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
             return myOrder;
         }
 
-        public final boolean isModified() {
+        public boolean isModified() {
             return myModified;
         }
 

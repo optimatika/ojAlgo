@@ -122,7 +122,8 @@ public abstract class BaseSolver extends GenericSolver {
         }
 
         /**
-         * Will rescale problem parameters to minimise rounding and representation errors.
+         * Will rescale problem parameters to minimise rounding and representation errors. Warning! This will rescale
+         * the objective function and therefore also the optimal value (but not the solution).
          */
         @SuppressWarnings("unchecked")
         public B balance() {

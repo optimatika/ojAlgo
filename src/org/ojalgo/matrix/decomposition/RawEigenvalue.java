@@ -49,9 +49,9 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
         }
 
         @Override
-        protected boolean compute(final RawStore aDelegate) {
+        protected boolean compute(final RawStore matrix) {
 
-            this.setDelegate(new JamaEigenvalue(aDelegate));
+            this.setDelegate(new JamaEigenvalue(matrix));
 
             this.computed(true);
 
@@ -66,9 +66,9 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
         }
 
         @Override
-        protected boolean compute(final RawStore aDelegate) {
+        protected boolean compute(final RawStore matrix) {
 
-            this.setDelegate(new JamaEigenvalue(aDelegate, false));
+            this.setDelegate(new JamaEigenvalue(matrix, false));
 
             this.computed(true);
 
@@ -83,9 +83,9 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
         }
 
         @Override
-        protected boolean compute(final RawStore aDelegate) {
+        protected boolean compute(final RawStore matrix) {
 
-            this.setDelegate(new JamaEigenvalue(aDelegate, true));
+            this.setDelegate(new JamaEigenvalue(matrix, true));
 
             this.computed(true);
 
@@ -230,7 +230,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
     }
 
     @Override
-    RawStore solve(final RawStore aRHS) {
+    RawStore solve(final RawStore rhs) {
         // TODO Auto-generated method stub
         return null;
     }

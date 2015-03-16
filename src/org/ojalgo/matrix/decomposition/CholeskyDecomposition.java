@@ -38,8 +38,8 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain Cholesky#makeBig()}, {@linkplain Cholesky#makeComplex()}, {@linkplain Cholesky#makePrimitive()} or
- * {@linkplain Cholesky#makeJama()}.
+ * {@linkplain Cholesky#makeBig()}, {@linkplain Cholesky#makeComplex()}, {@linkplain Cholesky#makePrimitive()}
+ * or {@linkplain Cholesky#makeJama()}.
  *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
@@ -230,7 +230,7 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
      * Solves [this][X] = [aRHS] by first solving
      *
      * <pre>
-     * [L][Y] = [aRHS]
+     * [L][Y] = [RHS]
      * </pre>
      *
      * and then

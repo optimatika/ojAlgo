@@ -29,19 +29,24 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * Cholesky: [A] = [L][L]<sup>T</sup>
  * <p>
- * If [A] is symmetric and positive definite then the general LU decomposition - [P][L][D][U] - becomes
- * [I][L][D][L]<sup>T</sup> (or [I][U]<sup>T</sup>[D][U]). [I] can be left out and [D] is normally split in halves and
- * merged with [L] (and/or [U]). We'll express it as [A] = [R]<sup>T</sup>[R].
+ * Cholesky: [A] = [L][L]<sup>H</sup>
  * </p>
  * <p>
- * A cholesky decomposition is still/also an LU decomposition where [P][L][D][U] => [R]<sup>T</sup>[R].
+ * [A]<sup>H</sup> = [A] = [L][L]<sup>H</sup>
+ * </p>
+ * <p>
+ * If [A] is symmetric and positive definite then the general LU decomposition - [P][L][D][U] - becomes
+ * [I][L][D][L]<sup>T</sup> (or [I][U]<sup>T</sup>[D][U]). [I] can be left out and [D] is normally split in
+ * halves and merged with [L] (and/or [U]). We'll express it as [A] = [L][L]<sup>T</sup>.
+ * </p>
+ * <p>
+ * A cholesky decomposition is still/also an LU decomposition where [P][L][D][U] => [L][L]<sup>T</sup>.
  * </p>
  *
  * @author apete
  */
-public interface Cholesky<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
+public interface Cholesky<N extends Number> extends LDU<N>, DeterminantTask<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
@@ -76,10 +81,10 @@ public interface Cholesky<N extends Number> extends MatrixDecomposition<N>, Dete
     }
 
     /**
-     * To use the Cholesky decomposition rather than the LU decomposition the matrix must be symmetric and positive
-     * definite. It is recommended that the decomposition algorithm checks for this during calculation. Possibly the
-     * matrix could be assumed to be symmetric (to improve performance) but tests should be made to assure the matrix is
-     * positive definite.
+     * To use the Cholesky decomposition rather than the LU decomposition the matrix must be symmetric and
+     * positive definite. It is recommended that the decomposition algorithm checks for this during
+     * calculation. Possibly the matrix could be assumed to be symmetric (to improve performance) but tests
+     * should be made to assure the matrix is positive definite.
      *
      * @return true if the tests did not fail.
      */

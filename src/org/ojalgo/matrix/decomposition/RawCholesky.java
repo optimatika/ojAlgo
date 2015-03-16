@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.IdentityStore;
@@ -57,24 +60,24 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
 
         this.reset();
 
-        final double[][] tmpRawInPlace = this.setRawInPlace(matrix);
+        final double[][] tmpData = this.setRawInPlace(matrix);
 
         final int tmpRowDim = this.getRowDim();
         mySPD = (this.getColDim() == tmpRowDim);
 
         // Main loop.
         for (int i = 0; i < tmpRowDim; i++) { // For each row
-            final double[] tmpRowI = tmpRawInPlace[i];
-            double tmpVal = 0.0;
+            final double[] tmpRowI = tmpData[i];
+            double tmpVal = ZERO;
             for (int k = 0; k < i; k++) { // For each previous row
-                final double[] tmpRowK = tmpRawInPlace[k];
+                final double[] tmpRowK = tmpData[k];
                 double tmpDotProd = DotProduct.invoke(tmpRowI, tmpRowK, k);
                 tmpRowI[k] = tmpDotProd = (tmpRowI[k] - tmpDotProd) / tmpRowK[k];
                 tmpVal += (tmpDotProd * tmpDotProd);
             }
-            tmpVal = tmpRawInPlace[i][i] - tmpVal;
-            mySPD &= (tmpVal > 0.0);
-            tmpRawInPlace[i][i] = Math.sqrt(Math.max(tmpVal, 0.0));
+            tmpVal = tmpData[i][i] - tmpVal;
+            mySPD &= (tmpVal > ZERO);
+            tmpData[i][i] = Math.sqrt(Math.max(tmpVal, ZERO));
         }
 
         return this.computed(true);
@@ -155,6 +158,12 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         return MatrixUtils.reconstruct(this);
     }
 
+    /**
+     * Will only copy the lower/left part of the matrix
+     *
+     * @see org.ojalgo.matrix.decomposition.RawDecomposition#copy(org.ojalgo.access.Access2D, int, int,
+     *      double[][])
+     */
     @Override
     void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
         for (int i = 0; i < rows; i++) {
@@ -166,15 +175,14 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
     }
 
     @Override
-    protected boolean compute(final RawStore aDelegate) {
-        // TODO Auto-generated method stub
+    protected boolean compute(final RawStore matrix) {
+        ProgrammingError.throwForIllegalInvocation();
         return false;
     }
 
     @Override
-    RawStore solve(final RawStore aRHS) {
+    RawStore solve(final RawStore rhs) {
         // TODO Auto-generated method stub
         return null;
     }
-
 }

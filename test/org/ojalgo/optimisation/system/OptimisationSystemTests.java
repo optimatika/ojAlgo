@@ -10,7 +10,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ojalgo.optimisation.convex;
+package org.ojalgo.optimisation.system;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -20,30 +20,23 @@ import org.ojalgo.FunctionalityTest;
 /**
  * @author apete
  */
-public abstract class OptimisationConvexTests extends FunctionalityTest {
+public abstract class OptimisationSystemTests extends FunctionalityTest {
 
     public static Test suite() {
-        final TestSuite suite = new TestSuite(OptimisationConvexTests.class.getPackage().getName());
+        final TestSuite suite = new TestSuite(OptimisationSystemTests.class.getPackage().getName());
         //$JUnit-BEGIN$
-        suite.addTestSuite(ComPictetPamBamTest.class);
-        suite.addTestSuite(MostBasicCase.class);
-        suite.addTestSuite(Qsd20030327P1Case.class);
-        suite.addTestSuite(Qsd20030409P1Case.class);
-        suite.addTestSuite(QsdOldFundOfFundsCase.class);
-        suite.addTestSuite(QsdOldNormalCase.class);
-        suite.addTestSuite(QsdOldOptimalCase.class);
-        suite.addTestSuite(ConvexProblems.class);
+        suite.addTestSuite(KKTSolverTest.class);
         //$JUnit-END$
         return suite;
     }
 
     static final boolean DEBUG = false;
 
-    protected OptimisationConvexTests() {
+    protected OptimisationSystemTests() {
         super();
     }
 
-    protected OptimisationConvexTests(final String name) {
+    protected OptimisationSystemTests(final String name) {
         super(name);
     }
 }

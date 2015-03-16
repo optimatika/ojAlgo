@@ -97,6 +97,11 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.aggregator();
     }
 
+    @Override
+    protected final DecompositionStore<N> preallocate(final long numberOfRows, final long numberOfColumns) {
+        return myFactory.makeZero(numberOfRows, numberOfColumns);
+    }
+
     protected final FunctionSet<N> getFunctionSet() {
         return myFactory.function();
     }

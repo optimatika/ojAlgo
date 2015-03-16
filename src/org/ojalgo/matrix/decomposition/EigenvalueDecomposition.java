@@ -32,7 +32,8 @@ import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain Eigenvalue#makeBig()}, {@linkplain Eigenvalue#makePrimitive()} or {@linkplain Eigenvalue#makeJama()}.
+ * {@linkplain Eigenvalue#makeBig()}, {@linkplain Eigenvalue#makePrimitive()} or
+ * {@linkplain Eigenvalue#makeJama()}.
  *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
@@ -156,10 +157,6 @@ public abstract class EigenvalueDecomposition<N extends Number> extends GenericD
         }
 
         return myV;
-    }
-
-    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
-        return this.makeZero((int) templateBody.countColumns(), (int) templateRHS.countColumns());
     }
 
     public final MatrixStore<N> reconstruct() {

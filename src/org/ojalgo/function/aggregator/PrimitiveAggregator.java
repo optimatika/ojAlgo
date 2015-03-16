@@ -448,7 +448,7 @@ public abstract class PrimitiveAggregator {
 
                 public void invoke(final double anArg) {
                     final double tmpArg = Math.abs(anArg);
-                    if (tmpArg >= IS_ZERO) {
+                    if (tmpArg != ZERO) {
                         myValue = Math.min(myValue, tmpArg);
                     }
                 }

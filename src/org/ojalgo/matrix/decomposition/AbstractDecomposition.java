@@ -40,7 +40,12 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
     }
 
     public final DecompositionStore<N> preallocate(final Access2D<N> template) {
-        return this.preallocate(template, template);
+        final long tmpCountRows = template.countRows();
+        return this.preallocate(tmpCountRows, tmpCountRows);
+    }
+
+    public final DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
+        return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 
     public final boolean isComputed() {
@@ -59,4 +64,7 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
     protected final boolean computed(final boolean computed) {
         return (myComputed = computed);
     }
+
+    protected abstract DecompositionStore<N> preallocate(long numberOfRows, long numberOfColumns);
+
 }

@@ -35,10 +35,10 @@ public final class SubstituteForwards extends MatrixOperation {
 
     public static int THRESHOLD = 16;
 
-    public static void invoke(final BigDecimal[] aData, final int aRowDim, final int aFirstCol, final int aColLimit, final Access2D<BigDecimal> aBody,
+    public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final Access2D<BigDecimal> body,
             final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
 
-        final int tmpDiagDim = (int) Math.min(aBody.countRows(), aBody.countColumns());
+        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
         final BigDecimal[] tmpBodyRow = new BigDecimal[tmpDiagDim];
         BigDecimal tmpVal;
         int tmpColBaseIndex;
@@ -46,30 +46,30 @@ public final class SubstituteForwards extends MatrixOperation {
         for (int i = 0; i < tmpDiagDim; i++) {
 
             for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = aBody.get(i, j);
+                tmpBodyRow[j] = body.get(i, j);
             }
 
-            for (int s = aFirstCol; s < aColLimit; s++) {
-                tmpColBaseIndex = s * aRowDim;
+            for (int s = firstColumn; s < columnLimit; s++) {
+                tmpColBaseIndex = s * structure;
 
                 tmpVal = BigMath.ZERO;
                 for (int j = zerosAboveDiagonal ? s : 0; j < i; j++) {
-                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(aData[j + tmpColBaseIndex]));
+                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
                 }
-                tmpVal = aData[i + tmpColBaseIndex].subtract(tmpVal);
+                tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
                 if (!onesOnDiagonal) {
                     tmpVal = BigFunction.DIVIDE.invoke(tmpVal, tmpBodyRow[i]);
                 }
 
-                aData[i + tmpColBaseIndex] = tmpVal;
+                data[i + tmpColBaseIndex] = tmpVal;
             }
         }
     }
 
-    public static void invoke(final ComplexNumber[] aData, final int aRowDim, final int aFirstCol, final int aColLimit, final Access2D<ComplexNumber> aBody,
-            final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
+    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit,
+            final Access2D<ComplexNumber> body, final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
 
-        final int tmpDiagDim = (int) Math.min(aBody.countRows(), aBody.countColumns());
+        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
         final ComplexNumber[] tmpBodyRow = new ComplexNumber[tmpDiagDim];
         ComplexNumber tmpVal;
         int tmpColBaseIndex;
@@ -77,30 +77,30 @@ public final class SubstituteForwards extends MatrixOperation {
         for (int i = 0; i < tmpDiagDim; i++) {
 
             for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = aBody.get(i, j);
+                tmpBodyRow[j] = body.get(i, j);
             }
 
-            for (int s = aFirstCol; s < aColLimit; s++) {
-                tmpColBaseIndex = s * aRowDim;
+            for (int s = firstColumn; s < columnLimit; s++) {
+                tmpColBaseIndex = s * structure;
 
                 tmpVal = ComplexNumber.ZERO;
                 for (int j = zerosAboveDiagonal ? s : 0; j < i; j++) {
-                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(aData[j + tmpColBaseIndex]));
+                    tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
                 }
-                tmpVal = aData[i + tmpColBaseIndex].subtract(tmpVal);
+                tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
                 if (!onesOnDiagonal) {
                     tmpVal = tmpVal.divide(tmpBodyRow[i]);
                 }
 
-                aData[i + tmpColBaseIndex] = tmpVal;
+                data[i + tmpColBaseIndex] = tmpVal;
             }
         }
     }
 
-    public static void invoke(final double[] aData, final int aRowDim, final int aFirstCol, final int aColLimit, final Access2D<Double> aBody,
+    public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final Access2D<Double> body,
             final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
 
-        final int tmpDiagDim = (int) Math.min(aBody.countRows(), aBody.countColumns());
+        final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
         final double[] tmpBodyRow = new double[tmpDiagDim];
         double tmpVal;
         int tmpColBaseIndex;
@@ -108,22 +108,22 @@ public final class SubstituteForwards extends MatrixOperation {
         for (int i = 0; i < tmpDiagDim; i++) {
 
             for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = aBody.doubleValue(i, j);
+                tmpBodyRow[j] = body.doubleValue(i, j);
             }
 
-            for (int s = aFirstCol; s < aColLimit; s++) {
-                tmpColBaseIndex = s * aRowDim;
+            for (int s = firstColumn; s < columnLimit; s++) {
+                tmpColBaseIndex = s * structure;
 
                 tmpVal = PrimitiveMath.ZERO;
                 for (int j = zerosAboveDiagonal ? s : 0; j < i; j++) {
-                    tmpVal += tmpBodyRow[j] * aData[j + tmpColBaseIndex];
+                    tmpVal += tmpBodyRow[j] * data[j + tmpColBaseIndex];
                 }
-                tmpVal = aData[i + tmpColBaseIndex] - tmpVal;
+                tmpVal = data[i + tmpColBaseIndex] - tmpVal;
                 if (!onesOnDiagonal) {
                     tmpVal /= tmpBodyRow[i];
                 }
 
-                aData[i + tmpColBaseIndex] = tmpVal;
+                data[i + tmpColBaseIndex] = tmpVal;
             }
         }
     }

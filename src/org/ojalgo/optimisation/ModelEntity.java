@@ -242,7 +242,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
     @SuppressWarnings("unchecked")
     public final ME weight(final Number weight) {
-        final BigDecimal tmpWeight = TypeUtils.toBigDecimal(weight);
+        final BigDecimal tmpWeight = weight != null ? TypeUtils.toBigDecimal(weight) : null;
         if ((tmpWeight != null) && (tmpWeight.signum() != 0)) {
             myContributionWeight = tmpWeight;
         } else {
