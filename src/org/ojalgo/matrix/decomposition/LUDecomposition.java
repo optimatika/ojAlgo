@@ -169,11 +169,6 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
         super(aFactory);
     }
 
-    public final N calculateDeterminant(final Access2D<N> matrix) {
-        this.compute(matrix);
-        return this.getDeterminant();
-    }
-
     public boolean compute(final Access2D<?> aStore) {
         return this.compute(aStore, false);
     }
@@ -321,9 +316,9 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, true, false);
+        preallocated.substituteForwards(tmpBody, true, false, false);
 
-        preallocated.substituteBackwards(tmpBody, false);
+        preallocated.substituteBackwards(tmpBody, false, false, false);
 
         return preallocated;
     }
@@ -387,9 +382,9 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 
-        retVal.substituteForwards(tmpBody, true, !myPivot.isModified());
+        retVal.substituteForwards(tmpBody, true, false, !myPivot.isModified());
 
-        retVal.substituteBackwards(tmpBody, false);
+        retVal.substituteBackwards(tmpBody, false, false, false);
 
         return retVal;
     }

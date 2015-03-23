@@ -506,7 +506,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public void caxpy(final ComplexNumber scalarA, final int columnX, final int columnY, final int firstRow) {
-        AXPY.invoke(data, columnY * myRowDim + firstRow, 1, scalarA, data, columnX * myRowDim + firstRow, 1, myRowDim - firstRow);
+        AXPY.invoke(data, (columnY * myRowDim) + firstRow, 1, scalarA, data, (columnX * myRowDim) + firstRow, 1, myRowDim - firstRow);
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<ComplexNumber> transformationCollector, final boolean eigenvalue) {
@@ -908,8 +908,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public void raxpy(final ComplexNumber scalarA, final int rowX, final int rowY, final int firstColumn) {
-        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data, rowX + (firstColumn * (data.length / myColDim)),
-        data.length / myColDim, myColDim - firstColumn);
+        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data, rowX
+                + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
     public MatrixStore.ElementsConsumer<ComplexNumber> region(final int row, final int column) {
@@ -937,7 +937,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myUtility.fillColumn(aCol + 1, aCol, ComplexNumber.ZERO);
     }
 
-    public void substituteBackwards(final Access2D<ComplexNumber> body, final boolean conjugated) {
+    public void substituteBackwards(final Access2D<ComplexNumber> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -948,7 +948,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteBackwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, conjugated);
+                    SubstituteBackwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, hermitian);
                 }
 
             };
@@ -957,11 +957,11 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         } else {
 
-            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, conjugated);
+            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian);
         }
     }
 
-    public void substituteForwards(final Access2D<ComplexNumber> body, final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
+    public void substituteForwards(final Access2D<ComplexNumber> body, final boolean unitDiagonal, final boolean conjugated, final boolean zerosAboveDiagonal) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -972,7 +972,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteForwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, onesOnDiagonal, zerosAboveDiagonal);
+                    SubstituteForwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, zerosAboveDiagonal);
                 }
 
             };
@@ -981,7 +981,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         } else {
 
-            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, onesOnDiagonal, zerosAboveDiagonal);
+            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, zerosAboveDiagonal);
         }
     }
 

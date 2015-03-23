@@ -51,11 +51,6 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         super();
     }
 
-    public Double calculateDeterminant(final Access2D<Double> matrix) {
-        this.compute(matrix);
-        return this.getDeterminant();
-    }
-
     public boolean compute(final Access2D<?> matrix) {
 
         this.reset();
@@ -65,9 +60,11 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         final int tmpRowDim = this.getRowDim();
         mySPD = (this.getColDim() == tmpRowDim);
 
+        double[] tmpRowI;
+
         // Main loop.
         for (int i = 0; i < tmpRowDim; i++) { // For each row
-            final double[] tmpRowI = tmpData[i];
+            tmpRowI = tmpData[i];
             double tmpVal = ZERO;
             for (int k = 0; k < i; k++) { // For each previous row
                 final double[] tmpRowK = tmpData[k];
@@ -144,14 +141,27 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
 
         final RawStore tmpBody = this.getRawInPlaceStore();
 
-        preallocated.substituteForwards(tmpBody, false, false);
-        preallocated.substituteBackwards(tmpBody, true);
+        preallocated.substituteForwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(tmpBody, false, true, false);
 
         return preallocated;
     }
 
     public boolean isSPD() {
         return mySPD;
+    }
+
+    public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+
+        preallocated.fillAll(ZERO);
+        preallocated.fillDiagonal(0L, 0L, ONE);
+
+        final RawStore tmpBody = this.getRawInPlaceStore();
+
+        preallocated.substituteForwards(tmpBody, false, false, true);
+        preallocated.substituteBackwards(tmpBody, false, true, true);
+
+        return preallocated;
     }
 
     public MatrixStore<Double> reconstruct() {

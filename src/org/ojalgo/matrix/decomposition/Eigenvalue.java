@@ -38,18 +38,18 @@ import org.ojalgo.scalar.ComplexNumber;
  * <li>[D] = a diagonal matrix with the eigenvalues on the diagonal (possibly in blocks).</li>
  * </ul>
  * <p>
- * [A] is normal if [A][A]<sup>H</sup> = [A]<sup>H</sup>[A], and [A] is normal if and only if there exists a unitary
- * matrix [Q] such that [A] = [Q][D][Q]<sup>H</sup>. Hermitian matrices are normal.
+ * [A] is normal if [A][A]<sup>H</sup> = [A]<sup>H</sup>[A], and [A] is normal if and only if there exists a
+ * unitary matrix [Q] such that [A] = [Q][D][Q]<sup>H</sup>. Hermitian matrices are normal.
  * </p>
  * <p>
- * [V] and [D] can always be calculated in the sense that they will satisfy [A][V] = [V][D], but it is not always
- * possible to calculate [V]<sup>-1</sup>. (Check the rank and/or the condition number of [V] to determine the validity
- * of [V][D][V]<sup>-1</sup>.)
+ * [V] and [D] can always be calculated in the sense that they will satisfy [A][V] = [V][D], but it is not
+ * always possible to calculate [V]<sup>-1</sup>. (Check the rank and/or the condition number of [V] to
+ * determine the validity of [V][D][V]<sup>-1</sup>.)
  * </p>
  *
  * @author apete
  */
-public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
+public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, HermitianDecomposition<N>, DeterminantTask<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
@@ -120,12 +120,12 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, De
     boolean compute(Access2D<?> matrix, boolean eigenvaluesOnly);
 
     /**
-     * The only requirements on [D] are that it should contain the eigenvalues and that [A][V] = [V][D]. The ordering of
-     * the eigenvalues is not specified.
+     * The only requirements on [D] are that it should contain the eigenvalues and that [A][V] = [V][D]. The
+     * ordering of the eigenvalues is not specified.
      * <ul>
      * <li>If [A] is real and symmetric then [D] is (purely) diagonal with real eigenvalues.</li>
-     * <li>If [A] is real but not symmetric then [D] is block-diagonal with real eigenvalues in 1-by-1 blocks and
-     * complex eigenvalues in 2-by-2 blocks.</li>
+     * <li>If [A] is real but not symmetric then [D] is block-diagonal with real eigenvalues in 1-by-1 blocks
+     * and complex eigenvalues in 2-by-2 blocks.</li>
      * <li>If [A] is complex then [D] is (purely) diagonal with complex eigenvalues.</li>
      * </ul>
      *
@@ -144,8 +144,8 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, De
 
     /**
      * <p>
-     * Even for real matrices the eigenvalues are potentially complex numbers. Typically they need to be expressed as
-     * complex numbers when [A] is not symmetric.
+     * Even for real matrices the eigenvalues are potentially complex numbers. Typically they need to be
+     * expressed as complex numbers when [A] is not symmetric.
      * </p>
      * <p>
      * The eigenvalues in this array should be ordered in descending order - largest (modulus) first.
@@ -156,8 +156,8 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, De
     Array1D<ComplexNumber> getEigenvalues();
 
     /**
-     * A matrix' trace is the sum of the diagonal elements. It is also the sum of the eigenvalues. This method should
-     * return the sum of the eigenvalues.
+     * A matrix' trace is the sum of the diagonal elements. It is also the sum of the eigenvalues. This method
+     * should return the sum of the eigenvalues.
      *
      * @return The matrix' trace
      */

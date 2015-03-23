@@ -22,11 +22,10 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.task.DeterminantTask;
 
 /**
  * <p>
- * LDL: [A] = [L][D][L]<sup>H</sup>
+ * LDL: [A] = [L][D][L]<sup>H</sup> (or [R]<sup>H</sup>[D][R])
  * </p>
  * <p>
  * [A]<sup>H</sup> = [A] = [L][D][L]<sup>H</sup>
@@ -44,16 +43,30 @@ import org.ojalgo.matrix.task.DeterminantTask;
  *
  * @author apete
  */
-public interface LDL<N extends Number> extends LDU<N>, DeterminantTask<N> {
+public interface LDL<N extends Number> extends LDU<N>, HermitianDecomposition<N> {
 
-    N getDeterminant();
+    /**
+     * Must implement either {@link #getL()} or {@link #getR()}.
+     */
+    default MatrixStore<N> getL() {
+        return this.getR().conjugate();
+    }
 
-    MatrixStore<N> getL();
+    /**
+     * Must implement either {@link #getL()} or {@link #getR()}.
+     */
+    default MatrixStore<N> getR() {
+        return this.getL().conjugate();
+    }
 
     MatrixStore<N> getD();
 
     int getRank();
 
     boolean isSquareAndNotSingular();
+
+    default boolean isFullSize() {
+        return true;
+    }
 
 }

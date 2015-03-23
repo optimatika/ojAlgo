@@ -87,11 +87,6 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return null;
     }
 
-    public N calculateDeterminant(final Access2D<N> matrix) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public N getDeterminant() {
         // TODO Auto-generated method stub
         return null;

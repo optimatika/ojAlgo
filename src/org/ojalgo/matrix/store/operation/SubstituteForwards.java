@@ -36,7 +36,7 @@ public final class SubstituteForwards extends MatrixOperation {
     public static int THRESHOLD = 16;
 
     public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final Access2D<BigDecimal> body,
-            final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
+            final boolean unitDiagonal, final boolean conjugated, final boolean zerosAboveDiagonal) {
 
         final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
         final BigDecimal[] tmpBodyRow = new BigDecimal[tmpDiagDim];
@@ -46,7 +46,7 @@ public final class SubstituteForwards extends MatrixOperation {
         for (int i = 0; i < tmpDiagDim; i++) {
 
             for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = body.get(i, j);
+                tmpBodyRow[j] = conjugated ? body.get(j, i) : body.get(i, j);
             }
 
             for (int s = firstColumn; s < columnLimit; s++) {
@@ -57,7 +57,7 @@ public final class SubstituteForwards extends MatrixOperation {
                     tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
                 }
                 tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
-                if (!onesOnDiagonal) {
+                if (!unitDiagonal) {
                     tmpVal = BigFunction.DIVIDE.invoke(tmpVal, tmpBodyRow[i]);
                 }
 
@@ -67,7 +67,7 @@ public final class SubstituteForwards extends MatrixOperation {
     }
 
     public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit,
-            final Access2D<ComplexNumber> body, final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
+            final Access2D<ComplexNumber> body, final boolean unitDiagonal, final boolean conjugated, final boolean zerosAboveDiagonal) {
 
         final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
         final ComplexNumber[] tmpBodyRow = new ComplexNumber[tmpDiagDim];
@@ -77,7 +77,7 @@ public final class SubstituteForwards extends MatrixOperation {
         for (int i = 0; i < tmpDiagDim; i++) {
 
             for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = body.get(i, j);
+                tmpBodyRow[j] = conjugated ? body.get(j, i).conjugate() : body.get(i, j);
             }
 
             for (int s = firstColumn; s < columnLimit; s++) {
@@ -88,7 +88,7 @@ public final class SubstituteForwards extends MatrixOperation {
                     tmpVal = tmpVal.add(tmpBodyRow[j].multiply(data[j + tmpColBaseIndex]));
                 }
                 tmpVal = data[i + tmpColBaseIndex].subtract(tmpVal);
-                if (!onesOnDiagonal) {
+                if (!unitDiagonal) {
                     tmpVal = tmpVal.divide(tmpBodyRow[i]);
                 }
 
@@ -98,7 +98,7 @@ public final class SubstituteForwards extends MatrixOperation {
     }
 
     public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final Access2D<Double> body,
-            final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
+            final boolean unitDiagonal, final boolean conjugated, final boolean zerosAboveDiagonal) {
 
         final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
         final double[] tmpBodyRow = new double[tmpDiagDim];
@@ -108,7 +108,7 @@ public final class SubstituteForwards extends MatrixOperation {
         for (int i = 0; i < tmpDiagDim; i++) {
 
             for (int j = 0; j <= i; j++) {
-                tmpBodyRow[j] = body.doubleValue(i, j);
+                tmpBodyRow[j] = conjugated ? body.doubleValue(j, i) : body.doubleValue(i, j);
             }
 
             for (int s = firstColumn; s < columnLimit; s++) {
@@ -119,7 +119,7 @@ public final class SubstituteForwards extends MatrixOperation {
                     tmpVal += tmpBodyRow[j] * data[j + tmpColBaseIndex];
                 }
                 tmpVal = data[i + tmpColBaseIndex] - tmpVal;
-                if (!onesOnDiagonal) {
+                if (!unitDiagonal) {
                     tmpVal /= tmpBodyRow[i];
                 }
 

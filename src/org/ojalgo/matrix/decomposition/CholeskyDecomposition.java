@@ -118,11 +118,6 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
         super(aFactory);
     }
 
-    public final N calculateDeterminant(final Access2D<N> matrix) {
-        this.compute(matrix);
-        return this.getDeterminant();
-    }
-
     public final boolean compute(final Access2D<?> aStore) {
         return this.compute(aStore, false);
     }
@@ -253,8 +248,8 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, false, false);
-        preallocated.substituteBackwards(tmpBody, true);
+        preallocated.substituteForwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(tmpBody, false, true, false);
 
         return preallocated;
     }
@@ -263,8 +258,8 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 
-        retVal.substituteForwards(tmpBody, false, true);
-        retVal.substituteBackwards(tmpBody, true);
+        retVal.substituteForwards(tmpBody, false, false, true);
+        retVal.substituteBackwards(tmpBody, false, true, true);
 
         return retVal;
     }

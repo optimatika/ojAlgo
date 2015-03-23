@@ -142,13 +142,14 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
         //$JUnit-BEGIN$
         suite.addTestSuite(BidiagonalTest.class);
         suite.addTestSuite(CompareJamaAndPrimitive.class);
+        suite.addTestSuite(DecompositionProblems.class);
         suite.addTestSuite(DegenerateLUCase.class);
         suite.addTestSuite(DesignCase.class);
         suite.addTestSuite(EigenvalueTest.class);
         suite.addTestSuite(HessenbergTest.class);
+        suite.addTestSuite(LDLTest.class);
         suite.addTestSuite(LUTest.class);
         suite.addTestSuite(QRTest.class);
-        suite.addTestSuite(DecompositionProblems.class);
         suite.addTestSuite(SchurTest.class);
         suite.addTestSuite(SingularValueTest.class);
         suite.addTestSuite(SVDbyEvD.class);

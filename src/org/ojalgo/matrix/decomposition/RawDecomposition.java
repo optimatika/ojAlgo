@@ -66,17 +66,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return AccessUtils.equals(this.reconstruct(), other.reconstruct(), context);
     }
 
-    public abstract MatrixStore<Double> getInverse();
-
-    /**
-     * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
-     *
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#getInverse(org.ojalgo.matrix.decomposition.DecompositionStore)
-     */
-    public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
-        return this.getInverse();
-    }
-
     public final MatrixStore<Double> invert(final MatrixStore<Double> original) {
         this.compute(original);
         return this.getInverse();

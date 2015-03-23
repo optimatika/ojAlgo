@@ -1551,7 +1551,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.fillColumn(aCol + 1, aCol, ZERO);
     }
 
-    public void substituteBackwards(final Access2D<Double> body, final boolean conjugated) {
+    public void substituteBackwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1562,7 +1562,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    SubstituteBackwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, body, conjugated);
+                    SubstituteBackwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, hermitian);
                 }
 
             };
@@ -1571,11 +1571,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         } else {
 
-            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, conjugated);
+            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian);
         }
     }
 
-    public void substituteForwards(final Access2D<Double> body, final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
+    public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean zerosAboveDiagonal) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1586,7 +1586,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    SubstituteForwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, body, onesOnDiagonal, zerosAboveDiagonal);
+                    SubstituteForwards.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, body, unitDiagonal, conjugated, zerosAboveDiagonal);
                 }
 
             };
@@ -1595,7 +1595,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         } else {
 
-            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, onesOnDiagonal, zerosAboveDiagonal);
+            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, zerosAboveDiagonal);
         }
     }
 

@@ -26,6 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.ArrayUtils;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
@@ -54,11 +55,6 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
      */
     public RawLU() {
         super();
-    }
-
-    public Double calculateDeterminant(final Access2D<Double> matrix) {
-        this.compute(matrix);
-        return this.getDeterminant();
     }
 
     /**
@@ -175,11 +171,6 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
         return retVal;
     }
 
-    public int[] getReducedPivots() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public MatrixStore<Double> getU() {
         return this.getRawInPlaceStore().builder().triangular(true, false).build();
     }
@@ -207,9 +198,9 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
 
         final MatrixStore<Double> tmpBody = this.getRawInPlaceStore();
 
-        preallocated.substituteForwards(tmpBody, true, false);
+        preallocated.substituteForwards(tmpBody, true, false, false);
 
-        preallocated.substituteBackwards(tmpBody, false);
+        preallocated.substituteBackwards(tmpBody, false, false, false);
 
         return preallocated;
     }
@@ -297,6 +288,23 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
             }
         }
         return Xmat;
+    }
+
+    public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+
+        final int[] tmpPivotOrder = myPivot.getOrder();
+        final int tmpRowDim = this.getRowDim();
+        for (int i = 0; i < tmpRowDim; i++) {
+            preallocated.set(i, tmpPivotOrder[i], PrimitiveMath.ONE);
+        }
+
+        final RawStore tmpBody = this.getRawInPlaceStore();
+
+        preallocated.substituteForwards(tmpBody, true, false, !myPivot.isModified());
+
+        preallocated.substituteBackwards(tmpBody, false, false, false);
+
+        return preallocated;
     }
 
 }

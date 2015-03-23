@@ -222,10 +222,12 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      * </ul>
      *
      * @param body The equation system body parameters [A]
+     * @param unitDiagonal TODO
      * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
      *        matrix, and the elements conjugated.
+     * @param hermitian TODO
      */
-    void substituteBackwards(Access2D<N> body, boolean conjugated);
+    void substituteBackwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean hermitian);
 
     /**
      * Will solve the equation system [A][X]=[B] where:
@@ -236,10 +238,11 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      * </ul>
      *
      * @param body The equation system body parameters [A]
-     * @param onesOnDiagonal true if body as ones on the diagonal
+     * @param unitDiagonal true if body as ones on the diagonal
+     * @param conjugated TODO
      * @param zerosAboveDiagonal
      */
-    void substituteForwards(Access2D<N> body, boolean onesOnDiagonal, boolean zerosAboveDiagonal);
+    void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean zerosAboveDiagonal);
 
     void transformSymmetric(Householder<N> transformation);
 

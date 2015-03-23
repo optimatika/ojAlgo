@@ -28,7 +28,6 @@ import org.ojalgo.matrix.store.ColumnsStore;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RowsStore;
-import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -53,7 +52,7 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface LU<N extends Number> extends LDU<N>, DeterminantTask<N> {
+public interface LU<N extends Number> extends LDU<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> LU<N> make(final Access2D<N> typical) {
@@ -96,8 +95,6 @@ public interface LU<N extends Number> extends LDU<N>, DeterminantTask<N> {
      */
     boolean computeWithoutPivoting(MatrixStore<?> matrix);
 
-    N getDeterminant();
-
     MatrixStore<N> getL();
 
     /**
@@ -107,8 +104,6 @@ public interface LU<N extends Number> extends LDU<N>, DeterminantTask<N> {
     int[] getPivotOrder();
 
     int getRank();
-
-    int[] getReducedPivots();
 
     /**
      * http://en.wikipedia.org/wiki/Row_echelon_form <br>

@@ -25,12 +25,11 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * <p>
- * Cholesky: [A] = [L][L]<sup>H</sup>
+ * Cholesky: [A] = [L][L]<sup>H</sup> (or [R]<sup>H</sup>[R])
  * </p>
  * <p>
  * [A]<sup>H</sup> = [A] = [L][L]<sup>H</sup>
@@ -46,7 +45,7 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface Cholesky<N extends Number> extends LDU<N>, DeterminantTask<N> {
+public interface Cholesky<N extends Number> extends LDU<N>, HermitianDecomposition<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
@@ -92,8 +91,18 @@ public interface Cholesky<N extends Number> extends LDU<N>, DeterminantTask<N> {
 
     boolean compute(final Access2D<?> matrix, final boolean checkHermitian);
 
-    N getDeterminant();
+    /**
+     * Must implement either {@link #getL()} or {@link #getR()}.
+     */
+    default MatrixStore<N> getL() {
+        return this.getR().conjugate();
+    }
 
-    MatrixStore<N> getL();
+    /**
+     * Must implement either {@link #getL()} or {@link #getR()}.
+     */
+    default MatrixStore<N> getR() {
+        return this.getL().conjugate();
+    }
 
 }

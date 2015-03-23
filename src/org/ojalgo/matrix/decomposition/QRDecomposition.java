@@ -281,7 +281,7 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
             }
         }
 
-        preallocated.substituteBackwards(tmpStore, false);
+        preallocated.substituteBackwards(tmpStore, false, false, false);
 
         if (tmpColDim < tmpRowDim) {
             return preallocated.builder().rows(0, tmpColDim).build();
