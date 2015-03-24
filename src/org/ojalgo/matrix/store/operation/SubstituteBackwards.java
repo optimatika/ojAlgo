@@ -65,9 +65,6 @@ public final class SubstituteBackwards extends MatrixOperation {
                 }
 
                 data[i + tmpColBaseIndex] = tmpVal;
-                if (hermitian && (i != s)) {
-                    data[s + (i * structure)] = tmpVal;
-                }
             }
         }
     }
@@ -102,9 +99,6 @@ public final class SubstituteBackwards extends MatrixOperation {
                 }
 
                 data[i + tmpColBaseIndex] = tmpVal;
-                if (hermitian && (i != s)) {
-                    data[s + (i * structure)] = tmpVal;
-                }
             }
         }
     }
@@ -138,9 +132,6 @@ public final class SubstituteBackwards extends MatrixOperation {
                 }
 
                 data[i + tmpColBaseIndex] = tmpVal;
-                if (hermitian && (i != s)) {
-                    data[s + (i * structure)] = tmpVal;
-                }
             }
         }
     }

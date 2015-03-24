@@ -138,9 +138,8 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
         return d;
     }
 
-    @Override
-    public RawStore getInverse() {
-        return this.solve(this.makeEyeStore((int) this.getL().countRows(), (int) this.getU().countColumns()));
+    public final MatrixStore<Double> getInverse() {
+        return this.getInverse(this.preallocate(this.getRowDim(), this.getRowDim()));
     }
 
     public MatrixStore<Double> getL() {

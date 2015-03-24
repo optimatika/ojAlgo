@@ -34,8 +34,8 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
         super(aFactory);
     }
 
-    public MatrixStore<N> getInverse() {
-        throw new UnsupportedOperationException();
+    public final MatrixStore<N> getInverse() {
+        return this.getInverse(this.preallocate(this.getRowDim(), this.getRowDim()));
     }
 
     public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {

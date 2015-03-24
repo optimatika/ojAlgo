@@ -26,7 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.IdentityStore;
+import org.ojalgo.matrix.store.LowerHermitianStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
@@ -113,9 +113,8 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         return retVal;
     }
 
-    @Override
-    public MatrixStore<Double> getInverse() {
-        return this.solve(IdentityStore.PRIMITIVE.make(this.getRowDim()));
+    public final MatrixStore<Double> getInverse() {
+        return this.getInverse(this.preallocate(this.getRowDim(), this.getRowDim()));
     }
 
     public MatrixStore<Double> getL() {
@@ -153,15 +152,12 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
 
     public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
 
-        preallocated.fillAll(ZERO);
-        preallocated.fillDiagonal(0L, 0L, ONE);
-
         final RawStore tmpBody = this.getRawInPlaceStore();
 
         preallocated.substituteForwards(tmpBody, false, false, true);
         preallocated.substituteBackwards(tmpBody, false, true, true);
 
-        return preallocated;
+        return new LowerHermitianStore<>(preallocated);
     }
 
     public MatrixStore<Double> reconstruct() {

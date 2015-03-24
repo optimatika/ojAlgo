@@ -27,40 +27,40 @@ import org.ojalgo.scalar.Scalar;
 
 public final class LowerTriangularStore<N extends Number> extends ShadingStore<N> {
 
-    private final boolean myAssumeOne;
+    private final boolean myUnitDiagonal;
 
-    public LowerTriangularStore(final MatrixStore<N> aBase, final boolean assumeOne) {
+    public LowerTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
 
-        super((int) aBase.countRows(), (int) Math.min(aBase.countRows(), aBase.countColumns()), aBase);
+        super((int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()), base);
 
-        myAssumeOne = assumeOne;
+        myUnitDiagonal = unitDiagonal;
     }
 
     @SuppressWarnings("unused")
-    private LowerTriangularStore(final int aRowDim, final int aColDim, final MatrixStore<N> aBase) {
+    private LowerTriangularStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
 
-        this(aBase, true);
+        this(base, true);
 
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    public double doubleValue(final long aRow, final long aCol) {
-        if (aRow < aCol) {
+    public double doubleValue(final long row, final long col) {
+        if (row < col) {
             return PrimitiveMath.ZERO;
-        } else if (myAssumeOne && (aRow == aCol)) {
+        } else if (myUnitDiagonal && (row == col)) {
             return PrimitiveMath.ONE;
         } else {
-            return this.getBase().doubleValue(aRow, aCol);
+            return this.getBase().doubleValue(row, col);
         }
     }
 
-    public N get(final long aRow, final long aCol) {
-        if (aRow < aCol) {
+    public N get(final long row, final long col) {
+        if (row < col) {
             return this.factory().scalar().zero().getNumber();
-        } else if (myAssumeOne && (aRow == aCol)) {
+        } else if (myUnitDiagonal && (row == col)) {
             return this.factory().scalar().one().getNumber();
         } else {
-            return this.getBase().get(aRow, aCol);
+            return this.getBase().get(row, col);
         }
     }
 
@@ -72,13 +72,13 @@ public final class LowerTriangularStore<N extends Number> extends ShadingStore<N
         return true;
     }
 
-    public Scalar<N> toScalar(final long row, final long column) {
-        if (row < column) {
+    public Scalar<N> toScalar(final long row, final long col) {
+        if (row < col) {
             return this.factory().scalar().zero();
-        } else if (myAssumeOne && (row == column)) {
+        } else if (myUnitDiagonal && (row == col)) {
             return this.factory().scalar().one();
         } else {
-            return this.getBase().toScalar(row, column);
+            return this.getBase().toScalar(row, col);
         }
     }
 

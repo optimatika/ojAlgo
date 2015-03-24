@@ -147,7 +147,7 @@ public final class RawLDL extends RawDecomposition implements LDL<Double> {
             preallocated.modifyRow(i, 0, PrimitiveFunction.DIVIDE.second(tmpBody.doubleValue(i, i)));
         }
 
-        preallocated.substituteBackwards(tmpBody, true, true, true);
+        preallocated.substituteBackwards(tmpBody, true, true, false);
 
         return preallocated;
     }

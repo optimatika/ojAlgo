@@ -31,6 +31,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.LowerHermitianStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -182,15 +183,14 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
     }
 
     @Override
-    public final MatrixStore<N> getInverse() {
-        return this.invert(this.makeEye(this.getColDim(), this.getRowDim()));
-    }
-
-    @Override
     public final MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
-        preallocated.fillAll(this.getStaticZero());
-        preallocated.fillDiagonal(0, 0, this.getStaticOne());
-        return this.invert(preallocated);
+
+        final DecompositionStore<N> tmpBody = this.getInPlace();
+
+        preallocated.substituteForwards(tmpBody, false, false, true);
+        preallocated.substituteBackwards(tmpBody, false, true, true);
+
+        return new LowerHermitianStore<>(preallocated);
     }
 
     public MatrixStore<N> getL() {
@@ -252,16 +252,6 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
         preallocated.substituteBackwards(tmpBody, false, true, false);
 
         return preallocated;
-    }
-
-    private final MatrixStore<N> invert(final DecompositionStore<N> retVal) {
-
-        final DecompositionStore<N> tmpBody = this.getInPlace();
-
-        retVal.substituteForwards(tmpBody, false, false, true);
-        retVal.substituteBackwards(tmpBody, false, true, true);
-
-        return retVal;
     }
 
 }

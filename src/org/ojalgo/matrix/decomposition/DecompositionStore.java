@@ -240,9 +240,9 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      * @param body The equation system body parameters [A]
      * @param unitDiagonal true if body as ones on the diagonal
      * @param conjugated TODO
-     * @param zerosAboveDiagonal
+     * @param identity
      */
-    void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean zerosAboveDiagonal);
+    void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 
     void transformSymmetric(Householder<N> transformation);
 
