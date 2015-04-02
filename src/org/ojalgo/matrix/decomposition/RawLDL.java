@@ -49,8 +49,7 @@ public final class RawLDL extends RawDecomposition implements LDL<Double> {
         final int tmpDiagDim = this.getRowDim();
         mySPD = (this.getColDim() == tmpDiagDim);
 
-        final double[] tmpModRow = new double[tmpDiagDim];
-
+        final double[] tmpRowIJ = new double[tmpDiagDim];
         double[] tmpRowI;
 
         // Main loop.
@@ -58,16 +57,16 @@ public final class RawLDL extends RawDecomposition implements LDL<Double> {
             tmpRowI = tmpData[ij];
 
             for (int j = 0; j < ij; j++) {
-                tmpModRow[j] = tmpRowI[j] * tmpData[j][j];
+                tmpRowIJ[j] = tmpRowI[j] * tmpData[j][j];
             }
 
-            final double tmpD = tmpRowI[ij] = matrix.doubleValue(ij, ij) - DotProduct.invoke(tmpRowI, tmpModRow, ij);
+            final double tmpD = tmpRowI[ij] = matrix.doubleValue(ij, ij) - DotProduct.invoke(tmpRowI, tmpRowIJ, ij);
             mySPD &= (tmpD > ZERO);
 
             for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
                 tmpRowI = tmpData[i];
 
-                tmpRowI[ij] = (matrix.doubleValue(i, ij) - DotProduct.invoke(tmpRowI, tmpModRow, ij)) / tmpD;
+                tmpRowI[ij] = (matrix.doubleValue(i, ij) - DotProduct.invoke(tmpRowI, tmpRowIJ, ij)) / tmpD;
             }
         }
 

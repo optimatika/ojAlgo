@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
@@ -43,6 +44,33 @@ import org.ojalgo.scalar.ComplexNumber;
  * @author apete
  */
 public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
+
+    public static final class ColumnReference<N extends Number> implements Access1D<N> {
+
+        public int column = 0;
+
+        private final DecompositionStore<N> myStore;
+
+        public ColumnReference(final DecompositionStore<N> store) {
+
+            super();
+
+            myStore = store;
+        }
+
+        public long count() {
+            return myStore.countColumns();
+        }
+
+        public double doubleValue(final long index) {
+            return myStore.doubleValue(index, column);
+        }
+
+        public N get(final long index) {
+            return myStore.get(index, column);
+        }
+
+    }
 
     public static final class HouseholderReference<N extends Number> implements Householder<N> {
 
@@ -181,6 +209,33 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
             retVal.append(" }");
 
             return retVal.toString();
+        }
+
+    }
+
+    public static final class RowReference<N extends Number> implements Access1D<N> {
+
+        public int row = 0;
+
+        private final DecompositionStore<N> myStore;
+
+        public RowReference(final DecompositionStore<N> store) {
+
+            super();
+
+            myStore = store;
+        }
+
+        public long count() {
+            return myStore.countColumns();
+        }
+
+        public double doubleValue(final long index) {
+            return myStore.doubleValue(row, index);
+        }
+
+        public N get(final long index) {
+            return myStore.get(row, index);
         }
 
     }

@@ -33,7 +33,7 @@ public final class SubstituteBackwards extends MatrixOperation {
 
     public static final SubstituteBackwards SETUP = new SubstituteBackwards();
 
-    public static int THRESHOLD = 32;
+    public static int THRESHOLD = 64;
 
     public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final Access2D<BigDecimal> body,
             final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {

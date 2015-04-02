@@ -21,6 +21,11 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -35,6 +40,19 @@ import org.ojalgo.TestUtils;
 public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     static final boolean DEBUG = true;
+
+    public static final List<MatrixDecomposition<Double>> getAllPrimitive() {
+
+        final List<MatrixDecomposition<Double>> retVal = new ArrayList<>();
+
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getCholeskyPrimitive()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getLUPrimitive()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getQRPrimitive()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getSingularValuePrimitive()));
+        retVal.addAll(Arrays.asList(MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric()));
+
+        return Collections.unmodifiableList(retVal);
+    }
 
     public static final Bidiagonal<?>[] getBidiagonalAll() {
         return new Bidiagonal<?>[] { new BidiagonalDecomposition.Big(), Bidiagonal.makeComplex(), Bidiagonal.makePrimitive() };

@@ -274,19 +274,19 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
-    public static final boolean isLowerLeftShaded(final Access1D<?> anAccess) {
-        return anAccess instanceof MatrixStore<?> ? ((MatrixStore<?>) anAccess).isLowerLeftShaded() : false;
+    public static final boolean isLowerLeftShaded(final Access1D<?> matrix) {
+        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).isLowerLeftShaded() : false;
     }
 
     public static <N extends Number> boolean isNormal(final MatrixStore<N> matrix) {
 
-        final MatrixStore<N> tmpConjugate = matrix.builder().conjugate().build();
+        final MatrixStore<N> tmpConjugate = matrix.conjugate();
 
         return matrix.multiplyLeft(tmpConjugate).equals(matrix.multiply(tmpConjugate));
     }
 
-    public static final boolean isUpperRightShaded(final Access1D<?> anAccess) {
-        return anAccess instanceof MatrixStore<?> ? ((MatrixStore<?>) anAccess).isUpperRightShaded() : false;
+    public static final boolean isUpperRightShaded(final Access1D<?> matrix) {
+        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).isUpperRightShaded() : false;
     }
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int aRowDim, final int aColDim) {
@@ -347,33 +347,74 @@ public abstract class MatrixUtils {
     }
 
     public static void setAllOperationThresholds(final int value) {
-        AggregateAll.THRESHOLD = value;
-        ApplyCholesky.THRESHOLD = value;
-        ApplyLU.THRESHOLD = value;
-        AXPY.THRESHOLD = value;
-        FillMatchingBoth.THRESHOLD = value;
-        FillConjugated.THRESHOLD = value;
-        FillMatchingLeft.THRESHOLD = value;
-        FillMatchingRight.THRESHOLD = value;
-        FillMatchingSingle.THRESHOLD = value;
-        FillTransposed.THRESHOLD = value;
-        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = value;
-        GenerateApplyAndCopyHouseholderRow.THRESHOLD = value;
-        HermitianRank2Update.THRESHOLD = value;
-        HouseholderHermitian.THRESHOLD = value;
-        HouseholderLeft.THRESHOLD = value;
-        HouseholderRight.THRESHOLD = value;
-        MAXPY.THRESHOLD = value;
-        ModifyAll.THRESHOLD = value;
-        MultiplyBoth.THRESHOLD = value;
-        MultiplyHermitianAndVector.THRESHOLD = value;
-        MultiplyLeft.THRESHOLD = value;
-        MultiplyRight.THRESHOLD = value;
-        RotateLeft.THRESHOLD = value;
-        RotateRight.THRESHOLD = value;
-        SubstituteBackwards.THRESHOLD = value;
-        SubstituteForwards.THRESHOLD = value;
-        SubtractScaledVector.THRESHOLD = value;
+        MatrixUtils.setThresholdsMaxValue(value);
+        MatrixUtils.setThresholdsMinValue(value);
+    }
+
+    /**
+     * @param maxValue The max allowed/required value
+     */
+    public static void setThresholdsMaxValue(final int maxValue) {
+        AggregateAll.THRESHOLD = Math.min(maxValue, AggregateAll.THRESHOLD);
+        ApplyCholesky.THRESHOLD = Math.min(maxValue, ApplyCholesky.THRESHOLD);
+        ApplyLU.THRESHOLD = Math.min(maxValue, ApplyLU.THRESHOLD);
+        AXPY.THRESHOLD = Math.min(maxValue, AXPY.THRESHOLD);
+        FillMatchingBoth.THRESHOLD = Math.min(maxValue, FillMatchingBoth.THRESHOLD);
+        FillConjugated.THRESHOLD = Math.min(maxValue, FillConjugated.THRESHOLD);
+        FillMatchingLeft.THRESHOLD = Math.min(maxValue, FillMatchingLeft.THRESHOLD);
+        FillMatchingRight.THRESHOLD = Math.min(maxValue, FillMatchingRight.THRESHOLD);
+        FillMatchingSingle.THRESHOLD = Math.min(maxValue, FillMatchingSingle.THRESHOLD);
+        FillTransposed.THRESHOLD = Math.min(maxValue, FillTransposed.THRESHOLD);
+        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
+        GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
+        HermitianRank2Update.THRESHOLD = Math.min(maxValue, HermitianRank2Update.THRESHOLD);
+        HouseholderHermitian.THRESHOLD = Math.min(maxValue, HouseholderHermitian.THRESHOLD);
+        HouseholderLeft.THRESHOLD = Math.min(maxValue, HouseholderLeft.THRESHOLD);
+        HouseholderRight.THRESHOLD = Math.min(maxValue, HouseholderRight.THRESHOLD);
+        MAXPY.THRESHOLD = Math.min(maxValue, MAXPY.THRESHOLD);
+        ModifyAll.THRESHOLD = Math.min(maxValue, ModifyAll.THRESHOLD);
+        MultiplyBoth.THRESHOLD = Math.min(maxValue, MultiplyBoth.THRESHOLD);
+        MultiplyHermitianAndVector.THRESHOLD = Math.min(maxValue, MultiplyHermitianAndVector.THRESHOLD);
+        MultiplyLeft.THRESHOLD = Math.min(maxValue, MultiplyLeft.THRESHOLD);
+        MultiplyRight.THRESHOLD = Math.min(maxValue, MultiplyRight.THRESHOLD);
+        RotateLeft.THRESHOLD = Math.min(maxValue, RotateLeft.THRESHOLD);
+        RotateRight.THRESHOLD = Math.min(maxValue, RotateRight.THRESHOLD);
+        SubstituteBackwards.THRESHOLD = Math.min(maxValue, SubstituteBackwards.THRESHOLD);
+        SubstituteForwards.THRESHOLD = Math.min(maxValue, SubstituteForwards.THRESHOLD);
+        SubtractScaledVector.THRESHOLD = Math.min(maxValue, SubtractScaledVector.THRESHOLD);
+    }
+
+    /**
+     * @param minValue The min allowed/required value
+     */
+    public static void setThresholdsMinValue(final int minValue) {
+        AggregateAll.THRESHOLD = Math.max(minValue, AggregateAll.THRESHOLD);
+        ApplyCholesky.THRESHOLD = Math.max(minValue, ApplyCholesky.THRESHOLD);
+        ApplyLU.THRESHOLD = Math.max(minValue, ApplyLU.THRESHOLD);
+        AXPY.THRESHOLD = Math.max(minValue, AXPY.THRESHOLD);
+        FillMatchingBoth.THRESHOLD = Math.max(minValue, FillMatchingBoth.THRESHOLD);
+        FillConjugated.THRESHOLD = Math.max(minValue, FillConjugated.THRESHOLD);
+        FillMatchingLeft.THRESHOLD = Math.max(minValue, FillMatchingLeft.THRESHOLD);
+        FillMatchingRight.THRESHOLD = Math.max(minValue, FillMatchingRight.THRESHOLD);
+        FillMatchingSingle.THRESHOLD = Math.max(minValue, FillMatchingSingle.THRESHOLD);
+        FillTransposed.THRESHOLD = Math.max(minValue, FillTransposed.THRESHOLD);
+        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
+        GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
+        HermitianRank2Update.THRESHOLD = Math.max(minValue, HermitianRank2Update.THRESHOLD);
+        HouseholderHermitian.THRESHOLD = Math.max(minValue, HouseholderHermitian.THRESHOLD);
+        HouseholderLeft.THRESHOLD = Math.max(minValue, HouseholderLeft.THRESHOLD);
+        HouseholderRight.THRESHOLD = Math.max(minValue, HouseholderRight.THRESHOLD);
+        MAXPY.THRESHOLD = Math.max(minValue, MAXPY.THRESHOLD);
+        ModifyAll.THRESHOLD = Math.max(minValue, ModifyAll.THRESHOLD);
+        MultiplyBoth.THRESHOLD = Math.max(minValue, MultiplyBoth.THRESHOLD);
+        MultiplyHermitianAndVector.THRESHOLD = Math.max(minValue, MultiplyHermitianAndVector.THRESHOLD);
+        MultiplyLeft.THRESHOLD = Math.max(minValue, MultiplyLeft.THRESHOLD);
+        MultiplyRight.THRESHOLD = Math.max(minValue, MultiplyRight.THRESHOLD);
+        RotateLeft.THRESHOLD = Math.max(minValue, RotateLeft.THRESHOLD);
+        RotateRight.THRESHOLD = Math.max(minValue, RotateRight.THRESHOLD);
+        SubstituteBackwards.THRESHOLD = Math.max(minValue, SubstituteBackwards.THRESHOLD);
+        SubstituteForwards.THRESHOLD = Math.max(minValue, SubstituteForwards.THRESHOLD);
+        SubtractScaledVector.THRESHOLD = Math.max(minValue, SubtractScaledVector.THRESHOLD);
     }
 
     public static String toString(final Access2D<?> matrix) {

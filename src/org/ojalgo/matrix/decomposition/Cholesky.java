@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -53,14 +54,14 @@ public interface Cholesky<N extends Number> extends LDU<N>, HermitianDecompositi
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (Cholesky<N>) Cholesky.makeBig();
+            return (Cholesky<N>) new CholeskyDecomposition.Big();
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (Cholesky<N>) Cholesky.makeComplex();
+            return (Cholesky<N>) new CholeskyDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            if ((typical.countColumns() <= 32) || (typical.countColumns() >= 46340)) { //64,16,16
+            if ((typical.countColumns() <= 256) || (typical.count() > BasicArray.MAX_ARRAY_SIZE)) {
                 return (Cholesky<N>) new RawCholesky();
             } else {
-                return (Cholesky<N>) Cholesky.makePrimitive();
+                return (Cholesky<N>) new CholeskyDecomposition.Primitive();
             }
         } else {
             throw new IllegalArgumentException();

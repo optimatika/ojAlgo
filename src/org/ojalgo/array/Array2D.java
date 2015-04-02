@@ -27,8 +27,6 @@ import java.util.List;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.ColumnsIterator;
-import org.ojalgo.access.RowsIterator;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -311,15 +309,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     /**
-     * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not copied, it is
-     * just accessed through a different adaptor.
+     * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not
+     * copied, it is just accessed through a different adaptor.
      */
     public Array1D<N> asArray1D() {
         return myDelegate.asArray1D();
-    }
-
-    public Iterable<Access1D<N>> columns() {
-        return ColumnsIterator.make(this);
     }
 
     public long count() {
@@ -523,10 +517,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
         myDelegate.modify(row + (column * myRowsCount), row + (myColumnsCount * myRowsCount), myRowsCount, function);
-    }
-
-    public Iterable<Access1D<N>> rows() {
-        return RowsIterator.make(this);
     }
 
     public void set(final long index, final double value) {

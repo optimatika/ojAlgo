@@ -23,6 +23,7 @@ package org.ojalgo.array;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
@@ -43,12 +44,12 @@ import org.ojalgo.scalar.Scalar;
 /**
  * <p>
  * A BasicArray is one-dimensional, but designed to easily be extended or encapsulated, and then treated as
- * arbitrary-dimensional. It stores/handles (any subclass of) {@linkplain java.lang.Number} elements depending on the
- * subclass/implementation.
+ * arbitrary-dimensional. It stores/handles (any subclass of) {@linkplain java.lang.Number} elements depending
+ * on the subclass/implementation.
  * </p>
  * <p>
- * This abstract class defines a set of methods to access and modify array elements. It does not "know" anything about
- * linear algebra or similar.
+ * This abstract class defines a set of methods to access and modify array elements. It does not "know"
+ * anything about linear algebra or similar.
  * </p>
  *
  * @author apete
@@ -93,11 +94,21 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     }
 
+    /**
+     * Exists as a private constant in {@link ArrayList}.
+     */
+    public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+
     static final BasicFactory<BigDecimal> BIG = new BasicFactory<BigDecimal>() {
 
         @Override
         DenseFactory<BigDecimal> getDenseFactory() {
             return BigArray.FACTORY;
+        }
+
+        @Override
+        long getElementSize() {
+            return BigArray.ELEMENT_SIZE;
         }
 
         @Override
@@ -110,11 +121,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return SparseArray.BIG;
         }
 
-        @Override
-        long getElementSize() {
-            return BigArray.ELEMENT_SIZE;
-        }
-
     };
 
     static final BasicFactory<ComplexNumber> COMPLEX = new BasicFactory<ComplexNumber>() {
@@ -122,6 +128,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         @Override
         DenseFactory<ComplexNumber> getDenseFactory() {
             return ComplexArray.FACTORY;
+        }
+
+        @Override
+        long getElementSize() {
+            return ComplexArray.ELEMENT_SIZE;
         }
 
         @Override
@@ -134,35 +145,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return SparseArray.COMPLEX;
         }
 
-        @Override
-        long getElementSize() {
-            return ComplexArray.ELEMENT_SIZE;
-        }
-
-    };
-
-    static final BasicFactory<Quaternion> QUATERNION = new BasicFactory<Quaternion>() {
-
-        @Override
-        DenseFactory<Quaternion> getDenseFactory() {
-            return QuaternionArray.FACTORY;
-        }
-
-        @Override
-        SegmentedFactory<Quaternion> getSegmentedFactory() {
-            return SegmentedArray.QUATERNION;
-        }
-
-        @Override
-        SparseFactory<Quaternion> getSparseFactory() {
-            return SparseArray.QUATERNION;
-        }
-
-        @Override
-        long getElementSize() {
-            return QuaternionArray.ELEMENT_SIZE;
-        }
-
     };
 
     static final BasicFactory<Double> PRIMITIVE = new BasicFactory<Double>() {
@@ -170,6 +152,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         @Override
         DenseFactory<Double> getDenseFactory() {
             return PrimitiveArray.FACTORY;
+        }
+
+        @Override
+        long getElementSize() {
+            return PrimitiveArray.ELEMENT_SIZE;
         }
 
         @Override
@@ -182,9 +169,28 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return SparseArray.PRIMITIVE;
         }
 
+    };
+
+    static final BasicFactory<Quaternion> QUATERNION = new BasicFactory<Quaternion>() {
+
+        @Override
+        DenseFactory<Quaternion> getDenseFactory() {
+            return QuaternionArray.FACTORY;
+        }
+
         @Override
         long getElementSize() {
-            return PrimitiveArray.ELEMENT_SIZE;
+            return QuaternionArray.ELEMENT_SIZE;
+        }
+
+        @Override
+        SegmentedFactory<Quaternion> getSegmentedFactory() {
+            return SegmentedArray.QUATERNION;
+        }
+
+        @Override
+        SparseFactory<Quaternion> getSparseFactory() {
+            return SparseArray.QUATERNION;
         }
 
     };
@@ -197,6 +203,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         }
 
         @Override
+        long getElementSize() {
+            return RationalArray.ELEMENT_SIZE;
+        }
+
+        @Override
         SegmentedFactory<RationalNumber> getSegmentedFactory() {
             return SegmentedArray.RATIONAL;
         }
@@ -204,11 +215,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         @Override
         SparseFactory<RationalNumber> getSparseFactory() {
             return SparseArray.RATIONAL;
-        }
-
-        @Override
-        long getElementSize() {
-            return RationalArray.ELEMENT_SIZE;
         }
 
     };
@@ -257,8 +263,9 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     /**
      * <p>
-     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray} as a
-     * one-dimensional array. Note that you will modify the actual array by accessing it through this facade.
+     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
+     * as a one-dimensional array. Note that you will modify the actual array by accessing it through this
+     * facade.
      * </p>
      * <p>
      * Disregards the array structure, and simply treats it as one-domensional.
@@ -270,13 +277,14 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     /**
      * <p>
-     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray} as a
-     * two-dimensional array. Note that you will modify the actual array by accessing it through this facade.
+     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
+     * as a two-dimensional array. Note that you will modify the actual array by accessing it through this
+     * facade.
      * </p>
      * <p>
      * If "this" has more than two dimensions then only the first plane of the first cube of the first... is
-     * used/accessed. If this only has one dimension then everything is assumed to be in the first column of the first
-     * plane of the first cube...
+     * used/accessed. If this only has one dimension then everything is assumed to be in the first column of
+     * the first plane of the first cube...
      * </p>
      */
     protected final Array2D<N> asArray2D(final long structure) {
@@ -285,8 +293,9 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     /**
      * <p>
-     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray} as a
-     * multi-dimensional array. Note that you will modify the actual array by accessing it through this facade.
+     * A utility facade that conveniently/consistently presents the {@linkplain org.ojalgo.array.BasicArray}
+     * as a multi-dimensional array. Note that you will modify the actual array by accessing it through this
+     * facade.
      * </p>
      */
     protected final ArrayAnyD<N> asArrayAnyD(final long[] structure) {
