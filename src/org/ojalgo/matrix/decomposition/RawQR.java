@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 @Deprecated
-public final class RawQR extends RawDecomposition implements QR<Double> {
+public final class RawQR extends OldRawDecomposition implements QR<Double> {
 
     private JamaQR myDelegate;
 
@@ -75,7 +75,7 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     public RawStore solve(final Access2D<Double> rhs) {
-        return new RawStore(this.solve(RawDecomposition.cast(rhs)));
+        return new RawStore(this.solve(OldRawDecomposition.cast(rhs)));
     }
 
     @Override
@@ -156,7 +156,7 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
 
         this.reset();
 
-        return this.compute(RawDecomposition.cast(matrix));
+        return this.compute(OldRawDecomposition.cast(matrix));
     }
 
     /**

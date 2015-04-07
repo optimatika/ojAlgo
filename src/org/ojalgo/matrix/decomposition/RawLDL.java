@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -151,32 +150,14 @@ public final class RawLDL extends RawDecomposition implements LDL<Double> {
         return preallocated;
     }
 
-    @Override
-    protected boolean compute(final RawStore matrix) {
-        ProgrammingError.throwForIllegalInvocation();
-        return false;
-    }
-
     /**
-     * Will only copy the lower/left part of the matrix
+     * Doesn't copy anything. Tha input original matrix is copied while computing the decomposition.
      *
      * @see org.ojalgo.matrix.decomposition.RawDecomposition#copy(org.ojalgo.access.Access2D, int, int,
      *      double[][])
      */
     @Override
     void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
-        //        for (int i = 0; i < rows; i++) {
-        //            final double[] tmpRow = destination[i];
-        //            for (int j = 0; j <= i; j++) {
-        //                tmpRow[j] = source.doubleValue(i, j);
-        //            }
-        //        }
-    }
-
-    @Override
-    RawStore solve(final RawStore rhs) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {

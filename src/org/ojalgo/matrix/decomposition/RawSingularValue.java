@@ -39,7 +39,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 @Deprecated
-public final class RawSingularValue extends RawDecomposition implements SingularValue<Double> {
+public final class RawSingularValue extends OldRawDecomposition implements SingularValue<Double> {
 
     private JamaSingularValue myDelegate;
     private RawStore myPseudoinverse;
@@ -57,7 +57,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
 
         this.reset();
 
-        final RawStore tmpCast = RawDecomposition.cast(matrix);
+        final RawStore tmpCast = OldRawDecomposition.cast(matrix);
 
         return this.compute(tmpCast, singularValuesOnly);
     }
@@ -226,7 +226,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
 
         this.reset();
 
-        return this.compute(RawDecomposition.cast(matrix));
+        return this.compute(OldRawDecomposition.cast(matrix));
     }
 
     /**

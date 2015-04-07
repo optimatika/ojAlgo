@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -34,14 +35,30 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-abstract class RawDecomposition extends AbstractDecomposition<Double> {
+abstract class OldRawDecomposition extends AbstractDecomposition<Double> {
+
+    protected static RawStore cast(final Access2D<?> access) {
+        if (access instanceof RawStore) {
+            return ((RawStore) access);
+        } else {
+            return new RawStore(ArrayUtils.toRawCopyOf(access));
+        }
+    }
+
+    static double[][] extract(final Access2D<?> access) {
+        if (access instanceof RawStore) {
+            return ((RawStore) access).data;
+        } else {
+            return ArrayUtils.toRawCopyOf(access);
+        }
+    }
 
     private int myColDim;
     private double[][] myRawInPlaceData;
     private RawStore myRawInPlaceStore;
     private int myRowDim;
 
-    protected RawDecomposition() {
+    protected OldRawDecomposition() {
         super();
     }
 
@@ -78,6 +95,8 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     public MatrixStore<Double> solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
         return this.solve(rhs);
     }
+
+    protected abstract boolean compute(RawStore matrix);
 
     protected final int getColDim() {
         return myColDim;
@@ -136,5 +155,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
         MatrixUtils.copy(source, rows, columns, destination);
     }
+
+    abstract RawStore solve(RawStore rhs);
 
 }

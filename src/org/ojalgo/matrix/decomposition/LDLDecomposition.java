@@ -21,12 +21,17 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.MatrixStore.Builder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -63,8 +68,38 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     }
 
     public boolean compute(final Access2D<?> matrix) {
-        // TODO Auto-generated method stub
-        return false;
+
+        this.reset();
+
+        final DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
+
+        final int tmpRowDim = this.getRowDim();
+        final int tmpColDim = this.getColDim();
+        final int tmpMinDim = this.getMinDim();
+
+        final BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
+
+        // Main loop - along the diagonal
+        for (int ij = 0; ij < tmpMinDim; ij++) {
+
+            // Do the calculations...
+            if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
+
+                // Calculate multipliers and copy to local column
+                // Current column, below the diagonal
+                tmpInPlace.divideAndCopyColumn(ij, ij, tmpMultipliers);
+
+                // Apply transformations to everything below and to the right of the pivot element
+                tmpInPlace.applyLDL(ij, tmpMultipliers);
+
+            } else {
+
+                tmpInPlace.set(ij, ij, ZERO);
+            }
+
+        }
+
+        return this.computed(true);
     }
 
     public boolean equals(final MatrixStore<N> other, final NumberContext context) {
@@ -93,13 +128,17 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     }
 
     public MatrixStore<N> getL() {
-        // TODO Auto-generated method stub
-        return null;
+        final DecompositionStore<N> tmpInPlace = this.getInPlace();
+        final Builder<N> tmpBuilder = tmpInPlace.builder();
+        final Builder<N> tmpTriangular = tmpBuilder.triangular(false, true);
+        return tmpTriangular.build();
     }
 
     public MatrixStore<N> getD() {
-        // TODO Auto-generated method stub
-        return null;
+        final DecompositionStore<N> tmpInPlace = this.getInPlace();
+        final Builder<N> tmpBuilder = tmpInPlace.builder();
+        final Builder<N> tmpTriangular = tmpBuilder.diagonal(false);
+        return tmpTriangular.build();
     }
 
     public int getRank() {

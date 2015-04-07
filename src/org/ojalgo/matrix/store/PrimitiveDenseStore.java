@@ -1010,6 +1010,29 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
+    public void applyLDL(final int iterationPoint, final BasicArray<Double> multipliers) {
+
+        final double[] tmpData = data;
+        final double[] tmpColumn = ((PrimitiveArray) multipliers).data;
+
+        if ((myColDim - iterationPoint - 1) > ApplyLDL.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    ApplyLDL.invoke(tmpData, myRowDim, first, limit, tmpColumn, iterationPoint);
+                }
+            };
+
+            tmpConquerer.invoke(iterationPoint + 1, myColDim, ApplyLDL.THRESHOLD);
+
+        } else {
+
+            ApplyLDL.invoke(tmpData, myRowDim, iterationPoint + 1, myColDim, tmpColumn, iterationPoint);
+        }
+    }
+
     public void applyLU(final int iterationPoint, final BasicArray<Double> multipliers) {
 
         final double[] tmpData = data;

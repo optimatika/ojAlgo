@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
@@ -138,7 +137,7 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
         return d;
     }
 
-    public final MatrixStore<Double> getInverse() {
+    public MatrixStore<Double> getInverse() {
         return this.getInverse(this.preallocate(this.getRowDim(), this.getRowDim()));
     }
 
@@ -179,11 +178,11 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public boolean isSolvable() {
-        return (this != null) && this.isNonsingular();
+        return this.isSquareAndNotSingular();
     }
 
     public boolean isSquareAndNotSingular() {
-        return (this != null) && ((int) this.getL().countRows() == (int) this.getU().countColumns()) && this.isNonsingular();
+        return (this.getRowDim() == this.getColDim()) && this.isNonsingular();
     }
 
     public MatrixStore<Double> reconstruct() {
@@ -216,12 +215,6 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
         return this.solve(rhs, this.preallocate(this.getRawInPlaceStore(), rhs));
     }
 
-    @Override
-    protected boolean compute(final RawStore matrix) {
-        ProgrammingError.throwForIllegalInvocation();
-        return false;
-    }
-
     /**
      * Is the matrix nonsingular?
      *
@@ -239,57 +232,7 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
         return true;
     }
 
-    /**
-     * Solve A*X = B
-     *
-     * @param B A RawStore with as many rows as A and any number of columns.
-     * @return X so that L*U*X = B(piv,:)
-     * @exception IllegalArgumentException RawStore row dimensions must agree.
-     * @exception RuntimeException RawStore is singular.
-     */
-    @Override
-    RawStore solve(final RawStore B) {
-
-        final double[][] LU = this.getRawInPlaceData();
-
-        final int m = this.getRowDim();
-        final int n = this.getColDim();
-
-        if ((int) B.countRows() != m) {
-            throw new IllegalArgumentException("RawStore row dimensions must agree.");
-        }
-        if (!this.isNonsingular()) {
-            throw new RuntimeException("RawStore is singular.");
-        }
-
-        // Copy right hand side with pivoting
-        final int nx = (int) B.countColumns();
-        final RawStore Xmat = B.getMatrix(myPivot.getOrder(), 0, nx - 1);
-        final double[][] X = Xmat.data;
-
-        // Solve L*Y = B(piv,:)
-        for (int k = 0; k < n; k++) {
-            for (int i = k + 1; i < n; i++) {
-                for (int j = 0; j < nx; j++) {
-                    X[i][j] -= X[k][j] * LU[i][k];
-                }
-            }
-        }
-        // Solve U*X = Y;
-        for (int k = n - 1; k >= 0; k--) {
-            for (int j = 0; j < nx; j++) {
-                X[k][j] /= LU[k][k];
-            }
-            for (int i = 0; i < k; i++) {
-                for (int j = 0; j < nx; j++) {
-                    X[i][j] -= X[k][j] * LU[i][k];
-                }
-            }
-        }
-        return Xmat;
-    }
-
-    public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
 
         final int[] tmpPivotOrder = myPivot.getOrder();
         final int tmpRowDim = this.getRowDim();

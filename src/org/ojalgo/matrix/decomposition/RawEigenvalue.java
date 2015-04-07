@@ -40,7 +40,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 @Deprecated
-public abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Double> {
+public abstract class RawEigenvalue extends OldRawDecomposition implements Eigenvalue<Double> {
 
     public static final class General extends RawEigenvalue {
 
@@ -239,7 +239,7 @@ public abstract class RawEigenvalue extends RawDecomposition implements Eigenval
 
         this.reset();
 
-        return this.compute(RawDecomposition.cast(matrix));
+        return this.compute(OldRawDecomposition.cast(matrix));
     }
 
     /**

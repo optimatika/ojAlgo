@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.LowerHermitianStore;
@@ -167,7 +166,7 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
     /**
      * Will only copy the lower/left part of the matrix
      *
-     * @see org.ojalgo.matrix.decomposition.RawDecomposition#copy(org.ojalgo.access.Access2D, int, int,
+     * @see org.ojalgo.matrix.decomposition.OldRawDecomposition#copy(org.ojalgo.access.Access2D, int, int,
      *      double[][])
      */
     @Override
@@ -180,15 +179,4 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         //        }
     }
 
-    @Override
-    protected boolean compute(final RawStore matrix) {
-        ProgrammingError.throwForIllegalInvocation();
-        return false;
-    }
-
-    @Override
-    RawStore solve(final RawStore rhs) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

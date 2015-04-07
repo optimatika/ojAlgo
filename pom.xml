@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ojalgo</groupId>
@@ -13,6 +15,27 @@
 	</organization>
 	<url>http://ojalgo.org/</url>
 	<description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation; particularly (but certainly not exclusively) suitable for the financial domain. </description>
+
+	<developers>
+		<developer>
+			<name>Anders Peterson</name>
+			<email>apete@optimatika.se</email>
+			<organization>Optimatika</organization>
+			<organizationUrl>http://optimatika.se/</organizationUrl>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>MIT</name>
+			<url>http://ojalgo.org/license.txt</url>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:cvs:pserver:anonymous@ojalgo.cvs.sourceforge.net:/cvsroot/ojalgo co -P DevProj</connection>
+		<url>http://ojalgo.cvs.sourceforge.net/viewvc/ojalgo/DevProj/</url>
+	</scm>
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
