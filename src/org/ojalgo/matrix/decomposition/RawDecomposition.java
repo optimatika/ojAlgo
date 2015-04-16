@@ -22,6 +22,10 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+<<<<<<< HEAD
+=======
+import org.ojalgo.access.AccessUtils;
+>>>>>>> origin/master
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -43,6 +47,13 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         super();
     }
 
+<<<<<<< HEAD
+=======
+    public final boolean equals(final MatrixDecomposition<Double> other, final NumberContext context) {
+        return AccessUtils.equals(this.reconstruct(), other.reconstruct(), context);
+    }
+
+>>>>>>> origin/master
     public final MatrixStore<Double> invert(final MatrixStore<Double> original) {
         this.compute(original);
         return this.getInverse();

@@ -163,6 +163,10 @@ public abstract class EigenvalueDecomposition<N extends Number> extends GenericD
         return this.compute(matrix, MatrixUtils.isHermitian(matrix), false);
     }
 
+    public final boolean checkAndCompute(final Access2D<?> matrix) {
+        return this.compute(matrix, MatrixUtils.isHermitian(matrix), false);
+    }
+
     @Override
     public void reset() {
 

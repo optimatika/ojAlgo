@@ -28,8 +28,11 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.constant.PrimitiveMath;
+<<<<<<< HEAD
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+=======
+>>>>>>> origin/master
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -71,6 +74,42 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     }
 
     public boolean compute(final Access2D<?> matrix) {
+<<<<<<< HEAD
+=======
+
+        this.reset();
+
+        final DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
+
+        final int tmpRowDim = this.getRowDim();
+        final int tmpColDim = this.getColDim();
+        final int tmpMinDim = this.getMinDim();
+
+        final BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
+
+        // Main loop - along the diagonal
+        for (int ij = 0; ij < tmpMinDim; ij++) {
+
+            // Do the calculations...
+            if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
+
+                // Calculate multipliers and copy to local column
+                // Current column, below the diagonal
+                tmpInPlace.divideAndCopyColumn(ij, ij, tmpMultipliers);
+
+                // Apply transformations to everything below and to the right of the pivot element
+                tmpInPlace.applyLDL(ij, tmpMultipliers);
+
+            } else {
+
+                tmpInPlace.set(ij, ij, ZERO);
+            }
+
+        }
+
+        return this.computed(true);
+    }
+>>>>>>> origin/master
 
         this.reset();
 
@@ -116,6 +155,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return this.computed(true);
     }
 
+<<<<<<< HEAD
     public MatrixStore<N> getD() {
         final DecompositionStore<N> tmpInPlace = this.getInPlace();
         final Builder<N> tmpBuilder = tmpInPlace.builder();
@@ -123,6 +163,8 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return tmpTriangular.build();
     }
 
+=======
+>>>>>>> origin/master
     public N getDeterminant() {
 
         final AggregatorFunction<N> tmpAggrFunc = this.getAggregatorCollection().product();
@@ -136,6 +178,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         }
     }
 
+<<<<<<< HEAD
     @Override
     public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
 
@@ -168,6 +211,19 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         final DecompositionStore<N> tmpInPlace = this.getInPlace();
         final Builder<N> tmpBuilder = tmpInPlace.builder();
         final Builder<N> tmpTriangular = tmpBuilder.triangular(false, true);
+=======
+    public MatrixStore<N> getL() {
+        final DecompositionStore<N> tmpInPlace = this.getInPlace();
+        final Builder<N> tmpBuilder = tmpInPlace.builder();
+        final Builder<N> tmpTriangular = tmpBuilder.triangular(false, true);
+        return tmpTriangular.build();
+    }
+
+    public MatrixStore<N> getD() {
+        final DecompositionStore<N> tmpInPlace = this.getInPlace();
+        final Builder<N> tmpBuilder = tmpInPlace.builder();
+        final Builder<N> tmpTriangular = tmpBuilder.diagonal(false);
+>>>>>>> origin/master
         return tmpTriangular.build();
     }
 

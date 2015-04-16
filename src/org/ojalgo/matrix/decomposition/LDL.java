@@ -26,8 +26,11 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
+<<<<<<< HEAD
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
+=======
+>>>>>>> origin/master
 
 /**
  * <p>
@@ -50,6 +53,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface LDL<N extends Number> extends LDU<N>, HermitianDecomposition<N> {
+<<<<<<< HEAD
 
     public static <N extends Number> LDL<N> make(final Access2D<N> typical) {
 
@@ -90,6 +94,16 @@ public interface LDL<N extends Number> extends LDU<N>, HermitianDecomposition<N>
         return this.getR().conjugate();
     }
 
+=======
+
+    /**
+     * Must implement either {@link #getL()} or {@link #getR()}.
+     */
+    default MatrixStore<N> getL() {
+        return this.getR().conjugate();
+    }
+
+>>>>>>> origin/master
     /**
      * Must implement either {@link #getL()} or {@link #getR()}.
      */
@@ -107,6 +121,7 @@ public interface LDL<N extends Number> extends LDU<N>, HermitianDecomposition<N>
         return true;
     }
 
+<<<<<<< HEAD
     default MatrixStore<N> reconstruct() {
         return MatrixUtils.reconstruct(this);
     }
@@ -114,4 +129,6 @@ public interface LDL<N extends Number> extends LDU<N>, HermitianDecomposition<N>
     default boolean equals(final MatrixStore<N> other, final NumberContext context) {
         return MatrixUtils.equals(other, this, context);
     }
+=======
+>>>>>>> origin/master
 }

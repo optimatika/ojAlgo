@@ -95,8 +95,12 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     }
 
     /**
+<<<<<<< HEAD
      * Exists as a private constant in {@link ArrayList}. The Oracle JVM seems to actually be limited at
      * Integer.MAX_VALUE - 2 but other JVM:s may have different limits.
+=======
+     * Exists as a private constant in {@link ArrayList}.
+>>>>>>> origin/master
      */
     public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 

@@ -182,6 +182,13 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
 
     public boolean isSquareAndNotSingular() {
         return (this.getRowDim() == this.getColDim()) && this.isNonsingular();
+<<<<<<< HEAD
+=======
+    }
+
+    public MatrixStore<Double> reconstruct() {
+        return MatrixUtils.reconstruct(this);
+>>>>>>> origin/master
     }
 
     @Override

@@ -157,6 +157,13 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         preallocated.substituteBackwards(tmpBody, false, true, true);
 
         return new LowerHermitianStore<>(preallocated);
+<<<<<<< HEAD
+=======
+    }
+
+    public MatrixStore<Double> reconstruct() {
+        return MatrixUtils.reconstruct(this);
+>>>>>>> origin/master
     }
 
     /**

@@ -152,7 +152,11 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
     public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
 
         if (myPivot.isModified()) {
+<<<<<<< HEAD
             preallocated.fillAll(this.scalar().zero().getNumber());
+=======
+            preallocated.fillAll(this.getStaticZero());
+>>>>>>> origin/master
             final int[] tmpPivotOrder = myPivot.getOrder();
             final int tmpRowDim = this.getRowDim();
             for (int i = 0; i < tmpRowDim; i++) {

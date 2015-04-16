@@ -22,6 +22,11 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.TestUtils;
+<<<<<<< HEAD
+=======
+import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
+>>>>>>> origin/master
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -40,6 +45,7 @@ public class LDLTest extends MatrixDecompositionTests {
         super(arg0);
     }
 
+<<<<<<< HEAD
     public void testWikipediaCase() {
 
         final RawStore tmpA = new RawStore(new double[][] { { 4, 12, -16 }, { 12, 37, -43 }, { -16, -43, 98 } });
@@ -54,10 +60,77 @@ public class LDLTest extends MatrixDecompositionTests {
 
         final LDL<Double> tmpPrimLDL = new LDLDecomposition.Primitive();
         tmpPrimLDL.compute(tmpA);
+=======
+    public void testStratMixCase() {
+
+        final double[][] tmpRawA = new double[][] { { 1.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.5, 1.0, 0.5, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0 },
+                { 0.5, 0.5, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0 },
+                { 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 1.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } };
+        final RawStore tmpA = RawStore.FACTORY.rows(tmpRawA);
+
+        final SingularValue<Double> tmpSVD = SingularValue.makePrimitive();
+        tmpSVD.compute(tmpA);
+
+        int tmpRank = tmpSVD.getRank();
+        final boolean tmpSolvable = tmpSVD.isSolvable();
+
+        if (MatrixDecompositionTests.DEBUG) {
+            BasicLogger.debug(tmpSVD.getSingularValues());
+        }
+
+        final QR<Double> tmpPrimQR = new RawQR();
+        tmpPrimQR.compute(tmpA);
+        tmpRank = tmpPrimQR.getRank();
+        TestUtils.assertEquals(tmpSolvable, tmpPrimQR.isSolvable());
+
+        if (MatrixDecompositionTests.DEBUG) {
+            BasicLogger.debug(tmpPrimQR.getR());
+        }
+
+        final RawLU tmpRawLU = new RawLU();
+        tmpRawLU.compute(tmpA);
+        TestUtils.assertEquals(tmpSolvable, tmpRawLU.isSolvable());
+
+        final LU<Double> tmpPrimLU = new LUDecomposition.Primitive();
+        tmpPrimLU.compute(tmpA);
+        TestUtils.assertEquals(tmpSolvable, tmpPrimLU.isSolvable());
+
+    }
+
+    public void testWikipediaCase() {
+
+        final Access2D<?> tmpA = new RawStore(new double[][] { { 4, 12, -16 }, { 12, 37, -43 }, { -16, -43, 98 } });
+        final RawStore tmpL = new RawStore(new double[][] { { 1, 0, 0 }, { 3, 1, 0 }, { -4, 5, 1 } });
+        final RawStore tmpD = new RawStore(new double[][] { { 4, 0, 0 }, { 0, 1, 0 }, { 0, 0, 9 } });
+
+        final RawStore tmpA2 = tmpD.multiply(tmpL.transpose()).multiplyLeft(tmpL);
+
+        TestUtils.assertEquals(tmpA, tmpA2);
+
+        final RawLDL tmpLDL = new RawLDL();
+        tmpLDL.compute(tmpA);
+
+        final LDL<Double> tmpPrim = new LDLDecomposition.Primitive();
+        tmpPrim.compute(tmpA);
+>>>>>>> origin/master
 
         BasicLogger.debug(tmpL);
         BasicLogger.debug(tmpD);
 
+<<<<<<< HEAD
         BasicLogger.debug("RAW L", tmpRawLDL.getL());
         BasicLogger.debug("RAW D", tmpRawLDL.getD());
 
@@ -75,6 +148,23 @@ public class LDLTest extends MatrixDecompositionTests {
 
         tmpRawLDL.compute(tmpRawInv);
         final MatrixStore<Double> tmpInverse2 = tmpRawLDL.solve(IdentityStore.PRIMITIVE.make(3));
+=======
+        BasicLogger.debug(tmpLDL.getL());
+        BasicLogger.debug(tmpLDL.getD());
+
+        BasicLogger.debug(tmpPrim.getL());
+        BasicLogger.debug(tmpPrim.getD());
+
+        TestUtils.assertEquals(tmpL, tmpLDL.getL());
+        TestUtils.assertEquals(tmpD, tmpLDL.getD());
+
+        final MatrixStore<Double> tmpInverse = tmpLDL.solve(IdentityStore.PRIMITIVE.make(3));
+
+        final MatrixStore<Double> tmpIdentity = tmpInverse.multiply((Access1D<Double>) tmpA);
+
+        tmpLDL.compute(tmpInverse);
+        final MatrixStore<Double> tmpInverse2 = tmpLDL.solve(IdentityStore.PRIMITIVE.make(3));
+>>>>>>> origin/master
 
         TestUtils.assertEquals(tmpA, tmpInverse2);
     }
