@@ -25,31 +25,37 @@ import java.math.BigDecimal;
 
 import org.ojalgo.scalar.ComplexNumber;
 
-public final class ApplyCholesky extends MatrixOperation {
+public final class ApplyLDL extends MatrixOperation {
 
-    public static final ApplyCholesky SETUP = new ApplyCholesky();
+    public static final ApplyLDL SETUP = new ApplyLDL();
 
     public static int THRESHOLD = 256;
 
-    public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final BigDecimal[] multipliers) {
+    public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final BigDecimal[] multipliers,
+            final int iterationPoint) {
+        final BigDecimal tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, multipliers[j], j, structure);
+            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, tmpDiagVal.multiply(multipliers[j]), j, structure);
         }
     }
 
-    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit, final ComplexNumber[] multipliers) {
+    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit, final ComplexNumber[] multipliers,
+            final int iterationPoint) {
+        final ComplexNumber tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, multipliers[j].conjugate(), j, structure);
+            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, tmpDiagVal.multiply(multipliers[j].conjugate()), j, structure);
         }
     }
 
-    public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers) {
+    public static void invoke(final double[] data, final int structure, final int firstColumn, final int columnLimit, final double[] multipliers,
+            final int iterationPoint) {
+        final double tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, multipliers[j], j, structure);
+            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, tmpDiagVal * multipliers[j], j, structure);
         }
     }
 
-    private ApplyCholesky() {
+    private ApplyLDL() {
         super();
     }
 

@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
@@ -91,11 +92,15 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, Determinan
     int getRank();
 
     /**
-     * The QR decompostion always exists, even if the matrix does not have full column rank, so the compute method will
-     * never fail. The primary use of the QR decomposition is in the least squares solution of overdetermined systems of
-     * simultaneous linear equations. This will fail if the matrix does not have full column rank. The rank must be
-     * equal to the number of columns.
+     * The QR decompostion always exists, even if the matrix does not have full column rank, so the compute
+     * method will never fail. The primary use of the QR decomposition is in the least squares solution of
+     * overdetermined systems of simultaneous linear equations. This will fail if the matrix does not have
+     * full column rank. The rank must be equal to the number of columns.
      */
     boolean isFullColumnRank();
+
+    default MatrixStore<N> reconstruct() {
+        return MatrixUtils.reconstruct(this);
+    }
 
 }

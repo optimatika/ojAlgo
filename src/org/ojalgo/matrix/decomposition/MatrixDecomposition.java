@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.task.InverterTask;
@@ -59,7 +60,13 @@ public interface MatrixDecomposition<N extends Number> extends InverterTask<N>, 
      */
     boolean compute(Access2D<?> matrix);
 
-    boolean equals(MatrixDecomposition<N> other, NumberContext context);
+    /**
+     * @deprecated v38
+     */
+    @Deprecated
+    default boolean equals(final MatrixDecomposition<N> other, final NumberContext context) {
+        return AccessUtils.equals(this.reconstruct(), other.reconstruct(), context);
+    }
 
     boolean equals(MatrixStore<N> other, NumberContext context);
 

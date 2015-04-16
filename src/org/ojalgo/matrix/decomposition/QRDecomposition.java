@@ -164,11 +164,6 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
     }
 
     @Override
-    public MatrixStore<N> getInverse() {
-        return this.solve(this.makeEye(this.getColDim(), this.getRowDim()));
-    }
-
-    @Override
     public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
         return this.solve(this.makeEye(this.getColDim(), this.getRowDim()), preallocated);
     }
@@ -239,10 +234,6 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
         return this.isComputed() && this.isFullColumnRank();
     }
 
-    public MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
-    }
-
     @Override
     public void reset() {
 
@@ -252,10 +243,12 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
     }
 
     /**
-     * Solve [A]*[X]=[B] by first solving [Q]*[Y]=[B] and then [R]*[X]=[Y]. [X] minimises the 2-norm of [Q]*[R]*[X]-[B].
+     * Solve [A]*[X]=[B] by first solving [Q]*[Y]=[B] and then [R]*[X]=[Y]. [X] minimises the 2-norm of
+     * [Q]*[R]*[X]-[B].
      *
      * @param rhs The right hand side [B]
-     * @return [X] "preallocated" is used to form the results, but the solution is in the returned MatrixStore.
+     * @return [X] "preallocated" is used to form the results, but the solution is in the returned
+     *         MatrixStore.
      * @see org.ojalgo.matrix.decomposition.GenericDecomposition#solve(Access2D,
      *      org.ojalgo.matrix.decomposition.DecompositionStore)
      */
@@ -281,7 +274,7 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
             }
         }
 
-        preallocated.substituteBackwards(tmpStore, false);
+        preallocated.substituteBackwards(tmpStore, false, false, false);
 
         if (tmpColDim < tmpRowDim) {
             return preallocated.builder().rows(0, tmpColDim).build();

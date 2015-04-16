@@ -28,7 +28,6 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -178,7 +177,7 @@ public abstract class TridiagonalDecomposition<N extends Number> extends InPlace
             final Array1D<N> tmpMain = tmpArray2D.sliceDiagonal(0, 0).copy();
             final Array1D<N> tmpSub = tmpArray2D.sliceDiagonal(1, 0).copy(); // Super differs only in possible conjugate values
 
-            myDiagonalAccessD = new DiagonalAccess<N>(tmpMain, tmpSub, tmpSub, this.getStaticZero());
+            myDiagonalAccessD = new DiagonalAccess<N>(tmpMain, tmpSub, tmpSub, this.scalar().zero().getNumber());
             myInitDiagQ = this.makeReal(myDiagonalAccessD);
 
             retVal = true;
@@ -225,10 +224,6 @@ public abstract class TridiagonalDecomposition<N extends Number> extends InPlace
         return false;
     }
 
-    public MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
-    }
-
     @Override
     public void reset() {
 
@@ -239,6 +234,10 @@ public abstract class TridiagonalDecomposition<N extends Number> extends InPlace
         myQ = null;
 
         myInitDiagQ = null;
+    }
+
+    public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
+        throw new UnsupportedOperationException();
     }
 
     protected final DiagonalAccess<N> getDiagonalAccessD() {

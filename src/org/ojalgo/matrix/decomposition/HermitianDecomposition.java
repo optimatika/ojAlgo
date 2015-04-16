@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.ojalgo.matrix.decomposition;
+
+import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.MatrixUtils;
+
+/**
+ * Only for Hermitian matrices
+ *
+ * @author apete
+ */
+public interface HermitianDecomposition<N extends Number> extends MatrixDecomposition<N> {
+
+    /**
+     * Will check if then the input matrix is hermitian and if it is then compute the decomposition.
+     *
+     * @param matrix A matrix to decompose
+     * @return true if the hermitian check passed and computation suceeded; false if not
+     */
+    default boolean checkAndCompute(final Access2D<?> matrix) {
+
+        this.reset();
+
+        if (MatrixUtils.isHermitian(matrix)) {
+            return this.compute(matrix);
+        } else {
+            return false;
+        }
+    }
+
+}

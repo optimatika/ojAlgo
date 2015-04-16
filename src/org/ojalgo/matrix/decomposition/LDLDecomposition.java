@@ -21,26 +21,24 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.MatrixStore.Builder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.type.context.NumberContext;
 
 abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LDL<N> {
-
-    static final class Primitive extends LDLDecomposition<Double> {
-
-        Primitive() {
-            super(PrimitiveDenseStore.FACTORY);
-        }
-
-    }
 
     static final class Big extends LDLDecomposition<BigDecimal> {
 
@@ -58,63 +56,185 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
     }
 
+    static final class Primitive extends LDLDecomposition<Double> {
+
+        Primitive() {
+            super(PrimitiveDenseStore.FACTORY);
+        }
+
+    }
+
+    private Pivot myPivot;
+
     protected LDLDecomposition(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory) {
         super(factory);
     }
 
     public boolean compute(final Access2D<?> matrix) {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
-    public boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        // TODO Auto-generated method stub
-        return false;
-    }
+        this.reset();
 
-    public boolean isFullSize() {
-        // TODO Auto-generated method stub
-        return false;
-    }
+        final DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
 
-    public boolean isSolvable() {
-        // TODO Auto-generated method stub
-        return false;
-    }
+        final int tmpRowDim = this.getRowDim();
+        final int tmpColDim = this.getColDim();
+        final int tmpMinDim = this.getMinDim();
 
-    public MatrixStore<N> reconstruct() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        myPivot = new Pivot(tmpRowDim);
 
-    public N calculateDeterminant(final Access2D<N> matrix) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        final BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
 
-    public N getDeterminant() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        // Main loop - along the diagonal
+        for (int ij = 0; ij < tmpMinDim; ij++) {
 
-    public MatrixStore<N> getL() {
-        // TODO Auto-generated method stub
-        return null;
+            // Find next pivot row
+            final int tmpPivotRow = tmpInPlace.indexOfLargestInDiagonal(ij, ij) / tmpRowDim;
+
+            // Pivot?
+            if (tmpPivotRow != ij) {
+                tmpInPlace.exchangeHermitian(tmpPivotRow, ij);
+                myPivot.change(tmpPivotRow, ij);
+            }
+
+            // Do the calculations...
+            if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
+
+                // Calculate multipliers and copy to local column
+                // Current column, below the diagonal
+                tmpInPlace.divideAndCopyColumn(ij, ij, tmpMultipliers);
+
+                // Apply transformations to everything below and to the right of the pivot element
+                tmpInPlace.applyLDL(ij, tmpMultipliers);
+
+            } else {
+
+                tmpInPlace.set(ij, ij, ZERO);
+            }
+
+        }
+
+        return this.computed(true);
     }
 
     public MatrixStore<N> getD() {
-        // TODO Auto-generated method stub
-        return null;
+        final DecompositionStore<N> tmpInPlace = this.getInPlace();
+        final Builder<N> tmpBuilder = tmpInPlace.builder();
+        final Builder<N> tmpTriangular = tmpBuilder.diagonal(false);
+        return tmpTriangular.build();
+    }
+
+    public N getDeterminant() {
+
+        final AggregatorFunction<N> tmpAggrFunc = this.getAggregatorCollection().product();
+
+        this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
+
+        if (myPivot.signum() == -1) {
+            return tmpAggrFunc.toScalar().negate().getNumber();
+        } else {
+            return tmpAggrFunc.getNumber();
+        }
+    }
+
+    @Override
+    public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
+
+        final int tmpRowDim = this.getRowDim();
+        final int[] tmpOrder = myPivot.getOrder();
+        final boolean tmpModified = myPivot.isModified();
+
+        if (tmpModified) {
+            preallocated.fillAll(this.scalar().zero().getNumber());
+            for (int i = 0; i < tmpRowDim; i++) {
+                preallocated.set(i, tmpOrder[i], PrimitiveMath.ONE);
+            }
+        }
+
+        final DecompositionStore<N> tmpBody = this.getInPlace();
+
+        preallocated.substituteForwards(tmpBody, true, false, !tmpModified);
+
+        final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();
+        for (int i = 0; i < tmpRowDim; i++) {
+            preallocated.modifyRow(i, 0, tmpDivide.second(tmpBody.doubleValue(i, i)));
+        }
+
+        preallocated.substituteBackwards(tmpBody, true, true, false);
+
+        return preallocated.builder().row(tmpOrder).build();
+    }
+
+    public MatrixStore<N> getL() {
+        final DecompositionStore<N> tmpInPlace = this.getInPlace();
+        final Builder<N> tmpBuilder = tmpInPlace.builder();
+        final Builder<N> tmpTriangular = tmpBuilder.triangular(false, true);
+        return tmpTriangular.build();
     }
 
     public int getRank() {
-        // TODO Auto-generated method stub
-        return 0;
+
+        int retVal = 0;
+
+        final DecompositionStore<N> tmpInPlace = this.getInPlace();
+
+        final AggregatorFunction<N> tmpLargest = this.getAggregatorCollection().largest();
+        tmpInPlace.visitDiagonal(0L, 0L, tmpLargest);
+        final double tmpLargestValue = tmpLargest.doubleValue();
+
+        final int tmpMinDim = this.getMinDim();
+
+        for (int ij = 0; ij < tmpMinDim; ij++) {
+            if (!tmpInPlace.isSmall(ij, ij, tmpLargestValue)) {
+                retVal++;
+            }
+        }
+
+        return retVal;
+    }
+
+    public boolean isFullSize() {
+        return true;
+    }
+
+    public boolean isSolvable() {
+        return this.isSquareAndNotSingular();
     }
 
     public boolean isSquareAndNotSingular() {
-        // TODO Auto-generated method stub
-        return false;
+
+        boolean retVal = this.getRowDim() == this.getColDim();
+
+        final DecompositionStore<N> tmpStore = this.getInPlace();
+        final int tmpMinDim = (int) Math.min(tmpStore.countRows(), tmpStore.countColumns());
+
+        for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
+            retVal &= !tmpStore.isZero(ij, ij);
+        }
+
+        return retVal;
+    }
+
+    @Override
+    public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
+
+        final int tmpRowDim = this.getRowDim();
+        final int[] tmpOrder = myPivot.getOrder();
+
+        //        preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), tmpOrder));
+        preallocated.fillMatching(this.wrap(rhs).builder().row(tmpOrder).build());
+
+        final DecompositionStore<N> tmpBody = this.getInPlace();
+
+        preallocated.substituteForwards(tmpBody, true, false, false);
+
+        final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();
+        for (int i = 0; i < tmpRowDim; i++) {
+            preallocated.modifyRow(i, 0, tmpDivide.second(tmpBody.doubleValue(i, i)));
+        }
+
+        preallocated.substituteBackwards(tmpBody, true, true, false);
+
+        return preallocated.builder().row(tmpOrder).build();
     }
 
 }

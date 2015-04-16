@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.ojalgo.matrix.decomposition;
+
+import org.ojalgo.access.AccessUtils;
+
+final class Pivot {
+
+    private boolean myModified = false;
+    private final int[] myOrder;
+    private int mySign;
+
+    Pivot(final int numberOfRows) {
+
+        super();
+
+        myOrder = AccessUtils.makeIncreasingRange(0, numberOfRows);
+        mySign = 1;
+    }
+
+    public void change(final int row1, final int row2) {
+
+        if (row1 != row2) {
+
+            final int tmpRow = myOrder[row1];
+            myOrder[row1] = myOrder[row2];
+            myOrder[row2] = tmpRow;
+
+            mySign = -mySign;
+
+            myModified = true;
+
+        } else {
+            // Why?!
+        }
+    }
+
+    public int[] getOrder() {
+        return myOrder;
+    }
+
+    public boolean isModified() {
+        return myModified;
+    }
+
+    public int signum() {
+        return mySign;
+    }
+
+}

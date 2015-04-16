@@ -269,7 +269,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
 
             final PhysicalStore<N> tmpMtrx = tmpV.conjugate().copy();
 
-            final N tmpZero = this.getStaticZero();
+            final N tmpZero = this.scalar().zero().getNumber();
             final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();
 
             for (int i = 0; i < tmpDim; i++) {
@@ -298,7 +298,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
             final PhysicalStore<N> tmpMtrx = preallocated;
             tmpMtrx.fillMatching(new TransposedStore<N>(tmpV));
 
-            final N tmpZero = this.getStaticZero();
+            final N tmpZero = this.scalar().zero().getNumber();
             final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();
 
             for (int i = 0; i < tmpDim; i++) {

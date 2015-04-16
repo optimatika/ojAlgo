@@ -27,8 +27,6 @@ import java.util.List;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.ColumnsIterator;
-import org.ojalgo.access.RowsIterator;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -311,15 +309,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     /**
-     * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not copied, it is
-     * just accessed through a different adaptor.
+     * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not
+     * copied, it is just accessed through a different adaptor.
      */
     public Array1D<N> asArray1D() {
         return myDelegate.asArray1D();
-    }
-
-    public Iterable<Access1D<N>> columns() {
-        return ColumnsIterator.make(this);
     }
 
     public long count() {
@@ -436,10 +430,37 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         return (int) (myRowsCount * myColumnsCount * myDelegate.hashCode());
     }
 
+    /**
+     * @param row
+     * @param column
+     * @return The row-index of the largest absolute value in a column, starting at the specified row.
+     */
     public long indexOfLargestInColumn(final long row, final long column) {
         return myDelegate.indexOfLargest(row + (column * myRowsCount), myRowsCount + (column * myRowsCount), 1L) % myRowsCount;
     }
 
+    /**
+     * @param row
+     * @param column
+     * @return The matrix-index of the largest absolute value on a diagonal, starting at the specified
+     *         row-column pair.
+     */
+    public long indexOfLargestInDiagonal(final long row, final long column) {
+
+        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
+
+        final long tmpFirst = row + (column * myRowsCount);
+        final long tmpLimit = row + tmpCount + ((column + tmpCount) * myRowsCount);
+        final long tmpStep = 1L + myRowsCount;
+
+        return myDelegate.indexOfLargest(tmpFirst, tmpLimit, tmpStep);
+    }
+
+    /**
+     * @param row
+     * @param column
+     * @return The column-index of the largest absolute value in a row, starting at the specified column.
+     */
     public long indexOfLargestInRow(final long row, final long column) {
         return myDelegate.indexOfLargest(row + (column * myRowsCount), row + (myColumnsCount * myRowsCount), myRowsCount) / myRowsCount;
     }
@@ -523,10 +544,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
         myDelegate.modify(row + (column * myRowsCount), row + (myColumnsCount * myRowsCount), myRowsCount, function);
-    }
-
-    public Iterable<Access1D<N>> rows() {
-        return RowsIterator.make(this);
     }
 
     public void set(final long index, final double value) {

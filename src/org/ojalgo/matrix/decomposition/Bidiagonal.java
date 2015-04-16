@@ -24,12 +24,13 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * A general matrix [A] can be factorized by similarity transformations into the form [A]=[Q1][D][Q2]<sup>-1</sup>
- * where:
+ * A general matrix [A] can be factorized by similarity transformations into the form
+ * [A]=[Q1][D][Q2]<sup>-1</sup> where:
  * <ul>
  * <li>[A] (m-by-n) is any, real or complex, matrix</li>
  * <li>[D] (r-by-r) or (m-by-n) is, upper or lower, bidiagonal</li>
@@ -83,5 +84,9 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N> {
     MatrixStore<N> getQ2();
 
     boolean isUpper();
+
+    default MatrixStore<N> reconstruct() {
+        return MatrixUtils.reconstruct(this);
+    }
 
 }

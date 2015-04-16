@@ -291,7 +291,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
         //        BasicLogger.logDebug(this.getClass().toString());
         //        BasicLogger.logDebug("Init D", myD);
 
-        final N tmpZero = this.getStaticZero();
+        final N tmpZero = this.scalar().zero().getNumber();
         boolean tmpNotAllZeros = true;
         for (int l = 0; tmpNotAllZeros && (l < tmpMinDim); l++) {
 
@@ -398,13 +398,13 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
 
             final Array1D<N> tmpSuper = tmpArray2D.sliceDiagonal(0, 1);
 
-            return new DiagonalAccess<N>(tmpMain, tmpSuper, null, this.getStaticZero());
+            return new DiagonalAccess<N>(tmpMain, tmpSuper, null, this.scalar().zero().getNumber());
 
         } else {
 
             final Array1D<N> tmpSub = tmpArray2D.sliceDiagonal(1, 0);
 
-            return new DiagonalAccess<N>(tmpMain, null, tmpSub, this.getStaticZero());
+            return new DiagonalAccess<N>(tmpMain, null, tmpSub, this.scalar().zero().getNumber());
         }
     }
 

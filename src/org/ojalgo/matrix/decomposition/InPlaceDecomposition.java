@@ -34,8 +34,8 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
         super(aFactory);
     }
 
-    public MatrixStore<N> getInverse() {
-        throw new UnsupportedOperationException();
+    public final MatrixStore<N> getInverse() {
+        return this.getInverse(this.preallocate(this.getRowDim(), this.getRowDim()));
     }
 
     public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
@@ -44,10 +44,6 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
 
     public final MatrixStore<N> solve(final Access2D<N> rhs) {
         return this.solve(rhs, this.preallocate(myInPlace, rhs));
-    }
-
-    public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
-        throw new UnsupportedOperationException();
     }
 
     protected final int getColDim() {

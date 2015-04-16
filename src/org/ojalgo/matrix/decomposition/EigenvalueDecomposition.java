@@ -159,8 +159,8 @@ public abstract class EigenvalueDecomposition<N extends Number> extends GenericD
         return myV;
     }
 
-    public final MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+    public final boolean checkAndCompute(final Access2D<?> matrix) {
+        return this.compute(matrix, MatrixUtils.isHermitian(matrix), false);
     }
 
     @Override

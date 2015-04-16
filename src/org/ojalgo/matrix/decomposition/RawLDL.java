@@ -21,71 +21,69 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.type.context.NumberContext;
+import static org.ojalgo.constant.PrimitiveMath.*;
 
-public final class RawLDL extends RawDecomposition implements LDL<Double> {
+import org.ojalgo.access.Access2D;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.MatrixStore.Builder;
+import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.matrix.store.operation.DotProduct;
+
+final class RawLDL extends RawDecomposition implements LDL<Double> {
+
+    private boolean mySPD = false;
+
+    RawLDL() {
+        super();
+    }
 
     public boolean compute(final Access2D<?> matrix) {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
-    public boolean equals(final MatrixStore<Double> other, final NumberContext context) {
-        // TODO Auto-generated method stub
-        return false;
-    }
+        this.reset();
 
-    public boolean isFullSize() {
-        // TODO Auto-generated method stub
-        return false;
-    }
+        final double[][] tmpData = this.setRawInPlace(matrix);
 
-    public boolean isSolvable() {
-        // TODO Auto-generated method stub
-        return false;
-    }
+        final int tmpDiagDim = this.getRowDim();
+        mySPD = (this.getColDim() == tmpDiagDim);
 
-    public MatrixStore<Double> reconstruct() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        final double[] tmpRowIJ = new double[tmpDiagDim];
+        double[] tmpRowI;
 
-    public MatrixStore<Double> solve(final Access2D<Double> rhs) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        // Main loop.
+        for (int ij = 0; ij < tmpDiagDim; ij++) { // For each row/column, along the diagonal
+            tmpRowI = tmpData[ij];
 
-    public Double calculateDeterminant(final Access2D<Double> matrix) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+            for (int j = 0; j < ij; j++) {
+                tmpRowIJ[j] = tmpRowI[j] * tmpData[j][j];
+            }
 
-    public Double getDeterminant() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+            final double tmpD = tmpRowI[ij] = matrix.doubleValue(ij, ij) - DotProduct.invoke(tmpRowI, tmpRowIJ, ij);
+            mySPD &= (tmpD > ZERO);
 
-    public MatrixStore<Double> getL() {
-        // TODO Auto-generated method stub
-        return null;
+            for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
+                tmpRowI = tmpData[i];
+
+                tmpRowI[ij] = (matrix.doubleValue(i, ij) - DotProduct.invoke(tmpRowI, tmpRowIJ, ij)) / tmpD;
+            }
+        }
+
+        return this.computed(true);
     }
 
     public MatrixStore<Double> getD() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getRawInPlaceStore().builder().diagonal(false).build();
     }
 
-    public int getRank() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
+    public Double getDeterminant() {
 
-    public boolean isSquareAndNotSingular() {
-        // TODO Auto-generated method stub
-        return false;
+        final double[][] tmpData = this.getRawInPlaceData();
+
+        double retVal = ONE;
+        for (int ij = 0; ij < tmpData.length; ij++) {
+            retVal *= tmpData[ij][ij];
+        }
+        return retVal;
     }
 
     @Override
@@ -94,16 +92,79 @@ public final class RawLDL extends RawDecomposition implements LDL<Double> {
         return null;
     }
 
-    @Override
-    protected boolean compute(final RawStore matrix) {
+    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+
+        preallocated.fillAll(ZERO);
+        preallocated.fillDiagonal(0L, 0L, ONE);
+
+        final RawStore tmpBody = this.getRawInPlaceStore();
+
+        preallocated.substituteForwards(tmpBody, true, false, true);
+
+        for (int i = 0; i < preallocated.countRows(); i++) {
+            preallocated.modifyRow(i, 0, PrimitiveFunction.DIVIDE.second(tmpBody.doubleValue(i, i)));
+        }
+
+        preallocated.substituteBackwards(tmpBody, true, true, true);
+
+        return preallocated;
+    }
+
+    public MatrixStore<Double> getL() {
+        final RawStore tmpRawInPlaceStore = this.getRawInPlaceStore();
+        final Builder<Double> tmpBuilder = tmpRawInPlaceStore.builder();
+        final Builder<Double> tmpTriangular = tmpBuilder.triangular(false, true);
+        return tmpTriangular.build();
+    }
+
+    public int getRank() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public boolean isSolvable() {
+        return this.isComputed() && this.isSquareAndNotSingular();
+    }
+
+    public boolean isSPD() {
+        return mySPD;
+    }
+
+    public boolean isSquareAndNotSingular() {
         // TODO Auto-generated method stub
         return false;
     }
 
+    public MatrixStore<Double> solve(final Access2D<Double> rhs) {
+        return this.solve(rhs, this.preallocate(this.getRawInPlaceStore(), rhs));
+    }
+
     @Override
-    RawStore solve(final RawStore rhs) {
-        // TODO Auto-generated method stub
-        return null;
+    public final MatrixStore<Double> solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
+
+        preallocated.fillMatching(rhs);
+
+        final RawStore tmpBody = this.getRawInPlaceStore();
+
+        preallocated.substituteForwards(tmpBody, true, false, false);
+
+        for (int i = 0; i < preallocated.countRows(); i++) {
+            preallocated.modifyRow(i, 0, PrimitiveFunction.DIVIDE.second(tmpBody.doubleValue(i, i)));
+        }
+
+        preallocated.substituteBackwards(tmpBody, true, true, false);
+
+        return preallocated;
+    }
+
+    /**
+     * Doesn't copy anything. Tha input original matrix is copied while computing the decomposition.
+     *
+     * @see org.ojalgo.matrix.decomposition.RawDecomposition#copy(org.ojalgo.access.Access2D, int, int,
+     *      double[][])
+     */
+    @Override
+    void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
     }
 
 }

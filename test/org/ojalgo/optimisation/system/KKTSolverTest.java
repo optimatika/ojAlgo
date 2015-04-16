@@ -272,38 +272,6 @@ public class KKTSolverTest extends FunctionalityTest {
         this.doTest(new Access2D<?>[] { tmpA, tmpB, tmpQ, tmpC, tmpX }, true, new NumberContext(7, 6));
     }
 
-    public void testStratMixCase() {
-
-        final PrimitiveDenseStore tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0, 0.0, -1.0, 0.0 }, { 1.0, 0.0, 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, 1.0, 0.0, 0.0, -1.0 },
-                { 0.0, -1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, -1.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, -1.0 } });
-        final PrimitiveDenseStore tmpB = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
-                { 0.0 }, { 0.0 }, { 0.0 } });
-
-        final PrimitiveDenseStore tmpQ = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0.5, 0.5, 0.0, 0.0, 0.0 }, { 0.5, 1.0, 0.5, 0.0, 0.0, 0.0 },
-                { 0.5, 0.5, 1.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } });
-        final PrimitiveDenseStore tmpC = PrimitiveDenseStore.FACTORY.rows(new double[][] { { -0.33330000000000004 }, { 0.16669999999999996 },
-                { 0.16659999999999997 }, { 0.0 }, { 0.0 }, { 0.0 } });
-
-        final PrimitiveDenseStore tmpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
-
-        final PrimitiveDenseStore tmpL = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 3.469446951953614E-17 }, { -0.2222000000000002 },
-                { -0.11110000000000014 }, { 0.05556666666666671 }, { -0.11110000000000002 }, { 0.05553333333333336 }, { -0.11113333333333346 },
-                { -0.11106666666666672 }, { -0.05556666666666672 }, { -0.05553333333333335 } });
-
-        final PhysicalStore<Double> tmpActL = this.doTest(new Access2D<?>[] { tmpA, tmpB, tmpQ, tmpC, tmpX }, false, new NumberContext(12, 14)).copy();
-
-        final QR<Double> tmpQR = QR.makePrimitive();
-        tmpQR.compute(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculated  myQR.compute(tmpA).
-
-        if (OptimisationSystemTests.DEBUG) {
-            BasicLogger.debug("Q", tmpQR.getQ());
-            BasicLogger.debug("R", tmpQR.getR());
-        }
-
-        TestUtils.assertEquals(tmpL, tmpActL);
-    }
-
     /**
      * @param matrices A, B, Q, C, X
      * @param validate TODO

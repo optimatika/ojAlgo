@@ -330,6 +330,10 @@ final class ActiveSetSolver extends ConvexSolver {
                 }
             }
 
+            while (((this.countEqualityConstraints() + myActivator.countIncluded()) >= this.countVariables()) && (myActivator.countIncluded() > 0)) {
+                myActivator.shrink();
+            }
+
         } else {
 
             this.setState(State.INFEASIBLE);

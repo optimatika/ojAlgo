@@ -25,19 +25,21 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * Singular Value: [A] = [Q1][D][Q2]<sup>T</sup> Decomposes [this] into [Q1], [D] and [Q2] where:
  * <ul>
- * <li>[Q1] is an orthogonal matrix. The columns are the left, orthonormal, singular vectors of [this]. Its columns are
- * the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this].</li>
- * <li>[D] is a diagonal matrix. The elements on the diagonal are the singular values of [this]. It is either square or
- * has the same dimensions as [this]. The singular values of [this] are the square roots of the nonzero eigenvalues of
- * [A][A]<sup>T</sup> and [A]<sup>T</sup>[A] (they are the same)</li>
- * <li>[Q2] is an orthogonal matrix. The columns are the right, orthonormal, singular vectors of [this]. Its columns are
- * the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this] has columns.</li>
+ * <li>[Q1] is an orthogonal matrix. The columns are the left, orthonormal, singular vectors of [this]. Its
+ * columns are the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this].</li>
+ * <li>[D] is a diagonal matrix. The elements on the diagonal are the singular values of [this]. It is either
+ * square or has the same dimensions as [this]. The singular values of [this] are the square roots of the
+ * nonzero eigenvalues of [A][A]<sup>T</sup> and [A]<sup>T</sup>[A] (they are the same)</li>
+ * <li>[Q2] is an orthogonal matrix. The columns are the right, orthonormal, singular vectors of [this]. Its
+ * columns are the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this] has
+ * columns.</li>
  * <li>[this] = [Q1][D][Q2]<sup>T</sup></li>
  * </ul>
  * A singular values decomposition always exists.
@@ -122,8 +124,8 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N> 
      * Ky Fan k-norm.
      * </p>
      * <p>
-     * The first Ky Fan k-norm is the operator norm (the largest singular value), and the last is called the trace norm
-     * (the sum of all singular values).
+     * The first Ky Fan k-norm is the operator norm (the largest singular value), and the last is called the
+     * trace norm (the sum of all singular values).
      * </p>
      *
      * @param k The number of singular values to add up.
@@ -171,5 +173,9 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N> 
     double getTraceNorm();
 
     boolean isOrdered();
+
+    default MatrixStore<N> reconstruct() {
+        return MatrixUtils.reconstruct(this);
+    }
 
 }

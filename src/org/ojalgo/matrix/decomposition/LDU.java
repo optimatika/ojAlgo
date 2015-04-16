@@ -21,6 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.task.DeterminantTask;
+
 /**
  * <p>
  * LDU: [A] = [L][D][U] ( [P1][L][D][U][P2] )
@@ -63,6 +66,13 @@ package org.ojalgo.matrix.decomposition;
  *
  * @author apete
  */
-public interface LDU<N extends Number> extends MatrixDecomposition<N> {
+public interface LDU<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
+
+    N getDeterminant();
+
+    default N calculateDeterminant(final Access2D<N> matrix) {
+        this.compute(matrix);
+        return this.getDeterminant();
+    }
 
 }

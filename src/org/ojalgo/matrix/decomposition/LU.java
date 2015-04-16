@@ -24,11 +24,12 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ColumnsStore;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RowsStore;
-import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -53,7 +54,7 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface LU<N extends Number> extends LDU<N>, DeterminantTask<N> {
+public interface LU<N extends Number> extends LDU<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> LU<N> make(final Access2D<N> typical) {
@@ -66,9 +67,7 @@ public interface LU<N extends Number> extends LDU<N>, DeterminantTask<N> {
             return (LU<N>) LU.makeComplex();
         } else if (tmpNumber instanceof Double) {
 
-            final int tmpMaxDim = (int) Math.max(typical.countRows(), typical.countColumns());
-
-            if ((tmpMaxDim <= 32) || (tmpMaxDim >= 46340)) { //16,32,2
+            if ((typical.countColumns() <= 256) || (typical.count() > BasicArray.MAX_ARRAY_SIZE)) {
                 return (LU<N>) new RawLU();
             } else {
                 return (LU<N>) LU.makePrimitive();
@@ -96,8 +95,6 @@ public interface LU<N extends Number> extends LDU<N>, DeterminantTask<N> {
      */
     boolean computeWithoutPivoting(MatrixStore<?> matrix);
 
-    N getDeterminant();
-
     MatrixStore<N> getL();
 
     /**
@@ -107,8 +104,6 @@ public interface LU<N extends Number> extends LDU<N>, DeterminantTask<N> {
     int[] getPivotOrder();
 
     int getRank();
-
-    int[] getReducedPivots();
 
     /**
      * http://en.wikipedia.org/wiki/Row_echelon_form <br>
@@ -122,5 +117,9 @@ public interface LU<N extends Number> extends LDU<N>, DeterminantTask<N> {
     MatrixStore<N> getU();
 
     boolean isSquareAndNotSingular();
+
+    default MatrixStore<N> reconstruct() {
+        return MatrixUtils.reconstruct(this);
+    }
 
 }

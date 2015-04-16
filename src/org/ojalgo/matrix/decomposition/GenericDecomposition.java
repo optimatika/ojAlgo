@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -53,10 +52,6 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         super();
 
         myFactory = factory;
-    }
-
-    public final boolean equals(final MatrixDecomposition<N> other, final NumberContext context) {
-        return AccessUtils.equals(this.reconstruct(), other.reconstruct(), context);
     }
 
     @SuppressWarnings("unchecked")
@@ -97,25 +92,12 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.aggregator();
     }
 
-    @Override
-    protected final DecompositionStore<N> preallocate(final long numberOfRows, final long numberOfColumns) {
-        return myFactory.makeZero(numberOfRows, numberOfColumns);
-    }
-
     protected final FunctionSet<N> getFunctionSet() {
         return myFactory.function();
     }
 
     protected final int getMaxDimToFitInCache() {
         return OjAlgoUtils.ENVIRONMENT.getCacheDim2D(8L) / 3;
-    }
-
-    protected final N getStaticOne() {
-        return myFactory.scalar().one().getNumber();
-    }
-
-    protected final N getStaticZero() {
-        return myFactory.scalar().zero().getNumber();
     }
 
     protected final BasicArray<N> makeArray(final int aLength) {
@@ -142,12 +124,17 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.makeZero(aRowDim, aColDim);
     }
 
+    @Override
+    protected final DecompositionStore<N> preallocate(final long numberOfRows, final long numberOfColumns) {
+        return myFactory.makeZero(numberOfRows, numberOfColumns);
+    }
+
     protected final Scalar.Factory<N> scalar() {
         return myFactory.scalar();
     }
 
-    protected final MatrixStore<N> wrap(final Access2D<?> aSource) {
-        return new WrapperStore<N>(myFactory, aSource);
+    protected final MatrixStore<N> wrap(final Access2D<?> source) {
+        return new WrapperStore<N>(myFactory, source);
     }
 
 }

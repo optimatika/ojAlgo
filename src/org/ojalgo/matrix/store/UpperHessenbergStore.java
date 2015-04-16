@@ -26,38 +26,38 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * A Hessenberg matrix is one that is "almost" triangular. An upper Hessenberg matrix has zero entries below the first
- * subdiagonal.
- * 
+ * A Hessenberg matrix is one that is "almost" triangular. An upper Hessenberg matrix has zero entries below
+ * the first subdiagonal.
+ *
  * @author apete
  */
 public final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
 
-    public UpperHessenbergStore(final MatrixStore<N> aBase) {
-        super((int) Math.min(aBase.countRows(), aBase.countColumns()), (int) aBase.countColumns(), aBase);
+    public UpperHessenbergStore(final MatrixStore<N> base) {
+        super((int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns(), base);
     }
 
     @SuppressWarnings("unused")
-    private UpperHessenbergStore(final int aRowDim, final int aColDim, final MatrixStore<N> aBase) {
+    private UpperHessenbergStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
 
-        this(aBase);
+        this(base);
 
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    public double doubleValue(final long aRow, final long aCol) {
-        if (aRow > (aCol + 1)) {
+    public double doubleValue(final long row, final long col) {
+        if (row > (col + 1)) {
             return PrimitiveMath.ZERO;
         } else {
-            return this.getBase().doubleValue(aRow, aCol);
+            return this.getBase().doubleValue(row, col);
         }
     }
 
-    public N get(final long aRow, final long aCol) {
-        if (aRow > (aCol + 1)) {
+    public N get(final long row, final long col) {
+        if (row > (col + 1)) {
             return this.factory().scalar().zero().getNumber();
         } else {
-            return this.getBase().get(aRow, aCol);
+            return this.getBase().get(row, col);
         }
     }
 
@@ -69,11 +69,11 @@ public final class UpperHessenbergStore<N extends Number> extends ShadingStore<N
         return false;
     }
 
-    public Scalar<N> toScalar(final long row, final long column) {
-        if (row > (column + 1)) {
+    public Scalar<N> toScalar(final long row, final long col) {
+        if (row > (col + 1)) {
             return this.factory().scalar().zero();
         } else {
-            return this.getBase().toScalar(row, column);
+            return this.getBase().toScalar(row, col);
         }
     }
 }

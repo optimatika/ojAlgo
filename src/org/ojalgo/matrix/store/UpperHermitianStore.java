@@ -22,50 +22,36 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
-public final class UpperTriangularStore<N extends Number> extends ShadingStore<N> {
+public final class UpperHermitianStore<N extends Number> extends ShadingStore<N> {
 
-    private final boolean myUnitDiagonal;
-
-    public UpperTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
-
+    public UpperHermitianStore(final MatrixStore<N> base) {
         super((int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns(), base);
-
-        myUnitDiagonal = unitDiagonal;
     }
 
     @SuppressWarnings("unused")
-    private UpperTriangularStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
+    private UpperHermitianStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
 
-        this(base, true);
+        this(base);
 
         ProgrammingError.throwForIllegalInvocation();
     }
 
     public double doubleValue(final long row, final long col) {
         if (row > col) {
-            return PrimitiveMath.ZERO;
-        } else if (myUnitDiagonal && (row == col)) {
-            return PrimitiveMath.ONE;
+            return this.getBase().doubleValue(col, row);
         } else {
             return this.getBase().doubleValue(row, col);
         }
     }
 
     public N get(final long row, final long col) {
-        if (row > col) {
-            return this.factory().scalar().zero().getNumber();
-        } else if (myUnitDiagonal && (row == col)) {
-            return this.factory().scalar().one().getNumber();
-        } else {
-            return this.getBase().get(row, col);
-        }
+        return this.toScalar(row, col).getNumber();
     }
 
     public boolean isLowerLeftShaded() {
-        return true;
+        return false;
     }
 
     public boolean isUpperRightShaded() {
@@ -74,9 +60,7 @@ public final class UpperTriangularStore<N extends Number> extends ShadingStore<N
 
     public Scalar<N> toScalar(final long row, final long col) {
         if (row > col) {
-            return this.factory().scalar().zero();
-        } else if (myUnitDiagonal && (row == col)) {
-            return this.factory().scalar().one();
+            return this.getBase().toScalar(col, row).conjugate();
         } else {
             return this.getBase().toScalar(row, col);
         }

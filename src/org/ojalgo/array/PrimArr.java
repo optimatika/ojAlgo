@@ -1,5 +1,5 @@
 /*
- * Copyright © 2003-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package org.ojalgo.array;
+
+abstract class PrimArr<N extends Number> extends BasicArray<N> {
+
+    public abstract byte byteValue(long index);
+
+    public abstract double doubleValue(long index);
+
+    public abstract float floatValue(long index);
+
+    public abstract int intValue(long index);
+
+    public abstract long longValue(long index);
+
+    public abstract void set(long index, byte value);
+
+    public abstract void set(long index, double value);
+
+    public abstract void set(long index, float value);
+
+    public abstract void set(long index, int value);
+
+    public abstract void set(long index, long value);
+
+    public abstract void set(long index, short value);
+
+    public abstract short shortValue(long index);
+
+}

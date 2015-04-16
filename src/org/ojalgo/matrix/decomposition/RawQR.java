@@ -36,7 +36,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 @Deprecated
-public final class RawQR extends RawDecomposition implements QR<Double> {
+public final class RawQR extends OldRawDecomposition implements QR<Double> {
 
     private JamaQR myDelegate;
 
@@ -75,7 +75,7 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     public RawStore solve(final Access2D<Double> rhs) {
-        return new RawStore(this.solve(RawDecomposition.cast(rhs)));
+        return new RawStore(this.solve(OldRawDecomposition.cast(rhs)));
     }
 
     @Override
@@ -123,10 +123,6 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
         return (myDelegate != null) && myDelegate.isFullRank();
     }
 
-    public MatrixStore<Double> reconstruct() {
-        return MatrixUtils.reconstruct(this);
-    }
-
     @Override
     public void reset() {
         myDelegate = null;
@@ -156,7 +152,16 @@ public final class RawQR extends RawDecomposition implements QR<Double> {
 
         this.reset();
 
-        return this.compute(RawDecomposition.cast(matrix));
+        return this.compute(OldRawDecomposition.cast(matrix));
+    }
+
+    /**
+     * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
+     *
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#getInverse(org.ojalgo.matrix.decomposition.DecompositionStore)
+     */
+    public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+        return this.getInverse();
     }
 
 }

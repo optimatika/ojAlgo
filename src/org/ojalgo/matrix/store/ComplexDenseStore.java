@@ -470,6 +470,29 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
+    public void applyLDL(final int iterationPoint, final BasicArray<ComplexNumber> multipliers) {
+
+        final ComplexNumber[] tmpData = data;
+        final ComplexNumber[] tmpColumn = ((ComplexArray) multipliers).data;
+
+        if ((myColDim - iterationPoint - 1) > ApplyLDL.THRESHOLD) {
+
+            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                @Override
+                protected void conquer(final int first, final int limit) {
+                    ApplyLDL.invoke(tmpData, myRowDim, first, limit, tmpColumn, iterationPoint);
+                }
+            };
+
+            tmpConquerer.invoke(iterationPoint + 1, myColDim, ApplyLDL.THRESHOLD);
+
+        } else {
+
+            ApplyLDL.invoke(tmpData, myRowDim, iterationPoint + 1, myColDim, tmpColumn, iterationPoint);
+        }
+    }
+
     public void applyLU(final int iterationPoint, final BasicArray<ComplexNumber> multipliers) {
 
         final ComplexNumber[] tmpData = data;
@@ -506,7 +529,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public void caxpy(final ComplexNumber scalarA, final int columnX, final int columnY, final int firstRow) {
-        AXPY.invoke(data, columnY * myRowDim + firstRow, 1, scalarA, data, columnX * myRowDim + firstRow, 1, myRowDim - firstRow);
+        AXPY.invoke(data, (columnY * myRowDim) + firstRow, 1, scalarA, data, (columnX * myRowDim) + firstRow, 1, myRowDim - firstRow);
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<ComplexNumber> transformationCollector, final boolean eigenvalue) {
@@ -569,6 +592,35 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public void exchangeRows(final int rowA, final int rowB) {
         myUtility.exchangeRows(rowA, rowB);
+    }
+
+    public void exchangeHermitian(final int indexA, final int indexB) {
+
+        final int tmpMin = Math.min(indexA, indexB);
+        final int tmpMax = Math.max(indexA, indexB);
+
+        ComplexNumber tmpVal;
+        for (int j = 0; j < tmpMin; j++) {
+            tmpVal = this.get(tmpMin, j);
+            this.set(tmpMin, j, this.get(tmpMax, j));
+            this.set(tmpMax, j, tmpVal);
+        }
+
+        tmpVal = this.get(tmpMin, tmpMin);
+        this.set(tmpMin, tmpMin, this.get(tmpMax, tmpMax));
+        this.set(tmpMax, tmpMax, tmpVal);
+
+        for (int ij = tmpMin + 1; ij < tmpMax; ij++) {
+            tmpVal = this.get(ij, tmpMin);
+            this.set(ij, tmpMin, this.get(tmpMax, ij).conjugate());
+            this.set(tmpMax, ij, tmpVal.conjugate());
+        }
+
+        for (int i = tmpMax + 1; i < myRowDim; i++) {
+            tmpVal = this.get(i, tmpMin);
+            this.set(i, tmpMin, this.get(i, tmpMax));
+            this.set(i, tmpMax, tmpVal);
+        }
     }
 
     public PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> factory() {
@@ -774,8 +826,12 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return myColDim;
     }
 
-    public int getIndexOfLargestInColumn(final int row, final int column) {
+    public int indexOfLargestInColumn(final int row, final int column) {
         return (int) myUtility.indexOfLargestInColumn(row, column);
+    }
+
+    public int indexOfLargestInDiagonal(final int row, final int column) {
+        return (int) myUtility.indexOfLargestInDiagonal(row, column);
     }
 
     public int getMaxDim() {
@@ -908,8 +964,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public void raxpy(final ComplexNumber scalarA, final int rowX, final int rowY, final int firstColumn) {
-        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data, rowX + (firstColumn * (data.length / myColDim)),
-        data.length / myColDim, myColDim - firstColumn);
+        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data, rowX
+                + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
     public MatrixStore.ElementsConsumer<ComplexNumber> region(final int row, final int column) {
@@ -937,7 +993,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myUtility.fillColumn(aCol + 1, aCol, ComplexNumber.ZERO);
     }
 
-    public void substituteBackwards(final Access2D<ComplexNumber> body, final boolean conjugated) {
+    public void substituteBackwards(final Access2D<ComplexNumber> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -948,7 +1004,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteBackwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, conjugated);
+                    SubstituteBackwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, hermitian);
                 }
 
             };
@@ -957,11 +1013,11 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         } else {
 
-            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, conjugated);
+            SubstituteBackwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, hermitian);
         }
     }
 
-    public void substituteForwards(final Access2D<ComplexNumber> body, final boolean onesOnDiagonal, final boolean zerosAboveDiagonal) {
+    public void substituteForwards(final Access2D<ComplexNumber> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -972,7 +1028,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteForwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, onesOnDiagonal, zerosAboveDiagonal);
+                    SubstituteForwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, identity);
                 }
 
             };
@@ -981,7 +1037,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         } else {
 
-            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, onesOnDiagonal, zerosAboveDiagonal);
+            SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
         }
     }
 

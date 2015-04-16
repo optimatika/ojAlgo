@@ -195,6 +195,11 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      */
     void applyLU(final int iterationPoint, final BasicArray<N> multipliers);
 
+    /**
+     * LDL transformations
+     */
+    void applyLDL(final int iterationPoint, final BasicArray<N> multipliers);
+
     Array2D<N> asArray2D();
 
     Array1D<ComplexNumber> computeInPlaceSchur(PhysicalStore<N> transformationCollector, boolean eigenvalue);
@@ -205,7 +210,9 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
 
     boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<N> destination);
 
-    int getIndexOfLargestInColumn(final int row, final int column);
+    int indexOfLargestInColumn(final int row, final int column);
+
+    int indexOfLargestInDiagonal(final int row, final int column);
 
     void negateColumn(int column);
 
@@ -222,10 +229,12 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      * </ul>
      *
      * @param body The equation system body parameters [A]
+     * @param unitDiagonal TODO
      * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
      *        matrix, and the elements conjugated.
+     * @param hermitian TODO
      */
-    void substituteBackwards(Access2D<N> body, boolean conjugated);
+    void substituteBackwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean hermitian);
 
     /**
      * Will solve the equation system [A][X]=[B] where:
@@ -236,13 +245,16 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      * </ul>
      *
      * @param body The equation system body parameters [A]
-     * @param onesOnDiagonal true if body as ones on the diagonal
-     * @param zerosAboveDiagonal
+     * @param unitDiagonal true if body as ones on the diagonal
+     * @param conjugated TODO
+     * @param identity
      */
-    void substituteForwards(Access2D<N> body, boolean onesOnDiagonal, boolean zerosAboveDiagonal);
+    void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 
     void transformSymmetric(Householder<N> transformation);
 
     void tred2(BasicArray<N> mainDiagonal, BasicArray<N> offDiagonal, boolean yesvecs);
+
+    void exchangeHermitian(int indexA, int indexB);
 
 }

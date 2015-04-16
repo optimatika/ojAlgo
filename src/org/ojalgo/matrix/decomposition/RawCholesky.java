@@ -23,10 +23,9 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.IdentityStore;
+import org.ojalgo.matrix.store.LowerHermitianStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
@@ -51,33 +50,30 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         super();
     }
 
-    public Double calculateDeterminant(final Access2D<Double> matrix) {
-        this.compute(matrix);
-        return this.getDeterminant();
-    }
-
     public boolean compute(final Access2D<?> matrix) {
 
         this.reset();
 
         final double[][] tmpData = this.setRawInPlace(matrix);
 
-        final int tmpRowDim = this.getRowDim();
-        mySPD = (this.getColDim() == tmpRowDim);
+        final int tmpDiagDim = this.getRowDim();
+        mySPD = (this.getColDim() == tmpDiagDim);
+
+        double[] tmpRowIJ;
+        double[] tmpRowI;
 
         // Main loop.
-        for (int i = 0; i < tmpRowDim; i++) { // For each row
-            final double[] tmpRowI = tmpData[i];
-            double tmpVal = ZERO;
-            for (int k = 0; k < i; k++) { // For each previous row
-                final double[] tmpRowK = tmpData[k];
-                double tmpDotProd = DotProduct.invoke(tmpRowI, tmpRowK, k);
-                tmpRowI[k] = tmpDotProd = (tmpRowI[k] - tmpDotProd) / tmpRowK[k];
-                tmpVal += (tmpDotProd * tmpDotProd);
+        for (int ij = 0; ij < tmpDiagDim; ij++) { // For each row/column, along the diagonal
+            tmpRowIJ = tmpData[ij];
+
+            final double tmpD = tmpRowIJ[ij] = Math.sqrt(Math.max(matrix.doubleValue(ij, ij) - DotProduct.invoke(tmpRowIJ, tmpRowIJ, ij), ZERO));
+            mySPD &= (tmpD > ZERO);
+
+            for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
+                tmpRowI = tmpData[i];
+
+                tmpRowI[ij] = (matrix.doubleValue(i, ij) - DotProduct.invoke(tmpRowI, tmpRowIJ, ij)) / tmpD;
             }
-            tmpVal = tmpData[i][i] - tmpVal;
-            mySPD &= (tmpVal > ZERO);
-            tmpData[i][i] = Math.sqrt(Math.max(tmpVal, ZERO));
         }
 
         return this.computed(true);
@@ -116,9 +112,8 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         return retVal;
     }
 
-    @Override
-    public MatrixStore<Double> getInverse() {
-        return this.solve(IdentityStore.PRIMITIVE.make(this.getRowDim()));
+    public final MatrixStore<Double> getInverse() {
+        return this.getInverse(this.preallocate(this.getRowDim(), this.getRowDim()));
     }
 
     public MatrixStore<Double> getL() {
@@ -144,8 +139,8 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
 
         final RawStore tmpBody = this.getRawInPlaceStore();
 
-        preallocated.substituteForwards(tmpBody, false, false);
-        preallocated.substituteBackwards(tmpBody, true);
+        preallocated.substituteForwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(tmpBody, false, true, false);
 
         return preallocated;
     }
@@ -154,35 +149,30 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
         return mySPD;
     }
 
-    public MatrixStore<Double> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+    public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+
+        final RawStore tmpBody = this.getRawInPlaceStore();
+
+        preallocated.substituteForwards(tmpBody, false, false, true);
+        preallocated.substituteBackwards(tmpBody, false, true, true);
+
+        return new LowerHermitianStore<>(preallocated);
     }
 
     /**
      * Will only copy the lower/left part of the matrix
      *
-     * @see org.ojalgo.matrix.decomposition.RawDecomposition#copy(org.ojalgo.access.Access2D, int, int,
+     * @see org.ojalgo.matrix.decomposition.OldRawDecomposition#copy(org.ojalgo.access.Access2D, int, int,
      *      double[][])
      */
     @Override
     void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
-        for (int i = 0; i < rows; i++) {
-            final double[] tmpRow = destination[i];
-            for (int j = 0; j <= i; j++) {
-                tmpRow[j] = source.doubleValue(i, j);
-            }
-        }
+        //        for (int i = 0; i < rows; i++) {
+        //            final double[] tmpRow = destination[i];
+        //            for (int j = 0; j <= i; j++) {
+        //                tmpRow[j] = source.doubleValue(i, j);
+        //            }
+        //        }
     }
 
-    @Override
-    protected boolean compute(final RawStore matrix) {
-        ProgrammingError.throwForIllegalInvocation();
-        return false;
-    }
-
-    @Override
-    RawStore solve(final RawStore rhs) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

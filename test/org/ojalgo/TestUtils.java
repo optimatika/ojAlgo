@@ -215,7 +215,7 @@ public abstract class TestUtils {
         // TestUtils.assertEquals(message, Double.valueOf(expected), Double.valueOf(actual), context);
         if (Double.isNaN(expected) && Double.isNaN(actual)) {
 
-        } else if (!!context.isDifferent(expected, actual)) {
+        } else if (context.isDifferent(expected, actual)) {
             Assert.fail(Assert.format(message, expected, actual));
         }
     }

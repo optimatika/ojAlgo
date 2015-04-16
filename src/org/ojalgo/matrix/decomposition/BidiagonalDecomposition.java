@@ -303,10 +303,6 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
         return this.isAspectRatioNormal();
     }
 
-    public final MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
-    }
-
     @Override
     public final void reset() {
 
@@ -320,6 +316,10 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
         myInitDiagQ2 = null;
 
         myFullSize = false;
+    }
+
+    public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
+        throw new UnsupportedOperationException();
     }
 
     private final DiagonalAccess<N> makeDiagonalAccessD() {
@@ -338,7 +338,7 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
             tmpSuper = null;
         }
 
-        return new DiagonalAccess<N>(tmpMain, tmpSuper, tmpSub, this.getStaticZero());
+        return new DiagonalAccess<N>(tmpMain, tmpSuper, tmpSub, this.scalar().zero().getNumber());
     }
 
     /**

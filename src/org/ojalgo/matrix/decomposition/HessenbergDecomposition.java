@@ -35,7 +35,8 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain Hessenberg#makeBig()}, {@linkplain Hessenberg#makeComplex()} or {@linkplain Hessenberg#makePrimitive()}.
+ * {@linkplain Hessenberg#makeBig()}, {@linkplain Hessenberg#makeComplex()} or
+ * {@linkplain Hessenberg#makePrimitive()}.
  *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
@@ -100,8 +101,9 @@ public abstract class HessenbergDecomposition<N extends Number> extends InPlaceD
         return Hessenberg.makePrimitive();
     }
 
-    private boolean myUpper = true;
     private transient DecompositionStore<N> myQ = null;
+
+    private boolean myUpper = true;
 
     protected HessenbergDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
@@ -179,10 +181,6 @@ public abstract class HessenbergDecomposition<N extends Number> extends InPlaceD
         return myUpper;
     }
 
-    public MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
-    }
-
     @Override
     public void reset() {
 
@@ -190,6 +188,10 @@ public abstract class HessenbergDecomposition<N extends Number> extends InPlaceD
 
         myQ = null;
         myUpper = true;
+    }
+
+    public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
+        throw new UnsupportedOperationException();
     }
 
     private final DecompositionStore<N> makeQ(final DecompositionStore<N> aStoreToTransform, final boolean tmpUpper, final boolean eye) {

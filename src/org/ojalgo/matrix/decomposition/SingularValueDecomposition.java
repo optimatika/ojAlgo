@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
@@ -226,7 +225,7 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
 
             final PhysicalStore<N> tmpMtrx = preallocated;
 
-            final N tmpZero = this.getStaticZero();
+            final N tmpZero = this.scalar().zero().getNumber();
 
             N tmpSingularValue;
             for (int i = 0; i < tmpRowDim; i++) {
@@ -323,10 +322,6 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
 
     public final boolean isFullSize() {
         return myFullSize;
-    }
-
-    public MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
     }
 
     @Override

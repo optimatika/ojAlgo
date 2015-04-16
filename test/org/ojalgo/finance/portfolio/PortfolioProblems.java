@@ -38,6 +38,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.type.StandardType;
 import org.ojalgo.type.context.NumberContext;
 
 public class PortfolioProblems extends FinancePortfolioTests {
@@ -51,8 +52,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
     }
 
     /**
-     * The user got, constraint breaking, negative portfolio weights. The model is "wrong" - should not have negative
-     * excess returns - but he still should not get a constraint breaking solution.
+     * The user got, constraint breaking, negative portfolio weights. The model is "wrong" - should not have
+     * negative excess returns - but he still should not get a constraint breaking solution.
      */
     public void testP20090115() {
 
@@ -166,16 +167,20 @@ public class PortfolioProblems extends FinancePortfolioTests {
     }
 
     /**
-     * we have a problem with MarkowitzModel. I have produced a little source that explain the problem. We have set 3
-     * different TargetReturn on the same data.. With targets near to the best end worst target return, the
-     * MarkowitzModel works fine. With targets within the interval of best and worst return, seem that the
-     * MarkowitzModel is not able to find a correct list of weights. If you try this program and use target of 0.08 or
-     * 0.13 or 0.12 you can see a correct solution. With a target of 0.10 MarkowitzModel is not able to find a valid
-     * solution.
+     * we have a problem with MarkowitzModel. I have produced a little source that explain the problem. We
+     * have set 3 different TargetReturn on the same data.. With targets near to the best end worst target
+     * return, the MarkowitzModel works fine. With targets within the interval of best and worst return, seem
+     * that the MarkowitzModel is not able to find a correct list of weights. If you try this program and use
+     * target of 0.08 or 0.13 or 0.12 you can see a correct solution. With a target of 0.10 MarkowitzModel is
+     * not able to find a valid solution.
      */
     public void testP20130329() {
 
         final BasicMatrix tmpCovariances = BigMatrix.FACTORY.rows(new double[][] { { 0.00360000, 0.001800000000 }, { 0.001800000000, 0.00090000 } });
+
+        //        final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
+        //        tmpEvD.compute(tmpCovariances, true);
+        //        BasicLogger.debug("Eigenvalues: {}", tmpEvD.getEigenvalues());
 
         final MarketEquilibrium tmpMarketEquilibrium = new MarketEquilibrium(tmpCovariances, BigMath.THOUSAND);
 
@@ -217,14 +222,19 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
     /**
      * <p>
-     * First of all, let me say that I really like ojAlgo so thank you for making it! I do, however, think that you
-     * should make tmpIterCount and _0_000005 variables fields (with getters and setters) in the MarkowitzModel.java
-     * class. We are finding that we get suboptimal solutions with the hard-coded limit of 20 iterations in a mean
-     * variance optimisation (solving for the highest return given a target variance). We are now testing it (against
-     * our own Python model) with a limit of 100. Please let me know what you think when you get a chance.
+     * First of all, let me say that I really like ojAlgo so thank you for making it! I do, however, think
+     * that you should make tmpIterCount and _0_000005 variables fields (with getters and setters) in the
+     * MarkowitzModel.java class. We are finding that we get suboptimal solutions with the hard-coded limit of
+     * 20 iterations in a mean variance optimisation (solving for the highest return given a target variance).
+     * We are now testing it (against our own Python model) with a limit of 100. Please let me know what you
+     * think when you get a chance.
      * </p>
      * <p>
-     * Borrowed test data from {@link #testP20090115()}. </p<
+     * Borrowed test data from {@link #testP20090115()}.
+     * </p>
+     * <p>
+     * 2015-04-14: Changed test evaluation context from <7,14> to <4,4>.
+     * </p>
      */
     public void testP20141202() {
 
@@ -264,18 +274,23 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         tmpMarkowitz.setRiskAversion(tmpInitialRiskAversion);
 
+        // test evaluation context
+        final NumberContext tmpPrecision = StandardType.PERCENT.newPrecision(4);
+
         for (int r = 0; r < tmpPortfolioReturn.length; r++) {
             tmpMarkowitz.setRiskAversion(tmpInitialRiskAversion);
             tmpMarkowitz.setTargetReturn(BigDecimal.valueOf(tmpPortfolioReturn[r]));
             tmpMarkowitz.getWeights();
-            TestUtils.assertEquals("Return: " + tmpRiskAversions[r], tmpPortfolioReturn[r], tmpMarkowitz.getMeanReturn());
+            BasicLogger.debug("Exp={}, Act={}, Quoat={}", tmpPortfolioReturn[r], tmpMarkowitz.getMeanReturn(), tmpMarkowitz.getMeanReturn()
+                    / tmpPortfolioReturn[r]);
+            TestUtils.assertEquals("Return: " + tmpRiskAversions[r], tmpPortfolioReturn[r], tmpMarkowitz.getMeanReturn(), tmpPrecision);
         }
 
         for (int v = 0; v < tmpPortfolioVariance.length; v++) {
             tmpMarkowitz.setRiskAversion(tmpInitialRiskAversion);
             tmpMarkowitz.setTargetVariance(BigDecimal.valueOf(tmpPortfolioVariance[v]));
             tmpMarkowitz.getWeights();
-            TestUtils.assertEquals("Variance: " + tmpRiskAversions[v], tmpPortfolioVariance[v], tmpMarkowitz.getReturnVariance());
+            TestUtils.assertEquals("Variance: " + tmpRiskAversions[v], tmpPortfolioVariance[v], tmpMarkowitz.getReturnVariance(), tmpPrecision);
         }
 
     }

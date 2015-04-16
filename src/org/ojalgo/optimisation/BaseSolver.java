@@ -26,7 +26,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -122,8 +121,8 @@ public abstract class BaseSolver extends GenericSolver {
         }
 
         /**
-         * Will rescale problem parameters to minimise rounding and representation errors. Warning! This will rescale
-         * the objective function and therefore also the optimal value (but not the solution).
+         * Will rescale problem parameters to minimise rounding and representation errors. Warning! This will
+         * rescale the objective function and therefore also the optimal value (but not the solution).
          */
         @SuppressWarnings("unchecked")
         public B balance() {
@@ -415,19 +414,19 @@ public abstract class BaseSolver extends GenericSolver {
 
         public void resetLE() {
             if (myLE != null) {
-                myLE.fillAll(PrimitiveMath.ZERO);
+                myLE.fillAll(ZERO);
             }
         }
 
         public void resetLI() {
             if (myLI != null) {
-                myLI.fillAll(PrimitiveMath.ZERO);
+                myLI.fillAll(ZERO);
             }
         }
 
         public void resetX() {
             if (myX != null) {
-                myX.fillAll(PrimitiveMath.ZERO);
+                myX.fillAll(ZERO);
             }
         }
 
@@ -767,6 +766,8 @@ public abstract class BaseSolver extends GenericSolver {
 
     private final BaseSolver.AbstractBuilder<?, ?> myMatrices;
 
+    private transient PhysicalStore<Double> myModifiedQ = null;
+
     @SuppressWarnings("unused")
     private BaseSolver(final Options solverOptions) {
         this(null, solverOptions);
@@ -843,7 +844,16 @@ public abstract class BaseSolver extends GenericSolver {
     }
 
     protected MatrixStore<Double> getQ() {
-        return myMatrices.getQ();
+        if (myModifiedQ == null) {
+            final MatrixStore<Double> tmpQ = myMatrices.getQ();
+            myModifiedQ = tmpQ instanceof PhysicalStore ? (PhysicalStore<Double>) tmpQ : tmpQ.copy();
+            //            final double tmpLargest = myModifiedQ.aggregateAll(Aggregator.LARGEST);
+            //            final double tmpRelativelySmall = MACHINE_EPSILON * tmpLargest;
+            //            final double tmpPracticalLimit = 1E-14 / THREE;
+            //            final double tmpSmallToAdd = Math.max(tmpRelativelySmall, tmpPracticalLimit);
+            //            myModifiedQ.modifyDiagonal(0, 0, PrimitiveFunction.ADD.second(tmpSmallToAdd));
+        }
+        return myModifiedQ;
     }
 
     protected PhysicalStore<Double> getSE() {

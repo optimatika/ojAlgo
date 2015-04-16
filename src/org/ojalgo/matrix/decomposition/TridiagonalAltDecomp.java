@@ -79,8 +79,8 @@ class TridiagonalAltDecomp extends InPlaceDecomposition<Double> implements Tridi
         return false;
     }
 
-    public MatrixStore<Double> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+    public MatrixStore<Double> solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
+        throw new UnsupportedOperationException();
     }
 
 }

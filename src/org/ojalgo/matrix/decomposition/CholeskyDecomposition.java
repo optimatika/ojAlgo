@@ -31,6 +31,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.LowerHermitianStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -118,11 +119,6 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
         super(aFactory);
     }
 
-    public final N calculateDeterminant(final Access2D<N> matrix) {
-        this.compute(matrix);
-        return this.getDeterminant();
-    }
-
     public final boolean compute(final Access2D<?> aStore) {
         return this.compute(aStore, false);
     }
@@ -187,15 +183,14 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
     }
 
     @Override
-    public final MatrixStore<N> getInverse() {
-        return this.invert(this.makeEye(this.getColDim(), this.getRowDim()));
-    }
-
-    @Override
     public final MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
-        preallocated.fillAll(this.getStaticZero());
-        preallocated.fillDiagonal(0, 0, this.getStaticOne());
-        return this.invert(preallocated);
+
+        final DecompositionStore<N> tmpBody = this.getInPlace();
+
+        preallocated.substituteForwards(tmpBody, false, false, true);
+        preallocated.substituteBackwards(tmpBody, false, true, true);
+
+        return new LowerHermitianStore<>(preallocated);
     }
 
     public MatrixStore<N> getL() {
@@ -212,10 +207,6 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
 
     public boolean isSPD() {
         return mySPD;
-    }
-
-    public MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
     }
 
     @Override
@@ -253,20 +244,10 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 
-        preallocated.substituteForwards(tmpBody, false, false);
-        preallocated.substituteBackwards(tmpBody, true);
+        preallocated.substituteForwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(tmpBody, false, true, false);
 
         return preallocated;
-    }
-
-    private final MatrixStore<N> invert(final DecompositionStore<N> retVal) {
-
-        final DecompositionStore<N> tmpBody = this.getInPlace();
-
-        retVal.substituteForwards(tmpBody, false, true);
-        retVal.substituteBackwards(tmpBody, true);
-
-        return retVal;
     }
 
 }

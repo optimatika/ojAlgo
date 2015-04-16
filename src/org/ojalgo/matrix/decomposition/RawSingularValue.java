@@ -32,13 +32,14 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * This class adapts JAMA's SingularValueDecomposition to ojAlgo's {@linkplain SingularValue} interface. speed: 52.641s
+ * This class adapts JAMA's SingularValueDecomposition to ojAlgo's {@linkplain SingularValue} interface.
+ * speed: 52.641s
  *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
 @Deprecated
-public final class RawSingularValue extends RawDecomposition implements SingularValue<Double> {
+public final class RawSingularValue extends OldRawDecomposition implements SingularValue<Double> {
 
     private JamaSingularValue myDelegate;
     private RawStore myPseudoinverse;
@@ -56,7 +57,7 @@ public final class RawSingularValue extends RawDecomposition implements Singular
 
         this.reset();
 
-        final RawStore tmpCast = RawDecomposition.cast(matrix);
+        final RawStore tmpCast = OldRawDecomposition.cast(matrix);
 
         return this.compute(tmpCast, singularValuesOnly);
     }
@@ -166,10 +167,6 @@ public final class RawSingularValue extends RawDecomposition implements Singular
         return this.isComputed();
     }
 
-    public MatrixStore<Double> reconstruct() {
-        return MatrixUtils.reconstruct(this);
-    }
-
     @Override
     public void reset() {
 
@@ -225,7 +222,16 @@ public final class RawSingularValue extends RawDecomposition implements Singular
 
         this.reset();
 
-        return this.compute(RawDecomposition.cast(matrix));
+        return this.compute(OldRawDecomposition.cast(matrix));
+    }
+
+    /**
+     * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
+     *
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#getInverse(org.ojalgo.matrix.decomposition.DecompositionStore)
+     */
+    public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+        return this.getInverse();
     }
 
 }

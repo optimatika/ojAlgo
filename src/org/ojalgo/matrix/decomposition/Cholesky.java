@@ -24,13 +24,14 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * <p>
- * Cholesky: [A] = [L][L]<sup>H</sup>
+ * Cholesky: [A] = [L][L]<sup>H</sup> (or [R]<sup>H</sup>[R])
  * </p>
  * <p>
  * [A]<sup>H</sup> = [A] = [L][L]<sup>H</sup>
@@ -46,7 +47,7 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface Cholesky<N extends Number> extends LDU<N>, DeterminantTask<N> {
+public interface Cholesky<N extends Number> extends LDU<N>, HermitianDecomposition<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
@@ -54,14 +55,14 @@ public interface Cholesky<N extends Number> extends LDU<N>, DeterminantTask<N> {
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (Cholesky<N>) Cholesky.makeBig();
+            return (Cholesky<N>) new CholeskyDecomposition.Big();
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (Cholesky<N>) Cholesky.makeComplex();
+            return (Cholesky<N>) new CholeskyDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            if ((typical.countColumns() <= 32) || (typical.countColumns() >= 46340)) { //64,16,16
+            if ((typical.countColumns() <= 256) || (typical.count() > BasicArray.MAX_ARRAY_SIZE)) {
                 return (Cholesky<N>) new RawCholesky();
             } else {
-                return (Cholesky<N>) Cholesky.makePrimitive();
+                return (Cholesky<N>) new CholeskyDecomposition.Primitive();
             }
         } else {
             throw new IllegalArgumentException();
@@ -92,8 +93,22 @@ public interface Cholesky<N extends Number> extends LDU<N>, DeterminantTask<N> {
 
     boolean compute(final Access2D<?> matrix, final boolean checkHermitian);
 
-    N getDeterminant();
+    /**
+     * Must implement either {@link #getL()} or {@link #getR()}.
+     */
+    default MatrixStore<N> getL() {
+        return this.getR().conjugate();
+    }
 
-    MatrixStore<N> getL();
+    /**
+     * Must implement either {@link #getL()} or {@link #getR()}.
+     */
+    default MatrixStore<N> getR() {
+        return this.getL().conjugate();
+    }
+
+    default MatrixStore<N> reconstruct() {
+        return MatrixUtils.reconstruct(this);
+    }
 
 }

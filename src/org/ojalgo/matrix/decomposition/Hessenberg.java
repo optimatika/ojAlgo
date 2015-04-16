@@ -24,12 +24,13 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * Hessenberg: [A] = [Q][H][Q]<sup>T</sup> A general square matrix [A] can be decomposed by orthogonal similarity
- * transformations into the form [A]=[Q][H][Q]<sup>T</sup> where
+ * Hessenberg: [A] = [Q][H][Q]<sup>T</sup> A general square matrix [A] can be decomposed by orthogonal
+ * similarity transformations into the form [A]=[Q][H][Q]<sup>T</sup> where
  * <ul>
  * <li>[H] is upper (or lower) hessenberg matrix</li>
  * <li>[Q] is orthogonal/unitary</li>
@@ -75,4 +76,7 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
 
     boolean isUpper();
 
+    default MatrixStore<N> reconstruct() {
+        return MatrixUtils.reconstruct(this);
+    }
 }

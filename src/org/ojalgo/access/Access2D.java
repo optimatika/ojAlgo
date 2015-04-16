@@ -33,8 +33,8 @@ import org.ojalgo.scalar.Scalar;
 public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     /**
-     * This interface mimics {@linkplain Fillable}, but methods return the builder instance instead, and then adds the
-     * {@link #build()} method.
+     * This interface mimics {@linkplain Fillable}, but methods return the builder instance instead, and then
+     * adds the {@link #build()} method.
      *
      * @author apete
      */
@@ -146,11 +146,15 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
-    public interface Iterable2D<N extends Number> {
+    public interface Iterable2D<N extends Number> extends Access2D<N> {
 
-        Iterable<Access1D<N>> columns();
+        default Iterable<Access1D<N>> columns() {
+            return ColumnsIterator.make(this);
+        }
 
-        Iterable<Access1D<N>> rows();
+        default Iterable<Access1D<N>> rows() {
+            return RowsIterator.make(this);
+        }
     }
 
     public interface Modifiable<N extends Number> extends Structure2D, Access1D.Modifiable<N> {

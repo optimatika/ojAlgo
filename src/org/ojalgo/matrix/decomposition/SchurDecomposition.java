@@ -145,10 +145,6 @@ public abstract class SchurDecomposition<N extends Number> extends InPlaceDecomp
         return false;
     }
 
-    public MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
-    }
-
     @Override
     public void reset() {
 
@@ -156,6 +152,10 @@ public abstract class SchurDecomposition<N extends Number> extends InPlaceDecomp
 
         myDiagonal = null;
         myQ = null;
+    }
+
+    public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
+        throw new UnsupportedOperationException();
     }
 
     final void setDiagonal(final Array1D<ComplexNumber> newDiagonal) {
