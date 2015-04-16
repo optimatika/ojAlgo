@@ -25,10 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
-<<<<<<< HEAD
 import org.ojalgo.matrix.MatrixUtils;
-=======
->>>>>>> origin/master
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -102,7 +99,6 @@ public interface Cholesky<N extends Number> extends LDU<N>, HermitianDecompositi
     default MatrixStore<N> getL() {
         return this.getR().conjugate();
     }
-<<<<<<< HEAD
 
     /**
      * Must implement either {@link #getL()} or {@link #getR()}.
@@ -113,14 +109,6 @@ public interface Cholesky<N extends Number> extends LDU<N>, HermitianDecompositi
 
     default MatrixStore<N> reconstruct() {
         return MatrixUtils.reconstruct(this);
-=======
-
-    /**
-     * Must implement either {@link #getL()} or {@link #getR()}.
-     */
-    default MatrixStore<N> getR() {
-        return this.getL().conjugate();
->>>>>>> origin/master
     }
 
 }
