@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,17 +36,18 @@ import org.ojalgo.type.TypeUtils;
 
 /**
  * <p>
- * MarketEquilibrium translates between the market portfolio weights and the equilibrium excess returns. The only things
- * needed to do those translations are the covariance matrix and the (market) risk aversion factor - that's what you
- * need to supply when you instantiate this class.
+ * MarketEquilibrium translates between the market portfolio weights and the equilibrium excess returns. The
+ * only things needed to do those translations are the covariance matrix and the (market) risk aversion factor
+ * - that's what you need to supply when you instantiate this class.
  * </p>
  * <p>
- * This class performs unconstrained optimisation. For each set of asset returns there is an optimal set of weights. It
- * also performs reverse (unconstrained) optimisation producing the "optimal" expected returns given a set of weights.
+ * This class performs unconstrained optimisation. For each set of asset returns there is an optimal set of
+ * weights. It also performs reverse (unconstrained) optimisation producing the "optimal" expected returns
+ * given a set of weights.
  * </p>
  * <p>
- * The name MarketEquilibrium is actually a bit misleading. By altering the risk aversion factor this class can/will
- * describe the weights/returns equilibrium for any investor.
+ * The name MarketEquilibrium is actually a bit misleading. By altering the risk aversion factor this class
+ * can/will describe the weights/returns equilibrium for any investor.
  * </p>
  *
  * @see #calculateAssetReturns(BasicMatrix)
@@ -127,8 +128,8 @@ public class MarketEquilibrium {
     }
 
     /**
-     * If the input vector of asset weights are the weights of the market portfolio, then the ouput is the equilibrium
-     * excess returns.
+     * If the input vector of asset weights are the weights of the market portfolio, then the ouput is the
+     * equilibrium excess returns.
      */
     public BasicMatrix calculateAssetReturns(final BasicMatrix assetWeights) {
         final BasicMatrix tmpAssetWeights = myRiskAversion.compareTo(DEFAULT_RISK_AVERSION) == 0 ? assetWeights : assetWeights.multiply(myRiskAversion);
@@ -136,8 +137,9 @@ public class MarketEquilibrium {
     }
 
     /**
-     * If the input vector of returns are the equilibrium excess returns then the output is the market portfolio
-     * weights. This is unconstrained optimisation - there are no constraints on the resulting instrument weights.
+     * If the input vector of returns are the equilibrium excess returns then the output is the market
+     * portfolio weights. This is unconstrained optimisation - there are no constraints on the resulting
+     * instrument weights.
      */
     public BasicMatrix calculateAssetWeights(final BasicMatrix assetReturns) {
         final BasicMatrix tmpAssetWeights = myCovariances.solve(assetReturns);
@@ -168,8 +170,8 @@ public class MarketEquilibrium {
     }
 
     /**
-     * Will set the risk aversion factor to the best fit for an observed pair of market portfolio asset weights and
-     * equilibrium/historical excess returns.
+     * Will set the risk aversion factor to the best fit for an observed pair of market portfolio asset
+     * weights and equilibrium/historical excess returns.
      */
     public void calibrate(final BasicMatrix assetWeights, final BasicMatrix assetReturns) {
 
@@ -179,8 +181,8 @@ public class MarketEquilibrium {
     }
 
     /**
-     * Equivalent to copying, but additionally the covariance matrix will be cleaned of negative and very small
-     * eigenvalues to make it positive definite.
+     * Equivalent to copying, but additionally the covariance matrix will be cleaned of negative and very
+     * small eigenvalues to make it positive definite.
      */
     public MarketEquilibrium clean() {
 
@@ -234,8 +236,8 @@ public class MarketEquilibrium {
     }
 
     /**
-     * Will calculate the risk aversion factor that is the best fit for an observed pair of market portfolio weights and
-     * equilibrium/historical excess returns.
+     * Will calculate the risk aversion factor that is the best fit for an observed pair of market portfolio
+     * weights and equilibrium/historical excess returns.
      */
     Scalar<?> calculateImpliedRiskAversion(final BasicMatrix assetWeights, final BasicMatrix assetReturns) {
 

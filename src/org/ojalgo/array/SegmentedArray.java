@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -182,8 +182,8 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     private final long myIndexMask;
     private final BasicArray<N>[] mySegments;
     /**
-     * All segments except the last one are assumed to (must) be of equal length. The last segment cannot be longer than
-     * the others.
+     * All segments except the last one are assumed to (must) be of equal length. The last segment cannot be
+     * longer than the others.
      */
     private final long mySegmentSize;
 
@@ -521,14 +521,14 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     }
 
     static <N extends Number> SegmentedArray<N> make(final ArrayFactory<N> segmentFactory, final long... structure) {
-    
+
         final long tmpCount = AccessUtils.count(structure);
-    
+
         int tmpNumberOfUniformSegments = 1; // NumberOfUniformSegments
         long tmpUniformSegmentSize = tmpCount;
-    
+
         final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpCount));
-    
+
         for (int i = 0; i < structure.length; i++) {
             final long tmpNoS = (tmpNumberOfUniformSegments * structure[i]);
             final long tmpSS = tmpUniformSegmentSize / structure[i];
@@ -537,16 +537,16 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
                 tmpUniformSegmentSize = tmpSS;
             }
         }
-    
+
         final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(segmentFactory.getElementSize());
         final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
         while ((tmpUnits != 1L) && (tmpUniformSegmentSize >= tmpCacheDim) && ((tmpNumberOfUniformSegments * tmpUnits) <= tmpMaxNumberOfSegments)) {
             tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpUnits);
             tmpUniformSegmentSize = tmpUniformSegmentSize / tmpUnits;
         }
-    
+
         final int tmpShift = (int) (Math.log(tmpUniformSegmentSize) / Math.log(2));
-    
+
         return new SegmentedArray<N>(tmpCount, tmpShift, segmentFactory);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -172,8 +172,9 @@ public class LinearProblems extends OptimisationLinearTests {
     }
 
     /**
-     * Problemet var att en av noderna som IntegerSolver genererade var infeasible, men det misslyckades LinearSolver
-     * med att identifiera och returnerade en felaktig lösning som OPTIMAL. Detta testfall motsvarar
+     * Problemet var att en av noderna som IntegerSolver genererade var infeasible, men det misslyckades
+     * LinearSolver med att identifiera och returnerade en felaktig lösning som OPTIMAL. Detta testfall
+     * motsvarar
      */
     public void testP20150127() {
 
@@ -190,8 +191,8 @@ public class LinearProblems extends OptimisationLinearTests {
     }
 
     /**
-     * Depending on how the constraints were constructed the solver could fail to solve and report the problem to be
-     * unbounded.
+     * Depending on how the constraints were constructed the solver could fail to solve and report the problem
+     * to be unbounded.
      */
     public void testP20111010() {
 

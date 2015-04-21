@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,8 +41,8 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     private final int[] myUpperBounds;
 
     /**
-     * How much the branched on variable must be displaced because of the new constraint introduced with this node (each
-     * node introduces precisely 1 new upper or lower bound).
+     * How much the branched on variable must be displaced because of the new constraint introduced with this
+     * node (each node introduces precisely 1 new upper or lower bound).
      */
     final double displacement;
     /**

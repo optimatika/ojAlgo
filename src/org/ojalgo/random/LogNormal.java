@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,10 +27,10 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 
 /**
- * A continuous distribution in which the logarithm of a variable has a normal distribution. A log normal distribution
- * results if the variable is the product of a large number of independent, identically-distributed variables in the
- * same way that a normal distribution results if the variable is the sum of a large number of independent,
- * identically-distributed variables.
+ * A continuous distribution in which the logarithm of a variable has a normal distribution. A log normal
+ * distribution results if the variable is the product of a large number of independent,
+ * identically-distributed variables in the same way that a normal distribution results if the variable is the
+ * sum of a large number of independent, identically-distributed variables.
  * 
  * @author apete
  */
@@ -70,8 +70,8 @@ public class LogNormal extends AbstractContinuous {
     }
 
     /**
-     * The aMean and aStdDev parameters are the mean and standard deviation of the variable's logarithm (by definition,
-     * the variable's logarithm is normally distributed).
+     * The aMean and aStdDev parameters are the mean and standard deviation of the variable's logarithm (by
+     * definition, the variable's logarithm is normally distributed).
      */
     public LogNormal(final double aMean, final double aStdDev) {
 

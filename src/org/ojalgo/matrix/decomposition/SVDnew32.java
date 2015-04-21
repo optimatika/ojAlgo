@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,8 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Orginalet, sedan ett tag Based on SVDnew2, but with transposing so that calculations are always made on a matrix that
- * "isAspectRationNormal". Based on SVDnew5, but with Rotation replaced by the new alternative.
+ * Orginalet, sedan ett tag Based on SVDnew2, but with transposing so that calculations are always made on a
+ * matrix that "isAspectRationNormal". Based on SVDnew5, but with Rotation replaced by the new alternative.
  *
  * @author apete
  */

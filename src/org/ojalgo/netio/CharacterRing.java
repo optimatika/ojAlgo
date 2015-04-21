@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,8 @@ import org.ojalgo.netio.BasicLogger.Appender;
 import org.ojalgo.netio.BasicLogger.GenericAppender;
 
 /**
- * A circular char buffer - an {@linkplain Appendable} {@linkplain CharSequence} that always hold exactly 65536
- * characters. Whenever you append something the oldest entry gets overwritten.
+ * A circular char buffer - an {@linkplain Appendable} {@linkplain CharSequence} that always hold exactly
+ * 65536 characters. Whenever you append something the oldest entry gets overwritten.
  *
  * @author apete
  */

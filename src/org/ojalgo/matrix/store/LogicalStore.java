@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,7 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.ProgrammingError;
 
 /**
- * Logical stores are (intended to be) immutable. Therefore LogicalStore
- * subclasses should be made .
+ * Logical stores are (intended to be) immutable. Therefore LogicalStore subclasses should be made .
  * 
  * @author apete
  */

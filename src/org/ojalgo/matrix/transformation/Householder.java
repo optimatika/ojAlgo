@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -356,8 +356,9 @@ public interface Householder<N extends Number> extends Access1D<N> {
     }
 
     /**
-     * Regardless of what is actually returned by {@linkplain #doubleValue(long)} and/or {@linkplain #get(long)} vector
-     * elements with indeces less than 'first' should be assumed to be, and treated as if they are, zero.
+     * Regardless of what is actually returned by {@linkplain #doubleValue(long)} and/or
+     * {@linkplain #get(long)} vector elements with indeces less than 'first' should be assumed to be, and
+     * treated as if they are, zero.
      */
     int first();
 

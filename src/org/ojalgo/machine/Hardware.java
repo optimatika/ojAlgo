@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,22 +30,24 @@ import org.ojalgo.netio.ASCII;
 
 /**
  * <ul>
- * <li>The first element in the array should correspond to total system resources; the total amount of RAM and the total
- * number of threads (Typically the same as what is returned by {@linkplain Runtime#availableProcessors()}).</li>
- * <li>The last element in the array should describe the L1 cache. Typically Intel processors have 32k L1 cache and AMD
- * 64k. 1 or maybe 2 threads use/share this cache.</li>
- * <li>Caches, all levels except L1, are described between the first and last elements in descending order (L3 cache
- * comes before L2 cache). Specify the size of the cache and the number of threads using/sharing the cache. (Do not
- * worry about how many cache units there are - describe one unit.)</li>
- * <li>The array must have at least 2 elements. You must describe the total system resources and the L1 cache. It is
- * strongly recommended to also describe the L2 cache. The L3 cache, if it exists, is less important to describe. The
- * derived attributes <code>processors</code>, <code>cores</code> and <code>units</code> may be incorrectly calculated
- * if you fail to specify the caches. Known issue: If you have more than one processor, nut no L3 cache; the
- * <code>processors</code> attribute will be incorrectly set 1. A workaround that currently works is to define an L3
- * cache anyway and set the memory/size of that cache to 0bytes. This workoround may stop working in the future.</li>
+ * <li>The first element in the array should correspond to total system resources; the total amount of RAM and
+ * the total number of threads (Typically the same as what is returned by
+ * {@linkplain Runtime#availableProcessors()}).</li>
+ * <li>The last element in the array should describe the L1 cache. Typically Intel processors have 32k L1
+ * cache and AMD 64k. 1 or maybe 2 threads use/share this cache.</li>
+ * <li>Caches, all levels except L1, are described between the first and last elements in descending order (L3
+ * cache comes before L2 cache). Specify the size of the cache and the number of threads using/sharing the
+ * cache. (Do not worry about how many cache units there are - describe one unit.)</li>
+ * <li>The array must have at least 2 elements. You must describe the total system resources and the L1 cache.
+ * It is strongly recommended to also describe the L2 cache. The L3 cache, if it exists, is less important to
+ * describe. The derived attributes <code>processors</code>, <code>cores</code> and <code>units</code> may be
+ * incorrectly calculated if you fail to specify the caches. Known issue: If you have more than one processor,
+ * nut no L3 cache; the <code>processors</code> attribute will be incorrectly set 1. A workaround that
+ * currently works is to define an L3 cache anyway and set the memory/size of that cache to 0bytes. This
+ * workoround may stop working in the future.</li>
  * <li>
- * <code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or
- * <code>new MemoryThreads[] { SYSTEM, L1 }</code></li>
+ * <code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or
+ * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L1 }</code></li>
  * <ul>
  *
  * @author apete
@@ -355,8 +357,9 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
     private final BasicMachine[] myLevels;
 
     /**
-     * <code>new BasicMachine[] { SYSTEM, L3, L2, L1 }</code> or <code>new BasicMachine[] { SYSTEM, L2, L1 }</code> or
-     * in worst case <code>new BasicMachine[] { SYSTEM, L1 }</code>
+     * <code>new BasicMachine[] { SYSTEM, L3, L2, L1 }</code> or
+     * <code>new BasicMachine[] { SYSTEM, L2, L1 }</code> or in worst case
+     * <code>new BasicMachine[] { SYSTEM, L1 }</code>
      */
     public Hardware(final String architecture, final BasicMachine[] levels) {
 

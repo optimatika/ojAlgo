@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,13 +40,13 @@ import org.ojalgo.type.context.NumberContext;
  * {@linkplain Access2D.Elements}) and defines some futher funtionality - mainly matrix multiplication.
  * </p>
  * <p>
- * This interface does not define any methods that require implementations to alter the matrix. Either the methods
- * return matrix elements, some meta data or produce new instances.
+ * This interface does not define any methods that require implementations to alter the matrix. Either the
+ * methods return matrix elements, some meta data or produce new instances.
  * </p>
  * <p>
  * The methods {@linkplain #conjugate()}, {@linkplain #copy()} and {@linkplain #transpose()} return
- * {@linkplain PhysicalStore} instances. {@linkplain PhysicalStore} extends {@linkplain MatrixStore}. It defines
- * additional methods, and is mutable.
+ * {@linkplain PhysicalStore} instances. {@linkplain PhysicalStore} extends {@linkplain MatrixStore}. It
+ * defines additional methods, and is mutable.
  * </p>
  *
  * @author apete

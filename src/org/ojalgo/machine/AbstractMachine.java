@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -66,8 +66,9 @@ abstract class AbstractMachine extends BasicMachine {
     }
 
     /**
-     * <code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or
-     * in worst case <code>new MemoryThreads[] { SYSTEM, L1 }</code>
+     * <code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or
+     * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or in worst case
+     * <code>new MemoryThreads[] { SYSTEM, L1 }</code>
      */
     protected AbstractMachine(final String architecture, final BasicMachine[] levels) {
 

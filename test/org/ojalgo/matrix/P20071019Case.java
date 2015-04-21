@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,13 @@
 package org.ojalgo.matrix;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.decomposition.RawLU;
 import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.RawLU;
 import org.ojalgo.matrix.store.MatrixStore;
 
 /**
- * Discovered problems with calculating the LU decompositions for fat and/or tall matrices. Problems were found with all
- * three implementations (including Jama).
+ * Discovered problems with calculating the LU decompositions for fat and/or tall matrices. Problems were
+ * found with all three implementations (including Jama).
  *
  * @author apete
  */

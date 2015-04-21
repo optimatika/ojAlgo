@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -101,8 +101,8 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
     }
 
     /**
-     * Should be called after a completed iteration. The iterations count is not "1" untill the first iteration is
-     * completed.
+     * Should be called after a completed iteration. The iterations count is not "1" untill the first
+     * iteration is completed.
      */
     protected final int incrementIterationsCount() {
         return myIterationsCount.incrementAndGet();
@@ -115,8 +115,9 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
     }
 
     /**
-     * Should be called at the start of an iteration (before it actually starts) to check if you should abort instead.
-     * Will return false if either the iterations count or the execution time has reached their respective limits.
+     * Should be called at the start of an iteration (before it actually starts) to check if you should abort
+     * instead. Will return false if either the iterations count or the execution time has reached their
+     * respective limits.
      */
     protected final boolean isIterationAllowed() {
 
@@ -146,11 +147,12 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
     }
 
     /**
-     * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the method should
-     * only be called if {@linkplain Optimisation.Options#validate} is set to true. In addition to returning true or
-     * false the implementation should set the state to either {@linkplain Optimisation.State#VALID} or
-     * {@linkplain Optimisation.State#INVALID} (or possibly {@linkplain Optimisation.State#FAILED}). Typically the
-     * method should be called at the very beginning of the solve-method.
+     * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the
+     * method should only be called if {@linkplain Optimisation.Options#validate} is set to true. In addition
+     * to returning true or false the implementation should set the state to either
+     * {@linkplain Optimisation.State#VALID} or {@linkplain Optimisation.State#INVALID} (or possibly
+     * {@linkplain Optimisation.State#FAILED}). Typically the method should be called at the very beginning of
+     * the solve-method.
      *
      * @return Is the solver instance valid?
      */

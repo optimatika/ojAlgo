@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -176,8 +176,8 @@ public abstract class FinanceUtils {
 
     /**
      * @param aPriceSeries A series of prices
-     * @param aRiskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0 means 5.0%
-     *        annualized risk free return)
+     * @param aRiskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0
+     *        means 5.0% annualized risk free return)
      * @return A sample set of price growth rates adjusted for risk free return
      */
     public static SampleSet makeExcessGrowthRateSampleSet(final CalendarDateSeries<?> aPriceSeries, final CalendarDateSeries<?> aRiskFreeInterestRateSeries) {
@@ -224,8 +224,8 @@ public abstract class FinanceUtils {
 
     /**
      * @param aPriceSeries A series of prices
-     * @param aRiskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0 means 5.0%
-     *        annualized risk free return)
+     * @param aRiskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0
+     *        means 5.0% annualized risk free return)
      * @return A sample set of price growth rates adjusted for risk free return
      */
     public static CalendarDateSeries<Double> makeNormalisedExcessPrice(final CalendarDateSeries<?> aPriceSeries,

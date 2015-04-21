@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,9 +39,9 @@ public class StoreProblems extends AbstractMatrixStoreTest {
     }
 
     /**
-     * Problem with {@linkplain LogicalStore} and multi-threading. The {@linkplain MinBatchSize#EXECUTOR} was designed
-     * to have a fixed number of threads which doesn't work if nested {@linkplain LogicalStore}s require more. The
-     * program would hang. This test makes sure ojAlgo no longer hangs in such a case.
+     * Problem with {@linkplain LogicalStore} and multi-threading. The {@linkplain MinBatchSize#EXECUTOR} was
+     * designed to have a fixed number of threads which doesn't work if nested {@linkplain LogicalStore}s
+     * require more. The program would hang. This test makes sure ojAlgo no longer hangs in such a case.
      */
     public void testP20071210() {
 

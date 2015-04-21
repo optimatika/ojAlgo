@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,8 @@ package org.ojalgo.machine;
 
 public enum JavaType {
 
-    BYTE(byte.class, 8, 1L), SHORT(short.class, 16, 2L), INT(int.class, 32, 4L), LONG(long.class, 64, 8L), FLOAT(float.class, 32, 4L), DOUBLE(double.class, 64, 8L), BOOLEAN(boolean.class, 1, 1L), CHAR(char.class, 16, 2L),
+    BYTE(byte.class, 8, 1L), SHORT(short.class, 16, 2L), INT(int.class, 32, 4L), LONG(long.class, 64, 8L), FLOAT(float.class, 32, 4L), DOUBLE(double.class, 64,
+            8L), BOOLEAN(boolean.class, 1, 1L), CHAR(char.class, 16, 2L),
     /**
      * 4 bytes with 32-bit JVM or 64-bit JVM with compressed pointers (All JVM:s assigned less than 32GB)
      */

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +46,9 @@ public abstract class StandardType {
      * <li>Locale: JVM Default</li>
      * <li>Style: {@linkplain NumberStyle#CURRENCY}</li>
      * </ul>
-     * Fits within the Sybase (and MS SQL Server) money type which is (19,4). Typically you have {@linkplain #QUANTITY}
-     * x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative is {@linkplain #QUANTITY} x {@linkplain #PRICE} =
-     * {@linkplain #QUANTITY}.
+     * Fits within the Sybase (and MS SQL Server) money type which is (19,4). Typically you have
+     * {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative is
+     * {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #QUANTITY}.
      */
     public static final NumberContext AMOUNT = StandardType.amount(Locale.getDefault());
     public static final DateContext DATE = new DateContext(DatePart.DATE);
@@ -135,8 +135,8 @@ public abstract class StandardType {
      * <li>Locale: JVM Default</li>
      * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
      * </ul>
-     * Typically you have {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative is
-     * {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #QUANTITY}.
+     * Typically you have {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative
+     * is {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #QUANTITY}.
      */
     public static final NumberContext PRICE = NumberContext.getGeneral(8);
     /**
@@ -147,8 +147,8 @@ public abstract class StandardType {
      * <li>Locale: JVM Default</li>
      * <li>Style: {@linkplain NumberStyle#GENERAL}</li>
      * </ul>
-     * Typically you have {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative is
-     * {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #QUANTITY}.
+     * Typically you have {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #AMOUNT}, an alternative
+     * is {@linkplain #QUANTITY} x {@linkplain #PRICE} = {@linkplain #QUANTITY}.
      */
     public static final NumberContext QUANTITY = NumberContext.getGeneral(6);
     public static final DateContext SQL_DATE = new DateContext(DatePart.DATE, DateStyle.SQL, null);

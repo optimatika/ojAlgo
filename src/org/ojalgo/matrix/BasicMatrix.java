@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,8 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * <p>
  * This interface declares a set of high level methods for linear algebra. Only the most basic set of matrix
- * functionality is defined here. Various matrix decompositions may be used to do some of the more advanced tasks.
+ * functionality is defined here. Various matrix decompositions may be used to do some of the more advanced
+ * tasks.
  * </p>
  * <p>
  * A vector is a matrix with column (or perhaps row) dimension 1.
@@ -84,8 +85,8 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix add(int aRow, int aCol, Access2D<?> aMtrx);
 
     /**
-     * Do not use this method to populate large dense matrices! Only use it to change a few (a small number) of
-     * elements.
+     * Do not use this method to populate large dense matrices! Only use it to change a few (a small number)
+     * of elements.
      */
     BasicMatrix add(int aRow, int aCol, Number value);
 
@@ -133,14 +134,14 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix enforce(NumberContext aCntxt);
 
     /**
-     * @return true if the frobenius norm of the difference between [this] and [aStore] is zero within the limits of
-     *         aCntxt.
+     * @return true if the frobenius norm of the difference between [this] and [aStore] is zero within the
+     *         limits of aCntxt.
      */
     boolean equals(Access2D<?> aMtrx, NumberContext aCntxt);
 
     /**
-     * BasicMatrix instances are intended to be immutable. If they are it is possible to cache (partial) calculation
-     * results. Calling this method should flush any cached calculation results.
+     * BasicMatrix instances are intended to be immutable. If they are it is possible to cache (partial)
+     * calculation results. Calling this method should flush any cached calculation results.
      */
     void flushCache();
 
@@ -166,8 +167,8 @@ public interface BasicMatrix extends Access2D<Number> {
     List<ComplexNumber> getEigenvalues();
 
     /**
-     * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of the sum of
-     * the square of the singular values.
+     * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
+     * the sum of the square of the singular values.
      *
      * @return The matrix' Frobenius norm
      * @see #getFrobeniusNorm()
@@ -229,8 +230,8 @@ public interface BasicMatrix extends Access2D<Number> {
     Scalar<?> getOperatorNorm();
 
     /**
-     * The rank of a matrix is the (maximum) number of linearly independent rows or columns it contains. It is also
-     * equal to the number of nonzero singular values of the matrix.
+     * The rank of a matrix is the (maximum) number of linearly independent rows or columns it contains. It is
+     * also equal to the number of nonzero singular values of the matrix.
      *
      * @return The matrix' rank.
      */
@@ -264,8 +265,8 @@ public interface BasicMatrix extends Access2D<Number> {
     Scalar<?> getTraceNorm();
 
     /**
-     * Treats [this] as if it is one dimensional (a vector) and calculates the vector norm. The interface only requires
-     * that implementations can handle arguments 0, 1, 2 and {@linkplain Integer#MAX_VALUE}.
+     * Treats [this] as if it is one dimensional (a vector) and calculates the vector norm. The interface only
+     * requires that implementations can handle arguments 0, 1, 2 and {@linkplain Integer#MAX_VALUE}.
      *
      * @see #getFrobeniusNorm()
      * @see #getInfinityNorm()
@@ -282,19 +283,20 @@ public interface BasicMatrix extends Access2D<Number> {
      * About inverting matrices:
      * </p>
      * <ul>
-     * <li>"right inverse": [this][right inverse]=[I]. You may calculate it using {@linkplain #solve(BasicMatrix)}.</li>
-     * <li>"left inverse": [left inverse][this]=[I]. You may calculate it using {@linkplain #solve(BasicMatrix)} and
-     * transposing.</li>
+     * <li>"right inverse": [this][right inverse]=[I]. You may calculate it using
+     * {@linkplain #solve(BasicMatrix)}.</li>
+     * <li>"left inverse": [left inverse][this]=[I]. You may calculate it using
+     * {@linkplain #solve(BasicMatrix)} and transposing.</li>
      * <li>"generalised inverse": [this][generalised inverse][this]=[this]. Note that if [this] is singular or
      * non-square, then [generalised inverse] is not unique.</li>
-     * <li>"pseudoinverse": The generalised inverse (there are typically/possibly many) with the smallest frobenius norm
-     * is called the pseudoinverse. You may calculate it using the {@linkplain QR} or {@linkplain SingularValue}
-     * decompositions.</li>
+     * <li>"pseudoinverse": The generalised inverse (there are typically/possibly many) with the smallest
+     * frobenius norm is called the pseudoinverse. You may calculate it using the {@linkplain QR} or
+     * {@linkplain SingularValue} decompositions.</li>
      * <li>"inverse":
      * <ul>
      * <li>If [left inverse]=[right inverse] then it is also [inverse].</li>
-     * <li>If [this] is square and has full rank then the [generalised inverse] is unique, with the [pseudoinverse]
-     * given, and equal to [inverse].</li>
+     * <li>If [this] is square and has full rank then the [generalised inverse] is unique, with the
+     * [pseudoinverse] given, and equal to [inverse].</li>
      * </ul>
      * </li>
      * </ul>
@@ -318,7 +320,8 @@ public interface BasicMatrix extends Access2D<Number> {
     boolean isFat();
 
     /**
-     * @return true if {@linkplain #getRank()} == min({@linkplain #getRowDim()},{@linkplain #getNumberOfColumns()})
+     * @return true if {@linkplain #getRank()} == min({@linkplain #getRowDim()},
+     *         {@linkplain #getNumberOfColumns()})
      */
     boolean isFullRank();
 
@@ -387,7 +390,8 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix multiply(Number value);
 
     /**
-     * Multiplies the elements of this matrix with the elements of aMtrx. The matrices must have equal dimensions.
+     * Multiplies the elements of this matrix with the elements of aMtrx. The matrices must have equal
+     * dimensions.
      *
      * @param aMtrx The elements to multiply by.
      * @return A new matrix whos elements are the elements of this multiplied with the elements of aMtrx.
@@ -413,8 +417,8 @@ public interface BasicMatrix extends Access2D<Number> {
     }
 
     /**
-     * Assumes that both [this] and [aVctr] have row or column dimension, doesn't matter which, equal to 1. The two
-     * vectors must have the same number of elements.
+     * Assumes that both [this] and [aVctr] have row or column dimension, doesn't matter which, equal to 1.
+     * The two vectors must have the same number of elements.
      */
     Scalar<?> multiplyVectors(Access2D<?> aVctr);
 
@@ -445,8 +449,8 @@ public interface BasicMatrix extends Access2D<Number> {
 
     /**
      * <p>
-     * This method solves a system of linear equations: [this][X]=[aRHS]. A combination of columns in [this] should
-     * produce a column in [aRHS]. It is ok for [aRHS] to have more than 1 column.
+     * This method solves a system of linear equations: [this][X]=[aRHS]. A combination of columns in [this]
+     * should produce a column in [aRHS]. It is ok for [aRHS] to have more than 1 column.
      * </p>
      * <ul>
      * <li>If the problem is over-qualified an approximate solution is returned.</li>
@@ -462,7 +466,8 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix solve(Access2D<?> aRHS);
 
     /**
-     * Subtracts the elements of aMtrx from the elements of this matrix. The matrices must have equal dimensions.
+     * Subtracts the elements of aMtrx from the elements of this matrix. The matrices must have equal
+     * dimensions.
      *
      * @param aMtrx What to subtract.
      * @return A new matrix whos elements are the difference of this' and aMtrx'.

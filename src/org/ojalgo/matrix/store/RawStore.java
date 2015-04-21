@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -347,9 +347,9 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     /**
-     * Read a matrix from a stream. The format is the same the print method, so printed matrices can be read back in
-     * (provided they were printed using US Locale). Elements are separated by whitespace, all the elements for each row
-     * appear on a single line, the last row is followed by a blank line.
+     * Read a matrix from a stream. The format is the same the print method, so printed matrices can be read
+     * back in (provided they were printed using US Locale). Elements are separated by whitespace, all the
+     * elements for each row appear on a single line, the last row is followed by a blank line.
      *
      * @param input the input stream.
      */

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,10 +37,11 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * An extremely simple/basic logging system that uses {@linkplain System#out}, {@linkplain System#err} or any other
- * {@linkplain PrintStream}. This is NOT a logging framework for your end application. It is primarly used within ojAlgo
- * when debugging. By supplying suitable {@linkplain PrintStream}:s you may connect this with whatever logging framework
- * you use, and thus get debug info from (for instance) the optimisation algorithms in log files of your choice.
+ * An extremely simple/basic logging system that uses {@linkplain System#out}, {@linkplain System#err} or any
+ * other {@linkplain PrintStream}. This is NOT a logging framework for your end application. It is primarly
+ * used within ojAlgo when debugging. By supplying suitable {@linkplain PrintStream}:s you may connect this
+ * with whatever logging framework you use, and thus get debug info from (for instance) the optimisation
+ * algorithms in log files of your choice.
  *
  * @author apete
  */

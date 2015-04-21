@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,8 @@ import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.SampleSet;
 
 /**
- * Diffusion process defined by a stochastic differential equation: dX = r X dt + s X dW A stochastic process is said to
- * follow a geometric Brownian motion if it satisfies this stochastic differential equation.
+ * Diffusion process defined by a stochastic differential equation: dX = r X dt + s X dW A stochastic process
+ * is said to follow a geometric Brownian motion if it satisfies this stochastic differential equation.
  * 
  * @author apete
  */
@@ -41,7 +41,8 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
 
     /**
      * @param aSeriesOfSamples A series of samples, evenly spaced in time.
-     * @param aSamplePeriod The amount of time (in which ever unit you prefer) between each sample in the series.
+     * @param aSamplePeriod The amount of time (in which ever unit you prefer) between each sample in the
+     *        series.
      */
     public static GeometricBrownianMotion estimate(final Access1D<?> aSeriesOfSamples, final double aSamplePeriod) {
 

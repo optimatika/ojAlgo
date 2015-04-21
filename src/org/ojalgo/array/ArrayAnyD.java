@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -160,8 +160,8 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     /**
-     * Flattens this abitrary dimensional array to a one dimensional array. The (internal/actual) array is not copied,
-     * it is just accessed through a different adaptor.
+     * Flattens this abitrary dimensional array to a one dimensional array. The (internal/actual) array is not
+     * copied, it is just accessed through a different adaptor.
      */
     public Array1D<N> asArray1D() {
         return myDelegate.asArray1D();

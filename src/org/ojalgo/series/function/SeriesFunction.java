@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,10 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.series.BasicSeries;
 
 /**
- * A function that maps from a (collection of) series and one or more keys to a
- * series of numbers. The interpretation of the input series data and the output
- * series is completely free.
+ * A function that maps from a (collection of) series and one or more keys to a series of numbers. The
+ * interpretation of the input series data and the output series is completely free.
  * 
  * @author apete
- *
  * @param <K> The series key type
  */
 public abstract class SeriesFunction<K extends Comparable<K>> {
@@ -66,8 +64,8 @@ public abstract class SeriesFunction<K extends Comparable<K>> {
 
     /**
      * @param key One or more time series keys
-     * @return A map with one entry per series. Each entry/series has the same
-     * number of elements as there were input keys.
+     * @return A map with one entry per series. Each entry/series has the same number of elements as there
+     *         were input keys.
      */
     public abstract Map<String, Access1D<?>> invoke(K... key);
 

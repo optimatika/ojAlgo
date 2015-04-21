@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,9 +59,11 @@ public class SuperimposedMatrixElementCase extends NonPhysicalTest {
 
         myBigStore = new SuperimposedStore<BigDecimal>(aBase, tmpRowIndex, tmpColumnIndex, new SingleStore<BigDecimal>(aBase.factory(), tmpElement));
         final MatrixStore<ComplexNumber> aBase1 = ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpBase);
-        myComplexStore = new SuperimposedStore<ComplexNumber>(aBase1, tmpRowIndex, tmpColumnIndex, new SingleStore<ComplexNumber>(aBase1.factory(), ComplexNumber.valueOf(tmpElement.doubleValue())));
+        myComplexStore = new SuperimposedStore<ComplexNumber>(aBase1, tmpRowIndex, tmpColumnIndex, new SingleStore<ComplexNumber>(aBase1.factory(),
+                ComplexNumber.valueOf(tmpElement.doubleValue())));
         final MatrixStore<Double> aBase2 = PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpBase);
-        myPrimitiveStore = new SuperimposedStore<Double>(aBase2, tmpRowIndex, tmpColumnIndex, new SingleStore<Double>(aBase2.factory(), tmpElement.doubleValue()));
+        myPrimitiveStore = new SuperimposedStore<Double>(aBase2, tmpRowIndex, tmpColumnIndex, new SingleStore<Double>(aBase2.factory(),
+                tmpElement.doubleValue()));
     }
 
 }

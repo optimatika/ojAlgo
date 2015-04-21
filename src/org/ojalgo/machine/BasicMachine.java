@@ -1,8 +1,9 @@
 package org.ojalgo.machine;
 
 /**
- * How much memory, and how many threads share that memory. Used to describe either total system resources (system RAM
- * and total number of threads handled by the processors) or a cache (processor's L1, L2 or L3 cache).
+ * How much memory, and how many threads share that memory. Used to describe either total system resources
+ * (system RAM and total number of threads handled by the processors) or a cache (processor's L1, L2 or L3
+ * cache).
  *
  * @author apete
  */

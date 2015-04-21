@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,8 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Model entities are identified and compared by their names only. Any/all other members/attributes are NOT part of
- * equals(), hashCode() or compareTo().
+ * Model entities are identified and compared by their names only. Any/all other members/attributes are NOT
+ * part of equals(), hashCode() or compareTo().
  *
  * @author apete
  */

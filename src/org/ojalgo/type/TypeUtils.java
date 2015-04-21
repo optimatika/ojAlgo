@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -138,8 +138,8 @@ public abstract class TypeUtils {
     }
 
     /**
-     * If the input {@linkplain java.lang.Number} is a {@linkplain java.math.BigDecimal} it is passed through unaltered.
-     * Otherwise an equivalent BigDecimal is created.
+     * If the input {@linkplain java.lang.Number} is a {@linkplain java.math.BigDecimal} it is passed through
+     * unaltered. Otherwise an equivalent BigDecimal is created.
      *
      * @param number Any Number
      * @return A corresponding BigDecimal

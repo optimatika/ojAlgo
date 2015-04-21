@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,8 @@ import java.util.Map;
 import org.ojalgo.netio.ASCII;
 
 /**
- * This class is primarily an implementation of {@linkplain Map.Entry},
- * but also implemnts {@linkplain KeyValue}.
+ * This class is primarily an implementation of {@linkplain Map.Entry}, but also implemnts
+ * {@linkplain KeyValue}.
  * 
  * @author apete
  */

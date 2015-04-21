@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,11 +28,11 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 
 /**
- * Only the reference type parameter (BigDecimal) methods are actually implemented. The methods with the primitive
- * parameters (double) should create a BigDecimal and then delegate to the primitive methods (and do nothing else). If
- * possible the implementations should be pure BigDecimal arithmatic without rounding. If rounding is necessary
- * MathContext.DECIMAL128 should be used. If BigDecimal arithmatic is not possible at all the implementation should
- * delegate to PrimitiveFunction.
+ * Only the reference type parameter (BigDecimal) methods are actually implemented. The methods with the
+ * primitive parameters (double) should create a BigDecimal and then delegate to the primitive methods (and do
+ * nothing else). If possible the implementations should be pure BigDecimal arithmatic without rounding. If
+ * rounding is necessary MathContext.DECIMAL128 should be used. If BigDecimal arithmatic is not possible at
+ * all the implementation should delegate to PrimitiveFunction.
  *
  * @author apete
  */

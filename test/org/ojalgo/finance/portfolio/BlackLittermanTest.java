@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,17 +31,17 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
- * Data for this test case originates from &quot;A STEP-BY-STEP GUIDE TO THE BLACK-LITTERMAN MODEL&quot; by Thomas M.
- * Idzorek.
+ * Data for this test case originates from &quot;A STEP-BY-STEP GUIDE TO THE BLACK-LITTERMAN MODEL&quot; by
+ * Thomas M. Idzorek.
  * </p>
  * <p>
- * Unfortunately the numbers in that paper are not specified with high enough precision to (directly) construct unit
- * tests without problems, but the tests available here should still be enough to indicate that the ojAlgo
- * Black-Litterman model class works correctly.
+ * Unfortunately the numbers in that paper are not specified with high enough precision to (directly)
+ * construct unit tests without problems, but the tests available here should still be enough to indicate that
+ * the ojAlgo Black-Litterman model class works correctly.
  * </p>
  * <p>
- * There are also various papers and presentations derived from that original paper available (on the Internet). To some
- * extent those are also used.
+ * There are also various papers and presentations derived from that original paper available (on the
+ * Internet). To some extent those are also used.
  * </p>
  *
  * @author apete
@@ -53,7 +53,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
 
     public static String[] getAssetNames() {
         return new String[] { "US Bonds", "Int Bonds", "US Large Growth", "US Large Value", "US Small Growth", "US Small Value", "Int Dev Equity",
-        "Int Emerg Equity" };
+                "Int Emerg Equity" };
     }
 
     public static BasicMatrix getCAPMReturns() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,8 @@ import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * There was a problem with the solve() method in the Jama Cholesky decomposition - it simply wasn't correct. (This case
- * tests that BigMatrix doesn't have the same problem.) Problem reported to jama(a)nist.gov
+ * There was a problem with the solve() method in the Jama Cholesky decomposition - it simply wasn't correct.
+ * (This case tests that BigMatrix doesn't have the same problem.) Problem reported to jama(a)nist.gov
  *
  * @author apete
  */

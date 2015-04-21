@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,8 @@ public final class FillMatchingLeft extends MatrixOperation {
     public static final FillMatchingLeft SETUP = new FillMatchingLeft();
 
     /**
-     * 2013-10-22: Was set to 128 (based on calibration) but I saw a dip in relative performance (java matrix benchmark)
-     * at size 200. So I cahnged it to 256.
+     * 2013-10-22: Was set to 128 (based on calibration) but I saw a dip in relative performance (java matrix
+     * benchmark) at size 200. So I cahnged it to 256.
      */
     public static int THRESHOLD = 256;
 

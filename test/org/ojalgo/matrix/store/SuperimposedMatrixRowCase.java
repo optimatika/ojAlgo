@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,9 +50,12 @@ public class SuperimposedMatrixRowCase extends NonPhysicalTest {
         final BasicMatrix tmpRow = NonPhysicalTest.makeRandomMatrix(1, tmpColDim);
         final int tmpIndex = Uniform.randomInteger(tmpRowDim);
 
-        myBigStore = new SuperimposedStore<BigDecimal>(BigDenseStore.FACTORY.copy((Access2D<?>) tmpBase), tmpIndex, 0, BigDenseStore.FACTORY.copy((Access2D<?>) tmpRow));
-        myComplexStore = new SuperimposedStore<ComplexNumber>(ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpBase), tmpIndex, 0, ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpRow));
-        myPrimitiveStore = new SuperimposedStore<Double>(PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpBase), tmpIndex, 0, PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpRow));
+        myBigStore = new SuperimposedStore<BigDecimal>(BigDenseStore.FACTORY.copy((Access2D<?>) tmpBase), tmpIndex, 0,
+                BigDenseStore.FACTORY.copy((Access2D<?>) tmpRow));
+        myComplexStore = new SuperimposedStore<ComplexNumber>(ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpBase), tmpIndex, 0,
+                ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpRow));
+        myPrimitiveStore = new SuperimposedStore<Double>(PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpBase), tmpIndex, 0,
+                PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpRow));
     }
 
 }

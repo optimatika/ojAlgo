@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,8 +39,8 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * <p>
- * PhysicalStore:s, as opposed to MatrixStore:s, are mutable. The vast majorty of the methods defined here return void
- * and none return {@linkplain PhysicalStore} or {@linkplain MatrixStore}.
+ * PhysicalStore:s, as opposed to MatrixStore:s, are mutable. The vast majorty of the methods defined here
+ * return void and none return {@linkplain PhysicalStore} or {@linkplain MatrixStore}.
  * </p>
  * <p>
  * This interface and its implementations are central to ojAlgo.
@@ -222,8 +222,8 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
     }
 
     /**
-     * @return The elements of the physical store as a fixed size (1 dimensional) list. The elements may be accessed
-     *         either row or colomn major.
+     * @return The elements of the physical store as a fixed size (1 dimensional) list. The elements may be
+     *         accessed either row or colomn major.
      */
     List<N> asList();
 
@@ -252,7 +252,8 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     /**
      * <p>
-     * Will replace the elements of [this] with the results of element wise invocation of the input binary funtion:
+     * Will replace the elements of [this] with the results of element wise invocation of the input binary
+     * funtion:
      * </p>
      * <code>this(i,j) = aFunc.invoke(aLeftArg(i,j),aRightArg(i,j))</code>
      */
@@ -260,7 +261,8 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     /**
      * <p>
-     * Will replace the elements of [this] with the results of element wise invocation of the input binary funtion:
+     * Will replace the elements of [this] with the results of element wise invocation of the input binary
+     * funtion:
      * </p>
      * <code>this(i,j) = aFunc.invoke(aLeftArg(i,j),aRightArg))</code>
      */
@@ -268,7 +270,8 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     /**
      * <p>
-     * Will replace the elements of [this] with the results of element wise invocation of the input binary funtion:
+     * Will replace the elements of [this] with the results of element wise invocation of the input binary
+     * funtion:
      * </p>
      * <code>this(i,j) = aFunc.invoke(aLeftArg,aRightArg(i,j))</code>
      */
@@ -306,15 +309,16 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     /**
      * <p>
-     * As in {@link MatrixStore#multiplyLeft(MatrixStore)} where the left/parameter matrix is a plane rotation.
+     * As in {@link MatrixStore#multiplyLeft(MatrixStore)} where the left/parameter matrix is a plane
+     * rotation.
      * </p>
      * <p>
-     * Multiplying by a plane rotation from the left means that [this] gets two of its rows updated to new combinations
-     * of those two (current) rows.
+     * Multiplying by a plane rotation from the left means that [this] gets two of its rows updated to new
+     * combinations of those two (current) rows.
      * </p>
      * <p>
-     * There are two ways to transpose/invert a rotation. Either you negate the angle or you interchange the two indeces
-     * that define the rotation plane.
+     * There are two ways to transpose/invert a rotation. Either you negate the angle or you interchange the
+     * two indeces that define the rotation plane.
      * </p>
      *
      * @see #transformRight(Rotation)
@@ -332,7 +336,8 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
      * combinations of those two (current) columns.
      * </p>
      * <p>
-     * There result is undefined if the two input indeces are the same (in which case the rotation plane is undefined).
+     * There result is undefined if the two input indeces are the same (in which case the rotation plane is
+     * undefined).
      * </p>
      *
      * @see #transformLeft(Rotation)

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,11 @@ package org.ojalgo.type.keyvalue;
 
 /**
  * <p>
- * A key-value pair or key-to-value map. The intention is that
- * {@linkplain #equals(Object)}, {@linkplain #hashCode()} and
- * {@linkplain #compareTo(Object)} operates on the key part only.
+ * A key-value pair or key-to-value map. The intention is that {@linkplain #equals(Object)},
+ * {@linkplain #hashCode()} and {@linkplain #compareTo(Object)} operates on the key part only.
  * </p>
  * <p>
- * This is NOT compatible with how for instance {@linkplain java.util.Map.Entry}
- * implements those methods.
+ * This is NOT compatible with how for instance {@linkplain java.util.Map.Entry} implements those methods.
  * </p>
  * <p>
  * Further it is indented that implementations should be immutable.

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,8 @@
 package org.ojalgo;
 
 /**
- * Something that potentially could go wrong, actually did go wrong. The API
- * user is expected to recover and continue execution. Is always declared to be
- * thrown, and must be caught.
+ * Something that potentially could go wrong, actually did go wrong. The API user is expected to recover and
+ * continue execution. Is always declared to be thrown, and must be caught.
  * 
  * @author apete
  */

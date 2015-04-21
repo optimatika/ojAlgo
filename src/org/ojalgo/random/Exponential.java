@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,9 @@ package org.ojalgo.random;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 /**
- * Distribution of length of life when no aging.
- * 
- * Describes the time between events in a Poisson process, i.e. a process in
- * which events occur continuously and independently at a constant average rate.
- * It is the continuous analogue of the geometric distribution.
+ * Distribution of length of life when no aging. Describes the time between events in a Poisson process, i.e.
+ * a process in which events occur continuously and independently at a constant average rate. It is the
+ * continuous analogue of the geometric distribution.
  *
  * @author apete
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,7 @@ package org.ojalgo.random;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 /**
- * The frequency in aCount indepedent trials, each with probability aProbability,
- * has a binomial distribution.
+ * The frequency in aCount indepedent trials, each with probability aProbability, has a binomial distribution.
  *
  * @author apete
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,14 +41,15 @@ import org.ojalgo.type.format.NumberStyle;
 /**
  * <p>
  * Think of this as a {@linkplain MathContext} that specifies both precision and scale. Numeric data types
- * (non-integers) in databases are specified using precison and scale. While doing maths the precision is all that
- * matters, but before sending a number to a database, or printing/displaying it, rounding to a specified scale is
- * desireable.
+ * (non-integers) in databases are specified using precison and scale. While doing maths the precision is all
+ * that matters, but before sending a number to a database, or printing/displaying it, rounding to a specified
+ * scale is desireable.
  * </p>
  * <p>
- * The enforce methods first enforce the precision and then set the scale. It is possible that this will create a number
- * with trailing zeros and more digits than the precision allows. It is also possible to define a context with a scale
- * that is larger than the precision. This is NOT how precision and scale is used with numeric types in databases.
+ * The enforce methods first enforce the precision and then set the scale. It is possible that this will
+ * create a number with trailing zeros and more digits than the precision allows. It is also possible to
+ * define a context with a scale that is larger than the precision. This is NOT how precision and scale is
+ * used with numeric types in databases.
  * </p>
  *
  * @author apete
@@ -238,7 +239,8 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     /**
-     * Will first enforce the precision, and then the scale. Both operations will comply with the rounding mode.
+     * Will first enforce the precision, and then the scale. Both operations will comply with the rounding
+     * mode.
      */
     public BigDecimal enforce(final BigDecimal number) {
 
@@ -252,8 +254,9 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     /**
-     * Does not enforce the precision and does not use the specified rounding mode. The precision is given by the type
-     * double and the rounding mode is always "half even" as given by {@linkplain StrictMath#rint(double)}.
+     * Does not enforce the precision and does not use the specified rounding mode. The precision is given by
+     * the type double and the rounding mode is always "half even" as given by
+     * {@linkplain StrictMath#rint(double)}.
      */
     public double enforce(final double number) {
         return Math.rint(myRoundingFactor * number) / myRoundingFactor;
@@ -485,8 +488,8 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     /**
-     * Works with {@linkplain DecimalFormat} and {@linkplain FormatPattern} implementations. In other cases it returns
-     * null.
+     * Works with {@linkplain DecimalFormat} and {@linkplain FormatPattern} implementations. In other cases it
+     * returns null.
      */
     public String toLocalizedPattern() {
 
@@ -502,8 +505,8 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     /**
-     * Works with {@linkplain DecimalFormat} and {@linkplain FormatPattern} implementations. In other cases it returns
-     * null.
+     * Works with {@linkplain DecimalFormat} and {@linkplain FormatPattern} implementations. In other cases it
+     * returns null.
      */
     public String toPattern() {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,8 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * An overdetermined equation system described in Scientific Computing An Introductory Survey II By Micheal T. Heath
- * Example 3.1
+ * An overdetermined equation system described in Scientific Computing An Introductory Survey II By Micheal T.
+ * Heath Example 3.1
  *
  * @author apete
  */

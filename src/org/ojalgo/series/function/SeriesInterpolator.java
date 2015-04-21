@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,9 @@ import java.util.Map;
 import org.ojalgo.series.BasicSeries;
 
 /**
- * An interpolator produces new data points to existing series, inbetween
- * existing keys.
+ * An interpolator produces new data points to existing series, inbetween existing keys.
  * 
  * @author apete
- *
  * @param <K>
  */
 public abstract class SeriesInterpolator<K extends Comparable<K>> extends SeriesExtrapolator<K> {

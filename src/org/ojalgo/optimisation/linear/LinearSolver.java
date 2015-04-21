@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,12 +53,13 @@ import org.ojalgo.type.IndexSelector;
  * <li>All variables have a nonnegativity sign restriction.</li>
  * </ul>
  * <p>
- * Further it is required here that the constraint right hand sides are nonnegative (nonnegative elements in [BE]).
+ * Further it is required here that the constraint right hand sides are nonnegative (nonnegative elements in
+ * [BE]).
  * </p>
  * <p>
- * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel} and not
- * worry about solver details. If you do want to instantiate a linear solver directly use the {@linkplain Builder}
- * class. It will return an appropriate subclass for you.
+ * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel}
+ * and not worry about solver details. If you do want to instantiate a linear solver directly use the
+ * {@linkplain Builder} class. It will return an appropriate subclass for you.
  * </p>
  *
  * @author apete

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * http://www.iana.org/assignments/media-types/
- * http://www.webmaster-toolkit.com/mime-types.shtml
+ * http://www.iana.org/assignments/media-types/ http://www.webmaster-toolkit.com/mime-types.shtml
  *
  * @author apete
  */
@@ -72,8 +71,8 @@ public final class DelimitedData extends Object {
     }
 
     /**
-     * The row and column must already exist. One way to create it is
-     * to call {@linkplain #addEmptyLines(int, int)}.
+     * The row and column must already exist. One way to create it is to call
+     * {@linkplain #addEmptyLines(int, int)}.
      */
     public void set(int aRowIndex, int aColumnIndex, Object anElement) {
         myLines.get(aRowIndex).set(aColumnIndex, anElement);

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,30 +38,30 @@ import org.ojalgo.type.context.NumberContext;
  * Theoretically it is a Field or at least a Division ring.
  * </p>
  * <p>
- * A group is a set of elements paired with a binary operation. Four conditions called the group axioms must be
- * satisfied:
+ * A group is a set of elements paired with a binary operation. Four conditions called the group axioms must
+ * be satisfied:
  * <ol>
  * <li>Closure: If A and B are both members of the set then the result of A op B is also a member.</li>
  * <li>Associativity: Invocation/execution order doesn't matter - ((A op B) op C) == (A op (B op C))</li>
  * <li>The identity property: There is an identity element in the set, I, so that I op A == A op I == A</li>
- * <li>The inverse property: For each element in the set there must be an inverse element (opposite or reciprocal) so
- * that A<sup>-1</sup> op A == A op A<sup>-1</sup> == I</li>
+ * <li>The inverse property: For each element in the set there must be an inverse element (opposite or
+ * reciprocal) so that A<sup>-1</sup> op A == A op A<sup>-1</sup> == I</li>
  * </ol>
- * Note that commutativity is not a requirement - A op B doesn't always have to be equal to B op A. If the operation is
- * commutative then the group is called an abelian group or simply a commutative group.
+ * Note that commutativity is not a requirement - A op B doesn't always have to be equal to B op A. If the
+ * operation is commutative then the group is called an abelian group or simply a commutative group.
  * </p>
  * <p>
- * A ring is a commutative Group (add operation) with a second binary operation (multiply) that is distributive over the
- * commutative group operation and is associative.
+ * A ring is a commutative Group (add operation) with a second binary operation (multiply) that is
+ * distributive over the commutative group operation and is associative.
  * </p>
  * <p>
  * A field is a commutative ring (even the multiplication operation) with notions of addition, subtraction,
- * multiplication, and division. Any field may be used as the scalars for a vector space, which is the standard general
- * context for linear algebra.
+ * multiplication, and division. Any field may be used as the scalars for a vector space, which is the
+ * standard general context for linear algebra.
  * </p>
  * <p>
- * A division ring is a ring in which division is possible. Division rings differ from fields only in that their
- * multiplication is not required to be commutative.
+ * A division ring is a ring in which division is possible. Division rings differ from fields only in that
+ * their multiplication is not required to be commutative.
  * </p>
  *
  * @author apete
@@ -163,8 +163,8 @@ public interface Scalar<N extends Number> extends Comparable<N> {
     Scalar<N> invert();
 
     /**
-     * @return true if this is equal to its own norm, modulus or absolute value (non-negative real part and no imaginary
-     *         part); otherwise false.
+     * @return true if this is equal to its own norm, modulus or absolute value (non-negative real part and no
+     *         imaginary part); otherwise false.
      * @see #isAbsolute()
      */
     boolean isAbsolute();

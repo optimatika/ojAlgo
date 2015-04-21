@@ -24,7 +24,8 @@ package org.ojalgo.matrix.store.operation;
 /**
  * Basic Linear Algebra Subprograms (BLAS) Level 2 contains matrix-vector operations.
  * <ul>
- * <li><a href="http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_2">BLAS Level 2 @ WikipediA</a></li>
+ * <li><a href="http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_2">BLAS Level 2 @
+ * WikipediA</a></li>
  * <li><a href="http://www.netlib.org/blas/#_level_2">BLAS Level 2 @ Netlib</a></li>
  * <li><a href="https://software.intel.com/en-us/node/520748">BLAS Level 2 @ Intel</a></li>
  * </ul>

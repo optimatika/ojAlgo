@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -221,10 +221,11 @@ public final class SampleSet implements Access1D<Double> {
 
     /**
      * <p>
-     * &quot;Sum of squares is a concept that permeates much of inferential statistics and descriptive statistics. More
-     * properly, it is "the sum of the squared deviations". Mathematically, it is an unscaled, or unadjusted measure of
-     * dispersion (also called variability). When scaled for the number of degrees of freedom, it estimates the
-     * variance, or spread of the observations about their mean value.&quot;
+     * &quot;Sum of squares is a concept that permeates much of inferential statistics and descriptive
+     * statistics. More properly, it is "the sum of the squared deviations". Mathematically, it is an
+     * unscaled, or unadjusted measure of dispersion (also called variability). When scaled for the number of
+     * degrees of freedom, it estimates the variance, or spread of the observations about their mean
+     * value.&quot;
      * </p>
      * <a href="http://en.wikipedia.org/wiki/Sum_of_squares">Wikipedia</a>
      */

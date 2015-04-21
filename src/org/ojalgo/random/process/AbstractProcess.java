@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,34 +46,34 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
     }
 
     /**
-     * Equivalent to calling {@link #getDistribution(double)} with argumant
-     * <code>1.0</code>, and then {@link Distribution#getExpected()}.
+     * Equivalent to calling {@link #getDistribution(double)} with argumant <code>1.0</code>, and then
+     * {@link Distribution#getExpected()}.
      */
     public final double getExpected() {
         return this.getExpected(ONE);
     }
 
     /**
-     * The same thing can be achieved by first calling {@link #getDistribution(double)}
-     * with argumant <code>1.0</code>, and then {@link ContinuousDistribution#getQuantile(double)}
-     * (but with different input argument).
+     * The same thing can be achieved by first calling {@link #getDistribution(double)} with argumant
+     * <code>1.0</code>, and then {@link ContinuousDistribution#getQuantile(double)} (but with different input
+     * argument).
      */
     public final double getLowerConfidenceQuantile(final double aConfidence) {
         return this.getLowerConfidenceQuantile(ONE, aConfidence);
     }
 
     /**
-     * Equivalent to calling {@link #getDistribution(double)} with argumant
-     * <code>1.0</code>, and then {@link Distribution#getStandardDeviation()}.
+     * Equivalent to calling {@link #getDistribution(double)} with argumant <code>1.0</code>, and then
+     * {@link Distribution#getStandardDeviation()}.
      */
     public final double getStandardDeviation() {
         return this.getStandardDeviation(ONE);
     }
 
     /**
-     * The same thing can be achieved by first calling {@link #getDistribution(double)}
-     * with argumant <code>1.0</code>, and then {@link ContinuousDistribution#getQuantile(double)}
-     * (but with different input argument).
+     * The same thing can be achieved by first calling {@link #getDistribution(double)} with argumant
+     * <code>1.0</code>, and then {@link ContinuousDistribution#getQuantile(double)} (but with different input
+     * argument).
      */
     public final double getUpperConfidenceQuantile(final double aConfidence) {
         return this.getUpperConfidenceQuantile(ONE, aConfidence);
@@ -84,8 +84,8 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
     }
 
     /**
-     * Equivalent to calling {@link #getDistribution(double)} with argumant
-     * <code>1.0</code>, and then {@link Distribution#getVariance()}.
+     * Equivalent to calling {@link #getDistribution(double)} with argumant <code>1.0</code>, and then
+     * {@link Distribution#getVariance()}.
      */
     public final double getVariance() {
         return this.getVariance(ONE);
@@ -100,8 +100,8 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
     }
 
     /**
-     * @return An array of sample sets. The array has aNumberOfSteps
-     * elements, and each sample set has aNumberOfRealisations samples.
+     * @return An array of sample sets. The array has aNumberOfSteps elements, and each sample set has
+     *         aNumberOfRealisations samples.
      */
     public final RandomProcess.SimulationResults simulate(final int numberOfRealisations, final int numberOfSteps, final double stepSize) {
 

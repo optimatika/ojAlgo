@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -110,9 +110,10 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
     }
 
     /**
-     * The mean/expected return of this instrument. May return either the absolute or excess return of the instrument.
-     * The context in which an instance is used should make it clear which. Calling {@linkplain #shift(Number)} with an
-     * appropriate argument will transform between absolute and excess return.
+     * The mean/expected return of this instrument. May return either the absolute or excess return of the
+     * instrument. The context in which an instance is used should make it clear which. Calling
+     * {@linkplain #shift(Number)} with an appropriate argument will transform between absolute and excess
+     * return.
      */
     public abstract double getMeanReturn();
 
@@ -138,8 +139,8 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
     }
 
     /**
-     * Value at Risk (VaR) is the maximum loss not exceeded with a given probability defined as the confidence level,
-     * over a given period of time.
+     * Value at Risk (VaR) is the maximum loss not exceeded with a given probability defined as the confidence
+     * level, over a given period of time.
      */
     public final double getValueAtRisk(final Number confidenceLevel, final Number timePeriod) {
 
@@ -157,19 +158,19 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
     }
 
     /**
-     * Volatility refers to the standard deviation of the change in value of an asset with a specific time horizon. It
-     * is often used to quantify the risk of the asset over that time period. Subclasses must override either
-     * {@linkplain #getReturnVariance()} or {@linkplain #getVolatility()}.
+     * Volatility refers to the standard deviation of the change in value of an asset with a specific time
+     * horizon. It is often used to quantify the risk of the asset over that time period. Subclasses must
+     * override either {@linkplain #getReturnVariance()} or {@linkplain #getVolatility()}.
      */
     public double getVolatility() {
         return PrimitiveFunction.SQRT.invoke(this.getReturnVariance());
     }
 
     /**
-     * This method returns a list of the weights of the Portfolio's contained assets. An asset weight is NOT restricted
-     * to being a share/percentage - it can be anything. Most subclasses do however assume that the list of asset
-     * weights are shares/percentages that sum up to 100%. Calling {@linkplain #normalise()} will transform any set of
-     * weights to that form.
+     * This method returns a list of the weights of the Portfolio's contained assets. An asset weight is NOT
+     * restricted to being a share/percentage - it can be anything. Most subclasses do however assume that the
+     * list of asset weights are shares/percentages that sum up to 100%. Calling {@linkplain #normalise()}
+     * will transform any set of weights to that form.
      */
     public abstract List<BigDecimal> getWeights();
 

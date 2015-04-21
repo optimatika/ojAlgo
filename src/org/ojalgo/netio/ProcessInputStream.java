@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -119,11 +119,10 @@ public class ProcessInputStream extends DataInputStream {
     }
 
     /**
-     * Creates a <code>String</code> from the stream of bytes.
-     * Each <code>byte</code> (8 bit) is converted to a <code>char</code>. The chars
-     * are meged to form a <code>String</code>. The first bytes, describing the count
-     * of bytes to come, as well as any '\r' character are discarded. Everything else
-     * is converted and merged.
+     * Creates a <code>String</code> from the stream of bytes. Each <code>byte</code> (8 bit) is converted to
+     * a <code>char</code>. The chars are meged to form a <code>String</code>. The first bytes, describing the
+     * count of bytes to come, as well as any '\r' character are discarded. Everything else is converted and
+     * merged.
      */
     private String readString() {
 

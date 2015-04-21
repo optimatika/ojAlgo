@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,9 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Using the original Jama implementation this matrix hung the SVD algorithm. The problem was "only" that the matrix is
- * fat (m smaller than n). A matrix of sixe 54-by-57 is too big for JUnit tests. Reported to jama@nist.gov
+ * Using the original Jama implementation this matrix hung the SVD algorithm. The problem was "only" that the
+ * matrix is fat (m smaller than n). A matrix of sixe 54-by-57 is too big for JUnit tests. Reported to
+ * jama@nist.gov
  *
  * @author apete
  */

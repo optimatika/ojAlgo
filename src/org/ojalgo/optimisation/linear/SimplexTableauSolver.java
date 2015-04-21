@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -474,15 +474,16 @@ final class SimplexTableauSolver extends LinearSolver {
     }
 
     /**
-     * It's transposed for you, and only returns the part of the column corresponding to the constraints - not the
-     * objective(s).
+     * It's transposed for you, and only returns the part of the column corresponding to the constraints - not
+     * the objective(s).
      */
     Array1D<Double> sliceTableauColumn(final int col) {
         return myTransposedTableau.asArray2D().sliceRow(col, 0).subList(0, this.countConstraints());
     }
 
     /**
-     * It's transposed for you, and only returns the part of the row corresponding to the variables - not the RHS.
+     * It's transposed for you, and only returns the part of the row corresponding to the variables - not the
+     * RHS.
      */
     Array1D<Double> sliceTableauRow(final int row) {
         return myTransposedTableau.asArray2D().sliceColumn(0, row).subList(0, this.countVariables());

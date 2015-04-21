@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -135,9 +135,9 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     }
 
     /**
-     * Peter Abeles reported a problem with ojAlgo his benchmark's invert test. This test case is an attempt to recreate
-     * the problem. ... The problem turned out to be a pure bug related to creating the inverse (applied the pivot row
-     * order, to the identity matrix, incorrectly).
+     * Peter Abeles reported a problem with ojAlgo his benchmark's invert test. This test case is an attempt
+     * to recreate the problem. ... The problem turned out to be a pure bug related to creating the inverse
+     * (applied the pivot row order, to the identity matrix, incorrectly).
      */
     public void testP20110223() {
 
@@ -188,7 +188,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                                                                                                               * TridiagonalDecomposition
                                                                                                               * .
                                                                                                               * makeComplex
-                                                                                                              * ()
+                                                                                                              * (
+                                                                                                              * )
                                                                                                               */};
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {

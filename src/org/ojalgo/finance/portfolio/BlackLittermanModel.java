@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -205,9 +205,9 @@ public final class BlackLittermanModel extends EquilibriumModel {
     }
 
     /**
-     * "weight on views" or "tau" A parameter that describes the general confidence in the views. Typically set to
-     * sometghing between 0.0 and 1.0. 0.0 = "No confidence!" Why bother... 1.0 = As confident as the market. This is
-     * highly unlikely.
+     * "weight on views" or "tau" A parameter that describes the general confidence in the views. Typically
+     * set to sometghing between 0.0 and 1.0. 0.0 = "No confidence!" Why bother... 1.0 = As confident as the
+     * market. This is highly unlikely.
      */
     public final Scalar<?> getConfidence() {
         return new BigScalar(myConfidence);

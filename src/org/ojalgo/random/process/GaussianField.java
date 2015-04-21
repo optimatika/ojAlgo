@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,14 +41,15 @@ import org.ojalgo.random.Normal1D;
 import org.ojalgo.type.keyvalue.ComparableToDouble;
 
 /**
- * A Gaussian process is a stochastic process whose realizations consist of random values associated with every point in
- * a range of times (or of space) such that each such random variable has a normal distribution. Moreover, every finite
- * collection of those random variables has a multivariate normal distribution. A random field is a generalization of a
- * stochastic process such that the underlying parameter need no longer be a simple real or integer valued "time", but
- * can instead take values that are multidimensional vectors, or points on some manifold. This GaussianField class is a
- * generalization, as well as the underlying implementation, of {@linkplain GaussianProcess}. Prior to calling
- * {@linkplain #getDistribution(boolean, double)} you must call {@linkplain #addObservation(double, double)} one or more
- * times.
+ * A Gaussian process is a stochastic process whose realizations consist of random values associated with
+ * every point in a range of times (or of space) such that each such random variable has a normal
+ * distribution. Moreover, every finite collection of those random variables has a multivariate normal
+ * distribution. A random field is a generalization of a stochastic process such that the underlying parameter
+ * need no longer be a simple real or integer valued "time", but can instead take values that are
+ * multidimensional vectors, or points on some manifold. This GaussianField class is a generalization, as well
+ * as the underlying implementation, of {@linkplain GaussianProcess}. Prior to calling
+ * {@linkplain #getDistribution(boolean, double)} you must call {@linkplain #addObservation(double, double)}
+ * one or more times.
  *
  * @author apete
  */

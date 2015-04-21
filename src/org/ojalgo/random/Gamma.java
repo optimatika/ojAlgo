@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.type.TypeUtils;
 
 /**
- * Distribution of the sum of aCount random variables with an exponential
- * distribution with parameter aLambda.
+ * Distribution of the sum of aCount random variables with an exponential distribution with parameter aLambda.
  *
  * @author apete
  */
@@ -60,8 +59,7 @@ public class Gamma extends RandomNumber {
     }
 
     /**
-     * A Convenient Way of Generating Gamma Random Variables Using Generalized
-     * Exponential Distribution
+     * A Convenient Way of Generating Gamma Random Variables Using Generalized Exponential Distribution
      * 
      * @see org.ojalgo.random.RandomNumber#generate()
      */

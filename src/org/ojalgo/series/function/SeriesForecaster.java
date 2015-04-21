@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,8 @@ import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
- * A forecaster is restricted to {@linkplain CalendarDate} keys and is intended
- * to predict something related to future keys/dates.
+ * A forecaster is restricted to {@linkplain CalendarDate} keys and is intended to predict something related
+ * to future keys/dates.
  * 
  * @author apete
  */

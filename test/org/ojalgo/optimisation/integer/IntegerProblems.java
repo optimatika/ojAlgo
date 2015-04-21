@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -71,8 +71,8 @@ public class IntegerProblems extends OptimisationIntegerTests {
     }
 
     /**
-     * If the relaxed problem was infeasible you got a NullPointerException instead of a result indicating that the
-     * problem is infeasible.
+     * If the relaxed problem was infeasible you got a NullPointerException instead of a result indicating
+     * that the problem is infeasible.
      */
     public void testP20111010() {
 
@@ -108,9 +108,9 @@ public class IntegerProblems extends OptimisationIntegerTests {
     }
 
     /**
-     * The IP solver returns infeasible solutions, but the problem seems to actually be with the LP solver. Don't know
-     * what the actual solution is. Just check that the solver terminates normally and that the solution is in fact
-     * feasible/valid.
+     * The IP solver returns infeasible solutions, but the problem seems to actually be with the LP solver.
+     * Don't know what the actual solution is. Just check that the solver terminates normally and that the
+     * solution is in fact feasible/valid.
      */
     public void testP20130225() {
 

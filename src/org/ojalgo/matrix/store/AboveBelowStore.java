@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,9 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * A merger of two {@linkplain MatrixStore} instances by placing one store below the other. The two matrices must have
- * the same number of columns. The columns of the two matrices are logically merged to form new longer columns.
+ * A merger of two {@linkplain MatrixStore} instances by placing one store below the other. The two matrices
+ * must have the same number of columns. The columns of the two matrices are logically merged to form new
+ * longer columns.
  *
  * @author apete
  */

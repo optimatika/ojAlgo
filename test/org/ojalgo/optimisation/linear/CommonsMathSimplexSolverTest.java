@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -172,8 +172,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          */
         public static final double EPSILON = 0x1.0p-53;
         /**
-         * Safe minimum, such that {@code 1 / SAFE_MIN} does not overflow. In IEEE 754 arithmetic, this is also the
-         * smallest normalized number 2<sup>-1022</sup>: {@value} .
+         * Safe minimum, such that {@code 1 / SAFE_MIN} does not overflow. In IEEE 754 arithmetic, this is
+         * also the smallest normalized number 2<sup>-1022</sup>: {@value} .
          */
         public static final double SAFE_MIN = 0x1.0p-1022;
         /** Offset to order signed double numbers lexicographically. */
@@ -189,7 +189,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @param eps the amount of error to allow when checking for equality
          * @return <ul>
          *         <li>0 if {@link #equals(double, double, double) equals(x, y, eps)}</li>
-         *         <li>&lt; 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x &lt; y</li>
+         *         <li>&lt; 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x &lt;
+         *         y</li>
          *         <li>>0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x > y</li>
          *         </ul>
          */
@@ -203,17 +204,19 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Compares two numbers given some amount of allowed error. Two float numbers are considered equal if there are
-         * {@code (maxUlps - 1)} (or fewer) floating point numbers between them, i.e. two adjacent floating point
-         * numbers are considered equal. Adapted from <a
+         * Compares two numbers given some amount of allowed error. Two float numbers are considered equal if
+         * there are {@code (maxUlps - 1)} (or fewer) floating point numbers between them, i.e. two adjacent
+         * floating point numbers are considered equal. Adapted from <a
          * href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce Dawson</a>
          *
          * @param x first value
          * @param y second value
-         * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and {@code y}.
+         * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
+         *        {@code y}.
          * @return <ul>
          *         <li>0 if {@link #equals(double, double, int) equals(x, y, maxUlps)}</li>
-         *         <li>&lt; 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x &lt; y</li>
+         *         <li>&lt; 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x &lt;
+         *         y</li>
          *         <li>>0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x > y</li>
          *         </ul>
          */
@@ -238,30 +241,32 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Returns {@code true} if there is no double value strictly between the arguments or the difference between
-         * them is within the range of allowed error (inclusive).
+         * Returns {@code true} if there is no double value strictly between the arguments or the difference
+         * between them is within the range of allowed error (inclusive).
          *
          * @param x First value.
          * @param y Second value.
          * @param eps Amount of allowed absolute error.
-         * @return {@code true} if the values are two adjacent floating point numbers or they are within range of each
-         *         other.
+         * @return {@code true} if the values are two adjacent floating point numbers or they are within range
+         *         of each other.
          */
         public static boolean equals(final double x, final double y, final double eps) {
             return Precision.equals(x, y, 1) || (Math.abs(y - x) <= eps);
         }
 
         /**
-         * Returns true if both arguments are equal or within the range of allowed error (inclusive). Two float numbers
-         * are considered equal if there are {@code (maxUlps - 1)} (or fewer) floating point numbers between them, i.e.
-         * two adjacent floating point numbers are considered equal. Adapted from <a
-         * href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce Dawson</a>
+         * Returns true if both arguments are equal or within the range of allowed error (inclusive). Two
+         * float numbers are considered equal if there are {@code (maxUlps - 1)} (or fewer) floating point
+         * numbers between them, i.e. two adjacent floating point numbers are considered equal. Adapted from
+         * <a href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce
+         * Dawson</a>
          *
          * @param x first value
          * @param y second value
-         * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and {@code y}.
-         * @return {@code true} if there are fewer than {@code maxUlps} floating point values between {@code x} and
-         *         {@code y}.
+         * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
+         *        {@code y}.
+         * @return {@code true} if there are fewer than {@code maxUlps} floating point values between
+         *         {@code x} and {@code y}.
          */
         public static boolean equals(final double x, final double y, final int maxUlps) {
             long xInt = Double.doubleToLongBits(x);
@@ -305,16 +310,18 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Returns true if both arguments are equal or within the range of allowed error (inclusive). Two float numbers
-         * are considered equal if there are {@code (maxUlps - 1)} (or fewer) floating point numbers between them, i.e.
-         * two adjacent floating point numbers are considered equal. Adapted from <a
-         * href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce Dawson</a>
+         * Returns true if both arguments are equal or within the range of allowed error (inclusive). Two
+         * float numbers are considered equal if there are {@code (maxUlps - 1)} (or fewer) floating point
+         * numbers between them, i.e. two adjacent floating point numbers are considered equal. Adapted from
+         * <a href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce
+         * Dawson</a>
          *
          * @param x first value
          * @param y second value
-         * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and {@code y}.
-         * @return {@code true} if there are fewer than {@code maxUlps} floating point values between {@code x} and
-         *         {@code y}.
+         * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
+         *        {@code y}.
+         * @return {@code true} if there are fewer than {@code maxUlps} floating point values between
+         *         {@code x} and {@code y}.
          * @since 2.2
          */
         public static boolean equals(final float x, final float y, final int maxUlps) {
@@ -348,7 +355,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Returns true if both arguments are NaN or are equal or within the range of allowed error (inclusive).
+         * Returns true if both arguments are NaN or are equal or within the range of allowed error
+         * (inclusive).
          *
          * @param x first value
          * @param y second value
@@ -361,14 +369,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Returns true if both arguments are NaN or if they are equal as defined by {@link #equals(double,double,int)
-         * equals(x, y, maxUlps)}.
+         * Returns true if both arguments are NaN or if they are equal as defined by
+         * {@link #equals(double,double,int) equals(x, y, maxUlps)}.
          *
          * @param x first value
          * @param y second value
-         * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and {@code y}.
-         * @return {@code true} if both arguments are NaN or if there are less than {@code maxUlps} floating point
-         *         values between {@code x} and {@code y}.
+         * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
+         *        {@code y}.
+         * @return {@code true} if both arguments are NaN or if there are less than {@code maxUlps} floating
+         *         point values between {@code x} and {@code y}.
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final double x, final double y, final int maxUlps) {
@@ -389,7 +398,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Returns true if both arguments are NaN or are equal or within the range of allowed error (inclusive).
+         * Returns true if both arguments are NaN or are equal or within the range of allowed error
+         * (inclusive).
          *
          * @param x first value
          * @param y second value
@@ -402,14 +412,15 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Returns true if both arguments are NaN or if they are equal as defined by {@link #equals(float,float,int)
-         * equals(x, y, maxUlps)}.
+         * Returns true if both arguments are NaN or if they are equal as defined by
+         * {@link #equals(float,float,int) equals(x, y, maxUlps)}.
          *
          * @param x first value
          * @param y second value
-         * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and {@code y}.
-         * @return {@code true} if both arguments are NaN or if there are less than {@code maxUlps} floating point
-         *         values between {@code x} and {@code y}.
+         * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
+         *        {@code y}.
+         * @return {@code true} if both arguments are NaN or if there are less than {@code maxUlps} floating
+         *         point values between {@code x} and {@code y}.
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final float x, final float y, final int maxUlps) {
@@ -425,13 +436,13 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * </code>
          * </pre>
          *
-         * is exactly machine-representable. This is useful when computing numerical derivatives, in order to reduce
-         * roundoff errors.
+         * is exactly machine-representable. This is useful when computing numerical derivatives, in order to
+         * reduce roundoff errors.
          *
          * @param x Value.
          * @param originalDelta Offset value.
-         * @return a number {@code delta} so that {@code x + delta} and {@code x} differ by a representable floating
-         *         number.
+         * @return a number {@code delta} so that {@code x + delta} and {@code x} differ by a representable
+         *         floating number.
          */
         public static double representableDelta(final double x, final double originalDelta) {
             return (x + originalDelta) - x;
@@ -451,17 +462,18 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Rounds the given value to the specified number of decimal places. The value is rounded using the given method
-         * which is any method defined in {@link BigDecimal}. If {@code x} is infinite or {@code NaN}, then the value of
-         * {@code x} is returned unchanged, regardless of the other parameters.
+         * Rounds the given value to the specified number of decimal places. The value is rounded using the
+         * given method which is any method defined in {@link BigDecimal}. If {@code x} is infinite or
+         * {@code NaN}, then the value of {@code x} is returned unchanged, regardless of the other parameters.
          *
          * @param x Value to round.
          * @param scale Number of digits to the right of the decimal point.
          * @param roundingMethod Rounding method as defined in {@link BigDecimal}.
          * @return the rounded value.
-         * @throws ArithmeticException if {@code roundingMethod == ROUND_UNNECESSARY} and the specified scaling
-         *         operation would require rounding.
-         * @throws IllegalArgumentException if {@code roundingMethod} does not represent a valid rounding mode.
+         * @throws ArithmeticException if {@code roundingMethod == ROUND_UNNECESSARY} and the specified
+         *         scaling operation would require rounding.
+         * @throws IllegalArgumentException if {@code roundingMethod} does not represent a valid rounding
+         *         mode.
          * @since 1.1 (previously in {@code MathUtils}, moved as of version 3.0)
          */
         public static double round(final double x, final int scale, final int roundingMethod) {
@@ -490,8 +502,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Rounds the given value to the specified number of decimal places. The value is rounded using the given method
-         * which is any method defined in {@link BigDecimal}.
+         * Rounds the given value to the specified number of decimal places. The value is rounded using the
+         * given method which is any method defined in {@link BigDecimal}.
          *
          * @param x Value to round.
          * @param scale Number of digits to the right of the decimal point.
@@ -506,8 +518,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         /**
-         * Rounds the given non-negative value to the "nearest" integer. Nearest is determined by the rounding method
-         * specified. Rounding methods are defined in {@link BigDecimal}.
+         * Rounds the given non-negative value to the "nearest" integer. Nearest is determined by the rounding
+         * method specified. Rounding methods are defined in {@link BigDecimal}.
          *
          * @param unscaled Value to round.
          * @param sign Sign of the original, scaled value.
@@ -1050,7 +1062,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     }
 
     /**
-     * With no artificial variables needed (no equals and no greater than constraints) we can go straight to Phase 2.
+     * With no artificial variables needed (no equals and no greater than constraints) we can go straight to
+     * Phase 2.
      */
     public void testModelWithNoArtificialVars() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 0);

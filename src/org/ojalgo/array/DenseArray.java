@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -220,7 +220,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     /**
      * @see java.util.Arrays#binarySearch(Object[], Object)
      * @see #sortAscending()
-     * @throws UnsupportedOperationException if the this operation is not supported by this implementation/subclass
+     * @throws UnsupportedOperationException if the this operation is not supported by this
+     *         implementation/subclass
      */
     protected abstract int searchAscending(N number);
 
@@ -233,7 +234,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     /**
      * @see java.util.Arrays#sort(Object[])
      * @see #searchAscending(Number)
-     * @throws UnsupportedOperationException if the this operation is not supported by this implementation/subclass
+     * @throws UnsupportedOperationException if the this operation is not supported by this
+     *         implementation/subclass
      */
     protected abstract void sortAscending();
 

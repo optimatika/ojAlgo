@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,9 +34,9 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * Checks that {@linkplain org.ojalgo.function.BigFunction}, {@linkplain org.ojalgo.function.ComplexFunction},
- * {@linkplain org.ojalgo.function.PrimitiveFunction} and {@linkplain org.ojalgo.function.RationalFunction} members
- * produce equal results for simple cases. Cannot test complex valued arguments or results, and cannot require the
- * precision of BigDecimal or RationalNumber.
+ * {@linkplain org.ojalgo.function.PrimitiveFunction} and {@linkplain org.ojalgo.function.RationalFunction}
+ * members produce equal results for simple cases. Cannot test complex valued arguments or results, and cannot
+ * require the precision of BigDecimal or RationalNumber.
  *
  * @author apete
  */

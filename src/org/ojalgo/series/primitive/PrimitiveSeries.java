@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -107,8 +107,8 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
     }
 
     /**
-     * A positive valued shift will prune that many elements off the head of the series. A negative valued shift will
-     * prune that many elements off the tail of the series.
+     * A positive valued shift will prune that many elements off the head of the series. A negative valued
+     * shift will prune that many elements off the tail of the series.
      *
      * @param shift
      * @return

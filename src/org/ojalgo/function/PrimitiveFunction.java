@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,9 @@ import org.ojalgo.type.TypeUtils;
 
 /**
  * Only the primitive parameter (double) methods are actually implemented. The methods with the reference type
- * parameters (Double) should delegate to the primitive methods (and do nothing else). The various implementations
- * should delegate as much as possible to {@link java.lang.Math} and/or built-in Java operators.
+ * parameters (Double) should delegate to the primitive methods (and do nothing else). The various
+ * implementations should delegate as much as possible to {@link java.lang.Math} and/or built-in Java
+ * operators.
  *
  * @author apete
  */

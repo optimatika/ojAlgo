@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,6 @@ import java.util.List;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.task.AbstractDeterminator;
-import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.random.Uniform;
 
 public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {

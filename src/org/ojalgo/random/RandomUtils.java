@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,8 +44,8 @@ public abstract class RandomUtils {
      * For the Lanczos approximation of the gamma function
      */
     private static final double[] L9 = { 0.99999999999980993227684700473478, 676.520368121885098567009190444019, -1259.13921672240287047156078755283,
-        771.3234287776530788486528258894, -176.61502916214059906584551354, 12.507343278686904814458936853, -0.13857109526572011689554707,
-        9.984369578019570859563e-6, 1.50563273514931155834e-7 };
+            771.3234287776530788486528258894, -176.61502916214059906584551354, 12.507343278686904814458936853, -0.13857109526572011689554707,
+            9.984369578019570859563e-6, 1.50563273514931155834e-7 };
 
     /**
      * @param aSumOfValues The sum of all values in a sample set
@@ -116,9 +116,9 @@ public abstract class RandomUtils {
     }
 
     /**
-     * Lanczos approximation. The abritray constant is 7, and there are 9 coefficients used. Essentially the algorithm
-     * is taken from <a href="http://en.wikipedia.org/wiki/Lanczos_approximation">WikipediA</a> , but it's modified a
-     * bit and I found more exact coefficients somewhere else.
+     * Lanczos approximation. The abritray constant is 7, and there are 9 coefficients used. Essentially the
+     * algorithm is taken from <a href="http://en.wikipedia.org/wiki/Lanczos_approximation">WikipediA</a> ,
+     * but it's modified a bit and I found more exact coefficients somewhere else.
      */
     public static double gamma(final double arg) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se) Permission is hereby granted, free of charge, to any person
+ * Copyright 1997-2015 Optimatika (www.optimatika.se) Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software
  * without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
@@ -49,8 +49,8 @@ public final class MipCase extends OptimisationIntegerTests {
 
     /**
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with integer solution 14.0 rather than 1.0 solution after 4h
-     * expected:<1.0> but was:<14.000000000000192></li>
+     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with integer solution 14.0 rather than 1.0
+     * solution after 4h expected:<1.0> but was:<14.000000000000192></li>
      * </ul>
      *
      * @see RelaxedLpCase#testMarkshare2()
@@ -62,7 +62,8 @@ public final class MipCase extends OptimisationIntegerTests {
     /**
      * <ul>
      * <li>2012-11-30: Solved to optimality 40005.05414200003. Don't now how fast, but within 3 hours.</li>
-     * <li>2013-03-28: (MacPro) Had a time limit of 1h and that resulted in 40116.054142000015 rather than 40005.0541</li>
+     * <li>2013-03-28: (MacPro) Had a time limit of 1h and that resulted in 40116.054142000015 rather than
+     * 40005.0541</li>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 4h</li>
      * <li>2013-12-10: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 29min</li>
      * </ul>
@@ -159,7 +160,8 @@ public final class MipCase extends OptimisationIntegerTests {
     /**
      * <ul>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Terminated immediately, and stated "Solution Not Valid!"</li>
-     * <li>2013-11-24: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<764772.0> but was:<1012900.999999></li>
+     * <li>2013-11-24: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<764772.0> but
+     * was:<1012900.999999></li>
      * </ul>
      *
      * @see RelaxedLpCase#testTimtab1()

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,12 +27,11 @@ import org.ojalgo.random.Exponential;
 import org.ojalgo.random.Poisson;
 
 /**
- * A Poisson process is a stochastic process which counts the number of events
- * in a given time interval. The time between each pair of consecutive events
- * has an exponential distribution with parameter λ and each of these
- * inter-arrival times is assumed to be independent of other inter-arrival times.
- * The process is a good model of radioactive decay, telephone calls and requests
- * for a particular document on a web server, among many other phenomena.
+ * A Poisson process is a stochastic process which counts the number of events in a given time interval. The
+ * time between each pair of consecutive events has an exponential distribution with parameter λ and each of
+ * these inter-arrival times is assumed to be independent of other inter-arrival times. The process is a good
+ * model of radioactive decay, telephone calls and requests for a particular document on a web server, among
+ * many other phenomena.
  * 
  * @author apete
  */

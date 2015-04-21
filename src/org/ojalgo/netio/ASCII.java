@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,41 +22,195 @@
 package org.ojalgo.netio;
 
 /**
- * <table><tr>
- * <th></th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th>
- * </tr><tr>
- * <th>0</th><td>NUL</td><td>SOH</td><td>STX</td><td>ETX</td><td>EOT</td><td>ENQ</td><td>ACK</td><td>BEL</td>
- * </tr><tr>
- * <th>8</th><td>BS</td><td>HT</td><td>LF</td><td>VT</td><td>FF</td><td>CR</td><td>SO</td><td>SI</td>
- * </tr><tr>
- * <th>16</th><td>DLE</td><td>DC1</td><td>DC2</td><td>DC3</td><td>DC4</td><td>NAK</td><td>SYN</td><td>ETB</td>
- * </tr><tr>
- * <th>24</th><td>CAN</td><td>EM</td><td>SUB</td><td>ESC</td><td>FS</td><td>GS</td><td>RS</td><td>US</td>
- * </tr><tr>
- * <th>32</th><td>SP</td><td>!</td><td>"</td><td>#</td><td>$</td><td>%</td><td>&</td><td>'</td>
- * </tr><tr>
- * <th>40</th><td>(</td><td>)</td><td>*</td><td>+</td><td>,</td><td>-</td><td>.</td><td>/</td>
- * </tr><tr>
- * <th>48</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td>
- * </tr><tr>
- * <th>56</th><td>8</td><td>9</td><td>:</td><td>;</td><td><</td><td>=</td><td>></td><td>?</td>
- * </tr><tr>
- * <th>64</th><td>@</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td>
- * </tr><tr>
- * <th>72</th><td>H</td><td>I</td><td>J</td><td>K</td><td>L</td><td>M</td><td>N</td><td>O</td>
- * </tr><tr>
- * <th>80</th><td>P</td><td>Q</td><td>R</td><td>S</td><td>T</td><td>U</td><td>V</td><td>W</td>
- * </tr><tr>
- * <th>88</th><td>X</td><td>Y</td><td>Z</td><td>[</td><td>\</td><td>]</td><td>^</td><td>_</td>
- * </tr><tr>
- * <th>96</th><td>`</td><td>a</td><td>b</td><td>c</td><td>d</td><td>e</td><td>f</td><td>g</td>
- * </tr><tr>
- * <th>104</th><td>h</td><td>i</td><td>j</td><td>k</td><td>l</td><td>m</td><td>n</td><td>o</td>
- * </tr><tr>
- * <th>112</th><td>p</td><td>q</td><td>r</td><td>s</td><td>t</td><td>u</td><td>v</td><td>w</td>
- * </tr><tr>
- * <th>120</th><td>x</td><td>y</td><td>z</td><td>{</td><td>|</td><td>}</td><td>~</td><td>DEL</td>
- * </tr></table>
+ * <table>
+ * <tr>
+ * <th></th>
+ * <th>0</th>
+ * <th>1</th>
+ * <th>2</th>
+ * <th>3</th>
+ * <th>4</th>
+ * <th>5</th>
+ * <th>6</th>
+ * <th>7</th>
+ * </tr>
+ * <tr>
+ * <th>0</th>
+ * <td>NUL</td>
+ * <td>SOH</td>
+ * <td>STX</td>
+ * <td>ETX</td>
+ * <td>EOT</td>
+ * <td>ENQ</td>
+ * <td>ACK</td>
+ * <td>BEL</td>
+ * </tr>
+ * <tr>
+ * <th>8</th>
+ * <td>BS</td>
+ * <td>HT</td>
+ * <td>LF</td>
+ * <td>VT</td>
+ * <td>FF</td>
+ * <td>CR</td>
+ * <td>SO</td>
+ * <td>SI</td>
+ * </tr>
+ * <tr>
+ * <th>16</th>
+ * <td>DLE</td>
+ * <td>DC1</td>
+ * <td>DC2</td>
+ * <td>DC3</td>
+ * <td>DC4</td>
+ * <td>NAK</td>
+ * <td>SYN</td>
+ * <td>ETB</td>
+ * </tr>
+ * <tr>
+ * <th>24</th>
+ * <td>CAN</td>
+ * <td>EM</td>
+ * <td>SUB</td>
+ * <td>ESC</td>
+ * <td>FS</td>
+ * <td>GS</td>
+ * <td>RS</td>
+ * <td>US</td>
+ * </tr>
+ * <tr>
+ * <th>32</th>
+ * <td>SP</td>
+ * <td>!</td>
+ * <td>"</td>
+ * <td>#</td>
+ * <td>$</td>
+ * <td>%</td>
+ * <td>&</td>
+ * <td>'</td>
+ * </tr>
+ * <tr>
+ * <th>40</th>
+ * <td>(</td>
+ * <td>)</td>
+ * <td>*</td>
+ * <td>+</td>
+ * <td>,</td>
+ * <td>-</td>
+ * <td>.</td>
+ * <td>/</td>
+ * </tr>
+ * <tr>
+ * <th>48</th>
+ * <td>0</td>
+ * <td>1</td>
+ * <td>2</td>
+ * <td>3</td>
+ * <td>4</td>
+ * <td>5</td>
+ * <td>6</td>
+ * <td>7</td>
+ * </tr>
+ * <tr>
+ * <th>56</th>
+ * <td>8</td>
+ * <td>9</td>
+ * <td>:</td>
+ * <td>;</td>
+ * <td><</td>
+ * <td>=</td>
+ * <td>></td>
+ * <td>?</td>
+ * </tr>
+ * <tr>
+ * <th>64</th>
+ * <td>@</td>
+ * <td>A</td>
+ * <td>B</td>
+ * <td>C</td>
+ * <td>D</td>
+ * <td>E</td>
+ * <td>F</td>
+ * <td>G</td>
+ * </tr>
+ * <tr>
+ * <th>72</th>
+ * <td>H</td>
+ * <td>I</td>
+ * <td>J</td>
+ * <td>K</td>
+ * <td>L</td>
+ * <td>M</td>
+ * <td>N</td>
+ * <td>O</td>
+ * </tr>
+ * <tr>
+ * <th>80</th>
+ * <td>P</td>
+ * <td>Q</td>
+ * <td>R</td>
+ * <td>S</td>
+ * <td>T</td>
+ * <td>U</td>
+ * <td>V</td>
+ * <td>W</td>
+ * </tr>
+ * <tr>
+ * <th>88</th>
+ * <td>X</td>
+ * <td>Y</td>
+ * <td>Z</td>
+ * <td>[</td>
+ * <td>\</td>
+ * <td>]</td>
+ * <td>^</td>
+ * <td>_</td>
+ * </tr>
+ * <tr>
+ * <th>96</th>
+ * <td>`</td>
+ * <td>a</td>
+ * <td>b</td>
+ * <td>c</td>
+ * <td>d</td>
+ * <td>e</td>
+ * <td>f</td>
+ * <td>g</td>
+ * </tr>
+ * <tr>
+ * <th>104</th>
+ * <td>h</td>
+ * <td>i</td>
+ * <td>j</td>
+ * <td>k</td>
+ * <td>l</td>
+ * <td>m</td>
+ * <td>n</td>
+ * <td>o</td>
+ * </tr>
+ * <tr>
+ * <th>112</th>
+ * <td>p</td>
+ * <td>q</td>
+ * <td>r</td>
+ * <td>s</td>
+ * <td>t</td>
+ * <td>u</td>
+ * <td>v</td>
+ * <td>w</td>
+ * </tr>
+ * <tr>
+ * <th>120</th>
+ * <td>x</td>
+ * <td>y</td>
+ * <td>z</td>
+ * <td>{</td>
+ * <td>|</td>
+ * <td></td>
+ * <td>~</td>
+ * <td>DEL</td>
+ * </tr>
+ * </table>
  * http://www.lammertbies.nl/comm/info/ascii-characters.html
  *
  * @author apete
@@ -140,8 +294,8 @@ public abstract class ASCII {
     }
 
     /**
-     * If aChar is an uppercase character it is converted to the corresponding
-     * lowercase character. Otherwise it is returned unaltered.
+     * If aChar is an uppercase character it is converted to the corresponding lowercase character. Otherwise
+     * it is returned unaltered.
      */
     public static int toLowercase(final int aChar) {
         return ASCII.isUppercase(aChar) ? aChar + SP : aChar;
@@ -152,8 +306,8 @@ public abstract class ASCII {
     }
 
     /**
-     * If aChar is a lowercase character it is converted to the corresponding
-     * uppercase character. Otherwise it is returned unaltered.
+     * If aChar is a lowercase character it is converted to the corresponding uppercase character. Otherwise
+     * it is returned unaltered.
      */
     public static int toUppercase(final int aChar) {
         return ASCII.isLowercase(aChar) ? aChar - SP : aChar;

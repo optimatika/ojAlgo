@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,8 @@ import org.ojalgo.random.SampleSet;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 
 /**
- * A random/stochastic process is a collection of random variables representing the evolution of some random value over
- * "time".
+ * A random/stochastic process is a collection of random variables representing the evolution of some random
+ * value over "time".
  * 
  * @author apete
  */
@@ -79,8 +79,8 @@ public interface RandomProcess<D extends Distribution> {
         }
 
         /**
-         * A series representing one scenario. Each series has length "number of simulation steps" + 1 as the series
-         * includes the initial value.
+         * A series representing one scenario. Each series has length "number of simulation steps" + 1 as the
+         * series includes the initial value.
          */
         public PrimitiveSeries getScenario(final int index) {
 
@@ -108,7 +108,8 @@ public interface RandomProcess<D extends Distribution> {
     }
 
     /**
-     * Calling this method repeatedly gives the same ressult, unless you call {@linkplain #step(double)} inbetween.
+     * Calling this method repeatedly gives the same ressult, unless you call {@linkplain #step(double)}
+     * inbetween.
      * 
      * @param evaluationPoint How far into the future?
      * @return The distribution for the process value at that future time.

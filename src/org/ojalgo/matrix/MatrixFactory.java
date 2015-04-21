@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,8 +38,8 @@ import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.random.RandomNumber;
 
 /**
- * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix} interface
- * and have a constructor that takes a MatrixStore as input.
+ * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix}
+ * interface and have a constructor that takes a MatrixStore as input.
  *
  * @author apete
  */

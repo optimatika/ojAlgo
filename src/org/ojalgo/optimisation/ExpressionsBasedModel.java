@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,42 +38,43 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
- * Lets you construct optimisation problems by combining (mathematical) expressions in terms of variables. Each
- * expression or variable can be a constraint and/or contribute to the objective function. An expression or variable is
- * turned into a constraint by setting a lower and/or upper limit. Use {@linkplain ModelEntity#lower(Number)},
- * {@linkplain ModelEntity#upper(Number)} or {@linkplain ModelEntity#level(Number)}. An expression or variable is made
- * part of (contributing to) the objective function by setting a contribution weight. Use
- * {@linkplain ModelEntity#weight(Number)}.
+ * Lets you construct optimisation problems by combining (mathematical) expressions in terms of variables.
+ * Each expression or variable can be a constraint and/or contribute to the objective function. An expression
+ * or variable is turned into a constraint by setting a lower and/or upper limit. Use
+ * {@linkplain ModelEntity#lower(Number)}, {@linkplain ModelEntity#upper(Number)} or
+ * {@linkplain ModelEntity#level(Number)}. An expression or variable is made part of (contributing to) the
+ * objective function by setting a contribution weight. Use {@linkplain ModelEntity#weight(Number)}.
  * </p>
  * <p>
- * You may think of variables as simple (the simplest possible) expressions, and of expressions as weighted combinations
- * of variables. They are both model entities and it is as such they can be turned into constraints and set to
- * contribute to the objective function. Alternatively you may choose to disregard the fact that variables are model
- * entities and simply treat them as index values. In this case everything (constraints and objective) needs to be
- * defined using expressions.
+ * You may think of variables as simple (the simplest possible) expressions, and of expressions as weighted
+ * combinations of variables. They are both model entities and it is as such they can be turned into
+ * constraints and set to contribute to the objective function. Alternatively you may choose to disregard the
+ * fact that variables are model entities and simply treat them as index values. In this case everything
+ * (constraints and objective) needs to be defined using expressions.
  * </p>
  * <p>
  * Basic instructions:
  * <ol>
  * <li>Define (create) a set of variables. Set contribution weights and lower/upper limits as needed.</li>
  * <li>Create a model using that set of variables.</li>
- * <li>Add expressions to the model. The model is the expression factory. Set contribution weights and lower/upper
- * limits as needed.</li>
+ * <li>Add expressions to the model. The model is the expression factory. Set contribution weights and
+ * lower/upper limits as needed.</li>
  * <li>Solve your problem using either minimise() or maximise()</li>
  * </ol>
  * </p>
  * <p>
- * When using this class you do not need to worry about which solver will actually be used. The docs of the various
- * solvers describe requirements on input formats and similar. This is handled for you and should absolutely NOT be
- * considered here! Compared to using the various solvers directly this class actually does something for you:
+ * When using this class you do not need to worry about which solver will actually be used. The docs of the
+ * various solvers describe requirements on input formats and similar. This is handled for you and should
+ * absolutely NOT be considered here! Compared to using the various solvers directly this class actually does
+ * something for you:
  * <ol>
  * <li>You can model your problems without worrying about specific solver requirements.</li>
  * <li>It knows which solver to use.</li>
  * <li>It knows how to use that solver.</li>
- * <li>It has a presolver that tries to simplify the problem before invoking a solver (sometimes it turns out there is
- * no need to invoke a solver at all).</li>
- * <li>When/if needed it scales problem parameters, before creating solver specific data structures, to minimize
- * numerical problems in the solvers.</li>
+ * <li>It has a presolver that tries to simplify the problem before invoking a solver (sometimes it turns out
+ * there is no need to invoke a solver at all).</li>
+ * <li>When/if needed it scales problem parameters, before creating solver specific data structures, to
+ * minimize numerical problems in the solvers.</li>
  * <li>It's the only way to access the integer solver.</li>
  * </ol>
  * </p>
@@ -116,9 +117,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     };
 
     /**
-     * This method is no longer needed. Just use the {@linkplain MathProgSysModel} the same way you would use the
-     * {@linkplain ExpressionsBasedModel}. If you absolutely must have an {@linkplain ExpressionsBasedModel} then simply
-     * call {@linkplain MathProgSysModel#getExpressionsBasedModel()}.
+     * This method is no longer needed. Just use the {@linkplain MathProgSysModel} the same way you would use
+     * the {@linkplain ExpressionsBasedModel}. If you absolutely must have an
+     * {@linkplain ExpressionsBasedModel} then simply call
+     * {@linkplain MathProgSysModel#getExpressionsBasedModel()}.
      *
      * @deprecated v38
      */
@@ -292,7 +294,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * @return A list of the variables that are not fixed at a specific value and are marked as integer variables
+     * @return A list of the variables that are not fixed at a specific value and are marked as integer
+     *         variables
      */
     public List<Variable> getIntegerVariables() {
 
@@ -304,7 +307,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * @return A list of the variables that are not fixed at a specific value and whos range include negative values
+     * @return A list of the variables that are not fixed at a specific value and whos range include negative
+     *         values
      */
     public List<Variable> getNegativeVariables() {
 
@@ -375,8 +379,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * @return A list of the variables that are not fixed at a specific value and whos range include positive values
-     *         and/or zero
+     * @return A list of the variables that are not fixed at a specific value and whos range include positive
+     *         values and/or zero
      */
     public List<Variable> getPositiveVariables() {
 
@@ -404,9 +408,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * Null variable values are replaced with 0.0. If any variable value is null the state is set to INFEASIBLE even if
-     * zero would actually be a feasible value. The objective function value is not calculated for infeasible variable
-     * values.
+     * Null variable values are replaced with 0.0. If any variable value is null the state is set to
+     * INFEASIBLE even if zero would actually be a feasible value. The objective function value is not
+     * calculated for infeasible variable values.
      */
     public Optimisation.Result getVariableValues(final NumberContext validationContext) {
 
@@ -748,10 +752,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * The general recommendation is to NOT call this method directly. Instead you should use/call {@link #maximise()}
-     * or {@link #minimise()}. If you do use this method you must first set {@link #setMinimisation()} or
-     * {@link #setMaximisation()}. Also note that with this method the solver solution is not written back to the model
-     * (or validated by the model).
+     * The general recommendation is to NOT call this method directly. Instead you should use/call
+     * {@link #maximise()} or {@link #minimise()}. If you do use this method you must first set
+     * {@link #setMinimisation()} or {@link #setMaximisation()}. Also note that with this method the solver
+     * solution is not written back to the model (or validated by the model).
      */
     public Optimisation.Result solve(final Optimisation.Result initialSolution) {
 

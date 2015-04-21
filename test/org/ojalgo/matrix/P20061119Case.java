@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,8 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
- * Problem reported on the ojalgu-user mailing list. A user claimed that Colt, Jama & Mtj calculated eigenvalue
- * decompositions that do not satisfy: [A][V] = [D][V]
+ * Problem reported on the ojalgu-user mailing list. A user claimed that Colt, Jama & Mtj calculated
+ * eigenvalue decompositions that do not satisfy: [A][V] = [D][V]
  * </p>
  * <p>
  * The problem/solution was that you have to compare [A][V] = [V][D] instead.
@@ -38,8 +38,8 @@ import org.ojalgo.type.context.NumberContext;
  * The supplied matrix did however cause other problems...
  * </p>
  * <p>
- * (2009-04-13, years later) Unfortunately I forgot to document what those other problems were. I assume the matrix is
- * just generally numerically difficult.
+ * (2009-04-13, years later) Unfortunately I forgot to document what those other problems were. I assume the
+ * matrix is just generally numerically difficult.
  * </p>
  *
  * @author apete

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se) Permission is hereby granted, free of charge, to any person
+ * Copyright 1997-2015 Optimatika (www.optimatika.se) Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software
  * without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
@@ -25,9 +25,9 @@ import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * http://miplib.zib.de/miplib2003/ Not all problems/models available at that site are solved by any solver. The
- * problems that are considered "easy" are those that can be solved within an hour using a commercial solver (I assume
- * on commodity hardware). If ojAlgo could solve even 1 of these problems...
+ * http://miplib.zib.de/miplib2003/ Not all problems/models available at that site are solved by any solver.
+ * The problems that are considered "easy" are those that can be solved within an hour using a commercial
+ * solver (I assume on commodity hardware). If ojAlgo could solve even 1 of these problems...
  *
  * @author apete
  */

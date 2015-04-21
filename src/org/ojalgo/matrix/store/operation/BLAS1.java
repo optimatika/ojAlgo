@@ -24,7 +24,8 @@ package org.ojalgo.matrix.store.operation;
 /**
  * Basic Linear Algebra Subprograms (BLAS) Level 1 contains vector operations.
  * <ul>
- * <li><a href="http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_1">BLAS Level 1 @ WikipediA</a></li>
+ * <li><a href="http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_1">BLAS Level 1 @
+ * WikipediA</a></li>
  * <li><a href="http://www.netlib.org/blas/#_level_1">BLAS Level 1 @ Netlib</a></li>
  * <li><a href="https://software.intel.com/en-us/node/520730">BLAS Level 1 @ Intel</a></li>
  * </ul>

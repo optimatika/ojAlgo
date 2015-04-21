@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,8 @@ import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
 /**
- * ComplexNumber is an immutable complex number class. It only implements the most basic complex number operations.
- * {@linkplain org.ojalgo.function.ComplexFunction} implements some of the more complicated ones.
+ * ComplexNumber is an immutable complex number class. It only implements the most basic complex number
+ * operations. {@linkplain org.ojalgo.function.ComplexFunction} implements some of the more complicated ones.
  *
  * @author apete
  * @see org.ojalgo.function.ComplexFunction

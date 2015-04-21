@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,12 +27,9 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BigMatrix;
-import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.ZeroStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.convex.MostBasicCase;
 import org.ojalgo.optimisation.convex.Qsd20030327P1Case;

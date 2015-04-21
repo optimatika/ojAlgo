@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,9 @@ package org.ojalgo.function.aggregator;
 
 /**
  * Do not cache instances of this class! The methods {@linkplain BigAggregator#getSet()},
- * {@linkplain ComplexAggregator#getSet()} and {@linkplain PrimitiveAggregator#getSet()}
- * return threadlocal instances, and when you access the individual
- * aggregators they are {@linkplain AggregatorFunction#reset()} for you.
+ * {@linkplain ComplexAggregator#getSet()} and {@linkplain PrimitiveAggregator#getSet()} return threadlocal
+ * instances, and when you access the individual aggregators they are {@linkplain AggregatorFunction#reset()}
+ * for you.
  *
  * @author apete
  */

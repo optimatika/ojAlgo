@@ -5,13 +5,13 @@ import org.ojalgo.matrix.store.RawStore;
 /**
  * Singular Value Decomposition.
  * <P>
- * For an m-by-n matrix A with m >= n, the singular value decomposition is an m-by-n orthogonal matrix U, an n-by-n
- * diagonal matrix S, and an n-by-n orthogonal matrix V so that A = U*S*V'.
+ * For an m-by-n matrix A with m >= n, the singular value decomposition is an m-by-n orthogonal matrix U, an
+ * n-by-n diagonal matrix S, and an n-by-n orthogonal matrix V so that A = U*S*V'.
  * <P>
  * The singular values, sigma[k] = S[k][k], are ordered so that sigma[0] >= sigma[1] >= ... >= sigma[n-1].
  * <P>
- * The singular value decompostion always exists, so the constructor will never fail. The matrix condition number and
- * the effective numerical rank can be computed from this decomposition.
+ * The singular value decompostion always exists, so the constructor will never fail. The matrix condition
+ * number and the effective numerical rank can be computed from this decomposition.
  */
 class JamaSingularValue implements java.io.Serializable {
 
@@ -56,8 +56,9 @@ class JamaSingularValue implements java.io.Serializable {
         n = (int) Arg.countColumns();
 
         /*
-         * Apparently the failing cases are only a proper subset of (m<n), so let's not throw error. Correct fix to come
-         * later? if (m<n) { throw new IllegalArgumentException("Jama SVD only works for m >= n"); }
+         * Apparently the failing cases are only a proper subset of (m<n), so let's not throw error. Correct
+         * fix to come later? if (m<n) { throw new IllegalArgumentException("Jama SVD only works for m >= n");
+         * }
          */
         final int nu = Math.min(m, n);
         s = new double[Math.min(m + 1, n)];

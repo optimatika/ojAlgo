@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,8 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * Multiplies an hermitian (square symmetric) matrix with a vector. Will only read from the lower/left triangular part
- * of the matrix, and will only calculate the lower/left part of the results.
+ * Multiplies an hermitian (square symmetric) matrix with a vector. Will only read from the lower/left
+ * triangular part of the matrix, and will only calculate the lower/left part of the results.
  *
  * @author apete
  */

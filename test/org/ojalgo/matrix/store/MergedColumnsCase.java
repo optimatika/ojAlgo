@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,8 +50,10 @@ public class MergedColumnsCase extends NonPhysicalTest {
         final BasicMatrix tmpLower = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
         myBigStore = new AboveBelowStore<BigDecimal>(BigDenseStore.FACTORY.copy((Access2D<?>) tmpBase), BigDenseStore.FACTORY.copy((Access2D<?>) tmpLower));
-        myComplexStore = new AboveBelowStore<ComplexNumber>(ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpBase), ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpLower));
-        myPrimitiveStore = new AboveBelowStore<Double>(PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpBase), PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpLower));
+        myComplexStore = new AboveBelowStore<ComplexNumber>(ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpBase),
+                ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpLower));
+        myPrimitiveStore = new AboveBelowStore<Double>(PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpBase),
+                PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpLower));
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,9 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Here is a junit test. Currently, tests 1 and 4 fail and the others pass. I don't understand what is causing the
- * problem, but in the test cases that fail, the binary variables are being set to values other than 0 or 1.
+ * Here is a junit test. Currently, tests 1 and 4 fail and the others pass. I don't understand what is causing
+ * the problem, but in the test cases that fail, the binary variables are being set to values other than 0 or
+ * 1.
  *
  * @author Luke
  */

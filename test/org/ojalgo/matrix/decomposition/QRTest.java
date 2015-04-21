@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,8 +44,8 @@ public class QRTest extends MatrixDecompositionTests {
     private static final int DIMENSION = 4;
 
     /**
-     * An Hermitian matrix (or self-adjoint matrix) is a square matrix with complex entries that is equal to its own
-     * conjugate transpose.
+     * An Hermitian matrix (or self-adjoint matrix) is a square matrix with complex entries that is equal to
+     * its own conjugate transpose.
      */
     private static MatrixStore<ComplexNumber> makeHermitianMatrix() {
         final PhysicalStore<ComplexNumber> tmpBase = MatrixUtils.makeRandomComplexStore(DIMENSION, DIMENSION);

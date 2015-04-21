@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se) Permission is hereby granted, free of charge, to any person
+ * Copyright 1997-2015 Optimatika (www.optimatika.se) Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software
  * without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
@@ -47,15 +47,15 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     }
 
     /**
-     * Defines a problem of 57 rows and 97 columns. Seems to be the same model as adlittle at netlib. Netlib also
-     * provides the solution. <a
-     * href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/adlittle.html">adlittle@netlib</a> Found
-     * this info somewhere on the net: "With 56 constraints and 97 variables adlittle is one of its smaller members.
-     * While being in fact feasible, adlittle suffers from ill--posedness. Perturbing the right hand side of the
-     * equality constraints by subtracting a tiny multiple of the 96th column of the equation matrix renders the linear
-     * program infeasible. Running this problem through CPLEX and lp_solve does again return a solution without any
-     * warnings." FAIL: Hittar bara en lösning 0.0, oavsett om jag minimerrar eller maximerar. 2010-04-19 lp_solve =>
-     * 225494.96316238
+     * Defines a problem of 57 rows and 97 columns. Seems to be the same model as adlittle at netlib. Netlib
+     * also provides the solution. <a
+     * href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/adlittle.html"
+     * >adlittle@netlib</a> Found this info somewhere on the net: "With 56 constraints and 97 variables
+     * adlittle is one of its smaller members. While being in fact feasible, adlittle suffers from
+     * ill--posedness. Perturbing the right hand side of the equality constraints by subtracting a tiny
+     * multiple of the 96th column of the equation matrix renders the linear program infeasible. Running this
+     * problem through CPLEX and lp_solve does again return a solution without any warnings." FAIL: Hittar
+     * bara en lösning 0.0, oavsett om jag minimerrar eller maximerar. 2010-04-19 lp_solve => 225494.96316238
      */
     public void testMPSadlittle() {
 
@@ -78,10 +78,10 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     }
 
     /**
-     * Defines a problem of 28 rows and 32 columns. Seems to be the same model as afiro at netlib. Netlib also provides
-     * the solution. <a
-     * href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/afiro.html">afiro@netlib</a> OK! 2010-04-19
-     * lp_solve => -464.75314286
+     * Defines a problem of 28 rows and 32 columns. Seems to be the same model as afiro at netlib. Netlib also
+     * provides the solution. <a
+     * href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/afiro.html">afiro@netlib</a> OK!
+     * 2010-04-19 lp_solve => -464.75314286
      */
     public void testMPSafiro() {
 
@@ -101,8 +101,8 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     }
 
     /**
-     * A simple test file primarily useful for checking the compression and decompression programs. Don't think this
-     * model was designed to be solved; so I don't try to.
+     * A simple test file primarily useful for checking the compression and decompression programs. Don't
+     * think this model was designed to be solved; so I don't try to.
      */
     public void testMPSempstest() {
 
@@ -114,9 +114,9 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     }
 
     /**
-     * An example taken from Maros, which defines a problem of 3 rows and 4 columns. There's also a model named maros at
-     * netlib, but that's a different much larger model. ERROR: Något tar lång tid, och sedan blir det ArithmaticError.
-     * 2010-04-19 lp_solve => 128.33333333
+     * An example taken from Maros, which defines a problem of 3 rows and 4 columns. There's also a model
+     * named maros at netlib, but that's a different much larger model. ERROR: Något tar lång tid, och sedan
+     * blir det ArithmaticError. 2010-04-19 lp_solve => 128.33333333
      */
     public void testMPSmaros() {
 
@@ -128,8 +128,8 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     }
 
     /**
-     * An example taken from Nazareth, which defines a problem of 3 rows and 3 column. OK! 2010-04-19 lp_solve => This
-     * problem is unbounded (maximisation seems OK.)
+     * An example taken from Nazareth, which defines a problem of 3 rows and 3 column. OK! 2010-04-19 lp_solve
+     * => This problem is unbounded (maximisation seems OK.)
      */
     public void testMPSnazareth() {
 
@@ -141,8 +141,8 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
     }
 
     /**
-     * A simple problem with 4 rows and 3 variables. I got my version from here (same numbers but different names): <a
-     * href="http://en.wikipedia.org/wiki/MPS_(format)">testprob@wikipedia</a> and/or <a
+     * A simple problem with 4 rows and 3 variables. I got my version from here (same numbers but different
+     * names): <a href="http://en.wikipedia.org/wiki/MPS_(format)">testprob@wikipedia</a> and/or <a
      * href="http://lpsolve.sourceforge.net/5.5/mps-format.htm">testprob@lpsolve</a>
      */
     public void testMPStestprob() {

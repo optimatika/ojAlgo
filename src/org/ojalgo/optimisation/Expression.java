@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,19 +54,20 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
- * Think of an Expression as one constraint or a component to the objective function. An expression becomes a linear
- * expression as soon as you set a linear factor. Setting a quadratic factor turns it into a quadratic expression. If
- * you set both linear and quadratic factors it is a compound expression, and if you set neither it is an empty
- * expression. Currently the solvers supplied by ojAlgo can only handle linear constraint expressions. The objective
- * function can be linear, quadratic or compound. Empty expressions makes no sense...
+ * Think of an Expression as one constraint or a component to the objective function. An expression becomes a
+ * linear expression as soon as you set a linear factor. Setting a quadratic factor turns it into a quadratic
+ * expression. If you set both linear and quadratic factors it is a compound expression, and if you set
+ * neither it is an empty expression. Currently the solvers supplied by ojAlgo can only handle linear
+ * constraint expressions. The objective function can be linear, quadratic or compound. Empty expressions
+ * makes no sense...
  * </p>
  * <p>
  * An expression is turned into a constraint by setting a lower and/or upper limit. Use
  * {@linkplain ModelEntity#lower(BigDecimal)}, {@linkplain ModelEntity#upper(BigDecimal)} or
- * {@linkplain ModelEntity#level(BigDecimal)}. An expression is made part of (contributing to) the objective function by
- * setting a contribution weight. Use {@linkplain ModelEntity#weight(BigDecimal)}. The contribution weight can be set to
- * anything except zero (0.0). Often you may just want to set it to one (1.0). Other values can be used to balance
- * multiple expressions Contributing to the objective function.
+ * {@linkplain ModelEntity#level(BigDecimal)}. An expression is made part of (contributing to) the objective
+ * function by setting a contribution weight. Use {@linkplain ModelEntity#weight(BigDecimal)}. The
+ * contribution weight can be set to anything except zero (0.0). Often you may just want to set it to one
+ * (1.0). Other values can be used to balance multiple expressions Contributing to the objective function.
  * </p>
  *
  * @author apete
@@ -411,8 +412,8 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     /**
-     * Will set the quadratic and linear factors to an expression that measures (the square of) the distance from the
-     * given point.
+     * Will set the quadratic and linear factors to an expression that measures (the square of) the distance
+     * from the given point.
      *
      * @param variables The relevant variables
      * @param point The point to measure from

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2015 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,8 @@ public enum DateStyle {
     }
 
     /**
-     * @return {@linkplain DateFormat#FULL}, {@linkplain DateFormat#LONG}, {@linkplain DateFormat#MEDIUM} or {@linkplain DateFormat#SHORT}
+     * @return {@linkplain DateFormat#FULL}, {@linkplain DateFormat#LONG}, {@linkplain DateFormat#MEDIUM} or
+     *         {@linkplain DateFormat#SHORT}
      */
     public int intValue() {
         return myIntValue;
