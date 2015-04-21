@@ -1,4 +1,4 @@
-=oj! Algorithms=
+# oj! Algorithms
 
 oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.
 
