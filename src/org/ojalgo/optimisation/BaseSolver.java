@@ -798,8 +798,16 @@ public abstract class BaseSolver extends GenericSolver {
     }
 
     protected void fillX(final Access1D<?> solution) {
-        for (int i = 0; i < solution.count(); i++) {
+        final int tmpLimit = this.countVariables();
+        for (int i = 0; i < tmpLimit; i++) {
             myMatrices.setX(i, solution.doubleValue(i));
+        }
+    }
+
+    protected void fillX(final double value) {
+        final int tmpLimit = this.countVariables();
+        for (int i = 0; i < tmpLimit; i++) {
+            myMatrices.setX(i, value);
         }
     }
 

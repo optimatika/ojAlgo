@@ -128,6 +128,7 @@ public final class PortfolioMixer {
                     tmpVal = tmpVal.add(myComponents.get(row).getWeights().get(i).multiply(myComponents.get(col).getWeights().get(i)));
                 }
                 tmpQuadObj.setQuadraticFactor(row, col, tmpVal);
+                tmpQuadObj.setQuadraticFactor(tmpNumberOfComponents + row, tmpNumberOfComponents + col, tmpVal.multiply(THOUSANDTH));
             }
 
             final Expression tmpActive = tmpModel.addExpression(tmpVariables[row].getName() + ACTIVE);

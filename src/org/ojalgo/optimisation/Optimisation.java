@@ -487,6 +487,10 @@ public interface Optimisation {
             myValue = aValue;
         }
 
+        public boolean isApproximate() {
+            return (this == APPROXIMATE) || this.isFeasible();
+        }
+
         public boolean isDistinct() {
             return this.absValue() >= DISTINCT.absValue();
         }

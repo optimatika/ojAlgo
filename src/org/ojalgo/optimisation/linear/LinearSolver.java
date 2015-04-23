@@ -107,6 +107,8 @@ public abstract class LinearSolver extends BaseSolver {
         }
     }
 
+    static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
+
     public static void copy(final ExpressionsBasedModel sourceModel, final LinearSolver.Builder destinationBuilder) {
 
         final boolean tmpMaximisation = sourceModel.isMaximisation();
@@ -420,7 +422,9 @@ public abstract class LinearSolver extends BaseSolver {
         return new LinearSolver.Builder();
     }
 
-    static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
+    public static LinearSolver.Builder getBuilder(final MatrixStore<Double> C) {
+        return LinearSolver.getBuilder().objective(C);
+    }
 
     private final IndexSelector mySelector;
 

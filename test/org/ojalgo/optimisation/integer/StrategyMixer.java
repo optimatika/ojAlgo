@@ -98,6 +98,9 @@ public class StrategyMixer extends OptimisationIntegerTests {
         TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, PrimitiveMath.IS_ZERO / PrimitiveMath.HUNDRED);
     }
 
+    /**
+     * This is test case using a reimplementation of the algorithm in {@link PortfolioMixer}.
+     */
     public void testStratCombQuadraticExpressionModel() {
 
         final BigDecimal[] tmpTarget = new BigDecimal[] { THIRD, THIRD, THIRD };
@@ -129,8 +132,8 @@ public class StrategyMixer extends OptimisationIntegerTests {
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVars);
 
-        //        tmpModel.options.debug(GenericSolver.class);
-        //        tmpModel.options.validate = false;
+        tmpModel.options.debug(IntegerSolver.class);
+        tmpModel.options.validate = false;
 
         final Expression tmpQuadObj = tmpModel.addExpression("Quadratic Objective Part");
         tmpQuadObj.weight(ONE);
@@ -145,6 +148,7 @@ public class StrategyMixer extends OptimisationIntegerTests {
                 }
 
                 tmpQuadObj.setQuadraticFactor(row, col, tmpVal);
+                tmpQuadObj.setQuadraticFactor(3 + row, 3 + col, tmpVal.multiply(THOUSANDTH));
             }
 
             final Expression tmpActive = tmpModel.addExpression(tmpVars[row].getName() + " Active");

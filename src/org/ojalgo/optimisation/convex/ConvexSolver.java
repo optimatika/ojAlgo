@@ -120,6 +120,8 @@ public abstract class ConvexSolver extends BaseSolver {
 
     }
 
+    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
+
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
         final List<Variable> tmpFreeVariables = sourceModel.getFreeVariables();
@@ -277,7 +279,9 @@ public abstract class ConvexSolver extends BaseSolver {
         return new ConvexSolver.Builder();
     }
 
-    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
+    public static ConvexSolver.Builder getBuilder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
+        return ConvexSolver.getBuilder().objective(Q, C);
+    }
 
     private transient KKTSolver myDelegateSolver = null;
 
@@ -314,6 +318,14 @@ public abstract class ConvexSolver extends BaseSolver {
     }
 
     @Override
+    protected double evaluateFunction(final Access1D<?> solution) {
+
+        final MatrixStore<Double> tmpX = this.getSolutionX();
+
+        return this.getQ().multiply(tmpX).multiplyLeft(tmpX.transpose()).scale(0.5).subtract(this.getC().multiplyLeft(tmpX.transpose())).doubleValue(0L);
+    }
+
+    @Override
     protected MatrixStore<Double> extractSolution() {
 
         return this.getSolutionX().copy();
@@ -347,13 +359,5 @@ public abstract class ConvexSolver extends BaseSolver {
 
     final MatrixStore<Double> getSolutionX() {
         return this.getX();
-    }
-
-    @Override
-    protected double evaluateFunction(final Access1D<?> solution) {
-
-        final MatrixStore<Double> tmpX = this.getSolutionX();
-
-        return this.getQ().multiply(tmpX).multiplyLeft(tmpX.transpose()).scale(0.5).subtract(this.getC().multiplyLeft(tmpX.transpose())).doubleValue(0L);
     }
 }
