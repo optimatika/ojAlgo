@@ -12,18 +12,16 @@
  * Financial instruments enable financial transactions, and are defined
  * in terms of assets. A financial instrument can for instance be
  * evidence of ownership of, or a contractual right/obligation to receive
- * or deliver, an asset. Financial instruments are often assets
- * themselves as they can be owned/traded.
+ * or deliver, an asset.
  * </li><li>
  * Financial portfolios contain financial instruments. Typically, in
  * terms of investments, it is a collection of assets with a common owner.
  * </li><li>
- * A portfolio is also an asset... Any asset can be viewed as a portfolio
- * containing only itself.
- * </li><li>
- * Here the term portfolio represents the collection and ownership, and the term
- * asset represents components/contents and underlying value. The term
- * instrument is not used here.
+ * The distiction between assets, instruments and portfolios is fuzzy, and the
+ * terms can often bu used interchangeably. Here the term portfolio represents
+ * the collection and ownership, and the term asset represents components/contents
+ * and underlying value. We try to avoid using the term instrument.
  * </li></ul>
  */
 package org.ojalgo.finance.portfolio;
+
