@@ -56,12 +56,8 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
         super(aStore);
     }
 
-    public PrimitiveMatrix enforce(final NumberContext aContext) {
-        return this.modify(aContext.getPrimitiveEnforceFunction());
-    }
-
-    public PrimitiveMatrix round(final NumberContext aContext) {
-        return this.modify(aContext.getPrimitiveRoundFunction());
+    public PrimitiveMatrix enforce(final NumberContext context) {
+        return this.modify(context.getPrimitiveFunction());
     }
 
     public BigDecimal toBigDecimal(final int row, final int column) {

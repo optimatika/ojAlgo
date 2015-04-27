@@ -76,31 +76,31 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         myPhysicalFactory = this.getFactory().getPhysicalFactory();
     }
 
-    public I add(final Access2D<?> aMtrx) {
+    public I add(final Access2D<?> addend) {
 
-        MatrixError.throwIfNotEqualDimensions(myStore, aMtrx);
+        MatrixError.throwIfNotEqualDimensions(myStore, addend);
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
 
-        retVal.fillMatching(myStore, myPhysicalFactory.function().add(), this.getStoreFrom(aMtrx));
+        retVal.fillMatching(myStore, myPhysicalFactory.function().add(), this.getStoreFrom(addend));
 
         return this.getFactory().instantiate(retVal);
     }
 
-    public I add(final int aRow, final int aCol, final Access2D<?> aMtrx) {
+    public I add(final int row, final int col, final Access2D<?> addend) {
 
-        final MatrixStore<N> tmpDiff = this.getStoreFrom(aMtrx);
+        final MatrixStore<N> tmpDiff = this.getStoreFrom(addend);
 
-        return this.getFactory().instantiate(new SuperimposedStore<N>(myStore, aRow, aCol, tmpDiff));
+        return this.getFactory().instantiate(new SuperimposedStore<N>(myStore, row, col, tmpDiff));
     }
 
-    public I add(final int aRow, final int aCol, final Number aNmbr) {
+    public I add(final int row, final int col, final Number aNmbr) {
 
         final PhysicalStore.Factory<N, ?> tmpPhysicalFactory = myStore.factory();
 
         final SingleStore<N> tmpDiff = new SingleStore<N>(tmpPhysicalFactory, tmpPhysicalFactory.scalar().cast(aNmbr));
 
-        return this.getFactory().instantiate(new SuperimposedStore<N>(myStore, aRow, aCol, tmpDiff));
+        return this.getFactory().instantiate(new SuperimposedStore<N>(myStore, row, col, tmpDiff));
     }
 
     public I add(final Number aNmbr) {

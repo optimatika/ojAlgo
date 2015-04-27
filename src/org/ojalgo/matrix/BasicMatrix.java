@@ -71,24 +71,24 @@ public interface BasicMatrix extends Access2D<Number> {
     /**
      * Adds the elements of aMtrx to the elements of this matrix. The matrices must have equal dimensions.
      *
-     * @param aMtrx What to add.
+     * @param addend What to add.
      * @return A new matrix whos elements are the sum of this' and aMtrx'.
      */
-    BasicMatrix add(Access2D<?> aMtrx);
+    BasicMatrix add(Access2D<?> addend);
 
     /**
-     * @param aRow The row index of where to superimpose the top left element of aMtrx
-     * @param aCol The column index of where to superimpose the top left element of aMtrx
-     * @param aMtrx A matrix to superimpose
+     * @param row The row index of where to superimpose the top left element of aMtrx
+     * @param col The column index of where to superimpose the top left element of aMtrx
+     * @param addend A matrix to superimpose
      * @return A new matrix
      */
-    BasicMatrix add(int aRow, int aCol, Access2D<?> aMtrx);
+    BasicMatrix add(int row, int col, Access2D<?> addend);
 
     /**
      * Do not use this method to populate large dense matrices! Only use it to change a few (a small number)
      * of elements.
      */
-    BasicMatrix add(int aRow, int aCol, Number value);
+    BasicMatrix add(int row, int col, Number value);
 
     /**
      * Adds value to the elements of this.
@@ -128,10 +128,12 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix divideElements(Access2D<?> aMtrx);
 
     /**
-     * @deprecated Since v27 Use {@link #round(NumberContext)} instead.
+     * Will enforce this context
+     *
+     * @param context The context
+     * @return A new matrix with the lements enforced
      */
-    @Deprecated
-    BasicMatrix enforce(NumberContext aCntxt);
+    BasicMatrix enforce(NumberContext context);
 
     /**
      * @return true if the frobenius norm of the difference between [this] and [aStore] is zero within the
@@ -426,14 +428,6 @@ public interface BasicMatrix extends Access2D<Number> {
      * @return A new matrix with negated elements.
      */
     BasicMatrix negate();
-
-    /**
-     * @param aCntxt
-     * @return
-     * @deprecated v34 Use {@link #modifyAll(UnaryFunction)} instead
-     */
-    @Deprecated
-    BasicMatrix round(NumberContext aCntxt);
 
     /**
      * @param someCols An ordered array of column indeces.

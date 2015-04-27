@@ -55,12 +55,8 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
         super(aStore);
     }
 
-    public BigMatrix enforce(final NumberContext aContext) {
-        return this.modify(aContext.getBigEnforceFunction());
-    }
-
-    public BigMatrix round(final NumberContext aContext) {
-        return this.modify(aContext.getBigRoundFunction());
+    public BigMatrix enforce(final NumberContext context) {
+        return this.modify(context.getBigFunction());
     }
 
     public BigDecimal toBigDecimal(final int row, final int column) {

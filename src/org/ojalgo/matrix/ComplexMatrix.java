@@ -56,12 +56,8 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
         super(aStore);
     }
 
-    public ComplexMatrix enforce(final NumberContext aContext) {
-        return this.modify(aContext.getComplexEnforceFunction());
-    }
-
-    public ComplexMatrix round(final NumberContext aContext) {
-        return this.modify(aContext.getComplexRoundFunction());
+    public ComplexMatrix enforce(final NumberContext context) {
+        return this.modify(context.getComplexFunction());
     }
 
     public BigDecimal toBigDecimal(final int row, final int column) {

@@ -787,7 +787,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
         final PhysicalStore<BigDecimal> tmpSolution = BigMatrix.FACTORY.columns(tmpResult).toBigStore();
-        tmpSolution.modifyAll(new NumberContext(7, 6).getBigEnforceFunction());
+        tmpSolution.modifyAll(new NumberContext(7, 6).getBigFunction());
         for (final BigDecimal tmpBigDecimal : tmpSolution.asList()) {
             if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
