@@ -2,6 +2,10 @@
 
 oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation. The motivation behind most of the development has been various financial applications, but what's here is (mostly) just maths.
 
+<p align="center">
+<a href="https://sourceforge.net/projects/ojalgo/files/latest/download" rel="nofollow"><img alt="Download oj! Algorithms" src="https://a.fsdn.com/con/app/sf-download-button"></a>
+</p>
+
 General information about ojAlgo can be found at: http://ojalgo.org/
 
 Downloads of prebuilt versions are found at SourceForge: http://sourceforge.net/projects/ojalgo/files/ojAlgo/
