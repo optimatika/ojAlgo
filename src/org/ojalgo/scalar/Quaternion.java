@@ -353,7 +353,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
     }
 
     /**
-     * Will calculate <code>this * reciprocal(arg)</code> which is <bold>not</bold> the same as
+     * Will calculate <code>this * reciprocal(arg)</code> which is <b>not</b> the same as
      * <code>reciprocal(arg) * this</code>.
      *
      * @see org.ojalgo.scalar.Scalar#divide(java.lang.Number)

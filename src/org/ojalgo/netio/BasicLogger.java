@@ -617,7 +617,7 @@ public abstract class BasicLogger {
         }
 
         /**
-         * @see java.io.PrintWriter#printf(java.util.Locale, java.lang.String, java.lang.Object)
+         * @see java.io.PrintWriter#printf(Locale, String, Object...)
          */
         public PrintWriterAppender printf(final Locale locale, final String format, final Object... args) {
             myWriter.printf(locale, format, args);
@@ -625,7 +625,7 @@ public abstract class BasicLogger {
         }
 
         /**
-         * @see java.io.PrintWriter#printf(java.lang.String, java.lang.Object)
+         * @see java.io.PrintWriter#printf(String, Object...)
          */
         public PrintWriterAppender printf(final String format, final Object... args) {
             myWriter.printf(format, args);

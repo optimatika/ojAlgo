@@ -30,7 +30,7 @@ import org.ojalgo.series.primitive.PrimitiveSeries;
 /**
  * A random/stochastic process is a collection of random variables representing the evolution of some random
  * value over "time".
- * 
+ *
  * @author apete
  */
 public interface RandomProcess<D extends Distribution> {
@@ -108,9 +108,6 @@ public interface RandomProcess<D extends Distribution> {
     }
 
     /**
-     * Calling this method repeatedly gives the same ressult, unless you call {@linkplain #step(double)}
-     * inbetween.
-     * 
      * @param evaluationPoint How far into the future?
      * @return The distribution for the process value at that future time.
      */

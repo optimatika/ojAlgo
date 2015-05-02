@@ -5,7 +5,7 @@ import org.ojalgo.matrix.store.RawStore;
 /**
  * QR Decomposition.
  * <P>
- * For an m-by-n matrix A with m >= n, the QR decomposition is an m-by-n orthogonal matrix Q and an n-by-n
+ * For an m-by-n matrix A with m &gt;= n, the QR decomposition is an m-by-n orthogonal matrix Q and an n-by-n
  * upper triangular matrix R so that A = Q*R.
  * <P>
  * The QR decompostion always exists, even if the matrix does not have full rank, so the constructor will

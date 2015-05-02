@@ -32,11 +32,6 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain SingularValue#makeBig()}, {@linkplain SingularValue#makeComplex()},
- * {@linkplain SingularValue#makePrimitive()}, {@linkplain SingularValue#makeAlternative()} or
- * {@linkplain SingularValue#makeJama()}.
- *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
@@ -44,7 +39,7 @@ import org.ojalgo.scalar.ComplexNumber;
 public abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
 
     /**
-     * @deprecated v38 Use {@link SingularValue#make(Access2D<N>)} instead
+     * @deprecated v38 Use {@link SingularValue#make(Access2D)} instead
      */
     @Deprecated
     @SuppressWarnings("unchecked")
@@ -53,7 +48,7 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
     }
 
     /**
-     * @deprecated v38 Use {@link SingularValue#makeAlternative()} instead
+     * @deprecated v38 Use {@link SingularValue#make(Access2D)} instead
      */
     @Deprecated
     public static final SingularValue<Double> makeAlternative() {
@@ -77,7 +72,7 @@ public abstract class SingularValueDecomposition<N extends Number & Comparable<N
     }
 
     /**
-     * @deprecated v38 Use {@link SingularValue#makeJama()} instead
+     * @deprecated v38 Use {@link SingularValue#makePrimitive()} instead
      */
     @Deprecated
     public static final SingularValue<Double> makeJama() {

@@ -49,7 +49,7 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.LU#makeJama()} instead.
+     * {@linkplain org.ojalgo.matrix.decomposition.LU#make(Access2D)} instead.
      */
     public RawLU() {
         super();

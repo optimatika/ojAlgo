@@ -554,8 +554,8 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return PrimitiveDenseStore.FACTORY.copy(this);
     }
 
-    public Scalar<N> toScalar(final long row, final long column) {
-        return myStore.toScalar(row, column);
+    public Scalar<N> toScalar(final long row, final long col) {
+        return myStore.toScalar(row, col);
     }
 
     @Override

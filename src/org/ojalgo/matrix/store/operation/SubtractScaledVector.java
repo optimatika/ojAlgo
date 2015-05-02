@@ -28,14 +28,6 @@ import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * y -= ax
- *
- * @param myBuffer y-data
- * @param dataIndexBase y-column base index
- * @param vector x-data
- * @param vectorIndexBase x-column base index
- * @param scalar a
- * @param first First index
- * @param limit Index limit
  */
 public final class SubtractScaledVector extends MatrixOperation {
 
@@ -43,6 +35,17 @@ public final class SubtractScaledVector extends MatrixOperation {
 
     public static int THRESHOLD = 128;
 
+    /**
+     * y -= ax
+     *
+     * @param data y-data
+     * @param dataIndexBase y-column base index
+     * @param vector x-data
+     * @param vectorIndexBase x-column base index
+     * @param scalar a
+     * @param first First index
+     * @param limit Index limit
+     */
     public static void invoke(final BigDecimal[] data, final int dataIndexBase, final BigDecimal[] vector, final int vectorIndexBase, final BigDecimal scalar,
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {

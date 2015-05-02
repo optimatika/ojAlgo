@@ -286,9 +286,9 @@ public interface BasicMatrix extends Access2D<Number> {
      * </p>
      * <ul>
      * <li>"right inverse": [this][right inverse]=[I]. You may calculate it using
-     * {@linkplain #solve(BasicMatrix)}.</li>
-     * <li>"left inverse": [left inverse][this]=[I]. You may calculate it using
-     * {@linkplain #solve(BasicMatrix)} and transposing.</li>
+     * {@linkplain #solve(Access2D)}.</li>
+     * <li>"left inverse": [left inverse][this]=[I]. You may calculate it using {@linkplain #solve(Access2D)}
+     * and transposing.</li>
      * <li>"generalised inverse": [this][generalised inverse][this]=[this]. Note that if [this] is singular or
      * non-square, then [generalised inverse] is not unique.</li>
      * <li>"pseudoinverse": The generalised inverse (there are typically/possibly many) with the smallest
@@ -308,22 +308,21 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix invert();
 
     /**
-     * Matrices are either square, tall, fat or empty. m <= 0 or n <= 0
+     * Matrices are either square, tall, fat or empty. m &lt;= 0 or n &lt;= 0
      *
      * @return true if matrix is empty
      */
     boolean isEmpty();
 
     /**
-     * Matrices are either square, tall, fat or empty. 1 <= m < n
+     * Matrices are either square, tall, fat or empty. 1 &lt;= m &lt; n
      *
      * @return true if matrix is fat
      */
     boolean isFat();
 
     /**
-     * @return true if {@linkplain #getRank()} == min({@linkplain #getRowDim()},
-     *         {@linkplain #getNumberOfColumns()})
+     * @return true if {@linkplain #getRank()} == min({@linkplain #countRows()}, {@linkplain #countColumns()})
      */
     boolean isFullRank();
 
@@ -335,7 +334,7 @@ public interface BasicMatrix extends Access2D<Number> {
     boolean isScalar();
 
     /**
-     * Matrices are either square, tall, fat or empty. m = n <> 0
+     * Matrices are either square, tall, fat or empty. m = n &lt;&gt; 0
      *
      * @return true if matrix is square
      */
@@ -344,7 +343,7 @@ public interface BasicMatrix extends Access2D<Number> {
     boolean isSymmetric();
 
     /**
-     * Matrices are either square, tall, fat or empty. m > n >= 1
+     * Matrices are either square, tall, fat or empty. m &lt; n &gt;= 1
      *
      * @return true if matrix is tall
      */
@@ -379,7 +378,7 @@ public interface BasicMatrix extends Access2D<Number> {
      *
      * @param right The right matrix.
      * @return The product.
-     * @see org.ojalgo.matrix.BasicMatrix#multiplyLeft(BasicMatrix)
+     * @see org.ojalgo.matrix.BasicMatrix#multiplyLeft(Access2D)
      */
     BasicMatrix multiply(Access2D<?> right);
 
@@ -406,7 +405,7 @@ public interface BasicMatrix extends Access2D<Number> {
      *
      * @param aMtrx The left matrix.
      * @return The product.
-     * @see org.ojalgo.matrix.BasicMatrix#multiply(BasicMatrix)
+     * @see org.ojalgo.matrix.BasicMatrix#multiply(Access2D)
      */
     BasicMatrix multiplyLeft(Access2D<?> aMtrx);
 
@@ -532,12 +531,12 @@ public interface BasicMatrix extends Access2D<Number> {
      * Extracts one element of this matrix as a Scalar.
      *
      * @param row A row index.
-     * @param column A column index.
+     * @param col A column index.
      * @return One matrix element
      */
-    Scalar<?> toScalar(long row, long column);
+    Scalar<?> toScalar(long row, long col);
 
-    String toString(int row, int column);
+    String toString(int row, int col);
 
     /**
      * Transposes this matrix. For complex matrices conjugate() and transpose() are NOT EQUAL.

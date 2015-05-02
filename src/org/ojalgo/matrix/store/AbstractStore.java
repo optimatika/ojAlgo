@@ -142,9 +142,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return this.toScalar(row, column).isSmall(comparedTo);
     }
 
-    /**
-     * @see org.ojalgo.matrix.store.MatrixStore#multiplyLeft(org.ojalgo.matrix.store.MatrixStore)
-     */
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
 
         final int tmpRowDim = (int) (leftMtrx.count() / this.countRows());

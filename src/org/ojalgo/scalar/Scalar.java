@@ -29,17 +29,18 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * <p>
  * A {@linkplain Scalar} is:
+ * </p>
  * <ol>
  * <li>An abstraction of a vector/matrix element.</li>
  * <li>A {@linkplain Number} decorator, increasing the number of things you can do with them.</li>
  * </ol>
- * </p>
  * <p>
  * Theoretically it is a Field or at least a Division ring.
  * </p>
  * <p>
  * A group is a set of elements paired with a binary operation. Four conditions called the group axioms must
  * be satisfied:
+ * </p>
  * <ol>
  * <li>Closure: If A and B are both members of the set then the result of A op B is also a member.</li>
  * <li>Associativity: Invocation/execution order doesn't matter - ((A op B) op C) == (A op (B op C))</li>
@@ -47,6 +48,7 @@ import org.ojalgo.type.context.NumberContext;
  * <li>The inverse property: For each element in the set there must be an inverse element (opposite or
  * reciprocal) so that A<sup>-1</sup> op A == A op A<sup>-1</sup> == I</li>
  * </ol>
+ * <p>
  * Note that commutativity is not a requirement - A op B doesn't always have to be equal to B op A. If the
  * operation is commutative then the group is called an abelian group or simply a commutative group.
  * </p>

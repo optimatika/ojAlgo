@@ -23,6 +23,7 @@ package org.ojalgo.netio;
 
 /**
  * <table>
+ * <caption>ASCII codes</caption>
  * <tr>
  * <th></th>
  * <th>0</th>
@@ -86,7 +87,7 @@ package org.ojalgo.netio;
  * <td>#</td>
  * <td>$</td>
  * <td>%</td>
- * <td>&</td>
+ * <td>&amp;</td>
  * <td>'</td>
  * </tr>
  * <tr>
@@ -117,9 +118,9 @@ package org.ojalgo.netio;
  * <td>9</td>
  * <td>:</td>
  * <td>;</td>
- * <td><</td>
+ * <td>&lt;</td>
  * <td>=</td>
- * <td>></td>
+ * <td>&gt;</td>
  * <td>?</td>
  * </tr>
  * <tr>

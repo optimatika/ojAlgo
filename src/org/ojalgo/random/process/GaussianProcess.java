@@ -30,9 +30,9 @@ import org.ojalgo.random.Normal1D;
  * every point in a range of times (or of space) such that each such random variable has a normal
  * distribution. Moreover, every finite collection of those random variables has a multivariate normal
  * distribution. Prior to calling {@linkplain #getDistribution(double)} or
- * {@linkplain #simulate(int, int, double)} you must call {@linkplain #addObservation(double, double)} one or
+ * {@linkplain #simulate(int, int, double)} you must call {@linkplain #addObservation(Double, double)} one or
  * more times.
- * 
+ *
  * @author apete
  */
 public final class GaussianProcess extends AbstractProcess<Normal> {

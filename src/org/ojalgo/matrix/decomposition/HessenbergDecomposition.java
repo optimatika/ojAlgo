@@ -34,10 +34,6 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain Hessenberg#makeBig()}, {@linkplain Hessenberg#makeComplex()} or
- * {@linkplain Hessenberg#makePrimitive()}.
- *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
@@ -69,7 +65,7 @@ public abstract class HessenbergDecomposition<N extends Number> extends InPlaceD
     }
 
     /**
-     * @deprecated v38 Use {@link Hessenberg#make(Access2D<N>)} instead
+     * @deprecated v38 Use {@link Hessenberg#make(Access2D)} instead
      */
     @Deprecated
     @SuppressWarnings("unchecked")

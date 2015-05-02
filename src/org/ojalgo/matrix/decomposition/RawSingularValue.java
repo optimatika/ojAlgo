@@ -47,7 +47,7 @@ public final class RawSingularValue extends OldRawDecomposition implements Singu
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.SingularValue#makeJama()} instead.
+     * {@linkplain org.ojalgo.matrix.decomposition.SingularValue#make(Access2D)} instead.
      */
     public RawSingularValue() {
         super();

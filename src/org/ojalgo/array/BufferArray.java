@@ -42,7 +42,7 @@ import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 
 /**
- * A one- and/or arbitrary-dimensional array of {@linkplain org.ojalgo.scalar.double}.
+ * A one- and/or arbitrary-dimensional array of double.
  *
  * @author apete
  */

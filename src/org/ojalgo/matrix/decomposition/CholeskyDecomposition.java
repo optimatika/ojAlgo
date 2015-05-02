@@ -38,10 +38,6 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain Cholesky#makeBig()}, {@linkplain Cholesky#makeComplex()}, {@linkplain Cholesky#makePrimitive()}
- * or {@linkplain Cholesky#makeJama()}.
- *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
@@ -73,7 +69,7 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
     }
 
     /**
-     * @deprecated v38 Use {@link Cholesky#make(Access2D<N>)} instead
+     * @deprecated v38 Use {@link Cholesky#make(Access2D)} instead
      */
     @Deprecated
     @SuppressWarnings("unchecked")
@@ -98,7 +94,7 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
     }
 
     /**
-     * @deprecated v38 Use {@link Cholesky#makeJama()} instead
+     * @deprecated v38 Use {@link Cholesky#makePrimitive()} instead
      */
     @Deprecated
     public static final Cholesky<Double> makeJama() {

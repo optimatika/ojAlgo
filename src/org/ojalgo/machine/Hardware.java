@@ -48,7 +48,7 @@ import org.ojalgo.netio.ASCII;
  * <li>
  * <code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or
  * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L1 }</code></li>
- * <ul>
+ * </ul>
  *
  * @author apete
  */

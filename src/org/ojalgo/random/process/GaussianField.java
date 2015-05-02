@@ -48,7 +48,7 @@ import org.ojalgo.type.keyvalue.ComparableToDouble;
  * need no longer be a simple real or integer valued "time", but can instead take values that are
  * multidimensional vectors, or points on some manifold. This GaussianField class is a generalization, as well
  * as the underlying implementation, of {@linkplain GaussianProcess}. Prior to calling
- * {@linkplain #getDistribution(boolean, double)} you must call {@linkplain #addObservation(double, double)}
+ * {@linkplain #getDistribution(Comparable...)} you must call {@linkplain #addObservation(Comparable, double)}
  * one or more times.
  *
  * @author apete

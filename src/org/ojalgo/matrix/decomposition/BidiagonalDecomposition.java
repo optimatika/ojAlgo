@@ -39,10 +39,6 @@ import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain Bidiagonal#makeBig()}, {@linkplain Bidiagonal#makeComplex()} or
- * {@linkplain Bidiagonal#makePrimitive()}.
- *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
@@ -160,10 +156,9 @@ public abstract class BidiagonalDecomposition<N extends Number> extends InPlaceD
     }
 
     /**
-     * @deprecated v38 Use {@link Bidiagonal#make(Access2D<N>)} instead
+     * @deprecated v38 Use {@link Bidiagonal#make(Access2D)} instead
      */
     @Deprecated
-    @SuppressWarnings("unchecked")
     public static final <N extends Number> Bidiagonal<N> make(final Access2D<N> aTypical) {
         return Bidiagonal.make(aTypical);
     }

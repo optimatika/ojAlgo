@@ -31,10 +31,6 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain Eigenvalue#makeBig()}, {@linkplain Eigenvalue#makePrimitive()} or
- * {@linkplain Eigenvalue#makeJama()}.
- *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
@@ -42,7 +38,7 @@ import org.ojalgo.scalar.ComplexNumber;
 public abstract class EigenvalueDecomposition<N extends Number> extends GenericDecomposition<N> implements Eigenvalue<N> {
 
     /**
-     * @deprecated v38 Use {@link Eigenvalue#make(Access2D<N>)} instead
+     * @deprecated v38 Use {@link Eigenvalue#makePrimitive(boolean)} instead
      */
     @Deprecated
     @SuppressWarnings("unchecked")
@@ -83,7 +79,7 @@ public abstract class EigenvalueDecomposition<N extends Number> extends GenericD
     }
 
     /**
-     * @deprecated v38 Use {@link Eigenvalue#makeJama()} instead
+     * @deprecated v38 Use {@link Eigenvalue#makePrimitive()} instead
      */
     @Deprecated
     public static final Eigenvalue<Double> makeJama() {
@@ -91,7 +87,7 @@ public abstract class EigenvalueDecomposition<N extends Number> extends GenericD
     }
 
     /**
-     * @deprecated v38 Use {@link Eigenvalue#makeJama(boolean)} instead
+     * @deprecated v38 Use {@link Eigenvalue#makePrimitive(boolean)} instead
      */
     @Deprecated
     public static final Eigenvalue<Double> makeJama(final boolean symmetric) {

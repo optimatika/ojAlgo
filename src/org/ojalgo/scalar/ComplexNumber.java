@@ -286,8 +286,6 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
 
     /**
      * Will call {@linkplain NumberContext#enforce(double)} on the real and imaginary parts separately.
-     *
-     * @see org.ojalgo.scalar.Scalar#enforce(org.ojalgo.type.context.NumberContext)
      */
     public ComplexNumber enforce(final NumberContext context) {
 

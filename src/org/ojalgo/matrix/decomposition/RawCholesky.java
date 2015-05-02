@@ -44,7 +44,7 @@ public final class RawCholesky extends RawDecomposition implements Cholesky<Doub
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.Cholesky#makeJama()} instead.
+     * {@linkplain org.ojalgo.matrix.decomposition.Cholesky#make(Access2D)} instead.
      */
     public RawCholesky() {
         super();

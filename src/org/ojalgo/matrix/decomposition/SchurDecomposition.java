@@ -30,9 +30,6 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * You create instances of (some subclass of) this class by calling the static factory method
- * {@linkplain Schur#makePrimitive()}.
- *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
@@ -76,7 +73,7 @@ public abstract class SchurDecomposition<N extends Number> extends InPlaceDecomp
     }
 
     /**
-     * @deprecated v38 Use {@link Schur#make(Access2D<N>)} instead
+     * @deprecated v38 Use {@link Schur#make(Access2D)} instead
      */
     @Deprecated
     @SuppressWarnings("unchecked")

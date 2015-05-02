@@ -44,8 +44,8 @@ import org.ojalgo.type.IndexSelector;
  * <p>
  * min [C]<sup>T</sup>[X]<br>
  * when [AE][X] == [BE]<br>
- * and 0 <= [X]<br>
- * and 0 <= [BE]
+ * and 0 &lt;= [X]<br>
+ * and 0 &lt;= [BE]
  * </p>
  * A Linear Program is in Standard Form if:
  * <ul>

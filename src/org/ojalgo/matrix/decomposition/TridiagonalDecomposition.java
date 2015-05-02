@@ -38,10 +38,6 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain Tridiagonal#makeBig()}, {@linkplain Tridiagonal#makeComplex()} or
- * {@linkplain Tridiagonal#makePrimitive()}.
- *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
@@ -109,7 +105,7 @@ public abstract class TridiagonalDecomposition<N extends Number> extends InPlace
     }
 
     /**
-     * @deprecated v38 Use {@link Tridiagonal#make(Access2D<N>)} instead
+     * @deprecated v38 Use {@link Tridiagonal#make(Access2D)} instead
      */
     @Deprecated
     @SuppressWarnings("unchecked")

@@ -36,10 +36,6 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain QR#makeBig()}, {@linkplain QR#makeComplex()}, {@linkplain QR#makePrimitive()} or
- * {@linkplain QR#makeJama()}.
- *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
@@ -71,7 +67,7 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
     }
 
     /**
-     * @deprecated v38 Use {@link QR#make(Access2D<N>)} instead
+     * @deprecated v38 Use {@link QR#make(Access2D)} instead
      */
     @Deprecated
     @SuppressWarnings("unchecked")
@@ -96,7 +92,7 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
     }
 
     /**
-     * @deprecated v38 Use {@link QR#makeJama()} instead
+     * @deprecated v38 Use {@link QR#makePrimitive()} instead
      */
     @Deprecated
     public static final QR<Double> makeJama() {

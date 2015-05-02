@@ -200,7 +200,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#getNumberOfColumns()
+     * @see org.ojalgo.matrix.BasicMatrix#countColumns()
      */
     public void testGetColDim() {
 
@@ -392,7 +392,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#getRowDim()
+     * @see org.ojalgo.matrix.BasicMatrix#countRows()
      */
     public void testGetRowDim() {
 
@@ -791,7 +791,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#solve(BasicMatrix)
+     * @see org.ojalgo.matrix.BasicMatrix#solve(org.ojalgo.access.Access2D)
      */
     public void testSolveBasicMatrix() {
 

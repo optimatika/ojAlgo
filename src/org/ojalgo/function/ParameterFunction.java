@@ -74,6 +74,13 @@ public interface ParameterFunction<N extends Number> extends BasicFunction<N>, B
         return this.invoke(arg, param);
     }
 
+    /**
+     * Turns this parameter function into a unary function with the parameter fixed/locked to the specified
+     * value.
+     *
+     * @param param The parameter of the parameter function.
+     * @return The resulting unary function.
+     */
     default UnaryFunction<N> parameter(final int param) {
         return new FixedParameter<N>(this, param);
     }

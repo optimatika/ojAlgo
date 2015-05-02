@@ -309,8 +309,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     /**
      * <p>
-     * As in {@link MatrixStore#multiplyLeft(MatrixStore)} where the left/parameter matrix is a plane
-     * rotation.
+     * As in {@link MatrixStore#multiplyLeft(Access1D)} where the left/parameter matrix is a plane rotation.
      * </p>
      * <p>
      * Multiplying by a plane rotation from the left means that [this] gets two of its rows updated to new
@@ -329,7 +328,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     /**
      * <p>
-     * As in {@link MatrixStore#multiply(MatrixStore)} where the right/parameter matrix is a plane rotation.
+     * As in {@link MatrixStore#multiply(Access1D)} where the right/parameter matrix is a plane rotation.
      * </p>
      * <p>
      * Multiplying by a plane rotation from the right means that [this] gets two of its columns updated to new

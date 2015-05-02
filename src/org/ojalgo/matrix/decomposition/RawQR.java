@@ -42,7 +42,7 @@ public final class RawQR extends OldRawDecomposition implements QR<Double> {
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.QR#makeJama()} instead.
+     * {@linkplain org.ojalgo.matrix.decomposition.QR#make(Access2D)} instead.
      */
     public RawQR() {
         super();

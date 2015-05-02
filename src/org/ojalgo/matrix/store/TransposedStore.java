@@ -34,10 +34,8 @@ public final class TransposedStore<N extends Number> extends TransjugatedStore<N
         return this.getBase().get(aCol, aRow);
     }
 
-    /**
-     * @see org.ojalgo.matrix.store.MatrixStore#multiplyLeft(org.ojalgo.matrix.store.MatrixStore)
-     */
-    @Override
+
+    
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
 
         MatrixStore<N> retVal;
@@ -56,10 +54,6 @@ public final class TransposedStore<N extends Number> extends TransjugatedStore<N
         return retVal;
     }
 
-    /**
-     * @see org.ojalgo.matrix.store.MatrixStore#multiply(org.ojalgo.matrix.store.MatrixStore)
-     */
-    @Override
     public MatrixStore<N> multiply(final Access1D<N> right) {
 
         MatrixStore<N> retVal;

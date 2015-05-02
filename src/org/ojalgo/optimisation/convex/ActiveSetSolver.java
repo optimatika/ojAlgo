@@ -44,7 +44,7 @@ import org.ojalgo.type.IndexSelector;
  * <p>
  * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
  * when [AE][X] == [BE]<br>
- * and [AI][X] <= [BI]
+ * and [AI][X] &lt;= [BI]
  * </p>
  *
  * @author apete

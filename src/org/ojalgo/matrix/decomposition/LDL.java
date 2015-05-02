@@ -44,7 +44,7 @@ import org.ojalgo.type.context.NumberContext;
  * <li>[L] is a unit lower (left) triangular matrix. It has the same dimensions as [this], and ones on the
  * diagonal.</li>
  * <li>[D] is a diagonal matrix. It has the same dimensions as [this].</li>
- * <li>[this] = [L][D][L]<sup>T</sup</li>
+ * <li>[this] = [L][D][L]<sup>T</sup></li>
  * </ul>
  *
  * @author apete

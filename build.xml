@@ -131,7 +131,22 @@
                 <include name="**/*.java" />
             </fileset>
 
-            <link href="http://download.oracle.com/javase/6/docs/api/" />
+            <classpath>
+                <fileset dir="${path.ExtJavaMail}${file.separator}${dir.lib}">
+                    <include name="**/*.jar" />
+                </fileset>
+                <fileset dir="${path.ExtPriDE}${file.separator}${dir.lib}">
+                    <include name="**/*.jar" />
+                </fileset>
+                <fileset dir="${path.ExtJExcel}${file.separator}${dir.lib}">
+                    <include name="**/*.jar" />
+                </fileset>
+                <fileset dir="${path.ExtJFree}${file.separator}${dir.lib}">
+                    <include name="**/*.jar" />
+                </fileset>
+            </classpath>
+
+            <link href="http://docs.oracle.com/javase/8/docs/api/index.html" />
             <link href="http://jexcelapi.sourceforge.net/resources/javadocs/current/docs/" />
             <link href="http://www.jfree.org/jfreechart/api/javadoc/" />
             <link href="http://pride.sourceforge.net/javadoc/" />

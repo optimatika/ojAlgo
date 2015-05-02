@@ -99,7 +99,7 @@ public abstract class RawEigenvalue extends OldRawDecomposition implements Eigen
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
-     * {@linkplain org.ojalgo.matrix.decomposition.Eigenvalue#makeJama()} instead.
+     * {@linkplain org.ojalgo.matrix.decomposition.Eigenvalue#makePrimitive()} instead.
      */
 
     protected RawEigenvalue() {

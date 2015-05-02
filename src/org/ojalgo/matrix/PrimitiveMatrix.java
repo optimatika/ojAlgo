@@ -73,8 +73,8 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
         return this.getStore().copy();
     }
 
-    public String toString(final int row, final int column) {
-        return Double.toString(this.doubleValue(row, column));
+    public String toString(final int row, final int col) {
+        return Double.toString(this.doubleValue(row, col));
     }
 
     @SuppressWarnings("unchecked")

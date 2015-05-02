@@ -42,10 +42,6 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * You create instances of (some subclass of) this class by calling one of the static factory methods:
- * {@linkplain LU#makeBig()}, {@linkplain LU#makeComplex()}, {@linkplain LU#makePrimitive()} or
- * {@linkplain LU#makeJama()}.
- *
  * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
@@ -77,7 +73,7 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
     }
 
     /**
-     * @deprecated v38 Use {@link LU#make(Access2D<N>)} instead
+     * @deprecated v38 Use {@link LU#make(Access2D)} instead
      */
     @Deprecated
     @SuppressWarnings("unchecked")
@@ -102,7 +98,7 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
     }
 
     /**
-     * @deprecated v38 Use {@link LU#makeJama()} instead
+     * @deprecated v38 Use {@link LU#makePrimitive()} instead
      */
     @Deprecated
     public static final LU<Double> makeJama() {

@@ -38,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
  * <li>[A]<sup>H</sup> is the conjugate transpose of [A]. [A]<sup>H</sup> is equilvalent to [A]<sup>T</sup> if
  * the elements are all real.</li>
  * <li>[D] is a diagonal matrix. Possibly bi-, tri- or block-diagonal.</li>
- * <li>[H] is an, upper or lower, Hessenberg matrix.</il>
+ * <li>[H] is an, upper or lower, Hessenberg matrix.</li>
  * <li>[I] is an identity matrix - obvioulsly orthogonal/unitary.</li>
  * <li>[L] is a lower (left) triangular matrix.</li>
  * <li>[P] is a permutation matrix - an identity matrix with interchanged rows or columns - and
@@ -47,7 +47,7 @@ import org.ojalgo.type.context.NumberContext;
  * [Q]<sup>T</sup>.</li>
  * <li>[R] is a right (upper) tringular matrix. It is equivalent to [U].</li>
  * <li>[U] is an upper (right) triangular matrix. It is equivalent to [R].</li>
- * <li>[V] is an eigenvector matrix. The columns are the eigenvectors</il>
+ * <li>[V] is an eigenvector matrix. The columns are the eigenvectors</li>
  * </ul>
  *
  * @author apete

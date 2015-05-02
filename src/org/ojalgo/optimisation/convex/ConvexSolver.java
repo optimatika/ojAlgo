@@ -45,10 +45,11 @@ import org.ojalgo.optimisation.system.KKTSolver;
  * <p>
  * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]<br>
  * when [AE][X] == [BE]<br>
- * and [AI][X] <= [BI]
+ * and [AI][X] &lt;= [BI]
  * </p>
  * <p>
  * The matrix [Q] is assumed to be symmetric (it must be made that way) and positive (semi)definite:
+ * </p>
  * <ul>
  * <li>If [Q] is positive semidefinite, then the objective function is convex: In this case the quadratic
  * program has a global minimizer if there exists some feasible vector [X] (satisfying the constraints) and if
@@ -56,7 +57,6 @@ import org.ojalgo.optimisation.system.KKTSolver;
  * <li>If [Q] is positive definite and the problem has a feasible solution, then the global minimizer is
  * unique.</li>
  * </ul>
- * </p>
  * <p>
  * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel}
  * and not worry about solver details. If you do want to instantiate a convex solver directly use the

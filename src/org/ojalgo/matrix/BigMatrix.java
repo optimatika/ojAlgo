@@ -72,8 +72,8 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
         return ComplexNumber.valueOf(this.getStore().doubleValue(row, column));
     }
 
-    public String toString(final int row, final int column) {
-        return this.toBigDecimal(row, column).toPlainString();
+    public String toString(final int row, final int col) {
+        return this.toBigDecimal(row, col).toPlainString();
     }
 
     @SuppressWarnings("unchecked")

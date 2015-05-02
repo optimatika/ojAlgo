@@ -37,6 +37,11 @@ import org.ojalgo.scalar.ComplexNumber;
  * <li>[this] = [Q][R]</li>
  * </ul>
  * Note: Either Q or R will be square. The interface does not specify which.
+ * <p>
+ * You create instances of (some subclass of) this class by calling one of the static factory methods:
+ * {@linkplain #makeBig()}, {@linkplain #makeComplex()}, {@linkplain #makePrimitive()} or
+ * {@linkplain #make(Access2D)}
+ * </p>
  *
  * @author apete
  */

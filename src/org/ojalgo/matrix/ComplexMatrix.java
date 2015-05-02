@@ -73,8 +73,8 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
         return this.getStore().copy();
     }
 
-    public String toString(final int row, final int column) {
-        return this.toComplexNumber(row, column).toString();
+    public String toString(final int row, final int col) {
+        return this.toComplexNumber(row, col).toString();
     }
 
     @SuppressWarnings("unchecked")

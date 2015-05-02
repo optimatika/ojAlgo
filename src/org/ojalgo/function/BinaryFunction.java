@@ -162,18 +162,38 @@ public interface BinaryFunction<N extends Number> extends BasicFunction<N>, Bina
         return this.invoke(arg1, arg2);
     }
 
+    /**
+     * @see #first(Number)
+     */
     default UnaryFunction<N> first(final double arg1) {
         return new FixedFirst<N>(arg1, this);
     }
 
+    /**
+     * Turns this binary function into a unary function with the first argument fixed/locked to the specified
+     * value.
+     *
+     * @param arg1 The first argument of the binary function.
+     * @return The resulting unary function.
+     */
     default UnaryFunction<N> first(final N arg1) {
         return new FixedFirst<N>(arg1, this);
     }
 
+    /**
+     * @see #second(Number)
+     */
     default UnaryFunction<N> second(final double arg2) {
         return new FixedSecond<N>(this, arg2);
     }
 
+    /**
+     * Turns this binary function into a unary function with the second argument fixed/locked to the specified
+     * value.
+     *
+     * @param arg2 The second argument of the binary function.
+     * @return The resulting unary function.
+     */
     default UnaryFunction<N> second(final N arg2) {
         return new FixedSecond<N>(this, arg2);
     }

@@ -134,7 +134,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * Implementiong this method is optional.
      * </p>
      * Will create a {@linkplain DecompositionStore} instance suitable for use with
-     * {@link #solve(Access2D, DecompositionStore)}. When solving an equation system [A][X]=[B]
+     * {@link #solve(Access2D, Access2D, DecompositionStore)}. When solving an equation system [A][X]=[B]
      * ([mxn][nxb]=[mxb]) the preallocated memory/matrix will typically be either mxb or nxb (if A is square
      * then there is no doubt).
      *
@@ -161,7 +161,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * interface. It must be documented for each implementation.
      * </p>
      * <p>
-     * Should produce the same results as calling {@link #solve(Access2D)}.
+     * Should produce the same results as calling {@link #solve(Access2D, Access2D)}.
      * </p>
      *
      * @param rhs The Right Hand Side, wont be modfied
