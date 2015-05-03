@@ -124,16 +124,10 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return BigDecimal.ONE.movePointRight(this.getAdjustmentExponent()).doubleValue(); // 10^exponent
     }
 
-    /**
-     * @see org.ojalgo.optimisation.Objective#getContributionWeight()
-     */
     public final BigDecimal getContributionWeight() {
         return myContributionWeight;
     }
 
-    /**
-     * @see org.ojalgo.optimisation.Constraint#getLowerLimit()
-     */
     public final BigDecimal getLowerLimit() {
         return this.getLowerLimit(false);
     }
@@ -142,24 +136,15 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return myName;
     }
 
-    /**
-     * @see org.ojalgo.optimisation.Constraint#getUpperLimit()
-     */
     public final BigDecimal getUpperLimit() {
         return this.getUpperLimit(false);
     }
 
-    /**
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public final int hashCode() {
         return myName.hashCode();
     }
 
-    /**
-     * @see org.ojalgo.optimisation.Constraint#isConstraint()
-     */
     public final boolean isConstraint() {
         return this.isLowerLimitSet() || this.isUpperLimitSet();
     }
@@ -168,16 +153,10 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return myContributionWeight != null;
     }
 
-    /**
-     * @see org.ojalgo.optimisation.Constraint#isEqualityConstraint()
-     */
     public final boolean isEqualityConstraint() {
         return this.isLowerLimitSet() && this.isUpperLimitSet() && (myLowerLimit.compareTo(myUpperLimit) == 0);
     }
 
-    /**
-     * @see org.ojalgo.optimisation.Constraint#isLowerConstraint()
-     */
     public final boolean isLowerConstraint() {
         return this.isLowerLimitSet() && !this.isEqualityConstraint();
     }
@@ -186,16 +165,10 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return myLowerLimit != null;
     }
 
-    /**
-     * @see org.ojalgo.optimisation.Objective#isObjective()
-     */
     public final boolean isObjective() {
         return this.isContributionWeightSet() && (myContributionWeight.signum() != 0);
     }
 
-    /**
-     * @see org.ojalgo.optimisation.Constraint#isUpperConstraint()
-     */
     public final boolean isUpperConstraint() {
         return this.isUpperLimitSet() && !this.isEqualityConstraint();
     }

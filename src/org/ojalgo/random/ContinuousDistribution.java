@@ -30,9 +30,9 @@ public interface ContinuousDistribution extends Distribution {
      * function of the probability distribution. Cumulative distribution functions are also used to specify
      * the distribution of multivariate random variables. <a
      * href="http://en.wikipedia.org/wiki/Cumulative_distribution_function">WikipediA</a>
-     * 
+     *
      * @param aValue x
-     * @return P(<=x)
+     * @return P(&lt;=x)
      */
     double getDistribution(double aValue);
 
@@ -43,7 +43,7 @@ public interface ContinuousDistribution extends Distribution {
      * integral of this variable's density over the region. The probability density function is nonnegative
      * everywhere, and its integral over the entire space is equal to one. <a
      * href="http://en.wikipedia.org/wiki/Probability_density_function">WikipediA</a>
-     * 
+     *
      * @param aValue x
      * @return P(x)
      */
@@ -54,8 +54,8 @@ public interface ContinuousDistribution extends Distribution {
      * mathematically the inverse of the cumulative distribution function. <a
      * href="http://en.wikipedia.org/wiki/Quantile_function">WikipediA</a> The input probability absolutely
      * has to be [0.0, 1.0], but values close to 0.0 and 1.0 may be problematic
-     * 
-     * @param aProbality P(<=x)
+     *
+     * @param aProbality P(&lt;=x)
      * @return x
      */
     double getQuantile(double aProbality);

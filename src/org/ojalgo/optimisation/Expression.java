@@ -63,11 +63,11 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  * <p>
  * An expression is turned into a constraint by setting a lower and/or upper limit. Use
- * {@linkplain ModelEntity#lower(BigDecimal)}, {@linkplain ModelEntity#upper(BigDecimal)} or
- * {@linkplain ModelEntity#level(BigDecimal)}. An expression is made part of (contributing to) the objective
- * function by setting a contribution weight. Use {@linkplain ModelEntity#weight(BigDecimal)}. The
- * contribution weight can be set to anything except zero (0.0). Often you may just want to set it to one
- * (1.0). Other values can be used to balance multiple expressions Contributing to the objective function.
+ * {@linkplain ModelEntity#lower(Number)}, {@linkplain ModelEntity#upper(Number)} or
+ * {@linkplain ModelEntity#level(Number)}. An expression is made part of (contributing to) the objective
+ * function by setting a contribution weight. Use {@linkplain ModelEntity#weight(Number)}. The contribution
+ * weight can be set to anything except zero (0.0). Often you may just want to set it to one (1.0). Other
+ * values can be used to balance multiple expressions Contributing to the objective function.
  * </p>
  *
  * @author apete

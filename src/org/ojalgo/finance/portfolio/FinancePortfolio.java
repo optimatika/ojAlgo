@@ -111,9 +111,7 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
 
     /**
      * The mean/expected return of this instrument. May return either the absolute or excess return of the
-     * instrument. The context in which an instance is used should make it clear which. Calling
-     * {@linkplain #shift(Number)} with an appropriate argument will transform between absolute and excess
-     * return.
+     * instrument. The context in which an instance is used should make it clear which. return.
      */
     public abstract double getMeanReturn();
 

@@ -33,21 +33,21 @@ public class Uniform extends AbstractContinuous {
     private static final long serialVersionUID = -8198257914507986404L;
 
     /**
-     * @return An integer: 0 <= ? < limit
+     * @return An integer: 0 &lt;= ? &lt; limit
      */
     public static int randomInteger(final int limit) {
         return (int) Math.floor(limit * Math.random());
     }
 
     /**
-     * @return An integer: aLower <= ? < aHigher
+     * @return An integer: lower &lt;= ? &lt; higher
      */
     public static int randomInteger(final int lower, final int higher) {
         return lower + Uniform.randomInteger(higher - lower);
     }
 
     /**
-     * @return An integer: 0 <= ? < aLimit
+     * @return An integer: 0 &lt;= ? &lt; limit
      */
     public static long randomInteger(final long limit) {
         return (long) Math.floor(limit * Math.random());

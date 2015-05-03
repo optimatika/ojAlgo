@@ -54,6 +54,7 @@ import org.ojalgo.type.context.NumberContext;
  * </p>
  * <p>
  * Basic instructions:
+ * </p>
  * <ol>
  * <li>Define (create) a set of variables. Set contribution weights and lower/upper limits as needed.</li>
  * <li>Create a model using that set of variables.</li>
@@ -61,12 +62,12 @@ import org.ojalgo.type.context.NumberContext;
  * lower/upper limits as needed.</li>
  * <li>Solve your problem using either minimise() or maximise()</li>
  * </ol>
- * </p>
  * <p>
  * When using this class you do not need to worry about which solver will actually be used. The docs of the
  * various solvers describe requirements on input formats and similar. This is handled for you and should
  * absolutely NOT be considered here! Compared to using the various solvers directly this class actually does
  * something for you:
+ * </p>
  * <ol>
  * <li>You can model your problems without worrying about specific solver requirements.</li>
  * <li>It knows which solver to use.</li>
@@ -77,12 +78,13 @@ import org.ojalgo.type.context.NumberContext;
  * minimize numerical problems in the solvers.</li>
  * <li>It's the only way to access the integer solver.</li>
  * </ol>
- * </p>
  * <p>
  * There are some restrictions on the models you can create:
+ * </p>
  * <ul>
  * <li>No quadratic constraints</li>
  * </ul>
+ * <p>
  * The plan is that future versions should not have any restrictions like these.
  * </p>
  *
