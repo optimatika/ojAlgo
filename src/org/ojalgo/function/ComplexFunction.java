@@ -27,6 +27,7 @@ import org.ojalgo.type.TypeUtils;
 
 public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
+    @FunctionalInterface
     public static interface Binary extends BinaryFunction<ComplexNumber> {
 
         default double invoke(final double arg1, final double arg2) {
@@ -35,6 +36,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     }
 
+    @FunctionalInterface
     public static interface Parameter extends ParameterFunction<ComplexNumber> {
 
         default double invoke(final double arg, final int param) {
@@ -43,6 +45,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     }
 
+    @FunctionalInterface
     public static interface Unary extends UnaryFunction<ComplexNumber> {
 
         default double invoke(final double arg) {

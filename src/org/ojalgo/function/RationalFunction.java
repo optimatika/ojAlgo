@@ -33,6 +33,7 @@ import org.ojalgo.type.TypeUtils;
  */
 public final class RationalFunction extends FunctionSet<RationalNumber> {
 
+    @FunctionalInterface
     public static interface Binary extends BinaryFunction<RationalNumber> {
 
         default double invoke(final double arg1, final double arg2) {
@@ -41,6 +42,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
     }
 
+    @FunctionalInterface
     public static interface Parameter extends ParameterFunction<RationalNumber> {
 
         default double invoke(final double arg, final int param) {
@@ -49,6 +51,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
     }
 
+    @FunctionalInterface
     public static interface Unary extends UnaryFunction<RationalNumber> {
 
         default double invoke(final double arg) {

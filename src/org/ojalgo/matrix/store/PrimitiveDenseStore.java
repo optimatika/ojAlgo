@@ -53,7 +53,6 @@ import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -192,11 +191,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             return retVal;
         }
 
-        public Householder.Primitive makeHouseholder(final int length) {
-            return new Householder.Primitive(length);
-        }
-
-        public PrimitiveDenseStore makeRandom(final long rows, final long columns, final RandomNumber distribution) {
+        public PrimitiveDenseStore makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final int tmpRowDim = (int) rows;
             final int tmpColDim = (int) columns;
@@ -206,10 +201,14 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             final double[] tmpData = new double[tmpLength];
 
             for (int i = 0; i < tmpLength; i++) {
-                tmpData[i] = distribution.doubleValue();
+                tmpData[i] = supplier.doubleValue();
             }
 
             return new PrimitiveDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public Householder.Primitive makeHouseholder(final int length) {
+            return new Householder.Primitive(length);
         }
 
         public Rotation.Primitive makeRotation(final int low, final int high, final double cos, final double sin) {
@@ -1161,10 +1160,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.exchangeColumns(colA, colB);
     }
 
-    public void exchangeRows(final int rowA, final int rowB) {
-        myUtility.exchangeRows(rowA, rowB);
-    }
-
     public void exchangeHermitian(final int indexA, final int indexB) {
 
         final int tmpMin = Math.min(indexA, indexB);
@@ -1192,6 +1187,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             this.set(i, tmpMin, this.doubleValue(i, tmpMax));
             this.set(i, tmpMax, tmpVal);
         }
+    }
+
+    public void exchangeRows(final int rowA, final int rowB) {
+        myUtility.exchangeRows(rowA, rowB);
     }
 
     public PhysicalStore.Factory<Double, PrimitiveDenseStore> factory() {
@@ -1385,14 +1384,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return myColDim;
     }
 
-    public int indexOfLargestInColumn(final int row, final int column) {
-        return (int) myUtility.indexOfLargestInColumn(row, column);
-    }
-
-    public int indexOfLargestInDiagonal(final int row, final int column) {
-        return (int) myUtility.indexOfLargestInDiagonal(row, column);
-    }
-
     public int getMaxDim() {
         return Math.max(myRowDim, myColDim);
     }
@@ -1408,6 +1399,14 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     @Override
     public int hashCode() {
         return MatrixUtils.hashCode(this);
+    }
+
+    public int indexOfLargestInColumn(final int row, final int column) {
+        return (int) myUtility.indexOfLargestInColumn(row, column);
+    }
+
+    public int indexOfLargestInDiagonal(final int row, final int column) {
+        return (int) myUtility.indexOfLargestInDiagonal(row, column);
     }
 
     public boolean isAbsolute(final long row, final long column) {

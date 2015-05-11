@@ -24,15 +24,7 @@ package org.ojalgo.array;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
-import java.util.Spliterator;
-import java.util.Spliterators;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
@@ -43,7 +35,7 @@ import org.ojalgo.type.TypeUtils;
  *
  * @author apete
  */
-public class QuaternionArray extends DenseArray<Quaternion> {
+public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
 
     static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(Quaternion.class);
 
@@ -78,99 +70,17 @@ public class QuaternionArray extends DenseArray<Quaternion> {
         return new QuaternionArray(data);
     }
 
-    protected static void exchange(final Quaternion[] data, final int firstA, final int firstB, final int step, final int aCount) {
+    protected QuaternionArray(final int size) {
 
-        int tmpIndexA = firstA;
-        int tmpIndexB = firstB;
+        super(new Quaternion[size]);
 
-        Quaternion tmpVal;
-
-        for (int i = 0; i < aCount; i++) {
-
-            tmpVal = data[tmpIndexA];
-            data[tmpIndexA] = data[tmpIndexB];
-            data[tmpIndexB] = tmpVal;
-
-            tmpIndexA += step;
-            tmpIndexB += step;
-        }
+        this.fill(0, size, 1, Quaternion.ZERO);
     }
-
-    protected static void fill(final Quaternion[] data, final Access1D<?> value) {
-        final int tmpLimit = (int) Math.min(data.length, value.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            data[i] = TypeUtils.toQuaternion(value.get(i));
-        }
-    }
-
-    protected static void fill(final Quaternion[] data, final int first, final int limit, final int step, final Quaternion value) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = value;
-        }
-    }
-
-    protected static void fill(final Quaternion[] data, final int first, final int limit, final int step, final NullaryFunction<Quaternion> supplier) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = supplier.invoke();
-        }
-    }
-
-    protected static void invoke(final Quaternion[] data, final int first, final int limit, final int step, final Access1D<Quaternion> left,
-            final BinaryFunction<Quaternion> function, final Access1D<Quaternion> right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(left.get(i), right.get(i));
-        }
-    }
-
-    protected static void invoke(final Quaternion[] data, final int first, final int limit, final int step, final Access1D<Quaternion> left,
-            final BinaryFunction<Quaternion> function, final Quaternion right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(left.get(i), right);
-        }
-    }
-
-    protected static void invoke(final Quaternion[] data, final int first, final int limit, final int step, final Access1D<Quaternion> value,
-            final ParameterFunction<Quaternion> function, final int aParam) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(value.get(i), aParam);
-        }
-    }
-
-    protected static void invoke(final Quaternion[] data, final int first, final int limit, final int step, final Access1D<Quaternion> value,
-            final UnaryFunction<Quaternion> function) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(value.get(i));
-        }
-    }
-
-    protected static void invoke(final Quaternion[] data, final int first, final int limit, final int step, final Quaternion left,
-            final BinaryFunction<Quaternion> function, final Access1D<Quaternion> right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(left, right.get(i));
-        }
-    }
-
-    protected static void invoke(final Quaternion[] data, final int first, final int limit, final int step, final VoidFunction<Quaternion> aVisitor) {
-        for (int i = first; i < limit; i += step) {
-            aVisitor.invoke(data[i]);
-        }
-    }
-
-    public final Quaternion[] data;
 
     protected QuaternionArray(final Quaternion[] data) {
 
-        super();
+        super(data);
 
-        this.data = data;
-    }
-
-    protected QuaternionArray(final int size) {
-
-        super();
-
-        data = new Quaternion[size];
-        this.fill(0, size, 1, Quaternion.ZERO);
     }
 
     @Override
@@ -187,63 +97,8 @@ public class QuaternionArray extends DenseArray<Quaternion> {
         return Arrays.hashCode(data);
     }
 
-    public Spliterator<Quaternion> spliterator() {
-        return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
-    }
-
-    protected final Quaternion[] copyOfData() {
-        return ArrayUtils.copyOf(data);
-    }
-
     @Override
-    protected double doubleValue(final int index) {
-        return data[index].doubleValue();
-    }
-
-    @Override
-    protected final void exchange(final int firstA, final int firstB, final int step, final int count) {
-        QuaternionArray.exchange(data, firstA, firstB, step, count);
-    }
-
-    protected void fill(final Access1D<?> value) {
-        QuaternionArray.fill(data, value);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final Access1D<Quaternion> left, final BinaryFunction<Quaternion> function,
-            final Access1D<Quaternion> right) {
-        QuaternionArray.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final Access1D<Quaternion> left, final BinaryFunction<Quaternion> function,
-            final Quaternion right) {
-        QuaternionArray.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final Quaternion left, final BinaryFunction<Quaternion> function,
-            final Access1D<Quaternion> right) {
-        QuaternionArray.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final int step, final Quaternion value) {
-        QuaternionArray.fill(data, first, limit, step, value);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<Quaternion> supplier) {
-        QuaternionArray.fill(data, first, limit, step, supplier);
-    }
-
-    @Override
-    protected final Quaternion get(final int index) {
-        return data[index];
-    }
-
-    @Override
-    protected final int indexOfLargest(final int first, final int limit, final int step) {
+    protected int indexOfLargest(final int first, final int limit, final int step) {
 
         int retVal = first;
         double tmpLargest = ZERO;
@@ -271,106 +126,18 @@ public class QuaternionArray extends DenseArray<Quaternion> {
     }
 
     @Override
-    protected void modify(final int index, final Access1D<Quaternion> left, final BinaryFunction<Quaternion> function) {
-        data[index] = function.invoke(left.get(index), data[index]);
-    }
-
-    @Override
-    protected void modify(final int index, final BinaryFunction<Quaternion> function, final Access1D<Quaternion> right) {
-        data[index] = function.invoke(data[index], right.get(index));
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final Access1D<Quaternion> left, final BinaryFunction<Quaternion> function) {
-        QuaternionArray.invoke(data, first, limit, step, left, function, this);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Quaternion> function, final Access1D<Quaternion> right) {
-        QuaternionArray.invoke(data, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Quaternion> function, final Quaternion right) {
-        QuaternionArray.invoke(data, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final Quaternion left, final BinaryFunction<Quaternion> function) {
-        QuaternionArray.invoke(data, first, limit, step, left, function, this);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final ParameterFunction<Quaternion> function, final int parameter) {
-        QuaternionArray.invoke(data, first, limit, step, this, function, parameter);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final UnaryFunction<Quaternion> function) {
-        QuaternionArray.invoke(data, first, limit, step, this, function);
-    }
-
-    @Override
-    protected void modify(final int index, final UnaryFunction<Quaternion> function) {
-        data[index] = function.invoke(data[index]);
-    }
-
-    /**
-     * @see org.ojalgo.array.BasicArray#searchAscending(java.lang.Number)
-     */
-    @Override
-    protected final int searchAscending(final Quaternion value) {
-        return Arrays.binarySearch(data, value);
-    }
-
-    @Override
-    protected final void set(final int index, final double value) {
+    protected void set(final int index, final double value) {
         data[index] = Quaternion.valueOf(value);
     }
 
     @Override
-    protected final void set(final int index, final Number value) {
+    protected void set(final int index, final Number value) {
         data[index] = TypeUtils.toQuaternion(value);
-    }
-
-    @Override
-    protected int size() {
-        return data.length;
-    }
-
-    @Override
-    protected final void sortAscending() {
-        Arrays.sort(data);
-    }
-
-    @Override
-    protected final Quaternion toScalar(final long index) {
-        return data[(int) index];
-    }
-
-    @Override
-    protected final void visit(final int first, final int limit, final int step, final VoidFunction<Quaternion> visitor) {
-        QuaternionArray.invoke(data, first, limit, step, visitor);
-    }
-
-    @Override
-    protected final void visit(final int index, final VoidFunction<Quaternion> visitor) {
-        visitor.invoke(data[index]);
-    }
-
-    @Override
-    boolean isPrimitive() {
-        return false;
     }
 
     @Override
     DenseArray<Quaternion> newInstance(final int capacity) {
         return new QuaternionArray(capacity);
-    }
-
-    @Override
-    protected void modifyOne(final int index, final UnaryFunction<Quaternion> function) {
-        data[index] = function.invoke(data[index]);
     }
 
 }

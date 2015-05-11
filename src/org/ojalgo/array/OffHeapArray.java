@@ -35,7 +35,6 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Scalar;
 
 import sun.misc.Unsafe;
 
@@ -44,10 +43,14 @@ import sun.misc.Unsafe;
  *
  * @author apete
  */
-@SuppressWarnings("restriction")
 public final class OffHeapArray extends BasicArray<Double> {
 
     static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
+
+        @Override
+        long getElementSize() {
+            return JavaType.DOUBLE.memory();
+        }
 
         @Override
         BasicArray<Double> makeStructuredZero(final long... structure) {
@@ -57,11 +60,6 @@ public final class OffHeapArray extends BasicArray<Double> {
         @Override
         BasicArray<Double> makeToBeFilled(final long... structure) {
             return new OffHeapArray(AccessUtils.count(structure));
-        }
-
-        @Override
-        long getElementSize() {
-            return JavaType.DOUBLE.memory();
         }
 
     };
@@ -118,8 +116,18 @@ public final class OffHeapArray extends BasicArray<Double> {
         this.fill(0L, myCount, 1L, value);
     }
 
+    public void fillAll(final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
     public void fillRange(final long first, final long limit, final Double value) {
         this.fill(first, limit, 1L, value);
+    }
+
+    public void fillRange(final long first, final long limit, final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
     }
 
     public Double get(final long index) {
@@ -132,6 +140,16 @@ public final class OffHeapArray extends BasicArray<Double> {
 
     public boolean isSmall(final long index, final double comparedTo) {
         return PrimitiveScalar.isSmall(UNSAFE.getDouble(this.address(index)), comparedTo);
+    }
+
+    public Iterator<Double> iterator() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void modifyOne(final long index, final UnaryFunction<Double> function) {
+        // TODO Auto-generated method stub
+
     }
 
     public void set(final long index, final double value) {
@@ -178,6 +196,12 @@ public final class OffHeapArray extends BasicArray<Double> {
         for (long a = tmpFirst; a < tmpLimit; a += tmpStep) {
             UNSAFE.putDouble(a, tmpValue);
         }
+    }
+
+    @Override
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
@@ -244,11 +268,6 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     @Override
-    protected Scalar<Double> toScalar(final long index) {
-        return new PrimitiveScalar(UNSAFE.getDouble(this.address(index)));
-    }
-
-    @Override
     protected void visit(final long first, final long limit, final long step, final VoidFunction<Double> visitor) {
         final long tmpFirst = this.address(first);
         final long tmpLimit = this.address(limit);
@@ -261,32 +280,6 @@ public final class OffHeapArray extends BasicArray<Double> {
     @Override
     boolean isPrimitive() {
         return true;
-    }
-
-    public Iterator<Double> iterator() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void fillAll(final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillRange(final long first, final long limit, final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void fill(final long first, final long limit, final long step, final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void modifyOne(final long index, final UnaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-
     }
 
 }

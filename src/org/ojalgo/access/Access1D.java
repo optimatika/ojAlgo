@@ -80,7 +80,15 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
         I copy(Number... source);
 
-        I makeRandom(long count, RandomNumber distribution);
+        I makeFilled(long count, NullaryFunction<?> supplier);
+
+        /**
+         * @deprecated v38 Use {@link #makeFilled(long, NullaryFunction)} instead.
+         */
+        @Deprecated
+        default I makeRandom(final long count, final RandomNumber distribution) {
+            return this.makeFilled(count, distribution);
+        }
 
         I makeZero(long count);
 

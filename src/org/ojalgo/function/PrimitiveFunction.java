@@ -36,6 +36,7 @@ import org.ojalgo.type.TypeUtils;
  */
 public final class PrimitiveFunction extends FunctionSet<Double> {
 
+    @FunctionalInterface
     public static interface Binary extends BinaryFunction<Double> {
 
         default Double invoke(final Double arg1, final Double arg2) {
@@ -44,6 +45,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     }
 
+    @FunctionalInterface
     public static interface Parameter extends ParameterFunction<Double> {
 
         default Double invoke(final Double arg, final int param) {
@@ -52,6 +54,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     }
 
+    @FunctionalInterface
     public static interface Unary extends UnaryFunction<Double> {
 
         default Double invoke(final Double arg) {

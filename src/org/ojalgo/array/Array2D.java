@@ -33,7 +33,6 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -153,14 +152,14 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.asArray2D(rows);
         }
 
-        public final Array2D<N> makeRandom(final long rows, final long columns, final RandomNumber distribution) {
+        public final Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(rows, columns);
 
             long tmpIndex = 0L;
             for (long j = 0L; j < columns; j++) {
                 for (long i = 0L; i < rows; i++) {
-                    tmpDelegate.set(tmpIndex++, distribution);
+                    tmpDelegate.set(tmpIndex++, supplier.get());
                 }
             }
 
@@ -580,10 +579,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
      */
     public double[][] toRawCopy() {
         return ArrayUtils.toRawCopyOf(this);
-    }
-
-    public Scalar<N> toScalar(final long row, final long column) {
-        return myDelegate.toScalar(row + (column * myRowsCount));
     }
 
     @Override

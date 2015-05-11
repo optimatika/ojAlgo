@@ -66,13 +66,13 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final SparseFactory<BigDecimal> BIG = new SparseFactory<BigDecimal>() {
 
         @Override
-        SparseArray<BigDecimal> make(final long count) {
-            return SparseArray.makeBig(count);
+        long getElementSize() {
+            return BigArray.ELEMENT_SIZE;
         }
 
         @Override
-        long getElementSize() {
-            return BigArray.ELEMENT_SIZE;
+        SparseArray<BigDecimal> make(final long count) {
+            return SparseArray.makeBig(count);
         }
 
     };
@@ -80,13 +80,13 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final SparseFactory<ComplexNumber> COMPLEX = new SparseFactory<ComplexNumber>() {
 
         @Override
-        SparseArray<ComplexNumber> make(final long count) {
-            return SparseArray.makeComplex(count);
+        long getElementSize() {
+            return ComplexArray.ELEMENT_SIZE;
         }
 
         @Override
-        long getElementSize() {
-            return ComplexArray.ELEMENT_SIZE;
+        SparseArray<ComplexNumber> make(final long count) {
+            return SparseArray.makeComplex(count);
         }
 
     };
@@ -94,13 +94,13 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final SparseFactory<Double> PRIMITIVE = new SparseFactory<Double>() {
 
         @Override
-        SparseArray<Double> make(final long count) {
-            return SparseArray.makePrimitive(count);
+        long getElementSize() {
+            return PrimitiveArray.ELEMENT_SIZE;
         }
 
         @Override
-        long getElementSize() {
-            return PrimitiveArray.ELEMENT_SIZE;
+        SparseArray<Double> make(final long count) {
+            return SparseArray.makePrimitive(count);
         }
 
     };
@@ -108,13 +108,13 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final SparseFactory<Quaternion> QUATERNION = new SparseFactory<Quaternion>() {
 
         @Override
-        SparseArray<Quaternion> make(final long count) {
-            return SparseArray.makeQuaternion(count);
+        long getElementSize() {
+            return QuaternionArray.ELEMENT_SIZE;
         }
 
         @Override
-        long getElementSize() {
-            return QuaternionArray.ELEMENT_SIZE;
+        SparseArray<Quaternion> make(final long count) {
+            return SparseArray.makeQuaternion(count);
         }
 
     };
@@ -122,13 +122,13 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final SparseFactory<RationalNumber> RATIONAL = new SparseFactory<RationalNumber>() {
 
         @Override
-        SparseArray<RationalNumber> make(final long count) {
-            return SparseArray.makeRational(count);
+        long getElementSize() {
+            return RationalArray.ELEMENT_SIZE;
         }
 
         @Override
-        long getElementSize() {
-            return RationalArray.ELEMENT_SIZE;
+        SparseArray<RationalNumber> make(final long count) {
+            return SparseArray.makeRational(count);
         }
 
     };
@@ -304,6 +304,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         } else {
             return true;
         }
+    }
+
+    public void modifyOne(final long index, final UnaryFunction<N> function) {
+        this.set(index, function.invoke(this.get(index)));
     }
 
     @Override
@@ -614,16 +618,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    protected Scalar<N> toScalar(final long index) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.toScalar(tmpIndex);
-        } else {
-            return myZeroScalar;
-        }
-    }
-
-    @Override
     protected void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
         boolean tmpOnlyOnce = true;
         for (int i = 0; i < myIndices.length; i++) {
@@ -661,10 +655,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     boolean isPrimitive() {
         return myValues.isPrimitive();
-    }
-
-    public void modifyOne(final long index, final UnaryFunction<N> function) {
-        this.set(index, function.invoke(this.get(index)));
     }
 
 }

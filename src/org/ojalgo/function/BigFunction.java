@@ -38,6 +38,7 @@ import java.math.RoundingMode;
  */
 public final class BigFunction extends FunctionSet<BigDecimal> {
 
+    @FunctionalInterface
     public static interface Binary extends BinaryFunction<BigDecimal> {
 
         default double invoke(final double arg1, final double arg2) {
@@ -46,6 +47,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     }
 
+    @FunctionalInterface
     public static interface Parameter extends ParameterFunction<BigDecimal> {
 
         default double invoke(final double arg, final int param) {
@@ -54,6 +56,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     }
 
+    @FunctionalInterface
     public static interface Unary extends UnaryFunction<BigDecimal> {
 
         default double invoke(final double arg) {

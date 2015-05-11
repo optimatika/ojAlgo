@@ -50,6 +50,16 @@ public class PrimitiveArray extends DenseArray<Double> {
     static final DenseFactory<Double> FACTORY = new DenseFactory<Double>() {
 
         @Override
+        public final BasicArray<Double> makeFilled(final long count, final NullaryFunction<?> supplier) {
+            final int tmpSize = (int) count;
+            final double[] tmpData = new double[tmpSize];
+            for (int i = 0; i < tmpSize; i++) {
+                tmpData[i] = supplier.doubleValue();
+            }
+            return new PrimitiveArray(tmpData);
+        }
+
+        @Override
         long getElementSize() {
             return ELEMENT_SIZE;
         }
@@ -390,10 +400,6 @@ public class PrimitiveArray extends DenseArray<Double> {
         PrimitiveArray.exchange(data, firstA, firstB, step, count);
     }
 
-    protected void fill(final Access1D<?> values) {
-        PrimitiveArray.fill(data, values);
-    }
-
     @Override
     protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         PrimitiveArray.invoke(data, first, limit, 1, left, function, right);
@@ -523,11 +529,6 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
-    protected final Scalar<Double> toScalar(final long index) {
-        return new PrimitiveScalar(data[(int) index]);
-    }
-
-    @Override
     protected final void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         PrimitiveArray.invoke(data, first, limit, step, visitor);
     }
@@ -549,11 +550,6 @@ public class PrimitiveArray extends DenseArray<Double> {
 
     OfDouble split() {
         return Spliterators.spliterator(data, 0);
-    }
-
-    @Override
-    protected void modifyOne(final int index, final UnaryFunction<Double> function) {
-        data[index] = function.invoke(data[index]);
     }
 
 }

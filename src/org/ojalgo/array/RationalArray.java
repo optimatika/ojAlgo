@@ -22,15 +22,7 @@
 package org.ojalgo.array;
 
 import java.util.Arrays;
-import java.util.Spliterator;
-import java.util.Spliterators;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -41,7 +33,7 @@ import org.ojalgo.type.TypeUtils;
  *
  * @author apete
  */
-public class RationalArray extends DenseArray<RationalNumber> {
+public class RationalArray extends ReferenceTypeArray<RationalNumber> {
 
     static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(RationalNumber.class);
 
@@ -75,99 +67,17 @@ public class RationalArray extends DenseArray<RationalNumber> {
         return new RationalArray(data);
     }
 
-    protected static void exchange(final RationalNumber[] aData, final int aFirstA, final int aFirstB, final int aStep, final int aCount) {
-
-        int tmpIndexA = aFirstA;
-        int tmpIndexB = aFirstB;
-
-        RationalNumber tmpVal;
-
-        for (int i = 0; i < aCount; i++) {
-
-            tmpVal = aData[tmpIndexA];
-            aData[tmpIndexA] = aData[tmpIndexB];
-            aData[tmpIndexB] = tmpVal;
-
-            tmpIndexA += aStep;
-            tmpIndexB += aStep;
-        }
-    }
-
-    protected static void fill(final RationalNumber[] aData, final Access1D<?> anArg) {
-        final int tmpLimit = (int) Math.min(aData.length, anArg.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            aData[i] = TypeUtils.toRationalNumber(anArg.get(i));
-        }
-    }
-
-    protected static void fill(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final RationalNumber value) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = value;
-        }
-    }
-
-    protected static void fill(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final NullaryFunction<RationalNumber> supplier) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = supplier.invoke();
-        }
-    }
-
-    protected static void invoke(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final Access1D<RationalNumber> aLeftArg,
-            final BinaryFunction<RationalNumber> aFunc, final Access1D<RationalNumber> aRightArg) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aFunc.invoke(aLeftArg.get(i), aRightArg.get(i));
-        }
-    }
-
-    protected static void invoke(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final Access1D<RationalNumber> aLeftArg,
-            final BinaryFunction<RationalNumber> aFunc, final RationalNumber aRightArg) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aFunc.invoke(aLeftArg.get(i), aRightArg);
-        }
-    }
-
-    protected static void invoke(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final Access1D<RationalNumber> anArg,
-            final ParameterFunction<RationalNumber> aFunc, final int aParam) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aFunc.invoke(anArg.get(i), aParam);
-        }
-    }
-
-    protected static void invoke(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final Access1D<RationalNumber> anArg,
-            final UnaryFunction<RationalNumber> aFunc) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aFunc.invoke(anArg.get(i));
-        }
-    }
-
-    protected static void invoke(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final RationalNumber aLeftArg,
-            final BinaryFunction<RationalNumber> aFunc, final Access1D<RationalNumber> aRightArg) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aData[i] = aFunc.invoke(aLeftArg, aRightArg.get(i));
-        }
-    }
-
-    protected static void invoke(final RationalNumber[] aData, final int aFirst, final int aLimit, final int aStep, final VoidFunction<RationalNumber> aVisitor) {
-        for (int i = aFirst; i < aLimit; i += aStep) {
-            aVisitor.invoke(aData[i]);
-        }
-    }
-
-    public final RationalNumber[] data;
-
     protected RationalArray(final int size) {
 
-        super();
+        super(new RationalNumber[size]);
 
-        data = new RationalNumber[size];
         this.fill(0, size, 1, RationalNumber.ZERO);
     }
 
     protected RationalArray(final RationalNumber[] data) {
 
-        super();
+        super(data);
 
-        this.data = data;
     }
 
     @Override
@@ -184,63 +94,8 @@ public class RationalArray extends DenseArray<RationalNumber> {
         return Arrays.hashCode(data);
     }
 
-    public Spliterator<RationalNumber> spliterator() {
-        return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
-    }
-
-    protected final RationalNumber[] copyOfData() {
-        return ArrayUtils.copyOf(data);
-    }
-
     @Override
-    protected final double doubleValue(final int index) {
-        return data[index].doubleValue();
-    }
-
-    @Override
-    protected final void exchange(final int firstA, final int firstB, final int step, final int count) {
-        RationalArray.exchange(data, firstA, firstB, step, count);
-    }
-
-    protected void fill(final Access1D<?> anArg) {
-        RationalArray.fill(data, anArg);
-    }
-
-    @Override
-    protected final void fill(final int aFirst, final int aLimit, final Access1D<RationalNumber> aLeftArg, final BinaryFunction<RationalNumber> aFunc,
-            final Access1D<RationalNumber> aRightArg) {
-        RationalArray.invoke(data, aFirst, aLimit, 1, aLeftArg, aFunc, aRightArg);
-    }
-
-    @Override
-    protected final void fill(final int aFirst, final int aLimit, final Access1D<RationalNumber> aLeftArg, final BinaryFunction<RationalNumber> aFunc,
-            final RationalNumber aRightArg) {
-        RationalArray.invoke(data, aFirst, aLimit, 1, aLeftArg, aFunc, aRightArg);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final int step, final RationalNumber value) {
-        RationalArray.fill(data, first, limit, step, value);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<RationalNumber> supplier) {
-        RationalArray.fill(data, first, limit, step, supplier);
-    }
-
-    @Override
-    protected final void fill(final int aFirst, final int aLimit, final RationalNumber aLeftArg, final BinaryFunction<RationalNumber> aFunc,
-            final Access1D<RationalNumber> aRightArg) {
-        RationalArray.invoke(data, aFirst, aLimit, 1, aLeftArg, aFunc, aRightArg);
-    }
-
-    @Override
-    protected final RationalNumber get(final int index) {
-        return data[index];
-    }
-
-    @Override
-    protected final int indexOfLargest(final int first, final int limit, final int step) {
+    protected int indexOfLargest(final int first, final int limit, final int step) {
 
         int retVal = first;
         RationalNumber tmpLargest = RationalNumber.ZERO;
@@ -268,108 +123,18 @@ public class RationalArray extends DenseArray<RationalNumber> {
     }
 
     @Override
-    protected void modify(final int index, final Access1D<RationalNumber> left, final BinaryFunction<RationalNumber> function) {
-        data[index] = function.invoke(left.get(index), data[index]);
-    }
-
-    @Override
-    protected void modify(final int index, final BinaryFunction<RationalNumber> function, final Access1D<RationalNumber> right) {
-        data[index] = function.invoke(data[index], right.get(index));
-    }
-
-    @Override
-    protected final void modify(final int aFirst, final int aLimit, final int aStep, final Access1D<RationalNumber> aLeftArg,
-            final BinaryFunction<RationalNumber> aFunc) {
-        RationalArray.invoke(data, aFirst, aLimit, aStep, aLeftArg, aFunc, this);
-    }
-
-    @Override
-    protected final void modify(final int aFirst, final int aLimit, final int aStep, final BinaryFunction<RationalNumber> aFunc,
-            final Access1D<RationalNumber> aRightArg) {
-        RationalArray.invoke(data, aFirst, aLimit, aStep, this, aFunc, aRightArg);
-    }
-
-    @Override
-    protected final void modify(final int aFirst, final int aLimit, final int aStep, final BinaryFunction<RationalNumber> aFunc, final RationalNumber aRightArg) {
-        RationalArray.invoke(data, aFirst, aLimit, aStep, this, aFunc, aRightArg);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final ParameterFunction<RationalNumber> func, final int param) {
-        RationalArray.invoke(data, first, limit, step, this, func, param);
-    }
-
-    @Override
-    protected final void modify(final int aFirst, final int aLimit, final int aStep, final RationalNumber aLeftArg, final BinaryFunction<RationalNumber> aFunc) {
-        RationalArray.invoke(data, aFirst, aLimit, aStep, aLeftArg, aFunc, this);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final UnaryFunction<RationalNumber> func) {
-        RationalArray.invoke(data, first, limit, step, this, func);
-    }
-
-    @Override
-    protected void modify(final int index, final UnaryFunction<RationalNumber> func) {
-        data[index] = func.invoke(data[index]);
-    }
-
-    /**
-     * @see org.ojalgo.array.BasicArray#searchAscending(java.lang.Number)
-     */
-    @Override
-    protected final int searchAscending(final RationalNumber aNmbr) {
-        return Arrays.binarySearch(data, aNmbr);
-    }
-
-    @Override
-    protected final void set(final int index, final double value) {
+    protected void set(final int index, final double value) {
         data[index] = new RationalNumber(value);
     }
 
     @Override
-    protected final void set(final int index, final Number value) {
+    protected void set(final int index, final Number value) {
         data[index] = TypeUtils.toRationalNumber(value);
-    }
-
-    @Override
-    protected int size() {
-        return data.length;
-    }
-
-    @Override
-    protected final void sortAscending() {
-        Arrays.sort(data);
-    }
-
-    @Override
-    protected final RationalNumber toScalar(final long index) {
-        return data[(int) index];
-    }
-
-    @Override
-    protected final void visit(final int first, final int limit, final int step, final VoidFunction<RationalNumber> visitor) {
-        RationalArray.invoke(data, first, limit, step, visitor);
-    }
-
-    @Override
-    protected final void visit(final int index, final VoidFunction<RationalNumber> visitor) {
-        visitor.invoke(data[index]);
-    }
-
-    @Override
-    boolean isPrimitive() {
-        return false;
     }
 
     @Override
     DenseArray<RationalNumber> newInstance(final int capacity) {
         return new RationalArray(capacity);
-    }
-
-    @Override
-    protected void modifyOne(final int index, final UnaryFunction<RationalNumber> function) {
-        data[index] = function.invoke(data[index]);
     }
 
 }

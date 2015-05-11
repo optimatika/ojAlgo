@@ -25,15 +25,7 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Spliterator;
-import java.util.Spliterators;
 
-import org.ojalgo.access.Access1D;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.ParameterFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
@@ -44,7 +36,7 @@ import org.ojalgo.type.TypeUtils;
  *
  * @author apete
  */
-public class BigArray extends DenseArray<BigDecimal> {
+public class BigArray extends ReferenceTypeArray<BigDecimal> {
 
     static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(BigDecimal.class);
 
@@ -79,98 +71,16 @@ public class BigArray extends DenseArray<BigDecimal> {
         return new BigArray(data);
     }
 
-    protected static void exchange(final BigDecimal[] data, final int aFirstA, final int aFirstB, final int step, final int aCount) {
-
-        int tmpIndexA = aFirstA;
-        int tmpIndexB = aFirstB;
-
-        BigDecimal tmpVal;
-
-        for (int i = 0; i < aCount; i++) {
-
-            tmpVal = data[tmpIndexA];
-            data[tmpIndexA] = data[tmpIndexB];
-            data[tmpIndexB] = tmpVal;
-
-            tmpIndexA += step;
-            tmpIndexB += step;
-        }
-    }
-
-    protected static void fill(final BigDecimal[] data, final Access1D<?> values) {
-        final int tmpLimit = (int) Math.min(data.length, values.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            data[i] = TypeUtils.toBigDecimal(values.get(i));
-        }
-    }
-
-    protected static void fill(final BigDecimal[] data, final int first, final int limit, final int step, final BigDecimal number) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = number;
-        }
-    }
-
-    protected static void fill(final BigDecimal[] data, final int first, final int limit, final int step, final NullaryFunction<BigDecimal> supplier) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = supplier.invoke();
-        }
-    }
-
-    protected static void invoke(final BigDecimal[] data, final int first, final int limit, final int step, final Access1D<BigDecimal> left,
-            final BinaryFunction<BigDecimal> function, final Access1D<BigDecimal> right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(left.get(i), right.get(i));
-        }
-    }
-
-    protected static void invoke(final BigDecimal[] data, final int first, final int limit, final int step, final Access1D<BigDecimal> left,
-            final BinaryFunction<BigDecimal> function, final BigDecimal right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(left.get(i), right);
-        }
-    }
-
-    protected static void invoke(final BigDecimal[] data, final int first, final int limit, final int step, final Access1D<BigDecimal> values,
-            final ParameterFunction<BigDecimal> function, final int aParam) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(values.get(i), aParam);
-        }
-    }
-
-    protected static void invoke(final BigDecimal[] data, final int first, final int limit, final int step, final Access1D<BigDecimal> values,
-            final UnaryFunction<BigDecimal> function) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(values.get(i));
-        }
-    }
-
-    protected static void invoke(final BigDecimal[] data, final int first, final int limit, final int step, final BigDecimal left,
-            final BinaryFunction<BigDecimal> function, final Access1D<BigDecimal> right) {
-        for (int i = first; i < limit; i += step) {
-            data[i] = function.invoke(left, right.get(i));
-        }
-    }
-
-    protected static void invoke(final BigDecimal[] data, final int first, final int limit, final int step, final VoidFunction<BigDecimal> visitor) {
-        for (int i = first; i < limit; i += step) {
-            visitor.invoke(data[i]);
-        }
-    }
-
-    public final BigDecimal[] data;
-
     protected BigArray(final BigDecimal[] data) {
 
-        super();
+        super(data);
 
-        this.data = data;
     }
 
     protected BigArray(final int size) {
 
-        super();
+        super(new BigDecimal[size]);
 
-        data = new BigDecimal[size];
         this.fill(0, size, 1, ZERO);
     }
 
@@ -188,63 +98,8 @@ public class BigArray extends DenseArray<BigDecimal> {
         return Arrays.hashCode(data);
     }
 
-    public Spliterator<BigDecimal> spliterator() {
-        return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
-    }
-
-    protected final BigDecimal[] copyOfData() {
-        return ArrayUtils.copyOf(data);
-    }
-
     @Override
-    protected final double doubleValue(final int index) {
-        return data[index].doubleValue();
-    }
-
-    @Override
-    protected final void exchange(final int firstA, final int firstB, final int step, final int count) {
-        BigArray.exchange(data, firstA, firstB, step, count);
-    }
-
-    protected void fill(final Access1D<?> values) {
-        BigArray.fill(data, values);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final Access1D<BigDecimal> left, final BinaryFunction<BigDecimal> function,
-            final Access1D<BigDecimal> right) {
-        BigArray.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final Access1D<BigDecimal> left, final BinaryFunction<BigDecimal> function,
-            final BigDecimal right) {
-        BigArray.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final BigDecimal left, final BinaryFunction<BigDecimal> function,
-            final Access1D<BigDecimal> right) {
-        BigArray.invoke(data, first, limit, 1, left, function, right);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final int step, final BigDecimal value) {
-        BigArray.fill(data, first, limit, step, value);
-    }
-
-    @Override
-    protected final void fill(final int first, final int limit, final int step, final NullaryFunction<BigDecimal> supplier) {
-        BigArray.fill(data, first, limit, step, supplier);
-    }
-
-    @Override
-    protected final BigDecimal get(final int index) {
-        return data[index];
-    }
-
-    @Override
-    protected final int indexOfLargest(final int first, final int limit, final int step) {
+    protected int indexOfLargest(final int first, final int limit, final int step) {
 
         int retVal = first;
         BigDecimal tmpLargest = ZERO;
@@ -272,101 +127,13 @@ public class BigArray extends DenseArray<BigDecimal> {
     }
 
     @Override
-    protected void modify(final int index, final Access1D<BigDecimal> left, final BinaryFunction<BigDecimal> function) {
-        data[index] = function.invoke(left.get(index), data[index]);
-    }
-
-    @Override
-    protected void modify(final int index, final BinaryFunction<BigDecimal> function, final Access1D<BigDecimal> right) {
-        data[index] = function.invoke(data[index], right.get(index));
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final Access1D<BigDecimal> left, final BinaryFunction<BigDecimal> function) {
-        BigArray.invoke(data, first, limit, step, left, function, this);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final BigDecimal left, final BinaryFunction<BigDecimal> function) {
-        BigArray.invoke(data, first, limit, step, left, function, this);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<BigDecimal> function, final Access1D<BigDecimal> right) {
-        BigArray.invoke(data, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final BinaryFunction<BigDecimal> function, final BigDecimal right) {
-        BigArray.invoke(data, first, limit, step, this, function, right);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final ParameterFunction<BigDecimal> function, final int parameter) {
-        BigArray.invoke(data, first, limit, step, this, function, parameter);
-    }
-
-    @Override
-    protected final void modify(final int first, final int limit, final int step, final UnaryFunction<BigDecimal> function) {
-        BigArray.invoke(data, first, limit, step, this, function);
-    }
-
-    @Override
-    protected void modify(final int index, final UnaryFunction<BigDecimal> function) {
-        data[index] = function.invoke(data[index]);
-    }
-
-    @Override
-    protected void modifyOne(final int index, final UnaryFunction<BigDecimal> function) {
-        data[index] = function.invoke(data[index]);
-    }
-
-    /**
-     * @see org.ojalgo.array.BasicArray#searchAscending(java.lang.Number)
-     */
-    @Override
-    protected final int searchAscending(final BigDecimal number) {
-        return Arrays.binarySearch(data, number);
-    }
-
-    @Override
-    protected final void set(final int index, final double value) {
+    protected void set(final int index, final double value) {
         data[index] = new BigDecimal(value);
     }
 
     @Override
-    protected final void set(final int index, final Number value) {
+    protected void set(final int index, final Number value) {
         data[index] = TypeUtils.toBigDecimal(value);
-    }
-
-    @Override
-    protected int size() {
-        return data.length;
-    }
-
-    @Override
-    protected final void sortAscending() {
-        Arrays.sort(data);
-    }
-
-    @Override
-    protected final Scalar<BigDecimal> toScalar(final long index) {
-        return new BigScalar(data[(int) index]);
-    }
-
-    @Override
-    protected final void visit(final int first, final int limit, final int step, final VoidFunction<BigDecimal> visitor) {
-        BigArray.invoke(data, first, limit, step, visitor);
-    }
-
-    @Override
-    protected final void visit(final int index, final VoidFunction<BigDecimal> visitor) {
-        visitor.invoke(data[index]);
-    }
-
-    @Override
-    boolean isPrimitive() {
-        return false;
     }
 
     @Override

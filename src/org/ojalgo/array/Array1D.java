@@ -37,7 +37,6 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -105,12 +104,12 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
             return tmpDelegate.asArray1D();
         }
 
-        public final Array1D<N> makeRandom(final long count, final RandomNumber distribution) {
+        public final Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
 
             final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(count);
 
             for (int i = 0; i < count; i++) {
-                tmpDelegate.set(i, distribution);
+                tmpDelegate.set(i, supplier.get());
             }
 
             return tmpDelegate.asArray1D();
@@ -601,10 +600,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         }
 
         return retVal;
-    }
-
-    public Scalar<N> toScalar(final int index) {
-        return myDelegate.toScalar(myFirst + (myStep * index));
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

@@ -52,7 +52,6 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -175,21 +174,21 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
             return retVal;
         }
 
-        public Householder<Double> makeHouseholder(final int length) {
-            return new Householder.Primitive(length);
-        }
-
-        public RawStore makeRandom(final long rows, final long columns, final RandomNumber distribution) {
+        public RawStore makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final double[][] retVal = new double[(int) rows][(int) columns];
 
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
-                    retVal[i][j] = distribution.doubleValue();
+                    retVal[i][j] = supplier.doubleValue();
                 }
             }
 
             return new RawStore(retVal);
+        }
+
+        public Householder<Double> makeHouseholder(final int length) {
+            return new Householder.Primitive(length);
         }
 
         public Rotation<Double> makeRotation(final int low, final int high, final double cos, final double sin) {

@@ -447,15 +447,15 @@ public abstract class ArrayUtils {
             }
 
             public double doubleValue(final long index) {
-                return target[AccessUtils.row((int) index, target.length)][AccessUtils.column((int) index, target.length)].doubleValue();
+                return this.get(index).doubleValue();
             }
 
             public double doubleValue(final long row, final long column) {
-                return target[(int) row][(int) column].doubleValue();
+                return this.get(row, column).doubleValue();
             }
 
             public N get(final long index) {
-                throw new RuntimeException("Can't do this!");
+                return target[AccessUtils.row((int) index, target.length)][AccessUtils.column((int) index, target.length)];
             }
 
             public N get(final long row, final long column) {

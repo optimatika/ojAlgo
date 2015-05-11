@@ -29,13 +29,13 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Builder;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.matrix.store.AboveBelowStore;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.LeftRightStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.ZeroStore;
-import org.ojalgo.random.RandomNumber;
 
 /**
  * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix}
@@ -47,8 +47,8 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
     final class MatrixBuilder implements Access2D.Builder<I> {
 
-        private final PhysicalStore<N> myPhysicalStore;
         private final PhysicalStore.Factory<N, ?> myFactory;
+        private final PhysicalStore<N> myPhysicalStore;
         private boolean mySafe = true;
 
         @SuppressWarnings("unused")
@@ -238,8 +238,8 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         return this.instantiate(retVal);
     }
 
-    public I makeRandom(final long rows, final long columns, final RandomNumber distribution) {
-        return this.instantiate(myPhysicalFactory.makeRandom(rows, columns, distribution));
+    public I makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
+        return this.instantiate(myPhysicalFactory.makeFilled(rows, columns, supplier));
     }
 
     public I makeZero(final long rows, final long columns) {
@@ -254,6 +254,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         return this.instantiate(myPhysicalFactory.rows(source));
     }
 
+    @SuppressWarnings("unchecked")
     public I rows(final List<? extends Number>... source) {
         return this.instantiate(myPhysicalFactory.rows(source));
     }

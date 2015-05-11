@@ -24,6 +24,7 @@ package org.ojalgo.access;
 import java.math.BigDecimal;
 
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -279,6 +280,92 @@ public abstract class AccessUtils {
 
             public Double get(final long[] reference) {
                 return access.doubleValue(reference);
+            }
+
+            public long[] structure() {
+                return access.structure();
+            }
+
+        };
+    }
+
+    public static Access1D<Quaternion> asQuaternion1D(final Access1D<?> access) {
+        return new Access1D<Quaternion>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public Quaternion get(final long index) {
+                return TypeUtils.toQuaternion(access.get(index));
+            }
+
+        };
+    }
+
+    public static Access2D<Quaternion> asQuaternion2D(final Access2D<?> access) {
+        return new Access2D<Quaternion>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public long countColumns() {
+                return access.countColumns();
+            }
+
+            public long countRows() {
+                return access.countRows();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public double doubleValue(final long row, final long column) {
+                return access.doubleValue(row, column);
+            }
+
+            public Quaternion get(final long index) {
+                return TypeUtils.toQuaternion(access.get(index));
+            }
+
+            public Quaternion get(final long row, final long column) {
+                return TypeUtils.toQuaternion(access.get(row, column));
+            }
+
+        };
+    }
+
+    public static AccessAnyD<Quaternion> asQuaternionAnyD(final AccessAnyD<?> access) {
+        return new AccessAnyD<Quaternion>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public long count(final int dimension) {
+                return access.count(dimension);
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public double doubleValue(final long[] reference) {
+                return access.doubleValue(reference);
+            }
+
+            public Quaternion get(final long index) {
+                return TypeUtils.toQuaternion(access.get(index));
+            }
+
+            public Quaternion get(final long[] reference) {
+                return TypeUtils.toQuaternion(access.get(reference));
             }
 
             public long[] structure() {

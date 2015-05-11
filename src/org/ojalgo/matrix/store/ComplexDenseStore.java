@@ -48,7 +48,6 @@ import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
@@ -192,11 +191,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             return retVal;
         }
 
-        public Householder.Complex makeHouseholder(final int length) {
-            return new Householder.Complex(length);
-        }
-
-        public ComplexDenseStore makeRandom(final long rows, final long columns, final RandomNumber distribution) {
+        public ComplexDenseStore makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final int tmpRowDim = (int) rows;
             final int tmpColDim = (int) columns;
@@ -206,10 +201,14 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             final ComplexNumber[] tmpData = new ComplexNumber[tmpLength];
 
             for (int i = 0; i < tmpLength; i++) {
-                tmpData[i] = TypeUtils.toComplexNumber(distribution.doubleValue());
+                tmpData[i] = TypeUtils.toComplexNumber(supplier.get());
             }
 
             return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public Householder.Complex makeHouseholder(final int length) {
+            return new Householder.Complex(length);
         }
 
         public Rotation.Complex makeRotation(final int low, final int high, final ComplexNumber cos, final ComplexNumber sin) {
@@ -590,10 +589,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myUtility.exchangeColumns(colA, colB);
     }
 
-    public void exchangeRows(final int rowA, final int rowB) {
-        myUtility.exchangeRows(rowA, rowB);
-    }
-
     public void exchangeHermitian(final int indexA, final int indexB) {
 
         final int tmpMin = Math.min(indexA, indexB);
@@ -621,6 +616,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             this.set(i, tmpMin, this.get(i, tmpMax));
             this.set(i, tmpMax, tmpVal);
         }
+    }
+
+    public void exchangeRows(final int rowA, final int rowB) {
+        myUtility.exchangeRows(rowA, rowB);
     }
 
     public PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> factory() {
@@ -826,14 +825,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return myColDim;
     }
 
-    public int indexOfLargestInColumn(final int row, final int column) {
-        return (int) myUtility.indexOfLargestInColumn(row, column);
-    }
-
-    public int indexOfLargestInDiagonal(final int row, final int column) {
-        return (int) myUtility.indexOfLargestInDiagonal(row, column);
-    }
-
     public int getMaxDim() {
         return Math.max(myRowDim, myColDim);
     }
@@ -849,6 +840,14 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     @Override
     public int hashCode() {
         return MatrixUtils.hashCode(this);
+    }
+
+    public int indexOfLargestInColumn(final int row, final int column) {
+        return (int) myUtility.indexOfLargestInColumn(row, column);
+    }
+
+    public int indexOfLargestInDiagonal(final int row, final int column) {
+        return (int) myUtility.indexOfLargestInDiagonal(row, column);
     }
 
     public boolean isAbsolute(final long row, final long column) {
@@ -1046,7 +1045,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public Scalar<ComplexNumber> toScalar(final long row, final long column) {
-        return myUtility.toScalar(row, column);
+        return myUtility.get(row, column);
     }
 
     @Override

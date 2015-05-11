@@ -39,7 +39,6 @@ import org.ojalgo.netio.ASCII;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.scalar.Scalar;
 
 /**
  * <p>
@@ -318,8 +317,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     protected abstract void modify(long first, long limit, long step, BinaryFunction<N> function, Access1D<N> right);
 
     protected abstract void modify(long first, long limit, long step, UnaryFunction<N> function);
-
-    protected abstract Scalar<N> toScalar(long index);
 
     protected abstract void visit(long first, long limit, long step, VoidFunction<N> visitor);
 

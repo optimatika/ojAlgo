@@ -211,7 +211,7 @@ public abstract class BaseSolver extends GenericSolver {
         }
 
         /**
-         * [AI][X] <= [BI]
+         * [AI][X] &lt;= [BI]
          */
         public MatrixStore<Double> getAI() {
             if (myAIbuilder != null) {
@@ -263,7 +263,7 @@ public abstract class BaseSolver extends GenericSolver {
         }
 
         /**
-         * [AI][X] <= [BI]
+         * [AI][X] &lt;= [BI]
          */
         public MatrixStore<Double> getBI() {
             if (myBIbuilder != null) {

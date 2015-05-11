@@ -51,7 +51,6 @@ import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
@@ -191,11 +190,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
             return retVal;
         }
 
-        public Householder.Big makeHouseholder(final int length) {
-            return new Householder.Big(length);
-        }
-
-        public BigDenseStore makeRandom(final long rows, final long columns, final RandomNumber distribution) {
+        public BigDenseStore makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
             final int tmpRowDim = (int) rows;
             final int tmpColDim = (int) columns;
@@ -205,10 +200,14 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
             final BigDecimal[] tmpData = new BigDecimal[tmpLength];
 
             for (int i = 0; i < tmpLength; i++) {
-                tmpData[i] = TypeUtils.toBigDecimal(distribution.doubleValue());
+                tmpData[i] = TypeUtils.toBigDecimal(supplier.get());
             }
 
             return new BigDenseStore(tmpRowDim, tmpColDim, tmpData);
+        }
+
+        public Householder.Big makeHouseholder(final int length) {
+            return new Householder.Big(length);
         }
 
         public Rotation.Big makeRotation(final int low, final int high, final BigDecimal cos, final BigDecimal sin) {
@@ -589,10 +588,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myUtility.exchangeColumns(colA, colB);
     }
 
-    public void exchangeRows(final int rowA, final int rowB) {
-        myUtility.exchangeRows(rowA, rowB);
-    }
-
     public void exchangeHermitian(final int indexA, final int indexB) {
 
         final int tmpMin = Math.min(indexA, indexB);
@@ -620,6 +615,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
             this.set(i, tmpMin, this.get(i, tmpMax));
             this.set(i, tmpMax, tmpVal);
         }
+    }
+
+    public void exchangeRows(final int rowA, final int rowB) {
+        myUtility.exchangeRows(rowA, rowB);
     }
 
     public PhysicalStore.Factory<BigDecimal, BigDenseStore> factory() {

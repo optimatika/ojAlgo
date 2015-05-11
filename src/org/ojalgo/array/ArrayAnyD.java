@@ -33,7 +33,6 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -63,13 +62,13 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
             return tmpDelegate.asArrayAnyD(tmpStructure);
         }
 
-        public final ArrayAnyD<N> makeRandom(final long[] structure, final RandomNumber distribution) {
+        public final ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
 
             final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(structure);
 
             final long tmpCount = AccessUtils.count(structure);
             for (long index = 0L; index < tmpCount; index++) {
-                tmpDelegate.set(index, distribution);
+                tmpDelegate.set(index, supplier.get());
             }
 
             return tmpDelegate.asArrayAnyD(structure);
@@ -336,10 +335,6 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public long[] structure() {
         return myStructure;
-    }
-
-    public Scalar<N> toScalar(final long... reference) {
-        return myDelegate.toScalar(AccessUtils.index(myStructure, reference));
     }
 
     @Override
