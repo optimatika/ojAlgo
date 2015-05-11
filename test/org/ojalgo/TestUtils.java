@@ -232,8 +232,8 @@ public abstract class TestUtils {
 
         if ((expected instanceof ComplexNumber) || (actual instanceof ComplexNumber)) {
 
-            final ComplexNumber tmpExpected = TypeUtils.toComplexNumber(expected);
-            final ComplexNumber tmpActual = TypeUtils.toComplexNumber(actual);
+            final ComplexNumber tmpExpected = ComplexNumber.valueOf(expected);
+            final ComplexNumber tmpActual = ComplexNumber.valueOf(actual);
 
             if (!!context.isDifferent(tmpExpected.getReal(), tmpActual.getReal())) {
                 Assert.failNotEquals(message + " (real)", expected, actual);
@@ -244,8 +244,8 @@ public abstract class TestUtils {
 
         } else if ((expected instanceof Quaternion) || (actual instanceof Quaternion)) {
 
-            final Quaternion tmpExpected = TypeUtils.toQuaternion(expected);
-            final Quaternion tmpActual = TypeUtils.toQuaternion(actual);
+            final Quaternion tmpExpected = Quaternion.valueOf(expected);
+            final Quaternion tmpActual = Quaternion.valueOf(actual);
 
             if (!!context.isDifferent(tmpExpected.scalar(), tmpActual.scalar())) {
                 Assert.failNotEquals(message + " (scalar)", expected, actual);

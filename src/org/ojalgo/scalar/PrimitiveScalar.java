@@ -41,11 +41,11 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
         }
 
         public PrimitiveScalar convert(final double value) {
-            return new PrimitiveScalar(value);
+            return PrimitiveScalar.valueOf(value);
         }
 
         public PrimitiveScalar convert(final Number number) {
-            return new PrimitiveScalar(number.doubleValue());
+            return PrimitiveScalar.valueOf(number);
         }
 
         public PrimitiveScalar one() {
@@ -82,24 +82,50 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
         return PrimitiveScalar.CONTEXT.isSmall(comparedTo, value);
     }
 
-    private final double myValue;
-
     public static PrimitiveScalar valueOf(final double value) {
         return new PrimitiveScalar(value);
     }
 
-    public PrimitiveScalar(final double aVal) {
+    public static PrimitiveScalar valueOf(final Number number) {
 
-        super();
+        if (number != null) {
 
-        myValue = aVal;
+            if (number instanceof PrimitiveScalar) {
+
+                return (PrimitiveScalar) number;
+
+            } else {
+
+                return new PrimitiveScalar(number.doubleValue());
+            }
+
+        } else {
+
+            return ZERO;
+        }
     }
 
-    public PrimitiveScalar(final Number aNmbr) {
+    private final double myValue;
+
+    public PrimitiveScalar(final double value) {
 
         super();
 
-        myValue = aNmbr.doubleValue();
+        myValue = value;
+    }
+
+    public PrimitiveScalar(final Number number) {
+
+        super();
+
+        myValue = number.doubleValue();
+    }
+
+    public PrimitiveScalar(final Scalar<?> scalar) {
+
+        super();
+
+        myValue = scalar.doubleValue();
     }
 
     @SuppressWarnings("unused")

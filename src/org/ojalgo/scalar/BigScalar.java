@@ -43,11 +43,11 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         }
 
         public BigScalar convert(final double value) {
-            return new BigScalar(value);
+            return BigScalar.valueOf(value);
         }
 
         public BigScalar convert(final Number number) {
-            return new BigScalar(TypeUtils.toBigDecimal(number));
+            return BigScalar.valueOf(number);
         }
 
         public BigScalar one() {
@@ -77,6 +77,10 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return new BigScalar(BigDecimal.valueOf(value));
     }
 
+    public static BigScalar valueOf(final Number number) {
+        return new BigScalar(TypeUtils.toBigDecimal(number));
+    }
+
     private final BigDecimal myNumber;
 
     public BigScalar(final BigDecimal number) {
@@ -86,14 +90,14 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         myNumber = number;
     }
 
-    public BigScalar(final Number aNmbr) {
+    public BigScalar(final Scalar<?> scalar) {
 
         super();
 
-        myNumber = TypeUtils.toBigDecimal(aNmbr);
+        myNumber = scalar.toBigDecimal();
     }
 
-    private BigScalar() {
+    BigScalar() {
 
         super();
 

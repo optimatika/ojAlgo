@@ -129,7 +129,7 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
 
     @Override
     protected void set(final int index, final Number value) {
-        data[index] = TypeUtils.toRationalNumber(value);
+        data[index] = RationalNumber.valueOf(value);
     }
 
     @Override

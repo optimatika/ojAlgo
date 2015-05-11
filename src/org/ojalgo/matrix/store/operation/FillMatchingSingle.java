@@ -49,7 +49,7 @@ public final class FillMatchingSingle extends MatrixOperation {
         int tmpIndex = structure * firstColumn;
         for (int j = firstColumn; j < limitColumn; j++) {
             for (int i = 0; i < structure; i++) {
-                data[tmpIndex] = TypeUtils.toComplexNumber(source.get(tmpIndex));
+                data[tmpIndex] = ComplexNumber.valueOf(source.get(tmpIndex));
                 tmpIndex++;
             }
         }

@@ -188,23 +188,12 @@ public abstract class TypeUtils {
         return context.enforce(TypeUtils.toBigDecimal(number));
     }
 
+    /**
+     * @deprecated v38 Use {@link ComplexNumber#valueOf(Number)} instead.
+     */
+    @Deprecated
     public static ComplexNumber toComplexNumber(final Number number) {
-
-        ComplexNumber retVal = ComplexNumber.ZERO;
-
-        if (number != null) {
-
-            if (number instanceof ComplexNumber) {
-
-                retVal = (ComplexNumber) number;
-
-            } else {
-
-                retVal = ComplexNumber.valueOf(number.doubleValue());
-            }
-        }
-
-        return retVal;
+        return ComplexNumber.valueOf(number);
     }
 
     /**
@@ -214,46 +203,20 @@ public abstract class TypeUtils {
         return HEX + Integer.toHexString(aColor.getRGB()).substring(2);
     }
 
+    /**
+     * @deprecated v38 Use {@link Quaternion#valueOf(Number)} instead.
+     */
+    @Deprecated
     public static Quaternion toQuaternion(final Number number) {
-
-        Quaternion retVal = Quaternion.ZERO;
-
-        if (number != null) {
-
-            if (number instanceof Quaternion) {
-
-                retVal = (Quaternion) number;
-
-            } else if (number instanceof ComplexNumber) {
-
-                retVal = Quaternion.valueOf((ComplexNumber) number);
-
-            } else {
-
-                retVal = new Quaternion(number.doubleValue());
-            }
-        }
-
-        return retVal;
+        return Quaternion.valueOf(number);
     }
 
+    /**
+     * @deprecated v38 Use {@link RationalNumber#valueOf(Number)} instead.
+     */
+    @Deprecated
     public static RationalNumber toRationalNumber(final Number number) {
-
-        RationalNumber retVal = RationalNumber.ZERO;
-
-        if (number != null) {
-
-            if (number instanceof RationalNumber) {
-
-                retVal = (RationalNumber) number;
-
-            } else {
-
-                retVal = new RationalNumber(TypeUtils.toBigDecimal(number));
-            }
-        }
-
-        return retVal;
+        return RationalNumber.valueOf(number);
     }
 
     static boolean isSameDate(final Calendar aCal1, final Calendar aCal2) {

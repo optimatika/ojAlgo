@@ -95,7 +95,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = TypeUtils.toComplexNumber(tmpColumn.get(i));
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf((Number) tmpColumn.get(i));
                 }
             }
 
@@ -113,7 +113,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = TypeUtils.toComplexNumber(tmpColumn[i]);
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf((Number) tmpColumn[i]);
                 }
             }
 
@@ -131,7 +131,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = TypeUtils.toComplexNumber(tmpColumn.get(i));
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpColumn.get(i));
                 }
             }
 
@@ -149,7 +149,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = TypeUtils.toComplexNumber(tmpColumn[i]);
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpColumn[i]);
                 }
             }
 
@@ -201,7 +201,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             final ComplexNumber[] tmpData = new ComplexNumber[tmpLength];
 
             for (int i = 0; i < tmpLength; i++) {
-                tmpData[i] = TypeUtils.toComplexNumber(supplier.get());
+                tmpData[i] = ComplexNumber.valueOf((Number) supplier.get());
             }
 
             return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
@@ -234,7 +234,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = TypeUtils.toComplexNumber(tmpRow.get(j));
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf((Number) tmpRow.get(j));
                 }
             }
 
@@ -252,7 +252,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = TypeUtils.toComplexNumber(tmpRow[j]);
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf((Number) tmpRow[j]);
                 }
             }
 
@@ -270,7 +270,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = TypeUtils.toComplexNumber(tmpRow.get(j));
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpRow.get(j));
                 }
             }
 
@@ -288,7 +288,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = TypeUtils.toComplexNumber(tmpRow[j]);
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpRow[j]);
                 }
             }
 

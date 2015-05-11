@@ -50,8 +50,8 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
         for (int i = 0; i < tmpRowDim; i++) {
 
             ComplexNumber tmpX = ComplexNumber.ONE;
-            final ComplexNumber tmpXfactor = TypeUtils.toComplexNumber(x.get(i));
-            final ComplexNumber tmpY = TypeUtils.toComplexNumber(y.get(i));
+            final ComplexNumber tmpXfactor = ComplexNumber.valueOf((Number) x.get(i));
+            final ComplexNumber tmpY = ComplexNumber.valueOf((Number) y.get(i));
 
             for (int j = 0; j < tmpColDim; j++) {
                 tmpBody.set(i, j, tmpX);
@@ -91,7 +91,7 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
     public void set(final Access1D<?> someCoefficient) {
         final int tmpLimit = (int) Math.min(this.size(), someCoefficient.count());
         for (int p = 0; p < tmpLimit; p++) {
-            this.set(p, TypeUtils.toComplexNumber(someCoefficient.get(p)));
+            this.set(p, ComplexNumber.valueOf((Number) someCoefficient.get(p)));
         }
     }
 

@@ -132,7 +132,7 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
 
     @Override
     protected void set(final int index, final Number value) {
-        data[index] = TypeUtils.toComplexNumber(value);
+        data[index] = ComplexNumber.valueOf(value);
     }
 
     @Override

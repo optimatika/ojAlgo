@@ -132,7 +132,7 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
 
     @Override
     protected void set(final int index, final Number value) {
-        data[index] = TypeUtils.toQuaternion(value);
+        data[index] = Quaternion.valueOf(value);
     }
 
     @Override

@@ -83,7 +83,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.ACOS.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -113,7 +113,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.ASIN.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -135,7 +135,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.ATAN.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -171,7 +171,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.COS.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -198,7 +198,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.EXP.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -210,7 +210,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.EXPM1.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -243,7 +243,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.LOG.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -255,7 +255,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.LOG10.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -267,7 +267,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.LOG1P.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -337,7 +337,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.POWER.invoke(tmpArg, param);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -350,7 +350,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.ROOT.invoke(tmpArg, param);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -363,7 +363,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.SCALE.invoke(tmpArg, param);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -382,7 +382,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.SIN.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -401,7 +401,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.SQRT.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 
@@ -428,7 +428,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpRet = BigFunction.TAN.invoke(tmpArg);
 
-            return TypeUtils.toRationalNumber(tmpRet);
+            return RationalNumber.valueOf(tmpRet);
         }
     };
 

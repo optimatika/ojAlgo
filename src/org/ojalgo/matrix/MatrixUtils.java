@@ -258,10 +258,10 @@ public abstract class MatrixUtils {
             ComplexNumber tmpUpperRight;
 
             for (int j = 0; retVal && (j < tmpColDim); j++) {
-                retVal &= TypeUtils.isZero(TypeUtils.toComplexNumber(matrix.get(j, j)).i);
+                retVal &= TypeUtils.isZero(ComplexNumber.valueOf((Number) matrix.get(j, j)).i);
                 for (int i = j + 1; retVal && (i < tmpRowDim); i++) {
-                    tmpLowerLeft = TypeUtils.toComplexNumber(matrix.get(i, j)).conjugate();
-                    tmpUpperRight = TypeUtils.toComplexNumber(matrix.get(j, i));
+                    tmpLowerLeft = ComplexNumber.valueOf((Number) matrix.get(i, j)).conjugate();
+                    tmpUpperRight = ComplexNumber.valueOf((Number) matrix.get(j, i));
                     retVal &= TypeUtils.isZero(tmpLowerLeft.subtract(tmpUpperRight).norm());
                 }
             }

@@ -36,7 +36,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
         }
 
         public Money cast(final Number number) {
-            return null;
+            return Money.valueOf(number);
         }
 
         public Money convert(final double value) {
@@ -44,7 +44,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
         }
 
         public Money convert(final Number number) {
-            return null;
+            return Money.valueOf(number);
         }
 
         public Money one() {
@@ -57,14 +57,15 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
 
     };
 
+    private static final double D10000 = 10_000D;
     private static final long DENOMINATOR = 10_000L;
 
     public static final Money NEG = new Money(-DENOMINATOR);
     public static final Money ONE = new Money(DENOMINATOR);
-    public static final Money TWO = new Money(2L * DENOMINATOR);
-    public static final Money ZERO = new Money(0L);
+    public static final Money TWO = new Money(DENOMINATOR + DENOMINATOR);
+    public static final Money ZERO = new Money();
 
-    private static final double D10000 = 10_000D;
+    static final NumberContext CONTEXT = BigScalar.CONTEXT.newPrecision(19).newScale(4);
 
     public static boolean isAbsolute(final Money value) {
         return value.isAbsolute();
@@ -86,13 +87,32 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
         return new Money(value * D10000);
     }
 
-    private static String toString(final Money aNmbr) {
+    public static Money valueOf(final Number number) {
+
+        if (number != null) {
+
+            if (number instanceof Money) {
+
+                return (Money) number;
+
+            } else {
+
+                return new Money(number.doubleValue() * Money.D10000);
+            }
+
+        } else {
+
+            return ZERO;
+        }
+    }
+
+    private static String toString(final Money scalar) {
 
         final StringBuilder retVal = new StringBuilder("(");
 
-        retVal.append(aNmbr.getNumerator());
+        retVal.append(scalar.getNumerator());
         retVal.append(" / ");
-        retVal.append(aNmbr.getDenominator());
+        retVal.append(DENOMINATOR);
 
         return retVal.append(")").toString();
     }
@@ -100,6 +120,17 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     private transient BigDecimal myDecimal = null;
 
     private final long myNumerator;
+
+    public Money(final Scalar<?> scalar) {
+        this(scalar.doubleValue() * D10000);
+    }
+
+    Money() {
+
+        super();
+
+        myNumerator = 0L;
+    }
 
     Money(final double numerator) {
 
@@ -124,7 +155,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     public int compareTo(final Money reference) {
-        return this.toBigDecimal().compareTo(reference.toBigDecimal());
+        return Long.compare(myNumerator, reference.getNumerator());
     }
 
     public Money conjugate() {
@@ -141,7 +172,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
 
     @Override
     public double doubleValue() {
-        return this.toBigDecimal().doubleValue();
+        return myNumerator / D10000;
     }
 
     public Money enforce(final NumberContext context) {
@@ -154,7 +185,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
 
     @Override
     public float floatValue() {
-        return this.toBigDecimal().floatValue();
+        return (float) this.doubleValue();
     }
 
     public Money getNumber() {
@@ -163,7 +194,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
 
     @Override
     public int intValue() {
-        return this.toBigDecimal().intValue();
+        return (int) this.doubleValue();
     }
 
     public Money invert() {
@@ -175,7 +206,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     public boolean isSmall(final double comparedTo) {
-        return BigScalar.CONTEXT.isSmall(comparedTo, this.doubleValue());
+        return CONTEXT.isSmall(comparedTo, this.doubleValue());
     }
 
     @Override
@@ -219,7 +250,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
 
     public BigDecimal toBigDecimal() {
         if (myDecimal == null) {
-            myDecimal = this.toBigDecimal(BigScalar.CONTEXT.getMathContext());
+            myDecimal = this.toBigDecimal(CONTEXT.getMathContext());
         }
         return myDecimal;
     }
@@ -235,10 +266,6 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
 
     private BigDecimal toBigDecimal(final MathContext context) {
         return new BigDecimal(myNumerator).divide(new BigDecimal(DENOMINATOR), context);
-    }
-
-    long getDenominator() {
-        return DENOMINATOR;
     }
 
     long getNumerator() {

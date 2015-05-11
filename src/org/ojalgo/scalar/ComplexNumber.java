@@ -26,7 +26,6 @@ import java.math.MathContext;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -120,6 +119,25 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         return new ComplexNumber(value);
     }
 
+    public static ComplexNumber valueOf(final Number number) {
+
+        if (number != null) {
+
+            if (number instanceof ComplexNumber) {
+
+                return (ComplexNumber) number;
+
+            } else {
+
+                return new ComplexNumber(number.doubleValue());
+            }
+
+        } else {
+
+            return ZERO;
+        }
+    }
+
     public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
 
         public ComplexNumber cast(final double value) {
@@ -127,7 +145,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         }
 
         public ComplexNumber cast(final Number number) {
-            return TypeUtils.toComplexNumber(number);
+            return ComplexNumber.valueOf(number);
         }
 
         public ComplexNumber convert(final double value) {
@@ -135,7 +153,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         }
 
         public ComplexNumber convert(final Number number) {
-            return TypeUtils.toComplexNumber(number);
+            return ComplexNumber.valueOf(number);
         }
 
         public ComplexNumber one() {

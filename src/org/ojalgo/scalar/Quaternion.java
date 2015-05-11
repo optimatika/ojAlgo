@@ -27,7 +27,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -36,19 +35,19 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
     public static final Scalar.Factory<Quaternion> FACTORY = new Scalar.Factory<Quaternion>() {
 
         public Quaternion cast(final double value) {
-            return new Quaternion(value);
+            return Quaternion.valueOf(value);
         }
 
         public Quaternion cast(final Number number) {
-            return TypeUtils.toQuaternion(number);
+            return Quaternion.valueOf(number);
         }
 
         public Quaternion convert(final double value) {
-            return new Quaternion(value);
+            return Quaternion.valueOf(value);
         }
 
         public Quaternion convert(final Number number) {
-            return TypeUtils.toQuaternion(number);
+            return Quaternion.valueOf(number);
         }
 
         public Quaternion one() {
@@ -146,12 +145,32 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         return Quaternion.valueOf(value);
     }
 
-    public static Quaternion valueOf(final ComplexNumber complex) {
-        return new Quaternion(complex.doubleValue(), complex.i, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
-    }
-
     public static Quaternion valueOf(final double value) {
         return new Quaternion(value);
+    }
+
+    public static Quaternion valueOf(final Number number) {
+
+        if (number != null) {
+
+            if (number instanceof Quaternion) {
+
+                return (Quaternion) number;
+
+            } else if (number instanceof ComplexNumber) {
+
+                final ComplexNumber tmpComplex = (ComplexNumber) number;
+                return new Quaternion(tmpComplex.doubleValue(), tmpComplex.i, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
+
+            } else {
+
+                return new Quaternion(number.doubleValue());
+            }
+
+        } else {
+
+            return ZERO;
+        }
     }
 
     public final double i;

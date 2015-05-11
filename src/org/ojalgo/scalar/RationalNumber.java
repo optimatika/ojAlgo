@@ -32,26 +32,22 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
 
 public final class RationalNumber extends Number implements Scalar<RationalNumber>, Enforceable<RationalNumber> {
 
-    public static RationalNumber valueOf(final double value) {
-        return new RationalNumber(BigDecimal.valueOf(value));
-    }
-
     public static final Scalar.Factory<RationalNumber> FACTORY = new Scalar.Factory<RationalNumber>() {
 
         public RationalNumber cast(final double value) {
-            return new RationalNumber(value);
+            return RationalNumber.valueOf(value);
         }
 
         public RationalNumber cast(final Number number) {
-            return TypeUtils.toRationalNumber(number);
+            return RationalNumber.valueOf(number);
         }
 
         public RationalNumber convert(final double value) {
-            return new RationalNumber(value);
+            return RationalNumber.valueOf(value);
         }
 
         public RationalNumber convert(final Number number) {
-            return TypeUtils.toRationalNumber(number);
+            return RationalNumber.valueOf(number);
         }
 
         public RationalNumber one() {
@@ -71,9 +67,9 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     public static final RationalNumber POSITIVE_INFINITY = new RationalNumber(BigInteger.ONE, BigInteger.ZERO);
     public static final RationalNumber TWO = new RationalNumber(BigInteger.ONE.add(BigInteger.ONE), BigInteger.ONE);
     public static final RationalNumber ZERO = new RationalNumber(BigInteger.ZERO, BigInteger.ONE);
-
     private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
+
     private static final String RIGHT = ")";
 
     /**
@@ -143,6 +139,29 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return value.isSmall(comparedTo);
     }
 
+    public static RationalNumber valueOf(final double value) {
+        return new RationalNumber(BigDecimal.valueOf(value));
+    }
+
+    public static RationalNumber valueOf(final Number number) {
+
+        if (number != null) {
+
+            if (number instanceof RationalNumber) {
+
+                return (RationalNumber) number;
+
+            } else {
+
+                return new RationalNumber(TypeUtils.toBigDecimal(number));
+            }
+
+        } else {
+
+            return ZERO;
+        }
+    }
+
     private static String toString(final RationalNumber aNmbr) {
 
         final StringBuilder retVal = new StringBuilder(LEFT);
@@ -185,6 +204,10 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
                 myDenominator = tmpDenom;
             }
         }
+    }
+
+    public RationalNumber(final Scalar<?> scalar) {
+        this(scalar.toBigDecimal());
     }
 
     public RationalNumber(final double value) {
