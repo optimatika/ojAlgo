@@ -57,12 +57,12 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
 
     };
 
-    private static final double D10000 = 10_000D;
-    private static final long DENOMINATOR = 10_000L;
+    private static final double DOUBLE_DENOMINATOR = 1000_000D;
+    private static final long LONG_DENOMINATOR = 1000_000L;
 
-    public static final Money NEG = new Money(-DENOMINATOR);
-    public static final Money ONE = new Money(DENOMINATOR);
-    public static final Money TWO = new Money(DENOMINATOR + DENOMINATOR);
+    public static final Money NEG = new Money(-LONG_DENOMINATOR);
+    public static final Money ONE = new Money(LONG_DENOMINATOR);
+    public static final Money TWO = new Money(LONG_DENOMINATOR + LONG_DENOMINATOR);
     public static final Money ZERO = new Money();
 
     static final NumberContext CONTEXT = BigScalar.CONTEXT.newPrecision(19).newScale(4);
@@ -84,7 +84,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     public static Money valueOf(final double value) {
-        return new Money(value * D10000);
+        return new Money(value * DOUBLE_DENOMINATOR);
     }
 
     public static Money valueOf(final Number number) {
@@ -97,7 +97,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
 
             } else {
 
-                return new Money(number.doubleValue() * Money.D10000);
+                return new Money(number.doubleValue() * Money.DOUBLE_DENOMINATOR);
             }
 
         } else {
@@ -107,14 +107,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     private static String toString(final Money scalar) {
-
-        final StringBuilder retVal = new StringBuilder("(");
-
-        retVal.append(scalar.getNumerator());
-        retVal.append(" / ");
-        retVal.append(DENOMINATOR);
-
-        return retVal.append(")").toString();
+        return Double.toString(scalar.doubleValue());
     }
 
     private transient BigDecimal myDecimal = null;
@@ -122,7 +115,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     private final long myNumerator;
 
     public Money(final Scalar<?> scalar) {
-        this(scalar.doubleValue() * D10000);
+        this(scalar.doubleValue() * DOUBLE_DENOMINATOR);
     }
 
     Money() {
@@ -147,7 +140,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     public Money add(final double arg) {
-        return new Money(myNumerator + (arg * D10000));
+        return new Money(myNumerator + (arg * DOUBLE_DENOMINATOR));
     }
 
     public Money add(final Money arg) {
@@ -167,12 +160,12 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     public Money divide(final Money arg) {
-        return new Money((myNumerator * DENOMINATOR) / arg.getNumerator());
+        return new Money((myNumerator * LONG_DENOMINATOR) / arg.getNumerator());
     }
 
     @Override
     public double doubleValue() {
-        return myNumerator / D10000;
+        return myNumerator / DOUBLE_DENOMINATOR;
     }
 
     public Money enforce(final NumberContext context) {
@@ -198,7 +191,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     public Money invert() {
-        return new Money((DENOMINATOR * DENOMINATOR) / myNumerator);
+        return new Money((LONG_DENOMINATOR * LONG_DENOMINATOR) / myNumerator);
     }
 
     public boolean isAbsolute() {
@@ -219,7 +212,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     public Money multiply(final Money arg) {
-        return new Money((myNumerator * arg.getNumerator()) / DENOMINATOR);
+        return new Money((myNumerator * arg.getNumerator()) / LONG_DENOMINATOR);
     }
 
     public Money negate() {
@@ -241,7 +234,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     public Money subtract(final double arg) {
-        return new Money(myNumerator - (arg * D10000));
+        return new Money(myNumerator - (arg * DOUBLE_DENOMINATOR));
     }
 
     public Money subtract(final Money arg) {
@@ -265,7 +258,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     private BigDecimal toBigDecimal(final MathContext context) {
-        return new BigDecimal(myNumerator).divide(new BigDecimal(DENOMINATOR), context);
+        return new BigDecimal(myNumerator).divide(new BigDecimal(LONG_DENOMINATOR), context);
     }
 
     long getNumerator() {
