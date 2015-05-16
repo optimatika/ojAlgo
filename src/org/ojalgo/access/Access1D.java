@@ -30,7 +30,6 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.Scalar;
 
 public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
@@ -81,14 +80,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         I copy(Number... source);
 
         I makeFilled(long count, NullaryFunction<?> supplier);
-
-        /**
-         * @deprecated v38 Use {@link #makeFilled(long, NullaryFunction)} instead.
-         */
-        @Deprecated
-        default I makeRandom(final long count, final RandomNumber distribution) {
-            return this.makeFilled(count, distribution);
-        }
 
         I makeZero(long count);
 

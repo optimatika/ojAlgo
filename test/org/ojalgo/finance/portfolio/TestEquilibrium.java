@@ -150,7 +150,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
         final Uniform tmpRndmRiskAversionExponent = new Uniform(-1.0, 3.0);
         final Uniform tmpRndmWeight = new Uniform(0.0, 1.0);
 
-        final PhysicalStore<Double> tmpCovariances = PrimitiveDenseStore.FACTORY.makeRandom(tmpDim, tmpDim, tmpRndmCorrelation);
+        final PhysicalStore<Double> tmpCovariances = PrimitiveDenseStore.FACTORY.makeFilled(tmpDim, tmpDim, tmpRndmCorrelation);
         tmpCovariances.fillDiagonal(0, 0, 0.5);
         tmpCovariances.fillMatching(tmpCovariances, PrimitiveFunction.ADD, tmpCovariances.transpose());
         for (int ij = 0; ij < tmpDim; ij++) {
@@ -163,7 +163,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
         final MarketEquilibrium tmpEquilibrium = new MarketEquilibrium(PrimitiveMatrix.FACTORY.copy(tmpCovariances), tmpRAF).clean();
 
-        final Number[] tmpRawWeights = PrimitiveMatrix.FACTORY.makeRandom(tmpDim, 1, tmpRndmWeight).toListOfElements().toArray(new Number[tmpDim]);
+        final Number[] tmpRawWeights = PrimitiveMatrix.FACTORY.makeFilled(tmpDim, 1, tmpRndmWeight).toListOfElements().toArray(new Number[tmpDim]);
         final List<BigDecimal> tmpNormalisedWeights = new SimplePortfolio(tmpRawWeights).normalise().getWeights();
 
         @SuppressWarnings("unchecked")

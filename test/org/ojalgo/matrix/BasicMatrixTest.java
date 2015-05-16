@@ -47,7 +47,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     public static BigMatrix getSafe(final long rows, final long columns, final NumberContext context) {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.makeRandom(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
+        final BigMatrix tmpMtrx = BigMatrix.FACTORY.makeFilled(rows, columns, new Uniform(PrimitiveMath.E, PrimitiveMath.PI));
         return tmpMtrx.enforce(context);
     }
 

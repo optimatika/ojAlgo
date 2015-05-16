@@ -101,7 +101,7 @@ public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
     }
 
     MatrixStore<Double> makeFull(final int dim) {
-        return PrimitiveDenseStore.FACTORY.makeRandom(dim, dim, new Uniform());
+        return PrimitiveDenseStore.FACTORY.makeFilled(dim, dim, new Uniform());
     }
 
     MatrixStore<Double> makeSymmetric(final int dim) {

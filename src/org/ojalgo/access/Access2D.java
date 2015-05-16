@@ -27,7 +27,6 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.Scalar;
 
 public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
@@ -93,14 +92,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         I makeEye(long rows, long columns);
 
         I makeFilled(long rows, long columns, NullaryFunction<?> supplier);
-
-        /**
-         * @deprecated v38 Use {@link #makeFilled(long, long, NullaryFunction)} instead.
-         */
-        @Deprecated
-        default I makeRandom(final long rows, final long columns, final RandomNumber distribution) {
-            return this.makeFilled(rows, columns, distribution);
-        }
 
         I makeZero(long rows, long columns);
 

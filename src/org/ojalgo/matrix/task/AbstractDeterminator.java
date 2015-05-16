@@ -232,7 +232,7 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
     public static void main(final String... args) {
 
         final int tmpRows = 2;
-        final PrimitiveDenseStore tmpSource = PrimitiveDenseStore.FACTORY.makeRandom(tmpRows, tmpRows, new Uniform());
+        final PrimitiveDenseStore tmpSource = PrimitiveDenseStore.FACTORY.makeFilled(tmpRows, tmpRows, new Uniform());
         final PrimitiveDenseStore tmpDestination = PrimitiveDenseStore.FACTORY.makeZero(tmpRows, tmpRows);
 
         final long unwBefore = System.nanoTime();

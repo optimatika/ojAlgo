@@ -66,8 +66,8 @@ public class DesignCase extends MatrixDecompositionTests {
 
     public void testRandomUnderdetermined() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.makeRandom(3, 9, new Normal());
-        final PhysicalStore<Double> tmpB = PrimitiveDenseStore.FACTORY.makeRandom(3, 1, new Normal());
+        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.makeFilled(3, 9, new Normal());
+        final PhysicalStore<Double> tmpB = PrimitiveDenseStore.FACTORY.makeFilled(3, 1, new Normal());
 
         final QR<Double> tmpQR = QR.makePrimitive();
         tmpQR.compute(tmpA, false);

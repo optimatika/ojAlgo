@@ -24,7 +24,6 @@ package org.ojalgo.access;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.random.RandomNumber;
 import org.ojalgo.scalar.Scalar;
 
 public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N> {
@@ -71,14 +70,6 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         I copy(AccessAnyD<?> source);
 
         I makeFilled(long[] structure, NullaryFunction<?> supplier);
-
-        /**
-         * @deprecated v38 Use {@link #makeFilled(long[], NullaryFunction)} instead.
-         */
-        @Deprecated
-        default I makeRandom(final long[] structure, final RandomNumber distribution) {
-            return this.makeFilled(structure, distribution);
-        }
 
         I makeZero(long... structure);
 

@@ -44,14 +44,14 @@ public class ApproximationCase extends FunctionMultiaryTests {
 
         final int tmpArity = 9;
 
-        final PhysicalStore<Double> tmpLinear = PrimitiveDenseStore.FACTORY.makeRandom(tmpArity, 1, new Uniform(-1, 2));
+        final PhysicalStore<Double> tmpLinear = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-1, 2));
 
-        final PhysicalStore<Double> tmpPoint = PrimitiveDenseStore.FACTORY.makeRandom(tmpArity, 1, new Uniform(-10, 20));
+        final PhysicalStore<Double> tmpPoint = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
 
         final LinearFunction<Double> tmpOrgFunc = LinearFunction.makePrimitive(tmpLinear);
         final FirstOrderApproximation<Double> tmpApprFunc = tmpOrgFunc.toFirstOrderApproximation(tmpPoint);
 
-        final PhysicalStore<Double> tmpX = PrimitiveDenseStore.FACTORY.makeRandom(tmpArity, 1, new Uniform(-10, 20));
+        final PhysicalStore<Double> tmpX = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
 
         TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), new NumberContext(7, 14));
     }
@@ -60,15 +60,15 @@ public class ApproximationCase extends FunctionMultiaryTests {
 
         final int tmpArity = 9;
 
-        final PhysicalStore<Double> tmpQuadratic = PrimitiveDenseStore.FACTORY.makeRandom(tmpArity, tmpArity, new Uniform());
-        final PhysicalStore<Double> tmpLinear = PrimitiveDenseStore.FACTORY.makeRandom(tmpArity, 1, new Uniform(-1, 2));
+        final PhysicalStore<Double> tmpQuadratic = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, tmpArity, new Uniform());
+        final PhysicalStore<Double> tmpLinear = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-1, 2));
 
-        final PhysicalStore<Double> tmpPoint = PrimitiveDenseStore.FACTORY.makeRandom(tmpArity, 1, new Uniform(-10, 20));
+        final PhysicalStore<Double> tmpPoint = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
 
         final CompoundFunction<Double> tmpOrgFunc = CompoundFunction.makePrimitive(tmpQuadratic, tmpLinear);
         final SecondOrderApproximation<Double> tmpApprFunc = tmpOrgFunc.toSecondOrderApproximation(tmpPoint);
 
-        final PhysicalStore<Double> tmpX = PrimitiveDenseStore.FACTORY.makeRandom(tmpArity, 1, new Uniform(-10, 20));
+        final PhysicalStore<Double> tmpX = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
 
         TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), Math.sqrt(PrimitiveMath.IS_ZERO));
     }

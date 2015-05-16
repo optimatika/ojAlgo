@@ -40,7 +40,7 @@ public class P20050125Case extends BasicMatrixTest {
     private static int DIM = 3;
 
     public static BasicMatrix getProblematic() {
-        final BasicMatrix tmpMtrx = BigMatrix.FACTORY.makeRandom(DIM, DIM * DIM, new Uniform());
+        final BasicMatrix tmpMtrx = BigMatrix.FACTORY.makeFilled(DIM, DIM * DIM, new Uniform());
         return tmpMtrx.multiply(tmpMtrx.transpose());
     }
 

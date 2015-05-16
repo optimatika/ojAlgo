@@ -135,9 +135,9 @@ abstract class AbstractSolver implements SolverTask<Double> {
     public static void main(final String... args) {
 
         final int tmpDim = 5;
-        final MatrixStore<Double> tmpBody = PrimitiveDenseStore.FACTORY.makeRandom(tmpDim + tmpDim, tmpDim, new Uniform());
+        final MatrixStore<Double> tmpBody = PrimitiveDenseStore.FACTORY.makeFilled(tmpDim + tmpDim, tmpDim, new Uniform());
 
-        final PrimitiveDenseStore tmpRhs = PrimitiveDenseStore.FACTORY.makeRandom(tmpDim + tmpDim, 1, new Uniform());
+        final PrimitiveDenseStore tmpRhs = PrimitiveDenseStore.FACTORY.makeFilled(tmpDim + tmpDim, 1, new Uniform());
         final PrimitiveDenseStore tmpSolution = PrimitiveDenseStore.FACTORY.makeZero(tmpDim, 1);
 
         final long unwBefore = System.nanoTime();

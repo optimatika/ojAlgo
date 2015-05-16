@@ -97,7 +97,7 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
 
     public void testRandomBigComplexPrimitive() {
 
-        BasicMatrix tmpSymmetricRandoml = PrimitiveMatrix.FACTORY.makeRandom(9, 9, new Normal());
+        BasicMatrix tmpSymmetricRandoml = PrimitiveMatrix.FACTORY.makeFilled(9, 9, new Normal());
         tmpSymmetricRandoml = tmpSymmetricRandoml.add(tmpSymmetricRandoml.transpose());
 
         final MatrixStore<BigDecimal> tmpBigA = tmpSymmetricRandoml.toBigStore();
