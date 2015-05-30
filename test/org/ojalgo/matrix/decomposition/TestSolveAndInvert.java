@@ -35,8 +35,8 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class TestSolveAndInvert extends MatrixDecompositionTests {
 
-    static MatrixDecomposition<Double>[] getAllSquare() {
-        return (MatrixDecomposition<Double>[]) new MatrixDecomposition<?>[] { LU.makePrimitive(), new RawLU(), QR.makePrimitive(), new RawQR(),
+    static MatrixDecomposition.Solver<Double>[] getAllSquare() {
+        return (MatrixDecomposition.Solver<Double>[]) new MatrixDecomposition.Solver<?>[] { LU.makePrimitive(), new RawLU(), QR.makePrimitive(), new RawQR(),
                 SingularValue.makePrimitive(), new RawSingularValue(), new SVDold30.Primitive() };
     }
 
@@ -56,19 +56,19 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
         final PhysicalStore<Double> tmpIdentity = PrimitiveDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
 
-        final MatrixDecomposition<Double>[] tmpAllDecomps = TestSolveAndInvert.getAllSquare();
+        final MatrixDecomposition.Solver<Double>[] tmpAllDecomps = TestSolveAndInvert.getAllSquare();
 
-        final MatrixDecomposition<Double> tmpRefDecomps = new RawLU();
-        tmpRefDecomps.compute(tmpRandom);
+        final LU<Double> tmpRefDecomps = new RawLU();
+        tmpRefDecomps.decompose(tmpRandom);
         final MatrixStore<Double> tmpExpected = tmpRefDecomps.getInverse();
 
-        for (final MatrixDecomposition<Double> tmpDecomp : tmpAllDecomps) {
+        for (final MatrixDecomposition.Solver<Double> tmpDecomp : tmpAllDecomps) {
 
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug(tmpDecomp.getClass().getName());
             }
 
-            tmpDecomp.compute(tmpRandom);
+            tmpDecomp.decompose(tmpRandom);
 
             final MatrixStore<Double> tmpActual = tmpDecomp.getInverse();
 
@@ -84,15 +84,15 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
         final MatrixStore<Double> tmpRHS = SimpleEquationCase.getRHS().toPrimitiveStore();
         final MatrixStore<Double> tmpSolution = SimpleEquationCase.getSolution().toPrimitiveStore();
 
-        for (final MatrixDecomposition<Double> tmpDecomp : TestSolveAndInvert.getAllSquare()) {
+        for (final MatrixDecomposition.Solver<Double> tmpDecomp : TestSolveAndInvert.getAllSquare()) {
             this.doTest(tmpDecomp, tmpBody, tmpRHS, tmpSolution);
         }
     }
 
-    private void doTest(final MatrixDecomposition<Double> aDecomp, final MatrixStore<Double> aBody, final MatrixStore<Double> aRHS,
+    private void doTest(final MatrixDecomposition.Solver<Double> aDecomp, final MatrixStore<Double> aBody, final MatrixStore<Double> aRHS,
             final MatrixStore<Double> aSolution) {
 
-        aDecomp.compute(aBody);
+        aDecomp.decompose(aBody);
 
         TestUtils.assertEquals(aSolution, aDecomp.solve(aRHS), new NumberContext(7, 6));
 
@@ -100,7 +100,7 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpExpectedInverse = aDecomp.solve(tmpI);
         aDecomp.reset();
-        aDecomp.compute(aBody);
+        aDecomp.decompose(aBody);
         TestUtils.assertEquals(tmpExpectedInverse, aDecomp.getInverse(), new NumberContext(7, 6));
 
         TestUtils.assertEquals(tmpI, aBody.multiplyLeft(tmpExpectedInverse), new NumberContext(7, 6));

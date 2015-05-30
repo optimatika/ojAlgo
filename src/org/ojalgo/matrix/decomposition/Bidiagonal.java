@@ -41,7 +41,7 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N> {
+public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.EconomySize<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Bidiagonal<N> make(final Access2D<N> typical) {
@@ -70,12 +70,6 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N> {
     public static Bidiagonal<Double> makePrimitive() {
         return new BidiagonalDecomposition.Primitive();
     }
-
-    /**
-     * @param matrix A matrix to decompose
-     * @return true if the computation suceeded; false if not
-     */
-    boolean compute(Access2D<?> matrix, boolean fullSize);
 
     MatrixStore<N> getD();
 

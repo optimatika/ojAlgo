@@ -95,10 +95,6 @@ abstract class NonsymmetricEvD<N extends Number> extends EigenvalueDecomposition
         return tmpVisitor.getNumber();
     }
 
-    public final boolean isFullSize() {
-        return true;
-    }
-
     public final boolean isHermitian() {
         return false;
     }

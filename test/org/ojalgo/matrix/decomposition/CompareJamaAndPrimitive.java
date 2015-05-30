@@ -60,7 +60,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpMtrxA = SimpleCholeskyCase.getOriginal().toPrimitiveStore();
 
-        TestUtils.assertEquals(JAMA_CHOLESKY.compute(tmpMtrxA), PRIMITIVE_CHOLESKY.compute(tmpMtrxA));
+        TestUtils.assertEquals(JAMA_CHOLESKY.decompose(tmpMtrxA), PRIMITIVE_CHOLESKY.decompose(tmpMtrxA));
 
         TestUtils.assertEquals(JAMA_CHOLESKY.getL(), PRIMITIVE_CHOLESKY.getL(), COMPARE_CONTEXT);
 
@@ -79,10 +79,9 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpMtrxA = SimpleEigenvalueCase.getOriginal().toPrimitiveStore();
 
-        TestUtils.assertEquals(JAMA_EvD.compute(tmpMtrxA), PRIMITIVE_EvD.compute(tmpMtrxA));
+        TestUtils.assertEquals(JAMA_EvD.decompose(tmpMtrxA), PRIMITIVE_EvD.decompose(tmpMtrxA));
 
         TestUtils.assertEquals(JAMA_EvD.isComputed(), PRIMITIVE_EvD.isComputed());
-        TestUtils.assertEquals(JAMA_EvD.isFullSize(), PRIMITIVE_EvD.isFullSize());
         TestUtils.assertEquals(JAMA_EvD.isSolvable(), PRIMITIVE_EvD.isSolvable());
 
         TestUtils.assertEquals(JAMA_EvD.getTrace().doubleValue(), PRIMITIVE_EvD.getTrace().doubleValue(), COMPARE_CONTEXT);
@@ -100,7 +99,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpMtrxA = SimpleLUCase.getOrginal().toPrimitiveStore();
 
-        TestUtils.assertEquals(JAMA_LU.compute(tmpMtrxA), PRIMITIVE_DENSE_LU.compute(tmpMtrxA));
+        TestUtils.assertEquals(JAMA_LU.decompose(tmpMtrxA), PRIMITIVE_DENSE_LU.decompose(tmpMtrxA));
 
         TestUtils.assertEquals(JAMA_LU.getL(), PRIMITIVE_DENSE_LU.getL(), COMPARE_CONTEXT);
         TestUtils.assertEquals(JAMA_LU.getU(), PRIMITIVE_DENSE_LU.getU(), COMPARE_CONTEXT);
@@ -117,7 +116,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
         // Raw
 
-        TestUtils.assertEquals(JAMA_LU.compute(tmpMtrxA), PRIMITIVE_RAW_LU.compute(tmpMtrxA));
+        TestUtils.assertEquals(JAMA_LU.decompose(tmpMtrxA), PRIMITIVE_RAW_LU.decompose(tmpMtrxA));
 
         TestUtils.assertEquals(JAMA_LU.getL(), PRIMITIVE_RAW_LU.getL(), COMPARE_CONTEXT);
         TestUtils.assertEquals(JAMA_LU.getU(), PRIMITIVE_RAW_LU.getU(), COMPARE_CONTEXT);
@@ -138,7 +137,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         final MatrixStore<Double> tmpMtrxA = SimpleQRCase.getOriginal().toPrimitiveStore();
         final int tmpMinDim = (int) Math.min(tmpMtrxA.countRows(), tmpMtrxA.countColumns());
 
-        TestUtils.assertEquals(JAMA_QR.compute(tmpMtrxA), PRIMITIVE_QR.compute(tmpMtrxA));
+        TestUtils.assertEquals(JAMA_QR.decompose(tmpMtrxA), PRIMITIVE_QR.decompose(tmpMtrxA));
 
         final int[] tmpEconSet = AccessUtils.makeIncreasingRange(0, tmpMinDim);
 
@@ -158,7 +157,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpMtrxA = SimpleSingularValueCase.getOriginal().toPrimitiveStore();
 
-        TestUtils.assertEquals(JAMA_SVD.compute(tmpMtrxA), PRIMITIVE_SVD.compute(tmpMtrxA));
+        TestUtils.assertEquals(JAMA_SVD.decompose(tmpMtrxA), PRIMITIVE_SVD.decompose(tmpMtrxA));
 
         TestUtils.assertEquals(JAMA_SVD.isComputed(), PRIMITIVE_SVD.isComputed());
         TestUtils.assertEquals(JAMA_SVD.isFullSize(), PRIMITIVE_SVD.isFullSize());

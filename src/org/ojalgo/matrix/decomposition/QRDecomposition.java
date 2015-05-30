@@ -35,12 +35,7 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-/**
- * @deprecated v38 This class will be made package private. Use the inteface instead.
- * @author apete
- */
-@Deprecated
-public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N> implements QR<N> {
+abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N> implements QR<N> {
 
     static final class Big extends QRDecomposition<BigDecimal> {
 
@@ -66,67 +61,15 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
 
     }
 
-    /**
-     * @deprecated v38 Use {@link QR#make(Access2D)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static final <N extends Number> QR<N> make(final Access2D<N> aTypical) {
-        return QR.make(aTypical);
-    }
-
-    /**
-     * @deprecated v38 Use {@link QR#makeBig()} instead
-     */
-    @Deprecated
-    public static final QR<BigDecimal> makeBig() {
-        return QR.makeBig();
-    }
-
-    /**
-     * @deprecated v38 Use {@link QR#makeComplex()} instead
-     */
-    @Deprecated
-    public static final QR<ComplexNumber> makeComplex() {
-        return QR.makeComplex();
-    }
-
-    /**
-     * @deprecated v38 Use {@link QR#makePrimitive()} instead
-     */
-    @Deprecated
-    public static final QR<Double> makeJama() {
-        return new RawQR();
-    }
-
-    /**
-     * @deprecated v38 Use {@link QR#makePrimitive()} instead
-     */
-    @Deprecated
-    public static final QR<Double> makePrimitive() {
-        return QR.makePrimitive();
-    }
-
     private boolean myFullSize = false;
 
     protected QRDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
     }
 
-    public final N calculateDeterminant(final Access2D<N> matrix) {
-        this.compute(matrix);
-        return this.getDeterminant();
-    }
-
-    public boolean compute(final Access2D<?> matrix) {
-        return this.compute(matrix, false);
-    }
-
-    public boolean compute(final Access2D<?> matrix, final boolean fullSize) {
+    public boolean decompose(final Access2D<?> matrix) {
 
         this.reset();
-
-        myFullSize = fullSize;
 
         final DecompositionStore<N> tmpStore = this.setInPlace(matrix);
 
@@ -161,7 +104,7 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
 
     @Override
     public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
-        return this.solve(this.makeEye(this.getColDim(), this.getRowDim()), preallocated);
+        return this.solve(this.makeIdentity(this.getRowDim()), preallocated);
     }
 
     public MatrixStore<N> getQ() {
@@ -222,20 +165,20 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
         return this.getRank() == this.getMinDim();
     }
 
-    public final boolean isFullSize() {
+    public boolean isFullSize() {
         return myFullSize;
     }
 
-    public final boolean isSolvable() {
+    public boolean isSolvable() {
         return this.isComputed() && this.isFullColumnRank();
     }
 
-    @Override
-    public void reset() {
+    public void setFullSize(final boolean fullSize) {
+        myFullSize = fullSize;
+    }
 
-        super.reset();
-
-        myFullSize = false;
+    public MatrixStore<N> solve(final Access2D<N> rhs) {
+        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     /**
@@ -284,7 +227,7 @@ public abstract class QRDecomposition<N extends Number> extends InPlaceDecomposi
     /**
      * @return L as in R<sup>T</sup>.
      */
-    protected final DecompositionStore<N> getL() {
+    protected DecompositionStore<N> getL() {
 
         final int tmpRowDim = this.getColDim();
         final int tmpColDim = this.getMinDim();

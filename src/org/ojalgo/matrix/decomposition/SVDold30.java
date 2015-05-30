@@ -243,7 +243,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
         super(aFactory, aBidiagonal);
     }
 
-    public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
+    public boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
         return MatrixUtils.equals(aStore, this, context);
     }
 
@@ -256,7 +256,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    public final void reset() {
+    public void reset() {
 
         super.reset();
 
@@ -268,13 +268,13 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    public final MatrixStore<N> solve(final Access2D<N> rhs) {
+    public MatrixStore<N> solve(final Access2D<N> rhs) {
         return this.getInverse().multiply(rhs);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    protected final boolean doCompute(final Access2D<?> aStore, final boolean singularValuesOnly, final boolean fullSize) {
+    protected boolean doCompute(final Access2D<?> aStore, final boolean singularValuesOnly, final boolean fullSize) {
 
         final int tmpMinDim = (int) Math.min(aStore.countRows(), aStore.countColumns());
 
@@ -388,7 +388,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
         return this.computed(true);
     }
 
-    protected final DiagonalAccess<N> extractSimilar(final PhysicalStore<N> aStore, final boolean aNormalAspectRatio) {
+    protected DiagonalAccess<N> extractSimilar(final PhysicalStore<N> aStore, final boolean aNormalAspectRatio) {
 
         final Array2D<N> tmpArray2D = ((DecompositionStore<N>) aStore).asArray2D();
 
@@ -409,7 +409,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    protected final MatrixStore<N> makeD() {
+    protected MatrixStore<N> makeD() {
 
         //        final int tmpMinDim = this..getMinDim();
         //
@@ -423,7 +423,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    protected final MatrixStore<N> makeQ1() {
+    protected MatrixStore<N> makeQ1() {
         try {
             return myFutureQ1.get();
         } catch (final InterruptedException anException) {
@@ -434,7 +434,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    protected final MatrixStore<N> makeQ2() {
+    protected MatrixStore<N> makeQ2() {
         try {
             return myFutureQ2.get();
         } catch (final InterruptedException anException) {

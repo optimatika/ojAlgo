@@ -37,12 +37,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-/**
- * @deprecated v38 This class will be made package private. Use the inteface instead.
- * @author apete
- */
-@Deprecated
-public abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
+abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
 
     static final class Big extends TridiagonalDecomposition<BigDecimal> {
 
@@ -104,39 +99,6 @@ public abstract class TridiagonalDecomposition<N extends Number> extends InPlace
         }
     }
 
-    /**
-     * @deprecated v38 Use {@link Tridiagonal#make(Access2D)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static final <N extends Number> Tridiagonal<N> make(final Access2D<N> aTypical) {
-        return Tridiagonal.make(aTypical);
-    }
-
-    /**
-     * @deprecated v38 Use {@link Tridiagonal#makeBig()} instead
-     */
-    @Deprecated
-    public static final Tridiagonal<BigDecimal> makeBig() {
-        return Tridiagonal.makeBig();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Tridiagonal#makeComplex()} instead
-     */
-    @Deprecated
-    public static final Tridiagonal<ComplexNumber> makeComplex() {
-        return Tridiagonal.makeComplex();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Tridiagonal#makePrimitive()} instead
-     */
-    @Deprecated
-    public static final Tridiagonal<Double> makePrimitive() {
-        return Tridiagonal.makePrimitive();
-    }
-
     private transient MatrixStore<N> myD = null;
     private DiagonalAccess<N> myDiagonalAccessD = null;
     private Array1D<N> myInitDiagQ = null;
@@ -146,7 +108,7 @@ public abstract class TridiagonalDecomposition<N extends Number> extends InPlace
         super(aFactory);
     }
 
-    public final boolean compute(final Access2D<?> matrix) {
+    public final boolean decompose(final Access2D<?> matrix) {
 
         this.reset();
 

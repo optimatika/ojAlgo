@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
@@ -30,85 +28,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 
-/**
- * @deprecated v38 This class will be made package private. Use the inteface instead.
- * @author apete
- */
-@Deprecated
-public abstract class EigenvalueDecomposition<N extends Number> extends GenericDecomposition<N> implements Eigenvalue<N> {
-
-    /**
-     * @deprecated v38 Use {@link Eigenvalue#makePrimitive(boolean)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static final <N extends Number> Eigenvalue<N> make(final Access2D<N> template) {
-        return Eigenvalue.make(template);
-    }
-
-    /**
-     * @deprecated v38 Use {@link Eigenvalue#makeBig()} instead
-     */
-    @Deprecated
-    public static final Eigenvalue<BigDecimal> makeBig() {
-        return Eigenvalue.makeBig();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Eigenvalue#makeBig(boolean)} instead
-     */
-    @Deprecated
-    public static final Eigenvalue<BigDecimal> makeBig(final boolean symmetric) {
-        return Eigenvalue.makeBig(symmetric);
-    }
-
-    /**
-     * @deprecated v38 Use {@link Eigenvalue#makeComplex()} instead
-     */
-    @Deprecated
-    public static final Eigenvalue<ComplexNumber> makeComplex() {
-        return Eigenvalue.makeComplex();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Eigenvalue#makeComplex(boolean)} instead
-     */
-    @Deprecated
-    public static final Eigenvalue<ComplexNumber> makeComplex(final boolean hermitian) {
-        return Eigenvalue.makeComplex(hermitian);
-    }
-
-    /**
-     * @deprecated v38 Use {@link Eigenvalue#makePrimitive()} instead
-     */
-    @Deprecated
-    public static final Eigenvalue<Double> makeJama() {
-        return new RawEigenvalue.General();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Eigenvalue#makePrimitive(boolean)} instead
-     */
-    @Deprecated
-    public static final Eigenvalue<Double> makeJama(final boolean symmetric) {
-        return symmetric ? new RawEigenvalue.Symmetric() : new RawEigenvalue.Nonsymmetric();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Eigenvalue#makePrimitive()} instead
-     */
-    @Deprecated
-    public static final Eigenvalue<Double> makePrimitive() {
-        return Eigenvalue.makePrimitive();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Eigenvalue#makePrimitive(boolean)} instead
-     */
-    @Deprecated
-    public static final Eigenvalue<Double> makePrimitive(final boolean symmetric) {
-        return Eigenvalue.makePrimitive(symmetric);
-    }
+abstract class EigenvalueDecomposition<N extends Number> extends GenericDecomposition<N> implements Eigenvalue<N> {
 
     private MatrixStore<N> myD = null;
     private Array1D<ComplexNumber> myEigenvalues = null;
@@ -119,12 +39,7 @@ public abstract class EigenvalueDecomposition<N extends Number> extends GenericD
         super(aFactory);
     }
 
-    public final N calculateDeterminant(final Access2D<N> matrix) {
-        this.compute(matrix);
-        return this.getDeterminant();
-    }
-
-    public final boolean compute(final Access2D<?> matrix) {
+    public final boolean decompose(final Access2D<?> matrix) {
         return this.compute(matrix, false);
     }
 
@@ -157,6 +72,10 @@ public abstract class EigenvalueDecomposition<N extends Number> extends GenericD
 
     public final boolean checkAndCompute(final Access2D<?> matrix) {
         return this.compute(matrix, MatrixUtils.isHermitian(matrix), false);
+    }
+
+    public boolean computeValuesOnly(final Access2D<?> matrix) {
+        return this.compute(matrix, this.isHermitian(), true);
     }
 
     @Override

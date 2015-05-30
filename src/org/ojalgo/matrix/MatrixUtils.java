@@ -32,6 +32,7 @@ import org.ojalgo.matrix.decomposition.*;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
@@ -258,10 +259,10 @@ public abstract class MatrixUtils {
             ComplexNumber tmpUpperRight;
 
             for (int j = 0; retVal && (j < tmpColDim); j++) {
-                retVal &= TypeUtils.isZero(ComplexNumber.valueOf((Number) matrix.get(j, j)).i);
+                retVal &= TypeUtils.isZero(ComplexNumber.valueOf(matrix.get(j, j)).i);
                 for (int i = j + 1; retVal && (i < tmpRowDim); i++) {
-                    tmpLowerLeft = ComplexNumber.valueOf((Number) matrix.get(i, j)).conjugate();
-                    tmpUpperRight = ComplexNumber.valueOf((Number) matrix.get(j, i));
+                    tmpLowerLeft = ComplexNumber.valueOf(matrix.get(i, j)).conjugate();
+                    tmpUpperRight = ComplexNumber.valueOf(matrix.get(j, i));
                     retVal &= TypeUtils.isZero(tmpLowerLeft.subtract(tmpUpperRight).norm());
                 }
             }
@@ -303,6 +304,29 @@ public abstract class MatrixUtils {
             for (int i = 0; i < aRowDim; i++) {
                 retVal.set(i, j, ComplexNumber.makePolar(PrimitiveMath.E, tmpArgGen.doubleValue()).add(PrimitiveMath.PI));
             }
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Make a random symmetric positive definite matrix
+     */
+    public static PrimitiveDenseStore makeSPD(final int dim) {
+
+        final double[] tmpRandom = new double[dim];
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(dim, dim);
+
+        for (int i = 0; i < dim; i++) {
+
+            tmpRandom[i] = Math.random();
+
+            for (int j = 0; j < i; j++) {
+                retVal.set(i, j, tmpRandom[i] + tmpRandom[j]);
+                retVal.set(j, i, tmpRandom[j] + tmpRandom[i]);
+            }
+            retVal.set(i, i, tmpRandom[i] + 1.0);
         }
 
         return retVal;

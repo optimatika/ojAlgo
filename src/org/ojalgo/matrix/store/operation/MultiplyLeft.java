@@ -707,7 +707,7 @@ public final class MultiplyLeft extends MatrixOperation {
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, complexity);
+                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
             }
         }
     }
@@ -727,7 +727,7 @@ public final class MultiplyLeft extends MatrixOperation {
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, complexity);
+                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
             }
         }
     }
@@ -746,7 +746,7 @@ public final class MultiplyLeft extends MatrixOperation {
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, complexity);
+                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
             }
         }
     }

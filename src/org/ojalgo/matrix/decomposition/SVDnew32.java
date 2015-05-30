@@ -342,7 +342,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    public final MatrixStore<N> solve(final Access2D<N> rhs) {
+    public MatrixStore<N> solve(final Access2D<N> rhs) {
         return this.getInverse().multiply(rhs);
     }
 
@@ -372,22 +372,22 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    protected final MatrixStore<N> makeD() {
+    protected MatrixStore<N> makeD() {
         return this.wrap(new DiagonalAccess<Double>(this.getSingularValues(), null, null, PrimitiveMath.ZERO));
     }
 
     @Override
-    protected final MatrixStore<N> makeQ1() {
+    protected MatrixStore<N> makeQ1() {
         return this.getBidiagonalQ1();
     }
 
     @Override
-    protected final MatrixStore<N> makeQ2() {
+    protected MatrixStore<N> makeQ2() {
         return this.getBidiagonalQ2();
     }
 
     @Override
-    protected final Array1D<Double> makeSingularValues() {
+    protected Array1D<Double> makeSingularValues() {
         throw new IllegalStateException("Should never have to be called!");
     }
 }

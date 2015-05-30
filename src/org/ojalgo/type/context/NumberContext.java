@@ -310,14 +310,6 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     /**
-     * @deprecated v38 Use {@link #getBigFunction()} instead
-     */
-    @Deprecated
-    public UnaryFunction<BigDecimal> getBigEnforceFunction() {
-        return this.getBigFunction();
-    }
-
-    /**
      * "big" enforce(...)
      */
     public UnaryFunction<BigDecimal> getBigFunction() {
@@ -331,22 +323,6 @@ public final class NumberContext extends FormatContext<Number> {
                 return NumberContext.this.enforce(arg);
             }
         };
-    }
-
-    /**
-     * @deprecated v38 Use {@link #getBigFunction()} instead
-     */
-    @Deprecated
-    public UnaryFunction<BigDecimal> getBigRoundFunction() {
-        return this.getBigFunction();
-    }
-
-    /**
-     * @deprecated v38 Use {@link #getComplexFunction()} instead
-     */
-    @Deprecated
-    public UnaryFunction<ComplexNumber> getComplexEnforceFunction() {
-        return this.getComplexFunction();
     }
 
     /**
@@ -365,28 +341,12 @@ public final class NumberContext extends FormatContext<Number> {
         };
     }
 
-    /**
-     * @deprecated v38 Use {@link #getComplexFunction()} instead
-     */
-    @Deprecated
-    public UnaryFunction<ComplexNumber> getComplexRoundFunction() {
-        return this.getComplexFunction();
-    }
-
     public MathContext getMathContext() {
         return myMathContext;
     }
 
     public int getPrecision() {
         return myMathContext.getPrecision();
-    }
-
-    /**
-     * @deprecated v38 Use {@link #getPrimitiveFunction()} instead
-     */
-    @Deprecated
-    public UnaryFunction<Double> getPrimitiveEnforceFunction() {
-        return this.getPrimitiveFunction();
     }
 
     /**
@@ -406,14 +366,6 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     /**
-     * @deprecated v38 Use {@link #getPrimitiveFunction()} instead
-     */
-    @Deprecated
-    public UnaryFunction<Double> getPrimitiveRoundFunction() {
-        return this.getPrimitiveFunction();
-    }
-
-    /**
      * "quaternion" enforce(...)
      */
     public UnaryFunction<Quaternion> getQuaternionFunction() {
@@ -430,14 +382,6 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     /**
-     * @deprecated v38 Use {@link #getRationalFunction()} instead
-     */
-    @Deprecated
-    public UnaryFunction<RationalNumber> getRationalEnforceFunction() {
-        return this.getRationalFunction();
-    }
-
-    /**
      * "rational" enforce(...)
      */
     public UnaryFunction<RationalNumber> getRationalFunction() {
@@ -451,14 +395,6 @@ public final class NumberContext extends FormatContext<Number> {
                 return arg.enforce(NumberContext.this);
             }
         };
-    }
-
-    /**
-     * @deprecated v38 Use {@link #getRationalFunction()} instead
-     */
-    @Deprecated
-    public UnaryFunction<RationalNumber> getRationalRoundFunction() {
-        return this.getRationalFunction();
     }
 
     public RoundingMode getRoundingMode() {

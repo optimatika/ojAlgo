@@ -23,7 +23,6 @@ package org.ojalgo.matrix;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.decomposition.RawLU;
 import org.ojalgo.matrix.store.MatrixStore;
 
 /**
@@ -61,23 +60,23 @@ public class P20071019Case extends BasicMatrixTest {
     @Override
     public void testProblem() {
 
-        final LU<Double> tmpJamaLU = new RawLU();
+        final LU<Double> tmpJamaLU = LU.makePrimitive();
         final LU<Double> tmpDenseLU = LU.makePrimitive();
 
         MatrixStore<Double> tmpOriginal = P20071019Case.getFatProblematic().toPrimitiveStore();
 
-        tmpJamaLU.compute(tmpOriginal);
+        tmpJamaLU.decompose(tmpOriginal);
         TestUtils.assertEquals(tmpOriginal, tmpJamaLU, EVALUATION);
 
-        tmpDenseLU.compute(tmpOriginal);
+        tmpDenseLU.decompose(tmpOriginal);
         TestUtils.assertEquals(tmpOriginal, tmpDenseLU, EVALUATION);
 
         tmpOriginal = P20071019Case.getTallProblematic().toPrimitiveStore();
 
-        tmpJamaLU.compute(tmpOriginal);
+        tmpJamaLU.decompose(tmpOriginal);
         TestUtils.assertEquals(tmpOriginal, tmpJamaLU, EVALUATION);
 
-        tmpDenseLU.compute(tmpOriginal);
+        tmpDenseLU.decompose(tmpOriginal);
         TestUtils.assertEquals(tmpOriginal, tmpDenseLU, EVALUATION);
 
     }

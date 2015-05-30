@@ -36,11 +36,9 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * This class adapts JAMA's EigenvalueDecomposition to ojAlgo's {@linkplain Eigenvalue} interface.
  *
- * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
-@Deprecated
-public abstract class RawEigenvalue extends OldRawDecomposition implements Eigenvalue<Double> {
+abstract class RawEigenvalue extends OldRawDecomposition implements Eigenvalue<Double> {
 
     public static final class General extends RawEigenvalue {
 
@@ -106,13 +104,12 @@ public abstract class RawEigenvalue extends OldRawDecomposition implements Eigen
         super();
     }
 
-    public Double calculateDeterminant(final Access2D<Double> matrix) {
-        this.compute(matrix);
-        return this.getDeterminant();
+    public boolean compute(final Access2D<?> matrix, final boolean eigenvaluesOnly) {
+        return this.decompose(matrix);
     }
 
-    public boolean compute(final Access2D<?> matrix, final boolean eigenvaluesOnly) {
-        return this.compute(matrix);
+    public boolean computeValuesOnly(final Access2D<?> matrix) {
+        return this.compute(matrix, true);
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
@@ -189,10 +186,6 @@ public abstract class RawEigenvalue extends OldRawDecomposition implements Eigen
         return new RawStore(myDelegate.getV());
     }
 
-    public boolean isFullSize() {
-        return true;
-    }
-
     public boolean isHermitian() {
         return myDelegate.isSymmetric();
     }
@@ -235,7 +228,7 @@ public abstract class RawEigenvalue extends OldRawDecomposition implements Eigen
         return null;
     }
 
-    public final boolean compute(final Access2D<?> matrix) {
+    public final boolean decompose(final Access2D<?> matrix) {
 
         this.reset();
 

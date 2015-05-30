@@ -70,7 +70,7 @@ public class HessenbergTest extends MatrixDecompositionTests {
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {
 
         final HessenbergDecomposition<Double> tmpDecomposition = (HessenbergDecomposition<Double>) Hessenberg.makePrimitive();
-        tmpDecomposition.compute(aMatrix);
+        tmpDecomposition.decompose(aMatrix);
 
         if (!MatrixUtils.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);

@@ -30,6 +30,7 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.RowsStore;
 import org.ojalgo.matrix.store.WrapperStore;
@@ -39,11 +40,9 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * This class adapts JAMA's LUDecomposition to ojAlgo's {@linkplain LU} interface.
  *
- * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
-@Deprecated
-public final class RawLU extends RawDecomposition implements LU<Double> {
+final class RawLU extends RawDecomposition implements LU<Double> {
 
     private Pivot myPivot;
 
@@ -51,20 +50,20 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
      * Not recommended to use this constructor directly. Consider using the static factory method
      * {@linkplain org.ojalgo.matrix.decomposition.LU#make(Access2D)} instead.
      */
-    public RawLU() {
+    RawLU() {
         super();
     }
 
     /**
      * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
      *
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#compute(org.ojalgo.access.Access2D)
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#decompose(org.ojalgo.access.Access2D)
      */
-    public boolean compute(final Access2D<?> matrix) {
+    public boolean decompose(final Access2D<?> matrix) {
 
         this.reset();
 
-        final double[][] tmpData = this.setRawInPlace(matrix);
+        final double[][] tmpData = this.setRawInPlace(matrix, false);
 
         final int tmpRowDim = this.getRowDim();
         final int tmpColDim = this.getColDim();
@@ -84,7 +83,7 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
             // Apply previous transformations.
             for (int i = 0; i < tmpRowDim; i++) {
                 // Most of the time is spent in the following dot product.
-                tmpData[i][j] = tmpColJ[i] -= DotProduct.invoke(tmpData[i], tmpColJ, Math.min(i, j));
+                tmpData[i][j] = tmpColJ[i] -= DotProduct.invoke(tmpData[i], 0, tmpColJ, 0, 0, Math.min(i, j));
             }
 
             // Find pivot and exchange if necessary.
@@ -115,7 +114,7 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public boolean computeWithoutPivoting(final MatrixStore<?> matrix) {
-        return this.compute(matrix);
+        return this.decompose(matrix);
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
@@ -134,10 +133,6 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
             d *= LU[j][j];
         }
         return d;
-    }
-
-    public MatrixStore<Double> getInverse() {
-        return this.getInverse(this.preallocate(this.getRowDim(), this.getRowDim()));
     }
 
     public MatrixStore<Double> getL() {
@@ -185,7 +180,33 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     @Override
-    public MatrixStore<Double> solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
+    public void reset() {
+
+        super.reset();
+
+        myPivot = null;
+    }
+
+    @Override
+    protected MatrixStore<Double> getInverse(final PrimitiveDenseStore preallocated) {
+
+        final int[] tmpPivotOrder = myPivot.getOrder();
+        final int tmpRowDim = this.getRowDim();
+        for (int i = 0; i < tmpRowDim; i++) {
+            preallocated.set(i, tmpPivotOrder[i], PrimitiveMath.ONE);
+        }
+
+        final RawStore tmpBody = this.getRawInPlaceStore();
+
+        preallocated.substituteForwards(tmpBody, true, false, !myPivot.isModified());
+
+        preallocated.substituteBackwards(tmpBody, false, false, false);
+
+        return preallocated;
+    }
+
+    @Override
+    protected MatrixStore<Double> solve(final Access2D<Double> rhs, final PrimitiveDenseStore preallocated) {
 
         preallocated.fillMatching(new RowsStore<Double>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
 
@@ -196,18 +217,6 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
         preallocated.substituteBackwards(tmpBody, false, false, false);
 
         return preallocated;
-    }
-
-    @Override
-    public void reset() {
-
-        super.reset();
-
-        myPivot = null;
-    }
-
-    public final MatrixStore<Double> solve(final Access2D<Double> rhs) {
-        return this.solve(rhs, this.preallocate(this.getRawInPlaceStore(), rhs));
     }
 
     /**
@@ -225,23 +234,6 @@ public final class RawLU extends RawDecomposition implements LU<Double> {
             }
         }
         return true;
-    }
-
-    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
-
-        final int[] tmpPivotOrder = myPivot.getOrder();
-        final int tmpRowDim = this.getRowDim();
-        for (int i = 0; i < tmpRowDim; i++) {
-            preallocated.set(i, tmpPivotOrder[i], PrimitiveMath.ONE);
-        }
-
-        final RawStore tmpBody = this.getRawInPlaceStore();
-
-        preallocated.substituteForwards(tmpBody, true, false, !myPivot.isModified());
-
-        preallocated.substituteBackwards(tmpBody, false, false, false);
-
-        return preallocated;
     }
 
 }

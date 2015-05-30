@@ -28,6 +28,7 @@ import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20030422Case;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -66,7 +67,7 @@ public class QRTest extends MatrixDecompositionTests {
                 { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
         final QR<Double> tmpDecomp = QR.makePrimitive();
-        tmpDecomp.compute(tmpOriginalMatrix);
+        tmpDecomp.decompose(tmpOriginalMatrix);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Should be I", tmpDecomp.getQ());
@@ -88,7 +89,7 @@ public class QRTest extends MatrixDecompositionTests {
         }
 
         final QR<ComplexNumber> tmpDecomposition = QR.makeComplex();
-        tmpDecomposition.compute(tmpOriginal);
+        tmpDecomposition.decompose(tmpOriginal);
         final MatrixStore<ComplexNumber> tmpDecompQ = tmpDecomposition.getQ();
         final MatrixStore<ComplexNumber> tmpDecompR = tmpDecomposition.getR();
 
@@ -162,9 +163,9 @@ public class QRTest extends MatrixDecompositionTests {
         final QR<ComplexNumber> tmpComplexDecomp = QR.makeComplex();
         final QR<Double> tmpPrimitiveDecomp = QR.makePrimitive();
 
-        tmpBigDecomp.compute(tmpOriginal);
-        tmpComplexDecomp.compute(tmpOriginal);
-        tmpPrimitiveDecomp.compute(tmpOriginal);
+        tmpBigDecomp.decompose(tmpOriginal);
+        tmpComplexDecomp.decompose(tmpOriginal);
+        tmpPrimitiveDecomp.decompose(tmpOriginal);
 
         final MatrixStore<BigDecimal> tmpBigQ = tmpBigDecomp.getQ();
         final MatrixStore<ComplexNumber> tmpComplexQ = tmpComplexDecomp.getQ();
@@ -193,6 +194,29 @@ public class QRTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpOriginal.toPrimitiveStore(), tmpPrimitiveDecomp, new NumberContext(7, 14));
         ;
 
+    }
+
+    public void testLeastSquaresInvert() {
+
+        MatrixUtils.setThresholdsMinValue(100000);
+
+        final int tmpDim = 3;
+        final MatrixStore<Double> tmpA = MatrixUtils.makeSPD(tmpDim).builder().below(new IdentityStore<>(PrimitiveDenseStore.FACTORY, tmpDim)).build();
+
+        final QR<Double> tmpDenseQR = new QRDecomposition.Primitive();
+        final QR<Double> tmpRawQR = new RawQR();
+
+        final DecompositionStore<Double> tmpDenseAlloc = tmpDenseQR.preallocate(tmpA);
+        final DecompositionStore<Double> tmpRawAlloc = tmpRawQR.preallocate(tmpA);
+
+        final MatrixStore<Double> tmpDenseInv = tmpDenseQR.invert(tmpA, tmpDenseAlloc);
+        final MatrixStore<Double> tmpRawInv = tmpRawQR.invert(tmpA, tmpRawAlloc);
+
+        TestUtils.assertEquals(tmpDenseInv, tmpRawInv);
+
+        final IdentityStore<Double> tmpIdentity = IdentityStore.makePrimitive(tmpDim);
+        TestUtils.assertEquals(tmpIdentity, tmpDenseInv.multiply(tmpA));
+        TestUtils.assertEquals(tmpIdentity, tmpRawInv.multiply(tmpA));
     }
 
 }

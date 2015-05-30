@@ -130,9 +130,6 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     };
 
     /**
-     * <p>
-     * Implementiong this method is optional.
-     * </p>
      * Will create a {@linkplain DecompositionStore} instance suitable for use with
      * {@link #solve(Access2D, Access2D, DecompositionStore)}. When solving an equation system [A][X]=[B]
      * ([mxn][nxb]=[mxb]) the preallocated memory/matrix will typically be either mxb or nxb (if A is square
@@ -141,7 +138,6 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * @param templateBody
      * @param templateRHS
      * @return
-     * @throws UnsupportedOperationException When/if this feature is not implemented
      */
     DecompositionStore<N> preallocate(Access2D<N> templateBody, Access2D<N> templateRHS);
 
@@ -154,11 +150,8 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
     /**
      * <p>
-     * Implementiong this method is optional.
-     * </p>
-     * <p>
-     * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by this
-     * interface. It must be documented for each implementation.
+     * Exactly how (if at all) a specific implementation makes use of <code>preallocated</code> is not
+     * specified by this interface. It must be documented for each implementation.
      * </p>
      * <p>
      * Should produce the same results as calling {@link #solve(Access2D, Access2D)}.
@@ -168,7 +161,6 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
      *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
      * @return The solution
-     * @throws UnsupportedOperationException When/if this feature is not implemented
      */
     MatrixStore<N> solve(Access2D<N> body, Access2D<N> rhs, DecompositionStore<N> preallocated) throws TaskException;
 }

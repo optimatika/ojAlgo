@@ -61,7 +61,7 @@ public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
         }
 
         final QR<ComplexNumber> tmpQR = QR.makeComplex();
-        tmpQR.compute(tmpBody);
+        tmpQR.decompose(tmpBody);
         this.set(tmpQR.solve(tmpRHS));
     }
 

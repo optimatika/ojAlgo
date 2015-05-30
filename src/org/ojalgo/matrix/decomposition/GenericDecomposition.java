@@ -26,6 +26,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.WrapperStore;
 import org.ojalgo.matrix.transformation.Householder;
@@ -64,26 +65,6 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         }
     }
 
-    public final MatrixStore<N> invert(final MatrixStore<N> original) {
-        this.compute(original);
-        return this.getInverse();
-    }
-
-    public final MatrixStore<N> invert(final MatrixStore<N> original, final DecompositionStore<N> preallocated) {
-        this.compute(original);
-        return this.getInverse(preallocated);
-    }
-
-    public final MatrixStore<N> solve(final Access2D<N> body, final Access2D<N> rhs) {
-        this.compute(body);
-        return this.solve(rhs);
-    }
-
-    public final MatrixStore<N> solve(final Access2D<N> body, final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
-        this.compute(body);
-        return this.solve(rhs, preallocated);
-    }
-
     protected final DecompositionStore<N> copy(final Access2D<?> source) {
         return myFactory.copy(source);
     }
@@ -106,6 +87,10 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
 
     protected final DecompositionStore<N> makeEye(final int aRowDim, final int aColDim) {
         return myFactory.makeEye(aRowDim, aColDim);
+    }
+
+    protected final IdentityStore<N> makeIdentity(final int dimension) {
+        return new IdentityStore<N>(myFactory, dimension);
     }
 
     protected final Householder<N> makeHouseholder(final int aDim) {

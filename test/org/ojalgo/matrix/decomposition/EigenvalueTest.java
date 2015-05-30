@@ -51,7 +51,7 @@ public class EigenvalueTest extends MatrixDecompositionTests {
         MatrixStore<Double> tmpRecreatedMatrix;
 
         final Eigenvalue<Double> tmpDecomposition = Eigenvalue.makePrimitive();
-        tmpDecomposition.compute(originalMatrix);
+        tmpDecomposition.decompose(originalMatrix);
 
         final Array1D<ComplexNumber> tmpEigenvalues = tmpDecomposition.getEigenvalues();
         final MatrixStore<Double> tmpD = tmpDecomposition.getD();
@@ -91,7 +91,7 @@ public class EigenvalueTest extends MatrixDecompositionTests {
 
         final Eigenvalue<Double>[] tmpDecomps = MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric();
         for (int d = 0; d < tmpDecomps.length; d++) {
-            tmpDecomps[d].compute(tmpOriginalMatrix);
+            tmpDecomps[d].decompose(tmpOriginalMatrix);
         }
 
         if (MatrixDecompositionTests.DEBUG) {

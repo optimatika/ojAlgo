@@ -43,39 +43,47 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         super();
     }
 
+    public final MatrixStore<Double> getInverse() {
+        return this.getInverse(this.preallocate(this.getColDim(), this.getColDim()));
+    }
+
+    public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+        return this.getInverse((PrimitiveDenseStore) preallocated);
+    }
+
     public final MatrixStore<Double> invert(final MatrixStore<Double> original) {
-        this.compute(original);
+        this.decompose(original);
         return this.getInverse();
     }
 
     public final MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
-        this.compute(original);
+        this.decompose(original);
         return this.getInverse(preallocated);
     }
 
+    public final MatrixStore<Double> solve(final Access2D<Double> rhs) {
+        return this.solve(rhs, this.preallocate(this.getRawInPlaceStore(), rhs));
+    }
+
     public final MatrixStore<Double> solve(final Access2D<Double> body, final Access2D<Double> rhs) {
-        this.compute(body);
+        this.decompose(body);
         return this.solve(rhs);
     }
 
     public final MatrixStore<Double> solve(final Access2D<Double> body, final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
-        this.compute(body);
+        this.decompose(body);
         return this.solve(rhs, preallocated);
     }
 
-    /**
-     * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #solve(Access2D)}.
-     *
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#solve(Access2D,
-     *      org.ojalgo.matrix.decomposition.DecompositionStore)
-     */
-    public MatrixStore<Double> solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.solve(rhs);
+    public final MatrixStore<Double> solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.solve(rhs, (PrimitiveDenseStore) preallocated);
     }
 
     protected final int getColDim() {
         return myColDim;
     }
+
+    protected abstract MatrixStore<Double> getInverse(final PrimitiveDenseStore preallocated);
 
     protected final int getMinDim() {
         return Math.min(myRowDim, myColDim);
@@ -98,25 +106,29 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     @Override
-    protected final DecompositionStore<Double> preallocate(final long numberOfRows, final long numberOfColumns) {
+    protected final PrimitiveDenseStore preallocate(final long numberOfRows, final long numberOfColumns) {
         return PrimitiveDenseStore.FACTORY.makeZero(numberOfRows, numberOfColumns);
     }
 
-    protected final double[][] setRawInPlace(final Access2D<?> matrix) {
+    protected final double[][] setRawInPlace(final Access2D<?> matrix, final boolean transpose) {
 
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
 
         if ((myRawInPlaceData == null) || (myRowDim != tmpRowDim) || (myColDim != tmpColDim)) {
 
-            myRawInPlaceStore = RawStore.FACTORY.makeZero(tmpRowDim, tmpColDim);
+            myRawInPlaceStore = RawStore.FACTORY.makeZero(transpose ? tmpColDim : tmpRowDim, transpose ? tmpRowDim : tmpColDim);
             myRawInPlaceData = myRawInPlaceStore.data;
 
             myRowDim = tmpRowDim;
             myColDim = tmpColDim;
         }
 
-        this.copy(matrix, tmpRowDim, tmpColDim, myRawInPlaceData);
+        if (transpose) {
+            this.transpose(matrix, tmpRowDim, tmpColDim, myRawInPlaceData);
+        } else {
+            this.copy(matrix, tmpRowDim, tmpColDim, myRawInPlaceData);
+        }
 
         this.aspectRatioNormal(tmpRowDim >= tmpColDim);
         this.computed(false);
@@ -124,11 +136,25 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return myRawInPlaceData;
     }
 
+    protected abstract MatrixStore<Double> solve(final Access2D<Double> rhs, final PrimitiveDenseStore preallocated);
+
     /**
-     * Possible to override to, possibly, only copy part of the matrix (or transpose it)
+     * Possible to override to, possibly, only copy part of the matrix.
      */
     void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
         MatrixUtils.copy(source, rows, columns, destination);
+    }
+
+    /**
+     * Possible to override to, possibly, only copy/transpose part of the matrix.
+     */
+    void transpose(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
+        for (int j = 0; j < columns; j++) {
+            final double[] tmpColumn = destination[j];
+            for (int i = 0; i < rows; i++) {
+                tmpColumn[i] = source.doubleValue(i, j);
+            }
+        }
     }
 
 }

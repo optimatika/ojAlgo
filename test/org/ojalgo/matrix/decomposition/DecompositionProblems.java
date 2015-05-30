@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -51,7 +52,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
         final SingularValue<Double> tmpSVD = SingularValue.makePrimitive();
-        tmpSVD.compute(tmpA);
+        tmpSVD.decompose(tmpA);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("D", tmpSVD.getD(), new NumberContext(7, 6));
@@ -70,7 +71,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(5, 9));
 
         final QR<Double> tmpQR = QR.makePrimitive();
-        tmpQR.compute(tmpA);
+        tmpQR.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
     }
@@ -86,7 +87,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 { 1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233 } });
 
         final QR<Double> tmpQR = QR.makePrimitive();
-        tmpQR.compute(tmpA);
+        tmpQR.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
     }
@@ -97,7 +98,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 { 0.9544, 0.0782, 0.1140 } });
 
         final Eigenvalue<Double> tmpPrimitive = Eigenvalue.makePrimitive();
-        tmpPrimitive.compute(tmpA);
+        tmpPrimitive.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpPrimitive, new NumberContext(7, 6));
     }
@@ -122,13 +123,13 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         final LU<Double> tmpDecomp = LU.makePrimitive();
 
-        tmpDecomp.compute(tmpA);
+        tmpDecomp.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpDecomp, new NumberContext(7, 6));
 
         final MatrixStore<Double> tmpExpected = tmpDecomp.solve(tmpI);
 
-        tmpDecomp.compute(tmpA);
+        tmpDecomp.decompose(tmpA);
         final MatrixStore<Double> tmpActual = tmpDecomp.getInverse();
 
         TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
@@ -147,19 +148,19 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpRandom = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim));
         final PhysicalStore<Double> tmpIdentity = PrimitiveDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
 
-        final MatrixDecomposition<Double> tmpRefDecomps = new RawLU();
-        tmpRefDecomps.compute(tmpRandom);
+        final LU<Double> tmpRefDecomps = new RawLU();
+        tmpRefDecomps.decompose(tmpRandom);
         final MatrixStore<Double> tmpExpected = tmpRefDecomps.getInverse();
 
-        final MatrixDecomposition<Double> tmpTestDecomp = LU.makePrimitive();
-        tmpTestDecomp.compute(tmpRandom);
+        final LU<Double> tmpTestDecomp = LU.makePrimitive();
+        tmpTestDecomp.decompose(tmpRandom);
         MatrixStore<Double> tmpActual = tmpTestDecomp.getInverse();
 
         TestUtils.assertEquals(tmpExpected, tmpActual, tmpEqualsNumberContext);
         TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyLeft(tmpActual), tmpEqualsNumberContext);
         TestUtils.assertEquals(tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
 
-        tmpTestDecomp.compute(tmpRandom);
+        tmpTestDecomp.decompose(tmpRandom);
         tmpActual = tmpTestDecomp.getInverse();
 
         TestUtils.assertEquals(tmpExpected, tmpActual, tmpEqualsNumberContext);
@@ -193,15 +194,15 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                                                                                                               */};
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
-            tmpDecomposition.compute(tmpHermitian);
+            tmpDecomposition.decompose(tmpHermitian);
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug(tmpDecomposition.toString());
                 BasicLogger.debug("Original", tmpHermitian);
                 BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
             }
             TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), new NumberContext(8, 5));
-            if (tmpDecomposition.isSolvable()) {
-                tmpActual = tmpDecomposition.solve(tmpHermitian);
+            if ((tmpDecomposition instanceof MatrixDecomposition.Solver<?>) && ((Solver) tmpDecomposition).isSolvable()) {
+                tmpActual = ((Solver) tmpDecomposition).solve(tmpHermitian);
                 if (MatrixDecompositionTests.DEBUG) {
                     BasicLogger.debug("Actual", tmpActual);
                 }
@@ -233,15 +234,15 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 SingularValue.makeComplex() };
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
-            tmpDecomposition.compute(tmpTall);
+            tmpDecomposition.decompose(tmpTall);
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug(tmpDecomposition.toString());
                 BasicLogger.debug("Original", tmpTall);
                 BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
             }
             TestUtils.assertEquals(tmpDecomposition.toString(), tmpTall, tmpDecomposition.reconstruct(), new NumberContext(7, 5));
-            if (tmpDecomposition.isSolvable()) {
-                tmpActual = tmpDecomposition.solve(tmpTall);
+            if ((tmpDecomposition instanceof MatrixDecomposition.Solver<?>) && ((Solver) tmpDecomposition).isSolvable()) {
+                tmpActual = ((Solver) tmpDecomposition).solve(tmpTall);
                 if (MatrixDecompositionTests.DEBUG) {
                     BasicLogger.debug("Actual", tmpActual);
                 }

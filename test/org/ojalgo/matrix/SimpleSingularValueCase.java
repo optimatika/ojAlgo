@@ -22,7 +22,6 @@
 package org.ojalgo.matrix;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.decomposition.RawSingularValue;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -79,8 +78,8 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
 
         final MatrixStore<Double> tmpA = SimpleSingularValueCase.getOriginal().toPrimitiveStore();
 
-        final SingularValue<Double> tmpSVD = new RawSingularValue();
-        tmpSVD.compute(tmpA);
+        final SingularValue<Double> tmpSVD = SingularValue.make(tmpA);
+        tmpSVD.decompose(tmpA);
 
         tmpSVD.equals(tmpA, EVALUATION);
     }

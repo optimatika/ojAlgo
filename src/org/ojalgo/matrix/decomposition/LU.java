@@ -90,7 +90,7 @@ public interface LU<N extends Number> extends LDU<N> {
     }
 
     /**
-     * The normal {@link #compute(Access2D)} method must handle cases where pivoting is required. If you know
+     * The normal {@link #decompose(Access2D)} method must handle cases where pivoting is required. If you know
      * that pivoting is not needed you may call this method instead - it's faster.
      */
     boolean computeWithoutPivoting(MatrixStore<?> matrix);

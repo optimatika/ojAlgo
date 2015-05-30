@@ -27,7 +27,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -49,7 +48,8 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, HermitianDecomposition<N>, DeterminantTask<N> {
+public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.Hermitian<N>,
+        MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
@@ -89,7 +89,7 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, He
     }
 
     public static Eigenvalue<BigDecimal> makeBig() {
-        return EigenvalueDecomposition.makeBig(true);
+        return Eigenvalue.makeBig(true);
     }
 
     public static Eigenvalue<BigDecimal> makeBig(final boolean symmetric) {
@@ -97,7 +97,7 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, He
     }
 
     public static Eigenvalue<ComplexNumber> makeComplex() {
-        return EigenvalueDecomposition.makeComplex(true);
+        return Eigenvalue.makeComplex(true);
     }
 
     public static Eigenvalue<ComplexNumber> makeComplex(final boolean hermitian) {
@@ -132,15 +132,6 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, He
      * @return The (block) diagonal eigenvalue matrix.
      */
     MatrixStore<N> getD();
-
-    /**
-     * <p>
-     * A matrix' determinant is the product of its eigenvalues.
-     * </p>
-     *
-     * @return The matrix' determinant
-     */
-    N getDeterminant();
 
     /**
      * <p>

@@ -118,19 +118,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     };
 
-    /**
-     * This method is no longer needed. Just use the {@linkplain MathProgSysModel} the same way you would use
-     * the {@linkplain ExpressionsBasedModel}. If you absolutely must have an
-     * {@linkplain ExpressionsBasedModel} then simply call
-     * {@linkplain MathProgSysModel#getExpressionsBasedModel()}.
-     *
-     * @deprecated v38
-     */
-    @Deprecated
-    public static ExpressionsBasedModel make(final MathProgSysModel mps) {
-        return mps.getExpressionsBasedModel();
-    }
-
     static final void presolve(final ExpressionsBasedModel model) {
 
         for (final Expression tmpExpression : model.getExpressions()) {

@@ -110,14 +110,6 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
         }
     }
 
-    public boolean isFullSize() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.isFullSize();
-        } else {
-            return myNonsymmetricDelegate.isFullSize();
-        }
-    }
-
     public boolean isHermitian() {
         if (mySymmetricOrNot) {
             return mySymmetricDelegate.isHermitian();

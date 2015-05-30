@@ -29,12 +29,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-/**
- * @deprecated v38 This class will be made package private. Use the inteface instead.
- * @author apete
- */
-@Deprecated
-public abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Schur<N> {
+abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Schur<N> {
 
     public static final class SchurResult<N extends Number> extends Object {
 
@@ -72,23 +67,6 @@ public abstract class SchurDecomposition<N extends Number> extends InPlaceDecomp
 
     }
 
-    /**
-     * @deprecated v38 Use {@link Schur#make(Access2D)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static final <N extends Number> Schur<N> make(final Access2D<N> aTypical) {
-        return Schur.make(aTypical);
-    }
-
-    /**
-     * @deprecated v38 Use {@link Schur#makePrimitive()} instead
-     */
-    @Deprecated
-    public static final Schur<Double> makePrimitive() {
-        return Schur.makePrimitive();
-    }
-
     private Array1D<ComplexNumber> myDiagonal;
     private MatrixStore<N> myQ;
 
@@ -96,7 +74,7 @@ public abstract class SchurDecomposition<N extends Number> extends InPlaceDecomp
         super(aFactory);
     }
 
-    public boolean compute(final Access2D<?> matrix) {
+    public boolean decompose(final Access2D<?> matrix) {
 
         this.reset();
 

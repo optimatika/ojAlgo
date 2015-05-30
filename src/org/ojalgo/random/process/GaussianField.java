@@ -223,7 +223,7 @@ public final class GaussianField<K extends Comparable<K>> {
         return retVal;
     }
 
-    MatrixDecomposition<Double> getC22() {
+    MatrixDecomposition.Solver<Double> getC22() {
 
         final List<ComparableToDouble<K>> tmpObservations = this.getObservations();
 
@@ -240,7 +240,7 @@ public final class GaussianField<K extends Comparable<K>> {
 
         final SingularValue<Double> retVal = SingularValue.makePrimitive();
 
-        retVal.compute(tmpMatrix);
+        retVal.decompose(tmpMatrix);
 
         return retVal;
     }

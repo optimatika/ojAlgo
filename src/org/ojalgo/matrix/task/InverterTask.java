@@ -117,11 +117,8 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     /**
      * <p>
-     * Implementiong this method is optional.
-     * </p>
-     * <p>
-     * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by this
-     * interface. It must be documented for each implementation.
+     * Exactly how (if at all) a specific implementation makes use of <code>preallocated</code> is not
+     * specified by this interface. It must be documented for each implementation.
      * </p>
      * <p>
      * Should produce the same results as calling {@link #invert(MatrixStore)}.
@@ -130,20 +127,14 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
      *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
      * @return The inverse
-     * @throws UnsupportedOperationException When/if this feature is not implemented
      */
     MatrixStore<N> invert(MatrixStore<N> original, DecompositionStore<N> preallocated) throws TaskException;
 
     /**
-     * <p>
-     * Implementiong this method is optional.
-     * </p>
      * Will create a {@linkplain DecompositionStore} instance suitable for use with
      * {@link #invert(MatrixStore, DecompositionStore)}. When solving an equation system [A][X]=[B]
      * ([mxn][nxb]=[mxb]) the preallocated memory/matrix will typically be either mxb or nxb (if A is square
      * then there is no doubt).
-     *
-     * @throws UnsupportedOperationException When/if this feature is not implemented
      */
     DecompositionStore<N> preallocate(Access2D<N> template);
 

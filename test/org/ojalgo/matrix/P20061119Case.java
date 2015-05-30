@@ -23,7 +23,6 @@ package org.ojalgo.matrix;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.RawEigenvalue;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -72,8 +71,8 @@ public class P20061119Case extends BasicMatrixTest {
 
         final BasicMatrix tmpMatrix = P20061119Case.getProblematic();
 
-        final Eigenvalue<Double> tmpEigenvalue = new RawEigenvalue.General();
-        tmpEigenvalue.compute(tmpMatrix);
+        final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.makePrimitive();
+        tmpEigenvalue.decompose(tmpMatrix);
 
         TestUtils.assertEquals(tmpMatrix.toPrimitiveStore(), tmpEigenvalue, EVALUATION);
     }

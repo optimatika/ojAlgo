@@ -49,7 +49,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface LDL<N extends Number> extends LDU<N>, HermitianDecomposition<N> {
+public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N> {
 
     public static <N extends Number> LDL<N> make(final Access2D<N> typical) {
 

@@ -47,7 +47,7 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface Cholesky<N extends Number> extends LDU<N>, HermitianDecomposition<N> {
+public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {

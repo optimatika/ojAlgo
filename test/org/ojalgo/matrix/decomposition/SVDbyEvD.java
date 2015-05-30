@@ -120,7 +120,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         // So far...
 
         final SingularValue<Double> tmpExperimental = SingularValue.makePrimitive();
-        tmpExperimental.compute(aMtrxA);
+        tmpExperimental.decompose(aMtrxA);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();

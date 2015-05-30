@@ -153,10 +153,9 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
         final long luBefore = System.nanoTime();
         for (int l = 0; l < tmpI; l++) {
-            try {
-                tmpLU.solve(tmpBody, tmpRhs, tmpSolution);
-            } catch (final TaskException exception) {
-            }
+
+            tmpLU.solve(tmpBody, tmpRhs, tmpSolution);
+
         }
         final long tmpLUt = System.nanoTime() - luBefore;
 

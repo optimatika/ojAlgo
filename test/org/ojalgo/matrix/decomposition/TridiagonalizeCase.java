@@ -108,9 +108,9 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
         final Tridiagonal<ComplexNumber> tmpComplexDecomp = Tridiagonal.makeComplex();
         final Tridiagonal<Double> tmpPrimitiveDecomp = Tridiagonal.makePrimitive();
 
-        tmpBigDecomp.compute(tmpBigA);
-        tmpComplexDecomp.compute(tmpComplexA);
-        tmpPrimitiveDecomp.compute(tmpPrimitiveA);
+        tmpBigDecomp.decompose(tmpBigA);
+        tmpComplexDecomp.decompose(tmpComplexA);
+        tmpPrimitiveDecomp.decompose(tmpPrimitiveA);
 
         TestUtils.assertEquals(tmpBigA, tmpBigDecomp, new NumberContext(7, 14));
         TestUtils.assertEquals(tmpComplexA, tmpComplexDecomp, new NumberContext(7, 14));
@@ -152,7 +152,7 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
         final Tridiagonal<Double> tmpDecomp = Tridiagonal.makePrimitive();
         // final Tridiagonal<Double> tmpDecomp = new TridiagonalAltDecomp();
 
-        tmpDecomp.compute(aMtrxA);
+        tmpDecomp.decompose(aMtrxA);
 
         TestUtils.assertEquals(aMtrxD, tmpDecomp.getD(), new NumberContext(7, 6));
 

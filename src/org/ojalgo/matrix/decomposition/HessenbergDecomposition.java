@@ -33,12 +33,7 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-/**
- * @deprecated v38 This class will be made package private. Use the inteface instead.
- * @author apete
- */
-@Deprecated
-public abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Hessenberg<N> {
+abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Hessenberg<N> {
 
     static final class Big extends HessenbergDecomposition<BigDecimal> {
 
@@ -64,39 +59,6 @@ public abstract class HessenbergDecomposition<N extends Number> extends InPlaceD
 
     }
 
-    /**
-     * @deprecated v38 Use {@link Hessenberg#make(Access2D)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static final <N extends Number> Hessenberg<N> make(final Access2D<N> aTypical) {
-        return Hessenberg.make(aTypical);
-    }
-
-    /**
-     * @deprecated v38 Use {@link Hessenberg#makeBig()} instead
-     */
-    @Deprecated
-    public static Hessenberg<BigDecimal> makeBig() {
-        return Hessenberg.makeBig();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Hessenberg#makeComplex()} instead
-     */
-    @Deprecated
-    public static Hessenberg<ComplexNumber> makeComplex() {
-        return Hessenberg.makeComplex();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Hessenberg#makePrimitive()} instead
-     */
-    @Deprecated
-    public static Hessenberg<Double> makePrimitive() {
-        return Hessenberg.makePrimitive();
-    }
-
     private transient DecompositionStore<N> myQ = null;
 
     private boolean myUpper = true;
@@ -105,7 +67,7 @@ public abstract class HessenbergDecomposition<N extends Number> extends InPlaceD
         super(aFactory);
     }
 
-    public final boolean compute(final Access2D<?> matrix) {
+    public final boolean decompose(final Access2D<?> matrix) {
         return this.compute(matrix, true);
     }
 

@@ -41,12 +41,7 @@ import org.ojalgo.matrix.store.WrapperStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-/**
- * @deprecated v38 This class will be made package private. Use the inteface instead.
- * @author apete
- */
-@Deprecated
-public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LU<N> {
+abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LU<N> {
 
     static final class Big extends LUDecomposition<BigDecimal> {
 
@@ -72,54 +67,13 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
 
     }
 
-    /**
-     * @deprecated v38 Use {@link LU#make(Access2D)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static final <N extends Number> LU<N> make(final Access2D<N> aTypical) {
-        return LU.make(aTypical);
-    }
-
-    /**
-     * @deprecated v38 Use {@link LU#makeBig()} instead
-     */
-    @Deprecated
-    public static final LU<BigDecimal> makeBig() {
-        return LU.makeBig();
-    }
-
-    /**
-     * @deprecated v38 Use {@link LU#makeComplex()} instead
-     */
-    @Deprecated
-    public static final LU<ComplexNumber> makeComplex() {
-        return LU.makeComplex();
-    }
-
-    /**
-     * @deprecated v38 Use {@link LU#makePrimitive()} instead
-     */
-    @Deprecated
-    public static final LU<Double> makeJama() {
-        return new RawLU();
-    }
-
-    /**
-     * @deprecated v38 Use {@link LU#makePrimitive()} instead
-     */
-    @Deprecated
-    public static final LU<Double> makePrimitive() {
-        return LU.makePrimitive();
-    }
-
     private Pivot myPivot;
 
     protected LUDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
     }
 
-    public boolean compute(final Access2D<?> aStore) {
+    public boolean decompose(final Access2D<?> aStore) {
         return this.compute(aStore, false);
     }
 
@@ -235,6 +189,10 @@ public abstract class LUDecomposition<N extends Number> extends InPlaceDecomposi
         }
 
         return retVal;
+    }
+
+    public final MatrixStore<N> solve(final Access2D<N> rhs) {
+        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     @Override

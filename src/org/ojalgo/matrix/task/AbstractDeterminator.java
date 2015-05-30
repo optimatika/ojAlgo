@@ -248,10 +248,9 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
         final long luBefore = System.nanoTime();
         for (int l = 0; l < tmpI; l++) {
-            try {
-                tmpLU.invert(tmpSource, tmpDestination);
-            } catch (final TaskException exception) {
-            }
+
+            tmpLU.invert(tmpSource, tmpDestination);
+
         }
         final long tmpLUt = System.nanoTime() - luBefore;
 

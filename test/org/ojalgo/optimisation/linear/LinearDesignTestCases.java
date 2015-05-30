@@ -189,7 +189,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.74 }, { 0.45 }, { 1.0 } });
         final PhysicalStore<Double> tmpActX = tmpSolution.selectRows(new int[] { 0, 1, 2 }).toPrimitiveStore();
-        tmpActX.modifyAll(new NumberContext(7, 2).getPrimitiveRoundFunction());
+        tmpActX.modifyAll(new NumberContext(7, 2).getPrimitiveFunction());
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }

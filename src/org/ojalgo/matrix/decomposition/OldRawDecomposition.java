@@ -32,8 +32,10 @@ import org.ojalgo.matrix.store.RawStore;
  * In many ways similar to InPlaceDecomposition but this class is hardwired to work with double[][] data.
  *
  * @author apete
+ * @deprecated v39
  */
-abstract class OldRawDecomposition extends AbstractDecomposition<Double> {
+@Deprecated
+abstract class OldRawDecomposition extends AbstractDecomposition<Double> implements MatrixDecomposition.Solver<Double> {
 
     protected static RawStore cast(final Access2D<?> access) {
         if (access instanceof RawStore) {
@@ -61,22 +63,22 @@ abstract class OldRawDecomposition extends AbstractDecomposition<Double> {
     }
 
     public final MatrixStore<Double> invert(final MatrixStore<Double> original) {
-        this.compute(original);
+        this.decompose(original);
         return this.getInverse();
     }
 
     public final MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
-        this.compute(original);
+        this.decompose(original);
         return this.getInverse(preallocated);
     }
 
     public final MatrixStore<Double> solve(final Access2D<Double> body, final Access2D<Double> rhs) {
-        this.compute(body);
+        this.decompose(body);
         return this.solve(rhs);
     }
 
     public final MatrixStore<Double> solve(final Access2D<Double> body, final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
-        this.compute(body);
+        this.decompose(body);
         return this.solve(rhs, preallocated);
     }
 

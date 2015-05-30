@@ -93,12 +93,12 @@ public class TestJama extends MatrixDecompositionTests {
 
             // Requires square matrices
 
-            CHOLESKY.compute(aMtrx);
+            CHOLESKY.decompose(aMtrx);
             if (CHOLESKY.isSolvable()) {
                 TestUtils.assertEquals(aMtrx, CHOLESKY, EVAL_CNTXT);
             }
 
-            EIGENVALUE.compute(aMtrx);
+            EIGENVALUE.decompose(aMtrx);
             if (EIGENVALUE.isSolvable()) {
                 TestUtils.assertEquals(aMtrx, EIGENVALUE, EVAL_CNTXT);
             }
@@ -109,18 +109,18 @@ public class TestJama extends MatrixDecompositionTests {
             // The Jama QR decomposition can't handle matrices that are fat,
             // and it's not the most common use case for this decomposition.
 
-            QR.compute(aMtrx);
+            QR.decompose(aMtrx);
             if (QR.isSolvable()) {
                 TestUtils.assertEquals(aMtrx, QR, EVAL_CNTXT);
             }
         }
 
-        LU.compute(aMtrx);
+        LU.decompose(aMtrx);
         if (LU.isSolvable()) {
             TestUtils.assertEquals(aMtrx, LU, EVAL_CNTXT);
         }
 
-        SINGULAR_VALUE.compute(aMtrx);
+        SINGULAR_VALUE.decompose(aMtrx);
         if (SINGULAR_VALUE.isSolvable()) {
             TestUtils.assertEquals(aMtrx, SINGULAR_VALUE, EVAL_CNTXT);
         }

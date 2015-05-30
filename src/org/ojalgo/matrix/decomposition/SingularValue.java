@@ -46,7 +46,8 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface SingularValue<N extends Number> extends MatrixDecomposition<N> {
+public interface SingularValue<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
+        MatrixDecomposition.Values<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {
@@ -91,14 +92,6 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N> 
     public static SingularValue<Double> makePrimitive() {
         return new SVDnew32.Primitive();
     }
-
-    /**
-     * @param matrix A matrix to decompose
-     * @param singularValuesOnly No need to calculate eigenvectors
-     * @param fullSize TODO
-     * @return true/false if the computation succeeded or not
-     */
-    boolean compute(Access2D<?> matrix, boolean singularValuesOnly, boolean fullSize);
 
     /**
      * The condition number.
@@ -171,8 +164,6 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N> 
     Array1D<Double> getSingularValues();
 
     double getTraceNorm();
-
-    boolean isOrdered();
 
     default MatrixStore<N> reconstruct() {
         return MatrixUtils.reconstruct(this);

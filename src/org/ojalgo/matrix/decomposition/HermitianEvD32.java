@@ -326,10 +326,6 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
         return tmpVisitor.getNumber();
     }
 
-    public final boolean isFullSize() {
-        return true;
-    }
-
     public final boolean isHermitian() {
         return true;
     }
@@ -362,7 +358,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
 
         final int tmpDim = (int) aMtrx.countRows();
 
-        myTridiagonal.compute(aMtrx);
+        myTridiagonal.decompose(aMtrx);
 
         final DiagonalAccess<N> tmpTridiagonal = myTridiagonal.getDiagonalAccessD();
 

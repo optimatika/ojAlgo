@@ -70,7 +70,8 @@ public class DesignCase extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpB = PrimitiveDenseStore.FACTORY.makeFilled(3, 1, new Normal());
 
         final QR<Double> tmpQR = QR.makePrimitive();
-        tmpQR.compute(tmpA, false);
+        tmpQR.setFullSize(false);
+        tmpQR.decompose(tmpA);
 
         final PhysicalStore<Double> tmpX = tmpQR.solve(tmpB).copy();
 
@@ -88,7 +89,7 @@ public class DesignCase extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 2, 2, 1 }, { 2, -3, 1, 1 }, { 2, 1, 3, 1 },
                 { 1, 1, 1, 2 } });
 
-        tmpDecomposition.compute(tmpOriginalMatrix);
+        tmpDecomposition.decompose(tmpOriginalMatrix);
 
         TestUtils.assertTrue(MatrixUtils.equals(tmpOriginalMatrix, tmpDecomposition, new NumberContext(7, 6)));
     }
@@ -101,10 +102,12 @@ public class DesignCase extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
 
         final QR<Double> tmpQR = QR.makePrimitive();
-        tmpQR.compute(tmpA.transpose(), true);
+        tmpQR.setFullSize(true);
+        tmpQR.decompose(tmpA.transpose());
 
         final SingularValue<Double> tmpSVD = SingularValue.makePrimitive();
-        tmpSVD.compute(tmpA, false, true);
+        tmpSVD.setFullSize(true);
+        tmpSVD.decompose(tmpA);
 
         final PhysicalStore<Double> tmpNullspaceQR = tmpQR.getQ().builder().columns(tmpQR.getRank(), (int) tmpA.countColumns()).build().copy();
         final PhysicalStore<Double> tmpNullspaceSVD = tmpSVD.getQ2().builder().columns(tmpSVD.getRank(), (int) tmpA.countColumns()).build().copy();
@@ -132,13 +135,13 @@ public class DesignCase extends MatrixDecompositionTests {
         final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE.copy(new double[] { 4.0, 3.0, Math.sqrt(5.0), 0.0 });
 
         final SingularValue<Double> tmpOldDecomp = new SVDold30.Primitive();
-        tmpOldDecomp.compute(tmpOriginalMatrix);
+        tmpOldDecomp.decompose(tmpOriginalMatrix);
         tmpOldDecomp.getD();
         tmpOldDecomp.getQ1();
         tmpOldDecomp.getQ2();
 
         final SingularValue<Double> tmpNewDecomp = SingularValue.makePrimitive();
-        tmpNewDecomp.compute(tmpOriginalMatrix);
+        tmpNewDecomp.decompose(tmpOriginalMatrix);
         tmpNewDecomp.getD();
         tmpNewDecomp.getQ1();
         tmpNewDecomp.getQ2();
@@ -146,7 +149,7 @@ public class DesignCase extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, new NumberContext(7, 6));
     }
 
-    private void doTestSolveInverse(final MatrixDecomposition<Double> aDecomp, final MatrixStore<Double> aMtrx) {
+    private void doTestSolveInverse(final MatrixDecomposition.Solver<Double> aDecomp, final MatrixStore<Double> aMtrx) {
 
         TestUtils.assertEquals("Matrix not square!", aMtrx.countRows(), aMtrx.countColumns());
 
@@ -154,7 +157,7 @@ public class DesignCase extends MatrixDecompositionTests {
             BasicLogger.debug("Original", aMtrx);
         }
 
-        aDecomp.compute(aMtrx);
+        aDecomp.decompose(aMtrx);
 
         TestUtils.assertTrue("Decomposition not solveable", aDecomp.isSolvable());
 

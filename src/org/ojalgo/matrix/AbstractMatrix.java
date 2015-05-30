@@ -581,7 +581,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         final Eigenvalue<N> retVal = this.getEigenvalue();
 
         if (!retVal.isComputed()) {
-            retVal.compute(myStore);
+            retVal.decompose(myStore);
         }
 
         return retVal;
@@ -592,7 +592,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         final LU<N> retVal = this.getLU();
 
         if (!retVal.isComputed()) {
-            retVal.compute(myStore);
+            retVal.decompose(myStore);
         }
 
         return retVal;
@@ -603,7 +603,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         final QR<N> retVal = this.getQR();
 
         if (!retVal.isComputed()) {
-            retVal.compute(myStore);
+            retVal.decompose(myStore);
         }
 
         return retVal;
@@ -614,7 +614,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         final SingularValue<N> retVal = this.getSingularValue();
 
         if (!retVal.isComputed()) {
-            retVal.compute(myStore);
+            retVal.decompose(myStore);
         }
 
         return retVal;

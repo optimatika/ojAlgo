@@ -56,7 +56,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         final PhysicalStore<ComplexNumber> tmpOriginal = MatrixUtils.makeRandomComplexStore(4, 4);
 
         final Bidiagonal<ComplexNumber> tmpDecomposition = Bidiagonal.makeComplex();
-        tmpDecomposition.compute(tmpOriginal);
+        tmpDecomposition.decompose(tmpOriginal);
 
         final MatrixStore<ComplexNumber> tmpReconstructed = tmpDecomposition.reconstruct();
 
@@ -145,7 +145,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {
 
         final BidiagonalDecomposition<Double> tmpDecomposition = (BidiagonalDecomposition<Double>) Bidiagonal.makePrimitive();
-        tmpDecomposition.compute(aMatrix);
+        tmpDecomposition.decompose(aMatrix);
 
         if (!MatrixUtils.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);

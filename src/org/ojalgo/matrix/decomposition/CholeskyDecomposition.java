@@ -37,12 +37,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-/**
- * @deprecated v38 This class will be made package private. Use the inteface instead.
- * @author apete
- */
-@Deprecated
-public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Cholesky<N> {
+abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Cholesky<N> {
 
     static final class Big extends CholeskyDecomposition<BigDecimal> {
 
@@ -68,54 +63,13 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
 
     }
 
-    /**
-     * @deprecated v38 Use {@link Cholesky#make(Access2D)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static final <N extends Number> Cholesky<N> make(final Access2D<N> aTypical) {
-        return Cholesky.make(aTypical);
-    }
-
-    /**
-     * @deprecated v38 Use {@link Cholesky#makeBig()} instead
-     */
-    @Deprecated
-    public static final Cholesky<BigDecimal> makeBig() {
-        return Cholesky.makeBig();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Cholesky#makeComplex()} instead
-     */
-    @Deprecated
-    public static final Cholesky<ComplexNumber> makeComplex() {
-        return Cholesky.makeComplex();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Cholesky#makePrimitive()} instead
-     */
-    @Deprecated
-    public static final Cholesky<Double> makeJama() {
-        return new RawCholesky();
-    }
-
-    /**
-     * @deprecated v38 Use {@link Cholesky#makePrimitive()} instead
-     */
-    @Deprecated
-    public static final Cholesky<Double> makePrimitive() {
-        return Cholesky.makePrimitive();
-    }
-
     private boolean mySPD = false;
 
     protected CholeskyDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
     }
 
-    public final boolean compute(final Access2D<?> aStore) {
+    public final boolean decompose(final Access2D<?> aStore) {
         return this.compute(aStore, false);
     }
 
@@ -244,6 +198,10 @@ public abstract class CholeskyDecomposition<N extends Number> extends InPlaceDec
         preallocated.substituteBackwards(tmpBody, false, true, false);
 
         return preallocated;
+    }
+
+    public final MatrixStore<N> solve(final Access2D<N> rhs) {
+        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
 }

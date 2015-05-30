@@ -70,7 +70,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         super(factory);
     }
 
-    public boolean compute(final Access2D<?> matrix) {
+    public boolean decompose(final Access2D<?> matrix) {
 
         this.reset();
 
@@ -235,6 +235,10 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         preallocated.substituteBackwards(tmpBody, true, true, false);
 
         return preallocated.builder().row(tmpOrder).build();
+    }
+
+    public final MatrixStore<N> solve(final Access2D<N> rhs) {
+        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
 }

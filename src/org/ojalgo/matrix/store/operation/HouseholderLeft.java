@@ -35,70 +35,70 @@ public final class HouseholderLeft extends MatrixOperation {
 
     public static int THRESHOLD = 128;
 
-    public static void invoke(final BigDecimal[] aData, final int aRowDim, final int aFirstCol, final int aColLimit, final Householder.Big aHouseholder) {
+    public static void invoke(final BigDecimal[] data, final int structure, final int first, final int limit, final Householder.Big householder) {
 
-        final BigDecimal[] tmpHouseholderVector = aHouseholder.vector;
-        final int tmpFirstNonZero = aHouseholder.first;
-        final BigDecimal tmpBeta = aHouseholder.beta;
+        final BigDecimal[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final BigDecimal tmpBeta = householder.beta;
 
         BigDecimal tmpScale;
         int tmpIndex;
-        for (int j = aFirstCol; j < aColLimit; j++) {
+        for (int j = first; j < limit; j++) {
             tmpScale = BigMath.ZERO;
-            tmpIndex = tmpFirstNonZero + (j * aRowDim);
-            for (int i = tmpFirstNonZero; i < aRowDim; i++) {
-                tmpScale = BigFunction.ADD.invoke(tmpScale, BigFunction.MULTIPLY.invoke(tmpHouseholderVector[i], aData[tmpIndex++]));
+            tmpIndex = tmpFirstNonZero + (j * structure);
+            for (int i = tmpFirstNonZero; i < structure; i++) {
+                tmpScale = BigFunction.ADD.invoke(tmpScale, BigFunction.MULTIPLY.invoke(tmpHouseholderVector[i], data[tmpIndex++]));
             }
             tmpScale = BigFunction.MULTIPLY.invoke(tmpScale, tmpBeta);
-            tmpIndex = tmpFirstNonZero + (j * aRowDim);
-            for (int i = tmpFirstNonZero; i < aRowDim; i++) {
-                aData[tmpIndex] = BigFunction.SUBTRACT.invoke(aData[tmpIndex], BigFunction.MULTIPLY.invoke(tmpScale, tmpHouseholderVector[i]));
+            tmpIndex = tmpFirstNonZero + (j * structure);
+            for (int i = tmpFirstNonZero; i < structure; i++) {
+                data[tmpIndex] = BigFunction.SUBTRACT.invoke(data[tmpIndex], BigFunction.MULTIPLY.invoke(tmpScale, tmpHouseholderVector[i]));
                 tmpIndex++;
             }
         }
     }
 
-    public static void invoke(final ComplexNumber[] aData, final int aRowDim, final int aFirstCol, final int aColLimit, final Householder.Complex aHouseholder) {
+    public static void invoke(final ComplexNumber[] data, final int structure, final int first, final int limit, final Householder.Complex householder) {
 
-        final ComplexNumber[] tmpHouseholderVector = aHouseholder.vector;
-        final int tmpFirstNonZero = aHouseholder.first;
-        final ComplexNumber tmpBeta = aHouseholder.beta;
+        final ComplexNumber[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final ComplexNumber tmpBeta = householder.beta;
 
         ComplexNumber tmpScale;
         int tmpIndex;
-        for (int j = aFirstCol; j < aColLimit; j++) {
+        for (int j = first; j < limit; j++) {
             tmpScale = ComplexNumber.ZERO;
-            tmpIndex = tmpFirstNonZero + (j * aRowDim);
-            for (int i = tmpFirstNonZero; i < aRowDim; i++) {
-                tmpScale = tmpScale.add(tmpHouseholderVector[i].conjugate().multiply(aData[tmpIndex++]));
+            tmpIndex = tmpFirstNonZero + (j * structure);
+            for (int i = tmpFirstNonZero; i < structure; i++) {
+                tmpScale = tmpScale.add(tmpHouseholderVector[i].conjugate().multiply(data[tmpIndex++]));
             }
             tmpScale = tmpScale.multiply(tmpBeta);
-            tmpIndex = tmpFirstNonZero + (j * aRowDim);
-            for (int i = tmpFirstNonZero; i < aRowDim; i++) {
-                aData[tmpIndex] = aData[tmpIndex].subtract(tmpScale.multiply(tmpHouseholderVector[i]));
+            tmpIndex = tmpFirstNonZero + (j * structure);
+            for (int i = tmpFirstNonZero; i < structure; i++) {
+                data[tmpIndex] = data[tmpIndex].subtract(tmpScale.multiply(tmpHouseholderVector[i]));
                 tmpIndex++;
             }
         }
     }
 
-    public static void invoke(final double[] aData, final int aRowDim, final int aFirstCol, final int aColLimit, final Householder.Primitive aHouseholder) {
+    public static void invoke(final double[] data, final int structure, final int first, final int limit, final Householder.Primitive householder) {
 
-        final double[] tmpHouseholderVector = aHouseholder.vector;
-        final int tmpFirstNonZero = aHouseholder.first;
-        final double tmpBeta = aHouseholder.beta;
+        final double[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final double tmpBeta = householder.beta;
 
         double tmpScale;
         int tmpIndex;
-        for (int j = aFirstCol; j < aColLimit; j++) {
+        for (int j = first; j < limit; j++) {
             tmpScale = PrimitiveMath.ZERO;
-            tmpIndex = tmpFirstNonZero + (j * aRowDim);
-            for (int i = tmpFirstNonZero; i < aRowDim; i++) {
-                tmpScale += tmpHouseholderVector[i] * aData[tmpIndex++];
+            tmpIndex = tmpFirstNonZero + (j * structure);
+            for (int i = tmpFirstNonZero; i < structure; i++) {
+                tmpScale += tmpHouseholderVector[i] * data[tmpIndex++];
             }
             tmpScale *= tmpBeta;
-            tmpIndex = tmpFirstNonZero + (j * aRowDim);
-            for (int i = tmpFirstNonZero; i < aRowDim; i++) {
-                aData[tmpIndex++] -= tmpScale * tmpHouseholderVector[i];
+            tmpIndex = tmpFirstNonZero + (j * structure);
+            for (int i = tmpFirstNonZero; i < structure; i++) {
+                data[tmpIndex++] -= tmpScale * tmpHouseholderVector[i];
             }
         }
     }

@@ -60,7 +60,7 @@ public class PrimitivePolynomial extends AbstractPolynomial<Double> {
         }
 
         final QR<Double> tmpQR = QR.makePrimitive();
-        tmpQR.compute(tmpBody);
+        tmpQR.decompose(tmpBody);
         this.set(tmpQR.solve(tmpRHS));
     }
 

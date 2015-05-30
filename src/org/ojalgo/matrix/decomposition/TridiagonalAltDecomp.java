@@ -35,11 +35,11 @@ class TridiagonalAltDecomp extends InPlaceDecomposition<Double> implements Tridi
     BasicArray<Double> myMain;
     BasicArray<Double> myOff;
 
-    public TridiagonalAltDecomp() {
+    TridiagonalAltDecomp() {
         super(PrimitiveDenseStore.FACTORY);
     }
 
-    public boolean compute(final Access2D<?> matrix) {
+    public boolean decompose(final Access2D<?> matrix) {
 
         this.setInPlace(matrix);
 

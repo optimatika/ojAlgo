@@ -75,7 +75,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         // QR
 
         final QR<BigDecimal> tmpQR = QR.makeBig();
-        tmpQR.compute(SimpleQRCase.getOriginal().toBigStore());
+        tmpQR.decompose(SimpleQRCase.getOriginal().toBigStore());
 
         final MatrixStore<BigDecimal> tmpQ = tmpQR.getQ();
         final MatrixStore<BigDecimal> tmpR = tmpQR.getR();

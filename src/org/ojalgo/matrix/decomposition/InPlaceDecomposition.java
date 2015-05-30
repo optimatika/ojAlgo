@@ -42,10 +42,6 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
         throw new UnsupportedOperationException();
     }
 
-    public final MatrixStore<N> solve(final Access2D<N> rhs) {
-        return this.solve(rhs, this.preallocate(myInPlace, rhs));
-    }
-
     protected final int getColDim() {
         return myColDim;
     }

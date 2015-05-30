@@ -27,7 +27,7 @@ import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.Optimisation;
 
-abstract class DecompositionSolver<D extends MatrixDecomposition<Double>> extends OptimisationSystem {
+abstract class DecompositionSolver<D extends MatrixDecomposition.Solver<Double>> extends OptimisationSystem {
 
     private final D myDecomposition;
 
@@ -44,7 +44,7 @@ abstract class DecompositionSolver<D extends MatrixDecomposition<Double>> extend
     }
 
     public boolean compute(final Access2D<?> body) {
-        myDecomposition.compute(body);
+        myDecomposition.decompose(body);
         return myDecomposition.isSolvable();
     }
 
@@ -99,7 +99,7 @@ abstract class DecompositionSolver<D extends MatrixDecomposition<Double>> extend
 
     /**
      * Should test that the equation system body meets the requirements for the
-     * {@linkplain MatrixDecomposition#compute(Access2D)} method for the specific matrix decomposition.
+     * {@linkplain MatrixDecomposition#decompose(Access2D)} method for the specific matrix decomposition.
      */
     protected abstract boolean validate(MatrixStore<Double> body);
 

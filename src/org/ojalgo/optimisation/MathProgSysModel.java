@@ -414,14 +414,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
-    /**
-     * @deprecated v38 Use {@link #make(File)} instead
-     */
-    @Deprecated
-    public static MathProgSysModel makeFromFile(final File file) {
-        return MathProgSysModel.make(file);
-    }
-
     private final HashMap<String, Column> myColumns = new HashMap<String, Column>();
     private final ExpressionsBasedModel myDelegate;
     private final String[] myFields = new String[6];

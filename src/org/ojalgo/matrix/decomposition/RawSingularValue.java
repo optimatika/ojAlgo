@@ -35,21 +35,20 @@ import org.ojalgo.type.context.NumberContext;
  * This class adapts JAMA's SingularValueDecomposition to ojAlgo's {@linkplain SingularValue} interface.
  * speed: 52.641s
  *
- * @deprecated v38 This class will be made package private. Use the inteface instead.
  * @author apete
  */
-@Deprecated
-public final class RawSingularValue extends OldRawDecomposition implements SingularValue<Double> {
+final class RawSingularValue extends OldRawDecomposition implements SingularValue<Double> {
 
     private JamaSingularValue myDelegate;
     private RawStore myPseudoinverse;
     private boolean myTransposed;
+    private boolean myFullSize = false;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
      * {@linkplain org.ojalgo.matrix.decomposition.SingularValue#make(Access2D)} instead.
      */
-    public RawSingularValue() {
+    RawSingularValue() {
         super();
     }
 
@@ -156,7 +155,7 @@ public final class RawSingularValue extends OldRawDecomposition implements Singu
     }
 
     public boolean isFullSize() {
-        return false;
+        return myFullSize;
     }
 
     public boolean isOrdered() {
@@ -218,7 +217,7 @@ public final class RawSingularValue extends OldRawDecomposition implements Singu
         return null;
     }
 
-    public final boolean compute(final Access2D<?> matrix) {
+    public final boolean decompose(final Access2D<?> matrix) {
 
         this.reset();
 
@@ -232,6 +231,15 @@ public final class RawSingularValue extends OldRawDecomposition implements Singu
      */
     public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
         return this.getInverse();
+    }
+
+    public void setFullSize(final boolean fullSize) {
+        myFullSize = fullSize;
+    }
+
+    public boolean computeValuesOnly(final Access2D<?> matrix) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

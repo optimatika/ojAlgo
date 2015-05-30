@@ -114,7 +114,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
             final PhysicalStore<ComplexNumber> tmpOriginalMtrx = ComplexDenseStore.FACTORY.transpose(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScales[s]));
 
-            tmpBidiagonal.compute(tmpOriginalMtrx);
+            tmpBidiagonal.decompose(tmpOriginalMtrx);
             final MatrixStore<ComplexNumber> tmpReconstructed = tmpBidiagonal.reconstruct();
             if (MatrixDecompositionTests.DEBUG) {
                 BasicLogger.debug();
@@ -138,8 +138,9 @@ public class SingularValueTest extends MatrixDecompositionTests {
             final PhysicalStore<ComplexNumber> tmpOriginalMtrx = ComplexDenseStore.FACTORY.copy(tmpBaseMtrx);
             tmpOriginalMtrx.modifyAll(ComplexFunction.MULTIPLY.first(tmpScales[s]));
 
-            tmpBidiagonal.compute(tmpOriginalMtrx.conjugate());
-            tmpSVD.compute(tmpOriginalMtrx, false, false);
+            tmpBidiagonal.decompose(tmpOriginalMtrx.conjugate());
+            tmpSVD.setFullSize(false);
+            tmpSVD.decompose(tmpOriginalMtrx);
 
             final Array1D<Double> tmpActualSingularValues = tmpSVD.getSingularValues();
             if (MatrixDecompositionTests.DEBUG) {
@@ -164,7 +165,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         final SingularValue<ComplexNumber> tmpDecomposition = SingularValue.makeComplex();
 
-        tmpDecomposition.compute(tmpOriginal);
+        tmpDecomposition.decompose(tmpOriginal);
 
         final MatrixStore<ComplexNumber> tmpReconstructed = tmpDecomposition.reconstruct();
 
@@ -231,17 +232,17 @@ public class SingularValueTest extends MatrixDecompositionTests {
         final PhysicalStore<ComplexNumber> tmpComplexStore = original.toComplexStore();
         final PhysicalStore<Double> tmpPrimitiveStore = original.toPrimitiveStore();
 
-        BIG.compute(original);
-        COMPLEX.compute(original);
-        JAMA.compute(original);
-        DIRECT.compute(original);
+        BIG.decompose(original);
+        COMPLEX.decompose(original);
+        JAMA.decompose(original);
+        DIRECT.decompose(original);
 
         final Array1D<Double> tmpBigSingularValues = BIG.getSingularValues();
         final Array1D<Double> tmpComplexSingularValues = COMPLEX.getSingularValues();
         final Array1D<Double> tmpJamaSingularValues = JAMA.getSingularValues();
         final Array1D<Double> tmpDirectSingularValues = DIRECT.getSingularValues();
 
-        UnaryFunction<Double> tmpPrimitiveRoundFunction = CNTXT_REAL_VALUES.getPrimitiveRoundFunction();
+        UnaryFunction<Double> tmpPrimitiveRoundFunction = CNTXT_REAL_VALUES.getPrimitiveFunction();
         //        tmpBigSingularValues.modifyAll(tmpPrimitiveRoundFunction);
         //        tmpComplexSingularValues.modifyAll(tmpPrimitiveRoundFunction);
         //        tmpJamaSingularValues.modifyAll(tmpPrimitiveRoundFunction);
@@ -308,7 +309,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         }
 
-        tmpPrimitiveRoundFunction = CNTXT_CPLX_VALUES.getPrimitiveRoundFunction();
+        tmpPrimitiveRoundFunction = CNTXT_CPLX_VALUES.getPrimitiveFunction();
         tmpBigSingularValues.modifyAll(tmpPrimitiveRoundFunction);
         tmpComplexSingularValues.modifyAll(tmpPrimitiveRoundFunction);
         tmpJamaSingularValues.modifyAll(tmpPrimitiveRoundFunction);
@@ -341,7 +342,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         for (int i = 0; i < tmpImpls.length; i++) {
 
-            tmpImpls[i].compute(aMtrx);
+            tmpImpls[i].decompose(aMtrx);
             final MatrixStore<Double> tmpReconstructed = MatrixUtils.reconstruct(tmpImpls[i]);
             if (!AccessUtils.equals(aMtrx, tmpReconstructed, new NumberContext(7, 6))) {
                 BasicLogger.error("Recreation failed for: {}", tmpImpls[i].getClass().getName());

@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -45,7 +44,8 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface QR<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
+public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
+        MatrixDecomposition.Determinant<N> {
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> QR<N> make(final Access2D<N> typical) {
@@ -81,14 +81,6 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, Determinan
     public static QR<Double> makePrimitive() {
         return new QRDecomposition.Primitive();
     }
-
-    /**
-     * @param matrix A matrix to decompose
-     * @return true if the computation suceeded; false if not
-     */
-    boolean compute(Access2D<?> matrix, boolean fullSize);
-
-    N getDeterminant();
 
     MatrixStore<N> getQ();
 
