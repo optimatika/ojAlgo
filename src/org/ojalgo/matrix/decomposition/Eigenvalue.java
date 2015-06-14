@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -51,35 +52,33 @@ import org.ojalgo.scalar.ComplexNumber;
 public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.Hermitian<N>,
         MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N> {
 
-    @SuppressWarnings("unchecked")
     public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
+        return Eigenvalue.make(typical, MatrixUtils.isHermitian(typical));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical, final boolean hermitian) {
 
         final N tmpNumber = typical.get(0L, 0L);
         final long tmpDim = typical.countColumns();
 
         if (tmpNumber instanceof BigDecimal) {
 
-            final boolean tmpSymmetric = MatrixUtils.isHermitian(typical);
-
-            return (Eigenvalue<N>) Eigenvalue.makeBig(tmpSymmetric);
+            return (Eigenvalue<N>) (hermitian ? new HermitianEvD32.Big() : null);
 
         } else if (tmpNumber instanceof ComplexNumber) {
 
-            final boolean tmpHermitian = MatrixUtils.isHermitian(typical);
-
-            return (Eigenvalue<N>) Eigenvalue.makeComplex(tmpHermitian);
+            return (Eigenvalue<N>) (hermitian ? new HermitianEvD32.Complex() : null);
 
         } else if (tmpNumber instanceof Double) {
 
-            final boolean tmpSymmetric = MatrixUtils.isHermitian(typical);
+            if ((tmpDim > 128L) && (BasicArray.MAX_ARRAY_SIZE > typical.count())) {
 
-            if ((tmpDim > 128L) && (tmpDim < 46340L)) {
-
-                return (Eigenvalue<N>) Eigenvalue.makePrimitive(tmpSymmetric);
+                return (Eigenvalue<N>) (hermitian ? new HermitianEvD32.Primitive() : new NonsymmetricEvD.Primitive());
 
             } else {
 
-                return (Eigenvalue<N>) (tmpSymmetric ? new RawEigenvalue.Symmetric() : new RawEigenvalue.Nonsymmetric());
+                return (Eigenvalue<N>) (hermitian ? new RawEigenvalue.Symmetric() : new RawEigenvalue.General());
             }
 
         } else {

@@ -49,11 +49,11 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (Bidiagonal<N>) Bidiagonal.makeBig();
+            return (Bidiagonal<N>) new BidiagonalDecomposition.Big();
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (Bidiagonal<N>) Bidiagonal.makeComplex();
+            return (Bidiagonal<N>) new BidiagonalDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            return (Bidiagonal<N>) Bidiagonal.makePrimitive();
+            return (Bidiagonal<N>) new BidiagonalDecomposition.Primitive();
         } else {
             throw new IllegalArgumentException();
         }

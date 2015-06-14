@@ -61,7 +61,7 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
             return (LDL<N>) new LDLDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
             return (LDL<N>) new LDLDecomposition.Primitive();
-            //            if ((typical.countColumns() <= 256) || (typical.count() > BasicArray.MAX_ARRAY_SIZE)) {
+            //            if ((typical.countColumns() <= 256) || (BasicArray.MAX_ARRAY_SIZE < typical.count())) {
             //                return (LDL<N>) new RawLDL();
             //            } else {
             //                return (LDL<N>) new LDLDecomposition.Primitive();
@@ -83,6 +83,12 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         return new LDLDecomposition.Primitive();
     }
 
+    default boolean equals(final MatrixStore<N> other, final NumberContext context) {
+        return MatrixUtils.equals(other, this, context);
+    }
+
+    MatrixStore<N> getD();
+
     /**
      * Must implement either {@link #getL()} or {@link #getR()}.
      */
@@ -97,21 +103,15 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         return this.getL().conjugate();
     }
 
-    MatrixStore<N> getD();
-
     int getRank();
-
-    boolean isSquareAndNotSingular();
 
     default boolean isFullSize() {
         return true;
     }
 
+    boolean isSquareAndNotSingular();
+
     default MatrixStore<N> reconstruct() {
         return MatrixUtils.reconstruct(this);
-    }
-
-    default boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        return MatrixUtils.equals(other, this, context);
     }
 }

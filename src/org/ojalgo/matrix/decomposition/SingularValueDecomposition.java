@@ -53,34 +53,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         myBidiagonal = aBidiagonal;
     }
 
-    protected boolean compute(final Access2D<?> matrix, final boolean singularValuesOnly, final boolean fullSize) {
-
-        this.reset();
-
-        if (matrix.countRows() >= matrix.countColumns()) {
-            myTransposed = false;
-        } else {
-            myTransposed = true;
-        }
-
-        mySingularValuesOnly = singularValuesOnly;
-
-        boolean retVal = false;
-
-        try {
-
-            retVal = this.doCompute(myTransposed ? this.wrap(matrix).builder().conjugate().build() : matrix, singularValuesOnly, fullSize);
-
-        } catch (final Exception anException) {
-
-            BasicLogger.error(anException.toString());
-
-            this.reset();
-
-            retVal = false;
-        }
-
-        return this.computed(retVal);
+    public boolean computeValuesOnly(final Access2D<?> matrix) {
+        return this.compute(matrix, true, false);
     }
 
     public boolean decompose(final Access2D<?> matrix) {
@@ -261,6 +235,15 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return myFullSize;
     }
 
+    public DecompositionStore<N> preallocate(final Access2D<N> template) {
+        final long tmpCountRows = template.countRows();
+        return this.preallocate(tmpCountRows, tmpCountRows);
+    }
+
+    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
+        return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
+    }
+
     @Override
     public void reset() {
 
@@ -291,8 +274,34 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return preallocated;
     }
 
-    public boolean computeValuesOnly(final Access2D<?> matrix) {
-        return this.compute(matrix, true, false);
+    protected boolean compute(final Access2D<?> matrix, final boolean singularValuesOnly, final boolean fullSize) {
+
+        this.reset();
+
+        if (matrix.countRows() >= matrix.countColumns()) {
+            myTransposed = false;
+        } else {
+            myTransposed = true;
+        }
+
+        mySingularValuesOnly = singularValuesOnly;
+
+        boolean retVal = false;
+
+        try {
+
+            retVal = this.doCompute(myTransposed ? this.wrap(matrix).builder().conjugate().build() : matrix, singularValuesOnly, fullSize);
+
+        } catch (final Exception anException) {
+
+            BasicLogger.error(anException.toString());
+
+            this.reset();
+
+            retVal = false;
+        }
+
+        return this.computed(retVal);
     }
 
     protected boolean computeBidiagonal(final Access2D<?> matrix, final boolean fullSize) {

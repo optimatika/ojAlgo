@@ -38,7 +38,7 @@ import org.ojalgo.type.context.NumberContext;
 public class TestJama extends MatrixDecompositionTests {
 
     private static Cholesky<Double> CHOLESKY = new RawCholesky();
-    private static Eigenvalue<Double> EIGENVALUE = new RawEigenvalue.General();
+    private static Eigenvalue<Double> EIGENVALUE = new RawEigenvalue.Dynamic();
     private static NumberContext EVAL_CNTXT = NumberContext.getGeneral(8).newPrecision(15);
     private static LU<Double> LU = new RawLU();
     private static QR<Double> QR = new RawQR();

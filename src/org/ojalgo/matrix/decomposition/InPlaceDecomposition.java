@@ -50,6 +50,10 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
         return myInPlace;
     }
 
+    protected final int getMaxDim() {
+        return Math.max(myRowDim, myColDim);
+    }
+
     protected final int getMinDim() {
         return Math.min(myRowDim, myColDim);
     }

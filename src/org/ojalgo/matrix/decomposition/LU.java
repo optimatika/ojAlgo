@@ -67,7 +67,7 @@ public interface LU<N extends Number> extends LDU<N> {
             return (LU<N>) LU.makeComplex();
         } else if (tmpNumber instanceof Double) {
 
-            if ((typical.countColumns() <= 256) || (typical.count() > BasicArray.MAX_ARRAY_SIZE)) {
+            if ((typical.countColumns() <= 256) || (BasicArray.MAX_ARRAY_SIZE < typical.count())) {
                 return (LU<N>) new RawLU();
             } else {
                 return (LU<N>) LU.makePrimitive();
@@ -90,8 +90,8 @@ public interface LU<N extends Number> extends LDU<N> {
     }
 
     /**
-     * The normal {@link #decompose(Access2D)} method must handle cases where pivoting is required. If you know
-     * that pivoting is not needed you may call this method instead - it's faster.
+     * The normal {@link #decompose(Access2D)} method must handle cases where pivoting is required. If you
+     * know that pivoting is not needed you may call this method instead - it's faster.
      */
     boolean computeWithoutPivoting(MatrixStore<?> matrix);
 

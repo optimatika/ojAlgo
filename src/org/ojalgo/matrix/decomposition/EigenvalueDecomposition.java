@@ -39,6 +39,14 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         super(aFactory);
     }
 
+    public final boolean checkAndCompute(final Access2D<?> matrix) {
+        return this.compute(matrix, MatrixUtils.isHermitian(matrix), false);
+    }
+
+    public boolean computeValuesOnly(final Access2D<?> matrix) {
+        return this.compute(matrix, this.isHermitian(), true);
+    }
+
     public final boolean decompose(final Access2D<?> matrix) {
         return this.compute(matrix, false);
     }
@@ -70,12 +78,13 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         return myV;
     }
 
-    public final boolean checkAndCompute(final Access2D<?> matrix) {
-        return this.compute(matrix, MatrixUtils.isHermitian(matrix), false);
+    public DecompositionStore<N> preallocate(final Access2D<N> template) {
+        final long tmpCountRows = template.countRows();
+        return this.preallocate(tmpCountRows, tmpCountRows);
     }
 
-    public boolean computeValuesOnly(final Access2D<?> matrix) {
-        return this.compute(matrix, this.isHermitian(), true);
+    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
+        return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 
     @Override

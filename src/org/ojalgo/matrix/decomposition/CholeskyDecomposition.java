@@ -69,10 +69,6 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         super(aFactory);
     }
 
-    public final boolean decompose(final Access2D<?> aStore) {
-        return this.compute(aStore, false);
-    }
-
     public final boolean compute(final Access2D<?> matrix, final boolean checkHermitian) {
 
         this.reset();
@@ -119,6 +115,10 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.computed(mySPD = tmpPositiveDefinite);
     }
 
+    public final boolean decompose(final Access2D<?> aStore) {
+        return this.compute(aStore, false);
+    }
+
     public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
         return MatrixUtils.equals(aStore, this, context);
     }
@@ -159,12 +159,25 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return mySPD;
     }
 
+    public DecompositionStore<N> preallocate(final Access2D<N> template) {
+        final long tmpCountRows = template.countRows();
+        return this.preallocate(tmpCountRows, tmpCountRows);
+    }
+
+    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
+        return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
+    }
+
     @Override
     public void reset() {
 
         super.reset();
 
         mySPD = false;
+    }
+
+    public final MatrixStore<N> solve(final Access2D<N> rhs) {
+        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     /**
@@ -198,10 +211,6 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         preallocated.substituteBackwards(tmpBody, false, true, false);
 
         return preallocated;
-    }
-
-    public final MatrixStore<N> solve(final Access2D<N> rhs) {
-        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
 }

@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
@@ -88,18 +87,10 @@ public final class HouseholderLeft extends MatrixOperation {
         final double tmpBeta = householder.beta;
 
         double tmpScale;
-        int tmpIndex;
         for (int j = first; j < limit; j++) {
-            tmpScale = PrimitiveMath.ZERO;
-            tmpIndex = tmpFirstNonZero + (j * structure);
-            for (int i = tmpFirstNonZero; i < structure; i++) {
-                tmpScale += tmpHouseholderVector[i] * data[tmpIndex++];
-            }
+            tmpScale = DotProduct.invoke(data, j * structure, tmpHouseholderVector, 0, tmpFirstNonZero, structure);
             tmpScale *= tmpBeta;
-            tmpIndex = tmpFirstNonZero + (j * structure);
-            for (int i = tmpFirstNonZero; i < structure; i++) {
-                data[tmpIndex++] -= tmpScale * tmpHouseholderVector[i];
-            }
+            SubtractScaledVector.invoke(data, j * structure, tmpHouseholderVector, 0, tmpScale, tmpFirstNonZero, structure);
         }
     }
 

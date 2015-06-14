@@ -35,79 +35,79 @@ public final class HouseholderRight extends MatrixOperation {
 
     public static int THRESHOLD = 128;
 
-    public static void invoke(final BigDecimal[] aData, final int aFirstRow, final int aRowLimit, final int aColDim, final Householder.Big aHouseholder) {
+    public static void invoke(final BigDecimal[] data, final int first, final int limit, final int tmpColDim, final Householder.Big householder) {
 
-        final BigDecimal[] tmpVector = aHouseholder.vector;
-        final int tmpFirst = aHouseholder.first;
-        final BigDecimal tmpBeta = aHouseholder.beta;
+        final BigDecimal[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final BigDecimal tmpBeta = householder.beta;
 
-        final int tmpRowDim = aData.length / aColDim;
+        final int tmpRowDim = data.length / tmpColDim;
 
         BigDecimal tmpScale;
         int tmpIndex;
-        for (int i = aFirstRow; i < aRowLimit; i++) {
+        for (int i = first; i < limit; i++) {
             tmpScale = BigMath.ZERO;
-            tmpIndex = i + (tmpFirst * tmpRowDim);
-            for (int j = tmpFirst; j < aColDim; j++) {
-                tmpScale = BigFunction.ADD.invoke(tmpScale, BigFunction.MULTIPLY.invoke(tmpVector[j], aData[tmpIndex]));
+            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
+            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
+                tmpScale = BigFunction.ADD.invoke(tmpScale, BigFunction.MULTIPLY.invoke(tmpHouseholderVector[j], data[tmpIndex]));
                 tmpIndex += tmpRowDim;
             }
             tmpScale = BigFunction.MULTIPLY.invoke(tmpScale, tmpBeta);
-            tmpIndex = i + (tmpFirst * tmpRowDim);
-            for (int j = tmpFirst; j < aColDim; j++) {
-                aData[tmpIndex] = BigFunction.SUBTRACT.invoke(aData[tmpIndex], BigFunction.MULTIPLY.invoke(tmpScale, tmpVector[j]));
+            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
+            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
+                data[tmpIndex] = BigFunction.SUBTRACT.invoke(data[tmpIndex], BigFunction.MULTIPLY.invoke(tmpScale, tmpHouseholderVector[j]));
                 tmpIndex += tmpRowDim;
             }
         }
     }
 
-    public static void invoke(final ComplexNumber[] aData, final int aFirstRow, final int aRowLimit, final int aColDim, final Householder.Complex aHouseholder) {
+    public static void invoke(final ComplexNumber[] data, final int first, final int limit, final int tmpColDim, final Householder.Complex householder) {
 
-        final ComplexNumber[] tmpVector = aHouseholder.vector;
-        final int tmpFirst = aHouseholder.first;
-        final ComplexNumber tmpBeta = aHouseholder.beta;
+        final ComplexNumber[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final ComplexNumber tmpBeta = householder.beta;
 
-        final int tmpRowDim = aData.length / aColDim;
+        final int tmpRowDim = data.length / tmpColDim;
 
         ComplexNumber tmpScale;
         int tmpIndex;
-        for (int i = aFirstRow; i < aRowLimit; i++) {
+        for (int i = first; i < limit; i++) {
             tmpScale = ComplexNumber.ZERO;
-            tmpIndex = i + (tmpFirst * tmpRowDim);
-            for (int j = tmpFirst; j < aColDim; j++) {
-                tmpScale = tmpScale.add(tmpVector[j].conjugate().multiply(aData[tmpIndex].conjugate()));
+            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
+            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
+                tmpScale = tmpScale.add(tmpHouseholderVector[j].conjugate().multiply(data[tmpIndex].conjugate()));
                 tmpIndex += tmpRowDim;
             }
             tmpScale = tmpScale.multiply(tmpBeta);
-            tmpIndex = i + (tmpFirst * tmpRowDim);
-            for (int j = tmpFirst; j < aColDim; j++) {
-                aData[tmpIndex] = aData[tmpIndex].conjugate().subtract(tmpScale.multiply(tmpVector[j])).conjugate();
+            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
+            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
+                data[tmpIndex] = data[tmpIndex].conjugate().subtract(tmpScale.multiply(tmpHouseholderVector[j])).conjugate();
                 tmpIndex += tmpRowDim;
             }
         }
     }
 
-    public static void invoke(final double[] aData, final int aFirstRow, final int aRowLimit, final int aColDim, final Householder.Primitive aHouseholder) {
+    public static void invoke(final double[] data, final int first, final int limit, final int tmpColDim, final Householder.Primitive householder) {
 
-        final double[] tmpVector = aHouseholder.vector;
-        final int tmpFirst = aHouseholder.first;
-        final double tmpBeta = aHouseholder.beta;
+        final double[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final double tmpBeta = householder.beta;
 
-        final int tmpRowDim = aData.length / aColDim;
+        final int tmpRowDim = data.length / tmpColDim;
 
         double tmpScale;
         int tmpIndex;
-        for (int i = aFirstRow; i < aRowLimit; i++) {
+        for (int i = first; i < limit; i++) {
             tmpScale = PrimitiveMath.ZERO;
-            tmpIndex = i + (tmpFirst * tmpRowDim);
-            for (int j = tmpFirst; j < aColDim; j++) {
-                tmpScale += tmpVector[j] * aData[tmpIndex];
+            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
+            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
+                tmpScale += tmpHouseholderVector[j] * data[tmpIndex];
                 tmpIndex += tmpRowDim;
             }
             tmpScale *= tmpBeta;
-            tmpIndex = i + (tmpFirst * tmpRowDim);
-            for (int j = tmpFirst; j < aColDim; j++) {
-                aData[tmpIndex] -= tmpScale * tmpVector[j];
+            tmpIndex = i + (tmpFirstNonZero * tmpRowDim);
+            for (int j = tmpFirstNonZero; j < tmpColDim; j++) {
+                data[tmpIndex] -= tmpScale * tmpHouseholderVector[j];
                 tmpIndex += tmpRowDim;
             }
         }

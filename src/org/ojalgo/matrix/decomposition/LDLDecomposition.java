@@ -214,6 +214,19 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return retVal;
     }
 
+    public DecompositionStore<N> preallocate(final Access2D<N> template) {
+        final long tmpCountRows = template.countRows();
+        return this.preallocate(tmpCountRows, tmpCountRows);
+    }
+
+    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
+        return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
+    }
+
+    public final MatrixStore<N> solve(final Access2D<N> rhs) {
+        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
+    }
+
     @Override
     public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
 
@@ -235,10 +248,6 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         preallocated.substituteBackwards(tmpBody, true, true, false);
 
         return preallocated.builder().row(tmpOrder).build();
-    }
-
-    public final MatrixStore<N> solve(final Access2D<N> rhs) {
-        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
 }

@@ -49,6 +49,19 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         super();
     }
 
+    public boolean compute(final Access2D<?> matrix, final boolean checkHermitian) {
+
+        if (checkHermitian) {
+            mySPD = MatrixUtils.isHermitian(matrix);
+        }
+
+        if (mySPD) {
+            return this.decompose(matrix);
+        } else {
+            return this.computed(false);
+        }
+    }
+
     public boolean decompose(final Access2D<?> matrix) {
 
         this.reset();
@@ -80,19 +93,6 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         }
 
         return this.computed(true);
-    }
-
-    public boolean compute(final Access2D<?> matrix, final boolean checkHermitian) {
-
-        if (checkHermitian) {
-            mySPD = MatrixUtils.isHermitian(matrix);
-        }
-
-        if (mySPD) {
-            return this.decompose(matrix);
-        } else {
-            return this.computed(false);
-        }
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {

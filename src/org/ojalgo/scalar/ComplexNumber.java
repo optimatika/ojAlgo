@@ -249,18 +249,23 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
 
     public ComplexNumber divide(final ComplexNumber arg) {
 
-        final double a = myRealValue;
-        final double b = i;
+        final double tmpRe = arg.doubleValue();
+        final double tmpIm = arg.i;
 
-        final double c = arg.doubleValue();
-        final double d = arg.i;
+        if (Math.abs(tmpRe) > Math.abs(tmpIm)) {
 
-        final double tmpDenom = (c * c) + (d * d);
+            final double r = tmpIm / tmpRe;
+            final double d = tmpRe + (r * tmpIm);
 
-        final double tmpRe = ((a * c) + (b * d)) / tmpDenom;
-        final double tmpIm = ((b * c) - (a * d)) / tmpDenom;
+            return new ComplexNumber((myRealValue + (r * i)) / d, (i - (r * myRealValue)) / d);
 
-        return new ComplexNumber(tmpRe, tmpIm);
+        } else {
+
+            final double r = tmpRe / tmpIm;
+            final double d = tmpIm + (r * tmpRe);
+
+            return new ComplexNumber(((r * myRealValue) + i) / d, ((r * i) - myRealValue) / d);
+        }
     }
 
     public ComplexNumber divide(final double arg) {

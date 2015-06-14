@@ -173,6 +173,15 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.isComputed() && this.isFullColumnRank();
     }
 
+    public DecompositionStore<N> preallocate(final Access2D<N> template) {
+        final long tmpCountRows = template.countRows();
+        return this.preallocate(tmpCountRows, tmpCountRows);
+    }
+
+    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
+        return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
+    }
+
     public void setFullSize(final boolean fullSize) {
         myFullSize = fullSize;
     }

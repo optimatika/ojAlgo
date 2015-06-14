@@ -59,7 +59,7 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
         } else if (tmpNumber instanceof ComplexNumber) {
             return (Cholesky<N>) new CholeskyDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            if ((typical.countColumns() <= 256) || (typical.count() > BasicArray.MAX_ARRAY_SIZE)) {
+            if ((typical.countColumns() <= 256) || (BasicArray.MAX_ARRAY_SIZE < typical.count())) {
                 return (Cholesky<N>) new RawCholesky();
             } else {
                 return (Cholesky<N>) new CholeskyDecomposition.Primitive();

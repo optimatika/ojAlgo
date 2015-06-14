@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
@@ -52,6 +54,8 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      */
     private double[] myDiagonalR;
 
+    private boolean myFullSize = false;
+
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
      * {@linkplain org.ojalgo.matrix.decomposition.QR#make(Access2D)} instead.
@@ -77,6 +81,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         myDiagonalR = new double[n];
 
         double[] tmpColK;
+        double nrm;
 
         // Main loop.
         for (int k = 0; k < n; k++) {
@@ -84,12 +89,12 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             tmpColK = tmpData[k];
 
             // Compute 2-norm of k-th column without under/overflow.
-            double nrm = 0;
+            nrm = ZERO;
             for (int i = k; i < m; i++) {
                 nrm = Maths.hypot(nrm, tmpColK[i]);
             }
 
-            if (nrm != 0.0) {
+            if (nrm != ZERO) {
 
                 // Form k-th Householder vector.
                 if (tmpColK[k] < 0) {
@@ -98,7 +103,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
                 for (int i = k; i < m; i++) {
                     tmpColK[i] /= nrm;
                 }
-                tmpColK[k] += 1.0;
+                tmpColK[k] += ONE;
 
                 // Apply transformation to remaining columns.
                 for (int j = k + 1; j < n; j++) {
@@ -141,12 +146,12 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         for (int k = n - 1; k >= 0; k--) {
             for (int i = 0; i < m; i++) {
-                retData[i][k] = 0.0;
+                retData[i][k] = ZERO;
             }
-            retData[k][k] = 1.0;
+            retData[k][k] = ONE;
             for (int j = k; j < n; j++) {
                 if (tmpData[k][k] != 0) {
-                    double s = 0.0;
+                    double s = ZERO;
                     for (int i = k; i < m; i++) {
                         s += tmpData[k][i] * retData[i][j];
                     }
@@ -235,6 +240,10 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return MatrixUtils.reconstruct(this);
     }
 
+    public void setFullSize(final boolean fullSize) {
+        myFullSize = fullSize;
+    }
+
     /**
      * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
      *
@@ -291,12 +300,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         }
 
         return preallocated.builder().rows(0, n).build();
-    }
-
-    private boolean myFullSize = false;
-
-    public void setFullSize(final boolean fullSize) {
-        myFullSize = fullSize;
     }
 
 }

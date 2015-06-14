@@ -73,12 +73,12 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         super(aFactory);
     }
 
-    public boolean decompose(final Access2D<?> aStore) {
-        return this.compute(aStore, false);
-    }
-
     public boolean computeWithoutPivoting(final MatrixStore<?> matrix) {
         return this.compute(matrix, true);
+    }
+
+    public boolean decompose(final Access2D<?> aStore) {
+        return this.compute(aStore, false);
     }
 
     public boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
@@ -191,8 +191,13 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return retVal;
     }
 
-    public final MatrixStore<N> solve(final Access2D<N> rhs) {
-        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
+    public DecompositionStore<N> preallocate(final Access2D<N> template) {
+        final long tmpCountRows = template.countRows();
+        return this.preallocate(tmpCountRows, tmpCountRows);
+    }
+
+    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
+        return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 
     @Override
@@ -201,6 +206,10 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         super.reset();
 
         myPivot = null;
+    }
+
+    public final MatrixStore<N> solve(final Access2D<N> rhs) {
+        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     /**

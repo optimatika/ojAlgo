@@ -89,12 +89,12 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.makeEye(aRowDim, aColDim);
     }
 
-    protected final IdentityStore<N> makeIdentity(final int dimension) {
-        return new IdentityStore<N>(myFactory, dimension);
-    }
-
     protected final Householder<N> makeHouseholder(final int aDim) {
         return myFactory.makeHouseholder(aDim);
+    }
+
+    protected final IdentityStore<N> makeIdentity(final int dimension) {
+        return new IdentityStore<N>(myFactory, dimension);
     }
 
     protected final Rotation<N> makeRotation(final int aLow, final int aHigh, final double aCos, final double aSin) {

@@ -73,7 +73,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllGeneral() {
-        return new Eigenvalue<?>[] { Eigenvalue.makePrimitive(), new RawEigenvalue.General() };
+        return new Eigenvalue<?>[] { Eigenvalue.makePrimitive(), new RawEigenvalue.Dynamic() };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllNonsymmetric() {
@@ -86,12 +86,12 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new GeneralEvD.Primitive(), new RawEigenvalue.General() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new GeneralEvD.Primitive(), new RawEigenvalue.Dynamic() };
     }
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveNonsymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new NonsymmetricEvD.Primitive(), new RawEigenvalue.Nonsymmetric() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new NonsymmetricEvD.Primitive(), new RawEigenvalue.General() };
     }
 
     @SuppressWarnings("unchecked")

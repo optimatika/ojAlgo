@@ -54,6 +54,10 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         super();
     }
 
+    public boolean computeWithoutPivoting(final MatrixStore<?> matrix) {
+        return this.decompose(matrix);
+    }
+
     /**
      * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
      *
@@ -111,10 +115,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         }
 
         return this.computed(true);
-    }
-
-    public boolean computeWithoutPivoting(final MatrixStore<?> matrix) {
-        return this.decompose(matrix);
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {

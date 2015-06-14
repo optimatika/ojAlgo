@@ -148,7 +148,7 @@ public class VerySmallCase extends MatrixDecompositionTests {
         final Eigenvalue<BigDecimal> tmpBig = Eigenvalue.makeBig();
         final Eigenvalue<ComplexNumber> tmpComplex = Eigenvalue.makeComplex();
         final Eigenvalue<Double> tmpPrimitive = Eigenvalue.makePrimitive();
-        final Eigenvalue<Double> tmpJama = new RawEigenvalue.General();
+        final Eigenvalue<Double> tmpJama = new RawEigenvalue.Dynamic();
 
         TestUtils.assertTrue("Big.compute()", tmpBig.decompose(tmpProblematic));
         TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(tmpProblematic));

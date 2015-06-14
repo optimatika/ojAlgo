@@ -563,10 +563,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
      * @param n Number of colums.
      */
     public RawStore(final double[][] A, final int m, final int n) {
+
         data = A;
 
         myNumberOfColumns = n;
-
     }
 
     /**

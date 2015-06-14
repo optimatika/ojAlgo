@@ -67,10 +67,6 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
         super(aFactory);
     }
 
-    public final boolean decompose(final Access2D<?> matrix) {
-        return this.compute(matrix, true);
-    }
-
     public final boolean compute(final Access2D<?> matrix, final boolean upper) {
 
         this.reset();
@@ -110,6 +106,10 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
         }
 
         return this.computed(true);
+    }
+
+    public final boolean decompose(final Access2D<?> matrix) {
+        return this.compute(matrix, true);
     }
 
     public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {

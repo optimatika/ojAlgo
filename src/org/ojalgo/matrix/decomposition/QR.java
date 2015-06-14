@@ -24,8 +24,10 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.operation.HouseholderLeft;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -53,17 +55,15 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (QR<N>) QR.makeBig();
+            return (QR<N>) new QRDecomposition.Big();
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (QR<N>) QR.makeComplex();
+            return (QR<N>) new QRDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-
-            final int tmpMaxDim = (int) Math.max(typical.countRows(), typical.countColumns());
-
-            if ((tmpMaxDim <= 16) || (tmpMaxDim >= 46340)) { //16,16,8
+            if ((typical.countColumns() <= HouseholderLeft.THRESHOLD) || (BasicArray.MAX_ARRAY_SIZE < typical.count())) {
+                // If it wont multithread or if the number of elements is too large for a single array
                 return (QR<N>) new RawQR();
             } else {
-                return (QR<N>) QR.makePrimitive();
+                return (QR<N>) new QRDecomposition.Primitive();
             }
         } else {
             throw new IllegalArgumentException();

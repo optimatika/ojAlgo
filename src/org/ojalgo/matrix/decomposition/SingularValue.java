@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -55,23 +56,16 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-
-            return (SingularValue<N>) SingularValue.makeBig();
-
+            return (SingularValue<N>) new SVDnew32.Big();
         } else if (tmpNumber instanceof ComplexNumber) {
-
-            return (SingularValue<N>) SingularValue.makeComplex();
-
+            return (SingularValue<N>) new SVDnew32.Complex();
         } else if (tmpNumber instanceof Double) {
 
             final int tmpMaxDim = (int) Math.max(typical.countRows(), typical.countColumns());
 
-            if ((tmpMaxDim > 128) && (tmpMaxDim < 46340)) {
-
-                return (SingularValue<N>) SingularValue.makePrimitive();
-
+            if ((tmpMaxDim > 128) || (BasicArray.MAX_ARRAY_SIZE > typical.count())) {
+                return (SingularValue<N>) new SVDnew32.Primitive();
             } else {
-
                 return (SingularValue<N>) new RawSingularValue();
             }
 
