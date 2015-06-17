@@ -64,17 +64,17 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, Ma
 
         if (tmpNumber instanceof BigDecimal) {
 
-            return (Eigenvalue<N>) (hermitian ? new HermitianEvD32.Big() : null);
+            return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Big() : null);
 
         } else if (tmpNumber instanceof ComplexNumber) {
 
-            return (Eigenvalue<N>) (hermitian ? new HermitianEvD32.Complex() : null);
+            return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Complex() : null);
 
         } else if (tmpNumber instanceof Double) {
 
-            if ((tmpDim > 128L) && (BasicArray.MAX_ARRAY_SIZE > typical.count())) {
+            if ((tmpDim > 5120L) && (BasicArray.MAX_ARRAY_SIZE > typical.count())) {
 
-                return (Eigenvalue<N>) (hermitian ? new HermitianEvD32.Primitive() : new NonsymmetricEvD.Primitive());
+                return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Primitive() : new GeneralEvD.Primitive());
 
             } else {
 
@@ -92,7 +92,7 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, Ma
     }
 
     public static Eigenvalue<BigDecimal> makeBig(final boolean symmetric) {
-        return symmetric ? new HermitianEvD32.Big() : null;
+        return symmetric ? new HermitianEvD.Big() : null;
     }
 
     public static Eigenvalue<ComplexNumber> makeComplex() {
@@ -100,15 +100,15 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, Ma
     }
 
     public static Eigenvalue<ComplexNumber> makeComplex(final boolean hermitian) {
-        return hermitian ? new HermitianEvD32.Complex() : null;
+        return hermitian ? new HermitianEvD.Complex() : null;
     }
 
     public static Eigenvalue<Double> makePrimitive() {
-        return new GeneralEvD.Primitive();
+        return new DynamicEvD.Primitive();
     }
 
     public static Eigenvalue<Double> makePrimitive(final boolean symmetric) {
-        return symmetric ? new HermitianEvD32.Primitive() : new NonsymmetricEvD.Primitive();
+        return symmetric ? new HermitianEvD.Primitive() : new GeneralEvD.Primitive();
     }
 
     /**

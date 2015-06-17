@@ -23,8 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import java.util.Arrays;
-
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -34,8 +32,7 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.store.operation.DotProduct;
-import org.ojalgo.matrix.store.operation.SubtractScaledVector;
+import org.ojalgo.matrix.store.operation.HouseholderHermitian;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -978,147 +975,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    private void tred2() {
-        //  This is derived from the Algol procedures tred2 by
-        //  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
-        //  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
-        //  Fortran subroutine in EISPACK.
-
-        final int tmpLast = n - 1;
-        for (int j = 0; j < n; j++) {
-            //d[j] = V[n - 1][j];
-            d[j] = Vt[j][tmpLast];
-        }
-
-        // Householder reduction to tridiagonal form.
-        for (int i = tmpLast; i > 0; i--) {
-
-            // Scale to avoid under/overflow.
-            double scale = ZERO;
-            double h = ZERO;
-            for (int k = 0; k < i; k++) {
-                scale = scale + Math.abs(d[k]);
-            }
-            if (scale == ZERO) {
-                e[i] = d[i - 1];
-                for (int j = 0; j < i; j++) {
-                    //d[j] = V[i - 1][j];
-                    d[j] = Vt[j][i - 1];
-                    //V[i][j] = ZERO;
-                    Vt[j][i] = ZERO;
-                    //V[j][i] = ZERO;
-                    Vt[i][j] = ZERO;
-                }
-            } else {
-
-                // Generate Householder vector.
-                for (int k = 0; k < i; k++) {
-                    d[k] /= scale;
-                    h += d[k] * d[k];
-                }
-                double f = d[i - 1];
-                double g = Math.sqrt(h);
-                if (f > 0) {
-                    g = -g;
-                }
-                e[i] = scale * g;
-                h = h - (f * g);
-                d[i - 1] = f - g;
-                //                for (int j = 0; j < i; j++) {
-                //                    e[j] = ZERO;
-                //                }
-                Arrays.fill(e, 0, i, ZERO);
-
-                // Apply similarity transformation to remaining columns.
-                for (int j = 0; j < i; j++) {
-                    f = d[j];
-                    //V[j][i] = f;
-                    Vt[i][j] = f;
-                    //g = e[j] + (V[j][j] * f);
-                    final double[] tmpVt_j = Vt[j];
-                    g = e[j] + (tmpVt_j[j] * f);
-                    for (int k = j + 1; k <= (i - 1); k++) {
-                        //g += V[k][j] * d[k];
-                        g += tmpVt_j[k] * d[k];
-                        //e[k] += V[k][j] * f;
-                        e[k] += tmpVt_j[k] * f;
-                    }
-                    e[j] = g;
-                }
-                f = ZERO;
-                for (int j = 0; j < i; j++) {
-                    e[j] /= h;
-                    f += e[j] * d[j];
-                }
-                final double hh = f / (h + h);
-                SubtractScaledVector.invoke(e, 0, d, 0, hh, 0, i);
-                //                for (int j = 0; j < i; j++) {
-                //                    e[j] -= hh * d[j];
-                //                }
-                for (int j = 0; j < i; j++) {
-                    f = d[j];
-                    g = e[j];
-                    for (int k = j; k <= (i - 1); k++) {
-                        //V[k][j] -= ((f * e[k]) + (g * d[k]));
-                        Vt[j][k] -= ((f * e[k]) + (g * d[k]));
-                    }
-                    //d[j] = V[i - 1][j];
-                    d[j] = Vt[j][i - 1];
-                    //V[i][j] = ZERO;
-                    Vt[j][i] = ZERO;
-                }
-            }
-            d[i] = h;
-        }
-
-        // Accumulate transformations.
-        for (int i = 0; i < tmpLast; i++) {
-
-            final double[] tmpVt_i = Vt[i];
-            final double[] tmpVt_i1 = Vt[i + 1];
-
-            //V[n - 1][i] = V[i][i];
-            tmpVt_i[tmpLast] = tmpVt_i[i];
-            //V[i][i] = ONE;
-            tmpVt_i[i] = ONE;
-            final double h = d[i + 1];
-            if (h != ZERO) {
-                for (int k = 0; k <= i; k++) {
-                    //d[k] = V[k][i + 1] / h;
-                    d[k] = tmpVt_i1[k] / h;
-                }
-
-                for (int j = 0; j <= i; j++) {
-                    final double tmpDotProd = DotProduct.invoke(tmpVt_i1, 0, Vt[j], 0, 0, i + 1);
-                    //                    for (int k = 0; k <= i; k++) {
-                    //                        //g += V[k][i + 1] * V[k][j];
-                    //                        g += tmpVt_i1[k] * tmpVt_j[k];
-                    //                    }
-                    SubtractScaledVector.invoke(Vt[j], 0, d, 0, tmpDotProd, 0, i + 1);
-                    //                    for (int k = 0; k <= i; k++) {
-                    //                        //V[k][j] -= g * d[k];
-                    //                        tmpVt_j[k] -= g * d[k];
-                    //                    }
-                }
-            }
-            Arrays.fill(tmpVt_i1, 0, i + 1, ZERO);
-            //            for (int k = 0; k <= i; k++) {
-            //                //V[k][i + 1] = ZERO;
-            //                tmpVt_i1[k] = ZERO;
-            //            }
-        }
-
-        for (int j = 0; j < n; j++) {
-            //d[j] = V[n - 1][j];
-            d[j] = Vt[j][tmpLast];
-            //V[n - 1][j] = ZERO;
-            Vt[j][tmpLast] = ZERO;
-        }
-        //V[n - 1][n - 1] = ONE;
-        Vt[tmpLast][tmpLast] = ONE;
-        e[0] = ZERO;
-    }
-
     @Override
     protected MatrixStore<Double> getInverse(final PrimitiveDenseStore preallocated) {
         // TODO Auto-generated method stub
@@ -1168,7 +1024,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         //        }
 
         // Tridiagonalize.
-        this.tred2();
+        HouseholderHermitian.tred2jj(Vt, d, e, true);
 
         // Diagonalize.
         this.tql2();

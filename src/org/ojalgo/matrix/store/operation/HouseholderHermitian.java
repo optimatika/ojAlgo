@@ -21,9 +21,8 @@
  */
 package org.ojalgo.matrix.store.operation;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.BigMath;
@@ -45,12 +44,12 @@ public final class HouseholderHermitian extends MatrixOperation {
 
     public static int THRESHOLD = 64;
 
-    public static void invoke(final BigDecimal[] aData, final Householder.Big aHouseholder, final BigDecimal[] aWorker) {
+    public static void invoke(final BigDecimal[] data, final Householder.Big householder, final BigDecimal[] worker) {
 
-        final BigDecimal[] tmpVector = aHouseholder.vector;
-        final int tmpFirst = aHouseholder.first;
+        final BigDecimal[] tmpVector = householder.vector;
+        final int tmpFirst = householder.first;
         final int tmpLength = tmpVector.length;
-        final BigDecimal tmpBeta = aHouseholder.beta;
+        final BigDecimal tmpBeta = householder.beta;
         final int tmpCount = tmpLength - tmpFirst;
 
         if (tmpCount > THRESHOLD) {
@@ -59,7 +58,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
                 @Override
                 protected void conquer(final int aFirst, final int aLimit) {
-                    MultiplyHermitianAndVector.invoke(aWorker, aFirst, aLimit, aData, tmpVector, tmpFirst);
+                    MultiplyHermitianAndVector.invoke(worker, aFirst, aLimit, data, tmpVector, tmpFirst);
                 }
             };
 
@@ -67,19 +66,19 @@ public final class HouseholderHermitian extends MatrixOperation {
 
         } else {
 
-            MultiplyHermitianAndVector.invoke(aWorker, tmpFirst, tmpLength, aData, tmpVector, tmpFirst);
+            MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst);
         }
 
         BigDecimal tmpVal = BigMath.ZERO;
         for (int c = tmpFirst; c < tmpLength; c++) {
-            //tmpVal += tmpVector[c] * aWorker[c];
-            tmpVal = tmpVal.add(tmpVector[c].multiply(aWorker[c]));
+            //tmpVal += tmpVector[c] * worker[c];
+            tmpVal = tmpVal.add(tmpVector[c].multiply(worker[c]));
         }
         //tmpVal *= (tmpBeta / TWO);
         tmpVal = BigFunction.DIVIDE.invoke(tmpVal.multiply(tmpBeta), BigMath.TWO);
         for (int c = tmpFirst; c < tmpLength; c++) {
-            //aWorker[c] = tmpBeta * (aWorker[c] - (tmpVal * tmpVector[c]));
-            aWorker[c] = tmpBeta.multiply(aWorker[c].subtract(tmpVal.multiply(tmpVector[c])));
+            //worker[c] = tmpBeta * (worker[c] - (tmpVal * tmpVector[c]));
+            worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c])));
         }
 
         if (tmpCount > THRESHOLD) {
@@ -88,7 +87,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
                 @Override
                 protected void conquer(final int aFirst, final int aLimit) {
-                    HermitianRank2Update.invoke(aData, aFirst, aLimit, tmpVector, aWorker);
+                    HermitianRank2Update.invoke(data, aFirst, aLimit, tmpVector, worker);
                 }
             };
 
@@ -96,16 +95,16 @@ public final class HouseholderHermitian extends MatrixOperation {
 
         } else {
 
-            HermitianRank2Update.invoke(aData, tmpFirst, tmpLength, tmpVector, aWorker);
+            HermitianRank2Update.invoke(data, tmpFirst, tmpLength, tmpVector, worker);
         }
     }
 
-    public static void invoke(final ComplexNumber[] aData, final Householder.Complex aHouseholder, final ComplexNumber[] aWorker) {
+    public static void invoke(final ComplexNumber[] data, final Householder.Complex householder, final ComplexNumber[] worker) {
 
-        final ComplexNumber[] tmpVector = aHouseholder.vector;
-        final int tmpFirst = aHouseholder.first;
+        final ComplexNumber[] tmpVector = householder.vector;
+        final int tmpFirst = householder.first;
         final int tmpLength = tmpVector.length;
-        final ComplexNumber tmpBeta = aHouseholder.beta;
+        final ComplexNumber tmpBeta = householder.beta;
         final int tmpCount = tmpLength - tmpFirst;
 
         if (tmpCount > THRESHOLD) {
@@ -114,7 +113,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
                 @Override
                 protected void conquer(final int aFirst, final int aLimit) {
-                    MultiplyHermitianAndVector.invoke(aWorker, aFirst, aLimit, aData, tmpVector, tmpFirst);
+                    MultiplyHermitianAndVector.invoke(worker, aFirst, aLimit, data, tmpVector, tmpFirst);
                 }
             };
 
@@ -122,19 +121,19 @@ public final class HouseholderHermitian extends MatrixOperation {
 
         } else {
 
-            MultiplyHermitianAndVector.invoke(aWorker, tmpFirst, tmpLength, aData, tmpVector, tmpFirst);
+            MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst);
         }
 
         ComplexNumber tmpVal = ComplexNumber.ZERO;
         for (int c = tmpFirst; c < tmpLength; c++) {
-            //tmpVal += tmpVector[c] * aWorker[c];
-            tmpVal = tmpVal.add(tmpVector[c].conjugate().multiply(aWorker[c]));
+            //tmpVal += tmpVector[c] * worker[c];
+            tmpVal = tmpVal.add(tmpVector[c].conjugate().multiply(worker[c]));
         }
         //tmpVal *= (tmpBeta / TWO);
         tmpVal = ComplexFunction.DIVIDE.invoke(tmpVal.multiply(tmpBeta), ComplexNumber.TWO);
         for (int c = tmpFirst; c < tmpLength; c++) {
-            //aWorker[c] = tmpBeta * (aWorker[c] - (tmpVal * tmpVector[c]));
-            aWorker[c] = tmpBeta.multiply(aWorker[c].subtract(tmpVal.multiply(tmpVector[c])));
+            //worker[c] = tmpBeta * (worker[c] - (tmpVal * tmpVector[c]));
+            worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c])));
         }
 
         if (tmpCount > THRESHOLD) {
@@ -143,7 +142,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
                 @Override
                 protected void conquer(final int aFirst, final int aLimit) {
-                    HermitianRank2Update.invoke(aData, aFirst, aLimit, tmpVector, aWorker);
+                    HermitianRank2Update.invoke(data, aFirst, aLimit, tmpVector, worker);
                 }
             };
 
@@ -151,16 +150,16 @@ public final class HouseholderHermitian extends MatrixOperation {
 
         } else {
 
-            HermitianRank2Update.invoke(aData, tmpFirst, tmpLength, tmpVector, aWorker);
+            HermitianRank2Update.invoke(data, tmpFirst, tmpLength, tmpVector, worker);
         }
     }
 
-    public static void invoke(final double[] aData, final Householder.Primitive aHouseholder, final double[] aWorker) {
+    public static void invoke(final double[] data, final Householder.Primitive householder, final double[] worker) {
 
-        final double[] tmpVector = aHouseholder.vector;
-        final int tmpFirst = aHouseholder.first;
+        final double[] tmpVector = householder.vector;
+        final int tmpFirst = householder.first;
         final int tmpLength = tmpVector.length;
-        final double tmpBeta = aHouseholder.beta;
+        final double tmpBeta = householder.beta;
         final int tmpCount = tmpLength - tmpFirst;
 
         if (tmpCount > THRESHOLD) {
@@ -169,7 +168,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
                 @Override
                 protected void conquer(final int aFirst, final int aLimit) {
-                    MultiplyHermitianAndVector.invoke(aWorker, aFirst, aLimit, aData, tmpVector, tmpFirst);
+                    MultiplyHermitianAndVector.invoke(worker, aFirst, aLimit, data, tmpVector, tmpFirst);
                 }
             };
 
@@ -177,16 +176,16 @@ public final class HouseholderHermitian extends MatrixOperation {
 
         } else {
 
-            MultiplyHermitianAndVector.invoke(aWorker, tmpFirst, tmpLength, aData, tmpVector, tmpFirst);
+            MultiplyHermitianAndVector.invoke(worker, tmpFirst, tmpLength, data, tmpVector, tmpFirst);
         }
 
-        double tmpVal = ZERO;
+        double tmpVal = PrimitiveMath.ZERO;
         for (int c = tmpFirst; c < tmpLength; c++) {
-            tmpVal += tmpVector[c] * aWorker[c];
+            tmpVal += tmpVector[c] * worker[c];
         }
-        tmpVal *= (tmpBeta / TWO);
+        tmpVal *= (tmpBeta / PrimitiveMath.TWO);
         for (int c = tmpFirst; c < tmpLength; c++) {
-            aWorker[c] = tmpBeta * (aWorker[c] - (tmpVal * tmpVector[c]));
+            worker[c] = tmpBeta * (worker[c] - (tmpVal * tmpVector[c]));
         }
 
         if (tmpCount > THRESHOLD) {
@@ -195,7 +194,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
                 @Override
                 protected void conquer(final int aFirst, final int aLimit) {
-                    HermitianRank2Update.invoke(aData, aFirst, aLimit, tmpVector, aWorker);
+                    HermitianRank2Update.invoke(data, aFirst, aLimit, tmpVector, worker);
                 }
             };
 
@@ -203,47 +202,43 @@ public final class HouseholderHermitian extends MatrixOperation {
 
         } else {
 
-            HermitianRank2Update.invoke(aData, tmpFirst, tmpLength, tmpVector, aWorker);
+            HermitianRank2Update.invoke(data, tmpFirst, tmpLength, tmpVector, worker);
         }
     }
 
-    public static void tred2j(final double[] z, final double[] d, final double[] e, final boolean yesvecs) {
+    public static void tred2j(final double[] data, final double[] d, final double[] e, final boolean yesvecs) {
 
         /*
          * Symmetric Householder reduction to tridiagonal form. The original version of this code was taken
          * from JAMA. That code is in turn derived from the Algol procedures tred2 by Bowdler, Martin,
          * Reinsch, and Wilkinson, Handbook for Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
-         * Fortran subroutine in EISPACK. tred2 is also described in Numerical Recipes. Parameters and
-         * variables are names are choosen to match what is used there. z is the original matrix [A] that will
-         * be overwritten with [Q] d will hold the main diagonal of the tridiagonal result e will hold the off
-         * (super and sub) diagonals of the tridiagonal result
+         * Fortran subroutine in EISPACK. tred2 is also described in Numerical Recipes. The array d will hold
+         * the main diagonal of the tridiagonal result, and e will hold the off (super and sub) diagonals of
+         * the tridiagonal result
          */
 
-        final int n = d.length;
+        final int n = d.length; // rows, columns, structure
+        final int tmpLast = n - 1;
 
         double scale;
         double h;
         double f;
         double g;
-        double hh;
+        double tmpVal; // Nothing special, just some transient value
 
         final int tmpRowDim = n;
-        final int tmpLast = n - 1;
 
         // Copy the last column (same as the last row) of z to d
         // The last row/column is the first to be worked on in the main loop
-        for (int i = 0; i < n; i++) {
-            d[i] = z[i + (tmpRowDim * tmpLast)];
-        }
+        Copy.invoke(data, tmpRowDim * tmpLast, d, 0, 0, n);
 
         // Householder reduction to tridiagonal form.
         for (int i = tmpLast; i > 0; i--) { // row index of target householder point
-
             final int l = i - 1; // col index of target householder point
 
             h = scale = PrimitiveMath.ZERO;
 
-            // Calc the norm of the row/col to zero out
+            // Calc the norm of the row/col to zero out - to avoid under/overflow.
             for (int k = 0; k < i; k++) {
                 scale += Math.abs(d[k]);
             }
@@ -252,17 +247,17 @@ public final class HouseholderHermitian extends MatrixOperation {
                 // Skip generation, already zero
                 e[i] = d[l];
                 for (int j = 0; j < i; j++) {
-                    d[j] = z[l + (tmpRowDim * j)];
-                    z[i + (tmpRowDim * j)] = PrimitiveMath.ZERO; // Are both needed?
-                    z[j + (tmpRowDim * i)] = PrimitiveMath.ZERO; // Could cause cache-misses
+                    d[j] = data[l + (tmpRowDim * j)];
+                    data[i + (tmpRowDim * j)] = PrimitiveMath.ZERO; // Are both needed?
+                    data[j + (tmpRowDim * i)] = PrimitiveMath.ZERO; // Could cause cache-misses
                 }
 
             } else {
                 // Generate Householder vector.
 
                 for (int k = 0; k < i; k++) {
-                    d[k] /= scale;
-                    h += d[k] * d[k]; // can be optimised, too many array read/write ops
+                    tmpVal = d[k] /= scale;
+                    h += tmpVal * tmpVal; // d[k] * d[k]
                 }
                 f = d[l];
                 g = Math.sqrt(h);
@@ -272,19 +267,18 @@ public final class HouseholderHermitian extends MatrixOperation {
                 e[i] = scale * g;
                 h -= f * g;
                 d[l] = f - g;
-                for (int j = 0; j < i; j++) {
-                    e[j] = PrimitiveMath.ZERO;
-                }
+                Arrays.fill(e, 0, i, PrimitiveMath.ZERO);
 
                 // Apply similarity transformation to remaining columns.
                 // Remaing refers to all columns "before" the target col
                 for (int j = 0; j < i; j++) {
                     f = d[j];
-                    z[j + (tmpRowDim * i)] = f;
-                    g = e[j] + (z[j + (tmpRowDim * j)] * f);
+                    data[j + (tmpRowDim * i)] = f;
+                    g = e[j] + (data[j + (tmpRowDim * j)] * f);
                     for (int k = j + 1; k <= l; k++) {
-                        g += z[k + (tmpRowDim * j)] * d[k]; // access the same element in z twice
-                        e[k] += z[k + (tmpRowDim * j)] * f;
+                        tmpVal = data[k + (tmpRowDim * j)];
+                        g += tmpVal * d[k]; // access the same element in z twice
+                        e[k] += tmpVal * f;
                     }
                     e[j] = g;
                 }
@@ -293,18 +287,16 @@ public final class HouseholderHermitian extends MatrixOperation {
                     e[j] /= h;
                     f += e[j] * d[j];
                 }
-                hh = f / (h + h);
-                for (int j = 0; j < i; j++) {
-                    e[j] -= hh * d[j];
-                }
+                tmpVal = f / (h + h);
+                SubtractScaledVector.invoke(e, 0, d, 0, tmpVal, 0, i);
                 for (int j = 0; j < i; j++) {
                     f = d[j];
                     g = e[j];
                     for (int k = j; k <= l; k++) {
-                        z[k + (tmpRowDim * j)] -= ((f * e[k]) + (g * d[k]));
+                        data[k + (tmpRowDim * j)] -= ((f * e[k]) + (g * d[k]));
                     }
-                    d[j] = z[l + (tmpRowDim * j)];
-                    z[i + (tmpRowDim * j)] = PrimitiveMath.ZERO;
+                    d[j] = data[l + (tmpRowDim * j)];
+                    data[i + (tmpRowDim * j)] = PrimitiveMath.ZERO;
                 }
             }
             d[i] = h;
@@ -317,39 +309,181 @@ public final class HouseholderHermitian extends MatrixOperation {
 
                 final int l = i + 1;
 
-                z[tmpLast + (tmpRowDim * i)] = z[i + (tmpRowDim * i)];
-                z[i + (tmpRowDim * i)] = PrimitiveMath.ONE;
+                data[tmpLast + (tmpRowDim * i)] = data[i + (tmpRowDim * i)];
+                data[i + (tmpRowDim * i)] = PrimitiveMath.ONE;
                 h = d[l];
                 if (h != PrimitiveMath.ZERO) {
                     for (int k = 0; k <= i; k++) {
-                        d[k] = z[k + (tmpRowDim * l)] / h;
+                        d[k] = data[k + (tmpRowDim * l)] / h;
                     }
                     for (int j = 0; j <= i; j++) {
                         g = PrimitiveMath.ZERO;
                         for (int k = 0; k <= i; k++) {
-                            g += z[k + (tmpRowDim * l)] * z[k + (tmpRowDim * j)];
+                            g += data[k + (tmpRowDim * l)] * data[k + (tmpRowDim * j)];
                         }
                         for (int k = 0; k <= i; k++) {
-                            z[k + (tmpRowDim * j)] -= g * d[k];
+                            data[k + (tmpRowDim * j)] -= g * d[k];
                         }
                     }
                 }
                 for (int k = 0; k <= i; k++) {
-                    z[k + (tmpRowDim * l)] = PrimitiveMath.ZERO;
+                    data[k + (tmpRowDim * l)] = PrimitiveMath.ZERO;
                 }
             }
             for (int j = 0; j < n; j++) {
-                d[j] = z[tmpLast + (tmpRowDim * j)];
-                z[tmpLast + (tmpRowDim * j)] = PrimitiveMath.ZERO;
+                d[j] = data[tmpLast + (tmpRowDim * j)];
+                data[tmpLast + (tmpRowDim * j)] = PrimitiveMath.ZERO;
             }
-            z[tmpLast + (tmpRowDim * tmpLast)] = PrimitiveMath.ONE;
+            data[tmpLast + (tmpRowDim * tmpLast)] = PrimitiveMath.ONE;
 
             e[0] = PrimitiveMath.ZERO;
         }
 
     }
 
-    public static void tred2nr(final double[] z, final double[] d, final double[] e, final boolean yesvecs) {
+    public static void tred2jj(final double[][] data, final double[] d, final double[] e, final boolean yesvecs) {
+
+        /*
+         * Symmetric Householder reduction to tridiagonal form. The original version of this code was taken
+         * from JAMA. That code is in turn derived from the Algol procedures tred2 by Bowdler, Martin,
+         * Reinsch, and Wilkinson, Handbook for Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
+         * Fortran subroutine in EISPACK. tred2 is also described in Numerical Recipes. The array d will hold
+         * the main diagonal of the tridiagonal result, and e will hold the off (super and sub) diagonals of
+         * the tridiagonal result
+         */
+
+        final int n = d.length; // rows, columns, structure
+        final int tmpLast = n - 1;
+
+        double scale;
+        double h;
+        double f;
+        double g;
+        double tmpVal; // Nothing special, just some transient value
+
+        // Copy the last column (same as the last row) of z to d
+        // The last row/column is the first to be worked on in the main loop
+        Copy.invoke(data[tmpLast], 0, d, 0, 0, n);
+
+        // Householder reduction to tridiagonal form.
+        for (int i = tmpLast; i > 0; i--) { // row index of target householder point
+            final int l = i - 1; // col index of target householder point
+
+            h = scale = PrimitiveMath.ZERO;
+
+            // Calc the norm of the row/col to zero out - to avoid under/overflow.
+            for (int k = 0; k < i; k++) {
+                scale += Math.abs(d[k]);
+            }
+            if (scale == PrimitiveMath.ZERO) {
+                // Skip generation, already zero
+                e[i] = d[l];
+                for (int j = 0; j < i; j++) {
+                    d[j] = data[j][l];
+                    data[j][i] = PrimitiveMath.ZERO; // Are both needed?
+                    data[i][j] = PrimitiveMath.ZERO; // Could cause cache-misses
+                }
+
+            } else {
+                // Generate Householder vector.
+
+                for (int k = 0; k < i; k++) {
+                    tmpVal = d[k] /= scale;
+                    h += tmpVal * tmpVal; // d[k] * d[k]
+                }
+                f = d[l];
+                g = Math.sqrt(h);
+                if (f > 0) {
+                    g = -g;
+                }
+                e[i] = scale * g;
+                h = h - (f * g);
+                d[l] = f - g;
+                Arrays.fill(e, 0, i, PrimitiveMath.ZERO);
+
+                // Apply similarity transformation to remaining columns.
+                // Remaing refers to all columns "before" the target col
+                for (int j = 0; j < i; j++) {
+                    f = d[j];
+                    data[i][j] = f;
+                    final double[] tmpVt_j = data[j];
+                    g = e[j] + (tmpVt_j[j] * f);
+                    for (int k = j + 1; k <= l; k++) {
+                        tmpVal = tmpVt_j[k];
+                        g += tmpVal * d[k];
+                        e[k] += tmpVal * f;
+                    }
+                    e[j] = g;
+                }
+                f = PrimitiveMath.ZERO;
+                for (int j = 0; j < i; j++) {
+                    e[j] /= h;
+                    f += e[j] * d[j];
+                }
+                tmpVal = f / (h + h);
+                SubtractScaledVector.invoke(e, 0, d, 0, tmpVal, 0, i);
+                for (int j = 0; j < i; j++) {
+                    f = d[j];
+                    g = e[j];
+                    for (int k = j; k <= l; k++) {
+                        data[j][k] -= ((f * e[k]) + (g * d[k]));
+                    }
+                    d[j] = data[j][l];
+                    data[j][i] = PrimitiveMath.ZERO;
+                }
+            }
+            d[i] = h;
+        }
+
+        // Accumulate transformations.
+        for (int i = 0; i < tmpLast; i++) {
+
+            final double[] tmpVt_i = data[i];
+            final double[] tmpVt_i1 = data[i + 1];
+
+            //V[n - 1][i] = V[i][i];
+            tmpVt_i[tmpLast] = tmpVt_i[i];
+            //V[i][i] = ONE;
+            tmpVt_i[i] = PrimitiveMath.ONE;
+            h = d[i + 1];
+            if (h != PrimitiveMath.ZERO) {
+                for (int k = 0; k <= i; k++) {
+                    //d[k] = V[k][i + 1] / h;
+                    d[k] = tmpVt_i1[k] / h;
+                }
+
+                for (int j = 0; j <= i; j++) {
+                    final double tmpDotProd = DotProduct.invoke(tmpVt_i1, 0, data[j], 0, 0, i + 1);
+                    //                    for (int k = 0; k <= i; k++) {
+                    //                        //g += V[k][i + 1] * V[k][j];
+                    //                        g += tmpVt_i1[k] * tmpVt_j[k];
+                    //                    }
+                    SubtractScaledVector.invoke(data[j], 0, d, 0, tmpDotProd, 0, i + 1);
+                    //                    for (int k = 0; k <= i; k++) {
+                    //                        //V[k][j] -= g * d[k];
+                    //                        tmpVt_j[k] -= g * d[k];
+                    //                    }
+                }
+            }
+            Arrays.fill(tmpVt_i1, 0, i + 1, PrimitiveMath.ZERO);
+            //            for (int k = 0; k <= i; k++) {
+            //                //V[k][i + 1] = ZERO;
+            //                tmpVt_i1[k] = ZERO;
+            //            }
+        }
+
+        for (int j = 0; j < n; j++) {
+            //d[j] = V[n - 1][j];
+            d[j] = data[j][tmpLast];
+            //V[n - 1][j] = ZERO;
+            data[j][tmpLast] = PrimitiveMath.ZERO;
+        }
+        //V[n - 1][n - 1] = ONE;
+        data[tmpLast][tmpLast] = PrimitiveMath.ONE;
+        e[0] = PrimitiveMath.ZERO;
+    }
+
+    public static void tred2nr(final double[] data, final double[] d, final double[] e, final boolean yesvecs) {
 
         final int n = d.length;
         int l;
@@ -371,47 +505,47 @@ public final class HouseholderHermitian extends MatrixOperation {
             if (l > 0) {
 
                 for (int k = 0; k < i; k++) {
-                    scale += Math.abs(z[i + (k * tmpRowDim)]);
+                    scale += Math.abs(data[i + (k * tmpRowDim)]);
                 }
 
                 if (scale == PrimitiveMath.ZERO) {
-                    e[i] = z[i + (l * tmpRowDim)];
+                    e[i] = data[i + (l * tmpRowDim)];
                 } else {
                     for (int k = 0; k < i; k++) {
-                        z[i + (k * tmpRowDim)] /= scale;
-                        h += z[i + (k * tmpRowDim)] * z[i + (k * tmpRowDim)];
+                        data[i + (k * tmpRowDim)] /= scale;
+                        h += data[i + (k * tmpRowDim)] * data[i + (k * tmpRowDim)];
                     }
-                    f = z[i + (l * tmpRowDim)];
+                    f = data[i + (l * tmpRowDim)];
                     g = (f >= PrimitiveMath.ZERO) ? -Math.sqrt(h) : Math.sqrt(h);
                     e[i] = scale * g;
                     h -= f * g;
-                    z[i + (l * tmpRowDim)] = f - g;
+                    data[i + (l * tmpRowDim)] = f - g;
                     f = PrimitiveMath.ZERO;
                     for (int j = 0; j < i; j++) {
                         if (yesvecs) {
-                            z[j + (i * tmpRowDim)] = z[i + (j * tmpRowDim)] / h;
+                            data[j + (i * tmpRowDim)] = data[i + (j * tmpRowDim)] / h;
                         }
                         g = PrimitiveMath.ZERO;
                         for (int k = 0; k < (j + 1); k++) {
-                            g += z[j + (k * tmpRowDim)] * z[i + (k * tmpRowDim)];
+                            g += data[j + (k * tmpRowDim)] * data[i + (k * tmpRowDim)];
                         }
                         for (int k = j + 1; k < i; k++) {
-                            g += z[k + (j * tmpRowDim)] * z[i + (k * tmpRowDim)];
+                            g += data[k + (j * tmpRowDim)] * data[i + (k * tmpRowDim)];
                         }
                         e[j] = g / h;
-                        f += e[j] * z[i + (j * tmpRowDim)];
+                        f += e[j] * data[i + (j * tmpRowDim)];
                     }
                     hh = f / (h + h);
                     for (int j = 0; j < i; j++) {
-                        f = z[i + (j * tmpRowDim)];
+                        f = data[i + (j * tmpRowDim)];
                         e[j] = g = e[j] - (hh * f);
                         for (int k = 0; k < (j + 1); k++) {
-                            z[j + (k * tmpRowDim)] -= ((f * e[k]) + (g * z[i + (k * tmpRowDim)]));
+                            data[j + (k * tmpRowDim)] -= ((f * e[k]) + (g * data[i + (k * tmpRowDim)]));
                         }
                     }
                 }
             } else {
-                e[i] = z[i + (l * tmpRowDim)];
+                e[i] = data[i + (l * tmpRowDim)];
             }
             d[i] = h;
         }
@@ -425,21 +559,21 @@ public final class HouseholderHermitian extends MatrixOperation {
                     for (int j = 0; j < i; j++) {
                         g = PrimitiveMath.ZERO;
                         for (int k = 0; k < i; k++) {
-                            g += z[i + (k * tmpRowDim)] * z[k + (j * tmpRowDim)];
+                            g += data[i + (k * tmpRowDim)] * data[k + (j * tmpRowDim)];
                         }
                         for (int k = 0; k < i; k++) {
-                            z[k + (j * tmpRowDim)] -= g * z[k + (i * tmpRowDim)];
+                            data[k + (j * tmpRowDim)] -= g * data[k + (i * tmpRowDim)];
                         }
                     }
                 }
-                d[i] = z[i + (i * tmpRowDim)];
-                z[i + (i * tmpRowDim)] = PrimitiveMath.ONE;
+                d[i] = data[i + (i * tmpRowDim)];
+                data[i + (i * tmpRowDim)] = PrimitiveMath.ONE;
                 for (int j = 0; j < i; j++) {
-                    z[i + (j * tmpRowDim)] = PrimitiveMath.ZERO;
-                    z[j + (i * tmpRowDim)] = PrimitiveMath.ZERO;
+                    data[i + (j * tmpRowDim)] = PrimitiveMath.ZERO;
+                    data[j + (i * tmpRowDim)] = PrimitiveMath.ZERO;
                 }
             } else {
-                d[i] = z[i + (i * tmpRowDim)];
+                d[i] = data[i + (i * tmpRowDim)];
             }
         }
     }

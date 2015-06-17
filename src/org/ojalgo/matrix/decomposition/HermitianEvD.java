@@ -40,9 +40,9 @@ import org.ojalgo.matrix.store.TransposedStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<N> {
+abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
-    static final class Big extends HermitianEvD32<BigDecimal> {
+    static final class Big extends HermitianEvD<BigDecimal> {
 
         Big() {
             super(BigDenseStore.FACTORY, new TridiagonalDecomposition.Big());
@@ -50,7 +50,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
 
     }
 
-    static final class Complex extends HermitianEvD32<ComplexNumber> {
+    static final class Complex extends HermitianEvD<ComplexNumber> {
 
         Complex() {
             super(ComplexDenseStore.FACTORY, new TridiagonalDecomposition.Complex());
@@ -71,7 +71,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
      * V.times(D). The matrix V may be badly conditioned, or even singular, so the validity of the equation A
      * = V*D*inverse(V) depends upon V.cond().
      **/
-    static final class Primitive extends HermitianEvD32<Double> {
+    static final class Primitive extends HermitianEvD<Double> {
 
         Primitive() {
             super(PrimitiveDenseStore.FACTORY, new TridiagonalDecomposition.Primitive());
@@ -232,11 +232,11 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
     private final TridiagonalDecomposition<N> myTridiagonal;
 
     @SuppressWarnings("unused")
-    private HermitianEvD32(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
+    private HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         this(aFactory, null);
     }
 
-    protected HermitianEvD32(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final TridiagonalDecomposition<N> aTridiagonal) {
+    protected HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final TridiagonalDecomposition<N> aTridiagonal) {
 
         super(aFactory);
 
@@ -368,7 +368,7 @@ abstract class HermitianEvD32<N extends Number> extends EigenvalueDecomposition<
 
         //        BasicLogger.logDebug("Tridiagonal2={}", tmpTridiagonal);
 
-        final Array1D<Double> tmpDiagonal = myDiagonalValues = HermitianEvD32.toDiagonal(tmpTridiagonal, tmpV);
+        final Array1D<Double> tmpDiagonal = myDiagonalValues = HermitianEvD.toDiagonal(tmpTridiagonal, tmpV);
 
         for (int ij1 = 0; ij1 < (tmpDim - 1); ij1++) {
             final double tmpValue1 = tmpDiagonal.doubleValue(ij1);

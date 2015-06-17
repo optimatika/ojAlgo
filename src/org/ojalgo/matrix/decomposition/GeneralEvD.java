@@ -21,171 +21,174 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
+    /**
+     * Eigenvalues and eigenvectors of a real matrix.
+     * <P>
+     * If A is symmetric, then A = V*D*V' where the eigenvalue matrix D is diagonal and the eigenvector matrix
+     * V is orthogonal. I.e. A = V.times(D.times(V.transpose())) and V.times(V.transpose()) equals the
+     * identity matrix.
+     * <P>
+     * If A is not symmetric, then the eigenvalue matrix D is block diagonal with the real eigenvalues in
+     * 1-by-1 blocks and any complex eigenvalues, lambda + i*mu, in 2-by-2 blocks, [lambda, mu; -mu, lambda].
+     * The columns of V represent the eigenvectors in the sense that A*V = V*D, i.e. A.times(V) equals
+     * V.times(D). The matrix V may be badly conditioned, or even singular, so the validity of the equation A
+     * = V*D*inverse(V) depends upon V.cond().
+     **/
     static final class Primitive extends GeneralEvD<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY, new HermitianEvD32.Primitive(), new NonsymmetricEvD.Primitive());
+            super(PrimitiveDenseStore.FACTORY);
         }
 
     }
 
-    private final EigenvalueDecomposition<N> myNonsymmetricDelegate;
-    private final EigenvalueDecomposition<N> mySymmetricDelegate;
-
-    private boolean mySymmetricOrNot = false;
-
-    @SuppressWarnings("unused")
-    private GeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
-
-        this(aFactory, null, null);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
-    protected GeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final EigenvalueDecomposition<N> aSymmetric,
-            final EigenvalueDecomposition<N> aNonsymmetric) {
-
+    protected GeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
-
-        mySymmetricDelegate = aSymmetric;
-        myNonsymmetricDelegate = aNonsymmetric;
     }
 
     public final boolean compute(final Access2D<?> matrix, final boolean eigenvaluesOnly) {
-
-        final boolean tmpSymmetric = MatrixUtils.isHermitian(matrix);
-
-        return this.compute(matrix, tmpSymmetric, eigenvaluesOnly);
+        return this.compute(matrix, false, eigenvaluesOnly);
     }
 
-    public boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.equals(other, context);
-        } else {
-            return myNonsymmetricDelegate.equals(other, context);
-        }
+    public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
+        return MatrixUtils.equals(aStore, this, context);
     }
 
-    @Override
-    public N getDeterminant() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.getDeterminant();
-        } else {
-            return myNonsymmetricDelegate.getDeterminant();
-        }
+    public final N getDeterminant() {
+
+        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().product();
+
+        this.getEigenvalues().visitAll(tmpVisitor);
+
+        return this.scalar().cast(tmpVisitor.getNumber());
     }
 
     public MatrixStore<N> getInverse() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.getInverse();
-        } else {
-            return myNonsymmetricDelegate.getInverse();
-        }
+        throw new UnsupportedOperationException();
     }
 
-    public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.getInverse(preallocated);
-        } else {
-            return myNonsymmetricDelegate.getInverse(preallocated);
-        }
+    public MatrixStore<N> getInverse(final DecompositionStore<N> newPreallocated) {
+        throw new UnsupportedOperationException();
     }
 
-    public ComplexNumber getTrace() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.getTrace();
-        } else {
-            return myNonsymmetricDelegate.getTrace();
-        }
+    public final ComplexNumber getTrace() {
+
+        final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
+
+        this.getEigenvalues().visitAll(tmpVisitor);
+
+        return tmpVisitor.getNumber();
     }
 
-    public boolean isHermitian() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.isHermitian();
-        } else {
-            return myNonsymmetricDelegate.isHermitian();
-        }
+    public final boolean isHermitian() {
+        return false;
     }
 
-    public boolean isOrdered() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.isOrdered();
-        } else {
-            return myNonsymmetricDelegate.isOrdered();
-        }
+    public final boolean isOrdered() {
+        return true;
     }
 
-    public boolean isSolvable() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.isSolvable();
-        } else {
-            return myNonsymmetricDelegate.isSolvable();
-        }
-    }
-
-    @Override
-    public void reset() {
-
-        super.reset();
-
-        myNonsymmetricDelegate.reset();
-        mySymmetricDelegate.reset();
-
-        mySymmetricOrNot = false;
+    public final boolean isSolvable() {
+        return this.isComputed() && this.isHermitian();
     }
 
     @Override
     protected boolean doNonsymmetric(final Access2D<?> aMtrx, final boolean eigenvaluesOnly) {
 
-        mySymmetricOrNot = false;
+        final int tmpDiagDim = (int) aMtrx.countRows();
 
-        return myNonsymmetricDelegate.compute(aMtrx, false, eigenvaluesOnly);
+        final DecompositionStore<N> tmpMtrxA = this.copy(aMtrx);
+
+        final DecompositionStore<N> tmpV = this.makeEye(tmpDiagDim, tmpDiagDim);
+
+        final Array1D<ComplexNumber> tmpEigenvalues = tmpMtrxA.computeInPlaceSchur(tmpV, true);
+
+        this.setV(tmpV);
+        this.setEigenvalues(tmpEigenvalues);
+
+        final PhysicalStore<N> tmpD = this.makeZero(tmpDiagDim, tmpDiagDim);
+        ComplexNumber tmpValue;
+        double tmpImaginary;
+        for (int ij = 0; ij < tmpDiagDim; ij++) {
+
+            tmpValue = tmpEigenvalues.get(ij);
+            tmpD.set(ij, ij, tmpValue.doubleValue());
+
+            tmpImaginary = tmpValue.i;
+
+            if (tmpImaginary > PrimitiveMath.ZERO) {
+                tmpD.set(ij, ij + 1, tmpImaginary);
+            } else if (tmpImaginary < PrimitiveMath.ZERO) {
+                tmpD.set(ij, ij - 1, tmpImaginary);
+            }
+        }
+        this.setD(tmpD);
+
+        //            BasicLogger.logDebug("Eigenvalues: {}", tmpEigenvalues);
+        //            BasicLogger.logDebug("D", tmpD);
+        //            BasicLogger.logDebug("THIS", tmpMtrxA);
+
+        tmpEigenvalues.sortDescending();
+
+        return this.computed(true);
     }
 
     @Override
     protected boolean doSymmetric(final Access2D<?> aMtrx, final boolean eigenvaluesOnly) {
-
-        mySymmetricOrNot = true;
-
-        return mySymmetricDelegate.compute(aMtrx, true, eigenvaluesOnly);
+        return this.doNonsymmetric(aMtrx, eigenvaluesOnly);
     }
 
     @Override
-    protected MatrixStore<N> makeD() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.getD();
-        } else {
-            return myNonsymmetricDelegate.getD();
-        }
+    protected final MatrixStore<N> makeD() {
+        return null;
     }
 
     @Override
     protected Array1D<ComplexNumber> makeEigenvalues() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.getEigenvalues();
-        } else {
-            return myNonsymmetricDelegate.getEigenvalues();
+        return null;
+    }
+
+    protected final MatrixStore<N> makeInverse() {
+
+        final MatrixStore<N> tmpV = this.getV();
+        final MatrixStore<N> tmpD = this.getD();
+
+        final int tmpDim = (int) tmpD.countRows();
+
+        final PhysicalStore<N> tmpMtrx = tmpV.transpose().copy();
+
+        final N tmpZero = this.scalar().zero().getNumber();
+        final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();
+
+        for (int i = 0; i < tmpDim; i++) {
+            if (tmpD.isZero(i, i)) {
+                tmpMtrx.fillRow(i, 0, tmpZero);
+            } else {
+                tmpMtrx.modifyRow(i, 0, tmpDivide.second(tmpD.get(i, i)));
+            }
         }
+
+        return tmpMtrx.multiplyLeft(tmpV);
     }
 
     @Override
     protected MatrixStore<N> makeV() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.getV();
-        } else {
-            return myNonsymmetricDelegate.getV();
-        }
+        return null;
     }
 
 }
