@@ -27,6 +27,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.operation.ApplyCholesky;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -59,10 +60,10 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
         } else if (tmpNumber instanceof ComplexNumber) {
             return (Cholesky<N>) new CholeskyDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            if ((typical.countColumns() <= 256) || (BasicArray.MAX_ARRAY_SIZE < typical.count())) {
-                return (Cholesky<N>) new RawCholesky();
-            } else {
+            if ((ApplyCholesky.THRESHOLD < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return (Cholesky<N>) new CholeskyDecomposition.Primitive();
+            } else {
+                return (Cholesky<N>) new RawCholesky();
             }
         } else {
             throw new IllegalArgumentException();

@@ -47,7 +47,7 @@ public interface Schur<N extends Number> extends MatrixDecomposition<N> {
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof Double) {
-            return (Schur<N>) Schur.makePrimitive();
+            return (Schur<N>) new SchurDecomposition.Primitive();
         } else {
             throw new IllegalArgumentException();
         }

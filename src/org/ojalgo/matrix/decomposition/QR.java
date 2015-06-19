@@ -59,11 +59,10 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
         } else if (tmpNumber instanceof ComplexNumber) {
             return (QR<N>) new QRDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            if ((typical.countColumns() <= HouseholderLeft.THRESHOLD) || (BasicArray.MAX_ARRAY_SIZE < typical.count())) {
-                // If it wont multithread or if the number of elements is too large for a single array
-                return (QR<N>) new RawQR();
-            } else {
+            if ((HouseholderLeft.THRESHOLD < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return (QR<N>) new QRDecomposition.Primitive();
+            } else {
+                return (QR<N>) new RawQR();
             }
         } else {
             throw new IllegalArgumentException();

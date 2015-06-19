@@ -60,29 +60,18 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, Ma
     public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical, final boolean hermitian) {
 
         final N tmpNumber = typical.get(0L, 0L);
-        final long tmpDim = typical.countColumns();
 
         if (tmpNumber instanceof BigDecimal) {
-
             return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Big() : null);
-
         } else if (tmpNumber instanceof ComplexNumber) {
-
             return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Complex() : null);
-
         } else if (tmpNumber instanceof Double) {
-
-            if ((tmpDim > 5120L) && (BasicArray.MAX_ARRAY_SIZE > typical.count())) {
-
+            if ((512L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Primitive() : new GeneralEvD.Primitive());
-
             } else {
-
                 return (Eigenvalue<N>) (hermitian ? new RawEigenvalue.Symmetric() : new RawEigenvalue.General());
             }
-
         } else {
-
             throw new IllegalArgumentException();
         }
     }

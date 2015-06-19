@@ -24,8 +24,10 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.operation.ApplyLDL;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -51,6 +53,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N> {
 
+    @SuppressWarnings("unchecked")
     public static <N extends Number> LDL<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
@@ -60,12 +63,11 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         } else if (tmpNumber instanceof ComplexNumber) {
             return (LDL<N>) new LDLDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            return (LDL<N>) new LDLDecomposition.Primitive();
-            //            if ((typical.countColumns() <= 256) || (BasicArray.MAX_ARRAY_SIZE < typical.count())) {
-            //                return (LDL<N>) new RawLDL();
-            //            } else {
-            //                return (LDL<N>) new LDLDecomposition.Primitive();
-            //            }
+            if ((ApplyLDL.THRESHOLD < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+                return (LDL<N>) new LDLDecomposition.Primitive();
+            } else {
+                return (LDL<N>) new RawLDL();
+            }
         } else {
             throw new IllegalArgumentException();
         }
