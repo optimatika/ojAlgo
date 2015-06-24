@@ -66,7 +66,7 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, Ma
         } else if (tmpNumber instanceof ComplexNumber) {
             return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Complex() : null);
         } else if (tmpNumber instanceof Double) {
-            if ((512L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            if ((8192L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Primitive() : new GeneralEvD.Primitive());
             } else {
                 return (Eigenvalue<N>) (hermitian ? new RawEigenvalue.Symmetric() : new RawEigenvalue.General());

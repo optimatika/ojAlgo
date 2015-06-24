@@ -220,7 +220,7 @@ public final class KKTSolver extends Object {
         final PrimitiveDenseStore tmpX = this.getX(input);
         MatrixStore<Double> tmpL = null;
 
-        if (input.isConstrained() && (tmpA.countRows() == tmpA.countColumns()) && myLU.decompose(tmpA) && (tmpSolvable = myLU.isSolvable())) {
+        if (input.isConstrained() && (tmpA.countRows() == tmpA.countColumns()) && (tmpSolvable = myLU.compute(tmpA))) {
             // Only 1 possible solution
 
             myLU.solve(tmpB, tmpX);
@@ -228,7 +228,7 @@ public final class KKTSolver extends Object {
             myLU.decompose(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculated  myLU.compute(tmpA).
             tmpL = myLU.solve(tmpC.subtract(tmpQ.multiply(tmpX)));
 
-        } else if (myCholesky.decompose(tmpQ) && (tmpSolvable = myCholesky.isSolvable())) {
+        } else if (tmpSolvable = myCholesky.compute(tmpQ)) {
             // Q is SPD
 
             if (!input.isConstrained()) {
@@ -244,7 +244,7 @@ public final class KKTSolver extends Object {
 
                 // Negated Schur complement
                 final MatrixStore<Double> tmpS = tmpInvQAT.multiplyLeft(tmpA);
-                if (myLU.decompose(tmpS) && (tmpSolvable = myLU.isSolvable())) {
+                if (tmpSolvable = myLU.compute(tmpS)) {
 
                     final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpC);
 
@@ -254,7 +254,7 @@ public final class KKTSolver extends Object {
             }
         }
 
-        if (!tmpSolvable && myLU.decompose(input.getKKT()) && (tmpSolvable = myLU.isSolvable())) {
+        if (!tmpSolvable && (tmpSolvable = myLU.compute(input.getKKT()))) {
             // The above failed
             // Try solving the full KKT system instaed
 

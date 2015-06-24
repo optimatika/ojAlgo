@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.type.TypeUtils;
 
 public final class FillConjugated extends MatrixOperation {
 

@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
@@ -1677,13 +1678,15 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
+        final double[] tmpWorker = this.getWorkerColumn();
+
         if ((tmpRowDim - firstRow) > HouseholderRight.THRESHOLD) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    HouseholderRight.invoke(tmpData, first, limit, tmpColDim, tmpTransf);
+                    HouseholderRight.invoke(tmpData, tmpRowDim, first, limit, tmpColDim, tmpTransf, tmpWorker);
                 }
 
             };
@@ -1692,9 +1695,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         } else {
 
-            HouseholderRight.invoke(tmpData, firstRow, tmpRowDim, tmpColDim, tmpTransf);
+            HouseholderRight.invoke(tmpData, tmpRowDim, firstRow, tmpRowDim, tmpColDim, tmpTransf, tmpWorker);
         }
     }
+
+    private transient double[] myWorkerColumn;
 
     public void transformRight(final Rotation<Double> transformation) {
 
@@ -1747,6 +1752,15 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public void visitRow(final long row, final long column, final VoidFunction<Double> visitor) {
         myUtility.visitRow(row, column, visitor);
+    }
+
+    double[] getWorkerColumn() {
+        if (myWorkerColumn != null) {
+            Arrays.fill(myWorkerColumn, ZERO);
+        } else {
+            myWorkerColumn = new double[myRowDim];
+        }
+        return myWorkerColumn;
     }
 
 }

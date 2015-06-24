@@ -27,7 +27,6 @@ import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.type.TypeUtils;
 
 public class ComplexPolynomial extends AbstractPolynomial<ComplexNumber> {
 

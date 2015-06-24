@@ -27,7 +27,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.operation.HouseholderLeft;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -59,7 +58,7 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
         } else if (tmpNumber instanceof ComplexNumber) {
             return (QR<N>) new QRDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            if ((HouseholderLeft.THRESHOLD < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            if ((128L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return (QR<N>) new QRDecomposition.Primitive();
             } else {
                 return (QR<N>) new RawQR();

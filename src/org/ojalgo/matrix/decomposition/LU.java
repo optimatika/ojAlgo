@@ -30,7 +30,6 @@ import org.ojalgo.matrix.store.ColumnsStore;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RowsStore;
-import org.ojalgo.matrix.store.operation.ApplyLU;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -67,7 +66,7 @@ public interface LU<N extends Number> extends LDU<N> {
         } else if (tmpNumber instanceof ComplexNumber) {
             return (LU<N>) new LUDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            if ((ApplyLU.THRESHOLD < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            if ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return (LU<N>) new LUDecomposition.Primitive();
             } else {
                 return (LU<N>) new RawLU();

@@ -60,7 +60,7 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         } else if (tmpNumber instanceof ComplexNumber) {
             return (SingularValue<N>) new SVDnew32.Complex();
         } else if (tmpNumber instanceof Double) {
-            if ((512L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            if ((2048L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return (SingularValue<N>) new SVDnew32.Primitive();
             } else {
                 return (SingularValue<N>) new RawSingularValue();

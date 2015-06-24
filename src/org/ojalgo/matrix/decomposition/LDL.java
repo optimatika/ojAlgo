@@ -27,7 +27,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.operation.ApplyLDL;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -63,7 +62,7 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         } else if (tmpNumber instanceof ComplexNumber) {
             return (LDL<N>) new LDLDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            if ((ApplyLDL.THRESHOLD < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            if ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return (LDL<N>) new LDLDecomposition.Primitive();
             } else {
                 return (LDL<N>) new RawLDL();

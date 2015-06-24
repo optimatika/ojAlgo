@@ -33,7 +33,7 @@ public final class HouseholderRight extends MatrixOperation {
 
     public static final HouseholderRight SETUP = new HouseholderRight();
 
-    public static int THRESHOLD = 128;
+    public static int THRESHOLD = 2048;
 
     public static void invoke(final BigDecimal[] data, final int first, final int limit, final int tmpColDim, final Householder.Big householder) {
 
@@ -87,7 +87,22 @@ public final class HouseholderRight extends MatrixOperation {
         }
     }
 
-    public static void invoke(final double[] data, final int first, final int limit, final int tmpColDim, final Householder.Primitive householder) {
+    public static void invoke(final double[] data, final int structure, final int first, final int limit, final int numberOfColumns,
+            final Householder.Primitive householder, final double[] work) {
+
+        final double[] tmpHouseholderVector = householder.vector;
+        final int tmpFirstNonZero = householder.first;
+        final double tmpBeta = householder.beta;
+
+        for (int j = tmpFirstNonZero; j < numberOfColumns; j++) {
+            SubtractScaledVector.invoke(work, 0, data, j * structure, -tmpBeta * tmpHouseholderVector[j], first, limit);
+        }
+        for (int j = tmpFirstNonZero; j < numberOfColumns; j++) {
+            SubtractScaledVector.invoke(data, j * structure, work, 0, tmpHouseholderVector[j], first, limit);
+        }
+    }
+
+    private static void invoke2old(final double[] data, final int first, final int limit, final int tmpColDim, final Householder.Primitive householder) {
 
         final double[] tmpHouseholderVector = householder.vector;
         final int tmpFirstNonZero = householder.first;

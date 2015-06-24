@@ -342,13 +342,13 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     for (int i = k + 1; i < m; i++) {
                         tmpWork[i] = ZERO;
                     }
+                    // ... remining columns
                     for (int j = k + 1; j < n; j++) {
                         SubtractScaledVector.invoke(tmpWork, 0, At[j], 0, -tmpE[j], k + 1, m);
                     }
                     for (int j = k + 1; j < n; j++) {
                         SubtractScaledVector.invoke(At[j], 0, tmpWork, 0, tmpE[j] / tmpE[k + 1], k + 1, m);
                     }
-
                 }
                 tmpE[k] = -nrm;
 

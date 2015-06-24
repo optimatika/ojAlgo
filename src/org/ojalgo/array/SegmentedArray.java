@@ -206,6 +206,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
         return new SegmentedArray<N>(tmpCount, tmpShift, segmentFactory);
     }
+
     private final int myIndexBits;
     private final long myIndexMask;
     private final BasicArray<N>[] mySegments;

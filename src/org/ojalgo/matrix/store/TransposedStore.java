@@ -34,8 +34,6 @@ public final class TransposedStore<N extends Number> extends TransjugatedStore<N
         return this.getBase().get(aCol, aRow);
     }
 
-
-    
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
 
         MatrixStore<N> retVal;
