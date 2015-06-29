@@ -66,7 +66,7 @@ public interface LU<N extends Number> extends LDU<N> {
         } else if (tmpNumber instanceof ComplexNumber) {
             return (LU<N>) new LUDecomposition.Complex();
         } else if (tmpNumber instanceof Double) {
-            if ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            if ((16L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return (LU<N>) new LUDecomposition.Primitive();
             } else {
                 return (LU<N>) new RawLU();

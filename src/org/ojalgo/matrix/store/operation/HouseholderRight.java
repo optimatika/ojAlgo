@@ -33,7 +33,7 @@ public final class HouseholderRight extends MatrixOperation {
 
     public static final HouseholderRight SETUP = new HouseholderRight();
 
-    public static int THRESHOLD = 2048;
+    public static int THRESHOLD = 512;
 
     public static void invoke(final BigDecimal[] data, final int first, final int limit, final int tmpColDim, final Householder.Big householder) {
 

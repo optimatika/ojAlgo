@@ -29,7 +29,7 @@ public final class ApplyCholesky extends MatrixOperation {
 
     public static final ApplyCholesky SETUP = new ApplyCholesky();
 
-    public static int THRESHOLD = 256;
+    public static int THRESHOLD = 128;
 
     public static void invoke(final BigDecimal[] data, final int structure, final int firstColumn, final int columnLimit, final BigDecimal[] multipliers) {
         for (int j = firstColumn; j < columnLimit; j++) {
