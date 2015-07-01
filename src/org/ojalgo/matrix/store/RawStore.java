@@ -496,7 +496,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    public double[][] data;
+    public final double[][] data;
 
     private final int myNumberOfColumns;
 

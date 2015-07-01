@@ -438,14 +438,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
 
     MatrixStore<N> multiplyLeft(Access1D<N> leftMtrx);
 
-    /**
-     * @deprecated v38
-     */
-    @Deprecated
-    default MatrixStore<N> multiplyRight(final Access1D<N> right) {
-        return this.multiply(right);
-    }
-
     MatrixStore<N> negate();
 
     MatrixStore<N> scale(N scalar);

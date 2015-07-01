@@ -25,7 +25,6 @@ import org.ojalgo.ProgrammingError;
 
 abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
 
-    @SuppressWarnings("unused")
     private TransjugatedStore(final int aRowDim, final int aColDim, final MatrixStore<N> aBase) {
 
         super(aRowDim, aColDim, aBase);
