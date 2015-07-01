@@ -43,17 +43,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         }
     }
 
-<<<<<<< Updated upstream
-    static double[][] extract(final Access2D<?> access) {
-        if (access instanceof RawStore) {
-            return ((RawStore) access).data;
-        } else {
-            return ArrayUtils.toRawCopyOf(access);
-        }
-    }
-
-=======
->>>>>>> Stashed changes
     private int myColDim;
     private double[][] myRawInPlaceData;
     private RawStore myRawInPlaceStore;

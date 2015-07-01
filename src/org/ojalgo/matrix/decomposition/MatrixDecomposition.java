@@ -54,7 +54,6 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface MatrixDecomposition<N extends Number> {
-<<<<<<< Updated upstream
 
     interface Determinant<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
 
@@ -210,29 +209,10 @@ public interface MatrixDecomposition<N extends Number> {
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
         MatrixStore<N> solve(Access2D<N> rhs, DecompositionStore<N> preallocated);
-=======
-
-    interface Determinant<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
-
-        default N calculateDeterminant(final Access2D<N> matrix) {
-            this.decompose(matrix);
-            return this.getDeterminant();
-        }
-
-        /**
-         * <p>
-         * A matrix' determinant is the product of its eigenvalues.
-         * </p>
-         *
-         * @return The matrix' determinant
-         */
-        N getDeterminant();
->>>>>>> Stashed changes
 
     }
 
     /**
-<<<<<<< Updated upstream
      * Eigenvalue:s and Singular Value:s decompositions can calculate the "values" only.
      *
      * @author apete
@@ -248,181 +228,9 @@ public interface MatrixDecomposition<N extends Number> {
          * @return true if they are ordered
          */
         boolean isOrdered();
-=======
-     * Several matrix decompositions can be expressed "economy sized" - some rows or columns of the decomposed
-     * matrix parts are not needed for the most releveant use cases, and can therefore be left out. By default
-     * these matrix decompositions should be "economy sized". Setting {@link #setFullSize(boolean)} to
-     * <code>true</code> should switch to "full sized".
-     *
-     * @author apete
-     */
-    interface EconomySize<N extends Number> extends MatrixDecomposition<N> {
-
-        /**
-         * @return True if it will generate a full sized decomposition.
-         */
-        boolean isFullSize();
-
-        void setFullSize(boolean fullSize);
->>>>>>> Stashed changes
 
     }
 
-    /**
-<<<<<<< Updated upstream
-     * @param matrix A matrix to decompose
-     * @return true if the computation suceeded; false if not
-     */
-    boolean decompose(Access2D<?> matrix);
-
-    boolean equals(MatrixStore<N> other, NumberContext context);
-
-    /**
-     * @return true if computation has been attemped; false if not.
-     * @see #decompose(Access2D)
-     * @see #isSolvable()
-=======
-     * Some matrix decompositions are only available with hermitian (symmetric) matrices or different
-     * decomposition algorithms could be used depending on if the matrix is hemitian or not.
-     *
-     * @author apete
-     */
-    public interface Hermitian<N extends Number> extends MatrixDecomposition<N> {
-
-        /**
-         * Absolutely must check if the matrix is hermitian or not. Then, depending on the result differents
-         * paths can be chosen - compute or not / choose different algorithms...
-         *
-         * @param matrix A matrix to check and then (maybe) decompose
-         * @return true if the hermitian check passed and computation suceeded; false if not
-         */
-        default boolean checkAndCompute(final Access2D<?> matrix) {
-
-            this.reset();
-
-            if (MatrixUtils.isHermitian(matrix)) {
-                return this instanceof Solver<?> ? ((Solver<?>) this).compute(matrix) : this.decompose(matrix);
-            } else {
-                return false;
-            }
-        }
-    }
-
-    interface Solver<N extends Number> extends MatrixDecomposition<N>, SolverTask<N>, InverterTask<N> {
-
-        /**
-         * @param matrix A matrix to decompose
-         * @return true if the decomposition suceeded AND {@link #isSolvable()}; false if not
-         */
-        default boolean compute(final Access2D<?> matrix) {
-            return this.decompose(matrix) && this.isSolvable();
-        }
-
-        /**
-         * The output must be a "right inverse" and a "generalised inverse".
-         *
-         * @see BasicMatrix#invert()
-         */
-        MatrixStore<N> getInverse();
-
-        /**
-         * <p>
-         * Implementiong this method is optional.
-         * </p>
-         * <p>
-         * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by
-         * this interface. It must be documented for each implementation.
-         * </p>
-         * <p>
-         * Should produce the same results as calling {@link #getInverse()}.
-         * </p>
-         *
-         * @param preallocated Preallocated memory for the results, possibly some intermediate results. You
-         *        must assume this is modified, but you cannot assume it will contain the full/final/correct
-         *        solution.
-         * @return The inverse, this is where you get the solution
-         * @throws UnsupportedOperationException When/if this feature is not implemented
-         */
-        MatrixStore<N> getInverse(DecompositionStore<N> preallocated);
-
-        default MatrixStore<N> invert(final MatrixStore<N> original) {
-            this.decompose(original);
-            return this.getInverse();
-        }
-
-        default MatrixStore<N> invert(final MatrixStore<N> original, final DecompositionStore<N> preallocated) {
-            this.decompose(original);
-            return this.getInverse(preallocated);
-        }
-
-        /**
-         * @return true if it is ok to call {@linkplain #solve(Access2D)} (computation was successful); false
-         *         if not
-         * @see #solve(Access2D)
-         * @see #isComputed()
-         */
-        boolean isSolvable();
-
-        /**
-         * [A][X]=[B] or [this][return]=[rhs]
-         */
-        MatrixStore<N> solve(Access2D<N> rhs);
-
-        default MatrixStore<N> solve(final Access2D<N> body, final Access2D<N> rhs) {
-            this.decompose(body);
-            return this.solve(rhs);
-        }
-
-        default MatrixStore<N> solve(final Access2D<N> body, final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
-            this.decompose(body);
-            return this.solve(rhs, preallocated);
-        }
-
-        /**
-         * <p>
-         * Implementiong this method is optional.
-         * </p>
-         * <p>
-         * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by
-         * this interface. It must be documented for each implementation.
-         * </p>
-         * <p>
-         * Should produce the same results as calling {@link #solve(Access2D)}.
-         * </p>
-         *
-         * @param rhs The Right Hand Side, wont be modfied
-         * @param preallocated Preallocated memory for the results, possibly some intermediate results. You
-         *        must assume this is modified, but you cannot assume it will contain the full/final/correct
-         *        solution.
-         * @return The solution
-         * @throws UnsupportedOperationException When/if this feature is not implemented
-         */
-        MatrixStore<N> solve(Access2D<N> rhs, DecompositionStore<N> preallocated);
-
-    }
-
-    /**
-     * Eigenvalue:s and Singular Value:s decompositions can calculate the "values" only.
-     *
-     * @author apete
->>>>>>> Stashed changes
-     */
-    interface Values<N extends Number> extends MatrixDecomposition<N> {
-
-        boolean computeValuesOnly(Access2D<?> matrix);
-
-        /**
-         * The eigenvalues in D (and the eigenvectors in V) are not necessarily ordered. This is a property of
-         * the algorithm/implementation, not the data.
-         *
-         * @return true if they are ordered
-         */
-        boolean isOrdered();
-
-    }
-
-<<<<<<< Updated upstream
-=======
     /**
      * @param matrix A matrix to decompose
      * @return true if the computation suceeded; false if not
@@ -437,7 +245,6 @@ public interface MatrixDecomposition<N extends Number> {
      */
     boolean isComputed();
 
->>>>>>> Stashed changes
     MatrixStore<N> reconstruct();
 
     /**
