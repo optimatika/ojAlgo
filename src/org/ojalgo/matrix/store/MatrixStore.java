@@ -26,8 +26,11 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Consumer2D;
 import org.ojalgo.access.Supplier2D;
+import org.ojalgo.algebra.NormedVectorSpace;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -51,7 +54,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Visitable<N>, Access2D.Elements {
+public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Visitable<N>, Access2D.Elements, NormedVectorSpace<MatrixStore<N>, N> {
 
     public static final class Builder<N extends Number> {
 
@@ -390,13 +393,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
     /**
      * Each call must produce a new instance.
      *
-     * @return A new conjugated instance.
-     */
-    MatrixStore<N> conjugate();
-
-    /**
-     * Each call must produce a new instance.
-     *
      * @return A new {@linkplain PhysicalStore} copy.
      */
     PhysicalStore<N> copy();
@@ -411,6 +407,10 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
      * @see #isUpperRightShaded()
      */
     boolean isLowerLeftShaded();
+
+    default boolean isSmall(final double comparedTo) {
+        return PrimitiveScalar.isSmall(comparedTo, this.norm());
+    }
 
     /**
      * The entries above (right of) the first superdiagonal are zero - effectively a lower Hessenberg matrix.
@@ -438,18 +438,28 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
 
     MatrixStore<N> multiplyLeft(Access1D<N> leftMtrx);
 
-    MatrixStore<N> negate();
+    default double norm() {
+        return this.aggregateAll(Aggregator.NORM2).doubleValue();
+    }
 
-    MatrixStore<N> scale(N scalar);
+    /**
+     * @deprecated v39 Use {@link #multiply(Number)} instead.
+     */
+    @Deprecated
+    default MatrixStore<N> scale(final N scalar) {
+        return this.multiply(scalar);
+    }
+
+    default MatrixStore<N> signum() {
+        return this.multiply(PrimitiveMath.ONE / this.norm());
+    }
 
     MatrixStore<N> subtract(MatrixStore<N> subtrahend);
 
     Scalar<N> toScalar(long row, long column);
 
     /**
-     * Each call must produce a new instance.
-     *
-     * @return A new transposed instance.
+     * @return A transposed matrix instance.
      */
     MatrixStore<N> transpose();
 

@@ -477,14 +477,14 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                             aMtrxH[i + (tmpDiagDim * ij)] = tmpZ.i;
 
                             if (Math.abs(x) > (Math.abs(z) + Math.abs(q))) {
-                                aMtrxH[(i + 1) + (tmpDiagDim * (ij - 1))] = ((-ra - (w * aMtrxH[i + (tmpDiagDim * (ij - 1))])) + (q * aMtrxH[i
-                                        + (tmpDiagDim * ij)]))
-                                        / x;
+                                aMtrxH[(i + 1)
+                                        + (tmpDiagDim * (ij - 1))] = ((-ra - (w * aMtrxH[i + (tmpDiagDim * (ij - 1))])) + (q * aMtrxH[i + (tmpDiagDim * ij)]))
+                                                / x;
                                 aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-sa - (w * aMtrxH[i + (tmpDiagDim * ij)]) - (q * aMtrxH[i + (tmpDiagDim * (ij - 1))]))
                                         / x;
                             } else {
-                                final ComplexNumber tmpX1 = new ComplexNumber((-r - (y * aMtrxH[i + (tmpDiagDim * (ij - 1))])), (-s - (y * aMtrxH[i
-                                        + (tmpDiagDim * ij)])));
+                                final ComplexNumber tmpX1 = new ComplexNumber((-r - (y * aMtrxH[i + (tmpDiagDim * (ij - 1))])),
+                                        (-s - (y * aMtrxH[i + (tmpDiagDim * ij)])));
                                 final double real1 = z;
                                 final double imaginary1 = q;
                                 final ComplexNumber tmpY1 = new ComplexNumber(real1, imaginary1);
@@ -785,8 +785,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     if (m == l) {
                         break;
                     }
-                    if ((Math.abs(aMtrxH[m + (tmpDiagDim * (m - 1))]) * (Math.abs(q) + Math.abs(r))) < (PrimitiveMath.MACHINE_EPSILON * (Math.abs(p) * (Math
-                            .abs(aMtrxH[(m - 1) + (tmpDiagDim * (m - 1))]) + Math.abs(z) + Math.abs(aMtrxH[(m + 1) + (tmpDiagDim * (m + 1))]))))) {
+                    if ((Math.abs(aMtrxH[m + (tmpDiagDim * (m - 1))]) * (Math.abs(q) + Math.abs(r))) < (PrimitiveMath.MACHINE_EPSILON * (Math.abs(p)
+                            * (Math.abs(aMtrxH[(m - 1) + (tmpDiagDim * (m - 1))]) + Math.abs(z) + Math.abs(aMtrxH[(m + 1) + (tmpDiagDim * (m + 1))]))))) {
                         break;
                     }
                     m--;
@@ -1527,8 +1527,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {
-        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data, rowX
-                + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
+        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data,
+                rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
     public MatrixStore.ElementsConsumer<Double> region(final int row, final int column) {
@@ -1539,7 +1539,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         RotateRight.invoke(data, myRowDim, aLow, aHigh, aCos, aSin);
     }
 
-    public MatrixStore<Double> scale(final Double scalar) {
+    public MatrixStore<Double> multiply(final Double scalar) {
+        return new ModificationStore<>(this, FACTORY.function().multiply().first(scalar));
+    }
+
+    public MatrixStore<Double> multiply(final double scalar) {
         return new ModificationStore<>(this, FACTORY.function().multiply().first(scalar));
     }
 

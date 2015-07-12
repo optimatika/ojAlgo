@@ -1152,12 +1152,16 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return new PhysicalStore.ConsumerRegion<Double>(this, row, column);
     }
 
-    public RawStore scale(final Double scalar) {
+    public RawStore multiply(final Double scalar) {
+        return this.multiply(scalar.doubleValue());
+    }
+
+    public RawStore multiply(final double scalar) {
         final RawStore X = new RawStore(data.length, myNumberOfColumns);
         final double[][] C = X.data;
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < myNumberOfColumns; j++) {
-                C[i][j] = scalar.doubleValue() * data[i][j];
+                C[i][j] = scalar * data[i][j];
             }
         }
         return X;

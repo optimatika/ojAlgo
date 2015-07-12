@@ -38,6 +38,56 @@ import org.ojalgo.type.context.NumberContext.Enforceable;
  */
 public final class ComplexNumber extends Number implements Scalar<ComplexNumber>, Enforceable<ComplexNumber>, Access2D<Double> {
 
+    public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
+
+        public ComplexNumber cast(final double value) {
+            return ComplexNumber.valueOf(value);
+        }
+
+        public ComplexNumber cast(final Number number) {
+            return ComplexNumber.valueOf(number);
+        }
+
+        public ComplexNumber convert(final double value) {
+            return ComplexNumber.valueOf(value);
+        }
+
+        public ComplexNumber convert(final Number number) {
+            return ComplexNumber.valueOf(number);
+        }
+
+        public ComplexNumber one() {
+            return ONE;
+        }
+
+        public ComplexNumber zero() {
+            return ZERO;
+        }
+
+    };
+
+    public static final ComplexNumber I = new ComplexNumber(PrimitiveMath.ZERO, PrimitiveMath.ONE);
+
+    public static final ComplexNumber INFINITY = ComplexNumber.makePolar(Double.POSITIVE_INFINITY, PrimitiveMath.ZERO);
+
+    public static final ComplexNumber NEG = ComplexNumber.valueOf(PrimitiveMath.NEG);
+
+    public static final ComplexNumber ONE = ComplexNumber.valueOf(PrimitiveMath.ONE);
+
+    public static final ComplexNumber TWO = ComplexNumber.valueOf(PrimitiveMath.TWO);
+
+    public static final ComplexNumber ZERO = ComplexNumber.valueOf(PrimitiveMath.ZERO);
+
+    private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
+
+    private static final String LEFT = "(";
+
+    private static final String MINUS = " - ";
+
+    private static final String PLUS = " + ";
+
+    private static final String RIGHT = "i)";
+
     public static boolean isAbsolute(final ComplexNumber value) {
         return value.isAbsolute();
     }
@@ -137,47 +187,6 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
             return ZERO;
         }
     }
-
-    public static final Scalar.Factory<ComplexNumber> FACTORY = new Scalar.Factory<ComplexNumber>() {
-
-        public ComplexNumber cast(final double value) {
-            return ComplexNumber.valueOf(value);
-        }
-
-        public ComplexNumber cast(final Number number) {
-            return ComplexNumber.valueOf(number);
-        }
-
-        public ComplexNumber convert(final double value) {
-            return ComplexNumber.valueOf(value);
-        }
-
-        public ComplexNumber convert(final Number number) {
-            return ComplexNumber.valueOf(number);
-        }
-
-        public ComplexNumber one() {
-            return ONE;
-        }
-
-        public ComplexNumber zero() {
-            return ZERO;
-        }
-
-    };
-
-    public static final ComplexNumber I = new ComplexNumber(PrimitiveMath.ZERO, PrimitiveMath.ONE);
-    public static final ComplexNumber INFINITY = ComplexNumber.makePolar(Double.POSITIVE_INFINITY, PrimitiveMath.ZERO);
-    public static final ComplexNumber NEG = ComplexNumber.valueOf(PrimitiveMath.NEG);
-    public static final ComplexNumber ONE = ComplexNumber.valueOf(PrimitiveMath.ONE);
-    public static final ComplexNumber TWO = ComplexNumber.valueOf(PrimitiveMath.TWO);
-    public static final ComplexNumber ZERO = ComplexNumber.valueOf(PrimitiveMath.ZERO);
-
-    private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
-    private static final String LEFT = "(";
-    private static final String MINUS = " - ";
-    private static final String PLUS = " + ";
-    private static final String RIGHT = "i)";
 
     public final double i;
 

@@ -142,6 +142,18 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return this.toScalar(row, column).isSmall(comparedTo);
     }
 
+    public MatrixStore<N> multiply(final double scalar) {
+        if (this.isPrimitive()) {
+            return new ModificationStore<>(this, this.factory().function().multiply().first(scalar));
+        } else {
+            return new ModificationStore<>(this, this.factory().function().multiply().first(this.factory().scalar().cast(scalar)));
+        }
+    }
+
+    public MatrixStore<N> multiply(final N scalar) {
+        return new ModificationStore<>(this, this.factory().function().multiply().first(scalar));
+    }
+
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
 
         final int tmpRowDim = (int) (leftMtrx.count() / this.countRows());
@@ -156,10 +168,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
     public final MatrixStore<N> negate() {
         return new ModificationStore<>(this, this.factory().function().negate());
-    }
-
-    public MatrixStore<N> scale(final N scalar) {
-        return new ModificationStore<>(this, this.factory().function().multiply().first(scalar));
     }
 
     public MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {
@@ -238,6 +246,15 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
     protected final int getRowDim() {
         return myRowDim;
+    }
+
+    boolean isPrimitive() {
+        return this.getComponentType().equals(Double.class);
+    }
+
+    public double norm() {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }

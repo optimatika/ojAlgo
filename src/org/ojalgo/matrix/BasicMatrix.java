@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -55,7 +56,7 @@ import org.ojalgo.type.context.NumberContext;
  * @see MatrixStore
  * @author apete
  */
-public interface BasicMatrix extends Access2D<Number> {
+public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMatrix, Number> {
 
     /**
      * @author apete
@@ -97,14 +98,6 @@ public interface BasicMatrix extends Access2D<Number> {
      * @return A new matrix whos elements are the sum of this' elements and value.
      */
     BasicMatrix add(Number value);
-
-    /**
-     * For real matrices conjugate() and transpose() are identical. For complex matrices they're not.
-     *
-     * @return The conjugate transpose of this.
-     * @see org.ojalgo.matrix.BasicMatrix#transpose()
-     */
-    BasicMatrix conjugate();
 
     /**
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
@@ -383,14 +376,6 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix multiply(Access2D<?> right);
 
     /**
-     * Multiplies the elements of this matrix with value.
-     *
-     * @param value What to multiply with.
-     * @return A new matrix whos elements are the elements of this multiplied with value.
-     */
-    BasicMatrix multiply(Number value);
-
-    /**
      * Multiplies the elements of this matrix with the elements of aMtrx. The matrices must have equal
      * dimensions.
      *
@@ -410,23 +395,10 @@ public interface BasicMatrix extends Access2D<Number> {
     BasicMatrix multiplyLeft(Access2D<?> aMtrx);
 
     /**
-     * @deprecated v38 Use {@link #multiply(Access2D)} instead.
-     */
-    @Deprecated
-    default BasicMatrix multiplyRight(final Access2D<?> right) {
-        return this.multiply(right);
-    }
-
-    /**
      * Assumes that both [this] and [aVctr] have row or column dimension, doesn't matter which, equal to 1.
      * The two vectors must have the same number of elements.
      */
     Scalar<?> multiplyVectors(Access2D<?> aVctr);
-
-    /**
-     * @return A new matrix with negated elements.
-     */
-    BasicMatrix negate();
 
     /**
      * @param someCols An ordered array of column indeces.

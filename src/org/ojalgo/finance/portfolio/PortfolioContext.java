@@ -97,7 +97,7 @@ public class PortfolioContext implements FinancePortfolio.Context {
     }
 
     public int size() {
-        return myAssetReturns.size();
+        return (int) myAssetReturns.count();
     }
 
 }

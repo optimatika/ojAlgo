@@ -67,9 +67,9 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     public static final RationalNumber POSITIVE_INFINITY = new RationalNumber(BigInteger.ONE, BigInteger.ZERO);
     public static final RationalNumber TWO = new RationalNumber(BigInteger.ONE.add(BigInteger.ONE), BigInteger.ONE);
     public static final RationalNumber ZERO = new RationalNumber(BigInteger.ZERO, BigInteger.ONE);
+
     private static final String DIVIDE = " / ";
     private static final String LEFT = "(";
-
     private static final String RIGHT = ")";
 
     /**
@@ -206,10 +206,6 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         }
     }
 
-    public RationalNumber(final Scalar<?> scalar) {
-        this(scalar.toBigDecimal());
-    }
-
     public RationalNumber(final double value) {
         this(new BigDecimal(value, MathContext.DECIMAL64));
     }
@@ -250,6 +246,10 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             myNumerator = BigInteger.valueOf(numerator);
             myDenominator = BigInteger.valueOf(denominator);
         }
+    }
+
+    public RationalNumber(final Scalar<?> scalar) {
+        this(scalar.toBigDecimal());
     }
 
     RationalNumber() {

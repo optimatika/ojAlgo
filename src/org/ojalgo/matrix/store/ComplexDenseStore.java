@@ -94,7 +94,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             for (int j = 0; j < tmpColDim; j++) {
                 tmpColumn = source[j];
                 for (int i = 0; i < tmpRowDim; i++) {
-                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf((Number) tmpColumn.get(i));
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpColumn.get(i));
                 }
             }
 
@@ -200,7 +200,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             final ComplexNumber[] tmpData = new ComplexNumber[tmpLength];
 
             for (int i = 0; i < tmpLength; i++) {
-                tmpData[i] = ComplexNumber.valueOf((Number) supplier.get());
+                tmpData[i] = ComplexNumber.valueOf(supplier.get());
             }
 
             return new ComplexDenseStore(tmpRowDim, tmpColDim, tmpData);
@@ -233,7 +233,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             for (int i = 0; i < tmpRowDim; i++) {
                 tmpRow = source[i];
                 for (int j = 0; j < tmpColDim; j++) {
-                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf((Number) tmpRow.get(j));
+                    tmpData[i + (tmpRowDim * j)] = ComplexNumber.valueOf(tmpRow.get(j));
                 }
             }
 
@@ -962,8 +962,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public void raxpy(final ComplexNumber scalarA, final int rowX, final int rowY, final int firstColumn) {
-        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data, rowX
-                + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
+        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data,
+                rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
     public MatrixStore.ElementsConsumer<ComplexNumber> region(final int row, final int column) {
@@ -974,8 +974,12 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         RotateRight.invoke(data, myRowDim, aLow, aHigh, FACTORY.scalar().cast(aCos), FACTORY.scalar().cast(aSin));
     }
 
-    public MatrixStore<ComplexNumber> scale(final ComplexNumber scalar) {
+    public MatrixStore<ComplexNumber> multiply(final ComplexNumber scalar) {
         return new ModificationStore<>(this, FACTORY.function().multiply().first(scalar));
+    }
+
+    public MatrixStore<ComplexNumber> multiply(final double scalar) {
+        return new ModificationStore<>(this, FACTORY.function().multiply().first(FACTORY.scalar().cast(scalar)));
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {

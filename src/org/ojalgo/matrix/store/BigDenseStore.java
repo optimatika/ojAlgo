@@ -942,8 +942,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     }
 
     public void raxpy(final BigDecimal scalarA, final int rowX, final int rowY, final int firstColumn) {
-        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data, rowX
-                + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
+        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data,
+                rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
     public MatrixStore.ElementsConsumer<BigDecimal> region(final int row, final int column) {
@@ -954,8 +954,12 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         RotateRight.invoke(data, myRowDim, aLow, aHigh, FACTORY.scalar().cast(aCos), FACTORY.scalar().cast(aSin));
     }
 
-    public MatrixStore<BigDecimal> scale(final BigDecimal scalar) {
+    public MatrixStore<BigDecimal> multiply(final BigDecimal scalar) {
         return new ModificationStore<>(this, FACTORY.function().multiply().first(scalar));
+    }
+
+    public MatrixStore<BigDecimal> multiply(final double scalar) {
+        return new ModificationStore<>(this, FACTORY.function().multiply().first(FACTORY.scalar().cast(scalar)));
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
