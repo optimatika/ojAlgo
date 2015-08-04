@@ -21,10 +21,9 @@
  */
 package org.ojalgo.optimisation;
 
-import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
 import org.ojalgo.optimisation.integer.IntegerSolver;
 
-final class ExpressionsBasedIntegerIntegration extends Integration<IntegerSolver> {
+final class ExpressionsBasedIntegerIntegration extends ExpressionsBasedModel.Integration<IntegerSolver> {
 
     public IntegerSolver build(final ExpressionsBasedModel model) {
         return IntegerSolver.make(model);

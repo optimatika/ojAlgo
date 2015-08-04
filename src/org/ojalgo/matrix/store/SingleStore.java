@@ -60,33 +60,33 @@ public final class SingleStore<N extends Number> extends FactoryStore<N> {
 
     };
 
-    public static SingleStore<BigDecimal> makeBig(final BigDecimal aSingleElement) {
-        return new SingleStore<BigDecimal>(BigDenseStore.FACTORY, aSingleElement);
+    public static SingleStore<BigDecimal> makeBig(final BigDecimal element) {
+        return new SingleStore<BigDecimal>(BigDenseStore.FACTORY, element);
     }
 
-    public static SingleStore<ComplexNumber> makeComplex(final ComplexNumber aSingleElement) {
-        return new SingleStore<ComplexNumber>(ComplexDenseStore.FACTORY, aSingleElement);
+    public static SingleStore<ComplexNumber> makeComplex(final ComplexNumber element) {
+        return new SingleStore<ComplexNumber>(ComplexDenseStore.FACTORY, element);
     }
 
-    public static SingleStore<Double> makePrimitive(final double aSingleElement) {
-        return new SingleStore<Double>(PrimitiveDenseStore.FACTORY, aSingleElement);
+    public static SingleStore<Double> makePrimitive(final Double element) {
+        return new SingleStore<Double>(PrimitiveDenseStore.FACTORY, element);
     }
 
     private final N myNumber;
     private final double myValue;
 
-    public SingleStore(final PhysicalStore.Factory<N, ?> aFactory, final N anElement) {
+    public SingleStore(final PhysicalStore.Factory<N, ?> factory, final N element) {
 
-        super(1, 1, aFactory);
+        super(1, 1, factory);
 
-        myNumber = anElement;
-        myValue = anElement.doubleValue();
+        myNumber = element;
+        myValue = element.doubleValue();
     }
 
     @SuppressWarnings("unused")
-    private SingleStore(final PhysicalStore.Factory<N, ?> aFactory) {
+    private SingleStore(final PhysicalStore.Factory<N, ?> factory) {
 
-        this(aFactory, aFactory.scalar().zero().getNumber());
+        this(factory, factory.scalar().zero().getNumber());
 
         ProgrammingError.throwForIllegalInvocation();
     }

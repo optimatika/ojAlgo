@@ -12,10 +12,10 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import org.ojalgo.FunctionalityTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
-import org.ojalgo.FunctionalityTest;
 
 /**
  * @author apete
@@ -37,7 +37,7 @@ public abstract class OptimisationConvexTests extends FunctionalityTest {
         return suite;
     }
 
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     protected OptimisationConvexTests() {
         super();

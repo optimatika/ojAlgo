@@ -407,10 +407,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
-    public MatrixStore<BigDecimal> add(final MatrixStore<BigDecimal> addend) {
-        return new SuperimposedStore<>(this, addend);
-    }
-
     public BigDecimal aggregateAll(final Aggregator aggregator) {
 
         final int tmpRowDim = myRowDim;
@@ -933,10 +929,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return retVal;
     }
 
-    public MatrixStore<BigDecimal> negate() {
-        return new ModificationStore<>(this, FACTORY.function().negate());
-    }
-
     public void negateColumn(final int column) {
         myUtility.modifyColumn(0, column, BigFunction.NEGATE);
     }
@@ -952,14 +944,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
         RotateRight.invoke(data, myRowDim, aLow, aHigh, FACTORY.scalar().cast(aCos), FACTORY.scalar().cast(aSin));
-    }
-
-    public MatrixStore<BigDecimal> multiply(final BigDecimal scalar) {
-        return new ModificationStore<>(this, FACTORY.function().multiply().first(scalar));
-    }
-
-    public MatrixStore<BigDecimal> multiply(final double scalar) {
-        return new ModificationStore<>(this, FACTORY.function().multiply().first(FACTORY.scalar().cast(scalar)));
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
@@ -1021,10 +1005,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
         }
-    }
-
-    public MatrixStore<BigDecimal> subtract(final MatrixStore<BigDecimal> subtrahend) {
-        return this.add(subtrahend.negate());
     }
 
     public Scalar<BigDecimal> toScalar(final long row, final long column) {

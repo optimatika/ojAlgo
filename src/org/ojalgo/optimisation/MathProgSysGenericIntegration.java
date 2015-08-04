@@ -21,9 +21,7 @@
  */
 package org.ojalgo.optimisation;
 
-import org.ojalgo.optimisation.MathProgSysModel.Integration;
-
-final class MathProgSysGenericIntegration extends Integration<GenericSolver> {
+final class MathProgSysGenericIntegration extends MathProgSysModel.Integration<GenericSolver> {
 
     public GenericSolver build(final MathProgSysModel model) {
         final ExpressionsBasedModel tmpDelegate = model.getExpressionsBasedModel();

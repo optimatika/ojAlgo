@@ -25,15 +25,15 @@ import org.ojalgo.ProgrammingError;
 
 abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
 
-    private TransjugatedStore(final int aRowDim, final int aColDim, final MatrixStore<N> aBase) {
+    private TransjugatedStore(final int rows, final int columns, final MatrixStore<N> base) {
 
-        super(aRowDim, aColDim, aBase);
+        super(rows, columns, base);
 
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected TransjugatedStore(final MatrixStore<N> aBase) {
-        super((int) aBase.countColumns(), (int) aBase.countRows(), aBase);
+    protected TransjugatedStore(final MatrixStore<N> base) {
+        super((int) base.countColumns(), (int) base.countRows(), base);
     }
 
     public final double doubleValue(final long aRow, final long aCol) {

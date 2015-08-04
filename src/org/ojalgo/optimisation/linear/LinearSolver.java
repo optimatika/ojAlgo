@@ -129,8 +129,8 @@ public abstract class LinearSolver extends BaseSolver {
         final List<Variable> tmpVarsNegLo = sourceModel.selectVariablesNegativeLower();
         final List<Variable> tmpVarsNegUp = sourceModel.selectVariablesNegativeUpper();
 
-        final int tmpConstraiCount = tmpExprsEq.size() + tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size()
-                + tmpVarsNegLo.size() + tmpVarsNegUp.size();
+        final int tmpConstraiCount = tmpExprsEq.size() + tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size()
+                + tmpVarsNegUp.size();
         final int tmpProblVarCount = tmpPosVariables.size() + tmpNegVariables.size();
         final int tmpSlackVarCount = tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size()
                 + tmpVarsNegUp.size();

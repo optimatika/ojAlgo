@@ -23,8 +23,8 @@ package org.ojalgo.matrix.store;
 
 abstract class ShadingStore<N extends Number> extends LogicalStore<N> {
 
-    protected ShadingStore(final int aRowDim, final int aColDim, final MatrixStore<N> aBase) {
-        super(aRowDim, aColDim, aBase);
+    protected ShadingStore(final int rows, final int columns, final MatrixStore<N> base) {
+        super(rows, columns, base);
     }
 
 }

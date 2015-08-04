@@ -21,41 +21,47 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.scalar.Scalar;
 
-public class ModificationStore<N extends Number> extends LogicalStore<N> {
+class BinaryOperatorStore<N extends Number> extends LogicalStore<N> {
 
-    private final UnaryFunction<N> myFunction;
+    private final BinaryFunction<N> myFunction;
+    private final MatrixStore<N> myRight;
 
-    public ModificationStore(final MatrixStore<N> aBase, final UnaryFunction<N> aFunc) {
+    private BinaryOperatorStore(final int rows, final int columns, final MatrixStore<N> base) {
 
-        super((int) aBase.countRows(), (int) aBase.countColumns(), aBase);
-
-        myFunction = aFunc;
-    }
-
-    private ModificationStore(final int aRowDim, final int aColDim, final MatrixStore<N> aBase) {
-
-        super(aRowDim, aColDim, aBase);
+        super(rows, columns, base);
 
         myFunction = null;
+        myRight = null;
     }
 
-    public double doubleValue(final long aRow, final long aCol) {
-        return myFunction.invoke(this.getBase().doubleValue(aRow, aCol));
+    BinaryOperatorStore(final MatrixStore<N> base, final BinaryFunction<N> function, final MatrixStore<N> right) {
+
+        super((int) base.countRows(), (int) base.countColumns(), base);
+
+        myFunction = function;
+        myRight = right;
     }
 
-    public N get(final long aRow, final long aCol) {
-        return myFunction.invoke(this.getBase().get(aRow, aCol));
+    public double doubleValue(final long row, final long col) {
+        return myFunction.invoke(this.getBase().doubleValue(row, col), myRight.doubleValue(row, col));
+    }
+
+    public N get(final long row, final long col) {
+        return myFunction.invoke(this.getBase().get(row, col), myRight.get(row, col));
     }
 
     public boolean isLowerLeftShaded() {
-        return false;
+        return this.getBase().isLowerLeftShaded() && myRight.isLowerLeftShaded()
+                && (myFunction.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO) == PrimitiveMath.ZERO);
     }
 
     public boolean isUpperRightShaded() {
-        return false;
+        return this.getBase().isUpperRightShaded() && myRight.isUpperRightShaded()
+                && (myFunction.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO) == PrimitiveMath.ZERO);
     }
 
     public Scalar<N> toScalar(final long row, final long column) {

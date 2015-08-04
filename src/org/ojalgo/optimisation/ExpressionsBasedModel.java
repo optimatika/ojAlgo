@@ -28,6 +28,7 @@ import java.util.*;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.netio.BasicLogger;
@@ -99,6 +100,40 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
          */
         public final Result extractSolverState(final ExpressionsBasedModel model) {
             return this.toSolverState(model.getVariableValues(), model);
+        }
+
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+
+            final PrimitiveArray tmpModelSolution = PrimitiveArray.make(model.countVariables());
+
+            for (final Index tmpFixed : model.getFixedVariables()) {
+                tmpModelSolution.set(tmpFixed.index, model.getVariable(tmpFixed.index).getValue().doubleValue());
+            }
+
+            final List<Variable> tmpFreeVariables = model.getFreeVariables();
+            for (int f = 0; f < tmpFreeVariables.size(); f++) {
+                final Variable tmpVariable = tmpFreeVariables.get(f);
+                final int tmpIndex = model.indexOf(tmpVariable);
+                tmpModelSolution.set(tmpIndex, solverState.doubleValue(f));
+            }
+
+            return new Result(solverState.getState(), solverState.getValue(), tmpModelSolution);
+        }
+
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+
+            final List<Variable> tmpFreeVariables = model.getFreeVariables();
+
+            final PrimitiveArray tmpSolverSolution = PrimitiveArray.make(tmpFreeVariables.size());
+            final double[] tmpData = tmpSolverSolution.data;
+
+            for (int i = 0; i < tmpData.length; i++) {
+                final Variable tmpVariable = tmpFreeVariables.get(i);
+                final int tmpIndex = model.indexOf(tmpVariable);
+                tmpData[i] = modelState.doubleValue(tmpIndex);
+            }
+
+            return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);
         }
 
     }
@@ -434,12 +469,16 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return variable.getIndex().index;
     }
 
+    public int indexOfFreeVariable(final Index variableIndex) {
+        return this.indexOfFreeVariable(variableIndex.index);
+    }
+
     /**
-     * @param index General, global, variable index
+     * @param globalIndex General, global, variable index
      * @return Local index among the positive variables. -1 indicates the variable is not a positive variable.
      */
-    public int indexOfFreeVariable(final int index) {
-        return myFreeIndices[index];
+    public int indexOfFreeVariable(final int globalIndex) {
+        return myFreeIndices[globalIndex];
     }
 
     public int indexOfFreeVariable(final Variable variable) {
@@ -558,6 +597,22 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         return retVal;
+    }
+
+    /**
+     * Any constrained non-redundant expression
+     */
+    public List<Expression> selectExpressions() {
+
+        final List<Expression> retVal = new ArrayList<Expression>();
+
+        for (final Expression tmpExpression : myExpressions.values()) {
+            if (tmpExpression.isConstraint() && !tmpExpression.isRedundant()) {
+                retVal.add(tmpExpression);
+            }
+        }
+
+        return Collections.unmodifiableList(retVal);
     }
 
     /**

@@ -21,10 +21,9 @@
  */
 package org.ojalgo.optimisation;
 
-import org.ojalgo.optimisation.FunctionsBasedModel.Integration;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 
-final class FunctionsBasedConvexIntegration extends Integration<ConvexSolver> {
+final class FunctionsBasedConvexIntegration extends FunctionsBasedModel.Integration<ConvexSolver> {
 
     public ConvexSolver build(final FunctionsBasedModel model) {
         // TODO Auto-generated method stub

@@ -25,10 +25,9 @@ import java.util.List;
 
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.optimisation.Expression.Index;
-import org.ojalgo.optimisation.ExpressionsBasedModel.Integration;
 import org.ojalgo.optimisation.linear.LinearSolver;
 
-final class ExpressionsBasedLinearIntegration extends Integration<LinearSolver> {
+final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
 
     public LinearSolver build(final ExpressionsBasedModel model) {
 

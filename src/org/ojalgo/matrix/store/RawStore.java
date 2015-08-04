@@ -630,21 +630,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    public MatrixStore<Double> add(final MatrixStore<Double> addend) {
-        final RawStore B = RawStore.convert(addend);
-        if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
-            throw new IllegalArgumentException("RawStore dimensions must agree.");
-        }
-        final RawStore X = new RawStore(data.length, myNumberOfColumns);
-        final double[][] C = X.data;
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < myNumberOfColumns; j++) {
-                C[i][j] = data[i][j] + B.data[i][j];
-            }
-        }
-        return X;
-    }
-
     public Double aggregateAll(final Aggregator aggregator) {
 
         final AggregatorFunction<Double> tmpVisitor = aggregator.getPrimitiveFunction();
@@ -1124,17 +1109,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
-    public RawStore negate() {
-        final RawStore retVal = new RawStore(data.length, myNumberOfColumns);
-        final double[][] C = retVal.data;
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < myNumberOfColumns; j++) {
-                C[i][j] = -data[i][j];
-            }
-        }
-        return retVal;
-    }
-
     public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {
 
         final double tmpValA = scalarA.doubleValue();
@@ -1152,21 +1126,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return new PhysicalStore.ConsumerRegion<Double>(this, row, column);
     }
 
-    public RawStore multiply(final Double scalar) {
-        return this.multiply(scalar.doubleValue());
-    }
-
-    public RawStore multiply(final double scalar) {
-        final RawStore X = new RawStore(data.length, myNumberOfColumns);
-        final double[][] C = X.data;
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < myNumberOfColumns; j++) {
-                C[i][j] = scalar * data[i][j];
-            }
-        }
-        return X;
-    }
-
     public void set(final long index, final double value) {
         data[AccessUtils.row(index, data.length)][AccessUtils.column(index, data.length)] = value;
     }
@@ -1181,10 +1140,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public void set(final long index, final Number value) {
         data[AccessUtils.row(index, data.length)][AccessUtils.column(index, data.length)] = value.doubleValue();
-    }
-
-    public MatrixStore<Double> subtract(final MatrixStore<Double> subtrahend) {
-        return this.add(subtrahend.negate());
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {

@@ -28,6 +28,7 @@ import org.ojalgo.access.Consumer2D;
 import org.ojalgo.access.Supplier2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -259,8 +260,8 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
-        public final Builder<N> modify(final UnaryFunction<N> aFunc) {
-            myStore = new ModificationStore<N>(myStore, aFunc);
+        public final Builder<N> modify(final UnaryFunction<N> function) {
+            myStore = new UnaryOperatorStore<N>(myStore, function);
             return this;
         }
 
@@ -384,7 +385,9 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
 
     }
 
-    MatrixStore<N> add(MatrixStore<N> addend);
+    default MatrixStore<N> add(final MatrixStore<N> addend) {
+        return this.operateOnMatching(this.factory().function().add(), addend);
+    }
 
     N aggregateAll(Aggregator aggregator);
 
@@ -436,10 +439,30 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
         return target;
     }
 
+    default MatrixStore<N> multiply(final double scalar) {
+        return this.multiply(this.factory().scalar().cast(scalar));
+    }
+
+    default MatrixStore<N> multiply(final N scalar) {
+        return this.operateOnAll(this.factory().function().multiply().second(scalar));
+    }
+
     MatrixStore<N> multiplyLeft(Access1D<N> leftMtrx);
+
+    default MatrixStore<N> negate() {
+        return this.operateOnAll(this.factory().function().negate());
+    }
 
     default double norm() {
         return this.aggregateAll(Aggregator.NORM2).doubleValue();
+    }
+
+    default MatrixStore<N> operateOnAll(final UnaryFunction<N> operator) {
+        return new UnaryOperatorStore<>(this, operator);
+    }
+
+    default MatrixStore<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
+        return new BinaryOperatorStore<>(this, operator, right);
     }
 
     /**
@@ -454,7 +477,9 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
         return this.multiply(PrimitiveMath.ONE / this.norm());
     }
 
-    MatrixStore<N> subtract(MatrixStore<N> subtrahend);
+    default MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {
+        return this.operateOnMatching(this.factory().function().subtract(), subtrahend);
+    }
 
     Scalar<N> toScalar(long row, long column);
 

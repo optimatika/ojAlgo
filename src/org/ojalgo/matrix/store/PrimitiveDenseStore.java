@@ -948,10 +948,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public MatrixStore<Double> add(final MatrixStore<Double> addend) {
-        return new SuperimposedStore<>(this, addend);
-    }
-
     public Double aggregateAll(final Aggregator aggregator) {
 
         final int tmpRowDim = myRowDim;
@@ -1518,10 +1514,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return retVal;
     }
 
-    public MatrixStore<Double> negate() {
-        return new ModificationStore<>(this, FACTORY.function().negate());
-    }
-
     public void negateColumn(final int column) {
         myUtility.modifyColumn(0, column, PrimitiveFunction.NEGATE);
     }
@@ -1537,14 +1529,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
         RotateRight.invoke(data, myRowDim, aLow, aHigh, aCos, aSin);
-    }
-
-    public MatrixStore<Double> multiply(final Double scalar) {
-        return new ModificationStore<>(this, FACTORY.function().multiply().first(scalar));
-    }
-
-    public MatrixStore<Double> multiply(final double scalar) {
-        return new ModificationStore<>(this, FACTORY.function().multiply().first(scalar));
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
@@ -1606,10 +1590,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
         }
-    }
-
-    public MatrixStore<Double> subtract(final MatrixStore<Double> subtrahend) {
-        return this.add(subtrahend.negate());
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {

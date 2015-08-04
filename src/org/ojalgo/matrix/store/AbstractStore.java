@@ -55,10 +55,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         myColDim = columnsCount;
     }
 
-    public MatrixStore<N> add(final MatrixStore<N> addend) {
-        return new SuperimposedStore<>(this, addend);
-    }
-
     @SuppressWarnings("unchecked")
     public N aggregateAll(final Aggregator aggregator) {
 
@@ -142,18 +138,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return this.toScalar(row, column).isSmall(comparedTo);
     }
 
-    public MatrixStore<N> multiply(final double scalar) {
-        if (this.isPrimitive()) {
-            return new ModificationStore<>(this, this.factory().function().multiply().first(scalar));
-        } else {
-            return new ModificationStore<>(this, this.factory().function().multiply().first(this.factory().scalar().cast(scalar)));
-        }
-    }
-
-    public MatrixStore<N> multiply(final N scalar) {
-        return new ModificationStore<>(this, this.factory().function().multiply().first(scalar));
-    }
-
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
 
         final int tmpRowDim = (int) (leftMtrx.count() / this.countRows());
@@ -164,14 +148,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         retVal.fillByMultiplying(leftMtrx, this);
 
         return retVal;
-    }
-
-    public final MatrixStore<N> negate() {
-        return new ModificationStore<>(this, this.factory().function().negate());
-    }
-
-    public MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {
-        return this.add(subtrahend.negate());
     }
 
     @Override
@@ -250,11 +226,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
     boolean isPrimitive() {
         return this.getComponentType().equals(Double.class);
-    }
-
-    public double norm() {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
 }

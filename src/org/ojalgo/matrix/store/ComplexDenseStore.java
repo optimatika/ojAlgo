@@ -407,10 +407,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
-    public MatrixStore<ComplexNumber> add(final MatrixStore<ComplexNumber> addend) {
-        return new SuperimposedStore<>(this, addend);
-    }
-
     public ComplexNumber aggregateAll(final Aggregator aggregator) {
 
         final int tmpRowDim = myRowDim;
@@ -953,10 +949,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return retVal;
     }
 
-    public MatrixStore<ComplexNumber> negate() {
-        return new ModificationStore<>(this, FACTORY.function().negate());
-    }
-
     public void negateColumn(final int column) {
         myUtility.modifyColumn(0, column, ComplexFunction.NEGATE);
     }
@@ -972,14 +964,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
         RotateRight.invoke(data, myRowDim, aLow, aHigh, FACTORY.scalar().cast(aCos), FACTORY.scalar().cast(aSin));
-    }
-
-    public MatrixStore<ComplexNumber> multiply(final ComplexNumber scalar) {
-        return new ModificationStore<>(this, FACTORY.function().multiply().first(scalar));
-    }
-
-    public MatrixStore<ComplexNumber> multiply(final double scalar) {
-        return new ModificationStore<>(this, FACTORY.function().multiply().first(FACTORY.scalar().cast(scalar)));
     }
 
     public void set(final long aRow, final long aCol, final double aNmbr) {
@@ -1041,10 +1025,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
         }
-    }
-
-    public MatrixStore<ComplexNumber> subtract(final MatrixStore<ComplexNumber> subtrahend) {
-        return this.add(subtrahend.negate());
     }
 
     public Scalar<ComplexNumber> toScalar(final long row, final long column) {
