@@ -61,8 +61,6 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
             myRingAsAppender = ring.asAppender();
 
             myDelimiter = delimiter;
-
-            myRingAsAppender.print(myDelimiter);
         }
 
         public char charAt(final int index) {
@@ -101,7 +99,6 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         public void flush(final Appender appender) {
             appender.print(this.toString());
             myRing.clear();
-            myRingAsAppender.print(myDelimiter);
         }
 
         @Override
@@ -123,53 +120,53 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         }
 
         public void print(final boolean b) {
-            myRingAsAppender.print(b);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.print(b);
         }
 
         public void print(final char c) {
-            myRingAsAppender.print(c);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.print(c);
         }
 
         public void print(final char[] ca) {
-            myRingAsAppender.print(ca);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.print(ca);
         }
 
         public void print(final double d) {
-            myRingAsAppender.print(d);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.print(d);
         }
 
         public void print(final float f) {
-            myRingAsAppender.print(f);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.print(f);
         }
 
         public void print(final int i) {
-            myRingAsAppender.print(i);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.print(i);
         }
 
         public void print(final long l) {
-            myRingAsAppender.print(l);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.print(l);
         }
 
         public void print(final Object obj) {
-            myRingAsAppender.print(obj);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.print(obj);
         }
 
         public void print(final String str) {
-            myRingAsAppender.print(str);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.print(str);
         }
 
         public void print(final String message, final Object... args) {
-            myRingAsAppender.print(message, args);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.print(message, args);
         }
 
         public Appender printf(final Locale locale, final String format, final Object... args) {
@@ -181,68 +178,68 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         }
 
         public void println() {
-            myRingAsAppender.println();
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println();
         }
 
         public void println(final boolean b) {
-            myRingAsAppender.println(b);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println(b);
         }
 
         public void println(final char c) {
-            myRingAsAppender.println(c);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println(c);
         }
 
         public void println(final char[] ca) {
-            myRingAsAppender.println(ca);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println(ca);
         }
 
         public void println(final double d) {
-            myRingAsAppender.println(d);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println(d);
         }
 
         public void println(final float f) {
-            myRingAsAppender.println(f);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println(f);
         }
 
         public void println(final int i) {
-            myRingAsAppender.println(i);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println(i);
         }
 
         public void println(final long l) {
-            myRingAsAppender.println(l);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println(l);
         }
 
         public void println(final Object obj) {
-            myRingAsAppender.println(obj);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println(obj);
         }
 
         public void println(final String str) {
-            myRingAsAppender.println(str);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println(str);
         }
 
         public void println(final String message, final Object... args) {
-            myRingAsAppender.println(message, args);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.println(message, args);
         }
 
         public void printmtrx(final String message, final Access2D<?> matrix) {
-            myRingAsAppender.printmtrx(message, matrix);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.printmtrx(message, matrix);
         }
 
         public void printmtrx(final String message, final Access2D<?> matrix, final NumberContext context) {
-            myRingAsAppender.printmtrx(message, matrix, context);
             myRingAsAppender.print(myDelimiter);
+            myRingAsAppender.printmtrx(message, matrix, context);
         }
 
         public CharSequence subSequence(final int start, final int end) {
@@ -268,7 +265,7 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         }
 
         private int indexOfLimit() {
-            return myRing.indexOfLast(myDelimiter);
+            return myRing.getCursor();
         }
 
     }
@@ -495,6 +492,10 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         final String tmpSecondPart = String.valueOf(myCharacters, 0, tmpCursor);
 
         return tmpFirstPart + tmpSecondPart;
+    }
+
+    char getCursor() {
+        return myCursor;
     }
 
 }
