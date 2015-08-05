@@ -352,6 +352,12 @@ public abstract class BasicLogger {
 
     }
 
+    public static interface LoggerCache extends BasicLogger.Appender, CharSequence {
+
+        void flush(BasicLogger.Appender appender);
+
+    }
+
     public static final class PrintStreamAppender implements Appender {
 
         private final PrintStream myStream;

@@ -27,9 +27,13 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.nio.CharBuffer;
 import java.util.Arrays;
+import java.util.Locale;
 
+import org.ojalgo.access.Access2D;
 import org.ojalgo.netio.BasicLogger.Appender;
 import org.ojalgo.netio.BasicLogger.GenericAppender;
+import org.ojalgo.netio.BasicLogger.LoggerCache;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * A circular char buffer - an {@linkplain Appendable} {@linkplain CharSequence} that always hold exactly
@@ -38,6 +42,236 @@ import org.ojalgo.netio.BasicLogger.GenericAppender;
  * @author apete
  */
 public class CharacterRing implements CharSequence, Appendable, Serializable {
+
+    static final class DelimitedCache implements LoggerCache {
+
+        private final char myDelimiter;
+        private final CharacterRing myRing;
+        private final BasicLogger.Appender myRingAsAppender;
+
+        DelimitedCache(final CharacterRing ring) {
+            this(ring, ASCII.CR);
+        }
+
+        DelimitedCache(final CharacterRing ring, final char delimiter) {
+
+            super();
+
+            myRing = ring;
+            myRingAsAppender = ring.asAppender();
+
+            myDelimiter = delimiter;
+
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public char charAt(final int index) {
+            // TODO Auto-generated method stub
+
+            final int tmpFirst = this.indexOfFirst();
+
+            return myRing.charAt(tmpFirst + index);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof DelimitedCache)) {
+                return false;
+            }
+            final DelimitedCache other = (DelimitedCache) obj;
+            if (myRing == null) {
+                if (other.myRing != null) {
+                    return false;
+                }
+            } else if (!myRing.equals(other.myRing)) {
+                return false;
+            }
+            if (myDelimiter != other.myDelimiter) {
+                return false;
+            }
+            return true;
+        }
+
+        public void flush(final Appender appender) {
+            appender.print(this.toString());
+            myRing.clear();
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + ((myRing == null) ? 0 : myRing.hashCode());
+            result = (prime * result) + myDelimiter;
+            return result;
+        }
+
+        public int length() {
+            // TODO Auto-generated method stub
+
+            final int tmpFirst = this.indexOfFirst();
+            final int tmpLimit = this.indexOfLimit();
+
+            return tmpLimit - tmpFirst;
+        }
+
+        public void print(final boolean b) {
+            myRingAsAppender.print(b);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void print(final char c) {
+            myRingAsAppender.print(c);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void print(final char[] ca) {
+            myRingAsAppender.print(ca);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void print(final double d) {
+            myRingAsAppender.print(d);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void print(final float f) {
+            myRingAsAppender.print(f);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void print(final int i) {
+            myRingAsAppender.print(i);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void print(final long l) {
+            myRingAsAppender.print(l);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void print(final Object obj) {
+            myRingAsAppender.print(obj);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void print(final String str) {
+            myRingAsAppender.print(str);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void print(final String message, final Object... args) {
+            myRingAsAppender.print(message, args);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public Appender printf(final Locale locale, final String format, final Object... args) {
+            return myRingAsAppender.printf(locale, format, args);
+        }
+
+        public Appender printf(final String format, final Object... args) {
+            return myRingAsAppender.printf(format, args);
+        }
+
+        public void println() {
+            myRingAsAppender.println();
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void println(final boolean b) {
+            myRingAsAppender.println(b);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void println(final char c) {
+            myRingAsAppender.println(c);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void println(final char[] ca) {
+            myRingAsAppender.println(ca);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void println(final double d) {
+            myRingAsAppender.println(d);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void println(final float f) {
+            myRingAsAppender.println(f);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void println(final int i) {
+            myRingAsAppender.println(i);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void println(final long l) {
+            myRingAsAppender.println(l);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void println(final Object obj) {
+            myRingAsAppender.println(obj);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void println(final String str) {
+            myRingAsAppender.println(str);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void println(final String message, final Object... args) {
+            myRingAsAppender.println(message, args);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void printmtrx(final String message, final Access2D<?> matrix) {
+            myRingAsAppender.printmtrx(message, matrix);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public void printmtrx(final String message, final Access2D<?> matrix, final NumberContext context) {
+            myRingAsAppender.printmtrx(message, matrix, context);
+            myRingAsAppender.print(myDelimiter);
+        }
+
+        public CharSequence subSequence(final int start, final int end) {
+            // TODO Auto-generated method stub
+
+            final int tmpFirst = this.indexOfFirst();
+
+            return myRing.subSequence(tmpFirst + start, tmpFirst + end);
+        }
+
+        @Override
+        public String toString() {
+            // TODO Auto-generated method stub
+
+            final int tmpFirst = this.indexOfFirst();
+            final int tmpLimit = this.indexOfLimit();
+
+            return myRing.subSequence(tmpFirst, tmpLimit).toString();
+        }
+
+        private int indexOfFirst() {
+            return myRing.indexOfFirst(myDelimiter) + 1;
+        }
+
+        private int indexOfLimit() {
+            return myRing.indexOfLast(myDelimiter);
+        }
+
+    }
 
     static final class RingStream extends OutputStream {
 
@@ -123,6 +357,14 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         return new GenericAppender(this);
     }
 
+    public LoggerCache asLoggerCache() {
+        return new DelimitedCache(this);
+    }
+
+    public LoggerCache asLoggerCache(final char entryDelimiter) {
+        return new DelimitedCache(this, entryDelimiter);
+    }
+
     public OutputStream asOutputStream() {
         return new RingStream(this);
     }
@@ -141,8 +383,30 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
         myCursor = 0;
     }
 
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof CharacterRing)) {
+            return false;
+        }
+        final CharacterRing other = (CharacterRing) obj;
+        if (!Arrays.equals(myCharacters, other.myCharacters)) {
+            return false;
+        }
+        if (myCursor != other.myCursor) {
+            return false;
+        }
+        return true;
+    }
+
     public void flush(final Appendable target) {
         try {
+
             final int tmpCursor = myCursor;
             char tmpChar;
             for (int i = tmpCursor; i < length; i++) {
@@ -157,9 +421,21 @@ public class CharacterRing implements CharSequence, Appendable, Serializable {
                     target.append(tmpChar);
                 }
             }
+
+            this.clear();
+
         } catch (final IOException exception) {
             exception.printStackTrace();
         }
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + Arrays.hashCode(myCharacters);
+        result = (prime * result) + myCursor;
+        return result;
     }
 
     public int indexOfFirst(final char c) {

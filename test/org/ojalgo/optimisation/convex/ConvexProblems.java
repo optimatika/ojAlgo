@@ -1115,6 +1115,12 @@ public class ConvexProblems extends OptimisationConvexTests {
 
     /**
      * Issue reported at GitHub
+     * <p>
+     * apete: I believe there are problems with the models the user supplied, but ojAlgo fails to correctly
+     * identify and report these problems. Instead ojAlgo struggles and returns different solutions with
+     * sequential executions. This test is designed to (only) ensure consistency between exections. (I don't
+     * know what the correct solution is.)
+     * </p>
      *
      * @see <a href="https://github.com/optimatika/ojAlgo/issues/5">GitHub Issue 5</a>
      */
@@ -1133,32 +1139,34 @@ public class ConvexProblems extends OptimisationConvexTests {
         for (int l = 0; l < 10; l++) {
 
             final Result tmpResult1 = tmpModel1.maximise();
+
+            if (OptimisationConvexTests.DEBUG) {
+                BasicLogger.debug();
+                BasicLogger.debug("Model 1");
+                BasicLogger.debug(tmpResult1);
+                BasicLogger.debug(tmpModel1);
+            }
+
+            TestUtils.assertStateNotLessThanFeasible(tmpResult1);
+
+            TestUtils.assertEquals("Model 1 State @" + l, tmpBaseResult1.getState(), tmpResult1.getState());
+            TestUtils.assertEquals("Model 1 Value @" + l, tmpBaseResult1.getValue(), tmpResult1.getValue());
+            TestUtils.assertEquals("Model 1 Solution @" + l, tmpBaseResult1, tmpResult1);
+
             final Result tmpResult2 = tmpModel2.maximise();
 
             if (OptimisationConvexTests.DEBUG) {
                 BasicLogger.debug();
-                BasicLogger.debug("1");
-                BasicLogger.debug("1", tmpResult1);
-                BasicLogger.debug("1", tmpModel1);
+                BasicLogger.debug("Model 2");
+                BasicLogger.debug(tmpResult2);
+                BasicLogger.debug(tmpModel2);
             }
 
-            if (OptimisationConvexTests.DEBUG) {
-                BasicLogger.debug();
-                BasicLogger.debug("2");
-                BasicLogger.debug("2", tmpResult2);
-                BasicLogger.debug("2", tmpModel2);
-            }
-
-            TestUtils.assertStateNotLessThanFeasible(tmpResult1);
             TestUtils.assertStateNotLessThanFeasible(tmpResult2);
 
-            TestUtils.assertEquals("1", tmpBaseResult1.getState(), tmpResult1.getState());
-            TestUtils.assertEquals("1", tmpBaseResult1.getValue(), tmpResult1.getValue());
-            TestUtils.assertEquals("1", tmpBaseResult1, tmpResult1);
-
-            TestUtils.assertEquals("2", tmpBaseResult2.getState(), tmpResult2.getState());
-            TestUtils.assertEquals("2", tmpBaseResult2.getValue(), tmpResult2.getValue());
-            TestUtils.assertEquals("2", tmpBaseResult2, tmpResult2);
+            TestUtils.assertEquals("Model 2 State @" + l, tmpBaseResult2.getState(), tmpResult2.getState());
+            TestUtils.assertEquals("Model 2 Value @" + l, tmpBaseResult2.getValue(), tmpResult2.getValue());
+            TestUtils.assertEquals("Model 2 Solution @" + l, tmpBaseResult2, tmpResult2);
         }
 
     }
