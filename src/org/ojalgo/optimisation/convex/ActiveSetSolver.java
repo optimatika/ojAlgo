@@ -209,31 +209,17 @@ final class ActiveSetSolver extends ConvexSolver {
         myActivator.excludeAll();
 
         boolean tmpFeasible = false;
+        final boolean tmpUsableKickStarter = (kickStarter != null) && kickStarter.getState().isApproximate();
 
-        if ((kickStarter != null) && kickStarter.getState().isApproximate()) {
-
+        if (tmpUsableKickStarter) {
             this.fillX(kickStarter);
-
-        } else {
-
-            final KKTSolver.Input tmpInput = new KKTSolver.Input(tmpQ, tmpC, tmpAE, tmpBE);
-            final KKTSolver tmpSolver = this.getDelegateSolver(tmpInput);
-            final Output tmpOutput = tmpSolver.solve(tmpInput);
-
-            if (tmpOutput.isSolvable()) {
-
-                this.fillX(tmpOutput.getX());
-
-            } else {
-
-                this.fillX(ONE / tmpNumVars);
-            }
+            tmpFeasible = this.checkFeasibility(false);
         }
 
-        if (!(tmpFeasible = this.checkFeasibility(false))) {
+        if (!tmpFeasible) {
             // Form LP to check feasibility
 
-            final MatrixStore<Double> tmpGradient = tmpQ.multiply(tmpX).subtract(tmpC);
+            final MatrixStore<Double> tmpGradient = tmpUsableKickStarter ? tmpQ.multiply(tmpX).subtract(tmpC) : tmpC.negate();
 
             final MatrixStore<Double> tmpLinearC = tmpGradient.builder().below(tmpGradient.negate()).below(tmpNumInes).build();
 

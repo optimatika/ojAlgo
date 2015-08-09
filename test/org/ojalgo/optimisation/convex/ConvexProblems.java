@@ -1173,6 +1173,27 @@ public class ConvexProblems extends OptimisationConvexTests {
 
     public void testP20150809() {
 
+        final PrimitiveArray tmpExpectedSolution = PrimitiveArray.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
+        final PrimitiveArray tmpBoundedSolution = PrimitiveArray.wrap(new double[] { 99999, -99999, 99999, 99999 });
+
+        ConvexSolver tmpSolver = P20150809.buildModel(true, false);
+        Result tmpResult = tmpSolver.solve();
+        TestUtils.assertStateNotLessThanOptimal(tmpResult);
+        TestUtils.assertEquals(tmpExpectedSolution, tmpResult);
+
+        tmpSolver = P20150809.buildModel(true, true);
+        tmpResult = tmpSolver.solve();
+        TestUtils.assertStateNotLessThanOptimal(tmpResult);
+        TestUtils.assertEquals(tmpExpectedSolution, tmpResult);
+
+        tmpSolver = P20150809.buildModel(false, false);
+        tmpResult = tmpSolver.solve();
+        TestUtils.assertStateLessThanFeasible(tmpResult); // Ideally the state should be UNBOUNDED, but any failure seems acceptable (for now)
+
+        tmpSolver = P20150809.buildModel(false, true);
+        tmpResult = tmpSolver.solve();
+        TestUtils.assertStateNotLessThanOptimal(tmpResult); // Since it is now constrained, the solver should be able find the optimal solution.
+        TestUtils.assertEquals(tmpBoundedSolution, tmpResult);
     }
 
     private void doEarly2008(final Variable[] variables, final Access2D<?> covariances, final Access1D<?> expected) {

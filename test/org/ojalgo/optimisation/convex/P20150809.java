@@ -38,6 +38,33 @@ class P20150809 {
     }
 
     static void attempt5(final boolean identity, final boolean addDummyConstraints) {
+
+        final ConvexSolver cs = P20150809.buildModel(identity, addDummyConstraints);
+
+        try {
+            final Optimisation.Result solution = cs.solve();
+            if ((solution.getState() == Optimisation.State.DISTINCT) || (solution.getState() == Optimisation.State.APPROXIMATE)
+                    || (solution.getState() == Optimisation.State.OPTIMAL)) {
+                final double[] pt = new double[4];
+                for (int i = 0; i < pt.length; i++) {
+                    pt[i] = solution.doubleValue(i);
+                }
+
+                System.out.println("Objective " + solution.getValue());
+                for (int ii = 0; ii < 4; ii++) {
+                    System.out.println("x[" + ii + "] = " + solution.doubleValue(ii));
+                }
+            } else {
+                System.out.println("Failure State = " + solution.getState().name());
+
+            }
+
+        } catch (final Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    static ConvexSolver buildModel(final boolean identity, final boolean addDummyConstraints) {
         if (!identity && !addDummyConstraints) {
             System.out.println("Zero Q matrix and no constraints -------------------------!");
         } else if (!identity) {
@@ -69,30 +96,11 @@ class P20150809 {
         final Optimisation.Options opts = new Optimisation.Options();
         opts.iterations_abort = 10000;
         opts.iterations_suffice = 100;
-        opts.debug(ConvexSolver.class);
-        final ConvexSolver cs = builder.build(opts);
-
-        try {
-            final Optimisation.Result solution = cs.solve();
-            if ((solution.getState() == Optimisation.State.DISTINCT) || (solution.getState() == Optimisation.State.APPROXIMATE)
-                    || (solution.getState() == Optimisation.State.OPTIMAL)) {
-                final double[] pt = new double[4];
-                for (int i = 0; i < pt.length; i++) {
-                    pt[i] = solution.doubleValue(i);
-                }
-
-                System.out.println("Objective " + solution.getValue());
-                for (int ii = 0; ii < 4; ii++) {
-                    System.out.println("x[" + ii + "] = " + solution.doubleValue(ii));
-                }
-            } else {
-                System.out.println("Failure State = " + solution.getState().name());
-
-            }
-
-        } catch (final Exception e) {
-            System.out.println(e);
+        if (OptimisationConvexTests.DEBUG) {
+            opts.debug(ConvexSolver.class);
         }
+
+        return builder.build(opts);
     }
 
     P20150809() {
