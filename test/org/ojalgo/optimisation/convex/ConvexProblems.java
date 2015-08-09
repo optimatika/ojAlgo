@@ -1171,6 +1171,10 @@ public class ConvexProblems extends OptimisationConvexTests {
 
     }
 
+    public void testP20150809() {
+
+    }
+
     private void doEarly2008(final Variable[] variables, final Access2D<?> covariances, final Access1D<?> expected) {
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(variables);

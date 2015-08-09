@@ -413,7 +413,7 @@ final class ActiveSetSolver extends ConvexSolver {
             if (this.isDebug()) {
                 this.debug("Current: {}", this.getX().copy().asList());
                 this.debug("Step: {}", tmpSubX.copy().asList());
-                this.debug("Step Nullspace: {}", this.getAE().multiply(tmpSubX).copy().asList());
+                // this.debug("Step Nullspace: {}", this.getAE().multiply(tmpSubX).copy().asList());
             }
 
             final double tmpFrobNormX = tmpSubX.aggregateAll(Aggregator.NORM2);
