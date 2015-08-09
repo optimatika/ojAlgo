@@ -155,8 +155,15 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     static final void presolve(final ExpressionsBasedModel model) {
 
+        final Set<Index> tmpFixedVariables = model.getFixedVariables();
+
         for (final Expression tmpExpression : model.getExpressions()) {
-            if (tmpExpression.simplify()) {
+
+            final boolean tmpConstraint = tmpExpression.isConstraint();
+            final boolean tmpInfeasible = tmpExpression.isInfeasible();
+            final boolean tmpRedundant = tmpExpression.isRedundant();
+
+            if (tmpConstraint && !tmpInfeasible && !tmpRedundant && tmpExpression.simplify(tmpFixedVariables)) {
                 ExpressionsBasedModel.presolve(model);
                 break;
             }

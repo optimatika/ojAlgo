@@ -651,6 +651,11 @@ public final class Expression extends ModelEntity<Expression> {
         this.appendRightPart(aStringBuilder);
     }
 
+    /**
+     * Will return null if none of the fixed variables affect the value of this expression. If any fixed
+     * variable does affect the value of the expressions the returned value could be zero ( 0.0 ) but must be
+     * assumed to be different from zero.
+     */
     BigDecimal calculateFixedValue(final Collection<Index> fixedVariables) {
 
         BigDecimal retVal = null;
@@ -796,28 +801,30 @@ public final class Expression extends ModelEntity<Expression> {
         return myRedundant;
     }
 
+    boolean simplify(final Set<Index> fixedVariables) {
+        return this.simplifyZeroOrOneFreeVariable(fixedVariables) || this.simplifyDegenerate(fixedVariables);
+    }
+
     /**
-     * @return true if this expression was changed from not redundant to redundant
+     * @param fixedVariables The current set of fixed variable indices
+     * @return true if an additional variable was fixed (and marked this expression as a redundant constraint)
      */
-    boolean simplify() {
+    boolean simplifyZeroOrOneFreeVariable(final Set<Index> fixedVariables) {
+
+        boolean tmpDidFixVariable = false;
 
         myRedundant = myRedundant || !this.isConstraint();
-        final boolean tmpInitiallyRedundant = myRedundant;
 
-        final Set<Index> tmpFixedVariables = myModel.getFixedVariables();
-        if (!tmpInitiallyRedundant && (this.countQuadraticFactors() == 0) && (this.countLinearFactors() <= (tmpFixedVariables.size() + 1))) {
+        if (!myRedundant && (this.countQuadraticFactors() == 0) && (this.countLinearFactors() <= (fixedVariables.size() + 1))) {
             // This constraint can possibly be reduced to 0 or 1 remaining linear factors
 
-            BigDecimal tmpFixedValue = this.calculateFixedValue(tmpFixedVariables);
-            if (tmpFixedValue == null) {
-                tmpFixedValue = BigMath.ZERO;
-            }
+            final BigDecimal tmpFixedValue = this.calculateFixedValue(fixedVariables);
 
             if (tmpFixedValue != null) {
                 // The fixed variables are part of this expression
 
                 final HashSet<Index> tmpLinear = new HashSet<Index>(this.getLinearFactorKeys());
-                tmpLinear.removeAll(tmpFixedVariables);
+                tmpLinear.removeAll(fixedVariables);
 
                 if (tmpLinear.size() == 0) {
                     // This constraint has 0 remaining free variable
@@ -919,22 +926,133 @@ public final class Expression extends ModelEntity<Expression> {
                     if (tmpVariable.isEqualityConstraint()) {
                         tmpVariable.setValue(tmpVariable.getLowerLimit());
                         myModel.addFixedVariable(tmpIndex);
+                        tmpDidFixVariable = true;
                     }
                 }
-
-                return !tmpInitiallyRedundant && myRedundant;
 
             } else {
 
                 // Didn't change anything: No fixed value
-                return false;
+
             }
 
         } else {
 
             // Didn't change anything: Already redundant, quadratic or not enough fixed variables
-            return false;
         }
+
+        return tmpDidFixVariable;
+    }
+
+    /**
+     * @param fixedVariables The current set of fixed variable indices
+     * @return true if an additional variable was fixed (and marked this expression as a redundant constraint)
+     */
+    boolean simplifyDegenerate(final Set<Index> fixedVariables) {
+
+        boolean tmpDidFixVariable = false;
+
+        myRedundant = myRedundant || !this.isConstraint();
+
+        if (!myRedundant && (this.countQuadraticFactors() == 0)) {
+            // This constraint can possibly be reduced to 0 or 1 remaining linear factors
+
+            final BigDecimal tmpCompLowLim = this.compensateLowerLimit(fixedVariables);
+            final BigDecimal tmpCompUppLim = this.compensateUpperLimit(fixedVariables);
+
+            if ((tmpCompLowLim != null) && (tmpCompLowLim.signum() == 0) && this.isNegative(fixedVariables)) {
+
+                for (final Index tmpLinear : this.getLinear().keySet()) {
+                    if (!fixedVariables.contains(tmpLinear)) {
+
+                        final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.index);
+
+                        myInfeasible &= !tmpFreeVariable.validate(BigMath.ZERO, myModel.options.slack, myModel.appender());
+
+                        if (!myInfeasible) {
+                            tmpFreeVariable.level(BigMath.ZERO);
+                            tmpFreeVariable.setValue(BigMath.ZERO);
+                            myModel.addFixedVariable(tmpLinear);
+                            tmpDidFixVariable = true;
+                        }
+                    }
+                }
+
+                myRedundant = true;
+            }
+
+            if ((tmpCompUppLim != null) && (tmpCompUppLim.signum() == 0) && this.isPositive(fixedVariables)) {
+
+                for (final Index tmpLinear : this.getLinear().keySet()) {
+                    if (!fixedVariables.contains(tmpLinear)) {
+
+                        final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.index);
+
+                        myInfeasible &= !tmpFreeVariable.validate(BigMath.ZERO, myModel.options.slack, myModel.appender());
+
+                        if (!myInfeasible) {
+                            tmpFreeVariable.level(BigMath.ZERO);
+                            tmpFreeVariable.setValue(BigMath.ZERO);
+                            myModel.addFixedVariable(tmpLinear);
+                            tmpDidFixVariable = true;
+                        }
+                    }
+                }
+
+                myRedundant = true;
+            }
+
+        } else {
+
+            // Didn't change anything: Already redundant, quadratic or not enough fixed variables
+
+        }
+
+        return tmpDidFixVariable;
+    }
+
+    private boolean isPositive(final Set<Index> fixedVariables) {
+
+        boolean retVal = !this.isAnyQuadraticFactorNonZero();
+
+        if (retVal) {
+            for (final Entry<Index, BigDecimal> tmpLinear : this.getLinear().entrySet()) {
+                if (retVal && !fixedVariables.contains(tmpLinear.getKey())) {
+                    final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.getKey().index);
+                    if ((tmpLinear.getValue().signum() > 0) && tmpFreeVariable.isLowerLimitSet() && (tmpFreeVariable.getLowerLimit().signum() >= 0)) {
+                        retVal &= true;
+                    } else if ((tmpLinear.getValue().signum() < 0) && tmpFreeVariable.isUpperLimitSet() && (tmpFreeVariable.getUpperLimit().signum() <= 0)) {
+                        retVal &= true;
+                    } else {
+                        retVal &= false;
+                    }
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    private boolean isNegative(final Set<Index> fixedVariables) {
+
+        boolean retVal = !this.isAnyQuadraticFactorNonZero();
+
+        if (retVal) {
+            for (final Entry<Index, BigDecimal> tmpLinear : this.getLinear().entrySet()) {
+                if (retVal && !fixedVariables.contains(tmpLinear.getKey())) {
+                    final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.getKey().index);
+                    if ((tmpLinear.getValue().signum() < 0) && tmpFreeVariable.isLowerLimitSet() && (tmpFreeVariable.getLowerLimit().signum() >= 0)) {
+                        retVal &= true;
+                    } else if ((tmpLinear.getValue().signum() > 0) && tmpFreeVariable.isUpperLimitSet() && (tmpFreeVariable.getUpperLimit().signum() <= 0)) {
+                        retVal &= true;
+                    } else {
+                        retVal &= false;
+                    }
+                }
+            }
+        }
+
+        return retVal;
     }
 
 }
