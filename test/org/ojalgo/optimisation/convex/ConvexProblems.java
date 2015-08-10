@@ -1189,6 +1189,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpSolver = P20150809.buildModel(false, false);
         tmpResult = tmpSolver.solve();
         TestUtils.assertStateLessThanFeasible(tmpResult); // Ideally the state should be UNBOUNDED, but any failure seems acceptable (for now)
+        TestUtils.assertEquals(Optimisation.State.UNBOUNDED, tmpResult.getState());
 
         tmpSolver = P20150809.buildModel(false, true);
         tmpResult = tmpSolver.solve();

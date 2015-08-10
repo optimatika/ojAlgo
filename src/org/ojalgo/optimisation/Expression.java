@@ -802,6 +802,7 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     boolean simplify(final Set<Index> fixedVariables) {
+        myRedundant = myRedundant || !this.isConstraint();
         return this.simplifyZeroOrOneFreeVariable(fixedVariables) || this.simplifyDegenerate(fixedVariables);
     }
 
@@ -812,8 +813,6 @@ public final class Expression extends ModelEntity<Expression> {
     boolean simplifyZeroOrOneFreeVariable(final Set<Index> fixedVariables) {
 
         boolean tmpDidFixVariable = false;
-
-        myRedundant = myRedundant || !this.isConstraint();
 
         if (!myRedundant && (this.countQuadraticFactors() == 0) && (this.countLinearFactors() <= (fixedVariables.size() + 1))) {
             // This constraint can possibly be reduced to 0 or 1 remaining linear factors
@@ -933,7 +932,6 @@ public final class Expression extends ModelEntity<Expression> {
             } else {
 
                 // Didn't change anything: No fixed value
-
             }
 
         } else {
@@ -952,65 +950,79 @@ public final class Expression extends ModelEntity<Expression> {
 
         boolean tmpDidFixVariable = false;
 
-        myRedundant = myRedundant || !this.isConstraint();
-
         if (!myRedundant && (this.countQuadraticFactors() == 0)) {
             // This constraint can possibly be reduced to 0 or 1 remaining linear factors
 
             final BigDecimal tmpCompLowLim = this.compensateLowerLimit(fixedVariables);
             final BigDecimal tmpCompUppLim = this.compensateUpperLimit(fixedVariables);
 
-            if ((tmpCompLowLim != null) && (tmpCompLowLim.signum() == 0) && this.isNegative(fixedVariables)) {
+            if ((tmpCompLowLim != null) && (tmpCompLowLim.signum() >= 0) && this.isNegative(fixedVariables)) {
 
-                for (final Index tmpLinear : this.getLinear().keySet()) {
-                    if (!fixedVariables.contains(tmpLinear)) {
+                if (tmpCompLowLim.signum() == 0) {
 
-                        final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.index);
+                    for (final Index tmpLinear : this.getLinear().keySet()) {
+                        if (!fixedVariables.contains(tmpLinear)) {
+                            final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.index);
 
-                        myInfeasible &= !tmpFreeVariable.validate(BigMath.ZERO, myModel.options.slack, myModel.appender());
+                            myInfeasible &= !tmpFreeVariable.validate(BigMath.ZERO, myModel.options.slack, myModel.appender());
 
-                        if (!myInfeasible) {
-                            tmpFreeVariable.level(BigMath.ZERO);
-                            tmpFreeVariable.setValue(BigMath.ZERO);
-                            myModel.addFixedVariable(tmpLinear);
-                            tmpDidFixVariable = true;
+                            if (!myInfeasible) {
+                                tmpFreeVariable.level(BigMath.ZERO);
+                                tmpFreeVariable.setValue(BigMath.ZERO);
+                                myModel.addFixedVariable(tmpLinear);
+                                tmpDidFixVariable = true;
+                            }
                         }
                     }
-                }
 
-                myRedundant = true;
+                    myRedundant = true;
+
+                } else {
+
+                    myInfeasible = true;
+                }
             }
 
-            if ((tmpCompUppLim != null) && (tmpCompUppLim.signum() == 0) && this.isPositive(fixedVariables)) {
+            if ((tmpCompUppLim != null) && (tmpCompUppLim.signum() <= 0) && this.isPositive(fixedVariables)) {
 
-                for (final Index tmpLinear : this.getLinear().keySet()) {
-                    if (!fixedVariables.contains(tmpLinear)) {
+                if (tmpCompUppLim.signum() == 0) {
 
-                        final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.index);
+                    for (final Index tmpLinear : this.getLinear().keySet()) {
+                        if (!fixedVariables.contains(tmpLinear)) {
+                            final Variable tmpFreeVariable = myModel.getVariable(tmpLinear.index);
 
-                        myInfeasible &= !tmpFreeVariable.validate(BigMath.ZERO, myModel.options.slack, myModel.appender());
+                            myInfeasible &= !tmpFreeVariable.validate(BigMath.ZERO, myModel.options.slack, myModel.appender());
 
-                        if (!myInfeasible) {
-                            tmpFreeVariable.level(BigMath.ZERO);
-                            tmpFreeVariable.setValue(BigMath.ZERO);
-                            myModel.addFixedVariable(tmpLinear);
-                            tmpDidFixVariable = true;
+                            if (!myInfeasible) {
+                                tmpFreeVariable.level(BigMath.ZERO);
+                                tmpFreeVariable.setValue(BigMath.ZERO);
+                                myModel.addFixedVariable(tmpLinear);
+                                tmpDidFixVariable = true;
+                            }
                         }
                     }
-                }
 
-                myRedundant = true;
+                    myRedundant = true;
+
+                } else {
+
+                    myInfeasible = true;
+                }
             }
 
         } else {
 
             // Didn't change anything: Already redundant, quadratic or not enough fixed variables
-
         }
 
         return tmpDidFixVariable;
     }
 
+    /**
+     * @param fixedVariables The indices of the fixed variables
+     * @return true if none of the free (not fixed) variables can make a negative contribution to the
+     *         expression value
+     */
     private boolean isPositive(final Set<Index> fixedVariables) {
 
         boolean retVal = !this.isAnyQuadraticFactorNonZero();
@@ -1033,6 +1045,11 @@ public final class Expression extends ModelEntity<Expression> {
         return retVal;
     }
 
+    /**
+     * @param fixedVariables The indices of the fixed variables
+     * @return true if none of the free (not fixed) variables can make a positve contribution to the
+     *         expression value
+     */
     private boolean isNegative(final Set<Index> fixedVariables) {
 
         boolean retVal = !this.isAnyQuadraticFactorNonZero();
