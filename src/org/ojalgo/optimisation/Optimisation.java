@@ -436,7 +436,7 @@ public interface Optimisation {
         DISTINCT(256),
 
         /**
-         * Failed
+         * Unexpected failure or exception
          */
         FAILED(-1),
 
@@ -456,7 +456,7 @@ public interface Optimisation {
         INFEASIBLE(-8),
 
         /**
-         * Model/problem components/entities are invalid
+         * Model entities or solver components (matrices) are invalid - don't meet the requirements
          */
         INVALID(-2),
 
@@ -476,7 +476,7 @@ public interface Optimisation {
         UNEXPLORED(0),
 
         /**
-         * Model/problem components/entities are valid
+         * Model entities and solver components (matrices) are valid
          */
         VALID(4);
 

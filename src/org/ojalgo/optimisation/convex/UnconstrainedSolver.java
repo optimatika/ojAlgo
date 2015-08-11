@@ -61,12 +61,12 @@ final class UnconstrainedSolver extends ConvexSolver {
 
         if (tmpOutput.isSolvable()) {
 
-            this.setState(State.OPTIMAL);
+            this.setState(State.DISTINCT);
             this.fillX(tmpOutput.getX());
 
         } else {
 
-            this.setState(State.INVALID);
+            this.setState(State.UNBOUNDED);
             this.resetX();
         }
     }
