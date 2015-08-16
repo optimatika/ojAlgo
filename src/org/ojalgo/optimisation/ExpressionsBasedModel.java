@@ -30,6 +30,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.GenericAppender;
@@ -447,29 +448,50 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         final int tmpNumberOfVariables = myVariables.size();
 
-        final Array1D<BigDecimal> tmpSolution = Array1D.BIG.makeZero(tmpNumberOfVariables);
+        State retState = State.UNEXPLORED;
+        double retValue = Double.NaN;
+        final Array1D<BigDecimal> retSolution = Array1D.BIG.makeZero(tmpNumberOfVariables);
 
-        boolean tmpNoneNull = true;
+        boolean tmpAllVarsSomeInfo = true;
 
-        BigDecimal tmpVal;
         for (int i = 0; i < tmpNumberOfVariables; i++) {
 
-            tmpVal = myVariables.get(i).getValue();
+            final Variable tmpVariable = myVariables.get(i);
 
-            if (tmpVal != null) {
-                tmpSolution.set(i, tmpVal);
+            if (tmpVariable.getValue() != null) {
+
+                retSolution.set(i, tmpVariable.getValue());
+
             } else {
-                tmpSolution.set(i, BigMath.ZERO);
-                tmpNoneNull = false;
+
+                if (tmpVariable.isEqualityConstraint()) {
+                    retSolution.set(i, tmpVariable.getLowerLimit());
+                } else if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
+                    retSolution.set(i, BigFunction.DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), BigMath.TWO));
+                } else if (tmpVariable.isLowerLimitSet()) {
+                    retSolution.set(i, tmpVariable.getLowerLimit());
+                } else if (tmpVariable.isUpperLimitSet()) {
+                    retSolution.set(i, tmpVariable.getUpperLimit());
+                } else {
+                    retSolution.set(i, BigMath.ZERO);
+                    tmpAllVarsSomeInfo = false; // This var no info
+                }
             }
         }
 
-        if (tmpNoneNull && this.validate(tmpSolution, validationContext)) {
-            final double tmpValue = this.getObjectiveExpression().evaluate(tmpSolution).doubleValue();
-            return new Optimisation.Result(State.FEASIBLE, tmpValue, tmpSolution);
+        if (tmpAllVarsSomeInfo) {
+            if (this.validate(retSolution, validationContext)) {
+                retState = State.FEASIBLE;
+                retValue = this.getObjectiveExpression().evaluate(retSolution).doubleValue();
+            } else {
+                retState = State.APPROXIMATE;
+            }
+
         } else {
-            return new Optimisation.Result(State.INFEASIBLE, Double.NaN, tmpSolution);
+            retState = State.INFEASIBLE;
         }
+
+        return new Optimisation.Result(retState, retValue, retSolution);
     }
 
     public int indexOf(final Variable variable) {
@@ -803,10 +825,22 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
+     * <p>
      * The general recommendation is to NOT call this method directly. Instead you should use/call
-     * {@link #maximise()} or {@link #minimise()}. If you do use this method you must first set
-     * {@link #setMinimisation()} or {@link #setMaximisation()}. Also note that with this method the solver
-     * solution is not written back to the model (or validated by the model).
+     * {@link #maximise()} or {@link #minimise()}.
+     * </P>
+     * <p>
+     * The primary use case for this method is as a callback method for solvers that iteratively modifies the
+     * model and solves at each iteration point.
+     * </P>
+     * <p>
+     * With direct usage of this method:
+     * <ul>
+     * <li>Maximisation/Minimisation is undefined (you don't know which it is)</li>
+     * <li>The solution is not written back to the model</li>
+     * <li>The solution is not validated by the model</li>
+     * </ul>
+     * </P>
      */
     public Optimisation.Result solve(final Optimisation.Result initialSolution) {
 

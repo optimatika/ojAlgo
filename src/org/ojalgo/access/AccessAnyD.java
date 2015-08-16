@@ -93,7 +93,15 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
+    default double doubleValue(final long index) {
+        return this.doubleValue(AccessUtils.reference(index, this.structure()));
+    }
+
     double doubleValue(long[] reference);
+
+    default N get(final long index) {
+        return this.get(AccessUtils.reference(index, this.structure()));
+    }
 
     N get(long[] reference);
 

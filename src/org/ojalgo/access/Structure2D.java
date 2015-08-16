@@ -21,10 +21,14 @@
  */
 package org.ojalgo.access;
 
-/**
- * count() == countRows() * countColumns()
- */
 interface Structure2D extends Structure1D {
+
+    /**
+     * count() == countRows() * countColumns()
+     */
+    default long count() {
+        return this.countRows() * this.countColumns();
+    }
 
     /**
      * @return The number of columns

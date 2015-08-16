@@ -72,10 +72,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
             }
         }
 
-        public long count() {
-            return this.countRows() * this.countColumns();
-        }
-
         public long countColumns() {
             return myDelegate.countColumns() - myColumn;
         }

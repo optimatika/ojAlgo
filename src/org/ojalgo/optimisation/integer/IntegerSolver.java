@@ -187,7 +187,7 @@ public abstract class IntegerSolver extends GenericSolver {
 
         final Result tmpCurrentlyTheBest = myBestResultSoFar;
 
-        if (tmpCurrentlyTheBest == null) {
+        if ((tmpCurrentlyTheBest == null) || Double.isNaN(nonIntegerValue)) {
 
             return true;
 

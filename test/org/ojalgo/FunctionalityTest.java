@@ -12,10 +12,7 @@
  */
 package org.ojalgo;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
+import org.ojalgo.access.AccessTests;
 import org.ojalgo.array.ArrayTests;
 import org.ojalgo.constant.ConstantTests;
 import org.ojalgo.finance.FinanceTests;
@@ -40,6 +37,10 @@ import org.ojalgo.scalar.ScalarTests;
 import org.ojalgo.series.SeriesTests;
 import org.ojalgo.type.context.TypeContextTests;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 /**
  * @author apete
  */
@@ -52,6 +53,7 @@ public abstract class FunctionalityTest extends TestCase {
     public static Test suite() {
         final TestSuite suite = new TestSuite("ojAlgo Functionality Tests");
         //$JUnit-BEGIN$
+        suite.addTest(AccessTests.suite());
         suite.addTest(ArrayTests.suite());
         suite.addTest(ConstantTests.suite());
         suite.addTest(MachineTests.suite());

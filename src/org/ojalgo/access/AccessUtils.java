@@ -129,7 +129,7 @@ public abstract class AccessUtils {
             }
 
             public ComplexNumber get(final long index) {
-                return ComplexNumber.valueOf((Number) access.get(index));
+                return ComplexNumber.valueOf(access.get(index));
             }
 
         };
@@ -159,11 +159,11 @@ public abstract class AccessUtils {
             }
 
             public ComplexNumber get(final long index) {
-                return ComplexNumber.valueOf((Number) access.get(index));
+                return ComplexNumber.valueOf(access.get(index));
             }
 
             public ComplexNumber get(final long row, final long column) {
-                return ComplexNumber.valueOf((Number) access.get(row, column));
+                return ComplexNumber.valueOf(access.get(row, column));
             }
 
         };
@@ -189,11 +189,11 @@ public abstract class AccessUtils {
             }
 
             public ComplexNumber get(final long index) {
-                return ComplexNumber.valueOf((Number) access.get(index));
+                return ComplexNumber.valueOf(access.get(index));
             }
 
             public ComplexNumber get(final long[] reference) {
-                return ComplexNumber.valueOf((Number) access.get(reference));
+                return ComplexNumber.valueOf(access.get(reference));
             }
 
             public long[] structure() {
@@ -301,7 +301,7 @@ public abstract class AccessUtils {
             }
 
             public Quaternion get(final long index) {
-                return Quaternion.valueOf((Number) access.get(index));
+                return Quaternion.valueOf(access.get(index));
             }
 
         };
@@ -331,11 +331,11 @@ public abstract class AccessUtils {
             }
 
             public Quaternion get(final long index) {
-                return Quaternion.valueOf((Number) access.get(index));
+                return Quaternion.valueOf(access.get(index));
             }
 
             public Quaternion get(final long row, final long column) {
-                return Quaternion.valueOf((Number) access.get(row, column));
+                return Quaternion.valueOf(access.get(row, column));
             }
 
         };
@@ -361,11 +361,11 @@ public abstract class AccessUtils {
             }
 
             public Quaternion get(final long index) {
-                return Quaternion.valueOf((Number) access.get(index));
+                return Quaternion.valueOf(access.get(index));
             }
 
             public Quaternion get(final long[] reference) {
-                return Quaternion.valueOf((Number) access.get(reference));
+                return Quaternion.valueOf(access.get(reference));
             }
 
             public long[] structure() {
@@ -387,7 +387,7 @@ public abstract class AccessUtils {
             }
 
             public RationalNumber get(final long index) {
-                return RationalNumber.valueOf((Number) access.get(index));
+                return RationalNumber.valueOf(access.get(index));
             }
 
         };
@@ -417,11 +417,11 @@ public abstract class AccessUtils {
             }
 
             public RationalNumber get(final long index) {
-                return RationalNumber.valueOf((Number) access.get(index));
+                return RationalNumber.valueOf(access.get(index));
             }
 
             public RationalNumber get(final long row, final long column) {
-                return RationalNumber.valueOf((Number) access.get(row, column));
+                return RationalNumber.valueOf(access.get(row, column));
             }
 
         };
@@ -447,11 +447,11 @@ public abstract class AccessUtils {
             }
 
             public RationalNumber get(final long index) {
-                return RationalNumber.valueOf((Number) access.get(index));
+                return RationalNumber.valueOf(access.get(index));
             }
 
             public RationalNumber get(final long[] reference) {
-                return RationalNumber.valueOf((Number) access.get(reference));
+                return RationalNumber.valueOf(access.get(reference));
             }
 
             public long[] structure() {
@@ -581,6 +581,10 @@ public abstract class AccessUtils {
         return retVal;
     }
 
+    public static int index(final int structure, final int row, final int column) {
+        return row + (column * structure);
+    }
+
     /**
      * @param structure An access structure
      * @param reference An access element reference
@@ -611,6 +615,10 @@ public abstract class AccessUtils {
             tmpFactor *= structure[i];
         }
         return retVal;
+    }
+
+    public static long index(final long structure, final long row, final long column) {
+        return row + (column * structure);
     }
 
     /**
@@ -658,6 +666,22 @@ public abstract class AccessUtils {
         for (int i = 0; i < count; i++) {
             retVal[i] = first + i;
         }
+        return retVal;
+    }
+
+    public static long[] reference(final long index, final long[] structure) {
+
+        final long[] retVal = new long[structure.length];
+
+        long tmpPrev = 1L;
+        long tmpNext = 1L;
+
+        for (int s = 0; s < structure.length; s++) {
+            tmpNext *= structure[s];
+            retVal[s] = (index % tmpNext) / tmpPrev;
+            tmpPrev = tmpNext;
+        }
+
         return retVal;
     }
 

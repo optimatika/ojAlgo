@@ -21,17 +21,31 @@
  */
 package org.ojalgo.access;
 
-interface StructureAnyD extends Structure1D {
+import org.ojalgo.FunctionalityTest;
 
-    /**
-     * count() == count(0) * count(1) * count(2) * count(3) * ...
-     */
-    default long count() {
-        return AccessUtils.count(this.structure());
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+/**
+ * @author apete
+ */
+public abstract class AccessTests extends FunctionalityTest {
+
+    static final boolean DEBUG = false;
+
+    public static Test suite() {
+        final TestSuite suite = new TestSuite(AccessTests.class.getPackage().getName());
+        //$JUnit-BEGIN$
+        suite.addTestSuite(AccessUtilsTest.class);
+        //$JUnit-END$
+        return suite;
     }
 
-    long count(int dimension);
+    protected AccessTests() {
+        super();
+    }
 
-    long[] structure();
-
+    protected AccessTests(final String name) {
+        super(name);
+    }
 }

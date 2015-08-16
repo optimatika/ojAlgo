@@ -178,6 +178,11 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    default double doubleValue(final long index) {
+        final long tmpStructure = this.countRows();
+        return this.doubleValue(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure));
+    }
+
     /**
      * Extracts one element of this matrix as a double.
      *
@@ -186,6 +191,11 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
      * @return One matrix element
      */
     double doubleValue(long row, long column);
+
+    default N get(final long index) {
+        final long tmpStructure = this.countRows();
+        return this.get(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure));
+    }
 
     N get(long row, long column);
 

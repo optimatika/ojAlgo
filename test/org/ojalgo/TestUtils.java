@@ -23,8 +23,7 @@ package org.ojalgo;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-
-import junit.framework.Assert;
+import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -43,6 +42,8 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
+
+import junit.framework.Assert;
 
 /**
  * JUnitUtils
@@ -112,8 +113,16 @@ public abstract class TestUtils {
         Assert.assertEquals(expected, actual);
     }
 
+    public static void assertEquals(final int[] expected, final int[] actual) {
+        TestUtils.assertEquals(Arrays.toString(expected) + " != " + Arrays.toString(actual), expected, actual);
+    }
+
     public static void assertEquals(final long expected, final long actual) {
         Assert.assertEquals(expected, actual);
+    }
+
+    public static void assertEquals(final long[] expected, final long[] actual) {
+        TestUtils.assertEquals(Arrays.toString(expected) + " != " + Arrays.toString(actual), expected, actual);
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Bidiagonal<N> actual, final NumberContext context) {
@@ -222,6 +231,14 @@ public abstract class TestUtils {
 
     public static void assertEquals(final String message, final int expected, final int actual) {
         Assert.assertEquals(message, expected, actual);
+    }
+
+    public static void assertEquals(final String message, final int[] expected, final int[] actual) {
+        TestUtils.assertTrue(message, Arrays.equals(expected, actual));
+    }
+
+    public static void assertEquals(final String message, final long[] expected, final long[] actual) {
+        TestUtils.assertTrue(message, Arrays.equals(expected, actual));
     }
 
     public static void assertEquals(final String message, final Number expected, final Number actual) {
