@@ -33,31 +33,8 @@ final class MathProgSysGenericIntegration extends MathProgSysModel.Integration<G
         return tmpDelegate.getIntegration().extractSolverState(tmpDelegate);
     }
 
-    public Capabilities getCapabilities() {
-        return new Capabilities() {
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#integerVariables()
-             */
-            public boolean integerVariables() {
-                return true;
-            }
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearConstraints()
-             */
-            public boolean linearConstraints() {
-                return true;
-            }
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearObjective()
-             */
-            public boolean linearObjective() {
-                return true;
-            }
-
-        };
+    public boolean isCapable(final MathProgSysModel model) {
+        return !model.getExpressionsBasedModel().isAnyExpressionQuadratic();
     }
 
     public Result toModelState(final Result solverState, final MathProgSysModel model) {

@@ -29,51 +29,16 @@ final class ExpressionsBasedIntegerIntegration extends ExpressionsBasedModel.Int
         return IntegerSolver.make(model);
     }
 
-    public Capabilities getCapabilities() {
-        return new Capabilities() {
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#integerVariables()
-             */
-            public boolean integerVariables() {
-                return true;
-            }
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearConstraints()
-             */
-            public boolean linearConstraints() {
-                return true;
-            }
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearObjective()
-             */
-            public boolean linearObjective() {
-                return true;
-            }
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#quadraticConstraints()
-             */
-            public boolean quadraticConstraints() {
-                return true;
-            }
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#quadraticObjective()
-             */
-            public boolean quadraticObjective() {
-                return true;
-            }
-
-        };
+    public boolean isCapable(final ExpressionsBasedModel model) {
+        return true;
     }
 
+    @Override
     public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
         return solverState;
     }
 
+    @Override
     public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
         return modelState;
     }

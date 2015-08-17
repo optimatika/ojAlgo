@@ -139,10 +139,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
+    public static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
+
     private static final String NEW_LINE = "\n";
-
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
-
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
     private static final String START_END = "############################################\n";
 
@@ -1053,13 +1053,24 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     ExpressionsBasedModel.Integration<?> getIntegration() {
-        if (this.isAnyVariableInteger()) {
-            return new ExpressionsBasedIntegerIntegration();
-        } else if (this.isAnyExpressionQuadratic()) {
-            return new ExpressionsBasedConvexIntegration();
-        } else {
-            return new ExpressionsBasedLinearIntegration();
+
+        ExpressionsBasedModel.Integration<?> retVal = null;
+
+        for (final ExpressionsBasedModel.Integration<?> tmpIntegration : INTEGRATIONS) {
+            retVal = tmpIntegration;
         }
+
+        if (retVal == null) {
+            if (this.isAnyVariableInteger()) {
+                retVal = new ExpressionsBasedIntegerIntegration();
+            } else if (this.isAnyExpressionQuadratic()) {
+                retVal = new ExpressionsBasedConvexIntegration();
+            } else {
+                retVal = new ExpressionsBasedLinearIntegration();
+            }
+        }
+
+        return retVal;
     }
 
     boolean isFixed() {

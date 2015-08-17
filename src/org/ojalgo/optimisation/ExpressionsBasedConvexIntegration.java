@@ -34,24 +34,8 @@ final class ExpressionsBasedConvexIntegration extends ExpressionsBasedModel.Inte
         return tmpBuilder.build(model.options);
     }
 
-    public Capabilities getCapabilities() {
-        return new Capabilities() {
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearConstraints()
-             */
-            public boolean linearConstraints() {
-                return true;
-            }
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#quadraticObjective()
-             */
-            public boolean quadraticObjective() {
-                return true;
-            }
-
-        };
+    public boolean isCapable(final ExpressionsBasedModel model) {
+        return !model.isAnyVariableInteger() && model.isAnyExpressionQuadratic();
     }
 
 }

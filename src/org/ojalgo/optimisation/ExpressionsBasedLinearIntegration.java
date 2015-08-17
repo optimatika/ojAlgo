@@ -38,26 +38,11 @@ final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Inte
         return tmpBuilder.build(model.options);
     }
 
-    public Capabilities getCapabilities() {
-        return new Capabilities() {
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearConstraints()
-             */
-            public boolean linearConstraints() {
-                return true;
-            }
-
-            /**
-             * @see org.ojalgo.optimisation.Optimisation.Capabilities#linearObjective()
-             */
-            public boolean linearObjective() {
-                return true;
-            }
-
-        };
+    public boolean isCapable(final ExpressionsBasedModel model) {
+        return !(model.isAnyVariableInteger() || model.isAnyExpressionQuadratic());
     }
 
+    @Override
     public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
         final PrimitiveArray tmpModelSolution = PrimitiveArray.make(model.countVariables());
@@ -83,6 +68,7 @@ final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Inte
         return new Result(solverState.getState(), solverState.getValue(), tmpModelSolution);
     }
 
+    @Override
     public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
 
         final List<Variable> tmpPositives = model.getPositiveVariables();

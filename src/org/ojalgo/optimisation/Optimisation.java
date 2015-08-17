@@ -36,42 +36,6 @@ import org.ojalgo.type.context.NumberContext;
 
 public interface Optimisation {
 
-    public static interface Capabilities extends Optimisation {
-
-        default boolean convexConstraints() {
-            return false;
-        }
-
-        default boolean convexObjective() {
-            return false;
-        }
-
-        /**
-         * If this is true then it is assumed that integer variables can be handled in combination with every
-         * other capalility.
-         */
-        default boolean integerVariables() {
-            return false;
-        }
-
-        default boolean linearConstraints() {
-            return this.convexConstraints();
-        }
-
-        default boolean linearObjective() {
-            return this.convexObjective();
-        }
-
-        default boolean quadraticConstraints() {
-            return this.convexConstraints();
-        }
-
-        default boolean quadraticObjective() {
-            return this.convexObjective();
-        }
-
-    }
-
     /**
      * Constraint
      *
@@ -124,9 +88,9 @@ public interface Optimisation {
         Optimisation.Result extractSolverState(M model);
 
         /**
-         * The capabilities of this model solver combination.
+         * @return true if this solver (integration) can handle the input model
          */
-        Capabilities getCapabilities();
+        boolean isCapable(M model);
 
         /**
          * Convert solver state to model state.

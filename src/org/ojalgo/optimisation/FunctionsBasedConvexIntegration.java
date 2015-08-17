@@ -35,10 +35,9 @@ final class FunctionsBasedConvexIntegration extends FunctionsBasedModel.Integrat
         return null;
     }
 
-    public Capabilities getCapabilities() {
-        return new Capabilities() {
-
-        };
+    public boolean isCapable(final FunctionsBasedModel model) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     public Result toModelState(final Result solverState, final FunctionsBasedModel model) {
