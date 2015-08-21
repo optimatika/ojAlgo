@@ -32,7 +32,6 @@ import org.ojalgo.access.Iterator1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.integer.IntegerSolver;
-import org.ojalgo.optimisation.linear.ReportedProblems;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -110,7 +109,8 @@ public interface Optimisation {
 
         /**
          * @return true If eveything is ok
-         * @return false The model is structurally ok, but the "value" breaks constraints - the solution is infeasible.
+         * @return false The model is structurally ok, but the "value" breaks constraints - the solution is
+         *         infeasible.
          */
         boolean validate();
 
@@ -160,27 +160,29 @@ public interface Optimisation {
         public int iterations_abort = Integer.MAX_VALUE;
 
         /**
-         * Calculations will be terminated after this number of iterations if a feasible solution has been found. If no
-         * feasible solution has been found calculations will continue until one is found or
+         * Calculations will be terminated after this number of iterations if a feasible solution has been
+         * found. If no feasible solution has been found calculations will continue until one is found or
          * {@linkplain #iterations_abort} is reached. This option is, probably, only of interest with the
          * {@linkplain IntegerSolver}.
          */
         public int iterations_suffice = Integer.MAX_VALUE;
 
         /**
-         * The (relative) MIP gap is the difference between the best integer solution found so far and a node's
-         * non-integer solution, relative to the optimal value. If the gap is smaller than this value, then the
-         * corresponding branch i terminated as it is deemed unlikely or too "expensive" to find better integer
-         * solutions there.
+         * The (relative) MIP gap is the difference between the best integer solution found so far and a
+         * node's non-integer solution, relative to the optimal value. If the gap is smaller than this value,
+         * then the corresponding branch i terminated as it is deemed unlikely or too "expensive" to find
+         * better integer solutions there.
          */
         public double mip_gap = 1.0E-4;
 
         /**
-         * Used to compare/check objective function values (incl. temporary, phase 1, objectives). The most importatnt
-         * use of this parameter is, with the linear (simplex) solver, to determine if the phase 1 objective function
-         * value is zero or not. Thus it is used to determine if the problem is feasible or not.
+         * Used to compare/check objective function values (incl. temporary, phase 1, objectives). The most
+         * importatnt use of this parameter is, with the linear (simplex) solver, to determine if the phase 1
+         * objective function value is zero or not. Thus it is used to determine if the problem is feasible or
+         * not.
          * <ul>
-         * <li>2015-01-30: Changed from 12,7 to 12,8 to be able to handle {@linkplain ReportedProblems#testP20150127()}</li>
+         * <li>2015-01-30: Changed from 12,7 to 12,8 to be able to handle ReportedProblems#testP20150127()
+         * </li>
          * </ul>
          */
         public NumberContext objective = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
@@ -191,8 +193,8 @@ public interface Optimisation {
         public NumberContext print = NumberContext.getGeneral(8, 10);
 
         /**
-         * Problem parameters; constraints and objectives The numbers used to state/describe the problem, incl. when/if
-         * these are transformed during the solution algorithm.
+         * Problem parameters; constraints and objectives The numbers used to state/describe the problem,
+         * incl. when/if these are transformed during the solution algorithm.
          * <ul>
          * <li>2014-09-29: Changed from 11,9 to 12,8</li>
          * </ul>
@@ -200,34 +202,36 @@ public interface Optimisation {
         public NumberContext problem = new NumberContext(12, 8, RoundingMode.HALF_EVEN);
 
         /**
-         * Used to determine if a constraint is violated or not. Essentially this context determines if the various
-         * validate(...) methods will return true or false. Calculate the slack - zero if the constraint is "active" -
-         * and check the sign.
+         * Used to determine if a constraint is violated or not. Essentially this context determines if the
+         * various validate(...) methods will return true or false. Calculate the slack - zero if the
+         * constraint is "active" - and check the sign.
          */
         public NumberContext slack = new NumberContext(14, 8, RoundingMode.HALF_DOWN);
 
         /**
-         * Used when copying the solver's solution back to the model (converting from double to BigDecimal). Variable
-         * values, dual variable values, lagrange multipliers...
+         * Used when copying the solver's solution back to the model (converting from double to BigDecimal).
+         * Variable values, dual variable values, lagrange multipliers...
          */
         public NumberContext solution = new NumberContext(12, 14, RoundingMode.HALF_DOWN);
 
         /**
-         * The maximmum number of millis allowed for the solve() command. Executions will be aborted regardless of if a
-         * solution has been found or not.
+         * The maximmum number of millis allowed for the solve() command. Executions will be aborted
+         * regardless of if a solution has been found or not.
          */
         public long time_abort = CalendarDateUnit.MILLENIUM.size();
 
         /**
-         * Calculations will be terminated after this amount of time if a feasible solution has been found. If no
-         * feasible solution has been found calculations will continue until one is found or {@linkplain #time_abort} is
-         * reached. This option is , probably, only of interest with the {@linkplain IntegerSolver}.
+         * Calculations will be terminated after this amount of time if a feasible solution has been found. If
+         * no feasible solution has been found calculations will continue until one is found or
+         * {@linkplain #time_abort} is reached. This option is , probably, only of interest with the
+         * {@linkplain IntegerSolver}.
          */
         public long time_suffice = CalendarDateUnit.DAY.size();
 
         /**
-         * If true models and solvers will validate data at various points. Validation is turned off by default. Turning
-         * it on will significantly slow down execution - even very expensive validation may be performed.
+         * If true models and solvers will validate data at various points. Validation is turned off by
+         * default. Turning it on will significantly slow down execution - even very expensive validation may
+         * be performed.
          */
         public boolean validate = false;
 
@@ -365,9 +369,9 @@ public interface Optimisation {
 
     /**
      * <p>
-     * An {@linkplain Optimisation.Solver} instance implements a specific optimisation algorithm. Typically each
-     * algorithm solves problems of (at least) one problem category. {@linkplain Optimisation.Model} represents a
-     * problem category.
+     * An {@linkplain Optimisation.Solver} instance implements a specific optimisation algorithm. Typically
+     * each algorithm solves problems of (at least) one problem category. {@linkplain Optimisation.Model}
+     * represents a problem category.
      * </p>
      * <p>
      * A solver internally works with primitive double.
