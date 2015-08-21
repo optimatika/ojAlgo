@@ -835,12 +835,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      * </P>
      * <p>
      * With direct usage of this method:
+     * </P>
      * <ul>
      * <li>Maximisation/Minimisation is undefined (you don't know which it is)</li>
      * <li>The solution is not written back to the model</li>
      * <li>The solution is not validated by the model</li>
      * </ul>
-     * </P>
      */
     public Optimisation.Result solve(final Optimisation.Result initialSolution) {
 
@@ -1057,7 +1057,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         ExpressionsBasedModel.Integration<?> retVal = null;
 
         for (final ExpressionsBasedModel.Integration<?> tmpIntegration : INTEGRATIONS) {
-            retVal = tmpIntegration;
+            if (tmpIntegration.isCapable(this)) {
+                retVal = tmpIntegration;
+                break;
+            }
         }
 
         if (retVal == null) {

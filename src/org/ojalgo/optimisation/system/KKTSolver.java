@@ -228,7 +228,7 @@ public final class KKTSolver extends Object {
             myLU.decompose(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculated  myLU.compute(tmpA).
             tmpL = myLU.solve(tmpC.subtract(tmpQ.multiply(tmpX)));
 
-        } else if (tmpSolvable = myCholesky.compute(tmpQ)) {
+        } else if (tmpSolvable = myCholesky.compute(tmpQ)) { //TODO Doesn't change inbetween active set iterations
             // Q is SPD
 
             if (!input.isConstrained()) {
@@ -240,13 +240,13 @@ public final class KKTSolver extends Object {
             } else {
                 // Actual/normal optimisation problem
 
-                final MatrixStore<Double> tmpInvQAT = myCholesky.solve(tmpA.transpose());
+                final MatrixStore<Double> tmpInvQAT = myCholesky.solve(tmpA.transpose()); //TODO Only some columns change inbetween active set iterations
 
                 // Negated Schur complement
                 final MatrixStore<Double> tmpS = tmpInvQAT.multiplyLeft(tmpA);
                 if (tmpSolvable = myLU.compute(tmpS)) {
 
-                    final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpC);
+                    final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpC); //TODO Doesn't change inbetween active set iterations
 
                     tmpL = myLU.solve(tmpInvQC.multiplyLeft(tmpA).subtract(tmpB));
                     myCholesky.solve(tmpC.subtract(tmpL.multiplyLeft(tmpA.transpose())), tmpX);
