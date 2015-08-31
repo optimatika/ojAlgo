@@ -30,6 +30,7 @@ import java.nio.DoubleBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
@@ -373,6 +374,41 @@ public class BufferArray extends DenseArray<Double> {
     DenseArray<Double> newInstance(final int capacity) {
         return null;
         // return new MyTestArray(capacity);
+    }
+
+    public Iterator<Double> iterator() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected void add(final int index, final double addend) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void add(final int index, final Number addend) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void fillOne(final int index, final Double value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void visitOne(final int index, final VoidFunction<Double> visitor) {
+        // TODO Auto-generated method stub
+
     }
 
 }

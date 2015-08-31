@@ -66,6 +66,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * 40005.0541</li>
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 4h</li>
      * <li>2013-12-10: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 29min</li>
+     * <li>2015-08-28: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 97min</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMas76()
@@ -76,8 +77,8 @@ public final class MipCase extends OptimisationIntegerTests {
 
     /**
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<2.07405081E7> but
-     * was:<2.2769621121583242E7></li>
+     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<2.07405081E7> but was:
+     * <2.2769621121583242E7></li>
      * </ul>
      *
      * @see RelaxedLpCase#testModglob()
@@ -88,7 +89,8 @@ public final class MipCase extends OptimisationIntegerTests {
 
     /**
      * <ul>
-     * <li>2015-02-08: MacPro (suffice=4h abort=8h) Stopped after 4.75h: expected:<54.76> but was:<220.69></li>
+     * <li>2015-02-08: MacPro (suffice=4h abort=8h) Stopped after 4.75h: expected:<54.76> but was:<220.69>
+     * </li>
      * </ul>
      *
      * @see RelaxedLpCase#testNeos911880()
@@ -126,6 +128,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2013-11-23: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 546s</li>
      * <li>2013-12-03: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 475s</li>
      * <li>2013-12-08: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
+     * <li>2015-08-28: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 411s</li>
      * </ul>
      *
      * @see RelaxedLpCase#testPk1()
@@ -159,9 +162,10 @@ public final class MipCase extends OptimisationIntegerTests {
 
     /**
      * <ul>
-     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Terminated immediately, and stated "Solution Not Valid!"</li>
-     * <li>2013-11-24: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<764772.0> but
-     * was:<1012900.999999></li>
+     * <li>2013-04-01: MacPro (suffice=4h abort=8h) Terminated immediately, and stated "Solution Not Valid!"
+     * </li>
+     * <li>2013-11-24: MacPro (suffice=4h abort=8h) Stopped after 4h expected:<764772.0> but was:
+     * <1012900.999999></li>
      * </ul>
      *
      * @see RelaxedLpCase#testTimtab1()

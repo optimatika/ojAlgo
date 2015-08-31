@@ -38,20 +38,14 @@ import org.ojalgo.optimisation.Optimisation;
  *
  * @author apete
  */
-public final class KKTSolver extends KKTSystem {
+public class KKTSolver2 extends KKTSystem {
 
     private final Cholesky<Double> myCholesky;
     private final LU<Double> myLU;
 
-    public KKTSolver() {
+    private transient PrimitiveDenseStore myX = null;
 
-        super();
-
-        myCholesky = Cholesky.makePrimitive();
-        myLU = LU.makePrimitive();
-    }
-
-    public KKTSolver(final KKTSystem.Input template) {
+    public KKTSolver2(final KKTSystem.Input template) {
 
         super();
 
@@ -59,15 +53,12 @@ public final class KKTSolver extends KKTSystem {
 
         myCholesky = Cholesky.make(tmpQ);
         myLU = LU.make(tmpQ);
+
+        myCholesky.compute(tmpQ);
     }
 
-    private transient PrimitiveDenseStore myX = null;
-
-    PrimitiveDenseStore getX(final KKTSystem.Input input) {
-        if (myX == null) {
-            myX = PrimitiveDenseStore.FACTORY.makeZero(input.getQ().countRows(), 1L);
-        }
-        return myX;
+    KKTSolver2() {
+        this(null);
     }
 
     @Override
@@ -94,7 +85,7 @@ public final class KKTSolver extends KKTSystem {
             myLU.decompose(tmpA.transpose()); //TODO Shouldn't have to do this. Can solve directly with the already calculated  myLU.compute(tmpA).
             tmpL = myLU.solve(tmpC.subtract(tmpQ.multiply(tmpX)));
 
-        } else if (tmpSolvable = myCholesky.compute(tmpQ)) { //TODO Doesn't change inbetween active set iterations
+        } else if (tmpSolvable = myCholesky.isSolvable()) { // TODO Doesn't change inbetween active set iterations
             // Q is SPD
 
             if (!input.isConstrained()) {
@@ -106,13 +97,13 @@ public final class KKTSolver extends KKTSystem {
             } else {
                 // Actual/normal optimisation problem
 
-                final MatrixStore<Double> tmpInvQAT = myCholesky.solve(tmpA.transpose()); //TODO Only some columns change inbetween active set iterations
+                final MatrixStore<Double> tmpInvQAT = myCholesky.solve(tmpA.transpose()); //TODO Only some columns change inbetween active set iterations, precalculate all columns and only select which at active set iteration
 
                 // Negated Schur complement
-                final MatrixStore<Double> tmpS = tmpInvQAT.multiplyLeft(tmpA);
+                final MatrixStore<Double> tmpS = tmpInvQAT.multiplyLeft(tmpA); //TODO Selection of rows/columns based on active set
                 if (tmpSolvable = myLU.compute(tmpS)) {
 
-                    final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpC);
+                    final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpC); //TODO Constant if C doesn't change
 
                     tmpL = myLU.solve(tmpInvQC.multiplyLeft(tmpA).subtract(tmpB));
                     myCholesky.solve(tmpC.subtract(tmpL.multiplyLeft(tmpA.transpose())), tmpX);
@@ -203,6 +194,13 @@ public final class KKTSolver extends KKTSystem {
                 throw new IllegalArgumentException("A must have full (row) rank!");
             }
         }
+    }
+
+    PrimitiveDenseStore getX(final KKTSystem.Input input) {
+        if (myX == null) {
+            myX = PrimitiveDenseStore.FACTORY.makeZero(input.getQ().countRows(), 1L);
+        }
+        return myX;
     }
 
 }

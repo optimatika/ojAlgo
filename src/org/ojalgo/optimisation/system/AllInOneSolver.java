@@ -19,43 +19,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.store;
+package org.ojalgo.optimisation.system;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.task.SolverTask;
+import org.ojalgo.matrix.task.TaskException;
+import org.ojalgo.optimisation.Optimisation;
 
-public final class LowerHermitianStore<N extends Number> extends ShadingStore<N> {
+public class AllInOneSolver extends KKTSystem {
 
-    public LowerHermitianStore(final MatrixStore<N> base) {
-        super((int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()), base);
+    public AllInOneSolver() {
+        super();
     }
 
-    @SuppressWarnings("unused")
-    private LowerHermitianStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
+    @Override
+    public KKTSystem.Output solve(final KKTSystem.Input input, final Optimisation.Options options) {
 
-        this(base);
+        boolean tmpSolvable = false;
+        MatrixStore<Double> tmpSolution = null;
 
-        ProgrammingError.throwForIllegalInvocation();
-    }
+        final MatrixStore<Double> tmpKKT = input.getKKT();
+        final MatrixStore<Double> tmpRHS = input.getRHS();
+        final SolverTask<Double> tmpSolver = SolverTask.PRIMITIVE.make(tmpKKT, tmpRHS);
 
-    public double doubleValue(final long row, final long col) {
-        if (row < col) {
-            return this.getBase().doubleValue(col, row);
-        } else {
-            return this.getBase().doubleValue(row, col);
+        try {
+            tmpSolution = tmpSolver.solve(tmpKKT, tmpRHS);
+            tmpSolvable = true;
+        } catch (final TaskException exception) {
+            tmpSolvable = false;
         }
-    }
 
-    public N get(final long row, final long col) {
-        return this.toScalar(row, col).getNumber();
-    }
-
-    public Scalar<N> toScalar(final long row, final long col) {
-        if (row < col) {
-            return this.getBase().toScalar(col, row).conjugate();
+        if (tmpSolvable && (tmpSolution != null)) {
+            return null;
         } else {
-            return this.getBase().toScalar(row, col);
+            return KKTSystem.FAILURE;
         }
+
     }
 
 }

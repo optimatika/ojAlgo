@@ -236,6 +236,14 @@ public abstract class MatrixUtils {
         // Check that Q is orthogonal/unitary...
     }
 
+    public static final int firstInColumn(final Access1D<?> matrix, final int col) {
+        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).firstInColumn(col) : 0;
+    }
+
+    public static final int firstInRow(final Access1D<?> matrix, final int row) {
+        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).firstInRow(row) : 0;
+    }
+
     public static <N extends Number> int hashCode(final BasicMatrix matrix) {
         return AccessUtils.hashCode(matrix);
     }
@@ -292,6 +300,14 @@ public abstract class MatrixUtils {
 
     public static final boolean isUpperRightShaded(final Access1D<?> matrix) {
         return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).isUpperRightShaded() : false;
+    }
+
+    public static final int limitOfColumn(final Access1D<?> matrix, final int col, final int defaultLimit) {
+        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).limitOfColumn(col) : defaultLimit;
+    }
+
+    public static final int limitOfRow(final Access1D<?> matrix, final int row, final int defaultLimit) {
+        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).limitOfRow(row) : defaultLimit;
     }
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int aRowDim, final int aColDim) {
@@ -506,20 +522,16 @@ public abstract class MatrixUtils {
                 return matrix.countRows();
             }
 
-            public double doubleValue(final long anInd) {
-                return matrix.doubleValue(anInd);
+            public double doubleValue(final long ind) {
+                return matrix.doubleValue(ind);
             }
 
-            public double doubleValue(final long aRow, final long aCol) {
-                return matrix.doubleValue(aRow, aCol);
+            public double doubleValue(final long row, final long col) {
+                return matrix.doubleValue(row, col);
             }
 
-            public BigDecimal get(final long index) {
-                return this.get(AccessUtils.row(index, matrix.countRows()), AccessUtils.column(index, matrix.countRows()));
-            }
-
-            public BigDecimal get(final long aRow, final long aCol) {
-                return matrix.toBigDecimal((int) aRow, (int) aCol);
+            public BigDecimal get(final long row, final long col) {
+                return matrix.toBigDecimal((int) row, (int) col);
             }
 
             public int size() {
@@ -544,20 +556,16 @@ public abstract class MatrixUtils {
                 return matrix.countRows();
             }
 
-            public double doubleValue(final long anInd) {
-                return matrix.doubleValue(anInd);
+            public double doubleValue(final long ind) {
+                return matrix.doubleValue(ind);
             }
 
-            public double doubleValue(final long aRow, final long aCol) {
-                return matrix.doubleValue(aRow, aCol);
+            public double doubleValue(final long row, final long col) {
+                return matrix.doubleValue(row, col);
             }
 
-            public ComplexNumber get(final long index) {
-                return this.get(AccessUtils.row(index, matrix.countRows()), AccessUtils.column(index, matrix.countRows()));
-            }
-
-            public ComplexNumber get(final long aRow, final long aCol) {
-                return matrix.toComplexNumber((int) aRow, (int) aCol);
+            public ComplexNumber get(final long row, final long col) {
+                return matrix.toComplexNumber((int) row, (int) col);
             }
 
             public int size() {
@@ -582,20 +590,16 @@ public abstract class MatrixUtils {
                 return matrix.countRows();
             }
 
-            public double doubleValue(final long anInd) {
-                return matrix.doubleValue(anInd);
+            public double doubleValue(final long ind) {
+                return matrix.doubleValue(ind);
             }
 
-            public double doubleValue(final long aRow, final long aCol) {
-                return matrix.doubleValue(aRow, aCol);
+            public double doubleValue(final long row, final long col) {
+                return matrix.doubleValue(row, col);
             }
 
-            public Double get(final long index) {
-                return this.get(AccessUtils.row(index, matrix.countRows()), AccessUtils.column(index, matrix.countRows()));
-            }
-
-            public Double get(final long aRow, final long aCol) {
-                return matrix.doubleValue(aRow, aCol);
+            public Double get(final long row, final long col) {
+                return matrix.doubleValue(row, col);
             }
 
             public int size() {

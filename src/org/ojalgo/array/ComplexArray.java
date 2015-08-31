@@ -97,6 +97,16 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
     }
 
     @Override
+    protected final void add(final int index, final double addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
+    protected final void add(final int index, final Number addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
     protected int indexOfLargest(final int first, final int limit, final int step) {
 
         int retVal = first;
@@ -125,18 +135,18 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
     }
 
     @Override
-    protected void set(final int index, final double value) {
-        data[index] = ComplexNumber.valueOf(value);
-    }
-
-    @Override
-    protected void set(final int index, final Number value) {
-        data[index] = ComplexNumber.valueOf(value);
-    }
-
-    @Override
     DenseArray<ComplexNumber> newInstance(final int capacity) {
         return new ComplexArray(capacity);
+    }
+
+    @Override
+    ComplexNumber valueOf(final double value) {
+        return ComplexNumber.valueOf(value);
+    }
+
+    @Override
+    ComplexNumber valueOf(final Number number) {
+        return ComplexNumber.valueOf(number);
     }
 
 }

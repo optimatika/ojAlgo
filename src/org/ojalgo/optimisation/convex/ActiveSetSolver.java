@@ -26,17 +26,13 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
-import org.ojalgo.matrix.store.AboveBelowStore;
 import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.RowsStore;
-import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.LinearSolver;
-import org.ojalgo.optimisation.system.KKTSolver;
-import org.ojalgo.optimisation.system.KKTSolver.Input;
-import org.ojalgo.optimisation.system.KKTSolver.Output;
+import org.ojalgo.optimisation.system.KKTSystem;
+import org.ojalgo.optimisation.system.KKTSystem.Input;
 import org.ojalgo.type.IndexSelector;
 
 /**
@@ -46,10 +42,11 @@ import org.ojalgo.type.IndexSelector;
  * when [AE][X] == [BE]<br>
  * and [AI][X] &lt;= [BI]
  * </p>
+ * Where [AE] and [BE] are optinal.
  *
  * @author apete
  */
-final class ActiveSetSolver extends ConvexSolver {
+abstract class ActiveSetSolver extends ConvexSolver {
 
     private final IndexSelector myActivator;
 
@@ -376,9 +373,9 @@ final class ActiveSetSolver extends ConvexSolver {
 
         myConstraintToInclude = -1;
 
-        final Input tmpInput = this.buildDelegateSolverInput();
-        final KKTSolver tmpSolver = this.getDelegateSolver(tmpInput);
-        final Output tmpOutput = tmpSolver.solve(tmpInput, options);
+        final KKTSystem.Input tmpInput = this.buildDelegateSolverInput();
+        final KKTSystem tmpSolver = this.getDelegateSolver(tmpInput);
+        final KKTSystem.Output tmpOutput = tmpSolver.solve(tmpInput, options);
 
         if (this.isDebug()) {
             this.debug("X/L: {}", tmpOutput);
@@ -503,31 +500,10 @@ final class ActiveSetSolver extends ConvexSolver {
     }
 
     @Override
-    KKTSolver.Input buildDelegateSolverInput() {
-
-        MatrixStore<Double> tmpSubAE = null;
-        final MatrixStore<Double> tmpSubQ = this.getQ();
-        final MatrixStore<Double> tmpSubC = this.getC();
-
-        final int[] tmpActivator = myActivator.getIncluded();
-
-        if (tmpActivator.length == 0) {
-            if (this.hasEqualityConstraints()) {
-                tmpSubAE = this.getAE();
-            } else {
-                tmpSubAE = ZeroStore.makePrimitive(0, (int) tmpSubC.countRows());
-            }
-        } else {
-            if (this.hasEqualityConstraints()) {
-                tmpSubAE = new AboveBelowStore<Double>(this.getAE(), new RowsStore<Double>(this.getAI(), tmpActivator));
-            } else {
-                tmpSubAE = new RowsStore<Double>(this.getAI(), tmpActivator);
-            }
-        }
-
-        final PhysicalStore<Double> tmpX = this.getX();
-
-        return new KKTSolver.Input(tmpSubQ, tmpSubC.subtract(tmpSubQ.multiply(tmpX)), tmpSubAE, ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1));
+    final KKTSystem.Input buildDelegateSolverInput() {
+        return this.buildDelegateSolverInput(myActivator.getIncluded());
     }
+
+    abstract Input buildDelegateSolverInput(int[] included);
 
 }

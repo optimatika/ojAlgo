@@ -97,6 +97,16 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
     }
 
     @Override
+    protected final void add(final int index, final double addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
+    protected final void add(final int index, final Number addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
     protected int indexOfLargest(final int first, final int limit, final int step) {
 
         int retVal = first;
@@ -125,18 +135,18 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
     }
 
     @Override
-    protected void set(final int index, final double value) {
-        data[index] = Quaternion.valueOf(value);
-    }
-
-    @Override
-    protected void set(final int index, final Number value) {
-        data[index] = Quaternion.valueOf(value);
-    }
-
-    @Override
     DenseArray<Quaternion> newInstance(final int capacity) {
         return new QuaternionArray(capacity);
+    }
+
+    @Override
+    final Quaternion valueOf(final double value) {
+        return Quaternion.valueOf(value);
+    }
+
+    @Override
+    final Quaternion valueOf(final Number number) {
+        return Quaternion.valueOf(number);
     }
 
 }

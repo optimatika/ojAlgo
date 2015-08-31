@@ -26,8 +26,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.system.KKTSolver;
-import org.ojalgo.optimisation.system.KKTSolver.Input;
+import org.ojalgo.optimisation.system.KKTSystem;
 
 /**
  * Solves optimisation problems of the form:
@@ -83,11 +82,11 @@ final class QPESolver extends ConvexSolver {
     @Override
     protected void performIteration() {
 
-        final KKTSolver.Input tmpInput = this.buildDelegateSolverInput();
+        final KKTSystem.Input tmpInput = this.buildDelegateSolverInput();
 
-        final KKTSolver tmpSolver = this.getDelegateSolver(tmpInput);
+        final KKTSystem tmpSolver = this.getDelegateSolver(tmpInput);
 
-        final KKTSolver.Output tmpOutput = tmpSolver.solve(tmpInput, options);
+        final KKTSystem.Output tmpOutput = tmpSolver.solve(tmpInput, options);
 
         if (tmpOutput.isSolvable()) {
 
@@ -107,7 +106,7 @@ final class QPESolver extends ConvexSolver {
     }
 
     @Override
-    Input buildDelegateSolverInput() {
+    KKTSystem.Input buildDelegateSolverInput() {
 
         final MatrixStore<Double> tmpQ = this.getQ();
         final MatrixStore<Double> tmpC = this.getC();
@@ -117,13 +116,13 @@ final class QPESolver extends ConvexSolver {
 
             final PhysicalStore<Double> tmpX = this.getX();
 
-            return new KKTSolver.Input(tmpQ, tmpC.subtract(tmpQ.multiply(tmpX)), tmpA, ZeroStore.makePrimitive((int) tmpA.countRows(), 1));
+            return new KKTSystem.Input(tmpQ, tmpC.subtract(tmpQ.multiply(tmpX)), tmpA, ZeroStore.makePrimitive((int) tmpA.countRows(), 1));
 
         } else {
 
             final MatrixStore<Double> tmpB = this.getBE();
 
-            return new KKTSolver.Input(tmpQ, tmpC, tmpA, tmpB);
+            return new KKTSystem.Input(tmpQ, tmpC, tmpA, tmpB);
         }
     }
 

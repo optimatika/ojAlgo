@@ -21,9 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.scalar.Scalar;
 
 class BinaryOperatorStore<N extends Number> extends LogicalStore<N> {
 
@@ -52,20 +50,6 @@ class BinaryOperatorStore<N extends Number> extends LogicalStore<N> {
 
     public N get(final long row, final long col) {
         return myFunction.invoke(this.getBase().get(row, col), myRight.get(row, col));
-    }
-
-    public boolean isLowerLeftShaded() {
-        return this.getBase().isLowerLeftShaded() && myRight.isLowerLeftShaded()
-                && (myFunction.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO) == PrimitiveMath.ZERO);
-    }
-
-    public boolean isUpperRightShaded() {
-        return this.getBase().isUpperRightShaded() && myRight.isUpperRightShaded()
-                && (myFunction.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO) == PrimitiveMath.ZERO);
-    }
-
-    public Scalar<N> toScalar(final long row, final long column) {
-        return this.factory().scalar().convert(this.get(row, column));
     }
 
 }

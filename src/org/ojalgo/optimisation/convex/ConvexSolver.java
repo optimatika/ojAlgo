@@ -38,7 +38,8 @@ import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.system.KKTSolver;
+import org.ojalgo.optimisation.system.KKTSolver2;
+import org.ojalgo.optimisation.system.KKTSystem;
 
 /**
  * ConvexSolver solves optimisation problems of the form:
@@ -95,7 +96,11 @@ public abstract class ConvexSolver extends BaseSolver {
             this.validate();
 
             if (this.hasInequalityConstraints()) {
-                return new ActiveSetSolver(this, options);
+                if (this.hasEqualityConstraints()) {
+                    return new MixedASS(this, options);
+                } else {
+                    return new PureASS(this, options);
+                }
             } else if (this.hasEqualityConstraints()) {
                 return new QPESolver(this, options);
             } else {
@@ -283,7 +288,7 @@ public abstract class ConvexSolver extends BaseSolver {
         return ConvexSolver.getBuilder().objective(Q, C);
     }
 
-    private transient KKTSolver myDelegateSolver = null;
+    private transient KKTSystem myDelegateSolver = null;
 
     protected ConvexSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
         super(matrices, solverOptions);
@@ -340,11 +345,11 @@ public abstract class ConvexSolver extends BaseSolver {
         return true;
     }
 
-    abstract KKTSolver.Input buildDelegateSolverInput();
+    abstract KKTSystem.Input buildDelegateSolverInput();
 
-    final KKTSolver getDelegateSolver(final KKTSolver.Input template) {
+    final KKTSystem getDelegateSolver(final KKTSystem.Input template) {
         if (myDelegateSolver == null) {
-            myDelegateSolver = new KKTSolver(template);
+            myDelegateSolver = new KKTSolver2(template);
         }
         return myDelegateSolver;
     }

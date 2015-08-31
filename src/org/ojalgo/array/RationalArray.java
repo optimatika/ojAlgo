@@ -94,6 +94,16 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
     }
 
     @Override
+    protected final void add(final int index, final double addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
+    protected final void add(final int index, final Number addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
     protected int indexOfLargest(final int first, final int limit, final int step) {
 
         int retVal = first;
@@ -122,18 +132,18 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
     }
 
     @Override
-    protected void set(final int index, final double value) {
-        data[index] = new RationalNumber(value);
-    }
-
-    @Override
-    protected void set(final int index, final Number value) {
-        data[index] = RationalNumber.valueOf(value);
-    }
-
-    @Override
     DenseArray<RationalNumber> newInstance(final int capacity) {
         return new RationalArray(capacity);
+    }
+
+    @Override
+    final RationalNumber valueOf(final double value) {
+        return RationalNumber.valueOf(value);
+    }
+
+    @Override
+    final RationalNumber valueOf(final Number number) {
+        return RationalNumber.valueOf(number);
     }
 
 }

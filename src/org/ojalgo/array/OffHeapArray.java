@@ -282,4 +282,29 @@ public final class OffHeapArray extends BasicArray<Double> {
         return true;
     }
 
+    public void fillOne(final long index, final Double value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void fillOne(final long index, final NullaryFunction<Double> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void add(final long index, final double addend) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void add(final long index, final Number addend) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void visitOne(final long index, final VoidFunction<Double> visitor) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

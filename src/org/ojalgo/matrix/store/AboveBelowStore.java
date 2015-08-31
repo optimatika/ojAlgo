@@ -67,16 +67,26 @@ public final class AboveBelowStore<N extends Number> extends DelegatingStore<N> 
         return (row >= mySplit) ? myBelow.doubleValue(row - mySplit, column) : this.getBase().doubleValue(row, column);
     }
 
+    public int firstInColumn(final int col) {
+        return this.getBase().firstInColumn(col);
+    }
+
+    public int firstInRow(final int row) {
+        return (row < mySplit) ? this.getBase().firstInRow(row) : myBelow.firstInRow(row);
+    }
+
     public N get(final long row, final long column) {
         return (row >= mySplit) ? myBelow.get(row - mySplit, column) : this.getBase().get(row, column);
     }
 
-    public boolean isLowerLeftShaded() {
-        return false;
+    @Override
+    public int limitOfColumn(final int col) {
+        return myBelow.limitOfColumn(col);
     }
 
-    public boolean isUpperRightShaded() {
-        return this.getBase().isUpperRightShaded();
+    @Override
+    public int limitOfRow(final int row) {
+        return (row < mySplit) ? this.getBase().limitOfRow(row) : myBelow.limitOfRow(row);
     }
 
     @Override

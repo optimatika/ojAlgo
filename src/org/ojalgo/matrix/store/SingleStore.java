@@ -124,14 +124,6 @@ public final class SingleStore<N extends Number> extends FactoryStore<N> {
         return myNumber;
     }
 
-    public boolean isLowerLeftShaded() {
-        return true;
-    }
-
-    public boolean isUpperRightShaded() {
-        return true;
-    }
-
     @Override
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
 

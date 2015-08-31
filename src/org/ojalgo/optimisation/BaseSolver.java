@@ -853,13 +853,30 @@ public abstract class BaseSolver extends GenericSolver {
 
     protected MatrixStore<Double> getQ() {
         if (myModifiedQ == null) {
+
             final MatrixStore<Double> tmpQ = myMatrices.getQ();
+
             myModifiedQ = tmpQ instanceof PhysicalStore ? (PhysicalStore<Double>) tmpQ : tmpQ.copy();
+
             //            final double tmpLargest = myModifiedQ.aggregateAll(Aggregator.LARGEST);
             //            final double tmpRelativelySmall = MACHINE_EPSILON * tmpLargest;
-            //            final double tmpPracticalLimit = 1E-14 / THREE;
-            //            final double tmpSmallToAdd = Math.max(tmpRelativelySmall, tmpPracticalLimit);
-            //            myModifiedQ.modifyDiagonal(0, 0, PrimitiveFunction.ADD.second(tmpSmallToAdd));
+            //
+            //            if (myMatrices.hasEqualityConstraints()) {
+            //
+            //                final AggregatorFunction<Double> tmpVisitor = PrimitiveAggregator.SUM2.get();
+            //
+            //                for (int j = 0; j < myMatrices.countVariables(); j++) {
+            //                    tmpVisitor.reset();
+            //                    myMatrices.getAE().visitColumn(0L, j, tmpVisitor);
+            //                    final double tmpDoubleValue = 1.0 + tmpVisitor.doubleValue();
+            //                    myModifiedQ.modifyOne(j, j, PrimitiveFunction.ADD.second(tmpRelativelySmall / tmpDoubleValue));
+            //                }
+            //
+            //            } else {
+            //
+            //                myModifiedQ.modifyDiagonal(0, 0, PrimitiveFunction.ADD.second(tmpRelativelySmall));
+            //            }
+
         }
         return myModifiedQ;
     }

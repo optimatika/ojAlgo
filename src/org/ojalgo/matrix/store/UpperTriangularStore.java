@@ -64,14 +64,6 @@ public final class UpperTriangularStore<N extends Number> extends ShadingStore<N
         }
     }
 
-    public boolean isLowerLeftShaded() {
-        return true;
-    }
-
-    public boolean isUpperRightShaded() {
-        return false;
-    }
-
     public Scalar<N> toScalar(final long row, final long col) {
         if (row > col) {
             return this.factory().scalar().zero();
@@ -81,4 +73,14 @@ public final class UpperTriangularStore<N extends Number> extends ShadingStore<N
             return this.getBase().toScalar(row, col);
         }
     }
+
+    public int firstInRow(final int row) {
+        return row;
+    }
+
+    @Override
+    public int limitOfColumn(final int col) {
+        return col + 1;
+    }
+
 }

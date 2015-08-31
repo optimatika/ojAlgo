@@ -61,7 +61,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    private static final int INITIAL_CAPACITY = 7;
+    private static final int INITIAL_CAPACITY = 97;
 
     static final SparseFactory<BigDecimal> BIG = new SparseFactory<BigDecimal>() {
 
@@ -199,6 +199,16 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         myZeroValue = myZeroNumber.doubleValue();
     }
 
+    public void add(final long index, final double addend) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void add(final long index, final Number addend) {
+        // TODO Auto-generated method stub
+
+    }
+
     public final long count() {
         return myCount;
     }
@@ -259,6 +269,16 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    public void fillOne(final long index, final N value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
     @Override
     public void fillRange(final long first, final long limit, final N value) {
         this.fill(first, limit, 1L, value);
@@ -267,6 +287,15 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
         this.fill(first, limit, 1L, supplier);
+    }
+
+    public long firstInRange(final long rangeFirst, final long rangeLimit) {
+        final int tmpFoundAt = this.index(rangeFirst);
+        if (tmpFoundAt < 0) {
+            return Math.min(myIndices[-tmpFoundAt + 1], rangeLimit);
+        } else {
+            return rangeFirst;
+        }
     }
 
     @Override
@@ -303,6 +332,15 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             return myValues.isZero(tmpIndex);
         } else {
             return true;
+        }
+    }
+
+    public long limitOfRange(final long rangeFirst, final long rangeLimit) {
+        final int tmpFoundAt = this.index(rangeLimit - 1L);
+        if (tmpFoundAt < 0) {
+            return Math.max(rangeFirst, myIndices[-tmpFoundAt] + 1L);
+        } else {
+            return rangeLimit;
         }
     }
 
@@ -432,6 +470,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
                 myActualLength++;
             }
         }
+    }
+
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

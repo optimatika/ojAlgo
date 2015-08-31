@@ -121,14 +121,6 @@ public final class IdentityStore<N extends Number> extends FactoryStore<N> {
         }
     }
 
-    public boolean isLowerLeftShaded() {
-        return true;
-    }
-
-    public boolean isUpperRightShaded() {
-        return true;
-    }
-
     @Override
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
         if (leftMtrx.count() == this.getRowDim()) {
@@ -162,6 +154,24 @@ public final class IdentityStore<N extends Number> extends FactoryStore<N> {
     @Override
     public PhysicalStore<N> transpose() {
         return this.factory().makeEye(myDim, myDim);
+    }
+
+    public int firstInColumn(final int col) {
+        return col;
+    }
+
+    public int firstInRow(final int row) {
+        return row;
+    }
+
+    @Override
+    public int limitOfColumn(final int col) {
+        return col + 1;
+    }
+
+    @Override
+    public int limitOfRow(final int row) {
+        return row + 1;
     }
 
 }

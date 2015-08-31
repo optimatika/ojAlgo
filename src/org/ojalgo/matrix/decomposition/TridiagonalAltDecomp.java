@@ -30,7 +30,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
 
-class TridiagonalAltDecomp extends InPlaceDecomposition<Double> implements Tridiagonal<Double> {
+class TridiagonalAltDecomp extends InPlaceDecomposition<Double>implements Tridiagonal<Double> {
 
     BasicArray<Double> myMain;
     BasicArray<Double> myOff;
@@ -43,10 +43,8 @@ class TridiagonalAltDecomp extends InPlaceDecomposition<Double> implements Tridi
 
         this.setInPlace(matrix);
 
-        final PrimitiveDenseStore tmpStore = (PrimitiveDenseStore) this.getInPlace();
-
-        myMain = PrimitiveArray.make(tmpStore.getMinDim());
-        myOff = PrimitiveArray.make(tmpStore.getMinDim());
+        myMain = PrimitiveArray.make(this.getMinDim());
+        myOff = PrimitiveArray.make(this.getMinDim());
 
         this.getInPlace().tred2(myMain, myOff, true);
 

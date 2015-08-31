@@ -19,43 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.store;
+package org.ojalgo.optimisation.system;
 
-import org.ojalgo.ProgrammingError;
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.optimisation.Optimisation.Options;
 
-public final class LowerHermitianStore<N extends Number> extends ShadingStore<N> {
+public class SolverEI extends KKTSolver2 {
 
-    public LowerHermitianStore(final MatrixStore<N> base) {
-        super((int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()), base);
+    public SolverEI() {
+        super();
     }
 
-    @SuppressWarnings("unused")
-    private LowerHermitianStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
-
-        this(base);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
-    public double doubleValue(final long row, final long col) {
-        if (row < col) {
-            return this.getBase().doubleValue(col, row);
-        } else {
-            return this.getBase().doubleValue(row, col);
-        }
-    }
-
-    public N get(final long row, final long col) {
-        return this.toScalar(row, col).getNumber();
-    }
-
-    public Scalar<N> toScalar(final long row, final long col) {
-        if (row < col) {
-            return this.getBase().toScalar(col, row).conjugate();
-        } else {
-            return this.getBase().toScalar(row, col);
-        }
+    @Override
+    public Output solve(final Input input, final Options options) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

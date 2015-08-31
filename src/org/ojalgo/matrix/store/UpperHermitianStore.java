@@ -50,14 +50,6 @@ public final class UpperHermitianStore<N extends Number> extends ShadingStore<N>
         return this.toScalar(row, col).getNumber();
     }
 
-    public boolean isLowerLeftShaded() {
-        return false;
-    }
-
-    public boolean isUpperRightShaded() {
-        return false;
-    }
-
     public Scalar<N> toScalar(final long row, final long col) {
         if (row > col) {
             return this.getBase().toScalar(col, row).conjugate();

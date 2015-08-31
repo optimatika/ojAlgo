@@ -37,8 +37,8 @@ import org.ojalgo.scalar.Scalar;
  */
 public final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
 
-    private final int mySplit;
     private final MatrixStore<N> myRight;
+    private final int mySplit;
 
     public LeftRightStore(final MatrixStore<N> base, final MatrixStore<N> right) {
 
@@ -67,16 +67,26 @@ public final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
         return (column >= mySplit) ? myRight.doubleValue(row, column - mySplit) : this.getBase().doubleValue(row, column);
     }
 
+    public int firstInColumn(final int col) {
+        return (col < mySplit) ? this.getBase().firstInColumn(col) : myRight.firstInColumn(col);
+    }
+
+    public int firstInRow(final int row) {
+        return this.getBase().firstInRow(row);
+    }
+
     public N get(final long row, final long column) {
         return (column >= mySplit) ? myRight.get(row, column - mySplit) : this.getBase().get(row, column);
     }
 
-    public boolean isLowerLeftShaded() {
-        return this.getBase().isLowerLeftShaded();
+    @Override
+    public int limitOfColumn(final int col) {
+        return (col < mySplit) ? this.getBase().limitOfColumn(col) : myRight.limitOfColumn(col);
     }
 
-    public boolean isUpperRightShaded() {
-        return false;
+    @Override
+    public int limitOfRow(final int row) {
+        return myRight.limitOfRow(row);
     }
 
     @Override

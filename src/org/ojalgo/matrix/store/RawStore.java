@@ -630,6 +630,14 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
+    public void add(final long row, final long column, final double addend) {
+        data[(int) row][(int) column] += addend;
+    }
+
+    public void add(final long row, final long column, final Number addend) {
+        data[(int) row][(int) column] += addend.doubleValue();
+    }
+
     public Double aggregateAll(final Aggregator aggregator) {
 
         final AggregatorFunction<Double> tmpVisitor = aggregator.getPrimitiveFunction();
@@ -719,10 +727,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return data.length;
     }
 
-    public double doubleValue(final long anInd) {
-        return this.get(AccessUtils.row((int) anInd, data.length), AccessUtils.column((int) anInd, data.length));
-    }
-
     public double doubleValue(final long row, final long column) {
         return this.get((int) row, (int) column);
     }
@@ -775,10 +779,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public void fillColumn(final long row, final long column, final NullaryFunction<Double> supplier) {
         ArrayUtils.fillColumn(data, (int) row, (int) column, supplier);
-    }
-
-    public void fillConjugated(final Access2D<? extends Number> source) {
-        this.fillTransposed(source);
     }
 
     public void fillDiagonal(final long row, final long column, final Double value) {
@@ -897,6 +897,14 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.fillMatching(data, aLeftArg, function, RawStore.convert(aRightArg, data.length).data);
     }
 
+    public void fillOne(final long row, final long column, final Double value) {
+        data[(int) row][(int) column] = value;
+    }
+
+    public void fillOne(final long row, final long column, final NullaryFunction<Double> supplier) {
+        data[(int) row][(int) column] = supplier.doubleValue();
+    }
+
     public void fillRange(final long first, final long limit, final Double value) {
         ArrayUtils.fillRange(data, (int) first, (int) limit, value);
     }
@@ -911,23 +919,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public void fillRow(final long row, final long column, final NullaryFunction<Double> supplier) {
         ArrayUtils.fillRow(data, (int) row, (int) column, supplier);
-    }
-
-    public void fillTransposed(final Access2D<? extends Number> source) {
-
-        final double[][] tmpDelegateArray = data;
-
-        final int tmpRowDim = data.length;
-
-        for (int i = 0; i < tmpRowDim; i++) {
-            for (int j = 0; j < myNumberOfColumns; j++) {
-                tmpDelegateArray[i][j] = source.doubleValue(j, i);
-            }
-        }
-    }
-
-    public Double get(final long index) {
-        return data[AccessUtils.row(index, data.length)][AccessUtils.column(index, data.length)];
     }
 
     public Double get(final long row, final long column) {
@@ -997,10 +988,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return PrimitiveScalar.isAbsolute(this.get((int) row, (int) column));
     }
 
-    public boolean isLowerLeftShaded() {
-        return false;
-    }
-
     public boolean isSmall(final long index, final double comparedTo) {
         final int tmpRowDim = data.length;
         return PrimitiveScalar.isSmall(comparedTo, this.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
@@ -1008,10 +995,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return PrimitiveScalar.isSmall(comparedTo, this.doubleValue(row, column));
-    }
-
-    public boolean isUpperRightShaded() {
-        return false;
     }
 
     public void maxpy(final Double aSclrA, final MatrixStore<Double> aMtrxX) {
@@ -1058,15 +1041,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         tmpValue = function.invoke(tmpValue);
 
         this.set(row, column, tmpValue);
-    }
-
-    public void modifyOne(final long index, final UnaryFunction<Double> function) {
-
-        double tmpValue = this.doubleValue(index);
-
-        tmpValue = function.invoke(tmpValue);
-
-        this.set(index, tmpValue);
     }
 
     public void modifyRange(final long first, final long limit, final UnaryFunction<Double> function) {
@@ -1126,20 +1100,12 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return new PhysicalStore.ConsumerRegion<Double>(this, row, column);
     }
 
-    public void set(final long index, final double value) {
-        data[AccessUtils.row(index, data.length)][AccessUtils.column(index, data.length)] = value;
-    }
-
     public void set(final long row, final long column, final double value) {
         data[(int) row][(int) column] = value;
     }
 
     public void set(final long row, final long column, final Number value) {
         data[(int) row][(int) column] = value.doubleValue();
-    }
-
-    public void set(final long index, final Number value) {
-        data[AccessUtils.row(index, data.length)][AccessUtils.column(index, data.length)] = value.doubleValue();
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {

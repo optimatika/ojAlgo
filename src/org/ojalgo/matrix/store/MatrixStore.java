@@ -21,6 +21,10 @@
  */
 package org.ojalgo.matrix.store;
 
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.stream.BaseStream;
+
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
@@ -30,6 +34,7 @@ import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -57,7 +62,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Visitable<N>, Access2D.Elements, NormedVectorSpace<MatrixStore<N>, N> {
 
-    public static final class Builder<N extends Number> {
+    public static final class Builder<N extends Number> implements BaseStream<N, Builder<N>> {
 
         @SafeVarargs
         static <N extends Number> MatrixStore<N> buildColumn(final int aMinRowDim, final MatrixStore<N>... aColStore) {
@@ -175,8 +180,13 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return myStore;
         }
 
-        public final Builder<N> column(final int... aCol) {
-            myStore = new ColumnsStore<N>(myStore, aCol);
+        public void close() {
+            // TODO Auto-generated method stub
+            myStore = null;
+        }
+
+        public final Builder<N> column(final int... col) {
+            myStore = new ColumnsStore<N>(myStore, col);
             return this;
         }
 
@@ -240,6 +250,16 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
+        public boolean isParallel() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        public Iterator<N> iterator() {
+            // TODO Auto-generated method stub
+            return myStore.iterator();
+        }
+
         public final Builder<N> left(final int aColDim) {
             final MatrixStore<N> tmpLeftStore = new ZeroStore<N>(myStore.factory(), (int) myStore.countRows(), aColDim);
             myStore = new LeftRightStore<N>(tmpLeftStore, myStore);
@@ -280,6 +300,16 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
+        public MatrixStore.Builder<N> onClose(final Runnable closeHandler) {
+            // TODO Auto-generated method stub
+            return this;
+        }
+
+        public MatrixStore.Builder<N> parallel() {
+            // TODO Auto-generated method stub
+            return this;
+        }
+
         public final Builder<N> right(final int aColDim) {
             final MatrixStore<N> tmpRightStore = new ZeroStore<N>(myStore.factory(), (int) myStore.countRows(), aColDim);
             myStore = new LeftRightStore<N>(myStore, tmpRightStore);
@@ -300,8 +330,8 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
-        public final Builder<N> row(final int... aRow) {
-            myStore = new RowsStore<N>(myStore, aRow);
+        public final Builder<N> row(final int... row) {
+            myStore = new RowsStore<N>(myStore, row);
             return this;
         }
 
@@ -315,13 +345,23 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
-        public final Builder<N> superimpose(final int aRow, final int aCol, final MatrixStore<N> aStore) {
-            myStore = new SuperimposedStore<N>(myStore, aRow, aCol, aStore);
+        public MatrixStore.Builder<N> sequential() {
+            // TODO Auto-generated method stub
             return this;
         }
 
-        public final Builder<N> superimpose(final int aRow, final int aCol, final N aStore) {
-            myStore = new SuperimposedStore<N>(myStore, aRow, aCol, new SingleStore<N>(myStore.factory(), aStore));
+        public Spliterator<N> spliterator() {
+            // TODO Auto-generated method stub
+            return myStore.spliterator();
+        }
+
+        public final Builder<N> superimpose(final int row, final int col, final MatrixStore<N> aStore) {
+            myStore = new SuperimposedStore<N>(myStore, row, col, aStore);
+            return this;
+        }
+
+        public final Builder<N> superimpose(final int row, final int col, final N aStore) {
+            myStore = new SuperimposedStore<N>(myStore, row, col, new SingleStore<N>(myStore.factory(), aStore));
             return this;
         }
 
@@ -355,6 +395,11 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
 
         public final Builder<N> tridiagonal() {
             myStore = new UpperHessenbergStore<N>(new LowerHessenbergStore<N>(myStore));
+            return this;
+        }
+
+        public MatrixStore.Builder<N> unordered() {
+            // TODO Auto-generated method stub
             return this;
         }
 
@@ -405,11 +450,37 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
     PhysicalStore.Factory<N, ?> factory();
 
     /**
+     * The default value is simply <code>0</code>, and if all elements are zeros then
+     * <code>this.countRows()</code>.
+     *
+     * @param col
+     * @return The row index of the first non-zero element in the specified column
+     */
+    default int firstInColumn(final int col) {
+        return 0;
+    }
+
+    /**
+     * The default value is simply <code>0</code>, and if all elements are zeros then
+     * <code>this.countColumns()</code>.
+     *
+     * @param row
+     * @return The column index of the first non-zero element in the specified row
+     */
+    default int firstInRow(final int row) {
+        return 0;
+    }
+
+    /**
      * The entries below (left of) the first subdiagonal are zero - effectively an upper Hessenberg matrix.
      *
      * @see #isUpperRightShaded()
+     * @deprecated v39
      */
-    boolean isLowerLeftShaded();
+    @Deprecated
+    default boolean isLowerLeftShaded() {
+        return false;
+    }
 
     default boolean isSmall(final double comparedTo) {
         return PrimitiveScalar.isSmall(comparedTo, this.norm());
@@ -419,8 +490,36 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
      * The entries above (right of) the first superdiagonal are zero - effectively a lower Hessenberg matrix.
      *
      * @see #isLowerLeftShaded()
+     * @deprecated v39
      */
-    boolean isUpperRightShaded();
+    @Deprecated
+    default boolean isUpperRightShaded() {
+        return false;
+    }
+
+    /**
+     * The default value is simply <code>this.countRows()</code>, and if all elements are zeros then
+     * <code>0</code>.
+     *
+     * @param col
+     * @return The row index of the first zero element, after all non-zeros, in the specified column (index of
+     *         the last non-zero + 1)
+     */
+    default int limitOfColumn(final int col) {
+        return (int) this.countRows();
+    }
+
+    /**
+     * The default value is simply <code>this.countColumns()</code>, and if all elements are zeros then
+     * <code>0</code>.
+     *
+     * @param row
+     * @return The column index of the first zero element, after all non-zeros, in the specified row (index of
+     *         the last non-zero + 1)
+     */
+    default int limitOfRow(final int row) {
+        return (int) this.countColumns();
+    }
 
     default MatrixStore<N> multiply(final Access1D<N> right) {
 
@@ -481,11 +580,17 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
         return this.operateOnMatching(this.factory().function().subtract(), subtrahend);
     }
 
-    Scalar<N> toScalar(long row, long column);
+    default Scalar<N> toScalar(final long row, final long column) {
+        return this.factory().scalar().convert(this.get(row, column));
+    }
 
     /**
      * @return A transposed matrix instance.
      */
     MatrixStore<N> transpose();
+
+    default void visitOne(final long row, final long column, final VoidFunction<N> visitor) {
+        visitor.invoke(this.get(row, column));
+    }
 
 }

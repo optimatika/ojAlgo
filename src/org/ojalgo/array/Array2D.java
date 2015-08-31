@@ -308,6 +308,22 @@ public final class Array2D<N extends Number>
         myColumnsCount = structure == 0L ? 0L : delegate.count() / structure;
     }
 
+    public void add(final long index, final double addend) {
+        myDelegate.add(index, addend);
+    }
+
+    public void add(final long row, final long column, final double addend) {
+        myDelegate.add(AccessUtils.index(myRowsCount, row, column), addend);
+    }
+
+    public void add(final long row, final long column, final Number addend) {
+        myDelegate.add(AccessUtils.index(myRowsCount, row, column), addend);
+    }
+
+    public void add(final long index, final Number addend) {
+        myDelegate.add(index, addend);
+    }
+
     /**
      * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not
      * copied, it is just accessed through a different adaptor.
@@ -381,6 +397,22 @@ public final class Array2D<N extends Number>
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
         myDelegate.fill(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount), 1L + myRowsCount,
                 supplier);
+    }
+
+    public void fillOne(final long row, final long column, final N value) {
+        myDelegate.fillOne(AccessUtils.index(myRowsCount, row, column), value);
+    }
+
+    public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
+        myDelegate.fillOne(AccessUtils.index(myRowsCount, row, column), supplier);
+    }
+
+    public void fillOne(final long index, final N value) {
+        myDelegate.fillOne(index, value);
+    }
+
+    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+        myDelegate.fillOne(index, supplier);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
@@ -573,6 +605,14 @@ public final class Array2D<N extends Number>
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
         myDelegate.visit(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount), 1L + myRowsCount,
                 visitor);
+    }
+
+    public void visitOne(final long row, final long column, final VoidFunction<N> visitor) {
+        myDelegate.visitOne(AccessUtils.index(myRowsCount, row, column), visitor);
+    }
+
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
+        myDelegate.visitOne(index, visitor);
     }
 
     public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {

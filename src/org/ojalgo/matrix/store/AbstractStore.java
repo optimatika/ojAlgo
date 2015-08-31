@@ -30,7 +30,6 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serializable {
@@ -89,10 +88,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return myRowDim;
     }
 
-    public double doubleValue(final long index) {
-        return this.doubleValue(AccessUtils.row((int) index, myRowDim), AccessUtils.column((int) index, myRowDim));
-    }
-
     public final boolean equals(final MatrixStore<N> other, final NumberContext context) {
         return AccessUtils.equals(this, other, context);
     }
@@ -107,28 +102,18 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         }
     }
 
-    public N get(final long index) {
-        return this.get(AccessUtils.row(index, myRowDim), AccessUtils.column(index, myRowDim));
-    }
-
     @Override
     public final int hashCode() {
         return MatrixUtils.hashCode(this);
-    }
-
-    public boolean isAbsolute(final long index) {
-        return this.toScalar(index).isAbsolute();
     }
 
     public boolean isAbsolute(final long row, final long column) {
         return this.toScalar(row, column).isAbsolute();
     }
 
-    /**
-     * @see org.ojalgo.access.Access1D.Elements#isSmall(long, double)
-     */
-    public boolean isSmall(final long index, final double comparedTo) {
-        return this.toScalar(index).isSmall(comparedTo);
+    @Deprecated
+    public final boolean isLowerLeftShaded() {
+        return false;
     }
 
     /**
@@ -136,6 +121,19 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
      */
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return this.toScalar(row, column).isSmall(comparedTo);
+    }
+
+    @Deprecated
+    public final boolean isUpperRightShaded() {
+        return false;
+    }
+
+    public int limitOfColumn(final int col) {
+        return myRowDim;
+    }
+
+    public int limitOfRow(final int row) {
+        return myColDim;
     }
 
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
@@ -195,10 +193,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         for (long j = column; j < tmpColDim; j++) {
             visitor.invoke(this.get(row, j));
         }
-    }
-
-    private Scalar<N> toScalar(final long index) {
-        return this.toScalar(AccessUtils.row(index, myRowDim), AccessUtils.column(index, myRowDim));
     }
 
     protected final int getColDim() {

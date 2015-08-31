@@ -411,17 +411,8 @@ public abstract class ArrayUtils {
                 return target.length;
             }
 
-            public double doubleValue(final long index) {
-                return target[AccessUtils.row((int) index, target.length)][AccessUtils.column((int) index, target.length)];
-            }
-
             public double doubleValue(final long row, final long column) {
                 return target[(int) row][(int) column];
-            }
-
-            public Double get(final long index) {
-                return target[AccessUtils.row((int) index, target.length)][AccessUtils.column((int) index, target.length)];
-
             }
 
             public Double get(final long row, final long column) {
@@ -452,10 +443,6 @@ public abstract class ArrayUtils {
 
             public double doubleValue(final long row, final long column) {
                 return this.get(row, column).doubleValue();
-            }
-
-            public N get(final long index) {
-                return target[AccessUtils.row((int) index, target.length)][AccessUtils.column((int) index, target.length)];
             }
 
             public N get(final long row, final long column) {

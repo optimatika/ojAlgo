@@ -82,7 +82,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     }
 
-    public static final DecompositionStore.Factory<BigDecimal, BigDenseStore> FACTORY = new DecompositionStore.Factory<BigDecimal, BigDenseStore>() {
+    public static final PhysicalStore.Factory<BigDecimal, BigDenseStore> FACTORY = new PhysicalStore.Factory<BigDecimal, BigDenseStore>() {
 
         public AggregatorSet<BigDecimal> aggregator() {
             return BigAggregator.getSet();
@@ -302,7 +302,26 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
             final BigDenseStore retVal = new BigDenseStore((int) source.countColumns(), (int) source.countRows());
 
-            retVal.fillTransposed(source);
+            final int tmpRowDim = retVal.getRowDim();
+            final int tmpColDim = retVal.getColDim();
+
+            if (tmpColDim > FillTransposed.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillTransposed.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillTransposed.THRESHOLD);
+
+            } else {
+
+                FillTransposed.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
 
             return retVal;
         }
@@ -644,10 +663,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myUtility.fillColumn(row, column, supplier);
     }
 
-    public void fillConjugated(final Access2D<? extends Number> source) {
-        FillConjugated.invoke(data, myRowDim, 0, myColDim, source);
-    }
-
     public void fillDiagonal(final long row, final long column, final BigDecimal value) {
         myUtility.fillDiagonal(row, column, value);
     }
@@ -760,30 +775,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myUtility.fillRow(row, column, supplier);
     }
 
-    public void fillTransposed(final Access2D<? extends Number> source) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillTransposed.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    FillTransposed.invoke(BigDenseStore.this.data, tmpRowDim, aFirst, aLimit, source);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillTransposed.THRESHOLD);
-
-        } else {
-
-            FillTransposed.invoke(data, tmpRowDim, 0, tmpColDim, source);
-        }
-    }
-
     public boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<BigDecimal> destination) {
         return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column, (Householder.Big) destination);
     }
@@ -794,22 +785,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public BigDecimal get(final long aRow, final long aCol) {
         return myUtility.get(aRow, aCol);
-    }
-
-    public int getColDim() {
-        return myColDim;
-    }
-
-    public int getMaxDim() {
-        return Math.max(myRowDim, myColDim);
-    }
-
-    public int getMinDim() {
-        return Math.min(myRowDim, myColDim);
-    }
-
-    public int getRowDim() {
-        return myRowDim;
     }
 
     @Override
@@ -829,16 +804,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return myUtility.isAbsolute(row, column);
     }
 
-    public boolean isLowerLeftShaded() {
-        return false;
-    }
-
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return myUtility.isSmall(row, column, comparedTo);
-    }
-
-    public boolean isUpperRightShaded() {
-        return false;
     }
 
     public void maxpy(final BigDecimal aSclrA, final MatrixStore<BigDecimal> aMtrxX) {
@@ -1142,6 +1109,38 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void visitRow(final long row, final long column, final VoidFunction<BigDecimal> visitor) {
         myUtility.visitRow(row, column, visitor);
+    }
+
+    int getColDim() {
+        return myColDim;
+    }
+
+    int getMaxDim() {
+        return Math.max(myRowDim, myColDim);
+    }
+
+    int getMinDim() {
+        return Math.min(myRowDim, myColDim);
+    }
+
+    int getRowDim() {
+        return myRowDim;
+    }
+
+    public void fillOne(final long row, final long column, final BigDecimal value) {
+        myUtility.fillOne(row, column, value);
+    }
+
+    public void fillOne(final long row, final long column, final NullaryFunction<BigDecimal> supplier) {
+        myUtility.fillOne(row, column, supplier);
+    }
+
+    public void add(final long row, final long column, final double addend) {
+        myUtility.add(row, column, addend);
+    }
+
+    public void add(final long row, final long column, final Number addend) {
+        myUtility.add(row, column, addend);
     }
 
 }

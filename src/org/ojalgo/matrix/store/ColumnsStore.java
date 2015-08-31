@@ -26,7 +26,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * A selection (re-ordering) of columns.
- * 
+ *
  * @author apete
  */
 public final class ColumnsStore<N extends Number> extends SelectingStore<N> {
@@ -75,14 +75,6 @@ public final class ColumnsStore<N extends Number> extends SelectingStore<N> {
         } else {
             return this.getBase().get(row, myFirst + column);
         }
-    }
-
-    public boolean isLowerLeftShaded() {
-        return false;
-    }
-
-    public boolean isUpperRightShaded() {
-        return false;
     }
 
     public Scalar<N> toScalar(final long row, final long column) {

@@ -43,8 +43,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>,
-        AccessAnyD.Visitable<N>, Serializable {
+public final class ArrayAnyD<N extends Number>
+        implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>, AccessAnyD.Visitable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
 
@@ -158,6 +158,22 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         myStructure = structure;
     }
 
+    public void add(final long index, final double addend) {
+        myDelegate.add(index, addend);
+    }
+
+    public void add(final long index, final Number addend) {
+        myDelegate.add(index, addend);
+    }
+
+    public void add(final long[] reference, final double addend) {
+        myDelegate.add(AccessUtils.index(myStructure, reference), addend);
+    }
+
+    public void add(final long[] reference, final Number addend) {
+        myDelegate.add(AccessUtils.index(myStructure, reference), addend);
+    }
+
     /**
      * Flattens this abitrary dimensional array to a one dimensional array. The (internal/actual) array is not
      * copied, it is just accessed through a different adaptor.
@@ -199,6 +215,22 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public void fillAll(final NullaryFunction<N> supplier) {
         myDelegate.fill(0L, this.count(), 1L, supplier);
+    }
+
+    public void fillOne(final long index, final N value) {
+        myDelegate.fillOne(index, value);
+    }
+
+    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+        myDelegate.fillOne(index, supplier);
+    }
+
+    public void fillOne(final long[] reference, final N value) {
+        myDelegate.fillOne(AccessUtils.index(myStructure, reference), value);
+    }
+
+    public void fillOne(final long[] reference, final NullaryFunction<N> supplier) {
+        myDelegate.fillOne(AccessUtils.index(myStructure, reference), supplier);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
@@ -361,6 +393,14 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public void visitAll(final VoidFunction<N> visitor) {
         myDelegate.visit(0L, this.count(), 1L, visitor);
+    }
+
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
+        myDelegate.visitOne(index, visitor);
+    }
+
+    public void visitOne(final long[] reference, final VoidFunction<N> visitor) {
+        myDelegate.visitOne(AccessUtils.index(myStructure, reference), visitor);
     }
 
     public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {

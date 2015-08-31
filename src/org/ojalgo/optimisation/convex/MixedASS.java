@@ -21,58 +21,40 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.matrix.store.AboveBelowStore;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.RowsStore;
+import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.system.KKTSystem;
 
-/**
- * Solves optimisation problems of the form:
- * <p>
- * min 1/2 [X]<sup>T</sup>[Q][X] - [C]<sup>T</sup>[X]
- * </p>
- *
- * @author apete
- */
-final class UnconstrainedSolver extends ConvexSolver {
+class MixedASS extends ActiveSetSolver {
 
-    UnconstrainedSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+    MixedASS(final Builder matrices, final Options solverOptions) {
         super(matrices, solverOptions);
     }
 
     @Override
-    protected boolean initialise(final Result kickStart) {
-        this.resetX();
-        return true;
-    }
+    KKTSystem.Input buildDelegateSolverInput(final int[] included) {
 
-    @Override
-    protected boolean needsAnotherIteration() {
-        return this.countIterations() < 1;
-    }
+        final MatrixStore<Double> tmpQ = this.getQ();
+        final MatrixStore<Double> tmpC = this.getC();
+        final MatrixStore<Double> tmpAE = this.getAE();
+        final MatrixStore<Double> tmpAI = this.getAI();
+        final PhysicalStore<Double> tmpX = this.getX();
 
-    @Override
-    protected void performIteration() {
+        final MatrixStore<Double> tmpSubQ = tmpQ;
+        final MatrixStore<Double> tmpSubC = tmpC.subtract(tmpSubQ.multiply(tmpX));
 
-        final KKTSystem.Input tmpInput = this.buildDelegateSolverInput();
-
-        final KKTSystem tmpSolver = this.getDelegateSolver(tmpInput);
-
-        final KKTSystem.Output tmpOutput = tmpSolver.solve(tmpInput, options);
-
-        if (tmpOutput.isSolvable()) {
-
-            this.setState(State.DISTINCT);
-            this.fillX(tmpOutput.getX());
-
+        MatrixStore<Double> tmpSubAE = null;
+        if (included.length == 0) {
+            tmpSubAE = tmpAE;
         } else {
-
-            this.setState(State.UNBOUNDED);
-            this.resetX();
+            tmpSubAE = new AboveBelowStore<Double>(tmpAE, new RowsStore<Double>(tmpAI, included));
         }
-    }
+        final ZeroStore<Double> tmpSubBE = ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1);
 
-    @Override
-    KKTSystem.Input buildDelegateSolverInput() {
-        return new KKTSystem.Input(this.getQ(), this.getC());
+        return new KKTSystem.Input(tmpSubQ, tmpSubC, tmpSubAE, tmpSubBE);
     }
 
 }

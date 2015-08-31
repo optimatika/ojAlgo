@@ -85,17 +85,27 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    public boolean equals(final Object anObj) {
-        if (anObj instanceof BigArray) {
-            return Arrays.equals(data, ((BigArray) anObj).data);
+    public boolean equals(final Object other) {
+        if (other instanceof BigArray) {
+            return Arrays.equals(data, ((BigArray) other).data);
         } else {
-            return super.equals(anObj);
+            return super.equals(other);
         }
     }
 
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
+    }
+
+    @Override
+    protected final void add(final int index, final double addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
+    }
+
+    @Override
+    protected final void add(final int index, final Number addend) {
+        this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
 
     @Override
@@ -127,18 +137,18 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    protected void set(final int index, final double value) {
-        data[index] = new BigDecimal(value);
-    }
-
-    @Override
-    protected void set(final int index, final Number value) {
-        data[index] = TypeUtils.toBigDecimal(value);
-    }
-
-    @Override
     DenseArray<BigDecimal> newInstance(final int capacity) {
         return new BigArray(capacity);
+    }
+
+    @Override
+    BigDecimal valueOf(final double value) {
+        return BigDecimal.valueOf(value);
+    }
+
+    @Override
+    BigDecimal valueOf(final Number number) {
+        return TypeUtils.toBigDecimal(number);
     }
 
 }

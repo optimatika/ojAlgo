@@ -22,6 +22,7 @@
 package org.ojalgo.array;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
@@ -543,6 +544,36 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     @Override
     boolean isPrimitive() {
         return mySegments[0].isPrimitive();
+    }
+
+    public Iterator<N> iterator() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void fillOne(final long index, final N value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void add(final long index, final double addend) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void add(final long index, final Number addend) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
+        // TODO Auto-generated method stub
+
     }
 
 }

@@ -26,7 +26,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * SuperimposedStore
- * 
+ *
  * @author apete
  */
 public final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
@@ -88,14 +88,6 @@ public final class SuperimposedStore<N extends Number> extends DelegatingStore<N
         }
 
         return retVal;
-    }
-
-    public boolean isLowerLeftShaded() {
-        return false;
-    }
-
-    public boolean isUpperRightShaded() {
-        return false;
     }
 
     public Scalar<N> toScalar(final long row, final long column) {

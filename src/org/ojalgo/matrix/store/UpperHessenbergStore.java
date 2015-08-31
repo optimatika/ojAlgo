@@ -53,6 +53,14 @@ public final class UpperHessenbergStore<N extends Number> extends ShadingStore<N
         }
     }
 
+    public int firstInRow(final int row) {
+        if (row == 0) {
+            return 0;
+        } else {
+            return row - 1;
+        }
+    }
+
     public N get(final long row, final long col) {
         if (row > (col + 1)) {
             return this.factory().scalar().zero().getNumber();
@@ -61,12 +69,9 @@ public final class UpperHessenbergStore<N extends Number> extends ShadingStore<N
         }
     }
 
-    public boolean isLowerLeftShaded() {
-        return true;
-    }
-
-    public boolean isUpperRightShaded() {
-        return false;
+    @Override
+    public int limitOfColumn(final int col) {
+        return Math.min(col + 2, this.getRowDim());
     }
 
     public Scalar<N> toScalar(final long row, final long col) {
@@ -76,4 +81,5 @@ public final class UpperHessenbergStore<N extends Number> extends ShadingStore<N
             return this.getBase().toScalar(row, col);
         }
     }
+
 }

@@ -84,7 +84,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     }
 
-    public static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = new DecompositionStore.Factory<Double, PrimitiveDenseStore>() {
+    public static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = new PhysicalStore.Factory<Double, PrimitiveDenseStore>() {
 
         public AggregatorSet<Double> aggregator() {
             return PrimitiveAggregator.getSet();
@@ -304,7 +304,26 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
             final PrimitiveDenseStore retVal = new PrimitiveDenseStore((int) source.countColumns(), (int) source.countRows());
 
-            retVal.fillTransposed(source);
+            final int tmpRowDim = retVal.getRowDim();
+            final int tmpColDim = retVal.getColDim();
+
+            if (tmpColDim > FillTransposed.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillTransposed.invoke(retVal.data, tmpRowDim, first, limit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillTransposed.THRESHOLD);
+
+            } else {
+
+                FillTransposed.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
 
             return retVal;
         }
@@ -884,6 +903,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     private final int myRowDim;
     private final Array2D<Double> myUtility;
 
+    private transient double[] myWorkerColumn;
+
     PrimitiveDenseStore(final double[] anArray) {
 
         super(anArray);
@@ -1225,10 +1246,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.fillColumn(row, column, supplier);
     }
 
-    public void fillConjugated(final Access2D<? extends Number> source) {
-        FillConjugated.invoke(data, myRowDim, 0, myColDim, source);
-    }
-
     public void fillDiagonal(final long row, final long column, final Double value) {
         myUtility.fillDiagonal(row, column, value);
     }
@@ -1341,30 +1358,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.fillRow(row, column, supplier);
     }
 
-    public void fillTransposed(final Access2D<? extends Number> source) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillTransposed.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int first, final int limit) {
-                    FillTransposed.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, source);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillTransposed.THRESHOLD);
-
-        } else {
-
-            FillTransposed.invoke(data, tmpRowDim, 0, tmpColDim, source);
-        }
-    }
-
     public boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<Double> destination) {
         return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column, (Householder.Primitive) destination);
     }
@@ -1375,22 +1368,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public Double get(final long aRow, final long aCol) {
         return myUtility.get(aRow, aCol);
-    }
-
-    public int getColDim() {
-        return myColDim;
-    }
-
-    public int getMaxDim() {
-        return Math.max(myRowDim, myColDim);
-    }
-
-    public int getMinDim() {
-        return Math.min(myRowDim, myColDim);
-    }
-
-    public int getRowDim() {
-        return myRowDim;
     }
 
     @Override
@@ -1410,16 +1387,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return myUtility.isAbsolute(row, column);
     }
 
-    public boolean isLowerLeftShaded() {
-        return false;
-    }
-
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return myUtility.isSmall(row, column, comparedTo);
-    }
-
-    public boolean isUpperRightShaded() {
-        return false;
     }
 
     public boolean isZero(final long row, final long column) {
@@ -1593,7 +1562,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {
-        return new PrimitiveScalar(this.doubleValue(row + (column * myRowDim)));
+        return new PrimitiveScalar(this.doubleValue(row, column));
     }
 
     @Override
@@ -1683,8 +1652,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    private transient double[] myWorkerColumn;
-
     public void transformRight(final Rotation<Double> transformation) {
 
         final Rotation.Primitive tmpTransf = PrimitiveDenseStore.cast(transformation);
@@ -1738,6 +1705,22 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.visitRow(row, column, visitor);
     }
 
+    int getColDim() {
+        return myColDim;
+    }
+
+    int getMaxDim() {
+        return Math.max(myRowDim, myColDim);
+    }
+
+    int getMinDim() {
+        return Math.min(myRowDim, myColDim);
+    }
+
+    int getRowDim() {
+        return myRowDim;
+    }
+
     double[] getWorkerColumn() {
         if (myWorkerColumn != null) {
             Arrays.fill(myWorkerColumn, ZERO);
@@ -1745,6 +1728,22 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             myWorkerColumn = new double[myRowDim];
         }
         return myWorkerColumn;
+    }
+
+    public void fillOne(final long row, final long column, final Double value) {
+        myUtility.fillOne(row, column, value);
+    }
+
+    public void fillOne(final long row, final long column, final NullaryFunction<Double> supplier) {
+        myUtility.fillOne(row, column, supplier);
+    }
+
+    public void add(final long row, final long column, final double addend) {
+        myUtility.add(row, column, addend);
+    }
+
+    public void add(final long row, final long column, final Number addend) {
+        myUtility.add(row, column, addend);
     }
 
 }

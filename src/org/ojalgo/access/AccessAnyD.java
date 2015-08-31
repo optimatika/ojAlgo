@@ -24,6 +24,7 @@ package org.ojalgo.access;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 
 public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N> {
@@ -75,7 +76,41 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
-    public interface Fillable<N extends Number> extends StructureAnyD, Access1D.Fillable<N> {
+    public interface Fillable<N extends Number> extends Settable<N>, Access1D.Fillable<N> {
+
+        void fillOne(long[] reference, N value);
+
+        void fillOne(long[] reference, NullaryFunction<N> supplier);
+
+    }
+
+    public interface Modifiable<N extends Number> extends Settable<N>, Access1D.Modifiable<N> {
+
+        void modifyOne(long[] reference, UnaryFunction<N> function);
+
+    }
+
+    public interface Settable<N extends Number> extends StructureAnyD, Access1D.Settable<N> {
+
+        default void add(final long index, final double addend) {
+            this.add(AccessUtils.reference(index, this.structure()), addend);
+        }
+
+        default void add(final long index, final Number addend) {
+            this.add(AccessUtils.reference(index, this.structure()), addend);
+        }
+
+        void add(long[] reference, double addend);
+
+        void add(long[] reference, Number addend);
+
+        default void set(final long index, final double value) {
+            this.set(AccessUtils.reference(index, this.structure()), value);
+        }
+
+        default void set(final long index, final Number value) {
+            this.set(AccessUtils.reference(index, this.structure()), value);
+        }
 
         void set(long[] reference, double value);
 
@@ -83,13 +118,9 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
-    public interface Modifiable<N extends Number> extends StructureAnyD, Access1D.Modifiable<N> {
-
-        void modifyOne(long[] reference, UnaryFunction<N> function);
-
-    }
-
     public interface Visitable<N extends Number> extends StructureAnyD, Access1D.Visitable<N> {
+
+        void visitOne(long[] reference, VoidFunction<N> visitor);
 
     }
 

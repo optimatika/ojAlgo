@@ -31,7 +31,7 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * ZeroStore
- * 
+ *
  * @author apete
  */
 public final class ZeroStore<N extends Number> extends FactoryStore<N> {
@@ -41,14 +41,6 @@ public final class ZeroStore<N extends Number> extends FactoryStore<N> {
         ZeroStore<N> make(int rows, int columns);
 
     }
-
-    public static final ZeroStore.Factory<Double> PRIMITIVE = new ZeroStore.Factory<Double>() {
-
-        public ZeroStore<Double> make(final int rows, final int columns) {
-            return ZeroStore.makePrimitive(rows, columns);
-        }
-
-    };
 
     public static final ZeroStore.Factory<BigDecimal> BIG = new ZeroStore.Factory<BigDecimal>() {
 
@@ -62,6 +54,14 @@ public final class ZeroStore<N extends Number> extends FactoryStore<N> {
 
         public ZeroStore<ComplexNumber> make(final int rows, final int columns) {
             return ZeroStore.makeComplex(rows, columns);
+        }
+
+    };
+
+    public static final ZeroStore.Factory<Double> PRIMITIVE = new ZeroStore.Factory<Double>() {
+
+        public ZeroStore<Double> make(final int rows, final int columns) {
+            return ZeroStore.makePrimitive(rows, columns);
         }
 
     };
@@ -122,26 +122,36 @@ public final class ZeroStore<N extends Number> extends FactoryStore<N> {
         return PrimitiveMath.ZERO;
     }
 
+    public int firstInColumn(final int col) {
+        return this.getRowDim();
+    }
+
+    public int firstInRow(final int row) {
+        return this.getColDim();
+    }
+
     public N get(final long aRow, final long aCol) {
         return myNumberZero;
     }
 
-    public boolean isLowerLeftShaded() {
-        return true;
-    }
-
-    public boolean isUpperRightShaded() {
-        return true;
+    @Override
+    public int limitOfColumn(final int col) {
+        return 0;
     }
 
     @Override
-    public ZeroStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
-        return new ZeroStore<N>(this.factory(), (int) (leftMtrx.count() / this.getRowDim()), this.getColDim());
+    public int limitOfRow(final int row) {
+        return 0;
     }
 
     @Override
     public ZeroStore<N> multiply(final Access1D<N> right) {
         return new ZeroStore<N>(this.factory(), this.getRowDim(), (int) (right.count() / this.getColDim()));
+    }
+
+    @Override
+    public ZeroStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
+        return new ZeroStore<N>(this.factory(), (int) (leftMtrx.count() / this.getRowDim()), this.getColDim());
     }
 
     @Override

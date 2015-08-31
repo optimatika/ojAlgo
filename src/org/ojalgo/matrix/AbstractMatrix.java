@@ -203,10 +203,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         mySingularValue = null;
     }
 
-    public N get(final int index) {
-        return myStore.get(index);
-    }
-
     public N get(final long index) {
         return myStore.get(index);
     }

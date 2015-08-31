@@ -40,16 +40,26 @@ abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
         return this.getBase().doubleValue(aCol, aRow);
     }
 
+    public final int firstInColumn(final int col) {
+        return this.getBase().firstInRow(col);
+    }
+
+    public final int firstInRow(final int row) {
+        return this.getBase().firstInColumn(row);
+    }
+
     public final MatrixStore<N> getOriginal() {
         return this.getBase();
     }
 
-    public final boolean isLowerLeftShaded() {
-        return this.getBase().isUpperRightShaded();
+    @Override
+    public final int limitOfColumn(final int col) {
+        return this.getBase().limitOfRow(col);
     }
 
-    public final boolean isUpperRightShaded() {
-        return this.getBase().isLowerLeftShaded();
+    @Override
+    public final int limitOfRow(final int row) {
+        return this.getBase().limitOfColumn(row);
     }
 
 }

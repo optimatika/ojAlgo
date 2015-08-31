@@ -285,10 +285,10 @@ public class KKTSolverTest extends FunctionalityTest {
         final MatrixStore<Double> tmpC = PrimitiveDenseStore.FACTORY.copy(matrices[3]);
         final MatrixStore<Double> tmpX = PrimitiveDenseStore.FACTORY.copy(matrices[4]);
 
-        final KKTSolver.Input tmpFullInput = new KKTSolver.Input(tmpQ, tmpC, tmpA, tmpB);
+        final KKTSystem.Input tmpFullInput = new KKTSystem.Input(tmpQ, tmpC, tmpA, tmpB);
         final KKTSolver tmpFullSolver = new KKTSolver(tmpFullInput);
 
-        final KKTSolver.Output tmpFullOutput = tmpFullSolver.solve(tmpFullInput, tmpOptions);
+        final KKTSystem.Output tmpFullOutput = tmpFullSolver.solve(tmpFullInput, tmpOptions);
         final MatrixStore<Double> tmpFullX = tmpFullOutput.getX();
         final MatrixStore<Double> tmpFullL = tmpFullOutput.getL();
 
@@ -296,11 +296,11 @@ public class KKTSolverTest extends FunctionalityTest {
 
         TestUtils.assertEquals(tmpX, tmpFullX, context);
 
-        final KKTSolver.Input tmpStepInput = new KKTSolver.Input(tmpQ, tmpC.add(tmpQ.multiply(tmpFullX).negate()), tmpA,
+        final KKTSystem.Input tmpStepInput = new KKTSystem.Input(tmpQ, tmpC.add(tmpQ.multiply(tmpFullX).negate()), tmpA,
                 tmpB != null ? ZeroStore.makePrimitive((int) tmpB.countRows(), (int) tmpB.countColumns()) : null);
 
         final KKTSolver tmpStepSolver = new KKTSolver(tmpFullInput);
-        final KKTSolver.Output tmpStepOutput = tmpStepSolver.solve(tmpStepInput, tmpOptions);
+        final KKTSystem.Output tmpStepOutput = tmpStepSolver.solve(tmpStepInput, tmpOptions);
         final MatrixStore<Double> tmpStepX = tmpStepOutput.getX();
         final MatrixStore<Double> tmpStepL = tmpStepOutput.getL();
 

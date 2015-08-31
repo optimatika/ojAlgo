@@ -38,7 +38,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-abstract class DenseArray<N extends Number> extends BasicArray<N> implements RandomAccess {
+abstract class DenseArray<N extends Number> extends BasicArray<N>implements RandomAccess {
 
     static abstract class DenseFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -64,6 +64,14 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         super();
     }
 
+    public void add(final long index, final double addend) {
+        this.add((int) index, addend);
+    }
+
+    public void add(final long index, final Number addend) {
+        this.add((int) index, addend);
+    }
+
     public final long count() {
         return this.size();
     }
@@ -78,6 +86,14 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     public final void fillAll(final NullaryFunction<N> supplier) {
         this.fill(0, this.size(), 1, supplier);
+    }
+
+    public void fillOne(final long index, final N value) {
+        this.fillOne((int) index, value);
+    }
+
+    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+        this.fillOne((int) index, supplier);
     }
 
     public final void fillRange(final long first, final long limit, final N number) {
@@ -118,6 +134,10 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         this.set((int) index, number);
     }
 
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
+        this.visitOne((int) index, visitor);
+    }
+
     private final boolean isSmall(final int first, final int limit, final int step, final double comparedTo) {
 
         boolean retVal = true;
@@ -128,6 +148,10 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
         return retVal;
     }
+
+    protected abstract void add(int index, double addend);
+
+    protected abstract void add(int index, Number addend);
 
     protected abstract double doubleValue(final int index);
 
@@ -157,6 +181,10 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     protected final void fill(final long first, final long limit, final long step, final NullaryFunction<N> supplier) {
         this.fill((int) first, (int) limit, (int) step, supplier);
     }
+
+    protected abstract void fillOne(int index, N value);
+
+    protected abstract void fillOne(int index, NullaryFunction<N> supplier);
 
     protected abstract N get(final int index);
 
@@ -245,6 +273,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
     protected final void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
         this.visit((int) first, (int) limit, (int) step, visitor);
     }
+
+    protected abstract void visitOne(final int index, final VoidFunction<N> visitor);
 
     abstract DenseArray<N> newInstance(int capacity);
 

@@ -19,39 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.store;
+package org.ojalgo.optimisation.system;
 
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.scalar.Scalar;
+public class Solver__ extends KKTSolver2 {
 
-class UnaryOperatorStore<N extends Number> extends LogicalStore<N> {
-
-    private final UnaryFunction<N> myFunction;
-
-    private UnaryOperatorStore(final int rows, final int columns, final MatrixStore<N> base) {
-
-        super(rows, columns, base);
-
-        myFunction = null;
-    }
-
-    UnaryOperatorStore(final MatrixStore<N> base, final UnaryFunction<N> function) {
-
-        super((int) base.countRows(), (int) base.countColumns(), base);
-
-        myFunction = function;
-    }
-
-    public double doubleValue(final long row, final long col) {
-        return myFunction.invoke(this.getBase().doubleValue(row, col));
-    }
-
-    public N get(final long row, final long col) {
-        return myFunction.invoke(this.getBase().get(row, col));
-    }
-
-    public Scalar<N> toScalar(final long row, final long column) {
-        return this.factory().scalar().convert(this.get(row, column));
+    public Solver__() {
+        super();
     }
 
 }

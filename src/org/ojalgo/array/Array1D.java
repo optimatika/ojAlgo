@@ -47,8 +47,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-        Access1D.Visitable<N>, RandomAccess, Serializable {
+public final class Array1D<N extends Number> extends AbstractList<N>
+        implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>, Access1D.Visitable<N>, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access1D.Factory<Array1D<N>> {
 
@@ -236,6 +236,16 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         length = (myLimit - myFirst) / myStep;
     }
 
+    public void add(final long index, final double addend) {
+        final long tmpIndex = myFirst + (myStep * index);
+        myDelegate.add(tmpIndex, addend);
+    }
+
+    public void add(final long index, final Number addend) {
+        final long tmpIndex = myFirst + (myStep * index);
+        myDelegate.add(tmpIndex, addend);
+    }
+
     @Override
     public boolean contains(final Object obj) {
         return this.indexOf(obj) != -1;
@@ -342,6 +352,16 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public void fillAll(final NullaryFunction<N> supplier) {
         myDelegate.fill(myFirst, myLimit, myStep, supplier);
+    }
+
+    public void fillOne(final long index, final N value) {
+        final long tmpIndex = myFirst + (myStep * index);
+        myDelegate.fillOne(tmpIndex, value);
+    }
+
+    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+        final long tmpIndex = myFirst + (myStep * index);
+        myDelegate.fillOne(tmpIndex, supplier);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
@@ -604,6 +624,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public void visitAll(final VoidFunction<N> visitor) {
         myDelegate.visit(myFirst, myLimit, myStep, visitor);
+    }
+
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
+        myDelegate.visitOne(myFirst + (myStep * index), visitor);
     }
 
     public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {

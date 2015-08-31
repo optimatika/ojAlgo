@@ -193,6 +193,22 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
             myDelegate.set(myRow + AccessUtils.row(index, tmpStructure), myColumn + AccessUtils.column(index, tmpStructure), value);
         }
 
+        public void fillOne(final long row, final long column, final N value) {
+            myDelegate.fillOne(myRow + row, myColumn + column, value);
+        }
+
+        public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
+            myDelegate.fillOne(myRow + row, myColumn + column, supplier);
+        }
+
+        public void add(final long row, final long column, final double addend) {
+            myDelegate.add(myRow + row, myColumn + column, addend);
+        }
+
+        public void add(final long row, final long column, final Number addend) {
+            myDelegate.add(myRow + row, myColumn + column, addend);
+        }
+
     }
 
     public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Access2D.Factory<I>, Serializable {
@@ -238,12 +254,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     void exchangeRows(int rowA, int rowB);
 
-    /**
-     * @deprecated v38 Use {@link #conjugate()} or {@link PhysicalStore.Factory#conjugate(Access2D)} instead.
-     */
-    @Deprecated
-    void fillConjugated(Access2D<? extends Number> source);
-
     void fillMatching(Access1D<? extends Number> source);
 
     /**
@@ -272,12 +282,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
      * <code>this(i,j) = aFunc.invoke(aLeftArg,aRightArg(i,j))</code>
      */
     void fillMatching(N leftArg, BinaryFunction<N> func, Access1D<N> rightArg);
-
-    /**
-     * @deprecated v38 Use {@link #transpose()} or {@link PhysicalStore.Factory#transpose(Access2D)} instead.
-     */
-    @Deprecated
-    void fillTransposed(Access2D<? extends Number> source);
 
     /**
      * <p>

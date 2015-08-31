@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Scalar;
 
 /**
  * @author apete
@@ -98,18 +97,6 @@ public final class WrapperStore<N extends Number> extends FactoryStore<N> {
 
     public N get(final long aRow, final long aCol) {
         return this.factory().scalar().cast(myAccess.get(aRow, aCol));
-    }
-
-    public boolean isLowerLeftShaded() {
-        return false;
-    }
-
-    public boolean isUpperRightShaded() {
-        return false;
-    }
-
-    public Scalar<N> toScalar(final long row, final long column) {
-        return this.factory().scalar().convert(myAccess.get(row, column));
     }
 
 }

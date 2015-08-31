@@ -30,10 +30,15 @@ import java.util.stream.DoubleStream;
 import java.util.stream.StreamSupport;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.function.*;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
+import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.ParameterFunction.FixedParameter;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -386,6 +391,16 @@ public class PrimitiveArray extends DenseArray<Double> {
         return StreamSupport.doubleStream(this.spliterator(), parallel);
     }
 
+    @Override
+    protected void add(final int index, final double addend) {
+        data[index] += addend;
+    }
+
+    @Override
+    protected void add(final int index, final Number addend) {
+        data[index] += addend.doubleValue();
+    }
+
     protected final double[] copyOfData() {
         return ArrayUtils.copyOf(data);
     }
@@ -401,7 +416,8 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
-    protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
+    protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function,
+            final Access1D<Double> right) {
         PrimitiveArray.invoke(data, first, limit, 1, left, function, right);
     }
 
@@ -423,6 +439,16 @@ public class PrimitiveArray extends DenseArray<Double> {
     @Override
     protected final void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
         PrimitiveArray.fill(data, first, limit, step, supplier);
+    }
+
+    @Override
+    protected void fillOne(final int index, final Double value) {
+        data[index] = value;
+    }
+
+    @Override
+    protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
+        data[index] = supplier.doubleValue();
     }
 
     @Override
@@ -535,6 +561,11 @@ public class PrimitiveArray extends DenseArray<Double> {
 
     @Override
     protected final void visit(final int index, final VoidFunction<Double> visitor) {
+        visitor.invoke(data[index]);
+    }
+
+    @Override
+    protected void visitOne(final int index, final VoidFunction<Double> visitor) {
         visitor.invoke(data[index]);
     }
 

@@ -87,23 +87,23 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
-    public interface Fillable<N extends Number> extends Structure1D {
+    public interface Fillable<N extends Number> extends Settable<N> {
 
         void fillAll(N value);
 
         void fillAll(NullaryFunction<N> supplier);
 
+        void fillOne(long index, N value);
+
+        void fillOne(long index, NullaryFunction<N> supplier);
+
         void fillRange(long first, long limit, N value);
 
         void fillRange(long first, long limit, NullaryFunction<N> supplier);
 
-        void set(long index, double value);
-
-        void set(long index, Number value);
-
     }
 
-    public interface Modifiable<N extends Number> extends Structure1D {
+    public interface Modifiable<N extends Number> extends Settable<N> {
 
         void modifyAll(UnaryFunction<N> function);
 
@@ -113,9 +113,23 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
+    public interface Settable<N extends Number> extends Structure1D {
+
+        void add(long index, double addend);
+
+        void add(long index, Number addend);
+
+        void set(long index, double value);
+
+        void set(long index, Number value);
+
+    }
+
     public interface Visitable<N extends Number> extends Structure1D {
 
         void visitAll(VoidFunction<N> visitor);
+
+        void visitOne(long index, VoidFunction<N> visitor);
 
         void visitRange(long first, long limit, VoidFunction<N> visitor);
 
