@@ -23,14 +23,14 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.function.BinaryFunction;
 
-class BinaryOperatorStore<N extends Number> extends LogicalStore<N> {
+final class BinaryOperatorStore<N extends Number> extends LogicalStore<N> {
 
     private final BinaryFunction<N> myFunction;
     private final MatrixStore<N> myRight;
 
     private BinaryOperatorStore(final int rows, final int columns, final MatrixStore<N> base) {
 
-        super(rows, columns, base);
+        super(base, rows, columns);
 
         myFunction = null;
         myRight = null;
@@ -38,7 +38,7 @@ class BinaryOperatorStore<N extends Number> extends LogicalStore<N> {
 
     BinaryOperatorStore(final MatrixStore<N> base, final BinaryFunction<N> function, final MatrixStore<N> right) {
 
-        super((int) base.countRows(), (int) base.countColumns(), base);
+        super(base, (int) base.countRows(), (int) base.countColumns());
 
         myFunction = function;
         myRight = right;

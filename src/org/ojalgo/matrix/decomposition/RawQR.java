@@ -27,7 +27,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -251,7 +250,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      */
     @Override
     protected MatrixStore<Double> getInverse(final PrimitiveDenseStore preallocated) {
-        return this.solve(IdentityStore.makePrimitive(this.getRowDim()), preallocated);
+        return this.solve(MatrixStore.PRIMITIVE.makeIdentity(this.getRowDim()).get(), preallocated);
     }
 
     @Override

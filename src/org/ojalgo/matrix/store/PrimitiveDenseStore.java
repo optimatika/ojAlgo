@@ -327,6 +327,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
             return retVal;
         }
+
+        public MatrixStore.Factory<Double> builder() {
+            return MatrixStore.PRIMITIVE;
+        }
     };
 
     static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();

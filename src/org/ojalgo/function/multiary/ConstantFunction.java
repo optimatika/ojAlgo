@@ -30,7 +30,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -88,11 +87,13 @@ public final class ConstantFunction<N extends Number> extends AbstractMultiary<N
     }
 
     public MatrixStore<N> getGradient(final Access1D<N> arg) {
-        return new ZeroStore<>(this.factory(), this.arity(), 1);
+        //return new ZeroStore<>(this.factory(), this.arity(), 1);
+        return this.factory().builder().makeZero(this.arity(), 1).get();
     }
 
     public MatrixStore<N> getHessian(final Access1D<N> arg) {
-        return new ZeroStore<>(this.factory(), this.arity(), this.arity());
+        //return new ZeroStore<>(this.factory(), this.arity(), this.arity());
+        return this.factory().builder().makeZero(this.arity(), this.arity()).get();
     }
 
     public N invoke(final Access1D<N> arg) {

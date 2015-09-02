@@ -778,12 +778,6 @@ public final class MultiplyBoth extends MatrixOperation {
         final double[] tmpLeftRow = new double[complexity];
         double tmpVal;
 
-        final boolean tmpLL = MatrixUtils.isLowerLeftShaded(left);
-        final boolean tmpLU = MatrixUtils.isUpperRightShaded(left);
-        final boolean tmpRL = MatrixUtils.isLowerLeftShaded(right);
-        final boolean tmpRU = MatrixUtils.isUpperRightShaded(right);
-        final boolean tmpPrune = tmpLL || tmpLU || tmpRL || tmpRU;
-
         int tmpFirst = 0;
         int tmpLimit = complexity;
 
@@ -792,12 +786,14 @@ public final class MultiplyBoth extends MatrixOperation {
             for (int c = 0; c < complexity; c++) {
                 tmpLeftRow[c] = left.doubleValue(i + (c * tmpRowDim));
             }
+            final int tmpFirstInRow = MatrixUtils.firstInRow(left, i, 0);
+            final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
 
             for (int j = 0; j < tmpColDim; j++) {
-                if (tmpPrune) {
-                    tmpFirst = FunctionUtils.max(tmpLL ? i - 1 : 0, tmpRU ? j - 1 : 0, 0);
-                    tmpLimit = FunctionUtils.min(tmpLU ? i + 2 : complexity, tmpRL ? j + 2 : complexity, complexity);
-                }
+
+                tmpFirst = MatrixUtils.firstInColumn(right, j, tmpFirstInRow);
+                tmpLimit = MatrixUtils.limitOfColumn(right, j, tmpLimitOfRow);
+
                 tmpVal = PrimitiveMath.ZERO;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
                     tmpVal += tmpLeftRow[c] * right.doubleValue(c + (j * complexity));

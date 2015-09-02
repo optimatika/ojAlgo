@@ -28,7 +28,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
 
-abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
+abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends GenericDecomposition<N>implements SingularValue<N> {
 
     private final BidiagonalDecomposition<N> myBidiagonal;
     private transient MatrixStore<N> myD;
@@ -290,7 +290,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         try {
 
-            retVal = this.doCompute(myTransposed ? this.wrap(matrix).builder().conjugate().build() : matrix, singularValuesOnly, fullSize);
+            retVal = this.doCompute(myTransposed ? this.wrap(matrix).conjugate().build() : matrix, singularValuesOnly, fullSize);
 
         } catch (final Exception anException) {
 

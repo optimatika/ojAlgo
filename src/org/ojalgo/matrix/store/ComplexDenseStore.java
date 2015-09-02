@@ -344,6 +344,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
             return retVal;
         }
+
+        public MatrixStore.Factory<ComplexNumber> builder() {
+            return MatrixStore.COMPLEX;
+        }
     };
 
     static ComplexDenseStore cast(final Access1D<ComplexNumber> matrix) {

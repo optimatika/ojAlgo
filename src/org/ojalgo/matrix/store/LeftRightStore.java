@@ -35,12 +35,12 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
+final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
 
     private final MatrixStore<N> myRight;
     private final int mySplit;
 
-    public LeftRightStore(final MatrixStore<N> base, final MatrixStore<N> right) {
+    LeftRightStore(final MatrixStore<N> base, final MatrixStore<N> right) {
 
         super((int) base.countRows(), (int) (base.countColumns() + right.countColumns()), base);
 

@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.netio.BasicLogger;
@@ -67,14 +66,14 @@ public class LDLTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpL, tmpRawLDL.getL());
         TestUtils.assertEquals(tmpD, tmpRawLDL.getD());
 
-        final MatrixStore<Double> tmpRawInv = tmpRawLDL.solve(IdentityStore.PRIMITIVE.make(3));
-        final MatrixStore<Double> tmpPrimInv = tmpPrimLDL.solve(IdentityStore.PRIMITIVE.make(3));
+        final MatrixStore<Double> tmpRawInv = tmpRawLDL.solve(MatrixStore.PRIMITIVE.makeIdentity(3).get());
+        final MatrixStore<Double> tmpPrimInv = tmpPrimLDL.solve(MatrixStore.PRIMITIVE.makeIdentity(3).get());
 
         final MatrixStore<Double> tmpRawId = tmpRawInv.multiply(tmpA);
         final MatrixStore<Double> tmpPrimId = tmpPrimInv.multiply(tmpA);
 
         tmpRawLDL.decompose(tmpRawInv);
-        final MatrixStore<Double> tmpInverse2 = tmpRawLDL.solve(IdentityStore.PRIMITIVE.make(3));
+        final MatrixStore<Double> tmpInverse2 = tmpRawLDL.solve(MatrixStore.PRIMITIVE.makeIdentity(3).get());
 
         TestUtils.assertEquals(tmpA, tmpInverse2);
     }

@@ -62,7 +62,7 @@ class TridiagonalAltDecomp extends InPlaceDecomposition<Double>implements Tridia
 
         final DiagonalAccess<Double> tmpAccess = DiagonalAccess.makePrimitive(tmpMain, tmpOff, tmpOff);
 
-        return this.wrap(tmpAccess);
+        return this.wrap(tmpAccess).get();
     }
 
     public MatrixStore<Double> getQ() {

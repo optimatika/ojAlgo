@@ -35,14 +35,14 @@ abstract class LogicalStore<N extends Number> extends AbstractStore<N> {
     @SuppressWarnings("unused")
     private LogicalStore(final int aRowDim, final int aColDim) {
 
-        this(aRowDim, aColDim, null);
+        this(null, aRowDim, aColDim);
 
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected LogicalStore(final int rowCount, final int columnCount, final MatrixStore<N> base) {
+    protected LogicalStore(final MatrixStore<N> base, final int rowsCount, final int columnsCount) {
 
-        super(rowCount, columnCount);
+        super(rowsCount, columnsCount);
 
         myBase = base;
 

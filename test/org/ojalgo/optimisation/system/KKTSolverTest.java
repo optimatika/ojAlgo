@@ -29,7 +29,6 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.convex.MostBasicCase;
 import org.ojalgo.optimisation.convex.Qsd20030327P1Case;
@@ -83,8 +82,8 @@ public class KKTSolverTest extends FunctionalityTest {
         final BasicMatrix[] tmpMatrices = new BigMatrix[5];
 
         // Equations/Equalities
-        tmpMatrices[0] = BigMatrix.FACTORY.rows(new double[][] { { 1, 1, 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 1, 0 },
-                { 0, 0, 0, 0, 0, 0, 1 } });
+        tmpMatrices[0] = BigMatrix.FACTORY
+                .rows(new double[][] { { 1, 1, 1, 1, 1, 1, 1 }, { 0, 0, 0, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 1, 0 }, { 0, 0, 0, 0, 0, 0, 1 } });
 
         // Levels/Values
         tmpMatrices[1] = BigMatrix.FACTORY.rows(new double[][] { { 1 }, { 0.0000 }, { 0.0000 }, { 0.0000 } });
@@ -107,10 +106,9 @@ public class KKTSolverTest extends FunctionalityTest {
                         0.000000000000000000000000, 1.000000000000000000000000 } });
 
         // Linear
-        tmpMatrices[3] = BigMatrix.FACTORY.rows(
-                new double[][] { { -0.1100000000000000000000000000 }, { -0.1100000000000000000000000000 }, { -0.5000000000000000000000000000 },
-                        { -0.2800000000000000000000000000 }, { 0.0000000000000000000000000000 }, { 0.0000000000000000000000000000 },
-                        { 0.0000000000000000000000000000 } }).negate();
+        tmpMatrices[3] = BigMatrix.FACTORY.rows(new double[][] { { -0.1100000000000000000000000000 }, { -0.1100000000000000000000000000 },
+                { -0.5000000000000000000000000000 }, { -0.2800000000000000000000000000 }, { 0.0000000000000000000000000000 },
+                { 0.0000000000000000000000000000 }, { 0.0000000000000000000000000000 } }).negate();
 
         // LagrangeSolver
         tmpMatrices[4] = tmpMatrices[3];
@@ -150,11 +148,10 @@ public class KKTSolverTest extends FunctionalityTest {
                         0.002783000000000000000000, 1.004840680625000000000000 } });
 
         // Linear
-        tmpMatrices[3] = BigMatrix.FACTORY.rows(
-                new double[][] { { -0.00059512500000000000000000000000000000000000 }, { -0.00071070000000000000000000000000000000000000 },
-                        { -0.00127305000000000000000000000000000000000000 }, { -0.00222180000000000000000000000000000000000000 },
-                        { -1.00000000000000000000000000000000000000000000 }, { -0.00069000000000000000000000000000000000000000 },
-                        { -0.00120016875000000000000000000000000000000000 } }).negate();
+        tmpMatrices[3] = BigMatrix.FACTORY.rows(new double[][] { { -0.00059512500000000000000000000000000000000000 },
+                { -0.00071070000000000000000000000000000000000000 }, { -0.00127305000000000000000000000000000000000000 },
+                { -0.00222180000000000000000000000000000000000000 }, { -1.00000000000000000000000000000000000000000000 },
+                { -0.00069000000000000000000000000000000000000000 }, { -0.00120016875000000000000000000000000000000000 } }).negate();
 
         // LagrangeSolver
         tmpMatrices[4] = BigMatrix.FACTORY.rows(new double[][] { { 0.0000 }, { 0.0000 }, { 0.0000 }, { 0.0000 }, { 0.8709 }, { 0.0000 }, { 0.1291 } });
@@ -201,8 +198,8 @@ public class KKTSolverTest extends FunctionalityTest {
         final BasicMatrix[] tmpMatrices = new BigMatrix[5];
 
         // Equations/Equalities
-        tmpMatrices[0] = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.0738, 0.1288, 0.069575 },
-                { 0.0, 0.0, 0.0, 0.0, 1.0 } });
+        tmpMatrices[0] = BigMatrix.FACTORY
+                .rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.0738, 0.1288, 0.069575 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } });
 
         // Levels/Values
         tmpMatrices[1] = BigMatrix.FACTORY.rows(new double[][] { { 1.0 }, { 0.069575 }, { 0.0 } });
@@ -228,8 +225,8 @@ public class KKTSolverTest extends FunctionalityTest {
         final BasicMatrix[] tmpMatrices = new BigMatrix[5];
 
         // Equations/Equalities
-        tmpMatrices[0] = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.0738, 0.1288, 0.069575 },
-                { 0.0, 0.0, 0.0, 0.0, 1.0 } });
+        tmpMatrices[0] = BigMatrix.FACTORY
+                .rows(new double[][] { { 1.0, 1.0, 1.0, 1.0, 1.0 }, { 0.0345, 0.0412, 0.0738, 0.1288, 0.069575 }, { 0.0, 0.0, 0.0, 0.0, 1.0 } });
 
         // Levels/Values
         tmpMatrices[1] = BigMatrix.FACTORY.rows(new double[][] { { 1.0 }, { 0.043807039117990006 }, { 0.0 } });
@@ -297,7 +294,7 @@ public class KKTSolverTest extends FunctionalityTest {
         TestUtils.assertEquals(tmpX, tmpFullX, context);
 
         final KKTSystem.Input tmpStepInput = new KKTSystem.Input(tmpQ, tmpC.add(tmpQ.multiply(tmpFullX).negate()), tmpA,
-                tmpB != null ? ZeroStore.makePrimitive((int) tmpB.countRows(), (int) tmpB.countColumns()) : null);
+                tmpB != null ? MatrixStore.PRIMITIVE.makeZero((int) tmpB.countRows(), (int) tmpB.countColumns()).get() : null);
 
         final KKTSolver tmpStepSolver = new KKTSolver(tmpFullInput);
         final KKTSystem.Output tmpStepOutput = tmpStepSolver.solve(tmpStepInput, tmpOptions);

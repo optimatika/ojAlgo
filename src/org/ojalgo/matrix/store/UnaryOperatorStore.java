@@ -24,20 +24,20 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.scalar.Scalar;
 
-class UnaryOperatorStore<N extends Number> extends LogicalStore<N> {
+final class UnaryOperatorStore<N extends Number> extends LogicalStore<N> {
 
     private final UnaryFunction<N> myFunction;
 
     private UnaryOperatorStore(final int rows, final int columns, final MatrixStore<N> base) {
 
-        super(rows, columns, base);
+        super(base, rows, columns);
 
         myFunction = null;
     }
 
     UnaryOperatorStore(final MatrixStore<N> base, final UnaryFunction<N> function) {
 
-        super((int) base.countRows(), (int) base.countColumns(), base);
+        super(base, (int) base.countRows(), (int) base.countColumns());
 
         myFunction = function;
     }

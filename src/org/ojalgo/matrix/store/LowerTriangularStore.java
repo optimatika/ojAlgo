@@ -25,11 +25,11 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
-public final class LowerTriangularStore<N extends Number> extends ShadingStore<N> {
+final class LowerTriangularStore<N extends Number> extends ShadingStore<N> {
 
     private final boolean myUnitDiagonal;
 
-    public LowerTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
+    LowerTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
 
         super((int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()), base);
 

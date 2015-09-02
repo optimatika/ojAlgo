@@ -35,7 +35,6 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -117,7 +116,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         final int tmpConstraintsCount = this.countConstraints();
 
-        final MatrixStore.Builder<Double> tmpTableauBuilder = ZeroStore.makePrimitive(1, 1).builder();
+        final MatrixStore.Builder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE.makeZero(1, 1).get().builder();
         tmpTableauBuilder.left(matrices.getC().transpose());
 
         if (tmpConstraintsCount >= 1) {

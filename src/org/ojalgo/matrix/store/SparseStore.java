@@ -33,61 +33,61 @@ public final class SparseStore<N extends Number> extends FactoryStore<N>implemen
 
     public static interface Factory<N extends Number> {
 
-        SparseStore<N> make(int rows, int columns);
+        SparseStore<N> make(long rowsCount, long columnsCount);
 
     }
 
     public static final SparseStore.Factory<BigDecimal> BIG = new SparseStore.Factory<BigDecimal>() {
 
-        public SparseStore<BigDecimal> make(final int rows, final int columns) {
-            return SparseStore.makeBig(rows, columns);
+        public SparseStore<BigDecimal> make(final long rowsCount, final long columnsCount) {
+            return SparseStore.makeBig((int) rowsCount, (int) columnsCount);
         }
 
     };
 
     public static final SparseStore.Factory<ComplexNumber> COMPLEX = new SparseStore.Factory<ComplexNumber>() {
 
-        public SparseStore<ComplexNumber> make(final int rows, final int columns) {
-            return SparseStore.makeComplex(rows, columns);
+        public SparseStore<ComplexNumber> make(final long rowsCount, final long columnsCount) {
+            return SparseStore.makeComplex((int) rowsCount, (int) columnsCount);
         }
 
     };
 
     public static final SparseStore.Factory<Double> PRIMITIVE = new SparseStore.Factory<Double>() {
 
-        public SparseStore<Double> make(final int rows, final int columns) {
-            return SparseStore.makePrimitive(rows, columns);
+        public SparseStore<Double> make(final long rowsCount, final long columnsCount) {
+            return SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
         }
 
     };
 
-    private static final int[] EMPTY_ROW = new int[0];
-
-    public static SparseStore<BigDecimal> makeBig(final int rows, final int columns) {
-        return new SparseStore<>(rows, columns, BigDenseStore.FACTORY, SparseArray.makeBig(rows * columns));
+    public static SparseStore<BigDecimal> makeBig(final int rowsCount, final int columnsCount) {
+        return new SparseStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.makeBig(rowsCount * columnsCount));
     }
 
-    public static SparseStore<ComplexNumber> makeComplex(final int rows, final int columns) {
-        return new SparseStore<>(rows, columns, ComplexDenseStore.FACTORY, SparseArray.makeComplex(rows * columns));
+    public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
+        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.makeComplex(rowsCount * columnsCount));
     }
 
-    public static SparseStore<Double> makePrimitive(final int rows, final int columns) {
-        return new SparseStore<>(rows, columns, PrimitiveDenseStore.FACTORY, SparseArray.makePrimitive(rows * columns));
+    public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {
+        return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.makePrimitive(rowsCount * columnsCount));
     }
 
     private final SparseArray<N> myElements;
     private final int[] myFirsts;
     private final int[] myLimits;
 
-    @SuppressWarnings("unused")
-    private SparseStore(final int rowsCount, final int columnsCount, final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> factory) {
-        this(rowsCount, columnsCount, factory, null);
+    private SparseStore(final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
+        super(factory, rowsCount, columnsCount);
+        myElements = null;
+        myFirsts = null;
+        myLimits = null;
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    SparseStore(final int rowsCount, final int columnsCount, final PhysicalStore.Factory<N, ?> factory, final SparseArray<N> elements) {
+    SparseStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount, final SparseArray<N> elements) {
 
-        super(rowsCount, columnsCount, factory);
+        super(factory, rowsCount, columnsCount);
 
         myElements = elements;
         myFirsts = new int[rowsCount];
@@ -112,29 +112,6 @@ public final class SparseStore<N extends Number> extends FactoryStore<N>implemen
         return myElements.doubleValue(AccessUtils.index(myFirsts.length, row, col));
     }
 
-    public N get(final long row, final long col) {
-        return myElements.get(AccessUtils.index(myFirsts.length, row, col));
-    }
-
-    public void set(final long row, final long col, final double value) {
-        myElements.set(AccessUtils.index(myFirsts.length, row, col), value);
-        this.updateNonZeros(row, col);
-    }
-
-    public void set(final long row, final long col, final Number value) {
-        myElements.set(AccessUtils.index(myFirsts.length, row, col), value);
-        this.updateNonZeros(row, col);
-    }
-
-    private void updateNonZeros(final long row, final long col) {
-        this.updateNonZeros((int) row, (int) col);
-    }
-
-    void updateNonZeros(final int row, final int col) {
-        myFirsts[row] = Math.min(col, myFirsts[row]);
-        myLimits[row] = Math.max(col, myLimits[row]);
-    }
-
     public int firstInColumn(final int col) {
 
         final int tmpRowDim = myFirsts.length;
@@ -153,6 +130,10 @@ public final class SparseStore<N extends Number> extends FactoryStore<N>implemen
 
     public int firstInRow(final int row) {
         return myFirsts[row];
+    }
+
+    public N get(final long row, final long col) {
+        return myElements.get(AccessUtils.index(myFirsts.length, row, col));
     }
 
     @Override
@@ -175,6 +156,25 @@ public final class SparseStore<N extends Number> extends FactoryStore<N>implemen
     @Override
     public int limitOfRow(final int row) {
         return myLimits[row];
+    }
+
+    public void set(final long row, final long col, final double value) {
+        myElements.set(AccessUtils.index(myFirsts.length, row, col), value);
+        this.updateNonZeros(row, col);
+    }
+
+    public void set(final long row, final long col, final Number value) {
+        myElements.set(AccessUtils.index(myFirsts.length, row, col), value);
+        this.updateNonZeros(row, col);
+    }
+
+    private void updateNonZeros(final long row, final long col) {
+        this.updateNonZeros((int) row, (int) col);
+    }
+
+    void updateNonZeros(final int row, final int col) {
+        myFirsts[row] = Math.min(col, myFirsts[row]);
+        myLimits[row] = Math.max(col, myLimits[row]);
     }
 
 }

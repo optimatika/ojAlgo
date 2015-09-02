@@ -21,12 +21,9 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -34,75 +31,31 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class IdentityStore<N extends Number> extends FactoryStore<N> {
+final class IdentityStore<N extends Number> extends FactoryStore<N> {
 
-    public static interface Factory<N extends Number> {
+    private final int myDimension;
 
-        IdentityStore<N> make(int dimension);
-
-    }
-
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
-
-        public IdentityStore<BigDecimal> make(final int dimension) {
-            return IdentityStore.makeBig(dimension);
-        }
-
-    };
-
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        public IdentityStore<ComplexNumber> make(final int dimension) {
-            return IdentityStore.makeComplex(dimension);
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
-
-        public IdentityStore<Double> make(final int dimension) {
-            return IdentityStore.makePrimitive(dimension);
-        }
-
-    };
-
-    public static IdentityStore<BigDecimal> makeBig(final int dimension) {
-        return new IdentityStore<BigDecimal>(BigDenseStore.FACTORY, dimension);
-    }
-
-    public static IdentityStore<ComplexNumber> makeComplex(final int dimension) {
-        return new IdentityStore<ComplexNumber>(ComplexDenseStore.FACTORY, dimension);
-    }
-
-    public static IdentityStore<Double> makePrimitive(final int dimension) {
-        return new IdentityStore<Double>(PrimitiveDenseStore.FACTORY, dimension);
-    }
-
-    private final int myDim;
-
-    public IdentityStore(final PhysicalStore.Factory<N, ?> aFactory, final int dimension) {
-
-        super(dimension, dimension, aFactory);
-
-        myDim = dimension;
-    }
-
-    @SuppressWarnings("unused")
-    private IdentityStore(final PhysicalStore.Factory<N, ?> aFactory) {
-
-        this(aFactory, 0);
-
+    private IdentityStore(final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
+        super(factory, rowsCount, columnsCount);
+        myDimension = 0;
         ProgrammingError.throwForIllegalInvocation();
     }
 
+    IdentityStore(final PhysicalStore.Factory<N, ?> factory, final int dimension) {
+
+        super(factory, dimension, dimension);
+
+        myDimension = dimension;
+    }
+
     @Override
-    public PhysicalStore<N> conjugate() {
-        return this.factory().makeEye(myDim, myDim);
+    public MatrixStore<N> conjugate() {
+        return this;
     }
 
     @Override
     public PhysicalStore<N> copy() {
-        return this.factory().makeEye(myDim, myDim);
+        return this.factory().makeEye(myDimension, myDimension);
     }
 
     public double doubleValue(final long aRow, final long aCol) {
@@ -113,11 +66,40 @@ public final class IdentityStore<N extends Number> extends FactoryStore<N> {
         }
     }
 
+    public int firstInColumn(final int col) {
+        return col;
+    }
+
+    public int firstInRow(final int row) {
+        return row;
+    }
+
     public N get(final long aRow, final long aCol) {
         if (aRow == aCol) {
             return this.factory().scalar().one().getNumber();
         } else {
             return this.factory().scalar().zero().getNumber();
+        }
+    }
+
+    @Override
+    public int limitOfColumn(final int col) {
+        return col + 1;
+    }
+
+    @Override
+    public int limitOfRow(final int row) {
+        return row + 1;
+    }
+
+    @Override
+    public MatrixStore<N> multiply(final Access1D<N> right) {
+        if (this.getColDim() == right.count()) {
+            return this.factory().columns(right);
+        } else if (right instanceof MatrixStore<?>) {
+            return ((MatrixStore<N>) right).copy();
+        } else {
+            return super.multiply(right);
         }
     }
 
@@ -132,17 +114,6 @@ public final class IdentityStore<N extends Number> extends FactoryStore<N> {
         }
     }
 
-    @Override
-    public MatrixStore<N> multiply(final Access1D<N> right) {
-        if (this.getColDim() == right.count()) {
-            return this.factory().columns(right);
-        } else if (right instanceof MatrixStore<?>) {
-            return ((MatrixStore<N>) right).copy();
-        } else {
-            return super.multiply(right);
-        }
-    }
-
     public Scalar<N> toScalar(final long row, final long column) {
         if (row == column) {
             return this.factory().scalar().one();
@@ -152,26 +123,8 @@ public final class IdentityStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public PhysicalStore<N> transpose() {
-        return this.factory().makeEye(myDim, myDim);
-    }
-
-    public int firstInColumn(final int col) {
-        return col;
-    }
-
-    public int firstInRow(final int row) {
-        return row;
-    }
-
-    @Override
-    public int limitOfColumn(final int col) {
-        return col + 1;
-    }
-
-    @Override
-    public int limitOfRow(final int row) {
-        return row + 1;
+    public MatrixStore<N> transpose() {
+        return this;
     }
 
 }

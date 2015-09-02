@@ -21,11 +21,8 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.ojalgo.matrix.store.AboveBelowStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.RowsStore;
-import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.system.KKTSystem;
 
 class MixedASS extends ActiveSetSolver {
@@ -50,9 +47,10 @@ class MixedASS extends ActiveSetSolver {
         if (included.length == 0) {
             tmpSubAE = tmpAE;
         } else {
-            tmpSubAE = new AboveBelowStore<Double>(tmpAE, new RowsStore<Double>(tmpAI, included));
+            //tmpSubAE = new AboveBelowStore<Double>(tmpAE, new RowsStore<Double>(tmpAI, included));
+            tmpSubAE = tmpAI.builder().row(included).above(tmpAE).build();
         }
-        final ZeroStore<Double> tmpSubBE = ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1);
+        final MatrixStore<Double> tmpSubBE = MatrixStore.PRIMITIVE.makeZero((int) tmpSubAE.countRows(), 1).get();
 
         return new KKTSystem.Input(tmpSubQ, tmpSubC, tmpSubAE, tmpSubBE);
     }

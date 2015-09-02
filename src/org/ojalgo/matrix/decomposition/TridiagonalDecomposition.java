@@ -37,7 +37,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
+abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N>implements Tridiagonal<N> {
 
     static final class Big extends TridiagonalDecomposition<BigDecimal> {
 
@@ -118,7 +118,7 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
 
             final int tmpRowDim = (int) matrix.countRows(); // Which is also the col-dim.
 
-            final Access2D<N> aTriangularMtrx = this.wrap(matrix).builder().triangular(false, false).build();
+            final Access2D<N> aTriangularMtrx = this.wrap(matrix).triangular(false, false).build();
 
             final DecompositionStore<N> tmpInPlace = this.setInPlace(aTriangularMtrx);
 
@@ -207,7 +207,7 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
     }
 
     protected final MatrixStore<N> makeD() {
-        return this.wrap(this.getDiagonalAccessD());
+        return this.wrap(this.getDiagonalAccessD()).get();
     }
 
     protected final DecompositionStore<N> makeQ() {

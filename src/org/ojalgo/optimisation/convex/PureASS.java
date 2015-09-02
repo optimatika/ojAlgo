@@ -23,8 +23,6 @@ package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.RowsStore;
-import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.system.KKTSystem;
 
 class PureASS extends ActiveSetSolver {
@@ -46,11 +44,12 @@ class PureASS extends ActiveSetSolver {
 
         MatrixStore<Double> tmpSubAE = null;
         if (included.length == 0) {
-            tmpSubAE = ZeroStore.makePrimitive(0, (int) tmpC.countRows());
+            tmpSubAE = MatrixStore.PRIMITIVE.makeZero(0, (int) tmpC.countRows()).get();
         } else {
-            tmpSubAE = new RowsStore<Double>(tmpAI, included);
+            //tmpSubAE = new RowsStore<Double>(tmpAI, included);
+            tmpSubAE = tmpAI.builder().row(included).build();
         }
-        final ZeroStore<Double> tmpSubBE = ZeroStore.makePrimitive((int) tmpSubAE.countRows(), 1);
+        final MatrixStore<Double> tmpSubBE = MatrixStore.PRIMITIVE.makeZero((int) tmpSubAE.countRows(), 1).get();
 
         return new KKTSystem.Input(tmpSubQ, tmpSubC, tmpSubAE, tmpSubBE);
     }

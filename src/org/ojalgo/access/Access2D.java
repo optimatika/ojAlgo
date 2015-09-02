@@ -55,25 +55,25 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     public interface Elements extends Structure2D, Access1D.Elements {
 
-        /**
-         * @see Scalar#isAbsolute()
-         */
-        boolean isAbsolute(long row, long column);
-
         default boolean isAbsolute(final long index) {
             final long tmpStructure = this.countRows();
             return this.isAbsolute(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure));
         }
 
         /**
-         * @see Scalar#isSmall(double)
+         * @see Scalar#isAbsolute()
          */
-        boolean isSmall(long row, long column, double comparedTo);
+        boolean isAbsolute(long row, long column);
 
         default boolean isSmall(final long index, final double comparedTo) {
             final long tmpStructure = this.countRows();
             return this.isSmall(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), comparedTo);
         }
+
+        /**
+         * @see Scalar#isSmall(double)
+         */
+        boolean isSmall(long row, long column, double comparedTo);
 
         /**
          * @see Scalar#isZero()
@@ -153,6 +153,18 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), supplier);
         }
 
+        default void fillRange(final long first, final long limit, final N value) {
+            for (long i = first; i < limit; i++) {
+                this.fillOne(i, value);
+            }
+        }
+
+        default void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+            for (long i = first; i < limit; i++) {
+                this.fillOne(i, supplier);
+            }
+        }
+
         default void fillRow(final long row, final long column, final Access1D<N> values) {
             for (long j = 0L; j < values.count(); j++) {
                 this.set(row, column + j, values.get(j));
@@ -187,6 +199,12 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         default void modifyOne(final long index, final UnaryFunction<N> function) {
             final long tmpStructure = this.countRows();
             this.modifyOne(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), function);
+        }
+
+        default void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
+            for (long i = first; i < limit; i++) {
+                this.modifyOne(i, function);
+            }
         }
 
         void modifyRow(long row, long column, UnaryFunction<N> function);

@@ -36,7 +36,6 @@ import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.TransposedStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -272,7 +271,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
             final PhysicalStore<N> tmpMtrx = tmpV.conjugate().copy();
 
             final N tmpZero = this.scalar().zero().getNumber();
-            final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();
+            final BinaryFunction<N> tmpDivide = this.function().divide();
 
             for (int i = 0; i < tmpDim; i++) {
                 if (tmpD.isZero(i, i)) {
@@ -298,10 +297,11 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
             final int tmpDim = (int) tmpD.countRows();
 
             final PhysicalStore<N> tmpMtrx = preallocated;
-            tmpMtrx.fillMatching(new TransposedStore<N>(tmpV));
+            //tmpMtrx.fillMatching(new TransposedStore<N>(tmpV));
+            tmpMtrx.fillMatching(tmpV.transpose());
 
             final N tmpZero = this.scalar().zero().getNumber();
-            final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();
+            final BinaryFunction<N> tmpDivide = this.function().divide();
 
             for (int i = 0; i < tmpDim; i++) {
                 if (tmpD.isZero(i, i)) {
@@ -403,7 +403,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
 
     @Override
     protected MatrixStore<N> makeD() {
-        return this.wrap(new DiagonalAccess<Double>(myDiagonalValues, null, null, PrimitiveMath.ZERO));
+        return this.wrap(new DiagonalAccess<Double>(myDiagonalValues, null, null, PrimitiveMath.ZERO)).get();
     }
 
     @Override

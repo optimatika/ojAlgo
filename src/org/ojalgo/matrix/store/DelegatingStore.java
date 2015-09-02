@@ -78,7 +78,7 @@ abstract class DelegatingStore<N extends Number> extends LogicalStore<N> {
     }
 
     protected DelegatingStore(final int rowsCount, final int columnsCount, final MatrixStore<N> base) {
-        super(rowsCount, columnsCount, base);
+        super(base, rowsCount, columnsCount);
     }
 
     protected final Future<MatrixStore<N>> executeMultiplyLeftOnBase(final Access1D<N> left) {

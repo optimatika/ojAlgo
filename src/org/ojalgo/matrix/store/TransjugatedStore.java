@@ -27,13 +27,13 @@ abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
 
     private TransjugatedStore(final int rows, final int columns, final MatrixStore<N> base) {
 
-        super(rows, columns, base);
+        super(base, rows, columns);
 
         ProgrammingError.throwForIllegalInvocation();
     }
 
     protected TransjugatedStore(final MatrixStore<N> base) {
-        super((int) base.countColumns(), (int) base.countRows(), base);
+        super(base, (int) base.countColumns(), (int) base.countRows());
     }
 
     public final double doubleValue(final long aRow, final long aCol) {

@@ -26,10 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.ColumnsStore;
-import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.RowsStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**

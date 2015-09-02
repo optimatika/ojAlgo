@@ -25,7 +25,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.LowerHermitianStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -139,7 +138,8 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         preallocated.substituteForwards(tmpBody, false, false, true);
         preallocated.substituteBackwards(tmpBody, false, true, true);
 
-        return new LowerHermitianStore<>(preallocated);
+        //return new LowerHermitianStore<>(preallocated);
+        return preallocated.builder().hermitian(false).get();
     }
 
     @Override

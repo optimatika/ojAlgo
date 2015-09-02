@@ -30,12 +30,12 @@ abstract class FactoryStore<N extends Number> extends AbstractStore<N> {
     @SuppressWarnings("unused")
     private FactoryStore(final int rowsCount, final int columnsCount) {
 
-        this(rowsCount, columnsCount, null);
+        this(null, rowsCount, columnsCount);
 
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected FactoryStore(final int rowsCount, final int columnsCount, final PhysicalStore.Factory<N, ?> factory) {
+    protected FactoryStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
 
         super(rowsCount, columnsCount);
 

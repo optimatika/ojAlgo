@@ -303,6 +303,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
             return new RawStore(retVal);
         }
 
+        public MatrixStore.Factory<Double> builder() {
+            return MatrixStore.PRIMITIVE;
+        }
+
     };
 
     /**

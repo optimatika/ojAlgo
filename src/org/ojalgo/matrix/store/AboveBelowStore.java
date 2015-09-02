@@ -35,12 +35,12 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
+final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
 
     private final MatrixStore<N> myBelow;
     private final int mySplit;
 
-    public AboveBelowStore(final MatrixStore<N> base, final MatrixStore<N> below) {
+    AboveBelowStore(final MatrixStore<N> base, final MatrixStore<N> below) {
 
         super((int) (base.countRows() + below.countRows()), (int) base.countColumns(), base);
 

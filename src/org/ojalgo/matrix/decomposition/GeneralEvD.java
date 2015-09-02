@@ -173,7 +173,7 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
         final PhysicalStore<N> tmpMtrx = tmpV.transpose().copy();
 
         final N tmpZero = this.scalar().zero().getNumber();
-        final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();
+        final BinaryFunction<N> tmpDivide = this.function().divide();
 
         for (int i = 0; i < tmpDim; i++) {
             if (tmpD.isZero(i, i)) {

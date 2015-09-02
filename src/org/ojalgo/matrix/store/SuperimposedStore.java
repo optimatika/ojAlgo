@@ -29,7 +29,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
+final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
 
     private final int myColFirst;
     private final int myColLimit;
@@ -37,7 +37,7 @@ public final class SuperimposedStore<N extends Number> extends DelegatingStore<N
     private final int myRowFirst;
     private final int myRowLimit;
 
-    public SuperimposedStore(final MatrixStore<N> base, final int row, final int column, final MatrixStore<N> diff) {
+    SuperimposedStore(final MatrixStore<N> base, final int row, final int column, final MatrixStore<N> diff) {
 
         super((int) base.countRows(), (int) base.countColumns(), base);
 

@@ -28,7 +28,6 @@ import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20030422Case;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -63,8 +62,8 @@ public class QRTest extends MatrixDecompositionTests {
 
     public void testDiagonalCase() {
 
-        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 },
-                { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
+        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 }, { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
         final QR<Double> tmpDecomp = QR.makePrimitive();
         tmpDecomp.decompose(tmpOriginalMatrix);
@@ -201,7 +200,7 @@ public class QRTest extends MatrixDecompositionTests {
         MatrixUtils.setThresholdsMinValue(100000);
 
         final int tmpDim = 3;
-        final MatrixStore<Double> tmpA = MatrixUtils.makeSPD(tmpDim).builder().below(new IdentityStore<>(PrimitiveDenseStore.FACTORY, tmpDim)).build();
+        final MatrixStore<Double> tmpA = MatrixUtils.makeSPD(tmpDim).builder().below(MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get()).build();
 
         final QR<Double> tmpDenseQR = new QRDecomposition.Primitive();
         final QR<Double> tmpRawQR = new RawQR();
@@ -214,7 +213,7 @@ public class QRTest extends MatrixDecompositionTests {
 
         TestUtils.assertEquals(tmpDenseInv, tmpRawInv);
 
-        final IdentityStore<Double> tmpIdentity = IdentityStore.makePrimitive(tmpDim);
+        final MatrixStore<Double> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get();
         TestUtils.assertEquals(tmpIdentity, tmpDenseInv.multiply(tmpA));
         TestUtils.assertEquals(tmpIdentity, tmpRawInv.multiply(tmpA));
     }

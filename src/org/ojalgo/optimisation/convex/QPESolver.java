@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.convex;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.system.KKTSystem;
 
@@ -116,7 +115,7 @@ final class QPESolver extends ConvexSolver {
 
             final PhysicalStore<Double> tmpX = this.getX();
 
-            return new KKTSystem.Input(tmpQ, tmpC.subtract(tmpQ.multiply(tmpX)), tmpA, ZeroStore.makePrimitive((int) tmpA.countRows(), 1));
+            return new KKTSystem.Input(tmpQ, tmpC.subtract(tmpQ.multiply(tmpX)), tmpA, MatrixStore.PRIMITIVE.makeZero((int) tmpA.countRows(), 1).get());
 
         } else {
 

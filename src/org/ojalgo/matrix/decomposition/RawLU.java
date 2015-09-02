@@ -32,8 +32,6 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.store.RowsStore;
-import org.ojalgo.matrix.store.WrapperStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.type.context.NumberContext;
 
@@ -208,7 +206,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     @Override
     protected MatrixStore<Double> solve(final Access2D<Double> rhs, final PrimitiveDenseStore preallocated) {
 
-        preallocated.fillMatching(new RowsStore<Double>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
+        //preallocated.fillMatching(new RowsStore<Double>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
+        preallocated.fillMatching(preallocated.factory().builder().makeWrapper(rhs).row(myPivot.getOrder()).get());
 
         final MatrixStore<Double> tmpBody = this.getRawInPlaceStore();
 

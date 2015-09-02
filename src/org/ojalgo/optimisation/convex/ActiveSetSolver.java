@@ -26,7 +26,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
-import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.optimisation.Optimisation;
@@ -231,7 +230,7 @@ abstract class ActiveSetSolver extends ConvexSolver {
             }
 
             if (tmpNumInes > 0) {
-                final MatrixStore<Double> tmpAIpart = tmpAI.builder().right(tmpAI.negate()).right(IdentityStore.makePrimitive(tmpNumInes)).build();
+                final MatrixStore<Double> tmpAIpart = tmpAI.builder().right(tmpAI.negate()).right(MatrixStore.PRIMITIVE.makeIdentity(tmpNumInes).get()).build();
                 final MatrixStore<Double> tmpBIpart = tmpBI;
                 if (tmpAEpart != null) {
                     tmpAEpart = tmpAEpart.builder().below(tmpAIpart).build();

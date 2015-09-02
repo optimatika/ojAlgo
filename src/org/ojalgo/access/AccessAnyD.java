@@ -82,11 +82,29 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
         void fillOne(long[] reference, NullaryFunction<N> supplier);
 
+        default void fillRange(final long first, final long limit, final N value) {
+            for (long i = first; i < limit; i++) {
+                this.fillOne(i, value);
+            }
+        }
+
+        default void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+            for (long i = first; i < limit; i++) {
+                this.fillOne(i, supplier);
+            }
+        }
+
     }
 
     public interface Modifiable<N extends Number> extends Settable<N>, Access1D.Modifiable<N> {
 
         void modifyOne(long[] reference, UnaryFunction<N> function);
+
+        default void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
+            for (long i = first; i < limit; i++) {
+                this.modifyOne(i, function);
+            }
+        }
 
     }
 

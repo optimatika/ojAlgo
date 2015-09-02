@@ -29,7 +29,6 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.store.WrapperStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.matrix.store.operation.SubtractScaledVector;
 import org.ojalgo.type.TypeUtils;
@@ -106,7 +105,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> getD() {
-        return new WrapperStore<Double>(RawStore.FACTORY, new DiagonalAccess<Double>(this.getSingularValues(), null, null, ZERO));
+        //return new WrapperStore<Double>(RawStore.FACTORY, new DiagonalAccess<Double>(this.getSingularValues(), null, null, ZERO));
+        return MatrixStore.PRIMITIVE.makeWrapper(new DiagonalAccess<Double>(this.getSingularValues(), null, null, ZERO)).get();
     }
 
     public double getFrobeniusNorm() {
@@ -536,8 +536,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             case 3: {
 
                 // Calculate the shift.
-                final double scale = Math.max(
-                        Math.max(Math.max(Math.max(Math.abs(myS[p - 1]), Math.abs(myS[p - 2])), Math.abs(tmpE[p - 2])), Math.abs(myS[k])), Math.abs(tmpE[k]));
+                final double scale = Math.max(Math.max(Math.max(Math.max(Math.abs(myS[p - 1]), Math.abs(myS[p - 2])), Math.abs(tmpE[p - 2])), Math.abs(myS[k])),
+                        Math.abs(tmpE[k]));
                 final double sp = myS[p - 1] / scale;
                 final double spm1 = myS[p - 2] / scale;
                 final double epm1 = tmpE[p - 2] / scale;

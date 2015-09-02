@@ -24,9 +24,9 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.scalar.Scalar;
 
-public final class LowerHermitianStore<N extends Number> extends ShadingStore<N> {
+final class LowerHermitianStore<N extends Number> extends ShadingStore<N> {
 
-    public LowerHermitianStore(final MatrixStore<N> base) {
+    LowerHermitianStore(final MatrixStore<N> base) {
         super((int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()), base);
     }
 

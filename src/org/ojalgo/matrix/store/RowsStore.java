@@ -29,26 +29,10 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class RowsStore<N extends Number> extends SelectingStore<N> {
+final class RowsStore<N extends Number> extends SelectingStore<N> {
 
-    private final int[] myRows;
     private final int myFirst;
-
-    public RowsStore(final int aFirst, final int aLimit, final MatrixStore<N> aBase) {
-
-        super(aLimit - aFirst, (int) aBase.countColumns(), aBase);
-
-        myRows = null;
-        myFirst = aFirst;
-    }
-
-    public RowsStore(final MatrixStore<N> aBase, final int... someRows) {
-
-        super(someRows.length, (int) aBase.countColumns(), aBase);
-
-        myRows = someRows;
-        myFirst = 0;
-    }
+    private final int[] myRows;
 
     @SuppressWarnings("unused")
     private RowsStore(final MatrixStore<N> aBase) {
@@ -56,6 +40,22 @@ public final class RowsStore<N extends Number> extends SelectingStore<N> {
         this(aBase, null);
 
         ProgrammingError.throwForIllegalInvocation();
+    }
+
+    RowsStore(final int aFirst, final int aLimit, final MatrixStore<N> aBase) {
+
+        super(aLimit - aFirst, (int) aBase.countColumns(), aBase);
+
+        myRows = null;
+        myFirst = aFirst;
+    }
+
+    RowsStore(final MatrixStore<N> aBase, final int... someRows) {
+
+        super(someRows.length, (int) aBase.countColumns(), aBase);
+
+        myRows = someRows;
+        myFirst = 0;
     }
 
     /**

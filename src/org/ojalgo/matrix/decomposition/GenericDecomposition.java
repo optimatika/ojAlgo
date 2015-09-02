@@ -21,14 +21,11 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.matrix.store.IdentityStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.WrapperStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
@@ -69,16 +66,12 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.copy(source);
     }
 
-    protected final AggregatorSet<N> getAggregatorCollection() {
+    protected final AggregatorSet<N> aggregator() {
         return myFactory.aggregator();
     }
 
-    protected final FunctionSet<N> getFunctionSet() {
+    protected final FunctionSet<N> function() {
         return myFactory.function();
-    }
-
-    protected final int getMaxDimToFitInCache() {
-        return OjAlgoUtils.ENVIRONMENT.getCacheDim2D(8L) / 3;
     }
 
     protected final BasicArray<N> makeArray(final int aLength) {
@@ -93,8 +86,8 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.makeHouseholder(aDim);
     }
 
-    protected final IdentityStore<N> makeIdentity(final int dimension) {
-        return new IdentityStore<N>(myFactory, dimension);
+    protected final MatrixStore.Builder<N> makeIdentity(final int dimension) {
+        return myFactory.builder().makeIdentity(dimension);
     }
 
     protected final Rotation<N> makeRotation(final int aLow, final int aHigh, final double aCos, final double aSin) {
@@ -118,8 +111,8 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.scalar();
     }
 
-    protected final MatrixStore<N> wrap(final Access2D<?> source) {
-        return new WrapperStore<N>(myFactory, source);
+    protected final MatrixStore.Builder<N> wrap(final Access2D<?> source) {
+        return myFactory.builder().makeWrapper(source);
     }
 
 }

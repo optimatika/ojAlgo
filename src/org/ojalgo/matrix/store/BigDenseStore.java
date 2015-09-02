@@ -325,6 +325,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
             return retVal;
         }
+
+        public MatrixStore.Factory<BigDecimal> builder() {
+            return MatrixStore.BIG;
+        }
     };
 
     static BigDenseStore cast(final Access1D<BigDecimal> matrix) {

@@ -26,12 +26,12 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * ConjugatedStore
- * 
+ *
  * @author apete
  */
-public final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
+final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
 
-    public ConjugatedStore(final MatrixStore<N> aBase) {
+    ConjugatedStore(final MatrixStore<N> aBase) {
         super(aBase);
     }
 

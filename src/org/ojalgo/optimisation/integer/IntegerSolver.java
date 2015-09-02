@@ -27,7 +27,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
@@ -167,7 +166,7 @@ public abstract class IntegerSolver extends GenericSolver {
 
             final State tmpSate = State.INVALID;
             final double tmpValue = myMinimisation ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-            final ZeroStore<Double> tmpSolution = ZeroStore.PRIMITIVE.make(this.getModel().countVariables(), 1);
+            final MatrixStore<Double> tmpSolution = MatrixStore.PRIMITIVE.makeZero(this.getModel().countVariables(), 1).get();
 
             return new Optimisation.Result(tmpSate, tmpValue, tmpSolution);
         }

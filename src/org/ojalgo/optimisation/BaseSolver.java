@@ -36,7 +36,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.ZeroStore;
 
 public abstract class BaseSolver extends GenericSolver {
 
@@ -686,7 +685,7 @@ public abstract class BaseSolver extends GenericSolver {
                 myQbuilder = myQ.builder();
             }
 
-            final MatrixStore<Double> tmpC = C != null ? C : ZeroStore.makePrimitive((int) Q.countRows(), 1);
+            final MatrixStore<Double> tmpC = C != null ? C : MatrixStore.PRIMITIVE.makeZero((int) Q.countRows(), 1).get();
             if (myCbuilder != null) {
                 myCbuilder.below(tmpC);
                 myC = null;

@@ -373,7 +373,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
     @Override
     protected MatrixStore<N> makeD() {
-        return this.wrap(new DiagonalAccess<Double>(this.getSingularValues(), null, null, PrimitiveMath.ZERO));
+        return this.wrap(new DiagonalAccess<Double>(this.getSingularValues(), null, null, PrimitiveMath.ZERO)).get();
     }
 
     @Override

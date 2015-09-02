@@ -29,12 +29,12 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class ColumnsStore<N extends Number> extends SelectingStore<N> {
+final class ColumnsStore<N extends Number> extends SelectingStore<N> {
 
     private final int[] myColumns;
     private final int myFirst;
 
-    public ColumnsStore(final int aFirst, final int aLimit, final MatrixStore<N> aBase) {
+    ColumnsStore(final int aFirst, final int aLimit, final MatrixStore<N> aBase) {
 
         super((int) aBase.countRows(), aLimit - aFirst, aBase);
 
@@ -42,7 +42,7 @@ public final class ColumnsStore<N extends Number> extends SelectingStore<N> {
         myFirst = aFirst;
     }
 
-    public ColumnsStore(final MatrixStore<N> aBase, final int... someColumns) {
+    ColumnsStore(final MatrixStore<N> aBase, final int... someColumns) {
 
         super((int) aBase.countRows(), someColumns.length, aBase);
 

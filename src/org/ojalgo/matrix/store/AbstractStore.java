@@ -68,10 +68,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return new MatrixStore.Builder<N>(this);
     }
 
-    public MatrixStore<N> conjugate() {
-        return new ConjugatedStore<>(this);
-    }
-
     public PhysicalStore<N> copy() {
         return this.factory().copy(this);
     }
@@ -111,21 +107,11 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return this.toScalar(row, column).isAbsolute();
     }
 
-    @Deprecated
-    public final boolean isLowerLeftShaded() {
-        return false;
-    }
-
     /**
      * @see org.ojalgo.access.Access2D.Elements#isSmall(long, long, double)
      */
     public boolean isSmall(final long row, final long column, final double comparedTo) {
         return this.toScalar(row, column).isSmall(comparedTo);
-    }
-
-    @Deprecated
-    public final boolean isUpperRightShaded() {
-        return false;
     }
 
     public int limitOfColumn(final int col) {
@@ -151,10 +137,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
     @Override
     public final String toString() {
         return MatrixUtils.toString(this);
-    }
-
-    public MatrixStore<N> transpose() {
-        return new TransposedStore<>(this);
     }
 
     public void visitAll(final VoidFunction<N> visitor) {
@@ -199,13 +181,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return myColDim;
     }
 
-    protected final Class<?> getComponentType() {
-        if (myComponentType == null) {
-            myComponentType = this.get(0, 0).getClass();
-        }
-        return myComponentType;
-    }
-
     protected final int getMaxDim() {
         return Math.max(myRowDim, myColDim);
     }
@@ -218,7 +193,14 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return myRowDim;
     }
 
-    boolean isPrimitive() {
+    final Class<?> getComponentType() {
+        if (myComponentType == null) {
+            myComponentType = this.get(0, 0).getClass();
+        }
+        return myComponentType;
+    }
+
+    final boolean isPrimitive() {
         return this.getComponentType().equals(Double.class);
     }
 

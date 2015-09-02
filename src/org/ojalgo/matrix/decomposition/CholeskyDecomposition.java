@@ -31,13 +31,12 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.LowerHermitianStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Cholesky<N> {
+abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposition<N>implements Cholesky<N> {
 
     static final class Big extends CholeskyDecomposition<BigDecimal> {
 
@@ -89,7 +88,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
             tmpPositiveDefinite &= MatrixUtils.isHermitian(tmpInPlace);
         }
 
-        final UnaryFunction<N> tmpSqrtFunc = this.getFunctionSet().sqrt();
+        final UnaryFunction<N> tmpSqrtFunc = this.function().sqrt();
 
         // Main loop - along the diagonal
         for (int ij = 0; tmpPositiveDefinite && (ij < tmpMinDim); ij++) {
@@ -125,7 +124,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
     public N getDeterminant() {
 
-        final AggregatorFunction<N> tmpAggrFunc = this.getAggregatorCollection().product2();
+        final AggregatorFunction<N> tmpAggrFunc = this.aggregator().product2();
 
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
@@ -140,7 +139,8 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         preallocated.substituteForwards(tmpBody, false, false, true);
         preallocated.substituteBackwards(tmpBody, false, true, true);
 
-        return new LowerHermitianStore<>(preallocated);
+        //return new LowerHermitianStore<>(preallocated);
+        return preallocated.builder().hermitian(false).build();
     }
 
     public MatrixStore<N> getL() {

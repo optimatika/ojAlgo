@@ -24,9 +24,9 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.Scalar;
 
-public final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
+final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
 
-    public TransposedStore(final MatrixStore<N> aBase) {
+    TransposedStore(final MatrixStore<N> aBase) {
         super(aBase);
     }
 
@@ -34,6 +34,7 @@ public final class TransposedStore<N extends Number> extends TransjugatedStore<N
         return this.getBase().get(aCol, aRow);
     }
 
+    @Override
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
 
         MatrixStore<N> retVal;

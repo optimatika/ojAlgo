@@ -32,16 +32,12 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.LowerTriangularStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.RowsStore;
-import org.ojalgo.matrix.store.UpperTriangularStore;
-import org.ojalgo.matrix.store.WrapperStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LU<N> {
+abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>implements LU<N> {
 
     static final class Big extends LUDecomposition<BigDecimal> {
 
@@ -87,7 +83,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     public N getDeterminant() {
 
-        final AggregatorFunction<N> tmpAggrFunc = this.getAggregatorCollection().product();
+        final AggregatorFunction<N> tmpAggrFunc = this.aggregator().product();
 
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
@@ -120,7 +116,8 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
     }
 
     public MatrixStore<N> getL() {
-        return new LowerTriangularStore<N>(this.getInPlace(), true);
+        //return new LowerTriangularStore<N>(this.getInPlace(), true);
+        return this.getInPlace().builder().triangular(false, true).build();
     }
 
     public int[] getPivotOrder() {
@@ -133,7 +130,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         final DecompositionStore<N> tmpInPlace = this.getInPlace();
 
-        final AggregatorFunction<N> tmpLargest = this.getAggregatorCollection().largest();
+        final AggregatorFunction<N> tmpLargest = this.aggregator().largest();
         tmpInPlace.visitDiagonal(0L, 0L, tmpLargest);
         final double tmpLargestValue = tmpLargest.doubleValue();
 
@@ -166,7 +163,8 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
     }
 
     public MatrixStore<N> getU() {
-        return new UpperTriangularStore<N>(this.getInPlace(), false);
+        //return new UpperTriangularStore<N>(this.getInPlace(), false);
+        return this.getInPlace().builder().triangular(true, false).build();
     }
 
     public final boolean isFullSize() {
@@ -233,7 +231,8 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
     @Override
     public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
 
-        preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
+        //preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
+        preallocated.fillMatching(this.wrap(rhs).row(myPivot.getOrder()).get());
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 

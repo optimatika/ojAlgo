@@ -236,12 +236,12 @@ public abstract class MatrixUtils {
         // Check that Q is orthogonal/unitary...
     }
 
-    public static final int firstInColumn(final Access1D<?> matrix, final int col) {
-        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).firstInColumn(col) : 0;
+    public static final int firstInColumn(final Access1D<?> matrix, final int col, final int defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn(col), defaultAndMinimum) : defaultAndMinimum;
     }
 
-    public static final int firstInRow(final Access1D<?> matrix, final int row) {
-        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).firstInRow(row) : 0;
+    public static final int firstInRow(final Access1D<?> matrix, final int row, final int defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
     }
 
     public static <N extends Number> int hashCode(final BasicMatrix matrix) {
@@ -287,6 +287,10 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public static final boolean isLowerLeftShaded(final Access1D<?> matrix) {
         return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).isLowerLeftShaded() : false;
     }
@@ -298,16 +302,20 @@ public abstract class MatrixUtils {
         return matrix.multiplyLeft(tmpConjugate).equals(matrix.multiply(tmpConjugate));
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public static final boolean isUpperRightShaded(final Access1D<?> matrix) {
         return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).isUpperRightShaded() : false;
     }
 
-    public static final int limitOfColumn(final Access1D<?> matrix, final int col, final int defaultLimit) {
-        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).limitOfColumn(col) : defaultLimit;
+    public static final int limitOfColumn(final Access1D<?> matrix, final int col, final int defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn(col), defaultAndMaximum) : defaultAndMaximum;
     }
 
-    public static final int limitOfRow(final Access1D<?> matrix, final int row, final int defaultLimit) {
-        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).limitOfRow(row) : defaultLimit;
+    public static final int limitOfRow(final Access1D<?> matrix, final int row, final int defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow(row), defaultAndMaximum) : defaultAndMaximum;
     }
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int aRowDim, final int aColDim) {

@@ -38,7 +38,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 
-abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LDL<N> {
+abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N>implements LDL<N> {
 
     static final class Big extends LDLDecomposition<BigDecimal> {
 
@@ -125,7 +125,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
     public N getDeterminant() {
 
-        final AggregatorFunction<N> tmpAggrFunc = this.getAggregatorCollection().product();
+        final AggregatorFunction<N> tmpAggrFunc = this.aggregator().product();
 
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
@@ -154,7 +154,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
         preallocated.substituteForwards(tmpBody, true, false, !tmpModified);
 
-        final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();
+        final BinaryFunction<N> tmpDivide = this.function().divide();
         for (int i = 0; i < tmpRowDim; i++) {
             preallocated.modifyRow(i, 0, tmpDivide.second(tmpBody.doubleValue(i, i)));
         }
@@ -177,7 +177,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
         final DecompositionStore<N> tmpInPlace = this.getInPlace();
 
-        final AggregatorFunction<N> tmpLargest = this.getAggregatorCollection().largest();
+        final AggregatorFunction<N> tmpLargest = this.aggregator().largest();
         tmpInPlace.visitDiagonal(0L, 0L, tmpLargest);
         final double tmpLargestValue = tmpLargest.doubleValue();
 
@@ -234,13 +234,13 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         final int[] tmpOrder = myPivot.getOrder();
 
         //        preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), tmpOrder));
-        preallocated.fillMatching(this.wrap(rhs).builder().row(tmpOrder).build());
+        preallocated.fillMatching(this.wrap(rhs).row(tmpOrder).build());
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 
         preallocated.substituteForwards(tmpBody, true, false, false);
 
-        final BinaryFunction<N> tmpDivide = this.getFunctionSet().divide();
+        final BinaryFunction<N> tmpDivide = this.function().divide();
         for (int i = 0; i < tmpRowDim; i++) {
             preallocated.modifyRow(i, 0, tmpDivide.second(tmpBody.doubleValue(i, i)));
         }

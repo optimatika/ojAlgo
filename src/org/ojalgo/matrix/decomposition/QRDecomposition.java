@@ -30,12 +30,11 @@ import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.UpperTriangularStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N> implements QR<N> {
+abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>implements QR<N> {
 
     static final class Big extends QRDecomposition<BigDecimal> {
 
@@ -95,7 +94,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     public N getDeterminant() {
 
-        final AggregatorFunction<N> tmpAggrFunc = this.getAggregatorCollection().product();
+        final AggregatorFunction<N> tmpAggrFunc = this.aggregator().product();
 
         this.getInPlace().visitDiagonal(0, 0, tmpAggrFunc);
 
@@ -104,7 +103,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     @Override
     public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
-        return this.solve(this.makeIdentity(this.getRowDim()), preallocated);
+        return this.solve(this.makeIdentity(this.getRowDim()).get(), preallocated);
     }
 
     public MatrixStore<N> getQ() {
@@ -128,10 +127,12 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     public MatrixStore<N> getR() {
 
-        MatrixStore<N> retVal = new UpperTriangularStore<N>(this.getInPlace(), false);
+        //MatrixStore<N> retVal = new UpperTriangularStore<N>(this.getInPlace(), false);
+        MatrixStore<N> retVal = this.getInPlace().builder().triangular(true, false).build();
 
-        if (myFullSize && (this.getRowDim() > this.getColDim())) {
-            retVal = retVal.builder().below(this.getRowDim() - this.getColDim()).build();
+        final int tmpPadding = this.getRowDim() - this.getColDim();
+        if (myFullSize && (tmpPadding < 0)) {
+            retVal = retVal.builder().below(tmpPadding).build();
         }
 
         return retVal;
@@ -143,7 +144,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         final DecompositionStore<N> tmpInPlace = this.getInPlace();
 
-        final AggregatorFunction<N> tmpLargest = this.getAggregatorCollection().largest();
+        final AggregatorFunction<N> tmpLargest = this.aggregator().largest();
         tmpInPlace.visitDiagonal(0L, 0L, tmpLargest);
         final double tmpLargestValue = tmpLargest.doubleValue();
 

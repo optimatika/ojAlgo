@@ -28,7 +28,6 @@ import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.ZeroStore;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -101,7 +100,7 @@ public final class KKTSolver extends KKTSystem {
                 // Unconstrained
 
                 myCholesky.solve(tmpC, tmpX);
-                tmpL = ZeroStore.makePrimitive(0, 1);
+                tmpL = MatrixStore.PRIMITIVE.makeZero(0, 1).get();
 
             } else {
                 // Actual/normal optimisation problem
