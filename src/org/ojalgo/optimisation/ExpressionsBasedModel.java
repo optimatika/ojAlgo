@@ -158,15 +158,28 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         final Set<Index> tmpFixedVariables = model.getFixedVariables();
 
-        for (final Expression tmpExpression : model.getExpressions()) {
+        int iters = 0;
+        boolean stillSimplifying = true;
+        while (stillSimplifying) {
+            ++iters;
+            if (iters % 100 == 0) {
+                BasicLogger.debug("Done {} iterations of presolving", iters);
+            }
 
-            final boolean tmpConstraint = tmpExpression.isConstraint();
-            final boolean tmpInfeasible = tmpExpression.isInfeasible();
-            final boolean tmpRedundant = tmpExpression.isRedundant();
+            stillSimplifying = false;
 
-            if (tmpConstraint && !tmpInfeasible && !tmpRedundant && tmpExpression.simplify(tmpFixedVariables)) {
-                ExpressionsBasedModel.presolve(model);
-                break;
+            for (final Expression tmpExpression : model.getExpressions()) {
+
+                final boolean tmpConstraint = tmpExpression.isConstraint();
+                final boolean tmpInfeasible = tmpExpression.isInfeasible();
+                final boolean tmpRedundant = tmpExpression.isRedundant();
+
+                if (tmpConstraint && !tmpInfeasible && !tmpRedundant && tmpExpression.simplify(tmpFixedVariables)) {
+
+                    BasicLogger.debug("Following expression is now redundant: {}", tmpExpression);
+                    stillSimplifying = true;
+                    break; // Restart the process after removing something.
+                }
             }
         }
     }
