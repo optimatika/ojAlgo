@@ -36,6 +36,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.GenericAppender;
 import org.ojalgo.netio.CharacterRing;
 import org.ojalgo.optimisation.Expression.Index;
+import org.ojalgo.optimisation.strategy.ExpressionBasedModelPresolveStrategy;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -154,23 +155,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     };
 
-    static final void presolve(final ExpressionsBasedModel model) {
-
-        final Set<Index> tmpFixedVariables = model.getFixedVariables();
-
-        for (final Expression tmpExpression : model.getExpressions()) {
-
-            final boolean tmpConstraint = tmpExpression.isConstraint();
-            final boolean tmpInfeasible = tmpExpression.isInfeasible();
-            final boolean tmpRedundant = tmpExpression.isRedundant();
-
-            if (tmpConstraint && !tmpInfeasible && !tmpRedundant && tmpExpression.simplify(tmpFixedVariables)) {
-                ExpressionsBasedModel.presolve(model);
-                break;
-            }
-        }
-    }
-
     private transient BasicLogger.Appender myAppender = null;
     private final CharacterRing myBuffer = new CharacterRing();
     private final HashMap<String, Expression> myExpressions = new HashMap<String, Expression>();
@@ -186,6 +170,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private transient int[] myPositiveIndices = null;
     private transient List<Variable> myPositiveVariables = null;
     private final ArrayList<Variable> myVariables = new ArrayList<Variable>();
+    private transient ExpressionBasedModelPresolveStrategy presolver = new ExpressionBasedModelPresolveRecursive();
     private final boolean myWorkCopy;
 
     public ExpressionsBasedModel() {
@@ -1093,7 +1078,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         this.categoriseVariables();
 
-        ExpressionsBasedModel.presolve(this);
+        presolver.presolve(this);
     }
 
 }
