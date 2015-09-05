@@ -207,8 +207,11 @@ public interface Optimisation {
          * Used to determine if a constraint is violated or not. Essentially this context determines if the
          * various validate(...) methods will return true or false. Calculate the slack - zero if the
          * constraint is "active" - and check the sign.
+         * <ul>
+         * <li>2015-09-05: Changed from 14,8 to 12,8 (the "8" can/should probably be increased)</li>
+         * </ul>
          */
-        public NumberContext slack = new NumberContext(14, 8, RoundingMode.HALF_DOWN);
+        public NumberContext slack = new NumberContext(12, 8, RoundingMode.HALF_DOWN);
 
         /**
          * Used when copying the solver's solution back to the model (converting from double to BigDecimal).

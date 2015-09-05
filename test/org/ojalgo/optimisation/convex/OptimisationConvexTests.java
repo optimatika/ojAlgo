@@ -46,4 +46,5 @@ public abstract class OptimisationConvexTests extends FunctionalityTest {
     protected OptimisationConvexTests(final String name) {
         super(name);
     }
+
 }

@@ -36,6 +36,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.GenericAppender;
 import org.ojalgo.netio.CharacterRing;
 import org.ojalgo.optimisation.Expression.Index;
+import org.ojalgo.optimisation.Expression.RowColumn;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -142,10 +143,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     public static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
 
     private static final String NEW_LINE = "\n";
+
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
     private static final String START_END = "############################################\n";
-
     static final Comparator<Expression> CE = new Comparator<Expression>() {
 
         public int compare(final Expression o1, final Expression o2) {
@@ -172,7 +173,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     private transient BasicLogger.Appender myAppender = null;
+
     private final CharacterRing myBuffer = new CharacterRing();
+    private boolean myDoPresolve = true;
     private final HashMap<String, Expression> myExpressions = new HashMap<String, Expression>();
     private final HashSet<Index> myFixedVariables = new HashSet<Index>();
     private transient int[] myFreeIndices = null;
@@ -351,6 +354,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return myNegativeVariables;
     }
 
+    /**
+     * @return The full objective function
+     */
     public Expression getObjectiveExpression() {
 
         if (myObjectiveExpression == null) {
@@ -399,6 +405,63 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         return myObjectiveExpression;
+    }
+
+    /**
+     * Parameters corresponding to fixed variables may or may not be included in the returned expression - the
+     * receiver is expected to not care about those parameters. Parameters corresponding to bilinear
+     * variables, where one is fixed and the other is not, must transform the expression correspondingly.
+     *
+     * @param fixed A set of (by the presolver) fixed variables
+     * @return The reduced/modified objective function
+     */
+    public Expression getObjectiveExpression(final Set<Index> fixed) {
+
+        final Expression tmpFull = this.getObjectiveExpression();
+
+        if ((fixed.size() > 0) && tmpFull.isAnyQuadraticFactorNonZero()) {
+
+            final Expression tmpMod = new Expression(OBJECTIVE, this);
+
+            for (final Index tmpKey : tmpFull.getLinearFactorKeys()) {
+                if (!fixed.contains(tmpKey)) {
+                    tmpMod.set(tmpKey, tmpFull.get(tmpKey));
+                }
+            }
+
+            for (final RowColumn tmpKey : tmpFull.getQuadraticFactorKeys()) {
+
+                final int tmpRow = this.indexOfFreeVariable(tmpKey.row);
+                final int tmpColumn = this.indexOfFreeVariable(tmpKey.column);
+
+                if ((tmpRow >= 0) && (tmpColumn >= 0)) {
+
+                    tmpMod.set(tmpKey, tmpFull.get(tmpKey));
+
+                } else if ((tmpRow < 0) && (tmpColumn >= 0)) {
+
+                    final Index tmpColKey = new Index(tmpColumn);
+
+                    tmpMod.add(tmpColKey, this.getVariable(tmpKey.row).getValue().multiply(tmpFull.get(tmpKey)));
+
+                } else if ((tmpColumn < 0) && (tmpRow >= 0)) {
+
+                    final Index tmpRowKey = new Index(tmpRow);
+
+                    tmpMod.add(tmpRowKey, this.getVariable(tmpKey.column).getValue().multiply(tmpFull.get(tmpKey)));
+
+                } else {
+
+                    // Both variables fixed
+                }
+            }
+
+            return tmpMod;
+
+        } else {
+
+            return tmpFull;
+        }
     }
 
     public MultiaryFunction.TwiceDifferentiable<Double> getObjectiveFunction() {
@@ -582,6 +645,14 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         return retVal;
+    }
+
+    /**
+     * @deprecated v38 Temporary feature. Presolving will be refactored
+     */
+    @Deprecated
+    public boolean isDoPresolve() {
+        return myDoPresolve;
     }
 
     public boolean isWorkCopy() {
@@ -822,6 +893,14 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         return Collections.unmodifiableList(retVal);
+    }
+
+    /**
+     * @deprecated v38 Temporary feature. Presolving will be refactored
+     */
+    @Deprecated
+    public void setDoPresolve(final boolean doPresolve) {
+        myDoPresolve = doPresolve;
     }
 
     /**
@@ -1093,7 +1172,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         this.categoriseVariables();
 
-        ExpressionsBasedModel.presolve(this);
+        if (this.isDoPresolve()) {
+            ExpressionsBasedModel.presolve(this);
+        }
+
     }
 
 }

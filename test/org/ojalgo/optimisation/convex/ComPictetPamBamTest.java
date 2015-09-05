@@ -39,6 +39,15 @@ import org.ojalgo.optimisation.Variable;
  */
 public class ComPictetPamBamTest extends OptimisationConvexTests {
 
+    public static ExpressionsBasedModel buildModel() {
+
+        final ComPictetPamBamTest tmpTestInstance = new ComPictetPamBamTest();
+
+        tmpTestInstance.setupModel(6);
+
+        return tmpTestInstance.model;
+    }
+
     Variable[] vars;
     BigDecimal[] point;
     ExpressionsBasedModel model;

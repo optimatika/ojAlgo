@@ -297,12 +297,14 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
         BigDecimal tmpLimit = null;
 
-        if (((tmpLimit = this.getLowerLimit()) != null) && ((context.enforce(value.subtract(tmpLimit)).signum() == -1))) {
+        if (((tmpLimit = this.getLowerLimit()) != null) && (value.subtract(tmpLimit).signum() == -1)
+                && context.isDifferent(tmpLimit.doubleValue(), value.doubleValue())) {
             appender.println(value + " ! " + this.toString());
             retVal = false;
         }
 
-        if (((tmpLimit = this.getUpperLimit()) != null) && ((context.enforce(value.subtract(tmpLimit)).signum() == 1))) {
+        if (((tmpLimit = this.getUpperLimit()) != null) && (value.subtract(tmpLimit).signum() == 1)
+                && context.isDifferent(tmpLimit.doubleValue(), value.doubleValue())) {
             appender.println(value + " ! " + this.toString());
             retVal = false;
         }

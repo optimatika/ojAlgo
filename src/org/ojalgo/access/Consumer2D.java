@@ -24,10 +24,14 @@ package org.ojalgo.access;
 import java.util.function.Consumer;
 
 /**
- * You can query the structure before accepting.
+ * You can query the shape/structure before accepting.
  *
  * @author apete
  */
 public interface Consumer2D<I extends Access2D<?>> extends Structure2D, Consumer<I> {
+
+    default boolean isAcceptable(final Supplier2D<? extends I> supplier) {
+        return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
+    }
 
 }

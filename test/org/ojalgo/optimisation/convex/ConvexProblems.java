@@ -1126,13 +1126,16 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         final ExpressionsBasedModel tmpModel1 = P20150720.buildModel1();
         final ExpressionsBasedModel tmpModel2 = P20150720.buildModel2();
+        final ExpressionsBasedModel tmpModel3 = P20150720.buildModel3();
 
         // The problem is with the ConvexSolver, and it is present without integer constraints
         tmpModel1.relax(true);
         tmpModel2.relax(true);
+        tmpModel3.relax(true);
 
         final Result tmpBaseResult1 = tmpModel1.maximise();
         final Result tmpBaseResult2 = tmpModel2.maximise();
+        final Result tmpBaseResult3 = tmpModel3.maximise();
 
         for (int l = 0; l < 10; l++) {
 
@@ -1165,6 +1168,21 @@ public class ConvexProblems extends OptimisationConvexTests {
             TestUtils.assertEquals("Model 2 State @" + l, tmpBaseResult2.getState(), tmpResult2.getState());
             TestUtils.assertEquals("Model 2 Value @" + l, tmpBaseResult2.getValue(), tmpResult2.getValue());
             TestUtils.assertEquals("Model 2 Solution @" + l, tmpBaseResult2, tmpResult2);
+
+            final Result tmpResult3 = tmpModel3.maximise();
+
+            if (OptimisationConvexTests.DEBUG) {
+                BasicLogger.debug();
+                BasicLogger.debug("Model 3");
+                BasicLogger.debug(tmpResult3);
+                BasicLogger.debug(tmpModel3);
+            }
+
+            TestUtils.assertStateNotLessThanFeasible(tmpResult3);
+
+            TestUtils.assertEquals("Model 3 State @" + l, tmpBaseResult3.getState(), tmpResult3.getState());
+            TestUtils.assertEquals("Model 3 Value @" + l, tmpBaseResult3.getValue(), tmpResult3.getValue());
+            TestUtils.assertEquals("Model 3 Solution @" + l, tmpBaseResult3, tmpResult3);
         }
 
     }

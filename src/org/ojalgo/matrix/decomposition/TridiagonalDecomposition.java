@@ -60,7 +60,7 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
         @Override
         Array1D<ComplexNumber> makeReal(final DiagonalAccess<ComplexNumber> aDiagonalAccessD) {
 
-            final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.makeZero(aDiagonalAccessD.getMinDim());
+            final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.makeZero(aDiagonalAccessD.getDimension());
             retVal.fillAll(ComplexNumber.ONE);
 
             final Array1D<ComplexNumber> tmpSubdiagonal = aDiagonalAccessD.subdiagonal; // superDiagonal should be the conjugate of this but it is set to the saem value

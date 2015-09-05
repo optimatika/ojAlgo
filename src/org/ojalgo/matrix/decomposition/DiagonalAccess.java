@@ -21,31 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.scalar.ComplexNumber;
 
 final class DiagonalAccess<N extends Number> implements Access2D<N> {
 
-    public static DiagonalAccess<BigDecimal> makeBig(final Array1D<BigDecimal> mainD, final Array1D<BigDecimal> superD, final Array1D<BigDecimal> subD) {
-        return new DiagonalAccess<BigDecimal>(mainD, superD, subD, BigMath.ZERO);
-    }
-
-    public static DiagonalAccess<ComplexNumber> makeComplex(final Array1D<ComplexNumber> mainD, final Array1D<ComplexNumber> superD,
-            final Array1D<ComplexNumber> subD) {
-        return new DiagonalAccess<ComplexNumber>(mainD, superD, subD, ComplexNumber.ZERO);
-    }
-
-    public static DiagonalAccess<Double> makePrimitive(final Array1D<Double> mainD, final Array1D<Double> superD, final Array1D<Double> subD) {
-        return new DiagonalAccess<Double>(mainD, superD, subD, PrimitiveMath.ZERO);
-    }
-
-    private final int myDim;
+    private final int myDimension;
     private final N myZero;
 
     final Array1D<N> mainDiagonal;
@@ -68,37 +51,28 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
         myZero = aZero;
 
         if (aMainDiagonal != null) {
-            myDim = aMainDiagonal.size();
+            myDimension = aMainDiagonal.size();
         } else if (aSuperdiagonal != null) {
-            myDim = aSuperdiagonal.size() + 1;
+            myDimension = aSuperdiagonal.size() + 1;
         } else {
-            myDim = aSubdiagonal.size() + 1;
+            myDimension = aSubdiagonal.size() + 1;
         }
     }
 
-    public DiagonalAccess<N> columns(final int aFirst, final int aLimit) {
-
-        final Array1D<N> tmpMainDiagonal = mainDiagonal != null ? mainDiagonal.subList(aFirst, aLimit) : null;
-        final Array1D<N> tmpSuperdiagonal = superdiagonal != null ? superdiagonal.subList(Math.max(aFirst - 1, 0), aLimit - 1) : null;
-        final Array1D<N> tmpSubdiagonal = subdiagonal != null ? subdiagonal.subList(aFirst, Math.min(aLimit, myDim - 1)) : null;
-
-        return new DiagonalAccess<N>(tmpMainDiagonal, tmpSuperdiagonal, tmpSubdiagonal, myZero);
-    }
-
     public long count() {
-        return this.size();
+        return (int) this.count();
     }
 
     public long countColumns() {
-        return myDim;
+        return myDimension;
     }
 
     public long countRows() {
-        return myDim;
+        return myDimension;
     }
 
     public double doubleValue(final long anInd) {
-        return this.doubleValue(AccessUtils.row((int) anInd, myDim), AccessUtils.column((int) anInd, myDim));
+        return this.doubleValue(AccessUtils.row((int) anInd, myDimension), AccessUtils.column((int) anInd, myDimension));
     }
 
     public double doubleValue(final long aRow, final long aCol) {
@@ -114,7 +88,7 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
     }
 
     public N get(final long index) {
-        return this.get(AccessUtils.row(index, myDim), AccessUtils.column(index, myDim));
+        return this.get(AccessUtils.row(index, myDimension), AccessUtils.column(index, myDimension));
     }
 
     public N get(final long aRow, final long aCol) {
@@ -129,37 +103,34 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
         }
     }
 
-    public int getColDim() {
-        return myDim;
-    }
-
-    public int getMinDim() {
-        return myDim;
-    }
-
-    public int getRowDim() {
-        return myDim;
-    }
-
-    public DiagonalAccess<N> rows(final int aFirst, final int aLimit) {
-
-        final Array1D<N> tmpMainDiagonal = mainDiagonal != null ? mainDiagonal.subList(aFirst, aLimit) : null;
-        final Array1D<N> tmpSuperdiagonal = superdiagonal != null ? superdiagonal.subList(aFirst, Math.min(aLimit, myDim - 1)) : null;
-        final Array1D<N> tmpSubdiagonal = subdiagonal != null ? subdiagonal.subList(Math.max(aFirst - 1, 0), aLimit - 1) : null;
-
-        return new DiagonalAccess<N>(tmpMainDiagonal, tmpSuperdiagonal, tmpSubdiagonal, myZero);
-    }
-
-    public int size() {
-        return myDim * myDim;
-    }
-
     @Override
     public String toString() {
         return "DiagonalAccess [mainDiagonal=" + mainDiagonal + ", subdiagonal=" + subdiagonal + ", superdiagonal=" + superdiagonal + "]";
     }
 
-    public final DiagonalAccess<N> transpose() {
+    DiagonalAccess<N> columns(final int first, final int limit) {
+
+        final Array1D<N> tmpMainDiagonal = mainDiagonal != null ? mainDiagonal.subList(first, limit) : null;
+        final Array1D<N> tmpSuperdiagonal = superdiagonal != null ? superdiagonal.subList(Math.max(first - 1, 0), limit - 1) : null;
+        final Array1D<N> tmpSubdiagonal = subdiagonal != null ? subdiagonal.subList(first, Math.min(limit, myDimension - 1)) : null;
+
+        return new DiagonalAccess<N>(tmpMainDiagonal, tmpSuperdiagonal, tmpSubdiagonal, myZero);
+    }
+
+    int getDimension() {
+        return myDimension;
+    }
+
+    DiagonalAccess<N> rows(final int first, final int limit) {
+
+        final Array1D<N> tmpMainDiagonal = mainDiagonal != null ? mainDiagonal.subList(first, limit) : null;
+        final Array1D<N> tmpSuperdiagonal = superdiagonal != null ? superdiagonal.subList(first, Math.min(limit, myDimension - 1)) : null;
+        final Array1D<N> tmpSubdiagonal = subdiagonal != null ? subdiagonal.subList(Math.max(first - 1, 0), limit - 1) : null;
+
+        return new DiagonalAccess<N>(tmpMainDiagonal, tmpSuperdiagonal, tmpSubdiagonal, myZero);
+    }
+
+    DiagonalAccess<N> transpose() {
         return new DiagonalAccess<N>(mainDiagonal, subdiagonal, superdiagonal, myZero);
     }
 

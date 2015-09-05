@@ -88,6 +88,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
             return BigAggregator.getSet();
         }
 
+        public MatrixStore.Factory<BigDecimal> builder() {
+            return MatrixStore.BIG;
+        }
+
         public BigDenseStore columns(final Access1D<?>... source) {
 
             final int tmpRowDim = (int) source[0].count();
@@ -325,10 +329,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
             return retVal;
         }
-
-        public MatrixStore.Factory<BigDecimal> builder() {
-            return MatrixStore.BIG;
-        }
     };
 
     static BigDenseStore cast(final Access1D<BigDecimal> matrix) {
@@ -428,6 +428,14 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
                 this.set(i, j, supplied.get(i, j));
             }
         }
+    }
+
+    public void add(final long row, final long column, final double addend) {
+        myUtility.add(row, column, addend);
+    }
+
+    public void add(final long row, final long column, final Number addend) {
+        myUtility.add(row, column, addend);
     }
 
     public BigDecimal aggregateAll(final Aggregator aggregator) {
@@ -771,6 +779,14 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
+    public void fillOne(final long row, final long column, final BigDecimal value) {
+        myUtility.fillOne(row, column, value);
+    }
+
+    public void fillOne(final long row, final long column, final NullaryFunction<BigDecimal> supplier) {
+        myUtility.fillOne(row, column, supplier);
+    }
+
     public void fillRow(final long row, final long column, final BigDecimal value) {
         myUtility.fillRow(row, column, value);
     }
@@ -909,8 +925,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
                 rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
-    public MatrixStore.ElementsConsumer<BigDecimal> region(final int row, final int column) {
-        return new PhysicalStore.ConsumerRegion<BigDecimal>(this, row, column);
+    public MatrixStore.ElementsConsumer<BigDecimal> region(final int rowOffset, final int columnOffset) {
+        return new PhysicalStore.ConsumerRegion<BigDecimal>(this, rowOffset, columnOffset);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
@@ -1129,22 +1145,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     int getRowDim() {
         return myRowDim;
-    }
-
-    public void fillOne(final long row, final long column, final BigDecimal value) {
-        myUtility.fillOne(row, column, value);
-    }
-
-    public void fillOne(final long row, final long column, final NullaryFunction<BigDecimal> supplier) {
-        myUtility.fillOne(row, column, supplier);
-    }
-
-    public void add(final long row, final long column, final double addend) {
-        myUtility.add(row, column, addend);
-    }
-
-    public void add(final long row, final long column, final Number addend) {
-        myUtility.add(row, column, addend);
     }
 
 }

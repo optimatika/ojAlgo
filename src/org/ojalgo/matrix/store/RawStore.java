@@ -69,6 +69,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
             return PrimitiveAggregator.getSet();
         }
 
+        public MatrixStore.Factory<Double> builder() {
+            return MatrixStore.PRIMITIVE;
+        }
+
         public RawStore columns(final Access1D<?>... source) {
 
             final int tmpRowDim = (int) source[0].count();
@@ -301,10 +305,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
             }
 
             return new RawStore(retVal);
-        }
-
-        public MatrixStore.Factory<Double> builder() {
-            return MatrixStore.PRIMITIVE;
         }
 
     };
@@ -1100,8 +1100,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    public MatrixStore.ElementsConsumer<Double> region(final int row, final int column) {
-        return new PhysicalStore.ConsumerRegion<Double>(this, row, column);
+    public MatrixStore.ElementsConsumer<Double> region(final int rowOffset, final int columnOffset) {
+        return new PhysicalStore.ConsumerRegion<Double>(this, rowOffset, columnOffset);
     }
 
     public void set(final long row, final long column, final double value) {

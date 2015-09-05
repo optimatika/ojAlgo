@@ -64,10 +64,10 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
             final DiagonalAccess<ComplexNumber> tmpDiagonalAccessD = this.getDiagonalAccessD();
 
-            final Array1D<ComplexNumber> tmpInitDiagQ1 = Array1D.COMPLEX.makeZero(tmpDiagonalAccessD.getMinDim());
+            final Array1D<ComplexNumber> tmpInitDiagQ1 = Array1D.COMPLEX.makeZero(tmpDiagonalAccessD.getDimension());
             tmpInitDiagQ1.fillAll(ComplexNumber.ONE);
 
-            final Array1D<ComplexNumber> tmpInitDiagQ2 = Array1D.COMPLEX.makeZero(tmpDiagonalAccessD.getMinDim());
+            final Array1D<ComplexNumber> tmpInitDiagQ2 = Array1D.COMPLEX.makeZero(tmpDiagonalAccessD.getDimension());
             tmpInitDiagQ2.fillAll(ComplexNumber.ONE);
 
             final boolean tmpUpper = this.isUpper();

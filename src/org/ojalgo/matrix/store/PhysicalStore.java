@@ -52,13 +52,13 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
     public static final class ConsumerRegion<N extends Number> implements MatrixStore.ElementsConsumer<N> {
 
         private final MatrixStore.ElementsConsumer<N> myDelegate;
-        private final int myRow, myColumn; // origin/offset
+        private final int myRowOffset, myColumnOffset; // origin/offset
 
         ConsumerRegion(final MatrixStore.ElementsConsumer<N> delegate, final int row, final int column) {
             super();
             myDelegate = delegate;
-            myRow = row;
-            myColumn = column;
+            myRowOffset = row;
+            myColumnOffset = column;
         }
 
         public void accept(final Access2D<N> supplied) {
@@ -66,114 +66,114 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
             final long tmpCountColumns = supplied.countColumns();
             for (long j = 0; j < tmpCountColumns; j++) {
                 for (long i = 0; i < tmpCountRows; i++) {
-                    myDelegate.set(myRow + i, myColumn + j, supplied.get(i, j));
+                    myDelegate.set(myRowOffset + i, myColumnOffset + j, supplied.get(i, j));
                 }
             }
         }
 
         public void add(final long row, final long column, final double addend) {
-            myDelegate.add(myRow + row, myColumn + column, addend);
+            myDelegate.add(myRowOffset + row, myColumnOffset + column, addend);
         }
 
         public void add(final long row, final long column, final Number addend) {
-            myDelegate.add(myRow + row, myColumn + column, addend);
+            myDelegate.add(myRowOffset + row, myColumnOffset + column, addend);
         }
 
         public long countColumns() {
-            return myDelegate.countColumns() - myColumn;
+            return myDelegate.countColumns() - myColumnOffset;
         }
 
         public long countRows() {
-            return myDelegate.countRows() - myRow;
+            return myDelegate.countRows() - myRowOffset;
         }
 
         public void fillAll(final N value) {
             final long tmpCountColumns = myDelegate.countColumns();
-            for (long j = myColumn; j < tmpCountColumns; j++) {
-                myDelegate.fillColumn(myRow, j, value);
+            for (long j = myColumnOffset; j < tmpCountColumns; j++) {
+                myDelegate.fillColumn(myRowOffset, j, value);
             }
         }
 
         public void fillAll(final NullaryFunction<N> supplier) {
             final long tmpCountColumns = myDelegate.countColumns();
-            for (long j = myColumn; j < tmpCountColumns; j++) {
-                myDelegate.fillColumn(myRow, j, supplier);
+            for (long j = myColumnOffset; j < tmpCountColumns; j++) {
+                myDelegate.fillColumn(myRowOffset, j, supplier);
             }
         }
 
         public void fillColumn(final long row, final long column, final N value) {
-            myDelegate.fillColumn(myRow + row, myColumn + column, value);
+            myDelegate.fillColumn(myRowOffset + row, myColumnOffset + column, value);
         }
 
         public void fillColumn(final long row, final long column, final NullaryFunction<N> supplier) {
-            myDelegate.fillColumn(myRow + row, myColumn + column, supplier);
+            myDelegate.fillColumn(myRowOffset + row, myColumnOffset + column, supplier);
         }
 
         public void fillDiagonal(final long row, final long column, final N value) {
-            myDelegate.fillDiagonal(myRow + row, myColumn + column, value);
+            myDelegate.fillDiagonal(myRowOffset + row, myColumnOffset + column, value);
         }
 
         public void fillDiagonal(final long row, final long column, final NullaryFunction<N> supplier) {
-            myDelegate.fillDiagonal(myRow + row, myColumn + column, supplier);
+            myDelegate.fillDiagonal(myRowOffset + row, myColumnOffset + column, supplier);
         }
 
         public void fillOne(final long row, final long column, final N value) {
-            myDelegate.fillOne(myRow + row, myColumn + column, value);
+            myDelegate.fillOne(myRowOffset + row, myColumnOffset + column, value);
         }
 
         public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
-            myDelegate.fillOne(myRow + row, myColumn + column, supplier);
+            myDelegate.fillOne(myRowOffset + row, myColumnOffset + column, supplier);
         }
 
         public void fillRow(final long row, final long column, final N value) {
-            myDelegate.fillRow(myRow + row, myColumn + column, value);
+            myDelegate.fillRow(myRowOffset + row, myColumnOffset + column, value);
         }
 
         public void fillRow(final long row, final long column, final NullaryFunction<N> supplier) {
-            myDelegate.fillRow(myRow + row, myColumn + column, supplier);
+            myDelegate.fillRow(myRowOffset + row, myColumnOffset + column, supplier);
         }
 
         public void modifyAll(final UnaryFunction<N> function) {
-            for (long j = myColumn; j < myDelegate.countColumns(); j++) {
-                myDelegate.modifyColumn(myRow, j, function);
+            for (long j = myColumnOffset; j < myDelegate.countColumns(); j++) {
+                myDelegate.modifyColumn(myRowOffset, j, function);
             }
         }
 
         public void modifyColumn(final long row, final long column, final UnaryFunction<N> function) {
-            myDelegate.modifyColumn(myRow + row, myColumn + column, function);
+            myDelegate.modifyColumn(myRowOffset + row, myColumnOffset + column, function);
         }
 
         public void modifyDiagonal(final long row, final long column, final UnaryFunction<N> function) {
-            myDelegate.modifyDiagonal(myRow + row, myColumn + column, function);
+            myDelegate.modifyDiagonal(myRowOffset + row, myColumnOffset + column, function);
         }
 
         public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
-            myDelegate.modifyOne(myRow + row, myColumn + column, function);
+            myDelegate.modifyOne(myRowOffset + row, myColumnOffset + column, function);
         }
 
         public void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
-            myDelegate.modifyRow(myRow + row, myColumn + column, function);
+            myDelegate.modifyRow(myRowOffset + row, myColumnOffset + column, function);
         }
 
-        public MatrixStore.ElementsConsumer<N> region(final int row, final int column) {
-            return new ConsumerRegion<N>(this, row, column);
+        public MatrixStore.ElementsConsumer<N> region(final int offsetRow, final int offsetColumn) {
+            return new ConsumerRegion<N>(this, offsetRow, offsetColumn);
         }
 
         public void set(final long row, final long column, final double value) {
-            myDelegate.set(myRow + row, myColumn + column, value);
+            myDelegate.set(myRowOffset + row, myColumnOffset + column, value);
         }
 
         public void set(final long row, final long column, final Number value) {
-            myDelegate.set(myRow + row, myColumn + column, value);
+            myDelegate.set(myRowOffset + row, myColumnOffset + column, value);
         }
 
     }
 
     public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Access2D.Factory<I>, Serializable {
 
-        MatrixStore.Factory<N> builder();
-
         AggregatorSet<N> aggregator();
+
+        MatrixStore.Factory<N> builder();
 
         I conjugate(Access2D<?> source);
 

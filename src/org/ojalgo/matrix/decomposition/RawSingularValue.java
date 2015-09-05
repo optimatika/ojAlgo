@@ -105,8 +105,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> getD() {
-        //return new WrapperStore<Double>(RawStore.FACTORY, new DiagonalAccess<Double>(this.getSingularValues(), null, null, ZERO));
-        return MatrixStore.PRIMITIVE.makeWrapper(new DiagonalAccess<Double>(this.getSingularValues(), null, null, ZERO)).get();
+        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<Double>(this.getSingularValues(), null, null, ZERO);
+        return MatrixStore.PRIMITIVE.makeWrapper(tmpDiagonal).get();
     }
 
     public double getFrobeniusNorm() {

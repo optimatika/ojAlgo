@@ -170,7 +170,7 @@ public abstract class ConvexSolver extends BaseSolver {
 
         // Q & C
 
-        final Expression tmpObjExpr = sourceModel.getObjectiveExpression();
+        final Expression tmpObjExpr = sourceModel.getObjectiveExpression(tmpFixedVariables);
 
         PhysicalStore<Double> tmpQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {

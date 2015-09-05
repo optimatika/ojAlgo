@@ -83,6 +83,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
             return ComplexAggregator.getSet();
         }
 
+        public MatrixStore.Factory<ComplexNumber> builder() {
+            return MatrixStore.COMPLEX;
+        }
+
         public ComplexDenseStore columns(final Access1D<?>... source) {
 
             final int tmpRowDim = (int) source[0].count();
@@ -344,10 +348,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
             return retVal;
         }
-
-        public MatrixStore.Factory<ComplexNumber> builder() {
-            return MatrixStore.COMPLEX;
-        }
     };
 
     static ComplexDenseStore cast(final Access1D<ComplexNumber> matrix) {
@@ -447,6 +447,14 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
                 this.set(i, j, supplied.get(i, j));
             }
         }
+    }
+
+    public void add(final long row, final long column, final double addend) {
+        myUtility.add(row, column, addend);
+    }
+
+    public void add(final long row, final long column, final Number addend) {
+        myUtility.add(row, column, addend);
     }
 
     public ComplexNumber aggregateAll(final Aggregator aggregator) {
@@ -790,6 +798,14 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
+    public void fillOne(final long row, final long column, final ComplexNumber value) {
+        myUtility.fillOne(row, column, value);
+    }
+
+    public void fillOne(final long row, final long column, final NullaryFunction<ComplexNumber> supplier) {
+        myUtility.fillOne(row, column, supplier);
+    }
+
     public void fillRow(final long row, final long column, final ComplexNumber value) {
         myUtility.fillRow(row, column, value);
     }
@@ -928,8 +944,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
                 rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
-    public MatrixStore.ElementsConsumer<ComplexNumber> region(final int row, final int column) {
-        return new PhysicalStore.ConsumerRegion<ComplexNumber>(this, row, column);
+    public MatrixStore.ElementsConsumer<ComplexNumber> region(final int rowOffset, final int columnOffset) {
+        return new PhysicalStore.ConsumerRegion<ComplexNumber>(this, rowOffset, columnOffset);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
@@ -1153,22 +1169,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     int getRowDim() {
         return myRowDim;
-    }
-
-    public void fillOne(final long row, final long column, final ComplexNumber value) {
-        myUtility.fillOne(row, column, value);
-    }
-
-    public void fillOne(final long row, final long column, final NullaryFunction<ComplexNumber> supplier) {
-        myUtility.fillOne(row, column, supplier);
-    }
-
-    public void add(final long row, final long column, final double addend) {
-        myUtility.add(row, column, addend);
-    }
-
-    public void add(final long row, final long column, final Number addend) {
-        myUtility.add(row, column, addend);
     }
 
 }

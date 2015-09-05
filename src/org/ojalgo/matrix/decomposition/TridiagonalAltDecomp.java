@@ -25,6 +25,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -60,7 +61,7 @@ class TridiagonalAltDecomp extends InPlaceDecomposition<Double>implements Tridia
         final Array1D<Double> tmpMain = Array1D.PRIMITIVE.wrap(myMain);
         final Array1D<Double> tmpOff = Array1D.PRIMITIVE.wrap(myOff).subList(1, (int) myOff.count());
 
-        final DiagonalAccess<Double> tmpAccess = DiagonalAccess.makePrimitive(tmpMain, tmpOff, tmpOff);
+        final DiagonalAccess<Double> tmpAccess = new DiagonalAccess<Double>(tmpMain, tmpOff, tmpOff, PrimitiveMath.ZERO);
 
         return this.wrap(tmpAccess).get();
     }

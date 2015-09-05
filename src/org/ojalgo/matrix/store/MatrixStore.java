@@ -339,14 +339,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             return this;
         }
 
-        public final void supplyTo(final ElementsConsumer<N> target) {
-            if (target.isAcceptable(this)) {
-                target.accept(myStore);
-            } else {
-                throw new ProgrammingError("Not acceptable!");
-            }
-        }
-
         @Override
         public String toString() {
             return myStore.toString();
@@ -379,24 +371,30 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
 
     public static interface ElementsConsumer<N extends Number> extends Consumer2D<Access2D<N>>, Access2D.Fillable<N>, Access2D.Modifiable<N> {
 
-        default void accept(final MatrixStore.ElementsSupplier<N> supplier) {
-            supplier.supplyTo(this);
-        }
-
-        default boolean isAcceptable(final MatrixStore.ElementsSupplier<N> supplier) {
-            return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
+        default void acceptFrom(final MatrixStore.ElementsSupplier<N> supplier) {
+            if (this.isAcceptable(supplier)) {
+                this.accept(supplier.get());
+            } else {
+                throw new ProgrammingError("Not acceptable!");
+            }
         }
 
         /**
          * @return A consumer (sub)region
          */
-        ElementsConsumer<N> region(int row, int column);
+        ElementsConsumer<N> region(int rowOffset, int columnOffset);
 
     }
 
     public static interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixStore<N>> {
 
-        void supplyTo(ElementsConsumer<N> target);
+        default void supplyTo(final ElementsConsumer<N> consumer) {
+            if (consumer.isAcceptable(this)) {
+                consumer.accept(this.get());
+            } else {
+                throw new ProgrammingError("Not acceptable!");
+            }
+        }
 
     }
 

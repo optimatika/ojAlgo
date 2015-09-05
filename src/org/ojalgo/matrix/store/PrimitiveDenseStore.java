@@ -90,6 +90,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             return PrimitiveAggregator.getSet();
         }
 
+        public MatrixStore.Factory<Double> builder() {
+            return MatrixStore.PRIMITIVE;
+        }
+
         public PrimitiveDenseStore columns(final Access1D<?>... source) {
 
             final int tmpRowDim = (int) source[0].count();
@@ -326,10 +330,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             }
 
             return retVal;
-        }
-
-        public MatrixStore.Factory<Double> builder() {
-            return MatrixStore.PRIMITIVE;
         }
     };
 
@@ -973,6 +973,14 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
+    public void add(final long row, final long column, final double addend) {
+        myUtility.add(row, column, addend);
+    }
+
+    public void add(final long row, final long column, final Number addend) {
+        myUtility.add(row, column, addend);
+    }
+
     public Double aggregateAll(final Aggregator aggregator) {
 
         final int tmpRowDim = myRowDim;
@@ -1354,6 +1362,14 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
+    public void fillOne(final long row, final long column, final Double value) {
+        myUtility.fillOne(row, column, value);
+    }
+
+    public void fillOne(final long row, final long column, final NullaryFunction<Double> supplier) {
+        myUtility.fillOne(row, column, supplier);
+    }
+
     public void fillRow(final long row, final long column, final Double value) {
         myUtility.fillRow(row, column, value);
     }
@@ -1496,8 +1512,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                 rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
-    public MatrixStore.ElementsConsumer<Double> region(final int row, final int column) {
-        return new PhysicalStore.ConsumerRegion<Double>(this, row, column);
+    public MatrixStore.ElementsConsumer<Double> region(final int rowOffset, final int columnOffset) {
+        return new PhysicalStore.ConsumerRegion<Double>(this, rowOffset, columnOffset);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {
@@ -1732,22 +1748,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             myWorkerColumn = new double[myRowDim];
         }
         return myWorkerColumn;
-    }
-
-    public void fillOne(final long row, final long column, final Double value) {
-        myUtility.fillOne(row, column, value);
-    }
-
-    public void fillOne(final long row, final long column, final NullaryFunction<Double> supplier) {
-        myUtility.fillOne(row, column, supplier);
-    }
-
-    public void add(final long row, final long column, final double addend) {
-        myUtility.add(row, column, addend);
-    }
-
-    public void add(final long row, final long column, final Number addend) {
-        myUtility.add(row, column, addend);
     }
 
 }
