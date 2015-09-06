@@ -1103,16 +1103,18 @@ public final class Expression extends ModelEntity<Expression> {
     @Override
     void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
 
-        super.visitAllParameters(largest, smallest);
-
-        for (final BigDecimal tmpLinearFactor : myLinear.values()) {
-            largest.invoke(tmpLinearFactor);
-            smallest.invoke(tmpLinearFactor);
-        }
-
-        for (final BigDecimal tmpQuadraticFactor : myQuadratic.values()) {
-            largest.invoke(tmpQuadraticFactor);
-            smallest.invoke(tmpQuadraticFactor);
+        if (this.isAnyQuadraticFactorNonZero()) {
+            for (final BigDecimal tmpQuadraticFactor : myQuadratic.values()) {
+                largest.invoke(tmpQuadraticFactor);
+                smallest.invoke(tmpQuadraticFactor);
+            }
+        } else if (this.isAnyLinearFactorNonZero()) {
+            for (final BigDecimal tmpLinearFactor : myLinear.values()) {
+                largest.invoke(tmpLinearFactor);
+                smallest.invoke(tmpLinearFactor);
+            }
+        } else {
+            super.visitAllParameters(largest, smallest);
         }
     }
 

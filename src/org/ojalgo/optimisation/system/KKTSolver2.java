@@ -28,7 +28,6 @@ import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -178,7 +177,7 @@ public class KKTSolver2 extends KKTSystem {
 
             final MatrixStore<Double> tmpD = tmpEvD.getD();
 
-            // BasicLogger.debug(tmpEvD.getEigenvalues());
+            //BasicLogger.debug(tmpEvD.getEigenvalues());
 
             tmpEvD.reset();
 

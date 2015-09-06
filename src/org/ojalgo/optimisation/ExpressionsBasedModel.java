@@ -155,36 +155,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     };
 
-    static final void presolve(final ExpressionsBasedModel model) {
-
-        final Set<Index> tmpFixedVariables = model.getFixedVariables();
-
-        int iters = 0;
-        boolean stillSimplifying = true;
-        while (stillSimplifying) {
-            ++iters;
-            if (iters % 100 == 0) {
-                BasicLogger.debug("Done {} iterations of presolving", iters);
-            }
-
-            stillSimplifying = false;
-
-            for (final Expression tmpExpression : model.getExpressions()) {
-
-                final boolean tmpConstraint = tmpExpression.isConstraint();
-                final boolean tmpInfeasible = tmpExpression.isInfeasible();
-                final boolean tmpRedundant = tmpExpression.isRedundant();
-
-                if (tmpConstraint && !tmpInfeasible && !tmpRedundant && tmpExpression.simplify(tmpFixedVariables)) {
-
-                    BasicLogger.debug("Following expression is now redundant: {}", tmpExpression);
-                    stillSimplifying = true;
-                    break; // Restart the process after removing something.
-                }
-            }
-        }
-    }
-
     private transient BasicLogger.Appender myAppender = null;
 
     private final CharacterRing myBuffer = new CharacterRing();
@@ -423,7 +393,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     /**
      * Parameters corresponding to fixed variables may or may not be included in the returned expression - the
      * receiver is expected to not care about those parameters. Parameters corresponding to bilinear
-     * variables, where one is fixed and the other is not, must transform the expression correspondingly.
+     * variables, where one is fixed and the other is not, must transform the expression to linearize that
+     * component.
      *
      * @param fixed A set of (by the presolver) fixed variables
      * @return The reduced/modified objective function
@@ -984,10 +955,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            if ((tmpExpression.isConstraint() && !tmpExpression.isRedundant()) || tmpExpression.isObjective()) {
-                tmpExpression.appendToString(retVal, this.getVariableValues());
-                retVal.append(NEW_LINE);
-            }
+            // if ((tmpExpression.isConstraint() && !tmpExpression.isRedundant()) || tmpExpression.isObjective()) {
+            tmpExpression.appendToString(retVal, this.getVariableValues());
+            retVal.append(NEW_LINE);
+            // }
         }
 
         return retVal.append(START_END).toString();
@@ -1186,7 +1157,33 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         this.categoriseVariables();
 
         if (this.isDoPresolve()) {
-            ExpressionsBasedModel.presolve(this);
+
+            final Set<Index> tmpFixedVariables = this.getFixedVariables();
+
+            int iters = 0;
+            boolean stillSimplifying = true;
+            while (stillSimplifying) {
+                ++iters;
+                if ((iters % 100) == 0) {
+                    // BasicLogger.debug("Done {} iterations of presolving", iters);
+                }
+
+                stillSimplifying = false;
+
+                for (final Expression tmpExpression : this.getExpressions()) {
+
+                    final boolean tmpConstraint = tmpExpression.isConstraint();
+                    final boolean tmpInfeasible = tmpExpression.isInfeasible();
+                    final boolean tmpRedundant = tmpExpression.isRedundant();
+
+                    if (tmpConstraint && !tmpInfeasible && !tmpRedundant && tmpExpression.simplify(tmpFixedVariables)) {
+
+                        // BasicLogger.debug("Following expression is now redundant: {}", tmpExpression);
+                        stillSimplifying = true;
+                        break; // Restart the process after removing something.
+                    }
+                }
+            }
         }
 
     }
