@@ -504,6 +504,9 @@ public abstract class BaseSolver extends GenericSolver {
             final AggregatorFunction<Double> tmpLargestAggr = PrimitiveAggregator.getSet().largest();
             final AggregatorFunction<Double> tmpSmallestAggr = PrimitiveAggregator.getSet().smallest();
 
+            tmpLargestAggr.invoke(ONE);
+            tmpSmallestAggr.invoke(ONE);
+
             for (final PhysicalStore<Double> tmpMatrix : someMatrices) {
                 if (tmpMatrix != null) {
                     tmpMatrix.visitAll(tmpLargestAggr);
@@ -559,6 +562,9 @@ public abstract class BaseSolver extends GenericSolver {
 
                 tmpLargestAggr.reset();
                 tmpSmallestAggr.reset();
+
+                tmpLargestAggr.invoke(ONE);
+                tmpSmallestAggr.invoke(ONE);
 
                 tmpBody.visitRow(i, 0, tmpLargestAggr);
                 tmpBody.visitRow(i, 0, tmpSmallestAggr);

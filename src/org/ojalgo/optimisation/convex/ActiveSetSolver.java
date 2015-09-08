@@ -402,33 +402,37 @@ abstract class ActiveSetSolver extends ConvexSolver {
             if (!options.solution.isZero(tmpFrobNormX)) {
                 // Non-zero solution
 
-                final int[] tmpExcluded = myActivator.getExcluded();
-
-                final MatrixStore<Double> tmpNumer = this.getSI(tmpExcluded);
-                final MatrixStore<Double> tmpDenom = this.getAI().builder().row(tmpExcluded).build().multiply(tmpSubX);
-                final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
-                tmpStepLengths.fillMatching(tmpStepLengths, PrimitiveFunction.DIVIDE, tmpDenom);
-
-                if (this.isDebug()) {
-                    this.debug("Slack (numerator): {}", tmpNumer.copy().asList());
-                    this.debug("Scaler (denominator): {}", tmpDenom.copy().asList());
-                    this.debug("Looking for the largest possible step length (smallest positive scalar) among these: {}).", tmpStepLengths.asList());
-                }
-
                 double tmpStepLength = ONE;
-                for (int i = 0; i < tmpExcluded.length; i++) {
 
-                    final double tmpN = tmpNumer.doubleValue(i);
-                    final double tmpD = tmpDenom.doubleValue(i);
-                    final double tmpVal = options.slack.isSmall(tmpD, tmpN) ? ZERO : tmpN / tmpD;
+                final int[] tmpExcluded = myActivator.getExcluded();
+                if (tmpExcluded.length > 0) {
 
-                    if ((tmpD > ZERO) && (tmpVal >= ZERO) && (tmpVal < tmpStepLength) && !options.solution.isSmall(tmpFrobNormX, tmpD)) {
-                        tmpStepLength = tmpVal;
-                        myConstraintToInclude = tmpExcluded[i];
-                        if (this.isDebug()) {
-                            this.debug("Best so far: {} @ {} ({}).", tmpStepLength, i, myConstraintToInclude);
+                    final MatrixStore<Double> tmpNumer = this.getSI(tmpExcluded);
+                    final MatrixStore<Double> tmpDenom = this.getAI().builder().row(tmpExcluded).build().multiply(tmpSubX);
+                    final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
+                    tmpStepLengths.fillMatching(tmpStepLengths, PrimitiveFunction.DIVIDE, tmpDenom);
+
+                    if (this.isDebug()) {
+                        this.debug("Slack (numerator): {}", tmpNumer.copy().asList());
+                        this.debug("Scaler (denominator): {}", tmpDenom.copy().asList());
+                        this.debug("Looking for the largest possible step length (smallest positive scalar) among these: {}).", tmpStepLengths.asList());
+                    }
+
+                    for (int i = 0; i < tmpExcluded.length; i++) {
+
+                        final double tmpN = tmpNumer.doubleValue(i);
+                        final double tmpD = tmpDenom.doubleValue(i);
+                        final double tmpVal = options.slack.isSmall(tmpD, tmpN) ? ZERO : tmpN / tmpD;
+
+                        if ((tmpD > ZERO) && (tmpVal >= ZERO) && (tmpVal < tmpStepLength) && !options.solution.isSmall(tmpFrobNormX, tmpD)) {
+                            tmpStepLength = tmpVal;
+                            myConstraintToInclude = tmpExcluded[i];
+                            if (this.isDebug()) {
+                                this.debug("Best so far: {} @ {} ({}).", tmpStepLength, i, myConstraintToInclude);
+                            }
                         }
                     }
+
                 }
 
                 if (tmpStepLength > ZERO) {
