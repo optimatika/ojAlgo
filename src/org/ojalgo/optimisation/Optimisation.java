@@ -209,9 +209,11 @@ public interface Optimisation {
          * constraint is "active" - and check the sign.
          * <ul>
          * <li>2015-09-05: Changed from 14,8 to 12,8 (the "8" can/should probably be increased)</li>
+         * <li>2015-09-09: Changed from 12,8 to 10,8 (the "8" can only be increased if some test cases are
+         * rewritten)</li>
          * </ul>
          */
-        public NumberContext slack = new NumberContext(12, 8, RoundingMode.HALF_DOWN);
+        public NumberContext slack = new NumberContext(10, 8, RoundingMode.HALF_DOWN);
 
         /**
          * Used when copying the solver's solution back to the model (converting from double to BigDecimal).

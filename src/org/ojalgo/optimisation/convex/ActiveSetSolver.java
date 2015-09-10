@@ -285,8 +285,8 @@ abstract class ActiveSetSolver extends ConvexSolver {
                 }
             }
 
-            while (((tmpNumEqus + myActivator.countIncluded()) >= tmpNumVars) && (myActivator.countIncluded() > 0)) {
-                myActivator.shrink();
+            if (this.isDebug() && ((tmpNumEqus + myActivator.countIncluded()) > tmpNumVars)) {
+                this.debug("Redundant contraints!");
             }
 
         } else {
@@ -393,13 +393,14 @@ abstract class ActiveSetSolver extends ConvexSolver {
             final MatrixStore<Double> tmpSubL = tmpOutput.getL();
 
             if (this.isDebug()) {
-                this.debug("Current: {}", this.getX().copy().asList());
+                this.debug("Current: {}", this.getX().asList());
                 this.debug("Step: {}", tmpSubX.copy().asList());
                 // this.debug("Step Nullspace: {}", this.getAE().multiply(tmpSubX).copy().asList());
             }
 
-            final double tmpFrobNormX = tmpSubX.aggregateAll(Aggregator.NORM2);
-            if (!options.solution.isZero(tmpFrobNormX)) {
+            final double tmpNormCurrentX = this.getX().aggregateAll(Aggregator.NORM2);
+            final double tmpNormStepX = tmpSubX.aggregateAll(Aggregator.NORM2);
+            if (!options.solution.isSmall(tmpNormCurrentX, tmpNormStepX)) {
                 // Non-zero solution
 
                 double tmpStepLength = ONE;
@@ -424,7 +425,7 @@ abstract class ActiveSetSolver extends ConvexSolver {
                         final double tmpD = tmpDenom.doubleValue(i);
                         final double tmpVal = options.slack.isSmall(tmpD, tmpN) ? ZERO : tmpN / tmpD;
 
-                        if ((tmpD > ZERO) && (tmpVal >= ZERO) && (tmpVal < tmpStepLength) && !options.solution.isSmall(tmpFrobNormX, tmpD)) {
+                        if ((tmpD > ZERO) && (tmpVal >= ZERO) && (tmpVal < tmpStepLength) && !options.solution.isSmall(tmpNormStepX, tmpD)) {
                             tmpStepLength = tmpVal;
                             myConstraintToInclude = tmpExcluded[i];
                             if (this.isDebug()) {
@@ -435,7 +436,7 @@ abstract class ActiveSetSolver extends ConvexSolver {
 
                 }
 
-                if (tmpStepLength > ZERO) {
+                if (tmpStepLength > ZERO) { // It is possible that it becomes == 0.0
                     this.getX().maxpy(tmpStepLength, tmpSubX);
                 }
 
@@ -444,7 +445,9 @@ abstract class ActiveSetSolver extends ConvexSolver {
             } else if (this.isDebug()) {
                 // Zero solution
 
-                this.debug("Step too small!");
+                if (this.isDebug()) {
+                    this.debug("Step too small!");
+                }
 
                 this.setState(State.FEASIBLE);
             }
@@ -461,16 +464,19 @@ abstract class ActiveSetSolver extends ConvexSolver {
             // Subproblem NOT solved successfully
             // At least 1 active inequality
 
-            myActivator.shrink();
+            int tmpToExclude = -1;
+            double tmpMinLagrange = ZERO;
 
-            //            final PhysicalStore<Double> tmpQ = (PhysicalStore<Double>) this.getQ();
-            //            final AggregatorFunction<Double> tmpAggregator = PrimitiveAggregator.getSet().largest();
-            //            tmpQ.visitAll(tmpAggregator);
-            //            tmpQ.modifyDiagonal(0, 0, PrimitiveFunction.ADD.second(1000000 * tmpAggregator.doubleValue() * PrimitiveMath.MACHINE_EPSILON));
-
-            if (this.isDebug()) {
-                this.debug("Did shrink!");
+            final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
+            for (int i = 0; i < tmpIncluded.length; i++) {
+                final double tmpVal = Math.abs(tmpLI.doubleValue(i));
+                if (tmpVal >= tmpMinLagrange) {
+                    tmpMinLagrange = tmpVal;
+                    tmpToExclude = tmpIncluded[i];
+                }
             }
+
+            myActivator.exclude(tmpToExclude);
 
             this.performIteration();
 

@@ -37,7 +37,7 @@ public abstract class OptimisationConvexTests extends FunctionalityTest {
         return suite;
     }
 
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
 
     protected OptimisationConvexTests() {
         super();

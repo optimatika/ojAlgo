@@ -975,121 +975,112 @@ public final class Expression extends ModelEntity<Expression> {
         if (!myRedundant && (this.countQuadraticFactors() == 0) && (this.countLinearFactors() <= (fixedVariables.size() + 1))) {
             // This constraint can possibly be reduced to 0 or 1 remaining linear factors
 
-            final BigDecimal tmpFixedValue = this.calculateFixedValue(fixedVariables);
+            BigDecimal tmpFixedValue = this.calculateFixedValue(fixedVariables);
+            if (tmpFixedValue == null) {
+                tmpFixedValue = BigMath.ZERO;
+            }
 
-            if (tmpFixedValue != null) {
-                // The fixed variables are part of this expression
+            final HashSet<Index> tmpLinear = new HashSet<Index>(this.getLinearFactorKeys());
+            tmpLinear.removeAll(fixedVariables);
 
-                final HashSet<Index> tmpLinear = new HashSet<Index>(this.getLinearFactorKeys());
-                tmpLinear.removeAll(fixedVariables);
+            if (tmpLinear.size() == 0) {
+                // This constraint has 0 remaining free variable
+                // It is entirely redundant
 
-                if (tmpLinear.size() == 0) {
-                    // This constraint has 0 remaining free variable
-                    // It is entirely redundant
+                myInfeasible = !this.validate(tmpFixedValue, myModel.options.slack, myModel.appender());
+                if (!myInfeasible) {
+                    myRedundant = true;
+                    this.level(tmpFixedValue);
+                } else {
+                    myRedundant = false;
+                }
 
-                    myInfeasible = !this.validate(tmpFixedValue, myModel.options.slack, myModel.appender());
+            } else if (tmpLinear.size() == 1) {
+                // This constraint has 1 remaining free variable
+                // The lower/upper limits can be transferred to that variable, and the expression marked as redundant
+
+                final Index tmpIndex = (Index) tmpLinear.toArray()[0];
+                final Variable tmpVariable = myModel.getVariable(tmpIndex.index);
+                final BigDecimal tmpFactor = this.getLinearFactor(tmpIndex);
+
+                if (this.isEqualityConstraint()) {
+                    // Simple case with equality constraint
+
+                    final BigDecimal tmpCompensatedLevel = BigFunction.SUBTRACT.invoke(this.getUpperLimit(), tmpFixedValue);
+                    final BigDecimal tmpSolutionValue = BigFunction.DIVIDE.invoke(tmpCompensatedLevel, tmpFactor);
+
+                    myInfeasible = !tmpVariable.validate(tmpSolutionValue, myModel.options.slack, myModel.appender());
                     if (!myInfeasible) {
                         myRedundant = true;
-                        this.level(tmpFixedValue);
+                        tmpVariable.level(tmpSolutionValue);
                     } else {
                         myRedundant = false;
                     }
 
-                } else if (tmpLinear.size() == 1) {
-                    // This constraint has 1 remaining free variable
-                    // The lower/upper limits can be transferred to that variable, and the expression marked as redundant
+                } else {
+                    // More general case
 
-                    final Index tmpIndex = (Index) tmpLinear.toArray()[0];
-                    final Variable tmpVariable = myModel.getVariable(tmpIndex.index);
-                    final BigDecimal tmpFactor = this.getLinearFactor(tmpIndex);
+                    final BigDecimal tmpLowerLimit = this.getLowerLimit();
+                    final BigDecimal tmpUpperLimit = this.getUpperLimit();
 
-                    if (this.isEqualityConstraint()) {
-                        // Simple case with equality constraint
+                    final BigDecimal tmpCompensatedLower = tmpLowerLimit != null ? BigFunction.SUBTRACT.invoke(tmpLowerLimit, tmpFixedValue) : tmpLowerLimit;
+                    final BigDecimal tmpCompensatedUpper = tmpUpperLimit != null ? BigFunction.SUBTRACT.invoke(tmpUpperLimit, tmpFixedValue) : tmpUpperLimit;
 
-                        final BigDecimal tmpCompensatedLevel = BigFunction.SUBTRACT.invoke(this.getUpperLimit(), tmpFixedValue);
-                        final BigDecimal tmpSolutionValue = BigFunction.DIVIDE.invoke(tmpCompensatedLevel, tmpFactor);
+                    BigDecimal tmpLowerSolution = tmpCompensatedLower != null ? BigFunction.DIVIDE.invoke(tmpCompensatedLower, tmpFactor) : tmpCompensatedLower;
+                    BigDecimal tmpUpperSolution = tmpCompensatedUpper != null ? BigFunction.DIVIDE.invoke(tmpCompensatedUpper, tmpFactor) : tmpCompensatedUpper;
+                    if (tmpFactor.signum() < 0) {
+                        final BigDecimal tmpVal = tmpLowerSolution;
+                        tmpLowerSolution = tmpUpperSolution;
+                        tmpUpperSolution = tmpVal;
+                    }
 
-                        myInfeasible = !tmpVariable.validate(tmpSolutionValue, myModel.options.slack, myModel.appender());
-                        if (!myInfeasible) {
-                            myRedundant = true;
-                            tmpVariable.level(tmpSolutionValue);
+                    final BigDecimal tmpOldLower = tmpVariable.getLowerLimit();
+                    final BigDecimal tmpOldUpper = tmpVariable.getUpperLimit();
+
+                    BigDecimal tmpNewLower = tmpOldLower;
+                    if (tmpLowerSolution != null) {
+                        if (tmpOldLower != null) {
+                            tmpNewLower = tmpOldLower.max(tmpLowerSolution);
                         } else {
-                            myRedundant = false;
+                            tmpNewLower = tmpLowerSolution;
                         }
+                    }
 
+                    BigDecimal tmpNewUpper = tmpOldUpper;
+                    if (tmpUpperSolution != null) {
+                        if (tmpOldUpper != null) {
+                            tmpNewUpper = tmpOldUpper.min(tmpUpperSolution);
+                        } else {
+                            tmpNewUpper = tmpUpperSolution;
+                        }
+                    }
+
+                    if (tmpVariable.isInteger()) {
+                        if (tmpNewLower != null) {
+                            tmpNewLower = tmpNewLower.setScale(0, RoundingMode.CEILING);
+                        }
+                        if (tmpNewUpper != null) {
+                            tmpNewUpper = tmpNewUpper.setScale(0, RoundingMode.FLOOR);
+                        }
+                    }
+
+                    myInfeasible = (tmpNewLower != null) && (tmpNewUpper != null) && (tmpNewLower.compareTo(tmpNewUpper) > 0);
+                    if (!myInfeasible) {
+                        myRedundant = true;
+                        tmpVariable.lower(tmpNewLower).upper(tmpNewUpper);
                     } else {
-                        // More general case
-
-                        final BigDecimal tmpLowerLimit = this.getLowerLimit();
-                        final BigDecimal tmpUpperLimit = this.getUpperLimit();
-
-                        final BigDecimal tmpCompensatedLower = tmpLowerLimit != null ? BigFunction.SUBTRACT.invoke(tmpLowerLimit, tmpFixedValue)
-                                : tmpLowerLimit;
-                        final BigDecimal tmpCompensatedUpper = tmpUpperLimit != null ? BigFunction.SUBTRACT.invoke(tmpUpperLimit, tmpFixedValue)
-                                : tmpUpperLimit;
-
-                        BigDecimal tmpLowerSolution = tmpCompensatedLower != null ? BigFunction.DIVIDE.invoke(tmpCompensatedLower, tmpFactor)
-                                : tmpCompensatedLower;
-                        BigDecimal tmpUpperSolution = tmpCompensatedUpper != null ? BigFunction.DIVIDE.invoke(tmpCompensatedUpper, tmpFactor)
-                                : tmpCompensatedUpper;
-                        if (tmpFactor.signum() < 0) {
-                            final BigDecimal tmpVal = tmpLowerSolution;
-                            tmpLowerSolution = tmpUpperSolution;
-                            tmpUpperSolution = tmpVal;
-                        }
-
-                        final BigDecimal tmpOldLower = tmpVariable.getLowerLimit();
-                        final BigDecimal tmpOldUpper = tmpVariable.getUpperLimit();
-
-                        BigDecimal tmpNewLower = tmpOldLower;
-                        if (tmpLowerSolution != null) {
-                            if (tmpOldLower != null) {
-                                tmpNewLower = tmpOldLower.max(tmpLowerSolution);
-                            } else {
-                                tmpNewLower = tmpLowerSolution;
-                            }
-                        }
-
-                        BigDecimal tmpNewUpper = tmpOldUpper;
-                        if (tmpUpperSolution != null) {
-                            if (tmpOldUpper != null) {
-                                tmpNewUpper = tmpOldUpper.min(tmpUpperSolution);
-                            } else {
-                                tmpNewUpper = tmpUpperSolution;
-                            }
-                        }
-
-                        if (tmpVariable.isInteger()) {
-                            if (tmpNewLower != null) {
-                                tmpNewLower = tmpNewLower.setScale(0, RoundingMode.CEILING);
-                            }
-                            if (tmpNewUpper != null) {
-                                tmpNewUpper = tmpNewUpper.setScale(0, RoundingMode.FLOOR);
-                            }
-                        }
-
-                        myInfeasible = (tmpNewLower != null) && (tmpNewUpper != null) && (tmpNewLower.compareTo(tmpNewUpper) > 0);
-                        if (!myInfeasible) {
-                            myRedundant = true;
-                            tmpVariable.lower(tmpNewLower).upper(tmpNewUpper);
-                        } else {
-                            myRedundant = false;
-                        }
-
-                        //                        BasicLogger.logDebug("{} < {} -> {} < {} ( {} < {} )", tmpOldLower, tmpOldUpper, tmpNewLower, tmpNewUpper, tmpLowerSolution,
-                        //                                tmpUpperSolution);
+                        myRedundant = false;
                     }
 
-                    if (tmpVariable.isEqualityConstraint()) {
-                        tmpVariable.setValue(tmpVariable.getLowerLimit());
-                        myModel.addFixedVariable(tmpIndex);
-                        tmpDidFixVariable = true;
-                    }
+                    //                        BasicLogger.logDebug("{} < {} -> {} < {} ( {} < {} )", tmpOldLower, tmpOldUpper, tmpNewLower, tmpNewUpper, tmpLowerSolution,
+                    //                                tmpUpperSolution);
                 }
 
-            } else {
-
-                // Didn't change anything: No fixed value
+                if (tmpVariable.isEqualityConstraint()) {
+                    tmpVariable.setValue(tmpVariable.getLowerLimit());
+                    myModel.addFixedVariable(tmpIndex);
+                    tmpDidFixVariable = true;
+                }
             }
 
         } else {
