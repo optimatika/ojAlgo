@@ -195,13 +195,7 @@ public final class PortfolioMixer {
             }
         }
 
-        //        tmpModel.options.debug(GenericSolver.class);
-        //        tmpModel.options.validate = false;
-
         tmpModel.minimise();
-
-        //        BasicLogger.debug(tmpModel.toString());
-        //        BasicLogger.debug(Arrays.toString(tmpVariables));
 
         final ArrayList<BigDecimal> retVal = new ArrayList<BigDecimal>(tmpNumberOfComponents);
         for (int v = 0; v < tmpNumberOfComponents; v++) {

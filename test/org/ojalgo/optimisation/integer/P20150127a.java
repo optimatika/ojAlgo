@@ -8,7 +8,6 @@ import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.linear.LinearSolver;
 
 /**
  * Hi everyone,
@@ -97,7 +96,7 @@ public class P20150127a {
         final int intX = valX.setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
         final int intY = valY.setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
 
-        model.options.debug(LinearSolver.class);
+        // model.options.debug(LinearSolver.class);
 
         System.out.println("x = " + valX + " ~ " + intX);
         System.out.println("y = " + valY + " ~ " + intY);

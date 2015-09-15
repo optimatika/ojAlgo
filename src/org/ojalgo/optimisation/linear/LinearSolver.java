@@ -471,4 +471,19 @@ public abstract class LinearSolver extends BaseSolver {
         mySelector.include(someIndecesToInclude);
     }
 
+    /**
+     * Can only be called after a solve()
+     *
+     * @deprecated v38 Temporary api
+     */
+    @Deprecated
+    public abstract int[] getBasis();
+
+    /**
+     * Can only be called after a solve()
+     *
+     * @deprecated v38 Temporary api
+     */
+    @Deprecated
+    public abstract double[] getResidualCosts();
 }

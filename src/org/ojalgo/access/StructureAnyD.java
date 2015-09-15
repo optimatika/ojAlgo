@@ -27,11 +27,19 @@ interface StructureAnyD extends Structure1D {
      * count() == count(0) * count(1) * count(2) * count(3) * ...
      */
     default long count() {
-        return AccessUtils.count(this.structure());
+        return AccessUtils.count(this.shape());
     }
 
     long count(int dimension);
 
-    long[] structure();
+    long[] shape();
+
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
+    default long[] structure() {
+        return this.shape();
+    }
 
 }

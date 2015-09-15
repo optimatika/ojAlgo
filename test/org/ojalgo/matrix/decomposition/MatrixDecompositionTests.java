@@ -39,7 +39,7 @@ import org.ojalgo.TestUtils;
  */
 public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
 
     public static final List<MatrixDecomposition<Double>> getAllPrimitive() {
 

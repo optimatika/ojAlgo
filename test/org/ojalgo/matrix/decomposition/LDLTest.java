@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.netio.BasicLogger;
 
 /**
  * @author apete
@@ -54,14 +53,14 @@ public class LDLTest extends MatrixDecompositionTests {
         final LDL<Double> tmpPrimLDL = new LDLDecomposition.Primitive();
         tmpPrimLDL.decompose(tmpA);
 
-        BasicLogger.debug(tmpL);
-        BasicLogger.debug(tmpD);
+        //        BasicLogger.debug(tmpL);
+        //        BasicLogger.debug(tmpD);
 
-        BasicLogger.debug("RAW L", tmpRawLDL.getL());
-        BasicLogger.debug("RAW D", tmpRawLDL.getD());
-
-        BasicLogger.debug("PRIM L", tmpPrimLDL.getL());
-        BasicLogger.debug("PRIM D", tmpPrimLDL.getD());
+        //        BasicLogger.debug("RAW L", tmpRawLDL.getL());
+        //        BasicLogger.debug("RAW D", tmpRawLDL.getD());
+        //
+        //        BasicLogger.debug("PRIM L", tmpPrimLDL.getL());
+        //        BasicLogger.debug("PRIM D", tmpPrimLDL.getD());
 
         TestUtils.assertEquals(tmpL, tmpRawLDL.getL());
         TestUtils.assertEquals(tmpD, tmpRawLDL.getD());

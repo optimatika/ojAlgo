@@ -264,6 +264,12 @@ abstract class ActiveSetSolver extends ConvexSolver {
                 for (int i = 0; i < tmpNumVars; i++) {
                     this.setX(i, tmpLinearResult.doubleValue(i) - tmpLinearResult.doubleValue(tmpNumVars + i));
                 }
+                @SuppressWarnings("deprecation")
+                final double[] tmpResidual = tmpLinearSolver.getResidualCosts();
+                for (int i = tmpNumVars * 2; i < tmpResidual.length; i++) {
+                    final int tmpIndexToInclude = i - (2 * tmpNumVars);
+                    this.setLI(tmpIndexToInclude, tmpResidual[i]);
+                }
             }
         }
 
@@ -283,6 +289,10 @@ abstract class ActiveSetSolver extends ConvexSolver {
                         myActivator.include(tmpExcluded[i]);
                     }
                 }
+            }
+
+            while ((tmpNumEqus + myActivator.countIncluded()) > tmpNumVars) {
+                this.shrink();
             }
 
             if (this.isDebug() && ((tmpNumEqus + myActivator.countIncluded()) > tmpNumVars)) {
@@ -376,10 +386,6 @@ abstract class ActiveSetSolver extends ConvexSolver {
         final KKTSystem tmpSolver = this.getDelegateSolver(tmpInput);
         final KKTSystem.Output tmpOutput = tmpSolver.solve(tmpInput, options);
 
-        if (this.isDebug()) {
-            this.debug("X/L: {}", tmpOutput);
-        }
-
         final int[] tmpIncluded = myActivator.getIncluded();
 
         final int tmpCountVariables = this.countVariables();
@@ -395,7 +401,6 @@ abstract class ActiveSetSolver extends ConvexSolver {
             if (this.isDebug()) {
                 this.debug("Current: {}", this.getX().asList());
                 this.debug("Step: {}", tmpSubX.copy().asList());
-                // this.debug("Step Nullspace: {}", this.getAE().multiply(tmpSubX).copy().asList());
             }
 
             final double tmpNormCurrentX = this.getX().aggregateAll(Aggregator.NORM2);
@@ -414,15 +419,13 @@ abstract class ActiveSetSolver extends ConvexSolver {
                     tmpStepLengths.fillMatching(tmpStepLengths, PrimitiveFunction.DIVIDE, tmpDenom);
 
                     if (this.isDebug()) {
-                        this.debug("Slack (numerator): {}", tmpNumer.copy().asList());
-                        this.debug("Scaler (denominator): {}", tmpDenom.copy().asList());
                         this.debug("Looking for the largest possible step length (smallest positive scalar) among these: {}).", tmpStepLengths.asList());
                     }
 
                     for (int i = 0; i < tmpExcluded.length; i++) {
 
-                        final double tmpN = tmpNumer.doubleValue(i);
-                        final double tmpD = tmpDenom.doubleValue(i);
+                        final double tmpN = tmpNumer.doubleValue(i); // Current slack
+                        final double tmpD = tmpDenom.doubleValue(i); // Proposed slack change
                         final double tmpVal = options.slack.isSmall(tmpD, tmpN) ? ZERO : tmpN / tmpD;
 
                         if ((tmpD > ZERO) && (tmpVal >= ZERO) && (tmpVal < tmpStepLength) && !options.solution.isSmall(tmpNormStepX, tmpD)) {
@@ -464,19 +467,7 @@ abstract class ActiveSetSolver extends ConvexSolver {
             // Subproblem NOT solved successfully
             // At least 1 active inequality
 
-            int tmpToExclude = -1;
-            double tmpMinLagrange = ZERO;
-
-            final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
-            for (int i = 0; i < tmpIncluded.length; i++) {
-                final double tmpVal = Math.abs(tmpLI.doubleValue(i));
-                if (tmpVal >= tmpMinLagrange) {
-                    tmpMinLagrange = tmpVal;
-                    tmpToExclude = tmpIncluded[i];
-                }
-            }
-
-            myActivator.exclude(tmpToExclude);
+            this.shrink();
 
             this.performIteration();
 
@@ -506,6 +497,24 @@ abstract class ActiveSetSolver extends ConvexSolver {
                 this.debug("\tI-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy().asList());
             }
         }
+    }
+
+    void shrink() {
+
+        final int[] tmpIncluded = myActivator.getIncluded();
+
+        int tmpToExclude = -1;
+        double tmpMaxLagrange = ZERO;
+
+        final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
+        for (int i = 0; i < tmpIncluded.length; i++) {
+            final double tmpVal = Math.abs(tmpLI.doubleValue(i));
+            if (tmpVal >= tmpMaxLagrange) {
+                tmpMaxLagrange = tmpVal;
+                tmpToExclude = tmpIncluded[i];
+            }
+        }
+        myActivator.exclude(tmpToExclude);
     }
 
     @Override

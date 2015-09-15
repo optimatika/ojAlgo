@@ -33,7 +33,6 @@ import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -340,8 +339,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         final Optimisation.Result tmpResult = tmpModel.maximise();
         final BasicMatrix tmpSolution = BigMatrix.FACTORY.columns(tmpResult);
 
-        final MatrixStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 },
-                { 0.8154 }, { 0.0 } });
+        final MatrixStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 0.0 }, { 0.0 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.8154 }, { 0.0 } });
         final MatrixStore<Double> tmpActX = tmpSolution.selectRows(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }).toPrimitiveStore();
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
@@ -354,8 +353,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         final Optimisation.Result tmpResult = tmpModel.minimise();
         final BasicMatrix tmpSolution = BigMatrix.FACTORY.columns(tmpResult);
 
-        final MatrixStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.8154 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 },
-                { 0.0 }, { 0.0 } });
+        final MatrixStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 0.0 }, { 0.8154 }, { 0.1846 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
         final MatrixStore<Double> tmpActX = tmpSolution.selectRows(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }).toPrimitiveStore();
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
@@ -365,8 +364,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
      * A specific node of {@linkplain org.ojalgo.optimisation.integer.IntegerProblems#testP20130409b}. Based
      * on some changes in ExpressionBasedModel and/or IntegerSolver some nodes started to fail as UNBOUNDED.
      * Which seems unreasonable. Must be a problem with either ExpressionBasedModel or LinearSolver. Test case
-     * sent in by the user / problem reporter <a
-     * href="http://bugzilla.optimatika.se/show_bug.cgi?id=178">BugZilla</a>
+     * sent in by the user / problem reporter
+     * <a href="http://bugzilla.optimatika.se/show_bug.cgi?id=178">BugZilla</a>
      */
     public void testP20130409b() {
 
@@ -426,8 +425,8 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         c6.setLinearFactor(x2013, 5000);
         c6.level(BigDecimal.valueOf(19105000));
 
-        final BigArray tmpExpSol = BigArray.wrap(new BigDecimal[] { new BigDecimal(4849.999999997941), new BigDecimal(1245), new BigDecimal(1269),
-                new BigDecimal(1307) });
+        final BigArray tmpExpSol = BigArray
+                .wrap(new BigDecimal[] { new BigDecimal(4849.999999997941), new BigDecimal(1245), new BigDecimal(1269), new BigDecimal(1307) });
 
         TestUtils.assertTrue("Expected Solution Not Valid", tmpModel.validate(tmpExpSol));
 
@@ -436,7 +435,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final Result tmpResult = tmpModel.minimise();
 
-        BasicLogger.debug(tmpResult.toString());
+        // BasicLogger.debug(tmpResult.toString());
 
         TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, new NumberContext(8, 8));
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());

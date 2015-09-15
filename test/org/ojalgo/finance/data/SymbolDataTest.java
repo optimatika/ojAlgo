@@ -1,37 +1,37 @@
-/* 
+/*
  * Copyright 1997-2015 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE. 
+ * SOFTWARE.
  */
 package org.ojalgo.finance.data;
 
 import java.util.List;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.series.CoordinationSet;
 import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * SymbolDataTest
- * 
+ *
  * @author apete
  */
 public class SymbolDataTest extends FinanceDataTests {
@@ -64,8 +64,8 @@ public class SymbolDataTest extends FinanceDataTests {
         final CalendarDateSeries<Double> tmpPrunedGoogle = tmpCoordinator.get(tmpGoogleSymbol);
 
         TestUtils.assertEquals("count", tmpPrunedYahoo.size(), tmpPrunedGoogle.size());
-        TestUtils.assertEquals("Last Value", tmpPrunedYahoo.lastValue(), tmpPrunedGoogle.lastValue(), PrimitiveMath.IS_ZERO);
-        // Doesn't work. Goggle and Yahoo seemsto have different data 
+        TestUtils.assertEquals("Last Value", tmpPrunedYahoo.lastValue(), tmpPrunedGoogle.lastValue(), NumberContext.getGeneral(8, 14));
+        // Doesn't work. Goggle and Yahoo seemsto have different data
         // JUnitUtils.assertEquals("First Value", tmpPrunedYahoo.firstValue(), tmpPrunedGoogle.firstValue(), PrimitiveMath.IS_ZERO);
 
         //        for (final CalendarDate tmpKey : tmpCoordinator.getAllContainedKeys()) {

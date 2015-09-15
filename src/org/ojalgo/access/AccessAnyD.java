@@ -111,11 +111,11 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
     public interface Settable<N extends Number> extends StructureAnyD, Access1D.Settable<N> {
 
         default void add(final long index, final double addend) {
-            this.add(AccessUtils.reference(index, this.structure()), addend);
+            this.add(AccessUtils.reference(index, this.shape()), addend);
         }
 
         default void add(final long index, final Number addend) {
-            this.add(AccessUtils.reference(index, this.structure()), addend);
+            this.add(AccessUtils.reference(index, this.shape()), addend);
         }
 
         void add(long[] reference, double addend);
@@ -123,11 +123,11 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         void add(long[] reference, Number addend);
 
         default void set(final long index, final double value) {
-            this.set(AccessUtils.reference(index, this.structure()), value);
+            this.set(AccessUtils.reference(index, this.shape()), value);
         }
 
         default void set(final long index, final Number value) {
-            this.set(AccessUtils.reference(index, this.structure()), value);
+            this.set(AccessUtils.reference(index, this.shape()), value);
         }
 
         void set(long[] reference, double value);
@@ -143,13 +143,13 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
     }
 
     default double doubleValue(final long index) {
-        return this.doubleValue(AccessUtils.reference(index, this.structure()));
+        return this.doubleValue(AccessUtils.reference(index, this.shape()));
     }
 
     double doubleValue(long[] reference);
 
     default N get(final long index) {
-        return this.get(AccessUtils.reference(index, this.structure()));
+        return this.get(AccessUtils.reference(index, this.shape()));
     }
 
     N get(long[] reference);

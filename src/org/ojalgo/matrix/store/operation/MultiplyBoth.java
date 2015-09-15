@@ -783,20 +783,22 @@ public final class MultiplyBoth extends MatrixOperation {
 
         for (int i = firstRow; i < rowLimit; i++) {
 
-            for (int c = 0; c < complexity; c++) {
-                tmpLeftRow[c] = left.doubleValue(i + (c * tmpRowDim));
-            }
             final int tmpFirstInRow = MatrixUtils.firstInRow(left, i, 0);
             final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
 
+            for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
+                tmpLeftRow[c] = left.doubleValue(i + (c * tmpRowDim));
+            }
+
             for (int j = 0; j < tmpColDim; j++) {
+                final int tmpColBase = j * complexity;
 
                 tmpFirst = MatrixUtils.firstInColumn(right, j, tmpFirstInRow);
                 tmpLimit = MatrixUtils.limitOfColumn(right, j, tmpLimitOfRow);
 
                 tmpVal = PrimitiveMath.ZERO;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
-                    tmpVal += tmpLeftRow[c] * right.doubleValue(c + (j * complexity));
+                    tmpVal += tmpLeftRow[c] * right.doubleValue(c + tmpColBase);
                 }
                 product[i + (j * tmpRowDim)] = tmpVal;
             }

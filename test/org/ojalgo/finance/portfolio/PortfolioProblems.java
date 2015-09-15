@@ -60,13 +60,15 @@ public class PortfolioProblems extends FinancePortfolioTests {
         final int assetNum = 7;
 
         final double[][] assets_return = {
-                { -1.5905837442343828E-4, -0.03062360801781757, -0.029857534032853142, -0.011811692726036832, -0.017972310602803136, 0.017338003502626997, 0.0 },
+                { -1.5905837442343828E-4, -0.03062360801781757, -0.029857534032853142, -0.011811692726036832, -0.017972310602803136, 0.017338003502626997,
+                        0.0 },
                 { -0.02757158006362653, -0.02562704471101405, -0.011751538891997735, -0.024915062287655786, -0.01684088269454123, 0.013585351447135364, 0.0 },
                 { -0.00699300699300693, -0.033802816901408676, -0.04675196850393671, -0.021166752710376546, -0.007911392405063583, 0.03827751196172254, 0.0 },
                 { -0.007626310772164015, 0.0038424591738713027, 0.02488038277511978, 0.025210084033613675, -0.02003642987249557, -0.09758364312267642, 0.0 },
                 { -0.03965053763440893, 0.021693491952414375, 0.01643835616438392, -0.007412398921833087, 0.01765105227427014, -0.010006671114076025, 0.0 },
                 { -0.017821782178217872, 0.005040322580645311, 0.006018054162487363, 9.008107296569024E-4, 0.002999999999999824, -0.01196410767696908, 0.0 },
-                { 2.630552127527583E-4, 2.5867028174649627E-4, 2.3866431891514327E-4, 1.9564035993080523E-4, 2.351016690966669E-4, 1.9070675120065465E-4, 0.0 } };
+                { 2.630552127527583E-4, 2.5867028174649627E-4, 2.3866431891514327E-4, 1.9564035993080523E-4, 2.351016690966669E-4, 1.9070675120065465E-4,
+                        0.0 } };
 
         final P20090115 tm = new P20090115();
         final BasicMatrix covariances = tm.getCovariances(assets_return);
@@ -80,7 +82,10 @@ public class PortfolioProblems extends FinancePortfolioTests {
             markowitzModel.setLowerLimit(i, new BigDecimal(0.0));
             markowitzModel.setUpperLimit(i, new BigDecimal(1.0));
         }
+
         final List<BigDecimal> re = markowitzModel.getWeights();
+
+        // TestUtils.assertTrue(markowitzModel.getOptimisationState().isOptimal());
 
         for (final BigDecimal tmpBigDecimal : re) {
             if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
@@ -155,8 +160,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         // No problem with both the lower and upper limits set.
 
-        tmpAI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 },
-                { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
+        tmpAI = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
         tmpBI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
 
         tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
@@ -239,13 +244,15 @@ public class PortfolioProblems extends FinancePortfolioTests {
     public void testP20141202() {
 
         final double[][] assets_return = {
-                { -1.5905837442343828E-4, -0.03062360801781757, -0.029857534032853142, -0.011811692726036832, -0.017972310602803136, 0.017338003502626997, 0.0 },
+                { -1.5905837442343828E-4, -0.03062360801781757, -0.029857534032853142, -0.011811692726036832, -0.017972310602803136, 0.017338003502626997,
+                        0.0 },
                 { -0.02757158006362653, -0.02562704471101405, -0.011751538891997735, -0.024915062287655786, -0.01684088269454123, 0.013585351447135364, 0.0 },
                 { -0.00699300699300693, -0.033802816901408676, -0.04675196850393671, -0.021166752710376546, -0.007911392405063583, 0.03827751196172254, 0.0 },
                 { -0.007626310772164015, 0.0038424591738713027, 0.02488038277511978, 0.025210084033613675, -0.02003642987249557, -0.09758364312267642, 0.0 },
                 { -0.03965053763440893, 0.021693491952414375, 0.01643835616438392, -0.007412398921833087, 0.01765105227427014, -0.010006671114076025, 0.0 },
                 { -0.017821782178217872, 0.005040322580645311, 0.006018054162487363, 9.008107296569024E-4, 0.002999999999999824, -0.01196410767696908, 0.0 },
-                { 2.630552127527583E-4, 2.5867028174649627E-4, 2.3866431891514327E-4, 1.9564035993080523E-4, 2.351016690966669E-4, 1.9070675120065465E-4, 0.0 } };
+                { 2.630552127527583E-4, 2.5867028174649627E-4, 2.3866431891514327E-4, 1.9564035993080523E-4, 2.351016690966669E-4, 1.9070675120065465E-4,
+                        0.0 } };
 
         final P20090115 tm = new P20090115();
         final BasicMatrix tmpCovariances = tm.getCovariances(assets_return);
@@ -267,8 +274,8 @@ public class PortfolioProblems extends FinancePortfolioTests {
             tmpPortfolioReturn[ra] = tmpMarkowitz.getMeanReturn();
             tmpPortfolioVariance[ra] = tmpMarkowitz.getReturnVariance();
             if (DEBUG) {
-                BasicLogger.debug("RA: {}\tret: {}\tvar: {}\tweights: {}", tmpRiskAversions[ra], tmpMarkowitz.getMeanReturn(),
-                        tmpMarkowitz.getReturnVariance(), tmpMarkowitz.getWeights());
+                BasicLogger.debug("RA: {}\tret: {}\tvar: {}\tweights: {}", tmpRiskAversions[ra], tmpMarkowitz.getMeanReturn(), tmpMarkowitz.getReturnVariance(),
+                        tmpMarkowitz.getWeights());
             }
         }
 
@@ -281,8 +288,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
             tmpMarkowitz.setRiskAversion(tmpInitialRiskAversion);
             tmpMarkowitz.setTargetReturn(BigDecimal.valueOf(tmpPortfolioReturn[r]));
             tmpMarkowitz.getWeights();
-            BasicLogger.debug("Exp={}, Act={}, Quoat={}", tmpPortfolioReturn[r], tmpMarkowitz.getMeanReturn(), tmpMarkowitz.getMeanReturn()
-                    / tmpPortfolioReturn[r]);
+            // BasicLogger.debug("Exp={}, Act={}, Quoat={}", tmpPortfolioReturn[r], tmpMarkowitz.getMeanReturn(), tmpMarkowitz.getMeanReturn()  / tmpPortfolioReturn[r]);
             TestUtils.assertEquals("Return: " + tmpRiskAversions[r], tmpPortfolioReturn[r], tmpMarkowitz.getMeanReturn(), tmpPrecision);
         }
 

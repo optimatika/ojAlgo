@@ -294,6 +294,8 @@ public final class MarkowitzModel extends EquilibriumModel {
 
         myOptimisationVariance.weight(riskAversion / 2.0);
 
+        // myOptimisationModel.options.debug(ConvexSolver.class);
+
         return myOptimisationModel;
     }
 

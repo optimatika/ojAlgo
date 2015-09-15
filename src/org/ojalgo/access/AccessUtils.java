@@ -110,8 +110,8 @@ public abstract class AccessUtils {
                 return TypeUtils.toBigDecimal(access.get(reference));
             }
 
-            public long[] structure() {
-                return access.structure();
+            public long[] shape() {
+                return access.shape();
             }
 
         };
@@ -196,8 +196,8 @@ public abstract class AccessUtils {
                 return ComplexNumber.valueOf(access.get(reference));
             }
 
-            public long[] structure() {
-                return access.structure();
+            public long[] shape() {
+                return access.shape();
             }
 
         };
@@ -282,8 +282,8 @@ public abstract class AccessUtils {
                 return access.doubleValue(reference);
             }
 
-            public long[] structure() {
-                return access.structure();
+            public long[] shape() {
+                return access.shape();
             }
 
         };
@@ -368,8 +368,8 @@ public abstract class AccessUtils {
                 return Quaternion.valueOf(access.get(reference));
             }
 
-            public long[] structure() {
-                return access.structure();
+            public long[] shape() {
+                return access.shape();
             }
 
         };
@@ -454,8 +454,8 @@ public abstract class AccessUtils {
                 return RationalNumber.valueOf(access.get(reference));
             }
 
-            public long[] structure() {
-                return access.structure();
+            public long[] shape() {
+                return access.shape();
             }
 
         };
@@ -705,6 +705,27 @@ public abstract class AccessUtils {
         return AccessUtils.row(index, structure[0]);
     }
 
+    public static long[] shape(final StructureAnyD structure) {
+
+        final long tmpSize = structure.count();
+
+        long tmpTotal = structure.count(0);
+        int tmpRank = 1;
+
+        while (tmpTotal < tmpSize) {
+            tmpTotal *= structure.count(tmpRank);
+            tmpRank++;
+        }
+
+        final long[] retVal = new long[tmpRank];
+
+        for (int i = 0; i < retVal.length; i++) {
+            retVal[i] = structure.count(i);
+        }
+
+        return retVal;
+    }
+
     /**
      * @param structure An access structure
      * @return The size of an access with that structure
@@ -788,25 +809,12 @@ public abstract class AccessUtils {
         return retVal;
     }
 
+    /**
+     * @deprecated v39 Use {@link #shape(StructureAnyD)} instead
+     */
+    @Deprecated
     public static long[] structure(final StructureAnyD structure) {
-
-        final long tmpSize = structure.count();
-
-        long tmpTotal = structure.count(0);
-        int tmpRank = 1;
-
-        while (tmpTotal < tmpSize) {
-            tmpTotal *= structure.count(tmpRank);
-            tmpRank++;
-        }
-
-        final long[] retVal = new long[tmpRank];
-
-        for (int i = 0; i < retVal.length; i++) {
-            retVal[i] = structure.count(i);
-        }
-
-        return retVal;
+        return AccessUtils.shape(structure);
     }
 
     private AccessUtils() {

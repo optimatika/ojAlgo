@@ -127,8 +127,8 @@ public class IntegerProblems extends OptimisationIntegerTests {
     }
 
     /**
-     * apete's implementation of the original problem description. <a
-     * href="http://bugzilla.optimatika.se/show_bug.cgi?id=178">BugZilla</a>
+     * apete's implementation of the original problem description.
+     * <a href="http://bugzilla.optimatika.se/show_bug.cgi?id=178">BugZilla</a>
      */
     public void testP20130409a() {
 
@@ -163,15 +163,15 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         final Result tmpResult = tmpModel.minimise();
 
-        BasicLogger.debug(tmpResult.toString());
+        // BasicLogger.debug(tmpResult.toString());
 
         TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, new NumberContext(8, 8));
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());
     }
 
     /**
-     * Test case sent in by the user / problem reporter <a
-     * href="http://bugzilla.optimatika.se/show_bug.cgi?id=178">BugZilla</a>
+     * Test case sent in by the user / problem reporter
+     * <a href="http://bugzilla.optimatika.se/show_bug.cgi?id=178">BugZilla</a>
      */
     public void testP20130409b() {
 
@@ -229,8 +229,8 @@ public class IntegerProblems extends OptimisationIntegerTests {
         c6.setLinearFactor(x2013, 5000);
         c6.level(BigDecimal.valueOf(19105000));
 
-        final BigArray tmpExpSol = BigArray.wrap(new BigDecimal[] { new BigDecimal(4849.999999997941), new BigDecimal(1245), new BigDecimal(1269),
-                new BigDecimal(1307) });
+        final BigArray tmpExpSol = BigArray
+                .wrap(new BigDecimal[] { new BigDecimal(4849.999999997941), new BigDecimal(1245), new BigDecimal(1269), new BigDecimal(1307) });
 
         TestUtils.assertTrue("Expected Solution Not Valid", tmpModel.validate(tmpExpSol));
 
@@ -239,7 +239,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         final Result tmpResult = tmpModel.minimise();
 
-        BasicLogger.debug(tmpResult.toString());
+        // BasicLogger.debug(tmpResult.toString());
 
         TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, new NumberContext(8, 8));
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());

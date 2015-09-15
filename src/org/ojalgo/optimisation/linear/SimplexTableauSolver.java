@@ -488,4 +488,27 @@ final class SimplexTableauSolver extends LinearSolver {
         return myTransposedTableau.asArray2D().sliceColumn(0, row).subList(0, this.countVariables());
     }
 
+    @Override
+    public int[] getBasis() {
+        return myBasis.clone();
+    }
+
+    @Override
+    public double[] getResidualCosts() {
+
+        this.logDebugTableau("Tableau extracted");
+
+        final double[] retVal = new double[this.countVariables()];
+
+        final int tmpRowObjective = this.countConstraints();
+
+        // final double tmpObjVal = myTransposedTableau.doubleValue(32, tmpRowObjective);
+
+        for (int j = 0; j < retVal.length; j++) {
+            retVal[j] = myTransposedTableau.doubleValue(j, tmpRowObjective);
+        }
+
+        return retVal;
+    }
+
 }

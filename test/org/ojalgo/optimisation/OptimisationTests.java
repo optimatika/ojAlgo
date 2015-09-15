@@ -24,7 +24,7 @@ import org.ojalgo.FunctionalityTest;
  */
 public abstract class OptimisationTests extends FunctionalityTest {
 
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
 
     public static Test suite() {
         final TestSuite suite = new TestSuite(OptimisationTests.class.getPackage().getName());

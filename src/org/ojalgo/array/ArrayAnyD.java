@@ -50,7 +50,7 @@ public final class ArrayAnyD<N extends Number>
 
         public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
 
-            final long[] tmpStructure = source.structure();
+            final long[] tmpStructure = source.shape();
 
             final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpStructure);
 
@@ -105,7 +105,7 @@ public final class ArrayAnyD<N extends Number>
         @Override
         public ArrayAnyD<Double> copy(final AccessAnyD<?> source) {
 
-            final long[] tmpStructure = source.structure();
+            final long[] tmpStructure = source.shape();
 
             final BasicArray<Double> tmpDelegate = this.delegate().makeToBeFilled(tmpStructure);
 
@@ -203,7 +203,7 @@ public final class ArrayAnyD<N extends Number>
     public boolean equals(final Object obj) {
         if (obj instanceof ArrayAnyD) {
             final ArrayAnyD<N> tmpObj = (ArrayAnyD<N>) obj;
-            return Arrays.equals(myStructure, tmpObj.structure()) && myDelegate.equals(tmpObj.getDelegate());
+            return Arrays.equals(myStructure, tmpObj.shape()) && myDelegate.equals(tmpObj.getDelegate());
         } else {
             return super.equals(obj);
         }
@@ -365,7 +365,7 @@ public final class ArrayAnyD<N extends Number>
         return new Array1D<N>(myDelegate, tmpFirst, tmpLimit, tmpStep);
     }
 
-    public long[] structure() {
+    public long[] shape() {
         return myStructure;
     }
 

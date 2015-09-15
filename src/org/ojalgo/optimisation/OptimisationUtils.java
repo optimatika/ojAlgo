@@ -32,7 +32,9 @@ public abstract class OptimisationUtils {
     static int getAdjustmentExponent(final double largest, final double smallest) {
 
         final double tmpLargestExp = largest > ZERO ? Math.log10(largest) : ZERO;
-        final double tmpSmallestExp = smallest > ZERO ? Math.log10(smallest) : -EIGHT;
+        double tmpSmallestExp = smallest > ZERO ? Math.log10(smallest) : -EIGHT;
+
+        tmpSmallestExp = Math.max(tmpSmallestExp, tmpLargestExp - EIGHT - EIGHT);
 
         final double tmpNegatedAverage = (tmpLargestExp + tmpSmallestExp) / (-TWO);
 

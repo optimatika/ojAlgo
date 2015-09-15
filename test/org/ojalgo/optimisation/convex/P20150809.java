@@ -65,14 +65,17 @@ class P20150809 {
     }
 
     static ConvexSolver buildModel(final boolean identity, final boolean addDummyConstraints) {
-        if (!identity && !addDummyConstraints) {
-            System.out.println("Zero Q matrix and no constraints -------------------------!");
-        } else if (!identity) {
-            System.out.println("Zero Q matrix and constraints -------------------------!");
-        } else if (!addDummyConstraints) {
-            System.out.println("Identity Q matrix and no constraints -------------------------!");
-        } else {
-            System.out.println("Identity Q matrix and  constraints -------------------------!");
+
+        if (OptimisationConvexTests.DEBUG) {
+            if (!identity && !addDummyConstraints) {
+                System.out.println("Zero Q matrix and no constraints -------------------------!");
+            } else if (!identity) {
+                System.out.println("Zero Q matrix and constraints -------------------------!");
+            } else if (!addDummyConstraints) {
+                System.out.println("Identity Q matrix and no constraints -------------------------!");
+            } else {
+                System.out.println("Identity Q matrix and  constraints -------------------------!");
+            }
         }
 
         final double[] C = new double[] { 0.12, -0.05, 0.08, 0.07 };

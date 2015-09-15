@@ -53,7 +53,20 @@ public class KKTSolver2 extends KKTSystem {
         myCholesky = Cholesky.make(tmpQ);
         myLU = LU.make(tmpQ);
 
-        myCholesky.compute(tmpQ);
+        myCholesky.decompose(tmpQ);
+
+        //        if (!myCholesky.isSolvable()) {
+        //
+        //            final PhysicalStore<Double> tmpModifiedQ = tmpQ instanceof PhysicalStore ? (PhysicalStore<Double>) tmpQ : tmpQ.copy();
+        //
+        //            final double tmpLargest = tmpModifiedQ.aggregateAll(Aggregator.LARGEST);
+        //            final double tmpRelativelySmall = MACHINE_EPSILON * tmpLargest;
+        //            final UnaryFunction<Double> tmpModifier = PrimitiveFunction.ADD.second(tmpRelativelySmall);
+        //
+        //            tmpModifiedQ.modifyColumn(0L, 0L, tmpModifier);
+        //
+        //            myCholesky.compute(tmpModifiedQ);
+        //        }
     }
 
     KKTSolver2() {

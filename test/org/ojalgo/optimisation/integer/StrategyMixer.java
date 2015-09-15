@@ -132,8 +132,8 @@ public class StrategyMixer extends OptimisationIntegerTests {
 
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVars);
 
-        tmpModel.options.debug(IntegerSolver.class);
-        tmpModel.options.validate = false;
+        // tmpModel.options.debug(IntegerSolver.class);
+        // tmpModel.options.validate = false;
 
         final Expression tmpQuadObj = tmpModel.addExpression("Quadratic Objective Part");
         tmpQuadObj.weight(ONE);

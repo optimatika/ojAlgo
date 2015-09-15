@@ -75,9 +75,9 @@ public class DesignCase extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpX = tmpQR.solve(tmpB).copy();
 
-        BasicLogger.debug("Straigt X: " + tmpX.toString());
+        // BasicLogger.debug("Straigt X: " + tmpX.toString());
         tmpB.fillMatching(tmpB, PrimitiveFunction.SUBTRACT, tmpA.multiply(tmpX));
-        BasicLogger.debug("Residual B: " + tmpB.toString());
+        // BasicLogger.debug("Residual B: " + tmpB.toString());
 
     }
 
@@ -86,8 +86,8 @@ public class DesignCase extends MatrixDecompositionTests {
         final Tridiagonal<Double> tmpDecomposition = Tridiagonal.makePrimitive();
         //final Tridiagonal<Double> tmpDecomposition = new TridiagonalAltDecomp();
 
-        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 2, 2, 1 }, { 2, -3, 1, 1 }, { 2, 1, 3, 1 },
-                { 1, 1, 1, 2 } });
+        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 4, 2, 2, 1 }, { 2, -3, 1, 1 }, { 2, 1, 3, 1 }, { 1, 1, 1, 2 } });
 
         tmpDecomposition.decompose(tmpOriginalMatrix);
 
@@ -130,8 +130,8 @@ public class DesignCase extends MatrixDecompositionTests {
      */
     public void testWikipediaSVD() {
 
-        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 },
-                { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
+        final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
         final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE.copy(new double[] { 4.0, 3.0, Math.sqrt(5.0), 0.0 });
 
         final SingularValue<Double> tmpOldDecomp = new SVDold30.Primitive();

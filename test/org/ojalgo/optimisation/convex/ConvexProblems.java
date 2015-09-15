@@ -58,7 +58,16 @@ import org.ojalgo.type.context.NumberContext;
 
 public class ConvexProblems extends OptimisationConvexTests {
 
-    static void builAndTestModel(final PrimitiveDenseStore[] matrices, final PrimitiveDenseStore expectedSolution, final NumberContext modelValidationContext) {
+    static void builAndTestModel(final PrimitiveDenseStore[] matrices, final double[] expectedSolution, final NumberContext modelValidationContext,
+            final boolean testSolverDirectly) {
+
+        final PrimitiveDenseStore tmpExpectedSolution = PrimitiveDenseStore.FACTORY.columns(expectedSolution);
+
+        ConvexProblems.builAndTestModel(matrices, tmpExpectedSolution, modelValidationContext, testSolverDirectly);
+    }
+
+    static void builAndTestModel(final PrimitiveDenseStore[] matrices, final PrimitiveDenseStore expectedSolution, final NumberContext modelValidationContext,
+            final boolean testSolverDirectly) {
 
         final double tmpExpectedValue = matrices[2].multiply(expectedSolution).multiplyLeft(expectedSolution.transpose()).multiply(HALF.doubleValue())
                 .subtract(matrices[3].multiply(expectedSolution)).doubleValue(0);
@@ -69,7 +78,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertTrue("Expected solution not ok!", tmpModel.validate(tmpExpectedResult, modelValidationContext));
         TestUtils.assertTrue("Expected solution not ok!", tmpModel.validate(modelValidationContext)); // The expected solution is written to the variables
 
-        tmpModel.options.debug(ConvexSolver.class);
+        // tmpModel.options.debug(ConvexSolver.class);
 
         // When/if the correct/optimal solution is used to kickStart ojAlgo should return that solution
         final Result tmpInitialisedModelResult = tmpModel.minimise();
@@ -91,47 +100,55 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveExpression().evaluate(tmpUninitialisedModelResult).doubleValue(), modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
 
-        final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(matrices);
-        tmpBuilder.balance(); // Changes the objective function value
-        final ConvexSolver tmpSolver = tmpBuilder.build();
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        if (testSolverDirectly) {
 
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertEquals(tmpExpectedResult, tmpResult, NumberContext.getGeneral(2, 4));
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveExpression().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
+            final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(matrices);
+            tmpBuilder.balance(); // Changes the objective function value
+            final ConvexSolver tmpSolver = tmpBuilder.build();
+            // tmpSolver.options.debug(ConvexSolver.class);
+            tmpSolver.options.validate = false;
+            final Optimisation.Result tmpResult = tmpSolver.solve();
+
+            TestUtils.assertStateNotLessThanOptimal(tmpResult);
+            TestUtils.assertEquals(tmpExpectedResult, tmpResult, NumberContext.getGeneral(2, 4));
+            TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveExpression().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
+        }
+
     }
 
     static ExpressionsBasedModel buildModel(final PrimitiveDenseStore[] matrices, final PrimitiveDenseStore expectedSolution) {
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
 
-        for (int v = 0; v < 9; v++) {
+        final int tmpNumberOfVariables = (int) matrices[3].count();
+
+        for (int v = 0; v < tmpNumberOfVariables; v++) {
             final Variable tmpVariable = Variable.make("X" + v);
             tmpVariable.setValue(BigDecimal.valueOf(expectedSolution.doubleValue(v)));
             tmpModel.addVariable(tmpVariable);
         }
         for (int e = 0; e < matrices[0].countRows(); e++) {
             final Expression tmpExpression = tmpModel.addExpression("E" + e);
-            for (int v = 0; v < 9; v++) {
+            for (int v = 0; v < tmpNumberOfVariables; v++) {
                 tmpExpression.setLinearFactor(v, matrices[0].get(e, v));
             }
             tmpExpression.level(matrices[1].doubleValue(e));
         }
         for (int i = 0; i < matrices[4].countRows(); i++) {
             final Expression tmpExpression = tmpModel.addExpression("I" + i);
-            for (int v = 0; v < 9; v++) {
+            for (int v = 0; v < tmpNumberOfVariables; v++) {
                 tmpExpression.setLinearFactor(v, matrices[4].get(i, v));
             }
             tmpExpression.upper(matrices[5].doubleValue(i));
         }
         final Expression tmpObjQ = tmpModel.addExpression("Q");
-        for (int r = 0; r < 9; r++) {
-            for (int v = 0; v < 9; v++) {
+        for (int r = 0; r < tmpNumberOfVariables; r++) {
+            for (int v = 0; v < tmpNumberOfVariables; v++) {
                 tmpObjQ.setQuadraticFactor(r, v, matrices[2].doubleValue(r, v));
             }
         }
         tmpObjQ.weight(HALF);
         final Expression tmpObjC = tmpModel.addExpression("C");
-        for (int v = 0; v < 9; v++) {
+        for (int v = 0; v < tmpNumberOfVariables; v++) {
             tmpObjC.setLinearFactor(v, matrices[3].doubleValue(v));
         }
         tmpObjC.weight(NEG);
@@ -618,7 +635,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { 0.00000000000000, -0.01750000000000, -0.01750000000000,
                 0.88830035195990, 4.56989525276369, 5.00000000000000, 0.90562154243124, -1.91718419629399, 0.06390614020590 });
 
-        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(4, 14));
+        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(4, 14), false);
     }
 
     /**
@@ -673,7 +690,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { -0.00000000000000, -0.01750000000000, 0.01750000000000,
                 0.13427356981778, 0.50000000000000, -0.14913060410765, 0.06986475572103, -0.08535020176844, 0.00284500680371 });
 
-        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(4, 14));
+        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(4, 14), true);
     }
 
     /**
@@ -724,7 +741,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { 0.00000000000000, 0.01750000000000, -0.01750000000000, 1.46389524463679,
                 5.00000000000000, 4.87681260745493, 4.45803387299108, -6.77235264210831, 0.22574508859158 });
 
-        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(4, 14));
+        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(2, 14), false);
     }
 
     /**
@@ -949,7 +966,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpConstrExpr.setLinearFactor(1, BigMath.ONE);
         tmpConstrExpr.setLinearFactor(2, BigMath.NEG);
 
-        tmpModel.options.debug(ConvexSolver.class);
+        // tmpModel.options.debug(ConvexSolver.class);
         final Result tmpResult = tmpModel.minimise();
         final double tmpObjFuncVal = tmpResult.getValue();
 
@@ -966,7 +983,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * Continuation of P20111129 http://bugzilla.optimatika.se/show_bug.cgi?id=15 Have to turn off validation
      * as Q is not positive semidefinite.
      */
-    public void testP20111205() {
+    public void _testP20111205() {
 
         final PrimitiveDenseStore tmpAE = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, -1.0, -1.0, 1.0 },
                 { 1.0, -1.0, -1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0, -1.0, -1.0, 1.0, 0.0, 0.0, 0.0, 0.0 } });
@@ -1000,19 +1017,29 @@ public class ConvexProblems extends OptimisationConvexTests {
         final PrimitiveDenseStore tmpBI = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
-        final ConvexSolver tmpSolver = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
+        // final ConvexSolver tmpSolver = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
         // tmpSolver.options.debug(ConvexSolver.class);
-        tmpSolver.options.validate = false; // Q is not positive semidefinite
+        // tmpSolver.options.validate = false; // Q is not positive semidefinite
 
-        final Optimisation.Result tmpResult = tmpSolver.solve();
+        //final Optimisation.Result tmpResult = tmpSolver.solve();
 
         // Optimisation.Result from AMPL/LOQO
         final double[] tmpExpected = new double[] { 1.78684, 0.000326128, 1.78665, 0.000136478, 495.429, 0.00358488, 495.427, 0.00178874, 8.90701, 0.000339811,
                 8.90684, 0.000174032 };
 
-        for (int i = 0; i < tmpExpected.length; i++) {
-            TestUtils.assertEquals(tmpExpected[i], tmpResult.doubleValue(i), 0.005);
-        }
+        //        for (int i = 0; i < tmpExpected.length; i++) {
+        //            TestUtils.assertEquals(tmpExpected[i], tmpResult.doubleValue(i), 0.005);
+        //        }
+
+        final PrimitiveDenseStore[] tmpMatrices = new PrimitiveDenseStore[6];
+        tmpMatrices[0] = tmpAE;
+        tmpMatrices[1] = tmpBE;
+        tmpMatrices[2] = tmpQ;
+        tmpMatrices[3] = tmpC;
+        tmpMatrices[4] = tmpAI;
+        tmpMatrices[5] = tmpBI;
+
+        ConvexProblems.builAndTestModel(tmpMatrices, tmpExpected, NumberContext.getGeneral(6, 9), true);
     }
 
     /**
@@ -1204,6 +1231,10 @@ public class ConvexProblems extends OptimisationConvexTests {
 
     }
 
+    /**
+     * Issue reported at GitHub. A set of problems related to when Q is zero - a linear problem. Generally the
+     * ConvexSolver is not the right option to handle linear problems, but there is some desireable behaviour.
+     */
     public void testP20150809() {
 
         final PrimitiveArray tmpExpectedSolution = PrimitiveArray.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
@@ -1231,8 +1262,8 @@ public class ConvexProblems extends OptimisationConvexTests {
 
     /**
      * Problem reported to ojalgo-user. A simple bug caused a java.lang.ArithmeticException: / by zero. ojAlgo
-     * did not handle the case with inequality constraints that are all active (the set of exclude constraints
-     * was empty).
+     * did not handle the case with inequality constraints that are all active (the set of excluded
+     * constraints was empty).
      */
     public void testP20150908() {
 
