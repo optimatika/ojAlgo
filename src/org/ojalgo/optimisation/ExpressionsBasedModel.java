@@ -140,6 +140,53 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
+    public static abstract class Presolver implements Comparable<Presolver> {
+
+        private final int myExecutionOrder = 1;
+        private final UUID myUUID = UUID.randomUUID();
+
+        public int compareTo(final Presolver reference) {
+            return Integer.compare(myExecutionOrder, reference.getExecutionOrder());
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof Presolver)) {
+                return false;
+            }
+            final Presolver other = (Presolver) obj;
+            if (myUUID == null) {
+                if (other.myUUID != null) {
+                    return false;
+                }
+            } else if (!myUUID.equals(other.myUUID)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + ((myUUID == null) ? 0 : myUUID.hashCode());
+            return result;
+        }
+
+        public abstract boolean simplify(ExpressionsBasedModel model);
+
+        final int getExecutionOrder() {
+            return myExecutionOrder;
+        }
+
+    }
+
     public static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
 
     private static final String NEW_LINE = "\n";

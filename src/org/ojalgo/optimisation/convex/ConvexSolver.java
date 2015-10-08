@@ -21,25 +21,31 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.List;
 import java.util.Set;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.array.Array1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.decomposition.Cholesky;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
+import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.optimisation.BaseSolver;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.system.KKTSolver2;
-import org.ojalgo.optimisation.system.KKTSystem;
+import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * ConvexSolver solves optimisation problems of the form:
@@ -62,6 +68,11 @@ import org.ojalgo.optimisation.system.KKTSystem;
  * The general recommendation is to construct optimisation problems using {@linkplain ExpressionsBasedModel}
  * and not worry about solver details. If you do want to instantiate a convex solver directly use the
  * {@linkplain Builder} class. It will return an appropriate subclass for you.
+ * </p>
+ * <p>
+ * When the KKT matrix is nonsingular, there is a unique optimal primal-dual pair (x,l). If the KKT matrix is
+ * singular, but the KKT system is still solvable, any solution yields an optimal pair (x,l). If the KKT
+ * system is not solvable, the quadratic optimization problem is unbounded below or infeasible.
  * </p>
  *
  * @author apete
@@ -125,6 +136,152 @@ public abstract class ConvexSolver extends BaseSolver {
 
     }
 
+    public static final class Input {
+
+        private final MatrixStore<Double> myA;
+        private final MatrixStore<Double> myB;
+        private final MatrixStore<Double> myC;
+        private final MatrixStore<Double> myQ;
+
+        /**
+         * | Q | = | C |
+         *
+         * @param Q
+         * @param C
+         */
+        public Input(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
+            this(Q, C, null, null);
+        }
+
+        /**
+         * | Q | A<sup>T</sup> | = | C | <br>
+         * | A | 0 | = | B |
+         *
+         * @param Q
+         * @param C
+         * @param A
+         * @param B
+         */
+        public Input(final MatrixStore<Double> Q, final MatrixStore<Double> C, final MatrixStore<Double> A, final MatrixStore<Double> B) {
+
+            super();
+
+            myQ = Q;
+            myC = C;
+            myA = A;
+            myB = B;
+        }
+
+        final int countConstraints() {
+            return (int) (myB != null ? myB.count() : 0);
+        }
+
+        final int countVariables() {
+            return (int) myC.count();
+        }
+
+        final MatrixStore<Double> getA() {
+            return myA;
+        }
+
+        final MatrixStore<Double> getB() {
+            return myB;
+        }
+
+        final MatrixStore<Double> getC() {
+            return myC;
+        }
+
+        final MatrixStore<Double> getKKT() {
+            if (myA != null) {
+                return myQ.builder().right(myA.transpose()).below(myA).build();
+            } else {
+                return myQ;
+            }
+        }
+
+        final MatrixStore<Double> getQ() {
+            return myQ;
+        }
+
+        final MatrixStore<Double> getRHS() {
+            if (myB != null) {
+                return myC.builder().below(myB).build();
+            } else {
+                return myC;
+            }
+        }
+
+        final boolean isConstrained() {
+            return (myA != null) && (myA.count() > 0L);
+        }
+
+    }
+
+    public static final class Output {
+
+        private final MatrixStore<Double> myL;
+        private final boolean mySolvable;
+        private final MatrixStore<Double> myX;
+
+        Output() {
+
+            super();
+
+            myX = null;
+            myL = null;
+            mySolvable = false;
+        }
+
+        Output(final MatrixStore<Double> X, final MatrixStore<Double> L, final boolean solvable) {
+
+            super();
+
+            myX = X;
+            myL = L;
+            mySolvable = solvable;
+        }
+
+        public final MatrixStore<Double> getL() {
+            return myL;
+        }
+
+        public final MatrixStore<Double> getX() {
+            return myX;
+        }
+
+        public final boolean isSolvable() {
+            return mySolvable;
+        }
+
+        /**
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+
+            final StringBuilder tmpSB = new StringBuilder();
+
+            tmpSB.append(mySolvable);
+
+            if (mySolvable) {
+
+                tmpSB.append(" X=");
+
+                tmpSB.append(Array1D.PRIMITIVE.copy(this.getX()));
+
+                tmpSB.append(" L=");
+
+                tmpSB.append(Array1D.PRIMITIVE.copy(this.getL()));
+            }
+
+            return tmpSB.toString();
+        }
+
+    }
+
+    public static final Output FAILURE = new Output();
+
     static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
@@ -149,7 +306,7 @@ public abstract class ConvexSolver extends BaseSolver {
 
         if (tmpEqExprDim > 0) {
 
-            final PhysicalStore<Double> tmpAE = FACTORY.makeZero(tmpEqExprDim, tmpFreeVarDim);
+            final SparseStore<Double> tmpAE = SparseStore.PRIMITIVE.make(tmpEqExprDim, tmpFreeVarDim);
             final PhysicalStore<Double> tmpBE = FACTORY.makeZero(tmpEqExprDim, 1);
 
             for (int i = 0; i < tmpEqExprDim; i++) {
@@ -225,8 +382,8 @@ public abstract class ConvexSolver extends BaseSolver {
 
         if ((tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim) > 0) {
 
-            final PhysicalStore<Double> tmpUAI = FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim, tmpFreeVarDim);
-            final PhysicalStore<Double> tmpUBI = FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim, 1);
+            final SparseStore<Double> tmpAI = SparseStore.PRIMITIVE.make(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim, tmpFreeVarDim);
+            final PhysicalStore<Double> tmpBI = FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim, 1);
 
             if (tmpUpExprDim > 0) {
                 for (int i = 0; i < tmpUpExprDim; i++) {
@@ -234,23 +391,20 @@ public abstract class ConvexSolver extends BaseSolver {
                     for (final Expression.Index tmpKey : tmpExpression.getLinearFactorKeys()) {
                         final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                         if (tmpIndex >= 0) {
-                            tmpUAI.set(i, tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
+                            tmpAI.set(i, tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
                         }
                     }
-                    tmpUBI.set(i, 0, tmpExpression.getCompensatedUpperLimit(tmpFixedVariables));
+                    tmpBI.set(i, 0, tmpExpression.getCompensatedUpperLimit(tmpFixedVariables));
                 }
             }
 
             if (tmpUpVarDim > 0) {
                 for (int i = 0; i < tmpUpVarDim; i++) {
                     final Variable tmpVariable = tmpUpVar.get(i);
-                    tmpUAI.set(tmpUpExprDim + i, sourceModel.indexOfFreeVariable(tmpVariable), tmpVariable.getAdjustmentFactor());
-                    tmpUBI.set(tmpUpExprDim + i, 0, tmpVariable.getAdjustedUpperLimit());
+                    tmpAI.set(tmpUpExprDim + i, sourceModel.indexOfFreeVariable(tmpVariable), tmpVariable.getAdjustmentFactor());
+                    tmpBI.set(tmpUpExprDim + i, 0, tmpVariable.getAdjustedUpperLimit());
                 }
             }
-
-            final PhysicalStore<Double> tmpLAI = FACTORY.makeZero(tmpLoExprDim + tmpLoVarDim, tmpFreeVarDim);
-            final PhysicalStore<Double> tmpLBI = FACTORY.makeZero(tmpLoExprDim + tmpLoVarDim, 1);
 
             if (tmpLoExprDim > 0) {
                 for (int i = 0; i < tmpLoExprDim; i++) {
@@ -258,23 +412,20 @@ public abstract class ConvexSolver extends BaseSolver {
                     for (final Expression.Index tmpKey : tmpExpression.getLinearFactorKeys()) {
                         final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                         if (tmpIndex >= 0) {
-                            tmpLAI.set(i, tmpIndex, -tmpExpression.getAdjustedLinearFactor(tmpKey));
+                            tmpAI.set(tmpUpExprDim + tmpUpVarDim + i, tmpIndex, -tmpExpression.getAdjustedLinearFactor(tmpKey));
                         }
                     }
-                    tmpLBI.set(i, 0, -tmpExpression.getCompensatedLowerLimit(tmpFixedVariables));
+                    tmpBI.set(tmpUpExprDim + tmpUpVarDim + i, 0, -tmpExpression.getCompensatedLowerLimit(tmpFixedVariables));
                 }
             }
 
             if (tmpLoVarDim > 0) {
                 for (int i = 0; i < tmpLoVarDim; i++) {
                     final Variable tmpVariable = tmpLoVar.get(i);
-                    tmpLAI.set(tmpLoExprDim + i, sourceModel.indexOfFreeVariable(tmpVariable), -tmpVariable.getAdjustmentFactor());
-                    tmpLBI.set(tmpLoExprDim + i, 0, -tmpVariable.getAdjustedLowerLimit());
+                    tmpAI.set(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + i, sourceModel.indexOfFreeVariable(tmpVariable), -tmpVariable.getAdjustmentFactor());
+                    tmpBI.set(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + i, 0, -tmpVariable.getAdjustedLowerLimit());
                 }
             }
-
-            final MatrixStore<Double> tmpAI = tmpLAI.builder().above(tmpUAI).build();
-            final MatrixStore<Double> tmpBI = tmpLBI.builder().above(tmpUBI).build();
 
             destinationBuilder.inequalities(tmpAI, tmpBI);
         }
@@ -288,11 +439,19 @@ public abstract class ConvexSolver extends BaseSolver {
         return ConvexSolver.getBuilder().objective(Q, C);
     }
 
-    private transient KKTSystem myDelegateSolver = null;
-
     protected ConvexSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+
         super(matrices, solverOptions);
+
+        final MatrixStore<Double> tmpQ = this.getIterationQ();
+
+        myCholesky = Cholesky.make(tmpQ);
+        myLU = LU.make(tmpQ);
+
     }
+
+    final Cholesky<Double> myCholesky;
+    final LU<Double> myLU;
 
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
 
@@ -337,21 +496,58 @@ public abstract class ConvexSolver extends BaseSolver {
 
     }
 
+    protected abstract MatrixStore<Double> getIterationKKT();
+
+    protected abstract MatrixStore<Double> getIterationRHS();
+
     abstract protected void performIteration();
 
     @Override
-    protected final boolean validate() {
+    protected boolean validate() {
+
+        final MatrixStore<Double> tmpQ = this.getQ();
+        final MatrixStore<Double> tmpC = this.getC();
+
+        if ((tmpQ == null) || (tmpC == null)) {
+            throw new IllegalArgumentException("Neither Q nor C may be null!");
+        }
+
+        if (!MatrixUtils.isHermitian(tmpQ)) {
+            if (this.isDebug()) {
+                this.debug("Q not symmetric!", tmpQ);
+            }
+            throw new IllegalArgumentException("Q must be symmetric!");
+        }
+
+        if (!myCholesky.isSPD()) {
+            // Not symmetric positive definite. Check if at least positive semidefinite.
+
+            final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
+
+            tmpEvD.compute(tmpQ, true);
+
+            final Array1D<ComplexNumber> tmpEigenvalues = tmpEvD.getEigenvalues();
+
+            tmpEvD.reset();
+
+            for (final ComplexNumber tmpValue : tmpEigenvalues) {
+                if ((tmpValue.doubleValue() < ZERO) || !tmpValue.isReal()) {
+                    if (this.isDebug()) {
+                        this.debug("Q not positive semidefinite!", tmpQ);
+                    }
+                    throw new IllegalArgumentException("Q must be positive semidefinite!");
+                }
+            }
+        }
+
         this.setState(State.VALID);
         return true;
     }
 
-    abstract KKTSystem.Input buildDelegateSolverInput();
+    abstract MatrixStore<Double> getIterationC();
 
-    final KKTSystem getDelegateSolver(final KKTSystem.Input template) {
-        if (myDelegateSolver == null) {
-            myDelegateSolver = new KKTSolver2(template);
-        }
-        return myDelegateSolver;
+    final MatrixStore<Double> getIterationQ() {
+        return this.getQ();
     }
 
     final MatrixStore<Double> getSolutionLE() {
@@ -365,4 +561,13 @@ public abstract class ConvexSolver extends BaseSolver {
     final MatrixStore<Double> getSolutionX() {
         return this.getX();
     }
+
+    @Override
+    protected boolean initialise(final Result kickStarter) {
+
+        myCholesky.decompose(this.getIterationQ());
+
+        return true;
+    }
+
 }

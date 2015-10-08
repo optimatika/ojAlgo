@@ -134,7 +134,7 @@ public final class NewIntegerSolver extends IntegerSolver {
     }
 
     @Override
-    protected boolean initialise(final Result kickStart) {
+    protected boolean initialise(final Result kickStarter) {
         return true;
     }
 

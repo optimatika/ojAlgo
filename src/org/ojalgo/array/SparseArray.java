@@ -200,13 +200,21 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public void add(final long index, final double addend) {
-        // TODO Auto-generated method stub
-
+        final int tmpIndex = this.index(index);
+        if (tmpIndex >= 0) {
+            myValues.add(tmpIndex, addend);
+        } else {
+            this.set(index, addend);
+        }
     }
 
     public void add(final long index, final Number addend) {
-        // TODO Auto-generated method stub
-
+        final int tmpIndex = this.index(index);
+        if (tmpIndex >= 0) {
+            myValues.add(tmpIndex, addend);
+        } else {
+            this.set(index, addend);
+        }
     }
 
     public final long count() {
@@ -249,34 +257,25 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     public void fillAll(final NullaryFunction<N> supplier) {
 
-        if (TypeUtils.isZero(supplier.doubleValue())) {
+        // Bad idea...
 
-            myValues.fillAll(myZeroNumber);
+        final int tmpSize = (int) this.count();
 
-        } else {
-
-            // Bad idea...
-
-            final int tmpSize = (int) this.count();
-
-            if (tmpSize != myIndices.length) {
-                myIndices = AccessUtils.makeIncreasingRange(0L, tmpSize);
-                myValues = myValues.newInstance(tmpSize);
-                myActualLength = tmpSize;
-            }
-
-            myValues.fillAll(supplier);
+        if (tmpSize != myIndices.length) {
+            myIndices = AccessUtils.makeIncreasingRange(0L, tmpSize);
+            myValues = myValues.newInstance(tmpSize);
+            myActualLength = tmpSize;
         }
+
+        myValues.fillAll(supplier);
     }
 
     public void fillOne(final long index, final N value) {
-        // TODO Auto-generated method stub
-
+        this.set(index, value);
     }
 
     public void fillOne(final long index, final NullaryFunction<N> supplier) {
-        // TODO Auto-generated method stub
-
+        this.set(index, supplier.get());
     }
 
     @Override
@@ -473,8 +472,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public void visitOne(final long index, final VoidFunction<N> visitor) {
-        // TODO Auto-generated method stub
-
+        if (this.isPrimitive()) {
+            visitor.invoke(this.doubleValue(index));
+        } else {
+            visitor.invoke(this.get(index));
+        }
     }
 
     @Override
@@ -666,7 +668,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];
             if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
-                myValues.visit(i, visitor);
+                myValues.visitOne(i, visitor);
             } else if (tmpOnlyOnce) {
                 visitor.invoke(myZeroValue);
                 tmpOnlyOnce = false;

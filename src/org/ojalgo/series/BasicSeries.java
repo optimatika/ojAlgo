@@ -21,7 +21,6 @@
  */
 package org.ojalgo.series;
 
-import java.awt.Color;
 import java.util.Collection;
 import java.util.SortedMap;
 
@@ -29,6 +28,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.primitive.DataSeries;
+import org.ojalgo.type.Colour;
 import org.ojalgo.type.keyvalue.KeyValue;
 
 /**
@@ -43,11 +43,11 @@ import org.ojalgo.type.keyvalue.KeyValue;
  */
 public interface BasicSeries<K extends Comparable<K>, V extends Number> extends SortedMap<K, V> {
 
-    BasicSeries<K, V> colour(Color aPaint);
+    BasicSeries<K, V> colour(Colour aPaint);
 
     V firstValue();
 
-    Color getColour();
+    Colour getColour();
 
     DataSeries getDataSeries();
 

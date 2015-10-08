@@ -27,8 +27,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.type.StandardType;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -38,19 +37,16 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class GenericQPSolverTest extends OptimisationConvexTests {
 
-    private MatrixStore<Double> myAE;
-    private MatrixStore<Double> myAI;
-    private MatrixStore<Double> myBE;
-    private MatrixStore<Double> myBI;
-    private MatrixStore<Double> myC;
-    private MatrixStore<Double> myQ;
-    private MatrixStore<Double> myXE;
-    private MatrixStore<Double> myXI;
+    private PrimitiveDenseStore myAE;
+    private PrimitiveDenseStore myAI;
+    private PrimitiveDenseStore myBE;
+    private PrimitiveDenseStore myBI;
+    private PrimitiveDenseStore myC;
+    private final NumberContext myEvaluationContext = new NumberContext(8, 8);
+    private PrimitiveDenseStore myQ;
+    private PrimitiveDenseStore myXE;
 
-    private ConvexSolver.Builder myBuilderE;
-    private ConvexSolver.Builder myBuilderI;
-
-    private final NumberContext myEvaluationContext = new NumberContext(6, 6);
+    private PrimitiveDenseStore myXI;
 
     public GenericQPSolverTest() {
         super();
@@ -58,14 +54,6 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
 
     public GenericQPSolverTest(final String arg0) {
         super(arg0);
-    }
-
-    public final ConvexSolver.Builder getBuilderE() {
-        return myBuilderE;
-    }
-
-    public final ConvexSolver.Builder getBuilderI() {
-        return myBuilderI;
     }
 
     public final MatrixStore<Double> getSolutionE() {
@@ -98,12 +86,14 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
     }
 
     public void testSolverResults() {
-        if (OptimisationConvexTests.DEBUG) {
-            BasicLogger.debug(myXE.copy().toString());
-            BasicLogger.debug(myBuilderE.build().solve().toString());
-        }
-        TestUtils.assertEquals("Equality Constrained", myXE, myBuilderE.build().solve(), myEvaluationContext);
-        TestUtils.assertEquals("Inequality Constrained", myXI, myBuilderI.build().solve(), myEvaluationContext);
+
+        final PrimitiveDenseStore[] tmpMatricesI = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, myAI, myBI };
+
+        ConvexProblems.builAndTestModel(tmpMatricesI, myXI, myEvaluationContext, true);
+
+        final PrimitiveDenseStore[] tmpMatricesE = new PrimitiveDenseStore[] { myAE, myBE, myQ, myC, null, null };
+
+        ConvexProblems.builAndTestModel(tmpMatricesE, myXE, myEvaluationContext, true);
     }
 
     /**
@@ -119,55 +109,46 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
         final BasicMatrix[] tmpMatrices = this.getMatrices();
 
         if (tmpMatrices[0] != null) {
-            myAE = tmpMatrices[0].enforce(StandardType.DECIMAL_064).toPrimitiveStore();
+            myAE = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[0]);
         } else {
             myAE = null;
         }
         if (tmpMatrices[1] != null) {
-            myBE = tmpMatrices[1].enforce(StandardType.DECIMAL_064).toPrimitiveStore();
+            myBE = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[1]);
         } else {
             myBE = null;
         }
         if (tmpMatrices[2] != null) {
-            myQ = tmpMatrices[2].enforce(StandardType.DECIMAL_064).toPrimitiveStore();
+            myQ = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[2]);
         } else {
             myQ = null;
         }
         if (tmpMatrices[3] != null) {
-            myC = tmpMatrices[3].negate().enforce(StandardType.DECIMAL_064).toPrimitiveStore();
+            myC = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[3].negate());
         } else {
             myC = null;
         }
         if (tmpMatrices[4] != null) {
-            myAI = tmpMatrices[4].enforce(StandardType.DECIMAL_064).toPrimitiveStore();
+            myAI = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[4]);
         } else {
             myAI = null;
         }
         if (tmpMatrices[5] != null) {
-            myBI = tmpMatrices[5].enforce(StandardType.DECIMAL_064).toPrimitiveStore();
+            myBI = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[5]);
         } else {
             myBI = null;
         }
         if (tmpMatrices[6] != null) {
-            myXE = tmpMatrices[6].enforce(StandardType.DECIMAL_064).toPrimitiveStore();
+            myXE = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[6]);
         } else {
             myXE = null;
         }
         if (tmpMatrices[7] != null) {
-            myXI = tmpMatrices[7].enforce(StandardType.DECIMAL_064).toPrimitiveStore();
+            myXI = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[7]);
         } else {
             myXI = null;
         }
 
-        myBuilderE = new ConvexSolver.Builder(myQ, myC);
-        myBuilderI = new ConvexSolver.Builder(myQ, myC);
-
-        myBuilderE.equalities(myAE, myBE);
-        myBuilderI.equalities(myAE, myBE);
-
-        if ((myAI != null) && (myBI != null)) {
-            myBuilderI.inequalities(myAI, myBI);
-        }
     }
 
 }

@@ -66,9 +66,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class PrimitiveDenseStore extends PrimitiveArray implements PhysicalStore<Double>, DecompositionStore<Double> {
 
-    public static interface PrimitiveMultiplyBoth {
-
-        void invoke(double[] product, Access1D<?> left, int complexity, Access1D<?> right);
+    public static interface PrimitiveMultiplyBoth extends FillByMultiplying<Double> {
 
     }
 
@@ -172,9 +170,28 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         public PrimitiveDenseStore copy(final Access2D<?> source) {
 
-            final PrimitiveDenseStore retVal = new PrimitiveDenseStore((int) source.countRows(), (int) source.countColumns());
+            final int tmpRowDim = (int) source.countRows();
+            final int tmpColDim = (int) source.countColumns();
 
-            retVal.fillMatching(source);
+            final PrimitiveDenseStore retVal = new PrimitiveDenseStore(tmpRowDim, tmpColDim);
+
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
 
             return retVal;
         }
@@ -1231,14 +1248,12 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         final int tmpComplexity = ((int) left.count()) / myRowDim;
 
-        final double[] tmpProductData = data;
-
         if (right instanceof PrimitiveDenseStore) {
-            multiplyLeft.invoke(tmpProductData, left, tmpComplexity, PrimitiveDenseStore.cast(right).data);
+            multiplyLeft.invoke(data, left, tmpComplexity, PrimitiveDenseStore.cast(right).data);
         } else if (left instanceof PrimitiveDenseStore) {
-            multiplyRight.invoke(tmpProductData, PrimitiveDenseStore.cast(left).data, tmpComplexity, right);
+            multiplyRight.invoke(data, PrimitiveDenseStore.cast(left).data, tmpComplexity, right);
         } else {
-            multiplyBoth.invoke(tmpProductData, left, tmpComplexity, right);
+            multiplyBoth.invoke(this, left, tmpComplexity, right);
         }
     }
 
@@ -1264,54 +1279,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public void fillDiagonal(final long row, final long column, final NullaryFunction<Double> supplier) {
         myUtility.fillDiagonal(row, column, supplier);
-    }
-
-    public void fillMatching(final Access1D<? extends Number> source) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingSingle.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int first, final int limit) {
-                    FillMatchingSingle.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, source);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
-
-        } else {
-
-            FillMatchingSingle.invoke(data, tmpRowDim, 0, tmpColDim, source);
-        }
-    }
-
-    public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingBoth.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int first, final int limit) {
-                    PrimitiveDenseStore.this.fill(tmpRowDim * first, tmpRowDim * limit, left, function, right);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingBoth.THRESHOLD);
-
-        } else {
-
-            this.fill(0, tmpRowDim * tmpColDim, left, function, right);
-        }
     }
 
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
@@ -1512,8 +1479,20 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                 rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
-    public MatrixStore.ElementsConsumer<Double> region(final int rowOffset, final int columnOffset) {
-        return new PhysicalStore.ConsumerRegion<Double>(this, rowOffset, columnOffset);
+    public final MatrixStore.ElementsConsumer<Double> regionByColumns(final int... columns) {
+        return new ColumnsRegion<Double>(this, multiplyBoth, columns);
+    }
+
+    public final MatrixStore.ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
+        return new LimitRegion<Double>(this, multiplyBoth, rowLimit, columnLimit);
+    }
+
+    public final MatrixStore.ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
+        return new OffsetRegion<Double>(this, multiplyBoth, rowOffset, columnOffset);
+    }
+
+    public final MatrixStore.ElementsConsumer<Double> regionByRows(final int... rows) {
+        return new RowsRegion<Double>(this, multiplyBoth, rows);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

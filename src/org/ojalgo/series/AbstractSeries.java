@@ -21,7 +21,6 @@
  */
 package org.ojalgo.series;
 
-import java.awt.Color;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
@@ -33,12 +32,13 @@ import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.DataSeries;
+import org.ojalgo.type.Colour;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.keyvalue.KeyValue;
 
-abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I extends AbstractSeries<K, V, I>> extends TreeMap<K, V> implements BasicSeries<K, V> {
+abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I extends AbstractSeries<K, V, I>> extends TreeMap<K, V>implements BasicSeries<K, V> {
 
-    private Color myColour = null;
+    private Colour myColour = null;
     private String myName = null;
 
     protected AbstractSeries() {
@@ -57,7 +57,7 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         super(someM);
     }
 
-    public I colour(final Color aPaint) {
+    public I colour(final Colour aPaint) {
         myColour = aPaint;
         return (I) this;
     }
@@ -66,7 +66,7 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         return this.get(this.firstKey());
     }
 
-    public Color getColour() {
+    public Colour getColour() {
         return myColour;
     }
 
@@ -170,7 +170,7 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
 
     void appendLastPartToString(final StringBuilder retVal) {
         if (this.getColour() != null) {
-            retVal.append(TypeUtils.toHexString(this.getColour()));
+            retVal.append(TypeUtils.toHexString(this.getColour().getRGB()));
             retVal.append(ASCII.NBSP);
         }
 
@@ -188,7 +188,7 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         }
     }
 
-    void setColour(final Color aPaint) {
+    void setColour(final Colour aPaint) {
         this.colour(aPaint);
     }
 

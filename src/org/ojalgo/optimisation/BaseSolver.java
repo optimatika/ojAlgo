@@ -615,7 +615,7 @@ public abstract class BaseSolver extends GenericSolver {
 
             if (myAEbuilder != null) {
                 myAEbuilder.below(AE);
-                myAE = null;
+                this.reset();
             } else {
                 myAE = AE;
                 myAEbuilder = myAE.builder();
@@ -623,7 +623,7 @@ public abstract class BaseSolver extends GenericSolver {
 
             if (myBEbuilder != null) {
                 myBEbuilder.below(BE);
-                myBE = null;
+                this.reset();
             } else {
                 myBE = BE;
                 myBEbuilder = BE.builder();
@@ -641,7 +641,7 @@ public abstract class BaseSolver extends GenericSolver {
 
             if (myAIbuilder != null) {
                 myAIbuilder.below(AI);
-                myAI = null;
+                this.reset();
             } else {
                 myAI = AI;
                 myAIbuilder = myAI.builder();
@@ -649,7 +649,7 @@ public abstract class BaseSolver extends GenericSolver {
 
             if (myBIbuilder != null) {
                 myBIbuilder.below(BI);
-                myBI = null;
+                this.reset();
             } else {
                 myBI = BI;
                 myBIbuilder = BI.builder();
@@ -667,7 +667,7 @@ public abstract class BaseSolver extends GenericSolver {
 
             if (myCbuilder != null) {
                 myCbuilder.below(C);
-                myC = null;
+                this.reset();
             } else {
                 myC = C;
                 myCbuilder = myC.builder();
@@ -685,7 +685,7 @@ public abstract class BaseSolver extends GenericSolver {
 
             if (myQbuilder != null) {
                 myQbuilder.below(Q);
-                myQ = null;
+                this.reset();
             } else {
                 myQ = Q;
                 myQbuilder = myQ.builder();
@@ -694,7 +694,7 @@ public abstract class BaseSolver extends GenericSolver {
             final MatrixStore<Double> tmpC = C != null ? C : MatrixStore.PRIMITIVE.makeZero((int) Q.countRows(), 1).get();
             if (myCbuilder != null) {
                 myCbuilder.below(tmpC);
-                myC = null;
+                this.reset();
             } else {
                 myC = tmpC;
                 myCbuilder = myC.builder();
@@ -765,6 +765,18 @@ public abstract class BaseSolver extends GenericSolver {
                 return FACTORY.copy(matrix);
             }
 
+        }
+
+        void reset() {
+            myAE = null;
+            myAI = null;
+            myBE = null;
+            myBI = null;
+            myC = null;
+            myLE = null;
+            myLI = null;
+            myQ = null;
+            myX = null;
         }
 
     }

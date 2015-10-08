@@ -31,6 +31,7 @@ import org.ojalgo.access.Supplier2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -371,6 +372,16 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
 
     public static interface ElementsConsumer<N extends Number> extends Consumer2D<Access2D<N>>, Access2D.Fillable<N>, Access2D.Modifiable<N> {
 
+        default void accept(final Access2D<N> supplied) {
+            final long tmpCountRows = supplied.countRows();
+            final long tmpCountColumns = supplied.countColumns();
+            for (long j = 0; j < tmpCountColumns; j++) {
+                for (long i = 0; i < tmpCountRows; i++) {
+                    this.set(i, j, supplied.get(i, j));
+                }
+            }
+        }
+
         default void acceptFrom(final MatrixStore.ElementsSupplier<N> supplier) {
             if (this.isAcceptable(supplier)) {
                 this.accept(supplier.get());
@@ -379,13 +390,137 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
             }
         }
 
+        default void fillAll(final N value) {
+            final long tmpCountRows = this.countRows();
+            final long tmpCountColumns = this.countColumns();
+            for (long j = 0L; j < tmpCountColumns; j++) {
+                for (long i = 0L; i < tmpCountRows; i++) {
+                    this.fillOne(i, j, value);
+                }
+            }
+        }
+
+        default void fillAll(final NullaryFunction<N> supplier) {
+            final long tmpCountRows = this.countRows();
+            final long tmpCountColumns = this.countColumns();
+            for (long j = 0L; j < tmpCountColumns; j++) {
+                for (long i = 0L; i < tmpCountRows; i++) {
+                    this.fillOne(i, j, supplier);
+                }
+            }
+        }
+
+        void fillByMultiplying(final Access1D<N> left, final Access1D<N> right);
+
+        default void fillColumn(final long row, final long column, final N value) {
+            final long tmpCountRows = this.countRows();
+            for (long i = row; i < tmpCountRows; i++) {
+                this.fillOne(i, column, value);
+            }
+        }
+
+        default void fillColumn(final long row, final long column, final NullaryFunction<N> supplier) {
+            final long tmpCountRows = this.countRows();
+            for (long i = row; i < tmpCountRows; i++) {
+                this.fillOne(i, column, supplier);
+            }
+        }
+
+        default void fillDiagonal(final long row, final long column, final N value) {
+            final long tmpCountRows = this.countRows();
+            final long tmpCountColumns = this.countColumns();
+            for (long i = row, j = column; (i < tmpCountRows) && (j < tmpCountColumns); i++, j++) {
+                this.fillOne(i, j, value);
+            }
+        }
+
+        default void fillDiagonal(final long row, final long column, final NullaryFunction<N> supplier) {
+            final long tmpCountRows = this.countRows();
+            final long tmpCountColumns = this.countColumns();
+            for (long i = row, j = column; (i < tmpCountRows) && (j < tmpCountColumns); i++, j++) {
+                this.fillOne(i, j, supplier);
+            }
+        }
+
+        default void fillRow(final long row, final long column, final N value) {
+            final long tmpCountColumns = this.countColumns();
+            for (long j = column; j < tmpCountColumns; j++) {
+                this.fillOne(row, j, value);
+            }
+        }
+
+        default void fillRow(final long row, final long column, final NullaryFunction<N> supplier) {
+            final long tmpCountColumns = this.countColumns();
+            for (long j = column; j < tmpCountColumns; j++) {
+                this.fillOne(row, j, supplier);
+            }
+        }
+
+        default void modifyAll(final UnaryFunction<N> function) {
+            final long tmpCountRows = this.countRows();
+            final long tmpCountColumns = this.countColumns();
+            for (long j = 0L; j < tmpCountColumns; j++) {
+                for (long i = 0L; i < tmpCountRows; i++) {
+                    this.modifyOne(i, j, function);
+                }
+            }
+        }
+
+        default void modifyColumn(final long row, final long column, final UnaryFunction<N> function) {
+            final long tmpCountRows = this.countRows();
+            for (long i = row; i < tmpCountRows; i++) {
+                this.modifyOne(i, column, function);
+            }
+        }
+
+        default void modifyDiagonal(final long row, final long column, final UnaryFunction<N> function) {
+            final long tmpCountRows = this.countRows();
+            final long tmpCountColumns = this.countColumns();
+            for (long i = row, j = column; (i < tmpCountRows) && (j < tmpCountColumns); i++, j++) {
+                this.modifyOne(i, j, function);
+            }
+        }
+
+        default void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
+            final long tmpCountColumns = this.countColumns();
+            for (long j = column; j < tmpCountColumns; j++) {
+                this.modifyOne(row, j, function);
+            }
+        }
+
         /**
          * @return A consumer (sub)region
          */
-        ElementsConsumer<N> region(int rowOffset, int columnOffset);
+        ElementsConsumer<N> regionByColumns(int... columns);
+
+        /**
+         * @return A consumer (sub)region
+         */
+        ElementsConsumer<N> regionByLimits(int rowLimit, int columnLimit);
+
+        /**
+         * @return A consumer (sub)region
+         */
+        ElementsConsumer<N> regionByOffsets(int rowOffset, int columnOffset);
+
+        /**
+         * @return A consumer (sub)region
+         */
+        ElementsConsumer<N> regionByRows(int... rows);
 
     }
 
+    /**
+     * An elements supplier is not (yet) a matrix. There are 3 things you can do with them:
+     * <ol>
+     * <li>You can query the size/shape of the (future) matrix</li>
+     * <li>You can get that matrix</li>
+     * <li>You can supply the elements to an already existing matrix (or more precisely to an
+     * {@linkplain ElementsConsumer})</li>
+     * </ol>
+     *
+     * @author apete
+     */
     public static interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixStore<N>> {
 
         default void supplyTo(final ElementsConsumer<N> consumer) {
@@ -471,7 +606,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
     };
 
     default MatrixStore<N> add(final MatrixStore<N> addend) {
-        return this.operateOnMatching(this.factory().function().add(), addend);
+        return this.operateOnMatching(this.factory().function().add(), addend).get();
     }
 
     N aggregateAll(Aggregator aggregator);
@@ -587,24 +722,24 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
     }
 
     default MatrixStore<N> multiply(final N scalar) {
-        return this.operateOnAll(this.factory().function().multiply().second(scalar));
+        return this.operateOnAll(this.factory().function().multiply().second(scalar)).get();
     }
 
     MatrixStore<N> multiplyLeft(Access1D<N> leftMtrx);
 
     default MatrixStore<N> negate() {
-        return this.operateOnAll(this.factory().function().negate());
+        return this.operateOnAll(this.factory().function().negate()).get();
     }
 
     default double norm() {
         return this.aggregateAll(Aggregator.NORM2).doubleValue();
     }
 
-    default MatrixStore<N> operateOnAll(final UnaryFunction<N> operator) {
+    default MatrixStore.ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {
         return new UnaryOperatorStore<>(this, operator);
     }
 
-    default MatrixStore<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
+    default MatrixStore.ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
         return new BinaryOperatorStore<>(this, operator, right);
     }
 
@@ -621,7 +756,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Vis
     }
 
     default MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {
-        return this.operateOnMatching(this.factory().function().subtract(), subtrahend);
+        return this.operateOnMatching(this.factory().function().subtract(), subtrahend).get();
     }
 
     default Scalar<N> toScalar(final long row, final long column) {

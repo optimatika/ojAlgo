@@ -22,36 +22,43 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.optimisation.system.KKTSystem;
 
-class PureASS extends ActiveSetSolver {
+final class PureASS extends ActiveSetSolver {
 
     PureASS(final Builder matrices, final Options solverOptions) {
         super(matrices, solverOptions);
     }
 
     @Override
-    KKTSystem.Input buildDelegateSolverInput(final int[] included) {
+    MatrixStore<Double> getIterationA(final int[] included) {
 
-        final MatrixStore<Double> tmpQ = this.getQ();
-        final MatrixStore<Double> tmpC = this.getC();
         final MatrixStore<Double> tmpAI = this.getAI();
-        final PhysicalStore<Double> tmpX = this.getX();
 
-        final MatrixStore<Double> tmpSubQ = tmpQ;
-        final MatrixStore<Double> tmpSubC = tmpC.subtract(tmpSubQ.multiply(tmpX));
-
-        MatrixStore<Double> tmpSubAE = null;
+        MatrixStore<Double> retVal = null;
         if (included.length == 0) {
-            tmpSubAE = MatrixStore.PRIMITIVE.makeZero(0, (int) tmpC.countRows()).get();
+            retVal = MatrixStore.PRIMITIVE.makeZero(0, this.countVariables()).get();
         } else {
-            //tmpSubAE = new RowsStore<Double>(tmpAI, included);
-            tmpSubAE = tmpAI.builder().row(included).build();
+            retVal = tmpAI.builder().row(included).build();
         }
-        final MatrixStore<Double> tmpSubBE = MatrixStore.PRIMITIVE.makeZero((int) tmpSubAE.countRows(), 1).get();
 
-        return new KKTSystem.Input(tmpSubQ, tmpSubC, tmpSubAE, tmpSubBE);
+        return retVal;
+    }
+
+    @Override
+    MatrixStore<Double> getIterationB(final int[] included) {
+
+        // return MatrixStore.PRIMITIVE.makeZero(included.length, 1).get();
+
+        final MatrixStore<Double> tmpBI = this.getBI();
+
+        MatrixStore<Double> retVal = null;
+        if (included.length == 0) {
+            retVal = MatrixStore.PRIMITIVE.makeZero(0, 1).get();
+        } else {
+            retVal = tmpBI.builder().row(included).build();
+        }
+
+        return retVal;
     }
 
 }

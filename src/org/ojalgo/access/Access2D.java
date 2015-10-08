@@ -57,7 +57,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default boolean isAbsolute(final long index) {
             final long tmpStructure = this.countRows();
-            return this.isAbsolute(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure));
+            return this.isAbsolute(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure));
         }
 
         /**
@@ -67,7 +67,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default boolean isSmall(final long index, final double comparedTo) {
             final long tmpStructure = this.countRows();
-            return this.isSmall(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), comparedTo);
+            return this.isSmall(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), comparedTo);
         }
 
         /**
@@ -145,12 +145,12 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default void fillOne(final long index, final N value) {
             final long tmpStructure = this.countRows();
-            this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), value);
+            this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), value);
         }
 
         default void fillOne(final long index, final NullaryFunction<N> supplier) {
             final long tmpStructure = this.countRows();
-            this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), supplier);
+            this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), supplier);
         }
 
         default void fillRange(final long first, final long limit, final N value) {
@@ -198,7 +198,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default void modifyOne(final long index, final UnaryFunction<N> function) {
             final long tmpStructure = this.countRows();
-            this.modifyOne(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), function);
+            this.modifyOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), function);
         }
 
         default void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
@@ -215,7 +215,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default void add(final long index, final double addend) {
             final long tmpStructure = this.countRows();
-            this.add(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), addend);
+            this.add(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
         }
 
         void add(long row, long column, double addend);
@@ -224,12 +224,12 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default void add(final long index, final Number addend) {
             final long tmpStructure = this.countRows();
-            this.add(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), addend);
+            this.add(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
         }
 
         default void set(final long index, final double addend) {
             final long tmpStructure = this.countRows();
-            this.set(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), addend);
+            this.set(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
         }
 
         void set(long row, long column, double value);
@@ -238,7 +238,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default void set(final long index, final Number addend) {
             final long tmpStructure = this.countRows();
-            this.set(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), addend);
+            this.set(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
         }
 
     }
@@ -253,7 +253,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         default void visitOne(final long index, final VoidFunction<N> visitor) {
             final long tmpStructure = this.countRows();
-            this.visitOne(AccessUtils.row(index, tmpStructure), AccessUtils.row(index, tmpStructure), visitor);
+            this.visitOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), visitor);
         }
 
         void visitRow(long row, long column, VoidFunction<N> visitor);

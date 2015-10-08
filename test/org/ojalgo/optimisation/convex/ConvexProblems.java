@@ -69,8 +69,11 @@ public class ConvexProblems extends OptimisationConvexTests {
     static void builAndTestModel(final PrimitiveDenseStore[] matrices, final PrimitiveDenseStore expectedSolution, final NumberContext modelValidationContext,
             final boolean testSolverDirectly) {
 
-        final double tmpExpectedValue = matrices[2].multiply(expectedSolution).multiplyLeft(expectedSolution.transpose()).multiply(HALF.doubleValue())
-                .subtract(matrices[3].multiply(expectedSolution)).doubleValue(0);
+        final MatrixStore<Double> tmpPartQ = matrices[2].multiply(expectedSolution).multiplyLeft(expectedSolution.transpose());
+        final MatrixStore<Double> tmpPartC = matrices[3].transpose().multiply(expectedSolution);
+
+        final double tmpExpectedValue = tmpPartQ.multiply(HALF.doubleValue()).subtract(tmpPartC).doubleValue(0);
+
         final Optimisation.Result tmpExpectedResult = new Optimisation.Result(Optimisation.State.OPTIMAL, tmpExpectedValue, expectedSolution);
 
         final ExpressionsBasedModel tmpModel = ConvexProblems.buildModel(matrices, expectedSolution);
@@ -106,7 +109,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             tmpBuilder.balance(); // Changes the objective function value
             final ConvexSolver tmpSolver = tmpBuilder.build();
             // tmpSolver.options.debug(ConvexSolver.class);
-            tmpSolver.options.validate = false;
+            // tmpSolver.options.validate = false;
             final Optimisation.Result tmpResult = tmpSolver.solve();
 
             TestUtils.assertStateNotLessThanOptimal(tmpResult);
@@ -117,42 +120,48 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     static ExpressionsBasedModel buildModel(final PrimitiveDenseStore[] matrices, final PrimitiveDenseStore expectedSolution) {
-        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
+
+        final ExpressionsBasedModel retVal = new ExpressionsBasedModel();
 
         final int tmpNumberOfVariables = (int) matrices[3].count();
 
         for (int v = 0; v < tmpNumberOfVariables; v++) {
             final Variable tmpVariable = Variable.make("X" + v);
             tmpVariable.setValue(BigDecimal.valueOf(expectedSolution.doubleValue(v)));
-            tmpModel.addVariable(tmpVariable);
+            retVal.addVariable(tmpVariable);
         }
-        for (int e = 0; e < matrices[0].countRows(); e++) {
-            final Expression tmpExpression = tmpModel.addExpression("E" + e);
-            for (int v = 0; v < tmpNumberOfVariables; v++) {
-                tmpExpression.setLinearFactor(v, matrices[0].get(e, v));
+        if ((matrices[0] != null) && (matrices[1] != null)) {
+            for (int e = 0; e < matrices[0].countRows(); e++) {
+                final Expression tmpExpression = retVal.addExpression("E" + e);
+                for (int v = 0; v < tmpNumberOfVariables; v++) {
+                    tmpExpression.setLinearFactor(v, matrices[0].get(e, v));
+                }
+                tmpExpression.level(matrices[1].doubleValue(e));
             }
-            tmpExpression.level(matrices[1].doubleValue(e));
         }
-        for (int i = 0; i < matrices[4].countRows(); i++) {
-            final Expression tmpExpression = tmpModel.addExpression("I" + i);
-            for (int v = 0; v < tmpNumberOfVariables; v++) {
-                tmpExpression.setLinearFactor(v, matrices[4].get(i, v));
+        if ((matrices[4] != null) && (matrices[5] != null)) {
+            for (int i = 0; i < matrices[4].countRows(); i++) {
+                final Expression tmpExpression = retVal.addExpression("I" + i);
+                for (int v = 0; v < tmpNumberOfVariables; v++) {
+                    tmpExpression.setLinearFactor(v, matrices[4].get(i, v));
+                }
+                tmpExpression.upper(matrices[5].doubleValue(i));
             }
-            tmpExpression.upper(matrices[5].doubleValue(i));
         }
-        final Expression tmpObjQ = tmpModel.addExpression("Q");
+        final Expression tmpObjQ = retVal.addExpression("Q");
         for (int r = 0; r < tmpNumberOfVariables; r++) {
             for (int v = 0; v < tmpNumberOfVariables; v++) {
                 tmpObjQ.setQuadraticFactor(r, v, matrices[2].doubleValue(r, v));
             }
         }
         tmpObjQ.weight(HALF);
-        final Expression tmpObjC = tmpModel.addExpression("C");
+        final Expression tmpObjC = retVal.addExpression("C");
         for (int v = 0; v < tmpNumberOfVariables; v++) {
             tmpObjC.setLinearFactor(v, matrices[3].doubleValue(v));
         }
         tmpObjC.weight(NEG);
-        return tmpModel;
+
+        return retVal;
     }
 
     static void doEarly2008(final Variable[] variables, final Access2D<?> covariances, final Access1D<?> expected) {
@@ -167,8 +176,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpBalance.setLinearFactorsSimple(tmpModel.getVariables());
         tmpBalance.level(BigMath.ONE);
 
-        // tmpModel.options.debug(ConvexSolver.class);
-        // tmpModel.options.validate = false;
+        //        tmpModel.options.debug(ConvexSolver.class);
+        //        tmpModel.options.validate = false;
         final Result tmpActualResult = tmpModel.minimise();
 
         TestUtils.assertTrue(tmpModel.validate(Array1D.BIG.copy(expected), StandardType.PERCENT));
@@ -1280,6 +1289,51 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
 
         TestUtils.assertEquals(tmpExpectedResult, tmpResult);
+    }
+
+    /**
+     * <p>
+     * I recently upgraded to v38.2 of Ojalgo for solving some quadratic programs. It seems that somewhere in
+     * the code there is an assumption that whenever there are inequality constraints there must be at least
+     * one equality constraint. My problem has a bunch of inequality constraints but no equality constraints
+     * and running it gives a "divide by zero" error. Again, this only seems to manifest itself when there are
+     * inequality constraints but no equality constraints. I have reproduced it below with a simple example.
+     * </p>
+     * <p>
+     * apete. Most likely the same problem as P20150908 (Cannot reproduce the problem with the leatest code.)
+     * </p>
+     */
+    public void testP20150922() {
+
+        final PrimitiveDenseStore Q = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0 }, { 0, 1.0 } });
+        final PrimitiveDenseStore C = PrimitiveDenseStore.FACTORY.columns(new double[] { 0, 0 });
+
+        final Builder myBuilderI = new ConvexSolver.Builder(Q, C);
+
+        final PrimitiveDenseStore AI = PrimitiveDenseStore.FACTORY.rows(new double[] { 1, 1 });
+        final PrimitiveDenseStore BI = PrimitiveDenseStore.FACTORY.columns(new double[] { 1 });
+
+        myBuilderI.inequalities(AI, BI);
+
+        final ConvexSolver prob = myBuilderI.build();
+        final Result solved = prob.solve(); // java.lang.ArithmeticException: / by zero
+
+        if (DEBUG) {
+            BasicLogger.debug(solved);
+        }
+
+        final PrimitiveDenseStore AI2 = PrimitiveDenseStore.FACTORY.rows(new double[] { 1, 1 });
+        final PrimitiveDenseStore BI2 = PrimitiveDenseStore.FACTORY.columns(new double[] { 2 });
+        // Discovered that you got (fixed now) a problem if you modify a builder after it has been used to build a solver
+        myBuilderI.inequalities(AI2, BI2);
+
+        final ConvexSolver prob2 = myBuilderI.build();
+        final Result solved2 = prob2.solve(); // java.lang.ArithmeticException: / by zero
+
+        if (DEBUG) {
+            BasicLogger.debug(solved2);
+        }
+
     }
 
 }

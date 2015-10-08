@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,7 +32,6 @@ import java.nio.DoubleBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
-import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
@@ -153,6 +154,12 @@ public class BufferArray extends DenseArray<Double> {
         }
     }
 
+    protected static void fill(final DoubleBuffer data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+        for (int i = first; i < limit; i += step) {
+            data.put(i, supplier.doubleValue());
+        }
+    }
+
     protected static void invoke(final DoubleBuffer data, final int first, final int limit, final int step, final Access1D<Double> left,
             final BinaryFunction<Double> function, final Access1D<Double> right) {
         for (int i = first; i < limit; i += step) {
@@ -216,14 +223,37 @@ public class BufferArray extends DenseArray<Double> {
     }
 
     @Override
+    protected void add(final int index, final double addend) {
+        myBuffer.put(index, myBuffer.get(index) + addend);
+    }
+
+    @Override
+    protected void add(final int index, final Number addend) {
+        myBuffer.put(index, myBuffer.get(index) + addend.doubleValue());
+    }
+
+    @Override
     protected double doubleValue(final int index) {
         return myBuffer.get(index);
     }
 
     @Override
     protected void exchange(final int firstA, final int firstB, final int step, final int count) {
-        // TODO Auto-generated method stub
 
+        int tmpIndexA = firstA;
+        int tmpIndexB = firstB;
+
+        double tmpVal;
+
+        for (int i = 0; i < count; i++) {
+
+            tmpVal = myBuffer.get(tmpIndexA);
+            myBuffer.put(tmpIndexA, myBuffer.get(tmpIndexB));
+            myBuffer.put(tmpIndexB, tmpVal);
+
+            tmpIndexA += step;
+            tmpIndexB += step;
+        }
     }
 
     @Override
@@ -233,13 +263,12 @@ public class BufferArray extends DenseArray<Double> {
 
     @Override
     protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
-
+        BufferArray.invoke(myBuffer, first, limit, 1, left, function, right);
     }
 
     @Override
     protected void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        // TODO Auto-generated method stub
-
+        BufferArray.invoke(myBuffer, first, limit, 1, left, function, right);
     }
 
     @Override
@@ -249,8 +278,17 @@ public class BufferArray extends DenseArray<Double> {
 
     @Override
     protected void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
+        BufferArray.fill(myBuffer, first, limit, step, supplier);
+    }
 
+    @Override
+    protected void fillOne(final int index, final Double value) {
+        myBuffer.put(index, value);
+    }
+
+    @Override
+    protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
+        myBuffer.put(index, supplier.doubleValue());
     }
 
     @Override
@@ -270,8 +308,20 @@ public class BufferArray extends DenseArray<Double> {
 
     @Override
     protected int indexOfLargest(final int first, final int limit, final int step) {
-        // TODO Auto-generated method stub
-        return 0;
+
+        int retVal = first;
+        double tmpLargest = ZERO;
+        double tmpValue;
+
+        for (int i = first; i < limit; i += step) {
+            tmpValue = Math.abs(myBuffer.get(i));
+            if (tmpValue > tmpLargest) {
+                tmpLargest = tmpValue;
+                retVal = i;
+            }
+        }
+
+        return retVal;
     }
 
     @Override
@@ -332,7 +382,7 @@ public class BufferArray extends DenseArray<Double> {
     @Override
     protected int searchAscending(final Double number) {
         // TODO Auto-generated method stub
-        return 0;
+        return -1;
     }
 
     @Override
@@ -361,7 +411,7 @@ public class BufferArray extends DenseArray<Double> {
     }
 
     @Override
-    protected void visit(final int index, final VoidFunction<Double> visitor) {
+    protected void visitOne(final int index, final VoidFunction<Double> visitor) {
         visitor.invoke(myBuffer.get(index));
     }
 
@@ -374,41 +424,6 @@ public class BufferArray extends DenseArray<Double> {
     DenseArray<Double> newInstance(final int capacity) {
         return null;
         // return new MyTestArray(capacity);
-    }
-
-    public Iterator<Double> iterator() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    protected void add(final int index, final double addend) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void add(final int index, final Number addend) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void fillOne(final int index, final Double value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void visitOne(final int index, final VoidFunction<Double> visitor) {
-        // TODO Auto-generated method stub
-
     }
 
 }

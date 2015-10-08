@@ -52,6 +52,13 @@ public abstract class DatePrice implements KeyValue<CalendarDate, Double> {
         key = new CalendarDate(aDate);
     }
 
+    protected DatePrice(final String sqlString) {
+
+        super();
+
+        key = new CalendarDate(sqlString);
+    }
+
     public int compareTo(final KeyValue<CalendarDate, ?> ref) {
         return key.compareTo(ref.getKey());
     }

@@ -267,8 +267,6 @@ abstract class DenseArray<N extends Number> extends BasicArray<N>implements Rand
 
     protected abstract void visit(int first, int limit, int step, VoidFunction<N> visitor);
 
-    protected abstract void visit(int index, VoidFunction<N> visitor);
-
     @Override
     protected final void visit(final long first, final long limit, final long step, final VoidFunction<N> visitor) {
         this.visit((int) first, (int) limit, (int) step, visitor);

@@ -33,6 +33,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.ParameterFunction.FixedParameter;
@@ -336,13 +337,13 @@ public class PrimitiveArray extends DenseArray<Double> {
             PrimitiveArray.negate(data, first, limit, step, values);
         } else if (function instanceof FixedFirst<?>) {
             final FixedFirst<Double> tmpFunc = (FixedFirst<Double>) function;
-            PrimitiveArray.invoke(data, first, limit, step, tmpFunc.doubleValue(), tmpFunc.getFunction(), data);
+            PrimitiveArray.invoke(data, first, limit, step, tmpFunc.doubleValue(), tmpFunc.getFunction(), values);
         } else if (function instanceof FixedSecond<?>) {
             final FixedSecond<Double> tmpFunc = (FixedSecond<Double>) function;
-            PrimitiveArray.invoke(data, first, limit, step, data, tmpFunc.getFunction(), tmpFunc.doubleValue());
+            PrimitiveArray.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.doubleValue());
         } else if (function instanceof FixedParameter<?>) {
             final FixedParameter<Double> tmpFunc = (FixedParameter<Double>) function;
-            PrimitiveArray.invoke(data, first, limit, step, data, tmpFunc.getFunction(), tmpFunc.getParameter());
+            PrimitiveArray.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values[i]);
@@ -560,11 +561,6 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
-    protected final void visit(final int index, final VoidFunction<Double> visitor) {
-        visitor.invoke(data[index]);
-    }
-
-    @Override
     protected void visitOne(final int index, final VoidFunction<Double> visitor) {
         visitor.invoke(data[index]);
     }
@@ -581,6 +577,20 @@ public class PrimitiveArray extends DenseArray<Double> {
 
     OfDouble split() {
         return Spliterators.spliterator(data, 0);
+    }
+
+    public final void fillMatching(final Access1D<?> values) {
+        PrimitiveArray.fill(data, values);
+    }
+
+    public final void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
+        PrimitiveArray.invoke(data, 0, tmpLimit, 1, left, function, right);
+    }
+
+    public final void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
+        PrimitiveArray.invoke(data, 0, tmpLimit, 1, arguments, function);
     }
 
 }

@@ -23,6 +23,8 @@ package org.ojalgo.array;
 
 import java.util.Arrays;
 
+import org.ojalgo.access.Access1D;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -85,6 +87,13 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
             return Arrays.equals(data, ((RationalArray) anObj).data);
         } else {
             return super.equals(anObj);
+        }
+    }
+
+    public final void fillMatching(final Access1D<?> values) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), values.count());
+        for (int i = 0; i < tmpLimit; i++) {
+            data[i] = RationalNumber.valueOf(values.get(i));
         }
     }
 

@@ -21,9 +21,8 @@
  */
 package org.ojalgo.finance.data;
 
-import java.sql.Date;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.Date;
 
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.type.CalendarDateUnit;
@@ -43,6 +42,18 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
         public double low;
         public double open;
         public double volume;
+
+        protected Data(final Date aDate) {
+            super(aDate);
+        }
+
+        protected Data(final long aDate) {
+            super(aDate);
+        }
+
+        protected Data(final String sqlString) {
+            super(sqlString);
+        }
 
         protected Data(final Calendar aDate) {
             super(aDate);
@@ -98,10 +109,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
         int tmpInclusiveBegin = 0;
         int tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
         String tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        final Calendar tmpCalendar = new GregorianCalendar();
-        tmpCalendar.setTime(Date.valueOf(tmpString));
-        this.getResolution().round(tmpCalendar);
-        retVal = new Data(tmpCalendar);
+        retVal = new Data(tmpString);
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
         tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);

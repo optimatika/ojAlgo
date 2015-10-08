@@ -22,37 +22,45 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.optimisation.system.KKTSystem;
 
-class MixedASS extends ActiveSetSolver {
+final class MixedASS extends ActiveSetSolver {
 
     MixedASS(final Builder matrices, final Options solverOptions) {
         super(matrices, solverOptions);
     }
 
     @Override
-    KKTSystem.Input buildDelegateSolverInput(final int[] included) {
+    MatrixStore<Double> getIterationA(final int[] included) {
 
-        final MatrixStore<Double> tmpQ = this.getQ();
-        final MatrixStore<Double> tmpC = this.getC();
         final MatrixStore<Double> tmpAE = this.getAE();
         final MatrixStore<Double> tmpAI = this.getAI();
-        final PhysicalStore<Double> tmpX = this.getX();
 
-        final MatrixStore<Double> tmpSubQ = tmpQ;
-        final MatrixStore<Double> tmpSubC = tmpC.subtract(tmpSubQ.multiply(tmpX));
-
-        MatrixStore<Double> tmpSubAE = null;
+        MatrixStore<Double> retVal = null;
         if (included.length == 0) {
-            tmpSubAE = tmpAE;
+            retVal = tmpAE;
         } else {
-            //tmpSubAE = new AboveBelowStore<Double>(tmpAE, new RowsStore<Double>(tmpAI, included));
-            tmpSubAE = tmpAI.builder().row(included).above(tmpAE).build();
+            retVal = tmpAI.builder().row(included).above(tmpAE).build();
         }
-        final MatrixStore<Double> tmpSubBE = MatrixStore.PRIMITIVE.makeZero((int) tmpSubAE.countRows(), 1).get();
 
-        return new KKTSystem.Input(tmpSubQ, tmpSubC, tmpSubAE, tmpSubBE);
+        return retVal;
+    }
+
+    @Override
+    MatrixStore<Double> getIterationB(final int[] included) {
+
+        // return MatrixStore.PRIMITIVE.makeZero((int) this.getBE().count() + included.length, 1).get();
+
+        final MatrixStore<Double> tmpBE = this.getBE();
+        final MatrixStore<Double> tmpBI = this.getBI();
+
+        MatrixStore<Double> retVal = null;
+        if (included.length == 0) {
+            retVal = tmpBE;
+        } else {
+            retVal = tmpBI.builder().row(included).above(tmpBE).build();
+        }
+
+        return retVal;
     }
 
 }

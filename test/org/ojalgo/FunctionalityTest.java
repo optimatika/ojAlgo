@@ -30,7 +30,6 @@ import org.ojalgo.optimisation.OptimisationTests;
 import org.ojalgo.optimisation.convex.OptimisationConvexTests;
 import org.ojalgo.optimisation.integer.OptimisationIntegerTests;
 import org.ojalgo.optimisation.linear.OptimisationLinearTests;
-import org.ojalgo.optimisation.system.OptimisationSystemTests;
 import org.ojalgo.random.RandomTests;
 import org.ojalgo.random.process.RandomProcessTests;
 import org.ojalgo.scalar.ScalarTests;
@@ -71,7 +70,6 @@ public abstract class FunctionalityTest extends TestCase {
         suite.addTest(OptimisationConvexTests.suite());
         suite.addTest(OptimisationIntegerTests.suite());
         suite.addTest(OptimisationLinearTests.suite());
-        suite.addTest(OptimisationSystemTests.suite());
         suite.addTest(RandomTests.suite());
         suite.addTest(RandomProcessTests.suite());
         suite.addTest(ScalarTests.suite());

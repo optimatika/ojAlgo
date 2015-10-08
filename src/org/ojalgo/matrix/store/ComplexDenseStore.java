@@ -59,9 +59,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ComplexDenseStore extends ComplexArray implements PhysicalStore<ComplexNumber>, DecompositionStore<ComplexNumber> {
 
-    public static interface ComplexMultiplyBoth {
-
-        void invoke(ComplexNumber[] product, Access1D<ComplexNumber> left, int complexity, Access1D<ComplexNumber> right);
+    public static interface ComplexMultiplyBoth extends FillByMultiplying<ComplexNumber> {
 
     }
 
@@ -189,9 +187,28 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         public ComplexDenseStore copy(final Access2D<?> source) {
 
-            final ComplexDenseStore retVal = new ComplexDenseStore((int) source.countRows(), (int) source.countColumns());
+            final int tmpRowDim = (int) source.countRows();
+            final int tmpColDim = (int) source.countColumns();
 
-            retVal.fillMatching(source);
+            final ComplexDenseStore retVal = new ComplexDenseStore(tmpRowDim, tmpColDim);
+
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
 
             return retVal;
         }
@@ -675,14 +692,12 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         final int tmpComplexity = ((int) left.count()) / myRowDim;
 
-        final ComplexNumber[] tmpProductData = data;
-
         if (right instanceof ComplexDenseStore) {
-            multiplyLeft.invoke(tmpProductData, left, tmpComplexity, ComplexDenseStore.cast(right).data);
+            multiplyLeft.invoke(data, left, tmpComplexity, ComplexDenseStore.cast(right).data);
         } else if (left instanceof ComplexDenseStore) {
-            multiplyRight.invoke(tmpProductData, ComplexDenseStore.cast(left).data, tmpComplexity, right);
+            multiplyRight.invoke(data, ComplexDenseStore.cast(left).data, tmpComplexity, right);
         } else {
-            multiplyBoth.invoke(tmpProductData, left, tmpComplexity, right);
+            multiplyBoth.invoke(this, left, tmpComplexity, right);
         }
     }
 
@@ -700,54 +715,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public void fillDiagonal(final long row, final long column, final NullaryFunction<ComplexNumber> supplier) {
         myUtility.fillDiagonal(row, column, supplier);
-    }
-
-    public void fillMatching(final Access1D<? extends Number> source) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingSingle.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    FillMatchingSingle.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, source);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
-
-        } else {
-
-            FillMatchingSingle.invoke(data, tmpRowDim, 0, tmpColDim, source);
-        }
-    }
-
-    public void fillMatching(final Access1D<ComplexNumber> leftArg, final BinaryFunction<ComplexNumber> func, final Access1D<ComplexNumber> rightArg) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingBoth.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    ComplexDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, leftArg, func, rightArg);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingBoth.THRESHOLD);
-
-        } else {
-
-            this.fill(0, tmpRowDim * tmpColDim, leftArg, func, rightArg);
-        }
     }
 
     public void fillMatching(final Access1D<ComplexNumber> aLeftArg, final BinaryFunction<ComplexNumber> aFunc, final ComplexNumber aRightArg) {
@@ -944,8 +911,20 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
                 rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
-    public MatrixStore.ElementsConsumer<ComplexNumber> region(final int rowOffset, final int columnOffset) {
-        return new PhysicalStore.ConsumerRegion<ComplexNumber>(this, rowOffset, columnOffset);
+    public final MatrixStore.ElementsConsumer<ComplexNumber> regionByColumns(final int... columns) {
+        return new ColumnsRegion<ComplexNumber>(this, multiplyBoth, columns);
+    }
+
+    public final MatrixStore.ElementsConsumer<ComplexNumber> regionByLimits(final int rowLimit, final int columnLimit) {
+        return new LimitRegion<ComplexNumber>(this, multiplyBoth, rowLimit, columnLimit);
+    }
+
+    public final MatrixStore.ElementsConsumer<ComplexNumber> regionByOffsets(final int rowOffset, final int columnOffset) {
+        return new OffsetRegion<ComplexNumber>(this, multiplyBoth, rowOffset, columnOffset);
+    }
+
+    public final MatrixStore.ElementsConsumer<ComplexNumber> regionByRows(final int... rows) {
+        return new RowsRegion<ComplexNumber>(this, multiplyBoth, rows);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

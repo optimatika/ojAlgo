@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright 1997-2015 Optimatika (www.optimatika.se)
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,16 +21,13 @@
  */
 package org.ojalgo.type;
 
-import java.awt.Color;
-import java.awt.color.ColorSpace;
-
 /**
  * @author apete
  */
-public class Colour extends Color {
+public class Colour extends Object {
 
-    public static final Colour WHITE = new Colour(Color.WHITE);
-    public static final Colour BLACK = new Colour(Color.BLACK);
+    public static final Colour BLACK = new Colour(0, 0, 0);
+    public static final Colour WHITE = new Colour(255, 255, 255);
 
     private static final int LIMIT = 256;
 
@@ -43,48 +40,63 @@ public class Colour extends Color {
         return new Colour(tmpR, tmpG, tmpB);
     }
 
-    public static Colour valueOf(final String aColourAsHexString) {
-        return new Colour(Color.decode(aColourAsHexString));
+    public static Colour valueOf(final String colourAsHexString) {
+        final int i = Integer.decode(colourAsHexString).intValue();
+        return new Colour((i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF);
     }
 
-    public Colour(final Color aColor) {
-        super(aColor.getRGB());
-    }
-
-    public Colour(final Color aColor, final float a) {
-        super(aColor.getRed(), aColor.getGreen(), aColor.getBlue(), a);
-    }
-
-    public Colour(final ColorSpace cspace, final float components[], final float alpha) {
-        super(cspace, components, alpha);
-    }
+    private final int myValue;
 
     public Colour(final float r, final float g, final float b) {
-        super(r, g, b);
+        this((int) ((r * 255F) + 0.5F), (int) ((g * 255F) + 0.5F), (int) ((b * 255F) + 0.5F));
     }
 
     public Colour(final float r, final float g, final float b, final float a) {
-        super(r, g, b, a);
+        this((int) ((r * 255F) + 0.5F), (int) ((g * 255F) + 0.5F), (int) ((b * 255F) + 0.5F), (int) ((a * 255F) + 0.5F));
     }
 
     public Colour(final int rgb) {
-        super(rgb);
+        myValue = 0xff000000 | rgb;
     }
 
-    public Colour(final int rgba, final boolean hasalpha) {
-        super(rgba, hasalpha);
+    public Colour(final int rgba, final boolean alpha) {
+        if (alpha) {
+            myValue = rgba;
+        } else {
+            myValue = 0xff000000 | rgba;
+        }
     }
 
     public Colour(final int r, final int g, final int b) {
-        super(r, g, b);
+        this(r, g, b, 255);
     }
 
     public Colour(final int r, final int g, final int b, final int a) {
-        super(r, g, b, a);
+        myValue = ((a & 0xFF) << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | ((b & 0xFF) << 0);
+    }
+
+    public int getAlpha() {
+        return (myValue >> 24) & 0xff;
+    }
+
+    public int getBlue() {
+        return (myValue >> 0) & 0xFF;
+    }
+
+    public int getGreen() {
+        return (myValue >> 8) & 0xFF;
+    }
+
+    public int getRed() {
+        return (myValue >> 16) & 0xFF;
+    }
+
+    public int getRGB() {
+        return myValue;
     }
 
     public String toHexString() {
-        return TypeUtils.toHexString(this);
+        return TypeUtils.toHexString(myValue);
     }
 
 }

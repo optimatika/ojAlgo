@@ -83,7 +83,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
 
         final PhysicalStore<N> retVal = tmpFactory.makeZero(tmpRowDim, tmpColDim);
 
-        retVal.fillMatching(myNumber, tmpFactory.function().multiply(), right);
+        retVal.fillMatching(tmpFactory.function().multiply().first(myNumber), right);
 
         return retVal;
     }
@@ -98,7 +98,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
 
         final PhysicalStore<N> retVal = tmpFactory.makeZero(tmpRowDim, tmpColDim);
 
-        retVal.fillMatching(leftMtrx, tmpFactory.function().multiply(), myNumber);
+        retVal.fillMatching(tmpFactory.function().multiply().second(myNumber), leftMtrx);
 
         return retVal;
     }

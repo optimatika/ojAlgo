@@ -19,23 +19,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.system;
+package org.ojalgo.optimisation.convex;
 
-import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 
-public final class SingularValueSolver extends DecompositionSolver<SingularValue<Double>> {
+abstract class ConstrainedSolver extends ConvexSolver {
 
-    public SingularValueSolver() {
-        super(SingularValue.makePrimitive());
+    protected ConstrainedSolver(final Builder matrices, final Options solverOptions) {
+        super(matrices, solverOptions);
     }
 
-    private SingularValueSolver(final SingularValue<Double> decomposition) {
-        super(decomposition);
-    }
+    abstract MatrixStore<Double> getIterationA();
+
+    abstract MatrixStore<Double> getIterationB();
 
     @Override
-    protected boolean validate(final MatrixStore<Double> body) {
+    protected boolean validate() {
+
+        super.validate();
+
+        final MatrixStore<Double> tmpA = this.getIterationA();
+        final MatrixStore<Double> tmpB = this.getIterationB();
+
+        if (((tmpA != null) && (tmpB == null)) || ((tmpA == null) && (tmpB != null))) {
+            throw new IllegalArgumentException("Either A or B is null, and the other one is not!");
+        }
+
+        if (tmpA != null) {
+            myLU.decompose(tmpA.countRows() < tmpA.countColumns() ? tmpA.transpose() : tmpA);
+            if (myLU.getRank() != tmpA.countRows()) {
+                throw new IllegalArgumentException("A must have full (row) rank!");
+            }
+        }
+
+        this.setState(State.VALID);
         return true;
     }
 

@@ -51,16 +51,8 @@ public abstract class BasicArrayTest extends FunctionalityTest {
         super(aName);
     }
 
-    public void testOffHeap() {
-        this.doTest(OffHeapArray.make(COUNT));
-    }
-
     public void testPrimitive() {
         this.doTest(PrimitiveArray.make(COUNT));
-    }
-
-    public void testSegmentedOffHeap() {
-        this.doTest(OffHeapArray.makeSegmented(COUNT));
     }
 
     public void testSegmentedPrimitive() {

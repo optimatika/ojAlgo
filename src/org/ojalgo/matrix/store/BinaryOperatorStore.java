@@ -22,15 +22,16 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.matrix.store.MatrixStore.ElementsConsumer;
 
-final class BinaryOperatorStore<N extends Number> extends LogicalStore<N> {
+final class BinaryOperatorStore<N extends Number> extends AbstractSupplier<N> {
 
     private final BinaryFunction<N> myFunction;
     private final MatrixStore<N> myRight;
 
-    private BinaryOperatorStore(final int rows, final int columns, final MatrixStore<N> base) {
+    private BinaryOperatorStore(final MatrixStore<N> base) {
 
-        super(base, rows, columns);
+        super(base);
 
         myFunction = null;
         myRight = null;
@@ -38,18 +39,27 @@ final class BinaryOperatorStore<N extends Number> extends LogicalStore<N> {
 
     BinaryOperatorStore(final MatrixStore<N> base, final BinaryFunction<N> function, final MatrixStore<N> right) {
 
-        super(base, (int) base.countRows(), (int) base.countColumns());
+        super(base);
 
         myFunction = function;
         myRight = right;
     }
 
-    public double doubleValue(final long row, final long col) {
-        return myFunction.invoke(this.getBase().doubleValue(row, col), myRight.doubleValue(row, col));
+    public long countColumns() {
+        return myRight.countColumns();
     }
 
-    public N get(final long row, final long col) {
-        return myFunction.invoke(this.getBase().get(row, col), myRight.get(row, col));
+    public long countRows() {
+        return myRight.countRows();
+    }
+
+    public long count() {
+        return myRight.count();
+    }
+
+    @Override
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        consumer.fillMatching(this.getBase(), myFunction, myRight);
     }
 
 }

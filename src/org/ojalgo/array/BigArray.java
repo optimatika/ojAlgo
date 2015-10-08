@@ -26,6 +26,8 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+import org.ojalgo.access.Access1D;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
@@ -90,6 +92,13 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
             return Arrays.equals(data, ((BigArray) other).data);
         } else {
             return super.equals(other);
+        }
+    }
+
+    public final void fillMatching(final Access1D<?> values) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), values.count());
+        for (int i = 0; i < tmpLimit; i++) {
+            data[i] = TypeUtils.toBigDecimal(values.get(i));
         }
     }
 

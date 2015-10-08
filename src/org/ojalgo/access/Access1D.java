@@ -27,6 +27,8 @@ import java.util.stream.BaseStream;
 import java.util.stream.StreamSupport;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -92,6 +94,48 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         void fillAll(N value);
 
         void fillAll(NullaryFunction<N> supplier);
+
+        /**
+         * <p>
+         * Will fill the elements of [this] with the corresponding input values, and in the process (if
+         * necessary) convert the elements to the correct type:
+         * </p>
+         * <code>this(i) = values(i)</code>
+         */
+        default void fillMatching(final Access1D<?> values) {
+            final long tmpLimit = FunctionUtils.min(this.count(), values.count());
+            for (long i = 0; i < tmpLimit; i++) {
+                this.set(i, values.get(i));
+            }
+        }
+
+        /**
+         * <p>
+         * Will fill the elements of [this] with the results of element wise invocation of the input binary
+         * funtion:
+         * </p>
+         * <code>this(i) = function.invoke(left(i),right(i))</code>
+         */
+        default void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
+            final long tmpLimit = FunctionUtils.min(left.count(), right.count(), this.count());
+            for (long i = 0; i < tmpLimit; i++) {
+                this.fillOne(i, function.invoke(left.get(i), right.get(i)));
+            }
+        }
+
+        /**
+         * <p>
+         * Will fill the elements of [this] with the results of element wise invocation of the input unary
+         * funtion:
+         * </p>
+         * <code>this(i) = function.invoke(arguments(i))</code>
+         */
+        default void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
+            final long tmpLimit = FunctionUtils.min(this.count(), arguments.count());
+            for (long i = 0; i < tmpLimit; i++) {
+                this.fillOne(i, function.invoke(arguments.get(i)));
+            }
+        }
 
         void fillOne(long index, N value);
 

@@ -217,7 +217,7 @@ final class SimplexTableauSolver extends LinearSolver {
     }
 
     @Override
-    protected boolean initialise(final Result kickStart) {
+    protected boolean initialise(final Result kickStarter) {
         return false;
         // TODO Auto-generated method stub
 

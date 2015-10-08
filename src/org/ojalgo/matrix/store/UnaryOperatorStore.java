@@ -22,36 +22,41 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.scalar.Scalar;
+import org.ojalgo.matrix.store.MatrixStore.ElementsConsumer;
 
-final class UnaryOperatorStore<N extends Number> extends LogicalStore<N> {
+final class UnaryOperatorStore<N extends Number> extends AbstractSupplier<N> {
 
     private final UnaryFunction<N> myFunction;
 
     private UnaryOperatorStore(final int rows, final int columns, final MatrixStore<N> base) {
 
-        super(base, rows, columns);
+        super(base);
 
         myFunction = null;
     }
 
     UnaryOperatorStore(final MatrixStore<N> base, final UnaryFunction<N> function) {
 
-        super(base, (int) base.countRows(), (int) base.countColumns());
+        super(base);
 
         myFunction = function;
     }
 
-    public double doubleValue(final long row, final long col) {
-        return myFunction.invoke(this.getBase().doubleValue(row, col));
+    public long count() {
+        return this.getBase().count();
     }
 
-    public N get(final long row, final long col) {
-        return myFunction.invoke(this.getBase().get(row, col));
+    public long countColumns() {
+        return this.getBase().countColumns();
     }
 
-    public Scalar<N> toScalar(final long row, final long column) {
-        return this.factory().scalar().convert(this.get(row, column));
+    public long countRows() {
+        return this.getBase().countRows();
+    }
+
+    @Override
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        consumer.fillMatching(myFunction, this.getBase());
     }
 
 }

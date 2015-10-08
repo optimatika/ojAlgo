@@ -21,8 +21,6 @@
  */
 package org.ojalgo.machine;
 
-import java.lang.management.ManagementFactory;
-
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.netio.BasicLogger;
@@ -33,7 +31,7 @@ public final class VirtualMachine extends AbstractMachine {
 
         // http://fantom.org/sidewalk/topic/756
 
-        final String tmpProperty = ManagementFactory.getOperatingSystemMXBean().getArch().toLowerCase();
+        final String tmpProperty = System.getProperty("os.arch").toLowerCase();
 
         if (tmpProperty.equals(I386)) {
             return X86;

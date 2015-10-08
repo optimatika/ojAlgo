@@ -401,6 +401,8 @@ public interface Optimisation {
 
         /**
          * Unique (and optimal) solution - there is no other solution that is equal or better
+         *
+         * @deprecated v39 Use OPTIMAL instead
          */
         DISTINCT(256),
 
@@ -416,16 +418,20 @@ public interface Optimisation {
 
         /**
          * Optimal, but not distinct solution - there are other solutions that are equal, but not better.
+         *
+         * @deprecated v39 Use OPTIMAL instead
          */
         INDISTINCT(-128),
 
         /**
          * No solution that complies with all constraints exists
+         *
+         * @deprecated v39 Use INVALID instead
          */
         INFEASIBLE(-8),
 
         /**
-         * Model entities or solver components (matrices) are invalid - don't meet the requirements
+         * The problem/model is infeasible, unbounded or otherwise invalid.
          */
         INVALID(-2),
 
@@ -436,6 +442,8 @@ public interface Optimisation {
 
         /**
          * There's an infinite number of feasible solutions and no bound on the objective function value
+         *
+         * @deprecated v39 Use INVALID or FEASIBLE instead
          */
         UNBOUNDED(-32),
 
@@ -446,6 +454,8 @@ public interface Optimisation {
 
         /**
          * Model entities and solver components (matrices) are valid
+         *
+         * @deprecated v39 Use UNEXPLORED, APPROXIMATE or FEASIBLE instead
          */
         VALID(4);
 
@@ -459,6 +469,10 @@ public interface Optimisation {
             return (this == APPROXIMATE) || this.isFeasible();
         }
 
+        /**
+         * @deprecated v39 Irrelevant since both DISTINCT and INDISTINCT are deprecated
+         */
+        @Deprecated
         public boolean isDistinct() {
             return this.absValue() >= DISTINCT.absValue();
         }

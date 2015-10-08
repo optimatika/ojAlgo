@@ -25,6 +25,8 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
 
+import org.ojalgo.access.Access1D;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
@@ -91,6 +93,13 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
         }
     }
 
+    public final void fillMatching(final Access1D<?> values) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), values.count());
+        for (int i = 0; i < tmpLimit; i++) {
+            data[i] = Quaternion.valueOf(values.get(i));
+        }
+    }
+
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
@@ -148,5 +157,4 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
     final Quaternion valueOf(final Number number) {
         return Quaternion.valueOf(number);
     }
-
 }

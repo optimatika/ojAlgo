@@ -64,9 +64,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class BigDenseStore extends BigArray implements PhysicalStore<BigDecimal>, DecompositionStore<BigDecimal> {
 
-    public static interface BigMultiplyBoth {
-
-        void invoke(BigDecimal[] product, Access1D<BigDecimal> left, int complexity, Access1D<BigDecimal> right);
+    public static interface BigMultiplyBoth extends FillByMultiplying<BigDecimal> {
 
     }
 
@@ -170,9 +168,28 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
         public BigDenseStore copy(final Access2D<?> source) {
 
-            final BigDenseStore retVal = new BigDenseStore((int) source.countRows(), (int) source.countColumns());
+            final int tmpRowDim = (int) source.countRows();
+            final int tmpColDim = (int) source.countColumns();
 
-            retVal.fillMatching(source);
+            final BigDenseStore retVal = new BigDenseStore(tmpRowDim, tmpColDim);
+
+            if (tmpColDim > FillMatchingSingle.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int aFirst, final int aLimit) {
+                        FillMatchingSingle.invoke(retVal.data, tmpRowDim, aFirst, aLimit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
+
+            } else {
+
+                FillMatchingSingle.invoke(retVal.data, tmpRowDim, 0, tmpColDim, source);
+            }
 
             return retVal;
         }
@@ -656,14 +673,12 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
         final int tmpComplexity = ((int) left.count()) / myRowDim;
 
-        final BigDecimal[] tmpProductData = data;
-
         if (right instanceof BigDenseStore) {
-            multiplyLeft.invoke(tmpProductData, left, tmpComplexity, BigDenseStore.cast(right).data);
+            multiplyLeft.invoke(data, left, tmpComplexity, BigDenseStore.cast(right).data);
         } else if (left instanceof BigDenseStore) {
-            multiplyRight.invoke(tmpProductData, BigDenseStore.cast(left).data, tmpComplexity, right);
+            multiplyRight.invoke(data, BigDenseStore.cast(left).data, tmpComplexity, right);
         } else {
-            multiplyBoth.invoke(tmpProductData, left, tmpComplexity, right);
+            multiplyBoth.invoke(this, left, tmpComplexity, right);
         }
     }
 
@@ -681,54 +696,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void fillDiagonal(final long row, final long column, final NullaryFunction<BigDecimal> supplier) {
         myUtility.fillDiagonal(row, column, supplier);
-    }
-
-    public void fillMatching(final Access1D<? extends Number> source) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingSingle.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    FillMatchingSingle.invoke(BigDenseStore.this.data, tmpRowDim, aFirst, aLimit, source);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingSingle.THRESHOLD);
-
-        } else {
-
-            FillMatchingSingle.invoke(data, tmpRowDim, 0, tmpColDim, source);
-        }
-    }
-
-    public void fillMatching(final Access1D<BigDecimal> leftArg, final BinaryFunction<BigDecimal> func, final Access1D<BigDecimal> rightArg) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > FillMatchingBoth.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    BigDenseStore.this.fill(tmpRowDim * aFirst, tmpRowDim * aLimit, leftArg, func, rightArg);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, FillMatchingBoth.THRESHOLD);
-
-        } else {
-
-            this.fill(0, tmpRowDim * tmpColDim, leftArg, func, rightArg);
-        }
     }
 
     public void fillMatching(final Access1D<BigDecimal> aLeftArg, final BinaryFunction<BigDecimal> aFunc, final BigDecimal aRightArg) {
@@ -925,8 +892,20 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
                 rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
-    public MatrixStore.ElementsConsumer<BigDecimal> region(final int rowOffset, final int columnOffset) {
-        return new PhysicalStore.ConsumerRegion<BigDecimal>(this, rowOffset, columnOffset);
+    public final MatrixStore.ElementsConsumer<BigDecimal> regionByColumns(final int... columns) {
+        return new ColumnsRegion<BigDecimal>(this, multiplyBoth, columns);
+    }
+
+    public final MatrixStore.ElementsConsumer<BigDecimal> regionByLimits(final int rowLimit, final int columnLimit) {
+        return new LimitRegion<BigDecimal>(this, multiplyBoth, rowLimit, columnLimit);
+    }
+
+    public final MatrixStore.ElementsConsumer<BigDecimal> regionByOffsets(final int rowOffset, final int columnOffset) {
+        return new OffsetRegion<BigDecimal>(this, multiplyBoth, rowOffset, columnOffset);
+    }
+
+    public final MatrixStore.ElementsConsumer<BigDecimal> regionByRows(final int... rows) {
+        return new RowsRegion<BigDecimal>(this, multiplyBoth, rows);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

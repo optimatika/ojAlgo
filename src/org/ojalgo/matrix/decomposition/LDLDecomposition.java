@@ -37,6 +37,7 @@ import org.ojalgo.matrix.store.MatrixStore.Builder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 
 abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N>implements LDL<N> {
 
@@ -197,19 +198,17 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     }
 
     public boolean isSolvable() {
-        return this.isSquareAndNotSingular();
+        return this.isComputed() && this.isSquareAndNotSingular();
     }
 
     public boolean isSquareAndNotSingular() {
 
         boolean retVal = this.getRowDim() == this.getColDim();
 
-        final DecompositionStore<N> tmpStore = this.getInPlace();
-        final int tmpMinDim = (int) Math.min(tmpStore.countRows(), tmpStore.countColumns());
+        final int tmpFirst = 0;
+        final int tmpLast = this.getColDim() - 1;
 
-        for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
-            retVal &= !tmpStore.isZero(ij, ij);
-        }
+        retVal = retVal && PrimitiveScalar.isSmall(this.getInPlace().doubleValue(tmpFirst, tmpFirst), this.getInPlace().doubleValue(tmpLast, tmpLast));
 
         return retVal;
     }

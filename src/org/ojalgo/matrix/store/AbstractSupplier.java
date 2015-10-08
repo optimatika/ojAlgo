@@ -19,17 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.system;
+package org.ojalgo.matrix.store;
 
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.matrix.store.MatrixStore.ElementsConsumer;
 
-public abstract class OptimisationSystem {
+abstract class AbstractSupplier<N extends Number> implements MatrixStore.ElementsSupplier<N> {
 
-    protected OptimisationSystem() {
+    private final MatrixStore<N> myBase;
+
+    protected AbstractSupplier(final MatrixStore<N> base) {
         super();
+        myBase = base;
     }
 
-    public abstract Optimisation.Result solve(MatrixStore<Double> body, MatrixStore<Double> rhs);
+    public final MatrixStore<N> get() {
+
+        final PhysicalStore<N> retVal = myBase.factory().makeZero(this.countRows(), this.countColumns());
+
+        this.supplyTo(retVal);
+
+        return retVal;
+    }
+
+    public abstract void supplyTo(final ElementsConsumer<N> consumer);
+
+    protected final MatrixStore<N> getBase() {
+        return myBase;
+    }
 
 }

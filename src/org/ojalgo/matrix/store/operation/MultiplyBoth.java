@@ -32,6 +32,8 @@ import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
 import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyBoth;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.MatrixStore.ElementsConsumer;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -43,21 +45,23 @@ public final class MultiplyBoth extends MatrixOperation {
 
     static final BigMultiplyBoth BIG = new BigMultiplyBoth() {
 
-        public void invoke(final BigDecimal[] product, final Access1D<BigDecimal> left, final int complexity, final Access1D<BigDecimal> right) {
-            MultiplyBoth.invoke(product, 0, ((int) left.count()) / complexity, left, complexity, right);
+        public void invoke(final ElementsConsumer<BigDecimal> product, final Access1D<BigDecimal> left, final int complexity,
+                final Access1D<BigDecimal> right) {
+            MultiplyBoth.invokeBig(product, 0, ((int) left.count()) / complexity, left, complexity, right);
         }
 
     };
 
     static final BigMultiplyBoth BIG_MT = new BigMultiplyBoth() {
 
-        public void invoke(final BigDecimal[] product, final Access1D<BigDecimal> left, final int complexity, final Access1D<BigDecimal> right) {
+        public void invoke(final ElementsConsumer<BigDecimal> product, final Access1D<BigDecimal> left, final int complexity,
+                final Access1D<BigDecimal> right) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    MultiplyBoth.invoke(product, first, limit, left, complexity, right);
+                    MultiplyBoth.invokeBig(product, first, limit, left, complexity, right);
                 }
             };
 
@@ -68,21 +72,23 @@ public final class MultiplyBoth extends MatrixOperation {
 
     static final ComplexMultiplyBoth COMPLEX = new ComplexMultiplyBoth() {
 
-        public void invoke(final ComplexNumber[] product, final Access1D<ComplexNumber> left, final int complexity, final Access1D<ComplexNumber> right) {
-            MultiplyBoth.invoke(product, 0, ((int) left.count()) / complexity, left, complexity, right);
+        public void invoke(final ElementsConsumer<ComplexNumber> product, final Access1D<ComplexNumber> left, final int complexity,
+                final Access1D<ComplexNumber> right) {
+            MultiplyBoth.invokeComplex(product, 0, ((int) left.count()) / complexity, left, complexity, right);
         }
 
     };
 
     static final ComplexMultiplyBoth COMPLEX_MT = new ComplexMultiplyBoth() {
 
-        public void invoke(final ComplexNumber[] product, final Access1D<ComplexNumber> left, final int complexity, final Access1D<ComplexNumber> right) {
+        public void invoke(final ElementsConsumer<ComplexNumber> product, final Access1D<ComplexNumber> left, final int complexity,
+                final Access1D<ComplexNumber> right) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    MultiplyBoth.invoke(product, first, limit, left, complexity, right);
+                    MultiplyBoth.invokeComplex(product, first, limit, left, complexity, right);
                 }
             };
 
@@ -93,15 +99,15 @@ public final class MultiplyBoth extends MatrixOperation {
 
     static final PrimitiveMultiplyBoth PRIMITIVE = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
-            MultiplyBoth.invoke(product, 0, ((int) left.count()) / complexity, left, complexity, right);
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
+            MultiplyBoth.invokePrimitive(product, 0, ((int) left.count()) / complexity, left, complexity, right);
         }
 
     };
 
     static final PrimitiveMultiplyBoth PRIMITIVE_0XN = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             final int tmpRowDim = (int) (left.count() / complexity);
             final int tmpColDim = (int) (right.count() / complexity);
@@ -134,16 +140,16 @@ public final class MultiplyBoth extends MatrixOperation {
                     tmp9J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 }
 
-                product[tmpIndex = j * tmpRowDim] = tmp0J;
-                product[++tmpIndex] = tmp1J;
-                product[++tmpIndex] = tmp2J;
-                product[++tmpIndex] = tmp3J;
-                product[++tmpIndex] = tmp4J;
-                product[++tmpIndex] = tmp5J;
-                product[++tmpIndex] = tmp6J;
-                product[++tmpIndex] = tmp7J;
-                product[++tmpIndex] = tmp8J;
-                product[++tmpIndex] = tmp9J;
+                product.set(0, j, tmp0J);
+                product.set(1, j, tmp1J);
+                product.set(2, j, tmp2J);
+                product.set(3, j, tmp3J);
+                product.set(4, j, tmp4J);
+                product.set(5, j, tmp5J);
+                product.set(6, j, tmp6J);
+                product.set(7, j, tmp7J);
+                product.set(8, j, tmp8J);
+                product.set(9, j, tmp9J);
             }
         }
 
@@ -151,22 +157,22 @@ public final class MultiplyBoth extends MatrixOperation {
 
     static final PrimitiveMultiplyBoth PRIMITIVE_1X1 = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             double tmp00 = PrimitiveMath.ZERO;
 
-            for (long c = 0; c < complexity; c++) {
+            for (long c = 0L; c < complexity; c++) {
                 tmp00 += left.doubleValue(c) * right.doubleValue(c);
             }
 
-            product[0] = tmp00;
+            product.set(0L, 0L, tmp00);
         }
 
     };
 
     static final PrimitiveMultiplyBoth PRIMITIVE_1XN = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             final int tmpColDim = (int) (right.count() / complexity);
 
@@ -179,7 +185,7 @@ public final class MultiplyBoth extends MatrixOperation {
                     tmp0J += left.doubleValue(tmpIndex++) * right.doubleValue(c + (j * complexity));
                 }
 
-                product[j] = tmp0J;
+                product.set(0, j, tmp0J);
             }
         }
 
@@ -187,7 +193,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
     static final PrimitiveMultiplyBoth PRIMITIVE_2X2 = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             double tmp00 = PrimitiveMath.ZERO;
             double tmp10 = PrimitiveMath.ZERO;
@@ -212,17 +218,18 @@ public final class MultiplyBoth extends MatrixOperation {
                 tmp11 += tmpLeft1 * tmpRight1;
             }
 
-            product[0] = tmp00;
-            product[1] = tmp10;
-            product[2] = tmp01;
-            product[3] = tmp11;
+            product.set(0, 0, tmp00);
+            product.set(1, 0, tmp10);
+
+            product.set(0, 1, tmp01);
+            product.set(1, 1, tmp11);
         }
 
     };
 
     static final PrimitiveMultiplyBoth PRIMITIVE_3X3 = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             double tmp00 = PrimitiveMath.ZERO;
             double tmp10 = PrimitiveMath.ZERO;
@@ -261,22 +268,24 @@ public final class MultiplyBoth extends MatrixOperation {
                 tmp22 += tmpLeft2 * tmpRight2;
             }
 
-            product[0] = tmp00;
-            product[1] = tmp10;
-            product[2] = tmp20;
-            product[3] = tmp01;
-            product[4] = tmp11;
-            product[5] = tmp21;
-            product[6] = tmp02;
-            product[7] = tmp12;
-            product[8] = tmp22;
+            product.set(0, 0, tmp00);
+            product.set(1, 0, tmp10);
+            product.set(2, 0, tmp20);
+
+            product.set(0, 1, tmp01);
+            product.set(1, 1, tmp11);
+            product.set(2, 1, tmp21);
+
+            product.set(0, 2, tmp02);
+            product.set(1, 2, tmp12);
+            product.set(2, 2, tmp22);
         }
 
     };
 
     static final PrimitiveMultiplyBoth PRIMITIVE_4X4 = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             double tmp00 = PrimitiveMath.ZERO;
             double tmp10 = PrimitiveMath.ZERO;
@@ -333,29 +342,32 @@ public final class MultiplyBoth extends MatrixOperation {
                 tmp33 += tmpLeft3 * tmpRight3;
             }
 
-            product[0] = tmp00;
-            product[1] = tmp10;
-            product[2] = tmp20;
-            product[3] = tmp30;
-            product[4] = tmp01;
-            product[5] = tmp11;
-            product[6] = tmp21;
-            product[7] = tmp31;
-            product[8] = tmp02;
-            product[9] = tmp12;
-            product[10] = tmp22;
-            product[11] = tmp32;
-            product[12] = tmp03;
-            product[13] = tmp13;
-            product[14] = tmp23;
-            product[15] = tmp33;
+            product.set(0, 0, tmp00);
+            product.set(1, 0, tmp10);
+            product.set(2, 0, tmp20);
+            product.set(3, 0, tmp30);
+
+            product.set(0, 1, tmp01);
+            product.set(1, 1, tmp11);
+            product.set(2, 1, tmp21);
+            product.set(3, 1, tmp31);
+
+            product.set(0, 2, tmp02);
+            product.set(1, 2, tmp12);
+            product.set(2, 2, tmp22);
+            product.set(3, 2, tmp32);
+
+            product.set(0, 3, tmp03);
+            product.set(1, 3, tmp13);
+            product.set(2, 3, tmp23);
+            product.set(3, 3, tmp33);
         }
 
     };
 
     static final PrimitiveMultiplyBoth PRIMITIVE_5X5 = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             double tmp00 = PrimitiveMath.ZERO;
             double tmp10 = PrimitiveMath.ZERO;
@@ -434,38 +446,42 @@ public final class MultiplyBoth extends MatrixOperation {
                 tmp44 += tmpLeft4 * tmpRight4;
             }
 
-            product[0] = tmp00;
-            product[1] = tmp10;
-            product[2] = tmp20;
-            product[3] = tmp30;
-            product[4] = tmp40;
-            product[5] = tmp01;
-            product[6] = tmp11;
-            product[7] = tmp21;
-            product[8] = tmp31;
-            product[9] = tmp41;
-            product[10] = tmp02;
-            product[11] = tmp12;
-            product[12] = tmp22;
-            product[13] = tmp32;
-            product[14] = tmp42;
-            product[15] = tmp03;
-            product[16] = tmp13;
-            product[17] = tmp23;
-            product[18] = tmp33;
-            product[19] = tmp43;
-            product[20] = tmp04;
-            product[21] = tmp14;
-            product[22] = tmp24;
-            product[23] = tmp34;
-            product[24] = tmp44;
+            product.set(0, 0, tmp00);
+            product.set(1, 0, tmp10);
+            product.set(2, 0, tmp20);
+            product.set(3, 0, tmp30);
+            product.set(4, 0, tmp40);
+
+            product.set(0, 1, tmp01);
+            product.set(1, 1, tmp11);
+            product.set(2, 1, tmp21);
+            product.set(3, 1, tmp31);
+            product.set(4, 1, tmp41);
+
+            product.set(0, 2, tmp02);
+            product.set(1, 2, tmp12);
+            product.set(2, 2, tmp22);
+            product.set(3, 2, tmp32);
+            product.set(4, 2, tmp42);
+
+            product.set(0, 3, tmp03);
+            product.set(1, 3, tmp13);
+            product.set(2, 3, tmp23);
+            product.set(3, 3, tmp33);
+            product.set(4, 3, tmp43);
+
+            product.set(0, 4, tmp04);
+            product.set(1, 4, tmp14);
+            product.set(2, 4, tmp24);
+            product.set(3, 4, tmp34);
+            product.set(4, 4, tmp44);
         }
 
     };
 
     static final PrimitiveMultiplyBoth PRIMITIVE_6XN = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             final int tmpRowDim = 6;
             final int tmpColDim = (int) (right.count() / complexity);
@@ -490,12 +506,12 @@ public final class MultiplyBoth extends MatrixOperation {
                     tmp5J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 }
 
-                product[tmpIndex = j * tmpRowDim] = tmp0J;
-                product[++tmpIndex] = tmp1J;
-                product[++tmpIndex] = tmp2J;
-                product[++tmpIndex] = tmp3J;
-                product[++tmpIndex] = tmp4J;
-                product[++tmpIndex] = tmp5J;
+                product.set(0, j, tmp0J);
+                product.set(1, j, tmp1J);
+                product.set(2, j, tmp2J);
+                product.set(3, j, tmp3J);
+                product.set(4, j, tmp4J);
+                product.set(5, j, tmp5J);
             }
         }
 
@@ -503,7 +519,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
     static final PrimitiveMultiplyBoth PRIMITIVE_7XN = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             final int tmpRowDim = (int) (left.count() / complexity);
             final int tmpColDim = (int) (right.count() / complexity);
@@ -530,13 +546,13 @@ public final class MultiplyBoth extends MatrixOperation {
                     tmp6J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 }
 
-                product[tmpIndex = j * tmpRowDim] = tmp0J;
-                product[++tmpIndex] = tmp1J;
-                product[++tmpIndex] = tmp2J;
-                product[++tmpIndex] = tmp3J;
-                product[++tmpIndex] = tmp4J;
-                product[++tmpIndex] = tmp5J;
-                product[++tmpIndex] = tmp6J;
+                product.set(0, j, tmp0J);
+                product.set(1, j, tmp1J);
+                product.set(2, j, tmp2J);
+                product.set(3, j, tmp3J);
+                product.set(4, j, tmp4J);
+                product.set(5, j, tmp5J);
+                product.set(6, j, tmp6J);
             }
         }
 
@@ -544,7 +560,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
     static final PrimitiveMultiplyBoth PRIMITIVE_8XN = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             final int tmpRowDim = (int) (left.count() / complexity);
             final int tmpColDim = (int) (right.count() / complexity);
@@ -573,14 +589,14 @@ public final class MultiplyBoth extends MatrixOperation {
                     tmp7J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 }
 
-                product[tmpIndex = j * tmpRowDim] = tmp0J;
-                product[++tmpIndex] = tmp1J;
-                product[++tmpIndex] = tmp2J;
-                product[++tmpIndex] = tmp3J;
-                product[++tmpIndex] = tmp4J;
-                product[++tmpIndex] = tmp5J;
-                product[++tmpIndex] = tmp6J;
-                product[++tmpIndex] = tmp7J;
+                product.set(0, j, tmp0J);
+                product.set(1, j, tmp1J);
+                product.set(2, j, tmp2J);
+                product.set(3, j, tmp3J);
+                product.set(4, j, tmp4J);
+                product.set(5, j, tmp5J);
+                product.set(6, j, tmp6J);
+                product.set(7, j, tmp7J);
             }
         }
 
@@ -588,7 +604,7 @@ public final class MultiplyBoth extends MatrixOperation {
 
     static final PrimitiveMultiplyBoth PRIMITIVE_9XN = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             final int tmpRowDim = (int) (left.count() / complexity);
             final int tmpColDim = (int) (right.count() / complexity);
@@ -619,15 +635,15 @@ public final class MultiplyBoth extends MatrixOperation {
                     tmp8J += left.doubleValue(tmpIndex++) * tmpRightCJ;
                 }
 
-                product[tmpIndex = j * tmpRowDim] = tmp0J;
-                product[++tmpIndex] = tmp1J;
-                product[++tmpIndex] = tmp2J;
-                product[++tmpIndex] = tmp3J;
-                product[++tmpIndex] = tmp4J;
-                product[++tmpIndex] = tmp5J;
-                product[++tmpIndex] = tmp6J;
-                product[++tmpIndex] = tmp7J;
-                product[++tmpIndex] = tmp8J;
+                product.set(0, j, tmp0J);
+                product.set(1, j, tmp1J);
+                product.set(2, j, tmp2J);
+                product.set(3, j, tmp3J);
+                product.set(4, j, tmp4J);
+                product.set(5, j, tmp5J);
+                product.set(6, j, tmp6J);
+                product.set(7, j, tmp7J);
+                product.set(8, j, tmp8J);
             }
         }
 
@@ -635,13 +651,13 @@ public final class MultiplyBoth extends MatrixOperation {
 
     static final PrimitiveMultiplyBoth PRIMITIVE_MT = new PrimitiveMultiplyBoth() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+        public void invoke(final ElementsConsumer<Double> product, final Access1D<Double> left, final int complexity, final Access1D<Double> right) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    MultiplyBoth.invoke(product, first, limit, left, complexity, right);
+                    MultiplyBoth.invokePrimitive(product, first, limit, left, complexity, right);
                 }
             };
 
@@ -694,8 +710,8 @@ public final class MultiplyBoth extends MatrixOperation {
         }
     }
 
-    static void invoke(final BigDecimal[] product, final int firstRow, final int rowLimit, final Access1D<BigDecimal> left, final int complexity,
-            final Access1D<BigDecimal> right) {
+    static void invokeBig(final MatrixStore.ElementsConsumer<BigDecimal> product, final int firstRow, final int rowLimit, final Access1D<BigDecimal> left,
+            final int complexity, final Access1D<BigDecimal> right) {
 
         final int tmpRowDim = (int) (left.count() / complexity);
         final int tmpColDim = (int) (right.count() / complexity);
@@ -727,13 +743,13 @@ public final class MultiplyBoth extends MatrixOperation {
                 for (int c = tmpFirst; c < tmpLimit; c++) {
                     tmpVal = BigFunction.ADD.invoke(tmpVal, BigFunction.MULTIPLY.invoke(tmpLeftRow[c], right.get(c + (j * complexity))));
                 }
-                product[i + (j * tmpRowDim)] = tmpVal;
+                product.set(i, j, tmpVal);
             }
         }
     }
 
-    static void invoke(final ComplexNumber[] product, final int firstRow, final int rowLimit, final Access1D<ComplexNumber> left, final int complexity,
-            final Access1D<ComplexNumber> right) {
+    static void invokeComplex(final MatrixStore.ElementsConsumer<ComplexNumber> product, final int firstRow, final int rowLimit,
+            final Access1D<ComplexNumber> left, final int complexity, final Access1D<ComplexNumber> right) {
 
         final int tmpRowDim = (int) (left.count() / complexity);
         final int tmpColDim = (int) (right.count() / complexity);
@@ -765,15 +781,16 @@ public final class MultiplyBoth extends MatrixOperation {
                 for (int c = tmpFirst; c < tmpLimit; c++) {
                     tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c + (j * complexity))));
                 }
-                product[i + (j * tmpRowDim)] = tmpVal;
+                product.set(i, j, tmpVal);
             }
         }
     }
 
-    static void invoke(final double[] product, final int firstRow, final int rowLimit, final Access1D<?> left, final int complexity, final Access1D<?> right) {
+    static void invokePrimitive(final MatrixStore.ElementsConsumer<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
+            final int complexity, final Access1D<Double> right) {
 
-        final int tmpRowDim = (int) (left.count() / complexity);
-        final int tmpColDim = (int) (right.count() / complexity);
+        final int tmpRowDim = (int) product.countRows();
+        final int tmpColDim = (int) product.countColumns();
 
         final double[] tmpLeftRow = new double[complexity];
         double tmpVal;
@@ -800,7 +817,7 @@ public final class MultiplyBoth extends MatrixOperation {
                 for (int c = tmpFirst; c < tmpLimit; c++) {
                     tmpVal += tmpLeftRow[c] * right.doubleValue(c + tmpColBase);
                 }
-                product[i + (j * tmpRowDim)] = tmpVal;
+                product.set(i, j, tmpVal);
             }
         }
     }

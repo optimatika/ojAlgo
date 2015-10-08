@@ -27,6 +27,7 @@ import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -268,11 +269,6 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
     }
 
     @Override
-    protected final void visit(final int index, final VoidFunction<N> visitor) {
-        visitor.invoke(data[index]);
-    }
-
-    @Override
     protected void visitOne(final int index, final VoidFunction<N> visitor) {
         visitor.invoke(data[index]);
     }
@@ -285,5 +281,19 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
     abstract N valueOf(double value);
 
     abstract N valueOf(Number number);
+
+    public final void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
+        for (int i = 0; i < tmpLimit; i++) {
+            data[i] = function.invoke(left.get(i), right.get(i));
+        }
+    }
+
+    public final void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
+        for (int i = 0; i < tmpLimit; i++) {
+            data[i] = function.invoke(arguments.get(i));
+        }
+    }
 
 }

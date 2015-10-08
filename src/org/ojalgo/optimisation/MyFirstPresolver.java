@@ -19,30 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.system;
+package org.ojalgo.optimisation;
 
-import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.store.MatrixStore;
+public class MyFirstPresolver extends ExpressionsBasedModel.Presolver {
 
-public final class EigenvalueSolver extends DecompositionSolver<Eigenvalue<Double>> {
-
-    public EigenvalueSolver() {
-        super(Eigenvalue.makePrimitive(true));
-    }
-
-    private EigenvalueSolver(final Eigenvalue<Double> decomposition) {
-        super(decomposition);
+    public MyFirstPresolver() {
+        super();
     }
 
     @Override
-    protected boolean validate(final MatrixStore<Double> body) {
-
-        boolean retVal = body.countRows() == body.countColumns();
-
-        retVal = retVal && MatrixUtils.isHermitian(body);
-
-        return retVal;
+    public boolean simplify(final ExpressionsBasedModel model) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

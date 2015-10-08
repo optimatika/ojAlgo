@@ -22,6 +22,8 @@ import junit.framework.TestSuite;
  */
 public abstract class OptimisationConvexTests extends FunctionalityTest {
 
+    static final boolean DEBUG = false;
+
     public static Test suite() {
         final TestSuite suite = new TestSuite(OptimisationConvexTests.class.getPackage().getName());
         //$JUnit-BEGIN$
@@ -36,8 +38,6 @@ public abstract class OptimisationConvexTests extends FunctionalityTest {
         //$JUnit-END$
         return suite;
     }
-
-    static final boolean DEBUG = false;
 
     protected OptimisationConvexTests() {
         super();

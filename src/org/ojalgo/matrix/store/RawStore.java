@@ -50,6 +50,7 @@ import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -793,7 +794,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.fillDiagonal(data, (int) row, (int) column, supplier);
     }
 
-    public void fillMatching(final Access1D<? extends Number> source) {
+    public void fillMatching(final Access1D<?> source) {
 
         final double[][] tmpDelegateArray = data;
 
@@ -1100,8 +1101,20 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    public MatrixStore.ElementsConsumer<Double> region(final int rowOffset, final int columnOffset) {
-        return new PhysicalStore.ConsumerRegion<Double>(this, rowOffset, columnOffset);
+    public final MatrixStore.ElementsConsumer<Double> regionByColumns(final int... columns) {
+        return new ColumnsRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), columns);
+    }
+
+    public final MatrixStore.ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
+        return new LimitRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowLimit, columnLimit);
+    }
+
+    public final MatrixStore.ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
+        return new OffsetRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowOffset, columnOffset);
+    }
+
+    public final MatrixStore.ElementsConsumer<Double> regionByRows(final int... rows) {
+        return new RowsRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rows);
     }
 
     public void set(final long row, final long column, final double value) {

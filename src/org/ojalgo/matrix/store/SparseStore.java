@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.store;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
@@ -92,10 +93,8 @@ public final class SparseStore<N extends Number> extends FactoryStore<N>implemen
         myElements = elements;
         myFirsts = new int[rowsCount];
         myLimits = new int[rowsCount];
-        for (int i = 0; i < rowsCount; i++) {
-            myFirsts[i] = columnsCount;
-            myLimits[i] = 0;
-        }
+        Arrays.fill(myFirsts, columnsCount);
+        // Arrays.fill(myLimits, 0); // Behövs inte, redan 0
     }
 
     public void add(final long row, final long col, final double addend) {

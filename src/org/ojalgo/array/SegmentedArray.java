@@ -22,7 +22,6 @@
 package org.ojalgo.array;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
@@ -244,6 +243,14 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         myIndexMask = tmpSegmentSize - 1L;
     }
 
+    public void add(final long index, final double addend) {
+        mySegments[(int) (index >> myIndexBits)].add(index & myIndexMask, addend);
+    }
+
+    public void add(final long index, final Number addend) {
+        mySegments[(int) (index >> myIndexBits)].add(index & myIndexMask, addend);
+    }
+
     @Override
     public long count() {
         final int tmpVal = mySegments.length - 1;
@@ -264,6 +271,14 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         for (final BasicArray<N> tmpSegment : mySegments) {
             tmpSegment.fillAll(supplier);
         }
+    }
+
+    public void fillOne(final long index, final N value) {
+        mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, value);
+    }
+
+    public void fillOne(final long index, final NullaryFunction<N> supplier) {
+        mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, supplier);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
@@ -320,6 +335,14 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     public void set(final long index, final Number value) {
         mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
+    }
+
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
+        if (this.isPrimitive()) {
+            visitor.invoke(this.doubleValue(index));
+        } else {
+            visitor.invoke(this.get(index));
+        }
     }
 
     @Override
@@ -544,36 +567,6 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     @Override
     boolean isPrimitive() {
         return mySegments[0].isPrimitive();
-    }
-
-    public Iterator<N> iterator() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void fillOne(final long index, final N value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillOne(final long index, final NullaryFunction<N> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void add(final long index, final double addend) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void add(final long index, final Number addend) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void visitOne(final long index, final VoidFunction<N> visitor) {
-        // TODO Auto-generated method stub
-
     }
 
 }
