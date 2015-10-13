@@ -23,11 +23,26 @@ package org.ojalgo.access;
 
 import java.util.function.Consumer;
 
+import org.ojalgo.function.FunctionUtils;
+
 /**
- * You can query the structure before accepting.
+ * You can query the shape before accepting.
  *
  * @author apete
  */
 public interface ConsumerAnyD<I extends AccessAnyD<?>> extends StructureAnyD, Consumer<I> {
+
+    default boolean isAcceptable(final SupplierAnyD<? extends I> supplier) {
+
+        boolean retVal = true;
+
+        final int tmpRank = FunctionUtils.max(this.shape().length, this.shape().length);
+
+        for (int i = 0; i < tmpRank; i++) {
+            retVal &= this.count(i) >= supplier.count(i);
+        }
+
+        return retVal;
+    }
 
 }

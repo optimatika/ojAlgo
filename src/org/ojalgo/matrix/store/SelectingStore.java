@@ -27,4 +27,14 @@ abstract class SelectingStore<N extends Number> extends LogicalStore<N> {
         super(base, rowCount, columnCount);
     }
 
+    @Override
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        this.supplyNonZerosTo(consumer);
+    }
+
+    @Override
+    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+        consumer.fillMatching(this);
+    }
+
 }

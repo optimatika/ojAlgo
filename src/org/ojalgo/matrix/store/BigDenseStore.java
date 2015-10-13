@@ -869,16 +869,11 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
         final BigDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
-        retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
-
-        return retVal;
-    }
-
-    public MatrixStore<BigDecimal> multiplyLeft(final Access1D<BigDecimal> left) {
-
-        final BigDenseStore retVal = FACTORY.makeZero(left.count() / myRowDim, myColDim);
-
-        retVal.multiplyLeft.invoke(retVal.data, left, myRowDim, data);
+        if (right instanceof BigDenseStore) {
+            retVal.multiplyLeft.invoke(retVal.data, this, myColDim, ((BigDenseStore) right).data);
+        } else {
+            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+        }
 
         return retVal;
     }
@@ -892,19 +887,19 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
                 rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
-    public final MatrixStore.ElementsConsumer<BigDecimal> regionByColumns(final int... columns) {
+    public final ElementsConsumer<BigDecimal> regionByColumns(final int... columns) {
         return new ColumnsRegion<BigDecimal>(this, multiplyBoth, columns);
     }
 
-    public final MatrixStore.ElementsConsumer<BigDecimal> regionByLimits(final int rowLimit, final int columnLimit) {
+    public final ElementsConsumer<BigDecimal> regionByLimits(final int rowLimit, final int columnLimit) {
         return new LimitRegion<BigDecimal>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
-    public final MatrixStore.ElementsConsumer<BigDecimal> regionByOffsets(final int rowOffset, final int columnOffset) {
+    public final ElementsConsumer<BigDecimal> regionByOffsets(final int rowOffset, final int columnOffset) {
         return new OffsetRegion<BigDecimal>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
-    public final MatrixStore.ElementsConsumer<BigDecimal> regionByRows(final int... rows) {
+    public final ElementsConsumer<BigDecimal> regionByRows(final int... rows) {
         return new RowsRegion<BigDecimal>(this, multiplyBoth, rows);
     }
 
@@ -971,6 +966,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
         }
+    }
+
+    public void supplyTo(final ElementsConsumer<BigDecimal> consumer) {
+        consumer.fillMatching(this);
     }
 
     public Scalar<BigDecimal> toScalar(final long row, final long column) {

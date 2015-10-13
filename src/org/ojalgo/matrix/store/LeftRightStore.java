@@ -40,6 +40,14 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
     private final MatrixStore<N> myRight;
     private final int mySplit;
 
+    @SuppressWarnings("unused")
+    private LeftRightStore(final MatrixStore<N> base) {
+
+        this(base, null);
+
+        ProgrammingError.throwForIllegalInvocation();
+    }
+
     LeftRightStore(final MatrixStore<N> base, final MatrixStore<N> right) {
 
         super((int) base.countRows(), (int) (base.countColumns() + right.countColumns()), base);
@@ -50,14 +58,6 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
         if (base.countRows() != right.countRows()) {
             throw new IllegalArgumentException();
         }
-    }
-
-    @SuppressWarnings("unused")
-    private LeftRightStore(final MatrixStore<N> base) {
-
-        this(base, null);
-
-        ProgrammingError.throwForIllegalInvocation();
     }
 
     /**
@@ -89,12 +89,16 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
         return myRight.limitOfRow(row);
     }
 
+    /**
+     * @deprecated v39 Use {@link #multiply(MatrixStore, boolean)} instead
+     */
     @Override
+    @Deprecated
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
 
         final Future<MatrixStore<N>> tmpBaseFuture = this.executeMultiplyLeftOnBase(leftMtrx);
 
-        final MatrixStore<N> tmpRight = myRight.multiplyLeft(leftMtrx);
+        final MatrixStore<N> tmpRight = myRight.multiplyLeft(leftMtrx).get();
 
         try {
             return new LeftRightStore<N>(tmpBaseFuture.get(), tmpRight);
@@ -105,6 +109,12 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
 
     public Scalar<N> toScalar(final long row, final long column) {
         return (column >= mySplit) ? myRight.toScalar(row, column - mySplit) : this.getBase().toScalar(row, column);
+    }
+
+    @Override
+    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+        consumer.regionByLimits(this.getRowDim(), mySplit).fillMatching(this.getBase());
+        consumer.regionByOffsets(0, mySplit).fillMatching(myRight);
     }
 
 }

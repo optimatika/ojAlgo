@@ -32,8 +32,7 @@ import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
 import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyBoth;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.ElementsConsumer;
+import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -710,7 +709,7 @@ public final class MultiplyBoth extends MatrixOperation {
         }
     }
 
-    static void invokeBig(final MatrixStore.ElementsConsumer<BigDecimal> product, final int firstRow, final int rowLimit, final Access1D<BigDecimal> left,
+    static void invokeBig(final ElementsConsumer<BigDecimal> product, final int firstRow, final int rowLimit, final Access1D<BigDecimal> left,
             final int complexity, final Access1D<BigDecimal> right) {
 
         final int tmpRowDim = (int) (left.count() / complexity);
@@ -748,7 +747,7 @@ public final class MultiplyBoth extends MatrixOperation {
         }
     }
 
-    static void invokeComplex(final MatrixStore.ElementsConsumer<ComplexNumber> product, final int firstRow, final int rowLimit,
+    static void invokeComplex(final ElementsConsumer<ComplexNumber> product, final int firstRow, final int rowLimit,
             final Access1D<ComplexNumber> left, final int complexity, final Access1D<ComplexNumber> right) {
 
         final int tmpRowDim = (int) (left.count() / complexity);
@@ -786,7 +785,7 @@ public final class MultiplyBoth extends MatrixOperation {
         }
     }
 
-    static void invokePrimitive(final MatrixStore.ElementsConsumer<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
+    static void invokePrimitive(final ElementsConsumer<Double> product, final int firstRow, final int rowLimit, final Access1D<Double> left,
             final int complexity, final Access1D<Double> right) {
 
         final int tmpRowDim = (int) product.countRows();

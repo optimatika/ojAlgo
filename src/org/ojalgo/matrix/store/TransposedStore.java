@@ -34,32 +34,13 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
         return this.getBase().get(aCol, aRow);
     }
 
-    @Override
-    public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
-
-        MatrixStore<N> retVal;
-
-        if (leftMtrx instanceof TransposedStore<?>) {
-
-            retVal = this.getBase().multiply(((TransposedStore<N>) leftMtrx).getOriginal());
-
-            retVal = new TransposedStore<N>(retVal);
-
-        } else {
-
-            retVal = super.multiplyLeft(leftMtrx);
-        }
-
-        return retVal;
-    }
-
     public MatrixStore<N> multiply(final Access1D<N> right) {
 
         MatrixStore<N> retVal;
 
         if (right instanceof TransposedStore<?>) {
 
-            retVal = this.getBase().multiplyLeft(((TransposedStore<N>) right).getOriginal());
+            retVal = ((TransposedStore<N>) right).getOriginal().multiply(this.getBase());
 
             retVal = new TransposedStore<N>(retVal);
 

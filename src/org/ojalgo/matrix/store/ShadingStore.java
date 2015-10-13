@@ -27,4 +27,32 @@ abstract class ShadingStore<N extends Number> extends LogicalStore<N> {
         super(base, rows, columns);
     }
 
+    @Override
+    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+
+        final int tmpColDim = this.getColDim();
+
+        if (this.isPrimitive()) {
+
+            for (int j = 0; j < tmpColDim; j++) {
+                final int tmpFirst = this.firstInColumn(j);
+                final int tmpLimit = this.limitOfColumn(j);
+                for (int i = tmpFirst; i < tmpLimit; i++) {
+                    consumer.set(i, j, this.doubleValue(i, j));
+                }
+            }
+
+        } else {
+
+            for (int j = 0; j < tmpColDim; j++) {
+                final int tmpFirst = this.firstInColumn(j);
+                final int tmpLimit = this.limitOfColumn(j);
+                for (int i = tmpFirst; i < tmpLimit; i++) {
+                    consumer.fillOne(i, j, this.get(i, j));
+                }
+            }
+        }
+
+    }
+
 }

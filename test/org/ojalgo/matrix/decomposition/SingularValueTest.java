@@ -302,10 +302,10 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q2 unitary", BIG.getQ2().builder().conjugate().build().multiplyLeft(BIG.getQ2()));
-            BasicLogger.debug("Cmplx Q2 unitary", COMPLEX.getQ2().builder().conjugate().build().multiplyLeft(COMPLEX.getQ2()));
-            BasicLogger.debug("Jama  Q2 unitary", JAMA.getQ2().builder().conjugate().build().multiplyLeft(JAMA.getQ2()));
-            BasicLogger.debug("Direc Q2 unitary", DIRECT.getQ2().builder().conjugate().build().multiplyLeft(DIRECT.getQ2()));
+            BasicLogger.debug("Big   Q2 unitary", BIG.getQ2().multiply(BIG.getQ2().builder().conjugate().build()));
+            BasicLogger.debug("Cmplx Q2 unitary", COMPLEX.getQ2().multiply(COMPLEX.getQ2().builder().conjugate().build()));
+            BasicLogger.debug("Jama  Q2 unitary", JAMA.getQ2().multiply(JAMA.getQ2().builder().conjugate().build()));
+            BasicLogger.debug("Direc Q2 unitary", DIRECT.getQ2().multiply(DIRECT.getQ2().builder().conjugate().build()));
 
         }
 

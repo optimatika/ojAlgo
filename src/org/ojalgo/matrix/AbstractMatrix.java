@@ -470,7 +470,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         MatrixError.throwIfMultiplicationNotPossible(aMtrx, myStore);
 
-        return this.getFactory().instantiate(myStore.multiplyLeft(this.getStoreFrom(aMtrx)));
+        return this.getFactory().instantiate(this.getStoreFrom(aMtrx).multiply(myStore));
     }
 
     public Scalar<?> multiplyVectors(final Access2D<?> aVctr) {

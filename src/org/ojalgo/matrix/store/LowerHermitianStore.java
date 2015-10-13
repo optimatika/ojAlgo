@@ -26,16 +26,16 @@ import org.ojalgo.scalar.Scalar;
 
 final class LowerHermitianStore<N extends Number> extends ShadingStore<N> {
 
-    LowerHermitianStore(final MatrixStore<N> base) {
-        super((int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()), base);
-    }
-
     @SuppressWarnings("unused")
     private LowerHermitianStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
 
         this(base);
 
         ProgrammingError.throwForIllegalInvocation();
+    }
+
+    LowerHermitianStore(final MatrixStore<N> base) {
+        super((int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()), base);
     }
 
     public double doubleValue(final long row, final long col) {

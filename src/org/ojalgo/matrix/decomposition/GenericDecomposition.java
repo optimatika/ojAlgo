@@ -26,6 +26,7 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
@@ -38,7 +39,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class GenericDecomposition<N extends Number> extends AbstractDecomposition<N> {
 
-    private final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
+    private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
 
     @SuppressWarnings("unused")
     private GenericDecomposition() {
@@ -74,16 +75,16 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.function();
     }
 
-    protected final BasicArray<N> makeArray(final int aLength) {
-        return myFactory.makeArray(aLength);
+    protected final BasicArray<N> makeArray(final int length) {
+        return myFactory.makeArray(length);
     }
 
-    protected final DecompositionStore<N> makeEye(final int aRowDim, final int aColDim) {
-        return myFactory.makeEye(aRowDim, aColDim);
+    protected final DecompositionStore<N> makeEye(final int numberOfRows, final int numberOfColumns) {
+        return myFactory.makeEye(numberOfRows, numberOfColumns);
     }
 
-    protected final Householder<N> makeHouseholder(final int aDim) {
-        return myFactory.makeHouseholder(aDim);
+    protected final Householder<N> makeHouseholder(final int dimension) {
+        return myFactory.makeHouseholder(dimension);
     }
 
     protected final MatrixStore.Builder<N> makeIdentity(final int dimension) {
@@ -98,8 +99,8 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.makeRotation(aLow, aHigh, aCos, aSin);
     }
 
-    protected final DecompositionStore<N> makeZero(final int aRowDim, final int aColDim) {
-        return myFactory.makeZero(aRowDim, aColDim);
+    protected final DecompositionStore<N> makeZero(final int numberOfRows, final int numberOfColumns) {
+        return myFactory.makeZero(numberOfRows, numberOfColumns);
     }
 
     @Override

@@ -30,7 +30,7 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.scalar.ComplexNumber;
 
-public final class SparseStore<N extends Number> extends FactoryStore<N>implements Access2D.Settable<N> {
+public final class SparseStore<N extends Number> extends FactoryStore<N> implements Access2D.Settable<N> {
 
     public static interface Factory<N extends Number> {
 
@@ -169,6 +169,11 @@ public final class SparseStore<N extends Number> extends FactoryStore<N>implemen
 
     private void updateNonZeros(final long row, final long col) {
         this.updateNonZeros((int) row, (int) col);
+    }
+
+    @Override
+    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+        myElements.supplyNonZerosTo(consumer);
     }
 
     void updateNonZeros(final int row, final int col) {

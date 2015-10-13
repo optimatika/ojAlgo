@@ -1456,16 +1456,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         final PrimitiveDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
-        retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
-
-        return retVal;
-    }
-
-    public MatrixStore<Double> multiplyLeft(final Access1D<Double> left) {
-
-        final PrimitiveDenseStore retVal = FACTORY.makeZero(left.count() / myRowDim, myColDim);
-
-        retVal.multiplyLeft.invoke(retVal.data, left, myRowDim, data);
+        if (right instanceof PrimitiveDenseStore) {
+            retVal.multiplyLeft.invoke(retVal.data, this, myColDim, ((PrimitiveDenseStore) right).data);
+        } else {
+            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+        }
 
         return retVal;
     }
@@ -1479,19 +1474,19 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                 rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
-    public final MatrixStore.ElementsConsumer<Double> regionByColumns(final int... columns) {
+    public final ElementsConsumer<Double> regionByColumns(final int... columns) {
         return new ColumnsRegion<Double>(this, multiplyBoth, columns);
     }
 
-    public final MatrixStore.ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
+    public final ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
         return new LimitRegion<Double>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
-    public final MatrixStore.ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
+    public final ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
         return new OffsetRegion<Double>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
-    public final MatrixStore.ElementsConsumer<Double> regionByRows(final int... rows) {
+    public final ElementsConsumer<Double> regionByRows(final int... rows) {
         return new RowsRegion<Double>(this, multiplyBoth, rows);
     }
 
@@ -1558,6 +1553,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
         }
+    }
+
+    public void supplyTo(final ElementsConsumer<Double> consumer) {
+        consumer.fillMatching(this);
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {

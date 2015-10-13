@@ -63,12 +63,12 @@ public class EigenvalueTest extends MatrixDecompositionTests {
             BasicLogger.debug("V = {}", tmpV);
         }
 
-        tmpRecreatedMatrix = tmpDecomposition.getD().multiplyLeft(tmpV).multiply(tmpV.transpose());
+        tmpRecreatedMatrix = tmpV.multiply(tmpDecomposition.getD()).multiply(tmpV.transpose());
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Original = {}", originalMatrix);
             BasicLogger.debug("Recreated = {}", tmpRecreatedMatrix);
         }
-        TestUtils.assertEquals(originalMatrix.multiply(tmpV), tmpDecomposition.getD().multiplyLeft(tmpV), accuracyContext);
+        TestUtils.assertEquals(originalMatrix.multiply(tmpV), tmpV.multiply(tmpDecomposition.getD()), accuracyContext);
 
         expectedEigenvalues.sortDescending();
         tmpEigenvalues.sortDescending();

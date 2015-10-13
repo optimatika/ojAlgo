@@ -29,19 +29,19 @@ final class LowerTriangularStore<N extends Number> extends ShadingStore<N> {
 
     private final boolean myUnitDiagonal;
 
-    LowerTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
-
-        super((int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()), base);
-
-        myUnitDiagonal = unitDiagonal;
-    }
-
     @SuppressWarnings("unused")
     private LowerTriangularStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
 
         this(base, true);
 
         ProgrammingError.throwForIllegalInvocation();
+    }
+
+    LowerTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
+
+        super((int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()), base);
+
+        myUnitDiagonal = unitDiagonal;
     }
 
     public double doubleValue(final long row, final long col) {

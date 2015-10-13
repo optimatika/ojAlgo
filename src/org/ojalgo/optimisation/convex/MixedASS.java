@@ -26,7 +26,9 @@ import org.ojalgo.matrix.store.MatrixStore;
 final class MixedASS extends ActiveSetSolver {
 
     MixedASS(final Builder matrices, final Options solverOptions) {
+
         super(matrices, solverOptions);
+
     }
 
     @Override
@@ -59,6 +61,16 @@ final class MixedASS extends ActiveSetSolver {
         } else {
             retVal = tmpBI.builder().row(included).above(tmpBE).build();
         }
+
+        return retVal;
+    }
+
+    @Override
+    protected boolean initialise(final Result kickStarter) {
+
+        final boolean retVal = super.initialise(kickStarter);
+
+        // myCholesky.solve(this.getAE().transpose(), myInvQAEt);
 
         return retVal;
     }

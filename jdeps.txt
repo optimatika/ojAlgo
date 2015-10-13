@@ -1,6 +1,6 @@
-Last login: Wed Oct  7 23:36:26 on ttys000
+Last login: Thu Oct  8 10:30:02 on ttys000
 bubble:~ apete$ /Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/bin/jdeps -profile /Users/apete/Developer/eclipse_ws/ojAlgo/target/ojalgo-39.0-SNAPSHOT.jar
-ojalgo-39.0-SNAPSHOT.jar -> /Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/rt.jar (compact3)
+ojalgo-39.0-SNAPSHOT.jar -> /Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/rt.jar (compact1)
    org.ojalgo (ojalgo-39.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
       -> java.util                                          compact1
@@ -147,7 +147,6 @@ ojalgo-39.0-SNAPSHOT.jar -> /Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Co
       -> org.ojalgo.type                                    ojalgo-39.0-SNAPSHOT.jar
    org.ojalgo.machine (ojalgo-39.0-SNAPSHOT.jar)
       -> java.lang                                          compact1
-      -> java.lang.management                               compact3
       -> java.lang.reflect                                  compact1
       -> java.util                                          compact1
       -> org.ojalgo                                         ojalgo-39.0-SNAPSHOT.jar

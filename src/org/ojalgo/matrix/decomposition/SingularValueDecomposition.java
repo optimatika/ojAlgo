@@ -118,7 +118,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
                 }
             }
 
-            myInverse = tmpMtrx.multiplyLeft(this.getQ2());
+            myInverse = this.getQ2().multiply(tmpMtrx);
         }
 
         return myInverse;
@@ -150,7 +150,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
                 }
             }
 
-            myInverse = tmpMtrx.multiplyLeft(this.getQ2());
+            myInverse = this.getQ2().multiply(tmpMtrx);
         }
 
         return myInverse;

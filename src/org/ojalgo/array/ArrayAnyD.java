@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessAnyD;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.BasicArray.BasicFactory;
@@ -303,12 +304,12 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.modify(0L, this.count(), 1L, function);
     }
 
-    public void modifyMatching(final ArrayAnyD<N> left, final BinaryFunction<N> function) {
-        myDelegate.modify(0L, this.count(), 1L, left.getDelegate(), function);
+    public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
+        myDelegate.modify(0L, this.count(), 1L, left, function);
     }
 
-    public void modifyMatching(final BinaryFunction<N> function, final ArrayAnyD<N> right) {
-        myDelegate.modify(0L, this.count(), 1L, function, right.getDelegate());
+    public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
+        myDelegate.modify(0L, this.count(), 1L, function, right);
     }
 
     public void modifyOne(final long index, final UnaryFunction<N> function) {

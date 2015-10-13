@@ -527,12 +527,12 @@ public final class Array2D<N extends Number>
                 function);
     }
 
-    public void modifyMatching(final Array2D<N> left, final BinaryFunction<N> function) {
-        myDelegate.modify(0L, this.count(), 1L, left.getDelegate(), function);
+    public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
+        myDelegate.modify(0L, this.count(), 1L, left, function);
     }
 
-    public void modifyMatching(final BinaryFunction<N> function, final Array2D<N> right) {
-        myDelegate.modify(0L, this.count(), 1L, function, right.getDelegate());
+    public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
+        myDelegate.modify(0L, this.count(), 1L, function, right);
     }
 
     public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {

@@ -173,8 +173,8 @@ public class DesignCase extends MatrixDecompositionTests {
         }
 
         TestUtils.assertEquals("Not inverted/solved correctly!", tmpDirInv, tmpSolInv);
-        TestUtils.assertEquals("Not inverted correctly!", aMtrx, tmpDirInv.multiplyLeft(aMtrx).multiply(aMtrx));
-        TestUtils.assertEquals("Not solved correctly!", aMtrx, tmpSolInv.multiplyLeft(aMtrx).multiply(aMtrx));
+        TestUtils.assertEquals("Not inverted correctly!", aMtrx, aMtrx.multiply(tmpDirInv).multiply(aMtrx));
+        TestUtils.assertEquals("Not solved correctly!", aMtrx, aMtrx.multiply(tmpSolInv).multiply(aMtrx));
 
     }
 }

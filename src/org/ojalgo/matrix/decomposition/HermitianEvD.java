@@ -281,7 +281,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
                 }
             }
 
-            myInverse = tmpMtrx.multiplyLeft(tmpV);
+            myInverse = tmpV.multiply(tmpMtrx);
         }
 
         return myInverse;
@@ -311,7 +311,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
                 }
             }
 
-            myInverse = tmpMtrx.multiplyLeft(tmpV);
+            myInverse = tmpV.multiply(tmpMtrx);
         }
 
         return myInverse;

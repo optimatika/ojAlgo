@@ -45,32 +45,13 @@ final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
     }
 
     @Override
-    public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
-
-        MatrixStore<N> retVal;
-
-        if (leftMtrx instanceof ConjugatedStore<?>) {
-
-            retVal = this.getBase().multiply(((ConjugatedStore<N>) leftMtrx).getOriginal());
-
-            retVal = new ConjugatedStore<N>(retVal);
-
-        } else {
-
-            retVal = super.multiplyLeft(leftMtrx);
-        }
-
-        return retVal;
-    }
-
-    @Override
     public MatrixStore<N> multiply(final Access1D<N> right) {
 
         MatrixStore<N> retVal;
 
         if (right instanceof ConjugatedStore<?>) {
 
-            retVal = this.getBase().multiplyLeft(((ConjugatedStore<N>) right).getOriginal());
+            retVal = ((ConjugatedStore<N>) right).getOriginal().multiply(this.getBase());
 
             retVal = new ConjugatedStore<N>(retVal);
 

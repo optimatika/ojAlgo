@@ -1039,6 +1039,24 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     }
 
+    public void modifyMatching(final Access1D<Double> left, final BinaryFunction<Double> function) {
+        long tmpIndex = 0L;
+        for (int j = 0; j < myNumberOfColumns; j++) {
+            for (int i = 0; i < data.length; i++) {
+                data[i][j] = function.invoke(left.doubleValue(tmpIndex++), data[i][j]);
+            }
+        }
+    }
+
+    public void modifyMatching(final BinaryFunction<Double> function, final Access1D<Double> right) {
+        long tmpIndex = 0L;
+        for (int j = 0; j < myNumberOfColumns; j++) {
+            for (int i = 0; i < data.length; i++) {
+                data[i][j] = function.invoke(data[i][j], right.doubleValue(tmpIndex++));
+            }
+        }
+    }
+
     public void modifyOne(final long row, final long column, final UnaryFunction<Double> function) {
 
         double tmpValue = this.doubleValue(row, column);
@@ -1073,21 +1091,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
-    public RawStore multiplyLeft(final Access1D<Double> leftMtrx) {
-
-        final int tmpComplexity = data.length;
-        final int tmpColDim = myNumberOfColumns;
-        final int tmpRowDim = (int) (leftMtrx.count() / tmpComplexity);
-
-        final RawStore retVal = new RawStore(tmpRowDim, tmpColDim);
-
-        final double[][] tmpLeft = RawStore.extract(leftMtrx, tmpComplexity);
-
-        RawStore.multiply(retVal.data, tmpLeft, data);
-
-        return retVal;
-    }
-
     public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {
 
         final double tmpValA = scalarA.doubleValue();
@@ -1101,19 +1104,19 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    public final MatrixStore.ElementsConsumer<Double> regionByColumns(final int... columns) {
+    public final ElementsConsumer<Double> regionByColumns(final int... columns) {
         return new ColumnsRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), columns);
     }
 
-    public final MatrixStore.ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
+    public final ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
         return new LimitRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowLimit, columnLimit);
     }
 
-    public final MatrixStore.ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
+    public final ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
         return new OffsetRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowOffset, columnOffset);
     }
 
-    public final MatrixStore.ElementsConsumer<Double> regionByRows(final int... rows) {
+    public final ElementsConsumer<Double> regionByRows(final int... rows) {
         return new RowsRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rows);
     }
 
@@ -1123,6 +1126,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public void set(final long row, final long column, final Number value) {
         data[(int) row][(int) column] = value.doubleValue();
+    }
+
+    public void supplyTo(final ElementsConsumer<Double> consumer) {
+        consumer.fillMatching(this);
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {

@@ -37,6 +37,14 @@ final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
     private final int myRowFirst;
     private final int myRowLimit;
 
+    @SuppressWarnings("unused")
+    private SuperimposedStore(final int rowsCount, final int columnsCount, final MatrixStore<N> base) {
+
+        this(base, 0, 0, (MatrixStore<N>) null);
+
+        ProgrammingError.throwForIllegalInvocation();
+    }
+
     SuperimposedStore(final MatrixStore<N> base, final int row, final int column, final MatrixStore<N> diff) {
 
         super((int) base.countRows(), (int) base.countColumns(), base);
@@ -51,14 +59,6 @@ final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
         myColLimit = column + tmpDiffColDim;
 
         myDiff = diff;
-    }
-
-    @SuppressWarnings("unused")
-    private SuperimposedStore(final int rowsCount, final int columnsCount, final MatrixStore<N> base) {
-
-        this(base, 0, 0, (MatrixStore<N>) null);
-
-        ProgrammingError.throwForIllegalInvocation();
     }
 
     SuperimposedStore(final MatrixStore<N> base, final MatrixStore<N> diff) {
@@ -103,6 +103,12 @@ final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
 
     private final boolean isCovered(final int row, final int column) {
         return (myRowFirst <= row) && (myColFirst <= column) && (row < myRowLimit) && (column < myColLimit);
+    }
+
+    @Override
+    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+        consumer.fillMatching(this.getBase());
+        consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.factory().function().add(), myDiff);
     }
 
 }

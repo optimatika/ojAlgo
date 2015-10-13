@@ -21,45 +21,21 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.matrix.store.MatrixStore.ElementsConsumer;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 
-final class BinaryOperatorStore<N extends Number> extends AbstractSupplier<N> {
+abstract class ContextSupplier<N extends Number> implements ElementsSupplier<N> {
 
-    private final BinaryFunction<N> myFunction;
-    private final MatrixStore<N> myRight;
+    private final ElementsSupplier<N> myContext;
 
-    private BinaryOperatorStore(final MatrixStore<N> base) {
-
-        super(base);
-
-        myFunction = null;
-        myRight = null;
+    protected ContextSupplier(final ElementsSupplier<N> context) {
+        super();
+        myContext = context;
     }
 
-    BinaryOperatorStore(final MatrixStore<N> base, final BinaryFunction<N> function, final MatrixStore<N> right) {
-
-        super(base);
-
-        myFunction = function;
-        myRight = right;
+    public Factory<N, ?> factory() {
+        return myContext.factory();
     }
 
-    public long countColumns() {
-        return myRight.countColumns();
-    }
-
-    public long countRows() {
-        return myRight.countRows();
-    }
-
-    public long count() {
-        return myRight.count();
-    }
-
-    @Override
-    public void supplyTo(final ElementsConsumer<N> consumer) {
-        consumer.fillMatching(this.getBase(), myFunction, myRight);
-    }
+    public abstract void supplyTo(final ElementsConsumer<N> consumer);
 
 }

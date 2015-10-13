@@ -72,9 +72,9 @@ public class BidiagonalTest extends MatrixDecompositionTests {
             BasicLogger.debug("D", tmpD);
             BasicLogger.debug("Q2", tmpQ2);
             BasicLogger.debug("Reconstructed", tmpReconstructed);
-            BasicLogger.debug("Q1 orthogonal (left)", tmpQ1.multiplyLeft(tmpQ1.conjugate()));
+            BasicLogger.debug("Q1 orthogonal (left)", tmpQ1.conjugate().multiply(tmpQ1));
             BasicLogger.debug("Q1 orthogonal (right)", tmpQ1.multiply(tmpQ1.conjugate()));
-            BasicLogger.debug("Q2 orthogonal (left)", tmpQ2.multiplyLeft(tmpQ2.conjugate()));
+            BasicLogger.debug("Q2 orthogonal (left)", tmpQ2.conjugate().multiply(tmpQ2));
             BasicLogger.debug("Q2 orthogonal (right)", tmpQ2.multiply(tmpQ2.conjugate()));
         }
 

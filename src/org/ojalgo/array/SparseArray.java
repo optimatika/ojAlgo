@@ -471,6 +471,18 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    public void supplyNonZerosTo(final Access1D.Settable<N> consumer) {
+        if (this.isPrimitive()) {
+            for (int n = 0; n < myActualLength; n++) {
+                consumer.set(myIndices[n], myValues.doubleValue(n));
+            }
+        } else {
+            for (int n = 0; n < myActualLength; n++) {
+                consumer.set(myIndices[n], myValues.get(n));
+            }
+        }
+    }
+
     public void visitOne(final long index, final VoidFunction<N> visitor) {
         if (this.isPrimitive()) {
             visitor.invoke(this.doubleValue(index));

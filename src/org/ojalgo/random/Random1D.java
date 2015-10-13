@@ -79,7 +79,7 @@ public class Random1D {
         }
 
         if (myCholeskiedCorrelations != null) {
-            return ((PrimitiveDenseStore) tmpUncorrelated.multiplyLeft(myCholeskiedCorrelations)).asList();
+            return ((PrimitiveDenseStore) myCholeskiedCorrelations.multiply(tmpUncorrelated)).asList();
         } else {
             return tmpUncorrelated.asList();
         }
@@ -97,7 +97,7 @@ public class Random1D {
         }
 
         if (myCholeskiedCorrelations != null) {
-            return ((PrimitiveDenseStore) tmpUncorrelated.multiplyLeft(myCholeskiedCorrelations)).asList();
+            return ((PrimitiveDenseStore) myCholeskiedCorrelations.multiply(tmpUncorrelated)).asList();
         } else {
             return tmpUncorrelated.asList();
         }

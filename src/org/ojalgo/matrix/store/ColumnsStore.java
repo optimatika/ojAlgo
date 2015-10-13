@@ -34,6 +34,14 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
     private final int[] myColumns;
     private final int myFirst;
 
+    @SuppressWarnings("unused")
+    private ColumnsStore(final MatrixStore<N> aBase) {
+
+        this(aBase, null);
+
+        ProgrammingError.throwForIllegalInvocation();
+    }
+
     ColumnsStore(final int aFirst, final int aLimit, final MatrixStore<N> aBase) {
 
         super((int) aBase.countRows(), aLimit - aFirst, aBase);
@@ -48,14 +56,6 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
 
         myColumns = someColumns;
         myFirst = 0;
-    }
-
-    @SuppressWarnings("unused")
-    private ColumnsStore(final MatrixStore<N> aBase) {
-
-        this(aBase, null);
-
-        ProgrammingError.throwForIllegalInvocation();
     }
 
     /**

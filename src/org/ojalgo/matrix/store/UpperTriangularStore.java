@@ -29,19 +29,19 @@ final class UpperTriangularStore<N extends Number> extends ShadingStore<N> {
 
     private final boolean myUnitDiagonal;
 
-    UpperTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
-
-        super((int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns(), base);
-
-        myUnitDiagonal = unitDiagonal;
-    }
-
     @SuppressWarnings("unused")
     private UpperTriangularStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
 
         this(base, true);
 
         ProgrammingError.throwForIllegalInvocation();
+    }
+
+    UpperTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
+
+        super((int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns(), base);
+
+        myUnitDiagonal = unitDiagonal;
     }
 
     public double doubleValue(final long row, final long col) {
@@ -54,6 +54,10 @@ final class UpperTriangularStore<N extends Number> extends ShadingStore<N> {
         }
     }
 
+    public int firstInRow(final int row) {
+        return row;
+    }
+
     public N get(final long row, final long col) {
         if (row > col) {
             return this.factory().scalar().zero().getNumber();
@@ -64,6 +68,11 @@ final class UpperTriangularStore<N extends Number> extends ShadingStore<N> {
         }
     }
 
+    @Override
+    public int limitOfColumn(final int col) {
+        return col + 1;
+    }
+
     public Scalar<N> toScalar(final long row, final long col) {
         if (row > col) {
             return this.factory().scalar().zero();
@@ -72,15 +81,6 @@ final class UpperTriangularStore<N extends Number> extends ShadingStore<N> {
         } else {
             return this.getBase().toScalar(row, col);
         }
-    }
-
-    public int firstInRow(final int row) {
-        return row;
-    }
-
-    @Override
-    public int limitOfColumn(final int col) {
-        return col + 1;
     }
 
 }

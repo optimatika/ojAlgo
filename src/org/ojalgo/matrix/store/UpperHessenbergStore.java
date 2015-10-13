@@ -33,16 +33,16 @@ import org.ojalgo.scalar.Scalar;
  */
 final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
 
-    UpperHessenbergStore(final MatrixStore<N> base) {
-        super((int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns(), base);
-    }
-
     @SuppressWarnings("unused")
     private UpperHessenbergStore(final int aRowDim, final int aColDim, final MatrixStore<N> base) {
 
         this(base);
 
         ProgrammingError.throwForIllegalInvocation();
+    }
+
+    UpperHessenbergStore(final MatrixStore<N> base) {
+        super((int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns(), base);
     }
 
     public double doubleValue(final long row, final long col) {

@@ -54,11 +54,6 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public PhysicalStore<N> copy() {
-        return this.factory().makeZero(this.getRowDim(), this.getColDim());
-    }
-
-    @Override
     public double doubleValue(final long anInd) {
         return PrimitiveMath.ZERO;
     }
@@ -95,11 +90,6 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public ZeroStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
-        return new ZeroStore<N>(this.factory(), (int) (leftMtrx.count() / this.getRowDim()), this.getColDim());
-    }
-
-    @Override
     public MatrixStore<N> scale(final N scalar) {
         return this;
     }
@@ -111,6 +101,10 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
     @Override
     public MatrixStore<N> transpose() {
         return new ZeroStore<N>(this.factory(), this.getColDim(), this.getRowDim());
+    }
+
+    @Override
+    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
     }
 
 }

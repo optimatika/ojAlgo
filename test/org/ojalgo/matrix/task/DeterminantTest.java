@@ -108,7 +108,7 @@ public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
 
         final MatrixStore<Double> tmpVal = this.makeFull(dim);
 
-        return tmpVal.multiplyLeft(tmpVal.transpose());
+        return tmpVal.transpose().multiply(tmpVal);
     }
 
 }

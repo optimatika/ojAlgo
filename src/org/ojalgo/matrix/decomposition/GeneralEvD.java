@@ -183,7 +183,7 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
             }
         }
 
-        return tmpMtrx.multiplyLeft(tmpV);
+        return tmpV.multiply(tmpMtrx);
     }
 
     @Override

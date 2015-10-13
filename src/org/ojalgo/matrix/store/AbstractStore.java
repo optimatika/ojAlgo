@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store;
 import java.io.Serializable;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -68,8 +67,13 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return new MatrixStore.Builder<N>(this);
     }
 
-    public PhysicalStore<N> copy() {
-        return this.factory().copy(this);
+    public final PhysicalStore<N> copy() {
+
+        final PhysicalStore<N> retVal = this.factory().makeZero(this.countRows(), this.countColumns());
+
+        this.supplyNonZerosTo(retVal);
+
+        return retVal;
     }
 
     public long count() {
@@ -122,16 +126,9 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return myColDim;
     }
 
-    public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
-
-        final int tmpRowDim = (int) (leftMtrx.count() / this.countRows());
-        final int tmpColDim = this.getColDim();
-
-        final PhysicalStore<N> retVal = this.factory().makeZero(tmpRowDim, tmpColDim);
-
-        retVal.fillByMultiplying(leftMtrx, this);
-
-        return retVal;
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        consumer.fillAll(this.factory().scalar().zero().getNumber());
+        this.supplyNonZerosTo(consumer);
     }
 
     @Override
@@ -192,6 +189,8 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
     protected final int getRowDim() {
         return myRowDim;
     }
+
+    protected abstract void supplyNonZerosTo(final ElementsConsumer<N> consumer);
 
     final Class<?> getComponentType() {
         if (myComponentType == null) {

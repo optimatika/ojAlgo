@@ -162,7 +162,7 @@ public final class GaussianField<K extends Comparable<K>> {
                 }
             }
 
-            tmpCovariances.fillMatching(tmpD.multiplyLeft(tmpV).multiply(tmpV.builder().transpose().build()));
+            tmpCovariances.fillMatching(tmpV.multiply(tmpD).multiply(tmpV.builder().transpose().build()));
         }
 
         return new Normal1D(tmpLocations, tmpCovariances);

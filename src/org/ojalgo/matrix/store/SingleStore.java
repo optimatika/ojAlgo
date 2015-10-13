@@ -51,16 +51,6 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public PhysicalStore<N> copy() {
-
-        final PhysicalStore<N> retVal = this.factory().makeZero(1, 1);
-
-        retVal.set(0, 0, myNumber);
-
-        return retVal;
-    }
-
-    @Override
     public double doubleValue(final long anInd) {
         return myValue;
     }
@@ -89,18 +79,8 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
-
-        final int tmpRowDim = (int) (leftMtrx.count() / this.getRowDim());
-        final int tmpColDim = this.getColDim();
-
-        final PhysicalStore.Factory<N, ?> tmpFactory = this.factory();
-
-        final PhysicalStore<N> retVal = tmpFactory.makeZero(tmpRowDim, tmpColDim);
-
-        retVal.fillMatching(tmpFactory.function().multiply().second(myNumber), leftMtrx);
-
-        return retVal;
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        this.supplyNonZerosTo(consumer);
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
@@ -110,6 +90,11 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
     @Override
     public MatrixStore<N> transpose() {
         return this;
+    }
+
+    @Override
+    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+        consumer.fillOne(0L, 0L, myNumber);
     }
 
 }

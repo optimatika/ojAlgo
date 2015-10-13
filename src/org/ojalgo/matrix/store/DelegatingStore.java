@@ -48,7 +48,7 @@ abstract class DelegatingStore<N extends Number> extends LogicalStore<N> {
         }
 
         public MatrixStore<N> call() throws Exception {
-            return myThisStore.multiplyLeft(myLeftStore);
+            return ((MatrixStore<N>) myLeftStore).multiply(myThisStore);
         }
 
     }
@@ -79,6 +79,11 @@ abstract class DelegatingStore<N extends Number> extends LogicalStore<N> {
 
     protected DelegatingStore(final int rowsCount, final int columnsCount, final MatrixStore<N> base) {
         super(base, rowsCount, columnsCount);
+    }
+
+    @Override
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        this.supplyNonZerosTo(consumer);
     }
 
     protected final Future<MatrixStore<N>> executeMultiplyLeftOnBase(final Access1D<N> left) {

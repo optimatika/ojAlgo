@@ -48,8 +48,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
      */
     public void testP20090923() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
+        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
         final SingularValue<Double> tmpSVD = SingularValue.makePrimitive();
         tmpSVD.decompose(tmpA);
@@ -81,10 +81,10 @@ public class DecompositionProblems extends MatrixDecompositionTests {
      */
     public void testP20091012fixed() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] {
-                { 1.5686711899234411, 5.857030526629094, 2.1798778832593637, 1.4901137152515287, 5.640993583029061 },
-                { 4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545 },
-                { 1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233 } });
+        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 1.5686711899234411, 5.857030526629094, 2.1798778832593637, 1.4901137152515287, 5.640993583029061 },
+                        { 4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545 },
+                        { 1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233 } });
 
         final QR<Double> tmpQR = QR.makePrimitive();
         tmpQR.decompose(tmpA);
@@ -94,8 +94,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
     public void testP20100512a() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 },
-                { 0.9544, 0.0782, 0.1140 } });
+        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
 
         final Eigenvalue<Double> tmpPrimitive = Eigenvalue.makePrimitive();
         tmpPrimitive.decompose(tmpA);
@@ -105,8 +105,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
     public void testP20100512b() {
 
-        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 },
-                { 0.9544, 0.0782, 0.1140 } });
+        final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
 
         final Eigenvalue<Double> tmpPrimitive = Eigenvalue.makePrimitive();
         tmpPrimitive.compute(tmpA, false);
@@ -157,14 +157,16 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         MatrixStore<Double> tmpActual = tmpTestDecomp.getInverse();
 
         TestUtils.assertEquals(tmpExpected, tmpActual, tmpEqualsNumberContext);
-        TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyLeft(tmpActual), tmpEqualsNumberContext);
+        final MatrixStore<Double> left = tmpActual;
+        TestUtils.assertEquals(tmpIdentity, left.multiply(tmpRandom), tmpEqualsNumberContext);
         TestUtils.assertEquals(tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
 
         tmpTestDecomp.decompose(tmpRandom);
         tmpActual = tmpTestDecomp.getInverse();
 
         TestUtils.assertEquals(tmpExpected, tmpActual, tmpEqualsNumberContext);
-        TestUtils.assertEquals(tmpIdentity, tmpRandom.multiplyLeft(tmpActual), tmpEqualsNumberContext);
+        final MatrixStore<Double> left1 = tmpActual;
+        TestUtils.assertEquals(tmpIdentity, left1.multiply(tmpRandom), tmpEqualsNumberContext);
         TestUtils.assertEquals(tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
     }
 
@@ -184,14 +186,10 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.makeComplex(), Cholesky.makeComplex(),
                 Eigenvalue.makeComplex()/*
                                          * , HessenbergDecomposition. makeComplex()
-                                         */, LU.makeComplex(), QR.makeComplex(), SingularValue.makeComplex() /*
-                                                                                                              * ,
-                                                                                                              * TridiagonalDecomposition
-                                                                                                              * .
-                                                                                                              * makeComplex
-                                                                                                              * (
-                                                                                                              * )
-                                                                                                              */};
+                                         */, LU.makeComplex(), QR.makeComplex(),
+                SingularValue.makeComplex() /*
+                                             * , TridiagonalDecomposition . makeComplex ( )
+                                             */ };
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.decompose(tmpHermitian);
@@ -223,15 +221,10 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         MatrixStore<ComplexNumber> tmpActual;
 
         @SuppressWarnings("unchecked")
-        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.makeComplex()/*
-                                                                                                                          * ,
-                                                                                                                          * LUDecomposition
-                                                                                                                          * .
-                                                                                                                          * makeComplex
-                                                                                                                          * (
-                                                                                                                          * )
-                                                                                                                          */, QR.makeComplex(),
-                SingularValue.makeComplex() };
+        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] {
+                Bidiagonal.makeComplex()/*
+                                         * , LUDecomposition . makeComplex ( )
+                                         */, QR.makeComplex(), SingularValue.makeComplex() };
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.decompose(tmpTall);

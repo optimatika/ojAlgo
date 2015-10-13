@@ -84,7 +84,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpTranspA = aMtrxA.transpose();
         final MatrixStore<Double> tmpLeftA = aMtrxA.multiply(tmpTranspA);
-        final MatrixStore<Double> tmpRightA = aMtrxA.multiplyLeft(tmpTranspA);
+        final MatrixStore<Double> tmpRightA = tmpTranspA.multiply(aMtrxA);
 
         final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.makePrimitive();
 

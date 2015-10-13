@@ -52,4 +52,14 @@ final class WrapperStore<N extends Number> extends FactoryStore<N> {
         return this.factory().scalar().cast(myAccess.get(aRow, aCol));
     }
 
+    @Override
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        this.supplyNonZerosTo(consumer);
+    }
+
+    @Override
+    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+        consumer.fillMatching(myAccess);
+    }
+
 }

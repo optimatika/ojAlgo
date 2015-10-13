@@ -26,11 +26,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.ojalgo.FunctionalityTest;
 import org.ojalgo.TestUtils;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * MatrixDecompositionPackageTests

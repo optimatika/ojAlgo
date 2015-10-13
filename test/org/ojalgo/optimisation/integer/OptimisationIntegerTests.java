@@ -12,10 +12,10 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import org.ojalgo.FunctionalityTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
-import org.ojalgo.FunctionalityTest;
 
 /**
  * OptimisationIntegerPackageTests

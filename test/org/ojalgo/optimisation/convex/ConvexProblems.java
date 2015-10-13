@@ -69,7 +69,7 @@ public class ConvexProblems extends OptimisationConvexTests {
     static void builAndTestModel(final PrimitiveDenseStore[] matrices, final PrimitiveDenseStore expectedSolution, final NumberContext modelValidationContext,
             final boolean testSolverDirectly) {
 
-        final MatrixStore<Double> tmpPartQ = matrices[2].multiply(expectedSolution).multiplyLeft(expectedSolution.transpose());
+        final MatrixStore<Double> tmpPartQ = expectedSolution.transpose().multiply(matrices[2].multiply(expectedSolution));
         final MatrixStore<Double> tmpPartC = matrices[3].transpose().multiply(expectedSolution);
 
         final double tmpExpectedValue = tmpPartQ.multiply(HALF.doubleValue()).subtract(tmpPartC).doubleValue(0);

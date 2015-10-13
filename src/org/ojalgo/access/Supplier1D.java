@@ -24,7 +24,7 @@ package org.ojalgo.access;
 import java.util.function.Supplier;
 
 /**
- * You can query the structure before getting.
+ * You can query the size/count before getting.
  *
  * @author apete
  */

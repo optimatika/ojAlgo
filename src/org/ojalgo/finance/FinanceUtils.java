@@ -340,7 +340,7 @@ public abstract class FinanceUtils {
             final MatrixStore<Double> tmpMiddle = tmpD;
             final MatrixStore<Double> tmpRight = tmpLeft.transpose();
 
-            tmpCovariances = tmpMiddle.multiplyLeft(tmpLeft).multiply(tmpRight);
+            tmpCovariances = tmpLeft.multiply(tmpMiddle).multiply(tmpRight);
         }
 
         final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.getBuilder(tmpSize, tmpSize);

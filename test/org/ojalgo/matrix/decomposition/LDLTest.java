@@ -44,7 +44,7 @@ public class LDLTest extends MatrixDecompositionTests {
         final RawStore tmpL = new RawStore(new double[][] { { 1, 0, 0 }, { 3, 1, 0 }, { -4, 5, 1 } });
         final RawStore tmpD = new RawStore(new double[][] { { 4, 0, 0 }, { 0, 1, 0 }, { 0, 0, 9 } });
 
-        final RawStore tmpReconstructed = tmpD.multiply(tmpL.transpose()).multiplyLeft(tmpL);
+        final RawStore tmpReconstructed = (RawStore) tmpL.multiply(tmpD.multiply(tmpL.transpose()));
         TestUtils.assertEquals(tmpA, tmpReconstructed);
 
         final RawLDL tmpRawLDL = new RawLDL();

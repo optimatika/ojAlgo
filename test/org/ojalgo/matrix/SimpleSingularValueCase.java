@@ -67,8 +67,7 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
 
         final PhysicalStore<Double> tmpExp = SimpleSingularValueCase.getOriginal().toPrimitiveStore()
                 .multiply(SimpleSingularValueCase.getMatrixQ2().toPrimitiveStore()).copy();
-        final PhysicalStore<Double> tmpAct = SimpleSingularValueCase.getMatrixD().toPrimitiveStore()
-                .multiplyLeft(SimpleSingularValueCase.getMatrixQ1().toPrimitiveStore()).copy();
+        final PhysicalStore<Double> tmpAct = SimpleSingularValueCase.getMatrixQ1().toPrimitiveStore().multiply(SimpleSingularValueCase.getMatrixD().toPrimitiveStore()).copy();
 
         TestUtils.assertEquals(tmpExp, tmpAct, EVALUATION);
     }

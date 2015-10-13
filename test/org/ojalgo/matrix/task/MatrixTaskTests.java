@@ -24,11 +24,11 @@ package org.ojalgo.matrix.task;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.ojalgo.FunctionalityTest;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * MatrixDecompositionPackageTests

@@ -888,16 +888,11 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         final ComplexDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
-        retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
-
-        return retVal;
-    }
-
-    public MatrixStore<ComplexNumber> multiplyLeft(final Access1D<ComplexNumber> left) {
-
-        final ComplexDenseStore retVal = FACTORY.makeZero(left.count() / myRowDim, myColDim);
-
-        retVal.multiplyLeft.invoke(retVal.data, left, myRowDim, data);
+        if (right instanceof ComplexDenseStore) {
+            retVal.multiplyLeft.invoke(retVal.data, this, myColDim, ((ComplexDenseStore) right).data);
+        } else {
+            retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
+        }
 
         return retVal;
     }
@@ -911,19 +906,19 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
                 rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
     }
 
-    public final MatrixStore.ElementsConsumer<ComplexNumber> regionByColumns(final int... columns) {
+    public final ElementsConsumer<ComplexNumber> regionByColumns(final int... columns) {
         return new ColumnsRegion<ComplexNumber>(this, multiplyBoth, columns);
     }
 
-    public final MatrixStore.ElementsConsumer<ComplexNumber> regionByLimits(final int rowLimit, final int columnLimit) {
+    public final ElementsConsumer<ComplexNumber> regionByLimits(final int rowLimit, final int columnLimit) {
         return new LimitRegion<ComplexNumber>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
-    public final MatrixStore.ElementsConsumer<ComplexNumber> regionByOffsets(final int rowOffset, final int columnOffset) {
+    public final ElementsConsumer<ComplexNumber> regionByOffsets(final int rowOffset, final int columnOffset) {
         return new OffsetRegion<ComplexNumber>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
-    public final MatrixStore.ElementsConsumer<ComplexNumber> regionByRows(final int... rows) {
+    public final ElementsConsumer<ComplexNumber> regionByRows(final int... rows) {
         return new RowsRegion<ComplexNumber>(this, multiplyBoth, rows);
     }
 
@@ -990,6 +985,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
             SubstituteForwards.invoke(data, tmpRowDim, 0, tmpColDim, body, unitDiagonal, conjugated, identity);
         }
+    }
+
+    public void supplyTo(final ElementsConsumer<ComplexNumber> consumer) {
+        consumer.fillMatching(this);
     }
 
     public Scalar<ComplexNumber> toScalar(final long row, final long column) {

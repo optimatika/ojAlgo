@@ -40,6 +40,14 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
     private final MatrixStore<N> myBelow;
     private final int mySplit;
 
+    @SuppressWarnings("unused")
+    private AboveBelowStore(final MatrixStore<N> base) {
+
+        this(base, null);
+
+        ProgrammingError.throwForIllegalInvocation();
+    }
+
     AboveBelowStore(final MatrixStore<N> base, final MatrixStore<N> below) {
 
         super((int) (base.countRows() + below.countRows()), (int) base.countColumns(), base);
@@ -50,14 +58,6 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
         if (base.countColumns() != below.countColumns()) {
             throw new IllegalArgumentException();
         }
-    }
-
-    @SuppressWarnings("unused")
-    private AboveBelowStore(final MatrixStore<N> base) {
-
-        this(base, null);
-
-        ProgrammingError.throwForIllegalInvocation();
     }
 
     /**
@@ -105,6 +105,12 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
 
     public Scalar<N> toScalar(final long row, final long column) {
         return (row >= mySplit) ? myBelow.toScalar(row - mySplit, column) : this.getBase().toScalar(row, column);
+    }
+
+    @Override
+    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+        consumer.regionByLimits(mySplit, this.getColDim()).fillMatching(this.getBase());
+        consumer.regionByOffsets(mySplit, 0).fillMatching(myBelow);
     }
 
 }

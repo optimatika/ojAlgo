@@ -21,10 +21,10 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.ojalgo.FunctionalityTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
-import org.ojalgo.FunctionalityTest;
 
 public abstract class MatrixStoreTests extends FunctionalityTest {
 

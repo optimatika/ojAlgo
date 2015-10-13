@@ -22,8 +22,8 @@
 package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -50,7 +50,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private int myConstraintToInclude = -1;
     private final PrimitiveDenseStore myIterationX;
 
-    MatrixStore<Double> tmpInvQC;
+    MatrixStore<Double> myInvQC;
 
     ActiveSetSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
@@ -59,6 +59,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         myActivator = new IndexSelector(this.countInequalityConstraints());
 
         myIterationX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
+
     }
 
     private boolean checkFeasibility(final boolean onlyExcluded) {
@@ -263,8 +264,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 for (int i = 0; i < tmpLinearBE.countRows(); i++) {
                     if (tmpLinearBE.doubleValue(i) < 0.0) {
-                        tmpLinearAE.modifyRow(i, 0, PrimitiveFunction.NEGATE);
-                        tmpLinearBE.modifyRow(i, 0, PrimitiveFunction.NEGATE);
+                        tmpLinearAE.modifyRow(i, 0, NEGATE);
+                        tmpLinearBE.modifyRow(i, 0, NEGATE);
                     }
                 }
 
@@ -314,7 +315,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.debug("Redundant contraints!");
             }
 
-            tmpInvQC = myCholesky.solve(this.getIterationC());
+            myInvQC = myCholesky.solve(this.getIterationC());
 
         } else {
 
@@ -436,8 +437,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
                     // TODO B is zero
-                    myLU.solve(tmpInvQC.multiplyLeft(tmpIterA).subtract(tmpIterB), tmpIterL);
-                    myCholesky.solve(tmpIterC.subtract(tmpIterL.multiplyLeft(tmpIterA.transpose())), tmpIterX);
+                    myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
+                    //myLU.solve(myInvQC.multiplyLeft(tmpIterA).andThenOnMatching(SUBTRACT, tmpIterB).get(), tmpIterL);
+                    myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
                 }
             }
         }
@@ -460,7 +462,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         if (tmpSolvable) {
             // Subproblem solved successfully
 
-            tmpIterX.fillMatching(tmpIterX, PrimitiveFunction.SUBTRACT, this.getX());
+            tmpIterX.fillMatching(tmpIterX, SUBTRACT, this.getX());
 
             if (this.isDebug()) {
                 this.debug("Current: {}", this.getX().asList());
@@ -480,7 +482,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     final MatrixStore<Double> tmpNumer = this.getSI(tmpExcluded);
                     final MatrixStore<Double> tmpDenom = this.getAI().builder().row(tmpExcluded).build().multiply(tmpIterX);
                     final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
-                    tmpStepLengths.fillMatching(tmpStepLengths, PrimitiveFunction.DIVIDE, tmpDenom);
+                    tmpStepLengths.fillMatching(tmpStepLengths, DIVIDE, tmpDenom);
 
                     if (this.isDebug()) {
                         this.debug("Looking for the largest possible step length (smallest positive scalar) among these: {}).", tmpStepLengths.asList());

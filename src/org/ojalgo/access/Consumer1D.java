@@ -24,10 +24,14 @@ package org.ojalgo.access;
 import java.util.function.Consumer;
 
 /**
- * You can query the structure before accepting.
+ * You can query the size/count before accepting.
  *
  * @author apete
  */
 public interface Consumer1D<I extends Access1D<?>> extends Structure1D, Consumer<I> {
+
+    default boolean isAcceptable(final Supplier1D<? extends I> supplier) {
+        return this.count() >= supplier.count();
+    }
 
 }

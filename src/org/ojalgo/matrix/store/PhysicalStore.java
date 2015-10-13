@@ -27,7 +27,9 @@ import java.util.List;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -46,14 +48,14 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixStore.ElementsConsumer<N> {
+public interface PhysicalStore<N extends Number> extends MatrixStore<N>, ElementsConsumer<N> {
 
     public static final class ColumnsRegion<N extends Number> extends ConsumerRegion<N> {
 
-        private final MatrixStore.ElementsConsumer<N> myBase;
+        private final ElementsConsumer<N> myBase;
         private final int[] myColumns;
 
-        ColumnsRegion(final MatrixStore.ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int... columns) {
+        ColumnsRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int... columns) {
             super(multiplier);
             myBase = base;
             myColumns = columns;
@@ -113,7 +115,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     }
 
-    abstract static class ConsumerRegion<N extends Number> implements MatrixStore.ElementsConsumer<N> {
+    abstract static class ConsumerRegion<N extends Number> implements ElementsConsumer<N> {
 
         private final FillByMultiplying<N> myMultiplier;
 
@@ -133,19 +135,35 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
             myMultiplier.invoke(this, left, (int) (left.count() / this.countRows()), right);
         }
 
-        public final MatrixStore.ElementsConsumer<N> regionByColumns(final int... columns) {
+        public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
+            // TODO very inefficient implemention - must invent something better
+            final long tmpLimit = FunctionUtils.min(left.count(), this.count());
+            for (long i = 0; i < tmpLimit; i++) {
+                this.modifyOne(i, function.first(left.get(i)));
+            }
+        }
+
+        public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
+            // TODO very inefficient implemention - must invent something better
+            final long tmpLimit = FunctionUtils.min(this.count(), right.count());
+            for (long i = 0; i < tmpLimit; i++) {
+                this.modifyOne(i, function.second(right.get(i)));
+            }
+        }
+
+        public final ElementsConsumer<N> regionByColumns(final int... columns) {
             return new ColumnsRegion<N>(this, myMultiplier, columns);
         }
 
-        public final MatrixStore.ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
+        public final ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
             return new LimitRegion<N>(this, myMultiplier, rowLimit, columnLimit);
         }
 
-        public final MatrixStore.ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
+        public final ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
             return new OffsetRegion<N>(this, myMultiplier, rowOffset, columnOffset);
         }
 
-        public final MatrixStore.ElementsConsumer<N> regionByRows(final int... rows) {
+        public final ElementsConsumer<N> regionByRows(final int... rows) {
             return new RowsRegion<N>(this, myMultiplier, rows);
         }
 
@@ -177,16 +195,16 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     public static interface FillByMultiplying<N extends Number> {
 
-        void invoke(MatrixStore.ElementsConsumer<N> product, Access1D<N> left, int complexity, Access1D<N> right);
+        void invoke(ElementsConsumer<N> product, Access1D<N> left, int complexity, Access1D<N> right);
 
     }
 
     public static final class LimitRegion<N extends Number> extends ConsumerRegion<N> {
 
-        private final MatrixStore.ElementsConsumer<N> myBase;
+        private final ElementsConsumer<N> myBase;
         private final int myRowLimit, myColumnLimit; // limits
 
-        LimitRegion(final MatrixStore.ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int rowLimit, final int columnLimit) {
+        LimitRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int rowLimit, final int columnLimit) {
             super(multiplier);
             myBase = base;
             myRowLimit = rowLimit;
@@ -233,10 +251,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     public static final class OffsetRegion<N extends Number> extends ConsumerRegion<N> {
 
-        private final MatrixStore.ElementsConsumer<N> myBase;
+        private final ElementsConsumer<N> myBase;
         private final int myRowOffset, myColumnOffset; // origin/offset
 
-        OffsetRegion(final MatrixStore.ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int rowOffset, final int columnOffset) {
+        OffsetRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int rowOffset, final int columnOffset) {
             super(multiplier);
             myBase = base;
             myRowOffset = rowOffset;
@@ -341,10 +359,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     public static final class RowsRegion<N extends Number> extends ConsumerRegion<N> {
 
-        private final MatrixStore.ElementsConsumer<N> myBase;
+        private final ElementsConsumer<N> myBase;
         private final int[] myRows;
 
-        RowsRegion(final MatrixStore.ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int... rows) {
+        RowsRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int... rows) {
             super(multiplier);
             myBase = base;
             myRows = rows;
@@ -451,7 +469,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, MatrixS
 
     /**
      * <p>
-     * As in {@link MatrixStore#multiplyLeft(Access1D)} where the left/parameter matrix is a plane rotation.
+     * As in {@link MatrixStore#multiplyLeft(MatrixStore)} where the left/parameter matrix is a plane rotation.
      * </p>
      * <p>
      * Multiplying by a plane rotation from the left means that [this] gets two of its rows updated to new

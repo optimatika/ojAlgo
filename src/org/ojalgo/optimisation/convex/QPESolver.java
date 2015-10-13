@@ -122,15 +122,15 @@ final class QPESolver extends ConstrainedSolver {
             // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
 
             // Negated Schur complement
-            final MatrixStore<Double> tmpS = tmpInvQAT.multiplyLeft(tmpIterA);
+            final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
             // TODO Symmetric, only need to calculate halv the Schur complement
             if (tmpSolvable = myLU.compute(tmpS)) {
 
                 // tmpX temporarely used to store tmpInvQC
                 final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpIterC, tmpIterX); //TODO Constant if C doesn't change
 
-                myLU.solve(tmpInvQC.multiplyLeft(tmpIterA).subtract(tmpIterB), tmpIterL);
-                myCholesky.solve(tmpIterC.subtract(tmpIterL.multiplyLeft(tmpIterA.transpose())), tmpIterX);
+                myLU.solve(tmpIterA.multiply(tmpInvQC).subtract(tmpIterB), tmpIterL);
+                myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
             }
 
         }

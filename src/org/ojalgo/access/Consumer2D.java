@@ -24,7 +24,7 @@ package org.ojalgo.access;
 import java.util.function.Consumer;
 
 /**
- * You can query the shape/structure before accepting.
+ * You can query the size/shape before accepting.
  *
  * @author apete
  */

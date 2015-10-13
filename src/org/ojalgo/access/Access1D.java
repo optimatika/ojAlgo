@@ -151,6 +151,14 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
         void modifyAll(UnaryFunction<N> function);
 
+        void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function);
+
+        void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right);
+
+        // void modifyOneMatching(long index, final Access1D<N> left, final BinaryFunction<N> function);
+
+        // void modifyOneMatching(long index, final BinaryFunction<N> function, final Access1D<N> right);
+
         void modifyOne(long index, UnaryFunction<N> function);
 
         void modifyRange(long first, long limit, UnaryFunction<N> function);

@@ -96,7 +96,7 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
 
         Scalar<N> retVal = this.getScalarConstant();
 
-        retVal = retVal.add(myFactors.multiply(arg).multiplyLeft(arg).get(0, 0));
+        retVal = retVal.add(myFactors.multiply(arg).multiplyLeft(arg).get().get(0, 0));
 
         return retVal.getNumber();
     }
