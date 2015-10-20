@@ -770,6 +770,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Big) destination);
     }
 
+    public final MatrixStore<BigDecimal> get() {
+        return this;
+    }
+
     public BigDecimal get(final long aRow, final long aCol) {
         return myUtility.get(aRow, aCol);
     }

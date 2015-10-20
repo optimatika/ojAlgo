@@ -31,6 +31,7 @@ import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
@@ -162,9 +163,9 @@ public class QRTest extends MatrixDecompositionTests {
         final QR<ComplexNumber> tmpComplexDecomp = QR.makeComplex();
         final QR<Double> tmpPrimitiveDecomp = QR.makePrimitive();
 
-        tmpBigDecomp.decompose(tmpOriginal);
-        tmpComplexDecomp.decompose(tmpOriginal);
-        tmpPrimitiveDecomp.decompose(tmpOriginal);
+        tmpBigDecomp.decompose(tmpOriginal.toBigStore());
+        tmpComplexDecomp.decompose(tmpOriginal.toComplexStore());
+        tmpPrimitiveDecomp.decompose(tmpOriginal.toPrimitiveStore());
 
         final MatrixStore<BigDecimal> tmpBigQ = tmpBigDecomp.getQ();
         final MatrixStore<ComplexNumber> tmpComplexQ = tmpComplexDecomp.getQ();
@@ -187,12 +188,8 @@ public class QRTest extends MatrixDecompositionTests {
         }
 
         TestUtils.assertEquals(tmpOriginal.toBigStore(), tmpBigDecomp, new NumberContext(7, 14));
-        ;
         TestUtils.assertEquals(tmpOriginal.toComplexStore(), tmpComplexDecomp, new NumberContext(7, 14));
-        ;
         TestUtils.assertEquals(tmpOriginal.toPrimitiveStore(), tmpPrimitiveDecomp, new NumberContext(7, 14));
-        ;
-
     }
 
     public void testLeastSquaresInvert() {
@@ -208,14 +205,22 @@ public class QRTest extends MatrixDecompositionTests {
         final DecompositionStore<Double> tmpDenseAlloc = tmpDenseQR.preallocate(tmpA);
         final DecompositionStore<Double> tmpRawAlloc = tmpRawQR.preallocate(tmpA);
 
-        final MatrixStore<Double> tmpDenseInv = tmpDenseQR.invert(tmpA, tmpDenseAlloc);
-        final MatrixStore<Double> tmpRawInv = tmpRawQR.invert(tmpA, tmpRawAlloc);
+        MatrixStore<Double> tmpDenseInv;
+        try {
+            tmpDenseInv = tmpDenseQR.invert(tmpA, tmpDenseAlloc);
+            final MatrixStore<Double> tmpRawInv = tmpRawQR.invert(tmpA, tmpRawAlloc);
 
-        TestUtils.assertEquals(tmpDenseInv, tmpRawInv);
+            TestUtils.assertEquals(tmpDenseInv, tmpRawInv);
 
-        final MatrixStore<Double> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get();
-        TestUtils.assertEquals(tmpIdentity, tmpDenseInv.multiply(tmpA));
-        TestUtils.assertEquals(tmpIdentity, tmpRawInv.multiply(tmpA));
+            final MatrixStore<Double> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get();
+            TestUtils.assertEquals(tmpIdentity, tmpDenseInv.multiply(tmpA));
+            TestUtils.assertEquals(tmpIdentity, tmpRawInv.multiply(tmpA));
+
+        } catch (final TaskException anException) {
+            anException.printStackTrace();
+            TestUtils.fail(anException.toString());
+        }
+
     }
 
 }

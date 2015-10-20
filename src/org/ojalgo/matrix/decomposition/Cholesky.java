@@ -91,8 +91,6 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
      */
     public boolean isSPD();
 
-    boolean compute(final Access2D<?> matrix, final boolean checkHermitian);
-
     /**
      * Must implement either {@link #getL()} or {@link #getR()}.
      */

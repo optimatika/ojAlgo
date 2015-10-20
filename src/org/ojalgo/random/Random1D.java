@@ -42,7 +42,7 @@ public class Random1D {
         super();
 
         final Cholesky<Double> tmpCholesky = Cholesky.makePrimitive();
-        tmpCholesky.decompose(aCorrelationsMatrix);
+        tmpCholesky.decompose(MatrixStore.PRIMITIVE.makeWrapper(aCorrelationsMatrix));
         myCholeskiedCorrelations = tmpCholesky.getL();
 
         tmpCholesky.reset();

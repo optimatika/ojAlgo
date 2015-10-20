@@ -102,6 +102,10 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         }
     }
 
+    public final MatrixStore<N> get() {
+        return this;
+    }
+
     @Override
     public final int hashCode() {
         return MatrixUtils.hashCode(this);

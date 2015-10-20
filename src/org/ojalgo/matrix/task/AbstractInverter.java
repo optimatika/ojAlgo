@@ -24,6 +24,7 @@ package org.ojalgo.matrix.task;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -32,7 +33,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_1X1 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
             AbstractInverter.full1X1(original, preallocated);
             return preallocated;
         }
@@ -46,7 +47,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_2X2 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
             AbstractInverter.full2X2(original, preallocated);
             return preallocated;
         }
@@ -60,7 +61,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_3X3 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
             AbstractInverter.full3X3(original, preallocated);
             return preallocated;
         }
@@ -74,7 +75,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_4X4 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
             AbstractInverter.full4X4(original, preallocated);
             return preallocated;
         }
@@ -88,7 +89,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_5X5 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
             AbstractInverter.full5X5(original, preallocated);
             return preallocated;
         }
@@ -102,7 +103,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_2X2 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
             AbstractInverter.symmetric2X2(original, preallocated);
             return preallocated;
         }
@@ -116,7 +117,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_3X3 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
             AbstractInverter.symmetric3X3(original, preallocated);
             return preallocated;
         }
@@ -130,7 +131,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_4X4 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
             AbstractInverter.symmetric4X4(original, preallocated);
             return preallocated;
         }
@@ -144,7 +145,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_5X5 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
             AbstractInverter.symmetric5X5(original, preallocated);
             return preallocated;
         }
@@ -315,60 +316,60 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         final double tmp34 = source.doubleValue(23L);
         final double tmp44 = source.doubleValue(24L);
 
-        final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23, tmp33, tmp43, tmp14,
-                tmp24, tmp34, tmp44);
-        final double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23, tmp33, tmp43, tmp04,
-                tmp24, tmp34, tmp44);
-        final double tmpMin20 = AbstractDeterminator.calculate(tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13, tmp33, tmp43, tmp04,
-                tmp14, tmp34, tmp44);
-        final double tmpMin30 = AbstractDeterminator.calculate(tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13, tmp23, tmp43, tmp04,
-                tmp14, tmp24, tmp44);
-        final double tmpMin40 = AbstractDeterminator.calculate(tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13, tmp23, tmp33, tmp04,
-                tmp14, tmp24, tmp34);
+        final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
+                tmp34, tmp44);
+        final double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23, tmp33, tmp43, tmp04, tmp24,
+                tmp34, tmp44);
+        final double tmpMin20 = AbstractDeterminator.calculate(tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13, tmp33, tmp43, tmp04, tmp14,
+                tmp34, tmp44);
+        final double tmpMin30 = AbstractDeterminator.calculate(tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13, tmp23, tmp43, tmp04, tmp14,
+                tmp24, tmp44);
+        final double tmpMin40 = AbstractDeterminator.calculate(tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13, tmp23, tmp33, tmp04, tmp14,
+                tmp24, tmp34);
 
-        final double tmpMin01 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23, tmp33, tmp43, tmp14,
-                tmp24, tmp34, tmp44);
-        final double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23, tmp33, tmp43, tmp04,
-                tmp24, tmp34, tmp44);
-        final double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13, tmp33, tmp43, tmp04,
-                tmp14, tmp34, tmp44);
-        final double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13, tmp23, tmp43, tmp04,
-                tmp14, tmp24, tmp44);
-        final double tmpMin41 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13, tmp23, tmp33, tmp04,
-                tmp14, tmp24, tmp34);
+        final double tmpMin01 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
+                tmp34, tmp44);
+        final double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23, tmp33, tmp43, tmp04, tmp24,
+                tmp34, tmp44);
+        final double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13, tmp33, tmp43, tmp04, tmp14,
+                tmp34, tmp44);
+        final double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13, tmp23, tmp43, tmp04, tmp14,
+                tmp24, tmp44);
+        final double tmpMin41 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13, tmp23, tmp33, tmp04, tmp14,
+                tmp24, tmp34);
 
-        final double tmpMin02 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp13, tmp23, tmp33, tmp43, tmp14,
-                tmp24, tmp34, tmp44);
-        final double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp03, tmp23, tmp33, tmp43, tmp04,
-                tmp24, tmp34, tmp44);
-        final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp03, tmp13, tmp33, tmp43, tmp04,
-                tmp14, tmp34, tmp44);
-        final double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp03, tmp13, tmp23, tmp43, tmp04,
-                tmp14, tmp24, tmp44);
-        final double tmpMin42 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp03, tmp13, tmp23, tmp33, tmp04,
-                tmp14, tmp24, tmp34);
+        final double tmpMin02 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
+                tmp34, tmp44);
+        final double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp03, tmp23, tmp33, tmp43, tmp04, tmp24,
+                tmp34, tmp44);
+        final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp03, tmp13, tmp33, tmp43, tmp04, tmp14,
+                tmp34, tmp44);
+        final double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp03, tmp13, tmp23, tmp43, tmp04, tmp14,
+                tmp24, tmp44);
+        final double tmpMin42 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp03, tmp13, tmp23, tmp33, tmp04, tmp14,
+                tmp24, tmp34);
 
-        final double tmpMin03 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp14,
-                tmp24, tmp34, tmp44);
-        final double tmpMin13 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp04,
-                tmp24, tmp34, tmp44);
-        final double tmpMin23 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp04,
-                tmp14, tmp34, tmp44);
-        final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp04,
-                tmp14, tmp24, tmp44);
-        final double tmpMin43 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp04,
-                tmp14, tmp24, tmp34);
+        final double tmpMin03 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp14, tmp24,
+                tmp34, tmp44);
+        final double tmpMin13 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp04, tmp24,
+                tmp34, tmp44);
+        final double tmpMin23 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp04, tmp14,
+                tmp34, tmp44);
+        final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp04, tmp14,
+                tmp24, tmp44);
+        final double tmpMin43 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp04, tmp14,
+                tmp24, tmp34);
 
-        final double tmpMin04 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp13,
-                tmp23, tmp33, tmp43);
-        final double tmpMin14 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp03,
-                tmp23, tmp33, tmp43);
-        final double tmpMin24 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp03,
-                tmp13, tmp33, tmp43);
-        final double tmpMin34 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp03,
-                tmp13, tmp23, tmp43);
-        final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03,
-                tmp13, tmp23, tmp33);
+        final double tmpMin04 = AbstractDeterminator.calculate(tmp10, tmp20, tmp30, tmp40, tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23,
+                tmp33, tmp43);
+        final double tmpMin14 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp01, tmp21, tmp31, tmp41, tmp02, tmp22, tmp32, tmp42, tmp03, tmp23,
+                tmp33, tmp43);
+        final double tmpMin24 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp01, tmp11, tmp31, tmp41, tmp02, tmp12, tmp32, tmp42, tmp03, tmp13,
+                tmp33, tmp43);
+        final double tmpMin34 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp01, tmp11, tmp21, tmp41, tmp02, tmp12, tmp22, tmp42, tmp03, tmp13,
+                tmp23, tmp43);
+        final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13,
+                tmp23, tmp33);
 
         final double tmpDet = ((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30)) + (tmp40 * tmpMin40);
 
@@ -529,40 +530,40 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
         final double tmp44 = source.doubleValue(24L);
 
-        final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp21, tmp22, tmp32, tmp42, tmp31, tmp32, tmp33, tmp43, tmp41,
-                tmp42, tmp43, tmp44);
-        final double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp31, tmp41, tmp20, tmp22, tmp32, tmp42, tmp30, tmp32, tmp33, tmp43, tmp40,
-                tmp42, tmp43, tmp44);
-        final double tmpMin20 = AbstractDeterminator.calculate(tmp10, tmp11, tmp31, tmp41, tmp20, tmp21, tmp32, tmp42, tmp30, tmp31, tmp33, tmp43, tmp40,
-                tmp41, tmp43, tmp44);
-        final double tmpMin30 = AbstractDeterminator.calculate(tmp10, tmp11, tmp21, tmp41, tmp20, tmp21, tmp22, tmp42, tmp30, tmp31, tmp32, tmp43, tmp40,
-                tmp41, tmp42, tmp44);
-        final double tmpMin40 = AbstractDeterminator.calculate(tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31, tmp32, tmp33, tmp40,
-                tmp41, tmp42, tmp43);
+        final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp21, tmp22, tmp32, tmp42, tmp31, tmp32, tmp33, tmp43, tmp41, tmp42,
+                tmp43, tmp44);
+        final double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp31, tmp41, tmp20, tmp22, tmp32, tmp42, tmp30, tmp32, tmp33, tmp43, tmp40, tmp42,
+                tmp43, tmp44);
+        final double tmpMin20 = AbstractDeterminator.calculate(tmp10, tmp11, tmp31, tmp41, tmp20, tmp21, tmp32, tmp42, tmp30, tmp31, tmp33, tmp43, tmp40, tmp41,
+                tmp43, tmp44);
+        final double tmpMin30 = AbstractDeterminator.calculate(tmp10, tmp11, tmp21, tmp41, tmp20, tmp21, tmp22, tmp42, tmp30, tmp31, tmp32, tmp43, tmp40, tmp41,
+                tmp42, tmp44);
+        final double tmpMin40 = AbstractDeterminator.calculate(tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41,
+                tmp42, tmp43);
 
-        final double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp20, tmp22, tmp32, tmp42, tmp30, tmp32, tmp33, tmp43, tmp40,
-                tmp42, tmp43, tmp44);
-        final double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp20, tmp21, tmp32, tmp42, tmp30, tmp31, tmp33, tmp43, tmp40,
-                tmp41, tmp43, tmp44);
-        final double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp20, tmp21, tmp22, tmp42, tmp30, tmp31, tmp32, tmp43, tmp40,
-                tmp41, tmp42, tmp44);
-        final double tmpMin41 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31, tmp32, tmp33, tmp40,
-                tmp41, tmp42, tmp43);
+        final double tmpMin11 = AbstractDeterminator.calculate(tmp00, tmp20, tmp30, tmp40, tmp20, tmp22, tmp32, tmp42, tmp30, tmp32, tmp33, tmp43, tmp40, tmp42,
+                tmp43, tmp44);
+        final double tmpMin21 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp20, tmp21, tmp32, tmp42, tmp30, tmp31, tmp33, tmp43, tmp40, tmp41,
+                tmp43, tmp44);
+        final double tmpMin31 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp20, tmp21, tmp22, tmp42, tmp30, tmp31, tmp32, tmp43, tmp40, tmp41,
+                tmp42, tmp44);
+        final double tmpMin41 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41,
+                tmp42, tmp43);
 
-        final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp10, tmp11, tmp31, tmp41, tmp30, tmp31, tmp33, tmp43, tmp40,
-                tmp41, tmp43, tmp44);
-        final double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp10, tmp11, tmp21, tmp41, tmp30, tmp31, tmp32, tmp43, tmp40,
-                tmp41, tmp42, tmp44);
-        final double tmpMin42 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp30, tmp31, tmp32, tmp33, tmp40,
-                tmp41, tmp42, tmp43);
+        final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp40, tmp10, tmp11, tmp31, tmp41, tmp30, tmp31, tmp33, tmp43, tmp40, tmp41,
+                tmp43, tmp44);
+        final double tmpMin32 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp10, tmp11, tmp21, tmp41, tmp30, tmp31, tmp32, tmp43, tmp40, tmp41,
+                tmp42, tmp44);
+        final double tmpMin42 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41,
+                tmp42, tmp43);
 
-        final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp10, tmp11, tmp21, tmp41, tmp20, tmp21, tmp22, tmp42, tmp40,
-                tmp41, tmp42, tmp44);
-        final double tmpMin43 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp40,
-                tmp41, tmp42, tmp43);
+        final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp40, tmp10, tmp11, tmp21, tmp41, tmp20, tmp21, tmp22, tmp42, tmp40, tmp41,
+                tmp42, tmp44);
+        final double tmpMin43 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp40, tmp41,
+                tmp42, tmp43);
 
-        final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30,
-                tmp31, tmp32, tmp33);
+        final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31,
+                tmp32, tmp33);
 
         final double tmpDet = ((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30)) + (tmp40 * tmpMin40);
 
@@ -601,11 +602,11 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         super();
     }
 
-    public final MatrixStore<Double> invert(final MatrixStore<Double> original) throws TaskException {
+    public final MatrixStore<Double> invert(final Access2D<?> original) throws TaskException {
         return this.invert(original, PrimitiveDenseStore.FACTORY.makeZero(this.dim(), this.dim()));
     }
 
-    public final DecompositionStore<Double> preallocate(final Access2D<Double> template) {
+    public final DecompositionStore<Double> preallocate(final Structure2D template) {
         return PrimitiveDenseStore.FACTORY.makeZero(this.dim(), this.dim());
     }
 

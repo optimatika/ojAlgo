@@ -136,7 +136,8 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final SingularValue<?>[] getSingularValueAll() {
-        return new SingularValue<?>[] { new SVDold30.Big(), new SVDold30.Complex(), new SVDold30.Primitive(), new SVDnew32.Primitive(), new RawSingularValue() };
+        return new SingularValue<?>[] { new SVDold30.Big(), new SVDold30.Complex(), new SVDold30.Primitive(), new SVDnew32.Primitive(),
+                new RawSingularValue() };
     }
 
     @SuppressWarnings("unchecked")

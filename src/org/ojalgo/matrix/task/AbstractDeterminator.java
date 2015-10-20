@@ -22,16 +22,12 @@
 package org.ojalgo.matrix.task;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.decomposition.LU;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.random.Uniform;
 
 abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
     static final DeterminantTask<Double> FULL_1X1 = new AbstractDeterminator() {
 
-        public Double calculateDeterminant(final Access2D<Double> matrix) {
+        public Double calculateDeterminant(final Access2D<?> matrix) {
             return matrix.doubleValue(0L);
         }
 
@@ -39,7 +35,7 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
     static final DeterminantTask<Double> FULL_2X2 = new AbstractDeterminator() {
 
-        public Double calculateDeterminant(final Access2D<Double> matrix) {
+        public Double calculateDeterminant(final Access2D<?> matrix) {
 
             final double tmp00 = matrix.doubleValue(0L);
             final double tmp10 = matrix.doubleValue(1L);
@@ -54,7 +50,7 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
     static final DeterminantTask<Double> FULL_3X3 = new AbstractDeterminator() {
 
-        public Double calculateDeterminant(final Access2D<Double> matrix) {
+        public Double calculateDeterminant(final Access2D<?> matrix) {
 
             final double tmp00 = matrix.doubleValue(0L);
             final double tmp10 = matrix.doubleValue(1L);
@@ -75,7 +71,7 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
     static final DeterminantTask<Double> FULL_4X4 = new AbstractDeterminator() {
 
-        public Double calculateDeterminant(final Access2D<Double> matrix) {
+        public Double calculateDeterminant(final Access2D<?> matrix) {
 
             final double tmp00 = matrix.doubleValue(0L);
             final double tmp10 = matrix.doubleValue(1L);
@@ -105,7 +101,7 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
     static final DeterminantTask<Double> FULL_5X5 = new AbstractDeterminator() {
 
-        public Double calculateDeterminant(final Access2D<Double> matrix) {
+        public Double calculateDeterminant(final Access2D<?> matrix) {
 
             final double tmp00 = matrix.doubleValue(0L);
             final double tmp10 = matrix.doubleValue(1L);
@@ -145,7 +141,7 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
     static final DeterminantTask<Double> SYMMETRIC_2X2 = new AbstractDeterminator() {
 
-        public Double calculateDeterminant(final Access2D<Double> matrix) {
+        public Double calculateDeterminant(final Access2D<?> matrix) {
 
             final double tmp00 = matrix.doubleValue(0L);
             final double tmp10 = matrix.doubleValue(1L);
@@ -159,7 +155,7 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
     static final DeterminantTask<Double> SYMMETRIC_3X3 = new AbstractDeterminator() {
 
-        public Double calculateDeterminant(final Access2D<Double> matrix) {
+        public Double calculateDeterminant(final Access2D<?> matrix) {
 
             final double tmp00 = matrix.doubleValue(0L);
             final double tmp10 = matrix.doubleValue(1L);
@@ -177,7 +173,7 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
     static final DeterminantTask<Double> SYMMETRIC_4X4 = new AbstractDeterminator() {
 
-        public Double calculateDeterminant(final Access2D<Double> matrix) {
+        public Double calculateDeterminant(final Access2D<?> matrix) {
 
             final double tmp00 = matrix.doubleValue(0L);
             final double tmp10 = matrix.doubleValue(1L);
@@ -201,7 +197,7 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
 
     static final DeterminantTask<Double> SYMMETRIC_5X5 = new AbstractDeterminator() {
 
-        public Double calculateDeterminant(final Access2D<Double> matrix) {
+        public Double calculateDeterminant(final Access2D<?> matrix) {
 
             final double tmp00 = matrix.doubleValue(0L);
             final double tmp10 = matrix.doubleValue(1L);
@@ -228,39 +224,6 @@ abstract class AbstractDeterminator implements DeterminantTask<Double> {
         }
 
     };
-
-    public static void main(final String... args) {
-
-        final int tmpRows = 2;
-        final PrimitiveDenseStore tmpSource = PrimitiveDenseStore.FACTORY.makeFilled(tmpRows, tmpRows, new Uniform());
-        final PrimitiveDenseStore tmpDestination = PrimitiveDenseStore.FACTORY.makeZero(tmpRows, tmpRows);
-
-        final long unwBefore = System.nanoTime();
-        final int tmpI = 10000000;
-        for (int l = 0; l < tmpI; l++) {
-            AbstractInverter.full2X2(tmpSource, tmpDestination);
-        }
-        final long tmpUnwrapped = System.nanoTime() - unwBefore;
-
-        BasicLogger.debug("Unwrapped", tmpDestination);
-
-        final LU<Double> tmpLU = LU.makePrimitive();
-
-        final long luBefore = System.nanoTime();
-        for (int l = 0; l < tmpI; l++) {
-
-            tmpLU.invert(tmpSource, tmpDestination);
-
-        }
-        final long tmpLUt = System.nanoTime() - luBefore;
-
-        BasicLogger.debug("LU", tmpDestination);
-
-        BasicLogger.debug("LU: {}", tmpLUt);
-        BasicLogger.debug("UNW: {}", tmpUnwrapped);
-        BasicLogger.debug("Improvement: {}", ((double) tmpLUt) / ((double) tmpUnwrapped));
-
-    }
 
     static double calculate(final double a00, final double a10, final double a01, final double a11) {
         return (a00 * a11) - (a10 * a01);

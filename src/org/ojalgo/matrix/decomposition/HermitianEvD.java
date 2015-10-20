@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
@@ -33,6 +32,7 @@ import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -242,10 +242,6 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         myTridiagonal = aTridiagonal;
     }
 
-    public final boolean compute(final Access2D<?> matrix, final boolean eigenvaluesOnly) {
-        return this.compute(matrix, true, eigenvaluesOnly);
-    }
-
     public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
         return MatrixUtils.equals(aStore, this, context);
     }
@@ -349,12 +345,12 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
     }
 
     @Override
-    protected final boolean doNonsymmetric(final Access2D<?> aMtrx, final boolean eigenvaluesOnly) {
+    protected final boolean doNonsymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    protected final boolean doSymmetric(final Access2D<?> aMtrx, final boolean eigenvaluesOnly) {
+    protected final boolean doSymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly) {
 
         final int tmpDim = (int) aMtrx.countRows();
 

@@ -733,7 +733,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public double doubleValue(final long row, final long column) {
-        return this.get((int) row, (int) column);
+        return data[(int) row][(int) column];
     }
 
     public boolean equals(final MatrixStore<Double> other, final NumberContext context) {
@@ -796,110 +796,89 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public void fillMatching(final Access1D<?> source) {
 
-        final double[][] tmpDelegateArray = data;
+        double[] tmpRowI;
 
         final int tmpRowDim = data.length;
-
         for (int i = 0; i < tmpRowDim; i++) {
+
+            tmpRowI = data[i];
+
             for (int j = 0; j < myNumberOfColumns; j++) {
-                tmpDelegateArray[i][j] = source.doubleValue(i + (j * tmpRowDim));
+                tmpRowI[j] = source.doubleValue(i + (j * tmpRowDim));
             }
         }
     }
 
-    public void fillMatching(final Access1D<Double> leftArg, final BinaryFunction<Double> function, final Access1D<Double> rightArg) {
-        if (leftArg == this) {
+    public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
+        if (left == this) {
+            final double[][] tmpRight = RawStore.convert(right, data.length).data;
             if (function == ADD) {
-                final RawStore B = RawStore.convert(rightArg, data.length);
-                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
-                    throw new IllegalArgumentException("RawStore dimensions must agree.");
-                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
-                        data[i][j] = data[i][j] + B.data[i][j];
+                        data[i][j] = data[i][j] + tmpRight[i][j];
                     }
                 }
             } else if (function == DIVIDE) {
-                final RawStore B = RawStore.convert(rightArg, data.length);
-                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
-                    throw new IllegalArgumentException("RawStore dimensions must agree.");
-                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
-                        data[i][j] = data[i][j] / B.data[i][j];
+                        data[i][j] = data[i][j] / tmpRight[i][j];
                     }
                 }
             } else if (function == MULTIPLY) {
-                final RawStore B = RawStore.convert(rightArg, data.length);
-                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
-                    throw new IllegalArgumentException("RawStore dimensions must agree.");
-                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
-                        data[i][j] = data[i][j] * B.data[i][j];
+                        data[i][j] = data[i][j] * tmpRight[i][j];
                     }
                 }
             } else if (function == SUBTRACT) {
-                final RawStore B = RawStore.convert(rightArg, data.length);
-                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
-                    throw new IllegalArgumentException("RawStore dimensions must agree.");
-                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
-                        data[i][j] = data[i][j] - B.data[i][j];
+                        data[i][j] = data[i][j] - tmpRight[i][j];
                     }
                 }
             } else {
-                ArrayUtils.fillMatching(data, data, function, RawStore.convert(rightArg, data.length).data);
+                ArrayUtils.fillMatching(data, data, function, tmpRight);
             }
-        } else if (rightArg == this) {
+        } else if (right == this) {
+            final double[][] tmpLeft = RawStore.convert(left, data.length).data;
             if (function == ADD) {
-                final RawStore B = RawStore.convert(leftArg, data.length);
-                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
-                    throw new IllegalArgumentException("RawStore dimensions must agree.");
-                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
-                        data[i][j] = data[i][j] + B.data[i][j];
+                        data[i][j] = tmpLeft[i][j] + data[i][j];
                     }
                 }
             } else if (function == DIVIDE) {
-                final RawStore B = RawStore.convert(leftArg, data.length);
-                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
-                    throw new IllegalArgumentException("RawStore dimensions must agree.");
-                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
-                        data[i][j] = B.data[i][j] / data[i][j];
+                        data[i][j] = tmpLeft[i][j] / data[i][j];
                     }
-
                 }
             } else if (function == MULTIPLY) {
-                final RawStore B = RawStore.convert(leftArg, data.length);
-                if ((B.data.length != data.length) || (B.myNumberOfColumns != myNumberOfColumns)) {
-                    throw new IllegalArgumentException("RawStore dimensions must agree.");
-                }
                 for (int i = 0; i < data.length; i++) {
                     for (int j = 0; j < myNumberOfColumns; j++) {
-                        data[i][j] = data[i][j] * B.data[i][j];
+                        data[i][j] = tmpLeft[i][j] * data[i][j];
                     }
                 }
             } else if (function == SUBTRACT) {
-                ArrayUtils.fillMatching(data, RawStore.convert(leftArg, data.length).data, function, data);
+                for (int i = 0; i < data.length; i++) {
+                    for (int j = 0; j < myNumberOfColumns; j++) {
+                        data[i][j] = tmpLeft[i][j] - data[i][j];
+                    }
+                }
             } else {
-                ArrayUtils.fillMatching(data, RawStore.convert(leftArg, data.length).data, function, data);
+                ArrayUtils.fillMatching(data, tmpLeft, function, data);
             }
         } else {
-            ArrayUtils.fillMatching(data, RawStore.convert(leftArg, data.length).data, function, RawStore.convert(rightArg, data.length).data);
+            ArrayUtils.fillMatching(data, RawStore.convert(left, data.length).data, function, RawStore.convert(right, data.length).data);
         }
     }
 
-    public void fillMatching(final Access1D<Double> aLeftArg, final BinaryFunction<Double> function, final Double aRightArg) {
-        ArrayUtils.fillMatching(data, RawStore.convert(aLeftArg, data.length).data, function, aRightArg);
+    public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
+        ArrayUtils.fillMatching(data, RawStore.convert(left, data.length).data, function, right);
     }
 
-    public void fillMatching(final Double aLeftArg, final BinaryFunction<Double> function, final Access1D<Double> aRightArg) {
-        ArrayUtils.fillMatching(data, aLeftArg, function, RawStore.convert(aRightArg, data.length).data);
+    public void fillMatching(final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
+        ArrayUtils.fillMatching(data, left, function, RawStore.convert(right, data.length).data);
     }
 
     public void fillOne(final long row, final long column, final Double value) {
@@ -924,6 +903,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public void fillRow(final long row, final long column, final NullaryFunction<Double> supplier) {
         ArrayUtils.fillRow(data, (int) row, (int) column, supplier);
+    }
+
+    public final MatrixStore<Double> get() {
+        return this;
     }
 
     public Double get(final long row, final long column) {
@@ -1040,19 +1023,31 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public void modifyMatching(final Access1D<Double> left, final BinaryFunction<Double> function) {
-        long tmpIndex = 0L;
-        for (int j = 0; j < myNumberOfColumns; j++) {
-            for (int i = 0; i < data.length; i++) {
-                data[i][j] = function.invoke(left.doubleValue(tmpIndex++), data[i][j]);
+
+        double[] tmpRowI;
+
+        final int tmpRowDim = data.length;
+        for (int i = 0; i < tmpRowDim; i++) {
+
+            tmpRowI = data[i];
+
+            for (int j = 0; j < myNumberOfColumns; j++) {
+                tmpRowI[j] = function.invoke(left.doubleValue(i + (j * tmpRowDim)), tmpRowI[j]);
             }
         }
     }
 
     public void modifyMatching(final BinaryFunction<Double> function, final Access1D<Double> right) {
-        long tmpIndex = 0L;
-        for (int j = 0; j < myNumberOfColumns; j++) {
-            for (int i = 0; i < data.length; i++) {
-                data[i][j] = function.invoke(data[i][j], right.doubleValue(tmpIndex++));
+
+        double[] tmpRowI;
+
+        final int tmpRowDim = data.length;
+        for (int i = 0; i < tmpRowDim; i++) {
+
+            tmpRowI = data[i];
+
+            for (int j = 0; j < myNumberOfColumns; j++) {
+                tmpRowI[j] = function.invoke(tmpRowI[j], right.doubleValue(i + (j * tmpRowDim)));
             }
         }
     }

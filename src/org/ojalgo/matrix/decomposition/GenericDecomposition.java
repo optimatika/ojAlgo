@@ -63,12 +63,12 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         }
     }
 
-    protected final DecompositionStore<N> copy(final Access2D<?> source) {
-        return myFactory.copy(source);
-    }
-
     protected final AggregatorSet<N> aggregator() {
         return myFactory.aggregator();
+    }
+
+    protected final DecompositionStore<N> copy(final Access2D<?> source) {
+        return myFactory.copy(source);
     }
 
     protected final FunctionSet<N> function() {

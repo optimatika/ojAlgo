@@ -27,11 +27,12 @@ import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
 
-class TridiagonalAltDecomp extends InPlaceDecomposition<Double>implements Tridiagonal<Double> {
+class TridiagonalAltDecomp extends InPlaceDecomposition<Double> implements Tridiagonal<Double> {
 
     BasicArray<Double> myMain;
     BasicArray<Double> myOff;
@@ -40,7 +41,7 @@ class TridiagonalAltDecomp extends InPlaceDecomposition<Double>implements Tridia
         super(PrimitiveDenseStore.FACTORY);
     }
 
-    public boolean decompose(final Access2D<?> matrix) {
+    public boolean decompose(final ElementsSupplier<Double> matrix) {
 
         this.setInPlace(matrix);
 

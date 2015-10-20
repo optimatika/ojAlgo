@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.Builder;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -39,11 +40,27 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         super();
     }
 
-    public boolean decompose(final Access2D<?> matrix) {
+    public Double calculateDeterminant(final Access2D<?> matrix) {
 
-        this.reset();
+        final double[][] retVal = this.reset(matrix, false);
 
-        final double[][] tmpData = this.setRawInPlace(matrix, false);
+        this.doDecompose(retVal, matrix);
+
+        return this.getDeterminant();
+    }
+
+    public boolean decompose(final ElementsSupplier<Double> matrix) {
+
+        final double[][] retVal = this.reset(matrix, false);
+
+        final RawStore tmpRawInPlaceStore = this.getRawInPlaceStore();
+
+        matrix.supplyTo(tmpRawInPlaceStore);
+
+        return this.doDecompose(retVal, tmpRawInPlaceStore);
+    }
+
+    boolean doDecompose(final double[][] data, final Access2D<?> input) {
 
         final int tmpDiagDim = this.getRowDim();
         mySPD = (this.getColDim() == tmpDiagDim);
@@ -53,23 +70,18 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
 
         // Main loop.
         for (int ij = 0; ij < tmpDiagDim; ij++) { // For each row/column, along the diagonal
-            tmpRowI = tmpData[ij];
+            tmpRowI = data[ij];
 
             for (int j = 0; j < ij; j++) {
-                tmpRowIJ[j] = tmpRowI[j] * tmpData[j][j];
+                tmpRowIJ[j] = tmpRowI[j] * data[j][j];
             }
-            final double[] array1 = tmpRowI;
-            final int count = ij;
-
-            final double tmpD = tmpRowI[ij] = matrix.doubleValue(ij, ij) - DotProduct.invoke(array1, 0, tmpRowIJ, 0, 0, count);
+            final double tmpD = tmpRowI[ij] = input.doubleValue(ij, ij) - DotProduct.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij);
             mySPD &= (tmpD > ZERO);
 
             for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
-                tmpRowI = tmpData[i];
-                final double[] array11 = tmpRowI;
-                final int count1 = ij;
+                tmpRowI = data[i];
 
-                tmpRowI[ij] = (matrix.doubleValue(i, ij) - DotProduct.invoke(array11, 0, tmpRowIJ, 0, 0, count1)) / tmpD;
+                tmpRowI[ij] = (input.doubleValue(i, ij) - DotProduct.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij)) / tmpD;
             }
         }
 
@@ -103,6 +115,16 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return 0;
     }
 
+    @Override
+    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+
+        final double[][] retVal = this.reset(original, false);
+
+        this.doDecompose(retVal, original);
+
+        return this.getInverse(preallocated);
+    }
+
     public boolean isSolvable() {
         return this.isComputed() && this.isSquareAndNotSingular();
     }
@@ -117,7 +139,26 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     }
 
     @Override
-    protected MatrixStore<Double> getInverse(final PrimitiveDenseStore preallocated) {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
+
+        final double[][] retVal = this.reset(body, false);
+
+        this.doDecompose(retVal, body);
+
+        return this.solve(rhs, preallocated);
+    }
+
+    @Override
+    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+    }
+
+    public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+    }
+
+    @Override
+    protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
 
         preallocated.fillAll(ZERO);
         preallocated.fillDiagonal(0L, 0L, ONE);
@@ -135,10 +176,9 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return preallocated;
     }
 
-    @Override
-    protected MatrixStore<Double> solve(final Access2D<Double> rhs, final PrimitiveDenseStore preallocated) {
+    MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final PrimitiveDenseStore preallocated) {
 
-        preallocated.fillMatching(rhs);
+        rhs.supplyTo(preallocated);
 
         final RawStore tmpBody = this.getRawInPlaceStore();
 
@@ -151,16 +191,6 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         preallocated.substituteBackwards(tmpBody, true, true, false);
 
         return preallocated;
-    }
-
-    /**
-     * Doesn't copy anything. Tha input original matrix is copied while computing the decomposition.
-     *
-     * @see org.ojalgo.matrix.decomposition.RawDecomposition#copy(org.ojalgo.access.Access2D, int, int,
-     *      double[][])
-     */
-    @Override
-    void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
     }
 
 }

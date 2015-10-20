@@ -30,14 +30,16 @@ import org.ojalgo.array.Array2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.MatrixStore.Builder;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N>implements Tridiagonal<N> {
+abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
 
     static final class Big extends TridiagonalDecomposition<BigDecimal> {
 
@@ -108,7 +110,7 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
         super(aFactory);
     }
 
-    public final boolean decompose(final Access2D<?> matrix) {
+    public final boolean decompose(final ElementsSupplier<N> matrix) {
 
         this.reset();
 
@@ -118,7 +120,7 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
 
             final int tmpRowDim = (int) matrix.countRows(); // Which is also the col-dim.
 
-            final Access2D<N> aTriangularMtrx = this.wrap(matrix).triangular(false, false).build();
+            final Builder<N> aTriangularMtrx = matrix.get().builder().triangular(false, false);
 
             final DecompositionStore<N> tmpInPlace = this.setInPlace(aTriangularMtrx);
 

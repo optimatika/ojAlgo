@@ -25,8 +25,8 @@ import org.ojalgo.function.BinaryFunction;
 
 final class BinaryOperatorSupplier<N extends Number> extends ContextSupplier<N> {
 
-    private final MatrixStore<N> myLeft;
     private final BinaryFunction<N> myFunction;
+    private final MatrixStore<N> myLeft;
     private final MatrixStore<N> myRight;
 
     private BinaryOperatorSupplier(final MatrixStore<N> context) {

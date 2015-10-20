@@ -101,13 +101,6 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, Ma
     }
 
     /**
-     * @param matrix A matrix to decompose
-     * @param eigenvaluesOnly No need to calculate eigenvectors
-     * @return true/false if the computation succeeded or not
-     */
-    boolean compute(Access2D<?> matrix, boolean eigenvaluesOnly);
-
-    /**
      * The only requirements on [D] are that it should contain the eigenvalues and that [A][V] = [V][D]. The
      * ordering of the eigenvalues is not specified.
      * <ul>
@@ -127,7 +120,7 @@ public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, Ma
      * expressed as complex numbers when [A] is not symmetric.
      * </p>
      * <p>
-     * The eigenvalues in this array should be ordered in descending order - largest (modulus) first.
+     * The eigenvalues in this array should always be ordered in descending order - largest (modulus) first.
      * </p>
      *
      * @return The eigenvalues in an ordered array.

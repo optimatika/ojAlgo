@@ -24,6 +24,7 @@ package org.ojalgo.matrix.task;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -111,7 +112,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
      *
      * @see BasicMatrix#invert()
      */
-    default MatrixStore<N> invert(final MatrixStore<N> original) throws TaskException {
+    default MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
         return this.invert(original, this.preallocate(original));
     }
 
@@ -121,21 +122,21 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
      * specified by this interface. It must be documented for each implementation.
      * </p>
      * <p>
-     * Should produce the same results as calling {@link #invert(MatrixStore)}.
+     * Should produce the same results as calling {@link #invert(Access2D)}.
      * </p>
      *
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
      *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
      * @return The inverse
      */
-    MatrixStore<N> invert(MatrixStore<N> original, DecompositionStore<N> preallocated) throws TaskException;
+    MatrixStore<N> invert(Access2D<?> original, DecompositionStore<N> preallocated) throws TaskException;
 
     /**
      * Will create a {@linkplain DecompositionStore} instance suitable for use with
-     * {@link #invert(MatrixStore, DecompositionStore)}. When solving an equation system [A][X]=[B]
+     * {@link #invert(Access2D, DecompositionStore)}. When solving an equation system [A][X]=[B]
      * ([mxn][nxb]=[mxb]) the preallocated memory/matrix will typically be either mxb or nxb (if A is square
      * then there is no doubt).
      */
-    DecompositionStore<N> preallocate(Access2D<N> template);
+    DecompositionStore<N> preallocate(Structure2D template);
 
 }

@@ -22,9 +22,11 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.array.ArrayUtils;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.MatrixStore.Builder;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 
@@ -35,12 +37,8 @@ import org.ojalgo.matrix.store.RawStore;
  */
 abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
-    protected static RawStore cast(final Access2D<?> access) {
-        if (access instanceof RawStore) {
-            return ((RawStore) access);
-        } else {
-            return new RawStore(ArrayUtils.toRawCopyOf(access));
-        }
+    protected static Builder<Double> wrap(final Access2D<?> access) {
+        return MatrixStore.PRIMITIVE.makeWrapper(access);
     }
 
     private int myColDim;
@@ -53,55 +51,55 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     public MatrixStore<Double> getInverse() {
-        return this.getInverse(this.preallocate(this.getColDim(), this.getColDim()));
+        return this.doGetInverse(this.preallocate(this.getColDim(), this.getColDim()));
     }
 
     public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
-        return this.getInverse((PrimitiveDenseStore) preallocated);
+        return this.doGetInverse((PrimitiveDenseStore) preallocated);
     }
 
-    public final MatrixStore<Double> invert(final MatrixStore<Double> original) {
-        this.decompose(original);
-        return this.getInverse();
+    public final MatrixStore<Double> invert(final Access2D<?> original) {
+        return this.invert(original, this.preallocate(original));
     }
 
-    public final MatrixStore<Double> invert(final MatrixStore<Double> original, final DecompositionStore<Double> preallocated) {
-        this.decompose(original);
-        return this.getInverse(preallocated);
-    }
+    public abstract MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated);
 
-    public DecompositionStore<Double> preallocate(final Access2D<Double> template) {
+    public DecompositionStore<Double> preallocate(final Structure2D template) {
         final long tmpCountRows = template.countRows();
         return this.preallocate(tmpCountRows, tmpCountRows);
     }
 
-    public DecompositionStore<Double> preallocate(final Access2D<Double> templateBody, final Access2D<Double> templateRHS) {
+    public DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 
-    public final MatrixStore<Double> solve(final Access2D<Double> rhs) {
+    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs) {
+        return this.solve(body, rhs, this.preallocate(body, rhs));
+    }
+
+    public abstract MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated);
+
+    public final MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
         return this.solve(rhs, this.preallocate(this.getRawInPlaceStore(), rhs));
     }
 
-    public final MatrixStore<Double> solve(final Access2D<Double> body, final Access2D<Double> rhs) {
-        this.decompose(body);
-        return this.solve(rhs);
+    public abstract MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated);
+
+    protected final boolean checkSymmetry() {
+        boolean retVal = myRowDim == myColDim;
+        for (int i = 0; retVal && (i < myRowDim); i++) {
+            for (int j = 0; retVal && (j < i); j++) {
+                retVal &= (myRawInPlaceData[i][j] == myRawInPlaceData[j][i]);
+            }
+        }
+        return retVal;
     }
 
-    public final MatrixStore<Double> solve(final Access2D<Double> body, final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
-        this.decompose(body);
-        return this.solve(rhs, preallocated);
-    }
-
-    public final MatrixStore<Double> solve(final Access2D<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.solve(rhs, (PrimitiveDenseStore) preallocated);
-    }
+    protected abstract MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated);
 
     protected final int getColDim() {
         return myColDim;
     }
-
-    protected abstract MatrixStore<Double> getInverse(final PrimitiveDenseStore preallocated);
 
     protected final int getMaxDim() {
         return Math.max(myRowDim, myColDim);
@@ -123,48 +121,40 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return myRowDim;
     }
 
-    protected RawStore makeEyeStore(final int aRowDim, final int aColDim) {
-        return new RawStore(RawStore.FACTORY.makeEye(aRowDim, aColDim));
-    }
-
     @Override
     protected final PrimitiveDenseStore preallocate(final long numberOfRows, final long numberOfColumns) {
         return PrimitiveDenseStore.FACTORY.makeZero(numberOfRows, numberOfColumns);
     }
-
-    protected final double[][] setRawInPlace(final Access2D<?> matrix, final boolean transpose) {
-
-        final int tmpRowDim = (int) matrix.countRows();
-        final int tmpColDim = (int) matrix.countColumns();
-
-        if ((myRawInPlaceData == null) || (myRowDim != tmpRowDim) || (myColDim != tmpColDim)) {
-
-            myRawInPlaceStore = RawStore.FACTORY.makeZero(transpose ? tmpColDim : tmpRowDim, transpose ? tmpRowDim : tmpColDim);
-            myRawInPlaceData = myRawInPlaceStore.data;
-
-            myRowDim = tmpRowDim;
-            myColDim = tmpColDim;
-        }
-
-        if (transpose) {
-            this.transpose(matrix, tmpRowDim, tmpColDim, myRawInPlaceData);
-        } else {
-            this.copy(matrix, tmpRowDim, tmpColDim, myRawInPlaceData);
-        }
-
-        this.aspectRatioNormal(tmpRowDim >= tmpColDim);
-        this.computed(false);
-
-        return myRawInPlaceData;
-    }
-
-    protected abstract MatrixStore<Double> solve(final Access2D<Double> rhs, final PrimitiveDenseStore preallocated);
 
     /**
      * Possible to override to, possibly, only copy part of the matrix.
      */
     void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
         MatrixUtils.copy(source, rows, columns, destination);
+    }
+
+    final double[][] reset(final Structure2D matrix, final boolean transpose) {
+
+        this.reset();
+
+        final int tmpInputRowDim = (int) matrix.countRows();
+        final int tmpInputColDim = (int) matrix.countColumns();
+
+        final int tmpInPlaceRowDim = transpose ? tmpInputColDim : tmpInputRowDim;
+        final int tmpInPlaceColDim = transpose ? tmpInputRowDim : tmpInputColDim;
+
+        if ((myRawInPlaceData == null) || (myRowDim != tmpInputRowDim) || (myColDim != tmpInputColDim)) {
+
+            myRawInPlaceStore = RawStore.FACTORY.makeZero(tmpInPlaceRowDim, tmpInPlaceColDim);
+            myRawInPlaceData = myRawInPlaceStore.data;
+
+            myRowDim = tmpInputRowDim;
+            myColDim = tmpInputColDim;
+        }
+
+        this.aspectRatioNormal(tmpInputRowDim >= tmpInputColDim);
+
+        return myRawInPlaceData;
     }
 
     /**
@@ -177,16 +167,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
                 tmpColumn[i] = source.doubleValue(i, j);
             }
         }
-    }
-
-    protected final boolean checkSymmetry() {
-        boolean retVal = myRowDim == myColDim;
-        for (int i = 0; retVal && (i < myRowDim); i++) {
-            for (int j = 0; retVal && (j < i); j++) {
-                retVal &= (myRawInPlaceData[i][j] == myRawInPlaceData[j][i]);
-            }
-        }
-        return retVal;
     }
 
 }

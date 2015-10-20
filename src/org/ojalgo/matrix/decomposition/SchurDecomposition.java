@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -74,7 +75,7 @@ abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition
         super(aFactory);
     }
 
-    public boolean decompose(final Access2D<?> matrix) {
+    public boolean decompose(final ElementsSupplier<N> matrix) {
 
         this.reset();
 

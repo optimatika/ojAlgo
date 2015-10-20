@@ -26,12 +26,14 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.Builder;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -39,7 +41,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 
-abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N>implements LDL<N> {
+abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LDL<N> {
 
     static final class Big extends LDLDecomposition<BigDecimal> {
 
@@ -71,7 +73,12 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         super(factory);
     }
 
-    public boolean decompose(final Access2D<?> matrix) {
+    public N calculateDeterminant(final Access2D<?> matrix) {
+        this.decompose(this.wrap(matrix));
+        return this.getDeterminant();
+    }
+
+    public boolean decompose(final ElementsSupplier<N> matrix) {
 
         this.reset();
 
@@ -193,6 +200,16 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return retVal;
     }
 
+    public MatrixStore<N> invert(final Access2D<?> original) {
+        this.decompose(this.wrap(original));
+        return this.getInverse();
+    }
+
+    public MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) {
+        this.decompose(this.wrap(original));
+        return this.getInverse(preallocated);
+    }
+
     public boolean isFullSize() {
         return true;
     }
@@ -213,27 +230,37 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return retVal;
     }
 
-    public DecompositionStore<N> preallocate(final Access2D<N> template) {
+    public DecompositionStore<N> preallocate(final Structure2D template) {
         final long tmpCountRows = template.countRows();
         return this.preallocate(tmpCountRows, tmpCountRows);
     }
 
-    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
+    public DecompositionStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 
-    public final MatrixStore<N> solve(final Access2D<N> rhs) {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) {
+        this.decompose(this.wrap(body));
+        return this.solve(this.wrap(rhs));
+    }
+
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) {
+        this.decompose(this.wrap(body));
+        return this.solve(rhs, preallocated);
+    }
+
+    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
         return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     @Override
-    public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
 
         final int tmpRowDim = this.getRowDim();
         final int[] tmpOrder = myPivot.getOrder();
 
         //        preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), tmpOrder));
-        preallocated.fillMatching(this.wrap(rhs).row(tmpOrder).build());
+        preallocated.fillMatching(rhs.get().builder().row(tmpOrder).get());
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 

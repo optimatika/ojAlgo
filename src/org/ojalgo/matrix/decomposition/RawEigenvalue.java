@@ -29,6 +29,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -58,9 +59,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             super();
         }
 
-        public boolean decompose(final Access2D<?> matrix) {
+        public boolean decompose(final ElementsSupplier<Double> matrix) {
 
-            final double[][] tmpRawInPlaceData = this.setRawInPlace(matrix, false);
+            final Access2D<?> matrix1 = matrix.get();
+            final double[][] retVal = this.reset(matrix1, false);
+
+            if (false) {
+                RawDecomposition.wrap(matrix1).transpose().supplyTo(this.getRawInPlaceStore());
+            } else {
+                this.getRawInPlaceStore().fillMatching(matrix1);
+            }
+            final double[][] tmpRawInPlaceData = retVal;
 
             if (this.checkSymmetry()) {
                 this.decomposeSymmetric(tmpRawInPlaceData);
@@ -83,9 +92,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             super();
         }
 
-        public boolean decompose(final Access2D<?> matrix) {
+        public boolean decompose(final ElementsSupplier<Double> matrix) {
 
-            final double[][] tmpRawInPlaceData = this.setRawInPlace(matrix, false);
+            final Access2D<?> matrix1 = matrix.get();
+            final double[][] retVal = this.reset(matrix1, false);
+
+            if (false) {
+                RawDecomposition.wrap(matrix1).transpose().supplyTo(this.getRawInPlaceStore());
+            } else {
+                this.getRawInPlaceStore().fillMatching(matrix1);
+            }
+            final double[][] tmpRawInPlaceData = retVal;
 
             this.decomposeGeneral(tmpRawInPlaceData);
 
@@ -95,6 +112,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         public boolean isHermitian() {
             return false;
         }
+
     }
 
     static final class Symmetric extends RawEigenvalue {
@@ -103,9 +121,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             super();
         }
 
-        public boolean decompose(final Access2D<?> matrix) {
+        public boolean decompose(final ElementsSupplier<Double> matrix) {
 
-            final double[][] tmpRawInPlaceData = this.setRawInPlace(matrix, false);
+            final Access2D<?> matrix1 = matrix.get();
+            final double[][] retVal = this.reset(matrix1, false);
+
+            if (false) {
+                RawDecomposition.wrap(matrix1).transpose().supplyTo(this.getRawInPlaceStore());
+            } else {
+                this.getRawInPlaceStore().fillMatching(matrix1);
+            }
+            final double[][] tmpRawInPlaceData = retVal;
 
             this.decomposeSymmetric(tmpRawInPlaceData);
 
@@ -155,17 +181,13 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         super();
     }
 
-    public Double calculateDeterminant(final Access2D<Double> matrix) {
-        this.decompose(matrix);
+    public Double calculateDeterminant(final Access2D<?> matrix) {
+        this.decompose(RawDecomposition.wrap(matrix));
         return this.getDeterminant();
     }
 
-    public boolean compute(final Access2D<?> matrix, final boolean eigenvaluesOnly) {
+    public boolean computeValuesOnly(final ElementsSupplier<Double> matrix) {
         return this.decompose(matrix);
-    }
-
-    public boolean computeValuesOnly(final Access2D<?> matrix) {
-        return this.compute(matrix, true);
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
@@ -265,27 +287,48 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return new RawStore(Vt, n, n).transpose();
     }
 
-    public boolean isOrdered() {
-        return !this.isHermitian();
-    }
-
-    public boolean isSolvable() {
-        return this.isComputed() && this.isHermitian();
+    @Override
+    public final MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        this.decompose(RawDecomposition.wrap(original));
+        return this.getInverse(preallocated);
     }
 
     // Symmetric Householder reduction to tridiagonal form.
 
-    public MatrixStore<Double> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+    public boolean isOrdered() {
+        return !this.isHermitian();
     }
 
     // Symmetric tridiagonal QL algorithm.
 
     // Nonsymmetric reduction to Hessenberg form.
 
+    public boolean isSolvable() {
+        return this.isComputed() && this.isHermitian();
+    }
+
+    public MatrixStore<Double> reconstruct() {
+        return MatrixUtils.reconstruct(this);
+    }
+
     @Override
     public void reset() {
         myInverse = null;
+    }
+
+    @Override
+    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
+        this.decompose(RawDecomposition.wrap(body));
+        return this.solve(rhs, preallocated);
+    }
+
+    @Override
+    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return null;
+    }
+
+    public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.solve((Access2D<?>) rhs, preallocated);
     }
 
     /**
@@ -501,8 +544,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     if (m == l) {
                         break;
                     }
-                    if ((Math.abs(H[m][m - 1]) * (Math.abs(q) + Math.abs(r))) < (eps * (Math.abs(p) * (Math.abs(H[m - 1][m - 1]) + Math.abs(z) + Math
-                            .abs(H[m + 1][m + 1]))))) {
+                    if ((Math.abs(H[m][m - 1]) * (Math.abs(q) + Math.abs(r))) < (eps
+                            * (Math.abs(p) * (Math.abs(H[m - 1][m - 1]) + Math.abs(z) + Math.abs(H[m + 1][m + 1]))))) {
                         break;
                     }
                     m--;
@@ -848,6 +891,18 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
+    private void rot1(final double[] tmpVt_i, final double[] tmpVt_i1, final double c, final double s) {
+        double h;
+        for (int k = 0; k < n; k++) {
+            //h = V[k][i + 1];
+            h = tmpVt_i1[k];
+            //V[k][i + 1] = (s * V[k][i]) + (c * h);
+            tmpVt_i1[k] = (s * tmpVt_i[k]) + (c * h);
+            //V[k][i] = (c * V[k][i]) - (s * h);
+            tmpVt_i[k] = (c * tmpVt_i[k]) - (s * h);
+        }
+    }
+
     private void tql2() {
         //  This is derived from the Algol procedures tql2, by
         //  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
@@ -963,26 +1018,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    private void rot1(final double[] tmpVt_i, final double[] tmpVt_i1, final double c, final double s) {
-        double h;
-        for (int k = 0; k < n; k++) {
-            //h = V[k][i + 1];
-            h = tmpVt_i1[k];
-            //V[k][i + 1] = (s * V[k][i]) + (c * h);
-            tmpVt_i1[k] = (s * tmpVt_i[k]) + (c * h);
-            //V[k][i] = (c * V[k][i]) - (s * h);
-            tmpVt_i[k] = (c * tmpVt_i[k]) - (s * h);
-        }
-    }
-
     @Override
-    protected MatrixStore<Double> getInverse(final PrimitiveDenseStore preallocated) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    protected MatrixStore<Double> solve(final Access2D<Double> rhs, final PrimitiveDenseStore preallocated) {
+    protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
         // TODO Auto-generated method stub
         return null;
     }

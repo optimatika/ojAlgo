@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -86,10 +87,11 @@ public interface LU<N extends Number> extends LDU<N> {
     }
 
     /**
-     * The normal {@link #decompose(Access2D)} method must handle cases where pivoting is required. If you
-     * know that pivoting is not needed you may call this method instead - it's faster.
+     * The normal {@link #decompose(ElementsSupplier)} method must handle cases where pivoting is required. If
+     * you know that pivoting is not needed you may call this method instead - it may be faster. Note that the
+     * algorithm implementation may still pivot. Pivoting is optional not forbidden (or required).
      */
-    boolean computeWithoutPivoting(MatrixStore<?> matrix);
+    boolean computeWithoutPivoting(ElementsSupplier<N> matrix);
 
     MatrixStore<N> getL();
 

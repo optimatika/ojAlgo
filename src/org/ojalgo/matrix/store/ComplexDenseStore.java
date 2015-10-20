@@ -789,6 +789,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Complex) destination);
     }
 
+    public final MatrixStore<ComplexNumber> get() {
+        return this;
+    }
+
     public ComplexNumber get(final long aRow, final long aCol) {
         return myUtility.get(aRow, aCol);
     }

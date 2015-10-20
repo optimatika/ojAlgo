@@ -22,9 +22,8 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -40,10 +39,10 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     }
 
+    private boolean myHermitian = false;
     private final EigenvalueDecomposition<N> myNonsymmetricDelegate;
-    private final EigenvalueDecomposition<N> mySymmetricDelegate;
 
-    private boolean mySymmetricOrNot = false;
+    private final EigenvalueDecomposition<N> mySymmetricDelegate;
 
     @SuppressWarnings("unused")
     private DynamicEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
@@ -62,15 +61,8 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
         myNonsymmetricDelegate = aNonsymmetric;
     }
 
-    public final boolean compute(final Access2D<?> matrix, final boolean eigenvaluesOnly) {
-
-        final boolean tmpSymmetric = MatrixUtils.isHermitian(matrix);
-
-        return this.compute(matrix, tmpSymmetric, eigenvaluesOnly);
-    }
-
     public boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        if (mySymmetricOrNot) {
+        if (myHermitian) {
             return mySymmetricDelegate.equals(other, context);
         } else {
             return myNonsymmetricDelegate.equals(other, context);
@@ -79,7 +71,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     @Override
     public N getDeterminant() {
-        if (mySymmetricOrNot) {
+        if (myHermitian) {
             return mySymmetricDelegate.getDeterminant();
         } else {
             return myNonsymmetricDelegate.getDeterminant();
@@ -87,7 +79,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     public MatrixStore<N> getInverse() {
-        if (mySymmetricOrNot) {
+        if (myHermitian) {
             return mySymmetricDelegate.getInverse();
         } else {
             return myNonsymmetricDelegate.getInverse();
@@ -95,7 +87,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
-        if (mySymmetricOrNot) {
+        if (myHermitian) {
             return mySymmetricDelegate.getInverse(preallocated);
         } else {
             return myNonsymmetricDelegate.getInverse(preallocated);
@@ -103,7 +95,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     public ComplexNumber getTrace() {
-        if (mySymmetricOrNot) {
+        if (myHermitian) {
             return mySymmetricDelegate.getTrace();
         } else {
             return myNonsymmetricDelegate.getTrace();
@@ -111,15 +103,11 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     public boolean isHermitian() {
-        if (mySymmetricOrNot) {
-            return mySymmetricDelegate.isHermitian();
-        } else {
-            return myNonsymmetricDelegate.isHermitian();
-        }
+        return myHermitian;
     }
 
     public boolean isOrdered() {
-        if (mySymmetricOrNot) {
+        if (myHermitian) {
             return mySymmetricDelegate.isOrdered();
         } else {
             return myNonsymmetricDelegate.isOrdered();
@@ -127,7 +115,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     public boolean isSolvable() {
-        if (mySymmetricOrNot) {
+        if (myHermitian) {
             return mySymmetricDelegate.isSolvable();
         } else {
             return myNonsymmetricDelegate.isSolvable();
@@ -142,28 +130,28 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
         myNonsymmetricDelegate.reset();
         mySymmetricDelegate.reset();
 
-        mySymmetricOrNot = false;
+        myHermitian = false;
     }
 
     @Override
-    protected boolean doNonsymmetric(final Access2D<?> aMtrx, final boolean eigenvaluesOnly) {
+    protected boolean doNonsymmetric(final ElementsSupplier<N> matrix, final boolean eigenvaluesOnly) {
 
-        mySymmetricOrNot = false;
+        myHermitian = false;
 
-        return myNonsymmetricDelegate.compute(aMtrx, false, eigenvaluesOnly);
+        return myNonsymmetricDelegate.compute(matrix, false, eigenvaluesOnly);
     }
 
     @Override
-    protected boolean doSymmetric(final Access2D<?> aMtrx, final boolean eigenvaluesOnly) {
+    protected boolean doSymmetric(final ElementsSupplier<N> matrix, final boolean eigenvaluesOnly) {
 
-        mySymmetricOrNot = true;
+        myHermitian = true;
 
-        return mySymmetricDelegate.compute(aMtrx, true, eigenvaluesOnly);
+        return mySymmetricDelegate.compute(matrix, true, eigenvaluesOnly);
     }
 
     @Override
     protected MatrixStore<N> makeD() {
-        if (mySymmetricOrNot) {
+        if (myHermitian) {
             return mySymmetricDelegate.getD();
         } else {
             return myNonsymmetricDelegate.getD();
@@ -172,7 +160,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     @Override
     protected Array1D<ComplexNumber> makeEigenvalues() {
-        if (mySymmetricOrNot) {
+        if (myHermitian) {
             return mySymmetricDelegate.getEigenvalues();
         } else {
             return myNonsymmetricDelegate.getEigenvalues();
@@ -181,7 +169,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     @Override
     protected MatrixStore<N> makeV() {
-        if (mySymmetricOrNot) {
+        if (myHermitian) {
             return mySymmetricDelegate.getV();
         } else {
             return myNonsymmetricDelegate.getV();

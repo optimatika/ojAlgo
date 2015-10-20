@@ -27,6 +27,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -63,56 +64,30 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         super();
     }
 
+    public Double calculateDeterminant(final Access2D<?> matrix) {
+
+        final double[][] retVal = this.reset(matrix, true);
+
+        RawDecomposition.wrap(matrix).transpose().supplyTo(this.getRawInPlaceStore());
+
+        this.doDecompose(retVal);
+
+        return this.getDeterminant();
+    }
+
     /**
      * QR Decomposition, computed by Householder reflections. Structure to access R and the Householder
      * vectors and compute Q.
      *
      * @param A Rectangular matrix
      */
-    public boolean decompose(final Access2D<?> matrix) {
+    public boolean decompose(final ElementsSupplier<Double> matrix) {
 
-        // Initialize.
-        final double[][] tmpData = this.setRawInPlace(matrix, true);
+        final double[][] retVal = this.reset(matrix, true);
 
-        final int m = this.getRowDim();
-        final int n = this.getColDim();
+        matrix.transpose().supplyTo(this.getRawInPlaceStore());
 
-        myDiagonalR = new double[n];
-
-        double[] tmpColK;
-        double nrm;
-
-        // Main loop.
-        for (int k = 0; k < n; k++) {
-
-            tmpColK = tmpData[k];
-
-            // Compute 2-norm of k-th column without under/overflow.
-            nrm = ZERO;
-            for (int i = k; i < m; i++) {
-                nrm = Maths.hypot(nrm, tmpColK[i]);
-            }
-
-            if (nrm != ZERO) {
-
-                // Form k-th Householder vector.
-                if (tmpColK[k] < 0) {
-                    nrm = -nrm;
-                }
-                for (int i = k; i < m; i++) {
-                    tmpColK[i] /= nrm;
-                }
-                tmpColK[k] += ONE;
-
-                // Apply transformation to remaining columns.
-                for (int j = k + 1; j < n; j++) {
-                    SubtractScaledVector.invoke(tmpData[j], 0, tmpColK, 0, DotProduct.invoke(tmpColK, 0, tmpData[j], 0, k, m) / tmpColK[k], k, m);
-                }
-            }
-            myDiagonalR[k] = -nrm;
-        }
-
-        return this.computed(true);
+        return this.doDecompose(retVal);
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
@@ -210,6 +185,18 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return retVal;
     }
 
+    @Override
+    public final MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+
+        final double[][] tmpData = this.reset(RawDecomposition.wrap(original), true);
+
+        RawDecomposition.wrap(original).transpose().supplyTo(this.getRawInPlaceStore());
+
+        this.doDecompose(tmpData);
+
+        return this.getInverse(preallocated);
+    }
+
     /**
      * Is the matrix full rank?
      *
@@ -243,21 +230,84 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         myFullSize = fullSize;
     }
 
-    /**
-     * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
-     *
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#getInverse(org.ojalgo.matrix.decomposition.DecompositionStore)
-     */
     @Override
-    protected MatrixStore<Double> getInverse(final PrimitiveDenseStore preallocated) {
-        return this.solve(MatrixStore.PRIMITIVE.makeIdentity(this.getRowDim()).get(), preallocated);
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
+
+        final double[][] tmpData = this.reset(body, true);
+
+        RawDecomposition.wrap(body).transpose().supplyTo(this.getRawInPlaceStore());
+
+        this.doDecompose(tmpData);
+
+        return this.solve(rhs, preallocated);
     }
 
     @Override
-    protected MatrixStore<Double> solve(final Access2D<Double> rhs, final PrimitiveDenseStore preallocated) {
+    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+    }
+
+    public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.solve((Access2D<?>) rhs, preallocated);
+    }
+
+    /**
+     * Makes no use of <code>preallocated</code> at all. Simply delegates to {@link #getInverse()}.
+     *
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#doGetInverse(org.ojalgo.matrix.decomposition.DecompositionStore)
+     */
+    @Override
+    protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
+        return this.doSolve(MatrixStore.PRIMITIVE.makeIdentity(this.getRowDim()).get(), preallocated);
+    }
+
+    boolean doDecompose(final double[][] data) {
+
+        final int m = this.getRowDim();
+        final int n = this.getColDim();
+
+        myDiagonalR = new double[n];
+
+        double[] tmpColK;
+        double nrm;
+
+        // Main loop.
+        for (int k = 0; k < n; k++) {
+
+            tmpColK = data[k];
+
+            // Compute 2-norm of k-th column without under/overflow.
+            nrm = ZERO;
+            for (int i = k; i < m; i++) {
+                nrm = Maths.hypot(nrm, tmpColK[i]);
+            }
+
+            if (nrm != ZERO) {
+
+                // Form k-th Householder vector.
+                if (tmpColK[k] < 0) {
+                    nrm = -nrm;
+                }
+                for (int i = k; i < m; i++) {
+                    tmpColK[i] /= nrm;
+                }
+                tmpColK[k] += ONE;
+
+                // Apply transformation to remaining columns.
+                for (int j = k + 1; j < n; j++) {
+                    SubtractScaledVector.invoke(data[j], 0, tmpColK, 0, DotProduct.invoke(tmpColK, 0, data[j], 0, k, m) / tmpColK[k], k, m);
+                }
+            }
+            myDiagonalR[k] = -nrm;
+        }
+
+        return this.computed(true);
+    }
+
+    MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final PrimitiveDenseStore preallocated) {
 
         // Copy right hand side
-        preallocated.fillMatching(rhs);
+        rhs.supplyTo(preallocated);
         final double[] tmpRHSdata = preallocated.data;
 
         final int m = this.getRowDim();

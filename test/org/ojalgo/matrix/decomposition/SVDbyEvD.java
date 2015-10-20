@@ -72,23 +72,23 @@ public class SVDbyEvD extends MatrixDecompositionTests {
      */
     public void testWikipedia() {
 
-        final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
+        final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
         final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE.copy(new double[] { 4.0, 3.0, Math.sqrt(5.0), 0.0 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }
 
-    private void doTest(final PhysicalStore<Double> aMtrxA, final Array1D<Double> theSingularValues) {
+    private void doTest(final PhysicalStore<Double> matrixA, final Array1D<Double> singularValues) {
 
-        final MatrixStore<Double> tmpTranspA = aMtrxA.transpose();
-        final MatrixStore<Double> tmpLeftA = aMtrxA.multiply(tmpTranspA);
-        final MatrixStore<Double> tmpRightA = tmpTranspA.multiply(aMtrxA);
+        final MatrixStore<Double> tmpTranspA = matrixA.transpose();
+        final MatrixStore<Double> tmpLeftA = matrixA.multiply(tmpTranspA);
+        final MatrixStore<Double> tmpRightA = tmpTranspA.multiply(matrixA);
 
-        final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.makePrimitive();
+        final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.makePrimitive(true);
 
-        tmpEigenvalue.compute(tmpLeftA, false);
+        tmpEigenvalue.compute(tmpLeftA);
         final MatrixStore<Double> tmpLeftD = tmpEigenvalue.getD();
         final MatrixStore<Double> tmpLeftV = tmpEigenvalue.getV();
         if (MatrixDecompositionTests.DEBUG) {
@@ -98,7 +98,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         // Check that the eigenvalue decomposition of the "left" matrix is correct
         TestUtils.assertEquals(tmpLeftA, tmpEigenvalue, new NumberContext(7, 6));
 
-        tmpEigenvalue.compute(tmpRightA, false);
+        tmpEigenvalue.compute(tmpRightA);
         final MatrixStore<Double> tmpRightD = tmpEigenvalue.getD();
         final MatrixStore<Double> tmpRightV = tmpEigenvalue.getV();
         if (MatrixDecompositionTests.DEBUG) {
@@ -109,8 +109,8 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpRightA, tmpEigenvalue, new NumberContext(7, 6));
 
         // Check that the, left and right, singular values are correct
-        for (int ij = 0; ij < theSingularValues.length; ij++) {
-            final double tmpExpected = theSingularValues.doubleValue(ij);
+        for (int ij = 0; ij < singularValues.length; ij++) {
+            final double tmpExpected = singularValues.doubleValue(ij);
             final double tmpLeftSqrt = Math.sqrt(Math.abs(tmpLeftD.doubleValue(ij, ij)));
             final double tmpRightSqrt = Math.sqrt(Math.abs(tmpRightD.doubleValue(ij, ij)));
             TestUtils.assertEquals("Left " + ij, tmpExpected, tmpLeftSqrt, new NumberContext(7, 6));
@@ -120,7 +120,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         // So far...
 
         final SingularValue<Double> tmpExperimental = SingularValue.makePrimitive();
-        tmpExperimental.decompose(aMtrxA);
+        tmpExperimental.decompose(matrixA);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
@@ -130,7 +130,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
             BasicLogger.debug("Q2", tmpExperimental.getQ2(), new NumberContext(7, 6));
         }
 
-        TestUtils.assertEquals(aMtrxA, tmpExperimental, new NumberContext(7, 6));
+        TestUtils.assertEquals(matrixA, tmpExperimental, new NumberContext(7, 6));
     }
 
 }

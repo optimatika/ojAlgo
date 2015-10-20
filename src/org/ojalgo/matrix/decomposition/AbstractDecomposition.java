@@ -55,5 +55,4 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
     }
 
     protected abstract DecompositionStore<N> preallocate(long numberOfRows, long numberOfColumns);
-
 }

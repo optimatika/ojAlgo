@@ -29,6 +29,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -52,20 +53,43 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         super();
     }
 
-    public boolean computeWithoutPivoting(final MatrixStore<?> matrix) {
-        return this.decompose(matrix);
+    public Double calculateDeterminant(final Access2D<?> matrix) {
+
+        final double[][] tmpData = this.reset(matrix, false);
+
+        this.getRawInPlaceStore().fillMatching(matrix);
+
+        this.doDecompose(tmpData);
+
+        return this.getDeterminant();
+    }
+
+    public boolean computeWithoutPivoting(final ElementsSupplier<Double> matrix) {
+
+        final double[][] tmpData = this.reset(matrix, false);
+
+        matrix.supplyTo(this.getRawInPlaceStore());
+
+        return this.doDecompose(tmpData);
+    }
+
+    public boolean decompose(final ElementsSupplier<Double> matrix) {
+
+        this.reset();
+
+        final double[][] tmpData = this.reset(matrix, false);
+
+        matrix.supplyTo(this.getRawInPlaceStore());
+
+        return this.doDecompose(tmpData);
     }
 
     /**
      * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
      *
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#decompose(org.ojalgo.access.Access2D)
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#decompose(ElementsSupplier)
      */
-    public boolean decompose(final Access2D<?> matrix) {
-
-        this.reset();
-
-        final double[][] tmpData = this.setRawInPlace(matrix, false);
+    boolean doDecompose(final double[][] data) {
 
         final int tmpRowDim = this.getRowDim();
         final int tmpColDim = this.getColDim();
@@ -79,13 +103,13 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
             // Make a copy of the j-th column to localize references.
             for (int i = 0; i < tmpRowDim; i++) {
-                tmpColJ[i] = tmpData[i][j];
+                tmpColJ[i] = data[i][j];
             }
 
             // Apply previous transformations.
             for (int i = 0; i < tmpRowDim; i++) {
                 // Most of the time is spent in the following dot product.
-                tmpData[i][j] = tmpColJ[i] -= DotProduct.invoke(tmpData[i], 0, tmpColJ, 0, 0, Math.min(i, j));
+                data[i][j] = tmpColJ[i] -= DotProduct.invoke(data[i], 0, tmpColJ, 0, 0, Math.min(i, j));
             }
 
             // Find pivot and exchange if necessary.
@@ -96,16 +120,16 @@ final class RawLU extends RawDecomposition implements LU<Double> {
                 }
             }
             if (p != j) {
-                ArrayUtils.exchangeRows(tmpData, j, p);
+                ArrayUtils.exchangeRows(data, j, p);
                 myPivot.change(j, p);
             }
 
             // Compute multipliers.
             if (j < tmpRowDim) {
-                final double tmpVal = tmpData[j][j];
+                final double tmpVal = data[j][j];
                 if (tmpVal != ZERO) {
                     for (int i = j + 1; i < tmpRowDim; i++) {
-                        tmpData[i][j] /= tmpVal;
+                        data[i][j] /= tmpVal;
                     }
                 }
             }
@@ -165,8 +189,16 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.getRawInPlaceStore().builder().triangular(true, false).build();
     }
 
-    public boolean isFullSize() {
-        return false;
+    @Override
+    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+
+        final double[][] tmpData = this.reset(original, false);
+
+        this.getRawInPlaceStore().fillMatching(original);
+
+        this.doDecompose(tmpData);
+
+        return this.getInverse(preallocated);
     }
 
     public boolean isSolvable() {
@@ -186,7 +218,28 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     @Override
-    protected MatrixStore<Double> getInverse(final PrimitiveDenseStore preallocated) {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
+
+        final double[][] tmpData = this.reset(body, false);
+
+        this.getRawInPlaceStore().fillMatching(this.getRawInPlaceStore());
+
+        this.doDecompose(tmpData);
+
+        return this.solve(rhs, preallocated);
+    }
+
+    @Override
+    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+    }
+
+    public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+    }
+
+    @Override
+    protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
 
         final int[] tmpPivotOrder = myPivot.getOrder();
         final int tmpRowDim = this.getRowDim();
@@ -203,11 +256,9 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return preallocated;
     }
 
-    @Override
-    protected MatrixStore<Double> solve(final Access2D<Double> rhs, final PrimitiveDenseStore preallocated) {
+    MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final PrimitiveDenseStore preallocated) {
 
-        //preallocated.fillMatching(new RowsStore<Double>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
-        preallocated.fillMatching(preallocated.factory().builder().makeWrapper(rhs).row(myPivot.getOrder()).get());
+        rhs.get().builder().row(myPivot.getOrder()).supplyTo(preallocated);
 
         final MatrixStore<Double> tmpBody = this.getRawInPlaceStore();
 

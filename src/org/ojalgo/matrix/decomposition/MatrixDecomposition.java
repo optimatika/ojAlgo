@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
@@ -56,11 +57,6 @@ import org.ojalgo.type.context.NumberContext;
 public interface MatrixDecomposition<N extends Number> {
 
     interface Determinant<N extends Number> extends MatrixDecomposition<N>, DeterminantTask<N> {
-
-        default N calculateDeterminant(final Access2D<N> matrix) {
-            this.decompose(matrix);
-            return this.getDeterminant();
-        }
 
         /**
          * <p>
@@ -107,12 +103,12 @@ public interface MatrixDecomposition<N extends Number> {
          * @param matrix A matrix to check and then (maybe) decompose
          * @return true if the hermitian check passed and computation suceeded; false if not
          */
-        default boolean checkAndCompute(final Access2D<?> matrix) {
+        default boolean checkAndCompute(final MatrixStore<N> matrix) {
 
             this.reset();
 
             if (MatrixUtils.isHermitian(matrix)) {
-                return this instanceof Solver<?> ? ((Solver<?>) this).compute(matrix) : this.decompose(matrix);
+                return this instanceof Solver<?> ? ((Solver<N>) this).compute(matrix) : this.decompose(matrix);
             } else {
                 return false;
             }
@@ -125,7 +121,7 @@ public interface MatrixDecomposition<N extends Number> {
          * @param matrix A matrix to decompose
          * @return true if the decomposition suceeded AND {@link #isSolvable()}; false if not
          */
-        default boolean compute(final Access2D<?> matrix) {
+        default boolean compute(final ElementsSupplier<N> matrix) {
             return this.decompose(matrix) && this.isSolvable();
         }
 
@@ -156,20 +152,10 @@ public interface MatrixDecomposition<N extends Number> {
          */
         MatrixStore<N> getInverse(DecompositionStore<N> preallocated);
 
-        default MatrixStore<N> invert(final MatrixStore<N> original) {
-            this.decompose(original);
-            return this.getInverse();
-        }
-
-        default MatrixStore<N> invert(final MatrixStore<N> original, final DecompositionStore<N> preallocated) {
-            this.decompose(original);
-            return this.getInverse(preallocated);
-        }
-
         /**
-         * @return true if it is ok to call {@linkplain #solve(Access2D)} (computation was successful); false
-         *         if not
-         * @see #solve(Access2D)
+         * @return true if it is ok to call {@linkplain #solve(ElementsSupplier)} (computation was
+         *         successful); false if not
+         * @see #solve(ElementsSupplier)
          * @see #isComputed()
          */
         boolean isSolvable();
@@ -177,17 +163,7 @@ public interface MatrixDecomposition<N extends Number> {
         /**
          * [A][X]=[B] or [this][return]=[rhs]
          */
-        MatrixStore<N> solve(Access2D<N> rhs);
-
-        default MatrixStore<N> solve(final Access2D<N> body, final Access2D<N> rhs) {
-            this.decompose(body);
-            return this.solve(rhs);
-        }
-
-        default MatrixStore<N> solve(final Access2D<N> body, final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
-            this.decompose(body);
-            return this.solve(rhs, preallocated);
-        }
+        MatrixStore<N> solve(ElementsSupplier<N> rhs);
 
         /**
          * <p>
@@ -198,7 +174,7 @@ public interface MatrixDecomposition<N extends Number> {
          * this interface. It must be documented for each implementation.
          * </p>
          * <p>
-         * Should produce the same results as calling {@link #solve(Access2D)}.
+         * Should produce the same results as calling {@link #solve(ElementsSupplier)}.
          * </p>
          *
          * @param rhs The Right Hand Side, wont be modfied
@@ -208,7 +184,15 @@ public interface MatrixDecomposition<N extends Number> {
          * @return The solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
-        MatrixStore<N> solve(Access2D<N> rhs, DecompositionStore<N> preallocated);
+        MatrixStore<N> solve(ElementsSupplier<N> rhs, DecompositionStore<N> preallocated);
+
+        /**
+         * To differentiate between {@link SolverTask#solve(Access2D, Access2D)} and
+         * {@link #solve(ElementsSupplier, DecompositionStore)} when the RHS is a {@link MatrixStore}.
+         */
+        default MatrixStore<N> solve(final MatrixStore<N> rhs, final DecompositionStore<N> preallocated) {
+            return this.solve((ElementsSupplier<N>) rhs, preallocated);
+        }
 
     }
 
@@ -219,7 +203,7 @@ public interface MatrixDecomposition<N extends Number> {
      */
     interface Values<N extends Number> extends MatrixDecomposition<N> {
 
-        boolean computeValuesOnly(Access2D<?> matrix);
+        boolean computeValuesOnly(ElementsSupplier<N> matrix);
 
         /**
          * The eigenvalues in D (and the eigenvectors in V) are not necessarily ordered. This is a property of
@@ -235,16 +219,20 @@ public interface MatrixDecomposition<N extends Number> {
      * @param matrix A matrix to decompose
      * @return true if the computation suceeded; false if not
      */
-    boolean decompose(Access2D<?> matrix);
+    boolean decompose(ElementsSupplier<N> matrix);
 
     boolean equals(MatrixStore<N> other, NumberContext context);
 
     /**
      * @return true if computation has been attemped; false if not.
-     * @see #decompose(Access2D)
+     * @see #decompose(ElementsSupplier)
      */
     boolean isComputed();
 
+    /**
+     * @deprecated v39 Use {@link MatrixUtils} instead
+     */
+    @Deprecated
     MatrixStore<N> reconstruct();
 
     /**

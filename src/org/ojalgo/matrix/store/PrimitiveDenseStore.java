@@ -1353,6 +1353,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Primitive) destination);
     }
 
+    public final MatrixStore<Double> get() {
+        return this;
+    }
+
     public Double get(final long aRow, final long aCol) {
         return myUtility.get(aRow, aCol);
     }

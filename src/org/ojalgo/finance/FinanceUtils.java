@@ -200,7 +200,8 @@ public abstract class FinanceUtils {
         final Array1D<Double> retVal = Array1D.PRIMITIVE.makeZero(tmpPrices.length - 1);
 
         final CalendarDateUnit tmpUnit = aPriceSeries.getResolution();
-        double tmpThisRiskFree, tmpNextRiskFree, tmpAvgRiskFree, tmpRiskFreeGrowthRate, tmpThisPrice, tmpNextPrice, tmpPriceGrowthFactor, tmpPriceGrowthRate, tmpAdjustedPriceGrowthRate;
+        double tmpThisRiskFree, tmpNextRiskFree, tmpAvgRiskFree, tmpRiskFreeGrowthRate, tmpThisPrice, tmpNextPrice, tmpPriceGrowthFactor, tmpPriceGrowthRate,
+                tmpAdjustedPriceGrowthRate;
 
         for (int i = 0; i < retVal.size(); i++) {
 
@@ -251,7 +252,8 @@ public abstract class FinanceUtils {
 
         final CalendarDateSeries<Double> retVal = new CalendarDateSeries<Double>(tmpResolution);
 
-        double tmpThisRiskFree, tmpLastRiskFree, tmpAvgRiskFree, tmpRiskFreeGrowthFactor, tmpThisPrice, tmpLastPrice, tmpPriceGrowthFactor, tmpAdjustedPriceGrowthFactor;
+        double tmpThisRiskFree, tmpLastRiskFree, tmpAvgRiskFree, tmpRiskFreeGrowthFactor, tmpThisPrice, tmpLastPrice, tmpPriceGrowthFactor,
+                tmpAdjustedPriceGrowthFactor;
 
         double tmpAggregatedExcessPrice = PrimitiveMath.ONE;
         retVal.put(new CalendarDate(tmpDates[0]), tmpAggregatedExcessPrice);
@@ -317,12 +319,12 @@ public abstract class FinanceUtils {
 
         final int tmpSize = (int) Math.min(covariances.countRows(), covariances.countColumns());
 
-        Access2D<?> tmpCovariances = covariances;
+        MatrixStore<Double> tmpCovariances = MatrixStore.PRIMITIVE.makeWrapper(covariances).get();
 
         if (clean) {
 
             final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
-            tmpEvD.compute(tmpCovariances, false);
+            tmpEvD.compute(tmpCovariances);
 
             final MatrixStore<Double> tmpV = tmpEvD.getV();
             final PhysicalStore<Double> tmpD = tmpEvD.getD().copy();

@@ -35,7 +35,7 @@ public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
     public static abstract class Factory<N extends Number> {
 
         public final DeterminantTask<N> make(final MatrixStore<N> template) {
-            return this.make(template, MatrixUtils.isHermitian((Access2D<?>) template));
+            return this.make(template, MatrixUtils.isHermitian(template));
         }
 
         public abstract DeterminantTask<N> make(MatrixStore<N> template, boolean symmetric);
@@ -104,6 +104,6 @@ public interface DeterminantTask<N extends Number> extends MatrixTask<N> {
 
     };
 
-    N calculateDeterminant(Access2D<N> matrix);
+    N calculateDeterminant(Access2D<?> matrix);
 
 }

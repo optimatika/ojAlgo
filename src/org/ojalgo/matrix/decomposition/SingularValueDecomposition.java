@@ -22,13 +22,15 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
 
-abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends GenericDecomposition<N>implements SingularValue<N> {
+abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
 
     private final BidiagonalDecomposition<N> myBidiagonal;
     private transient MatrixStore<N> myD;
@@ -53,11 +55,11 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         myBidiagonal = aBidiagonal;
     }
 
-    public boolean computeValuesOnly(final Access2D<?> matrix) {
+    public boolean computeValuesOnly(final ElementsSupplier<N> matrix) {
         return this.compute(matrix, true, false);
     }
 
-    public boolean decompose(final Access2D<?> matrix) {
+    public boolean decompose(final ElementsSupplier<N> matrix) {
         return this.compute(matrix, false, this.isFullSize());
     }
 
@@ -231,16 +233,26 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return this.getKyFanNorm(this.getSingularValues().size());
     }
 
+    public MatrixStore<N> invert(final Access2D<?> original) {
+        this.decompose(this.wrap(original));
+        return this.getInverse();
+    }
+
+    public MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) {
+        this.decompose(this.wrap(original));
+        return this.getInverse(preallocated);
+    }
+
     public boolean isFullSize() {
         return myFullSize;
     }
 
-    public DecompositionStore<N> preallocate(final Access2D<N> template) {
+    public DecompositionStore<N> preallocate(final Structure2D template) {
         final long tmpCountRows = template.countRows();
         return this.preallocate(tmpCountRows, tmpCountRows);
     }
 
-    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
+    public DecompositionStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 
@@ -265,16 +277,26 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         myFullSize = fullSize;
     }
 
-    public MatrixStore<N> solve(final Access2D<N> rhs) {
-        return this.getInverse().multiply(rhs);
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) {
+        this.decompose(this.wrap(body));
+        return this.solve(this.wrap(rhs));
     }
 
-    public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), rhs);
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) {
+        this.decompose(this.wrap(body));
+        return this.solve(rhs, preallocated);
+    }
+
+    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
+        return this.getInverse().multiply(rhs.get());
+    }
+
+    public MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+        preallocated.fillByMultiplying(this.getInverse(), rhs.get());
         return preallocated;
     }
 
-    protected boolean compute(final Access2D<?> matrix, final boolean singularValuesOnly, final boolean fullSize) {
+    protected boolean compute(final ElementsSupplier<N> matrix, final boolean singularValuesOnly, final boolean fullSize) {
 
         this.reset();
 
@@ -290,7 +312,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         try {
 
-            retVal = this.doCompute(myTransposed ? this.wrap(matrix).conjugate().build() : matrix, singularValuesOnly, fullSize);
+            retVal = this.doCompute(myTransposed ? matrix.get().conjugate() : matrix, singularValuesOnly, fullSize);
 
         } catch (final Exception anException) {
 
@@ -304,12 +326,12 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return this.computed(retVal);
     }
 
-    protected boolean computeBidiagonal(final Access2D<?> matrix, final boolean fullSize) {
+    protected boolean computeBidiagonal(final ElementsSupplier<N> matrix, final boolean fullSize) {
         myBidiagonal.setFullSize(fullSize);
         return myBidiagonal.decompose(matrix);
     }
 
-    protected abstract boolean doCompute(Access2D<?> aMtrx, boolean singularValuesOnly, boolean fullSize);
+    protected abstract boolean doCompute(ElementsSupplier<N> aMtrx, boolean singularValuesOnly, boolean fullSize);
 
     protected DiagonalAccess<N> getBidiagonalAccessD() {
         return myBidiagonal.getDiagonalAccessD();

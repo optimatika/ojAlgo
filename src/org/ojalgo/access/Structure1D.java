@@ -21,7 +21,7 @@
  */
 package org.ojalgo.access;
 
-interface Structure1D {
+public interface Structure1D {
 
     /**
      * @return The total number of elements in this structure.

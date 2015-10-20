@@ -524,7 +524,7 @@ public abstract class ConvexSolver extends BaseSolver {
 
             final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
 
-            tmpEvD.compute(tmpQ, true);
+            tmpEvD.computeValuesOnly(tmpQ);
 
             final Array1D<ComplexNumber> tmpEigenvalues = tmpEvD.getEigenvalues();
 

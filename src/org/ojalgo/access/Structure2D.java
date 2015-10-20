@@ -21,7 +21,7 @@
  */
 package org.ojalgo.access;
 
-interface Structure2D extends Structure1D {
+public interface Structure2D extends Structure1D {
 
     /**
      * count() == countRows() * countColumns()

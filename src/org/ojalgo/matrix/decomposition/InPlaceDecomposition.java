@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 
 abstract class InPlaceDecomposition<N extends Number> extends GenericDecomposition<N> {
@@ -62,22 +62,22 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
         return myRowDim;
     }
 
-    final DecompositionStore<N> setInPlace(final Access2D<?> matrix) {
+    final DecompositionStore<N> setInPlace(final ElementsSupplier<N> matrix) {
 
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
 
         if ((myInPlace != null) && (myRowDim == tmpRowDim) && (myColDim == tmpColDim)) {
 
-            myInPlace.fillMatching(matrix);
-
         } else {
 
-            myInPlace = this.copy(matrix);
+            myInPlace = this.makeZero(tmpRowDim, tmpColDim);
 
             myRowDim = tmpRowDim;
             myColDim = tmpColDim;
         }
+
+        matrix.supplyTo(myInPlace);
 
         this.aspectRatioNormal(tmpRowDim >= tmpColDim);
         this.computed(false);

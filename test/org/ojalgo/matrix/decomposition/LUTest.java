@@ -48,16 +48,16 @@ public class LUTest extends MatrixDecompositionTests {
         final BigMatrix tmpProblematic = P20061119Case.getProblematic();
 
         final LU<BigDecimal> tmpBig = LU.makeBig();
-        tmpBig.decompose(tmpProblematic);
+        tmpBig.decompose(tmpProblematic.toBigStore());
 
         final LU<ComplexNumber> tmpComplex = LU.makeComplex();
-        tmpComplex.decompose(tmpProblematic);
+        tmpComplex.decompose(tmpProblematic.toComplexStore());
 
         final LU<Double> tmpPrimitive = LU.makePrimitive();
-        tmpPrimitive.decompose(tmpProblematic);
+        tmpPrimitive.decompose(tmpProblematic.toPrimitiveStore());
 
         final LU<Double> tmpJama = new RawLU();
-        tmpJama.decompose(tmpProblematic);
+        tmpJama.decompose(tmpProblematic.toPrimitiveStore());
 
         final NumberContext tmpPrintContext = NumberContext.getGeneral(20);
 
@@ -76,7 +76,7 @@ public class LUTest extends MatrixDecompositionTests {
         }
 
         final SingularValue<Double> tmpSVD = new RawSingularValue();
-        tmpSVD.decompose(tmpProblematic);
+        tmpSVD.decompose(tmpProblematic.toPrimitiveStore());
 
         TestUtils.assertEquals("LU.rank SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
         TestUtils.assertEquals("LU.rank SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());

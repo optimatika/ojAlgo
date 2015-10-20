@@ -22,8 +22,10 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
@@ -39,16 +41,21 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         super(aFactory);
     }
 
-    public final boolean checkAndCompute(final Access2D<?> matrix) {
+    public N calculateDeterminant(final Access2D<?> matrix) {
+        this.decompose(this.wrap(matrix));
+        return this.getDeterminant();
+    }
+
+    public final boolean checkAndCompute(final MatrixStore<N> matrix) {
         return this.compute(matrix, MatrixUtils.isHermitian(matrix), false);
     }
 
-    public boolean computeValuesOnly(final Access2D<?> matrix) {
+    public boolean computeValuesOnly(final ElementsSupplier<N> matrix) {
         return this.compute(matrix, this.isHermitian(), true);
     }
 
-    public final boolean decompose(final Access2D<?> matrix) {
-        return this.compute(matrix, false);
+    public final boolean decompose(final ElementsSupplier<N> matrix) {
+        return this.compute(matrix.get(), this.isHermitian(), false);
     }
 
     public final MatrixStore<N> getD() {
@@ -78,12 +85,22 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         return myV;
     }
 
-    public DecompositionStore<N> preallocate(final Access2D<N> template) {
+    public MatrixStore<N> invert(final Access2D<?> original) {
+        this.decompose(this.wrap(original));
+        return this.getInverse();
+    }
+
+    public MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) {
+        this.decompose(this.wrap(original));
+        return this.getInverse(preallocated);
+    }
+
+    public DecompositionStore<N> preallocate(final Structure2D template) {
         final long tmpCountRows = template.countRows();
         return this.preallocate(tmpCountRows, tmpCountRows);
     }
 
-    public DecompositionStore<N> preallocate(final Access2D<N> templateBody, final Access2D<N> templateRHS) {
+    public DecompositionStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 
@@ -99,16 +116,36 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         myEigenvaluesOnly = false;
     }
 
-    public final MatrixStore<N> solve(final Access2D<N> rhs) {
-        return this.getInverse().multiply(rhs);
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) {
+        this.decompose(this.wrap(body));
+        return this.solve(this.wrap(rhs));
     }
 
-    public final MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), rhs);
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) {
+        this.decompose(this.wrap(body));
+        return this.solve(rhs, preallocated);
+    }
+
+    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
+        return this.getInverse().multiply(rhs.get());
+    }
+
+    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+        preallocated.fillByMultiplying(this.getInverse(), rhs.get());
         return preallocated;
     }
 
-    protected final boolean compute(final Access2D<?> aMtrx, final boolean symmetric, final boolean eigenvaluesOnly) {
+    protected abstract boolean doNonsymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly);
+
+    protected abstract boolean doSymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly);
+
+    protected abstract MatrixStore<N> makeD();
+
+    protected abstract Array1D<ComplexNumber> makeEigenvalues();
+
+    protected abstract MatrixStore<N> makeV();
+
+    final boolean compute(final ElementsSupplier<N> matrix, final boolean symmetric, final boolean eigenvaluesOnly) {
 
         this.reset();
 
@@ -120,16 +157,16 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
 
             if (symmetric) {
 
-                retVal = this.doSymmetric(aMtrx, eigenvaluesOnly);
+                retVal = this.doSymmetric(matrix, eigenvaluesOnly);
 
             } else {
 
-                retVal = this.doNonsymmetric(aMtrx, eigenvaluesOnly);
+                retVal = this.doNonsymmetric(matrix, eigenvaluesOnly);
             }
 
-        } catch (final Exception anException) {
+        } catch (final Exception exc) {
 
-            BasicLogger.error(anException.toString());
+            BasicLogger.error(exc.toString());
 
             this.reset();
 
@@ -138,16 +175,6 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
 
         return this.computed(retVal);
     }
-
-    protected abstract boolean doNonsymmetric(final Access2D<?> aMtrx, final boolean eigenvaluesOnly);
-
-    protected abstract boolean doSymmetric(final Access2D<?> aMtrx, final boolean eigenvaluesOnly);
-
-    protected abstract MatrixStore<N> makeD();
-
-    protected abstract Array1D<ComplexNumber> makeEigenvalues();
-
-    protected abstract MatrixStore<N> makeV();
 
     final void setD(final MatrixStore<N> newD) {
         myD = newD;

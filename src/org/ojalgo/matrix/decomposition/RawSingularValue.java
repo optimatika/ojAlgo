@@ -24,8 +24,10 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -88,12 +90,12 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         super();
     }
 
-    public boolean computeValuesOnly(final Access2D<?> matrix) {
-        return this.decompose(matrix, false);
+    public boolean computeValuesOnly(final ElementsSupplier<Double> matrix) {
+        return this.decompose(matrix.get(), false);
     }
 
-    public boolean decompose(final Access2D<?> matrix) {
-        return this.decompose(matrix, true);
+    public boolean decompose(final ElementsSupplier<Double> matrix) {
+        return this.decompose(matrix.get(), true);
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
@@ -124,7 +126,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     @Override
     public MatrixStore<Double> getInverse() {
-        return this.getInverse(this.preallocate(this.getColDim(), this.getRowDim()));
+        return this.doGetInverse(this.preallocate(this.getColDim(), this.getRowDim()));
     }
 
     public double getKyFanNorm(final int k) {
@@ -175,6 +177,12 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.getKyFanNorm(myS.length);
     }
 
+    @Override
+    public final MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        this.decompose(RawDecomposition.wrap(original));
+        return this.getInverse(preallocated);
+    }
+
     public boolean isFullSize() {
         return false;
     }
@@ -188,7 +196,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
-    public DecompositionStore<Double> preallocate(final Access2D<Double> templateBody, final Access2D<Double> templateRHS) {
+    public DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return this.preallocate(templateBody.countColumns(), templateBody.countRows());
     }
 
@@ -209,7 +217,22 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
-    protected MatrixStore<Double> getInverse(final PrimitiveDenseStore preallocated) {
+    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
+        this.decompose(RawDecomposition.wrap(body));
+        return this.solve(rhs, preallocated);
+    }
+
+    @Override
+    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+    }
+
+    public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.solve((Access2D<?>) rhs, preallocated);
+    }
+
+    @Override
+    protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
 
         if (myPseudoinverse == null) {
 
@@ -240,9 +263,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return myPseudoinverse;
     }
 
-    @Override
-    protected MatrixStore<Double> solve(final Access2D<Double> rhs, final PrimitiveDenseStore preallocated) {
-        return this.getInverse(preallocated).multiply(rhs);
+    MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final PrimitiveDenseStore preallocated) {
+        return this.doGetInverse(preallocated).multiply(rhs.get());
     }
 
     boolean decompose(final Access2D<?> matrix, final boolean factors) {
@@ -252,8 +274,16 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         // Initialize
         myTransposed = matrix.countRows() < matrix.countColumns();
+        final boolean transpose = !myTransposed;
+        final double[][] retVal = this.reset(matrix, transpose);
 
-        final double[][] At = this.setRawInPlace(matrix, !myTransposed);
+        if (transpose) {
+            RawDecomposition.wrap(matrix).transpose().supplyTo(this.getRawInPlaceStore());
+        } else {
+            this.getRawInPlaceStore().fillMatching(matrix);
+        }
+
+        final double[][] At = retVal;
 
         // Input is possibly transposed so that m >= n always
         m = this.getMaxDim();

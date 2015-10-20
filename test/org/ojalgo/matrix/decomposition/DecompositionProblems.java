@@ -109,7 +109,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 .rows(new double[][] { { 0.2845, 0.3597, 0.9544 }, { 0.3597, 0.6887, 0.0782 }, { 0.9544, 0.0782, 0.1140 } });
 
         final Eigenvalue<Double> tmpPrimitive = Eigenvalue.makePrimitive();
-        tmpPrimitive.compute(tmpA, false);
+        tmpPrimitive.compute(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpPrimitive, new NumberContext(7, 6));
     }

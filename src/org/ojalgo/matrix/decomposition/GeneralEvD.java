@@ -21,13 +21,13 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -59,10 +59,6 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     protected GeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
-    }
-
-    public final boolean compute(final Access2D<?> matrix, final boolean eigenvaluesOnly) {
-        return this.compute(matrix, false, eigenvaluesOnly);
     }
 
     public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
@@ -108,11 +104,11 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     @Override
-    protected boolean doNonsymmetric(final Access2D<?> aMtrx, final boolean eigenvaluesOnly) {
+    protected boolean doNonsymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly) {
 
         final int tmpDiagDim = (int) aMtrx.countRows();
 
-        final DecompositionStore<N> tmpMtrxA = this.copy(aMtrx);
+        final DecompositionStore<N> tmpMtrxA = this.copy(aMtrx.get());
 
         final DecompositionStore<N> tmpV = this.makeEye(tmpDiagDim, tmpDiagDim);
 
@@ -149,7 +145,7 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     @Override
-    protected boolean doSymmetric(final Access2D<?> aMtrx, final boolean eigenvaluesOnly) {
+    protected boolean doSymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly) {
         return this.doNonsymmetric(aMtrx, eigenvaluesOnly);
     }
 

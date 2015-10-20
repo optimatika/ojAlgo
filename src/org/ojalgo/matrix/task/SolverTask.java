@@ -24,6 +24,7 @@ package org.ojalgo.matrix.task;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
@@ -139,12 +140,12 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * @param templateRHS
      * @return
      */
-    DecompositionStore<N> preallocate(Access2D<N> templateBody, Access2D<N> templateRHS);
+    DecompositionStore<N> preallocate(Structure2D templateBody, Structure2D templateRHS);
 
     /**
      * [A][X]=[B] or [body][return]=[rhs]
      */
-    default MatrixStore<N> solve(final Access2D<N> body, final Access2D<N> rhs) throws TaskException {
+    default MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
         return this.solve(body, rhs, this.preallocate(body, rhs));
     }
 
@@ -162,5 +163,5 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
      * @return The solution
      */
-    MatrixStore<N> solve(Access2D<N> body, Access2D<N> rhs, DecompositionStore<N> preallocated) throws TaskException;
+    MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, DecompositionStore<N> preallocated) throws TaskException;
 }

@@ -21,8 +21,10 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Supplier2D;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 
 /**
@@ -128,5 +130,132 @@ public interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixSto
     }
 
     void supplyTo(final ElementsConsumer<N> consumer);
+
+    default ElementsSupplier<N> transpose() {
+
+        return new ContextSupplier<N>(this) {
+
+            public long count() {
+                return ElementsSupplier.this.count();
+            }
+
+            public long countColumns() {
+                return ElementsSupplier.this.countColumns();
+            }
+
+            public long countRows() {
+                return ElementsSupplier.this.countRows();
+            }
+
+            @Override
+            public void supplyTo(final ElementsConsumer<N> consumer) {
+                ElementsSupplier.this.supplyTo(new ElementsConsumer<N>() {
+
+                    public void add(final long row, final long column, final double addend) {
+                        consumer.add(column, row, addend);
+                    }
+
+                    public void add(final long row, final long column, final Number addend) {
+                        consumer.add(column, row, addend);
+                    }
+
+                    public long countColumns() {
+                        return consumer.countRows();
+                    }
+
+                    public long countRows() {
+                        return consumer.countColumns();
+                    }
+
+                    public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
+                        consumer.fillByMultiplying(left, right);
+                    }
+
+                    public void fillColumn(final long row, final long column, final N value) {
+                        consumer.fillRow(column, row, value);
+                    }
+
+                    public void fillColumn(final long row, final long column, final NullaryFunction<N> supplier) {
+                        consumer.fillRow(column, row, supplier);
+                    }
+
+                    public void fillDiagonal(final long row, final long column, final N value) {
+                        consumer.fillDiagonal(column, row, value);
+                    }
+
+                    public void fillDiagonal(final long row, final long column, final NullaryFunction<N> supplier) {
+                        consumer.fillRow(column, row, supplier);
+                    }
+
+                    public void fillOne(final long row, final long column, final N value) {
+                        consumer.fillOne(column, row, value);
+                    }
+
+                    public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
+                        consumer.fillOne(column, row, supplier);
+                    }
+
+                    public void fillRow(final long row, final long column, final N value) {
+                        consumer.fillDiagonal(column, row, value);
+                    }
+
+                    public void fillRow(final long row, final long column, final NullaryFunction<N> supplier) {
+                        consumer.fillDiagonal(column, row, supplier);
+                    }
+
+                    public void modifyColumn(final long row, final long column, final UnaryFunction<N> function) {
+                        consumer.modifyRow(column, row, function);
+                    }
+
+                    public void modifyDiagonal(final long row, final long column, final UnaryFunction<N> function) {
+                        consumer.modifyDiagonal(column, row, function);
+                    }
+
+                    public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
+                        consumer.modifyMatching(left, function);
+                    }
+
+                    public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
+                        consumer.modifyMatching(function, right);
+                    }
+
+                    public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
+                        consumer.modifyOne(column, row, function);
+                    }
+
+                    public void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
+                        consumer.modifyColumn(column, row, function);
+                    }
+
+                    public ElementsConsumer<N> regionByColumns(final int... columns) {
+                        return this.regionByRows(columns);
+                    }
+
+                    public ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
+                        return this.regionByLimits(columnLimit, rowLimit);
+                    }
+
+                    public ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
+                        return this.regionByOffsets(columnOffset, rowOffset);
+                    }
+
+                    public ElementsConsumer<N> regionByRows(final int... rows) {
+                        return this.regionByColumns(rows);
+                    }
+
+                    public void set(final long row, final long column, final double value) {
+                        consumer.set(column, row, value);
+                    }
+
+                    public void set(final long row, final long column, final Number value) {
+                        consumer.set(column, row, value);
+                    }
+
+                });
+            }
+
+        };
+
+    }
 
 }
