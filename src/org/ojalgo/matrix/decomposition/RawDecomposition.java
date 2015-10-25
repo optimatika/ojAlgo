@@ -37,10 +37,6 @@ import org.ojalgo.matrix.store.RawStore;
  */
 abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
-    protected static Builder<Double> wrap(final Access2D<?> access) {
-        return MatrixStore.PRIMITIVE.makeWrapper(access);
-    }
-
     private int myColDim;
     private double[][] myRawInPlaceData;
     private RawStore myRawInPlaceStore;

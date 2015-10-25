@@ -22,6 +22,7 @@
 package org.ojalgo.optimisation;
 
 import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -29,8 +30,6 @@ import java.util.*;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PrimitiveArray;
-import org.ojalgo.constant.BigMath;
-import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicLogger.GenericAppender;
@@ -142,8 +141,13 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public static abstract class Presolver implements Comparable<Presolver> {
 
-        private final int myExecutionOrder = 1;
+        private final int myExecutionOrder;
         private final UUID myUUID = UUID.randomUUID();
+
+        protected Presolver(final int executionOrder) {
+            super();
+            myExecutionOrder = executionOrder;
+        }
 
         public int compareTo(final Presolver reference) {
             return Integer.compare(myExecutionOrder, reference.getExecutionOrder());
@@ -179,7 +183,13 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             return result;
         }
 
-        public abstract boolean simplify(ExpressionsBasedModel model);
+        /**
+         * @param expression
+         * @param fixedVariables
+         * @return True if any model entity was modified so that a re-run of the presolvers is necessary -
+         *         typically when/if a variable was fixed.
+         */
+        public abstract boolean simplify(Expression expression, Set<Index> fixedVariables);
 
         final int getExecutionOrder() {
             return myExecutionOrder;
@@ -187,12 +197,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
-    public static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
-
     private static final String NEW_LINE = "\n";
 
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
+
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
+
     private static final String START_END = "############################################\n";
     static final Comparator<Expression> CE = new Comparator<Expression>() {
 
@@ -202,10 +212,40 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     };
 
-    private transient BasicLogger.Appender myAppender = null;
+    static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
+    static final TreeSet<Presolver> PRESOLVERS = new TreeSet<>();
 
+    static {
+        ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
+        ExpressionsBasedModel.addPresolver(Presolvers.OPPOSITE_SIGN);
+    }
+
+    public static boolean addIntegration(final Integration<?> integration) {
+        return INTEGRATIONS.add(integration);
+    }
+
+    public static boolean addPresolver(final Presolver presolver) {
+        return PRESOLVERS.add(presolver);
+    }
+
+    public static void clearIntegrations() {
+        INTEGRATIONS.clear();
+    }
+
+    public static void clearPresolvers() {
+        PRESOLVERS.clear();
+    }
+
+    public static boolean removeIntegration(final Integration<?> integration) {
+        return INTEGRATIONS.remove(integration);
+    }
+
+    public static boolean removePresolver(final Presolver presolver) {
+        return PRESOLVERS.remove(presolver);
+    }
+
+    private transient BasicLogger.Appender myAppender = null;
     private final CharacterRing myBuffer = new CharacterRing();
-    private boolean myDoPresolve = true;
     private final HashMap<String, Expression> myExpressions = new HashMap<String, Expression>();
     private final HashSet<Index> myFixedVariables = new HashSet<Index>();
     private transient int[] myFreeIndices = null;
@@ -217,8 +257,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private transient Expression myObjectiveExpression = null;
     private transient MultiaryFunction.TwiceDifferentiable<Double> myObjectiveFunction = null;
     private transient int[] myPositiveIndices = null;
+
     private transient List<Variable> myPositiveVariables = null;
+
     private final ArrayList<Variable> myVariables = new ArrayList<Variable>();
+
     private final boolean myWorkCopy;
 
     public ExpressionsBasedModel() {
@@ -561,13 +604,13 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                 if (tmpVariable.isEqualityConstraint()) {
                     retSolution.set(i, tmpVariable.getLowerLimit());
                 } else if (tmpVariable.isLowerLimitSet() && tmpVariable.isUpperLimitSet()) {
-                    retSolution.set(i, BigFunction.DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), BigMath.TWO));
+                    retSolution.set(i, DIVIDE.invoke(tmpVariable.getLowerLimit().add(tmpVariable.getUpperLimit()), TWO));
                 } else if (tmpVariable.isLowerLimitSet()) {
                     retSolution.set(i, tmpVariable.getLowerLimit());
                 } else if (tmpVariable.isUpperLimitSet()) {
                     retSolution.set(i, tmpVariable.getUpperLimit());
                 } else {
-                    retSolution.set(i, BigMath.ZERO);
+                    retSolution.set(i, ZERO);
                     tmpAllVarsSomeInfo = false; // This var no info
                 }
             }
@@ -676,14 +719,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         return retVal;
-    }
-
-    /**
-     * @deprecated v38 Temporary feature. Presolving will be refactored
-     */
-    @Deprecated
-    public boolean isDoPresolve() {
-        return myDoPresolve;
     }
 
     public boolean isWorkCopy() {
@@ -927,14 +962,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * @deprecated v38 Temporary feature. Presolving will be refactored
-     */
-    @Deprecated
-    public void setDoPresolve(final boolean doPresolve) {
-        myDoPresolve = doPresolve;
-    }
-
-    /**
      * <p>
      * The general recommendation is to NOT call this method directly. Instead you should use/call
      * {@link #maximise()} or {@link #minimise()}.
@@ -1051,7 +1078,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return this.getVariableValues(context).getState().isFeasible();
     }
 
-    private void categoriseVariables() {
+    private Set<Index> categoriseVariables() {
 
         final int tmpLength = myVariables.size();
 
@@ -1106,6 +1133,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myPositiveVariables = Collections.unmodifiableList(myPositiveVariables);
         myNegativeVariables = Collections.unmodifiableList(myNegativeVariables);
         myIntegerVariables = Collections.unmodifiableList(myIntegerVariables);
+
+        return this.getFixedVariables();
     }
 
     private Optimisation.Result handleResult(final Result solverResult) {
@@ -1149,10 +1178,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         myPositiveVariables = null;
         myPositiveIndices = null;
-    }
-
-    boolean addFixedVariable(final Index index) {
-        return myFixedVariables.add(index);
     }
 
     BasicLogger.Appender appender() {
@@ -1201,37 +1226,22 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     final void presolve() {
 
-        this.categoriseVariables();
+        boolean tmpNeedToRepeat = false;
 
-        if (this.isDoPresolve()) {
+        do {
 
-            final Set<Index> tmpFixedVariables = this.getFixedVariables();
+            final Set<Index> tmpFixedVariables = this.categoriseVariables();
+            tmpNeedToRepeat = false;
 
-            int iters = 0;
-            boolean stillSimplifying = true;
-            while (stillSimplifying) {
-                ++iters;
-                if ((iters % 100) == 0) {
-                    // BasicLogger.debug("Done {} iterations of presolving", iters);
-                }
-
-                stillSimplifying = false;
-
-                for (final Expression tmpExpression : this.getExpressions()) {
-
-                    final boolean tmpConstraint = tmpExpression.isConstraint();
-                    final boolean tmpInfeasible = tmpExpression.isInfeasible();
-                    final boolean tmpRedundant = tmpExpression.isRedundant();
-
-                    if (tmpConstraint && !tmpInfeasible && !tmpRedundant && tmpExpression.simplify(tmpFixedVariables)) {
-
-                        // BasicLogger.debug("Following expression is now redundant: {}", tmpExpression);
-                        stillSimplifying = true;
-                        break; // Restart the process after removing something.
+            for (final Expression tmpExpr : this.getExpressions()) {
+                if (!tmpNeedToRepeat && tmpExpr.isConstraint() && !tmpExpr.isInfeasible() && !tmpExpr.isRedundant() && (tmpExpr.countQuadraticFactors() == 0)) {
+                    for (final Presolver tmpPreS : PRESOLVERS) {
+                        tmpNeedToRepeat |= tmpPreS.simplify(tmpExpr, tmpFixedVariables);
                     }
                 }
             }
-        }
+
+        } while (tmpNeedToRepeat);
 
     }
 

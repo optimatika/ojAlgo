@@ -59,29 +59,20 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             super();
         }
 
-        public boolean decompose(final ElementsSupplier<Double> matrix) {
+        public boolean isHermitian() {
+            return this.checkSymmetry();
+        }
 
-            final Access2D<?> matrix1 = matrix.get();
-            final double[][] retVal = this.reset(matrix1, false);
-
-            if (false) {
-                RawDecomposition.wrap(matrix1).transpose().supplyTo(this.getRawInPlaceStore());
-            } else {
-                this.getRawInPlaceStore().fillMatching(matrix1);
-            }
-            final double[][] tmpRawInPlaceData = retVal;
+        @Override
+        boolean doDecompose(final double[][] data) {
 
             if (this.checkSymmetry()) {
-                this.decomposeSymmetric(tmpRawInPlaceData);
+                this.doDecomposeSymmetric(data);
             } else {
-                this.decomposeGeneral(tmpRawInPlaceData);
+                this.doDecomposeGeneral(data);
             }
 
             return this.computed(true);
-        }
-
-        public boolean isHermitian() {
-            return this.checkSymmetry();
         }
 
     }
@@ -92,25 +83,16 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             super();
         }
 
-        public boolean decompose(final ElementsSupplier<Double> matrix) {
-
-            final Access2D<?> matrix1 = matrix.get();
-            final double[][] retVal = this.reset(matrix1, false);
-
-            if (false) {
-                RawDecomposition.wrap(matrix1).transpose().supplyTo(this.getRawInPlaceStore());
-            } else {
-                this.getRawInPlaceStore().fillMatching(matrix1);
-            }
-            final double[][] tmpRawInPlaceData = retVal;
-
-            this.decomposeGeneral(tmpRawInPlaceData);
-
-            return this.computed(true);
-        }
-
         public boolean isHermitian() {
             return false;
+        }
+
+        @Override
+        boolean doDecompose(final double[][] data) {
+
+            this.doDecomposeGeneral(data);
+
+            return this.computed(true);
         }
 
     }
@@ -121,25 +103,16 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             super();
         }
 
-        public boolean decompose(final ElementsSupplier<Double> matrix) {
-
-            final Access2D<?> matrix1 = matrix.get();
-            final double[][] retVal = this.reset(matrix1, false);
-
-            if (false) {
-                RawDecomposition.wrap(matrix1).transpose().supplyTo(this.getRawInPlaceStore());
-            } else {
-                this.getRawInPlaceStore().fillMatching(matrix1);
-            }
-            final double[][] tmpRawInPlaceData = retVal;
-
-            this.decomposeSymmetric(tmpRawInPlaceData);
-
-            return this.computed(true);
-        }
-
         public boolean isHermitian() {
             return true;
+        }
+
+        @Override
+        boolean doDecompose(final double[][] data) {
+
+            this.doDecomposeSymmetric(data);
+
+            return this.computed(true);
         }
 
     }
@@ -182,12 +155,32 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     public Double calculateDeterminant(final Access2D<?> matrix) {
-        this.decompose(RawDecomposition.wrap(matrix));
+
+        final double[][] tmpData = this.reset(matrix, false);
+
+        this.getRawInPlaceStore().fillMatching(matrix);
+
+        this.doDecompose(tmpData);
+
         return this.getDeterminant();
     }
 
     public boolean computeValuesOnly(final ElementsSupplier<Double> matrix) {
-        return this.decompose(matrix);
+
+        final double[][] tmpData = this.reset(matrix, false);
+
+        matrix.supplyTo(this.getRawInPlaceStore());
+
+        return this.doDecompose(tmpData);
+    }
+
+    public boolean decompose(final ElementsSupplier<Double> matrix) {
+
+        final double[][] tmpData = this.reset(matrix, false);
+
+        matrix.supplyTo(this.getRawInPlaceStore());
+
+        return this.doDecompose(tmpData);
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
@@ -288,20 +281,20 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     @Override
-    public final MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
-        this.decompose(RawDecomposition.wrap(original));
+    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+
+        final double[][] tmpData = this.reset(original, false);
+
+        this.getRawInPlaceStore().fillMatching(original);
+
+        this.doDecompose(tmpData);
+
         return this.getInverse(preallocated);
     }
-
-    // Symmetric Householder reduction to tridiagonal form.
 
     public boolean isOrdered() {
         return !this.isHermitian();
     }
-
-    // Symmetric tridiagonal QL algorithm.
-
-    // Nonsymmetric reduction to Hessenberg form.
 
     public boolean isSolvable() {
         return this.isComputed() && this.isHermitian();
@@ -317,8 +310,14 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     @Override
-    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
-        this.decompose(RawDecomposition.wrap(body));
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
+
+        final double[][] tmpData = this.reset(body, false);
+
+        this.getRawInPlaceStore().fillMatching(body);
+
+        this.doDecompose(tmpData);
+
         return this.solve(rhs, preallocated);
     }
 
@@ -328,7 +327,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.solve((Access2D<?>) rhs, preallocated);
+        return null;
     }
 
     /**
@@ -1024,14 +1023,16 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return null;
     }
 
-    void decomposeGeneral(final double[][] A) {
+    abstract boolean doDecompose(final double[][] data);
 
-        n = A.length;
+    void doDecomposeGeneral(final double[][] data) {
+
+        n = data.length;
         Vt = new double[n][n];
         d = new double[n];
         e = new double[n];
 
-        H = A;
+        H = data;
 
         //        for (int j = 0; j < n; j++) {
         //            for (int i = 0; i < n; i++) {
@@ -1047,10 +1048,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     }
 
-    void decomposeSymmetric(final double[][] A) {
+    void doDecomposeSymmetric(final double[][] data) {
 
-        n = A.length;
-        Vt = A;
+        n = data.length;
+        Vt = data;
         d = new double[n];
         e = new double[n];
 

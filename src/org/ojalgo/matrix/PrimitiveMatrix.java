@@ -85,17 +85,17 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
 
     @SuppressWarnings("unchecked")
     @Override
-    MatrixStore<Double> getStoreFrom(final Access1D<?> aMtrx) {
-        if (aMtrx instanceof PrimitiveMatrix) {
-            return ((PrimitiveMatrix) aMtrx).getStore();
-        } else if (aMtrx instanceof PrimitiveDenseStore) {
-            return (PrimitiveDenseStore) aMtrx;
-        } else if ((aMtrx instanceof MatrixStore) && !this.isEmpty() && (aMtrx.get(0) instanceof Double)) {
-            return (MatrixStore<Double>) aMtrx;
-        } else if (aMtrx instanceof Access2D<?>) {
-            return this.getPhysicalFactory().copy((Access2D<?>) aMtrx);
+    MatrixStore<Double> getStoreFrom(final Access1D<?> matrix) {
+        if (matrix instanceof PrimitiveMatrix) {
+            return ((PrimitiveMatrix) matrix).getStore();
+        } else if (matrix instanceof PrimitiveDenseStore) {
+            return (PrimitiveDenseStore) matrix;
+        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof Double)) {
+            return (MatrixStore<Double>) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
         } else {
-            return this.getPhysicalFactory().columns(aMtrx);
+            return this.getPhysicalFactory().columns(matrix);
         }
     }
 

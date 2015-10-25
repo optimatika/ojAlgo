@@ -68,7 +68,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         final double[][] retVal = this.reset(matrix, true);
 
-        RawDecomposition.wrap(matrix).transpose().supplyTo(this.getRawInPlaceStore());
+        MatrixStore.PRIMITIVE.makeWrapper(matrix).transpose().supplyTo(this.getRawInPlaceStore());
 
         this.doDecompose(retVal);
 
@@ -188,9 +188,9 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     @Override
     public final MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
 
-        final double[][] tmpData = this.reset(RawDecomposition.wrap(original), true);
+        final double[][] tmpData = this.reset(MatrixStore.PRIMITIVE.makeWrapper(original), true);
 
-        RawDecomposition.wrap(original).transpose().supplyTo(this.getRawInPlaceStore());
+        MatrixStore.PRIMITIVE.makeWrapper(original).transpose().supplyTo(this.getRawInPlaceStore());
 
         this.doDecompose(tmpData);
 
@@ -235,7 +235,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         final double[][] tmpData = this.reset(body, true);
 
-        RawDecomposition.wrap(body).transpose().supplyTo(this.getRawInPlaceStore());
+        MatrixStore.PRIMITIVE.makeWrapper(body).transpose().supplyTo(this.getRawInPlaceStore());
 
         this.doDecompose(tmpData);
 

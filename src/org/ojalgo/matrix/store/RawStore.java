@@ -48,7 +48,6 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.matrix.transformation.Householder;
@@ -740,13 +739,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return AccessUtils.equals(this, other, context);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(final Object other) {
-        if (other instanceof MatrixStore) {
-            return this.equals((MatrixStore<Double>) other, NumberContext.getGeneral(6));
-        } else if (other instanceof BasicMatrix) {
-            return AccessUtils.equals(this, (BasicMatrix) other, NumberContext.getGeneral(6));
+        if (other instanceof Access2D<?>) {
+            return AccessUtils.equals(this, (Access2D<?>) other, NumberContext.getGeneral(6));
         } else {
             return super.equals(other);
         }

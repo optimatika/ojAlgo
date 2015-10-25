@@ -228,19 +228,19 @@ public interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixSto
                     }
 
                     public ElementsConsumer<N> regionByColumns(final int... columns) {
-                        return this.regionByRows(columns);
+                        return consumer.regionByRows(columns);
                     }
 
                     public ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
-                        return this.regionByLimits(columnLimit, rowLimit);
+                        return consumer.regionByLimits(columnLimit, rowLimit);
                     }
 
                     public ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-                        return this.regionByOffsets(columnOffset, rowOffset);
+                        return consumer.regionByOffsets(columnOffset, rowOffset);
                     }
 
                     public ElementsConsumer<N> regionByRows(final int... rows) {
-                        return this.regionByColumns(rows);
+                        return consumer.regionByColumns(rows);
                     }
 
                     public void set(final long row, final long column, final double value) {

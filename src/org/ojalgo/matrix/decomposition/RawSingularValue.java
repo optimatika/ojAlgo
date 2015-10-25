@@ -91,11 +91,33 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public boolean computeValuesOnly(final ElementsSupplier<Double> matrix) {
-        return this.decompose(matrix.get(), false);
+
+        myTransposed = matrix.countRows() < matrix.countColumns();
+
+        final double[][] tmpData = this.reset(matrix.get(), !myTransposed);
+
+        if (myTransposed) {
+            matrix.supplyTo(this.getRawInPlaceStore());
+        } else {
+            matrix.transpose().supplyTo(this.getRawInPlaceStore());
+        }
+
+        return this.doDecompose(tmpData, false);
     }
 
     public boolean decompose(final ElementsSupplier<Double> matrix) {
-        return this.decompose(matrix.get(), true);
+
+        myTransposed = matrix.countRows() < matrix.countColumns();
+
+        final double[][] tmpData = this.reset(matrix.get(), !myTransposed);
+
+        if (myTransposed) {
+            matrix.supplyTo(this.getRawInPlaceStore());
+        } else {
+            matrix.transpose().supplyTo(this.getRawInPlaceStore());
+        }
+
+        return this.doDecompose(tmpData, true);
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
@@ -178,8 +200,20 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
-    public final MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
-        this.decompose(RawDecomposition.wrap(original));
+    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+
+        myTransposed = original.countRows() < original.countColumns();
+
+        final double[][] tmpData = this.reset(original, !myTransposed);
+
+        if (myTransposed) {
+            this.getRawInPlaceStore().fillMatching(original);
+        } else {
+            MatrixStore.PRIMITIVE.makeWrapper(original).transpose().supplyTo(this.getRawInPlaceStore());
+        }
+
+        this.doDecompose(tmpData, true);
+
         return this.getInverse(preallocated);
     }
 
@@ -218,7 +252,19 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     @Override
     public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
-        this.decompose(RawDecomposition.wrap(body));
+
+        myTransposed = body.countRows() < body.countColumns();
+
+        final double[][] tmpData = this.reset(body, !myTransposed);
+
+        if (myTransposed) {
+            this.getRawInPlaceStore().fillMatching(body);
+        } else {
+            MatrixStore.PRIMITIVE.makeWrapper(body).transpose().supplyTo(this.getRawInPlaceStore());
+        }
+
+        this.doDecompose(tmpData, true);
+
         return this.solve(rhs, preallocated);
     }
 
@@ -228,7 +274,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.solve((Access2D<?>) rhs, preallocated);
+        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
     }
 
     @Override
@@ -267,23 +313,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.doGetInverse(preallocated).multiply(rhs.get());
     }
 
-    boolean decompose(final Access2D<?> matrix, final boolean factors) {
+    boolean doDecompose(final double[][] data, final boolean factors) {
         // Derived from JAMA which is derived from LINPACK code
-
-        this.reset();
-
-        // Initialize
-        myTransposed = matrix.countRows() < matrix.countColumns();
-        final boolean transpose = !myTransposed;
-        final double[][] retVal = this.reset(matrix, transpose);
-
-        if (transpose) {
-            RawDecomposition.wrap(matrix).transpose().supplyTo(this.getRawInPlaceStore());
-        } else {
-            this.getRawInPlaceStore().fillMatching(matrix);
-        }
-
-        final double[][] At = retVal;
 
         // Input is possibly transposed so that m >= n always
         m = this.getMaxDim();
@@ -305,7 +336,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         final int nrt = Math.max(0, n - 2); // Number of Row Transformations
         final int tmpLimK = Math.max(nct, nrt);
         for (int k = 0; k < tmpLimK; k++) {
-            tmpAt_k = At[k];
+            tmpAt_k = data[k];
 
             if (k < nct) {
                 // Compute the transformation for the k-th column and
@@ -329,9 +360,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
                     // Apply the transformation to the remaining columns
                     for (int j = k + 1; j < n; j++) {
-                        double t = DotProduct.invoke(tmpAt_k, 0, At[j], 0, k, m);
+                        double t = DotProduct.invoke(tmpAt_k, 0, data[j], 0, k, m);
                         t = t / tmpAt_k[k];
-                        SubtractScaledVector.invoke(At[j], 0, tmpAt_k, 0, t, k, m);
+                        SubtractScaledVector.invoke(data[j], 0, tmpAt_k, 0, t, k, m);
                     }
                 }
                 myS[k] = -nrm;
@@ -340,7 +371,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             for (int j = k + 1; j < n; j++) {
                 // Place the k-th row of A into e for the
                 // subsequent calculation of the row transformation.
-                tmpE[j] = At[j][k];
+                tmpE[j] = data[j][k];
             }
 
             if (factors && (k < nct)) {
@@ -374,10 +405,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     }
                     // ... remining columns
                     for (int j = k + 1; j < n; j++) {
-                        SubtractScaledVector.invoke(tmpWork, 0, At[j], 0, -tmpE[j], k + 1, m);
+                        SubtractScaledVector.invoke(tmpWork, 0, data[j], 0, -tmpE[j], k + 1, m);
                     }
                     for (int j = k + 1; j < n; j++) {
-                        SubtractScaledVector.invoke(At[j], 0, tmpWork, 0, tmpE[j] / tmpE[k + 1], k + 1, m);
+                        SubtractScaledVector.invoke(data[j], 0, tmpWork, 0, tmpE[j] / tmpE[k + 1], k + 1, m);
                     }
                 }
                 tmpE[k] = -nrm;
@@ -394,13 +425,13 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         // Set up the final bidiagonal matrix or order p. []
         int p = n;
         if (nct < n) { // Only happens when m == n, then nct == n-1
-            myS[nct] = At[nct][nct];
+            myS[nct] = data[nct][nct];
         }
         //        if (m < p) {
         //            myS[p - 1] = ZERO;
         //        }
         if ((nrt + 1) < p) {
-            tmpE[nrt] = At[p - 1][nrt];
+            tmpE[nrt] = data[p - 1][nrt];
         }
         tmpE[p - 1] = ZERO;
 
