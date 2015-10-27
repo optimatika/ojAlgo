@@ -278,6 +278,14 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         this.set(index, supplier.get());
     }
 
+    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
+        if (this.isPrimitive()) {
+            this.set(index, values.doubleValue(valueIndex));
+        } else {
+            this.set(index, values.get(valueIndex));
+        }
+    }
+
     @Override
     public void fillRange(final long first, final long limit, final N value) {
         this.fill(first, limit, 1L, value);

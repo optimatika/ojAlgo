@@ -277,6 +277,10 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, value);
     }
 
+    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
+        mySegments[(int) (index >> myIndexBits)].fillOneMatching(index & myIndexMask, values, valueIndex);
+    }
+
     public void fillOne(final long index, final NullaryFunction<N> supplier) {
         mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, supplier);
     }

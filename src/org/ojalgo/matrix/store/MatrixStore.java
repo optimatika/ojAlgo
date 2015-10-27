@@ -594,6 +594,10 @@ public interface MatrixStore<N extends Number>
         return new BinaryOperatorSupplier<>(this, operator, right);
     }
 
+    default ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
+        return new BinaryOperatorSupplier<>(left, operator, this);
+    }
+
     /**
      * @deprecated v39 Use {@link #multiply(Number)} instead.
      */

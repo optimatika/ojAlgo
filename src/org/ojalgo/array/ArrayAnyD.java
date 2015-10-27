@@ -234,6 +234,10 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.fillOne(AccessUtils.index(myStructure, reference), supplier);
     }
 
+    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
+        myDelegate.fillOneMatching(index, values, valueIndex);
+    }
+
     public void fillRange(final long first, final long limit, final N value) {
         myDelegate.fill(first, limit, 1L, value);
     }
@@ -355,6 +359,10 @@ public final class ArrayAnyD<N extends Number>
         myDelegate.set(AccessUtils.index(myStructure, reference), value);
     }
 
+    public long[] shape() {
+        return myStructure;
+    }
+
     public Array1D<N> slice(final long[] first, final int dimension) {
 
         final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
@@ -364,10 +372,6 @@ public final class ArrayAnyD<N extends Number>
         final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         return new Array1D<N>(myDelegate, tmpFirst, tmpLimit, tmpStep);
-    }
-
-    public long[] shape() {
-        return myStructure;
     }
 
     @Override

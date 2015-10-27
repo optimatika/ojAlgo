@@ -105,7 +105,7 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         default void fillMatching(final Access1D<?> values) {
             final long tmpLimit = FunctionUtils.min(this.count(), values.count());
             for (long i = 0; i < tmpLimit; i++) {
-                this.set(i, values.get(i));
+                this.fillOneMatching(i, values, i);
             }
         }
 
@@ -140,6 +140,8 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         void fillOne(long index, N value);
 
         void fillOne(long index, NullaryFunction<N> supplier);
+
+        void fillOneMatching(long index, final Access1D<?> values, long valueIndex);
 
         void fillRange(long first, long limit, N value);
 

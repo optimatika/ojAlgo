@@ -38,7 +38,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-abstract class DenseArray<N extends Number> extends BasicArray<N>implements RandomAccess {
+abstract class DenseArray<N extends Number> extends BasicArray<N> implements RandomAccess {
 
     static abstract class DenseFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -94,6 +94,10 @@ abstract class DenseArray<N extends Number> extends BasicArray<N>implements Rand
 
     public void fillOne(final long index, final NullaryFunction<N> supplier) {
         this.fillOne((int) index, supplier);
+    }
+
+    public final void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
+        this.fillOneMatching((int) index, values, valueIndex);
     }
 
     public final void fillRange(final long first, final long limit, final N number) {
@@ -185,6 +189,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N>implements Rand
     protected abstract void fillOne(int index, N value);
 
     protected abstract void fillOne(int index, NullaryFunction<N> supplier);
+
+    protected abstract void fillOneMatching(final int index, final Access1D<?> values, final long valueIndex);
 
     protected abstract N get(final int index);
 

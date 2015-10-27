@@ -1337,6 +1337,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.fillOne(row, column, supplier);
     }
 
+    public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+        this.set(row, column, values.doubleValue(valueIndex));
+    }
+
     public void fillRow(final long row, final long column, final Double value) {
         myUtility.fillRow(row, column, value);
     }

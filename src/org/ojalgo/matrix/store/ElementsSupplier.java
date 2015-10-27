@@ -40,7 +40,7 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixStore<N>> {
 
-    default ElementsSupplier<N> andThenOnAll(final UnaryFunction<N> operator) {
+    default ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {
 
         return new ContextSupplier<N>(this) {
 
@@ -66,7 +66,7 @@ public interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixSto
 
     }
 
-    default ElementsSupplier<N> andThenOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
+    default ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
 
         return new ContextSupplier<N>(this) {
 
@@ -92,7 +92,7 @@ public interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixSto
 
     }
 
-    default ElementsSupplier<N> andThenOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
+    default ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
 
         return new ContextSupplier<N>(this) {
 
@@ -193,6 +193,10 @@ public interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixSto
 
                     public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
                         consumer.fillOne(column, row, supplier);
+                    }
+
+                    public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+                        consumer.fillOneMatching(column, row, values, valueIndex);
                     }
 
                     public void fillRow(final long row, final long column, final N value) {

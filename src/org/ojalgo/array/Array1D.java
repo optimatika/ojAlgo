@@ -640,4 +640,8 @@ public final class Array1D<N extends Number> extends AbstractList<N>
         return myDelegate;
     }
 
+    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
+        myDelegate.fillOneMatching(myFirst + (myStep * index), values, valueIndex);
+    }
+
 }

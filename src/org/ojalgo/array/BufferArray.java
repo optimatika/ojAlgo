@@ -426,4 +426,9 @@ public class BufferArray extends DenseArray<Double> {
         // return new MyTestArray(capacity);
     }
 
+    @Override
+    protected void fillOneMatching(final int index, final Access1D<?> values, final long valueIndex) {
+        myBuffer.put(index, values.doubleValue(valueIndex));
+    }
+
 }

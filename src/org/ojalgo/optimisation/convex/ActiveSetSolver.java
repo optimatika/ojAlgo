@@ -26,6 +26,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -394,7 +395,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     protected void performIteration() {
 
         if (this.isDebug()) {
-            this.debug("\nPerformIteration");
+            this.debug("\nPerformIteration {}", 1 + this.countIterations());
             this.debug(myActivator.toString());
         }
 
@@ -426,7 +427,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
 
                 // Negated Schur complement
-                final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
+                // final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
+                final ElementsSupplier<Double> tmpS = tmpInvQAT.multiplyLeft(tmpIterA);
                 // TODO Symmetric, only need to calculate halv the Schur complement
 
                 if (tmpSolvable = myLU.compute(tmpS)) {
@@ -436,10 +438,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     //TODO Constant if C doesn't change
 
                     //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
-                    // TODO B is zero
-                    myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
-                    //myLU.solve(myInvQC.multiplyLeft(tmpIterA).andThenOnMatching(SUBTRACT, tmpIterB).get(), tmpIterL);
-                    myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
+                    //myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
+                    myLU.solve(myInvQC.multiplyLeft(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
+
+                    //myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
+                    myCholesky.solve(tmpIterL.multiplyLeft(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
                 }
             }
         }

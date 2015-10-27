@@ -415,6 +415,14 @@ public final class Array2D<N extends Number>
         myDelegate.fillOne(index, supplier);
     }
 
+    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
+        myDelegate.fillOneMatching(index, values, valueIndex);
+    }
+
+    public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+        myDelegate.fillOneMatching(AccessUtils.index(myRowsCount, row, column), values, valueIndex);
+    }
+
     public void fillRange(final long first, final long limit, final N value) {
         myDelegate.fill(first, limit, 1L, value);
     }

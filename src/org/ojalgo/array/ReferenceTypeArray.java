@@ -129,6 +129,20 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
         }
     }
 
+    public final void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
+        for (int i = 0; i < tmpLimit; i++) {
+            data[i] = function.invoke(left.get(i), right.get(i));
+        }
+    }
+
+    public final void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
+        for (int i = 0; i < tmpLimit; i++) {
+            data[i] = function.invoke(arguments.get(i));
+        }
+    }
+
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
@@ -186,6 +200,11 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
     @Override
     protected final void fillOne(final int index, final NullaryFunction<N> supplier) {
         data[index] = supplier.get();
+    }
+
+    @Override
+    protected final void fillOneMatching(final int index, final Access1D<?> values, final long valueIndex) {
+        data[index] = this.valueOf(values.get(valueIndex));
     }
 
     @Override
@@ -281,19 +300,5 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
     abstract N valueOf(double value);
 
     abstract N valueOf(Number number);
-
-    public final void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            data[i] = function.invoke(left.get(i), right.get(i));
-        }
-    }
-
-    public final void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
-        for (int i = 0; i < tmpLimit; i++) {
-            data[i] = function.invoke(arguments.get(i));
-        }
-    }
 
 }

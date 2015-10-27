@@ -113,6 +113,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.set(row, myColumns[(int) column], value);
         }
 
+        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOneMatching(row, myColumns[(int) column], values, valueIndex);
+        }
+
     }
 
     abstract static class ConsumerRegion<N extends Number> implements ElementsConsumer<N> {
@@ -247,6 +251,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.set(row, column, value);
         }
 
+        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOneMatching(row, column, values, valueIndex);
+        }
+
     }
 
     public static final class OffsetRegion<N extends Number> extends ConsumerRegion<N> {
@@ -355,6 +363,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.set(myRowOffset + row, myColumnOffset + column, value);
         }
 
+        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOneMatching(myRowOffset + row, myColumnOffset + column, values, valueIndex);
+        }
+
     }
 
     public static final class RowsRegion<N extends Number> extends ConsumerRegion<N> {
@@ -420,6 +432,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.set(myRows[(int) row], column, value);
         }
 
+        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOneMatching(myRows[(int) row], column, values, valueIndex);
+        }
+
     }
 
     /**
@@ -469,7 +485,8 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
 
     /**
      * <p>
-     * As in {@link MatrixStore#multiplyLeft(MatrixStore)} where the left/parameter matrix is a plane rotation.
+     * As in {@link MatrixStore#multiplyLeft(MatrixStore)} where the left/parameter matrix is a plane
+     * rotation.
      * </p>
      * <p>
      * Multiplying by a plane rotation from the left means that [this] gets two of its rows updated to new

@@ -885,6 +885,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         data[(int) row][(int) column] = supplier.doubleValue();
     }
 
+    public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+        this.set(row, column, values.doubleValue(valueIndex));
+    }
+
     public void fillRange(final long first, final long limit, final Double value) {
         ArrayUtils.fillRange(data, (int) first, (int) limit, value);
     }

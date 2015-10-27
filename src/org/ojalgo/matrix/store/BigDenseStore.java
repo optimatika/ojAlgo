@@ -754,6 +754,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myUtility.fillOne(row, column, supplier);
     }
 
+    public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+        this.set(row, column, values.get(valueIndex));
+    }
+
     public void fillRow(final long row, final long column, final BigDecimal value) {
         myUtility.fillRow(row, column, value);
     }

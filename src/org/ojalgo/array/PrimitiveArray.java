@@ -379,6 +379,20 @@ public class PrimitiveArray extends DenseArray<Double> {
         }
     }
 
+    public final void fillMatching(final Access1D<?> values) {
+        PrimitiveArray.fill(data, values);
+    }
+
+    public final void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
+        PrimitiveArray.invoke(data, 0, tmpLimit, 1, left, function, right);
+    }
+
+    public final void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
+        final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
+        PrimitiveArray.invoke(data, 0, tmpLimit, 1, arguments, function);
+    }
+
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
@@ -450,6 +464,11 @@ public class PrimitiveArray extends DenseArray<Double> {
     @Override
     protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
         data[index] = supplier.doubleValue();
+    }
+
+    @Override
+    protected void fillOneMatching(final int index, final Access1D<?> values, final long valueIndex) {
+        data[index] = values.doubleValue(valueIndex);
     }
 
     @Override
@@ -577,20 +596,6 @@ public class PrimitiveArray extends DenseArray<Double> {
 
     OfDouble split() {
         return Spliterators.spliterator(data, 0);
-    }
-
-    public final void fillMatching(final Access1D<?> values) {
-        PrimitiveArray.fill(data, values);
-    }
-
-    public final void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
-        PrimitiveArray.invoke(data, 0, tmpLimit, 1, left, function, right);
-    }
-
-    public final void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
-        final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
-        PrimitiveArray.invoke(data, 0, tmpLimit, 1, arguments, function);
     }
 
 }

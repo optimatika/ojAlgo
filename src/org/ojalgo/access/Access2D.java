@@ -153,6 +153,13 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), supplier);
         }
 
+        default void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
+            final long tmpStructure = this.countRows();
+            this.fillOneMatching(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), values, valueIndex);
+        }
+
+        void fillOneMatching(long row, long column, final Access1D<?> values, final long valueIndex);
+
         default void fillRange(final long first, final long limit, final N value) {
             for (long i = first; i < limit; i++) {
                 this.fillOne(i, value);
