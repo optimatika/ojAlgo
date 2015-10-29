@@ -89,11 +89,6 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
         return myRight.limitOfRow(row);
     }
 
-    /**
-     * @deprecated v39 Use {@link #multiply(MatrixStore, boolean)} instead
-     */
-    @Override
-    @Deprecated
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
 
         final Future<MatrixStore<N>> tmpBaseFuture = this.executeMultiplyLeftOnBase(leftMtrx);

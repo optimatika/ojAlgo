@@ -166,4 +166,9 @@ public interface ElementsConsumer<N extends Number> extends Consumer2D<Access2D<
      */
     ElementsConsumer<N> regionByRows(int... rows);
 
+    /**
+     * @return A transposed consumer region
+     */
+    ElementsConsumer<N> regionByTransposing();
+
 }

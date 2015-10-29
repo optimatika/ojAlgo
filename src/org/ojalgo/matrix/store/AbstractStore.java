@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store;
 import java.io.Serializable;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -128,6 +129,24 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
     public int limitOfRow(final int row) {
         return myColDim;
+    }
+
+    public N multiplyBoth(final Access1D<N> leftAndRight) {
+
+        final PhysicalStore<N> tmpStep1 = this.factory().makeZero(1L, leftAndRight.count());
+        final PhysicalStore<N> tmpStep2 = this.factory().makeZero(1L, 1L);
+
+        if (this.isPrimitive()) {
+            tmpStep1.fillByMultiplying(leftAndRight, this);
+        } else {
+            final PhysicalStore<N> tmpLeft = this.factory().rows(leftAndRight);
+            tmpLeft.fillMatching(this.factory().function().conjugate(), leftAndRight);
+            tmpStep1.fillByMultiplying(tmpLeft, this);
+        }
+
+        tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
+
+        return tmpStep2.get(0L);
     }
 
     public void supplyTo(final ElementsConsumer<N> consumer) {

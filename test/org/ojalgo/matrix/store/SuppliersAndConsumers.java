@@ -21,26 +21,33 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
+import org.ojalgo.TestUtils;
 
-abstract class ContextSupplier<N extends Number> implements ElementsSupplier<N> {
+public class SuppliersAndConsumers extends AbstractMatrixStoreTest {
 
-    private final ElementsSupplier<N> myContext;
-
-    protected ContextSupplier(final ElementsSupplier<N> context) {
+    public SuppliersAndConsumers() {
         super();
-        myContext = context;
     }
 
-    public Factory<N, ?> factory() {
-        return myContext.factory();
+    public SuppliersAndConsumers(final String arg0) {
+        super(arg0);
     }
 
-    public abstract void supplyTo(final ElementsConsumer<N> consumer);
+    public void testMultiplyingAndTransposing() {
 
-    @Override
-    public String toString() {
-        return myContext.toString();
+        final PrimitiveDenseStore tmpMtrxA = PrimitiveDenseStore.FACTORY.makeZero(10, 5);
+        final MatrixStore<Double> tmpMtrxB = PrimitiveDenseStore.FACTORY.makeEye(5, 5).multiply(2.0);
+        final PrimitiveDenseStore tmpMtrxC = PrimitiveDenseStore.FACTORY.makeZero(5, 10);
+        final PrimitiveDenseStore tmpMtrxD = PrimitiveDenseStore.FACTORY.makeZero(5, 10);
+
+        for (int j = 0; j < 5; j++) {
+            tmpMtrxA.fillColumn(0L, j, j + 1.0);
+            tmpMtrxD.fillRow(j, 0L, 2.0 * (j + 1.0));
+        }
+
+        tmpMtrxB.multiplyLeft(tmpMtrxA).transpose().supplyTo(tmpMtrxC);
+
+        TestUtils.assertEquals(tmpMtrxD, tmpMtrxC);
     }
 
 }

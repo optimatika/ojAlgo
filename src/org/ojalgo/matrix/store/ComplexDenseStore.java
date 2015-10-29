@@ -905,6 +905,20 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return retVal;
     }
 
+    public ComplexNumber multiplyBoth(final Access1D<ComplexNumber> leftAndRight) {
+
+        final PhysicalStore<ComplexNumber> tmpStep1 = FACTORY.makeZero(1L, leftAndRight.count());
+        final PhysicalStore<ComplexNumber> tmpStep2 = FACTORY.makeZero(1L, 1L);
+
+        final PhysicalStore<ComplexNumber> tmpLeft = FACTORY.rows(leftAndRight);
+        tmpLeft.fillMatching(FACTORY.function().conjugate(), leftAndRight);
+        tmpStep1.fillByMultiplying(tmpLeft, this);
+
+        tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
+
+        return tmpStep2.get(0L);
+    }
+
     public void negateColumn(final int column) {
         myUtility.modifyColumn(0, column, ComplexFunction.NEGATE);
     }
@@ -928,6 +942,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public final ElementsConsumer<ComplexNumber> regionByRows(final int... rows) {
         return new RowsRegion<ComplexNumber>(this, multiplyBoth, rows);
+    }
+
+    public final ElementsConsumer<ComplexNumber> regionByTransposing() {
+        return new TransposedRegion<ComplexNumber>(this, multiplyBoth);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

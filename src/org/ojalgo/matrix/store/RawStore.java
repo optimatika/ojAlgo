@@ -1086,6 +1086,17 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
+    public Double multiplyBoth(final Access1D<Double> leftAndRight) {
+
+        final PhysicalStore<Double> tmpStep1 = FACTORY.makeZero(1L, leftAndRight.count());
+        final PhysicalStore<Double> tmpStep2 = FACTORY.makeZero(1L, 1L);
+
+        tmpStep1.fillByMultiplying(leftAndRight, this);
+        tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
+
+        return tmpStep2.get(0L);
+    }
+
     public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {
 
         final double tmpValA = scalarA.doubleValue();
@@ -1113,6 +1124,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public final ElementsConsumer<Double> regionByRows(final int... rows) {
         return new RowsRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rows);
+    }
+
+    public final ElementsConsumer<Double> regionByTransposing() {
+        return new TransposedRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns));
     }
 
     public void set(final long row, final long column, final double value) {

@@ -1473,6 +1473,17 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return retVal;
     }
 
+    public Double multiplyBoth(final Access1D<Double> leftAndRight) {
+
+        final PhysicalStore<Double> tmpStep1 = FACTORY.makeZero(1L, leftAndRight.count());
+        final PhysicalStore<Double> tmpStep2 = FACTORY.makeZero(1L, 1L);
+
+        tmpStep1.fillByMultiplying(leftAndRight, this);
+        tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
+
+        return tmpStep2.get(0L);
+    }
+
     public void negateColumn(final int column) {
         myUtility.modifyColumn(0, column, PrimitiveFunction.NEGATE);
     }
@@ -1496,6 +1507,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public final ElementsConsumer<Double> regionByRows(final int... rows) {
         return new RowsRegion<Double>(this, multiplyBoth, rows);
+    }
+
+    public final ElementsConsumer<Double> regionByTransposing() {
+        return new TransposedRegion<Double>(this, multiplyBoth);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

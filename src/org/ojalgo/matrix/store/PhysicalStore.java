@@ -33,6 +33,10 @@ import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
+import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyBoth;
+import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyBoth;
+import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
@@ -56,7 +60,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
         private final int[] myColumns;
 
         ColumnsRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int... columns) {
-            super(multiplier);
+            super(multiplier, base.countRows(), columns.length);
             myBase = base;
             myColumns = columns;
         }
@@ -97,6 +101,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.fillOne(row, myColumns[(int) column], supplier);
         }
 
+        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOneMatching(row, myColumns[(int) column], values, valueIndex);
+        }
+
         public void modifyColumn(final long row, final long column, final UnaryFunction<N> function) {
             myBase.modifyColumn(row, myColumns[(int) column], function);
         }
@@ -113,10 +121,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.set(row, myColumns[(int) column], value);
         }
 
-        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOneMatching(row, myColumns[(int) column], values, valueIndex);
-        }
-
     }
 
     abstract static class ConsumerRegion<N extends Number> implements ElementsConsumer<N> {
@@ -125,17 +129,26 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
 
         @SuppressWarnings("unused")
         private ConsumerRegion() {
-            this(null);
+            this(null, 0L, 0L);
         }
 
-        ConsumerRegion(final FillByMultiplying<N> multiplier) {
+        @SuppressWarnings("unchecked")
+        ConsumerRegion(final FillByMultiplying<N> multiplier, final long rows, final long columns) {
 
             super();
 
-            myMultiplier = multiplier;
+            if (multiplier instanceof PrimitiveMultiplyBoth) {
+                myMultiplier = (FillByMultiplying<N>) MultiplyBoth.getPrimitive(rows, columns);
+            } else if (multiplier instanceof ComplexMultiplyBoth) {
+                myMultiplier = (FillByMultiplying<N>) MultiplyBoth.getComplex(rows, columns);
+            } else if (multiplier instanceof BigMultiplyBoth) {
+                myMultiplier = (FillByMultiplying<N>) MultiplyBoth.getBig(rows, columns);
+            } else {
+                myMultiplier = multiplier;
+            }
         }
 
-        public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
+        public final void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
             myMultiplier.invoke(this, left, (int) (left.count() / this.countRows()), right);
         }
 
@@ -169,6 +182,15 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
 
         public final ElementsConsumer<N> regionByRows(final int... rows) {
             return new RowsRegion<N>(this, myMultiplier, rows);
+        }
+
+        public ElementsConsumer<N> regionByTransposing() {
+            return new TransposedRegion<N>(this, myMultiplier);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " " + this.countRows() + " x " + this.countColumns();
         }
 
     }
@@ -209,7 +231,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
         private final int myRowLimit, myColumnLimit; // limits
 
         LimitRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int rowLimit, final int columnLimit) {
-            super(multiplier);
+            super(multiplier, rowLimit, columnLimit);
             myBase = base;
             myRowLimit = rowLimit;
             myColumnLimit = columnLimit;
@@ -239,6 +261,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.fillOne(row, column, supplier);
         }
 
+        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOneMatching(row, column, values, valueIndex);
+        }
+
         public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
             myBase.modifyOne(row, column, function);
         }
@@ -251,10 +277,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.set(row, column, value);
         }
 
-        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOneMatching(row, column, values, valueIndex);
-        }
-
     }
 
     public static final class OffsetRegion<N extends Number> extends ConsumerRegion<N> {
@@ -263,7 +285,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
         private final int myRowOffset, myColumnOffset; // origin/offset
 
         OffsetRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int rowOffset, final int columnOffset) {
-            super(multiplier);
+            super(multiplier, base.countRows() - rowOffset, base.countColumns() - columnOffset);
             myBase = base;
             myRowOffset = rowOffset;
             myColumnOffset = columnOffset;
@@ -325,6 +347,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.fillOne(myRowOffset + row, myColumnOffset + column, supplier);
         }
 
+        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOneMatching(myRowOffset + row, myColumnOffset + column, values, valueIndex);
+        }
+
         public void fillRow(final long row, final long column, final N value) {
             myBase.fillRow(myRowOffset + row, myColumnOffset + column, value);
         }
@@ -363,10 +389,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.set(myRowOffset + row, myColumnOffset + column, value);
         }
 
-        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOneMatching(myRowOffset + row, myColumnOffset + column, values, valueIndex);
-        }
-
     }
 
     public static final class RowsRegion<N extends Number> extends ConsumerRegion<N> {
@@ -375,7 +397,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
         private final int[] myRows;
 
         RowsRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier, final int... rows) {
-            super(multiplier);
+            super(multiplier, rows.length, base.countColumns());
             myBase = base;
             myRows = rows;
         }
@@ -402,6 +424,10 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
 
         public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
             myBase.fillOne(myRows[(int) row], column, supplier);
+        }
+
+        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOneMatching(myRows[(int) row], column, values, valueIndex);
         }
 
         public void fillRow(final long row, final long column, final Access1D<N> values) {
@@ -432,8 +458,106 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.set(myRows[(int) row], column, value);
         }
 
+    }
+
+    public static final class TransposedRegion<N extends Number> extends ConsumerRegion<N> {
+
+        private final ElementsConsumer<N> myBase;
+
+        TransposedRegion(final ElementsConsumer<N> base, final FillByMultiplying<N> multiplier) {
+            super(multiplier, base.countColumns(), base.countRows());
+            myBase = base;
+        }
+
+        public void add(final long row, final long column, final double addend) {
+            myBase.add(column, row, addend);
+        }
+
+        public void add(final long row, final long column, final Number addend) {
+            myBase.add(column, row, addend);
+        }
+
+        public long countColumns() {
+            return myBase.countRows();
+        }
+
+        public long countRows() {
+            return myBase.countColumns();
+        }
+
+        public void fillColumn(final long row, final long column, final N value) {
+            myBase.fillRow(column, row, value);
+        }
+
+        public void fillColumn(final long row, final long column, final NullaryFunction<N> supplier) {
+            myBase.fillRow(column, row, supplier);
+        }
+
+        public void fillDiagonal(final long row, final long column, final N value) {
+            myBase.fillDiagonal(column, row, value);
+        }
+
+        public void fillDiagonal(final long row, final long column, final NullaryFunction<N> supplier) {
+            myBase.fillRow(column, row, supplier);
+        }
+
+        public void fillOne(final long row, final long column, final N value) {
+            myBase.fillOne(column, row, value);
+        }
+
+        public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
+            myBase.fillOne(column, row, supplier);
+        }
+
         public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOneMatching(myRows[(int) row], column, values, valueIndex);
+            myBase.fillOneMatching(column, row, values, valueIndex);
+        }
+
+        public void fillRow(final long row, final long column, final N value) {
+            myBase.fillDiagonal(column, row, value);
+        }
+
+        public void fillRow(final long row, final long column, final NullaryFunction<N> supplier) {
+            myBase.fillDiagonal(column, row, supplier);
+        }
+
+        public void modifyColumn(final long row, final long column, final UnaryFunction<N> function) {
+            myBase.modifyRow(column, row, function);
+        }
+
+        public void modifyDiagonal(final long row, final long column, final UnaryFunction<N> function) {
+            myBase.modifyDiagonal(column, row, function);
+        }
+
+        @Override
+        public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
+            myBase.modifyMatching(left, function);
+        }
+
+        @Override
+        public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
+            myBase.modifyMatching(function, right);
+        }
+
+        public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
+            myBase.modifyOne(column, row, function);
+        }
+
+        public void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
+            myBase.modifyColumn(column, row, function);
+        }
+
+        @Override
+        public ElementsConsumer<N> regionByTransposing() {
+            return myBase;
+        }
+
+        public void set(final long row, final long column, final double value) {
+            myBase.set(column, row, value);
+        }
+
+        public void set(final long row, final long column, final Number value) {
+            myBase.set(column, row, value);
         }
 
     }

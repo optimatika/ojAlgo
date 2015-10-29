@@ -886,6 +886,17 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return retVal;
     }
 
+    public BigDecimal multiplyBoth(final Access1D<BigDecimal> leftAndRight) {
+
+        final PhysicalStore<BigDecimal> tmpStep1 = FACTORY.makeZero(1L, leftAndRight.count());
+        final PhysicalStore<BigDecimal> tmpStep2 = FACTORY.makeZero(1L, 1L);
+
+        tmpStep1.fillByMultiplying(leftAndRight, this);
+        tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
+
+        return tmpStep2.get(0L);
+    }
+
     public void negateColumn(final int column) {
         myUtility.modifyColumn(0, column, BigFunction.NEGATE);
     }
@@ -909,6 +920,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public final ElementsConsumer<BigDecimal> regionByRows(final int... rows) {
         return new RowsRegion<BigDecimal>(this, multiplyBoth, rows);
+    }
+
+    public final ElementsConsumer<BigDecimal> regionByTransposing() {
+        return new TransposedRegion<BigDecimal>(this, multiplyBoth);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

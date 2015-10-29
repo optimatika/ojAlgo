@@ -574,6 +574,14 @@ public interface MatrixStore<N extends Number>
         return this.operateOnAll(this.factory().function().multiply().second(scalar)).get();
     }
 
+    /**
+     * Assumes [leftAndRight] is a vecor and will calulate [leftAndRight]<sup>H</sup>[this][leftAndRight]
+     *
+     * @param leftAndRight The argument vector
+     * @return A scalar (extracted from the resulting 1 x 1 matrix)
+     */
+    N multiplyBoth(final Access1D<N> leftAndRight);
+
     default ElementsSupplier<N> multiplyLeft(final Access1D<N> left) {
         return new MatrixProductSupplier<N>(left, this);
     }
