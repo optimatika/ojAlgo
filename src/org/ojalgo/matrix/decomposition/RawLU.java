@@ -75,8 +75,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     public boolean decompose(final ElementsSupplier<Double> matrix) {
 
-        this.reset();
-
         final double[][] tmpData = this.reset(matrix, false);
 
         matrix.supplyTo(this.getRawInPlaceStore());
@@ -222,20 +220,28 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         final double[][] tmpData = this.reset(body, false);
 
-        this.getRawInPlaceStore().fillMatching(this.getRawInPlaceStore());
+        this.getRawInPlaceStore().fillMatching(body);
 
         this.doDecompose(tmpData);
 
-        return this.solve(rhs, preallocated);
+        MatrixStore.PRIMITIVE.makeWrapper(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
+
+        return this.doSolve(preallocated);
     }
 
     @Override
     public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+
+        rhs.get().builder().row(myPivot.getOrder()).supplyTo(preallocated);
+
+        return this.doSolve(preallocated);
     }
 
     public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+
+        rhs.builder().row(myPivot.getOrder()).supplyTo(preallocated);
+
+        return this.doSolve(preallocated);
     }
 
     @Override
@@ -256,9 +262,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return preallocated;
     }
 
-    MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final PrimitiveDenseStore preallocated) {
-
-        rhs.get().builder().row(myPivot.getOrder()).supplyTo(preallocated);
+    MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
 
         final MatrixStore<Double> tmpBody = this.getRawInPlaceStore();
 

@@ -21,15 +21,21 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.util.List;
+
 import org.ojalgo.TestUtils;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.SolverTask;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
+import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -147,6 +153,23 @@ public class DesignCase extends MatrixDecompositionTests {
         tmpNewDecomp.getQ2();
 
         TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, new NumberContext(7, 6));
+    }
+
+    public void testSolveIdentity() {
+
+        final Access2D<?> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(9).get();
+        final Access2D<?> tmpRandom = PrimitiveDenseStore.FACTORY.makeFilled(9, 1, new Uniform());
+
+        final List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getAllPrimitive();
+        for (final MatrixDecomposition<Double> tmpDecomp : tmpAllDecomps) {
+            if (tmpDecomp instanceof SolverTask) {
+                try {
+                    TestUtils.assertEquals(tmpDecomp.getClass().toString(), tmpRandom, ((SolverTask) tmpDecomp).solve(tmpIdentity, tmpRandom));
+                } catch (final TaskException xcptn) {
+                    TestUtils.fail(xcptn.getMessage());
+                }
+            }
+        }
     }
 
     private void doTestSolveInverse(final MatrixDecomposition.Solver<Double> aDecomp, final MatrixStore<Double> aMtrx) {

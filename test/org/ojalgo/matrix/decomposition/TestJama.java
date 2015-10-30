@@ -99,7 +99,7 @@ public class TestJama extends MatrixDecompositionTests {
             }
 
             EIGENVALUE.decompose(aMtrx);
-            if (EIGENVALUE.isSolvable()) {
+            if (EIGENVALUE.isComputed()) {
                 TestUtils.assertEquals(aMtrx, EIGENVALUE, EVAL_CNTXT);
             }
         }

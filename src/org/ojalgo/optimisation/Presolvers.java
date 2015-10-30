@@ -37,9 +37,6 @@ public abstract class Presolvers {
     /**
      * Checks the sign of the limits and the sign of the expression parameters to deduce variables that in
      * fact can only zero.
-     *
-     * @param fixedVariables The current set of fixed variable indices
-     * @return true if an additional variable was fixed
      */
     public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
 
@@ -115,9 +112,6 @@ public abstract class Presolvers {
     /**
      * Looks for constraint expressions with 0, 1 or 2 non-fixed variables. Transfers the constraints of the
      * expressions to the variables and then marks the expression as redundant.
-     *
-     * @param fixedVariables The current set of fixed variable indices
-     * @return true if an additional variable was fixed (and marked this expression as redundant)
      */
     public static final ExpressionsBasedModel.Presolver ZERO_ONE_TWO = new ExpressionsBasedModel.Presolver(10) {
 

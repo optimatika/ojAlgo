@@ -49,8 +49,8 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface Eigenvalue<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.Hermitian<N>,
-        MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N> {
+public interface Eigenvalue<N extends Number>
+        extends MatrixDecomposition<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N> {
 
     public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
         return Eigenvalue.make(typical, MatrixUtils.isHermitian(typical));

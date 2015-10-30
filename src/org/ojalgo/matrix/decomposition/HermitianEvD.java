@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
@@ -39,7 +41,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> {
+abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
 
     static final class Big extends HermitianEvD<BigDecimal> {
 
@@ -420,6 +422,44 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
     @Override
     protected MatrixStore<N> makeV() {
         return myTridiagonal.getQ();
+    }
+
+    public MatrixStore<N> invert(final Access2D<?> original) {
+        this.decompose(this.wrap(original));
+        return this.getInverse();
+    }
+
+    public MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) {
+        this.decompose(this.wrap(original));
+        return this.getInverse(preallocated);
+    }
+
+    public DecompositionStore<N> preallocate(final Structure2D template) {
+        final long tmpCountRows = template.countRows();
+        return this.preallocate(tmpCountRows, tmpCountRows);
+    }
+
+    public DecompositionStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+        return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
+    }
+
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) {
+        this.decompose(this.wrap(body));
+        return this.solve(this.wrap(rhs));
+    }
+
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) {
+        this.decompose(this.wrap(body));
+        return this.solve(rhs, preallocated);
+    }
+
+    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
+        return this.getInverse().multiply(rhs.get());
+    }
+
+    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+        preallocated.fillByMultiplying(this.getInverse(), rhs.get());
+        return preallocated;
     }
 
 }

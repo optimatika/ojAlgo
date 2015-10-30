@@ -88,7 +88,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
 
         final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.makePrimitive(true);
 
-        tmpEigenvalue.compute(tmpLeftA);
+        tmpEigenvalue.decompose(tmpLeftA);
         final MatrixStore<Double> tmpLeftD = tmpEigenvalue.getD();
         final MatrixStore<Double> tmpLeftV = tmpEigenvalue.getV();
         if (MatrixDecompositionTests.DEBUG) {
@@ -98,7 +98,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         // Check that the eigenvalue decomposition of the "left" matrix is correct
         TestUtils.assertEquals(tmpLeftA, tmpEigenvalue, new NumberContext(7, 6));
 
-        tmpEigenvalue.compute(tmpRightA);
+        tmpEigenvalue.decompose(tmpRightA);
         final MatrixStore<Double> tmpRightD = tmpEigenvalue.getD();
         final MatrixStore<Double> tmpRightV = tmpEigenvalue.getV();
         if (MatrixDecompositionTests.DEBUG) {

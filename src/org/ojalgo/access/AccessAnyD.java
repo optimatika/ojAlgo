@@ -57,9 +57,6 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
          */
         boolean isSmall(long[] reference, double comparedTo);
 
-        /**
-         * @see Scalar#isZero()
-         */
         default boolean isZero(final long[] reference) {
             return this.isSmall(reference, PrimitiveMath.ONE);
         }

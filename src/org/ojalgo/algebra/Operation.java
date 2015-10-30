@@ -33,7 +33,8 @@ public interface Operation {
     public interface Addition<T> extends Operation {
 
         /**
-         * @return <code>this + addend</code>.
+         * @param addend What to add
+         * @return <code>this + addend</code>
          */
         T add(T addend);
 

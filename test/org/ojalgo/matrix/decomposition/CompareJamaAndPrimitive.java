@@ -80,7 +80,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         TestUtils.assertEquals(JAMA_EvD.decompose(tmpMtrxA), PRIMITIVE_EvD.decompose(tmpMtrxA));
 
         TestUtils.assertEquals(JAMA_EvD.isComputed(), PRIMITIVE_EvD.isComputed());
-        TestUtils.assertEquals(JAMA_EvD.isSolvable(), PRIMITIVE_EvD.isSolvable());
+        // TestUtils.assertEquals(JAMA_EvD.isSolvable(), PRIMITIVE_EvD.isSolvable());
 
         TestUtils.assertEquals(JAMA_EvD.getTrace().doubleValue(), PRIMITIVE_EvD.getTrace().doubleValue(), COMPARE_CONTEXT);
         TestUtils.assertEquals(JAMA_EvD.getDeterminant().doubleValue(), PRIMITIVE_EvD.getDeterminant().doubleValue(), COMPARE_CONTEXT);

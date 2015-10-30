@@ -134,16 +134,24 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
         this.doDecompose(retVal, body);
 
-        return this.solve(rhs, preallocated);
+        preallocated.fillMatching(rhs);
+
+        return this.doSolve(preallocated);
     }
 
     @Override
     public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+
+        rhs.supplyTo(preallocated);
+
+        return this.doSolve(preallocated);
     }
 
     public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+
+        preallocated.fillMatching(rhs);
+
+        return this.doSolve(preallocated);
     }
 
     @Override
@@ -157,9 +165,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return preallocated.builder().hermitian(false).get();
     }
 
-    MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final PrimitiveDenseStore preallocated) {
-
-        rhs.supplyTo(preallocated);
+    MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
 
         final RawStore tmpBody = this.getRawInPlaceStore();
 

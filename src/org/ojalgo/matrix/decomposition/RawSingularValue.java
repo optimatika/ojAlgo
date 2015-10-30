@@ -265,16 +265,17 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         this.doDecompose(tmpData, true);
 
-        return this.solve(rhs, preallocated);
+        final MatrixStore<Double> tmpRHS = MatrixStore.PRIMITIVE.makeWrapper(rhs).get();
+        return this.doGetInverse((PrimitiveDenseStore) preallocated).multiply(tmpRHS);
     }
 
     @Override
     public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+        return this.doGetInverse((PrimitiveDenseStore) preallocated).multiply(rhs.get());
     }
 
     public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+        return this.doGetInverse((PrimitiveDenseStore) preallocated).multiply(rhs);
     }
 
     @Override
@@ -307,10 +308,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         }
 
         return myPseudoinverse;
-    }
-
-    MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final PrimitiveDenseStore preallocated) {
-        return this.doGetInverse(preallocated).multiply(rhs.get());
     }
 
     boolean doDecompose(final double[][] data, final boolean factors) {

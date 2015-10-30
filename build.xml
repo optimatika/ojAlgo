@@ -146,7 +146,7 @@
                 </fileset>
             </classpath>
 
-            <link href="http://docs.oracle.com/javase/8/docs/api/index.html" />
+            <link href="http://docs.oracle.com/javase/8/docs/api/" />
             <link href="http://jexcelapi.sourceforge.net/resources/javadocs/current/docs/" />
             <link href="http://www.jfree.org/jfreechart/api/javadoc/" />
             <link href="http://pride.sourceforge.net/javadoc/" />

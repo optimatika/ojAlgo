@@ -78,22 +78,6 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
         }
     }
 
-    public MatrixStore<N> getInverse() {
-        if (myHermitian) {
-            return mySymmetricDelegate.getInverse();
-        } else {
-            return myNonsymmetricDelegate.getInverse();
-        }
-    }
-
-    public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
-        if (myHermitian) {
-            return mySymmetricDelegate.getInverse(preallocated);
-        } else {
-            return myNonsymmetricDelegate.getInverse(preallocated);
-        }
-    }
-
     public ComplexNumber getTrace() {
         if (myHermitian) {
             return mySymmetricDelegate.getTrace();
@@ -111,14 +95,6 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
             return mySymmetricDelegate.isOrdered();
         } else {
             return myNonsymmetricDelegate.isOrdered();
-        }
-    }
-
-    public boolean isSolvable() {
-        if (myHermitian) {
-            return mySymmetricDelegate.isSolvable();
-        } else {
-            return myNonsymmetricDelegate.isSolvable();
         }
     }
 

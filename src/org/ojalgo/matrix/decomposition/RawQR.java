@@ -239,12 +239,17 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         this.doDecompose(tmpData);
 
-        return this.solve(rhs, preallocated);
+        preallocated.fillMatching(rhs);
+
+        return this.doSolve((PrimitiveDenseStore) preallocated);
     }
 
     @Override
     public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+
+        rhs.supplyTo(preallocated);
+
+        return this.doSolve((PrimitiveDenseStore) preallocated);
     }
 
     public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
@@ -258,7 +263,10 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      */
     @Override
     protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
-        return this.doSolve(MatrixStore.PRIMITIVE.makeIdentity(this.getRowDim()).get(), preallocated);
+
+        MatrixStore.PRIMITIVE.makeIdentity(this.getRowDim()).supplyTo(preallocated);
+
+        return this.doSolve(preallocated);
     }
 
     boolean doDecompose(final double[][] data) {
@@ -304,17 +312,15 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return this.computed(true);
     }
 
-    MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final PrimitiveDenseStore preallocated) {
+    MatrixStore<Double> doSolve(final PrimitiveDenseStore preallocated) {
 
-        // Copy right hand side
-        rhs.supplyTo(preallocated);
         final double[] tmpRHSdata = preallocated.data;
 
         final int m = this.getRowDim();
         final int n = this.getColDim();
-        final int s = (int) rhs.countColumns();
+        final int s = (int) preallocated.countColumns();
 
-        if ((int) rhs.countRows() != m) {
+        if ((int) preallocated.countRows() != m) {
             throw new IllegalArgumentException("RawStore row dimensions must agree.");
         }
         if (!this.isFullColumnRank()) {

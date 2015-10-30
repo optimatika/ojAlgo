@@ -96,8 +96,7 @@ public interface LU<N extends Number> extends LDU<N> {
     MatrixStore<N> getL();
 
     /**
-     * This can be used to create a [P] matrix using {@linkplain IdentityStore} in combination with
-     * {@linkplain RowsStore} or {@linkplain ColumnsStore}.
+     * This can be used to create a [P] matrix..
      */
     int[] getPivotOrder();
 

@@ -97,7 +97,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     }
 
-    static final class Symmetric extends RawEigenvalue {
+    static final class Symmetric extends RawEigenvalue implements MatrixDecomposition.Solver<Double> {
 
         Symmetric() {
             super();
@@ -318,7 +318,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         this.doDecompose(tmpData);
 
-        return this.solve(rhs, preallocated);
+        preallocated.fillMatching(rhs);
+
+        return this.getInverse().multiply(preallocated);
     }
 
     @Override
