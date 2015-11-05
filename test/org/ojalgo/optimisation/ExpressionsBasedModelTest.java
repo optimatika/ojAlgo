@@ -53,21 +53,21 @@ public class ExpressionsBasedModelTest extends FunctionalityTest {
         final BigDecimal[] tmpFactorsLIM1 = new BigDecimal[] { ONE, ONE, ZERO };
         final Expression tmpLIM1 = tmpModel.addExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpLIM1.setLinearFactor(v, tmpFactorsLIM1[v]);
+            tmpLIM1.set(v, tmpFactorsLIM1[v]);
         }
         tmpLIM1.upper(FIVE.add(TENTH));
 
         final BigDecimal[] tmpFactorsLIM2 = new BigDecimal[] { ONE, ZERO, ONE };
         final Expression tmpLIM2 = tmpModel.addExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpLIM2.setLinearFactor(v, tmpFactorsLIM2[v]);
+            tmpLIM2.set(v, tmpFactorsLIM2[v]);
         }
         tmpLIM2.lower(TEN.add(TENTH));
 
         final BigDecimal[] tmpFactorsMYEQN = new BigDecimal[] { ZERO, ONE.negate(), ONE };
         final Expression tmpMYEQN = tmpModel.addExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpMYEQN.setLinearFactor(v, tmpFactorsMYEQN[v]);
+            tmpMYEQN.set(v, tmpFactorsMYEQN[v]);
         }
         tmpMYEQN.level(SEVEN);
 

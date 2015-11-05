@@ -54,10 +54,10 @@ public class DesignCase extends OptimisationIntegerTests {
         tmpModel.addVariables(tmpVariables);
 
         final Expression tmpBudgetCost = tmpModel.addExpression("Budget").upper(10);
-        tmpBudgetCost.setLinearFactor(tmpVariables.get(0), 6);
-        tmpBudgetCost.setLinearFactor(tmpVariables.get(1), 3);
-        tmpBudgetCost.setLinearFactor(tmpVariables.get(2), 5);
-        tmpBudgetCost.setLinearFactor(tmpVariables.get(3), 2);
+        tmpBudgetCost.set(tmpVariables.get(0), 6);
+        tmpBudgetCost.set(tmpVariables.get(1), 3);
+        tmpBudgetCost.set(tmpVariables.get(2), 5);
+        tmpBudgetCost.set(tmpVariables.get(3), 2);
 
         //tmpModel.options.debug(GenericSolver.class);
 

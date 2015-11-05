@@ -783,8 +783,6 @@ public abstract class BaseSolver extends GenericSolver {
 
     private final BaseSolver.AbstractBuilder<?, ?> myMatrices;
 
-    private transient PhysicalStore<Double> myModifiedQ = null;
-
     @SuppressWarnings("unused")
     private BaseSolver(final Options solverOptions) {
         this(null, solverOptions);
@@ -869,20 +867,7 @@ public abstract class BaseSolver extends GenericSolver {
     }
 
     protected MatrixStore<Double> getQ() {
-        if (myModifiedQ == null) {
-
-            final MatrixStore<Double> tmpQ = myMatrices.getQ();
-
-            myModifiedQ = tmpQ instanceof PhysicalStore ? (PhysicalStore<Double>) tmpQ : tmpQ.copy();
-            //
-            //            final double tmpLargest = myModifiedQ.aggregateAll(Aggregator.LARGEST);
-            //            final double tmpRelativelySmall = MACHINE_EPSILON * tmpLargest;
-            //            final UnaryFunction<Double> tmpModifier = PrimitiveFunction.ADD.second(tmpRelativelySmall);
-            //
-            //            myModifiedQ.modifyColumn(0L, 0L, tmpModifier);
-
-        }
-        return myModifiedQ;
+        return myMatrices.getQ();
     }
 
     protected PhysicalStore<Double> getSE() {
@@ -935,6 +920,13 @@ public abstract class BaseSolver extends GenericSolver {
 
     protected void setX(final int index, final double value) {
         myMatrices.setX(index, value);
+    }
+
+    public void dispose() {
+
+        super.dispose();
+
+        myMatrices.reset();
     }
 
 }

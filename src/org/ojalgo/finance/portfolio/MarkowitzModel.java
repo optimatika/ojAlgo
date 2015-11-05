@@ -269,13 +269,13 @@ public final class MarkowitzModel extends EquilibriumModel {
             final BasicMatrix tmpCovariances = this.getCovariances();
             for (int j = 0; j < tmpVariables.length; j++) {
                 for (int i = 0; i < tmpVariables.length; i++) {
-                    myOptimisationVariance.setQuadraticFactor(i, j, tmpCovariances.toBigDecimal(i, j));
+                    myOptimisationVariance.set(i, j, tmpCovariances.toBigDecimal(i, j));
                 }
             }
 
             final Expression tmpBalanceExpression = myOptimisationModel.addExpression(BALANCE);
             for (int i = 0; i < tmpVariables.length; i++) {
-                tmpBalanceExpression.setLinearFactor(i, ONE);
+                tmpBalanceExpression.set(i, ONE);
             }
             tmpBalanceExpression.level(ONE);
 
@@ -286,7 +286,7 @@ public final class MarkowitzModel extends EquilibriumModel {
 
                 final Expression tmpExpr = myOptimisationModel.addExpression(Arrays.toString(tmpKey));
                 for (int i = 0; i < tmpKey.length; i++) {
-                    tmpExpr.setLinearFactor(tmpKey[i], ONE);
+                    tmpExpr.set(tmpKey[i], ONE);
                 }
                 tmpExpr.lower(tmpValue.lower).upper(tmpValue.upper);
             }

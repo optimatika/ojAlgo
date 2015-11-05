@@ -75,8 +75,8 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
             // x0 = 2*x1, i.e. x0 - 2*x1 = 0
             //
             final Expression e = linearModel.addExpression("x0 = 2*x1");
-            e.setLinearFactor(0, BigMath.ONE);
-            e.setLinearFactor(1, BigMath.TWO.negate());
+            e.set(0, BigMath.ONE);
+            e.set(1, BigMath.TWO.negate());
             e.level(BigMath.ZERO);
         }
     }

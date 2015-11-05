@@ -23,8 +23,8 @@ package org.ojalgo.optimisation;
 
 import java.util.List;
 
+import org.ojalgo.access.IntIndex;
 import org.ojalgo.array.PrimitiveArray;
-import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.linear.LinearSolver;
 
 final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
@@ -47,7 +47,7 @@ final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Inte
 
         final PrimitiveArray tmpModelSolution = PrimitiveArray.make(model.countVariables());
 
-        for (final Index tmpFixed : model.getFixedVariables()) {
+        for (final IntIndex tmpFixed : model.getFixedVariables()) {
             tmpModelSolution.set(tmpFixed.index, model.getVariable(tmpFixed.index).getValue().doubleValue());
         }
 

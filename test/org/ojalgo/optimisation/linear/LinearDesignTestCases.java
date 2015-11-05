@@ -63,19 +63,19 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final Expression retExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            retExprC1.setLinearFactor(i, new BigDecimal[] { TWO, ONE, ONE }[i]);
+            retExprC1.set(i, new BigDecimal[] { TWO, ONE, ONE }[i]);
         }
         retExprC1.upper(new BigDecimal("14.0"));
 
         final Expression tmpExprC2 = tmpModel.addExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC2.setLinearFactor(i, new BigDecimal[] { FOUR, TWO, THREE }[i]);
+            tmpExprC2.set(i, new BigDecimal[] { FOUR, TWO, THREE }[i]);
         }
         tmpExprC2.upper(new BigDecimal("28.0"));
 
         final Expression tmpExprC3 = tmpModel.addExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC3.setLinearFactor(i, new BigDecimal[] { TWO, FIVE, FIVE }[i]);
+            tmpExprC3.set(i, new BigDecimal[] { TWO, FIVE, FIVE }[i]);
         }
         tmpExprC3.upper(new BigDecimal("30.0"));
 
@@ -100,13 +100,13 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.setLinearFactor(i, new BigDecimal[] { ONE, TWO, ONE }[i]);
+            tmpExprC1.set(i, new BigDecimal[] { ONE, TWO, ONE }[i]);
         }
         tmpExprC1.level(TEN);
 
         final Expression tmpExprC2 = tmpModel.addExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC2.setLinearFactor(i, new BigDecimal[] { ONE, TWO.negate(), TWO }[i]);
+            tmpExprC2.set(i, new BigDecimal[] { ONE, TWO.negate(), TWO }[i]);
         }
         tmpExprC2.level(SIX);
 
@@ -130,19 +130,19 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.setLinearFactor(i, new BigDecimal[] { ONE, ZERO }[i]);
+            tmpExprC1.set(i, new BigDecimal[] { ONE, ZERO }[i]);
         }
         tmpExprC1.upper(TWO);
 
         final Expression tmpExprC2 = tmpModel.addExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC2.setLinearFactor(i, new BigDecimal[] { ZERO, ONE }[i]);
+            tmpExprC2.set(i, new BigDecimal[] { ZERO, ONE }[i]);
         }
         tmpExprC2.upper(THREE);
 
         final Expression tmpExprC3 = tmpModel.addExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC3.setLinearFactor(i, new BigDecimal[] { ONE, ONE }[i]);
+            tmpExprC3.set(i, new BigDecimal[] { ONE, ONE }[i]);
         }
         tmpExprC3.level(FOUR);
 
@@ -167,19 +167,19 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.setLinearFactor(i, new BigDecimal[] { SIX, ONE.negate(), ZERO }[i]);
+            tmpExprC1.set(i, new BigDecimal[] { SIX, ONE.negate(), ZERO }[i]);
         }
         tmpExprC1.upper(TEN);
 
         final Expression tmpExprC2 = tmpModel.addExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC2.setLinearFactor(i, new BigDecimal[] { ONE, FIVE, ZERO }[i]);
+            tmpExprC2.set(i, new BigDecimal[] { ONE, FIVE, ZERO }[i]);
         }
         tmpExprC2.lower(FOUR);
 
         final Expression tmpExprC3 = tmpModel.addExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC3.setLinearFactor(i, new BigDecimal[] { ONE, FIVE, ONE }[i]);
+            tmpExprC3.set(i, new BigDecimal[] { ONE, FIVE, ONE }[i]);
         }
         tmpExprC3.level(FIVE);
 
@@ -204,19 +204,19 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.setLinearFactor(i, new BigDecimal[] { HALF, QUARTER }[i]);
+            tmpExprC1.set(i, new BigDecimal[] { HALF, QUARTER }[i]);
         }
         tmpExprC1.upper(FOUR);
 
         final Expression tmpExprC2 = tmpModel.addExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC2.setLinearFactor(i, new BigDecimal[] { ONE, THREE }[i]);
+            tmpExprC2.set(i, new BigDecimal[] { ONE, THREE }[i]);
         }
         tmpExprC2.lower(TEN.add(TEN));
 
         final Expression tmpExprC3 = tmpModel.addExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC3.setLinearFactor(i, new BigDecimal[] { ONE, ONE }[i]);
+            tmpExprC3.set(i, new BigDecimal[] { ONE, ONE }[i]);
         }
         tmpExprC3.level(TEN);
 
@@ -255,19 +255,19 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.setLinearFactor(i, new BigDecimal[] { ONE, ONE }[i]);
+            tmpExprC1.set(i, new BigDecimal[] { ONE, ONE }[i]);
         }
         tmpExprC1.upper(TEN);
 
         final Expression tmpExprC2 = tmpModel.addExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC2.setLinearFactor(i, new BigDecimal[] { ONE, TWO }[i]);
+            tmpExprC2.set(i, new BigDecimal[] { ONE, TWO }[i]);
         }
         tmpExprC2.lower(TWELVE);
 
         final Expression tmpExprC3 = tmpModel.addExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC3.setLinearFactor(i, new BigDecimal[] { TWO, ONE }[i]);
+            tmpExprC3.set(i, new BigDecimal[] { TWO, ONE }[i]);
         }
         tmpExprC3.lower(TWELVE);
 
@@ -292,19 +292,19 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.setLinearFactor(i, new BigDecimal[] { THREE, ONE, NEG }[i]);
+            tmpExprC1.set(i, new BigDecimal[] { THREE, ONE, NEG }[i]);
         }
         tmpExprC1.level(TEN.add(FIVE));
 
         final Expression tmpExprC2 = tmpModel.addExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC2.setLinearFactor(i, new BigDecimal[] { EIGHT, FOUR, NEG }[i]);
+            tmpExprC2.set(i, new BigDecimal[] { EIGHT, FOUR, NEG }[i]);
         }
         tmpExprC2.level(FIVE.multiply(TEN));
 
         final Expression tmpExprC3 = tmpModel.addExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC3.setLinearFactor(i, new BigDecimal[] { TWO, TWO, ONE }[i]);
+            tmpExprC3.set(i, new BigDecimal[] { TWO, TWO, ONE }[i]);
         }
         tmpExprC3.level(TEN.add(TEN));
 
@@ -322,7 +322,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.setLinearFactor(i, ONE);
+            tmpExprC1.set(i, ONE);
         }
         tmpExprC1.upper(TWO);
 
@@ -386,43 +386,43 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         tmpModel.addVariable(x2015);
 
         final Expression obj = tmpModel.addExpression("obj");
-        obj.setLinearFactor(x1, 1);
+        obj.set(x1, 1);
         obj.weight(BigDecimal.valueOf(1));
 
         final Expression c1 = tmpModel.addExpression("c1");
-        c1.setLinearFactor(x1, 1);
+        c1.set(x1, 1);
         c1.lower(BigDecimal.valueOf(0));
 
         final Expression c2 = tmpModel.addExpression("c2");
-        c2.setLinearFactor(x2014, -5000);
-        c2.setLinearFactor(x2013, 5100);
-        c2.setLinearFactor(x1, -1);
+        c2.set(x2014, -5000);
+        c2.set(x2013, 5100);
+        c2.set(x1, -1);
         c2.upper(BigDecimal.valueOf(0));
 
         final Expression c3 = tmpModel.addExpression("c3");
-        c3.setLinearFactor(x2014, -5000);
-        c3.setLinearFactor(x2013, 5100);
-        c3.setLinearFactor(x1, 1);
+        c3.set(x2014, -5000);
+        c3.set(x2013, 5100);
+        c3.set(x1, 1);
         c3.lower(BigDecimal.valueOf(0));
 
         final Expression c4 = tmpModel.addExpression("c4");
-        c4.setLinearFactor(x2014, 150);
-        c4.setLinearFactor(x2013, 5100);
-        c4.setLinearFactor(x2015, -5000);
-        c4.setLinearFactor(x1, -1);
+        c4.set(x2014, 150);
+        c4.set(x2013, 5100);
+        c4.set(x2015, -5000);
+        c4.set(x1, -1);
         c4.upper(BigDecimal.valueOf(0));
 
         final Expression c5 = tmpModel.addExpression("c5");
-        c5.setLinearFactor(x2014, 150);
-        c5.setLinearFactor(x2013, 5100);
-        c5.setLinearFactor(x2015, -5000);
-        c5.setLinearFactor(x1, 1);
+        c5.set(x2014, 150);
+        c5.set(x2013, 5100);
+        c5.set(x2015, -5000);
+        c5.set(x1, 1);
         c5.lower(BigDecimal.valueOf(0));
 
         final Expression c6 = tmpModel.addExpression("c6");
-        c6.setLinearFactor(x2015, 5000);
-        c6.setLinearFactor(x2014, 5000);
-        c6.setLinearFactor(x2013, 5000);
+        c6.set(x2015, 5000);
+        c6.set(x2014, 5000);
+        c6.set(x2013, 5000);
         c6.level(BigDecimal.valueOf(19105000));
 
         final BigArray tmpExpSol = BigArray
@@ -500,7 +500,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         final Expression retVal2 = retVal.addExpression("100%");
 
         for (int i = 0; i < tmpLength; i++) {
-            retVal2.setLinearFactor(i, ONE);
+            retVal2.set(i, ONE);
         }
         final Expression retVal1 = retVal2;
 

@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.IntIndex;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.BaseSolver;
 import org.ojalgo.optimisation.Expression;
-import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
@@ -115,9 +115,9 @@ public abstract class LinearSolver extends BaseSolver {
 
         final List<Variable> tmpPosVariables = sourceModel.getPositiveVariables();
         final List<Variable> tmpNegVariables = sourceModel.getNegativeVariables();
-        final Set<Index> tmpFixVariables = sourceModel.getFixedVariables();
+        final Set<IntIndex> tmpFixVariables = sourceModel.getFixedVariables();
 
-        final Expression tmpObjFunc = sourceModel.getObjectiveExpression();
+        final Expression tmpObjFunc = sourceModel.getObjectiveExpression().compensate(tmpFixVariables);
 
         final List<Expression> tmpExprsEq = sourceModel.selectExpressionsLinearEquality();
         final List<Expression> tmpExprsLo = sourceModel.selectExpressionsLinearLower();
@@ -149,7 +149,7 @@ public abstract class LinearSolver extends BaseSolver {
         final int tmpNegVarsBaseIndex = tmpPosVarsBaseIndex + tmpPosVariables.size();
         final int tmpSlaVarsBaseIndex = tmpNegVarsBaseIndex + tmpNegVariables.size();
 
-        for (final Expression.Index tmpKey : tmpObjFunc.getLinearFactorKeys()) {
+        for (final IntIndex tmpKey : tmpObjFunc.getLinearKeySet()) {
 
             final double tmpFactor = tmpMaximisation ? -tmpObjFunc.getAdjustedLinearFactor(tmpKey) : tmpObjFunc.getAdjustedLinearFactor(tmpKey);
 
@@ -170,14 +170,14 @@ public abstract class LinearSolver extends BaseSolver {
         final int tmpExprsEqLength = tmpExprsEq.size();
         for (int c = 0; c < tmpExprsEqLength; c++) {
 
-            final Expression tmpExpr = tmpExprsEq.get(c);
-            final double tmpRHS = tmpExpr.getCompensatedLowerLimit(tmpFixVariables);
+            final Expression tmpExpr = tmpExprsEq.get(c).compensate(tmpFixVariables);
+            final double tmpRHS = tmpExpr.getAdjustedLowerLimit();
 
             if (tmpRHS < ZERO) {
 
                 tmpBE.set(tmpConstrBaseIndex + c, 0, -tmpRHS);
 
-                for (final Expression.Index tmpKey : tmpExpr.getLinearFactorKeys()) {
+                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
 
                     final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
 
@@ -196,7 +196,7 @@ public abstract class LinearSolver extends BaseSolver {
 
                 tmpBE.set(tmpConstrBaseIndex + c, 0, tmpRHS);
 
-                for (final Expression.Index tmpKey : tmpExpr.getLinearFactorKeys()) {
+                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
 
                     final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
 
@@ -217,8 +217,8 @@ public abstract class LinearSolver extends BaseSolver {
         final int tmpExprsLoLength = tmpExprsLo.size();
         for (int c = 0; c < tmpExprsLoLength; c++) {
 
-            final Expression tmpExpr = tmpExprsLo.get(c);
-            final double tmpRHS = tmpExpr.getCompensatedLowerLimit(tmpFixVariables);
+            final Expression tmpExpr = tmpExprsLo.get(c).compensate(tmpFixVariables);
+            final double tmpRHS = tmpExpr.getAdjustedLowerLimit();
 
             if (tmpRHS < ZERO) {
 
@@ -226,7 +226,7 @@ public abstract class LinearSolver extends BaseSolver {
                 tmpBasis[tmpConstrBaseIndex + c] = tmpCurrentSlackVarIndex;
                 tmpAE.set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, ONE);
 
-                for (final Expression.Index tmpKey : tmpExpr.getLinearFactorKeys()) {
+                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
 
                     final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
 
@@ -246,7 +246,7 @@ public abstract class LinearSolver extends BaseSolver {
                 tmpBE.set(tmpConstrBaseIndex + c, 0, tmpRHS);
                 tmpAE.set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, NEG);
 
-                for (final Expression.Index tmpKey : tmpExpr.getLinearFactorKeys()) {
+                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
 
                     final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
 
@@ -267,15 +267,15 @@ public abstract class LinearSolver extends BaseSolver {
         final int tmpExprsUpLength = tmpExprsUp.size();
         for (int c = 0; c < tmpExprsUpLength; c++) {
 
-            final Expression tmpExpr = tmpExprsUp.get(c);
-            final double tmpRHS = tmpExpr.getCompensatedUpperLimit(tmpFixVariables);
+            final Expression tmpExpr = tmpExprsUp.get(c).compensate(tmpFixVariables);
+            final double tmpRHS = tmpExpr.getAdjustedUpperLimit();
 
             if (tmpRHS < ZERO) {
 
                 tmpBE.set(tmpConstrBaseIndex + c, 0, -tmpRHS);
                 tmpAE.set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, NEG);
 
-                for (final Expression.Index tmpKey : tmpExpr.getLinearFactorKeys()) {
+                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
 
                     final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
 
@@ -296,7 +296,7 @@ public abstract class LinearSolver extends BaseSolver {
                 tmpBasis[tmpConstrBaseIndex + c] = tmpCurrentSlackVarIndex;
                 tmpAE.set(tmpConstrBaseIndex + c, tmpCurrentSlackVarIndex++, ONE);
 
-                for (final Expression.Index tmpKey : tmpExpr.getLinearFactorKeys()) {
+                for (final IntIndex tmpKey : tmpExpr.getLinearKeySet()) {
 
                     final double tmpFactor = tmpExpr.getAdjustedLinearFactor(tmpKey);
 
@@ -435,6 +435,22 @@ public abstract class LinearSolver extends BaseSolver {
         mySelector = new IndexSelector(matrices.countVariables());
     }
 
+    /**
+     * Can only be called after a solve()
+     *
+     * @deprecated v38 Temporary api
+     */
+    @Deprecated
+    public abstract int[] getBasis();
+
+    /**
+     * Can only be called after a solve()
+     *
+     * @deprecated v38 Temporary api
+     */
+    @Deprecated
+    public abstract double[] getResidualCosts();
+
     protected final int countBasisDeficit() {
         return this.countEqualityConstraints() - mySelector.countIncluded();
     }
@@ -470,20 +486,4 @@ public abstract class LinearSolver extends BaseSolver {
     protected final void include(final int[] someIndecesToInclude) {
         mySelector.include(someIndecesToInclude);
     }
-
-    /**
-     * Can only be called after a solve()
-     *
-     * @deprecated v38 Temporary api
-     */
-    @Deprecated
-    public abstract int[] getBasis();
-
-    /**
-     * Can only be called after a solve()
-     *
-     * @deprecated v38 Temporary api
-     */
-    @Deprecated
-    public abstract double[] getResidualCosts();
 }

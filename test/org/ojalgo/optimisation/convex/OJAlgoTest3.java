@@ -211,9 +211,9 @@ public class OJAlgoTest3 {
                 final double target = stockTotal * ratio;
                 linked.forEach(v1 -> {
                     linked.forEach(v2 -> {
-                        objective.setQuadraticFactor(v1, v2, ratio / (target * target));
+                        objective.set(v1, v2, ratio / (target * target));
                     });
-                    objective.setLinearFactor(v1, (-2.0 * ratio) / target);
+                    objective.set(v1, (-2.0 * ratio) / target);
                 });
             }
         });

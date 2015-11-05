@@ -47,21 +47,21 @@ public class TestOjAlgo {
         // c1: X =0
         final Expression c1 = model.addExpression("c1");
         c1.level(ZERO);
-        c1.setLinearFactor(0, ONE);
+        c1.set(0, ONE);
 
         // c2: -X +5Y =0
         final Expression c2 = model.addExpression("c2");
         c2.level(ZERO);
 
-        c2.setLinearFactor(0, new BigDecimal(-1));
-        c2.setLinearFactor(1, ONE);
+        c2.set(0, new BigDecimal(-1));
+        c2.set(1, ONE);
 
         // c3: X -Z =0
         final Expression c3 = model.addExpression("c3");
         c3.level(ZERO);
         // bugs with this constraint
-        c3.setLinearFactor(0, ONE);
-        c3.setLinearFactor(2, new BigDecimal(-1));
+        c3.set(0, ONE);
+        c3.set(2, new BigDecimal(-1));
         // but not with this one ???
         //c3.setLinearFactor(0, new BigDecimal(-1));
         //c3.setLinearFactor(2, ONE);

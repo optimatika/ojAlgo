@@ -157,19 +157,19 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
         final Expression tmpLIM1 = tmpExpModel.addExpression("LIM1");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpLIM1.setLinearFactor(v, new BigDecimal[] { ONE, ONE, ZERO }[v]);
+            tmpLIM1.set(v, new BigDecimal[] { ONE, ONE, ZERO }[v]);
         }
         tmpLIM1.upper(FIVE);
 
         final Expression tmpLIM2 = tmpExpModel.addExpression("LIM2");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpLIM2.setLinearFactor(v, new BigDecimal[] { ONE, ZERO, ONE }[v]);
+            tmpLIM2.set(v, new BigDecimal[] { ONE, ZERO, ONE }[v]);
         }
         tmpLIM2.lower(TEN);
 
         final Expression tmpMYEQN = tmpExpModel.addExpression("MYEQN");
         for (int v = 0; v < tmpVariables.length; v++) {
-            tmpMYEQN.setLinearFactor(v, new BigDecimal[] { ZERO, ONE.negate(), ONE }[v]);
+            tmpMYEQN.set(v, new BigDecimal[] { ZERO, ONE.negate(), ONE }[v]);
         }
         tmpMYEQN.level(SEVEN);
 

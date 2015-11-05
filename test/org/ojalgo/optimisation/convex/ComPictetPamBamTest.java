@@ -138,12 +138,12 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
             final Expression retVal = model.addExpression("objective");
 
             for (int ij = 0; ij < tmpLength; ij++) {
-                retVal.setQuadraticFactor(ij, ij, ONE);
+                retVal.set(ij, ij, ONE);
             }
 
             final BigDecimal tmpLinearWeight = TWO.negate();
             for (int i = 0; i < tmpLength; i++) {
-                retVal.setLinearFactor(i, Arrays.asList(point).get(i).multiply(tmpLinearWeight));
+                retVal.set(i, Arrays.asList(point).get(i).multiply(tmpLinearWeight));
             }
             final Expression e = retVal;
             e.weight(BigMath.HALF);
@@ -157,7 +157,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
             final Expression retVal = model.addExpression("sum(xi) = 100.0");
 
             for (int i = 0; i < tmpLength; i++) {
-                retVal.setLinearFactor(i, ONE);
+                retVal.set(i, ONE);
             }
             final Expression e = retVal;
             e.level(BigMath.HUNDRED);
@@ -167,8 +167,8 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         //
         {
             final Expression e = model.addExpression("x1 + x2 <= 45.0");
-            e.setLinearFactor(1, BigMath.ONE);
-            e.setLinearFactor(2, BigMath.ONE);
+            e.set(1, BigMath.ONE);
+            e.set(2, BigMath.ONE);
             e.lower(BigMath.ZERO).upper(new BigDecimal(45.0));
         }
         //
@@ -176,8 +176,8 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         //
         {
             final Expression e = model.addExpression("x4 - 2*x5 = 0");
-            e.setLinearFactor(4, BigMath.ONE);
-            e.setLinearFactor(5, BigMath.TWO.negate());
+            e.set(4, BigMath.ONE);
+            e.set(5, BigMath.TWO.negate());
             e.level(BigMath.ZERO);
         }
     }

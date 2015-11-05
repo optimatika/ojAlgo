@@ -19,11 +19,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.access.IntIndex;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
-import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -377,10 +377,10 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         final Expression tmpExpression = tmpModel.getExpression(constraint);
 
         if (DEBUG) {
-            BasicLogger.debug("Fix count: {}", tmpExpression.getLinearFactorKeys().size());
+            BasicLogger.debug("Fix count: {}", tmpExpression.getLinearKeySet().size());
         }
 
-        for (final Index tmpIndex : tmpExpression.getLinearFactorKeys()) {
+        for (final IntIndex tmpIndex : tmpExpression.getLinearKeySet()) {
             final Variable tmpVariable = tmpModel.getVariable(tmpIndex.index);
             final String tmpName = tmpVariable.getName();
             tmpVariable.level(SOLUTION.get(tmpName));

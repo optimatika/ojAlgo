@@ -147,13 +147,13 @@ public class StrategyMixer extends OptimisationIntegerTests {
                     tmpVal = tmpVal.add(tmpStrats[row][i].multiply(tmpStrats[col][i]));
                 }
 
-                tmpQuadObj.setQuadraticFactor(row, col, tmpVal);
-                tmpQuadObj.setQuadraticFactor(3 + row, 3 + col, tmpVal.multiply(THOUSANDTH));
+                tmpQuadObj.set(row, col, tmpVal);
+                tmpQuadObj.set(3 + row, 3 + col, tmpVal.multiply(THOUSANDTH));
             }
 
             final Expression tmpActive = tmpModel.addExpression(tmpVars[row].getName() + " Active");
-            tmpActive.setLinearFactor(3 + row, ONE);
-            tmpActive.setLinearFactor(row, NEG);
+            tmpActive.set(3 + row, ONE);
+            tmpActive.set(row, NEG);
             tmpActive.lower(ZERO);
             if (OptimisationIntegerTests.DEBUG) {
                 BasicLogger.debug(tmpActive.toString());
@@ -162,18 +162,18 @@ public class StrategyMixer extends OptimisationIntegerTests {
 
         final Expression tmpHundredPercent = tmpModel.addExpression("100%");
         tmpHundredPercent.level(ONE);
-        tmpHundredPercent.setLinearFactor(0, ONE);
-        tmpHundredPercent.setLinearFactor(1, ONE);
-        tmpHundredPercent.setLinearFactor(2, ONE);
+        tmpHundredPercent.set(0, ONE);
+        tmpHundredPercent.set(1, ONE);
+        tmpHundredPercent.set(2, ONE);
         if (OptimisationIntegerTests.DEBUG) {
             BasicLogger.debug(tmpHundredPercent.toString());
         }
 
         final Expression tmpStrategyCount = tmpModel.addExpression("Strategy Count");
         tmpStrategyCount.upper(TWO);
-        tmpStrategyCount.setLinearFactor(3, ONE);
-        tmpStrategyCount.setLinearFactor(4, ONE);
-        tmpStrategyCount.setLinearFactor(5, ONE);
+        tmpStrategyCount.set(3, ONE);
+        tmpStrategyCount.set(4, ONE);
+        tmpStrategyCount.set(5, ONE);
         if (OptimisationIntegerTests.DEBUG) {
             BasicLogger.debug(tmpStrategyCount.toString());
         }

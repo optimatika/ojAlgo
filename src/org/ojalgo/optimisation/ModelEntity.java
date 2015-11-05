@@ -124,6 +124,26 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return BigDecimal.ONE.movePointRight(this.getAdjustmentExponent()).doubleValue(); // 10^exponent
     }
 
+    public final ConstraintType getConstraintType() {
+        if (myLowerLimit != null) {
+            if (myUpperLimit != null) {
+                if (myLowerLimit.compareTo(myUpperLimit) == 0) {
+                    return ConstraintType.EQUALITY;
+                } else {
+                    return ConstraintType.RANGE;
+                }
+            } else {
+                return ConstraintType.LOWER;
+            }
+        } else {
+            if (myUpperLimit != null) {
+                return ConstraintType.UPPER;
+            } else {
+                return ConstraintType.NONE;
+            }
+        }
+    }
+
     public final BigDecimal getContributionWeight() {
         return myContributionWeight;
     }

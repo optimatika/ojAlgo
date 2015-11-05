@@ -384,9 +384,16 @@ public interface Optimisation {
      */
     public static interface Solver extends Optimisation {
 
+        /**
+         * Cleanup when a solver instance is no longer needed. The default implementation does nothing,
+         */
+        default void dispose() {
+            ;
+        };
+
         default Optimisation.Result solve() {
             return this.solve(null);
-        };
+        }
 
         Optimisation.Result solve(Optimisation.Result kickStarter);
 

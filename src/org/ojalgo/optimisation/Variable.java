@@ -25,6 +25,7 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.access.IntIndex;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -44,7 +45,7 @@ public final class Variable extends ModelEntity<Variable> {
         return Variable.make(name).binary();
     }
 
-    private Expression.Index myIndex = null;
+    private IntIndex myIndex = null;
     private boolean myInteger = false;
     private BigDecimal myValue = null;
 
@@ -52,13 +53,13 @@ public final class Variable extends ModelEntity<Variable> {
         super(name);
     }
 
-    protected Variable(final Variable entityToCopy) {
+    protected Variable(final Variable variableToCopy) {
 
-        super(entityToCopy);
+        super(variableToCopy);
 
         myIndex = null;
-        myInteger = entityToCopy.isInteger();
-        myValue = entityToCopy.getValue();
+        myInteger = variableToCopy.isInteger();
+        myValue = variableToCopy.getValue();
     }
 
     public Variable binary() {
@@ -222,15 +223,15 @@ public final class Variable extends ModelEntity<Variable> {
         }
     }
 
-    Expression.Index getIndex() {
+    IntIndex getIndex() {
         return myIndex;
     }
 
-    void setIndex(final Expression.Index index) {
+    void setIndex(final IntIndex index) {
         if (index == null) {
             throw new IllegalArgumentException("The index cannot be null!");
         } else if ((myIndex != null) && (myIndex.index != index.index)) {
-            throw new IllegalStateException("Cannot change a variable's index, or add it to more than one model!");
+            throw new IllegalStateException("Cannot change a variable's index, or add a variable to more than one model!");
         }
         myIndex = index;
     }

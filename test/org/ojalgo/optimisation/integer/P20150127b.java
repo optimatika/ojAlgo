@@ -33,8 +33,8 @@ public class P20150127b {
             // We want coeff[0] * x + coeff[1] * y < 0. Since our
             // solutions are integer, we can do "<= -1".
             c.upper(BigDecimal.ONE.negate());
-            c.setLinearFactor(x, coeff[0]);
-            c.setLinearFactor(y, coeff[1]);
+            c.set(x, coeff[0]);
+            c.set(y, coeff[1]);
         }
 
         // DEBUG: "Speed things up a bit": This are the parameters that

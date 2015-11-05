@@ -134,7 +134,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             for (int e = 0; e < matrices[0].countRows(); e++) {
                 final Expression tmpExpression = retVal.addExpression("E" + e);
                 for (int v = 0; v < tmpNumberOfVariables; v++) {
-                    tmpExpression.setLinearFactor(v, matrices[0].get(e, v));
+                    tmpExpression.set(v, matrices[0].get(e, v));
                 }
                 tmpExpression.level(matrices[1].doubleValue(e));
             }
@@ -143,7 +143,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             for (int i = 0; i < matrices[4].countRows(); i++) {
                 final Expression tmpExpression = retVal.addExpression("I" + i);
                 for (int v = 0; v < tmpNumberOfVariables; v++) {
-                    tmpExpression.setLinearFactor(v, matrices[4].get(i, v));
+                    tmpExpression.set(v, matrices[4].get(i, v));
                 }
                 tmpExpression.upper(matrices[5].doubleValue(i));
             }
@@ -151,13 +151,13 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Expression tmpObjQ = retVal.addExpression("Q");
         for (int r = 0; r < tmpNumberOfVariables; r++) {
             for (int v = 0; v < tmpNumberOfVariables; v++) {
-                tmpObjQ.setQuadraticFactor(r, v, matrices[2].doubleValue(r, v));
+                tmpObjQ.set(r, v, matrices[2].doubleValue(r, v));
             }
         }
         tmpObjQ.weight(HALF);
         final Expression tmpObjC = retVal.addExpression("C");
         for (int v = 0; v < tmpNumberOfVariables; v++) {
-            tmpObjC.setLinearFactor(v, matrices[3].doubleValue(v));
+            tmpObjC.set(v, matrices[3].doubleValue(v));
         }
         tmpObjC.weight(NEG);
 
@@ -222,7 +222,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Expression tmpExprQ = tmpModel.addExpression("Q1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
             for (int j = 0; j < tmpModel.countVariables(); j++) {
-                tmpExprQ.setQuadraticFactor(i, i, Math.random());
+                tmpExprQ.set(i, i, Math.random());
             }
         } // May not be positive definite, but infeasibillity should be realised before that becomes a problem
         tmpExprQ.weight(TEN);
@@ -231,7 +231,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpExprC1.setLinearFactor(i, ONE);
+            tmpExprC1.set(i, ONE);
         }
         tmpExprC1.upper(TWO);
 
@@ -944,36 +944,36 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         final Expression tmpObjExpr = tmpModel.addExpression("Objective");
         tmpModel.setMinimisation();
-        tmpObjExpr.setQuadraticFactor(2, 2, BigMath.HALF);
-        tmpObjExpr.setQuadraticFactor(3, 3, BigMath.TWO);
-        tmpObjExpr.setQuadraticFactor(2, 3, BigMath.TWO.negate());
-        tmpObjExpr.setLinearFactor(0, BigMath.THREE);
-        tmpObjExpr.setLinearFactor(1, BigMath.TWO.negate());
-        tmpObjExpr.setLinearFactor(2, BigMath.ONE);
-        tmpObjExpr.setLinearFactor(3, BigMath.FOUR.negate());
+        tmpObjExpr.set(2, 2, BigMath.HALF);
+        tmpObjExpr.set(3, 3, BigMath.TWO);
+        tmpObjExpr.set(2, 3, BigMath.TWO.negate());
+        tmpObjExpr.set(0, BigMath.THREE);
+        tmpObjExpr.set(1, BigMath.TWO.negate());
+        tmpObjExpr.set(2, BigMath.ONE);
+        tmpObjExpr.set(3, BigMath.FOUR.negate());
         tmpObjExpr.weight(BigMath.ONE);
 
         Expression tmpConstrExpr;
 
         tmpConstrExpr = tmpModel.addExpression("C1").lower(BigMath.FOUR);
-        tmpConstrExpr.setLinearFactor(0, BigMath.ONE);
-        tmpConstrExpr.setLinearFactor(1, BigMath.ONE);
-        tmpConstrExpr.setLinearFactor(2, BigMath.FOUR.negate());
-        tmpConstrExpr.setLinearFactor(3, BigMath.TWO);
+        tmpConstrExpr.set(0, BigMath.ONE);
+        tmpConstrExpr.set(1, BigMath.ONE);
+        tmpConstrExpr.set(2, BigMath.FOUR.negate());
+        tmpConstrExpr.set(3, BigMath.TWO);
 
         tmpConstrExpr = tmpModel.addExpression("C2").upper(BigMath.SIX);
-        tmpConstrExpr.setLinearFactor(0, BigMath.THREE.negate());
-        tmpConstrExpr.setLinearFactor(1, BigMath.ONE);
-        tmpConstrExpr.setLinearFactor(2, BigMath.TWO.negate());
+        tmpConstrExpr.set(0, BigMath.THREE.negate());
+        tmpConstrExpr.set(1, BigMath.ONE);
+        tmpConstrExpr.set(2, BigMath.TWO.negate());
 
         tmpConstrExpr = tmpModel.addExpression("C3").level(BigMath.NEG);
-        tmpConstrExpr.setLinearFactor(1, BigMath.ONE);
-        tmpConstrExpr.setLinearFactor(3, BigMath.NEG);
+        tmpConstrExpr.set(1, BigMath.ONE);
+        tmpConstrExpr.set(3, BigMath.NEG);
 
         tmpConstrExpr = tmpModel.addExpression("C4").level(BigMath.ZERO);
-        tmpConstrExpr.setLinearFactor(0, BigMath.ONE);
-        tmpConstrExpr.setLinearFactor(1, BigMath.ONE);
-        tmpConstrExpr.setLinearFactor(2, BigMath.NEG);
+        tmpConstrExpr.set(0, BigMath.ONE);
+        tmpConstrExpr.set(1, BigMath.ONE);
+        tmpConstrExpr.set(2, BigMath.NEG);
 
         // tmpModel.options.debug(ConvexSolver.class);
         final Result tmpResult = tmpModel.minimise();

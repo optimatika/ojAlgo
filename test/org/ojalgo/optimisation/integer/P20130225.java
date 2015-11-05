@@ -130,7 +130,7 @@ class P20130225 {
                 final String name = v.getName();
                 if (name.startsWith("X_")) {
                     final String state = name.substring(name.lastIndexOf("_") + 1, name.length());
-                    expresion1.setLinearFactor(v, new BigDecimal((Integer.valueOf(state))));
+                    expresion1.set(v, new BigDecimal((Integer.valueOf(state))));
                 }
             }
             expresion1.upper(new BigDecimal(91));
@@ -152,13 +152,13 @@ class P20130225 {
                     final Variable v = (Variable) varsStation.get(j);
                     final String name = v.getName();
                     final int state = Integer.valueOf(name.substring(name.lastIndexOf("_") + 1, name.length()));
-                    expresion3.setLinearFactor(v, state);
+                    expresion3.set(v, state);
                 }
                 final ArrayList uvStation = (ArrayList) variablesUVStation.get(i);
                 final Variable u = (Variable) uvStation.get(0);
                 final Variable v = (Variable) uvStation.get(1);
-                expresion3.setLinearFactor(u, BigDecimal.ONE);
-                expresion3.setLinearFactor(v, new BigDecimal(-1));
+                expresion3.set(u, BigDecimal.ONE);
+                expresion3.set(v, new BigDecimal(-1));
                 expresion3.level(new BigDecimal(5));
             }
 
@@ -224,7 +224,7 @@ class P20130225 {
             final String name = v.getName();
             if (name.startsWith("X_")) {
                 final String state = name.substring(name.lastIndexOf("_") + 1, name.length());
-                expresion1.setLinearFactor(v, new BigDecimal((Integer.valueOf(state))));
+                expresion1.set(v, new BigDecimal((Integer.valueOf(state))));
             }
         }
         expresion1.upper(new BigDecimal(91));
@@ -246,13 +246,13 @@ class P20130225 {
                 final Variable v = (Variable) varsStation.get(j);
                 final String name = v.getName();
                 final int state = Integer.valueOf(name.substring(name.lastIndexOf("_") + 1, name.length()));
-                expresion3.setLinearFactor(v, state);
+                expresion3.set(v, state);
             }
             final ArrayList uvStation = (ArrayList) variablesUVStation.get(i);
             final Variable u = (Variable) uvStation.get(0);
             final Variable v = (Variable) uvStation.get(1);
-            expresion3.setLinearFactor(u, BigDecimal.ONE);
-            expresion3.setLinearFactor(v, new BigDecimal(-1));
+            expresion3.set(u, BigDecimal.ONE);
+            expresion3.set(v, new BigDecimal(-1));
             expresion3.level(new BigDecimal(5));
         }
         return tmpIntegerModel;

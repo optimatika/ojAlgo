@@ -188,7 +188,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         }
 
         public void setRowValue(final String rowName, final BigDecimal value) {
-            myRows.get(rowName).getExpression().setLinearFactor(myVariable, value);
+            myRows.get(rowName).getExpression().set(myVariable, value);
         }
 
         /**
@@ -323,7 +323,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         }
 
         public void setColumnValue(final String columnName, final BigDecimal value) {
-            myExpression.setLinearFactor(myColumns.get(columnName).getVariable(), value);
+            myExpression.set(myColumns.get(columnName).getVariable(), value);
         }
 
         /**

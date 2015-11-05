@@ -30,7 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.ojalgo.optimisation.Expression.Index;
+import org.ojalgo.access.IntIndex;
 
 public abstract class Presolvers {
 
@@ -41,20 +41,29 @@ public abstract class Presolvers {
     public static final ExpressionsBasedModel.Presolver OPPOSITE_SIGN = new ExpressionsBasedModel.Presolver(20) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<Index> fixedVariables) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables) {
 
             boolean tmpDidFixVariable = false;
 
             final ExpressionsBasedModel tmpModel = expression.getModel();
 
-            final BigDecimal tmpCompLowLim = expression.compensateLowerLimit(fixedVariables);
-            final BigDecimal tmpCompUppLim = expression.compensateUpperLimit(fixedVariables);
+            final BigDecimal tmpFixedValue = expression.calculateFixedValue(fixedVariables);
+
+            BigDecimal tmpCompLowLim = expression.getLowerLimit();
+            if ((tmpCompLowLim != null) && (tmpFixedValue.signum() != 0)) {
+                tmpCompLowLim = tmpCompLowLim.subtract(tmpFixedValue);
+            }
+
+            BigDecimal tmpCompUppLim = expression.getUpperLimit();
+            if ((tmpCompUppLim != null) && (tmpFixedValue.signum() != 0)) {
+                tmpCompUppLim = tmpCompUppLim.subtract(tmpFixedValue);
+            }
 
             if ((tmpCompLowLim != null) && (tmpCompLowLim.signum() >= 0) && expression.isNegative(fixedVariables)) {
 
                 if (tmpCompLowLim.signum() == 0) {
 
-                    for (final Index tmpLinear : expression.getLinear().keySet()) {
+                    for (final IntIndex tmpLinear : expression.getLinearKeySet()) {
                         if (!fixedVariables.contains(tmpLinear)) {
                             final Variable tmpFreeVariable = tmpModel.getVariable(tmpLinear.index);
 
@@ -81,7 +90,7 @@ public abstract class Presolvers {
 
                 if (tmpCompUppLim.signum() == 0) {
 
-                    for (final Index tmpLinear : expression.getLinear().keySet()) {
+                    for (final IntIndex tmpLinear : expression.getLinearKeySet()) {
                         if (!fixedVariables.contains(tmpLinear)) {
                             final Variable tmpFreeVariable = tmpModel.getVariable(tmpLinear.index);
 
@@ -111,24 +120,21 @@ public abstract class Presolvers {
 
     /**
      * Looks for constraint expressions with 0, 1 or 2 non-fixed variables. Transfers the constraints of the
-     * expressions to the variables and then marks the expression as redundant.
+     * expressions to the variables and then (if possible) marks the expression as redundant.
      */
     public static final ExpressionsBasedModel.Presolver ZERO_ONE_TWO = new ExpressionsBasedModel.Presolver(10) {
 
         @Override
-        public boolean simplify(final Expression expression, final Set<Index> fixedVariables) {
+        public boolean simplify(final Expression expression, final Set<IntIndex> fixedVariables) {
 
             boolean tmpDidFixVariable = false;
 
             if (expression.countLinearFactors() <= (fixedVariables.size() + 2)) {
                 // This constraint can possibly be reduced to 0, 1 or 2 remaining linear factors
 
-                BigDecimal tmpFixedValue = expression.calculateFixedValue(fixedVariables);
-                if (tmpFixedValue == null) {
-                    tmpFixedValue = ZERO;
-                }
+                final BigDecimal tmpFixedValue = expression.calculateFixedValue(fixedVariables);
 
-                final HashSet<Index> tmpRemainingLinear = new HashSet<Index>(expression.getLinearFactorKeys());
+                final HashSet<IntIndex> tmpRemainingLinear = new HashSet<IntIndex>(expression.getLinearKeySet());
                 tmpRemainingLinear.removeAll(fixedVariables);
 
                 switch (tmpRemainingLinear.size()) {
@@ -163,7 +169,7 @@ public abstract class Presolvers {
     /**
      * This constraint expression has 0 remaining free variable. It is entirely redundant.
      */
-    static boolean doCase0(final Expression expression, final BigDecimal fixedValue, final HashSet<Index> remaining) {
+    static boolean doCase0(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining) {
 
         final ExpressionsBasedModel tmpModel = expression.getModel();
 
@@ -185,13 +191,13 @@ public abstract class Presolvers {
      * This constraint expression has 1 remaining free variable. The lower/upper limits can be transferred to
      * that variable, and the expression marked as redundant.
      */
-    static boolean doCase1(final Expression expression, final BigDecimal fixedValue, final HashSet<Index> remaining) {
+    static boolean doCase1(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining) {
 
         final ExpressionsBasedModel tmpModel = expression.getModel();
 
-        final Index tmpIndex = remaining.iterator().next();
+        final IntIndex tmpIndex = remaining.iterator().next();
         final Variable tmpVariable = tmpModel.getVariable(tmpIndex.index);
-        final BigDecimal tmpFactor = expression.getLinearFactor(tmpIndex);
+        final BigDecimal tmpFactor = expression.get(tmpIndex);
 
         if (expression.isEqualityConstraint()) {
             // Simple case with equality constraint
@@ -277,21 +283,21 @@ public abstract class Presolvers {
         }
     }
 
-    static boolean doCase2(final Expression expression, final BigDecimal fixedValue, final HashSet<Index> remaining) {
+    static boolean doCase2(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining) {
 
         final ExpressionsBasedModel tmpModel = expression.getModel();
 
-        final Iterator<Index> tmpIterator = remaining.iterator();
+        final Iterator<IntIndex> tmpIterator = remaining.iterator();
 
-        final Index tmpIndexA = tmpIterator.next();
+        final IntIndex tmpIndexA = tmpIterator.next();
         final Variable tmpVariableA = tmpModel.getVariable(tmpIndexA.index);
-        final BigDecimal tmpFactorA = expression.getLinearFactor(tmpIndexA);
+        final BigDecimal tmpFactorA = expression.get(tmpIndexA);
         BigDecimal tmpLowerA = tmpVariableA.getLowerLimit();
         BigDecimal tmpUpperA = tmpVariableA.getUpperLimit();
 
-        final Index tmpIndexB = tmpIterator.next();
+        final IntIndex tmpIndexB = tmpIterator.next();
         final Variable tmpVariableB = tmpModel.getVariable(tmpIndexB.index);
-        final BigDecimal tmpFactorB = expression.getLinearFactor(tmpIndexB);
+        final BigDecimal tmpFactorB = expression.get(tmpIndexB);
         BigDecimal tmpLowerB = tmpVariableB.getLowerLimit();
         BigDecimal tmpUpperB = tmpVariableB.getUpperLimit();
 

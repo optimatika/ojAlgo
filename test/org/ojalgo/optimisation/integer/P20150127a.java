@@ -74,8 +74,8 @@ public class P20150127a {
             // We want coeff[0] * x + coeff[1] * y < 0. Since our
             // solutions are integer, we can do "<= -1".
             tmpExpression.upper(BigDecimal.ONE.negate());
-            tmpExpression.setLinearFactor(x, coeff[0]);
-            tmpExpression.setLinearFactor(y, coeff[1]);
+            tmpExpression.set(x, coeff[0]);
+            tmpExpression.set(y, coeff[1]);
         }
 
         return retVal;

@@ -127,13 +127,13 @@ public final class PortfolioMixer {
                 for (int i = 0; i < tmpNumberOfAssets; i++) {
                     tmpVal = tmpVal.add(myComponents.get(row).getWeights().get(i).multiply(myComponents.get(col).getWeights().get(i)));
                 }
-                tmpQuadObj.setQuadraticFactor(row, col, tmpVal);
-                tmpQuadObj.setQuadraticFactor(tmpNumberOfComponents + row, tmpNumberOfComponents + col, tmpVal.multiply(THOUSANDTH));
+                tmpQuadObj.set(row, col, tmpVal);
+                tmpQuadObj.set(tmpNumberOfComponents + row, tmpNumberOfComponents + col, tmpVal.multiply(THOUSANDTH));
             }
 
             final Expression tmpActive = tmpModel.addExpression(tmpVariables[row].getName() + ACTIVE);
-            tmpActive.setLinearFactor(row, NEG);
-            tmpActive.setLinearFactor(tmpNumberOfComponents + row, ONE);
+            tmpActive.set(row, NEG);
+            tmpActive.set(tmpNumberOfComponents + row, ONE);
             tmpActive.lower(ZERO);
             //            BasicLogger.logDebug(tmpActive.toString());
             //            BasicLogger.logDebug(tmpActive.getName(), tmpActive.getLinear().getFactors());
@@ -143,7 +143,7 @@ public final class PortfolioMixer {
         final Expression tmpHundredPercent = tmpModel.addExpression("100%");
         tmpHundredPercent.level(ONE);
         for (int c = 0; c < tmpNumberOfComponents; c++) {
-            tmpHundredPercent.setLinearFactor(c, ONE);
+            tmpHundredPercent.set(c, ONE);
         }
         //        BasicLogger.logDebug(tmpHundredPercent.toString());
         //        BasicLogger.logDebug(tmpHundredPercent.getName(), tmpHundredPercent.getLinear().getFactors());
@@ -151,7 +151,7 @@ public final class PortfolioMixer {
         final Expression tmpStrategyCount = tmpModel.addExpression(STRATEGY_COUNT);
         tmpStrategyCount.upper(TypeUtils.toBigDecimal(aNumber));
         for (int c = 0; c < tmpNumberOfComponents; c++) {
-            tmpStrategyCount.setLinearFactor(tmpNumberOfComponents + c, ONE);
+            tmpStrategyCount.set(tmpNumberOfComponents + c, ONE);
         }
         //        BasicLogger.logDebug(tmpStrategyCount.toString());
         //        BasicLogger.logDebug(tmpStrategyCount.getName(), tmpStrategyCount.getLinear().getFactors());
@@ -165,7 +165,7 @@ public final class PortfolioMixer {
             final Expression tmpExpr = tmpModel.addExpression("AC" + Arrays.toString(tmpEntry.getKey()));
 
             for (int c = 0; c < tmpNumberOfComponents; c++) {
-                tmpExpr.setLinearFactor(c, myComponents.get(c).getWeights().get(tmpIndex));
+                tmpExpr.set(c, myComponents.get(c).getWeights().get(tmpIndex));
             }
             if (tmpLower != null) {
                 tmpExpr.lower(tmpLower);
@@ -183,7 +183,7 @@ public final class PortfolioMixer {
 
             final Expression tmpExpr = tmpModel.addExpression("CC" + Arrays.toString(tmpEntry.getKey()));
 
-            tmpExpr.setLinearFactor(tmpIndex, BigMath.ONE);
+            tmpExpr.set(tmpIndex, BigMath.ONE);
 
             for (int c = 0; c < tmpNumberOfComponents; c++) {
             }

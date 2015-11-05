@@ -669,7 +669,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 final Expression tmpExpression = model.addExpression(tmpLinearConstraint.toString());
                 final double[] tmpFactors = tmpLinearConstraint.getFactors();
                 for (int i = 0; i < tmpFactors.length; i++) {
-                    tmpExpression.setLinearFactor(i, tmpFactors[i]);
+                    tmpExpression.set(i, tmpFactors[i]);
                 }
                 switch (tmpLinearConstraint.getType()) {
                 case GEQ:

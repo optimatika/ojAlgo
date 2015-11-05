@@ -53,13 +53,13 @@ public class UCLAee236aCase extends OptimisationIntegerTests {
 
         final Expression tmpExprC1 = retVal.addExpression("C1");
         for (int i = 0; i < retVal.countVariables(); i++) {
-            tmpExprC1.setLinearFactor(i, new BigDecimal[] { TWO.multiply(NINTH), QUARTER }[i]);
+            tmpExprC1.set(i, new BigDecimal[] { TWO.multiply(NINTH), QUARTER }[i]);
         }
         tmpExprC1.upper(ONE);
 
         final Expression tmpExprC2 = retVal.addExpression("C2");
         for (int i = 0; i < retVal.countVariables(); i++) {
-            tmpExprC2.setLinearFactor(i, new BigDecimal[] { SEVENTH, THIRD }[i]);
+            tmpExprC2.set(i, new BigDecimal[] { SEVENTH, THIRD }[i]);
         }
         tmpExprC2.upper(ONE);
 

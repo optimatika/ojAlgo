@@ -129,11 +129,11 @@ public abstract class P20150720 {
                 errors.add(error);
 
                 final Expression errorExp = model.addExpression("ERROR_EXP:" + entry.getKey()).level(stockTotal / demandTotal);
-                linked.forEach(v -> errorExp.setLinearFactor(v, 1.0 / entry.getValue().doubleValue()));
-                errorExp.setLinearFactor(error, -1.0);
+                linked.forEach(v -> errorExp.set(v, 1.0 / entry.getValue().doubleValue()));
+                errorExp.set(error, -1.0);
 
                 //- Squared of error.
-                objective.setQuadraticFactor(error, error, -1.0);
+                objective.set(error, error, -1.0);
             }
         });
         return model;
@@ -242,9 +242,9 @@ public abstract class P20150720 {
             if (!linked.isEmpty() && (entry.getValue().doubleValue() > 0)) {
                 linked.forEach(v1 -> {
                     linked.forEach(v2 -> {
-                        objective.setQuadraticFactor(v1, v2, -1);
+                        objective.set(v1, v2, -1);
                     });
-                    objective.setLinearFactor(v1, ((2 * stockTotal) / demandTotal) * entry.getValue().doubleValue());
+                    objective.set(v1, ((2 * stockTotal) / demandTotal) * entry.getValue().doubleValue());
                 });
             }
         });
@@ -463,9 +463,9 @@ public abstract class P20150720 {
                 final double target = stockTotal * ratio;
                 linked.forEach(v1 -> {
                     linked.forEach(v2 -> {
-                        objective.setQuadraticFactor(v1, v2, ratio / (target * target));
+                        objective.set(v1, v2, ratio / (target * target));
                     });
-                    objective.setLinearFactor(v1, (-2.0 * ratio) / target);
+                    objective.set(v1, (-2.0 * ratio) / target);
                 });
             }
         });

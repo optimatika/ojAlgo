@@ -83,20 +83,20 @@ public class IntegerProblems extends OptimisationIntegerTests {
 
         final Expression tmpC1 = tmpModel.addExpression("C1");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpC1.setLinearFactor(i, ONE);
+            tmpC1.set(i, ONE);
         }
 
         tmpC1.level(ONE);
 
         final Expression tmpC2 = tmpModel.addExpression("C2");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpC2.setLinearFactor(i, ONE);
+            tmpC2.set(i, ONE);
         }
         tmpC2.level(TWO);
 
         final Expression tmpC3 = tmpModel.addExpression("C3");
         for (int i = 0; i < tmpModel.countVariables(); i++) {
-            tmpC3.setLinearFactor(i, ONE);
+            tmpC3.set(i, ONE);
         }
         tmpC3.level(THREE);
 
@@ -138,20 +138,20 @@ public class IntegerProblems extends OptimisationIntegerTests {
         final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
 
         final Expression tmpExpr1 = tmpModel.addExpression("Expr1");
-        tmpExpr1.setLinearFactor(0, -1);
-        tmpExpr1.setLinearFactor(1, 5100);
-        tmpExpr1.setLinearFactor(2, -5000);
+        tmpExpr1.set(0, -1);
+        tmpExpr1.set(1, 5100);
+        tmpExpr1.set(2, -5000);
         tmpExpr1.upper(BigMath.ZERO);
 
         final Expression tmpExpr2 = tmpModel.addExpression("Expr2");
-        tmpExpr2.setLinearFactor(0, 1);
-        tmpExpr2.setLinearFactor(1, 5100);
-        tmpExpr2.setLinearFactor(2, -5000);
+        tmpExpr2.set(0, 1);
+        tmpExpr2.set(1, 5100);
+        tmpExpr2.set(2, -5000);
         tmpExpr2.lower(BigMath.ZERO);
 
         final Expression tmpExpr3 = tmpModel.addExpression("Expr3");
-        tmpExpr3.setLinearFactor(1, 5000);
-        tmpExpr3.setLinearFactor(2, 5000);
+        tmpExpr3.set(1, 5000);
+        tmpExpr3.set(2, 5000);
         tmpExpr3.level(new BigDecimal(19105000));
 
         final BigArray tmpExpSol = BigArray.wrap(new BigDecimal[] { new BigDecimal(4200.000000000075), new BigDecimal(1892), new BigDecimal(1929) });
@@ -190,43 +190,43 @@ public class IntegerProblems extends OptimisationIntegerTests {
         tmpModel.addVariable(x2015);
 
         final Expression obj = tmpModel.addExpression("obj");
-        obj.setLinearFactor(x1, 1);
+        obj.set(x1, 1);
         obj.weight(BigDecimal.valueOf(1));
 
         final Expression c1 = tmpModel.addExpression("c1");
-        c1.setLinearFactor(x1, 1);
+        c1.set(x1, 1);
         c1.lower(BigDecimal.valueOf(0));
 
         final Expression c2 = tmpModel.addExpression("c2");
-        c2.setLinearFactor(x2014, -5000);
-        c2.setLinearFactor(x2013, 5100);
-        c2.setLinearFactor(x1, -1);
+        c2.set(x2014, -5000);
+        c2.set(x2013, 5100);
+        c2.set(x1, -1);
         c2.upper(BigDecimal.valueOf(0));
 
         final Expression c3 = tmpModel.addExpression("c3");
-        c3.setLinearFactor(x2014, -5000);
-        c3.setLinearFactor(x2013, 5100);
-        c3.setLinearFactor(x1, 1);
+        c3.set(x2014, -5000);
+        c3.set(x2013, 5100);
+        c3.set(x1, 1);
         c3.lower(BigDecimal.valueOf(0));
 
         final Expression c4 = tmpModel.addExpression("c4");
-        c4.setLinearFactor(x2014, 150);
-        c4.setLinearFactor(x2013, 5100);
-        c4.setLinearFactor(x2015, -5000);
-        c4.setLinearFactor(x1, -1);
+        c4.set(x2014, 150);
+        c4.set(x2013, 5100);
+        c4.set(x2015, -5000);
+        c4.set(x1, -1);
         c4.upper(BigDecimal.valueOf(0));
 
         final Expression c5 = tmpModel.addExpression("c5");
-        c5.setLinearFactor(x2014, 150);
-        c5.setLinearFactor(x2013, 5100);
-        c5.setLinearFactor(x2015, -5000);
-        c5.setLinearFactor(x1, 1);
+        c5.set(x2014, 150);
+        c5.set(x2013, 5100);
+        c5.set(x2015, -5000);
+        c5.set(x1, 1);
         c5.lower(BigDecimal.valueOf(0));
 
         final Expression c6 = tmpModel.addExpression("c6");
-        c6.setLinearFactor(x2015, 5000);
-        c6.setLinearFactor(x2014, 5000);
-        c6.setLinearFactor(x2013, 5000);
+        c6.set(x2015, 5000);
+        c6.set(x2014, 5000);
+        c6.set(x2013, 5000);
         c6.level(BigDecimal.valueOf(19105000));
 
         final BigArray tmpExpSol = BigArray

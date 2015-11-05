@@ -82,7 +82,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal = tmpFullModel.addExpression("C1");
 
         for (int i = 0; i < tmpLength; i++) {
-            retVal.setLinearFactor(i, new BigDecimal[] { ONE, ZERO, ONE, ZERO, ONE, ZERO }[i]);
+            retVal.set(i, new BigDecimal[] { ONE, ZERO, ONE, ZERO, ONE, ZERO }[i]);
         }
 
         final Expression tmpAddWeightExpression = retVal;
@@ -92,7 +92,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal1 = tmpOddModel.addExpression("C1");
 
         for (int i = 0; i < tmpLength1; i++) {
-            retVal1.setLinearFactor(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
+            retVal1.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
         }
         final Expression tmpAddWeightExpression2 = retVal1;
         tmpAddWeightExpression2.level(tmpRHS);
@@ -101,7 +101,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal2 = tmpFullModel.addExpression("C2");
 
         for (int i = 0; i < tmpLength2; i++) {
-            retVal2.setLinearFactor(i, new BigDecimal[] { ZERO, ONE, ZERO, ONE, ZERO, ONE }[i]);
+            retVal2.set(i, new BigDecimal[] { ZERO, ONE, ZERO, ONE, ZERO, ONE }[i]);
         }
 
         final Expression tmpAddWeightExpression3 = retVal2;
@@ -111,7 +111,7 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression retVal3 = tmpEvenModel.addExpression("C2");
 
         for (int i = 0; i < tmpLength3; i++) {
-            retVal3.setLinearFactor(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
+            retVal3.set(i, new BigDecimal[] { ONE, ONE, ONE }[i]);
         }
         final Expression tmpAddWeightExpression4 = retVal3;
         tmpAddWeightExpression4.level(tmpRHS);
@@ -202,17 +202,17 @@ public class LinearProblems extends OptimisationLinearTests {
 
         final Expression tmpExprC1 = tmpModel.addExpression("C1");
         tmpExprC1.level(ZERO);
-        tmpExprC1.setLinearFactor(0, ONE);
+        tmpExprC1.set(0, ONE);
 
         final Expression tmpExprC2 = tmpModel.addExpression("C2");
         tmpExprC2.level(ZERO);
-        tmpExprC2.setLinearFactor(0, ONE);
-        tmpExprC2.setLinearFactor(1, NEG);
+        tmpExprC2.set(0, ONE);
+        tmpExprC2.set(1, NEG);
 
         final Expression tmpExprC3 = tmpModel.addExpression("C3");
         tmpExprC3.level(ZERO);
-        tmpExprC3.setLinearFactor(0, ONE);
-        tmpExprC3.setLinearFactor(2, NEG);
+        tmpExprC3.set(0, ONE);
+        tmpExprC3.set(2, NEG);
 
         final State tmpExpectedState = State.OPTIMAL;
         final BasicMatrix tmpExpectedSolution = PrimitiveMatrix.FACTORY.makeZero(3, 1);
@@ -222,33 +222,33 @@ public class LinearProblems extends OptimisationLinearTests {
         TestUtils.assertStateNotLessThanOptimal(tmpResult11);
         TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResult11));
 
-        tmpExprC2.setLinearFactor(0, NEG);
-        tmpExprC2.setLinearFactor(1, ONE);
+        tmpExprC2.set(0, NEG);
+        tmpExprC2.set(1, ONE);
 
-        tmpExprC3.setLinearFactor(0, ONE);
-        tmpExprC3.setLinearFactor(2, NEG);
+        tmpExprC3.set(0, ONE);
+        tmpExprC3.set(2, NEG);
 
         final Optimisation.Result tmpResultN1 = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResultN1.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResultN1);
         TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResultN1));
 
-        tmpExprC2.setLinearFactor(0, ONE);
-        tmpExprC2.setLinearFactor(1, NEG);
+        tmpExprC2.set(0, ONE);
+        tmpExprC2.set(1, NEG);
 
-        tmpExprC3.setLinearFactor(0, NEG);
-        tmpExprC3.setLinearFactor(2, ONE);
+        tmpExprC3.set(0, NEG);
+        tmpExprC3.set(2, ONE);
 
         final Optimisation.Result tmpResult1N = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResult1N.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResult1N);
         TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResult1N));
 
-        tmpExprC2.setLinearFactor(0, NEG);
-        tmpExprC2.setLinearFactor(1, ONE);
+        tmpExprC2.set(0, NEG);
+        tmpExprC2.set(1, ONE);
 
-        tmpExprC3.setLinearFactor(0, NEG);
-        tmpExprC3.setLinearFactor(2, ONE);
+        tmpExprC3.set(0, NEG);
+        tmpExprC3.set(2, ONE);
 
         final Optimisation.Result tmpResultNN = tmpModel.minimise();
         //TestUtils.assertEquals(tmpExpectedState, tmpResultNN.getState());

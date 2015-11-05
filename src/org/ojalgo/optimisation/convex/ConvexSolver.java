@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.IntIndex;
+import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -41,7 +43,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.optimisation.BaseSolver;
 import org.ojalgo.optimisation.Expression;
-import org.ojalgo.optimisation.Expression.Index;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
@@ -287,7 +288,7 @@ public abstract class ConvexSolver extends BaseSolver {
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
         final List<Variable> tmpFreeVariables = sourceModel.getFreeVariables();
-        final Set<Index> tmpFixedVariables = sourceModel.getFixedVariables();
+        final Set<IntIndex> tmpFixedVariables = sourceModel.getFixedVariables();
         final int tmpFreeVarDim = tmpFreeVariables.size();
 
         //        final Array1D<Double> tmpCurrentSolution = Array1D.PRIMITIVE.makeZero(tmpFreeVarDim);
@@ -311,15 +312,15 @@ public abstract class ConvexSolver extends BaseSolver {
 
             for (int i = 0; i < tmpEqExprDim; i++) {
 
-                final Expression tmpExpression = tmpEqExpr.get(i);
+                final Expression tmpExpression = tmpEqExpr.get(i).compensate(tmpFixedVariables);
 
-                for (final Expression.Index tmpKey : tmpExpression.getLinearFactorKeys()) {
+                for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                     if (tmpIndex >= 0) {
                         tmpAE.set(i, tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
                     }
                 }
-                tmpBE.set(i, 0, tmpExpression.getCompensatedUpperLimit(tmpFixedVariables));
+                tmpBE.set(i, 0, tmpExpression.getAdjustedUpperLimit());
             }
 
             destinationBuilder.equalities(tmpAE, tmpBE);
@@ -327,7 +328,7 @@ public abstract class ConvexSolver extends BaseSolver {
 
         // Q & C
 
-        final Expression tmpObjExpr = sourceModel.getObjectiveExpression(tmpFixedVariables);
+        final Expression tmpObjExpr = sourceModel.getObjectiveExpression().compensate(tmpFixedVariables);
 
         PhysicalStore<Double> tmpQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
@@ -335,7 +336,7 @@ public abstract class ConvexSolver extends BaseSolver {
 
             final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
             UnaryFunction<Double> tmpModifier;
-            for (final Expression.RowColumn tmpKey : tmpObjExpr.getQuadraticFactorKeys()) {
+            for (final IntRowColumn tmpKey : tmpObjExpr.getQuadraticKeySet()) {
                 final int tmpRow = sourceModel.indexOfFreeVariable(tmpKey.row);
                 final int tmpColumn = sourceModel.indexOfFreeVariable(tmpKey.column);
                 if ((tmpRow >= 0) && (tmpColumn >= 0)) {
@@ -350,14 +351,14 @@ public abstract class ConvexSolver extends BaseSolver {
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
             tmpC = FACTORY.makeZero(tmpFreeVarDim, 1);
             if (sourceModel.isMinimisation()) {
-                for (final Expression.Index tmpKey : tmpObjExpr.getLinearFactorKeys()) {
+                for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                     if (tmpIndex >= 0) {
                         tmpC.set(tmpIndex, 0, -tmpObjExpr.getAdjustedLinearFactor(tmpKey));
                     }
                 }
             } else {
-                for (final Expression.Index tmpKey : tmpObjExpr.getLinearFactorKeys()) {
+                for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                     if (tmpIndex >= 0) {
                         tmpC.set(tmpIndex, 0, tmpObjExpr.getAdjustedLinearFactor(tmpKey));
@@ -387,14 +388,14 @@ public abstract class ConvexSolver extends BaseSolver {
 
             if (tmpUpExprDim > 0) {
                 for (int i = 0; i < tmpUpExprDim; i++) {
-                    final Expression tmpExpression = tmpUpExpr.get(i);
-                    for (final Expression.Index tmpKey : tmpExpression.getLinearFactorKeys()) {
+                    final Expression tmpExpression = tmpUpExpr.get(i).compensate(tmpFixedVariables);
+                    for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
                         final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                         if (tmpIndex >= 0) {
                             tmpAI.set(i, tmpIndex, tmpExpression.getAdjustedLinearFactor(tmpKey));
                         }
                     }
-                    tmpBI.set(i, 0, tmpExpression.getCompensatedUpperLimit(tmpFixedVariables));
+                    tmpBI.set(i, 0, tmpExpression.getAdjustedUpperLimit());
                 }
             }
 
@@ -408,14 +409,14 @@ public abstract class ConvexSolver extends BaseSolver {
 
             if (tmpLoExprDim > 0) {
                 for (int i = 0; i < tmpLoExprDim; i++) {
-                    final Expression tmpExpression = tmpLoExpr.get(i);
-                    for (final Expression.Index tmpKey : tmpExpression.getLinearFactorKeys()) {
+                    final Expression tmpExpression = tmpLoExpr.get(i).compensate(tmpFixedVariables);
+                    for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
                         final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
                         if (tmpIndex >= 0) {
                             tmpAI.set(tmpUpExprDim + tmpUpVarDim + i, tmpIndex, -tmpExpression.getAdjustedLinearFactor(tmpKey));
                         }
                     }
-                    tmpBI.set(tmpUpExprDim + tmpUpVarDim + i, 0, -tmpExpression.getCompensatedLowerLimit(tmpFixedVariables));
+                    tmpBI.set(tmpUpExprDim + tmpUpVarDim + i, 0, -tmpExpression.getAdjustedLowerLimit());
                 }
             }
 
@@ -439,6 +440,10 @@ public abstract class ConvexSolver extends BaseSolver {
         return ConvexSolver.getBuilder().objective(Q, C);
     }
 
+    final Cholesky<Double> myCholesky;
+
+    final LU<Double> myLU;
+
     protected ConvexSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
         super(matrices, solverOptions);
@@ -449,9 +454,6 @@ public abstract class ConvexSolver extends BaseSolver {
         myLU = LU.make(tmpQ);
 
     }
-
-    final Cholesky<Double> myCholesky;
-    final LU<Double> myLU;
 
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
 
@@ -499,6 +501,14 @@ public abstract class ConvexSolver extends BaseSolver {
     protected abstract MatrixStore<Double> getIterationKKT();
 
     protected abstract MatrixStore<Double> getIterationRHS();
+
+    @Override
+    protected boolean initialise(final Result kickStarter) {
+
+        myCholesky.decompose(this.getIterationQ());
+
+        return true;
+    }
 
     abstract protected void performIteration();
 
@@ -560,14 +570,6 @@ public abstract class ConvexSolver extends BaseSolver {
 
     final MatrixStore<Double> getSolutionX() {
         return this.getX();
-    }
-
-    @Override
-    protected boolean initialise(final Result kickStarter) {
-
-        myCholesky.decompose(this.getIterationQ());
-
-        return true;
     }
 
 }
