@@ -186,25 +186,29 @@ public final class Expression extends ModelEntity<Expression> {
 
             BigDecimal tmpFixedValue = BigMath.ZERO;
 
-            for (final IntIndex tmpKey : myLinear.keySet()) {
+            for (final Entry<IntIndex, BigDecimal> tmpEntry : myLinear.entrySet()) {
 
-                final BigDecimal tmpFactor = this.get(tmpKey);
+                final IntIndex tmpKey = tmpEntry.getKey();
+                final BigDecimal tmpFactor = tmpEntry.getValue();
 
                 if (fixedVariables.contains(tmpKey)) {
+                    // Fixed
 
                     final BigDecimal tmpValue = tmpModel.getVariable(tmpKey.index).getValue();
 
                     tmpFixedValue = tmpFixedValue.add(tmpFactor.multiply(tmpValue));
 
                 } else {
+                    // Not fixed
 
                     retVal.set(tmpKey, tmpFactor);
                 }
             }
 
-            for (final IntRowColumn tmpKey : myQuadratic.keySet()) {
+            for (final Entry<IntRowColumn, BigDecimal> tmpEntry : myQuadratic.entrySet()) {
 
-                final BigDecimal tmpFactor = this.get(tmpKey);
+                final IntRowColumn tmpKey = tmpEntry.getKey();
+                final BigDecimal tmpFactor = tmpEntry.getValue();
 
                 final Variable tmpRowVariable = tmpModel.getVariable(tmpKey.row);
                 final Variable tmpColVariable = tmpModel.getVariable(tmpKey.column);
@@ -239,7 +243,7 @@ public final class Expression extends ModelEntity<Expression> {
                         retVal.add(tmpRowKey, tmpFactor.multiply(tmpColValue));
 
                     } else {
-                        // Nothing fixed
+                        // Neither fixed
 
                         retVal.set(tmpKey, tmpFactor);
                     }

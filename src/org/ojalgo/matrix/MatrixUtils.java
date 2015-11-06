@@ -28,8 +28,10 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.decomposition.*;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -47,6 +49,56 @@ public abstract class MatrixUtils {
             for (int j = 0; j < columns; j++) {
                 tmpRow[j] = source.doubleValue(i, j);
             }
+        }
+    }
+
+    public static void copyComplexArgument(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
+        final long tmpCount = FunctionUtils.min(source.count(), destination.count());
+        for (long i = 0; i < tmpCount; i++) {
+            destination.set(i, source.get(i).getArgument());
+        }
+    }
+
+    public static void copyComplexImaginary(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
+        final long tmpCount = FunctionUtils.min(source.count(), destination.count());
+        for (long i = 0; i < tmpCount; i++) {
+            destination.set(i, source.get(i).getImaginary());
+        }
+    }
+
+    public static void copyComplexModulus(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
+        final long tmpCount = FunctionUtils.min(source.count(), destination.count());
+        for (long i = 0; i < tmpCount; i++) {
+            destination.set(i, source.get(i).getModulus());
+        }
+    }
+
+    public static void copyComplexModulusAndArgument(final Access2D<ComplexNumber> source, final ElementsConsumer<?> modDest,
+            final ElementsConsumer<?> argDest) {
+        final long tmpCount = FunctionUtils.min(source.count(), modDest.count(), argDest.count());
+        ComplexNumber tmpComplexNumber;
+        for (long i = 0; i < tmpCount; i++) {
+            tmpComplexNumber = source.get(i);
+            modDest.set(i, tmpComplexNumber.getModulus());
+            argDest.set(i, tmpComplexNumber.getArgument());
+        }
+    }
+
+    public static void copyComplexReal(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
+        final long tmpCount = FunctionUtils.min(source.count(), destination.count());
+        for (long i = 0; i < tmpCount; i++) {
+            destination.set(i, source.get(i).getReal());
+        }
+    }
+
+    public static void copyComplexRealAndImaginary(final Access2D<ComplexNumber> source, final ElementsConsumer<?> realDest,
+            final ElementsConsumer<?> imagDest) {
+        final long tmpCount = FunctionUtils.min(source.count(), realDest.count(), imagDest.count());
+        ComplexNumber tmpComplexNumber;
+        for (long i = 0; i < tmpCount; i++) {
+            tmpComplexNumber = source.get(i);
+            realDest.set(i, tmpComplexNumber.getReal());
+            imagDest.set(i, tmpComplexNumber.getImaginary());
         }
     }
 
@@ -242,6 +294,54 @@ public abstract class MatrixUtils {
 
     public static final int firstInRow(final Access1D<?> matrix, final int row, final int defaultAndMinimum) {
         return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    public static PrimitiveDenseStore getComplexArgument(final Access2D<ComplexNumber> arg) {
+
+        final long tmpRows = arg.countRows();
+        final long tmpColumns = arg.countColumns();
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpRows, tmpColumns);
+
+        MatrixUtils.copyComplexArgument(arg, retVal);
+
+        return retVal;
+    }
+
+    public static PrimitiveDenseStore getComplexImaginary(final Access2D<ComplexNumber> arg) {
+
+        final long tmpRows = arg.countRows();
+        final long tmpColumns = arg.countColumns();
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpRows, tmpColumns);
+
+        MatrixUtils.copyComplexImaginary(arg, retVal);
+
+        return retVal;
+    }
+
+    public static PrimitiveDenseStore getComplexModulus(final Access2D<ComplexNumber> arg) {
+
+        final long tmpRows = arg.countRows();
+        final long tmpColumns = arg.countColumns();
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpRows, tmpColumns);
+
+        MatrixUtils.copyComplexModulus(arg, retVal);
+
+        return retVal;
+    }
+
+    public static PrimitiveDenseStore getComplexReal(final Access2D<ComplexNumber> arg) {
+
+        final long tmpRows = arg.countRows();
+        final long tmpColumns = arg.countColumns();
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(tmpRows, tmpColumns);
+
+        MatrixUtils.copyComplexReal(arg, retVal);
+
+        return retVal;
     }
 
     public static <N extends Number> int hashCode(final BasicMatrix matrix) {

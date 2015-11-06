@@ -280,7 +280,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myWorkCopy = false;
     }
 
-    public ExpressionsBasedModel(final Variable[] variables) {
+    public ExpressionsBasedModel(final Variable... variables) {
 
         super();
 
