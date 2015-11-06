@@ -52,6 +52,9 @@ public abstract class MatrixUtils {
         }
     }
 
+    /**
+     * Copies the argument of the ComplexNumber elements to the destination.
+     */
     public static void copyComplexArgument(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
         final long tmpCount = FunctionUtils.min(source.count(), destination.count());
         for (long i = 0; i < tmpCount; i++) {
@@ -59,6 +62,9 @@ public abstract class MatrixUtils {
         }
     }
 
+    /**
+     * Copies the imaginary part of the ComplexNumber elements to the destination.
+     */
     public static void copyComplexImaginary(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
         final long tmpCount = FunctionUtils.min(source.count(), destination.count());
         for (long i = 0; i < tmpCount; i++) {
@@ -66,6 +72,9 @@ public abstract class MatrixUtils {
         }
     }
 
+    /**
+     * Copies the modulus of the ComplexNumber elements to the destination.
+     */
     public static void copyComplexModulus(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
         final long tmpCount = FunctionUtils.min(source.count(), destination.count());
         for (long i = 0; i < tmpCount; i++) {
@@ -73,6 +82,9 @@ public abstract class MatrixUtils {
         }
     }
 
+    /**
+     * Simultaneously copies the modulus and argument of the ComplexNumber elements to the destinations.
+     */
     public static void copyComplexModulusAndArgument(final Access2D<ComplexNumber> source, final ElementsConsumer<?> modDest,
             final ElementsConsumer<?> argDest) {
         final long tmpCount = FunctionUtils.min(source.count(), modDest.count(), argDest.count());
@@ -84,6 +96,9 @@ public abstract class MatrixUtils {
         }
     }
 
+    /**
+     * Copies the real part of the ComplexNumber elements to the destination.
+     */
     public static void copyComplexReal(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
         final long tmpCount = FunctionUtils.min(source.count(), destination.count());
         for (long i = 0; i < tmpCount; i++) {
@@ -91,6 +106,9 @@ public abstract class MatrixUtils {
         }
     }
 
+    /**
+     * Simultaneously copies the real and imaginary parts of the ComplexNumber elements to the destinations.
+     */
     public static void copyComplexRealAndImaginary(final Access2D<ComplexNumber> source, final ElementsConsumer<?> realDest,
             final ElementsConsumer<?> imagDest) {
         final long tmpCount = FunctionUtils.min(source.count(), realDest.count(), imagDest.count());
@@ -296,6 +314,9 @@ public abstract class MatrixUtils {
         return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
     }
 
+    /**
+     * Extracts the argument of the ComplexNumber elements to a new primitive double valued matrix.
+     */
     public static PrimitiveDenseStore getComplexArgument(final Access2D<ComplexNumber> arg) {
 
         final long tmpRows = arg.countRows();
@@ -308,6 +329,9 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
+    /**
+     * Extracts the imaginary part of the ComplexNumber elements to a new primitive double valued matrix.
+     */
     public static PrimitiveDenseStore getComplexImaginary(final Access2D<ComplexNumber> arg) {
 
         final long tmpRows = arg.countRows();
@@ -320,6 +344,9 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
+    /**
+     * Extracts the modulus of the ComplexNumber elements to a new primitive double valued matrix.
+     */
     public static PrimitiveDenseStore getComplexModulus(final Access2D<ComplexNumber> arg) {
 
         final long tmpRows = arg.countRows();
@@ -332,6 +359,9 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
+    /**
+     * Extracts the real part of the ComplexNumber elements to a new primitive double valued matrix.
+     */
     public static PrimitiveDenseStore getComplexReal(final Access2D<ComplexNumber> arg) {
 
         final long tmpRows = arg.countRows();
