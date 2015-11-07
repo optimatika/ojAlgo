@@ -353,7 +353,7 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
      *  G    greater than or equal
      *  N    objective
      *  N    no restriction
-     * 
+     *
      * row type       sign of r       h          u
      * ----------------------------------------------
      *    G            + or -         b        b + |r|
@@ -432,15 +432,32 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     }
 
     @Override
-    public void destroy() {
-        myDelegate.destroy();
+    public void dispose() {
+        myDelegate.dispose();
         myRows.clear();
         myColumns.clear();
     }
 
     @Override
     public boolean equals(final Object obj) {
-        return myDelegate.equals(obj);
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof MathProgSysModel)) {
+            return false;
+        }
+        final MathProgSysModel other = (MathProgSysModel) obj;
+        if (myDelegate == null) {
+            if (other.myDelegate != null) {
+                return false;
+            }
+        } else if (!myDelegate.equals(other.myDelegate)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -456,7 +473,10 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
 
     @Override
     public int hashCode() {
-        return myDelegate.hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((myDelegate == null) ? 0 : myDelegate.hashCode());
+        return result;
     }
 
     /**

@@ -292,7 +292,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return myAdjustmentExponent;
     }
 
-    protected boolean validate(final BasicLogger.Appender appender) {
+    protected boolean validate(final BasicLogger.Printer appender) {
 
         boolean retVal = true;
 
@@ -311,7 +311,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return retVal;
     }
 
-    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Appender appender) {
+    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
 
         boolean retVal = true;
 

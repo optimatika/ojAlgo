@@ -106,6 +106,13 @@ public interface Optimisation {
 
     public static interface Model extends Optimisation {
 
+        /**
+         * Cleanup when a model instance is no longer needed. The default implementation does nothing,
+         */
+        default void dispose() {
+            ;
+        }
+
         Optimisation.Result maximise();
 
         Optimisation.Result minimise();
@@ -142,9 +149,9 @@ public interface Optimisation {
 
         /**
          * If this is null nothing is printed, if it is not null then debug statements are printed to that
-         * {@linkplain BasicLogger.Appender}.
+         * {@linkplain BasicLogger.Printer}.
          */
-        public BasicLogger.Appender debug_appender = null;
+        public BasicLogger.Printer debug_appender = null;
 
         /**
          * Which {@linkplain Solver} to debug. Null means ALL solvers. This setting is only relevant if
@@ -389,7 +396,7 @@ public interface Optimisation {
          */
         default void dispose() {
             ;
-        };
+        }
 
         default Optimisation.Result solve() {
             return this.solve(null);

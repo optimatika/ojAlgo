@@ -67,7 +67,7 @@ public final class FunctionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     @Override
-    public void destroy() {
+    public void dispose() {
         // TODO Auto-generated method stub
     }
 

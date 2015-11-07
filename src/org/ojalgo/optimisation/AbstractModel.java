@@ -43,8 +43,6 @@ abstract class AbstractModel<S extends Optimisation.Solver> implements Optimisat
         options = someOptions;
     }
 
-    public abstract void destroy();
-
     public final boolean isMaximisation() {
         return !this.isMinimisation();
     }

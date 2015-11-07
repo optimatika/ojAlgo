@@ -725,7 +725,7 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    protected boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final BasicLogger.Appender appender) {
+    protected boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final BasicLogger.Printer appender) {
 
         final BigDecimal tmpValue = this.evaluate(solution);
 

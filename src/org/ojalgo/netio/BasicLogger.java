@@ -47,150 +47,12 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class BasicLogger {
 
-    public static interface Appender {
-
-        /**
-         * @see java.io.PrintWriter#print(boolean)
-         * @see java.io.PrintStream#print(boolean)
-         */
-        public abstract void print(boolean b);
-
-        /**
-         * @see java.io.PrintWriter#print(char)
-         * @see java.io.PrintStream#print(char)
-         */
-        public abstract void print(char c);
-
-        /**
-         * @see java.io.PrintWriter#print(char[])
-         * @see java.io.PrintStream#print(char[])
-         */
-        public abstract void print(char[] ca);
-
-        /**
-         * @see java.io.PrintWriter#print(double)
-         * @see java.io.PrintStream#print(double)
-         */
-        public abstract void print(double d);
-
-        /**
-         * @see java.io.PrintWriter#print(float)
-         * @see java.io.PrintStream#print(float)
-         */
-        public abstract void print(float f);
-
-        /**
-         * @see java.io.PrintWriter#print(int)
-         * @see java.io.PrintStream#print(int)
-         */
-        public abstract void print(int i);
-
-        /**
-         * @see java.io.PrintWriter#print(long)
-         * @see java.io.PrintStream#print(long)
-         */
-        public abstract void print(long l);
-
-        /**
-         * @see java.io.PrintWriter#print(java.lang.Object)
-         * @see java.io.PrintStream#print(java.lang.Object)
-         */
-        public abstract void print(Object obj);
-
-        /**
-         * @see java.io.PrintWriter#print(java.lang.String)
-         * @see java.io.PrintStream#print(java.lang.String)
-         */
-        public abstract void print(String str);
-
-        public abstract void print(final String message, final Object... args);
-
-        /**
-         * @see java.io.PrintWriter#printf(java.util.Locale, java.lang.String, java.lang.Object[])
-         * @see java.io.PrintStream#printf(java.util.Locale, java.lang.String, java.lang.Object[])
-         */
-        public abstract Appender printf(Locale locale, String format, Object... args);
-
-        /**
-         * @see java.io.PrintWriter#printf(java.lang.String, java.lang.Object[])
-         * @see java.io.PrintStream#printf(java.lang.String, java.lang.Object[])
-         */
-        public abstract Appender printf(String format, Object... args);
-
-        /**
-         * @see java.io.PrintWriter#println()
-         * @see java.io.PrintStream#println()
-         */
-        public abstract void println();
-
-        /**
-         * @see java.io.PrintWriter#println(boolean)
-         * @see java.io.PrintStream#println(boolean)
-         */
-        public abstract void println(boolean b);
-
-        /**
-         * @see java.io.PrintWriter#println(char)
-         * @see java.io.PrintStream#println(char)
-         */
-        public abstract void println(char c);
-
-        /**
-         * @see java.io.PrintWriter#println(char[])
-         * @see java.io.PrintStream#println(char[])
-         */
-        public abstract void println(char[] ca);
-
-        /**
-         * @see java.io.PrintWriter#println(double)
-         * @see java.io.PrintStream#println(double)
-         */
-        public abstract void println(double d);
-
-        /**
-         * @see java.io.PrintWriter#println(float)
-         * @see java.io.PrintStream#println(float)
-         */
-        public abstract void println(float f);
-
-        /**
-         * @see java.io.PrintWriter#println(int)
-         * @see java.io.PrintStream#println(int)
-         */
-        public abstract void println(int i);
-
-        /**
-         * @see java.io.PrintWriter#println(long)
-         * @see java.io.PrintStream#println(long)
-         */
-        public abstract void println(long l);
-
-        /**
-         * @see java.io.PrintWriter#println(java.lang.Object)
-         * @see java.io.PrintStream#println(java.lang.Object)
-         */
-        public abstract void println(Object obj);
-
-        /**
-         * @see java.io.PrintWriter#println(java.lang.String)
-         * @see java.io.PrintStream#println(java.lang.String)
-         */
-        public abstract void println(String str);
-
-        public abstract void println(final String message, final Object... args);
-
-        public abstract void printmtrx(final String message, final Access2D<?> matrix);
-
-        public abstract void printmtrx(final String message, final Access2D<?> matrix, NumberContext context);
-
-    }
-
-    public static final class GenericAppender implements Appender {
+    public static class AppendablePrinter implements Printer {
 
         private final Appendable myAppendable;
         private transient Formatter myFormatter;
 
-        public GenericAppender(final Appendable appendable) {
+        public AppendablePrinter(final Appendable appendable) {
             super();
             myAppendable = appendable;
         }
@@ -249,7 +111,7 @@ public abstract class BasicLogger {
             this.print(TypeUtils.format(message, args));
         }
 
-        public Appender printf(final Locale locale, final String format, final Object... args) {
+        public Printer printf(final Locale locale, final String format, final Object... args) {
 
             synchronized (myAppendable) {
                 if ((myFormatter == null) || (myFormatter.locale() != locale)) {
@@ -261,7 +123,7 @@ public abstract class BasicLogger {
             return this;
         }
 
-        public Appender printf(final String format, final Object... args) {
+        public Printer printf(final String format, final Object... args) {
 
             synchronized (myAppendable) {
                 if ((myFormatter == null) || (myFormatter.locale() != Locale.getDefault())) {
@@ -352,17 +214,174 @@ public abstract class BasicLogger {
 
     }
 
-    public static interface LoggerCache extends BasicLogger.Appender, CharSequence {
+    /**
+     * Temporarily store data/text. The buffer can be cleared and/or flushed to some receiver.
+     *
+     * @author apete
+     */
+    public static interface Buffer {
 
-        void flush(BasicLogger.Appender appender);
+        void clear();
+
+        default void flush(final Appendable target) {
+            this.flush(new AppendablePrinter(target));
+        }
+
+        void flush(final BasicLogger.Printer target);
+
+        default void flush(final PrintStream target) {
+            this.flush(new PrintStreamPrinter(target));
+        }
+
+        default void flush(final PrintWriter target) {
+            this.flush(new PrintWriterPrinter(target));
+        }
 
     }
 
-    public static final class PrintStreamAppender implements Appender {
+    public static interface Printer {
+
+        /**
+         * @see java.io.PrintWriter#print(boolean)
+         * @see java.io.PrintStream#print(boolean)
+         */
+        public abstract void print(boolean b);
+
+        /**
+         * @see java.io.PrintWriter#print(char)
+         * @see java.io.PrintStream#print(char)
+         */
+        public abstract void print(char c);
+
+        /**
+         * @see java.io.PrintWriter#print(char[])
+         * @see java.io.PrintStream#print(char[])
+         */
+        public abstract void print(char[] ca);
+
+        /**
+         * @see java.io.PrintWriter#print(double)
+         * @see java.io.PrintStream#print(double)
+         */
+        public abstract void print(double d);
+
+        /**
+         * @see java.io.PrintWriter#print(float)
+         * @see java.io.PrintStream#print(float)
+         */
+        public abstract void print(float f);
+
+        /**
+         * @see java.io.PrintWriter#print(int)
+         * @see java.io.PrintStream#print(int)
+         */
+        public abstract void print(int i);
+
+        /**
+         * @see java.io.PrintWriter#print(long)
+         * @see java.io.PrintStream#print(long)
+         */
+        public abstract void print(long l);
+
+        /**
+         * @see java.io.PrintWriter#print(java.lang.Object)
+         * @see java.io.PrintStream#print(java.lang.Object)
+         */
+        public abstract void print(Object obj);
+
+        /**
+         * @see java.io.PrintWriter#print(java.lang.String)
+         * @see java.io.PrintStream#print(java.lang.String)
+         */
+        public abstract void print(String str);
+
+        public abstract void print(final String message, final Object... args);
+
+        /**
+         * @see java.io.PrintWriter#printf(java.util.Locale, java.lang.String, java.lang.Object[])
+         * @see java.io.PrintStream#printf(java.util.Locale, java.lang.String, java.lang.Object[])
+         */
+        public abstract Printer printf(Locale locale, String format, Object... args);
+
+        /**
+         * @see java.io.PrintWriter#printf(java.lang.String, java.lang.Object[])
+         * @see java.io.PrintStream#printf(java.lang.String, java.lang.Object[])
+         */
+        public abstract Printer printf(String format, Object... args);
+
+        /**
+         * @see java.io.PrintWriter#println()
+         * @see java.io.PrintStream#println()
+         */
+        public abstract void println();
+
+        /**
+         * @see java.io.PrintWriter#println(boolean)
+         * @see java.io.PrintStream#println(boolean)
+         */
+        public abstract void println(boolean b);
+
+        /**
+         * @see java.io.PrintWriter#println(char)
+         * @see java.io.PrintStream#println(char)
+         */
+        public abstract void println(char c);
+
+        /**
+         * @see java.io.PrintWriter#println(char[])
+         * @see java.io.PrintStream#println(char[])
+         */
+        public abstract void println(char[] ca);
+
+        /**
+         * @see java.io.PrintWriter#println(double)
+         * @see java.io.PrintStream#println(double)
+         */
+        public abstract void println(double d);
+
+        /**
+         * @see java.io.PrintWriter#println(float)
+         * @see java.io.PrintStream#println(float)
+         */
+        public abstract void println(float f);
+
+        /**
+         * @see java.io.PrintWriter#println(int)
+         * @see java.io.PrintStream#println(int)
+         */
+        public abstract void println(int i);
+
+        /**
+         * @see java.io.PrintWriter#println(long)
+         * @see java.io.PrintStream#println(long)
+         */
+        public abstract void println(long l);
+
+        /**
+         * @see java.io.PrintWriter#println(java.lang.Object)
+         * @see java.io.PrintStream#println(java.lang.Object)
+         */
+        public abstract void println(Object obj);
+
+        /**
+         * @see java.io.PrintWriter#println(java.lang.String)
+         * @see java.io.PrintStream#println(java.lang.String)
+         */
+        public abstract void println(String str);
+
+        public abstract void println(final String message, final Object... args);
+
+        public abstract void printmtrx(final String message, final Access2D<?> matrix);
+
+        public abstract void printmtrx(final String message, final Access2D<?> matrix, NumberContext context);
+
+    }
+
+    public static final class PrintStreamPrinter implements Printer {
 
         private final PrintStream myStream;
 
-        public PrintStreamAppender(final PrintStream stream) {
+        public PrintStreamPrinter(final PrintStream stream) {
             super();
             myStream = stream;
         }
@@ -437,7 +456,7 @@ public abstract class BasicLogger {
         /**
          * @see java.io.PrintStream#printf(java.util.Locale, java.lang.String, java.lang.Object[])
          */
-        public PrintStreamAppender printf(final Locale locale, final String format, final Object... args) {
+        public PrintStreamPrinter printf(final Locale locale, final String format, final Object... args) {
             myStream.printf(locale, format, args);
             return this;
         }
@@ -445,7 +464,7 @@ public abstract class BasicLogger {
         /**
          * @see java.io.PrintStream#printf(java.lang.String, java.lang.Object[])
          */
-        public PrintStreamAppender printf(final String format, final Object... args) {
+        public PrintStreamPrinter printf(final String format, final Object... args) {
             myStream.printf(format, args);
             return this;
         }
@@ -546,11 +565,11 @@ public abstract class BasicLogger {
 
     }
 
-    public static final class PrintWriterAppender implements Appender {
+    public static final class PrintWriterPrinter implements Printer {
 
         private final PrintWriter myWriter;
 
-        public PrintWriterAppender(final PrintWriter writer) {
+        public PrintWriterPrinter(final PrintWriter writer) {
             super();
             myWriter = writer;
         }
@@ -625,7 +644,7 @@ public abstract class BasicLogger {
         /**
          * @see java.io.PrintWriter#printf(Locale, String, Object...)
          */
-        public PrintWriterAppender printf(final Locale locale, final String format, final Object... args) {
+        public PrintWriterPrinter printf(final Locale locale, final String format, final Object... args) {
             myWriter.printf(locale, format, args);
             return this;
         }
@@ -633,7 +652,7 @@ public abstract class BasicLogger {
         /**
          * @see java.io.PrintWriter#printf(String, Object...)
          */
-        public PrintWriterAppender printf(final String format, final Object... args) {
+        public PrintWriterPrinter printf(final String format, final Object... args) {
             myWriter.printf(format, args);
             return this;
         }
@@ -734,9 +753,9 @@ public abstract class BasicLogger {
 
     }
 
-    public static Appender DEBUG = new PrintStreamAppender(System.out);
+    public static Printer DEBUG = new PrintStreamPrinter(System.out);
 
-    public static Appender ERROR = new PrintStreamAppender(System.err);
+    public static Printer ERROR = new PrintStreamPrinter(System.err);
 
     static final NumberContext MATRIX_ELEMENT_CONTEXT = NumberContext.getGeneral(6);
 
@@ -786,7 +805,7 @@ public abstract class BasicLogger {
         BasicLogger.println(ERROR, message, arguments);
     }
 
-    private static void printmtrx(final Appender appender, final BasicMatrix matrix, final NumberContext context, final boolean plain) {
+    private static void printmtrx(final Printer appender, final BasicMatrix matrix, final NumberContext context, final boolean plain) {
 
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
@@ -826,25 +845,25 @@ public abstract class BasicLogger {
 
     }
 
-    static void println(final Appender appender) {
+    static void println(final Printer appender) {
         if (appender != null) {
             appender.println();
         }
     }
 
-    static void println(final Appender appender, final Object message) {
+    static void println(final Printer appender, final Object message) {
         if (appender != null) {
             appender.println(message);
         }
     }
 
-    static void println(final Appender appender, final String messagePattern, final Object... arguments) {
+    static void println(final Printer appender, final String messagePattern, final Object... arguments) {
         if (appender != null) {
             appender.println(messagePattern, arguments);
         }
     }
 
-    static void printmtrx(final Appender appender, final Access2D<?> matrix, final NumberContext context) {
+    static void printmtrx(final Printer appender, final Access2D<?> matrix, final NumberContext context) {
         if ((appender != null) && (matrix.count() > 0L)) {
             if (matrix instanceof ComplexMatrix) {
                 BasicLogger.printmtrx(appender, (ComplexMatrix) matrix, context, false);

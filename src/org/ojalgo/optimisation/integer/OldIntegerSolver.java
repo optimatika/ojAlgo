@@ -156,7 +156,7 @@ public final class OldIntegerSolver extends IntegerSolver {
                                     tmpModel.getVariable(OldIntegerSolver.this.getGlobalIndex(tmpBranchIndex)));
                         }
 
-                        tmpModel.destroy();
+                        tmpModel.dispose();
                         tmpModel = null;
 
                         final BranchAndBoundNodeTask tmpLowerBranchTask = this.createLowerBranch(tmpBranchIndex, tmpVariableValue, tmpSolutionValue);

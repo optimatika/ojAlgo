@@ -245,7 +245,7 @@ public final class NewIntegerSolver extends IntegerSolver {
                                 tmpModel.getVariable(NewIntegerSolver.this.getGlobalIndex(tmpBranchIndex)));
                     }
 
-                    tmpModel.destroy();
+                    tmpModel.dispose();
                     tmpModel = null;
 
                     final NodeKey tmpLowerBranchTask = nodeKey.createLowerBranch(tmpBranchIndex, tmpVariableValue, tmpResult.getValue());

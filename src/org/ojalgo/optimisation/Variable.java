@@ -195,7 +195,7 @@ public final class Variable extends ModelEntity<Variable> {
     }
 
     @Override
-    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Appender appender) {
+    protected boolean validate(final BigDecimal value, final NumberContext context, final BasicLogger.Printer appender) {
 
         boolean retVal = super.validate(value, context, appender);
 
@@ -211,7 +211,7 @@ public final class Variable extends ModelEntity<Variable> {
         return retVal;
     }
 
-    protected boolean validate(final NumberContext context, final BasicLogger.Appender appender) {
+    protected boolean validate(final NumberContext context, final BasicLogger.Printer appender) {
 
         if (myValue != null) {
 
