@@ -23,7 +23,7 @@ package org.ojalgo.optimisation;
 
 import org.ojalgo.function.multiary.MultiaryFunction;
 
-public final class FunctionsBasedModel extends AbstractModel<GenericSolver> {
+final class FunctionsBasedModel extends AbstractModel<GenericSolver> {
 
     public static abstract class Integration<S extends Optimisation.Solver> implements Optimisation.Integration<FunctionsBasedModel, S> {
 

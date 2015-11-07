@@ -288,20 +288,20 @@ public final class CharacterRing implements CharSequence, Appendable, Serializab
         return true;
     }
 
-    public void flush(final BasicLogger.Printer target) {
+    public void flush(final BasicLogger.Printer receiver) {
 
         final int tmpCursor = myCursor;
         char tmpChar;
         for (int i = tmpCursor; i < length; i++) {
             tmpChar = myCharacters[i];
             if (tmpChar != ASCII.NULL) {
-                target.print(tmpChar);
+                receiver.print(tmpChar);
             }
         }
         for (int i = 0; i < tmpCursor; i++) {
             tmpChar = myCharacters[i];
             if (tmpChar != ASCII.NULL) {
-                target.print(tmpChar);
+                receiver.print(tmpChar);
             }
         }
 

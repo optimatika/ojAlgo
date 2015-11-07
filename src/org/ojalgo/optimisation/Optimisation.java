@@ -43,6 +43,26 @@ public interface Optimisation {
      */
     public static interface Constraint extends Optimisation {
 
+        default ConstraintType getConstraintType() {
+            if (this.getLowerLimit() != null) {
+                if (this.getUpperLimit() != null) {
+                    if (this.getLowerLimit().compareTo(this.getUpperLimit()) == 0) {
+                        return ConstraintType.EQUALITY;
+                    } else {
+                        return ConstraintType.RANGE;
+                    }
+                } else {
+                    return ConstraintType.LOWER;
+                }
+            } else {
+                if (this.getUpperLimit() != null) {
+                    return ConstraintType.UPPER;
+                } else {
+                    return ConstraintType.NONE;
+                }
+            }
+        }
+
         /**
          * May return null
          */
@@ -54,23 +74,33 @@ public interface Optimisation {
         BigDecimal getUpperLimit();
 
         /**
-         * The Constraint has a lower or an upper limit (possibly both).
+         * The Constraint has a lower or an upper limit actually set (possibly both) - it actually is
+         * constained.
          */
         boolean isConstraint();
 
         /**
          * The Constraint has both a lower limit and an upper limit, and they are equal.
+         *
+         * @deprecated Use {@link #getConstraintType()} instead
          */
+        @Deprecated
         boolean isEqualityConstraint();
 
         /**
          * The Constraint has a lower limit, and the upper limit (if it exists) is different.
+         *
+         * @deprecated Use {@link #getConstraintType()} instead
          */
+        @Deprecated
         boolean isLowerConstraint();
 
         /**
          * The Constraint has an upper limit, and the lower limit (if it exists) is different.
+         *
+         * @deprecated Use {@link #getConstraintType()} instead
          */
+        @Deprecated
         boolean isUpperConstraint();
 
     }
@@ -139,7 +169,8 @@ public interface Optimisation {
         BigDecimal getContributionWeight();
 
         /**
-         * @return true if this objective has a non zero contribution weight.
+         * @return true if this Objective has a non zero contribution weight - it actually is contributing to
+         *         the objective function.
          */
         boolean isObjective();
 

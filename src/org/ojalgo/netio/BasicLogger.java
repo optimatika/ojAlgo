@@ -223,18 +223,18 @@ public abstract class BasicLogger {
 
         void clear();
 
-        default void flush(final Appendable target) {
-            this.flush(new AppendablePrinter(target));
+        default void flush(final Appendable receiver) {
+            this.flush(new AppendablePrinter(receiver));
         }
 
-        void flush(final BasicLogger.Printer target);
+        void flush(final BasicLogger.Printer receiver);
 
-        default void flush(final PrintStream target) {
-            this.flush(new PrintStreamPrinter(target));
+        default void flush(final PrintStream receiver) {
+            this.flush(new PrintStreamPrinter(receiver));
         }
 
-        default void flush(final PrintWriter target) {
-            this.flush(new PrintWriterPrinter(target));
+        default void flush(final PrintWriter receiver) {
+            this.flush(new PrintWriterPrinter(receiver));
         }
 
     }
