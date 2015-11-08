@@ -67,6 +67,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2013-04-01: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 4h</li>
      * <li>2013-12-10: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 29min</li>
      * <li>2015-08-28: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 97min</li>
+     * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 107min</li>
      * </ul>
      *
      * @see RelaxedLpCase#testMas76()
@@ -129,6 +130,7 @@ public final class MipCase extends OptimisationIntegerTests {
      * <li>2013-12-03: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 475s</li>
      * <li>2013-12-08: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 412s</li>
      * <li>2015-08-28: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 411s</li>
+     * <li>2015-11-07: MacPro (suffice=4h abort=8h) Stopped with optimal integer solution after 372s</li>
      * </ul>
      *
      * @see RelaxedLpCase#testPk1()

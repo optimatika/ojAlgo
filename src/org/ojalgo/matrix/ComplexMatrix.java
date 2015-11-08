@@ -60,6 +60,26 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
         return this.modify(context.getComplexFunction());
     }
 
+    @SuppressWarnings("unchecked")
+    public PrimitiveMatrix getArgument() {
+        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexArgument(this.getStore()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public PrimitiveMatrix getImaginary() {
+        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexImaginary(this.getStore()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public PrimitiveMatrix getModulus() {
+        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexModulus(this.getStore()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public PrimitiveMatrix getReal() {
+        return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexReal(this.getStore()));
+    }
+
     public BigDecimal toBigDecimal(final int row, final int column) {
         return new BigDecimal(this.getStore().doubleValue(row, column));
     }
