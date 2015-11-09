@@ -60,21 +60,33 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
         return this.modify(context.getComplexFunction());
     }
 
+    /**
+     * @return A primitive double valued matrix containg this matrix' element arguments
+     */
     @SuppressWarnings("unchecked")
     public PrimitiveMatrix getArgument() {
         return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexArgument(this.getStore()));
     }
 
+    /**
+     * @return A primitive double valued matrix containg this matrix' element imaginary parts
+     */
     @SuppressWarnings("unchecked")
     public PrimitiveMatrix getImaginary() {
         return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexImaginary(this.getStore()));
     }
 
+    /**
+     * @return A primitive double valued matrix containg this matrix' element modulus
+     */
     @SuppressWarnings("unchecked")
     public PrimitiveMatrix getModulus() {
         return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexModulus(this.getStore()));
     }
 
+    /**
+     * @return A primitive double valued matrix containg this matrix' element real parts
+     */
     @SuppressWarnings("unchecked")
     public PrimitiveMatrix getReal() {
         return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexReal(this.getStore()));

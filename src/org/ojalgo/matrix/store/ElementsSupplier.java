@@ -26,12 +26,14 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 
 /**
- * An elements supplier is not (yet) a matrix. There are 3 things you can do with them:
+ * An elements supplier is not (yet) a matrix. There are 4 things you can do with them:
  * <ol>
  * <li>You can query the size/shape of the (future) matrix</li>
  * <li>You can get that matrix</li>
  * <li>You can supply the elements to an already existing matrix (or more precisely to an
  * {@linkplain ElementsConsumer})</li>
+ * <li>You can also define additional, chained, operations to be executed when the elements are extracted.
+ * </li>
  * </ol>
  *
  * @author apete
