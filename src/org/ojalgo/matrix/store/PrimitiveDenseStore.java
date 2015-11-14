@@ -1530,6 +1530,22 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.fillColumn(aCol + 1, aCol, ZERO);
     }
 
+    public Array1D<Double> sliceColumn(final long row, final long column) {
+        return myUtility.sliceColumn(row, column);
+    }
+
+    public Array1D<Double> sliceDiagonal(final long row, final long column) {
+        return myUtility.sliceDiagonal(row, column);
+    }
+
+    public Array1D<Double> sliceRange(final long first, final long limit) {
+        return myUtility.sliceRange(first, limit);
+    }
+
+    public Array1D<Double> sliceRow(final long row, final long column) {
+        return myUtility.sliceRow(row, column);
+    }
+
     public void substituteBackwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
         final int tmpRowDim = myRowDim;

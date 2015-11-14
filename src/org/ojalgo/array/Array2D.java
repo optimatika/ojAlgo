@@ -44,8 +44,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array2D<N extends Number>
-        implements Access2D<N>, Access2D.Elements, Access2D.Fillable<N>, Access2D.Iterable2D<N>, Access2D.Modifiable<N>, Access2D.Visitable<N>, Serializable {
+public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.Fillable<N>, Access2D.Iterable2D<N>, Access2D.Modifiable<N>,
+        Access2D.Visitable<N>, Access2D.Sliceable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access2D.Factory<Array2D<N>> {
 
@@ -583,6 +583,10 @@ public final class Array2D<N extends Number>
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
         return new Array1D<N>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount),
                 1L + myRowsCount);
+    }
+
+    public Array1D<N> sliceRange(final long first, final long limit) {
+        return myDelegate.asArray1D().sliceRange(first, limit);
     }
 
     public Array1D<N> sliceRow(final long row, final long column) {

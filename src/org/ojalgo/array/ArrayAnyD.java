@@ -44,8 +44,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class ArrayAnyD<N extends Number>
-        implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>, AccessAnyD.Visitable<N>, Serializable {
+public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>,
+        AccessAnyD.Visitable<N>, AccessAnyD.Sliceable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
 
@@ -372,6 +372,10 @@ public final class ArrayAnyD<N extends Number>
         final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         return new Array1D<N>(myDelegate, tmpFirst, tmpLimit, tmpStep);
+    }
+
+    public Array1D<N> sliceRange(final long first, final long limit) {
+        return myDelegate.asArray1D().sliceRange(first, limit);
     }
 
     @Override

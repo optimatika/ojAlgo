@@ -139,6 +139,12 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
+    public interface Sliceable<N extends Number> extends StructureAnyD, Access1D.Sliceable<N> {
+
+        Access1D<N> slice(final long[] first, final int dimension);
+
+    }
+
     default double doubleValue(final long index) {
         return this.doubleValue(AccessUtils.reference(index, this.shape()));
     }

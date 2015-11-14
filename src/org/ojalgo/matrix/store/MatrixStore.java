@@ -58,7 +58,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface MatrixStore<N extends Number>
-        extends Access2D<N>, Access2D.Visitable<N>, Access2D.Elements, NormedVectorSpace<MatrixStore<N>, N>, ElementsSupplier<N> {
+        extends Access2D<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Access2D.Elements, NormedVectorSpace<MatrixStore<N>, N>, ElementsSupplier<N> {
 
     /**
      * A builder that lets you logically construct matrices and/or encode element structure.
@@ -616,6 +616,78 @@ public interface MatrixStore<N extends Number>
 
     default MatrixStore<N> signum() {
         return this.multiply(PrimitiveMath.ONE / this.norm());
+    }
+
+    default Access1D<N> sliceColumn(final long row, final long column) {
+        return new Access1D<N>() {
+
+            public long count() {
+                return MatrixStore.this.countRows() - row;
+            }
+
+            public double doubleValue(final long index) {
+                return MatrixStore.this.doubleValue(row + index, column);
+            }
+
+            public N get(final long index) {
+                return MatrixStore.this.get(row + index, column);
+            }
+
+        };
+    }
+
+    default Access1D<N> sliceDiagonal(final long row, final long column) {
+        return new Access1D<N>() {
+
+            public long count() {
+                return Math.min(MatrixStore.this.countRows() - row, MatrixStore.this.countColumns() - column);
+            }
+
+            public double doubleValue(final long index) {
+                return MatrixStore.this.doubleValue(row + index, column + index);
+            }
+
+            public N get(final long index) {
+                return MatrixStore.this.get(row + index, column + index);
+            }
+
+        };
+    }
+
+    default Access1D<N> sliceRange(final long first, final long limit) {
+        return new Access1D<N>() {
+
+            public long count() {
+                return limit - first;
+            }
+
+            public double doubleValue(final long index) {
+                return MatrixStore.this.doubleValue(first + index);
+            }
+
+            public N get(final long index) {
+                return MatrixStore.this.get(first + index);
+            }
+
+        };
+    }
+
+    default Access1D<N> sliceRow(final long row, final long column) {
+        return new Access1D<N>() {
+
+            public long count() {
+                return MatrixStore.this.countColumns() - column;
+            }
+
+            public double doubleValue(final long index) {
+                return MatrixStore.this.doubleValue(row, column + index);
+            }
+
+            public N get(final long index) {
+                return MatrixStore.this.get(row, column + index);
+            }
+
+        };
     }
 
     default MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {

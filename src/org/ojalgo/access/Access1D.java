@@ -189,6 +189,12 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
+    public interface Sliceable<N extends Number> extends Structure1D {
+
+        Access1D<N> sliceRange(long first, long limit);
+
+    }
+
     double doubleValue(long index);
 
     N get(long index);

@@ -47,8 +47,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array1D<N extends Number> extends AbstractList<N>
-        implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>, Access1D.Visitable<N>, RandomAccess, Serializable {
+public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
+        Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access1D.Factory<Array1D<N>> {
 
@@ -364,6 +364,10 @@ public final class Array1D<N extends Number> extends AbstractList<N>
         myDelegate.fillOne(tmpIndex, supplier);
     }
 
+    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
+        myDelegate.fillOneMatching(myFirst + (myStep * index), values, valueIndex);
+    }
+
     public void fillRange(final long first, final long limit, final N value) {
         final long tmpFirst = myFirst + (myStep * first);
         final long tmpLimit = myFirst + (myStep * limit);
@@ -560,6 +564,10 @@ public final class Array1D<N extends Number> extends AbstractList<N>
         return (int) length;
     }
 
+    public Array1D<N> sliceRange(final long first, final long limit) {
+        return new Array1D<N>(myDelegate, myFirst + (myStep * first), myFirst + (myStep * limit), myStep);
+    }
+
     public void sortAscending() {
 
         if (myDelegate instanceof DenseArray<?>) {
@@ -607,7 +615,7 @@ public final class Array1D<N extends Number> extends AbstractList<N>
 
     @Override
     public Array1D<N> subList(final int first, final int limit) {
-        return new Array1D<N>(myDelegate, myFirst + (myStep * first), myFirst + (myStep * limit), myStep);
+        return this.sliceRange(first, limit);
     }
 
     public double[] toRawCopy() {
@@ -638,10 +646,6 @@ public final class Array1D<N extends Number> extends AbstractList<N>
 
     BasicArray<N> getDelegate() {
         return myDelegate;
-    }
-
-    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-        myDelegate.fillOneMatching(myFirst + (myStep * index), values, valueIndex);
     }
 
 }

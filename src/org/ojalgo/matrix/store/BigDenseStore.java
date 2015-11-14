@@ -943,6 +943,22 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myUtility.fillColumn(aCol + 1, aCol, ZERO);
     }
 
+    public Array1D<BigDecimal> sliceColumn(final long row, final long column) {
+        return myUtility.sliceColumn(row, column);
+    }
+
+    public Array1D<BigDecimal> sliceDiagonal(final long row, final long column) {
+        return myUtility.sliceDiagonal(row, column);
+    }
+
+    public Array1D<BigDecimal> sliceRange(final long first, final long limit) {
+        return myUtility.sliceRange(first, limit);
+    }
+
+    public Array1D<BigDecimal> sliceRow(final long row, final long column) {
+        return myUtility.sliceRow(row, column);
+    }
+
     public void substituteBackwards(final Access2D<BigDecimal> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
         final int tmpRowDim = myRowDim;

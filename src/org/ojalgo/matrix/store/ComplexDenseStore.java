@@ -965,6 +965,22 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myUtility.fillColumn(aCol + 1, aCol, ComplexNumber.ZERO);
     }
 
+    public Array1D<ComplexNumber> sliceColumn(final long row, final long column) {
+        return myUtility.sliceColumn(row, column);
+    }
+
+    public Array1D<ComplexNumber> sliceDiagonal(final long row, final long column) {
+        return myUtility.sliceDiagonal(row, column);
+    }
+
+    public Array1D<ComplexNumber> sliceRange(final long first, final long limit) {
+        return myUtility.sliceRange(first, limit);
+    }
+
+    public Array1D<ComplexNumber> sliceRow(final long row, final long column) {
+        return myUtility.sliceRow(row, column);
+    }
+
     public void substituteBackwards(final Access2D<ComplexNumber> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
         final int tmpRowDim = myRowDim;

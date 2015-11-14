@@ -250,6 +250,16 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    public interface Sliceable<N extends Number> extends Structure2D, Access1D.Sliceable<N> {
+
+        Access1D<N> sliceColumn(long row, long column);
+
+        Access1D<N> sliceDiagonal(long row, long column);
+
+        Access1D<N> sliceRow(long row, long column);
+
+    }
+
     public interface Visitable<N extends Number> extends Structure2D, Access1D.Visitable<N> {
 
         void visitColumn(long row, long column, VoidFunction<N> visitor);
