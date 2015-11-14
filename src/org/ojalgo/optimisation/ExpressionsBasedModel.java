@@ -26,6 +26,7 @@ import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Stream;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.IntIndex;
@@ -512,6 +513,34 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     public List<Variable> getVariables() {
         return Collections.unmodifiableList(myVariables);
+    }
+
+    /**
+     * @return A stream of expressions that are constraints and have not been markes as redundant
+     */
+    public Stream<Expression> constraints() {
+        return myExpressions.values().stream().filter((final Expression c) -> c.isConstraint() && !c.isRedundant());
+    }
+
+    /**
+     * @return The aggregated objective "function"
+     */
+    public Expression objective() {
+        return this.getObjectiveExpression();
+    }
+
+    /**
+     * @return A stream of variables that are constraints and not fixed
+     */
+    public Stream<Variable> bounds() {
+        return this.variables().filter((final Variable v) -> v.isConstraint());
+    }
+
+    /**
+     * @return A stream of variables that are not fixed
+     */
+    public Stream<Variable> variables() {
+        return myVariables.stream().filter((final Variable v) -> (v.getConstraintType() != ConstraintType.EQUALITY));
     }
 
     public Optimisation.Result getVariableValues() {

@@ -105,6 +105,23 @@ public interface Optimisation {
 
     }
 
+    public enum ConstraintType implements Optimisation {
+
+        /**
+         * Constrained at both ends with the same value
+         */
+        EQUALITY, LOWER,
+        /**
+         * free, unconstrained, open
+         */
+        NONE,
+        /**
+         * Constrained at both ends, but with different values
+         */
+        RANGE, UPPER;
+
+    }
+
     public static interface Integration<M extends Optimisation.Model, S extends Optimisation.Solver> extends Optimisation {
 
         /**

@@ -178,7 +178,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     void updateNonZeros(final int row, final int col) {
         myFirsts[row] = Math.min(col, myFirsts[row]);
-        myLimits[row] = Math.max(col, myLimits[row]);
+        myLimits[row] = Math.max(col + 1, myLimits[row]);
     }
 
 }

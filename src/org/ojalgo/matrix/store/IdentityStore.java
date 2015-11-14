@@ -33,19 +33,13 @@ import org.ojalgo.scalar.Scalar;
  */
 final class IdentityStore<N extends Number> extends FactoryStore<N> {
 
-    private final int myDimension;
-
     private IdentityStore(final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
         super(factory, rowsCount, columnsCount);
-        myDimension = 0;
         ProgrammingError.throwForIllegalInvocation();
     }
 
     IdentityStore(final PhysicalStore.Factory<N, ?> factory, final int dimension) {
-
         super(factory, dimension, dimension);
-
-        myDimension = dimension;
     }
 
     @Override
