@@ -269,6 +269,10 @@ public abstract class ArrayUtils {
         } while (tmpSwapped);
     }
 
+    /**
+     * @deprecated v39 There's now a default method in Access1D that does the same thing.
+     */
+    @Deprecated
     public static double[] toRawCopyOf(final Access1D<?> original) {
 
         final int tmpLength = (int) original.count();
@@ -282,6 +286,10 @@ public abstract class ArrayUtils {
         return retVal;
     }
 
+    /**
+     * @deprecated v39 There's now a default method in Access2D that does the same thing.
+     */
+    @Deprecated
     public static double[][] toRawCopyOf(final Access2D<?> original) {
 
         final int tmpRowDim = (int) original.countRows();
@@ -300,6 +308,10 @@ public abstract class ArrayUtils {
         return retVal;
     }
 
+    /**
+     * @deprecated v39 There's now a default method in Access2D that does the same thing.
+     */
+    @Deprecated
     public static double[][] toRawCopyOf(final MatrixStore<?> original) {
         return ArrayUtils.toRawCopyOf((Access2D<?>) original);
     }

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.BaseStream;
 import java.util.stream.StreamSupport;
 
+import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionUtils;
@@ -179,6 +180,12 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
+    public interface Sliceable<N extends Number> extends Structure1D {
+
+        Access1D<N> sliceRange(long first, long limit);
+
+    }
+
     public interface Visitable<N extends Number> extends Structure1D {
 
         void visitAll(VoidFunction<N> visitor);
@@ -186,12 +193,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         void visitOne(long index, VoidFunction<N> visitor);
 
         void visitRange(long first, long limit, VoidFunction<N> visitor);
-
-    }
-
-    public interface Sliceable<N extends Number> extends Structure1D {
-
-        Access1D<N> sliceRange(long first, long limit);
 
     }
 
@@ -205,6 +206,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     default BaseStream<N, ? extends BaseStream<N, ?>> stream(final boolean parallel) {
         return StreamSupport.stream(this.spliterator(), parallel);
+    }
+
+    default double[] toRawCopy1D() {
+        return ArrayUtils.toRawCopyOf(this);
     }
 
 }
