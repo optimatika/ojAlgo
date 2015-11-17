@@ -43,26 +43,6 @@ public interface Optimisation {
      */
     public static interface Constraint extends Optimisation {
 
-        default ConstraintType getConstraintType() {
-            if (this.getLowerLimit() != null) {
-                if (this.getUpperLimit() != null) {
-                    if (this.getLowerLimit().compareTo(this.getUpperLimit()) == 0) {
-                        return ConstraintType.EQUALITY;
-                    } else {
-                        return ConstraintType.RANGE;
-                    }
-                } else {
-                    return ConstraintType.LOWER;
-                }
-            } else {
-                if (this.getUpperLimit() != null) {
-                    return ConstraintType.UPPER;
-                } else {
-                    return ConstraintType.NONE;
-                }
-            }
-        }
-
         /**
          * May return null
          */
@@ -81,44 +61,18 @@ public interface Optimisation {
 
         /**
          * The Constraint has both a lower limit and an upper limit, and they are equal.
-         *
-         * @deprecated Use {@link #getConstraintType()} instead
          */
-        @Deprecated
         boolean isEqualityConstraint();
 
         /**
          * The Constraint has a lower limit, and the upper limit (if it exists) is different.
-         *
-         * @deprecated Use {@link #getConstraintType()} instead
          */
-        @Deprecated
         boolean isLowerConstraint();
 
         /**
          * The Constraint has an upper limit, and the lower limit (if it exists) is different.
-         *
-         * @deprecated Use {@link #getConstraintType()} instead
          */
-        @Deprecated
         boolean isUpperConstraint();
-
-    }
-
-    public enum ConstraintType implements Optimisation {
-
-        /**
-         * Constrained at both ends with the same value
-         */
-        EQUALITY, LOWER,
-        /**
-         * free, unconstrained, open
-         */
-        NONE,
-        /**
-         * Constrained at both ends, but with different values
-         */
-        RANGE, UPPER;
 
     }
 

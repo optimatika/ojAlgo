@@ -53,4 +53,19 @@ package org.ojalgo.algebra;
  */
 public interface VectorSpace<V, F extends Number> extends Group.Additive<V>, ScalarOperation.Multiplication<V, F> {
 
+    /**
+     * <p>
+     * <b>This method will (most likely) be moved to some other interface in the future! Just have to figure
+     * out where it fits...</b>
+     * </p>
+     * <p>
+     * The conjugate transpose of a matrix and/or the conjugate of a scalar/field like ComplexNumber or
+     * Quaternion.
+     * </p>
+     * <p>
+     * The conjugate transpose of a real matrix is simply its transpose.
+     * </p>
+     */
+    V conjugate();
+
 }

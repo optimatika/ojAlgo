@@ -540,7 +540,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
      * @return A stream of variables that are not fixed
      */
     public Stream<Variable> variables() {
-        return myVariables.stream().filter((final Variable v) -> (v.getConstraintType() != ConstraintType.EQUALITY));
+        return myVariables.stream().filter((final Variable v) -> (!v.isEqualityConstraint()));
     }
 
     public Optimisation.Result getVariableValues() {
