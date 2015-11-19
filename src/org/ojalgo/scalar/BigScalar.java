@@ -73,35 +73,47 @@ public final class BigScalar extends Number implements Scalar<BigDecimal>, Enfor
         return (value.signum() == 0) || BigScalar.CONTEXT.isSmall(comparedTo, value.doubleValue());
     }
 
+    public static BigScalar of(final BigDecimal value) {
+        return new BigScalar(value);
+    }
+
     public static BigScalar valueOf(final double value) {
         return new BigScalar(BigDecimal.valueOf(value));
     }
 
     public static BigScalar valueOf(final Number number) {
-        return new BigScalar(TypeUtils.toBigDecimal(number));
+
+        if (number != null) {
+
+            if (number instanceof BigScalar) {
+
+                return (BigScalar) number;
+
+            } else {
+
+                return new BigScalar(TypeUtils.toBigDecimal(number));
+            }
+
+        } else {
+
+            return ZERO;
+        }
     }
 
     private final BigDecimal myNumber;
 
-    public BigScalar(final BigDecimal number) {
-
-        super();
-
-        myNumber = number;
-    }
-
-    public BigScalar(final Scalar<?> scalar) {
-
-        super();
-
-        myNumber = scalar.toBigDecimal();
-    }
-
-    BigScalar() {
+    private BigScalar() {
 
         super();
 
         myNumber = BigMath.ZERO;
+    }
+
+    private BigScalar(final BigDecimal number) {
+
+        super();
+
+        myNumber = number;
     }
 
     public BigScalar add(final BigDecimal arg) {

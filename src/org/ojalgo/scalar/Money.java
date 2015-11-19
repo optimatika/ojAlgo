@@ -114,25 +114,21 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
 
     private final long myNumerator;
 
-    public Money(final Scalar<?> scalar) {
-        this(scalar.doubleValue() * DOUBLE_DENOMINATOR);
-    }
-
-    Money() {
+    private Money() {
 
         super();
 
         myNumerator = 0L;
     }
 
-    Money(final double numerator) {
+    private Money(final double numerator) {
 
         super();
 
         myNumerator = Math.round(numerator);
     }
 
-    Money(final long numerator) {
+    private Money(final long numerator) {
 
         super();
 

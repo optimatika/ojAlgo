@@ -1143,7 +1143,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {
-        return new PrimitiveScalar(this.doubleValue(row, column));
+        return PrimitiveScalar.of(this.doubleValue(row, column));
     }
 
     @Override

@@ -211,7 +211,7 @@ public class MarketEquilibrium {
     }
 
     public Scalar<?> getRiskAversion() {
-        return new BigScalar(myRiskAversion);
+        return BigScalar.of(myRiskAversion);
     }
 
     public void setRiskAversion(final Number factor) {

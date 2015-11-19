@@ -39,6 +39,10 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * Theoretically it is a Field or at least a Division ring.
  * </p>
+ * <p>
+ * The intention is that implementors should be final immutable subclasses of {@link Number}and that they
+ * should inline with the requirements for ValueBased classes.
+ * </p>
  *
  * @author apete
  */

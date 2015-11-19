@@ -44,7 +44,7 @@ public class QuaternionTest extends ScalarTests {
                 for (int j = 0; j < tmpArguments.length; j++) {
                     for (int k = 0; k < tmpArguments.length; k++) {
 
-                        final Quaternion tmpOriginal = new Quaternion(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
 
                         final Quaternion tmpOp = QuaternionFunction.COS.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ACOS.invoke(tmpOriginal);
@@ -69,7 +69,7 @@ public class QuaternionTest extends ScalarTests {
                 for (int j = 0; j < tmpArguments.length; j++) {
                     for (int k = 0; k < tmpArguments.length; k++) {
 
-                        final Quaternion tmpOriginal = new Quaternion(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
 
                         final Quaternion tmpOp = QuaternionFunction.COSH.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ACOSH.invoke(tmpOriginal);
@@ -94,7 +94,7 @@ public class QuaternionTest extends ScalarTests {
                 for (int j = 0; j < tmpArguments.length; j++) {
                     for (int k = 0; k < tmpArguments.length; k++) {
 
-                        final Quaternion tmpQuaternion = new Quaternion(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpQuaternion = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
 
                         final Quaternion tmpLog = QuaternionFunction.LOG.invoke(tmpQuaternion);
                         final Quaternion tmpExp = QuaternionFunction.EXP.invoke(tmpQuaternion);
@@ -119,7 +119,7 @@ public class QuaternionTest extends ScalarTests {
                 for (int j = 0; j < tmpArguments.length; j++) {
                     for (int k = 0; k < tmpArguments.length; k++) {
 
-                        final Quaternion tmpExpected = new Quaternion(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpExpected = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
 
                         final double tmpNorm = tmpExpected.norm();
                         final double[] tmpUnit = tmpExpected.unit();
@@ -143,7 +143,7 @@ public class QuaternionTest extends ScalarTests {
                 for (int j = 0; j < tmpArguments.length; j++) {
                     for (int k = 0; k < tmpArguments.length; k++) {
 
-                        final Quaternion tmpOriginal = new Quaternion(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
 
                         final Quaternion tmpOp = QuaternionFunction.SIN.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ASIN.invoke(tmpOriginal);
@@ -168,7 +168,7 @@ public class QuaternionTest extends ScalarTests {
                 for (int j = 0; j < tmpArguments.length; j++) {
                     for (int k = 0; k < tmpArguments.length; k++) {
 
-                        final Quaternion tmpOriginal = new Quaternion(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
 
                         final Quaternion tmpOp = QuaternionFunction.SINH.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ASINH.invoke(tmpOriginal);
@@ -193,7 +193,7 @@ public class QuaternionTest extends ScalarTests {
                 for (int j = 0; j < tmpArguments.length; j++) {
                     for (int k = 0; k < tmpArguments.length; k++) {
 
-                        final Quaternion tmpOriginal = new Quaternion(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
 
                         final Quaternion tmpOp = QuaternionFunction.TAN.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ATAN.invoke(tmpOriginal);
@@ -218,7 +218,7 @@ public class QuaternionTest extends ScalarTests {
                 for (int j = 0; j < tmpArguments.length; j++) {
                     for (int k = 0; k < tmpArguments.length; k++) {
 
-                        final Quaternion tmpOriginal = new Quaternion(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+                        final Quaternion tmpOriginal = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
 
                         final Quaternion tmpOp = QuaternionFunction.TANH.invoke(tmpOriginal);
                         final Quaternion tmpInv = QuaternionFunction.ATANH.invoke(tmpOriginal);

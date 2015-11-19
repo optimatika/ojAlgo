@@ -139,8 +139,30 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
         return value.isSmall(comparedTo);
     }
 
+    public static RationalNumber of(final long numerator, final long denominator) {
+
+        BigInteger tmpNumerator;
+        BigInteger tmpDenominator;
+
+        long tmpGCD = RationalNumber.gcd(numerator, denominator);
+
+        if (denominator < 0L) {
+            tmpGCD = -tmpGCD;
+        }
+
+        if (tmpGCD > 1L) {
+            tmpNumerator = BigInteger.valueOf(numerator / tmpGCD);
+            tmpDenominator = BigInteger.valueOf(denominator / tmpGCD);
+        } else {
+            tmpNumerator = BigInteger.valueOf(numerator);
+            tmpDenominator = BigInteger.valueOf(denominator);
+        }
+
+        return new RationalNumber(tmpNumerator, tmpDenominator);
+    }
+
     public static RationalNumber valueOf(final double value) {
-        return new RationalNumber(BigDecimal.valueOf(value));
+        return RationalNumber.valueOf(BigDecimal.valueOf(value));
     }
 
     public static RationalNumber valueOf(final Number number) {
@@ -153,7 +175,35 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
 
             } else {
 
-                return new RationalNumber(TypeUtils.toBigDecimal(number));
+                final BigDecimal tmpBigDecimal = TypeUtils.toBigDecimal(number);
+
+                BigInteger tmpNumerator;
+                BigInteger tmpDenominator;
+
+                final int tmpScale = tmpBigDecimal.scale();
+
+                if (tmpScale < 0) {
+
+                    tmpNumerator = tmpBigDecimal.unscaledValue().multiply(BigInteger.TEN.pow(-tmpScale));
+                    tmpDenominator = BigInteger.ONE;
+
+                } else {
+
+                    final BigInteger tmpNumer = tmpBigDecimal.unscaledValue();
+                    final BigInteger tmpDenom = BigInteger.TEN.pow(tmpScale);
+
+                    final BigInteger tmpGCD = tmpNumer.gcd(tmpDenom);
+
+                    if (tmpGCD.compareTo(BigInteger.ONE) == 1) {
+                        tmpNumerator = tmpNumer.divide(tmpGCD);
+                        tmpDenominator = tmpDenom.divide(tmpGCD);
+                    } else {
+                        tmpNumerator = tmpNumer;
+                        tmpDenominator = tmpDenom;
+                    }
+                }
+
+                return new RationalNumber(tmpNumerator, tmpDenominator);
             }
 
         } else {
@@ -178,89 +228,11 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     private final BigInteger myDenominator;
     private final BigInteger myNumerator;
 
-    public RationalNumber(final BigDecimal decimal) {
-
-        super();
-
-        final int tmpScale = decimal.scale();
-
-        if (tmpScale < 0) {
-
-            myNumerator = decimal.unscaledValue().multiply(BigInteger.TEN.pow(-tmpScale));
-            myDenominator = BigInteger.ONE;
-
-        } else {
-
-            final BigInteger tmpNumer = decimal.unscaledValue();
-            final BigInteger tmpDenom = BigInteger.TEN.pow(tmpScale);
-
-            final BigInteger tmpGCD = tmpNumer.gcd(tmpDenom);
-
-            if (tmpGCD.compareTo(BigInteger.ONE) == 1) {
-                myNumerator = tmpNumer.divide(tmpGCD);
-                myDenominator = tmpDenom.divide(tmpGCD);
-            } else {
-                myNumerator = tmpNumer;
-                myDenominator = tmpDenom;
-            }
-        }
+    private RationalNumber() {
+        this(BigInteger.ZERO, BigInteger.ONE);
     }
 
-    public RationalNumber(final double value) {
-        this(new BigDecimal(value, MathContext.DECIMAL64));
-    }
-
-    public RationalNumber(final int numerator, final int denominator) {
-
-        super();
-
-        int tmpGCD = RationalNumber.gcd(numerator, denominator);
-
-        if (denominator < 0) {
-            tmpGCD = -tmpGCD;
-        }
-
-        if (tmpGCD > 1) {
-            myNumerator = BigInteger.valueOf(numerator / tmpGCD);
-            myDenominator = BigInteger.valueOf(denominator / tmpGCD);
-        } else {
-            myNumerator = BigInteger.valueOf(numerator);
-            myDenominator = BigInteger.valueOf(denominator);
-        }
-    }
-
-    public RationalNumber(final long numerator, final long denominator) {
-
-        super();
-
-        long tmpGCD = RationalNumber.gcd(numerator, denominator);
-
-        if (denominator < 0L) {
-            tmpGCD = -tmpGCD;
-        }
-
-        if (tmpGCD > 1L) {
-            myNumerator = BigInteger.valueOf(numerator / tmpGCD);
-            myDenominator = BigInteger.valueOf(denominator / tmpGCD);
-        } else {
-            myNumerator = BigInteger.valueOf(numerator);
-            myDenominator = BigInteger.valueOf(denominator);
-        }
-    }
-
-    public RationalNumber(final Scalar<?> scalar) {
-        this(scalar.toBigDecimal());
-    }
-
-    RationalNumber() {
-
-        super();
-
-        myNumerator = BigInteger.ZERO;
-        myDenominator = BigInteger.ONE;
-    }
-
-    RationalNumber(final BigInteger numerator, final BigInteger denominator) {
+    private RationalNumber(final BigInteger numerator, final BigInteger denominator) {
 
         super();
 
@@ -274,7 +246,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber add(final double arg) {
-        return this.add(new RationalNumber(arg));
+        return this.add(RationalNumber.valueOf(arg));
     }
 
     public RationalNumber add(final RationalNumber arg) {
@@ -307,7 +279,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber divide(final double arg) {
-        return this.divide(new RationalNumber(arg));
+        return this.divide(RationalNumber.valueOf(arg));
     }
 
     public RationalNumber divide(final RationalNumber arg) {
@@ -341,7 +313,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber enforce(final NumberContext context) {
-        return new RationalNumber(this.toBigDecimal(context.getMathContext()));
+        return RationalNumber.valueOf(this.toBigDecimal(context.getMathContext()));
     }
 
     @Override
@@ -414,7 +386,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber multiply(final double arg) {
-        return this.multiply(new RationalNumber(arg));
+        return this.multiply(RationalNumber.valueOf(arg));
     }
 
     public RationalNumber multiply(final RationalNumber arg) {
@@ -461,7 +433,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
     }
 
     public RationalNumber subtract(final double arg) {
-        return this.subtract(new RationalNumber(arg));
+        return this.subtract(RationalNumber.valueOf(arg));
     }
 
     public RationalNumber subtract(final RationalNumber arg) {

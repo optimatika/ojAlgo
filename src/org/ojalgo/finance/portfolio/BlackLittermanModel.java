@@ -210,7 +210,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
      * market. This is highly unlikely.
      */
     public final Scalar<?> getConfidence() {
-        return new BigScalar(myConfidence);
+        return BigScalar.of(myConfidence);
     }
 
     /**

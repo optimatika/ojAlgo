@@ -45,7 +45,7 @@ public abstract class RationalAggregator {
                 }
 
                 public RationalNumber getNumber() {
-                    return new RationalNumber(myCount);
+                    return RationalNumber.valueOf(myCount);
                 }
 
                 public int intValue() {
@@ -53,7 +53,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -104,7 +104,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -151,7 +151,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -203,7 +203,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -251,7 +251,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -291,7 +291,7 @@ public abstract class RationalAggregator {
                 }
 
                 public RationalNumber getNumber() {
-                    return new RationalNumber(Math.sqrt(Math.abs(myNumber.doubleValue())));
+                    return RationalNumber.valueOf(Math.sqrt(Math.abs(myNumber.doubleValue())));
                 }
 
                 public int intValue() {
@@ -299,7 +299,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -348,7 +348,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -396,7 +396,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -448,7 +448,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -498,7 +498,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {
@@ -546,7 +546,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    this.invoke(new RationalNumber(anArg));
+                    this.invoke(RationalNumber.valueOf(anArg));
                 }
 
                 public void invoke(final RationalNumber anArg) {

@@ -179,14 +179,14 @@ public class FundamentalScalarTest extends ScalarTests {
         value1 = this.makeRandom();
         big1 = BigScalar.valueOf(value1);
         complex1 = ComplexNumber.valueOf(value1);
-        primitive1 = PrimitiveScalar.valueOf(value1);
+        primitive1 = PrimitiveScalar.of(value1);
         quaternion1 = Quaternion.valueOf(value1);
         rational1 = RationalNumber.valueOf(value1);
 
         value2 = this.makeRandom();
         big2 = BigScalar.valueOf(value2);
         complex2 = ComplexNumber.valueOf(value2);
-        primitive2 = PrimitiveScalar.valueOf(value2);
+        primitive2 = PrimitiveScalar.of(value2);
         quaternion2 = Quaternion.valueOf(value2);
         rational2 = RationalNumber.valueOf(value2);
     }

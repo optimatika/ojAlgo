@@ -37,7 +37,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     public static interface Binary extends BinaryFunction<RationalNumber> {
 
         default double invoke(final double arg1, final double arg2) {
-            return this.invoke(new RationalNumber(arg1), new RationalNumber(arg2)).doubleValue();
+            return this.invoke(RationalNumber.valueOf(arg1), RationalNumber.valueOf(arg2)).doubleValue();
         }
 
     }
@@ -46,7 +46,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     public static interface Parameter extends ParameterFunction<RationalNumber> {
 
         default double invoke(final double arg, final int param) {
-            return this.invoke(new RationalNumber(arg), param).doubleValue();
+            return this.invoke(RationalNumber.valueOf(arg), param).doubleValue();
         }
 
     }
@@ -55,7 +55,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     public static interface Unary extends UnaryFunction<RationalNumber> {
 
         default double invoke(final double arg) {
-            return this.invoke(new RationalNumber(arg)).doubleValue();
+            return this.invoke(RationalNumber.valueOf(arg)).doubleValue();
         }
 
     }
@@ -224,7 +224,7 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
 
             final BigDecimal tmpResult = BigFunction.HYPOT.invoke(tmpArg1, tmpArg2);
 
-            return new RationalNumber(tmpResult);
+            return RationalNumber.valueOf(tmpResult);
         }
     };
 

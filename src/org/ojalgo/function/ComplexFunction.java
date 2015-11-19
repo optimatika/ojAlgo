@@ -234,7 +234,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
             final double tmpRe = Math.log(arg.norm());
             final double tmpIm = arg.phase();
 
-            return new ComplexNumber(tmpRe, tmpIm);
+            return ComplexNumber.of(tmpRe, tmpIm);
         }
 
     };
@@ -246,7 +246,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
             final double retRe = Math.log10(arg.norm());
             final double retIm = arg.phase();
 
-            return new ComplexNumber(retRe, retIm);
+            return ComplexNumber.of(retRe, retIm);
         }
 
     };
@@ -258,7 +258,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
             final double retRe = Math.log1p(arg.norm());
             final double retIm = arg.phase();
 
-            return new ComplexNumber(retRe, retIm);
+            return ComplexNumber.of(retRe, retIm);
         }
 
     };
@@ -366,7 +366,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
         public final ComplexNumber invoke(final ComplexNumber arg, final int param) {
             final double tmpRe = PrimitiveFunction.SCALE.invoke(arg.doubleValue(), param);
             final double tmpIm = PrimitiveFunction.SCALE.invoke(arg.i, param);
-            return new ComplexNumber(tmpRe, tmpIm);
+            return ComplexNumber.of(tmpRe, tmpIm);
         }
 
     };

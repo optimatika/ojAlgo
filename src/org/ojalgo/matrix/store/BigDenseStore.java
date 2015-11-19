@@ -1011,8 +1011,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         consumer.fillMatching(this);
     }
 
-    public Scalar<BigDecimal> toScalar(final long row, final long column) {
-        return new BigScalar(this.get(row, column));
+    public BigScalar toScalar(final long row, final long column) {
+        return BigScalar.of(this.get(row, column));
     }
 
     @Override

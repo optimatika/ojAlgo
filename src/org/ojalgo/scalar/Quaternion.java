@@ -60,9 +60,8 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
 
     };
 
-    static final Quaternion IJK = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ONE, PrimitiveMath.ONE).versor();
-
     public static final Quaternion I = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ZERO, PrimitiveMath.ZERO);
+    public static final Quaternion IJK = new Quaternion(PrimitiveMath.ONE, PrimitiveMath.ONE, PrimitiveMath.ONE).versor();
     public static final Quaternion INFINITY = Quaternion.makePolar(Double.POSITIVE_INFINITY, IJK.vector(), PrimitiveMath.ZERO);
     public static final Quaternion J = new Quaternion(PrimitiveMath.ZERO, PrimitiveMath.ONE, PrimitiveMath.ZERO);
     public static final Quaternion K = new Quaternion(PrimitiveMath.ZERO, PrimitiveMath.ZERO, PrimitiveMath.ONE);
@@ -137,12 +136,8 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
 
     }
 
-    /**
-     * @deprecated v38
-     */
-    @Deprecated
-    public static Quaternion makeReal(final double value) {
-        return Quaternion.valueOf(value);
+    public static Quaternion of(final double scalar, final double i, final double j, final double k) {
+        return new Quaternion(scalar, i, j, k);
     }
 
     public static Quaternion valueOf(final double value) {
@@ -181,7 +176,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
     private final boolean myRealForSure;
     private final double myScalar;
 
-    public Quaternion(final double scalar) {
+    private Quaternion(final double scalar) {
 
         super();
 
@@ -195,7 +190,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         k = PrimitiveMath.ZERO;
     }
 
-    public Quaternion(final double i, final double j, final double k) {
+    private Quaternion(final double i, final double j, final double k) {
 
         super();
 
@@ -209,7 +204,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         this.k = k;
     }
 
-    public Quaternion(final double scalar, final double i, final double j, final double k) {
+    private Quaternion(final double scalar, final double i, final double j, final double k) {
 
         super();
 
@@ -223,7 +218,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         this.k = k;
     }
 
-    public Quaternion(final double scalar, final double[] vector) {
+    private Quaternion(final double scalar, final double[] vector) {
 
         super();
 
@@ -237,7 +232,7 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         k = vector[2];
     }
 
-    public Quaternion(final double[] vector) {
+    private Quaternion(final double[] vector) {
 
         super();
 
@@ -299,10 +294,10 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
 
         final ComplexDenseStore retVal = ComplexDenseStore.FACTORY.makeZero(2L, 2L);
 
-        retVal.set(0L, new ComplexNumber(myScalar, i));
-        retVal.set(1L, new ComplexNumber(-j, k));
-        retVal.set(2L, new ComplexNumber(j, k));
-        retVal.set(3L, new ComplexNumber(myScalar, -i));
+        retVal.set(0L, ComplexNumber.of(myScalar, i));
+        retVal.set(1L, ComplexNumber.of(-j, k));
+        retVal.set(2L, ComplexNumber.of(j, k));
+        retVal.set(3L, ComplexNumber.of(myScalar, -i));
 
         return retVal;
     }

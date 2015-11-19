@@ -196,7 +196,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
                 final double tmpScalar = Math.exp(arg.scalar());
 
-                return new Quaternion(tmpScalar);
+                return Quaternion.valueOf(tmpScalar);
 
             } else {
 
@@ -253,7 +253,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
             final double tmpJ = tmpUnitVector[1] * tmpPhase;
             final double tmpK = tmpUnitVector[2] * tmpPhase;
 
-            return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
+            return Quaternion.of(tmpScalar, tmpI, tmpJ, tmpK);
         }
 
     };
@@ -373,7 +373,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
             final double tmpI = PrimitiveFunction.SCALE.invoke(arg.i, param);
             final double tmpJ = PrimitiveFunction.SCALE.invoke(arg.j, param);
             final double tmpK = PrimitiveFunction.SCALE.invoke(arg.k, param);
-            return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
+            return Quaternion.of(tmpScalar, tmpI, tmpJ, tmpK);
         }
 
     };

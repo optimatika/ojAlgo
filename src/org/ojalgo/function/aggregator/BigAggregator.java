@@ -77,7 +77,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
 
             };
@@ -126,7 +126,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
             };
         }
@@ -174,7 +174,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
             };
         }
@@ -226,7 +226,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
             };
         }
@@ -274,7 +274,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
             };
         }
@@ -322,7 +322,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
             };
         }
@@ -370,7 +370,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
             };
         }
@@ -418,7 +418,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
             };
         }
@@ -472,7 +472,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
             };
         }
@@ -520,7 +520,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
             };
         }
@@ -568,7 +568,7 @@ public abstract class BigAggregator {
                 }
 
                 public Scalar<BigDecimal> toScalar() {
-                    return new BigScalar(this.getNumber());
+                    return BigScalar.of(this.getNumber());
                 }
             };
         }

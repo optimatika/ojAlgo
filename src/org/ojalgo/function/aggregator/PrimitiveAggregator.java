@@ -74,7 +74,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }
@@ -122,7 +122,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }
@@ -170,7 +170,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }
@@ -222,7 +222,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }
@@ -270,7 +270,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }
@@ -320,7 +320,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }
@@ -368,7 +368,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }
@@ -416,7 +416,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }
@@ -471,7 +471,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }
@@ -519,7 +519,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }
@@ -567,7 +567,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Scalar<Double> toScalar() {
-                    return new PrimitiveScalar(this.doubleValue());
+                    return PrimitiveScalar.of(this.doubleValue());
                 }
             };
         }

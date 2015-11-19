@@ -750,7 +750,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     /**
      * Any constrained non-redundant expression
+     *
+     * @deprecated v39 Use {@link #constraints()} instead
      */
+    @Deprecated
     public List<Expression> selectExpressions() {
 
         final List<Expression> retVal = new ArrayList<Expression>();
@@ -766,7 +769,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     /**
      * Linear equality constrained expressions.
+     *
+     * @deprecated v39 Use {@link #constraints()} instead
      */
+    @Deprecated
     public List<Expression> selectExpressionsLinearEquality() {
 
         final List<Expression> retVal = new ArrayList<Expression>();
@@ -783,7 +789,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     /**
      * Linear lower constrained expressions.
+     *
+     * @deprecated v39 Use {@link #constraints()} instead
      */
+    @Deprecated
     public List<Expression> selectExpressionsLinearLower() {
 
         final List<Expression> retVal = new ArrayList<Expression>();
@@ -800,7 +809,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     /**
      * Linear upper constrained expressions.
+     *
+     * @deprecated v39 Use {@link #constraints()} instead
      */
+    @Deprecated
     public List<Expression> selectExpressionsLinearUpper() {
 
         final List<Expression> retVal = new ArrayList<Expression>();
@@ -817,7 +829,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     /**
      * Quadratic (and/or compound) equality constrained expressions.
+     *
+     * @deprecated v39 Use {@link #constraints()} instead
      */
+    @Deprecated
     public List<Expression> selectExpressionsQuadraticEquality() {
 
         final List<Expression> retVal = new ArrayList<Expression>();
@@ -834,7 +849,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     /**
      * Quadratic (and/or compound) lower constrained expressions.
+     *
+     * @deprecated v39 Use {@link #constraints()} instead
      */
+    @Deprecated
     public List<Expression> selectExpressionsQuadraticLower() {
 
         final List<Expression> retVal = new ArrayList<Expression>();
@@ -851,7 +869,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     /**
      * Quadratic (and/or compound) upper constrained expressions.
+     *
+     * @deprecated v39 Use {@link #constraints()} instead
      */
+    @Deprecated
     public List<Expression> selectExpressionsQuadraticUpper() {
 
         final List<Expression> retVal = new ArrayList<Expression>();
@@ -866,6 +887,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return Collections.unmodifiableList(retVal);
     }
 
+    /**
+     * @deprecated v39 Use {@link #bounds()} instead
+     */
+    @Deprecated
     public List<Variable> selectVariablesFreeLower() {
 
         final List<Variable> retVal = new ArrayList<Variable>();
@@ -879,6 +904,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return Collections.unmodifiableList(retVal);
     }
 
+    /**
+     * @deprecated v39 Use {@link #bounds()} instead
+     */
+    @Deprecated
     public List<Variable> selectVariablesFreeUpper() {
 
         final List<Variable> retVal = new ArrayList<Variable>();
@@ -892,6 +921,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return Collections.unmodifiableList(retVal);
     }
 
+    /**
+     * @deprecated v39 Use {@link #bounds()} instead
+     */
+    @Deprecated
     public List<Variable> selectVariablesNegativeLower() {
 
         final List<Variable> retVal = new ArrayList<Variable>();
@@ -905,6 +938,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return Collections.unmodifiableList(retVal);
     }
 
+    /**
+     * @deprecated v39 Use {@link #bounds()} instead
+     */
+    @Deprecated
     public List<Variable> selectVariablesNegativeUpper() {
 
         final List<Variable> retVal = new ArrayList<Variable>();
@@ -918,6 +955,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return Collections.unmodifiableList(retVal);
     }
 
+    /**
+     * @deprecated v39 Use {@link #bounds()} instead
+     */
+    @Deprecated
     public List<Variable> selectVariablesPositiveLower() {
 
         final List<Variable> retVal = new ArrayList<Variable>();
@@ -931,6 +972,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return Collections.unmodifiableList(retVal);
     }
 
+    /**
+     * @deprecated v39 Use {@link #bounds()} instead
+     */
+    @Deprecated
     public List<Variable> selectVariablesPositiveUpper() {
 
         final List<Variable> retVal = new ArrayList<Variable>();

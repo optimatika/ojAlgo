@@ -67,25 +67,17 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
     };
 
     public static final ComplexNumber I = new ComplexNumber(PrimitiveMath.ZERO, PrimitiveMath.ONE);
-
     public static final ComplexNumber INFINITY = ComplexNumber.makePolar(Double.POSITIVE_INFINITY, PrimitiveMath.ZERO);
-
     public static final ComplexNumber NEG = ComplexNumber.valueOf(PrimitiveMath.NEG);
-
     public static final ComplexNumber ONE = ComplexNumber.valueOf(PrimitiveMath.ONE);
-
     public static final ComplexNumber TWO = ComplexNumber.valueOf(PrimitiveMath.TWO);
-
     public static final ComplexNumber ZERO = ComplexNumber.valueOf(PrimitiveMath.ZERO);
 
     private static final double ARGUMENT_TOLERANCE = PrimitiveMath.PI * PrimitiveScalar.CONTEXT.epsilon();
 
     private static final String LEFT = "(";
-
     private static final String MINUS = " - ";
-
     private static final String PLUS = " + ";
-
     private static final String RIGHT = "i)";
 
     public static boolean isAbsolute(final ComplexNumber value) {
@@ -145,19 +137,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         }
     }
 
-    /**
-     * @deprecated v38
-     */
-    @Deprecated
-    public static ComplexNumber makeReal(final double value) {
-        return ComplexNumber.valueOf(value);
-    }
-
-    /**
-     * @deprecated v38
-     */
-    @Deprecated
-    public static ComplexNumber makeRectangular(final double real, final double imaginary) {
+    public static ComplexNumber of(final double real, final double imaginary) {
         if (PrimitiveScalar.CONTEXT.isSmall(real, imaginary)) {
             return new ComplexNumber(real);
         } else {
@@ -193,7 +173,11 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
     private final boolean myRealForSure;
     private final double myRealValue;
 
-    public ComplexNumber(final double real) {
+    private ComplexNumber() {
+        this(PrimitiveMath.ZERO);
+    }
+
+    private ComplexNumber(final double real) {
 
         super();
 
@@ -204,7 +188,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         i = PrimitiveMath.ZERO;
     }
 
-    public ComplexNumber(final double real, final double imaginary) {
+    private ComplexNumber(final double real, final double imaginary) {
 
         super();
 
@@ -213,10 +197,6 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         myRealForSure = false;
 
         i = imaginary;
-    }
-
-    ComplexNumber() {
-        this(PrimitiveMath.ZERO);
     }
 
     public ComplexNumber add(final ComplexNumber arg) {

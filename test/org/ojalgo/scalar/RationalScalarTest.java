@@ -39,8 +39,8 @@ public class RationalScalarTest extends ScalarTests {
 
     public void testAdd() {
 
-        final RationalNumber tmpVal1 = new RationalNumber(1.25);
-        final RationalNumber tmpVal2 = new RationalNumber(3.75);
+        final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
+        final RationalNumber tmpVal2 = RationalNumber.valueOf(3.75);
 
         myExp = 5.0;
 
@@ -64,8 +64,8 @@ public class RationalScalarTest extends ScalarTests {
 
     public void testDivide() {
 
-        final RationalNumber tmpVal1 = new RationalNumber(1.25);
-        final RationalNumber tmpVal2 = new RationalNumber(0.25);
+        final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
+        final RationalNumber tmpVal2 = RationalNumber.valueOf(0.25);
 
         myExp = 5.0;
 
@@ -76,7 +76,7 @@ public class RationalScalarTest extends ScalarTests {
 
     public void testInvert() {
 
-        final RationalNumber tmpVal1 = new RationalNumber(1.25);
+        final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
 
         myExp = 0.8;
 
@@ -87,8 +87,8 @@ public class RationalScalarTest extends ScalarTests {
 
     public void testMultiply() {
 
-        final RationalNumber tmpVal1 = new RationalNumber(1.25);
-        final RationalNumber tmpVal2 = new RationalNumber(4);
+        final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
+        final RationalNumber tmpVal2 = RationalNumber.valueOf(4);
 
         myExp = 5.0;
 
@@ -99,7 +99,7 @@ public class RationalScalarTest extends ScalarTests {
 
     public void testNegate() {
 
-        final RationalNumber tmpVal1 = new RationalNumber(1.25);
+        final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
 
         myExp = -1.25;
 
@@ -110,8 +110,8 @@ public class RationalScalarTest extends ScalarTests {
 
     public void testRationalNumber() {
 
-        final RationalNumber tmpRat1 = new RationalNumber(5, 1);
-        final RationalNumber tmpRat2 = new RationalNumber(2, 1);
+        final RationalNumber tmpRat1 = RationalNumber.of(5, 1);
+        final RationalNumber tmpRat2 = RationalNumber.of(2, 1);
 
         for (int i = 0; i < 100; i++) {
             tmpRat1.add(tmpRat2);
@@ -123,8 +123,8 @@ public class RationalScalarTest extends ScalarTests {
 
     public void testSubtract() {
 
-        final RationalNumber tmpVal1 = new RationalNumber(1.25);
-        final RationalNumber tmpVal2 = new RationalNumber(-3.75);
+        final RationalNumber tmpVal1 = RationalNumber.valueOf(1.25);
+        final RationalNumber tmpVal2 = RationalNumber.valueOf(-3.75);
 
         myExp = 5.0;
 

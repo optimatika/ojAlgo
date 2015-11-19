@@ -41,7 +41,7 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
         }
 
         public PrimitiveScalar convert(final double value) {
-            return PrimitiveScalar.valueOf(value);
+            return PrimitiveScalar.of(value);
         }
 
         public PrimitiveScalar convert(final Number number) {
@@ -82,8 +82,12 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
         return PrimitiveScalar.CONTEXT.isSmall(comparedTo, value);
     }
 
-    public static PrimitiveScalar valueOf(final double value) {
+    public static PrimitiveScalar of(final double value) {
         return new PrimitiveScalar(value);
+    }
+
+    public static PrimitiveScalar valueOf(final double value) {
+        return PrimitiveScalar.of(value);
     }
 
     public static PrimitiveScalar valueOf(final Number number) {
@@ -107,33 +111,18 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
 
     private final double myValue;
 
-    public PrimitiveScalar(final double value) {
-
-        super();
-
-        myValue = value;
-    }
-
-    public PrimitiveScalar(final Number number) {
-
-        super();
-
-        myValue = number.doubleValue();
-    }
-
-    public PrimitiveScalar(final Scalar<?> scalar) {
-
-        super();
-
-        myValue = scalar.doubleValue();
-    }
-
-    @SuppressWarnings("unused")
     private PrimitiveScalar() {
 
         super();
 
         myValue = PrimitiveMath.ZERO;
+    }
+
+    private PrimitiveScalar(final double value) {
+
+        super();
+
+        myValue = value;
     }
 
     public PrimitiveScalar add(final double arg) {
