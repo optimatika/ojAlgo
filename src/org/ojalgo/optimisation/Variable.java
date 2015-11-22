@@ -140,6 +140,14 @@ public final class Variable extends ModelEntity<Variable> {
         return myInteger;
     }
 
+    public boolean isNegative() {
+        return !this.isLowerLimitSet() || (this.getLowerLimit().signum() < 0);
+    }
+
+    public boolean isPositive() {
+        return !this.isUpperLimitSet() || (this.getUpperLimit().signum() > 0);
+    }
+
     public boolean isValueSet() {
         return myValue != null;
     }

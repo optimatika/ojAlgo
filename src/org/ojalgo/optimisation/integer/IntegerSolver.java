@@ -141,7 +141,7 @@ public abstract class IntegerSolver extends GenericSolver {
         super(solverOptions);
 
         myModel = model;
-        myFunction = model.getObjectiveFunction();
+        myFunction = model.objective().toFunction();
 
         myMinimisation = model.isMinimisation();
     }

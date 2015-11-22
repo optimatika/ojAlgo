@@ -26,6 +26,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.IntIndex;
@@ -302,7 +303,7 @@ public abstract class ConvexSolver extends BaseSolver {
 
         // AE & BE
 
-        final List<Expression> tmpEqExpr = sourceModel.selectExpressionsLinearEquality();
+        final List<Expression> tmpEqExpr = sourceModel.constraints().filter((final Expression c) -> c.isEqualityConstraint() && !c.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
         final int tmpEqExprDim = tmpEqExpr.size();
 
         if (tmpEqExprDim > 0) {
@@ -371,14 +372,14 @@ public abstract class ConvexSolver extends BaseSolver {
 
         // AI & BI
 
-        final List<Expression> tmpUpExpr = sourceModel.selectExpressionsLinearUpper();
+        final List<Expression> tmpUpExpr = sourceModel.constraints().filter((final Expression c2) -> c2.isUpperConstraint() && !c2.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
         final int tmpUpExprDim = tmpUpExpr.size();
-        final List<Variable> tmpUpVar = sourceModel.selectVariablesFreeUpper();
+        final List<Variable> tmpUpVar = sourceModel.bounds().filter((final Variable c4) -> c4.isUpperConstraint()).collect(Collectors.toList());
         final int tmpUpVarDim = tmpUpVar.size();
 
-        final List<Expression> tmpLoExpr = sourceModel.selectExpressionsLinearLower();
+        final List<Expression> tmpLoExpr = sourceModel.constraints().filter((final Expression c1) -> c1.isLowerConstraint() && !c1.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
         final int tmpLoExprDim = tmpLoExpr.size();
-        final List<Variable> tmpLoVar = sourceModel.selectVariablesFreeLower();
+        final List<Variable> tmpLoVar = sourceModel.bounds().filter((final Variable c3) -> c3.isLowerConstraint()).collect(Collectors.toList());
         final int tmpLoVarDim = tmpLoVar.size();
 
         if ((tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim) > 0) {

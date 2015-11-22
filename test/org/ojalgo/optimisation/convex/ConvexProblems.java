@@ -89,7 +89,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(tmpExpectedResult, tmpInitialisedModelResult, modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpInitialisedModelResult.getValue(), modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveExpression().evaluate(tmpInitialisedModelResult).doubleValue(), modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
+        TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
 
         for (final Variable tmpVariable : tmpModel.getVariables()) {
             tmpVariable.setValue(null);
@@ -101,7 +101,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(tmpExpectedResult, tmpUninitialisedModelResult, modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpUninitialisedModelResult.getValue(), modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveExpression().evaluate(tmpUninitialisedModelResult).doubleValue(), modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
+        TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
 
         if (testSolverDirectly) {
 
@@ -183,7 +183,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertTrue(tmpModel.validate(Array1D.BIG.copy(expected), StandardType.PERCENT));
         TestUtils.assertTrue(tmpModel.validate(tmpActualResult, StandardType.PERCENT));
 
-        final TwiceDifferentiable<Double> tmpObjective = tmpModel.getObjectiveFunction();
+        final TwiceDifferentiable<Double> tmpObjective = tmpModel.objective().toFunction();
         final double tmpExpObjFuncVal = tmpObjective.invoke(AccessUtils.asPrimitive1D(expected));
         final double tmpActObjFuncVal = tmpObjective.invoke(AccessUtils.asPrimitive1D(tmpActualResult));
         TestUtils.assertEquals(tmpExpObjFuncVal, tmpActObjFuncVal);

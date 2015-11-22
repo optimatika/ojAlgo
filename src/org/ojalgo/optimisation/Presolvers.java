@@ -171,17 +171,16 @@ public abstract class Presolvers {
      */
     static boolean doCase0(final Expression expression, final BigDecimal fixedValue, final HashSet<IntIndex> remaining) {
 
+        expression.setRedundant(true);
+
         final ExpressionsBasedModel tmpModel = expression.getModel();
 
         final boolean tmpValid = expression.validate(fixedValue, tmpModel.options.slack, tmpModel.appender());
-
         if (tmpValid) {
             expression.setInfeasible(false);
-            expression.setRedundant(true);
             expression.level(fixedValue);
         } else {
             expression.setInfeasible(true);
-            expression.setRedundant(false);
         }
 
         return false;
@@ -205,15 +204,14 @@ public abstract class Presolvers {
             final BigDecimal tmpCompensatedLevel = SUBTRACT.invoke(expression.getUpperLimit(), fixedValue);
             final BigDecimal tmpSolutionValue = DIVIDE.invoke(tmpCompensatedLevel, tmpFactor);
 
-            final boolean tmpValid = tmpVariable.validate(tmpSolutionValue, tmpModel.options.slack, tmpModel.appender());
+            expression.setRedundant(true);
 
+            final boolean tmpValid = tmpVariable.validate(tmpSolutionValue, tmpModel.options.slack, tmpModel.appender());
             if (tmpValid) {
                 expression.setInfeasible(false);
-                expression.setRedundant(true);
                 tmpVariable.level(tmpSolutionValue);
             } else {
                 expression.setInfeasible(true);
-                expression.setRedundant(false);
             }
 
         } else {
@@ -263,16 +261,11 @@ public abstract class Presolvers {
                 }
             }
 
+            tmpVariable.lower(tmpNewLower).upper(tmpNewUpper);
+            expression.setRedundant(true);
+
             final boolean tmpInfeasible = (tmpNewLower != null) && (tmpNewUpper != null) && (tmpNewLower.compareTo(tmpNewUpper) > 0);
             expression.setInfeasible(tmpInfeasible);
-            if (!tmpInfeasible) {
-                expression.setRedundant(true);
-                tmpVariable.lower(tmpNewLower).upper(tmpNewUpper);
-            } else {
-                expression.setRedundant(false);
-            }
-
-            // BasicLogger.debug("{} < {} -> {} < {} ( {} < {} )", tmpOldLower, tmpOldUpper, tmpNewLower, tmpNewUpper, tmpLowerSolution, tmpUpperSolution);
         }
 
         if (tmpVariable.isEqualityConstraint()) {

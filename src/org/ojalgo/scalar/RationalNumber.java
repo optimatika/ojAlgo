@@ -150,7 +150,7 @@ public final class RationalNumber extends Number implements Scalar<RationalNumbe
             tmpGCD = -tmpGCD;
         }
 
-        if (tmpGCD > 1L) {
+        if (tmpGCD != 1L) {
             tmpNumerator = BigInteger.valueOf(numerator / tmpGCD);
             tmpDenominator = BigInteger.valueOf(denominator / tmpGCD);
         } else {
