@@ -14,8 +14,8 @@ This repository is a copy of the DevProj module of the CVS repository at SourceF
 
 ## Isues and Discussions
 
-For bug reports, questions or discussions related to ojAlgo; please use the ojAlgo-user mailing list: http://sourceforge.net/p/ojalgo/mailman/ojalgo-user/
-(Please note that you have to be a member to post to that list!)
+For bug reports, questions or discussions related to ojAlgo; use the ojAlgo-user mailing list: http://sourceforge.net/p/ojalgo/mailman/ojalgo-user/
+(Note that you have to be a member to post to that list!)
 
 If you prefer you may also use "Issues" here at GitHub, but then please make sure your post actually relates to an issue with the source code (bug reports or suggested improvements). The issue tracker is not for user support or general discussions.
 
