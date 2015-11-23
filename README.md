@@ -12,7 +12,7 @@ ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/
 
 This repository is a copy of the DevProj module of the CVS repository at SourceForge. These two code locations are used in parallel, and are manually (semi-automatic) kept in sync. This solution is (probably) temporary. Most likely there will only be one code repository in the future.
 
-## Isues and Discussions
+## Issues and Discussions
 
 For bug reports, questions or discussions related to ojAlgo; use the ojAlgo-user mailing list: http://sourceforge.net/p/ojalgo/mailman/ojalgo-user/
 (Note that you have to be a member to post to that list!)
