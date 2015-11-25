@@ -47,8 +47,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.Fillable<N>, Access1D.Modifiable<N>,
-        Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
+public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Fillable<N>,
+        Access1D.Modifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access1D.Factory<Array1D<N>> {
 
@@ -423,6 +423,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return myDelegate.isAbsolute(myFirst + (myStep * index));
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public boolean isAllZeros() {
         return myDelegate.isSmall(myFirst, myLimit, myStep, PrimitiveMath.ONE);
     }
@@ -432,6 +436,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return length == 0;
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public boolean isRangeZeros(final long first, final long limit) {
         return myDelegate.isSmall((myFirst + (myStep * first)), (myFirst + (myStep * limit)), myStep, PrimitiveMath.ONE);
     }
@@ -485,7 +493,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     /**
      * Assumes you have first called {@linkplain #sortAscending()}.
+     *
+     * @deprecated v39
      */
+    @Deprecated
     public int searchAscending(final N key) {
 
         if (myDelegate instanceof DenseArray<?>) {
@@ -515,7 +526,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     /**
      * Asssumes you have first called {@linkplain #sortDescending()}.
+     *
+     * @deprecated v39
      */
+    @Deprecated
     public int searchDescending(final N key) {
 
         if (myDelegate instanceof DenseArray<?>) {
@@ -568,6 +582,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return new Array1D<N>(myDelegate, myFirst + (myStep * first), myFirst + (myStep * limit), myStep);
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public void sortAscending() {
 
         if (myDelegate instanceof DenseArray<?>) {
@@ -592,6 +610,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         }
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public void sortDescending() {
 
         if (myDelegate instanceof DenseArray<?>) {
@@ -618,6 +640,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return this.sliceRange(first, limit);
     }
 
+    /**
+     * @deprecated v39 Use {@link #toRawCopy1D()} instead
+     */
+    @Deprecated
     public double[] toRawCopy() {
 
         final int tmpLength = (int) length;

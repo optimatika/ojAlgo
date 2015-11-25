@@ -211,7 +211,9 @@ public final class Variable extends ModelEntity<Variable> {
             try {
                 context.enforce(value).longValueExact();
             } catch (final ArithmeticException ex) {
-                appender.println(value + " ! Integer: " + this.getName());
+                if (appender != null) {
+                    appender.println(value + " ! Integer: " + this.getName());
+                }
                 retVal = false;
             }
         }

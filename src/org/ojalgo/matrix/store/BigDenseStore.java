@@ -628,7 +628,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
-    public void exchangeColumns(final int colA, final int colB) {
+    public void exchangeColumns(final long colA, final long colB) {
         myUtility.exchangeColumns(colA, colB);
     }
 
@@ -661,7 +661,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
-    public void exchangeRows(final int rowA, final int rowB) {
+    public void exchangeRows(final long rowA, final long rowB) {
         myUtility.exchangeRows(rowA, rowB);
     }
 
@@ -791,8 +791,20 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return (int) myUtility.indexOfLargestInColumn(row, column);
     }
 
+    public long indexOfLargestInColumn(final long row, final long column) {
+        return myUtility.indexOfLargestInColumn(row, column);
+    }
+
     public int indexOfLargestInDiagonal(final int row, final int column) {
         return (int) myUtility.indexOfLargestInDiagonal(row, column);
+    }
+
+    public long indexOfLargestInDiagonal(final long row, final long column) {
+        return myUtility.indexOfLargestInDiagonal(row, column);
+    }
+
+    public long indexOfLargestInRow(final long row, final long column) {
+        return myUtility.indexOfLargestInRow(row, column);
     }
 
     public boolean isAbsolute(final long row, final long column) {

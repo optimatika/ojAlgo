@@ -156,7 +156,7 @@ public interface Optimisation {
         public BasicLogger.Printer debug_appender = null;
 
         /**
-         * Which {@linkplain Solver} to debug. Null means ALL solvers. This setting is only relevant if
+         * Which {@linkplain Solver} to debug. Null means NO solvers. This setting is only relevant if
          * {@link #debug_appender} has been set.
          */
         public Class<? extends Optimisation.Solver> debug_solver = null;
@@ -263,6 +263,12 @@ public interface Optimisation {
             }
         }
 
+        /**
+         * Will set {@link #debug_appender} to BasicLogger#DEBUG, {@link #debug_solver} to solver and
+         * {@link #validate} to true.
+         *
+         * @param solver
+         */
         public void debug(final Class<? extends Optimisation.Solver> solver) {
             debug_appender = BasicLogger.DEBUG;
             debug_solver = solver;

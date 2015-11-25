@@ -44,8 +44,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.Fillable<N>, AccessAnyD.Modifiable<N>,
-        AccessAnyD.Visitable<N>, AccessAnyD.Sliceable<N>, Serializable {
+public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, AccessAnyD.Fillable<N>,
+        AccessAnyD.Modifiable<N>, AccessAnyD.Visitable<N>, AccessAnyD.Sliceable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
 
@@ -178,7 +178,10 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     /**
      * Flattens this abitrary dimensional array to a one dimensional array. The (internal/actual) array is not
      * copied, it is just accessed through a different adaptor.
+     *
+     * @deprecated v39 Not needed
      */
+    @Deprecated
     public Array1D<N> asArray1D() {
         return myDelegate.asArray1D();
     }
@@ -281,6 +284,10 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return myDelegate.isAbsolute(AccessUtils.index(myStructure, reference));
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public boolean isAllZeros() {
         return myDelegate.isSmall(0L, myDelegate.count(), 1L, PrimitiveMath.ONE);
     }
@@ -293,6 +300,10 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return myDelegate.isSmall(AccessUtils.index(myStructure, reference), comparedTo);
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public boolean isZeros(final long[] first, final int dimension) {
 
         final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
@@ -429,6 +440,14 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     final BasicArray<N> getDelegate() {
         return myDelegate;
+    }
+
+    public long indexOfLargest() {
+        return myDelegate.indexOfLargest();
+    }
+
+    public long indexOfLargestInRange(final long first, final long limit) {
+        return myDelegate.indexOfLargestInRange(first, limit);
     }
 
 }

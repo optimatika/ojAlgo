@@ -36,6 +36,8 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.CharacterRing;
+import org.ojalgo.netio.CharacterRing.PrinterBuffer;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
@@ -107,6 +109,12 @@ public final class OldIntegerSolver extends IntegerSolver {
             final Optimisation.Result tmpResult = tmpModel.solve(OldIntegerSolver.this.getBestResultSoFar());
 
             OldIntegerSolver.this.incrementIterationsCount();
+
+            if ((tmpModel.options.debug_appender != null) && (tmpModel.options.debug_appender instanceof PrinterBuffer)) {
+                if (OldIntegerSolver.this.getModel().options.debug_appender != null) {
+                    ((PrinterBuffer) tmpModel.options.debug_appender).flush(OldIntegerSolver.this.getModel().options.debug_appender);
+                }
+            }
 
             if (tmpResult.getState().isOptimal()) {
                 if (OldIntegerSolver.this.isDebug()) {
@@ -213,6 +221,10 @@ public final class OldIntegerSolver extends IntegerSolver {
         ExpressionsBasedModel getModel() {
 
             final ExpressionsBasedModel retVal = OldIntegerSolver.this.getModel().relax(false);
+
+            if (retVal.options.debug_appender != null) {
+                retVal.options.debug_appender = new CharacterRing().asPrinter();
+            }
 
             final int[] tmpIntegerIndeces = OldIntegerSolver.this.getIntegerIndeces();
             for (int i = 0; i < tmpIntegerIndeces.length; i++) {

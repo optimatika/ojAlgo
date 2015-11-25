@@ -74,6 +74,16 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
+    public interface IndexOf extends Structure1D {
+
+        default long indexOfLargest() {
+            return this.indexOfLargestInRange(0L, this.count());
+        }
+
+        long indexOfLargestInRange(final long first, final long limit);
+
+    }
+
     public interface Factory<I extends Access1D<?>> {
 
         I copy(Access1D<?> source);

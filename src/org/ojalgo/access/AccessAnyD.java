@@ -133,6 +133,10 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
+    public interface IndexOf extends StructureAnyD, Access1D.IndexOf {
+
+    }
+
     public interface Visitable<N extends Number> extends StructureAnyD, Access1D.Visitable<N> {
 
         void visitOne(long[] reference, VoidFunction<N> visitor);

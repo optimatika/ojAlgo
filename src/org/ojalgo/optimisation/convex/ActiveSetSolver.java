@@ -558,12 +558,16 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         if (this.isDebug()) {
             this.debug("Post iteration");
             this.debug("\tSolution: {}", this.getX().copy().asList());
-            if (this.getAE() != null) {
+            if ((this.getAE() != null) && (this.getAE().count() > 0)) {
                 this.debug("\tE-slack: {}", this.getSE().copy().asList());
             }
-            if (this.getAI() != null) {
-                this.debug("\tI-included-slack: {}", this.getSI(tmpIncluded).copy().asList());
-                this.debug("\tI-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy().asList());
+            if ((this.getAI() != null) && (this.getAI().count() > 0)) {
+                if (tmpIncluded.length != 0) {
+                    this.debug("\tI-included-slack: {}", this.getSI(tmpIncluded).copy().asList());
+                }
+                if (myActivator.getExcluded().length != 0) {
+                    this.debug("\tI-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy().asList());
+                }
             }
         }
     }

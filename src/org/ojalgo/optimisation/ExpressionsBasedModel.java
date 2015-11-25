@@ -35,9 +35,6 @@ import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.function.multiary.MultiaryFunction;
-import org.ojalgo.netio.BasicLogger;
-import org.ojalgo.netio.BasicLogger.AppendablePrinter;
-import org.ojalgo.netio.CharacterRing;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -246,8 +243,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return PRESOLVERS.remove(presolver);
     }
 
-    private transient BasicLogger.Printer myAppender = null;
-    private final CharacterRing myBuffer = new CharacterRing();
     private final HashMap<String, Expression> myExpressions = new HashMap<String, Expression>();
     private final HashSet<IntIndex> myFixedVariables = new HashSet<IntIndex>();
 
@@ -507,10 +502,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         return Collections.unmodifiableList(myPositiveVariables);
-    }
-
-    public String getValidationMessages() {
-        return myBuffer.toString();
     }
 
     public Variable getVariable(final int index) {
@@ -1088,11 +1079,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         boolean retVal = true;
 
         for (final Variable tmpVariable : myVariables) {
-            retVal &= tmpVariable.validate(this.appender());
+            retVal &= tmpVariable.validate(options.debug_appender);
         }
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            retVal &= tmpExpression.validate(this.appender());
+            retVal &= tmpExpression.validate(options.debug_appender);
         }
 
         return retVal;
@@ -1109,11 +1100,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         boolean retVal = tmpSize == solution.count();
 
         for (int i = 0; retVal && (i < tmpSize); i++) {
-            retVal &= myVariables.get(i).validate(solution.get(i), context, this.appender());
+            retVal &= myVariables.get(i).validate(solution.get(i), context, options.debug_appender);
         }
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            retVal &= retVal && tmpExpression.validate(solution, context, this.appender());
+            retVal &= retVal && tmpExpression.validate(solution, context, options.debug_appender);
         }
 
         return retVal;
@@ -1239,13 +1230,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         myIntegerVariables.clear();
         myIntegerIndices = null;
-    }
-
-    BasicLogger.Printer appender() {
-        if (myAppender == null) {
-            myAppender = new AppendablePrinter(myBuffer);
-        }
-        return myAppender;
     }
 
     ExpressionsBasedModel.Integration<?> getIntegration() {

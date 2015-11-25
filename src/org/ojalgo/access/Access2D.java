@@ -87,6 +87,32 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    public interface IndexOf extends Structure2D, Access1D.IndexOf {
+
+        /**
+         * @param row
+         * @param column
+         * @return The row-index of the largest absolute value in a column, starting at the specified row.
+         */
+        long indexOfLargestInColumn(final long row, final long column);
+
+        /**
+         * @param row
+         * @param column
+         * @return The matrix-index of the largest absolute value on a diagonal, starting at the specified
+         *         row-column pair.
+         */
+        long indexOfLargestInDiagonal(final long row, final long column);
+
+        /**
+         * @param row
+         * @param column
+         * @return The column-index of the largest absolute value in a row, starting at the specified column.
+         */
+        long indexOfLargestInRow(final long row, final long column);
+
+    }
+
     public interface Factory<I extends Access2D<?>> {
 
         I columns(Access1D<?>... source);
@@ -258,6 +284,19 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         Access1D<N> sliceDiagonal(long row, long column);
 
         Access1D<N> sliceRow(long row, long column);
+
+    }
+
+    /**
+     * A few operations with no 1D or AnyD counterpart.
+     *
+     * @author apete
+     */
+    public interface Special<N extends Number> extends Structure2D {
+
+        void exchangeColumns(final long colA, final long colB);
+
+        void exchangeRows(final long rowA, final long rowB);
 
     }
 

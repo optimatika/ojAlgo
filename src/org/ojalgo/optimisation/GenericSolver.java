@@ -111,7 +111,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
     protected abstract boolean initialise(Result kickStarter);
 
     protected final boolean isDebug() {
-        return (options.debug_appender != null) && ((options.debug_solver == null) || options.debug_solver.isAssignableFrom(this.getClass()));
+        return (options.debug_appender != null) && (options.debug_solver.isAssignableFrom(this.getClass()));
     }
 
     /**

@@ -278,13 +278,17 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
         if ((myLowerLimit != null) && (myUpperLimit != null)) {
             if ((myLowerLimit.compareTo(myUpperLimit) == 1) || (myUpperLimit.compareTo(myLowerLimit) == -1)) {
-                appender.println(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
+                if (appender != null) {
+                    appender.println(this.toString() + " The lower limit (if it exists) must be smaller than or equal to the upper limit (if it exists)!");
+                }
                 retVal = false;
             }
         }
 
         if ((myContributionWeight != null) && (myContributionWeight.signum() == 0)) {
-            appender.println(this.toString() + " The contribution weight (if it exists) should not be zero!");
+            if (appender != null) {
+                appender.println(this.toString() + " The contribution weight (if it exists) should not be zero!");
+            }
             retVal = false;
         }
 
@@ -299,13 +303,17 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
         if (((tmpLimit = this.getLowerLimit()) != null) && (value.subtract(tmpLimit).signum() == -1)
                 && context.isDifferent(tmpLimit.doubleValue(), value.doubleValue())) {
-            appender.println(value + " ! " + this.toString());
+            if (appender != null) {
+                appender.println(value + " ! " + this.toString());
+            }
             retVal = false;
         }
 
         if (((tmpLimit = this.getUpperLimit()) != null) && (value.subtract(tmpLimit).signum() == 1)
                 && context.isDifferent(tmpLimit.doubleValue(), value.doubleValue())) {
-            appender.println(value + " ! " + this.toString());
+            if (appender != null) {
+                appender.println(value + " ! " + this.toString());
+            }
             retVal = false;
         }
 

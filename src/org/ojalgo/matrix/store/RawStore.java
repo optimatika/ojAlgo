@@ -748,12 +748,12 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    public void exchangeColumns(final int colA, final int colB) {
-        ArrayUtils.exchangeColumns(data, colA, colB);
+    public void exchangeColumns(final long colA, final long colB) {
+        ArrayUtils.exchangeColumns(data, (int) colA, (int) colB);
     }
 
-    public void exchangeRows(final int rowA, final int rowB) {
-        ArrayUtils.exchangeRows(data, rowA, rowB);
+    public void exchangeRows(final long rowA, final long rowB) {
+        ArrayUtils.exchangeRows(data, (int) rowA, (int) rowB);
     }
 
     public PhysicalStore.Factory<Double, RawStore> factory() {
@@ -965,6 +965,26 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     @Override
     public int hashCode() {
         return MatrixUtils.hashCode(this);
+    }
+
+    public long indexOfLargestInColumn(final long row, final long column) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public long indexOfLargestInDiagonal(final long row, final long column) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public long indexOfLargestInRange(final long first, final long limit) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public long indexOfLargestInRow(final long row, final long column) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     public boolean isAbsolute(final long index) {

@@ -35,6 +35,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.CharacterRing.PrinterBuffer;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
@@ -196,6 +197,11 @@ public final class NewIntegerSolver extends IntegerSolver {
 
         NewIntegerSolver.this.incrementIterationsCount();
 
+        if ((tmpModel.options.debug_appender != null) && (tmpModel.options.debug_appender instanceof PrinterBuffer)) {
+            if (NewIntegerSolver.this.getModel().options.debug_appender != null) {
+                ((PrinterBuffer) tmpModel.options.debug_appender).flush(NewIntegerSolver.this.getModel().options.debug_appender);
+            }
+        }
         if (tmpResult.getState().isOptimal()) {
             if (NewIntegerSolver.this.isDebug()) {
                 NewIntegerSolver.this.debug("Node solved to optimality!");

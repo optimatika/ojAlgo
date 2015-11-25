@@ -67,7 +67,7 @@ public abstract class Presolvers {
                         if (!fixedVariables.contains(tmpLinear)) {
                             final Variable tmpFreeVariable = tmpModel.getVariable(tmpLinear.index);
 
-                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, tmpModel.options.slack, tmpModel.appender());
+                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, tmpModel.options.slack, tmpModel.options.debug_appender);
                             expression.setInfeasible(!tmpValid);
 
                             if (tmpValid) {
@@ -94,7 +94,7 @@ public abstract class Presolvers {
                         if (!fixedVariables.contains(tmpLinear)) {
                             final Variable tmpFreeVariable = tmpModel.getVariable(tmpLinear.index);
 
-                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, tmpModel.options.slack, tmpModel.appender());
+                            final boolean tmpValid = tmpFreeVariable.validate(ZERO, tmpModel.options.slack, tmpModel.options.debug_appender);
                             expression.setInfeasible(!tmpValid);
 
                             if (tmpValid) {
@@ -175,7 +175,7 @@ public abstract class Presolvers {
 
         final ExpressionsBasedModel tmpModel = expression.getModel();
 
-        final boolean tmpValid = expression.validate(fixedValue, tmpModel.options.slack, tmpModel.appender());
+        final boolean tmpValid = expression.validate(fixedValue, tmpModel.options.slack, tmpModel.options.debug_appender);
         if (tmpValid) {
             expression.setInfeasible(false);
             expression.level(fixedValue);
@@ -206,7 +206,7 @@ public abstract class Presolvers {
 
             expression.setRedundant(true);
 
-            final boolean tmpValid = tmpVariable.validate(tmpSolutionValue, tmpModel.options.slack, tmpModel.appender());
+            final boolean tmpValid = tmpVariable.validate(tmpSolutionValue, tmpModel.options.slack, tmpModel.options.debug_appender);
             if (tmpValid) {
                 expression.setInfeasible(false);
                 tmpVariable.level(tmpSolutionValue);

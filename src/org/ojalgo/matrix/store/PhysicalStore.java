@@ -52,7 +52,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Number> extends MatrixStore<N>, ElementsConsumer<N> {
+public interface PhysicalStore<N extends Number> extends MatrixStore<N>, ElementsConsumer<N>, Access2D.IndexOf, Access2D.Special<N> {
 
     public static final class ColumnsRegion<N extends Number> extends ConsumerRegion<N> {
 
@@ -578,10 +578,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
      */
     @Deprecated
     void caxpy(final N scalarA, final int columnX, final int columnY, final int firstRow);
-
-    void exchangeColumns(int colA, int colB);
-
-    void exchangeRows(int rowA, int rowB);
 
     /**
      * <p>

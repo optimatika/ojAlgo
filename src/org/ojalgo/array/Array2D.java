@@ -44,8 +44,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.Fillable<N>, Access2D.Iterable2D<N>, Access2D.Modifiable<N>,
-        Access2D.Visitable<N>, Access2D.Sliceable<N>, Serializable {
+public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Access2D.Fillable<N>, Access2D.Iterable2D<N>,
+        Access2D.Modifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Access2D.Special<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements Access2D.Factory<Array2D<N>> {
 
@@ -327,7 +327,10 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     /**
      * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not
      * copied, it is just accessed through a different adaptor.
+     *
+     * @deprecated v39 Not needed
      */
+    @Deprecated
     public Array1D<N> asArray1D() {
         return myDelegate.asArray1D();
     }
@@ -494,20 +497,36 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         return myDelegate.isAbsolute(AccessUtils.index(myRowsCount, row, column));
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public boolean isAllZeros() {
         return myDelegate.isSmall(0L, this.count(), 1L, PrimitiveMath.ONE);
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public boolean isColumnZeros(final long row, final long column) {
         return myDelegate.isSmall(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, myRowsCount, column), 1L, PrimitiveMath.ONE);
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public boolean isDiagonalZeros(final long row, final long column) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
         return myDelegate.isSmall(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount),
                 1L + myRowsCount, PrimitiveMath.ONE);
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public boolean isRowZeros(final long row, final long column) {
         return myDelegate.isSmall(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount,
                 PrimitiveMath.ONE);
@@ -595,9 +614,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     /**
      * @return An array of arrays of doubles
+     * @deprecated v39 Use {@link #toRawCopy2D()} instead.
      */
+    @Deprecated
     public double[][] toRawCopy() {
-        return ArrayUtils.toRawCopyOf(this);
+        return this.toRawCopy2D();
     }
 
     @Override
@@ -637,6 +658,14 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     BasicArray<N> getDelegate() {
         return myDelegate;
+    }
+
+    public long indexOfLargest() {
+        return myDelegate.indexOfLargest();
+    }
+
+    public long indexOfLargestInRange(final long first, final long limit) {
+        return myDelegate.indexOfLargestInRange(first, limit);
     }
 
 }

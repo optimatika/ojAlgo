@@ -95,10 +95,6 @@ public class ExpressionsBasedModelTest extends FunctionalityTest {
 
         TestUtils.assertFalse(tmpModel.validate());
 
-        if (OptimisationTests.DEBUG) {
-            BasicLogger.debug(tmpModel.getValidationMessages());
-        }
-
     }
 
 }
