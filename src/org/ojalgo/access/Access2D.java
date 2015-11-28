@@ -77,7 +77,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         boolean isSmall(long row, long column, double comparedTo);
 
         /**
-         * @see Scalar#isZero()
          * @deprecated v37
          */
         @Deprecated

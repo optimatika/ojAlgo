@@ -64,7 +64,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         boolean isSmall(long index, double comparedTo);
 
         /**
-         * @see Scalar#isZero()
          * @deprecated v37
          */
         @Deprecated
