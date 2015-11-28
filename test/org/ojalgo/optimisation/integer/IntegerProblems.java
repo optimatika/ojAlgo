@@ -170,6 +170,55 @@ public class IntegerProblems extends OptimisationIntegerTests {
     }
 
     /**
+     * <a href="http://bugzilla.optimatika.se/show_bug.cgi?id=211">BugZilla-211</a>
+     */
+    public void testP20140819() {
+
+        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel();
+
+        final double[] tmpWeights = new double[] { 2691.5357279536333, 2600.760150603986, 2605.8958795795374, 2606.7208332501104, 2715.0757845953835,
+                2602.194912040238, 2606.0069468717575, 2609.0385816244316, 2750.0520522057927, 2602.048261785581, 2600.507229973181, 2602.046307869504,
+                2721.343937605796, 2601.7367414553805, 2600.595318433882, 2599.405979211142 };
+
+        for (int v = 0; v < tmpWeights.length; v++) {
+            tmpModel.addVariable(Variable.make("x" + v).integer(true).lower(0).upper(414).weight(tmpWeights[v]));
+        }
+
+        // 117 <= 30 30 30 30 0 4 0 0 0 4 0 0 0 4 0 0 <= 14868
+        // 36 <= 0 4 0 0 40 40 40 40 0 0 4 0 0 0 4 0 <= 170569
+        // 341 <= 0 0 8 0 0 0 8 0 68 68 68 68 0 0 0 5 <= 140833
+        // 413 <= 0 0 0 8 0 0 0 9 0 0 0 6 59 59 59 59 <= 48321
+
+        final int[] tmpLower = new int[] { 117, 36, 341, 413 };
+        final int[] tmpUpper = new int[] { 14868, 170569, 140833, 48321 };
+        final int[][] tmpFactors = new int[4][];
+        tmpFactors[0] = new int[] { 30, 30, 30, 30, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0 };
+        tmpFactors[1] = new int[] { 0, 4, 0, 0, 40, 40, 40, 40, 0, 0, 4, 0, 0, 0, 4, 0 };
+        tmpFactors[2] = new int[] { 0, 0, 8, 0, 0, 0, 8, 0, 68, 68, 68, 68, 0, 0, 0, 5 };
+        tmpFactors[3] = new int[] { 0, 0, 0, 8, 0, 0, 0, 9, 0, 0, 0, 6, 59, 59, 59, 59 };
+
+        for (int c = 0; c < tmpFactors.length; c++) {
+            final Expression tmpExpr = tmpModel.addExpression("C" + c);
+            tmpExpr.lower(tmpLower[c]).upper(tmpUpper[c]);
+            for (int v = 0; v < tmpFactors[c].length; v++) {
+                tmpExpr.set(v, tmpFactors[c][v]);
+            }
+        }
+
+        final Result tmpResult = tmpModel.minimise();
+
+        if (OptimisationIntegerTests.DEBUG) {
+            BasicLogger.debug(tmpResult);
+            BasicLogger.debug(tmpModel);
+        }
+
+        TestUtils.assertStateNotLessThanOptimal(tmpResult);
+
+        TestUtils.assertTrue(tmpModel.validate(tmpResult));
+
+    }
+
+    /**
      * Test case sent in by the user / problem reporter
      * <a href="http://bugzilla.optimatika.se/show_bug.cgi?id=178">BugZilla</a>
      */

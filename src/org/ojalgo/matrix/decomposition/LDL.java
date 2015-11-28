@@ -38,8 +38,8 @@ import org.ojalgo.type.context.NumberContext;
  * [A]<sup>H</sup> = [A] = [L][D][L]<sup>H</sup>
  * </p>
  * <p>
- * If [A] is symmetric (but not necessarily positive definite) then it can be decomposed into
- * [L][D][L]<sup>T</sup> (or [U]<sup>T</sup>[D][U]).
+ * If [A] is symmetric (but not necessarily positive definite) then it can be decomposed into [L][D][L]
+ * <sup>T</sup> (or [U]<sup>T</sup>[D][U]).
  * </p>
  * <ul>
  * <li>[L] is a unit lower (left) triangular matrix. It has the same dimensions as [this], and ones on the

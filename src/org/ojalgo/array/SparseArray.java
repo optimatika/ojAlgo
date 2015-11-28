@@ -23,6 +23,7 @@ package org.ojalgo.array;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.function.LongUnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
@@ -60,8 +61,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
 
     }
-
-    private static final int INITIAL_CAPACITY = 97;
 
     static final SparseFactory<BigDecimal> BIG = new SparseFactory<BigDecimal>() {
 
@@ -191,8 +190,15 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         myCount = count;
 
-        myIndices = new long[INITIAL_CAPACITY];
-        myValues = factory.make(INITIAL_CAPACITY);
+        double tmpInitialCapacity = count;
+        do {
+            tmpInitialCapacity = Math.sqrt(tmpInitialCapacity);
+        } while (tmpInitialCapacity > BasicArray.MAX_ARRAY_SIZE);
+
+        final int tmpLength = 2 * (int) tmpInitialCapacity;
+
+        myIndices = new long[tmpLength];
+        myValues = factory.make(tmpLength);
 
         myZeroScalar = factory.zero();
         myZeroNumber = myZeroScalar.getNumber();
@@ -480,13 +486,24 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public void supplyNonZerosTo(final Access1D.Settable<N> consumer) {
+        this.supplyNonZerosTo(consumer, LongUnaryOperator.identity());
+    }
+
+    public void supplyNonZerosTo(final Access1D.Settable<N> consumer, final LongUnaryOperator indexRemapper) {
+        long tmpMappedIndex;
         if (this.isPrimitive()) {
             for (int n = 0; n < myActualLength; n++) {
-                consumer.set(myIndices[n], myValues.doubleValue(n));
+                tmpMappedIndex = indexRemapper.applyAsLong(myIndices[n]);
+                if (tmpMappedIndex >= 0L) {
+                    consumer.set(tmpMappedIndex, myValues.doubleValue(n));
+                }
             }
         } else {
             for (int n = 0; n < myActualLength; n++) {
-                consumer.set(myIndices[n], myValues.get(n));
+                tmpMappedIndex = indexRemapper.applyAsLong(myIndices[n]);
+                if (tmpMappedIndex >= 0L) {
+                    consumer.set(tmpMappedIndex, myValues.get(n));
+                }
             }
         }
     }

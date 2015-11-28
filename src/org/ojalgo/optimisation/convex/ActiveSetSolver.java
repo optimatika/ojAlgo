@@ -52,6 +52,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private final PrimitiveDenseStore myIterationX;
 
     MatrixStore<Double> myInvQC;
+    // Access1D<Double>[] myInvQAtCols;
 
     ActiveSetSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
@@ -318,6 +319,18 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             myInvQC = myCholesky.solve(this.getIterationC());
 
+            //            myInvQAtCols = (Access1D<Double>[]) new Access1D<?>[tmpNumEqus + tmpNumInes];
+            //
+            //            final int[] tmpIncluded = myActivator.getIncluded();
+            //
+            //            final MatrixStore<Double> tmpCols = myCholesky.solve(this.getIterationA(tmpIncluded));
+            //            for (int j = 0; j < tmpNumEqus; j++) {
+            //                myInvQAtCols[j] = tmpCols.sliceColumn(0L, j);
+            //            }
+            //            for (int j = 0; j < tmpIncluded.length; j++) {
+            //                myInvQAtCols[tmpNumEqus + tmpIncluded[j]] = tmpCols.sliceColumn(0L, tmpNumEqus + j);
+            //            }
+
         } else {
 
             this.setState(State.INFEASIBLE);
@@ -425,11 +438,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 final MatrixStore<Double> tmpInvQAT = myCholesky.solve(tmpIterA.transpose());
                 // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
+                // BasicLogger.debug("tmpInvQAT", tmpInvQAT);
 
                 // Negated Schur complement
                 // final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
                 final ElementsSupplier<Double> tmpS = tmpInvQAT.multiplyLeft(tmpIterA);
                 // TODO Symmetric, only need to calculate halv the Schur complement
+                // BasicLogger.debug("Negated Schur complement", tmpS.get());
 
                 if (tmpSolvable = myLU.compute(tmpS)) {
 

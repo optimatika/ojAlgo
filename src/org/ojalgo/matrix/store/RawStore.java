@@ -869,10 +869,18 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
         ArrayUtils.fillMatching(data, RawStore.convert(left, data.length).data, function, right);
     }
 
+    /**
+     * @deprecated v39
+     */
+    @Deprecated
     public void fillMatching(final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         ArrayUtils.fillMatching(data, left, function, RawStore.convert(right, data.length).data);
     }
@@ -922,7 +930,9 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
      * @param j1 Final column index
      * @return A(i0:i1,j0:j1)
      * @exception ArrayIndexOutOfBoundsException Submatrix indices
+     * @deprecated v39
      */
+    @Deprecated
     public RawStore getMatrix(final int i0, final int i1, final int j0, final int j1) {
         final RawStore X = new RawStore((i1 - i0) + 1, (j1 - j0) + 1);
         final double[][] B = X.data;
@@ -946,7 +956,9 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
      * @param j1 Final column index
      * @return A(r(:),j0:j1)
      * @exception ArrayIndexOutOfBoundsException Submatrix indices
+     * @deprecated v39
      */
+    @Deprecated
     public RawStore getMatrix(final int[] r, final int j0, final int j1) {
         final RawStore X = new RawStore(r.length, (j1 - j0) + 1);
         final double[][] B = X.data;
@@ -967,24 +979,106 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return MatrixUtils.hashCode(this);
     }
 
+    public long indexOfLargest() {
+
+        final int tmpRowDim = data.length;
+
+        int retVal = 0;
+        double tmpLargest = ZERO;
+        double tmpValue;
+        double[] tmpRow;
+
+        for (int i = 0; i < tmpRowDim; i++) {
+            tmpRow = data[i];
+
+            for (int j = 0; j < myNumberOfColumns; j++) {
+                tmpValue = Math.abs(tmpRow[j]);
+                if (tmpValue > tmpLargest) {
+                    tmpLargest = tmpValue;
+                    retVal = i + (j * tmpRowDim);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
     public long indexOfLargestInColumn(final long row, final long column) {
-        // TODO Auto-generated method stub
-        return 0;
+
+        final int tmpRowDim = data.length;
+
+        int retVal = (int) row;
+        double tmpLargest = ZERO;
+        double tmpValue;
+
+        for (int i = (int) row; i < tmpRowDim; i++) {
+            tmpValue = Math.abs(data[i][(int) column]);
+            if (tmpValue > tmpLargest) {
+                tmpLargest = tmpValue;
+                retVal = i;
+            }
+
+        }
+
+        return retVal;
     }
 
     public long indexOfLargestInDiagonal(final long row, final long column) {
-        // TODO Auto-generated method stub
-        return 0;
+
+        final int tmpRowDim = data.length;
+
+        int retVal = (int) (row + (column * tmpRowDim));
+        double tmpLargest = ZERO;
+        double tmpValue;
+
+        for (int i = (int) row, j = (int) column; (i < tmpRowDim) && (j < myNumberOfColumns); i++, j++) {
+            tmpValue = Math.abs(data[i][j]);
+            if (tmpValue > tmpLargest) {
+                tmpLargest = tmpValue;
+                retVal = i + (j * tmpRowDim);
+            }
+        }
+
+        return retVal;
     }
 
     public long indexOfLargestInRange(final long first, final long limit) {
-        // TODO Auto-generated method stub
-        return 0;
+
+        final int tmpRowDim = data.length;
+
+        int retVal = 0;
+        double tmpLargest = ZERO;
+        double tmpValue;
+
+        for (int index = 0; index < this.count(); index++) {
+            final int i = AccessUtils.row(index, tmpRowDim);
+            final int j = AccessUtils.column(index, tmpRowDim);
+            tmpValue = Math.abs(data[i][j]);
+            if (tmpValue > tmpLargest) {
+                tmpLargest = tmpValue;
+                retVal = index;
+            }
+        }
+
+        return retVal;
     }
 
     public long indexOfLargestInRow(final long row, final long column) {
-        // TODO Auto-generated method stub
-        return 0;
+
+        int retVal = (int) column;
+        double tmpLargest = ZERO;
+        double tmpValue;
+        final double[] tmpRow = data[(int) row];
+
+        for (int j = (int) column; j < myNumberOfColumns; j++) {
+            tmpValue = Math.abs(tmpRow[j]);
+            if (tmpValue > tmpLargest) {
+                tmpLargest = tmpValue;
+                retVal = j;
+            }
+        }
+
+        return retVal;
     }
 
     public boolean isAbsolute(final long index) {
