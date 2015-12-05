@@ -25,10 +25,11 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Consumer2D;
+import org.ojalgo.access.Mutate2D;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 
-public interface ElementsConsumer<N extends Number> extends Consumer2D<Access2D<N>>, Access2D.Fillable<N>, Access2D.Modifiable<N> {
+public interface ElementsConsumer<N extends Number> extends Consumer2D<Access2D<N>>, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N> {
 
     default void accept(final Access2D<N> supplied) {
         final long tmpCountRows = supplied.countRows();

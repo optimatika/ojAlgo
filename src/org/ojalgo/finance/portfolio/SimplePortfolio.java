@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.finance.portfolio.FinancePortfolio.Context;
 import org.ojalgo.finance.portfolio.simulator.PortfolioSimulator;
 import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.random.process.GeometricBrownianMotion;
 
@@ -125,7 +125,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
 
             final int tmpSize = myComponents.size();
 
-            final Access2D.Builder<PrimitiveMatrix> tmpReturns = MATRIX_FACTORY.getBuilder(tmpSize, 1);
+            final Builder<PrimitiveMatrix> tmpReturns = MATRIX_FACTORY.getBuilder(tmpSize, 1);
 
             for (int i = 0; i < tmpSize; i++) {
                 tmpReturns.set(i, 0, this.getMeanReturn(i));

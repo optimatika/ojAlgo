@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Factory2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -195,7 +196,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
 
     }
 
-    public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Access2D.Factory<I>, Serializable {
+    public static interface Factory<N extends Number, I extends PhysicalStore<N>> extends Factory2D<I>, Serializable {
 
         AggregatorSet<N> aggregator();
 

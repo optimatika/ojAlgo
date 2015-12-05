@@ -135,7 +135,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(myStore.conjugate());
     }
 
-    public Access2D.Builder<I> copyToBuilder() {
+    public Builder<I> copyToBuilder() {
         return this.getFactory().wrap(myStore.copy());
     }
 

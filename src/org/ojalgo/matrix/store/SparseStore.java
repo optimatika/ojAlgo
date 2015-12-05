@@ -25,12 +25,12 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.scalar.ComplexNumber;
 
-public final class SparseStore<N extends Number> extends FactoryStore<N> implements Access2D.Settable<N> {
+public final class SparseStore<N extends Number> extends FactoryStore<N> implements Mutate2D {
 
     public static interface Factory<N extends Number> {
 

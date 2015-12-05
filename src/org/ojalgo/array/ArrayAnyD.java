@@ -28,6 +28,8 @@ import java.util.Arrays;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessAnyD;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.FactoryAnyD;
+import org.ojalgo.access.MutateAnyD;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -44,10 +46,10 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, AccessAnyD.Fillable<N>,
-        AccessAnyD.Modifiable<N>, AccessAnyD.Visitable<N>, AccessAnyD.Sliceable<N>, Serializable {
+public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, MutateAnyD.Fillable<N>,
+        MutateAnyD.Modifiable<N>, AccessAnyD.Visitable<N>, AccessAnyD.Sliceable<N>, Serializable {
 
-    public static abstract class Factory<N extends Number> implements AccessAnyD.Factory<ArrayAnyD<N>> {
+    public static abstract class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
 
         public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
 

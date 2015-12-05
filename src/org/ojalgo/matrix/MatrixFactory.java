@@ -28,8 +28,8 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 
@@ -41,7 +41,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
  */
 final class MatrixFactory<N extends Number, I extends BasicMatrix> implements BasicMatrix.Factory<I> {
 
-    final class MatrixBuilder implements Access2D.Builder<I> {
+    final class MatrixBuilder implements Builder<I> {
 
         private final PhysicalStore.Factory<N, ?> myFactory;
         private final PhysicalStore<N> myPhysicalStore;
@@ -68,10 +68,20 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             myFactory = aPhysicalStore.factory();
         }
 
-        @Override
-        public I build() {
-            mySafe = false;
-            return MatrixFactory.this.instantiate(myPhysicalStore);
+        public final void add(final long row, final long column, final double value) {
+            if (mySafe) {
+                myPhysicalStore.add(row, column, value);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+
+        public final void add(final long row, final long column, final Number value) {
+            if (mySafe) {
+                myPhysicalStore.add(row, column, value);
+            } else {
+                throw new IllegalStateException();
+            }
         }
 
         public long count() {
@@ -122,40 +132,42 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             return this;
         }
 
-        public final MatrixBuilder set(final long index, final double value) {
+        @Override
+        public I get() {
+            mySafe = false;
+            return MatrixFactory.this.instantiate(myPhysicalStore);
+        }
+
+        public final void set(final long index, final double value) {
             if (mySafe) {
                 myPhysicalStore.set(index, value);
             } else {
                 throw new IllegalStateException();
             }
-            return this;
         }
 
-        public final MatrixBuilder set(final long row, final long column, final double value) {
+        public final void set(final long row, final long column, final double value) {
             if (mySafe) {
                 myPhysicalStore.set(row, column, value);
             } else {
                 throw new IllegalStateException();
             }
-            return this;
         }
 
-        public final MatrixBuilder set(final long row, final long column, final Number value) {
+        public final void set(final long row, final long column, final Number value) {
             if (mySafe) {
-                myPhysicalStore.set(row, column, myFactory.scalar().cast(value));
+                myPhysicalStore.set(row, column, value);
             } else {
                 throw new IllegalStateException();
             }
-            return this;
         }
 
-        public final MatrixBuilder set(final long index, final Number value) {
+        public final void set(final long index, final Number value) {
             if (mySafe) {
                 myPhysicalStore.set(index, myFactory.scalar().cast(value));
             } else {
                 throw new IllegalStateException();
             }
-            return this;
         }
 
     }

@@ -24,9 +24,10 @@ package org.ojalgo.array;
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Factory1D;
 import org.ojalgo.function.NullaryFunction;
 
-abstract class ArrayFactory<N extends Number> extends Object implements Access1D.Factory<BasicArray<N>> {
+abstract class ArrayFactory<N extends Number> extends Object implements Factory1D<BasicArray<N>> {
 
     public final BasicArray<N> copy(final Access1D<?> source) {
         final long tmpCount = source.count();

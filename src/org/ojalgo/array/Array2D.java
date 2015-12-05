@@ -28,6 +28,8 @@ import java.util.List;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Factory2D;
+import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -44,10 +46,10 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Access2D.Fillable<N>, Access2D.Iterable2D<N>,
-        Access2D.Modifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Access2D.Special<N>, Serializable {
+public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Mutate2D.Fillable<N>, Access2D.Iterable2D<N>,
+        Mutate2D.Modifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Access2D.Special<N>, Serializable {
 
-    public static abstract class Factory<N extends Number> implements Access2D.Factory<Array2D<N>> {
+    public static abstract class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
         public final Array2D<N> columns(final Access1D<?>... source) {
 

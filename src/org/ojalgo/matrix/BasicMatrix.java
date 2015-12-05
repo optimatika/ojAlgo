@@ -25,6 +25,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Factory2D;
+import org.ojalgo.access.Mutate2D;
+import org.ojalgo.access.Supplier2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -58,14 +61,19 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMatrix, Number> {
 
-    /**
-     * @author apete
-     */
-    public static interface Factory<I extends BasicMatrix> extends Access2D.Factory<I> {
+    public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier2D<I> {
 
-        Access2D.Builder<I> getBuilder(int count);
+        default I build() {
+            return this.get();
+        }
 
-        Access2D.Builder<I> getBuilder(int rows, int columns);
+    }
+
+    public static interface Factory<I extends BasicMatrix> extends Factory2D<I> {
+
+        Builder<I> getBuilder(int count);
+
+        Builder<I> getBuilder(int rows, int columns);
 
     }
 

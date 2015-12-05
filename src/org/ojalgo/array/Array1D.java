@@ -31,6 +31,8 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Factory1D;
+import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -47,10 +49,10 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Fillable<N>,
-        Access1D.Modifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
+public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.Fillable<N>,
+        Mutate1D.Modifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
 
-    public static abstract class Factory<N extends Number> implements Access1D.Factory<Array1D<N>> {
+    public static abstract class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
         public Array1D<N> copy(final Access1D<?> source) {
 

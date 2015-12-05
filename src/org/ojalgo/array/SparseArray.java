@@ -27,6 +27,7 @@ import java.util.function.LongUnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -485,11 +486,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public void supplyNonZerosTo(final Access1D.Settable<N> consumer) {
+    public void supplyNonZerosTo(final Mutate1D consumer) {
         this.supplyNonZerosTo(consumer, LongUnaryOperator.identity());
     }
 
-    public void supplyNonZerosTo(final Access1D.Settable<N> consumer, final LongUnaryOperator indexRemapper) {
+    public void supplyNonZerosTo(final Mutate1D consumer, final LongUnaryOperator indexRemapper) {
         long tmpMappedIndex;
         if (this.isPrimitive()) {
             for (int n = 0; n < myActualLength; n++) {

@@ -25,11 +25,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -99,9 +99,22 @@ public class PortfolioProblems extends FinancePortfolioTests {
      */
     public void testP20110614() {
 
-        final BasicMatrix tmpCovars = PrimitiveMatrix.getBuilder(3, 3).set(0, 0, 0.04).set(0, 1, 0.01).set(0, 2, 0.02).set(1, 0, 0.01).set(1, 1, 0.09)
-                .set(1, 2, 0.01).set(2, 0, 0.02).set(2, 1, 0.01).set(2, 2, 0.16).build();
-        final BasicMatrix tmpReturs = PrimitiveMatrix.getBuilder(3, 1).set(0, 0, 0.10).set(1, 0, 0.15).set(2, 0, 0.18).build();
+        final Builder<PrimitiveMatrix> tmpCovarsBuilder = PrimitiveMatrix.getBuilder(3, 3);
+        tmpCovarsBuilder.set(0, 0, 0.04);
+        tmpCovarsBuilder.set(0, 1, 0.01);
+        tmpCovarsBuilder.set(0, 2, 0.02);
+        tmpCovarsBuilder.set(1, 0, 0.01);
+        tmpCovarsBuilder.set(1, 1, 0.09);
+        tmpCovarsBuilder.set(1, 2, 0.01);
+        tmpCovarsBuilder.set(2, 0, 0.02);
+        tmpCovarsBuilder.set(2, 1, 0.01);
+        tmpCovarsBuilder.set(2, 2, 0.16);
+        final BasicMatrix tmpCovars = tmpCovarsBuilder.build();
+        final Builder<PrimitiveMatrix> tmpReturnsBuilder = PrimitiveMatrix.getBuilder(3, 1);
+        tmpReturnsBuilder.set(0, 0, 0.10);
+        tmpReturnsBuilder.set(1, 0, 0.15);
+        tmpReturnsBuilder.set(2, 0, 0.18);
+        final BasicMatrix tmpReturs = tmpReturnsBuilder.build();
 
         final MarketEquilibrium tmpME = new MarketEquilibrium(tmpCovars);
 

@@ -26,12 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
@@ -260,7 +259,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
         final int tmpRowDim = myViews.size();
         final int tmpColDim = (int) myOriginalWeights.count();
 
-        final Access2D.Builder<PrimitiveMatrix> retVal = MATRIX_FACTORY.getBuilder(tmpRowDim, tmpColDim);
+        final Builder<PrimitiveMatrix> retVal = MATRIX_FACTORY.getBuilder(tmpRowDim, tmpColDim);
 
         FinancePortfolio tmpView;
         List<BigDecimal> tmpWeights;
@@ -286,7 +285,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
         final int tmpRowDim = myViews.size();
         final int tmpColDim = 1;
 
-        final Access2D.Builder<PrimitiveMatrix> retVal = MATRIX_FACTORY.getBuilder(tmpRowDim, tmpColDim);
+        final Builder<PrimitiveMatrix> retVal = MATRIX_FACTORY.getBuilder(tmpRowDim, tmpColDim);
 
         double tmpRet;
         final double tmpRAF = this.getRiskAversion().doubleValue();

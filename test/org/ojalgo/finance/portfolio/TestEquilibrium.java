@@ -26,11 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -71,23 +71,23 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
         final MarketEquilibrium marketEquilibrium = new MarketEquilibrium(covariances, riskAversion);
 
-        Builder<PrimitiveMatrix> expectedExcessReturns1 = PrimitiveMatrix.getBuilder(assetNum, 1);
-        expectedExcessReturns1 = expectedExcessReturns1.set(0, 0, 0.03360872);
-        expectedExcessReturns1 = expectedExcessReturns1.set(1, 0, 0.027322319);
-        expectedExcessReturns1 = expectedExcessReturns1.set(2, 0, 0.027668137);
-        expectedExcessReturns1 = expectedExcessReturns1.set(3, 0, 0.03080239);
-        expectedExcessReturns1 = expectedExcessReturns1.set(4, 0, 0.025067124);
-        expectedExcessReturns1 = expectedExcessReturns1.set(5, 0, 0.016578507);
-        expectedExcessReturns1 = expectedExcessReturns1.set(6, 0, 0.022622714);
-        expectedExcessReturns1 = expectedExcessReturns1.set(7, 0, 0.028957183);
-        expectedExcessReturns1 = expectedExcessReturns1.set(8, 0, 0.009939058);
-        expectedExcessReturns1 = expectedExcessReturns1.set(9, 0, 0.010014445);
-        expectedExcessReturns1 = expectedExcessReturns1.set(10, 0, 0.011565874);
-        expectedExcessReturns1 = expectedExcessReturns1.set(11, 0, 0.011609169);
-        expectedExcessReturns1 = expectedExcessReturns1.set(12, 0, 0.006286505);
-        expectedExcessReturns1 = expectedExcessReturns1.set(13, 0, 0.004240681);
-        expectedExcessReturns1 = expectedExcessReturns1.set(14, 0, 0.006162067);
-        expectedExcessReturns1 = expectedExcessReturns1.set(15, 0, 0.003081388);
+        final Builder<PrimitiveMatrix> expectedExcessReturns1 = PrimitiveMatrix.getBuilder(assetNum, 1);
+        expectedExcessReturns1.set(0, 0, 0.03360872);
+        expectedExcessReturns1.set(1, 0, 0.027322319);
+        expectedExcessReturns1.set(2, 0, 0.027668137);
+        expectedExcessReturns1.set(3, 0, 0.03080239);
+        expectedExcessReturns1.set(4, 0, 0.025067124);
+        expectedExcessReturns1.set(5, 0, 0.016578507);
+        expectedExcessReturns1.set(6, 0, 0.022622714);
+        expectedExcessReturns1.set(7, 0, 0.028957183);
+        expectedExcessReturns1.set(8, 0, 0.009939058);
+        expectedExcessReturns1.set(9, 0, 0.010014445);
+        expectedExcessReturns1.set(10, 0, 0.011565874);
+        expectedExcessReturns1.set(11, 0, 0.011609169);
+        expectedExcessReturns1.set(12, 0, 0.006286505);
+        expectedExcessReturns1.set(13, 0, 0.004240681);
+        expectedExcessReturns1.set(14, 0, 0.006162067);
+        expectedExcessReturns1.set(15, 0, 0.003081388);
 
         System.out.println("Return Matrix" + expectedExcessReturns1.build());
 
@@ -127,12 +127,12 @@ public class TestEquilibrium extends FinancePortfolioTests {
         final int row = returns.length;
         final int col = returns[0].length;
 
-        Builder<PrimitiveMatrix> covariances = PrimitiveMatrix.getBuilder(row, col);
+        final Builder<PrimitiveMatrix> covariances = PrimitiveMatrix.getBuilder(row, col);
 
         for (int i = 1; i <= row; i++) {
             for (int j = i; j <= col; j++) {
-                covariances = covariances.set(i - 1, j - 1, returns[i - 1][j - 1]);
-                covariances = covariances.set(j - 1, i - 1, returns[j - 1][i - 1]);
+                covariances.set(i - 1, j - 1, returns[i - 1][j - 1]);
+                covariances.set(j - 1, i - 1, returns[j - 1][i - 1]);
             }
 
         }

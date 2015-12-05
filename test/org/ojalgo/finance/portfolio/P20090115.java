@@ -21,8 +21,8 @@
  */
 package org.ojalgo.finance.portfolio;
 
-import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 
 class P20090115 {

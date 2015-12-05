@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
@@ -54,7 +55,7 @@ import org.ojalgo.scalar.RationalNumber;
  * @author apete
  */
 public abstract class BasicArray<N extends Number>
-        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Fillable<N>, Access1D.Modifiable<N>, Access1D.Visitable<N>, Serializable {
+        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Access1D.Visitable<N>, Serializable {
 
     static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 

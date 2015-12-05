@@ -32,12 +32,12 @@ import java.util.Map.Entry;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -143,7 +143,7 @@ public abstract class FinanceUtils {
 
         final int tmpSize = timeSeriesCollection.size();
 
-        final Access2D.Builder<PrimitiveMatrix> retValStore = PrimitiveMatrix.getBuilder(tmpSize, tmpSize);
+        final Builder<PrimitiveMatrix> retValStore = PrimitiveMatrix.getBuilder(tmpSize, tmpSize);
 
         final double tmpToYearFactor = (double) CalendarDateUnit.YEAR.size() / (double) tmpCoordinator.getResolution().size();
 

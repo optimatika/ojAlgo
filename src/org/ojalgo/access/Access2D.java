@@ -21,38 +21,17 @@
  */
 package org.ojalgo.access;
 
-import java.util.List;
-
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 
+/**
+ * 2-dimensional accessor methods
+ *
+ * @author apete
+ */
 public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
-
-    /**
-     * This interface mimics {@linkplain Fillable}, but methods return the builder instance instead, and then
-     * adds the {@link #build()} method.
-     *
-     * @author apete
-     */
-    public interface Builder<I extends Access2D<?>> extends Structure2D, Access1D.Builder<I> {
-
-        I build();
-
-        Builder<I> fillColumn(long row, long column, Number value);
-
-        Builder<I> fillDiagonal(long row, long column, Number value);
-
-        Builder<I> fillRow(long row, long column, Number value);
-
-        Builder<I> set(long row, long column, double value);
-
-        Builder<I> set(long row, long column, Number value);
-
-    }
 
     public interface Elements extends Structure2D, Access1D.Elements {
 
@@ -112,104 +91,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
-    public interface Factory<I extends Access2D<?>> {
-
-        I columns(Access1D<?>... source);
-
-        I columns(double[]... source);
-
-        @SuppressWarnings("unchecked")
-        I columns(List<? extends Number>... source);
-
-        I columns(Number[]... source);
-
-        I copy(Access2D<?> source);
-
-        I makeEye(long rows, long columns);
-
-        I makeFilled(long rows, long columns, NullaryFunction<?> supplier);
-
-        I makeZero(long rows, long columns);
-
-        I rows(Access1D<?>... source);
-
-        I rows(double[]... source);
-
-        @SuppressWarnings("unchecked")
-        I rows(List<? extends Number>... source);
-
-        I rows(Number[]... source);
-
-    }
-
-    public interface Fillable<N extends Number> extends Settable<N>, Access1D.Fillable<N> {
-
-        default void fillColumn(final long row, final long column, final Access1D<N> values) {
-            final long tmpCount = values.count();
-            for (long i = 0L; i < tmpCount; i++) {
-                this.set(row + i, column, values.get(i));
-            }
-        }
-
-        void fillColumn(long row, long column, N value);
-
-        void fillColumn(long row, long column, NullaryFunction<N> supplier);
-
-        default void fillDiagonal(final long row, final long column, final Access1D<N> values) {
-            for (long ij = 0L; ij < values.count(); ij++) {
-                this.set(row + ij, column + ij, values.get(ij));
-            }
-        }
-
-        void fillDiagonal(long row, long column, N value);
-
-        void fillDiagonal(long row, long column, NullaryFunction<N> supplier);
-
-        void fillOne(long row, long column, N value);
-
-        void fillOne(long row, long column, NullaryFunction<N> supplier);
-
-        default void fillOne(final long index, final N value) {
-            final long tmpStructure = this.countRows();
-            this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), value);
-        }
-
-        default void fillOne(final long index, final NullaryFunction<N> supplier) {
-            final long tmpStructure = this.countRows();
-            this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), supplier);
-        }
-
-        default void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-            final long tmpStructure = this.countRows();
-            this.fillOneMatching(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), values, valueIndex);
-        }
-
-        void fillOneMatching(long row, long column, final Access1D<?> values, final long valueIndex);
-
-        default void fillRange(final long first, final long limit, final N value) {
-            for (long i = first; i < limit; i++) {
-                this.fillOne(i, value);
-            }
-        }
-
-        default void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
-            for (long i = first; i < limit; i++) {
-                this.fillOne(i, supplier);
-            }
-        }
-
-        default void fillRow(final long row, final long column, final Access1D<N> values) {
-            for (long j = 0L; j < values.count(); j++) {
-                this.set(row, column + j, values.get(j));
-            }
-        }
-
-        void fillRow(long row, long column, N value);
-
-        void fillRow(long row, long column, NullaryFunction<N> supplier);
-
-    }
-
     public interface Iterable2D<N extends Number> extends Access2D<N> {
 
         default Iterable<Access1D<N>> columns() {
@@ -219,61 +100,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         default Iterable<Access1D<N>> rows() {
             return RowsIterator.make(this);
         }
-    }
-
-    public interface Modifiable<N extends Number> extends Settable<N>, Access1D.Modifiable<N> {
-
-        void modifyColumn(long row, long column, UnaryFunction<N> function);
-
-        void modifyDiagonal(long row, long column, UnaryFunction<N> function);
-
-        void modifyOne(long row, long column, UnaryFunction<N> function);
-
-        default void modifyOne(final long index, final UnaryFunction<N> function) {
-            final long tmpStructure = this.countRows();
-            this.modifyOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), function);
-        }
-
-        default void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
-            for (long i = first; i < limit; i++) {
-                this.modifyOne(i, function);
-            }
-        }
-
-        void modifyRow(long row, long column, UnaryFunction<N> function);
-
-    }
-
-    public interface Settable<N extends Number> extends Structure2D, Access1D.Settable<N> {
-
-        default void add(final long index, final double addend) {
-            final long tmpStructure = this.countRows();
-            this.add(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
-        }
-
-        void add(long row, long column, double addend);
-
-        void add(long row, long column, Number addend);
-
-        default void add(final long index, final Number addend) {
-            final long tmpStructure = this.countRows();
-            this.add(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
-        }
-
-        default void set(final long index, final double addend) {
-            final long tmpStructure = this.countRows();
-            this.set(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
-        }
-
-        void set(long row, long column, double value);
-
-        void set(long row, long column, Number value);
-
-        default void set(final long index, final Number addend) {
-            final long tmpStructure = this.countRows();
-            this.set(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
-        }
-
     }
 
     public interface Sliceable<N extends Number> extends Structure2D, Access1D.Sliceable<N> {
