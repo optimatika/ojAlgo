@@ -25,7 +25,6 @@ import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
 
@@ -180,7 +179,7 @@ public final class SampleSet implements Access1D<Double> {
 
         if (Double.isNaN(myMedian)) {
 
-            final double[] tmpCopy = ArrayUtils.toRawCopyOf(mySamples);
+            final double[] tmpCopy = mySamples.toRawCopy1D();
 
             Arrays.sort(tmpCopy);
 
@@ -262,7 +261,7 @@ public final class SampleSet implements Access1D<Double> {
      * @return A copy of the internal data (the samples).
      */
     public double[] getValues() {
-        return ArrayUtils.toRawCopyOf(mySamples);
+        return mySamples.toRawCopy1D();
     }
 
     public double getVariance() {

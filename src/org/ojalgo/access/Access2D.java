@@ -21,7 +21,6 @@
  */
 package org.ojalgo.access;
 
-import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
@@ -164,7 +163,21 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     N get(long row, long column);
 
     default double[][] toRawCopy2D() {
-        return ArrayUtils.toRawCopyOf(this);
+
+        final int tmpRowDim = (int) this.countRows();
+        final int tmpColDim = (int) this.countColumns();
+
+        final double[][] retVal = new double[tmpRowDim][tmpColDim];
+
+        double[] tmpRow;
+        for (int i = 0; i < tmpRowDim; i++) {
+            tmpRow = retVal[i];
+            for (int j = 0; j < tmpColDim; j++) {
+                tmpRow[j] = this.doubleValue(i, j);
+            }
+        }
+
+        return retVal;
     }
 
 }

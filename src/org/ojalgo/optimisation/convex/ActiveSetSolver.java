@@ -443,8 +443,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 // Negated Schur complement
                 // final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
                 final ElementsSupplier<Double> tmpS = tmpInvQAT.multiplyLeft(tmpIterA);
-                // TODO Symmetric, only need to calculate halv the Schur complement
+                // TODO Symmetric, only need to calculate halv the Schur complement, and only 1 row/column changes per iteration
                 // BasicLogger.debug("Negated Schur complement", tmpS.get());
+
+                // BasicLogger.debug(Arrays.toString(tmpIncluded), tmpS.get());
 
                 if (tmpSolvable = myLU.compute(tmpS)) {
 

@@ -74,6 +74,12 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     }
 
+    public static interface BigMultiplyNeither {
+
+        void invoke(BigDecimal[] product, BigDecimal[] left, int complexity, BigDecimal[] right);
+
+    }
+
     public static interface BigMultiplyRight {
 
         void invoke(BigDecimal[] product, BigDecimal[] left, int complexity, Access1D<BigDecimal> right);
@@ -379,6 +385,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     private final BigMultiplyBoth multiplyBoth;
     private final BigMultiplyLeft multiplyLeft;
     private final BigMultiplyRight multiplyRight;
+    private final BigMultiplyNeither multiplyNeither;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<BigDecimal> myUtility;
@@ -395,6 +402,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         multiplyBoth = MultiplyBoth.getBig(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getBig(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getBig(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getBig(myRowDim, myColDim);
     }
 
     BigDenseStore(final int aLength) {
@@ -409,6 +417,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         multiplyBoth = MultiplyBoth.getBig(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getBig(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getBig(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getBig(myRowDim, myColDim);
     }
 
     BigDenseStore(final int aRowDim, final int aColDim) {
@@ -423,6 +432,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         multiplyBoth = MultiplyBoth.getBig(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getBig(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getBig(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getBig(myRowDim, myColDim);
     }
 
     BigDenseStore(final int aRowDim, final int aColDim, final BigDecimal[] anArray) {
@@ -437,6 +447,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         multiplyBoth = MultiplyBoth.getBig(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getBig(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getBig(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getBig(myRowDim, myColDim);
     }
 
     public void accept(final Access2D<BigDecimal> supplied) {
@@ -673,12 +684,18 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
         final int tmpComplexity = ((int) left.count()) / myRowDim;
 
-        if (right instanceof BigDenseStore) {
-            multiplyLeft.invoke(data, left, tmpComplexity, BigDenseStore.cast(right).data);
-        } else if (left instanceof BigDenseStore) {
-            multiplyRight.invoke(data, BigDenseStore.cast(left).data, tmpComplexity, right);
+        if (left instanceof BigDenseStore) {
+            if (right instanceof BigDenseStore) {
+                multiplyNeither.invoke(data, BigDenseStore.cast(left).data, tmpComplexity, BigDenseStore.cast(right).data);
+            } else {
+                multiplyRight.invoke(data, BigDenseStore.cast(left).data, tmpComplexity, right);
+            }
         } else {
-            multiplyBoth.invoke(this, left, tmpComplexity, right);
+            if (right instanceof BigDenseStore) {
+                multiplyLeft.invoke(data, left, tmpComplexity, BigDenseStore.cast(right).data);
+            } else {
+                multiplyBoth.invoke(this, left, tmpComplexity, right);
+            }
         }
     }
 
@@ -890,7 +907,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         final BigDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
         if (right instanceof BigDenseStore) {
-            retVal.multiplyLeft.invoke(retVal.data, this, myColDim, ((BigDenseStore) right).data);
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, ((BigDenseStore) right).data);
         } else {
             retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
         }

@@ -62,42 +62,36 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
         TestUtils.assertEquals(aStore, aStore.copy(), CNTXT);
     }
 
-    private static <N extends Number> void testMultiplication(final MatrixStore<N> aStore) {
+    private static <N extends Number> void testMultiplication(final MatrixStore<N> matrixStore) {
 
-        final PhysicalStore<N> tmpPhysical = aStore.copy();
+        final PhysicalStore<N> tmpCopy = matrixStore.copy();
 
-        final int tmpRowDim = (int) aStore.countRows();
-        final int tmpColDim = (int) aStore.countColumns();
+        final int tmpRowDim = (int) matrixStore.countRows();
+        final int tmpColDim = (int) matrixStore.countColumns();
         final int tmpNewDim = Uniform.randomInteger(1, tmpRowDim + tmpColDim);
 
-        final BasicMatrix tmpLeftMtrx = NonPhysicalTest.makeRandomMatrix(tmpNewDim, tmpRowDim);
-        final PhysicalStore<N> tmpLeft = aStore.factory().copy(tmpLeftMtrx);
         // multiplyLeft
-        MatrixStore<N> tmpExpected = tmpLeft.multiply(tmpPhysical);
-        MatrixStore<N> tmpActual = tmpLeft.multiply(aStore);
+        final BasicMatrix tmpLeftMtrx = NonPhysicalTest.makeRandomMatrix(tmpNewDim, tmpRowDim);
+        final PhysicalStore<N> tmpLeft = matrixStore.factory().copy(tmpLeftMtrx);
+
+        MatrixStore<N> tmpExpected = tmpLeft.multiply(tmpCopy);
+        MatrixStore<N> tmpActual = tmpLeft.multiply(matrixStore);
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
 
-        tmpExpected = tmpLeft.multiply(tmpPhysical);
-        tmpActual = tmpLeft.multiply(tmpPhysical);
+        tmpExpected = tmpCopy.multiplyLeft(tmpLeft).get();
+        tmpActual = matrixStore.multiplyLeft(tmpLeft).get();
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
 
-        tmpExpected = tmpLeft.multiply(aStore);
-        tmpActual = tmpLeft.multiply(aStore);
-        TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
-
-        final BasicMatrix tmpRightMtrx = NonPhysicalTest.makeRandomMatrix(tmpColDim, tmpNewDim);
-        final PhysicalStore<N> tmpRight = aStore.factory().copy(tmpRightMtrx);
         // multiplyRight
-        tmpExpected = tmpPhysical.multiply(tmpRight);
-        tmpActual = aStore.multiply(tmpRight);
+        final BasicMatrix tmpRightMtrx = NonPhysicalTest.makeRandomMatrix(tmpColDim, tmpNewDim);
+        final PhysicalStore<N> tmpRight = matrixStore.factory().copy(tmpRightMtrx);
+
+        tmpExpected = tmpCopy.multiply(tmpRight);
+        tmpActual = matrixStore.multiply(tmpRight);
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
 
-        tmpExpected = tmpPhysical.multiply(tmpRight);
-        tmpActual = tmpPhysical.multiply(tmpRight);
-        TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
-
-        tmpExpected = aStore.multiply(tmpRight);
-        tmpActual = aStore.multiply(tmpRight);
+        tmpExpected = tmpRight.multiplyLeft(tmpCopy).get();
+        tmpActual = tmpRight.multiplyLeft(matrixStore).get();
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
     }
 

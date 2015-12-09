@@ -34,12 +34,4 @@ public interface StructureAnyD extends Structure1D {
 
     long[] shape();
 
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    default long[] structure() {
-        return this.shape();
-    }
-
 }

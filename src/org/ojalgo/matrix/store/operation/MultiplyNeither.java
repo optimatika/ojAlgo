@@ -23,82 +23,80 @@ package org.ojalgo.matrix.store.operation;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyLeft;
-import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyLeft;
-import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyLeft;
+import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyNeither;
+import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyNeither;
+import org.ojalgo.matrix.store.PrimitiveDenseStore.PrimitiveMultiplyNeither;
 import org.ojalgo.scalar.ComplexNumber;
 
-public final class MultiplyLeft extends MatrixOperation {
+public final class MultiplyNeither extends MatrixOperation {
 
-    public static final MultiplyLeft SETUP = new MultiplyLeft();
+    public static final MultiplyNeither SETUP = new MultiplyNeither();
 
     public static int THRESHOLD = 32;
 
-    static final BigMultiplyLeft BIG = new BigMultiplyLeft() {
+    static final BigMultiplyNeither BIG = new BigMultiplyNeither() {
 
-        public void invoke(final BigDecimal[] product, final Access1D<BigDecimal> left, final int complexity, final BigDecimal[] right) {
-            MultiplyLeft.invoke(product, 0, (int) (left.count() / complexity), left, complexity, right);
+        public void invoke(final BigDecimal[] product, final BigDecimal[] left, final int complexity, final BigDecimal[] right) {
+            MultiplyNeither.invoke(product, 0, left.length / complexity, left, complexity, right);
         }
 
     };
 
-    static final BigMultiplyLeft BIG_MT = new BigMultiplyLeft() {
+    static final BigMultiplyNeither BIG_MT = new BigMultiplyNeither() {
 
-        public void invoke(final BigDecimal[] product, final Access1D<BigDecimal> left, final int complexity, final BigDecimal[] right) {
+        public void invoke(final BigDecimal[] product, final BigDecimal[] left, final int complexity, final BigDecimal[] right) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    MultiplyLeft.invoke(product, first, limit, left, complexity, right);
+                    MultiplyNeither.invoke(product, first, limit, left, complexity, right);
                 }
             };
 
-            tmpConquerer.invoke(0, (int) (left.count() / complexity), THRESHOLD);
+            tmpConquerer.invoke(0, left.length / complexity, THRESHOLD);
         }
 
     };
 
-    static final ComplexMultiplyLeft COMPLEX = new ComplexMultiplyLeft() {
+    static final ComplexMultiplyNeither COMPLEX = new ComplexMultiplyNeither() {
 
-        public void invoke(final ComplexNumber[] product, final Access1D<ComplexNumber> left, final int complexity, final ComplexNumber[] right) {
-            MultiplyLeft.invoke(product, 0, (int) (left.count() / complexity), left, complexity, right);
+        public void invoke(final ComplexNumber[] product, final ComplexNumber[] left, final int complexity, final ComplexNumber[] right) {
+            MultiplyNeither.invoke(product, 0, left.length / complexity, left, complexity, right);
         }
 
     };
 
-    static final ComplexMultiplyLeft COMPLEX_MT = new ComplexMultiplyLeft() {
+    static final ComplexMultiplyNeither COMPLEX_MT = new ComplexMultiplyNeither() {
 
-        public void invoke(final ComplexNumber[] product, final Access1D<ComplexNumber> left, final int complexity, final ComplexNumber[] right) {
+        public void invoke(final ComplexNumber[] product, final ComplexNumber[] left, final int complexity, final ComplexNumber[] right) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    MultiplyLeft.invoke(product, first, limit, left, complexity, right);
+                    MultiplyNeither.invoke(product, first, limit, left, complexity, right);
                 }
             };
 
-            tmpConquerer.invoke(0, (int) (left.count() / complexity), THRESHOLD);
+            tmpConquerer.invoke(0, left.length / complexity, THRESHOLD);
         }
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
-            MultiplyLeft.invoke(product, 0, (int) (left.count() / complexity), left, complexity, right);
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
+            MultiplyNeither.invoke(product, 0, left.length / complexity, left, complexity, right);
         }
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_0XN = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_0XN = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             final int tmpRowDim = 10;
             final int tmpColDim = right.length / complexity;
@@ -119,16 +117,16 @@ public final class MultiplyLeft extends MatrixOperation {
                 int tmpIndex = 0;
                 for (int c = 0; c < complexity; c++) {
                     final double tmpRightCJ = right[c + (j * complexity)];
-                    tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp3J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp4J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp5J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp6J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp7J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp8J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp9J += left.doubleValue(tmpIndex++) * tmpRightCJ;
+                    tmp0J += left[tmpIndex++] * tmpRightCJ;
+                    tmp1J += left[tmpIndex++] * tmpRightCJ;
+                    tmp2J += left[tmpIndex++] * tmpRightCJ;
+                    tmp3J += left[tmpIndex++] * tmpRightCJ;
+                    tmp4J += left[tmpIndex++] * tmpRightCJ;
+                    tmp5J += left[tmpIndex++] * tmpRightCJ;
+                    tmp6J += left[tmpIndex++] * tmpRightCJ;
+                    tmp7J += left[tmpIndex++] * tmpRightCJ;
+                    tmp8J += left[tmpIndex++] * tmpRightCJ;
+                    tmp9J += left[tmpIndex++] * tmpRightCJ;
                 }
 
                 product[tmpIndex = j * tmpRowDim] = tmp0J;
@@ -146,16 +144,16 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_1X1 = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_1X1 = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             double tmp00 = PrimitiveMath.ZERO;
 
-            final int tmpLeftStruct = (int) (left.count() / complexity); // The number of rows in the product- and left-matrix.
+            final int tmpLeftStruct = left.length / complexity; // The number of rows in the product- and left-matrix.
 
             for (int c = 0; c < complexity; c++) {
-                tmp00 += left.doubleValue(c * tmpLeftStruct) * right[c];
+                tmp00 += left[c * tmpLeftStruct] * right[c];
             }
 
             product[0] = tmp00;
@@ -163,9 +161,9 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_1XN = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_1XN = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             final int tmpColDim = right.length / complexity;
 
@@ -175,7 +173,7 @@ public final class MultiplyLeft extends MatrixOperation {
 
                 int tmpIndex = 0;
                 for (int c = 0; c < complexity; c++) {
-                    tmp0J += left.doubleValue(tmpIndex++) * right[c + (j * complexity)];
+                    tmp0J += left[tmpIndex++] * right[c + (j * complexity)];
                 }
 
                 product[j] = tmp0J;
@@ -184,9 +182,9 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_2X2 = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_2X2 = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             double tmp00 = PrimitiveMath.ZERO;
             double tmp10 = PrimitiveMath.ZERO;
@@ -197,9 +195,9 @@ public final class MultiplyLeft extends MatrixOperation {
             for (int c = 0; c < complexity; c++) {
 
                 tmpIndex = c * 2;
-                final double tmpLeft0 = left.doubleValue(tmpIndex);
+                final double tmpLeft0 = left[tmpIndex];
                 tmpIndex++;
-                final double tmpLeft1 = left.doubleValue(tmpIndex);
+                final double tmpLeft1 = left[tmpIndex];
                 tmpIndex = c;
                 final double tmpRight0 = right[tmpIndex];
                 tmpIndex += complexity;
@@ -219,9 +217,9 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_3X3 = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_3X3 = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             double tmp00 = PrimitiveMath.ZERO;
             double tmp10 = PrimitiveMath.ZERO;
@@ -237,11 +235,11 @@ public final class MultiplyLeft extends MatrixOperation {
             for (int c = 0; c < complexity; c++) {
 
                 tmpIndex = c * 3;
-                final double tmpLeft0 = left.doubleValue(tmpIndex);
+                final double tmpLeft0 = left[tmpIndex];
                 tmpIndex++;
-                final double tmpLeft1 = left.doubleValue(tmpIndex);
+                final double tmpLeft1 = left[tmpIndex];
                 tmpIndex++;
-                final double tmpLeft2 = left.doubleValue(tmpIndex);
+                final double tmpLeft2 = left[tmpIndex];
                 tmpIndex = c;
                 final double tmpRight0 = right[tmpIndex];
                 tmpIndex += complexity;
@@ -273,9 +271,9 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_4X4 = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_4X4 = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             double tmp00 = PrimitiveMath.ZERO;
             double tmp10 = PrimitiveMath.ZERO;
@@ -298,13 +296,13 @@ public final class MultiplyLeft extends MatrixOperation {
             for (int c = 0; c < complexity; c++) {
 
                 tmpIndex = c * 4;
-                final double tmpLeft0 = left.doubleValue(tmpIndex);
+                final double tmpLeft0 = left[tmpIndex];
                 tmpIndex++;
-                final double tmpLeft1 = left.doubleValue(tmpIndex);
+                final double tmpLeft1 = left[tmpIndex];
                 tmpIndex++;
-                final double tmpLeft2 = left.doubleValue(tmpIndex);
+                final double tmpLeft2 = left[tmpIndex];
                 tmpIndex++;
-                final double tmpLeft3 = left.doubleValue(tmpIndex);
+                final double tmpLeft3 = left[tmpIndex];
                 tmpIndex = c;
                 final double tmpRight0 = right[tmpIndex];
                 tmpIndex += complexity;
@@ -352,9 +350,9 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_5X5 = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_5X5 = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             double tmp00 = PrimitiveMath.ZERO;
             double tmp10 = PrimitiveMath.ZERO;
@@ -386,15 +384,15 @@ public final class MultiplyLeft extends MatrixOperation {
             for (int c = 0; c < complexity; c++) {
 
                 tmpIndex = c * 5;
-                final double tmpLeft0 = left.doubleValue(tmpIndex);
+                final double tmpLeft0 = left[tmpIndex];
                 tmpIndex++;
-                final double tmpLeft1 = left.doubleValue(tmpIndex);
+                final double tmpLeft1 = left[tmpIndex];
                 tmpIndex++;
-                final double tmpLeft2 = left.doubleValue(tmpIndex);
+                final double tmpLeft2 = left[tmpIndex];
                 tmpIndex++;
-                final double tmpLeft3 = left.doubleValue(tmpIndex);
+                final double tmpLeft3 = left[tmpIndex];
                 tmpIndex++;
-                final double tmpLeft4 = left.doubleValue(tmpIndex);
+                final double tmpLeft4 = left[tmpIndex];
                 tmpIndex = c;
                 final double tmpRight0 = right[tmpIndex];
                 tmpIndex += complexity;
@@ -462,9 +460,9 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_6XN = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_6XN = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             final int tmpRowDim = 6;
             final int tmpColDim = right.length / complexity;
@@ -481,12 +479,12 @@ public final class MultiplyLeft extends MatrixOperation {
                 int tmpIndex = 0;
                 for (int c = 0; c < complexity; c++) {
                     final double tmpRightCJ = right[c + (j * complexity)];
-                    tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp3J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp4J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp5J += left.doubleValue(tmpIndex++) * tmpRightCJ;
+                    tmp0J += left[tmpIndex++] * tmpRightCJ;
+                    tmp1J += left[tmpIndex++] * tmpRightCJ;
+                    tmp2J += left[tmpIndex++] * tmpRightCJ;
+                    tmp3J += left[tmpIndex++] * tmpRightCJ;
+                    tmp4J += left[tmpIndex++] * tmpRightCJ;
+                    tmp5J += left[tmpIndex++] * tmpRightCJ;
                 }
 
                 product[tmpIndex = j * tmpRowDim] = tmp0J;
@@ -500,9 +498,9 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_7XN = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_7XN = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             final int tmpRowDim = 7;
             final int tmpColDim = right.length / complexity;
@@ -520,13 +518,13 @@ public final class MultiplyLeft extends MatrixOperation {
                 int tmpIndex = 0;
                 for (int c = 0; c < complexity; c++) {
                     final double tmpRightCJ = right[c + (j * complexity)];
-                    tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp3J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp4J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp5J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp6J += left.doubleValue(tmpIndex++) * tmpRightCJ;
+                    tmp0J += left[tmpIndex++] * tmpRightCJ;
+                    tmp1J += left[tmpIndex++] * tmpRightCJ;
+                    tmp2J += left[tmpIndex++] * tmpRightCJ;
+                    tmp3J += left[tmpIndex++] * tmpRightCJ;
+                    tmp4J += left[tmpIndex++] * tmpRightCJ;
+                    tmp5J += left[tmpIndex++] * tmpRightCJ;
+                    tmp6J += left[tmpIndex++] * tmpRightCJ;
                 }
 
                 product[tmpIndex = j * tmpRowDim] = tmp0J;
@@ -541,9 +539,9 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_8XN = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_8XN = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             final int tmpRowDim = 8;
             final int tmpColDim = right.length / complexity;
@@ -562,14 +560,14 @@ public final class MultiplyLeft extends MatrixOperation {
                 int tmpIndex = 0;
                 for (int c = 0; c < complexity; c++) {
                     final double tmpRightCJ = right[c + (j * complexity)];
-                    tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp3J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp4J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp5J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp6J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp7J += left.doubleValue(tmpIndex++) * tmpRightCJ;
+                    tmp0J += left[tmpIndex++] * tmpRightCJ;
+                    tmp1J += left[tmpIndex++] * tmpRightCJ;
+                    tmp2J += left[tmpIndex++] * tmpRightCJ;
+                    tmp3J += left[tmpIndex++] * tmpRightCJ;
+                    tmp4J += left[tmpIndex++] * tmpRightCJ;
+                    tmp5J += left[tmpIndex++] * tmpRightCJ;
+                    tmp6J += left[tmpIndex++] * tmpRightCJ;
+                    tmp7J += left[tmpIndex++] * tmpRightCJ;
                 }
 
                 product[tmpIndex = j * tmpRowDim] = tmp0J;
@@ -585,9 +583,9 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_9XN = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_9XN = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             final int tmpRowDim = 9;
             final int tmpColDim = right.length / complexity;
@@ -607,15 +605,15 @@ public final class MultiplyLeft extends MatrixOperation {
                 int tmpIndex = 0;
                 for (int c = 0; c < complexity; c++) {
                     final double tmpRightCJ = right[c + (j * complexity)];
-                    tmp0J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp1J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp2J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp3J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp4J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp5J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp6J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp7J += left.doubleValue(tmpIndex++) * tmpRightCJ;
-                    tmp8J += left.doubleValue(tmpIndex++) * tmpRightCJ;
+                    tmp0J += left[tmpIndex++] * tmpRightCJ;
+                    tmp1J += left[tmpIndex++] * tmpRightCJ;
+                    tmp2J += left[tmpIndex++] * tmpRightCJ;
+                    tmp3J += left[tmpIndex++] * tmpRightCJ;
+                    tmp4J += left[tmpIndex++] * tmpRightCJ;
+                    tmp5J += left[tmpIndex++] * tmpRightCJ;
+                    tmp6J += left[tmpIndex++] * tmpRightCJ;
+                    tmp7J += left[tmpIndex++] * tmpRightCJ;
+                    tmp8J += left[tmpIndex++] * tmpRightCJ;
                 }
 
                 product[tmpIndex = j * tmpRowDim] = tmp0J;
@@ -632,24 +630,24 @@ public final class MultiplyLeft extends MatrixOperation {
 
     };
 
-    static final PrimitiveMultiplyLeft PRIMITIVE_MT = new PrimitiveMultiplyLeft() {
+    static final PrimitiveMultiplyNeither PRIMITIVE_MT = new PrimitiveMultiplyNeither() {
 
-        public void invoke(final double[] product, final Access1D<?> left, final int complexity, final double[] right) {
+        public void invoke(final double[] product, final double[] left, final int complexity, final double[] right) {
 
             final DivideAndConquer tmpConquerer = new DivideAndConquer() {
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    MultiplyLeft.invoke(product, first, limit, left, complexity, right);
+                    MultiplyNeither.invoke(product, first, limit, left, complexity, right);
                 }
             };
 
-            tmpConquerer.invoke(0, (int) (left.count() / complexity), THRESHOLD);
+            tmpConquerer.invoke(0, left.length / complexity, THRESHOLD);
         }
 
     };
 
-    public static BigMultiplyLeft getBig(final long rows, final long columns) {
+    public static BigMultiplyNeither getBig(final long rows, final long columns) {
         if (rows > THRESHOLD) {
             return BIG_MT;
         } else {
@@ -657,7 +655,7 @@ public final class MultiplyLeft extends MatrixOperation {
         }
     }
 
-    public static ComplexMultiplyLeft getComplex(final long rows, final long columns) {
+    public static ComplexMultiplyNeither getComplex(final long rows, final long columns) {
         if (rows > THRESHOLD) {
             return COMPLEX_MT;
         } else {
@@ -665,7 +663,7 @@ public final class MultiplyLeft extends MatrixOperation {
         }
     }
 
-    public static PrimitiveMultiplyLeft getPrimitive(final long rows, final long columns) {
+    public static PrimitiveMultiplyNeither getPrimitive(final long rows, final long columns) {
         if (rows > THRESHOLD) {
             return PRIMITIVE_MT;
         } else if (rows == 10) {
@@ -693,7 +691,7 @@ public final class MultiplyLeft extends MatrixOperation {
         }
     }
 
-    static void invoke(final BigDecimal[] product, final int firstRow, final int rowLimit, final Access1D<BigDecimal> left, final int complexity,
+    static void invoke(final BigDecimal[] product, final int firstRow, final int rowLimit, final BigDecimal[] left, final int complexity,
             final BigDecimal[] right) {
 
         final int tmpColDim = right.length / complexity;
@@ -704,7 +702,7 @@ public final class MultiplyLeft extends MatrixOperation {
         for (int i = firstRow; i < rowLimit; i++) {
 
             for (int c = 0; c < complexity; c++) {
-                tmpLeftRow[c] = left.get(i + (c * tmpRowDim));
+                tmpLeftRow[c] = left[i + (c * tmpRowDim)];
             }
 
             for (int j = 0; j < tmpColDim; j++) {
@@ -713,7 +711,7 @@ public final class MultiplyLeft extends MatrixOperation {
         }
     }
 
-    static void invoke(final ComplexNumber[] product, final int firstRow, final int rowLimit, final Access1D<ComplexNumber> left, final int complexity,
+    static void invoke(final ComplexNumber[] product, final int firstRow, final int rowLimit, final ComplexNumber[] left, final int complexity,
             final ComplexNumber[] right) {
 
         final int tmpColDim = right.length / complexity;
@@ -724,7 +722,7 @@ public final class MultiplyLeft extends MatrixOperation {
         for (int i = firstRow; i < rowLimit; i++) {
 
             for (int c = 0; c < complexity; c++) {
-                tmpLeftRow[c] = left.get(i + (c * tmpRowDim));
+                tmpLeftRow[c] = left[i + (c * tmpRowDim)];
             }
 
             for (int j = 0; j < tmpColDim; j++) {
@@ -733,7 +731,7 @@ public final class MultiplyLeft extends MatrixOperation {
         }
     }
 
-    static void invoke(final double[] product, final int firstRow, final int rowLimit, final Access1D<?> left, final int complexity, final double[] right) {
+    static void invoke(final double[] product, final int firstRow, final int rowLimit, final double[] left, final int complexity, final double[] right) {
 
         final int tmpColDim = right.length / complexity;
         final int tmpRowDim = product.length / tmpColDim;
@@ -742,20 +740,17 @@ public final class MultiplyLeft extends MatrixOperation {
 
         for (int i = firstRow; i < rowLimit; i++) {
 
-            final int tmpFirstInRow = MatrixUtils.firstInRow(left, i, 0);
-            final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
-
-            for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
-                tmpLeftRow[c] = left.doubleValue(i + (c * tmpRowDim));
+            for (int c = 0; c < complexity; c++) {
+                tmpLeftRow[c] = left[i + (c * tmpRowDim)];
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, tmpFirstInRow, tmpLimitOfRow);
+                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
             }
         }
     }
 
-    private MultiplyLeft() {
+    private MultiplyNeither() {
         super();
     }
 

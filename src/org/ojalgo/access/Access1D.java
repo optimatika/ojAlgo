@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.stream.BaseStream;
 import java.util.stream.StreamSupport;
 
-import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
@@ -100,7 +99,16 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     }
 
     default double[] toRawCopy1D() {
-        return ArrayUtils.toRawCopyOf(this);
+
+        final int tmpLength = (int) this.count();
+
+        final double[] retVal = new double[tmpLength];
+
+        for (int i = 0; i < tmpLength; i++) {
+            retVal[i] = this.doubleValue(i);
+        }
+
+        return retVal;
     }
 
 }

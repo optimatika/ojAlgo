@@ -69,6 +69,12 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     }
 
+    public static interface ComplexMultiplyNeither {
+
+        void invoke(ComplexNumber[] product, ComplexNumber[] left, int complexity, ComplexNumber[] right);
+
+    }
+
     public static interface ComplexMultiplyRight {
 
         void invoke(ComplexNumber[] product, ComplexNumber[] left, int complexity, Access1D<ComplexNumber> right);
@@ -398,6 +404,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     private final ComplexMultiplyBoth multiplyBoth;
     private final ComplexMultiplyLeft multiplyLeft;
     private final ComplexMultiplyRight multiplyRight;
+    private final ComplexMultiplyNeither multiplyNeither;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<ComplexNumber> myUtility;
@@ -414,6 +421,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         multiplyBoth = MultiplyBoth.getComplex(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getComplex(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getComplex(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getComplex(myRowDim, myColDim);
     }
 
     ComplexDenseStore(final int aLength) {
@@ -428,6 +436,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         multiplyBoth = MultiplyBoth.getComplex(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getComplex(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getComplex(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getComplex(myRowDim, myColDim);
     }
 
     ComplexDenseStore(final int aRowDim, final int aColDim) {
@@ -442,6 +451,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         multiplyBoth = MultiplyBoth.getComplex(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getComplex(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getComplex(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getComplex(myRowDim, myColDim);
     }
 
     ComplexDenseStore(final int aRowDim, final int aColDim, final ComplexNumber[] anArray) {
@@ -456,6 +466,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         multiplyBoth = MultiplyBoth.getComplex(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getComplex(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getComplex(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getComplex(myRowDim, myColDim);
     }
 
     public void accept(final Access2D<ComplexNumber> supplied) {
@@ -692,12 +703,18 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         final int tmpComplexity = ((int) left.count()) / myRowDim;
 
-        if (right instanceof ComplexDenseStore) {
-            multiplyLeft.invoke(data, left, tmpComplexity, ComplexDenseStore.cast(right).data);
-        } else if (left instanceof ComplexDenseStore) {
-            multiplyRight.invoke(data, ComplexDenseStore.cast(left).data, tmpComplexity, right);
+        if (left instanceof ComplexDenseStore) {
+            if (right instanceof ComplexDenseStore) {
+                multiplyNeither.invoke(data, ComplexDenseStore.cast(left).data, tmpComplexity, ComplexDenseStore.cast(right).data);
+            } else {
+                multiplyRight.invoke(data, ComplexDenseStore.cast(left).data, tmpComplexity, right);
+            }
         } else {
-            multiplyBoth.invoke(this, left, tmpComplexity, right);
+            if (right instanceof ComplexDenseStore) {
+                multiplyLeft.invoke(data, left, tmpComplexity, ComplexDenseStore.cast(right).data);
+            } else {
+                multiplyBoth.invoke(this, left, tmpComplexity, right);
+            }
         }
     }
 
@@ -909,7 +926,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         final ComplexDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
         if (right instanceof ComplexDenseStore) {
-            retVal.multiplyLeft.invoke(retVal.data, this, myColDim, ((ComplexDenseStore) right).data);
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, ((ComplexDenseStore) right).data);
         } else {
             retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
         }

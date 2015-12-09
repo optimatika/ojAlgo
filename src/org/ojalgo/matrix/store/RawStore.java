@@ -416,7 +416,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         if (elements instanceof RawStore) {
             retVal = ((RawStore) elements);
         } else {
-            retVal = new RawStore(ArrayUtils.toRawCopyOf(elements), structure);
+            retVal = new RawStore(elements.toRawCopy1D(), structure);
         }
 
         return retVal;
@@ -429,7 +429,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         if (elements instanceof RawStore) {
             retVal = ((RawStore) elements);
         } else {
-            retVal = new RawStore(ArrayUtils.toRawCopyOf(elements), (int) elements.countRows(), (int) elements.countColumns());
+            retVal = new RawStore(elements.toRawCopy2D(), (int) elements.countRows(), (int) elements.countColumns());
         }
 
         return retVal;
@@ -445,7 +445,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
         } else if (elements instanceof Access2D) {
 
-            retVal = ArrayUtils.toRawCopyOf(((Access2D<?>) elements));
+            retVal = ((Access2D<?>) elements).toRawCopy2D();
 
         } else {
 

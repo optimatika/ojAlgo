@@ -31,7 +31,6 @@ import java.util.function.DoubleUnaryOperator;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.matrix.store.MatrixStore;
 
 public abstract class ArrayUtils {
 
@@ -267,53 +266,6 @@ public abstract class ArrayUtils {
                 }
             }
         } while (tmpSwapped);
-    }
-
-    /**
-     * @deprecated v39 There's now a default method in Access1D that does the same thing.
-     */
-    @Deprecated
-    public static double[] toRawCopyOf(final Access1D<?> original) {
-
-        final int tmpLength = (int) original.count();
-
-        final double[] retVal = new double[tmpLength];
-
-        for (int i = tmpLength; i-- != 0;) {
-            retVal[i] = original.doubleValue(i);
-        }
-
-        return retVal;
-    }
-
-    /**
-     * @deprecated v39 There's now a default method in Access2D that does the same thing.
-     */
-    @Deprecated
-    public static double[][] toRawCopyOf(final Access2D<?> original) {
-
-        final int tmpRowDim = (int) original.countRows();
-        final int tmpColDim = (int) original.countColumns();
-
-        final double[][] retVal = new double[tmpRowDim][tmpColDim];
-
-        double[] tmpRow;
-        for (int i = tmpRowDim; i-- != 0;) {
-            tmpRow = retVal[i];
-            for (int j = tmpColDim; j-- != 0;) {
-                tmpRow[j] = original.doubleValue(i, j);
-            }
-        }
-
-        return retVal;
-    }
-
-    /**
-     * @deprecated v39 There's now a default method in Access2D that does the same thing.
-     */
-    @Deprecated
-    public static double[][] toRawCopyOf(final MatrixStore<?> original) {
-        return ArrayUtils.toRawCopyOf((Access2D<?>) original);
     }
 
     public static void visitAll(final double[][] target, final DoubleConsumer visitor) {

@@ -76,6 +76,12 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     }
 
+    public static interface PrimitiveMultiplyNeither {
+
+        void invoke(double[] product, double[] left, int complexity, double[] right);
+
+    }
+
     public static interface PrimitiveMultiplyRight {
 
         void invoke(double[] product, double[] left, int complexity, Access1D<?> right);
@@ -920,6 +926,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     private final PrimitiveMultiplyBoth multiplyBoth;
     private final PrimitiveMultiplyLeft multiplyLeft;
     private final PrimitiveMultiplyRight multiplyRight;
+    private final PrimitiveMultiplyNeither multiplyNeither;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<Double> myUtility;
@@ -938,6 +945,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getPrimitive(myRowDim, myColDim);
     }
 
     PrimitiveDenseStore(final int aLength) {
@@ -952,6 +960,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getPrimitive(myRowDim, myColDim);
     }
 
     PrimitiveDenseStore(final int aRowDim, final int aColDim) {
@@ -966,6 +975,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getPrimitive(myRowDim, myColDim);
     }
 
     PrimitiveDenseStore(final int aRowDim, final int aColDim, final double[] anArray) {
@@ -980,6 +990,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         multiplyBoth = MultiplyBoth.getPrimitive(myRowDim, myColDim);
         multiplyLeft = MultiplyLeft.getPrimitive(myRowDim, myColDim);
         multiplyRight = MultiplyRight.getPrimitive(myRowDim, myColDim);
+        multiplyNeither = MultiplyNeither.getPrimitive(myRowDim, myColDim);
     }
 
     public void accept(final Access2D<Double> supplied) {
@@ -1248,12 +1259,18 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         final int tmpComplexity = ((int) left.count()) / myRowDim;
 
-        if (right instanceof PrimitiveDenseStore) {
-            multiplyLeft.invoke(data, left, tmpComplexity, PrimitiveDenseStore.cast(right).data);
-        } else if (left instanceof PrimitiveDenseStore) {
-            multiplyRight.invoke(data, PrimitiveDenseStore.cast(left).data, tmpComplexity, right);
+        if (left instanceof PrimitiveDenseStore) {
+            if (right instanceof PrimitiveDenseStore) {
+                multiplyNeither.invoke(data, PrimitiveDenseStore.cast(left).data, tmpComplexity, PrimitiveDenseStore.cast(right).data);
+            } else {
+                multiplyRight.invoke(data, PrimitiveDenseStore.cast(left).data, tmpComplexity, right);
+            }
         } else {
-            multiplyBoth.invoke(this, left, tmpComplexity, right);
+            if (right instanceof PrimitiveDenseStore) {
+                multiplyLeft.invoke(data, left, tmpComplexity, PrimitiveDenseStore.cast(right).data);
+            } else {
+                multiplyBoth.invoke(this, left, tmpComplexity, right);
+            }
         }
     }
 
@@ -1477,7 +1494,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         final PrimitiveDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
         if (right instanceof PrimitiveDenseStore) {
-            retVal.multiplyLeft.invoke(retVal.data, this, myColDim, ((PrimitiveDenseStore) right).data);
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, ((PrimitiveDenseStore) right).data);
         } else {
             retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
         }

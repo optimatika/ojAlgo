@@ -81,7 +81,7 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
 
     @Override
     public int limitOfColumn(final int col) {
-        return myBelow.limitOfColumn(col);
+        return mySplit + myBelow.limitOfColumn(col);
     }
 
     @Override

@@ -86,7 +86,7 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
 
     @Override
     public int limitOfRow(final int row) {
-        return myRight.limitOfRow(row);
+        return mySplit + myRight.limitOfRow(row);
     }
 
     public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
