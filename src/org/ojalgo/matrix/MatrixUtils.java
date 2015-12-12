@@ -417,27 +417,11 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public static final boolean isLowerLeftShaded(final Access1D<?> matrix) {
-        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).isLowerLeftShaded() : false;
-    }
-
     public static <N extends Number> boolean isNormal(final MatrixStore<N> matrix) {
 
         final MatrixStore<N> tmpConjugate = matrix.conjugate();
 
         return tmpConjugate.multiply(matrix).equals(matrix.multiply(tmpConjugate));
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public static final boolean isUpperRightShaded(final Access1D<?> matrix) {
-        return matrix instanceof MatrixStore<?> ? ((MatrixStore<?>) matrix).isUpperRightShaded() : false;
     }
 
     public static final int limitOfColumn(final Access1D<?> matrix, final int col, final int defaultAndMaximum) {

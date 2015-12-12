@@ -492,7 +492,7 @@ public abstract class ConvexSolver extends BaseSolver {
 
         final MatrixStore<Double> tmpX = this.getSolutionX();
 
-        return tmpX.transpose().multiply(this.getQ().multiply(tmpX)).scale(0.5).subtract(tmpX.transpose().multiply(this.getC())).doubleValue(0L);
+        return tmpX.transpose().multiply(this.getQ().multiply(tmpX)).multiply(0.5).subtract(tmpX.transpose().multiply(this.getC())).doubleValue(0L);
     }
 
     @Override

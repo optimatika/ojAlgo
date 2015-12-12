@@ -141,7 +141,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         final int tmpRowDim = myFirsts.length;
 
         final int tmpRangeFirst = tmpRowDim * col;
-        final int tmpRangeLimit = tmpRowDim * (col + 1);
+        final int tmpRangeLimit = tmpRangeFirst + tmpRowDim;
 
         final long tmpLimitOfRange = myElements.limitOfRange(tmpRangeFirst, tmpRangeLimit);
 

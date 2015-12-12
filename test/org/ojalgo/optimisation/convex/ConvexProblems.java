@@ -1145,7 +1145,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             assert false;
         }
 
-        final CompoundFunction<Double> tmpObj = CompoundFunction.makePrimitive(JamaQ.scale(0.5), JamaC.scale(-1.0));
+        final CompoundFunction<Double> tmpObj = CompoundFunction.makePrimitive(JamaQ.multiply(0.5), JamaC.multiply(-1.0));
 
         TestUtils.assertEquals(State.OPTIMAL, result.getState());
 

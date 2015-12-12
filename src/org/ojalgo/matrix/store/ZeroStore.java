@@ -89,11 +89,6 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
         return new ZeroStore<N>(this.factory(), this.getRowDim(), (int) (right.count() / this.getColDim()));
     }
 
-    @Override
-    public MatrixStore<N> scale(final N scalar) {
-        return this;
-    }
-
     public Scalar<N> toScalar(final long row, final long column) {
         return myScalarZero;
     }

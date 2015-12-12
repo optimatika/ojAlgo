@@ -50,7 +50,7 @@ public class VerySmallCase extends MatrixDecompositionTests {
             }
         }
 
-        return tmpRndm.transpose().multiply(tmpRndm).scale(1E-150);
+        return tmpRndm.transpose().multiply(tmpRndm).multiply(1E-150);
     }
 
     public VerySmallCase() {

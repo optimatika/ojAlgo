@@ -499,30 +499,8 @@ public interface MatrixStore<N extends Number>
         return this;
     }
 
-    /**
-     * The entries below (left of) the first subdiagonal are zero - effectively an upper Hessenberg matrix.
-     *
-     * @see #isUpperRightShaded()
-     * @deprecated v39
-     */
-    @Deprecated
-    default boolean isLowerLeftShaded() {
-        return false;
-    }
-
     default boolean isSmall(final double comparedTo) {
         return PrimitiveScalar.isSmall(comparedTo, this.norm());
-    }
-
-    /**
-     * The entries above (right of) the first superdiagonal are zero - effectively a lower Hessenberg matrix.
-     *
-     * @see #isLowerLeftShaded()
-     * @deprecated v39
-     */
-    @Deprecated
-    default boolean isUpperRightShaded() {
-        return false;
     }
 
     /**
@@ -604,14 +582,6 @@ public interface MatrixStore<N extends Number>
 
     default ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
         return new BinaryOperatorSupplier<>(left, operator, this);
-    }
-
-    /**
-     * @deprecated v39 Use {@link #multiply(Number)} instead.
-     */
-    @Deprecated
-    default MatrixStore<N> scale(final N scalar) {
-        return this.multiply(scalar);
     }
 
     default MatrixStore<N> signum() {

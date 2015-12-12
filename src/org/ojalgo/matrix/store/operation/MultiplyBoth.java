@@ -28,7 +28,6 @@ import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore.BigMultiplyBoth;
 import org.ojalgo.matrix.store.ComplexDenseStore.ComplexMultiplyBoth;
@@ -718,37 +717,35 @@ public final class MultiplyBoth extends MatrixOperation {
         final BigDecimal[] tmpLeftRow = new BigDecimal[complexity];
         BigDecimal tmpVal;
 
-        final boolean tmpLL = MatrixUtils.isLowerLeftShaded(left);
-        final boolean tmpLU = MatrixUtils.isUpperRightShaded(left);
-        final boolean tmpRL = MatrixUtils.isLowerLeftShaded(right);
-        final boolean tmpRU = MatrixUtils.isUpperRightShaded(right);
-        final boolean tmpPrune = tmpLL || tmpLU || tmpRL || tmpRU;
-
         int tmpFirst = 0;
         int tmpLimit = complexity;
 
         for (int i = firstRow; i < rowLimit; i++) {
 
-            for (int c = 0; c < complexity; c++) {
+            final int tmpFirstInRow = MatrixUtils.firstInRow(left, i, 0);
+            final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
+
+            for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.get(i + (c * tmpRowDim));
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                if (tmpPrune) {
-                    tmpFirst = FunctionUtils.max(tmpLL ? i - 1 : 0, tmpRU ? j - 1 : 0, 0);
-                    tmpLimit = FunctionUtils.min(tmpLU ? i + 2 : complexity, tmpRL ? j + 2 : complexity, complexity);
-                }
+                final int tmpColBase = j * complexity;
+
+                tmpFirst = MatrixUtils.firstInColumn(right, j, tmpFirstInRow);
+                tmpLimit = MatrixUtils.limitOfColumn(right, j, tmpLimitOfRow);
+
                 tmpVal = BigMath.ZERO;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
-                    tmpVal = BigFunction.ADD.invoke(tmpVal, BigFunction.MULTIPLY.invoke(tmpLeftRow[c], right.get(c + (j * complexity))));
+                    tmpVal = BigFunction.ADD.invoke(tmpVal, BigFunction.MULTIPLY.invoke(tmpLeftRow[c], right.get(c + tmpColBase)));
                 }
                 product.set(i, j, tmpVal);
             }
         }
     }
 
-    static void invokeComplex(final ElementsConsumer<ComplexNumber> product, final int firstRow, final int rowLimit,
-            final Access1D<ComplexNumber> left, final int complexity, final Access1D<ComplexNumber> right) {
+    static void invokeComplex(final ElementsConsumer<ComplexNumber> product, final int firstRow, final int rowLimit, final Access1D<ComplexNumber> left,
+            final int complexity, final Access1D<ComplexNumber> right) {
 
         final int tmpRowDim = (int) (left.count() / complexity);
         final int tmpColDim = (int) (right.count() / complexity);
@@ -756,29 +753,27 @@ public final class MultiplyBoth extends MatrixOperation {
         final ComplexNumber[] tmpLeftRow = new ComplexNumber[complexity];
         ComplexNumber tmpVal;
 
-        final boolean tmpLL = MatrixUtils.isLowerLeftShaded(left);
-        final boolean tmpLU = MatrixUtils.isUpperRightShaded(left);
-        final boolean tmpRL = MatrixUtils.isLowerLeftShaded(right);
-        final boolean tmpRU = MatrixUtils.isUpperRightShaded(right);
-        final boolean tmpPrune = tmpLL || tmpLU || tmpRL || tmpRU;
-
         int tmpFirst = 0;
         int tmpLimit = complexity;
 
         for (int i = firstRow; i < rowLimit; i++) {
 
-            for (int c = 0; c < complexity; c++) {
+            final int tmpFirstInRow = MatrixUtils.firstInRow(left, i, 0);
+            final int tmpLimitOfRow = MatrixUtils.limitOfRow(left, i, complexity);
+
+            for (int c = tmpFirstInRow; c < tmpLimitOfRow; c++) {
                 tmpLeftRow[c] = left.get(i + (c * tmpRowDim));
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                if (tmpPrune) {
-                    tmpFirst = FunctionUtils.max(tmpLL ? i - 1 : 0, tmpRU ? j - 1 : 0, 0);
-                    tmpLimit = FunctionUtils.min(tmpLU ? i + 2 : complexity, tmpRL ? j + 2 : complexity, complexity);
-                }
+                final int tmpColBase = j * complexity;
+
+                tmpFirst = MatrixUtils.firstInColumn(right, j, tmpFirstInRow);
+                tmpLimit = MatrixUtils.limitOfColumn(right, j, tmpLimitOfRow);
+
                 tmpVal = ComplexNumber.ZERO;
                 for (int c = tmpFirst; c < tmpLimit; c++) {
-                    tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c + (j * complexity))));
+                    tmpVal = tmpVal.add(tmpLeftRow[c].multiply(right.get(c + tmpColBase)));
                 }
                 product.set(i, j, tmpVal);
             }
