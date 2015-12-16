@@ -33,9 +33,9 @@ abstract class LogicalStore<N extends Number> extends AbstractStore<N> {
     private MatrixStore<N> myBase;
 
     @SuppressWarnings("unused")
-    private LogicalStore(final int aRowDim, final int aColDim) {
+    private LogicalStore(final int rowsCount, final int columnsCount) {
 
-        this(null, aRowDim, aColDim);
+        this(null, rowsCount, columnsCount);
 
         ProgrammingError.throwForIllegalInvocation();
     }

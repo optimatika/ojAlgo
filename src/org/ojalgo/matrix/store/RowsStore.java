@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -31,58 +31,41 @@ import org.ojalgo.scalar.Scalar;
  */
 final class RowsStore<N extends Number> extends SelectingStore<N> {
 
-    private final int myFirst;
     private final int[] myRows;
 
-    @SuppressWarnings("unused")
-    private RowsStore(final MatrixStore<N> aBase) {
-
-        this(aBase, null);
-
-        ProgrammingError.throwForIllegalInvocation();
+    RowsStore(final int first, final int limit, final MatrixStore<N> base) {
+        this(base, AccessUtils.makeIncreasingRange(first, limit - first));
     }
 
-    RowsStore(final int aFirst, final int aLimit, final MatrixStore<N> aBase) {
+    RowsStore(final MatrixStore<N> base, final int... rows) {
 
-        super(aLimit - aFirst, (int) aBase.countColumns(), aBase);
+        super(rows.length, (int) base.countColumns(), base);
 
-        myRows = null;
-        myFirst = aFirst;
-    }
-
-    RowsStore(final MatrixStore<N> aBase, final int... someRows) {
-
-        super(someRows.length, (int) aBase.countColumns(), aBase);
-
-        myRows = someRows;
-        myFirst = 0;
+        myRows = rows;
     }
 
     /**
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
     public double doubleValue(final long row, final long column) {
-        if (myRows != null) {
-            return this.getBase().doubleValue(myRows[(int) row], column);
-        } else {
-            return this.getBase().doubleValue(myFirst + row, column);
-        }
+        return this.getBase().doubleValue(myRows[(int) row], column);
+    }
+
+    public int firstInRow(final int row) {
+        return this.getBase().firstInRow(myRows[row]);
     }
 
     public N get(final long row, final long column) {
-        if (myRows != null) {
-            return this.getBase().get(myRows[(int) row], column);
-        } else {
-            return this.getBase().get(myFirst + row, column);
-        }
+        return this.getBase().get(myRows[(int) row], column);
+    }
+
+    @Override
+    public int limitOfRow(final int row) {
+        return this.getBase().limitOfRow(myRows[row]);
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
-        if (myRows != null) {
-            return this.getBase().toScalar(myRows[(int) row], column);
-        } else {
-            return this.getBase().toScalar(myFirst + row, column);
-        }
+        return this.getBase().toScalar(myRows[(int) row], column);
     }
 
 }
