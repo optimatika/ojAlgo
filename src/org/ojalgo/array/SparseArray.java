@@ -496,6 +496,17 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         this.supplyNonZerosTo(consumer, LongUnaryOperator.identity());
     }
 
+    public double dot(final Access1D<?> vector) {
+
+        double retVal = 0.0;
+
+        for (int n = 0; n < myActualLength; n++) {
+            retVal += myValues.doubleValue(n) * vector.doubleValue(myIndices[n]);
+        }
+
+        return retVal;
+    }
+
     public void supplyNonZerosTo(final Mutate1D consumer, final LongUnaryOperator indexRemapper) {
         long tmpMappedIndex;
         if (this.isPrimitive()) {

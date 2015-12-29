@@ -89,6 +89,7 @@ public abstract class MatrixTaskTests extends FunctionalityTest {
         final TestSuite suite = new TestSuite(MatrixTaskTests.class.getPackage().getName());
         //$JUnit-BEGIN$
         suite.addTestSuite(DeterminantTest.class);
+        suite.addTestSuite(JacobiSolverTest.class);
         //$JUnit-END$
         return suite;
     }

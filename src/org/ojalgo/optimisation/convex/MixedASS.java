@@ -32,6 +32,16 @@ final class MixedASS extends ActiveSetSolver {
     }
 
     @Override
+    protected boolean initialise(final Result kickStarter) {
+
+        final boolean retVal = super.initialise(kickStarter);
+
+        // myCholesky.solve(this.getAE().transpose(), myInvQAEt);
+
+        return retVal;
+    }
+
+    @Override
     MatrixStore<Double> getIterationA(final int[] included) {
 
         final MatrixStore<Double> tmpAE = this.getAE();
@@ -41,7 +51,7 @@ final class MixedASS extends ActiveSetSolver {
         if (included.length == 0) {
             retVal = tmpAE;
         } else {
-            retVal = tmpAI.builder().row(included).above(tmpAE).build();
+            retVal = tmpAI.builder().row(included).above(tmpAE).get();
         }
 
         return retVal;
@@ -59,18 +69,8 @@ final class MixedASS extends ActiveSetSolver {
         if (included.length == 0) {
             retVal = tmpBE;
         } else {
-            retVal = tmpBI.builder().row(included).above(tmpBE).build();
+            retVal = tmpBI.builder().row(included).above(tmpBE).get();
         }
-
-        return retVal;
-    }
-
-    @Override
-    protected boolean initialise(final Result kickStarter) {
-
-        final boolean retVal = super.initialise(kickStarter);
-
-        // myCholesky.solve(this.getAE().transpose(), myInvQAEt);
 
         return retVal;
     }

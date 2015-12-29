@@ -19,41 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.convex;
+package org.ojalgo.matrix.task.iterative;
 
+import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.task.TaskException;
 
-abstract class ConstrainedSolver extends ConvexSolver {
+public class ConjugateGradientSolver extends IterativeSolverTask {
 
-    protected ConstrainedSolver(final Builder matrices, final Options solverOptions) {
-        super(matrices, solverOptions);
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+
+        final MatrixStore<Double> A = MatrixStore.PRIMITIVE.makeWrapper(body).get();
+        final MatrixStore<Double> b = MatrixStore.PRIMITIVE.makeWrapper(rhs).get();
+        final DecompositionStore<Double> x = preallocated;
+
+        return x;
     }
-
-    @Override
-    protected boolean validate() {
-
-        super.validate();
-
-        final MatrixStore<Double> tmpA = this.getIterationA();
-        final MatrixStore<Double> tmpB = this.getIterationB();
-
-        if (((tmpA != null) && (tmpB == null)) || ((tmpA == null) && (tmpB != null))) {
-            throw new IllegalArgumentException("Either A or B is null, and the other one is not!");
-        }
-
-        if (tmpA != null) {
-            myLU.decompose(tmpA.countRows() < tmpA.countColumns() ? tmpA.transpose() : tmpA);
-            if (myLU.getRank() != tmpA.countRows()) {
-                throw new IllegalArgumentException("A must have full (row) rank!");
-            }
-        }
-
-        this.setState(State.VALID);
-        return true;
-    }
-
-    abstract MatrixStore<Double> getIterationA();
-
-    abstract MatrixStore<Double> getIterationB();
 
 }

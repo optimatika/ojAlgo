@@ -180,11 +180,14 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
             e.set(5, BigMath.TWO.negate());
             e.level(BigMath.ZERO);
         }
+
+        // model.options.debug(ConvexSolver.class);
     }
 
     void solve() {
 
         //  final ConvexSolver solver = new ConvexSolver.Builder(model).build();
+
         final Optimisation.Result result = model.minimise();
 
         if (BigMatrix.FACTORY.columns(result) != null) {

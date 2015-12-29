@@ -19,41 +19,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.convex;
+package org.ojalgo.matrix.task.iterative;
 
-import org.ojalgo.matrix.store.MatrixStore;
+import java.math.MathContext;
 
-abstract class ConstrainedSolver extends ConvexSolver {
+import org.ojalgo.access.Structure2D;
+import org.ojalgo.matrix.decomposition.DecompositionStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.SolverTask;
+import org.ojalgo.type.context.NumberContext;
 
-    protected ConstrainedSolver(final Builder matrices, final Options solverOptions) {
-        super(matrices, solverOptions);
+abstract class IterativeSolverTask implements SolverTask<Double> {
+
+    private final NumberContext myTerminationContext;
+
+    IterativeSolverTask() {
+        this(NumberContext.getMath(MathContext.DECIMAL32));
     }
 
-    @Override
-    protected boolean validate() {
-
-        super.validate();
-
-        final MatrixStore<Double> tmpA = this.getIterationA();
-        final MatrixStore<Double> tmpB = this.getIterationB();
-
-        if (((tmpA != null) && (tmpB == null)) || ((tmpA == null) && (tmpB != null))) {
-            throw new IllegalArgumentException("Either A or B is null, and the other one is not!");
-        }
-
-        if (tmpA != null) {
-            myLU.decompose(tmpA.countRows() < tmpA.countColumns() ? tmpA.transpose() : tmpA);
-            if (myLU.getRank() != tmpA.countRows()) {
-                throw new IllegalArgumentException("A must have full (row) rank!");
-            }
-        }
-
-        this.setState(State.VALID);
-        return true;
+    IterativeSolverTask(final NumberContext terminationContext) {
+        super();
+        myTerminationContext = terminationContext;
     }
 
-    abstract MatrixStore<Double> getIterationA();
+    public final DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+        if (templateRHS.countColumns() != 1L) {
+            throw new IllegalArgumentException("The RHS must have precisely 1 column!");
+        }
+        return PrimitiveDenseStore.FACTORY.makeZero(templateRHS.countRows(), 1L);
+    }
 
-    abstract MatrixStore<Double> getIterationB();
+    protected final NumberContext getTerminationContext() {
+        return myTerminationContext;
+    }
 
 }

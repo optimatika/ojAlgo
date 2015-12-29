@@ -19,46 +19,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation.convex;
+package org.ojalgo.matrix.task;
 
+import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.iterative.GaussSeidelSolver;
+import org.ojalgo.matrix.task.iterative.JacobiSolver;
 
-final class PureASS extends ActiveSetSolver {
+/**
+ * MatrixDecompositionPackageTests
+ *
+ * @author apete
+ */
+public class JacobiSolverTest extends AbstractMatrixDecompositionTaskTest {
 
-    PureASS(final Builder matrices, final Options solverOptions) {
-        super(matrices, solverOptions);
+    public JacobiSolverTest() {
+        super();
     }
 
-    @Override
-    MatrixStore<Double> getIterationA(final int[] included) {
-
-        final MatrixStore<Double> tmpAI = this.getAI();
-
-        MatrixStore<Double> retVal = null;
-        if (included.length == 0) {
-            retVal = MatrixStore.PRIMITIVE.makeZero(0, this.countVariables()).get();
-        } else {
-            retVal = tmpAI.builder().row(included).get();
-        }
-
-        return retVal;
+    public JacobiSolverTest(final String arg0) {
+        super(arg0);
     }
 
-    @Override
-    MatrixStore<Double> getIterationB(final int[] included) {
+    public void testLinAlg34PDF() {
 
-        // return MatrixStore.PRIMITIVE.makeZero(included.length, 1).get();
+        final MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 2, 3 }, { 3, -5, 2 }, { -2, 3, 8 } });
+        final MatrixStore<Double> tmpB = PrimitiveDenseStore.FACTORY.columns(new double[] { 8, -14, 27 });
 
-        final MatrixStore<Double> tmpBI = this.getBI();
+        final MatrixStore<Double> tmpExpected = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, 3, 2 });
 
-        MatrixStore<Double> retVal = null;
-        if (included.length == 0) {
-            retVal = MatrixStore.PRIMITIVE.makeZero(0, 1).get();
-        } else {
-            retVal = tmpBI.builder().row(included).get();
-        }
+        final JacobiSolver tmpJacobiSolver = new JacobiSolver();
+        TestUtils.assertEquals(tmpExpected, tmpJacobiSolver.solve(tmpA, tmpB).get());
 
-        return retVal;
+        final GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
+        TestUtils.assertEquals(tmpExpected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
     }
 
 }

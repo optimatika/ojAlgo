@@ -572,7 +572,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(retVal);
 
         // final ActiveSetSolver tmpSolver = new ActiveSetSolver(tmpMatrices);
-        final ActiveSetSolver tmpSolver = (ActiveSetSolver) tmpBuilder.build();
+        final ConvexSolver tmpSolver = tmpBuilder.build();
 
         // Test that the matrices were input in the right order
         // JUnitUtils.assertEquals(tmpSolver.getAE(), tmpMatrices[0].toPrimitiveStore(),

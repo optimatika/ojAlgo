@@ -23,37 +23,56 @@ package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.store.MatrixStore;
 
-abstract class ConstrainedSolver extends ConvexSolver {
+final class MixedASS2 extends ActiveSetSolver2 {
 
-    protected ConstrainedSolver(final Builder matrices, final Options solverOptions) {
+    MixedASS2(final Builder matrices, final Options solverOptions) {
+
         super(matrices, solverOptions);
+
     }
 
     @Override
-    protected boolean validate() {
+    protected boolean initialise(final Result kickStarter) {
 
-        super.validate();
+        final boolean retVal = super.initialise(kickStarter);
 
-        final MatrixStore<Double> tmpA = this.getIterationA();
-        final MatrixStore<Double> tmpB = this.getIterationB();
+        // myCholesky.solve(this.getAE().transpose(), myInvQAEt);
 
-        if (((tmpA != null) && (tmpB == null)) || ((tmpA == null) && (tmpB != null))) {
-            throw new IllegalArgumentException("Either A or B is null, and the other one is not!");
-        }
-
-        if (tmpA != null) {
-            myLU.decompose(tmpA.countRows() < tmpA.countColumns() ? tmpA.transpose() : tmpA);
-            if (myLU.getRank() != tmpA.countRows()) {
-                throw new IllegalArgumentException("A must have full (row) rank!");
-            }
-        }
-
-        this.setState(State.VALID);
-        return true;
+        return retVal;
     }
 
-    abstract MatrixStore<Double> getIterationA();
+    @Override
+    MatrixStore<Double> getIterationA(final int[] included) {
 
-    abstract MatrixStore<Double> getIterationB();
+        final MatrixStore<Double> tmpAE = this.getAE();
+        final MatrixStore<Double> tmpAI = this.getAI();
+
+        MatrixStore<Double> retVal = null;
+        if (included.length == 0) {
+            retVal = tmpAE;
+        } else {
+            retVal = tmpAI.builder().row(included).above(tmpAE).get();
+        }
+
+        return retVal;
+    }
+
+    @Override
+    MatrixStore<Double> getIterationB(final int[] included) {
+
+        // return MatrixStore.PRIMITIVE.makeZero((int) this.getBE().count() + included.length, 1).get();
+
+        final MatrixStore<Double> tmpBE = this.getBE();
+        final MatrixStore<Double> tmpBI = this.getBI();
+
+        MatrixStore<Double> retVal = null;
+        if (included.length == 0) {
+            retVal = tmpBE;
+        } else {
+            retVal = tmpBI.builder().row(included).above(tmpBE).get();
+        }
+
+        return retVal;
+    }
 
 }

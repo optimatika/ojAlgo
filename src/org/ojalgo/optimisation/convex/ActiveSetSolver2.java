@@ -26,15 +26,19 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
 
+import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.iterative.GaussSeidelSolver;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.IndexSelector;
 
 /**
@@ -48,21 +52,124 @@ import org.ojalgo.type.IndexSelector;
  *
  * @author apete
  */
-abstract class ActiveSetSolver extends ConstrainedSolver {
+abstract class ActiveSetSolver2 extends ConstrainedSolver {
+
+    final class MyGaussSeidel extends GaussSeidelSolver implements Access2D<Double> {
+
+        private final int myCountE = ActiveSetSolver2.this.countEqualityConstraints();
+
+        private final long myFullDim = myCountE + ActiveSetSolver2.this.countInequalityConstraints();
+        private final Row[] myIterationRows;
+        MyGaussSeidel() {
+
+            super();
+
+            this.setRelaxationFactor(1.5);
+
+            myIterationRows = new Row[(int) myFullDim];
+        }
+
+        public long countColumns() {
+            return super.countRows();
+        }
+
+        @Override
+        public long countRows() {
+            return super.countRows();
+        }
+
+        public double doubleValue(final long row, final long column) {
+
+            int tmpColumn = (int) column;
+
+            if (tmpColumn >= myCountE) {
+                tmpColumn = myCountE + myActivator.getIncluded()[tmpColumn - myCountE];
+            }
+
+            return this.doubleValue((int) row, tmpColumn);
+        }
+
+        public Double get(final long row, final long column) {
+            return this.doubleValue(row, column);
+        }
+
+        @Override
+        protected DecompositionStore<Double> preallocate(final Structure2D templateRHS) {
+            return myIterationL;
+        }
+
+        void add(final int j, final Access1D<Double> column) {
+
+            final int[] myIncluded = myActivator.getIncluded();
+
+            final Row tmpNewRow = new Row(j, myFullDim);
+            myIterationRows[j] = tmpNewRow;
+            this.add(tmpNewRow);
+
+            if (ActiveSetSolver2.this.getAE() != null) {
+
+                final MatrixStore<Double> tmpProdE = ActiveSetSolver2.this.getAE().multiply(column);
+                for (int i = 0; i < myCountE; i++) {
+                    final double tmpVal = tmpProdE.doubleValue(i);
+                    if (!PrimitiveScalar.isSmall(1.0, tmpVal)) {
+                        final Row tmpRowE = myIterationRows[i];
+                        if (tmpRowE != null) {
+                            tmpRowE.set(j, tmpVal);
+                        }
+                        tmpNewRow.set(i, tmpVal);
+                    }
+                }
+            }
+
+            if ((ActiveSetSolver2.this.getAI() != null) && (myIncluded.length > 0)) {
+
+                final MatrixStore<Double> tmpProdI = ActiveSetSolver2.this.getAI().builder().row(myIncluded).get().multiply(column);
+                for (int _i = 0; _i < myIncluded.length; _i++) {
+                    final double tmpVal = tmpProdI.doubleValue(_i);
+                    if (!PrimitiveScalar.isSmall(1.0, tmpVal)) {
+                        final int i = myCountE + myIncluded[_i];
+                        final Row tmpRowI = myIterationRows[i];
+                        if (tmpRowI != null) {
+                            tmpRowI.set(j, tmpVal);
+                        }
+                        tmpNewRow.set(i, tmpVal);
+                    }
+                }
+
+            }
+
+            tmpNewRow.solve(myIterationL, 0.0, 1.0);
+
+        }
+
+        void remove(final int i) {
+
+            final Row tmpO = myIterationRows[i];
+            if (tmpO != null) {
+                this.remove(tmpO);
+            }
+            myIterationRows[i] = null;
+
+            myIterationL.set(i, 0.0);
+        }
+
+    }
 
     private final IndexSelector myActivator;
+
     private int myConstraintToInclude = -1;
+    private final PrimitiveDenseStore myIterationL;
     private final PrimitiveDenseStore myIterationX;
-
+    private final MyGaussSeidel myS = new MyGaussSeidel();
     MatrixStore<Double> myInvQC;
-    // Access1D<Double>[] myInvQAtCols;
 
-    ActiveSetSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
+    ActiveSetSolver2(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
         super(matrices, solverOptions);
 
         myActivator = new IndexSelector(this.countInequalityConstraints());
 
+        myIterationL = PrimitiveDenseStore.FACTORY.makeZero(this.countEqualityConstraints() + this.countInequalityConstraints(), 1L);
         myIterationX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
     }
 
@@ -345,17 +452,15 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             myInvQC = myCholesky.solve(this.getIterationC());
 
-            //            myInvQAtCols = (Access1D<Double>[]) new Access1D<?>[tmpNumEqus + tmpNumInes];
-            //
-            //            final int[] tmpIncluded = myActivator.getIncluded();
-            //
-            //            final MatrixStore<Double> tmpCols = myCholesky.solve(this.getIterationA(tmpIncluded));
-            //            for (int j = 0; j < tmpNumEqus; j++) {
-            //                myInvQAtCols[j] = tmpCols.sliceColumn(0L, j);
-            //            }
-            //            for (int j = 0; j < tmpIncluded.length; j++) {
-            //                myInvQAtCols[tmpNumEqus + tmpIncluded[j]] = tmpCols.sliceColumn(0L, tmpNumEqus + j);
-            //            }
+            final int[] tmpIncluded = myActivator.getIncluded();
+
+            final MatrixStore<Double> tmpCols = myCholesky.solve(this.getIterationA(tmpIncluded).transpose());
+            for (int j = 0; j < tmpNumEqus; j++) {
+                myS.add(j, tmpCols.sliceColumn(0, j));
+            }
+            for (int j = 0; j < tmpIncluded.length; j++) {
+                myS.add(tmpNumEqus + tmpIncluded[j], tmpCols.sliceColumn(0, tmpNumEqus + j));
+            }
 
         } else {
 
@@ -417,11 +522,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if (tmpToInclude == -1) {
                 // Only suggested to exclude
                 myActivator.exclude(tmpToExclude);
+                myS.remove(this.countEqualityConstraints() + tmpToExclude);
                 this.setState(State.APPROXIMATE);
                 return true;
             } else {
                 // Suggested both to exclude and include
                 myActivator.exclude(tmpToExclude);
+                myS.remove(this.countEqualityConstraints() + tmpToExclude);
                 myActivator.include(tmpToInclude);
                 this.setState(State.APPROXIMATE);
                 return true;
@@ -438,6 +545,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.debug(myActivator.toString());
         }
 
+        final int tmpToInclude = myConstraintToInclude;
+        final int tmpToExclude = tmpToInclude >= 0 ? -1 : myActivator.getLastExcluded();
+
         myConstraintToInclude = -1;
         final int[] tmpIncluded = myActivator.getIncluded();
 
@@ -451,6 +561,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final PrimitiveDenseStore tmpIterX = myIterationX;
         final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(tmpIterA.countRows(), 1L);
 
+        final int tmpCountEqualityConstraints = this.countEqualityConstraints();
+
+        if (tmpToInclude >= 0) {
+            myS.add(tmpCountEqualityConstraints + tmpToInclude, myCholesky.solve(this.getAI().builder().row(tmpToInclude).transpose().get()));
+        }
+
         if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (tmpSolvable = myCholesky.isSolvable())) {
             // Q is SPD
 
@@ -462,35 +578,20 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             } else {
                 // Actual/normal optimisation problem
 
-                final MatrixStore<Double> tmpInvQAT = myCholesky.solve(tmpIterA.transpose());
-                // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
-                // BasicLogger.debug("tmpInvQAT", tmpInvQAT);
-
-                // Negated Schur complement
-                // final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
-                final ElementsSupplier<Double> tmpS = tmpInvQAT.multiplyLeft(tmpIterA);
-                // TODO Symmetric, only need to calculate halv the Schur complement, and only 1 row/column changes per iteration
-                //BasicLogger.debug("Negated Schur complement", tmpS.get());
-
                 if (this.isDebug()) {
-                    BasicLogger.debug(Arrays.toString(tmpIncluded), tmpS.get());
+                    BasicLogger.debug(Arrays.toString(tmpIncluded), myS);
                 }
 
-                if (tmpSolvable = myLU.compute(tmpS)) {
-
-                    // tmpIterX temporarely used to store tmpInvQC
-                    // final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpIterC, tmpIterX);
-                    //TODO Constant if C doesn't change
-
-                    //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
-                    //myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
-                    myLU.solve(myInvQC.multiplyLeft(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
-
-                    //BasicLogger.debug("L", tmpIterL);
-
-                    //myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
-                    myCholesky.solve(tmpIterL.multiplyLeft(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
+                final MatrixStore<Double> tmpRHS = myInvQC.multiplyLeft(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB).get();
+                final MatrixStore<Double> tmpL = myS.resolve(tmpRHS).get();
+                for (int i = 0; i < tmpCountEqualityConstraints; i++) {
+                    tmpIterL.set(i, tmpL.doubleValue(i));
                 }
+                for (int i = 0; i < tmpIncluded.length; i++) {
+                    tmpIterL.set(tmpCountEqualityConstraints + i, tmpL.doubleValue(tmpCountEqualityConstraints + tmpIncluded[i]));
+                }
+
+                myCholesky.solve(tmpIterL.multiplyLeft(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
             }
         }
 
@@ -663,6 +764,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
         myActivator.exclude(tmpToExclude);
+        myS.remove(this.countEqualityConstraints() + tmpToExclude);
     }
 
 }

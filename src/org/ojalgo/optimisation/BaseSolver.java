@@ -53,11 +53,11 @@ public abstract class BaseSolver extends GenericSolver {
         private MatrixStore.Builder<Double> myBIbuilder = null;
         private MatrixStore<Double> myC = null;
         private MatrixStore.Builder<Double> myCbuilder = null;
-        private PhysicalStore<Double> myLE = null;
-        private PhysicalStore<Double> myLI = null;
+        private PrimitiveDenseStore myLE = null;
+        private PrimitiveDenseStore myLI = null;
         private MatrixStore<Double> myQ = null;
         private MatrixStore.Builder<Double> myQbuilder = null;
-        private DecompositionStore<Double> myX = null;
+        private PrimitiveDenseStore myX = null;
 
         protected AbstractBuilder() {
             super();

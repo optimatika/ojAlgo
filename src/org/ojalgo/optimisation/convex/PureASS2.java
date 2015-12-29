@@ -23,37 +23,42 @@ package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.store.MatrixStore;
 
-abstract class ConstrainedSolver extends ConvexSolver {
+final class PureASS2 extends ActiveSetSolver2 {
 
-    protected ConstrainedSolver(final Builder matrices, final Options solverOptions) {
+    PureASS2(final Builder matrices, final Options solverOptions) {
         super(matrices, solverOptions);
     }
 
     @Override
-    protected boolean validate() {
+    MatrixStore<Double> getIterationA(final int[] included) {
 
-        super.validate();
+        final MatrixStore<Double> tmpAI = this.getAI();
 
-        final MatrixStore<Double> tmpA = this.getIterationA();
-        final MatrixStore<Double> tmpB = this.getIterationB();
-
-        if (((tmpA != null) && (tmpB == null)) || ((tmpA == null) && (tmpB != null))) {
-            throw new IllegalArgumentException("Either A or B is null, and the other one is not!");
+        MatrixStore<Double> retVal = null;
+        if (included.length == 0) {
+            retVal = MatrixStore.PRIMITIVE.makeZero(0, this.countVariables()).get();
+        } else {
+            retVal = tmpAI.builder().row(included).get();
         }
 
-        if (tmpA != null) {
-            myLU.decompose(tmpA.countRows() < tmpA.countColumns() ? tmpA.transpose() : tmpA);
-            if (myLU.getRank() != tmpA.countRows()) {
-                throw new IllegalArgumentException("A must have full (row) rank!");
-            }
-        }
-
-        this.setState(State.VALID);
-        return true;
+        return retVal;
     }
 
-    abstract MatrixStore<Double> getIterationA();
+    @Override
+    MatrixStore<Double> getIterationB(final int[] included) {
 
-    abstract MatrixStore<Double> getIterationB();
+        // return MatrixStore.PRIMITIVE.makeZero(included.length, 1).get();
+
+        final MatrixStore<Double> tmpBI = this.getBI();
+
+        MatrixStore<Double> retVal = null;
+        if (included.length == 0) {
+            retVal = MatrixStore.PRIMITIVE.makeZero(0, 1).get();
+        } else {
+            retVal = tmpBI.builder().row(included).get();
+        }
+
+        return retVal;
+    }
 
 }
