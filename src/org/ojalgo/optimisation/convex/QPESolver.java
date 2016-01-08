@@ -155,15 +155,12 @@ final class QPESolver extends ConstrainedSolver {
             this.setState(State.OPTIMAL);
 
             if (myFeasible) {
-
                 this.getX().fillMatching(this.getX(), PrimitiveFunction.ADD, tmpIterX);
-                this.getLE().fillMatching(tmpIterL);
-
             } else {
-
                 this.getX().fillMatching(tmpIterX);
-                this.getLE().fillMatching(tmpIterL);
             }
+
+            // this.getLE().fillMatching(tmpIterL);
 
         } else {
 

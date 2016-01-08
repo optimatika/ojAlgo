@@ -418,14 +418,6 @@ public abstract class ConvexSolver extends BaseSolver {
         return this.getQ();
     }
 
-    final MatrixStore<Double> getSolutionLE() {
-        return this.getLE();
-    }
-
-    final MatrixStore<Double> getSolutionLI(final int... active) {
-        return this.getLI(active);
-    }
-
     final MatrixStore<Double> getSolutionX() {
         return this.getX();
     }

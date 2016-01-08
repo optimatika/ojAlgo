@@ -68,7 +68,7 @@ abstract class StationaryIterativeSolver extends IterativeSolverTask {
 
         this.setup(body, rhs);
 
-        double tmpCurrNorm = preallocated.aggregateAll(Aggregator.NORM1);
+        double tmpCurrNorm = NEG;
         double tmpLastNorm = tmpCurrNorm;
 
         final NumberContext tmpCntxt = this.getTerminationContext();
@@ -77,7 +77,7 @@ abstract class StationaryIterativeSolver extends IterativeSolverTask {
             this.iterate(preallocated, myRelaxationFactor);
 
             tmpLastNorm = tmpCurrNorm;
-            tmpCurrNorm = preallocated.aggregateAll(Aggregator.NORM1);
+            tmpCurrNorm = preallocated.aggregateAll(Aggregator.NORM2);
 
         } while (tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm));
 

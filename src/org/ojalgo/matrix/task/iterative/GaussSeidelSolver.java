@@ -139,7 +139,7 @@ public class GaussSeidelSolver extends StationaryIterativeSolver {
 
         this.setup(rhs);
 
-        double tmpCurrNorm = preallocated.aggregateAll(Aggregator.NORM1);
+        double tmpCurrNorm = NEG;
         double tmpLastNorm = tmpCurrNorm;
 
         final NumberContext tmpCntxt = this.getTerminationContext();
@@ -148,7 +148,7 @@ public class GaussSeidelSolver extends StationaryIterativeSolver {
             this.iterate(preallocated, this.getRelaxationFactor());
 
             tmpLastNorm = tmpCurrNorm;
-            tmpCurrNorm = preallocated.aggregateAll(Aggregator.NORM1);
+            tmpCurrNorm = preallocated.aggregateAll(Aggregator.NORM2);
 
         } while (tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm));
 

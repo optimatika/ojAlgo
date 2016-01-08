@@ -297,6 +297,16 @@ public interface MatrixStore<N extends Number>
             return this;
         }
 
+        public final Builder<N> limits(final int rowLimit, final int columnLimit) {
+            myStore = new LimitStore<N>(rowLimit, columnLimit, myStore);
+            return this;
+        }
+
+        public final Builder<N> offsets(final int rowOffset, final int columnOffset) {
+            myStore = new OffsetStore<N>(myStore, rowOffset, columnOffset);
+            return this;
+        }
+
         public final Builder<N> right(final int aColDim) {
             final MatrixStore<N> tmpRightStore = new ZeroStore<N>(myStore.factory(), (int) myStore.countRows(), aColDim);
             myStore = new LeftRightStore<N>(myStore, tmpRightStore);

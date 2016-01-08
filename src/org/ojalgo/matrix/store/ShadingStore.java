@@ -21,6 +21,12 @@
  */
 package org.ojalgo.matrix.store;
 
+/**
+ * Does not change the matrix size/shape, but applies some structure to the elements. Shaded elements are
+ * assumed to be zero.
+ *
+ * @author apete
+ */
 abstract class ShadingStore<N extends Number> extends LogicalStore<N> {
 
     protected ShadingStore(final int rows, final int columns, final MatrixStore<N> base) {

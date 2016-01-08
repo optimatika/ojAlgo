@@ -34,7 +34,7 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
     private final NumberContext myTerminationContext;
 
     IterativeSolverTask() {
-        this(NumberContext.getMath(MathContext.DECIMAL32));
+        this(NumberContext.getMath(MathContext.DECIMAL64));
     }
 
     IterativeSolverTask(final NumberContext terminationContext) {

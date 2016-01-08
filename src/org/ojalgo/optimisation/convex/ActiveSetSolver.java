@@ -28,6 +28,7 @@ import java.util.Arrays;
 
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
+import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -52,10 +53,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
+    private final PrimitiveDenseStore myIterationL;
     private final PrimitiveDenseStore myIterationX;
 
     MatrixStore<Double> myInvQC;
-    // Access1D<Double>[] myInvQAtCols;
 
     ActiveSetSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
@@ -63,6 +64,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myActivator = new IndexSelector(this.countInequalityConstraints());
 
+        myIterationL = PrimitiveDenseStore.FACTORY.makeZero(this.countEqualityConstraints() + this.countInequalityConstraints(), 1L);
         myIterationX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
     }
 
@@ -151,7 +153,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         double tmpMin = POSITIVE_INFINITY;
         double tmpVal;
 
-        final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
+        //final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
+        final MatrixStore<Double> tmpLI = myIterationL.builder().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
 
         if (this.isDebug() && (tmpLI.count() > 0L)) {
             this.debug("Looking for the largest negative lagrange multiplier among these: {}.", tmpLI.copy().asList());
@@ -305,6 +308,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             final Result tmpLinearResult = tmpLinearSolver.solve();
 
             if (tmpFeasible = tmpLinearResult.getState().isFeasible()) {
+
+                final ElementsConsumer<Double> tmpLI = myIterationL.regionByOffsets(tmpNumEqus, 0);
+
                 for (int i = 0; i < tmpNumVars; i++) {
                     this.setX(i, tmpLinearResult.doubleValue(i) - tmpLinearResult.doubleValue(tmpNumVars + i));
                 }
@@ -312,7 +318,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final double[] tmpResidual = tmpLinearSolver.getResidualCosts();
                 for (int i = tmpNumVars * 2; i < tmpResidual.length; i++) {
                     final int tmpIndexToInclude = i - (2 * tmpNumVars);
-                    this.setLI(tmpIndexToInclude, tmpResidual[i]);
+                    // this.setLI(tmpIndexToInclude, tmpResidual[i]);
+                    tmpLI.set(tmpIndexToInclude, tmpResidual[i]);
                 }
             }
         }
@@ -344,18 +351,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
 
             myInvQC = myCholesky.solve(this.getIterationC());
-
-            //            myInvQAtCols = (Access1D<Double>[]) new Access1D<?>[tmpNumEqus + tmpNumInes];
-            //
-            //            final int[] tmpIncluded = myActivator.getIncluded();
-            //
-            //            final MatrixStore<Double> tmpCols = myCholesky.solve(this.getIterationA(tmpIncluded));
-            //            for (int j = 0; j < tmpNumEqus; j++) {
-            //                myInvQAtCols[j] = tmpCols.sliceColumn(0L, j);
-            //            }
-            //            for (int j = 0; j < tmpIncluded.length; j++) {
-            //                myInvQAtCols[tmpNumEqus + tmpIncluded[j]] = tmpCols.sliceColumn(0L, tmpNumEqus + j);
-            //            }
 
         } else {
 
@@ -532,10 +527,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     final MatrixStore<Double> tmpNumer = this.getSI(tmpExcluded);
                     final MatrixStore<Double> tmpDenom = this.getAI().builder().row(tmpExcluded).build().multiply(tmpIterX);
-                    final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
-                    tmpStepLengths.fillMatching(tmpStepLengths, DIVIDE, tmpDenom);
 
                     if (this.isDebug()) {
+                        final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
+                        tmpStepLengths.fillMatching(tmpStepLengths, DIVIDE, tmpDenom);
                         this.debug("Looking for the largest possible step length (smallest positive scalar) among these: {}).", tmpStepLengths.asList());
                     }
 
@@ -572,12 +567,17 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.setState(State.FEASIBLE);
             }
 
+            final ElementsConsumer<Double> tmpLE = myIterationL.regionByLimits(this.countEqualityConstraints(), 1);
+            final ElementsConsumer<Double> tmpLI = myIterationL.regionByOffsets(this.countEqualityConstraints(), 0);
+
             for (int i = 0; i < this.countEqualityConstraints(); i++) {
-                this.setLE(i, tmpIterL.doubleValue(i));
+                // this.setLE(i, tmpIterL.doubleValue(i));
+                tmpLE.set(i, tmpIterL.doubleValue(i));
             }
 
             for (int i = 0; i < tmpIncluded.length; i++) {
-                this.setLI(tmpIncluded[i], tmpIterL.doubleValue(this.countEqualityConstraints() + i));
+                // this.setLI(tmpIncluded[i], tmpIterL.doubleValue(this.countEqualityConstraints() + i));
+                tmpLI.set(tmpIncluded[i], tmpIterL.doubleValue(this.countEqualityConstraints() + i));
             }
 
         } else if (tmpIncluded.length >= 1) {
@@ -654,7 +654,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         int tmpToExclude = -1;
         double tmpMaxLagrange = ZERO;
 
-        final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
+        // final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
+        final MatrixStore<Double> tmpLI = myIterationL.builder().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
         for (int i = 0; i < tmpIncluded.length; i++) {
             final double tmpVal = Math.abs(tmpLI.doubleValue(i));
             if (tmpVal >= tmpMaxLagrange) {

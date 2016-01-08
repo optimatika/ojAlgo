@@ -53,8 +53,6 @@ public abstract class BaseSolver extends GenericSolver {
         private MatrixStore.Builder<Double> myBIbuilder = null;
         private MatrixStore<Double> myC = null;
         private MatrixStore.Builder<Double> myCbuilder = null;
-        private PrimitiveDenseStore myLE = null;
-        private PrimitiveDenseStore myLI = null;
         private MatrixStore<Double> myQ = null;
         private MatrixStore.Builder<Double> myQbuilder = null;
         private PrimitiveDenseStore myX = null;
@@ -294,38 +292,6 @@ public abstract class BaseSolver extends GenericSolver {
         }
 
         /**
-         * Lagrange multipliers / dual variables for Equalities
-         */
-        public PhysicalStore<Double> getLE() {
-            if (myLE == null) {
-                myLE = PrimitiveDenseStore.FACTORY.makeZero(this.countEqualityConstraints(), 1);
-            }
-            return myLE;
-        }
-
-        /**
-         * Lagrange multipliers / dual variables for Inequalities
-         */
-        public PhysicalStore<Double> getLI() {
-            if (myLI == null) {
-                myLI = PrimitiveDenseStore.FACTORY.makeZero(this.countInequalityConstraints(), 1);
-            }
-            return myLI;
-        }
-
-        /**
-         * Lagrange multipliers / dual variables for selected inequalities
-         */
-        public MatrixStore<Double> getLI(final int... selector) {
-            final PhysicalStore<Double> tmpLI = this.getLI();
-            if (tmpLI != null) {
-                return tmpLI.builder().row(selector).build();
-            } else {
-                return null;
-            }
-        }
-
-        /**
          * Quadratic objective: [Q]
          */
         public MatrixStore<Double> getQ() {
@@ -411,30 +377,10 @@ public abstract class BaseSolver extends GenericSolver {
             return myX != null;
         }
 
-        public void resetLE() {
-            if (myLE != null) {
-                myLE.fillAll(ZERO);
-            }
-        }
-
-        public void resetLI() {
-            if (myLI != null) {
-                myLI.fillAll(ZERO);
-            }
-        }
-
         public void resetX() {
             if (myX != null) {
                 myX.fillAll(ZERO);
             }
-        }
-
-        public void setLE(final int index, final double value) {
-            this.getLE().set(index, 0, value);
-        }
-
-        public void setLI(final int index, final double value) {
-            this.getLI().set(index, 0, value);
         }
 
         public void setX(final int index, final double value) {
@@ -459,10 +405,6 @@ public abstract class BaseSolver extends GenericSolver {
             retVal.append("\n[BI] = " + (this.getBI() != null ? PrimitiveMatrix.FACTORY.copy(this.getBI()) : "?"));
 
             retVal.append("\n[X] = " + (this.getX() != null ? PrimitiveMatrix.FACTORY.copy(this.getX()) : "?"));
-
-            retVal.append("\n[LE] = " + (this.getLE() != null ? PrimitiveMatrix.FACTORY.copy(this.getLE()) : "?"));
-
-            retVal.append("\n[LI] = " + (this.getLI() != null ? PrimitiveMatrix.FACTORY.copy(this.getLI()) : "?"));
 
             retVal.append("\n[SE] = " + (this.getSE() != null ? PrimitiveMatrix.FACTORY.copy(this.getSE()) : "?"));
 
@@ -593,14 +535,6 @@ public abstract class BaseSolver extends GenericSolver {
 
             if (myX != null) {
                 retVal.getX().fillMatching(myX);
-            }
-
-            if (myLE != null) {
-                retVal.getLE().fillMatching(myLE);
-            }
-
-            if (myLI != null) {
-                retVal.getLI().fillMatching(myLI);
             }
 
             return retVal;
@@ -773,8 +707,6 @@ public abstract class BaseSolver extends GenericSolver {
             myBE = null;
             myBI = null;
             myC = null;
-            myLE = null;
-            myLI = null;
             myQ = null;
             myX = null;
         }
@@ -858,14 +790,6 @@ public abstract class BaseSolver extends GenericSolver {
         return myMatrices.getC();
     }
 
-    protected PhysicalStore<Double> getLE() {
-        return myMatrices.getLE();
-    }
-
-    protected MatrixStore<Double> getLI(final int... aRowSelector) {
-        return myMatrices.getLI(aRowSelector);
-    }
-
     protected MatrixStore<Double> getQ() {
         return myMatrices.getQ();
     }
@@ -898,24 +822,8 @@ public abstract class BaseSolver extends GenericSolver {
         return myMatrices.isX();
     }
 
-    protected void resetLE() {
-        myMatrices.resetLE();
-    }
-
-    protected void resetLI() {
-        myMatrices.resetLI();
-    }
-
     protected void resetX() {
         myMatrices.resetX();
-    }
-
-    protected void setLE(final int index, final double value) {
-        myMatrices.setLE(index, value);
-    }
-
-    protected void setLI(final int index, final double value) {
-        myMatrices.setLI(index, value);
     }
 
     protected void setX(final int index, final double value) {
