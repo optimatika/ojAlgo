@@ -437,13 +437,6 @@ public interface Optimisation {
         FEASIBLE(16),
 
         /**
-         * Optimal, but not distinct solution - there are other solutions that are equal, but not better.
-         *
-         * @deprecated v39 Use OPTIMAL instead
-         */
-        INDISTINCT(-128),
-
-        /**
          * No solution that complies with all constraints exists
          */
         INFEASIBLE(-8),
@@ -488,7 +481,7 @@ public interface Optimisation {
         }
 
         /**
-         * FAILED, INVALID, INFEASIBLE, UNBOUNDED or INDISTINCT
+         * FAILED, INVALID, INFEASIBLE or UNBOUNDED
          */
         public boolean isFailure() {
             return myValue < 0;
