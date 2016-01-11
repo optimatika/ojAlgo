@@ -380,64 +380,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myFixedVariables.clear();
     }
 
-    /**
-     * This is generated on demend – you should not cache this. More specifically, modifications made to this
-     * expression will not be part of the optimisation model. You define the objective by setting the
-     * {@link ModelEntity#weight(Number)} on variables and/or expressions.
-     *
-     * @return The full generated/aggregated objective function
-     * @deprecated v40 Use {@link #objective()} instead
-     */
-    @Deprecated
-    public Expression generateObjectiveExpression() {
-
-        final Expression retVal = new Expression(OBJECTIVE, this);
-
-        Variable tmpVariable;
-        for (int i = 0; i < myVariables.size(); i++) {
-            tmpVariable = myVariables.get(i);
-
-            if (tmpVariable.isObjective()) {
-                retVal.set(i, tmpVariable.getContributionWeight());
-            }
-        }
-
-        BigDecimal tmpOldVal = null;
-        BigDecimal tmpDiff = null;
-        BigDecimal tmpNewVal = null;
-
-        for (final Expression tmpExpression : myExpressions.values()) {
-
-            if (tmpExpression.isObjective()) {
-
-                final BigDecimal tmpContributionWeight = tmpExpression.getContributionWeight();
-                final boolean tmpNotOne = tmpContributionWeight.compareTo(ONE) != 0; // To avoid multiplication by 1.0
-
-                if (tmpExpression.isAnyLinearFactorNonZero()) {
-                    for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
-                        tmpOldVal = retVal.get(tmpKey);
-                        tmpDiff = tmpExpression.get(tmpKey);
-                        tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
-                        final Number value = tmpNewVal;
-                        retVal.set(tmpKey, value);
-                    }
-                }
-
-                if (tmpExpression.isAnyQuadraticFactorNonZero()) {
-                    for (final IntRowColumn tmpKey : tmpExpression.getQuadraticKeySet()) {
-                        tmpOldVal = retVal.get(tmpKey);
-                        tmpDiff = tmpExpression.get(tmpKey);
-                        tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
-                        final Number value = tmpNewVal;
-                        retVal.set(tmpKey, value);
-                    }
-                }
-            }
-        }
-
-        return retVal;
-    }
-
     public Expression getExpression(final String name) {
         return myExpressions.get(name);
     }
@@ -489,12 +431,11 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * @return The full objective function
      * @deprecated v40 Use {@link #objective()} instead
      */
     @Deprecated
     public Expression getObjectiveExpression() {
-        return this.generateObjectiveExpression();
+        return this.objective();
     }
 
     /**
@@ -573,7 +514,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         if (tmpAllVarsSomeInfo) {
             if (this.validate(retSolution, validationContext)) {
                 retState = State.FEASIBLE;
-                retValue = this.generateObjectiveExpression().evaluate(retSolution).doubleValue();
+                retValue = this.objective().evaluate(retSolution).doubleValue();
             } else {
                 retState = State.APPROXIMATE;
             }
@@ -695,7 +636,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         Expression tmpEpression = myExpressions.get(OBJ_FUNC_AS_CONSTR_KEY);
         if (tmpEpression == null) {
-            tmpEpression = this.generateObjectiveExpression().copy(this, false);
+            tmpEpression = this.objective().copy(this, false);
             myExpressions.put(OBJ_FUNC_AS_CONSTR_KEY, tmpEpression);
         }
 
@@ -723,12 +664,57 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     /**
      * This is generated on demend – you should not cache this. More specifically, modifications made to this
      * expression will not be part of the optimisation model. You define the objective by setting the
-     * {@link ModelEntity#weight(Number)} on variables and/or expressions.
+     * {@link ModelEntity#weight(Number)} on one or more variables and/or expressions.
      *
      * @return The generated/aggregated objective function
      */
     public Expression objective() {
-        return this.generateObjectiveExpression();
+
+        final Expression retVal = new Expression(OBJECTIVE, this);
+
+        Variable tmpVariable;
+        for (int i = 0; i < myVariables.size(); i++) {
+            tmpVariable = myVariables.get(i);
+
+            if (tmpVariable.isObjective()) {
+                retVal.set(i, tmpVariable.getContributionWeight());
+            }
+        }
+
+        BigDecimal tmpOldVal = null;
+        BigDecimal tmpDiff = null;
+        BigDecimal tmpNewVal = null;
+
+        for (final Expression tmpExpression : myExpressions.values()) {
+
+            if (tmpExpression.isObjective()) {
+
+                final BigDecimal tmpContributionWeight = tmpExpression.getContributionWeight();
+                final boolean tmpNotOne = tmpContributionWeight.compareTo(ONE) != 0; // To avoid multiplication by 1.0
+
+                if (tmpExpression.isAnyLinearFactorNonZero()) {
+                    for (final IntIndex tmpKey : tmpExpression.getLinearKeySet()) {
+                        tmpOldVal = retVal.get(tmpKey);
+                        tmpDiff = tmpExpression.get(tmpKey);
+                        tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
+                        final Number value = tmpNewVal;
+                        retVal.set(tmpKey, value);
+                    }
+                }
+
+                if (tmpExpression.isAnyQuadraticFactorNonZero()) {
+                    for (final IntRowColumn tmpKey : tmpExpression.getQuadraticKeySet()) {
+                        tmpOldVal = retVal.get(tmpKey);
+                        tmpDiff = tmpExpression.get(tmpKey);
+                        tmpNewVal = tmpOldVal.add(tmpNotOne ? tmpContributionWeight.multiply(tmpDiff) : tmpDiff);
+                        final Number value = tmpNewVal;
+                        retVal.set(tmpKey, value);
+                    }
+                }
+            }
+        }
+
+        return retVal;
     }
 
     public ExpressionsBasedModel relax(final boolean inPlace) {
@@ -936,7 +922,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         final Access1D<BigDecimal> tmpSolution = this.getVariableValues();
         final Optimisation.State tmpState = solverResult.getState();
-        final double tmpValue = this.generateObjectiveExpression().evaluate(tmpSolution).doubleValue();
+        final double tmpValue = this.objective().evaluate(tmpSolution).doubleValue();
 
         if (options.validate) {
             // TODO && this.validate(tmpSolution, options.slack)

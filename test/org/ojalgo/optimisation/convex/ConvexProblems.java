@@ -88,7 +88,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertStateNotLessThanOptimal(tmpInitialisedModelResult);
         TestUtils.assertEquals(tmpExpectedResult, tmpInitialisedModelResult, modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpInitialisedModelResult.getValue(), modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.generateObjectiveExpression().evaluate(tmpInitialisedModelResult).doubleValue(), modelValidationContext);
+        TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().evaluate(tmpInitialisedModelResult).doubleValue(), modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
 
         for (final Variable tmpVariable : tmpModel.getVariables()) {
@@ -100,7 +100,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertStateNotLessThanOptimal(tmpUninitialisedModelResult);
         TestUtils.assertEquals(tmpExpectedResult, tmpUninitialisedModelResult, modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpUninitialisedModelResult.getValue(), modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.generateObjectiveExpression().evaluate(tmpUninitialisedModelResult).doubleValue(), modelValidationContext);
+        TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().evaluate(tmpUninitialisedModelResult).doubleValue(), modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
 
         if (testSolverDirectly) {
@@ -114,7 +114,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
             TestUtils.assertStateNotLessThanOptimal(tmpResult);
             TestUtils.assertEquals(tmpExpectedResult, tmpResult, NumberContext.getGeneral(2, 4));
-            TestUtils.assertEquals(tmpExpectedValue, tmpModel.generateObjectiveExpression().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
+            TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
         }
 
     }
