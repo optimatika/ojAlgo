@@ -41,8 +41,16 @@ public class JacobiSolver extends StationaryIterativeSolver {
         super();
     }
 
+    public JacobiSolver(final int iterationsLimit) {
+        super(iterationsLimit);
+    }
+
     public JacobiSolver(final NumberContext terminationContext) {
         super(terminationContext);
+    }
+
+    public JacobiSolver(final NumberContext terminationContext, final int iterationsLimit) {
+        super(terminationContext, iterationsLimit);
     }
 
     @Override

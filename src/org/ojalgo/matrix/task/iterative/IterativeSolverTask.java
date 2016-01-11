@@ -31,15 +31,28 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class IterativeSolverTask implements SolverTask<Double> {
 
+    private static final int ITERATIONS_LIMIT = Integer.MAX_VALUE;
+    private static final NumberContext TERMINATION_CONTEXT = NumberContext.getMath(MathContext.DECIMAL128);
+
+    private final int myIterationsLimit;
     private final NumberContext myTerminationContext;
 
     IterativeSolverTask() {
-        this(NumberContext.getMath(MathContext.DECIMAL64));
+        this(TERMINATION_CONTEXT, ITERATIONS_LIMIT);
+    }
+
+    IterativeSolverTask(final int iterationsLimit) {
+        this(TERMINATION_CONTEXT, iterationsLimit);
     }
 
     IterativeSolverTask(final NumberContext terminationContext) {
+        this(terminationContext, ITERATIONS_LIMIT);
+    }
+
+    IterativeSolverTask(final NumberContext terminationContext, final int iterationsLimit) {
         super();
         myTerminationContext = terminationContext;
+        myIterationsLimit = iterationsLimit;
     }
 
     public final DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
@@ -47,6 +60,10 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
             throw new IllegalArgumentException("The RHS must have precisely 1 column!");
         }
         return PrimitiveDenseStore.FACTORY.makeZero(templateRHS.countRows(), 1L);
+    }
+
+    protected final int getIterationsLimit() {
+        return myIterationsLimit;
     }
 
     protected final NumberContext getTerminationContext() {

@@ -117,9 +117,9 @@ public class LinearProblems extends OptimisationLinearTests {
         final Expression tmpAddWeightExpression4 = retVal3;
         tmpAddWeightExpression4.level(tmpRHS);
 
-        final Expression tmpFullObjective = tmpFullModel.getObjectiveExpression();
-        final Expression tmpOddObjective = tmpOddModel.getObjectiveExpression();
-        final Expression tmpEvenObjective = tmpEvenModel.getObjectiveExpression();
+        final Expression tmpFullObjective = tmpFullModel.generateObjectiveExpression();
+        final Expression tmpOddObjective = tmpOddModel.generateObjectiveExpression();
+        final Expression tmpEvenObjective = tmpEvenModel.generateObjectiveExpression();
 
         // A valid solution of 25.8 can be produced with:
         // X1=10, X2=0, X3=8, X4=0, X5=5, X6=23

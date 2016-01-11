@@ -110,9 +110,9 @@ public abstract class ConvexSolver extends BaseSolver {
 
             if (this.hasInequalityConstraints()) {
                 if (this.hasEqualityConstraints()) {
-                    return new MixedASS(this, options);
+                    return new IterativeMixedASS(this, options);
                 } else {
-                    return new PureASS(this, options);
+                    return new IterativePureASS(this, options);
                 }
             } else if (this.hasEqualityConstraints()) {
                 return new QPESolver(this, options);
@@ -184,7 +184,7 @@ public abstract class ConvexSolver extends BaseSolver {
 
         // Q & C
 
-        final Expression tmpObjExpr = sourceModel.getObjectiveExpression().compensate(tmpFixedVariables);
+        final Expression tmpObjExpr = sourceModel.generateObjectiveExpression().compensate(tmpFixedVariables);
 
         PhysicalStore<Double> tmpQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {

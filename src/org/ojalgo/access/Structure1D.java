@@ -21,6 +21,11 @@
  */
 package org.ojalgo.access;
 
+/**
+ * A (fixed size) 1-dimensional data structure.
+ *
+ * @author apete
+ */
 public interface Structure1D {
 
     /**

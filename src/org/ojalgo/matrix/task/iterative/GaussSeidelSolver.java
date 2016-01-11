@@ -120,6 +120,22 @@ public class GaussSeidelSolver extends StationaryIterativeSolver {
     private Access2D<?> myRHS;
     private final List<Row> myRows = new ArrayList<>();
 
+    public GaussSeidelSolver() {
+        super();
+    }
+
+    public GaussSeidelSolver(final int iterationsLimit) {
+        super(iterationsLimit);
+    }
+
+    public GaussSeidelSolver(final NumberContext terminationContext) {
+        super(terminationContext);
+    }
+
+    public GaussSeidelSolver(final NumberContext terminationContext, final int iterationsLimit) {
+        super(terminationContext, iterationsLimit);
+    }
+
     @Override
     public MatrixStore<Double> iterate(final PhysicalStore<Double> current, final double relaxation) {
 
@@ -142,6 +158,8 @@ public class GaussSeidelSolver extends StationaryIterativeSolver {
         double tmpCurrNorm = NEG;
         double tmpLastNorm = tmpCurrNorm;
 
+        int tmpIterations = 0;
+        final int tmpIterationsLimit = this.getIterationsLimit();
         final NumberContext tmpCntxt = this.getTerminationContext();
         do {
 
@@ -150,7 +168,9 @@ public class GaussSeidelSolver extends StationaryIterativeSolver {
             tmpLastNorm = tmpCurrNorm;
             tmpCurrNorm = preallocated.aggregateAll(Aggregator.NORM2);
 
-        } while (tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm));
+            tmpIterations++;
+
+        } while ((tmpIterations < tmpIterationsLimit) && tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm));
 
         return preallocated;
     }
@@ -165,14 +185,6 @@ public class GaussSeidelSolver extends StationaryIterativeSolver {
         } catch (final TaskException xcptn) {
             return Optional.empty();
         }
-    }
-
-    protected DecompositionStore<Double> preallocate(final Structure2D templateRHS) {
-        if (templateRHS.countColumns() != 1L) {
-            throw new IllegalArgumentException("The RHS must have precisely 1 column!");
-        }
-        return PrimitiveDenseStore.FACTORY.makeZero(templateRHS.countRows(), 1L);
-
     }
 
     public void setup(final Access2D<?> rhs) {
@@ -217,12 +229,20 @@ public class GaussSeidelSolver extends StationaryIterativeSolver {
         return retVal;
     }
 
+    protected long countRows() {
+        return myRows.size();
+    }
+
     protected double doubleValue(final int row, final int column) {
         return myRows.get(row).myElements.doubleValue(column);
     }
 
-    protected long countRows() {
-        return myRows.size();
+    protected DecompositionStore<Double> preallocate(final Structure2D templateRHS) {
+        if (templateRHS.countColumns() != 1L) {
+            throw new IllegalArgumentException("The RHS must have precisely 1 column!");
+        }
+        return PrimitiveDenseStore.FACTORY.makeZero(templateRHS.countRows(), 1L);
+
     }
 
     protected boolean remove(final Row row) {

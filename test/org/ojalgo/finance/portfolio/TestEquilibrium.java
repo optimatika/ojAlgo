@@ -139,7 +139,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
         return covariances.build();
     }
 
-    public void testRandomProblemsComparedToEquilibrium() {
+    public void _testRandomProblemsComparedToEquilibrium() {
 
         final NumberContext tmpWeightsContext = StandardType.PERCENT.newPrecision(6);
 

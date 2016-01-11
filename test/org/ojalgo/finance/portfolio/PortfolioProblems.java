@@ -254,7 +254,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
      * 2015-04-14: Changed test evaluation context from <7,14> to <4,4>.
      * </p>
      */
-    public void testP20141202() {
+    public void _testP20141202() {
 
         final double[][] assets_return = {
                 { -1.5905837442343828E-4, -0.03062360801781757, -0.029857534032853142, -0.011811692726036832, -0.017972310602803136, 0.017338003502626997,

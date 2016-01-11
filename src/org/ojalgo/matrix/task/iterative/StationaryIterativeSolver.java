@@ -48,8 +48,16 @@ abstract class StationaryIterativeSolver extends IterativeSolverTask {
         super();
     }
 
+    StationaryIterativeSolver(final int iterationsLimit) {
+        super(iterationsLimit);
+    }
+
     StationaryIterativeSolver(final NumberContext terminationContext) {
         super(terminationContext);
+    }
+
+    StationaryIterativeSolver(final NumberContext terminationContext, final int iterationsLimit) {
+        super(terminationContext, iterationsLimit);
     }
 
     public final double getRelaxationFactor() {
@@ -71,6 +79,8 @@ abstract class StationaryIterativeSolver extends IterativeSolverTask {
         double tmpCurrNorm = NEG;
         double tmpLastNorm = tmpCurrNorm;
 
+        int tmpIterations = 0;
+        final int tmpIterationsLimit = this.getIterationsLimit();
         final NumberContext tmpCntxt = this.getTerminationContext();
         do {
 
@@ -79,7 +89,9 @@ abstract class StationaryIterativeSolver extends IterativeSolverTask {
             tmpLastNorm = tmpCurrNorm;
             tmpCurrNorm = preallocated.aggregateAll(Aggregator.NORM2);
 
-        } while (tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm));
+            tmpIterations++;
+
+        } while ((tmpIterations < tmpIterationsLimit) && tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm));
 
         return preallocated;
     }

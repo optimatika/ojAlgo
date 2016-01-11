@@ -118,7 +118,7 @@ public abstract class LinearSolver extends BaseSolver {
         final List<Variable> tmpNegVariables = sourceModel.getNegativeVariables();
         final Set<IntIndex> tmpFixVariables = sourceModel.getFixedVariables();
 
-        final Expression tmpObjFunc = sourceModel.getObjectiveExpression().compensate(tmpFixVariables);
+        final Expression tmpObjFunc = sourceModel.generateObjectiveExpression().compensate(tmpFixVariables);
 
         final List<Expression> tmpExprsEq = sourceModel.constraints().filter((final Expression c1) -> c1.isEqualityConstraint() && !c1.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
         final List<Expression> tmpExprsLo = sourceModel.constraints().filter((final Expression c2) -> c2.isLowerConstraint() && !c2.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());

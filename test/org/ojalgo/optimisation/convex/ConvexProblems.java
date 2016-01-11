@@ -88,7 +88,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertStateNotLessThanOptimal(tmpInitialisedModelResult);
         TestUtils.assertEquals(tmpExpectedResult, tmpInitialisedModelResult, modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpInitialisedModelResult.getValue(), modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveExpression().evaluate(tmpInitialisedModelResult).doubleValue(), modelValidationContext);
+        TestUtils.assertEquals(tmpExpectedValue, tmpModel.generateObjectiveExpression().evaluate(tmpInitialisedModelResult).doubleValue(), modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
 
         for (final Variable tmpVariable : tmpModel.getVariables()) {
@@ -100,7 +100,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertStateNotLessThanOptimal(tmpUninitialisedModelResult);
         TestUtils.assertEquals(tmpExpectedResult, tmpUninitialisedModelResult, modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpUninitialisedModelResult.getValue(), modelValidationContext);
-        TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveExpression().evaluate(tmpUninitialisedModelResult).doubleValue(), modelValidationContext);
+        TestUtils.assertEquals(tmpExpectedValue, tmpModel.generateObjectiveExpression().evaluate(tmpUninitialisedModelResult).doubleValue(), modelValidationContext);
         TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().toFunction().invoke(expectedSolution).doubleValue(), modelValidationContext);
 
         if (testSolverDirectly) {
@@ -114,7 +114,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
             TestUtils.assertStateNotLessThanOptimal(tmpResult);
             TestUtils.assertEquals(tmpExpectedResult, tmpResult, NumberContext.getGeneral(2, 4));
-            TestUtils.assertEquals(tmpExpectedValue, tmpModel.getObjectiveExpression().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
+            TestUtils.assertEquals(tmpExpectedValue, tmpModel.generateObjectiveExpression().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
         }
 
     }
@@ -606,7 +606,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * -7.646043242556307E-15).
      * </p>
      */
-    public void testP20081014() {
+    public void _testP20081014() {
 
         final PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
 
@@ -663,7 +663,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * lösningen.
      * </p>
      */
-    public void testP20081015() {
+    public void _testP20081015() {
 
         final PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
 
@@ -715,7 +715,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * lösningen.
      * </p>
      */
-    public void testP20081119() {
+    public void _testP20081119() {
 
         final PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
 

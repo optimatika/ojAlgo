@@ -23,35 +23,22 @@ package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.store.MatrixStore;
 
-final class MixedASS extends ActiveSetSolver {
+final class IterativePureASS extends IterativeASS {
 
-    MixedASS(final Builder matrices, final Options solverOptions) {
-
+    IterativePureASS(final Builder matrices, final Options solverOptions) {
         super(matrices, solverOptions);
-
-    }
-
-    @Override
-    protected boolean initialise(final Result kickStarter) {
-
-        final boolean retVal = super.initialise(kickStarter);
-
-        // myCholesky.solve(this.getAE().transpose(), myInvQAEt);
-
-        return retVal;
     }
 
     @Override
     MatrixStore<Double> getIterationA(final int[] included) {
 
-        final MatrixStore<Double> tmpAE = this.getAE();
         final MatrixStore<Double> tmpAI = this.getAI();
 
         MatrixStore<Double> retVal = null;
         if (included.length == 0) {
-            retVal = tmpAE;
+            retVal = MatrixStore.PRIMITIVE.makeZero(0, this.countVariables()).get();
         } else {
-            retVal = tmpAI.builder().row(included).above(tmpAE).get();
+            retVal = tmpAI.builder().row(included).get();
         }
 
         return retVal;
@@ -60,16 +47,15 @@ final class MixedASS extends ActiveSetSolver {
     @Override
     MatrixStore<Double> getIterationB(final int[] included) {
 
-        // return MatrixStore.PRIMITIVE.makeZero((int) this.getBE().count() + included.length, 1).get();
+        // return MatrixStore.PRIMITIVE.makeZero(included.length, 1).get();
 
-        final MatrixStore<Double> tmpBE = this.getBE();
         final MatrixStore<Double> tmpBI = this.getBI();
 
         MatrixStore<Double> retVal = null;
         if (included.length == 0) {
-            retVal = tmpBE;
+            retVal = MatrixStore.PRIMITIVE.makeZero(0, 1).get();
         } else {
-            retVal = tmpBI.builder().row(included).above(tmpBE).get();
+            retVal = tmpBI.builder().row(included).get();
         }
 
         return retVal;

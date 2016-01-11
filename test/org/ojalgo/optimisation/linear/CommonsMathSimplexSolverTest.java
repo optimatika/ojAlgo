@@ -117,7 +117,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         }
 
         public MultiaryFunction<Double> getObjectiveFunction() {
-            return myModel.getObjectiveExpression().toFunction();
+            return myModel.generateObjectiveExpression().toFunction();
         }
 
         public List<Variable> getVariables() {
