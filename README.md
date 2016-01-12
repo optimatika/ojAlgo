@@ -4,6 +4,8 @@ oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathemati
 
 General information about ojAlgo can be found at: http://ojalgo.org/
 
+User documentation: https://github.com/optimatika/ojAlgo/wiki
+
 <p align="center">
 <a href="https://sourceforge.net/projects/ojalgo/files/latest/download" rel="nofollow"><img alt="Download oj! Algorithms" src="https://a.fsdn.com/con/app/sf-download-button"></a>
 </p>
