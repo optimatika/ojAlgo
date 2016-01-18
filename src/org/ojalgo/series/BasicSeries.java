@@ -28,7 +28,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.primitive.DataSeries;
-import org.ojalgo.type.Colour;
+import org.ojalgo.type.ColourData;
 import org.ojalgo.type.keyvalue.KeyValue;
 
 /**
@@ -43,11 +43,11 @@ import org.ojalgo.type.keyvalue.KeyValue;
  */
 public interface BasicSeries<K extends Comparable<K>, V extends Number> extends SortedMap<K, V> {
 
-    BasicSeries<K, V> colour(Colour aPaint);
+    BasicSeries<K, V> colour(ColourData aPaint);
 
     V firstValue();
 
-    Colour getColour();
+    ColourData getColour();
 
     DataSeries getDataSeries();
 

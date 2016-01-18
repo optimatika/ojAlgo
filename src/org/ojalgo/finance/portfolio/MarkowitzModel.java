@@ -329,7 +329,7 @@ public final class MarkowitzModel extends EquilibriumModel {
             }
 
             if (retVal.getState().isFeasible() && (tmpTargetValue < tmpTargetLast)) {
-                // tmpTargetLast at this pount is at max possible target value
+                // tmpTargetLast at this point is at max possible target value
 
                 double tmpCurrent;
                 double tmpLow;

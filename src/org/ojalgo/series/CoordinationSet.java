@@ -248,16 +248,16 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         final CalendarDate tmpLatestFirstKey = retVal.getLatestFirstKey();
         final CalendarDate tmpEarliestLastKey = retVal.getEarliestLastKey();
         final CalendarDate tmpLatestLastKey = retVal.getLatestLastKey();
-        if (!tmpEarliestFirstKey.equals(tmpFirstKey)) {
+        if ((tmpEarliestFirstKey == null) || !tmpEarliestFirstKey.equals(tmpFirstKey)) {
             throw new ProgrammingError("Something went wrong!");
         }
-        if (!tmpLatestFirstKey.equals(tmpFirstKey)) {
+        if ((tmpLatestFirstKey == null) || !tmpLatestFirstKey.equals(tmpFirstKey)) {
             throw new ProgrammingError("Something went wrong!");
         }
-        if (!tmpEarliestLastKey.equals(tmpLastKey)) {
+        if ((tmpEarliestLastKey == null) || !tmpEarliestLastKey.equals(tmpLastKey)) {
             throw new ProgrammingError("Something went wrong!");
         }
-        if (!tmpLatestLastKey.equals(tmpLastKey)) {
+        if ((tmpLatestLastKey == null) || !tmpLatestLastKey.equals(tmpLastKey)) {
             throw new ProgrammingError("Something went wrong!");
         }
 

@@ -22,11 +22,27 @@
 package org.ojalgo.matrix.task.iterative;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.matrix.task.TaskException;
 
 public class ConjugateGradientSolver extends IterativeSolverTask {
+
+    static final class DefultPreconditioner implements SolverTask<Double> {
+
+        public DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+    }
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
 

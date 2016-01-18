@@ -32,7 +32,7 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.ResourceLocator;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.type.CalendarDateUnit;
-import org.ojalgo.type.Colour;
+import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeCache;
 
 public abstract class DataSource<DP extends DatePrice> {
@@ -129,7 +129,7 @@ public abstract class DataSource<DP extends DatePrice> {
 
     public CalendarDateSeries<Double> getPriceSeries(final BufferedReader aReader) {
 
-        final CalendarDateSeries<Double> retVal = new CalendarDateSeries<Double>(myResolution).name(mySymbol).colour(Colour.random());
+        final CalendarDateSeries<Double> retVal = new CalendarDateSeries<Double>(myResolution).name(mySymbol).colour(ColourData.random());
 
         for (final DatePrice tmpDatePrice : this.getHistoricalPrices(aReader)) {
             retVal.put(tmpDatePrice.getKey(), tmpDatePrice.getValue());

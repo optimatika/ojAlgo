@@ -32,13 +32,13 @@ import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.DataSeries;
-import org.ojalgo.type.Colour;
+import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.keyvalue.KeyValue;
 
 abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I extends AbstractSeries<K, V, I>> extends TreeMap<K, V>implements BasicSeries<K, V> {
 
-    private Colour myColour = null;
+    private ColourData myColour = null;
     private String myName = null;
 
     protected AbstractSeries() {
@@ -57,7 +57,7 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         super(someM);
     }
 
-    public I colour(final Colour aPaint) {
+    public I colour(final ColourData aPaint) {
         myColour = aPaint;
         return (I) this;
     }
@@ -66,7 +66,7 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         return this.get(this.firstKey());
     }
 
-    public Colour getColour() {
+    public ColourData getColour() {
         return myColour;
     }
 
@@ -188,7 +188,7 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         }
     }
 
-    void setColour(final Colour aPaint) {
+    void setColour(final ColourData aPaint) {
         this.colour(aPaint);
     }
 

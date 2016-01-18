@@ -36,8 +36,9 @@ import org.ojalgo.type.context.NumberContext;
 /**
  * StationaryIterativeSolver
  *
- * @see https://en.wikipedia.org/wiki/Iterative_method#Stationary_iterative_methods
- * @see http://mathworld.wolfram.com/StationaryIterativeMethod.html
+ * @see <a href="https://en.wikipedia.org/wiki/Iterative_method#Stationary_iterative_methods">Iterative_method
+ *      </a>
+ * @see <a href="https://mathworld.wolfram.com/StationaryIterativeMethod.html">StationaryIterativeMethod</a>
  * @author apete
  */
 abstract class StationaryIterativeSolver extends IterativeSolverTask {

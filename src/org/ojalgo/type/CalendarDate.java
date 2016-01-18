@@ -215,7 +215,10 @@ public final class CalendarDate implements Comparable<CalendarDate> {
     @Deprecated
     public Date toSqlDate() {
         final LocalDate tmpDateOnly = this.toDateOnly();
-        return new Date(tmpDateOnly.getYear() - 1970, tmpDateOnly.getMonthValue() - 1, tmpDateOnly.getDayOfMonth());
+        final int tmpYear = tmpDateOnly.getYear() - 1900;
+        final int tmpMonth = tmpDateOnly.getMonthValue() - 1;
+        final int tmpDayOfMonth = tmpDateOnly.getDayOfMonth();
+        return new Date(tmpYear, tmpMonth, tmpDayOfMonth);
     }
 
     /**
@@ -224,7 +227,13 @@ public final class CalendarDate implements Comparable<CalendarDate> {
     @Deprecated
     public Date toSqlTime() {
         final LocalTime tmpTimeOnly = this.toTimeOnly();
-        return new Date(70, 0, 1, tmpTimeOnly.getHour(), tmpTimeOnly.getMinute(), tmpTimeOnly.getSecond());
+        final int tmpYear = 0;
+        final int tmpMonth = 0;
+        final int tmpDate = 1;
+        final int tmpHour = tmpTimeOnly.getHour();
+        final int tmpMinute = tmpTimeOnly.getMinute();
+        final int tmpSecond = tmpTimeOnly.getSecond();
+        return new Date(tmpYear, tmpMonth, tmpDate, tmpHour, tmpMinute, tmpSecond);
     }
 
     /**
