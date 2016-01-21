@@ -25,66 +25,64 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
-public class JacobiSolver extends StationaryIterativeSolver {
-
-    private MatrixStore<Double> myBody;
-    private MatrixStore<Double> myBodyDiagonal;
-    private PhysicalStore<Double> myIncrement;
-    private MatrixStore<Double> myRHS;
+public final class JacobiSolver extends StationaryIterativeSolver {
 
     public JacobiSolver() {
         super();
     }
 
-    public JacobiSolver(final int iterationsLimit) {
-        super(iterationsLimit);
-    }
-
-    public JacobiSolver(final NumberContext terminationContext) {
-        super(terminationContext);
-    }
-
-    public JacobiSolver(final NumberContext terminationContext, final int iterationsLimit) {
-        super(terminationContext, iterationsLimit);
-    }
-
-    @Override
-    public MatrixStore<Double> iterate(final PhysicalStore<Double> current, final double relaxation) {
-
-        current.multiplyLeft(myBody).operateOnMatching(myRHS, SUBTRACT).operateOnMatching(DIVIDE, myBodyDiagonal).supplyTo(myIncrement);
-
-        if (this.getTerminationContext().isDifferent(ONE, relaxation)) {
-            myIncrement.multiply(relaxation);
-        }
-
-        current.modifyMatching(ADD, myIncrement);
-
-        return current;
-    }
-
     @SuppressWarnings("unchecked")
-    @Override
-    public void setup(final Access2D<?> body, final Access2D<?> rhs) {
+    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
 
+        MatrixStore<Double> tmpBody = null;
         if ((body instanceof MatrixStore<?>) && (body.get(0L) instanceof Double)) {
-            myBody = (MatrixStore<Double>) body;
+            tmpBody = (MatrixStore<Double>) body;
         } else {
-            myBody = MatrixStore.PRIMITIVE.makeWrapper(body).get();
+            tmpBody = MatrixStore.PRIMITIVE.makeWrapper(body).get();
         }
-        myBodyDiagonal = PrimitiveDenseStore.FACTORY.columns(myBody.sliceDiagonal(0L, 0L));
+        final MatrixStore<Double> tmpBodyDiagonal = PrimitiveDenseStore.FACTORY.columns(tmpBody.sliceDiagonal(0L, 0L));
 
+        MatrixStore<Double> tmpRHS = null;
         if ((rhs instanceof MatrixStore<?>) && (rhs.get(0L) instanceof Double)) {
-            myRHS = (MatrixStore<Double>) rhs;
+            tmpRHS = (MatrixStore<Double>) rhs;
         } else {
-            myRHS = MatrixStore.PRIMITIVE.makeWrapper(rhs).get();
+            tmpRHS = MatrixStore.PRIMITIVE.makeWrapper(rhs).get();
         }
 
-        myIncrement = this.preallocate(body, rhs);
+        final PhysicalStore<Double> tmpIncrement = this.preallocate(body, rhs);
+
+        double tmpCurrNorm = NEG;
+        double tmpLastNorm = tmpCurrNorm;
+
+        int tmpIterations = 0;
+        final int tmpIterationsLimit = this.getIterationsLimit();
+        final NumberContext tmpCntxt = this.getTerminationContext();
+        final double tmpRelaxation = this.getRelaxationFactor();
+        do {
+
+            preallocated.multiplyLeft(tmpBody).operateOnMatching(tmpRHS, SUBTRACT).operateOnMatching(DIVIDE, tmpBodyDiagonal).supplyTo(tmpIncrement);
+
+            if (this.getTerminationContext().isDifferent(ONE, tmpRelaxation)) {
+                tmpIncrement.multiply(tmpRelaxation);
+            }
+
+            preallocated.modifyMatching(ADD, tmpIncrement);
+            tmpLastNorm = tmpCurrNorm;
+            tmpCurrNorm = preallocated.aggregateAll(Aggregator.NORM2);
+
+            tmpIterations++;
+
+        } while ((tmpIterations < tmpIterationsLimit) && tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm));
+
+        return preallocated;
     }
 
 }

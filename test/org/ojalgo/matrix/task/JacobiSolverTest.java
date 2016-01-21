@@ -24,6 +24,7 @@ package org.ojalgo.matrix.task;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.GaussSeidelSolver;
 import org.ojalgo.matrix.task.iterative.JacobiSolver;
 
@@ -42,6 +43,23 @@ public class JacobiSolverTest extends AbstractMatrixDecompositionTaskTest {
         super(arg0);
     }
 
+    public void testExampleWikipediA() {
+
+        final MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 1 }, { 1, 3 } });
+        final MatrixStore<Double> tmpB = PrimitiveDenseStore.FACTORY.columns(new double[] { 1, 2 });
+
+        final MatrixStore<Double> tmpExpected = PrimitiveDenseStore.FACTORY.columns(new double[] { 1.0 / 11.0, 7.0 / 11.0 });
+
+        final JacobiSolver tmpJacobiSolver = new JacobiSolver();
+        TestUtils.assertEquals(tmpExpected, tmpJacobiSolver.solve(tmpA, tmpB).get());
+
+        final GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
+        TestUtils.assertEquals(tmpExpected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
+
+        final ConjugateGradientSolver tmpConjugateGradientSolver = new ConjugateGradientSolver();
+        TestUtils.assertEquals(tmpExpected, tmpConjugateGradientSolver.solve(tmpA, tmpB).get());
+    }
+
     public void testLinAlg34PDF() {
 
         final MatrixStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4, 2, 3 }, { 3, -5, 2 }, { -2, 3, 8 } });
@@ -54,6 +72,7 @@ public class JacobiSolverTest extends AbstractMatrixDecompositionTaskTest {
 
         final GaussSeidelSolver tmpGaussSeidelSolver = new GaussSeidelSolver();
         TestUtils.assertEquals(tmpExpected, tmpGaussSeidelSolver.solve(tmpA, tmpB).get());
+
     }
 
 }

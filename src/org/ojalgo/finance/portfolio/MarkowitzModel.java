@@ -301,6 +301,12 @@ public final class MarkowitzModel extends EquilibriumModel {
 
     private Optimisation.Result optimise() {
 
+        //        BasicLogger.debug();
+        //        BasicLogger.debug("###################################################");
+        //        BasicLogger.debug("BEGIN RAF: {} MarkowitzModel optimisation", this.getRiskAversion());
+        //        BasicLogger.debug("###################################################");
+        //        BasicLogger.debug();
+
         Optimisation.Result retVal;
 
         if ((myTargetReturn != null) || (myTargetVariance != null)) {

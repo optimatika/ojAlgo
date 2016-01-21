@@ -21,38 +21,57 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import java.math.MathContext;
+import static org.ojalgo.constant.PrimitiveMath.*;
 
+import java.math.MathContext;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.SolverTask;
+import org.ojalgo.matrix.task.TaskException;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class IterativeSolverTask implements SolverTask<Double> {
 
-    private static final int ITERATIONS_LIMIT = Integer.MAX_VALUE;
-    private static final NumberContext TERMINATION_CONTEXT = NumberContext.getMath(MathContext.DECIMAL128);
+    static interface SparseDelegate {
 
-    private final int myIterationsLimit;
-    private final NumberContext myTerminationContext;
+        void resolve(List<Row> body, Access2D<?> rhs, final PhysicalStore<Double> current);
+
+    }
+
+    static List<Row> toListOfRows(final Access2D<?> body) {
+
+        final List<Row> retVal = new ArrayList<>();
+
+        final long tmpDim = body.countRows();
+
+        for (int i = 0; i < tmpDim; i++) {
+            final Row tmpRow = new Row(i, tmpDim);
+            for (int j = 0; j < tmpDim; j++) {
+                final double tmpVal = body.doubleValue(i, j);
+                if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
+                    tmpRow.set(j, tmpVal);
+                }
+            }
+            retVal.add(tmpRow);
+        }
+
+        return retVal;
+    }
+
+    private int myIterationsLimit = Integer.MAX_VALUE;
+    private NumberContext myTerminationContext = NumberContext.getMath(MathContext.DECIMAL128);
 
     IterativeSolverTask() {
-        this(TERMINATION_CONTEXT, ITERATIONS_LIMIT);
-    }
-
-    IterativeSolverTask(final int iterationsLimit) {
-        this(TERMINATION_CONTEXT, iterationsLimit);
-    }
-
-    IterativeSolverTask(final NumberContext terminationContext) {
-        this(terminationContext, ITERATIONS_LIMIT);
-    }
-
-    IterativeSolverTask(final NumberContext terminationContext, final int iterationsLimit) {
         super();
-        myTerminationContext = terminationContext;
-        myIterationsLimit = iterationsLimit;
     }
 
     public final DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
@@ -62,12 +81,28 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
         return PrimitiveDenseStore.FACTORY.makeZero(templateRHS.countRows(), 1L);
     }
 
+    public final Optional<MatrixStore<Double>> solve(final MatrixStore<Double> body, final MatrixStore<Double> rhs) {
+        try {
+            return Optional.of(this.solve(body, rhs, this.preallocate(body, rhs)));
+        } catch (final TaskException xcptn) {
+            return Optional.empty();
+        }
+    }
+
     protected final int getIterationsLimit() {
         return myIterationsLimit;
     }
 
     protected final NumberContext getTerminationContext() {
         return myTerminationContext;
+    }
+
+    protected void setIterationsLimit(final int iterationsLimit) {
+        myIterationsLimit = iterationsLimit;
+    }
+
+    protected void setTerminationContext(final NumberContext terminationContext) {
+        myTerminationContext = terminationContext;
     }
 
 }

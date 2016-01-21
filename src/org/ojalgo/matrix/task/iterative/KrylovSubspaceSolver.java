@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,30 +21,10 @@
  */
 package org.ojalgo.matrix.task.iterative;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+abstract class KrylovSubspaceSolver extends IterativeSolverTask {
 
-/**
- * StationaryIterativeSolver
- *
- * @see <a href="https://en.wikipedia.org/wiki/Iterative_method#Stationary_iterative_methods">Iterative_method
- *      </a>
- * @see <a href="https://mathworld.wolfram.com/StationaryIterativeMethod.html">StationaryIterativeMethod</a>
- * @author apete
- */
-abstract class StationaryIterativeSolver extends IterativeSolverTask {
-
-    private double myRelaxationFactor = ONE;
-
-    StationaryIterativeSolver() {
+    protected KrylovSubspaceSolver() {
         super();
-    }
-
-    public final double getRelaxationFactor() {
-        return myRelaxationFactor;
-    }
-
-    public final void setRelaxationFactor(final double relaxation) {
-        myRelaxationFactor = relaxation;
     }
 
 }

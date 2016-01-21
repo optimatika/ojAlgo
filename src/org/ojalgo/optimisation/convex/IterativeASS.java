@@ -29,14 +29,20 @@ import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.matrix.task.iterative.GaussSeidelSolver;
+import org.ojalgo.matrix.task.iterative.MutableSolver;
+import org.ojalgo.matrix.task.iterative.Row;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.LinearSolver;
@@ -57,7 +63,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 abstract class IterativeASS extends ActiveSetSolver {
 
-    final class MyGaussSeidel extends GaussSeidelSolver implements Access2D<Double> {
+    final class MyGaussSeidel extends MutableSolver<GaussSeidelSolver> implements Access2D<Double> {
 
         private final int myCountE = IterativeASS.this.countEqualityConstraints();
 
@@ -66,20 +72,23 @@ abstract class IterativeASS extends ActiveSetSolver {
 
         MyGaussSeidel() {
 
-            super(NumberContext.getMath(MathContext.DECIMAL64).newPrecision(13));
+            super(new GaussSeidelSolver(), IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countInequalityConstraints());
 
-            this.setRelaxationFactor(1.5);
+            this.setTerminationContext(NumberContext.getMath(MathContext.DECIMAL64).newPrecision(13));
+
+            this.getDelegate().setRelaxationFactor(1.5);
 
             myIterationRows = new Row[(int) myFullDim];
         }
 
+        @Override
         public long countColumns() {
-            return super.countRows();
+            return IterativeASS.this.countEqualityConstraints() + myActivator.countIncluded();
         }
 
         @Override
         public long countRows() {
-            return super.countRows();
+            return IterativeASS.this.countEqualityConstraints() + myActivator.countIncluded();
         }
 
         public double doubleValue(final long row, final long column) {
@@ -157,13 +166,26 @@ abstract class IterativeASS extends ActiveSetSolver {
             myIterationL.set(i, 0.0);
         }
 
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public double doubleValue(final long index) {
+            return this.doubleValue(AccessUtils.row(index, this.countRows()), AccessUtils.column(index, this.countRows()));
+        }
+
+        public Double get(final long index) {
+            return this.get(AccessUtils.row(index, this.countRows()), AccessUtils.column(index, this.countRows()));
+        }
+
     }
 
     private final IndexSelector myActivator;
     private int myConstraintToInclude = -1;
     private final PrimitiveDenseStore myIterationL;
     private final PrimitiveDenseStore myIterationX;
-    private final MyGaussSeidel myS = new MyGaussSeidel();
+    private final MyGaussSeidel myS;
 
     MatrixStore<Double> myInvQC;
 
@@ -175,6 +197,8 @@ abstract class IterativeASS extends ActiveSetSolver {
 
         myIterationL = PrimitiveDenseStore.FACTORY.makeZero(this.countEqualityConstraints() + this.countInequalityConstraints(), 1L);
         myIterationX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
+
+        myS = new MyGaussSeidel();
     }
 
     public int countExcluded() {
@@ -588,7 +612,15 @@ abstract class IterativeASS extends ActiveSetSolver {
                 // Actual/normal optimisation problem
 
                 if (this.isDebug()) {
+
                     BasicLogger.debug(Arrays.toString(tmpIncluded), myS);
+
+                    BasicLogger.debug("Is hermitian? {}", MatrixUtils.isHermitian(myS));
+
+                    final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
+                    tmpEvD.decompose(MatrixStore.PRIMITIVE.makeWrapper(myS));
+                    BasicLogger.debug("Eigenvalues: {}", tmpEvD.getEigenvalues());
+                    BasicLogger.debug();
                 }
 
                 final MatrixStore<Double> tmpRHS = myInvQC.multiplyLeft(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB).get();
