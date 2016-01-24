@@ -252,23 +252,6 @@ public abstract class P20150720 {
     }
 
     /**
-     * @param args the command line arguments Objective: allocate the maximum qty, and try to keep
-     *        proportionality between customer.
-     */
-    public static void main(final String[] args) {
-
-        final ExpressionsBasedModel model = P20150720.buildModel3();
-
-        //- Maximise -(Sum of Square error)
-        model.relax(true);
-        // model.options.debug(ConvexSolver.class);
-        final Result result = model.maximise();
-
-        BasicLogger.debug(result);
-        //BasicLogger.debug(model);
-    }
-
-    /**
      * Sent in 2015-09-03
      */
     public static ExpressionsBasedModel buildModel3() {
@@ -470,6 +453,23 @@ public abstract class P20150720 {
             }
         });
         return model;
+    }
+
+    /**
+     * @param args the command line arguments Objective: allocate the maximum qty, and try to keep
+     *        proportionality between customer.
+     */
+    public static void main(final String[] args) {
+
+        final ExpressionsBasedModel model = P20150720.buildModel3();
+
+        //- Maximise -(Sum of Square error)
+        model.relax(true);
+        // model.options.debug(ConvexSolver.class);
+        final Result result = model.maximise();
+
+        BasicLogger.debug(result);
+        //BasicLogger.debug(model);
     }
 
 }

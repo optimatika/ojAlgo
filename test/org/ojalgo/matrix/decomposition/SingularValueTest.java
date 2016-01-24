@@ -41,10 +41,10 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
     private static final SingularValue<BigDecimal> BIG = SingularValue.makeBig();
     private static final SingularValue<ComplexNumber> COMPLEX = SingularValue.makeComplex();
-    private static final SingularValue<Double> JAMA = new RawSingularValue();
     private static final SingularValue<Double> DIRECT = SingularValue.makePrimitive();
-
     private static final BasicMatrix FAT = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
+
+    private static final SingularValue<Double> JAMA = new RawSingularValue();
     private static final BasicMatrix SQUARE = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
     private static final BasicMatrix TALL = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 7));
 

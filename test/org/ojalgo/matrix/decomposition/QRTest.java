@@ -155,6 +155,37 @@ public class QRTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpDecompR, tmpForwardR, new NumberContext(7, 6));
     }
 
+    public void testLeastSquaresInvert() {
+
+        MatrixUtils.setThresholdsMinValue(100000);
+
+        final int tmpDim = 3;
+        final MatrixStore<Double> tmpA = MatrixUtils.makeSPD(tmpDim).builder().below(MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get()).build();
+
+        final QR<Double> tmpDenseQR = new QRDecomposition.Primitive();
+        final QR<Double> tmpRawQR = new RawQR();
+
+        final DecompositionStore<Double> tmpDenseAlloc = tmpDenseQR.preallocate(tmpA);
+        final DecompositionStore<Double> tmpRawAlloc = tmpRawQR.preallocate(tmpA);
+
+        MatrixStore<Double> tmpDenseInv;
+        try {
+            tmpDenseInv = tmpDenseQR.invert(tmpA, tmpDenseAlloc);
+            final MatrixStore<Double> tmpRawInv = tmpRawQR.invert(tmpA, tmpRawAlloc);
+
+            TestUtils.assertEquals(tmpDenseInv, tmpRawInv);
+
+            final MatrixStore<Double> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get();
+            TestUtils.assertEquals(tmpIdentity, tmpDenseInv.multiply(tmpA));
+            TestUtils.assertEquals(tmpIdentity, tmpRawInv.multiply(tmpA));
+
+        } catch (final TaskException anException) {
+            anException.printStackTrace();
+            TestUtils.fail(anException.toString());
+        }
+
+    }
+
     public void testP20030422Case() {
 
         final BigMatrix tmpOriginal = P20030422Case.getProblematic();
@@ -190,37 +221,6 @@ public class QRTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpOriginal.toBigStore(), tmpBigDecomp, new NumberContext(7, 14));
         TestUtils.assertEquals(tmpOriginal.toComplexStore(), tmpComplexDecomp, new NumberContext(7, 14));
         TestUtils.assertEquals(tmpOriginal.toPrimitiveStore(), tmpPrimitiveDecomp, new NumberContext(7, 14));
-    }
-
-    public void testLeastSquaresInvert() {
-
-        MatrixUtils.setThresholdsMinValue(100000);
-
-        final int tmpDim = 3;
-        final MatrixStore<Double> tmpA = MatrixUtils.makeSPD(tmpDim).builder().below(MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get()).build();
-
-        final QR<Double> tmpDenseQR = new QRDecomposition.Primitive();
-        final QR<Double> tmpRawQR = new RawQR();
-
-        final DecompositionStore<Double> tmpDenseAlloc = tmpDenseQR.preallocate(tmpA);
-        final DecompositionStore<Double> tmpRawAlloc = tmpRawQR.preallocate(tmpA);
-
-        MatrixStore<Double> tmpDenseInv;
-        try {
-            tmpDenseInv = tmpDenseQR.invert(tmpA, tmpDenseAlloc);
-            final MatrixStore<Double> tmpRawInv = tmpRawQR.invert(tmpA, tmpRawAlloc);
-
-            TestUtils.assertEquals(tmpDenseInv, tmpRawInv);
-
-            final MatrixStore<Double> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get();
-            TestUtils.assertEquals(tmpIdentity, tmpDenseInv.multiply(tmpA));
-            TestUtils.assertEquals(tmpIdentity, tmpRawInv.multiply(tmpA));
-
-        } catch (final TaskException anException) {
-            anException.printStackTrace();
-            TestUtils.fail(anException.toString());
-        }
-
     }
 
 }

@@ -57,25 +57,6 @@ public class PrimitiveCase extends FunctionTests {
         TestUtils.assertEquals(NEGATIVE_INFINITY, ATANH.invoke(NEG), MACHINE_EPSILON);
     }
 
-    public void testPOWER() {
-
-        TestUtils.assertEquals(ONE, POWER.invoke(ZERO, 0), MACHINE_EPSILON);
-        TestUtils.assertEquals(ONE, POWER.invoke(PI, 0), MACHINE_EPSILON);
-        TestUtils.assertEquals(ONE, POWER.invoke(E, 0), MACHINE_EPSILON);
-
-        TestUtils.assertEquals(ZERO, POWER.invoke(ZERO, 1), MACHINE_EPSILON);
-        TestUtils.assertEquals(PI, POWER.invoke(PI, 1), MACHINE_EPSILON);
-        TestUtils.assertEquals(E, POWER.invoke(E, 1), MACHINE_EPSILON);
-
-        TestUtils.assertEquals(ZERO * ZERO, POWER.invoke(ZERO, 2), MACHINE_EPSILON);
-        TestUtils.assertEquals(PI * PI, POWER.invoke(PI, 2), MACHINE_EPSILON);
-        TestUtils.assertEquals(E * E, POWER.invoke(E, 2), MACHINE_EPSILON);
-
-        TestUtils.assertEquals(1 / ZERO, POWER.invoke(ZERO, -1), MACHINE_EPSILON);
-        TestUtils.assertEquals(1 / PI, POWER.invoke(PI, -1), MACHINE_EPSILON);
-        TestUtils.assertEquals(1 / E, POWER.invoke(E, -1), MACHINE_EPSILON);
-    }
-
     public void testMinMax() {
 
         TestUtils.assertEquals(Math.min(2, -78), FunctionUtils.min(2, -78));
@@ -102,6 +83,25 @@ public class PrimitiveCase extends FunctionTests {
         TestUtils.assertEquals(80, FunctionUtils.max(new int[] { 80, 0, 67, -76 }));
         TestUtils.assertEquals(-80, FunctionUtils.min(new int[] { -80, 0, 67, -76 }));
 
+    }
+
+    public void testPOWER() {
+
+        TestUtils.assertEquals(ONE, POWER.invoke(ZERO, 0), MACHINE_EPSILON);
+        TestUtils.assertEquals(ONE, POWER.invoke(PI, 0), MACHINE_EPSILON);
+        TestUtils.assertEquals(ONE, POWER.invoke(E, 0), MACHINE_EPSILON);
+
+        TestUtils.assertEquals(ZERO, POWER.invoke(ZERO, 1), MACHINE_EPSILON);
+        TestUtils.assertEquals(PI, POWER.invoke(PI, 1), MACHINE_EPSILON);
+        TestUtils.assertEquals(E, POWER.invoke(E, 1), MACHINE_EPSILON);
+
+        TestUtils.assertEquals(ZERO * ZERO, POWER.invoke(ZERO, 2), MACHINE_EPSILON);
+        TestUtils.assertEquals(PI * PI, POWER.invoke(PI, 2), MACHINE_EPSILON);
+        TestUtils.assertEquals(E * E, POWER.invoke(E, 2), MACHINE_EPSILON);
+
+        TestUtils.assertEquals(1 / ZERO, POWER.invoke(ZERO, -1), MACHINE_EPSILON);
+        TestUtils.assertEquals(1 / PI, POWER.invoke(PI, -1), MACHINE_EPSILON);
+        TestUtils.assertEquals(1 / E, POWER.invoke(E, -1), MACHINE_EPSILON);
     }
 
 }

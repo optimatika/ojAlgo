@@ -39,16 +39,7 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
         super();
     }
 
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
-
-        final List<Row> tmpRows = IterativeSolverTask.toListOfRows(body);
-
-        this.resolve(tmpRows, rhs, preallocated);
-
-        return preallocated;
-    }
-
-    public void resolve(final List<Row> body, final Access2D<?> rhs, final PhysicalStore<Double> current) {
+    public void resolve(final List<Equation> body, final PhysicalStore<Double> current) {
 
         double tmpCurrNorm = NEG;
         double tmpLastNorm = tmpCurrNorm;
@@ -62,8 +53,8 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
 
             final int tmpSize = body.size();
             for (int r = 0; r < tmpSize; r++) {
-                final Row tmpRow = body.get(r);
-                tmpRow.solve(current, rhs.doubleValue(r), tmpRelaxationFactor);
+                final Equation tmpRow = body.get(r);
+                tmpRow.adjust(current, tmpRelaxationFactor);
             }
 
             tmpLastNorm = tmpCurrNorm;
@@ -73,6 +64,15 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
 
         } while ((tmpIterations < tmpIterationsLimit) && tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm));
 
+    }
+
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+
+        final List<Equation> tmpRows = IterativeSolverTask.toListOfRows(body, rhs);
+
+        this.resolve(tmpRows, preallocated);
+
+        return preallocated;
     }
 
 }

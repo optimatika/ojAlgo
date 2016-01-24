@@ -48,9 +48,9 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         return tmpTestInstance.model;
     }
 
-    Variable[] vars;
-    BigDecimal[] point;
     ExpressionsBasedModel model;
+    BigDecimal[] point;
+    Variable[] vars;
 
     public void test1() {
         this.setupModel(6);

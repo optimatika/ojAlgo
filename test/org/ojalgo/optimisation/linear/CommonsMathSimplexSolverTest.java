@@ -609,14 +609,14 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
      */
     static enum Relationship {
 
-        /** Lesser than or equal relationship. */
-        LEQ("<="),
-
         /** Equality relationship. */
         EQ("="),
 
         /** Greater than or equal relationship. */
-        GEQ(">=");
+        GEQ(">="),
+
+        /** Lesser than or equal relationship. */
+        LEQ("<=");
 
         /** Display string for the relationship. */
         private final String stringValue;

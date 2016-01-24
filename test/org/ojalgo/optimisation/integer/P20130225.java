@@ -81,6 +81,88 @@ class P20130225 {
         return costs;
     }
 
+    static ExpressionsBasedModel makeModel() {
+
+        final double alpha = 0.1;
+        final TreeMap preCalculateCosts = P20130225.preCalculateCosts();
+        final TreeMap variablesStation = new TreeMap();
+        final TreeMap variablesUVStation = new TreeMap();
+        final ArrayList allVariables = new ArrayList();
+
+        for (int i = 0; i < preCalculateCosts.size(); i++) {
+            final double[] costs = (double[]) preCalculateCosts.get(i);
+            // Cost function = Min(sum(C_i_j*X_i_j + alpha*(sum(Ui + Vi))
+            final int availableDocks = costs.length;
+            final Variable u = new Variable("U_" + i).lower(new BigDecimal(0)).weight(new BigDecimal(alpha));
+            final Variable v = new Variable("V_" + i).lower(new BigDecimal(0)).weight(new BigDecimal(alpha));
+
+            allVariables.add(u);
+            allVariables.add(v);
+            final ArrayList uvVariables = new ArrayList();
+            uvVariables.add(u);
+            uvVariables.add(v);
+            variablesUVStation.put(i, uvVariables);
+
+            for (int j = 0; j < availableDocks; j++) {
+
+                final double cost = costs[j];
+
+                final Variable variable = new Variable("X_" + i + "_" + j).binary().weight(new BigDecimal(cost));
+
+                if (variablesStation.containsKey(i)) {
+                    final ArrayList vars = (ArrayList) variablesStation.get(i);
+                    vars.add(variable);
+                } else {
+                    final ArrayList vars = new ArrayList();
+                    vars.add(variable);
+                    variablesStation.put(i, vars);
+                }
+                allVariables.add(variable);
+            }
+        }
+        final ExpressionsBasedModel tmpIntegerModel = new ExpressionsBasedModel(allVariables);
+
+        // Exp_total_bikes = sum(j*X_i_j) <= 91;
+        final Expression expresion1 = tmpIntegerModel.addExpression("Exp_total_bikes");
+        for (int i = 0; i < tmpIntegerModel.countVariables(); i++) {
+            final Variable v = tmpIntegerModel.getVariable(i);
+            final String name = v.getName();
+            if (name.startsWith("X_")) {
+                final String state = name.substring(name.lastIndexOf("_") + 1, name.length());
+                expresion1.set(v, new BigDecimal((Integer.valueOf(state))));
+            }
+        }
+        expresion1.upper(new BigDecimal(91));
+
+        for (int i = 0; i < preCalculateCosts.size(); i++) {
+            // Exp_i = sum(X_i_j) = 1
+            final ArrayList varsStation = (ArrayList) variablesStation.get(i);
+
+            final Expression expresion2 = tmpIntegerModel.addExpression("Exp_" + i);
+            expresion2.setLinearFactorsSimple(varsStation);
+            expresion2.level(new BigDecimal(1));
+        }
+
+        for (int i = 0; i < preCalculateCosts.size(); i++) {
+            // Exp_UV_i = Ui - Vi + sum(j*X_i_j) = 5
+            final Expression expresion3 = tmpIntegerModel.addExpression("Exp_UV_" + i);
+            final ArrayList varsStation = (ArrayList) variablesStation.get(i);
+            for (int j = 0; j < varsStation.size(); j++) {
+                final Variable v = (Variable) varsStation.get(j);
+                final String name = v.getName();
+                final int state = Integer.valueOf(name.substring(name.lastIndexOf("_") + 1, name.length()));
+                expresion3.set(v, state);
+            }
+            final ArrayList uvStation = (ArrayList) variablesUVStation.get(i);
+            final Variable u = (Variable) uvStation.get(0);
+            final Variable v = (Variable) uvStation.get(1);
+            expresion3.set(u, BigDecimal.ONE);
+            expresion3.set(v, new BigDecimal(-1));
+            expresion3.level(new BigDecimal(5));
+        }
+        return tmpIntegerModel;
+    }
+
     public P20130225() {
         try {
 
@@ -174,88 +256,6 @@ class P20130225 {
         } catch (final Exception e) {
             e.printStackTrace();
         }
-    }
-
-    static ExpressionsBasedModel makeModel() {
-
-        final double alpha = 0.1;
-        final TreeMap preCalculateCosts = P20130225.preCalculateCosts();
-        final TreeMap variablesStation = new TreeMap();
-        final TreeMap variablesUVStation = new TreeMap();
-        final ArrayList allVariables = new ArrayList();
-
-        for (int i = 0; i < preCalculateCosts.size(); i++) {
-            final double[] costs = (double[]) preCalculateCosts.get(i);
-            // Cost function = Min(sum(C_i_j*X_i_j + alpha*(sum(Ui + Vi))
-            final int availableDocks = costs.length;
-            final Variable u = new Variable("U_" + i).lower(new BigDecimal(0)).weight(new BigDecimal(alpha));
-            final Variable v = new Variable("V_" + i).lower(new BigDecimal(0)).weight(new BigDecimal(alpha));
-
-            allVariables.add(u);
-            allVariables.add(v);
-            final ArrayList uvVariables = new ArrayList();
-            uvVariables.add(u);
-            uvVariables.add(v);
-            variablesUVStation.put(i, uvVariables);
-
-            for (int j = 0; j < availableDocks; j++) {
-
-                final double cost = costs[j];
-
-                final Variable variable = new Variable("X_" + i + "_" + j).binary().weight(new BigDecimal(cost));
-
-                if (variablesStation.containsKey(i)) {
-                    final ArrayList vars = (ArrayList) variablesStation.get(i);
-                    vars.add(variable);
-                } else {
-                    final ArrayList vars = new ArrayList();
-                    vars.add(variable);
-                    variablesStation.put(i, vars);
-                }
-                allVariables.add(variable);
-            }
-        }
-        final ExpressionsBasedModel tmpIntegerModel = new ExpressionsBasedModel(allVariables);
-
-        // Exp_total_bikes = sum(j*X_i_j) <= 91;
-        final Expression expresion1 = tmpIntegerModel.addExpression("Exp_total_bikes");
-        for (int i = 0; i < tmpIntegerModel.countVariables(); i++) {
-            final Variable v = tmpIntegerModel.getVariable(i);
-            final String name = v.getName();
-            if (name.startsWith("X_")) {
-                final String state = name.substring(name.lastIndexOf("_") + 1, name.length());
-                expresion1.set(v, new BigDecimal((Integer.valueOf(state))));
-            }
-        }
-        expresion1.upper(new BigDecimal(91));
-
-        for (int i = 0; i < preCalculateCosts.size(); i++) {
-            // Exp_i = sum(X_i_j) = 1
-            final ArrayList varsStation = (ArrayList) variablesStation.get(i);
-
-            final Expression expresion2 = tmpIntegerModel.addExpression("Exp_" + i);
-            expresion2.setLinearFactorsSimple(varsStation);
-            expresion2.level(new BigDecimal(1));
-        }
-
-        for (int i = 0; i < preCalculateCosts.size(); i++) {
-            // Exp_UV_i = Ui - Vi + sum(j*X_i_j) = 5
-            final Expression expresion3 = tmpIntegerModel.addExpression("Exp_UV_" + i);
-            final ArrayList varsStation = (ArrayList) variablesStation.get(i);
-            for (int j = 0; j < varsStation.size(); j++) {
-                final Variable v = (Variable) varsStation.get(j);
-                final String name = v.getName();
-                final int state = Integer.valueOf(name.substring(name.lastIndexOf("_") + 1, name.length()));
-                expresion3.set(v, state);
-            }
-            final ArrayList uvStation = (ArrayList) variablesUVStation.get(i);
-            final Variable u = (Variable) uvStation.get(0);
-            final Variable v = (Variable) uvStation.get(1);
-            expresion3.set(u, BigDecimal.ONE);
-            expresion3.set(v, new BigDecimal(-1));
-            expresion3.level(new BigDecimal(5));
-        }
-        return tmpIntegerModel;
     }
 
 }

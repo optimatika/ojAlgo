@@ -85,55 +85,6 @@ public class QuaternionTest extends ScalarTests {
         }
     }
 
-    public void testLogExpAndBackAgain() {
-
-        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
-
-        for (int s = 0; s < tmpArguments.length; s++) {
-            for (int i = 0; i < tmpArguments.length; i++) {
-                for (int j = 0; j < tmpArguments.length; j++) {
-                    for (int k = 0; k < tmpArguments.length; k++) {
-
-                        final Quaternion tmpQuaternion = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
-
-                        final Quaternion tmpLog = QuaternionFunction.LOG.invoke(tmpQuaternion);
-                        final Quaternion tmpExp = QuaternionFunction.EXP.invoke(tmpQuaternion);
-
-                        final Quaternion tmpExpLog = QuaternionFunction.EXP.invoke(tmpLog);
-                        final Quaternion tmpLogExp = QuaternionFunction.LOG.invoke(tmpExp);
-
-                        TestUtils.assertEquals(tmpQuaternion, tmpExpLog);
-                        TestUtils.assertEquals(tmpQuaternion, tmpLogExp);
-                    }
-                }
-            }
-        }
-    }
-
-    public void testPolarForm() {
-
-        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
-
-        for (int s = 0; s < tmpArguments.length; s++) {
-            for (int i = 0; i < tmpArguments.length; i++) {
-                for (int j = 0; j < tmpArguments.length; j++) {
-                    for (int k = 0; k < tmpArguments.length; k++) {
-
-                        final Quaternion tmpExpected = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
-
-                        final double tmpNorm = tmpExpected.norm();
-                        final double[] tmpUnit = tmpExpected.unit();
-                        final double tmpAngle = tmpExpected.angle();
-
-                        final Quaternion tmpActual = Quaternion.makePolar(tmpNorm, tmpUnit, tmpAngle);
-
-                        TestUtils.assertEquals(tmpExpected, tmpActual);
-                    }
-                }
-            }
-        }
-    }
-
     public void _testSinAndBackAgain() {
 
         final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
@@ -228,6 +179,55 @@ public class QuaternionTest extends ScalarTests {
 
                         TestUtils.assertEquals(tmpOriginal, tmpInvOp);
                         TestUtils.assertEquals(tmpOriginal, tmpOpInv);
+                    }
+                }
+            }
+        }
+    }
+
+    public void testLogExpAndBackAgain() {
+
+        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
+
+        for (int s = 0; s < tmpArguments.length; s++) {
+            for (int i = 0; i < tmpArguments.length; i++) {
+                for (int j = 0; j < tmpArguments.length; j++) {
+                    for (int k = 0; k < tmpArguments.length; k++) {
+
+                        final Quaternion tmpQuaternion = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+
+                        final Quaternion tmpLog = QuaternionFunction.LOG.invoke(tmpQuaternion);
+                        final Quaternion tmpExp = QuaternionFunction.EXP.invoke(tmpQuaternion);
+
+                        final Quaternion tmpExpLog = QuaternionFunction.EXP.invoke(tmpLog);
+                        final Quaternion tmpLogExp = QuaternionFunction.LOG.invoke(tmpExp);
+
+                        TestUtils.assertEquals(tmpQuaternion, tmpExpLog);
+                        TestUtils.assertEquals(tmpQuaternion, tmpLogExp);
+                    }
+                }
+            }
+        }
+    }
+
+    public void testPolarForm() {
+
+        final double[] tmpArguments = new double[] { PrimitiveMath.NEG, PrimitiveMath.ZERO, PrimitiveMath.ONE };
+
+        for (int s = 0; s < tmpArguments.length; s++) {
+            for (int i = 0; i < tmpArguments.length; i++) {
+                for (int j = 0; j < tmpArguments.length; j++) {
+                    for (int k = 0; k < tmpArguments.length; k++) {
+
+                        final Quaternion tmpExpected = Quaternion.of(tmpArguments[s], tmpArguments[i], tmpArguments[j], tmpArguments[k]);
+
+                        final double tmpNorm = tmpExpected.norm();
+                        final double[] tmpUnit = tmpExpected.unit();
+                        final double tmpAngle = tmpExpected.angle();
+
+                        final Quaternion tmpActual = Quaternion.makePolar(tmpNorm, tmpUnit, tmpAngle);
+
+                        TestUtils.assertEquals(tmpExpected, tmpActual);
                     }
                 }
             }

@@ -36,7 +36,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.linear.LinearSolver;
-import org.ojalgo.type.IndexSelector;
 
 /**
  * Solves optimisation problems of the form:
@@ -51,184 +50,10 @@ import org.ojalgo.type.IndexSelector;
  */
 abstract class DirectASS extends ActiveSetSolver {
 
-    private final IndexSelector myActivator;
-    private int myConstraintToInclude = -1;
-    private final PrimitiveDenseStore myIterationL;
-    private final PrimitiveDenseStore myIterationX;
-
-    MatrixStore<Double> myInvQC;
-
     DirectASS(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
         super(matrices, solverOptions);
 
-        myActivator = new IndexSelector(this.countInequalityConstraints());
-
-        myIterationL = PrimitiveDenseStore.FACTORY.makeZero(this.countEqualityConstraints() + this.countInequalityConstraints(), 1L);
-        myIterationX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
-    }
-
-    public int countExcluded() {
-        return myActivator.countExcluded();
-    }
-
-    public int countIncluded() {
-        return myActivator.countIncluded();
-    }
-
-    public int[] getExcluded() {
-        return myActivator.getExcluded();
-    }
-
-    public int[] getIncluded() {
-        return myActivator.getIncluded();
-    }
-
-    public int getLastExcluded() {
-        return myActivator.getLastExcluded();
-    }
-
-    public int getLastIncluded() {
-        return myActivator.getLastIncluded();
-    }
-
-    private boolean checkFeasibility(final boolean onlyExcluded) {
-
-        boolean retVal = true;
-
-        if (!onlyExcluded) {
-
-            if (this.hasEqualityConstraints()) {
-                final MatrixStore<Double> tmpAEX = this.getAEX();
-                final MatrixStore<Double> tmpBE = this.getBE();
-                for (int i = 0; retVal && (i < tmpBE.countRows()); i++) {
-                    if (options.slack.isDifferent(tmpBE.doubleValue(i), tmpAEX.doubleValue(i))) {
-                        retVal = false;
-                    }
-                }
-            }
-
-            if (this.hasInequalityConstraints() && (myActivator.countIncluded() > 0)) {
-                final int[] tmpIncluded = myActivator.getIncluded();
-                final MatrixStore<Double> tmpAIX = this.getAIX(tmpIncluded);
-                final MatrixStore<Double> tmpBI = this.getBI(tmpIncluded);
-                for (int i = 0; retVal && (i < tmpIncluded.length); i++) {
-                    final double tmpBody = tmpAIX.doubleValue(i);
-                    final double tmpRHS = tmpBI.doubleValue(i);
-                    if ((tmpBody > tmpRHS) && options.slack.isDifferent(tmpRHS, tmpBody)) {
-                        retVal = false;
-                    }
-                }
-            }
-        }
-
-        if (this.hasInequalityConstraints() && (myActivator.countExcluded() > 0)) {
-            final int[] tmpExcluded = myActivator.getExcluded();
-            final MatrixStore<Double> tmpAIX = this.getAIX(tmpExcluded);
-            final MatrixStore<Double> tmpBI = this.getBI(tmpExcluded);
-            for (int i = 0; retVal && (i < tmpExcluded.length); i++) {
-                final double tmpBody = tmpAIX.doubleValue(i);
-                final double tmpRHS = tmpBI.doubleValue(i);
-                if ((tmpBody > tmpRHS) && options.slack.isDifferent(tmpRHS, tmpBody)) {
-                    retVal = false;
-                }
-            }
-        }
-
-        return retVal;
-    }
-
-    /**
-     * Find the minimum (largest negative) lagrange multiplier - for the active inequalities - to potentially
-     * deactivate.
-     */
-    private int suggestConstraintToExclude() {
-
-        int retVal = -1;
-
-        final int[] tmpIncluded = myActivator.getIncluded();
-        final int tmpLastIncluded = myActivator.getLastIncluded();
-        int tmpIndexOfLast = -1;
-
-        double tmpMin = POSITIVE_INFINITY;
-        double tmpVal;
-
-        //final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
-        final MatrixStore<Double> tmpLI = myIterationL.builder().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
-
-        if (this.isDebug() && (tmpLI.count() > 0L)) {
-            this.debug("Looking for the largest negative lagrange multiplier among these: {}.", tmpLI.copy().asList());
-        }
-
-        for (int i = 0; i < tmpLI.countRows(); i++) {
-
-            if (tmpIncluded[i] != tmpLastIncluded) {
-
-                tmpVal = tmpLI.doubleValue(i, 0);
-
-                if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !options.solution.isZero(tmpVal)) {
-                    tmpMin = tmpVal;
-                    retVal = i;
-                    if (this.isDebug()) {
-                        this.debug("Best so far: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[i]);
-                    }
-                }
-
-            } else {
-
-                tmpIndexOfLast = i;
-            }
-        }
-
-        if ((retVal < 0) && (tmpIndexOfLast >= 0)) {
-
-            tmpVal = tmpLI.doubleValue(tmpIndexOfLast, 0);
-
-            if ((tmpVal < ZERO) && (tmpVal < tmpMin) && !options.solution.isZero(tmpVal)) {
-                tmpMin = tmpVal;
-                retVal = tmpIndexOfLast;
-                if (this.isDebug()) {
-                    this.debug("Only the last included needs to be excluded: {} @ {} ({}).", tmpMin, retVal, tmpIncluded[retVal]);
-                }
-            }
-        }
-
-        return retVal >= 0 ? tmpIncluded[retVal] : retVal;
-    }
-
-    /**
-     * Find minimum (largest negative) slack - for the inactive inequalities - to potentially activate.
-     * Negative slack means the constraint is violated. Need to make sure it is enforced by activating it.
-     */
-    private int suggestConstraintToInclude() {
-        return myConstraintToInclude;
-    }
-
-    @Override
-    protected MatrixStore<Double> extractSolution() {
-        return super.extractSolution();
-    }
-
-    @Override
-    protected final MatrixStore<Double> getIterationKKT() {
-        return this.getIterationKKT(myActivator.getIncluded());
-    }
-
-    protected final MatrixStore<Double> getIterationKKT(final int[] included) {
-        final MatrixStore<Double> tmpIterationQ = this.getIterationQ();
-        final MatrixStore<Double> tmpIterationA = this.getIterationA(included);
-        return tmpIterationQ.builder().right(tmpIterationA.transpose()).below(tmpIterationA).build();
-    }
-
-    @Override
-    protected final MatrixStore<Double> getIterationRHS() {
-        return this.getIterationRHS(myActivator.getIncluded());
-    }
-
-    protected final MatrixStore<Double> getIterationRHS(final int[] included) {
-        final MatrixStore<Double> tmpIterationC = this.getIterationC();
-        final MatrixStore<Double> tmpIterationB = this.getIterationB(included);
-        return tmpIterationC.builder().below(tmpIterationB).build();
     }
 
     @Override
@@ -618,33 +443,6 @@ abstract class DirectASS extends ActiveSetSolver {
                 }
             }
         }
-    }
-
-    @Override
-    final MatrixStore<Double> getIterationA() {
-        return this.getIterationA(myActivator.getIncluded());
-    }
-
-    abstract MatrixStore<Double> getIterationA(int[] included);
-
-    @Override
-    final MatrixStore<Double> getIterationB() {
-        return this.getIterationB(myActivator.getIncluded());
-    }
-
-    abstract MatrixStore<Double> getIterationB(int[] included);
-
-    @Override
-    final MatrixStore<Double> getIterationC() {
-
-        //        final MatrixStore<Double> tmpQ = this.getQ();
-        //        final MatrixStore<Double> tmpC = this.getC();
-        //
-        //        final PhysicalStore<Double> tmpX = this.getX();
-        //
-        //        return tmpC.subtract(tmpQ.multiply(tmpX));
-
-        return this.getC();
     }
 
     void shrink() {

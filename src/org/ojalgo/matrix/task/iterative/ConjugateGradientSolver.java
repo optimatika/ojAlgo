@@ -27,14 +27,12 @@ import java.util.List;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure1D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
@@ -49,7 +47,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         super();
     }
 
-    public void resolve(final List<Row> body, final Access2D<?> rhs, final PhysicalStore<Double> current) {
+    public void resolve(final List<Equation> body, final PhysicalStore<Double> current) {
 
         final int tmpCountRows = body.size();
 
@@ -66,8 +64,8 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         double pAp0 = 0;
 
         for (int i = 0; i < tmpCountRows; i++) {
-            final Row tmpRow = body.get(i);
-            double tmpVal = rhs.doubleValue(i);
+            final Equation tmpRow = body.get(i);
+            double tmpVal = tmpRow.getRHS();
             tmpVal -= tmpRow.getElements().dot(current);
             tmpResidual.set(tmpRow.index, tmpVal);
             tmpPreconditioned.set(tmpRow.index, tmpVal / tmpRow.getPivot()); // precondition
@@ -89,7 +87,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             zr0 = zr1;
 
             for (int i = 0; i < tmpCountRows; i++) {
-                final Row tmpRow = body.get(i);
+                final Equation tmpRow = body.get(i);
                 final double tmpVal = tmpRow.getElements().dot(tmpDirection);
                 tmpVector.set(tmpRow.index, tmpVal);
             }
@@ -103,8 +101,8 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
             // tmpPreconditioned.fillMatching(tmpResidual);
             for (int i = 0; i < tmpCountRows; i++) {
-                final Row tmpRow = body.get(i);
-                tmpPreconditioned.set(tmpRow.index, tmpResidual.doubleValue(tmpRow.index));
+                final Equation tmpRow = body.get(i);
+                tmpPreconditioned.set(tmpRow.index, tmpResidual.doubleValue(tmpRow.index) / tmpRow.getPivot());
             }
 
             zr1 = tmpPreconditioned.transpose().multiply(tmpResidual).doubleValue(0L);
@@ -116,15 +114,16 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             tmpLastNorm = tmpCurrNorm;
             tmpCurrNorm = current.aggregateAll(Aggregator.NORM2);
 
-        } while ((tmpIterations < tmpIterationsLimit) && !tmpCntxt.isSmall(tmpCurrNorm, tmpResidual.aggregateAll(Aggregator.NORM2)));
+        } while ((tmpIterations < tmpIterationsLimit)
+                && !(!tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm) || tmpCntxt.isSmall(tmpCurrNorm, tmpResidual.aggregateAll(Aggregator.NORM2))));
 
     }
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
 
-        final List<Row> tmpRows = IterativeSolverTask.toListOfRows(body);
+        final List<Equation> tmpRows = IterativeSolverTask.toListOfRows(body, rhs);
 
-        this.resolve(tmpRows, rhs, preallocated);
+        this.resolve(tmpRows, preallocated);
 
         return preallocated;
     }
@@ -132,6 +131,8 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
     private PrimitiveDenseStore direction(final Structure1D structure) {
         if ((myDirection == null) || (myDirection.count() != structure.count())) {
             myDirection = PrimitiveDenseStore.FACTORY.makeZero(structure.count(), 1L);
+        } else {
+            myDirection.fillAll(ZERO);
         }
         return myDirection;
     }
@@ -139,6 +140,8 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
     private PrimitiveDenseStore preconditioned(final Structure1D structure) {
         if ((myPreconditioned == null) || (myPreconditioned.count() != structure.count())) {
             myPreconditioned = PrimitiveDenseStore.FACTORY.makeZero(structure.count(), 1L);
+        } else {
+            myPreconditioned.fillAll(ZERO);
         }
         return myPreconditioned;
     }
@@ -146,6 +149,8 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
     private PrimitiveDenseStore residual(final Structure1D structure) {
         if ((myResidual == null) || (myResidual.count() != structure.count())) {
             myResidual = PrimitiveDenseStore.FACTORY.makeZero(structure.count(), 1L);
+        } else {
+            myResidual.fillAll(ZERO);
         }
         return myResidual;
     }
@@ -153,6 +158,8 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
     private PrimitiveDenseStore vector(final Structure1D structure) {
         if ((myVector == null) || (myVector.count() != structure.count())) {
             myVector = PrimitiveDenseStore.FACTORY.makeZero(structure.count(), 1L);
+        } else {
+            myVector.fillAll(ZERO);
         }
         return myVector;
     }

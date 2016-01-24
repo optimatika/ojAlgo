@@ -39,9 +39,9 @@ public class ComPictetPamBamTest extends OptimisationLinearTests {
 
     final static int numberOfVars = 2;
 
-    Variable[] vars;
-    BigDecimal[] point;
     ExpressionsBasedModel linearModel;
+    BigDecimal[] point;
+    Variable[] vars;
 
     public void test1() {
         this.setupModel();

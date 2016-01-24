@@ -178,25 +178,6 @@ public class LinearProblems extends OptimisationLinearTests {
     }
 
     /**
-     * Problemet var att en av noderna som IntegerSolver genererade var infeasible, men det misslyckades
-     * LinearSolver med att identifiera och returnerade en felaktig lösning som OPTIMAL. Detta testfall
-     * motsvarar
-     */
-    public void testP20150127() {
-
-        final ExpressionsBasedModel tmpModel = P20150127b.getModel(true, true);
-
-        // tmpModel.options.debug(LinearSolver.class);
-        // Kan få testfallet att gå igenom, men dåsmäller andra testfall
-        // tmpModel.options.objective = tmpModel.options.objective.newScale(8);
-
-        final Result tmpResult = tmpModel.minimise();
-
-        TestUtils.assertStateLessThanFeasible(tmpResult); // Should be infeasible
-        TestUtils.assertFalse(tmpModel.validate(tmpResult));
-    }
-
-    /**
      * Depending on how the constraints were constructed the solver could fail to solve and report the problem
      * to be unbounded.
      */
@@ -260,6 +241,25 @@ public class LinearProblems extends OptimisationLinearTests {
         //TestUtils.assertEquals(tmpExpectedState, tmpResultNN.getState());
         TestUtils.assertStateNotLessThanOptimal(tmpResultNN);
         TestUtils.assertEquals(tmpExpectedSolution, BigMatrix.FACTORY.columns(tmpResultNN));
+    }
+
+    /**
+     * Problemet var att en av noderna som IntegerSolver genererade var infeasible, men det misslyckades
+     * LinearSolver med att identifiera och returnerade en felaktig lösning som OPTIMAL. Detta testfall
+     * motsvarar
+     */
+    public void testP20150127() {
+
+        final ExpressionsBasedModel tmpModel = P20150127b.getModel(true, true);
+
+        // tmpModel.options.debug(LinearSolver.class);
+        // Kan få testfallet att gå igenom, men dåsmäller andra testfall
+        // tmpModel.options.objective = tmpModel.options.objective.newScale(8);
+
+        final Result tmpResult = tmpModel.minimise();
+
+        TestUtils.assertStateLessThanFeasible(tmpResult); // Should be infeasible
+        TestUtils.assertFalse(tmpModel.validate(tmpResult));
     }
 
 }

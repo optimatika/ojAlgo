@@ -48,17 +48,6 @@ import org.ojalgo.optimisation.Variable;
  */
 public class P20150127a {
 
-    // Return the coefficients for some inequalities of the form 0 > a*x + b*y
-    static List<int[]> getCoefficients() {
-        final List<int[]> result = new LinkedList<>();
-        result.add(new int[] { 0, 1 });
-        for (int i = 0; i < 200; i++) {
-            result.add(new int[] { -1 - (i / 20), -i });
-        }
-        result.add(new int[] { -10, -200 });
-        return result;
-    }
-
     public static ExpressionsBasedModel getModel() {
 
         final ExpressionsBasedModel retVal = new ExpressionsBasedModel();
@@ -114,5 +103,16 @@ public class P20150127a {
                 throw new Exception(coeff[0] + "*x + " + coeff[1] + "*y = " + value + " must be negative (exact: " + exact + ")");
             }
         }
+    }
+
+    // Return the coefficients for some inequalities of the form 0 > a*x + b*y
+    static List<int[]> getCoefficients() {
+        final List<int[]> result = new LinkedList<>();
+        result.add(new int[] { 0, 1 });
+        for (int i = 0; i < 200; i++) {
+            result.add(new int[] { -1 - (i / 20), -i });
+        }
+        result.add(new int[] { -10, -200 });
+        return result;
     }
 }

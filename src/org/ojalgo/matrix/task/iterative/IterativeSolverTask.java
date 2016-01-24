@@ -43,18 +43,18 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
 
     static interface SparseDelegate {
 
-        void resolve(List<Row> body, Access2D<?> rhs, final PhysicalStore<Double> current);
+        void resolve(List<Equation> body, final PhysicalStore<Double> current);
 
     }
 
-    static List<Row> toListOfRows(final Access2D<?> body) {
+    static List<Equation> toListOfRows(final Access2D<?> body, final Access2D<?> rhs) {
 
-        final List<Row> retVal = new ArrayList<>();
+        final List<Equation> retVal = new ArrayList<>();
 
         final long tmpDim = body.countRows();
 
         for (int i = 0; i < tmpDim; i++) {
-            final Row tmpRow = new Row(i, tmpDim);
+            final Equation tmpRow = new Equation(i, tmpDim, rhs.doubleValue(i));
             for (int j = 0; j < tmpDim; j++) {
                 final double tmpVal = body.doubleValue(i, j);
                 if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {

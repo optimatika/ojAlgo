@@ -26,25 +26,37 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-public final class Row implements Comparable<Row> {
+public final class Equation implements Comparable<Equation> {
 
     /**
      * The row index of the original body matrix, [A].
      */
     public final int index;
     /**
-     * The nonzero elements of this row
+     * The nonzero elements of this equation/row
      */
     private final SparseArray<Double> myElements;
     private double myPivot = ZERO;
+    private final double myRHS;
 
-    public Row(final int row, final long numberOfColumns) {
+    public Equation(final int row, final long numberOfColumns, final double rhs) {
         super();
         index = row;
         myElements = SparseArray.makePrimitive(numberOfColumns);
+        myRHS = rhs;
     }
 
-    public int compareTo(final Row other) {
+    /**
+     * Will perform a (relaxed) GaussSeidel update.
+     *
+     * @param x The current solution (one element will be updated)
+     * @param relaxation Typically 1.0 but could be anything (Most likely should be between 0.0 and 2.0).
+     */
+    public void adjust(final PhysicalStore<Double> x, final double relaxation) {
+        this.calculate(x, myRHS, relaxation);
+    }
+
+    public int compareTo(final Equation other) {
         return Integer.compare(index, other.index);
     }
 
@@ -56,18 +68,28 @@ public final class Row implements Comparable<Row> {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof Row)) {
+        if (!(obj instanceof Equation)) {
             return false;
         }
-        final Row other = (Row) obj;
+        final Equation other = (Equation) obj;
         if (index != other.index) {
             return false;
         }
         return true;
     }
 
+    /**
+     * @return The element at {@link #index}
+     */
     public double getPivot() {
         return myPivot;
+    }
+
+    /**
+     * @return The equation RHS
+     */
+    public double getRHS() {
+        return myRHS;
     }
 
     @Override
@@ -78,6 +100,10 @@ public final class Row implements Comparable<Row> {
         return result;
     }
 
+    public void initialise(final PhysicalStore<Double> x) {
+        this.calculate(x, ZERO, ONE);
+    }
+
     public void set(final long index, final double value) {
         myElements.set(index, value);
         if (index == this.index) {
@@ -85,7 +111,12 @@ public final class Row implements Comparable<Row> {
         }
     }
 
-    public void solve(final PhysicalStore<Double> x, final double rhs, final double relaxation) {
+    @Override
+    public String toString() {
+        return index + ": " + myElements.toString();
+    }
+
+    private void calculate(final PhysicalStore<Double> x, final double rhs, final double relaxation) {
 
         double tmpIncrement = rhs;
 
@@ -96,11 +127,6 @@ public final class Row implements Comparable<Row> {
         tmpIncrement /= myPivot;
 
         x.add(index, tmpIncrement);
-    }
-
-    @Override
-    public String toString() {
-        return index + ": " + myElements.toString();
     }
 
     SparseArray<Double> getElements() {

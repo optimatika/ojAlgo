@@ -346,8 +346,8 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         final BasicMatrix tmpConfidenceMatrix = BlackLittermanTest.getInvestorConfidencesMatrix();
 
         for (int i = 0; i < tmpConfidenceMatrix.countRows(); i++) {
-            tmpBLM.addViewWithStandardDeviation(tmpViewPortfolios.selectRows(new int[] { i }).toBigStore().asList(),
-                    tmpViewPortfolioReturns.toBigDecimal(i, 0), BigFunction.SQRT.invoke(tmpConfidenceMatrix.toBigDecimal(i, i)));
+            tmpBLM.addViewWithStandardDeviation(tmpViewPortfolios.selectRows(new int[] { i }).toBigStore().asList(), tmpViewPortfolioReturns.toBigDecimal(i, 0),
+                    BigFunction.SQRT.invoke(tmpConfidenceMatrix.toBigDecimal(i, i)));
         }
 
         this.testBLM(tmpBLM);

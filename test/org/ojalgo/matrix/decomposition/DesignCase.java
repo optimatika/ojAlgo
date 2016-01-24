@@ -87,6 +87,23 @@ public class DesignCase extends MatrixDecompositionTests {
 
     }
 
+    public void testSolveIdentity() {
+
+        final Access2D<?> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(9).get();
+        final Access2D<?> tmpRandom = PrimitiveDenseStore.FACTORY.makeFilled(9, 1, new Uniform());
+
+        final List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getAllPrimitive();
+        for (final MatrixDecomposition<Double> tmpDecomp : tmpAllDecomps) {
+            if (tmpDecomp instanceof SolverTask) {
+                try {
+                    TestUtils.assertEquals(tmpDecomp.getClass().toString(), tmpRandom, ((SolverTask) tmpDecomp).solve(tmpIdentity, tmpRandom));
+                } catch (final TaskException xcptn) {
+                    TestUtils.fail(xcptn.getMessage());
+                }
+            }
+        }
+    }
+
     public void testTridiagonal() {
 
         final Tridiagonal<Double> tmpDecomposition = Tridiagonal.makePrimitive();
@@ -153,23 +170,6 @@ public class DesignCase extends MatrixDecompositionTests {
         tmpNewDecomp.getQ2();
 
         TestUtils.assertEquals(tmpOriginalMatrix, tmpNewDecomp, new NumberContext(7, 6));
-    }
-
-    public void testSolveIdentity() {
-
-        final Access2D<?> tmpIdentity = MatrixStore.PRIMITIVE.makeIdentity(9).get();
-        final Access2D<?> tmpRandom = PrimitiveDenseStore.FACTORY.makeFilled(9, 1, new Uniform());
-
-        final List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getAllPrimitive();
-        for (final MatrixDecomposition<Double> tmpDecomp : tmpAllDecomps) {
-            if (tmpDecomp instanceof SolverTask) {
-                try {
-                    TestUtils.assertEquals(tmpDecomp.getClass().toString(), tmpRandom, ((SolverTask) tmpDecomp).solve(tmpIdentity, tmpRandom));
-                } catch (final TaskException xcptn) {
-                    TestUtils.fail(xcptn.getMessage());
-                }
-            }
-        }
     }
 
     private void doTestSolveInverse(final MatrixDecomposition.Solver<Double> aDecomp, final MatrixStore<Double> aMtrx) {

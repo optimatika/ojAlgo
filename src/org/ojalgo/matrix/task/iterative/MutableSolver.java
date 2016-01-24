@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
@@ -42,13 +42,8 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
         implements Access2D<Double> {
 
     private final D myDelegate;
+    private final List<Equation> myRows = new ArrayList<>();
     private final long mySize;
-    private Access2D<?> myRHS;
-    private final List<Row> myRows = new ArrayList<>();
-
-    public void setup(final Access2D<?> rhs) {
-        myRHS = rhs;
-    }
 
     public MutableSolver(final D delegate, final long size) {
 
@@ -64,7 +59,7 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
         mySize = 0L;
     }
 
-    public boolean add(final Row row) {
+    public boolean add(final Equation row) {
         if (row.getElements().count() != mySize) {
             throw new IllegalArgumentException();
         }
@@ -81,25 +76,17 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
         return mySize;
     }
 
-    public boolean remove(final Row row) {
+    public boolean remove(final Equation row) {
         return myRows.remove(row);
     }
-
-    protected final D getDelegate() {
-        return myDelegate;
-    }
-
-    protected abstract DecompositionStore<Double> preallocate(final Structure2D templateRHS);
 
     /**
      * A variation of {@linkplain #solve(Access2D, Access2D, DecompositionStore)} where you do not supply the
      * equation system <code>body</code>. It is assumed to have been set up beforehand.
      */
-    public final MatrixStore<Double> resolve(final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+    public final MatrixStore<Double> resolve(final DecompositionStore<Double> preallocated) throws TaskException {
 
-        this.setup(rhs);
-
-        this.getDelegate().resolve(myRows, rhs, preallocated);
+        this.getDelegate().resolve(myRows, preallocated);
 
         return preallocated;
     }
@@ -108,17 +95,29 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
      * A variation of {@linkplain #solve(MatrixStore, MatrixStore)} where you do not supply the equation
      * system <code>body</code>. It is assumed to have been set up beforehand.
      */
-    public final Optional<MatrixStore<Double>> resolve(final MatrixStore<Double> rhs) {
+    public final Optional<MatrixStore<Double>> resolve() {
         try {
-            return Optional.of(this.resolve(rhs, this.preallocate(rhs)));
+            return Optional.of(this.resolve(this.preallocate()));
         } catch (final TaskException xcptn) {
             return Optional.empty();
         }
     }
 
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        return this.getDelegate().solve(body, rhs, preallocated);
+    }
+
     protected double doubleValue(final int row, final int column) {
-        final Row tmpRow = myRows.get(row);
+        final Equation tmpRow = myRows.get(row);
         return tmpRow.getElements().doubleValue(column);
+    }
+
+    protected final D getDelegate() {
+        return myDelegate;
+    }
+
+    protected DecompositionStore<Double> preallocate() {
+        return PrimitiveDenseStore.FACTORY.makeZero(mySize, 1L);
     }
 
     @Override
