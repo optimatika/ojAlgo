@@ -105,11 +105,6 @@ abstract class IterativeASS extends ActiveSetSolver {
             return this.doubleValue(row, column);
         }
 
-        @Override
-        protected DecompositionStore<Double> preallocate() {
-            return myIterationL;
-        }
-
         void add(final int j, final Access1D<Double> column, final double rhs) {
 
             final int[] myIncluded = myActivator.getIncluded();
@@ -448,7 +443,7 @@ abstract class IterativeASS extends ActiveSetSolver {
                     BasicLogger.debug();
                 }
 
-                final MatrixStore<Double> tmpL = myS.resolve().get();
+                final MatrixStore<Double> tmpL = myS.resolve(myIterationL);
                 for (int i = 0; i < tmpCountEqualityConstraints; i++) {
                     tmpIterL.set(i, tmpL.doubleValue(i));
                 }

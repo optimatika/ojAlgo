@@ -39,7 +39,7 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
         super();
     }
 
-    public void resolve(final List<Equation> body, final PhysicalStore<Double> current) {
+    public void resolve(final List<Equation> equations, final PhysicalStore<Double> current) {
 
         double tmpCurrNorm = NEG;
         double tmpLastNorm = tmpCurrNorm;
@@ -51,9 +51,9 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
 
         do {
 
-            final int tmpSize = body.size();
+            final int tmpSize = equations.size();
             for (int r = 0; r < tmpSize; r++) {
-                final Equation tmpRow = body.get(r);
+                final Equation tmpRow = equations.get(r);
                 tmpRow.adjust(current, tmpRelaxationFactor);
             }
 

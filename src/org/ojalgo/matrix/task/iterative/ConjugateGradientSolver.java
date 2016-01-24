@@ -36,6 +36,11 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
+/**
+ * A (Jacobi) preconditioned conjugate gradient solver.
+ *
+ * @author apete
+ */
 public final class ConjugateGradientSolver extends KrylovSubspaceSolver implements IterativeSolverTask.SparseDelegate {
 
     private transient PrimitiveDenseStore myDirection = null;
@@ -47,9 +52,9 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         super();
     }
 
-    public void resolve(final List<Equation> body, final PhysicalStore<Double> current) {
+    public void resolve(final List<Equation> equations, final PhysicalStore<Double> current) {
 
-        final int tmpCountRows = body.size();
+        final int tmpCountRows = equations.size();
 
         final PrimitiveDenseStore tmpResidual = this.residual(current);
         final PrimitiveDenseStore tmpDirection = this.direction(current);
@@ -64,7 +69,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         double pAp0 = 0;
 
         for (int i = 0; i < tmpCountRows; i++) {
-            final Equation tmpRow = body.get(i);
+            final Equation tmpRow = equations.get(i);
             double tmpVal = tmpRow.getRHS();
             tmpVal -= tmpRow.getElements().dot(current);
             tmpResidual.set(tmpRow.index, tmpVal);
@@ -87,7 +92,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             zr0 = zr1;
 
             for (int i = 0; i < tmpCountRows; i++) {
-                final Equation tmpRow = body.get(i);
+                final Equation tmpRow = equations.get(i);
                 final double tmpVal = tmpRow.getElements().dot(tmpDirection);
                 tmpVector.set(tmpRow.index, tmpVal);
             }
@@ -101,7 +106,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
             // tmpPreconditioned.fillMatching(tmpResidual);
             for (int i = 0; i < tmpCountRows; i++) {
-                final Equation tmpRow = body.get(i);
+                final Equation tmpRow = equations.get(i);
                 tmpPreconditioned.set(tmpRow.index, tmpResidual.doubleValue(tmpRow.index) / tmpRow.getPivot());
             }
 
