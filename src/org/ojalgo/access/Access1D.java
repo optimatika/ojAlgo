@@ -70,6 +70,23 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
+    /**
+     * Some special, primitive double only, operartions
+     *
+     * @author apete
+     */
+    public interface Primitive extends Structure1D {
+
+        /**
+         * Will calculate and return the dot product of this 1D-structure and another input 1D-vector.
+         *
+         * @param vector Another 1D-structure
+         * @return The dot product
+         */
+        double dot(Access1D<?> vector);
+
+    }
+
     public interface Sliceable<N extends Number> extends Structure1D {
 
         Access1D<N> sliceRange(long first, long limit);

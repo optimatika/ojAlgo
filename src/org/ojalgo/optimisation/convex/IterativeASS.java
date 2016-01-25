@@ -75,7 +75,6 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             // ConjugateGradient
             this.setTerminationContext(NumberContext.getMath(MathContext.DECIMAL64).newPrecision(9));
-            this.setIterationsLimit(IterativeASS.this.countEqualityConstraints() + IterativeASS.this.countInequalityConstraints());
 
             myIterationRows = new Equation[(int) myFullDim];
         }

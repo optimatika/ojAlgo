@@ -398,6 +398,19 @@ public class PrimitiveArray extends DenseArray<Double> {
         return Arrays.hashCode(data);
     }
 
+    @Override
+    public double dot(final Access1D<?> vector) {
+
+        double retVal = ZERO;
+
+        final int tmpCount = Math.min(data.length, (int) vector.count());
+        for (int i = 0; i < tmpCount; i++) {
+            retVal += data[i] * vector.doubleValue(i);
+        }
+
+        return retVal;
+    }
+
     public OfDouble spliterator() {
         return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
     }

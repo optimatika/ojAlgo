@@ -71,21 +71,22 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         for (int i = 0; i < tmpCountRows; i++) {
             final Equation tmpRow = equations.get(i);
             double tmpVal = tmpRow.getRHS();
-            tmpVal -= tmpRow.getElements().dot(current);
+            tmpVal -= tmpRow.dot(current);
             tmpResidual.set(tmpRow.index, tmpVal);
             tmpPreconditioned.set(tmpRow.index, tmpVal / tmpRow.getPivot()); // precondition
         }
 
-        tmpDirection.fillMatching(tmpPreconditioned);
+        tmpDirection.fillMatching(tmpPreconditioned); // tmpPreconditioned.supplyNonZerosTo(tmpDirection);
 
         double tmpCurrNorm = NEG;
         double tmpLastNorm = tmpCurrNorm;
 
-        final int tmpIterations = 0;
+        int tmpIterations = 0;
         final int tmpIterationsLimit = this.getIterationsLimit();
         final NumberContext tmpCntxt = this.getTerminationContext();
 
-        zr1 = tmpPreconditioned.transpose().multiply(tmpResidual).doubleValue(0L);
+        // zr1 = tmpPreconditioned.transpose().multiply(tmpResidual).doubleValue(0L);
+        zr1 = tmpPreconditioned.dot(tmpResidual);
 
         do {
 
@@ -93,24 +94,25 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
             for (int i = 0; i < tmpCountRows; i++) {
                 final Equation tmpRow = equations.get(i);
-                final double tmpVal = tmpRow.getElements().dot(tmpDirection);
+                final double tmpVal = tmpRow.dot(tmpDirection);
                 tmpVector.set(tmpRow.index, tmpVal);
             }
 
-            pAp0 = tmpVector.multiplyLeft(tmpDirection.transpose()).get().doubleValue(0L);
+            // pAp0 = tmpVector.multiplyLeft(tmpDirection.transpose()).get().doubleValue(0L);
+            pAp0 = tmpDirection.dot(tmpVector);
 
             tmpStepLength = zr0 / pAp0;
 
             current.maxpy(tmpStepLength, tmpDirection);
             tmpResidual.maxpy(-tmpStepLength, tmpVector);
 
-            // tmpPreconditioned.fillMatching(tmpResidual);
             for (int i = 0; i < tmpCountRows; i++) {
                 final Equation tmpRow = equations.get(i);
+                // tmpPreconditioned.updateNonZerosFrom(tmpResidual / "pivot")
                 tmpPreconditioned.set(tmpRow.index, tmpResidual.doubleValue(tmpRow.index) / tmpRow.getPivot());
             }
 
-            zr1 = tmpPreconditioned.transpose().multiply(tmpResidual).doubleValue(0L);
+            zr1 = tmpPreconditioned.dot(tmpResidual);
             tmpGradientCorrectionFactor = zr1 / zr0;
 
             tmpDirection.modifyAll(PrimitiveFunction.MULTIPLY.second(tmpGradientCorrectionFactor));
@@ -119,9 +121,14 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             tmpLastNorm = tmpCurrNorm;
             tmpCurrNorm = current.aggregateAll(Aggregator.NORM2);
 
+            // Behöver jag räkna ut 2 st olika NORM2?
+
+            tmpIterations++;
+
         } while ((tmpIterations < tmpIterationsLimit)
                 && !(!tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm) || tmpCntxt.isSmall(tmpCurrNorm, tmpResidual.aggregateAll(Aggregator.NORM2))));
 
+        // BasicLogger.debug("Done in {} iterations on problem size {}", tmpIterations, current.count());
     }
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {

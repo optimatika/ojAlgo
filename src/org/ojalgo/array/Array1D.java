@@ -50,7 +50,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.Fillable<N>,
-        Mutate1D.Modifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
+        Mutate1D.Modifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, Access1D.Primitive, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
@@ -342,6 +342,18 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public long count() {
         return length;
+    }
+
+    public double dot(final Access1D<?> vector) {
+
+        double retVal = PrimitiveMath.ZERO;
+
+        final long tmpCount = Math.min(this.count(), vector.count());
+        for (long i = 0L; i < tmpCount; i++) {
+            retVal += this.doubleValue(i) * vector.doubleValue(i);
+        }
+
+        return retVal;
     }
 
     public double doubleValue(final long index) {

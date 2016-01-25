@@ -23,10 +23,12 @@ package org.ojalgo.matrix.task.iterative;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-public final class Equation implements Comparable<Equation> {
+public final class Equation implements Comparable<Equation>, Access1D<Double>, Mutate1D, Access1D.Primitive {
 
     /**
      * The row index of the original body matrix, [A].
@@ -46,6 +48,17 @@ public final class Equation implements Comparable<Equation> {
         myRHS = rhs;
     }
 
+    public void add(final long index, final double addend) {
+        myElements.add(index, addend);
+        if (index == this.index) {
+            myPivot = myElements.doubleValue(index);
+        }
+    }
+
+    public void add(final long index, final Number addend) {
+        this.add(index, addend.doubleValue());
+    }
+
     /**
      * Will perform a (relaxed) GaussSeidel update.
      *
@@ -58,6 +71,18 @@ public final class Equation implements Comparable<Equation> {
 
     public int compareTo(final Equation other) {
         return Integer.compare(index, other.index);
+    }
+
+    public long count() {
+        return myElements.count();
+    }
+
+    public double dot(final Access1D<?> vector) {
+        return myElements.dot(vector);
+    }
+
+    public double doubleValue(final long index) {
+        return myElements.doubleValue(index);
     }
 
     @Override
@@ -76,6 +101,10 @@ public final class Equation implements Comparable<Equation> {
             return false;
         }
         return true;
+    }
+
+    public Double get(final long index) {
+        return myElements.get(index);
     }
 
     /**
@@ -111,6 +140,10 @@ public final class Equation implements Comparable<Equation> {
         }
     }
 
+    public void set(final long index, final Number value) {
+        this.set(index, value.doubleValue());
+    }
+
     @Override
     public String toString() {
         return index + ": " + myElements.toString();
@@ -127,10 +160,6 @@ public final class Equation implements Comparable<Equation> {
         tmpIncrement /= myPivot;
 
         x.add(index, tmpIncrement);
-    }
-
-    SparseArray<Double> getElements() {
-        return myElements;
     }
 
 }
