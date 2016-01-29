@@ -50,7 +50,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.Fillable<N>,
-        Mutate1D.Modifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, Access1D.Primitive, RandomAccess, Serializable {
+        Mutate1D.Modifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, Access1D.PrimitiveOnly, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 

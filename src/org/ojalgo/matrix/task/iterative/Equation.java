@@ -28,7 +28,7 @@ import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-public final class Equation implements Comparable<Equation>, Access1D<Double>, Mutate1D, Access1D.Primitive {
+public final class Equation implements Comparable<Equation>, Access1D<Double>, Mutate1D, Access1D.PrimitiveOnly {
 
     /**
      * The row index of the original body matrix, [A].

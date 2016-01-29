@@ -202,8 +202,8 @@ abstract class IterativeASS extends ActiveSetSolver {
             // Form LP to check feasibility
 
             final MatrixStore<Double> tmpGradient = tmpUsableKickStarter ? tmpQ.multiply(tmpX).subtract(tmpC) : tmpC.negate();
-
             final MatrixStore<Double> tmpLinearC = tmpGradient.builder().below(tmpGradient.negate()).below(tmpNumInes).build();
+            // final MatrixStore<Double> tmpLinearC = MatrixStore.PRIMITIVE.makeZero(tmpNumVars + tmpNumVars + tmpNumInes, 1).get();
 
             final LinearSolver.Builder tmpLinearBuilder = LinearSolver.getBuilder(tmpLinearC);
 

@@ -75,7 +75,7 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
      *
      * @author apete
      */
-    public interface Primitive extends Structure1D {
+    public interface PrimitiveOnly extends Structure1D {
 
         /**
          * Will calculate and return the dot product of this 1D-structure and another input 1D-vector.
