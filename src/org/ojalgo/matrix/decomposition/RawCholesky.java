@@ -127,6 +127,11 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return mySPD;
     }
 
+    public MatrixStore<Double> reconstruct() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
 
@@ -165,16 +170,6 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return preallocated.builder().hermitian(false).get();
     }
 
-    MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
-
-        final RawStore tmpBody = this.getRawInPlaceStore();
-
-        preallocated.substituteForwards(tmpBody, false, false, false);
-        preallocated.substituteBackwards(tmpBody, false, true, false);
-
-        return preallocated;
-    }
-
     boolean doDecompose(final double[][] data, final Access2D<?> input) {
 
         final int tmpDiagDim = this.getRowDim();
@@ -199,4 +194,20 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
         return this.computed(true);
     }
+
+    MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
+
+        final RawStore tmpBody = this.getRawInPlaceStore();
+
+        preallocated.substituteForwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(tmpBody, false, true, false);
+
+        return preallocated;
+    }
+
+    @Override
+    PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions) {
+        return this.allocate(numberOfEquations, numberOfSolutions);
+    }
+
 }

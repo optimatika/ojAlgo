@@ -357,4 +357,9 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return preallocated.builder().rows(0, n).build();
     }
 
+    @Override
+    PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions) {
+        return this.allocate(numberOfEquations, numberOfSolutions);
+    }
+
 }

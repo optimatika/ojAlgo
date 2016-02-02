@@ -104,7 +104,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
     }
 
     @Override
-    protected final DecompositionStore<N> preallocate(final long numberOfRows, final long numberOfColumns) {
+    protected final DecompositionStore<N> allocate(final long numberOfRows, final long numberOfColumns) {
         return myFactory.makeZero(numberOfRows, numberOfColumns);
     }
 

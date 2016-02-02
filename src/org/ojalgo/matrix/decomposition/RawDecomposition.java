@@ -46,7 +46,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     public MatrixStore<Double> getInverse() {
-        return this.doGetInverse(this.preallocate(this.getColDim(), this.getColDim()));
+        return this.doGetInverse(this.allocate(this.getColDim(), this.getColDim()));
     }
 
     public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
@@ -59,13 +59,12 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
     public abstract MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated);
 
-    public DecompositionStore<Double> preallocate(final Structure2D template) {
-        final long tmpCountRows = template.countRows();
-        return this.preallocate(tmpCountRows, tmpCountRows);
+    public final DecompositionStore<Double> preallocate(final Structure2D template) {
+        return this.preallocate(template.countRows(), template.countColumns(), template.countRows());
     }
 
-    public DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.preallocate(templateRHS.countRows(), templateRHS.countColumns());
+    public final DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+        return this.preallocate(templateBody.countRows(), templateBody.countColumns(), templateRHS.countColumns());
     }
 
     public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs) {
@@ -75,7 +74,8 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     public abstract MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated);
 
     public final MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
-        return this.solve(rhs, this.preallocate(this.getRawInPlaceStore(), rhs));
+        final DecompositionStore<Double> tmpPreallocated = this.preallocate(myRowDim, myColDim, rhs.countColumns());
+        return this.solve(rhs, tmpPreallocated);
     }
 
     public abstract MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated);
@@ -117,7 +117,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     @Override
-    protected final PrimitiveDenseStore preallocate(final long numberOfRows, final long numberOfColumns) {
+    protected final PrimitiveDenseStore allocate(final long numberOfRows, final long numberOfColumns) {
         return PrimitiveDenseStore.FACTORY.makeZero(numberOfRows, numberOfColumns);
     }
 
@@ -127,6 +127,8 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
         MatrixUtils.copy(source, rows, columns, destination);
     }
+
+    abstract PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions);
 
     final double[][] reset(final Structure2D matrix, final boolean transpose) {
 

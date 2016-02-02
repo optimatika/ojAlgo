@@ -32,16 +32,6 @@ final class DirectMixedASS extends DirectASS {
     }
 
     @Override
-    protected boolean initialise(final Result kickStarter) {
-
-        final boolean retVal = super.initialise(kickStarter);
-
-        // myCholesky.solve(this.getAE().transpose(), myInvQAEt);
-
-        return retVal;
-    }
-
-    @Override
     MatrixStore<Double> getIterationA(final int[] included) {
 
         final MatrixStore<Double> tmpAE = this.getAE();

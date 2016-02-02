@@ -508,16 +508,18 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(myStore.signum());
     }
 
-    public I solve(final Access2D<?> aRHS) {
+    public I solve(final Access2D<?> rhs) {
 
         MatrixStore<N> retVal = null;
 
+        final MatrixStore<N> tmpStoreFrom = this.getStoreFrom(rhs);
+
         if (this.isSquare() && this.getComputedLU().isSolvable()) {
-            retVal = this.getComputedLU().solve(this.getStoreFrom(aRHS));
+            retVal = this.getComputedLU().solve(tmpStoreFrom);
         } else if (this.isTall() && this.getComputedQR().isSolvable()) {
-            retVal = this.getComputedQR().solve(this.getStoreFrom(aRHS));
+            retVal = this.getComputedQR().solve(tmpStoreFrom);
         } else {
-            retVal = this.getComputedSingularValue().solve(this.getStoreFrom(aRHS));
+            retVal = this.getComputedSingularValue().solve(tmpStoreFrom);
         }
 
         return this.getFactory().instantiate(retVal);

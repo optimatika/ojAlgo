@@ -1088,4 +1088,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return d;
     }
 
+    @Override
+    PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions) {
+        return this.allocate(numberOfEquations, numberOfEquations);
+    }
+
 }

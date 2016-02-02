@@ -82,61 +82,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.doDecompose(tmpData);
     }
 
-    /**
-     * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
-     *
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#decompose(ElementsSupplier)
-     */
-    boolean doDecompose(final double[][] data) {
-
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
-
-        myPivot = new Pivot(tmpRowDim);
-
-        final double[] tmpColJ = new double[tmpRowDim];
-
-        // Outer loop.
-        for (int j = 0; j < tmpColDim; j++) {
-
-            // Make a copy of the j-th column to localize references.
-            for (int i = 0; i < tmpRowDim; i++) {
-                tmpColJ[i] = data[i][j];
-            }
-
-            // Apply previous transformations.
-            for (int i = 0; i < tmpRowDim; i++) {
-                // Most of the time is spent in the following dot product.
-                data[i][j] = tmpColJ[i] -= DotProduct.invoke(data[i], 0, tmpColJ, 0, 0, Math.min(i, j));
-            }
-
-            // Find pivot and exchange if necessary.
-            int p = j;
-            for (int i = j + 1; i < tmpRowDim; i++) {
-                if (Math.abs(tmpColJ[i]) > Math.abs(tmpColJ[p])) {
-                    p = i;
-                }
-            }
-            if (p != j) {
-                ArrayUtils.exchangeRows(data, j, p);
-                myPivot.change(j, p);
-            }
-
-            // Compute multipliers.
-            if (j < tmpRowDim) {
-                final double tmpVal = data[j][j];
-                if (tmpVal != ZERO) {
-                    for (int i = j + 1; i < tmpRowDim; i++) {
-                        data[i][j] /= tmpVal;
-                    }
-                }
-            }
-
-        }
-
-        return this.computed(true);
-    }
-
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
         return MatrixUtils.equals(aStore, this, context);
     }
@@ -262,6 +207,61 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return preallocated;
     }
 
+    /**
+     * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
+     *
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#decompose(ElementsSupplier)
+     */
+    boolean doDecompose(final double[][] data) {
+
+        final int tmpRowDim = this.getRowDim();
+        final int tmpColDim = this.getColDim();
+
+        myPivot = new Pivot(tmpRowDim);
+
+        final double[] tmpColJ = new double[tmpRowDim];
+
+        // Outer loop.
+        for (int j = 0; j < tmpColDim; j++) {
+
+            // Make a copy of the j-th column to localize references.
+            for (int i = 0; i < tmpRowDim; i++) {
+                tmpColJ[i] = data[i][j];
+            }
+
+            // Apply previous transformations.
+            for (int i = 0; i < tmpRowDim; i++) {
+                // Most of the time is spent in the following dot product.
+                data[i][j] = tmpColJ[i] -= DotProduct.invoke(data[i], 0, tmpColJ, 0, 0, Math.min(i, j));
+            }
+
+            // Find pivot and exchange if necessary.
+            int p = j;
+            for (int i = j + 1; i < tmpRowDim; i++) {
+                if (Math.abs(tmpColJ[i]) > Math.abs(tmpColJ[p])) {
+                    p = i;
+                }
+            }
+            if (p != j) {
+                ArrayUtils.exchangeRows(data, j, p);
+                myPivot.change(j, p);
+            }
+
+            // Compute multipliers.
+            if (j < tmpRowDim) {
+                final double tmpVal = data[j][j];
+                if (tmpVal != ZERO) {
+                    for (int i = j + 1; i < tmpRowDim; i++) {
+                        data[i][j] /= tmpVal;
+                    }
+                }
+            }
+
+        }
+
+        return this.computed(true);
+    }
+
     MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
 
         final MatrixStore<Double> tmpBody = this.getRawInPlaceStore();
@@ -288,6 +288,11 @@ final class RawLU extends RawDecomposition implements LU<Double> {
             }
         }
         return true;
+    }
+
+    @Override
+    PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions) {
+        return this.allocate(numberOfEquations, numberOfSolutions);
     }
 
 }

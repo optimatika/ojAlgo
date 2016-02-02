@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -148,7 +147,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     @Override
     public MatrixStore<Double> getInverse() {
-        return this.doGetInverse(this.preallocate(this.getColDim(), this.getRowDim()));
+        return this.doGetInverse(this.allocate(this.getColDim(), this.getRowDim()));
     }
 
     public double getKyFanNorm(final int k) {
@@ -227,11 +226,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     public boolean isSolvable() {
         return this.isComputed();
-    }
-
-    @Override
-    public DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.preallocate(templateBody.countColumns(), templateBody.countRows());
     }
 
     public MatrixStore<Double> reconstruct() {
@@ -728,6 +722,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      */
     RawStore getV() {
         return new RawStore(myVt, n, n);
+    }
+
+    @Override
+    PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions) {
+        return this.allocate(numberOfVariables, numberOfEquations);
     }
 
 }

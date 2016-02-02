@@ -64,26 +64,36 @@ public interface MultiaryFunction<N extends Number> extends BasicFunction<N>, Fu
     public static interface TwiceDifferentiable<N extends Number> extends MultiaryFunction<N> {
 
         /**
+         * <p>
          * The gradient of a scalar field is a vector field that points in the direction of the greatest rate
-         * of increase of the scalar field, and whose magnitude is that rate of increase. In simple terms, the
-         * variation in space of any quantity can be represented (e.g. graphically) by a slope. The gradient
-         * represents the steepness and direction of that slope. The Jacobian is a generalization of the
-         * gradient. Gradients are only defined on scalar-valued functions, but Jacobians are defined on
-         * vector- valued functions. When f is real-valued (i.e., f : Rn → R) the derivative Df(x) is a 1 × n
-         * matrix, i.e., it is a row vector. Its transpose is called the gradient of the function: ∇f(x) =
-         * Df(x)<sup>T</sup> , which is a (column) vector, i.e., in Rn. Its components are the partial
-         * derivatives of f: The first-order approximation of f at a point x ∈ int dom f can be expressed as
-         * (the affine function of z) f(x) + ∇f(x)T (z − x).
+         * of increase of the scalar field, and whose magnitude is that rate of increase.
+         * </p>
+         * <p>
+         * The Jacobian is a generalization of the gradient. Gradients are only defined on scalar-valued
+         * functions, but Jacobians are defined on vector- valued functions. When f is real-valued (i.e., f :
+         * Rn → R) the derivative Df(x) is a 1 × n matrix, i.e., it is a row vector. Its transpose is called
+         * the gradient of the function: ∇f(x) = Df(x)<sup>T</sup> , which is a (column) vector, i.e., in Rn.
+         * Its components are the partial derivatives of f:
+         * </p>
+         * <p>
+         * The first-order approximation of f at a point x ∈ int dom f can be expressed as (the affine
+         * function of z) f(z) = f(x) + ∇f(x)T (z − x).
+         * </p>
          */
-        MatrixStore<N> getGradient(Access1D<N> arg);
+        MatrixStore<N> getGradient(Access1D<N> point);
 
         /**
+         * <p>
          * The Hessian matrix or Hessian is a square matrix of second-order partial derivatives of a function.
          * It describes the local curvature of a function of many variables. The Hessian is the Jacobian of
-         * the gradient. The second-order approximation of f, at or near x, is the quadratic function of z
-         * defined by f(z) = f(x) + ∇f(x)T (z − x) + (1/2)(z − x)T ∇2f(x)(z − x)
+         * the gradient.
+         * </p>
+         * <p>
+         * The second-order approximation of f, at or near x, is the quadratic function of z defined by f(z) =
+         * f(x) + ∇f(x)T (z − x) + (1/2)(z − x)T ∇2f(x)(z − x)
+         * </p>
          */
-        MatrixStore<N> getHessian(Access1D<N> arg);
+        MatrixStore<N> getHessian(Access1D<N> point);
 
         FirstOrderApproximation<N> toFirstOrderApproximation(final Access1D<N> point);
 

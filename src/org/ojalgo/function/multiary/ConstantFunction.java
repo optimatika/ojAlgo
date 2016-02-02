@@ -86,12 +86,12 @@ public final class ConstantFunction<N extends Number> extends AbstractMultiary<N
         return myArity;
     }
 
-    public MatrixStore<N> getGradient(final Access1D<N> arg) {
+    public MatrixStore<N> getGradient(final Access1D<N> point) {
         //return new ZeroStore<>(this.factory(), this.arity(), 1);
         return this.factory().builder().makeZero(this.arity(), 1).get();
     }
 
-    public MatrixStore<N> getHessian(final Access1D<N> arg) {
+    public MatrixStore<N> getHessian(final Access1D<N> point) {
         //return new ZeroStore<>(this.factory(), this.arity(), this.arity());
         return this.factory().builder().makeZero(this.arity(), this.arity()).get();
     }

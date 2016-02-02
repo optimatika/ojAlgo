@@ -60,34 +60,6 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return this.doDecompose(retVal, tmpRawInPlaceStore);
     }
 
-    boolean doDecompose(final double[][] data, final Access2D<?> input) {
-
-        final int tmpDiagDim = this.getRowDim();
-        mySPD = (this.getColDim() == tmpDiagDim);
-
-        final double[] tmpRowIJ = new double[tmpDiagDim];
-        double[] tmpRowI;
-
-        // Main loop.
-        for (int ij = 0; ij < tmpDiagDim; ij++) { // For each row/column, along the diagonal
-            tmpRowI = data[ij];
-
-            for (int j = 0; j < ij; j++) {
-                tmpRowIJ[j] = tmpRowI[j] * data[j][j];
-            }
-            final double tmpD = tmpRowI[ij] = input.doubleValue(ij, ij) - DotProduct.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij);
-            mySPD &= (tmpD > ZERO);
-
-            for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
-                tmpRowI = data[i];
-
-                tmpRowI[ij] = (input.doubleValue(i, ij) - DotProduct.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij)) / tmpD;
-            }
-        }
-
-        return this.computed(true);
-    }
-
     public MatrixStore<Double> getD() {
         return this.getRawInPlaceStore().builder().diagonal(false).build();
     }
@@ -176,6 +148,34 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return preallocated;
     }
 
+    boolean doDecompose(final double[][] data, final Access2D<?> input) {
+
+        final int tmpDiagDim = this.getRowDim();
+        mySPD = (this.getColDim() == tmpDiagDim);
+
+        final double[] tmpRowIJ = new double[tmpDiagDim];
+        double[] tmpRowI;
+
+        // Main loop.
+        for (int ij = 0; ij < tmpDiagDim; ij++) { // For each row/column, along the diagonal
+            tmpRowI = data[ij];
+
+            for (int j = 0; j < ij; j++) {
+                tmpRowIJ[j] = tmpRowI[j] * data[j][j];
+            }
+            final double tmpD = tmpRowI[ij] = input.doubleValue(ij, ij) - DotProduct.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij);
+            mySPD &= (tmpD > ZERO);
+
+            for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
+                tmpRowI = data[i];
+
+                tmpRowI[ij] = (input.doubleValue(i, ij) - DotProduct.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij)) / tmpD;
+            }
+        }
+
+        return this.computed(true);
+    }
+
     MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final PrimitiveDenseStore preallocated) {
 
         rhs.supplyTo(preallocated);
@@ -191,6 +191,11 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         preallocated.substituteBackwards(tmpBody, true, true, false);
 
         return preallocated;
+    }
+
+    @Override
+    PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions) {
+        return this.allocate(numberOfEquations, numberOfSolutions);
     }
 
 }

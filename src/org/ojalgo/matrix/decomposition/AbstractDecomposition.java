@@ -42,6 +42,8 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
         myComputed = false;
     }
 
+    protected abstract DecompositionStore<N> allocate(long numberOfRows, long numberOfColumns);
+
     protected final boolean aspectRatioNormal(final boolean aspectRatioNormal) {
         return (myAspectRatioNormal = aspectRatioNormal);
     }
@@ -53,6 +55,4 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
     protected final boolean isAspectRatioNormal() {
         return myAspectRatioNormal;
     }
-
-    protected abstract DecompositionStore<N> preallocate(long numberOfRows, long numberOfColumns);
 }

@@ -72,11 +72,11 @@ public final class SecondOrderApproximation<N extends Number> extends Approximat
         return true;
     }
 
-    public MatrixStore<N> getGradient(final Access1D<N> arg) {
-        return myDelegate.getGradient(this.shift(arg));
+    public MatrixStore<N> getGradient(final Access1D<N> point) {
+        return myDelegate.getGradient(this.shift(point));
     }
 
-    public MatrixStore<N> getHessian(final Access1D<N> arg) {
+    public MatrixStore<N> getHessian(final Access1D<N> point) {
         return myDelegate.getHessian(null);
     }
 

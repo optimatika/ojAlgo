@@ -65,11 +65,11 @@ public final class FirstOrderApproximation<N extends Number> extends Approximate
         return true;
     }
 
-    public MatrixStore<N> getGradient(final Access1D<N> arg) {
+    public MatrixStore<N> getGradient(final Access1D<N> point) {
         return myDelegate.getGradient(null);
     }
 
-    public MatrixStore<N> getHessian(final Access1D<N> arg) {
+    public MatrixStore<N> getHessian(final Access1D<N> point) {
         return myDelegate.getHessian(null);
     }
 
