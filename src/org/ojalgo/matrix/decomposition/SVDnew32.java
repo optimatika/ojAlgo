@@ -231,7 +231,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
         final int tmpDiagDim = bidiagonal.mainDiagonal.size();
 
-        final double[] s = bidiagonal.mainDiagonal.toRawCopy(); // s
+        final double[] s = bidiagonal.mainDiagonal.toRawCopy1D(); // s
         final double[] e = new double[tmpDiagDim]; // e
         final int tmpOffLength = bidiagonal.superdiagonal.size();
         for (int i = 0; i < tmpOffLength; i++) {

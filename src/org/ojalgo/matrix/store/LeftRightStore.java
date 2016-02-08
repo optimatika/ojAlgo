@@ -102,14 +102,19 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
         }
     }
 
+    @Override
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        this.getBase().supplyTo(consumer.regionByLimits(this.getRowDim(), mySplit));
+        myRight.supplyTo(consumer.regionByOffsets(0, mySplit));
+    }
+
     public Scalar<N> toScalar(final long row, final long column) {
         return (column >= mySplit) ? myRight.toScalar(row, column - mySplit) : this.getBase().toScalar(row, column);
     }
 
     @Override
     protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
-        consumer.regionByLimits(this.getRowDim(), mySplit).fillMatching(this.getBase());
-        consumer.regionByOffsets(0, mySplit).fillMatching(myRight);
+        this.supplyTo(consumer);
     }
 
 }

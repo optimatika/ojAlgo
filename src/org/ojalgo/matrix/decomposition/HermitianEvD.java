@@ -91,7 +91,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
 
         final int tmpDim = tmpMainDiagonal.size();
 
-        final double[] tmpMainDiagData = tmpMainDiagonal.toRawCopy(); // Actually unnecessary to copy
+        final double[] tmpMainDiagData = tmpMainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
         final double[] tmpOffDiagData = new double[tmpDim]; // The algorith needs the array to be the same length as the main diagonal
         final int tmpLength = tmpSubdiagonal.size();
         for (int i = 0; i < tmpLength; i++) {

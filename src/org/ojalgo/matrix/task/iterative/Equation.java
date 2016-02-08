@@ -48,6 +48,13 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         myRHS = rhs;
     }
 
+    public Equation(final int row, final long numberOfColumns, final double rhs, final int numberOfNonzeros) {
+        super();
+        index = row;
+        myElements = SparseArray.makePrimitive(numberOfColumns, numberOfNonzeros);
+        myRHS = rhs;
+    }
+
     public void add(final long index, final double addend) {
         myElements.add(index, addend);
         if (index == this.index) {

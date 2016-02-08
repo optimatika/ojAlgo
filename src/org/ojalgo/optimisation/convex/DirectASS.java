@@ -130,7 +130,7 @@ abstract class DirectASS extends ActiveSetSolver {
             options.debug_appender.printmtrx("RHS", this.getIterationRHS());
         }
 
-        this.handleSubsolution(tmpIncluded, tmpSolvable, tmpIterX, tmpIterL);
+        this.handleSubsolution(tmpSolvable, tmpIterX, tmpIncluded);
     }
 
     @Override

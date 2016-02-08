@@ -32,8 +32,6 @@ import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Access2D refers to the active (not null or zero) rows and columns only - useful for debugging.
- *
  * @author apete
  */
 public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSolverTask.SparseDelegate> extends IterativeSolverTask {
@@ -42,7 +40,7 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
     private final List<Equation> myRows = new ArrayList<>();
     private final long mySize;
 
-    public MutableSolver(final D delegate, final long size) {
+    protected MutableSolver(final D delegate, final long size) {
 
         super();
 
@@ -50,6 +48,7 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
         mySize = size;
     }
 
+    @SuppressWarnings("unused")
     private MutableSolver() {
         super();
         myDelegate = null;

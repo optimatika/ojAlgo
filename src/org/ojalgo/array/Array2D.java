@@ -614,15 +614,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         return new Array1D<N>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount);
     }
 
-    /**
-     * @return An array of arrays of doubles
-     * @deprecated v39 Use {@link #toRawCopy2D()} instead.
-     */
-    @Deprecated
-    public double[][] toRawCopy() {
-        return this.toRawCopy2D();
-    }
-
     @Override
     public String toString() {
         return myDelegate.toString();

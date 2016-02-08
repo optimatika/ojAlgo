@@ -23,7 +23,6 @@ package org.ojalgo.array;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.function.LongUnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
@@ -49,7 +48,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     static abstract class SparseFactory<N extends Number> extends ArrayFactory<N> {
 
-        abstract SparseArray<N> make(long count);
+        final SparseArray<N> make(final long count) {
+            return this.make(count, SparseArray.capacity(count));
+        }
+
+        abstract SparseArray<N> make(long count, int initialCapacity);
 
         @Override
         final SparseArray<N> makeStructuredZero(final long... structure) {
@@ -71,8 +74,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
 
         @Override
-        SparseArray<BigDecimal> make(final long count) {
-            return SparseArray.makeBig(count);
+        SparseArray<BigDecimal> make(final long count, final int initialCapacity) {
+            return SparseArray.makeBig(count, initialCapacity);
         }
 
     };
@@ -85,11 +88,13 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
 
         @Override
-        SparseArray<ComplexNumber> make(final long count) {
-            return SparseArray.makeComplex(count);
+        SparseArray<ComplexNumber> make(final long count, final int initialCapacity) {
+            return SparseArray.makeComplex(count, initialCapacity);
         }
 
     };
+
+    static final int GROWTH_FACTOR = 2;
 
     static final SparseFactory<Double> PRIMITIVE = new SparseFactory<Double>() {
 
@@ -99,8 +104,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
 
         @Override
-        SparseArray<Double> make(final long count) {
-            return SparseArray.makePrimitive(count);
+        SparseArray<Double> make(final long count, final int initialCapacity) {
+            return SparseArray.makePrimitive(count, initialCapacity);
         }
 
     };
@@ -113,8 +118,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
 
         @Override
-        SparseArray<Quaternion> make(final long count) {
-            return SparseArray.makeQuaternion(count);
+        SparseArray<Quaternion> make(final long count, final int initialCapacity) {
+            return SparseArray.makeQuaternion(count, initialCapacity);
         }
 
     };
@@ -127,14 +132,18 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
 
         @Override
-        SparseArray<RationalNumber> make(final long count) {
-            return SparseArray.makeRational(count);
+        SparseArray<RationalNumber> make(final long count, final int initialCapacity) {
+            return SparseArray.makeRational(count, initialCapacity);
         }
 
     };
 
     public static SparseArray<BigDecimal> makeBig(final long count) {
-        return new SparseArray<>(count, BigArray.FACTORY);
+        return new SparseArray<>(count, BigArray.FACTORY, SparseArray.capacity(count));
+    }
+
+    public static SparseArray<BigDecimal> makeBig(final long count, final int initialCapacity) {
+        return new SparseArray<>(count, BigArray.FACTORY, initialCapacity);
     }
 
     public static final SegmentedArray<BigDecimal> makeBigSegmented(final long count) {
@@ -142,7 +151,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static SparseArray<ComplexNumber> makeComplex(final long count) {
-        return new SparseArray<>(count, ComplexArray.FACTORY);
+        return new SparseArray<>(count, ComplexArray.FACTORY, SparseArray.capacity(count));
+    }
+
+    public static SparseArray<ComplexNumber> makeComplex(final long count, final int initialCapacity) {
+        return new SparseArray<>(count, ComplexArray.FACTORY, initialCapacity);
     }
 
     public static final SegmentedArray<ComplexNumber> makeComplexSegmented(final long count) {
@@ -150,7 +163,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static SparseArray<Double> makePrimitive(final long count) {
-        return new SparseArray<>(count, PrimitiveArray.FACTORY);
+        return new SparseArray<>(count, PrimitiveArray.FACTORY, SparseArray.capacity(count));
+    }
+
+    public static SparseArray<Double> makePrimitive(final long count, final int initialCapacity) {
+        return new SparseArray<>(count, PrimitiveArray.FACTORY, initialCapacity);
     }
 
     public static final SegmentedArray<Double> makePrimitiveSegmented(final long count) {
@@ -158,7 +175,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static SparseArray<Quaternion> makeQuaternion(final long count) {
-        return new SparseArray<>(count, QuaternionArray.FACTORY);
+        return new SparseArray<>(count, QuaternionArray.FACTORY, SparseArray.capacity(count));
+    }
+
+    public static SparseArray<Quaternion> makeQuaternion(final long count, final int initialCapacity) {
+        return new SparseArray<>(count, QuaternionArray.FACTORY, initialCapacity);
     }
 
     public static final SegmentedArray<Quaternion> makeQuaternionSegmented(final long count) {
@@ -166,11 +187,27 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static SparseArray<RationalNumber> makeRational(final long count) {
-        return new SparseArray<>(count, RationalArray.FACTORY);
+        return new SparseArray<>(count, RationalArray.FACTORY, SparseArray.capacity(count));
+    }
+
+    public static SparseArray<RationalNumber> makeRational(final long count, final int initialCapacity) {
+        return new SparseArray<>(count, RationalArray.FACTORY, initialCapacity);
     }
 
     public static final SegmentedArray<RationalNumber> makeRationalSegmented(final long count) {
         return SegmentedArray.make(RATIONAL, count);
+    }
+
+    static int capacity(final long count) {
+
+        double tmpInitialCapacity = count;
+
+        while (tmpInitialCapacity > BasicArray.MAX_ARRAY_SIZE) {
+            tmpInitialCapacity = Math.sqrt(tmpInitialCapacity);
+        }
+
+        tmpInitialCapacity = Math.sqrt(tmpInitialCapacity);
+        return GROWTH_FACTOR * (int) tmpInitialCapacity;
     }
 
     /**
@@ -180,26 +217,18 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     private final long myCount;
     private long[] myIndices;
     private DenseArray<N> myValues;
-
     private final N myZeroNumber;
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
 
-    SparseArray(final long count, final DenseFactory<N> factory) {
+    SparseArray(final long count, final DenseFactory<N> factory, final int initialCapacity) {
 
         super();
 
         myCount = count;
 
-        double tmpInitialCapacity = count;
-        do {
-            tmpInitialCapacity = Math.sqrt(tmpInitialCapacity);
-        } while (tmpInitialCapacity > BasicArray.MAX_ARRAY_SIZE);
-
-        final int tmpLength = 2 * (int) tmpInitialCapacity;
-
-        myIndices = new long[tmpLength];
-        myValues = factory.make(tmpLength);
+        myIndices = new long[initialCapacity];
+        myValues = factory.make(initialCapacity);
 
         myZeroScalar = factory.zero();
         myZeroNumber = myZeroScalar.getNumber();
@@ -226,6 +255,18 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public final long count() {
         return myCount;
+    }
+
+    @Override
+    public double dot(final Access1D<?> vector) {
+
+        double retVal = 0.0;
+
+        for (int n = 0; n < myActualLength; n++) {
+            retVal += myValues.doubleValue(n) * vector.doubleValue(myIndices[n]);
+        }
+
+        return retVal;
     }
 
     @Override
@@ -403,7 +444,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             } else {
                 // Needs to grow the backing arrays
 
-                final int tmpCapacity = tmpOldIndeces.length * 2;
+                final int tmpCapacity = tmpOldIndeces.length * GROWTH_FACTOR;
                 final long[] tmpIndices = new long[tmpCapacity];
                 final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
 
@@ -463,7 +504,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             } else {
                 // Needs to grow the backing arrays
 
-                final int tmpCapacity = tmpOldIndeces.length * 2;
+                final int tmpCapacity = tmpOldIndeces.length * GROWTH_FACTOR;
                 final long[] tmpIndices = new long[tmpCapacity];
                 final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
 
@@ -493,35 +534,13 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public void supplyNonZerosTo(final Mutate1D consumer) {
-        this.supplyNonZerosTo(consumer, LongUnaryOperator.identity());
-    }
-
-    public double dot(final Access1D<?> vector) {
-
-        double retVal = 0.0;
-
-        for (int n = 0; n < myActualLength; n++) {
-            retVal += myValues.doubleValue(n) * vector.doubleValue(myIndices[n]);
-        }
-
-        return retVal;
-    }
-
-    public void supplyNonZerosTo(final Mutate1D consumer, final LongUnaryOperator indexRemapper) {
-        long tmpMappedIndex;
         if (this.isPrimitive()) {
             for (int n = 0; n < myActualLength; n++) {
-                tmpMappedIndex = indexRemapper.applyAsLong(myIndices[n]);
-                if (tmpMappedIndex >= 0L) {
-                    consumer.set(tmpMappedIndex, myValues.doubleValue(n));
-                }
+                consumer.set(myIndices[n], myValues.doubleValue(n));
             }
         } else {
             for (int n = 0; n < myActualLength; n++) {
-                tmpMappedIndex = indexRemapper.applyAsLong(myIndices[n]);
-                if (tmpMappedIndex >= 0L) {
-                    consumer.set(tmpMappedIndex, myValues.get(n));
-                }
+                consumer.set(myIndices[n], myValues.get(n));
             }
         }
     }

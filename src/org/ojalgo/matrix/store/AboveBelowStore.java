@@ -103,14 +103,19 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
         }
     }
 
+    @Override
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        this.getBase().supplyTo(consumer.regionByLimits(mySplit, this.getColDim()));
+        myBelow.supplyTo(consumer.regionByOffsets(mySplit, 0));
+    }
+
     public Scalar<N> toScalar(final long row, final long column) {
         return (row >= mySplit) ? myBelow.toScalar(row - mySplit, column) : this.getBase().toScalar(row, column);
     }
 
     @Override
     protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
-        consumer.regionByLimits(mySplit, this.getColDim()).fillMatching(this.getBase());
-        consumer.regionByOffsets(mySplit, 0).fillMatching(myBelow);
+        this.supplyTo(consumer);
     }
 
 }

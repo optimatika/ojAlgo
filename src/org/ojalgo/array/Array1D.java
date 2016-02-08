@@ -437,25 +437,9 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return myDelegate.isAbsolute(myFirst + (myStep * index));
     }
 
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public boolean isAllZeros() {
-        return myDelegate.isSmall(myFirst, myLimit, myStep, PrimitiveMath.ONE);
-    }
-
     @Override
     public boolean isEmpty() {
         return length == 0;
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public boolean isRangeZeros(final long first, final long limit) {
-        return myDelegate.isSmall((myFirst + (myStep * first)), (myFirst + (myStep * limit)), myStep, PrimitiveMath.ONE);
     }
 
     /**
@@ -652,22 +636,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     @Override
     public Array1D<N> subList(final int first, final int limit) {
         return this.sliceRange(first, limit);
-    }
-
-    /**
-     * @deprecated v39 Use {@link #toRawCopy1D()} instead
-     */
-    @Deprecated
-    public double[] toRawCopy() {
-
-        final int tmpLength = (int) length;
-        final double[] retVal = new double[tmpLength];
-
-        for (int i = 0; i < tmpLength; i++) {
-            retVal[i] = this.doubleValue(i);
-        }
-
-        return retVal;
     }
 
     public void visitAll(final VoidFunction<N> visitor) {

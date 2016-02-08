@@ -68,4 +68,11 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
         return this.getBase().toScalar(row, myColumns[(int) column]);
     }
 
+    @Override
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        final MatrixStore<N> tmpBase = this.getBase();
+        for (int c = 0; c < myColumns.length; c++) {
+            consumer.fillColumn(0, c, tmpBase.sliceColumn(0, myColumns[c]));
+        }
+    }
 }

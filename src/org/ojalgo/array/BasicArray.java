@@ -74,7 +74,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             if (tmpTotal > MAX_ARRAY_SIZE) {
                 return this.getSegmentedFactory().makeStructuredZero(structure);
             } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getDenseFactory().getElementSize())) {
-                return new SparseArray<N>(tmpTotal, this.getDenseFactory());
+                return new SparseArray<N>(tmpTotal, this.getDenseFactory(), SparseArray.capacity(tmpTotal));
             } else {
                 return this.getDenseFactory().makeStructuredZero(structure);
             }
