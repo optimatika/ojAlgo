@@ -335,12 +335,12 @@ public final class BlackLittermanModel extends EquilibriumModel {
         return retVal.build();
     }
 
-    BigDecimal calculateVariance(final BasicMatrix aWeightsMtrx) {
+    BigDecimal calculateVariance(final BasicMatrix weights) {
 
         BasicMatrix tmpVal = this.getCovariances();
 
-        tmpVal = tmpVal.multiply(aWeightsMtrx);
+        tmpVal = tmpVal.multiply(weights);
 
-        return tmpVal.multiplyLeft(aWeightsMtrx.transpose()).toBigDecimal(0, 0);
+        return weights.transpose().multiply(tmpVal).toBigDecimal(0, 0);
     }
 }

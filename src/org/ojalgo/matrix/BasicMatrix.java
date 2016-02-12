@@ -29,6 +29,8 @@ import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.access.Supplier2D;
 import org.ojalgo.algebra.NormedVectorSpace;
+import org.ojalgo.algebra.Operation;
+import org.ojalgo.algebra.ScalarOperation;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -59,7 +61,9 @@ import org.ojalgo.type.context.NumberContext;
  * @see MatrixStore
  * @author apete
  */
-public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMatrix, Number> {
+public interface BasicMatrix
+        extends Access2D<Number>, NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
+        ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
 
     public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier2D<I> {
 
@@ -78,14 +82,6 @@ public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMa
     }
 
     /**
-     * Adds the elements of aMtrx to the elements of this matrix. The matrices must have equal dimensions.
-     *
-     * @param addend What to add.
-     * @return A new matrix whos elements are the sum of this' and aMtrx'.
-     */
-    BasicMatrix add(Access2D<?> addend);
-
-    /**
      * @param row The row index of where to superimpose the top left element of aMtrx
      * @param col The column index of where to superimpose the top left element of aMtrx
      * @param addend A matrix to superimpose
@@ -94,31 +90,9 @@ public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMa
     BasicMatrix add(int row, int col, Access2D<?> addend);
 
     /**
-     * Do not use this method to populate large dense matrices! Only use it to change a few (a small number)
-     * of elements.
-     */
-    BasicMatrix add(int row, int col, Number value);
-
-    /**
-     * Adds value to the elements of this.
-     *
-     * @param value What to add
-     * @return A new matrix whos elements are the sum of this' elements and value.
-     */
-    BasicMatrix add(Number value);
-
-    /**
      * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
      */
     Builder<? extends BasicMatrix> copyToBuilder();
-
-    /**
-     * Divides the elements of this with value.
-     *
-     * @param value The denominator.
-     * @return A new matrix whos elements are the elements of this divided with value.
-     */
-    BasicMatrix divide(Number value);
 
     /**
      * Divides the elements of this with the elements of aMtrx. The matrices must have equal dimensions.
@@ -374,16 +348,6 @@ public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMa
     BasicMatrix modify(UnaryFunction<? extends Number> aFunc);
 
     /**
-     * Matrix multiplication: [this][aMtrx] <br>
-     * The column dimension of the left matrix must equal the row dimension of the right matrix.
-     *
-     * @param right The right matrix.
-     * @return The product.
-     * @see org.ojalgo.matrix.BasicMatrix#multiplyLeft(Access2D)
-     */
-    BasicMatrix multiply(Access2D<?> right);
-
-    /**
      * Multiplies the elements of this matrix with the elements of aMtrx. The matrices must have equal
      * dimensions.
      *
@@ -391,22 +355,6 @@ public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMa
      * @return A new matrix whos elements are the elements of this multiplied with the elements of aMtrx.
      */
     BasicMatrix multiplyElements(Access2D<?> aMtrx);
-
-    /**
-     * Matrix multiplication: [aMtrx][this] <br>
-     * The column dimension of the left matrix must equal the row dimension of the right matrix.
-     *
-     * @param aMtrx The left matrix.
-     * @return The product.
-     * @see org.ojalgo.matrix.BasicMatrix#multiply(Access2D)
-     */
-    BasicMatrix multiplyLeft(Access2D<?> aMtrx);
-
-    /**
-     * Assumes that both [this] and [aVctr] have row or column dimension, doesn't matter which, equal to 1.
-     * The two vectors must have the same number of elements.
-     */
-    Scalar<?> multiplyVectors(Access2D<?> aVctr);
 
     /**
      * @param someCols An ordered array of column indeces.
@@ -437,23 +385,6 @@ public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMa
      * @return The solution, [X].
      */
     BasicMatrix solve(Access2D<?> aRHS);
-
-    /**
-     * Subtracts the elements of aMtrx from the elements of this matrix. The matrices must have equal
-     * dimensions.
-     *
-     * @param aMtrx What to subtract.
-     * @return A new matrix whos elements are the difference of this' and aMtrx'.
-     */
-    BasicMatrix subtract(Access2D<?> aMtrx);
-
-    /**
-     * Subtracts value from the elements of this matrix.
-     *
-     * @param value What to subtract.
-     * @return A new matrix whos elements are the differences between this' elements and value.
-     */
-    BasicMatrix subtract(Number value);
 
     /**
      * Extracts one element of this matrix as a BigDecimal.

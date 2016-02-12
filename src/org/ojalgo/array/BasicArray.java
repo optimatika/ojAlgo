@@ -32,7 +32,6 @@ import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -55,8 +54,8 @@ import org.ojalgo.scalar.RationalNumber;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Access1D.PrimitiveOnly,
-        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
+public abstract class BasicArray<N extends Number>
+        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
 
     static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -223,18 +222,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     protected BasicArray() {
         super();
-    }
-
-    public double dot(final Access1D<?> vector) {
-
-        double retVal = PrimitiveMath.ZERO;
-
-        final long tmpCount = Math.min(this.count(), vector.count());
-        for (long i = 0L; i < tmpCount; i++) {
-            retVal += this.doubleValue(i) * vector.doubleValue(i);
-        }
-
-        return retVal;
     }
 
     public long indexOfLargest() {

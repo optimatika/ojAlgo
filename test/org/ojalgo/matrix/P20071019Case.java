@@ -33,7 +33,7 @@ import org.ojalgo.matrix.store.MatrixStore;
  */
 public class P20071019Case extends BasicMatrixTest {
 
-    public static BasicMatrix getFatProblematic() {
+    public static BigMatrix getFatProblematic() {
         return SimpleLeastSquaresCase.getBody().transpose();
     }
 

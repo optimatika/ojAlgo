@@ -88,9 +88,9 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         final BasicMatrix tmpMyWeights = MATRIX_FACTORY.columns(this.getWeights());
         final BasicMatrix tmpRefWeights = MATRIX_FACTORY.columns(reference.getWeights());
 
-        final double tmpNumerator = tmpMyWeights.multiplyVectors(tmpRefWeights).doubleValue();
-        final double tmpDenom1 = Math.sqrt(tmpMyWeights.multiplyVectors(tmpMyWeights).doubleValue());
-        final double tmpDenom2 = Math.sqrt(tmpRefWeights.multiplyVectors(tmpRefWeights).doubleValue());
+        final double tmpNumerator = tmpMyWeights.dot(tmpRefWeights);
+        final double tmpDenom1 = Math.sqrt(tmpMyWeights.dot(tmpMyWeights));
+        final double tmpDenom2 = Math.sqrt(tmpRefWeights.dot(tmpRefWeights));
 
         return tmpNumerator / (tmpDenom1 * tmpDenom2);
     }

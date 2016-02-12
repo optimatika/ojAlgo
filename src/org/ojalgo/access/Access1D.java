@@ -70,23 +70,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
-    /**
-     * Some special, primitive double only, operartions
-     *
-     * @author apete
-     */
-    public interface PrimitiveOnly extends Structure1D {
-
-        /**
-         * Will calculate and return the dot product of this 1D-structure and another input 1D-vector.
-         *
-         * @param vector Another 1D-structure
-         * @return The dot product
-         */
-        double dot(Access1D<?> vector);
-
-    }
-
     public interface Sliceable<N extends Number> extends Structure1D {
 
         Access1D<N> sliceRange(long first, long limit);
@@ -101,6 +84,21 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
         void visitRange(long first, long limit, VoidFunction<N> visitor);
 
+    }
+
+    /**
+     * Will calculate and return the dot product of this 1D-structure and another input 1D-vector.
+     *
+     * @param vector Another 1D-structure
+     * @return The dot product
+     */
+    default double dot(final Access1D<?> vector) {
+        double retVal = PrimitiveMath.ZERO;
+        final long tmpLength = Math.min(this.count(), vector.count());
+        for (long i = 0L; i < tmpLength; i++) {
+            retVal += this.doubleValue(i) * vector.doubleValue(i);
+        }
+        return retVal;
     }
 
     double doubleValue(long index);

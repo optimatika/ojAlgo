@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
@@ -56,27 +57,27 @@ public abstract class BasicMatrixTest extends MatrixTests {
     BasicMatrix myActMtrx;
     Number myActNmbr;
     Scalar<?> myActSclr;
-    BasicMatrix myBigAA;
-    BasicMatrix myBigAB;
-    BasicMatrix myBigAX;
-    BasicMatrix myBigI;
-    BasicMatrix myBigSafe;
-    BasicMatrix myComplexAA;
-    BasicMatrix myComplexAB;
-    BasicMatrix myComplexAX;
-    BasicMatrix myComplexI;
-    BasicMatrix myComplexSafe;
+    BigMatrix myBigAA;
+    BigMatrix myBigAB;
+    BigMatrix myBigAX;
+    BigMatrix myBigI;
+    BigMatrix myBigSafe;
+    ComplexMatrix myComplexAA;
+    ComplexMatrix myComplexAB;
+    ComplexMatrix myComplexAX;
+    ComplexMatrix myComplexI;
+    ComplexMatrix myComplexSafe;
     boolean myExpBool;
     int myExpInt;
     BasicMatrix myExpMtrx;
     Number myExpNmbr;
     Scalar<?> myExpSclr;
     Number myNmbr;
-    BasicMatrix myPrimitiveAA;
-    BasicMatrix myPrimitiveAB;
-    BasicMatrix myPrimitiveAX;
-    BasicMatrix myPrimitiveI;
-    BasicMatrix myPrimitiveSafe;
+    PrimitiveMatrix myPrimitiveAA;
+    PrimitiveMatrix myPrimitiveAB;
+    PrimitiveMatrix myPrimitiveAX;
+    PrimitiveMatrix myPrimitiveI;
+    PrimitiveMatrix myPrimitiveSafe;
 
     public BasicMatrixTest() {
         super();
@@ -102,21 +103,28 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#replace(int,int,java.lang.Number)
+     * @see BasicMatrix.Builder#add(long, long, Number)
      */
     public void testAddIntIntNumber() {
 
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        myExpMtrx = myBigAA.add(tmpRow, tmpCol, myNmbr);
+        final Builder<BigMatrix> tmpBigBuilder = myBigAA.copyToBuilder();
+        tmpBigBuilder.add(tmpRow, tmpCol, myNmbr);
+        myExpMtrx = tmpBigBuilder.build();
 
-        myActMtrx = myComplexAA.add(tmpRow, tmpCol, myNmbr);
+        final Builder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copyToBuilder();
+        tmpComplexBuilder.add(tmpRow, tmpCol, myNmbr);
+        myActMtrx = tmpComplexBuilder.build();
+
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        myActMtrx = myPrimitiveAA.add(tmpRow, tmpCol, myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+        final Builder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copyToBuilder();
+        tmpPrimitiveBuilder.add(tmpRow, tmpCol, myNmbr);
+        myActMtrx = tmpPrimitiveBuilder.build();
 
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
     /**
@@ -178,6 +186,23 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         myActMtrx = myPrimitiveAA.divide(myNmbr);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+
+    }
+
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#multiplyVectors(BasicMatrix)
+     */
+    public void testDotAccess1D() {
+
+        final int[] tmpCol = new int[] { (int) Uniform.randomInteger(myBigAA.countColumns()) };
+
+        myExpNmbr = myBigAA.selectColumns(tmpCol).dot(myBigSafe.selectColumns(tmpCol));
+
+        myActNmbr = myComplexAA.selectColumns(tmpCol).dot(myComplexSafe.selectColumns(tmpCol));
+        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
+
+        myActNmbr = myPrimitiveAA.selectColumns(tmpCol).dot(myPrimitiveSafe.selectColumns(tmpCol));
+        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
 
@@ -742,23 +767,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#multiplyVectors(BasicMatrix)
-     */
-    public void testMultiplyVectorsBasicMatrix() {
-
-        final int[] tmpCol = new int[] { (int) Uniform.randomInteger(myBigAA.countColumns()) };
-
-        myExpNmbr = myBigAA.selectColumns(tmpCol).multiplyVectors(myBigSafe.selectColumns(tmpCol)).getNumber();
-
-        myActNmbr = myComplexAA.selectColumns(tmpCol).multiplyVectors(myComplexSafe.selectColumns(tmpCol)).getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-        myActNmbr = myPrimitiveAA.selectColumns(tmpCol).multiplyVectors(myPrimitiveSafe.selectColumns(tmpCol)).getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-    }
-
-    /**
      * @see org.ojalgo.matrix.BasicMatrix#negate()
      */
     public void testNegate() {
@@ -774,6 +782,31 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     abstract public void testProblem();
+
+    /**
+     * @see BasicMatrix.Builder#set(long, long, Number)
+     */
+    public void testSetIntIntNumber() {
+
+        final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
+        final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
+
+        final Builder<BigMatrix> tmpBigBuilder = myBigAA.copyToBuilder();
+        tmpBigBuilder.set(tmpRow, tmpCol, myNmbr);
+        myExpMtrx = tmpBigBuilder.build();
+
+        final Builder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copyToBuilder();
+        tmpComplexBuilder.set(tmpRow, tmpCol, myNmbr);
+        myActMtrx = tmpComplexBuilder.build();
+
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+
+        final Builder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copyToBuilder();
+        tmpPrimitiveBuilder.set(tmpRow, tmpCol, myNmbr);
+        myActMtrx = tmpPrimitiveBuilder.build();
+
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+    }
 
     /**
      * @see org.ojalgo.matrix.BasicMatrix#size()
@@ -1058,23 +1091,23 @@ public abstract class BasicMatrixTest extends MatrixTests {
         return myBigSafe;
     }
 
-    protected final void setBigAA(final BasicMatrix someBigAA) {
+    protected final void setBigAA(final BigMatrix someBigAA) {
         myBigAA = someBigAA;
     }
 
-    protected final void setBigAB(final BasicMatrix someBigAB) {
+    protected final void setBigAB(final BigMatrix someBigAB) {
         myBigAB = someBigAB;
     }
 
-    protected final void setBigAX(final BasicMatrix someBigAX) {
+    protected final void setBigAX(final BigMatrix someBigAX) {
         myBigAX = someBigAX;
     }
 
-    protected final void setBigI(final BasicMatrix someBigI) {
+    protected final void setBigI(final BigMatrix someBigI) {
         myBigI = someBigI;
     }
 
-    protected final void setBigSafe(final BasicMatrix someBigSafe) {
+    protected final void setBigSafe(final BigMatrix someBigSafe) {
         myBigSafe = someBigSafe;
     }
 

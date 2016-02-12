@@ -113,7 +113,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
 
         final BasicMatrix tmpViews = BlackLittermanTest.getInvestorPortfoliosMatrix();
         final BasicMatrix tmpCovar = BlackLittermanTest.getCovariances();
-        final BasicMatrix tmpMtrx = tmpCovar.multiplyLeft(tmpViews).multiply(tmpViews.transpose());
+        final BasicMatrix tmpMtrx = tmpViews.multiply(tmpCovar).multiply(tmpViews.transpose());
         final BigDecimal tmpWeightOnViews = BlackLittermanTest.getWeightOnViews();
 
         final double[][] tmpArr = new double[3][3];
@@ -303,7 +303,7 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         final BasicMatrix tmpCovar = BlackLittermanTest.getCovariances();
 
         final BasicMatrix tmpExp = BlackLittermanTest.getVarianceOfInvestorViewPortfolios();
-        final BasicMatrix tmpAct = tmpCovar.multiplyLeft(tmpViews).multiply(tmpViews.transpose());
+        final BasicMatrix tmpAct = tmpViews.multiply(tmpCovar).multiply(tmpViews.transpose());
 
         for (int i = 0; i < tmpExp.countRows(); i++) {
             TestUtils.assertEquals(tmpExp.toBigDecimal(i, 0), tmpAct.toBigDecimal(i, i), EVAL_CNTXT);

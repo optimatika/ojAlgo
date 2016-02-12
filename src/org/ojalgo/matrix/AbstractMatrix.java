@@ -80,7 +80,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         myPhysicalFactory = this.getFactory().getPhysicalFactory();
     }
 
-    public I add(final Access2D<?> addend) {
+    public I add(final BasicMatrix addend) {
 
         MatrixError.throwIfNotEqualDimensions(myStore, addend);
 
@@ -91,13 +91,13 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
-    public I add(final BasicMatrix addend) {
-
-        MatrixError.throwIfNotEqualDimensions(myStore, addend);
+    public I add(final double scalarAddend) {
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
 
-        retVal.fillMatching(myStore, myPhysicalFactory.function().add(), this.getStoreFrom(addend));
+        final N tmpRight = myPhysicalFactory.scalar().cast(scalarAddend);
+
+        retVal.fillMatching(myPhysicalFactory.function().add().second(tmpRight), myStore);
 
         return this.getFactory().instantiate(retVal);
     }
@@ -110,21 +110,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(myStore.builder().superimpose(row, col, tmpDiff).get());
     }
 
-    public I add(final int row, final int col, final Number aNmbr) {
-
-        //final PhysicalStore.Factory<N, ?> tmpPhysicalFactory = myStore.factory();
-
-        //final SingleStore<N> tmpDiff = new SingleStore<N>(tmpPhysicalFactory, tmpPhysicalFactory.scalar().cast(aNmbr));
-
-        //return this.getFactory().instantiate(new SuperimposedStore<N>(myStore, row, col, tmpDiff));
-        return this.getFactory().instantiate(myStore.builder().superimpose(row, col, aNmbr).get());
-    }
-
-    public I add(final Number addend) {
+    public I add(final Number scalarAddend) {
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(addend);
+        final N tmpRight = myPhysicalFactory.scalar().cast(scalarAddend);
 
         retVal.fillMatching(myPhysicalFactory.function().add().second(tmpRight), myStore);
 
@@ -151,11 +141,22 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return myStore.countRows();
     }
 
-    public I divide(final Number divisor) {
+    public I divide(final double scalarDivisor) {
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(divisor);
+        final N tmpRight = myPhysicalFactory.scalar().cast(scalarDivisor);
+
+        retVal.fillMatching(myPhysicalFactory.function().divide().second(tmpRight), myStore);
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public I divide(final Number scalarDivisor) {
+
+        final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
+
+        final N tmpRight = myPhysicalFactory.scalar().cast(scalarDivisor);
 
         retVal.fillMatching(myPhysicalFactory.function().divide().second(tmpRight), myStore);
 
@@ -426,29 +427,29 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
-    public I multiply(final Access2D<?> right) {
+    public I multiply(final BasicMatrix multiplicand) {
 
-        MatrixError.throwIfMultiplicationNotPossible(myStore, right);
+        MatrixError.throwIfMultiplicationNotPossible(myStore, multiplicand);
 
-        return this.getFactory().instantiate(myStore.multiply(this.getStoreFrom(right)));
+        return this.getFactory().instantiate(myStore.multiply(this.getStoreFrom(multiplicand)));
     }
 
-    public I multiply(final double scalar) {
+    public I multiply(final double scalarMultiplicand) {
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(scalar);
+        final N tmpRight = myPhysicalFactory.scalar().cast(scalarMultiplicand);
 
         retVal.fillMatching(myPhysicalFactory.function().multiply().second(tmpRight), myStore);
 
         return this.getFactory().instantiate(retVal);
     }
 
-    public I multiply(final Number scalar) {
+    public I multiply(final Number scalarMultiplicand) {
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(scalar);
+        final N tmpRight = myPhysicalFactory.scalar().cast(scalarMultiplicand);
 
         retVal.fillMatching(myPhysicalFactory.function().multiply().second(tmpRight), myStore);
 
@@ -466,21 +467,8 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
-    public I multiplyLeft(final Access2D<?> aMtrx) {
-
-        MatrixError.throwIfMultiplicationNotPossible(aMtrx, myStore);
-
-        return this.getFactory().instantiate(this.getStoreFrom(aMtrx).multiply(myStore));
-    }
-
-    public Scalar<?> multiplyVectors(final Access2D<?> aVctr) {
-        if (this.countRows() == 1) {
-            return this.multiply(aVctr.countColumns() == 1 ? aVctr : this.getStoreFrom(aVctr).transpose()).toScalar(0, 0);
-        } else if (this.countColumns() == 1) {
-            return this.multiplyLeft(aVctr.countRows() == 1 ? aVctr : this.getStoreFrom(aVctr).transpose()).toScalar(0, 0);
-        } else {
-            throw new ProgrammingError("Not a vector!");
-        }
+    public final I multiplyLeft(final BasicMatrix left) {
+        return (I) left.multiply(this);
     }
 
     public I negate() {
@@ -525,22 +513,33 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
-    public I subtract(final Access2D<?> aMtrx) {
+    public I subtract(final BasicMatrix subtrahend) {
 
-        MatrixError.throwIfNotEqualDimensions(this, aMtrx);
+        MatrixError.throwIfNotEqualDimensions(myStore, subtrahend);
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
 
-        retVal.fillMatching(myStore, myPhysicalFactory.function().subtract(), this.getStoreFrom(aMtrx));
+        retVal.fillMatching(myStore, myPhysicalFactory.function().subtract(), this.getStoreFrom(subtrahend));
 
         return this.getFactory().instantiate(retVal);
     }
 
-    public I subtract(final Number value) {
+    public BasicMatrix subtract(final double scalarSubtrahend) {
 
         final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(value);
+        final N tmpRight = myPhysicalFactory.scalar().cast(scalarSubtrahend);
+
+        retVal.fillMatching(myPhysicalFactory.function().subtract().second(tmpRight), myStore);
+
+        return this.getFactory().instantiate(retVal);
+    }
+
+    public I subtract(final Number scalarSubtrahend) {
+
+        final PhysicalStore<N> retVal = myPhysicalFactory.makeZero(this.countRows(), this.countColumns());
+
+        final N tmpRight = myPhysicalFactory.scalar().cast(scalarSubtrahend);
 
         retVal.fillMatching(myPhysicalFactory.function().subtract().second(tmpRight), myStore);
 

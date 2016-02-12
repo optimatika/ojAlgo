@@ -31,6 +31,7 @@ import org.ojalgo.finance.FinanceUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.scalar.BigScalar;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
@@ -64,7 +65,7 @@ public class MarketEquilibrium {
      * Calculates the portfolio return using the input asset weights and returns.
      */
     public static Scalar<?> calculatePortfolioReturn(final BasicMatrix assetWeights, final BasicMatrix assetReturns) {
-        return assetWeights.multiplyVectors(assetReturns);
+        return PrimitiveScalar.valueOf(assetWeights.dot(assetReturns));
     }
 
     private static String[] makeSymbols(final int count) {
@@ -166,7 +167,7 @@ public class MarketEquilibrium {
             tmpRight = assetWeights.transpose();
         }
 
-        return myCovariances.multiply(tmpRight).multiplyLeft(tmpLeft).toScalar(0, 0);
+        return tmpLeft.multiply(myCovariances.multiply(tmpRight)).toScalar(0, 0);
     }
 
     /**
