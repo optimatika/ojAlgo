@@ -27,6 +27,7 @@ import java.util.stream.StreamSupport;
 
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -35,6 +36,12 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
+
+    public interface Aggregatable<N extends Number> extends Structure1D {
+
+        N aggregateAll(Aggregator aggregator);
+
+    }
 
     public interface Elements extends Structure1D {
 

@@ -57,8 +57,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface MatrixStore<N extends Number>
-        extends Access2D<N>, Access2D.Elements, Access2D.Visitable<N>, Access2D.Sliceable<N>, NormedVectorSpace<MatrixStore<N>, N>, ElementsSupplier<N> {
+public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Elements, Access2D.Visitable<N>, Access2D.Sliceable<N>,
+        NormedVectorSpace<MatrixStore<N>, N>, ElementsSupplier<N>, Access1D.Aggregatable<N> {
 
     /**
      * A builder that lets you logically construct matrices and/or encode element structure.
@@ -465,8 +465,6 @@ public interface MatrixStore<N extends Number>
     default MatrixStore<N> add(final MatrixStore<N> addend) {
         return this.operateOnMatching(this.factory().function().add(), addend).get();
     }
-
-    N aggregateAll(Aggregator aggregator);
 
     MatrixStore.Builder<N> builder();
 

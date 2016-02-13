@@ -121,6 +121,10 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
+    public N aggregateAll(final Aggregator aggregator) {
+        return myStore.aggregateAll(aggregator);
+    }
+
     public I conjugate() {
         return this.getFactory().instantiate(myStore.conjugate());
     }

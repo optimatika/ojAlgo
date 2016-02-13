@@ -24,6 +24,7 @@ package org.ojalgo.matrix;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
@@ -61,9 +62,9 @@ import org.ojalgo.type.context.NumberContext;
  * @see MatrixStore
  * @author apete
  */
-public interface BasicMatrix
-        extends Access2D<Number>, NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>,
-        ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
+public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>,
+        Operation.Multiplication<BasicMatrix>, ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>,
+        ScalarOperation.Subtraction<BasicMatrix, Number>, Access1D.Aggregatable<Number> {
 
     public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier2D<I> {
 
@@ -155,7 +156,9 @@ public interface BasicMatrix
      * @see #getOperatorNorm()
      * @see #getTraceNorm()
      * @see #getVectorNorm(int)
+     * @deprecated v40 Use {@link #norm()} or {@link #aggregateAll(org.ojalgo.function.aggregator.Aggregator)}
      */
+    @Deprecated
     Scalar<?> getFrobeniusNorm();
 
     /**
@@ -178,7 +181,9 @@ public interface BasicMatrix
      * @see #getOperatorNorm()
      * @see #getTraceNorm()
      * @see #getVectorNorm(int)
+     * @deprecated v40 Use {@link SingularValue}
      */
+    @Deprecated
     Scalar<?> getKyFanNorm(int k);
 
     /**
@@ -203,7 +208,9 @@ public interface BasicMatrix
      * @see #getOperatorNorm()
      * @see #getTraceNorm()
      * @see #getVectorNorm(int)
+     * @deprecated v40 Use {@link SingularValue}
      */
+    @Deprecated
     Scalar<?> getOperatorNorm();
 
     /**
@@ -238,7 +245,9 @@ public interface BasicMatrix
      * @see #getOperatorNorm()
      * @see #getTraceNorm()
      * @see #getVectorNorm(int)
+     * @deprecated v40 Use {@link SingularValue}
      */
+    @Deprecated
     Scalar<?> getTraceNorm();
 
     /**
@@ -252,7 +261,9 @@ public interface BasicMatrix
      * @see #getOperatorNorm()
      * @see #getTraceNorm()
      * @see #getVectorNorm(int)
+     * @deprecated v40 Use {@link #aggregateAll(org.ojalgo.function.aggregator.Aggregator)}
      */
+    @Deprecated
     Scalar<?> getVectorNorm(int aDegree);
 
     /**

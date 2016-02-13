@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,28 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.function.aggregator;
+package org.ojalgo.access;
 
-import org.ojalgo.access.AccessScalar;
-import org.ojalgo.function.VoidFunction;
-import org.ojalgo.scalar.Scalar;
+public interface AccessScalar<N extends Number> {
 
-public interface AggregatorFunction<N extends Number> extends VoidFunction<N>, AccessScalar<N> {
-
-    void merge(N result);
-
-    N merge(N result1, N result2);
-
-    AggregatorFunction<N> reset();
-
-    /**
-     * @deprecated v40 Use {@link #getNumber()} instead
-     */
-    @Deprecated
-    default AggregationResults<N> snapshot() {
-        return new AggregationResults<N>(this.getNumber(), this.doubleValue(), this.intValue(), this.intValue());
+    default double doubleValue() {
+        return this.getNumber().doubleValue();
     }
 
-    Scalar<N> toScalar();
+    N getNumber();
+
+    default int intValue() {
+        return this.getNumber().intValue();
+    }
+
+    default long longValue() {
+        return this.getNumber().longValue();
+    }
 
 }

@@ -26,6 +26,13 @@ import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
+/**
+ * AggregationResults
+ *
+ * @author apete
+ * @deprecated v40 Use {@link AggregatorFunction#getNumber()}
+ */
+@Deprecated
 public final class AggregationResults<N extends Number> implements Supplier<N>, IntSupplier, LongSupplier, DoubleSupplier {
 
     private final double myDoubleValue;

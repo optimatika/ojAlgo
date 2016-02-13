@@ -23,6 +23,7 @@ package org.ojalgo.scalar;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.access.AccessScalar;
 import org.ojalgo.algebra.Field;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.ScalarOperation;
@@ -46,7 +47,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface Scalar<N extends Number> extends Field<Scalar<N>>, NormedVectorSpace<Scalar<N>, N>, ScalarOperation.Addition<Scalar<N>, N>,
+public interface Scalar<N extends Number> extends AccessScalar<N>, Field<Scalar<N>>, NormedVectorSpace<Scalar<N>, N>, ScalarOperation.Addition<Scalar<N>, N>,
         ScalarOperation.Division<Scalar<N>, N>, ScalarOperation.Subtraction<Scalar<N>, N>, Comparable<N> {
 
     public interface Factory<N extends Number> {
@@ -78,10 +79,6 @@ public interface Scalar<N extends Number> extends Field<Scalar<N>>, NormedVector
     default Scalar<N> divide(final Scalar<N> divisor) {
         return this.divide(divisor.getNumber());
     }
-
-    double doubleValue();
-
-    N getNumber();
 
     /**
      * @return true if this is equal to its own norm, modulus or absolute value (non-negative real part and no
