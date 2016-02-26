@@ -181,7 +181,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         if (!tmpFeasible) {
-            tmpFeasible = this.formLP(tmpQ, tmpC, tmpAE, tmpBE, tmpAI, tmpBI, tmpNumVars, tmpNumEqus, tmpNumInes, tmpX, tmpUsableKickStarter);
+            tmpFeasible = this.solveLP(tmpC, tmpAE, tmpBE, tmpAI, tmpBI);
         }
 
         if (tmpFeasible) {
@@ -326,75 +326,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     abstract void excludeAndRemove(int toExclude);
 
-    final boolean formLP(final MatrixStore<Double> tmpQ, final MatrixStore<Double> tmpC, final MatrixStore<Double> tmpAE, final MatrixStore<Double> tmpBE,
-            final MatrixStore<Double> tmpAI, final MatrixStore<Double> tmpBI, final int tmpNumVars, final int tmpNumEqus, final int tmpNumInes,
-            final DecompositionStore<Double> tmpX, final boolean tmpUsableKickStarter) {
-        boolean tmpFeasible;
-        // Form LP to check feasibility
-
-        final MatrixStore<Double> tmpGradient = tmpUsableKickStarter ? tmpQ.multiply(tmpX).subtract(tmpC) : tmpC.negate();
-        final MatrixStore<Double> tmpLinearC = tmpGradient.builder().below(tmpGradient.negate()).below(tmpNumInes).build();
-        // final MatrixStore<Double> tmpLinearC = MatrixStore.PRIMITIVE.makeZero(tmpNumVars + tmpNumVars + tmpNumInes, 1).get();
-
-        final LinearSolver.Builder tmpLinearBuilder = LinearSolver.getBuilder(tmpLinearC);
-
-        MatrixStore<Double> tmpAEpart = null;
-        MatrixStore<Double> tmpBEpart = null;
-
-        if (tmpNumEqus > 0) {
-            tmpAEpart = tmpAE.builder().right(tmpAE.negate()).right(tmpNumInes).build();
-            tmpBEpart = tmpBE;
-        }
-
-        if (tmpNumInes > 0) {
-            final MatrixStore<Double> tmpAIpart = tmpAI.builder().right(tmpAI.negate()).right(MatrixStore.PRIMITIVE.makeIdentity(tmpNumInes).get()).build();
-            final MatrixStore<Double> tmpBIpart = tmpBI;
-            if (tmpAEpart != null) {
-                tmpAEpart = tmpAEpart.builder().below(tmpAIpart).build();
-                tmpBEpart = tmpBEpart.builder().below(tmpBIpart).build();
-            } else {
-                tmpAEpart = tmpAIpart;
-                tmpBEpart = tmpBIpart;
-            }
-        }
-
-        if (tmpAEpart != null) {
-
-            final PhysicalStore<Double> tmpLinearAE = tmpAEpart.copy();
-            final PhysicalStore<Double> tmpLinearBE = tmpBEpart.copy();
-
-            for (int i = 0; i < tmpLinearBE.countRows(); i++) {
-                if (tmpLinearBE.doubleValue(i) < 0.0) {
-                    tmpLinearAE.modifyRow(i, 0, NEGATE);
-                    tmpLinearBE.modifyRow(i, 0, NEGATE);
-                }
-            }
-
-            tmpLinearBuilder.equalities(tmpLinearAE, tmpLinearBE);
-        }
-
-        final LinearSolver tmpLinearSolver = tmpLinearBuilder.build();
-
-        final Result tmpLinearResult = tmpLinearSolver.solve();
-
-        if (tmpFeasible = tmpLinearResult.getState().isFeasible()) {
-
-            final ElementsConsumer<Double> tmpLI = myIterationL.regionByOffsets(tmpNumEqus, 0);
-
-            for (int i = 0; i < tmpNumVars; i++) {
-                this.setX(i, tmpLinearResult.doubleValue(i) - tmpLinearResult.doubleValue(tmpNumVars + i));
-            }
-            @SuppressWarnings("deprecation")
-            final double[] tmpResidual = tmpLinearSolver.getResidualCosts();
-            for (int i = tmpNumVars * 2; i < tmpResidual.length; i++) {
-                final int tmpIndexToInclude = i - (2 * tmpNumVars);
-                // this.setLI(tmpIndexToInclude, tmpResidual[i]);
-                tmpLI.set(tmpIndexToInclude, tmpResidual[i]);
-            }
-        }
-        return tmpFeasible;
-    }
-
     @Override
     final MatrixStore<Double> getIterationA() {
         return this.getIterationA(myActivator.getIncluded());
@@ -420,6 +351,15 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         //        return tmpC.subtract(tmpQ.multiply(tmpX));
 
         return this.getC();
+    }
+
+    MatrixStore<Double> getIterationL(final int[] included) {
+
+        final int tmpCountE = this.countEqualityConstraints();
+
+        final MatrixStore<Double> tmpLI = myIterationL.builder().offsets(tmpCountE, 0).row(included).get();
+
+        return myIterationL.builder().limits(tmpCountE, 1).below(tmpLI).get();
     }
 
     final void handleSubsolution(final boolean solved, final PrimitiveDenseStore iterationSolution, final int[] included) {
@@ -546,13 +486,84 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         this.excludeAndRemove(tmpToExclude);
     }
 
-    MatrixStore<Double> getIterationL(final int[] included) {
+    /**
+     * Form and solve LP to find initial/feasible solution
+     */
+    final boolean solveLP(final MatrixStore<Double> convexC, final MatrixStore<Double> convexAE, final MatrixStore<Double> convexBE,
+            final MatrixStore<Double> convexAI, final MatrixStore<Double> convexBI) {
 
-        final int tmpCountE = this.countEqualityConstraints();
+        final int tmpNumVars = this.countVariables();
+        final int tmpNumEqus = this.countEqualityConstraints();
+        final int tmpNumInes = this.countInequalityConstraints();
 
-        final MatrixStore<Double> tmpLI = myIterationL.builder().offsets(tmpCountE, 0).row(included).get();
+        final MatrixStore<Double> tmpLinearC = convexC.negate().builder().below(convexC).below(tmpNumInes).build();
 
-        return myIterationL.builder().limits(tmpCountE, 1).below(tmpLI).get();
+        final LinearSolver.Builder tmpLinearBuilder = LinearSolver.getBuilder(tmpLinearC);
+
+        MatrixStore<Double> tmpAEpart = null;
+        MatrixStore<Double> tmpBEpart = null;
+
+        if (tmpNumEqus > 0) {
+            tmpAEpart = convexAE.builder().right(convexAE.negate()).right(tmpNumInes).build();
+            tmpBEpart = convexBE;
+        }
+
+        if (tmpNumInes > 0) {
+            final MatrixStore<Double> tmpAIpart = convexAI.builder().right(convexAI.negate()).right(MatrixStore.PRIMITIVE.makeIdentity(tmpNumInes).get())
+                    .build();
+            final MatrixStore<Double> tmpBIpart = convexBI;
+            if (tmpAEpart != null) {
+                tmpAEpart = tmpAEpart.builder().below(tmpAIpart).build();
+                tmpBEpart = tmpBEpart.builder().below(tmpBIpart).build();
+            } else {
+                tmpAEpart = tmpAIpart;
+                tmpBEpart = tmpBIpart;
+            }
+        }
+
+        if (tmpAEpart != null) {
+
+            final PhysicalStore<Double> tmpLinearAE = tmpAEpart.copy();
+            final PhysicalStore<Double> tmpLinearBE = tmpBEpart.copy();
+
+            for (int i = 0; i < tmpLinearBE.countRows(); i++) {
+                if (tmpLinearBE.doubleValue(i) < 0.0) {
+                    tmpLinearAE.modifyRow(i, 0, NEGATE);
+                    tmpLinearBE.modifyRow(i, 0, NEGATE);
+                }
+            }
+
+            tmpLinearBuilder.equalities(tmpLinearAE, tmpLinearBE);
+        }
+
+        final LinearSolver tmpLinearSolver = tmpLinearBuilder.build();
+
+        final Result tmpLinearResult = tmpLinearSolver.solve();
+
+        if (tmpLinearResult.getState().isFeasible()) {
+
+            final ElementsConsumer<Double> tmpLI = myIterationL.regionByOffsets(tmpNumEqus, 0);
+
+            for (int i = 0; i < tmpNumVars; i++) {
+                this.setX(i, tmpLinearResult.doubleValue(i) - tmpLinearResult.doubleValue(tmpNumVars + i));
+            }
+            @SuppressWarnings("deprecation")
+            final double[] tmpResidual = tmpLinearSolver.getResidualCosts();
+            for (int i = tmpNumVars * 2; i < tmpResidual.length; i++) {
+                final int tmpIndexToInclude = i - (2 * tmpNumVars);
+                // this.setLI(tmpIndexToInclude, tmpResidual[i]);
+                tmpLI.set(tmpIndexToInclude, tmpResidual[i]);
+            }
+
+            // BasicLogger.debug();
+            // BasicLogger.debug("Initial L: {}", myIterationL.asList().copy());
+
+            return true;
+
+        } else {
+
+            return false;
+        }
     }
 
 }

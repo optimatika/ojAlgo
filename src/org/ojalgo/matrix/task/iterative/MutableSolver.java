@@ -29,6 +29,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.task.TaskException;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -40,19 +41,19 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
     private final List<Equation> myRows = new ArrayList<>();
     private final long mySize;
 
+    @SuppressWarnings("unused")
+    private MutableSolver() {
+        super();
+        myDelegate = null;
+        mySize = 0L;
+    }
+
     protected MutableSolver(final D delegate, final long size) {
 
         super();
 
         myDelegate = delegate;
         mySize = size;
-    }
-
-    @SuppressWarnings("unused")
-    private MutableSolver() {
-        super();
-        myDelegate = null;
-        mySize = 0L;
     }
 
     public boolean add(final Equation row) {
@@ -79,8 +80,8 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
         return current;
     }
 
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
-        return this.getDelegate().solve(body, rhs, preallocated);
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> current) throws TaskException {
+        return this.getDelegate().solve(body, rhs, current);
     }
 
     protected double doubleValue(final int row, final int column) {
@@ -93,15 +94,21 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
     }
 
     @Override
-    protected void setIterationsLimit(final int iterationsLimit) {
-        super.setIterationsLimit(iterationsLimit);
-        this.getDelegate().setIterationsLimit(iterationsLimit);
+    protected void setAccuracyContext(final NumberContext accuracyContext) {
+        super.setAccuracyContext(accuracyContext);
+        myDelegate.setAccuracyContext(accuracyContext);
     }
 
     @Override
-    protected void setTerminationContext(final NumberContext terminationContext) {
-        super.setTerminationContext(terminationContext);
-        this.getDelegate().setTerminationContext(terminationContext);
+    protected void setDebugPrinter(final BasicLogger.Printer debugPrinter) {
+        super.setDebugPrinter(debugPrinter);
+        myDelegate.setDebugPrinter(debugPrinter);
+    }
+
+    @Override
+    protected void setIterationsLimit(final int iterationsLimit) {
+        super.setIterationsLimit(iterationsLimit);
+        myDelegate.setIterationsLimit(iterationsLimit);
     }
 
     protected long size() {

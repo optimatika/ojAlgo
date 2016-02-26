@@ -84,15 +84,15 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             }
         }
 
-        public long count() {
+        public final long count() {
             return myPhysicalStore.count();
         }
 
-        public long countColumns() {
+        public final long countColumns() {
             return myPhysicalStore.countColumns();
         }
 
-        public long countRows() {
+        public final long countRows() {
             return myPhysicalStore.countRows();
         }
 
@@ -133,7 +133,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         }
 
         @Override
-        public I get() {
+        public final I get() {
             mySafe = false;
             return MatrixFactory.this.instantiate(myPhysicalStore);
         }

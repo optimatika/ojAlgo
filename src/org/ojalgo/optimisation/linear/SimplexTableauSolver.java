@@ -116,7 +116,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         final int tmpConstraintsCount = this.countConstraints();
 
-        final MatrixStore.Builder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE.makeZero(1, 1).get().builder();
+        final MatrixStore.Builder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE.makeZero(1, 1);
         tmpTableauBuilder.left(matrices.getC().transpose());
 
         if (tmpConstraintsCount >= 1) {

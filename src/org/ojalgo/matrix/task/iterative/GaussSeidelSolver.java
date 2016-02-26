@@ -26,7 +26,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.List;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -41,38 +40,43 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
 
     public void resolve(final List<Equation> equations, final PhysicalStore<Double> current) {
 
-        double tmpCurrNorm = NEG;
-        double tmpLastNorm = tmpCurrNorm;
+        double tmpNormErr = POSITIVE_INFINITY;
+        double tmpNormRHS = ZERO;
+
+        final int tmpCountRows = equations.size();
+        for (int r = 0; r < tmpCountRows; r++) {
+            tmpNormRHS = Math.hypot(tmpNormRHS, equations.get(r).getRHS());
+        }
 
         int tmpIterations = 0;
-        final int tmpIterationsLimit = this.getIterationsLimit();
-        final NumberContext tmpCntxt = this.getTerminationContext();
+        final int tmpLimit = this.getIterationsLimit();
+        final NumberContext tmpCntxt = this.getAccuracyContext();
         final double tmpRelaxationFactor = this.getRelaxationFactor();
 
         do {
 
-            final int tmpSize = equations.size();
-            for (int r = 0; r < tmpSize; r++) {
-                final Equation tmpRow = equations.get(r);
-                tmpRow.adjust(current, tmpRelaxationFactor);
-            }
+            tmpNormErr = ZERO;
 
-            tmpLastNorm = tmpCurrNorm;
-            tmpCurrNorm = current.aggregateAll(Aggregator.NORM2);
+            for (int r = 0; r < tmpCountRows; r++) {
+                tmpNormErr = Math.hypot(tmpNormErr, equations.get(r).adjust(current, tmpRelaxationFactor));
+            }
 
             tmpIterations++;
 
-        } while ((tmpIterations < tmpIterationsLimit) && tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm));
+            if (this.isDebugPrinterSet()) {
+                this.debug(tmpIterations, current);
+            }
 
+        } while ((tmpIterations < tmpLimit) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
     }
 
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> current) throws TaskException {
 
         final List<Equation> tmpRows = IterativeSolverTask.toListOfRows(body, rhs);
 
-        this.resolve(tmpRows, preallocated);
+        this.resolve(tmpRows, current);
 
-        return preallocated;
+        return current;
     }
 
 }

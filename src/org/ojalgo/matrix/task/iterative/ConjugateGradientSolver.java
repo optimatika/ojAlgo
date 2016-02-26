@@ -28,7 +28,6 @@ import java.util.List;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure1D;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -56,6 +55,9 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
         final int tmpCountRows = equations.size();
 
+        double tmpNormErr = POSITIVE_INFINITY;
+        double tmpNormRHS = ZERO;
+
         final PrimitiveDenseStore tmpResidual = this.residual(current);
         final PrimitiveDenseStore tmpDirection = this.direction(current);
         final PrimitiveDenseStore tmpPreconditioned = this.preconditioned(current);
@@ -68,9 +70,10 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         double zr1 = 1;
         double pAp0 = 0;
 
-        for (int i = 0; i < tmpCountRows; i++) {
-            final Equation tmpRow = equations.get(i);
+        for (int r = 0; r < tmpCountRows; r++) {
+            final Equation tmpRow = equations.get(r);
             double tmpVal = tmpRow.getRHS();
+            tmpNormRHS = Math.hypot(tmpNormRHS, tmpVal);
             tmpVal -= tmpRow.dot(current);
             tmpResidual.set(tmpRow.index, tmpVal);
             tmpPreconditioned.set(tmpRow.index, tmpVal / tmpRow.getPivot()); // precondition
@@ -78,12 +81,9 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
         tmpDirection.fillMatching(tmpPreconditioned); // tmpPreconditioned.supplyNonZerosTo(tmpDirection);
 
-        double tmpCurrNorm = NEG;
-        double tmpLastNorm = tmpCurrNorm;
-
         int tmpIterations = 0;
-        final int tmpIterationsLimit = this.getIterationsLimit();
-        final NumberContext tmpCntxt = this.getTerminationContext();
+        final int tmpLimit = this.getIterationsLimit();
+        final NumberContext tmpCntxt = this.getAccuracyContext();
 
         // zr1 = tmpPreconditioned.transpose().multiply(tmpResidual).doubleValue(0L);
         zr1 = tmpPreconditioned.dot(tmpResidual);
@@ -106,10 +106,13 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             current.maxpy(tmpStepLength, tmpDirection);
             tmpResidual.maxpy(-tmpStepLength, tmpVector);
 
-            for (int i = 0; i < tmpCountRows; i++) {
-                final Equation tmpRow = equations.get(i);
-                // tmpPreconditioned.updateNonZerosFrom(tmpResidual / "pivot")
-                tmpPreconditioned.set(tmpRow.index, tmpResidual.doubleValue(tmpRow.index) / tmpRow.getPivot());
+            tmpNormErr = ZERO;
+
+            for (int r = 0; r < tmpCountRows; r++) {
+                final Equation tmpRow = equations.get(r);
+                final double tmpValue = tmpResidual.doubleValue(tmpRow.index);
+                tmpNormErr = Math.hypot(tmpNormErr, tmpValue);
+                tmpPreconditioned.set(tmpRow.index, tmpValue / tmpRow.getPivot());
             }
 
             zr1 = tmpPreconditioned.dot(tmpResidual);
@@ -118,15 +121,13 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             tmpDirection.modifyAll(PrimitiveFunction.MULTIPLY.second(tmpGradientCorrectionFactor));
             tmpDirection.modifyMatching(PrimitiveFunction.ADD, tmpPreconditioned);
 
-            tmpLastNorm = tmpCurrNorm;
-            tmpCurrNorm = current.aggregateAll(Aggregator.NORM2);
-
-            // Behöver jag räkna ut 2 st olika NORM2?
-
             tmpIterations++;
 
-        } while ((tmpIterations < tmpIterationsLimit)
-                && !(!tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm) || tmpCntxt.isSmall(tmpCurrNorm, tmpResidual.aggregateAll(Aggregator.NORM2))));
+            if (this.isDebugPrinterSet()) {
+                this.debug(tmpIterations, current);
+            }
+
+        } while ((tmpIterations < tmpLimit) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
 
         // BasicLogger.debug("Done in {} iterations on problem size {}", tmpIterations, current.count());
     }

@@ -40,7 +40,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
     }
 
     @SuppressWarnings("unchecked")
-    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> current) throws TaskException {
 
         MatrixStore<Double> tmpBody = null;
         if ((body instanceof MatrixStore<?>) && (body.get(0L) instanceof Double)) {
@@ -59,30 +59,34 @@ public final class JacobiSolver extends StationaryIterativeSolver {
 
         final PhysicalStore<Double> tmpIncrement = this.preallocate(body, rhs);
 
-        double tmpCurrNorm = NEG;
-        double tmpLastNorm = tmpCurrNorm;
+        double tmpNormErr = POSITIVE_INFINITY;
+        final double tmpNormRHS = tmpRHS.aggregateAll(Aggregator.NORM2);
 
         int tmpIterations = 0;
-        final int tmpIterationsLimit = this.getIterationsLimit();
-        final NumberContext tmpCntxt = this.getTerminationContext();
+        final int tmpLimit = this.getIterationsLimit();
+        final NumberContext tmpCntxt = this.getAccuracyContext();
         final double tmpRelaxation = this.getRelaxationFactor();
         do {
 
-            preallocated.multiplyLeft(tmpBody).operateOnMatching(tmpRHS, SUBTRACT).operateOnMatching(DIVIDE, tmpBodyDiagonal).supplyTo(tmpIncrement);
+            current.multiplyLeft(tmpBody).operateOnMatching(tmpRHS, SUBTRACT).supplyTo(tmpIncrement);
+            tmpNormErr = tmpIncrement.aggregateAll(Aggregator.NORM2);
+            tmpIncrement.modifyMatching(DIVIDE, tmpBodyDiagonal);
 
-            if (this.getTerminationContext().isDifferent(ONE, tmpRelaxation)) {
+            if (this.getAccuracyContext().isDifferent(ONE, tmpRelaxation)) {
                 tmpIncrement.multiply(tmpRelaxation);
             }
 
-            preallocated.modifyMatching(ADD, tmpIncrement);
-            tmpLastNorm = tmpCurrNorm;
-            tmpCurrNorm = preallocated.aggregateAll(Aggregator.NORM2);
+            current.modifyMatching(ADD, tmpIncrement);
 
             tmpIterations++;
 
-        } while ((tmpIterations < tmpIterationsLimit) && tmpCntxt.isDifferent(tmpLastNorm, tmpCurrNorm));
+            if (this.isDebugPrinterSet()) {
+                this.debug(tmpIterations, current);
+            }
 
-        return preallocated;
+        } while ((tmpIterations < tmpLimit) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
+
+        return current;
     }
 
 }

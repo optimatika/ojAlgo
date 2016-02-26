@@ -244,6 +244,28 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    public long[] indicesInRange(final long first, final long limit) {
+
+        int tmpFirst = this.index(first);
+        if (tmpFirst < 0) {
+            tmpFirst = -tmpFirst + 1;
+        }
+        int tmpLimit = this.index(limit);
+        if (tmpLimit < 0) {
+            tmpLimit = -tmpLimit + 1;
+        }
+
+        // return Arrays.copyOfRange(myIndices, tmpFirst, tmpLimit);
+
+        final long[] retVal = new long[tmpLimit - tmpFirst];
+
+        for (int i = tmpFirst; i < tmpLimit; i++) {
+            retVal[i] = myIndices[i] - first;
+        }
+
+        return retVal;
+    }
+
     public void add(final long index, final Number addend) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {

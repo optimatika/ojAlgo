@@ -46,8 +46,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Mutate2D.Fillable<N>, Access2D.Iterable2D<N>,
-        Mutate2D.Modifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Access2D.Special<N>, Serializable {
+public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N>,
+        Access2D.Visitable<N>, Access2D.Sliceable<N>, Access2D.Special<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
@@ -457,6 +457,10 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         return (int) (myRowsCount * myColumnsCount * myDelegate.hashCode());
     }
 
+    public long indexOfLargest() {
+        return myDelegate.indexOfLargest();
+    }
+
     /**
      * @param row
      * @param column
@@ -476,6 +480,10 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
         return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount),
                 1L + myRowsCount);
+    }
+
+    public long indexOfLargestInRange(final long first, final long limit) {
+        return myDelegate.indexOfLargestInRange(first, limit);
     }
 
     /**
@@ -651,14 +659,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     BasicArray<N> getDelegate() {
         return myDelegate;
-    }
-
-    public long indexOfLargest() {
-        return myDelegate.indexOfLargest();
-    }
-
-    public long indexOfLargestInRange(final long first, final long limit) {
-        return myDelegate.indexOfLargestInRange(first, limit);
     }
 
 }

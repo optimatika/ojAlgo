@@ -69,7 +69,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             //this.getDelegate().setRelaxationFactor(1.5);
 
             // ConjugateGradient
-            this.setTerminationContext(NumberContext.getMath(MathContext.DECIMAL64).newPrecision(9));
+            this.setAccuracyContext(NumberContext.getMath(MathContext.DECIMAL64).newPrecision(9));
 
             myIterationRows = new Equation[(int) myFullDim];
         }
@@ -254,6 +254,8 @@ abstract class IterativeASS extends ActiveSetSolver {
         }
 
         this.handleSubsolution(tmpSolvable, tmpIterX, tmpIncluded);
+
+        // BasicLogger.debug("Iteration L: {}", myIterationL.asList().copy());
     }
 
     @Override

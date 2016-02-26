@@ -40,4 +40,71 @@ public interface Structure2D extends Structure1D {
      */
     long countRows();
 
+    /**
+     * 2D data structures are either square, tall, fat or empty.
+     * <p>
+     * m &lt;= 0 or n &lt;= 0
+     * </p>
+     * Historically some ojAlgo data structures did allow to create "empty" instances. Currently this is not
+     * encouraged, or even disallowed.
+     *
+     * @return true if matrix is empty
+     */
+    default boolean isEmpty() {
+        return ((this.countRows() <= 0L) || (this.countColumns() <= 0L));
+    }
+
+    /**
+     * 2D data structures are either square, tall, fat or empty.
+     * <p>
+     * 1 &lt;= m &lt; n
+     * </p>
+     *
+     * @return true if matrix is fat
+     */
+    default boolean isFat() {
+        final long tmpCountRows = this.countRows();
+        return ((tmpCountRows > 0L) && (tmpCountRows < this.countColumns()));
+    }
+
+    /**
+     * @return true if both the row and column dimensions are equal to 1.
+     */
+    default boolean isScalar() {
+        return (this.countRows() == 1L) && (this.countColumns() == 1L);
+    }
+
+    /**
+     * 2D data structures are either square, tall, fat or empty.
+     * <p>
+     * m = n &lt;&gt; 0
+     * </p>
+     *
+     * @return true if matrix is square
+     */
+    default boolean isSquare() {
+        final long tmpCountRows = this.countRows();
+        return ((tmpCountRows > 0L) && (tmpCountRows == this.countColumns()));
+    }
+
+    /**
+     * 2D data structures are either square, tall, fat or empty.
+     * <p>
+     * m &lt; n &gt;= 1
+     * </p>
+     *
+     * @return true if matrix is tall
+     */
+    default boolean isTall() {
+        final long tmpCountColumns = this.countColumns();
+        return ((tmpCountColumns > 0L) && (this.countRows() > tmpCountColumns));
+    }
+
+    /**
+     * @return true if either the row or column dimensions are equal to 1.
+     */
+    default boolean isVector() {
+        return ((this.countColumns() == 1L) || (this.countRows() == 1L));
+    }
+
 }

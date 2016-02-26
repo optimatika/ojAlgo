@@ -105,12 +105,12 @@ public final class NumberContext extends FormatContext<Number> {
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
 
-    public static NumberContext getGeneral(final int scale, final RoundingMode aRoundingMode) {
+    public static NumberContext getGeneral(final int scale, final RoundingMode roundingMode) {
 
         final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
         final int tmpPrecision = DEFAULT_MATH.getPrecision();
         final int tmpScale = scale;
-        final RoundingMode tmpRoundingMode = aRoundingMode;
+        final RoundingMode tmpRoundingMode = roundingMode;
 
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
@@ -138,14 +138,18 @@ public final class NumberContext extends FormatContext<Number> {
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
 
-    public static NumberContext getMath(final int aPrecisionAndScale, final RoundingMode aRoundingMode) {
+    public static NumberContext getMath(final int precisionAndScale, final RoundingMode roundingMode) {
 
         final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
-        final int tmpPrecision = aPrecisionAndScale;
-        final int tmpScale = aPrecisionAndScale;
-        final RoundingMode tmpRoundingMode = aRoundingMode;
+        final int tmpPrecision = precisionAndScale;
+        final int tmpScale = precisionAndScale;
+        final RoundingMode tmpRoundingMode = roundingMode;
 
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
+    }
+
+    public static NumberContext getMath(final int precisionAndScale) {
+        return NumberContext.getMath(precisionAndScale, DEFAULT_MATH.getRoundingMode());
     }
 
     /**

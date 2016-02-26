@@ -90,17 +90,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
-    public interface Iterable2D<N extends Number> extends Access2D<N> {
-
-        default Iterable<Access1D<N>> columns() {
-            return ColumnsIterator.make(this);
-        }
-
-        default Iterable<Access1D<N>> rows() {
-            return RowsIterator.make(this);
-        }
-    }
-
     public interface Sliceable<N extends Number> extends Structure2D, Access1D.Sliceable<N> {
 
         Access1D<N> sliceColumn(long row, long column);
@@ -178,6 +167,14 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         }
 
         return retVal;
+    }
+
+    default Iterable<Access1D<N>> columns() {
+        return ColumnsIterator.make(this);
+    }
+
+    default Iterable<Access1D<N>> rows() {
+        return RowsIterator.make(this);
     }
 
 }

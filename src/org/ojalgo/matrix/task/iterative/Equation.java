@@ -71,9 +71,10 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
      *
      * @param x The current solution (one element will be updated)
      * @param relaxation Typically 1.0 but could be anything (Most likely should be between 0.0 and 2.0).
+     * @return The error in this equation
      */
-    public void adjust(final PhysicalStore<Double> x, final double relaxation) {
-        this.calculate(x, myRHS, relaxation);
+    public double adjust(final PhysicalStore<Double> x, final double relaxation) {
+        return this.calculate(x, myRHS, relaxation);
     }
 
     public int compareTo(final Equation other) {
@@ -156,17 +157,19 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
         return index + ": " + myElements.toString();
     }
 
-    private void calculate(final PhysicalStore<Double> x, final double rhs, final double relaxation) {
+    private double calculate(final PhysicalStore<Double> x, final double rhs, final double relaxation) {
 
         double tmpIncrement = rhs;
 
-        tmpIncrement -= myElements.dot(x);
+        final double tmpError = tmpIncrement -= myElements.dot(x);
 
         tmpIncrement *= relaxation;
 
         tmpIncrement /= myPivot;
 
         x.add(index, tmpIncrement);
+
+        return tmpError;
     }
 
 }

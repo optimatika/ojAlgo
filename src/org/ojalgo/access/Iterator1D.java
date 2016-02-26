@@ -29,7 +29,7 @@ public final class Iterator1D<N extends Number> implements Iterator<N> {
     private final Access1D<? extends N> myAccess;
     private final long myCount;
 
-    public Iterator1D(final Access1D<? extends N> access) {
+    Iterator1D(final Access1D<? extends N> access) {
 
         super();
 

@@ -24,14 +24,12 @@ package org.ojalgo.matrix;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Iterator1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -362,12 +360,8 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
-    public boolean isEmpty() {
-        return ((this.countRows() <= 0) || (this.countColumns() <= 0));
-    }
-
-    public boolean isFat() {
-        return (!this.isEmpty() && (this.countRows() < this.countColumns()));
+    public boolean isAbsolute(final long row, final long column) {
+        return myStore.isAbsolute(row, column);
     }
 
     public boolean isFullRank() {
@@ -378,32 +372,16 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.isSquare() && myStore.equals(myStore.conjugate(), NumberContext.getGeneral(6));
     }
 
-    public boolean isScalar() {
-        return (myStore.countRows() == 1) && (this.countColumns() == 1);
-    }
-
     public boolean isSmall(final double comparedTo) {
         return myStore.isSmall(comparedTo);
     }
 
-    public boolean isSquare() {
-        return (!this.isEmpty() && (this.countRows() == this.countColumns()));
+    public boolean isSmall(final long row, final long column, final double comparedTo) {
+        return myStore.isSmall(row, column, comparedTo);
     }
 
     public boolean isSymmetric() {
         return this.isSquare() && myStore.equals(myStore.transpose(), NumberContext.getGeneral(6));
-    }
-
-    public boolean isTall() {
-        return (!this.isEmpty() && (this.countRows() > this.countColumns()));
-    }
-
-    public boolean isVector() {
-        return ((this.countColumns() == 1) || (this.countRows() == 1));
-    }
-
-    public Iterator<Number> iterator() {
-        return new Iterator1D<Number>(myStore);
     }
 
     public I mergeColumns(final Access2D<?> aMtrx) {

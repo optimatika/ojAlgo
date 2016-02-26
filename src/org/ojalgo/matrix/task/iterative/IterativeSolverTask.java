@@ -28,18 +28,67 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.matrix.task.TaskException;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class IterativeSolverTask implements SolverTask<Double> {
+
+    static final NumberContext DEFAULT = NumberContext.getMath(MathContext.DECIMAL128);
+
+    public static final class Configurator {
+
+        private final IterativeSolverTask mySolver;
+
+        @SuppressWarnings("unused")
+        private Configurator() {
+            this(null);
+        }
+
+        Configurator(final IterativeSolverTask solver) {
+            super();
+            mySolver = solver;
+        }
+
+        /**
+         * Accuracy/termination context
+         */
+        public Configurator accuracy(final NumberContext accuray) {
+            if (accuray != null) {
+                mySolver.setAccuracyContext(accuray);
+            } else {
+                mySolver.setAccuracyContext(DEFAULT);
+            }
+            return this;
+        }
+
+        /**
+         * To get debug print per iteration
+         */
+        public Configurator debug(final BasicLogger.Printer printer) {
+            mySolver.setDebugPrinter(printer);
+            return this;
+        }
+
+        /**
+         * Max number of iterations
+         */
+        public Configurator iterations(final int iterations) {
+            mySolver.setIterationsLimit(iterations);
+            return this;
+        }
+
+    }
 
     static interface SparseDelegate {
 
@@ -49,9 +98,9 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
 
     static List<Equation> toListOfRows(final Access2D<?> body, final Access2D<?> rhs) {
 
-        final List<Equation> retVal = new ArrayList<>();
+        final int tmpDim = (int) body.countRows();
 
-        final long tmpDim = body.countRows();
+        final List<Equation> retVal = new ArrayList<>(tmpDim);
 
         for (int i = 0; i < tmpDim; i++) {
             final Equation tmpRow = new Equation(i, tmpDim, rhs.doubleValue(i));
@@ -67,11 +116,17 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
         return retVal;
     }
 
+    private BasicLogger.Printer myDebugPrinter = null;
+
     private int myIterationsLimit = Integer.MAX_VALUE;
-    private NumberContext myTerminationContext = NumberContext.getMath(MathContext.DECIMAL128);
+    private NumberContext myAccuracyContext = DEFAULT;
 
     IterativeSolverTask() {
         super();
+    }
+
+    public final Configurator configurator() {
+        return new Configurator(this);
     }
 
     public final DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
@@ -89,20 +144,34 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
         }
     }
 
+    protected final void debug(final int iteration, final Access1D<?> current) {
+        if (myDebugPrinter != null) {
+            myDebugPrinter.println("{}: {}", iteration, Array1D.PRIMITIVE.copy(current));
+        }
+    }
+
     protected final int getIterationsLimit() {
         return myIterationsLimit;
     }
 
-    protected final NumberContext getTerminationContext() {
-        return myTerminationContext;
+    protected final NumberContext getAccuracyContext() {
+        return myAccuracyContext;
+    }
+
+    protected final boolean isDebugPrinterSet() {
+        return myDebugPrinter != null;
+    }
+
+    protected void setDebugPrinter(final BasicLogger.Printer debugPrinter) {
+        myDebugPrinter = debugPrinter;
     }
 
     protected void setIterationsLimit(final int iterationsLimit) {
         myIterationsLimit = iterationsLimit;
     }
 
-    protected void setTerminationContext(final NumberContext terminationContext) {
-        myTerminationContext = terminationContext;
+    protected void setAccuracyContext(final NumberContext accuracyContext) {
+        myAccuracyContext = accuracyContext;
     }
 
 }

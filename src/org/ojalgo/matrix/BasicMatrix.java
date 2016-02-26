@@ -33,12 +33,8 @@ import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.algebra.ScalarOperation;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
@@ -50,21 +46,12 @@ import org.ojalgo.type.context.NumberContext;
  * functionality is defined here. Various matrix decompositions may be used to do some of the more advanced
  * tasks.
  * </p>
- * <p>
- * A vector is a matrix with column (or perhaps row) dimension 1.
- * </p>
- *
- * @see LU
- * @see Cholesky
- * @see QR
- * @see Eigenvalue
- * @see SingularValue
- * @see MatrixStore
+ * 
  * @author apete
  */
-public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMatrix, Number>, Operation.Subtraction<BasicMatrix>,
-        Operation.Multiplication<BasicMatrix>, ScalarOperation.Addition<BasicMatrix, Number>, ScalarOperation.Division<BasicMatrix, Number>,
-        ScalarOperation.Subtraction<BasicMatrix, Number>, Access1D.Aggregatable<Number> {
+public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access1D.Aggregatable<Number>, NormedVectorSpace<BasicMatrix, Number>,
+        Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>, ScalarOperation.Addition<BasicMatrix, Number>,
+        ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
 
     public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier2D<I> {
 
@@ -294,51 +281,13 @@ public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMa
     BasicMatrix invert();
 
     /**
-     * Matrices are either square, tall, fat or empty. m &lt;= 0 or n &lt;= 0
-     *
-     * @return true if matrix is empty
-     */
-    boolean isEmpty();
-
-    /**
-     * Matrices are either square, tall, fat or empty. 1 &lt;= m &lt; n
-     *
-     * @return true if matrix is fat
-     */
-    boolean isFat();
-
-    /**
      * @return true if {@linkplain #getRank()} == min({@linkplain #countRows()}, {@linkplain #countColumns()})
      */
     boolean isFullRank();
 
     boolean isHermitian();
 
-    /**
-     * @return true if this is a 1x1 matrix
-     */
-    boolean isScalar();
-
-    /**
-     * Matrices are either square, tall, fat or empty. m = n &lt;&gt; 0
-     *
-     * @return true if matrix is square
-     */
-    boolean isSquare();
-
     boolean isSymmetric();
-
-    /**
-     * Matrices are either square, tall, fat or empty. m &lt; n &gt;= 1
-     *
-     * @return true if matrix is tall
-     */
-    boolean isTall();
-
-    /**
-     * @return true if the row or column dimensions are equal to 1.
-     */
-    boolean isVector();
 
     /**
      * [aMtrx] is appended to the bottom of [this]. The two matrices must have the same number of columns.
@@ -431,14 +380,25 @@ public interface BasicMatrix extends Access2D<Number>, NormedVectorSpace<BasicMa
      */
     PhysicalStore<ComplexNumber> toComplexStore();
 
+    /**
+     * @deprecated v40 Use {@link #columns()}
+     */
+    @Deprecated
     List<BasicMatrix> toListOfColumns();
 
     /**
      * It is also possible to call {@linkplain #toBigStore()}, {@linkplain #toComplexStore()} or
      * {@linkplain #toPrimitiveStore()} and then {@linkplain PhysicalStore#asList()}.
+     *
+     * @deprecated v40 Use {@link #iterator()}
      */
+    @Deprecated
     List<? extends Number> toListOfElements();
 
+    /**
+     * @deprecated v40 Use {@link #rows()}
+     */
+    @Deprecated
     List<BasicMatrix> toListOfRows();
 
     /**
