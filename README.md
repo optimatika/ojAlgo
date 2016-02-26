@@ -12,14 +12,14 @@ User documentation: https://github.com/optimatika/ojAlgo/wiki
 
 ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.ojalgo%22%20AND%20a%3A%22ojalgo%22) to be used with your favourite dependency management tool.
 
-This repository is a copy of the DevProj module of the CVS repository at SourceForge. These two code locations are used in parallel, and are manually (semi-automatic) kept in sync. This solution is (probably) temporary. Most likely there will only be one code repository in the future.
-
 ## Issues and Discussions
 
 For bug reports, questions or discussions related to ojAlgo; use the ojAlgo-user mailing list: http://sourceforge.net/p/ojalgo/mailman/ojalgo-user/
 (Note that you have to be a member to post to that list!)
 
-If you prefer you may also use "Issues" here at GitHub, but then please make sure your post actually relates to an issue with the source code (bug reports or suggested improvements). The issue tracker is not for user support or general discussions.
+If you prefer you may also use "Issues" here at GitHub, but then please make sure your post actually relates to an issue with the source code (bug reports or suggested improvements). The issue tracker is not for user support or general discussions. Use the mailing list for that.
+
+You can ofcourse also use something like [stack overflow](http://stackoverflow.com).
 
 ## Contributions
 
