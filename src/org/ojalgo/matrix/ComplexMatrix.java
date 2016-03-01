@@ -28,6 +28,9 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.task.DeterminantTask;
+import org.ojalgo.matrix.task.InverterTask;
+import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -109,25 +112,40 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
         return this.toComplexNumber(row, col).toString();
     }
 
+    @Override
+    DeterminantTask<ComplexNumber> getDeterminantTask(final MatrixStore<ComplexNumber> template) {
+        return DeterminantTask.COMPLEX.make(template, this.isHermitian());
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     MatrixFactory<ComplexNumber, ComplexMatrix> getFactory() {
         return (MatrixFactory<ComplexNumber, ComplexMatrix>) FACTORY;
     }
 
+    @Override
+    InverterTask<ComplexNumber> getInverterTask(final MatrixStore<ComplexNumber> base) {
+        return InverterTask.COMPLEX.make(base, this.isHermitian());
+    }
+
+    @Override
+    SolverTask<ComplexNumber> getSolverTask(final MatrixStore<ComplexNumber> templateBody, final MatrixStore<ComplexNumber> templateRHS) {
+        return SolverTask.COMPLEX.make(templateBody, templateRHS, this.isHermitian());
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    MatrixStore<ComplexNumber> getStoreFrom(final Access1D<?> aMtrx) {
-        if (aMtrx instanceof ComplexMatrix) {
-            return ((ComplexMatrix) aMtrx).getStore();
-        } else if (aMtrx instanceof ComplexDenseStore) {
-            return (ComplexDenseStore) aMtrx;
-        } else if ((aMtrx instanceof MatrixStore) && !this.isEmpty() && (aMtrx.get(0) instanceof ComplexNumber)) {
-            return (MatrixStore<ComplexNumber>) aMtrx;
-        } else if (aMtrx instanceof Access2D<?>) {
-            return this.getPhysicalFactory().copy((Access2D<?>) aMtrx);
+    MatrixStore<ComplexNumber> cast(final Access1D<?> matrix) {
+        if (matrix instanceof ComplexMatrix) {
+            return ((ComplexMatrix) matrix).getStore();
+        } else if (matrix instanceof ComplexDenseStore) {
+            return (ComplexDenseStore) matrix;
+        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof ComplexNumber)) {
+            return (MatrixStore<ComplexNumber>) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
         } else {
-            return this.getPhysicalFactory().columns(aMtrx);
+            return this.getPhysicalFactory().columns(matrix);
         }
     }
 

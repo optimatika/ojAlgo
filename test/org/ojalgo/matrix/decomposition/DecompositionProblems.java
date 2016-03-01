@@ -70,7 +70,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.copy(MatrixUtils.makeRandomComplexStore(5, 9));
 
-        final QR<Double> tmpQR = QR.makePrimitive();
+        final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));
@@ -86,7 +86,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                         { 4.890945865607895, 4.2576454398997265, 1.0251822439318778, 0.8623492557631138, 5.7457253685285545 },
                         { 1.6397137349990025, 0.6795594856277076, 4.7101325736711095, 2.0823473021899517, 2.2159317240940233 } });
 
-        final QR<Double> tmpQR = QR.makePrimitive();
+        final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.decompose(tmpA);
 
         TestUtils.assertEquals(tmpA, tmpQR, new NumberContext(7, 6));

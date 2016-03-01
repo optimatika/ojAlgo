@@ -68,7 +68,7 @@ public class PortfolioContext implements FinancePortfolio.Context {
     @SuppressWarnings("unchecked")
     public double calculatePortfolioVariance(final FinancePortfolio weightsPortfolio) {
         final PrimitiveMatrix tmpWeights = FinancePortfolio.MATRIX_FACTORY.columns(weightsPortfolio.getWeights());
-        return this.getCovariances().multiply(tmpWeights).multiplyLeft(tmpWeights.transpose()).doubleValue(0);
+        return tmpWeights.transpose().multiply(this.getCovariances().multiply(tmpWeights)).doubleValue(0);
     }
 
     public PrimitiveMatrix getAssetReturns() {

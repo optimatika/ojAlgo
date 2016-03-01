@@ -994,7 +994,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             int k = i;
             double p = d[i];
             for (int j = i + 1; j < n; j++) {
-                if (d[j] < p) {
+                if (d[j] > p) {
                     k = j;
                     p = d[j];
                 }

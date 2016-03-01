@@ -85,17 +85,18 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
         @Override
         public SolverTask<Double> make(final MatrixStore<Double> templateBody, final MatrixStore<Double> templateRHS, final boolean hermitian) {
+            final boolean tmpVectorRHS = templateRHS.countColumns() == 1L;
             if (hermitian) {
                 final long tmpDim = templateBody.countColumns();
-                if (tmpDim == 1l) {
+                if (tmpVectorRHS && (tmpDim == 1l)) {
                     return AbstractSolver.FULL_1X1;
-                } else if (tmpDim == 2l) {
+                } else if (tmpVectorRHS && (tmpDim == 2l)) {
                     return AbstractSolver.SYMMETRIC_2X2;
-                } else if (tmpDim == 3l) {
+                } else if (tmpVectorRHS && (tmpDim == 3l)) {
                     return AbstractSolver.SYMMETRIC_3X3;
-                } else if (tmpDim == 4l) {
+                } else if (tmpVectorRHS && (tmpDim == 4l)) {
                     return AbstractSolver.SYMMETRIC_4X4;
-                } else if (tmpDim == 5l) {
+                } else if (tmpVectorRHS && (tmpDim == 5l)) {
                     return AbstractSolver.SYMMETRIC_5X5;
                 } else {
                     return Cholesky.make(templateBody);
@@ -103,20 +104,20 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
             } else {
                 final long tmpDim = templateBody.countColumns();
                 if (templateBody.countRows() == tmpDim) {
-                    if (tmpDim == 1l) {
+                    if (tmpVectorRHS && (tmpDim == 1l)) {
                         return AbstractSolver.FULL_1X1;
-                    } else if (tmpDim == 2l) {
+                    } else if (tmpVectorRHS && (tmpDim == 2l)) {
                         return AbstractSolver.FULL_2X2;
-                    } else if (tmpDim == 3l) {
+                    } else if (tmpVectorRHS && (tmpDim == 3l)) {
                         return AbstractSolver.FULL_3X3;
-                    } else if (tmpDim == 4l) {
+                    } else if (tmpVectorRHS && (tmpDim == 4l)) {
                         return AbstractSolver.FULL_4X4;
-                    } else if (tmpDim == 5l) {
+                    } else if (tmpVectorRHS && (tmpDim == 5l)) {
                         return AbstractSolver.FULL_5X5;
                     } else {
                         return LU.make(templateBody);
                     }
-                } else if (templateBody.countRows() >= tmpDim) {
+                } else if (tmpVectorRHS && (templateBody.countRows() >= tmpDim)) {
                     if (tmpDim <= 5) {
                         return AbstractSolver.LEAST_SQUARES;
                     } else {

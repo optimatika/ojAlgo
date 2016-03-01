@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -39,32 +40,72 @@ import org.ojalgo.scalar.ComplexNumber;
  */
 public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
+    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Tridiagonal<N>> {
+
+    }
+
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+
+        public Tridiagonal<BigDecimal> make(final Structure2D template) {
+            return new TridiagonalDecomposition.Big();
+        }
+
+    };
+
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        public Tridiagonal<ComplexNumber> make(final Structure2D template) {
+            return new TridiagonalDecomposition.Complex();
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+
+        public Tridiagonal<Double> make(final Structure2D template) {
+            return new TridiagonalDecomposition.Primitive();
+        }
+
+    };
+
     @SuppressWarnings("unchecked")
     public static <N extends Number> Tridiagonal<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (Tridiagonal<N>) Tridiagonal.makeBig();
+            return (Tridiagonal<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (Tridiagonal<N>) Tridiagonal.makeComplex();
+            return (Tridiagonal<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
-            return (Tridiagonal<N>) Tridiagonal.makePrimitive();
+            return (Tridiagonal<N>) PRIMITIVE.make(typical);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
+    /**
+     * @deprecated v40 Use {@link #BIG}
+     */
+    @Deprecated
     public static Tridiagonal<BigDecimal> makeBig() {
-        return new TridiagonalDecomposition.Big();
+        return BIG.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #COMPLEX}
+     */
+    @Deprecated
     public static Tridiagonal<ComplexNumber> makeComplex() {
-        return new TridiagonalDecomposition.Complex();
+        return COMPLEX.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #PRIMITIVE}
+     */
+    @Deprecated
     public static Tridiagonal<Double> makePrimitive() {
-        return new TridiagonalDecomposition.Primitive();
+        return PRIMITIVE.make();
     }
 
     MatrixStore<N> getD();

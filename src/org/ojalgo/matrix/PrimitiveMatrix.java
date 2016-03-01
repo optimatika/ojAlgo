@@ -28,6 +28,9 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.DeterminantTask;
+import org.ojalgo.matrix.task.InverterTask;
+import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -77,15 +80,30 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
         return Double.toString(this.doubleValue(row, col));
     }
 
+    @Override
+    DeterminantTask<Double> getDeterminantTask(final MatrixStore<Double> template) {
+        return DeterminantTask.PRIMITIVE.make(template, this.isHermitian());
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     MatrixFactory<Double, PrimitiveMatrix> getFactory() {
         return (MatrixFactory<Double, PrimitiveMatrix>) FACTORY;
     }
 
+    @Override
+    InverterTask<Double> getInverterTask(final MatrixStore<Double> base) {
+        return InverterTask.PRIMITIVE.make(base, this.isHermitian());
+    }
+
+    @Override
+    SolverTask<Double> getSolverTask(final MatrixStore<Double> templateBody, final MatrixStore<Double> templateRHS) {
+        return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian());
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    MatrixStore<Double> getStoreFrom(final Access1D<?> matrix) {
+    MatrixStore<Double> cast(final Access1D<?> matrix) {
         if (matrix instanceof PrimitiveMatrix) {
             return ((PrimitiveMatrix) matrix).getStore();
         } else if (matrix instanceof PrimitiveDenseStore) {

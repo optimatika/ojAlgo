@@ -75,7 +75,7 @@ public class DesignCase extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.makeFilled(3, 9, new Normal());
         final PhysicalStore<Double> tmpB = PrimitiveDenseStore.FACTORY.makeFilled(3, 1, new Normal());
 
-        final QR<Double> tmpQR = QR.makePrimitive();
+        final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.setFullSize(false);
         tmpQR.decompose(tmpA);
 
@@ -124,12 +124,12 @@ public class DesignCase extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 2, 3, 5 }, { -4, 2, 3 } });
 
-        final QR<Double> tmpQR = QR.makePrimitive();
+        final QR<Double> tmpQR = QR.PRIMITIVE.make(tmpA);
         tmpQR.setFullSize(true);
         tmpQR.decompose(tmpA.transpose());
 
-        final SingularValue<Double> tmpSVD = SingularValue.makePrimitive();
-        tmpSVD.setFullSize(true);
+        final SingularValue<Double> tmpSVD = new SVDnew32.Primitive();
+        tmpSVD.setFullSize(true); // Supports full size
         tmpSVD.decompose(tmpA);
 
         final PhysicalStore<Double> tmpNullspaceQR = tmpQR.getQ().builder().columns(tmpQR.getRank(), (int) tmpA.countColumns()).build().copy();

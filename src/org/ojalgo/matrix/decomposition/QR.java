@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -45,8 +46,40 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
-        MatrixDecomposition.Determinant<N> {
+public interface QR<N extends Number>
+        extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>, MatrixDecomposition.Determinant<N> {
+
+    interface Factory<N extends Number> extends MatrixDecomposition.Factory<QR<N>> {
+
+    }
+
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+
+        public QR<BigDecimal> make(final Structure2D template) {
+            return new QRDecomposition.Big();
+        }
+
+    };
+
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        public QR<ComplexNumber> make(final Structure2D template) {
+            return new QRDecomposition.Complex();
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+
+        public QR<Double> make(final Structure2D template) {
+            if ((template.countColumns() > template.countRows()) || ((256L < template.countColumns()) && (template.count() <= BasicArray.MAX_ARRAY_SIZE))) {
+                return new QRDecomposition.Primitive();
+            } else {
+                return new RawQR();
+            }
+        }
+
+    };
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> QR<N> make(final Access2D<N> typical) {
@@ -54,30 +87,38 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (QR<N>) new QRDecomposition.Big();
+            return (QR<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (QR<N>) new QRDecomposition.Complex();
+            return (QR<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
-            if ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
-                return (QR<N>) new QRDecomposition.Primitive();
-            } else {
-                return (QR<N>) new RawQR();
-            }
+            return (QR<N>) PRIMITIVE.make(typical);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
+    /**
+     * @deprecated v40 Use {@link #BIG}
+     */
+    @Deprecated
     public static QR<BigDecimal> makeBig() {
-        return new QRDecomposition.Big();
+        return BIG.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #COMPLEX}
+     */
+    @Deprecated
     public static QR<ComplexNumber> makeComplex() {
-        return new QRDecomposition.Complex();
+        return COMPLEX.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #PRIMITIVE}
+     */
+    @Deprecated
     public static QR<Double> makePrimitive() {
-        return new QRDecomposition.Primitive();
+        return PRIMITIVE.make();
     }
 
     MatrixStore<N> getQ();

@@ -722,21 +722,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#multiplyLeft(org.ojalgo.matrix.BasicMatrix)
-     */
-    public void testMultiplyLeftBasicMatrix() {
-
-        myExpMtrx = myBigAX.multiplyLeft(myBigAA);
-
-        myActMtrx = myComplexAX.multiplyLeft(myComplexAA);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
-
-        myActMtrx = myPrimitiveAX.multiplyLeft(myPrimitiveAA);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
-
-    }
-
-    /**
      * @see org.ojalgo.matrix.BasicMatrix#multiply(java.lang.Number)
      */
     public void testMultiplyNumber() {
@@ -754,7 +739,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     /**
      * @see org.ojalgo.matrix.BasicMatrix#multiply(org.ojalgo.matrix.BasicMatrix)
      */
-    public void testMultiplyRightBasicMatrix() {
+    public void testMultiplyBasicMatrix() {
 
         myExpMtrx = myBigAA.multiply(myBigAX);
 

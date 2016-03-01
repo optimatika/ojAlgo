@@ -91,4 +91,9 @@ public class P20050125Case extends BasicMatrixTest {
         super.setUp();
     }
 
+    @Override
+    public void testSolveBasicMatrix() {
+        super.testSolveBasicMatrix();
+    }
+
 }

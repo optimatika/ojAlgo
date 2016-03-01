@@ -28,6 +28,9 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.task.DeterminantTask;
+import org.ojalgo.matrix.task.InverterTask;
+import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -76,25 +79,40 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
         return this.toBigDecimal(row, col).toPlainString();
     }
 
+    @Override
+    DeterminantTask<BigDecimal> getDeterminantTask(final MatrixStore<BigDecimal> template) {
+        return DeterminantTask.BIG.make(template, this.isHermitian());
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     MatrixFactory<BigDecimal, BigMatrix> getFactory() {
         return (MatrixFactory<BigDecimal, BigMatrix>) FACTORY;
     }
 
+    @Override
+    InverterTask<BigDecimal> getInverterTask(final MatrixStore<BigDecimal> base) {
+        return InverterTask.BIG.make(base, this.isHermitian());
+    }
+
+    @Override
+    SolverTask<BigDecimal> getSolverTask(final MatrixStore<BigDecimal> templateBody, final MatrixStore<BigDecimal> templateRHS) {
+        return SolverTask.BIG.make(templateBody, templateRHS, this.isHermitian());
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    MatrixStore<BigDecimal> getStoreFrom(final Access1D<?> aMtrx) {
-        if (aMtrx instanceof BigMatrix) {
-            return ((BigMatrix) aMtrx).getStore();
-        } else if (aMtrx instanceof BigDenseStore) {
-            return (BigDenseStore) aMtrx;
-        } else if ((aMtrx instanceof MatrixStore) && !this.isEmpty() && (aMtrx.get(0) instanceof BigDecimal)) {
-            return (MatrixStore<BigDecimal>) aMtrx;
-        } else if (aMtrx instanceof Access2D<?>) {
-            return this.getPhysicalFactory().copy((Access2D<?>) aMtrx);
+    MatrixStore<BigDecimal> cast(final Access1D<?> matrix) {
+        if (matrix instanceof BigMatrix) {
+            return ((BigMatrix) matrix).getStore();
+        } else if (matrix instanceof BigDenseStore) {
+            return (BigDenseStore) matrix;
+        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof BigDecimal)) {
+            return (MatrixStore<BigDecimal>) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
         } else {
-            return this.getPhysicalFactory().columns(aMtrx);
+            return this.getPhysicalFactory().columns(matrix);
         }
     }
 

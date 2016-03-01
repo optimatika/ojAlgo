@@ -67,9 +67,16 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
 
         final PhysicalStore<Double> tmpExp = SimpleSingularValueCase.getOriginal().toPrimitiveStore()
                 .multiply(SimpleSingularValueCase.getMatrixQ2().toPrimitiveStore()).copy();
-        final PhysicalStore<Double> tmpAct = SimpleSingularValueCase.getMatrixQ1().toPrimitiveStore().multiply(SimpleSingularValueCase.getMatrixD().toPrimitiveStore()).copy();
+
+        final PhysicalStore<Double> tmpAct = SimpleSingularValueCase.getMatrixQ1().toPrimitiveStore()
+                .multiply(SimpleSingularValueCase.getMatrixD().toPrimitiveStore()).copy();
 
         TestUtils.assertEquals(tmpExp, tmpAct, EVALUATION);
+    }
+
+    @Override
+    public void testInvert() {
+        super.testInvert();
     }
 
     @Override
@@ -81,6 +88,11 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
         tmpSVD.decompose(tmpA);
 
         tmpSVD.equals(tmpA, EVALUATION);
+    }
+
+    @Override
+    public void testSolveBasicMatrix() {
+        super.testSolveBasicMatrix();
     }
 
     @Override

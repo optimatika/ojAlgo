@@ -24,13 +24,14 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
- * A general matrix [A] can be factorized by similarity transformations into the form
- * [A]=[Q1][D][Q2]<sup>-1</sup> where:
+ * A general matrix [A] can be factorized by similarity transformations into the form [A]=[Q1][D][Q2]
+ * <sup>-1</sup> where:
  * <ul>
  * <li>[A] (m-by-n) is any, real or complex, matrix</li>
  * <li>[D] (r-by-r) or (m-by-n) is, upper or lower, bidiagonal</li>
@@ -43,32 +44,72 @@ import org.ojalgo.scalar.ComplexNumber;
  */
 public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.EconomySize<N> {
 
+    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Bidiagonal<N>> {
+
+    }
+
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+
+        public Bidiagonal<BigDecimal> make(final Structure2D template) {
+            return new BidiagonalDecomposition.Big();
+        }
+
+    };
+
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        public Bidiagonal<ComplexNumber> make(final Structure2D template) {
+            return new BidiagonalDecomposition.Complex();
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+
+        public Bidiagonal<Double> make(final Structure2D template) {
+            return new BidiagonalDecomposition.Primitive();
+        }
+
+    };
+
     @SuppressWarnings("unchecked")
     public static <N extends Number> Bidiagonal<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (Bidiagonal<N>) new BidiagonalDecomposition.Big();
+            return (Bidiagonal<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (Bidiagonal<N>) new BidiagonalDecomposition.Complex();
+            return (Bidiagonal<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
-            return (Bidiagonal<N>) new BidiagonalDecomposition.Primitive();
+            return (Bidiagonal<N>) PRIMITIVE.make(typical);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
+    /**
+     * @deprecated v40 Use {@link #BIG} instead
+     */
+    @Deprecated
     public static Bidiagonal<BigDecimal> makeBig() {
-        return new BidiagonalDecomposition.Big();
+        return BIG.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #COMPLEX} instead
+     */
+    @Deprecated
     public static Bidiagonal<ComplexNumber> makeComplex() {
-        return new BidiagonalDecomposition.Complex();
+        return COMPLEX.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #PRIMITIVE} instead
+     */
+    @Deprecated
     public static Bidiagonal<Double> makePrimitive() {
-        return new BidiagonalDecomposition.Primitive();
+        return PRIMITIVE.make();
     }
 
     MatrixStore<N> getD();

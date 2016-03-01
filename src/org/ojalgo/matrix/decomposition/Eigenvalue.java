@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
@@ -52,6 +53,56 @@ import org.ojalgo.scalar.ComplexNumber;
 public interface Eigenvalue<N extends Number>
         extends MatrixDecomposition<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N> {
 
+    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Eigenvalue<N>> {
+
+        default Eigenvalue<N> make(final Structure2D template) {
+            if (template instanceof Access2D) {
+                return this.make(template, MatrixUtils.isHermitian((Access2D<?>) template));
+            } else {
+                return this.make(template, false);
+            }
+        }
+
+        Eigenvalue<N> make(Structure2D template, boolean hermitian);
+
+    }
+
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+
+        public Eigenvalue<BigDecimal> make(final Structure2D template, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.Big() : null;
+        }
+
+    };
+
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        public Eigenvalue<ComplexNumber> make(final Structure2D template, final boolean hermitian) {
+            return hermitian ? new HermitianEvD.Complex() : null;
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+
+        public Eigenvalue<Double> make(final Structure2D template) {
+            if ((8192L < template.countColumns()) && (template.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+                return new DynamicEvD.Primitive();
+            } else {
+                return new RawEigenvalue.Dynamic();
+            }
+        }
+
+        public Eigenvalue<Double> make(final Structure2D template, final boolean hermitian) {
+            if ((8192L < template.countColumns()) && (template.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+                return hermitian ? new HermitianEvD.Primitive() : new GeneralEvD.Primitive();
+            } else {
+                return hermitian ? new RawEigenvalue.Symmetric() : new RawEigenvalue.General();
+            }
+        }
+
+    };
+
     public static <N extends Number> Eigenvalue<N> make(final Access2D<N> typical) {
         return Eigenvalue.make(typical, MatrixUtils.isHermitian(typical));
     }
@@ -62,42 +113,62 @@ public interface Eigenvalue<N extends Number>
         final N tmpNumber = typical.get(0L, 0L);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Big() : null);
+            return (Eigenvalue<N>) BIG.make(typical, hermitian);
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Complex() : null);
+            return (Eigenvalue<N>) COMPLEX.make(typical, hermitian);
         } else if (tmpNumber instanceof Double) {
-            if ((8192L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
-                return (Eigenvalue<N>) (hermitian ? new HermitianEvD.Primitive() : new GeneralEvD.Primitive());
-            } else {
-                return (Eigenvalue<N>) (hermitian ? new RawEigenvalue.Symmetric() : new RawEigenvalue.General());
-            }
+            return (Eigenvalue<N>) PRIMITIVE.make(typical, hermitian);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
+    /**
+     * @deprecated v40 Use {@link #BIG} instead
+     */
+    @Deprecated
     public static Eigenvalue<BigDecimal> makeBig() {
         return Eigenvalue.makeBig(true);
     }
 
+    /**
+     * @deprecated v40 Use {@link #BIG} instead
+     */
+    @Deprecated
     public static Eigenvalue<BigDecimal> makeBig(final boolean symmetric) {
-        return symmetric ? new HermitianEvD.Big() : null;
+        return BIG.make(TYPICAL, symmetric);
     }
 
+    /**
+     * @deprecated v40 Use {@link #COMPLEX} instead
+     */
+    @Deprecated
     public static Eigenvalue<ComplexNumber> makeComplex() {
         return Eigenvalue.makeComplex(true);
     }
 
+    /**
+     * @deprecated v40 Use {@link #COMPLEX} instead
+     */
+    @Deprecated
     public static Eigenvalue<ComplexNumber> makeComplex(final boolean hermitian) {
-        return hermitian ? new HermitianEvD.Complex() : null;
+        return COMPLEX.make(TYPICAL, hermitian);
     }
 
+    /**
+     * @deprecated v40 Use {@link #PRIMITIVE}
+     */
+    @Deprecated
     public static Eigenvalue<Double> makePrimitive() {
-        return new DynamicEvD.Primitive();
+        return PRIMITIVE.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #PRIMITIVE}
+     */
+    @Deprecated
     public static Eigenvalue<Double> makePrimitive(final boolean symmetric) {
-        return symmetric ? new HermitianEvD.Primitive() : new GeneralEvD.Primitive();
+        return PRIMITIVE.make(TYPICAL, symmetric);
     }
 
     /**

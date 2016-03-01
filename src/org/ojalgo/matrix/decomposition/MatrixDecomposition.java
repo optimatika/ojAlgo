@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -85,6 +86,16 @@ public interface MatrixDecomposition<N extends Number> {
         boolean isFullSize();
 
         void setFullSize(boolean fullSize);
+
+    }
+
+    interface Factory<D extends MatrixDecomposition<?>> {
+
+        default D make() {
+            return this.make(TYPICAL);
+        }
+
+        D make(Structure2D template);
 
     }
 
@@ -214,6 +225,17 @@ public interface MatrixDecomposition<N extends Number> {
         boolean isOrdered();
 
     }
+
+    static final Structure2D TYPICAL = new Structure2D() {
+
+        public long countColumns() {
+            return 50L;
+        }
+
+        public long countRows() {
+            return 50L;
+        }
+    };
 
     /**
      * @param matrix A matrix to decompose

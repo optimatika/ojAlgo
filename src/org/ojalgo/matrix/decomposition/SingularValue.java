@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
@@ -34,7 +35,8 @@ import org.ojalgo.scalar.ComplexNumber;
  * Singular Value: [A] = [Q1][D][Q2]<sup>T</sup> Decomposes [this] into [Q1], [D] and [Q2] where:
  * <ul>
  * <li>[Q1] is an orthogonal matrix. The columns are the left, orthonormal, singular vectors of [this]. Its
- * columns are the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this].</li>
+ * columns are the eigenvectors of [A][A]<sup>T</sup>, and therefore has the same number of rows as [this].
+ * </li>
  * <li>[D] is a diagonal matrix. The elements on the diagonal are the singular values of [this]. It is either
  * square or has the same dimensions as [this]. The singular values of [this] are the square roots of the
  * nonzero eigenvalues of [A][A]<sup>T</sup> and [A]<sup>T</sup>[A] (they are the same)</li>
@@ -47,8 +49,40 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface SingularValue<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
-        MatrixDecomposition.Values<N> {
+public interface SingularValue<N extends Number>
+        extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>, MatrixDecomposition.Values<N> {
+
+    interface Factory<N extends Number> extends MatrixDecomposition.Factory<SingularValue<N>> {
+
+    }
+
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+
+        public SingularValue<BigDecimal> make(final Structure2D template) {
+            return new SVDnew32.Big();
+        }
+
+    };
+
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        public SingularValue<ComplexNumber> make(final Structure2D template) {
+            return new SVDnew32.Complex();
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+
+        public SingularValue<Double> make(final Structure2D template) {
+            if ((2048L < template.countColumns()) && (template.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+                return new SVDnew32.Primitive();
+            } else {
+                return new RawSingularValue();
+            }
+        }
+
+    };
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> SingularValue<N> make(final Access2D<N> typical) {
@@ -56,30 +90,38 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (SingularValue<N>) new SVDnew32.Big();
+            return (SingularValue<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (SingularValue<N>) new SVDnew32.Complex();
+            return (SingularValue<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
-            if ((2048L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
-                return (SingularValue<N>) new SVDnew32.Primitive();
-            } else {
-                return (SingularValue<N>) new RawSingularValue();
-            }
+            return (SingularValue<N>) PRIMITIVE.make(typical);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
+    /**
+     * @deprecated v40 Use {@link #BIG}
+     */
+    @Deprecated
     public static SingularValue<BigDecimal> makeBig() {
-        return new SVDnew32.Big();
+        return BIG.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #COMPLEX}
+     */
+    @Deprecated
     public static SingularValue<ComplexNumber> makeComplex() {
-        return new SVDnew32.Complex();
+        return COMPLEX.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #PRIMITIVE}
+     */
+    @Deprecated
     public static SingularValue<Double> makePrimitive() {
-        return new SVDnew32.Primitive();
+        return PRIMITIVE.make();
     }
 
     /**
