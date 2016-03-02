@@ -65,9 +65,9 @@ public class VerySmallCase extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpProblematic = VerySmallCase.getVerySmall();
 
-        final Eigenvalue<BigDecimal> tmpBig = Eigenvalue.makeBig();
-        final Eigenvalue<ComplexNumber> tmpComplex = Eigenvalue.makeComplex();
-        final Eigenvalue<Double> tmpPrimitive = Eigenvalue.makePrimitive();
+        final Eigenvalue<BigDecimal> tmpBig = Eigenvalue.BIG.make(true);
+        final Eigenvalue<ComplexNumber> tmpComplex = Eigenvalue.COMPLEX.make(true);
+        final Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
         final Eigenvalue<Double> tmpJama = new RawEigenvalue.Dynamic();
 
         TestUtils.assertTrue("Big.compute()", tmpBig.decompose(MatrixStore.BIG.makeWrapper(tmpProblematic)));
@@ -109,9 +109,9 @@ public class VerySmallCase extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpProblematic = VerySmallCase.getVerySmall();
 
-        final LU<BigDecimal> tmpBig = LU.makeBig();
-        final LU<ComplexNumber> tmpComplex = LU.makeComplex();
-        final LU<Double> tmpPrimitive = LU.makePrimitive();
+        final LU<BigDecimal> tmpBig = LU.BIG.make();
+        final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
+        final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
         final LU<Double> tmpJama = new RawLU();
 
         TestUtils.assertTrue("Big.compute()", tmpBig.decompose(MatrixStore.BIG.makeWrapper(tmpProblematic)));
@@ -153,9 +153,9 @@ public class VerySmallCase extends MatrixDecompositionTests {
 
         final MatrixStore<Double> tmpProblematic = VerySmallCase.getVerySmall();
 
-        final QR<BigDecimal> tmpBig = QR.makeBig();
-        final QR<ComplexNumber> tmpComplex = QR.makeComplex();
-        final QR<Double> tmpPrimitive = QR.makePrimitive();
+        final QR<BigDecimal> tmpBig = QR.BIG.make();
+        final QR<ComplexNumber> tmpComplex = QR.COMPLEX.make();
+        final QR<Double> tmpPrimitive = QR.PRIMITIVE.make();
         final QR<Double> tmpJama = new RawQR();
 
         TestUtils.assertTrue("Big.compute()", tmpBig.decompose(MatrixStore.BIG.makeWrapper(tmpProblematic)));

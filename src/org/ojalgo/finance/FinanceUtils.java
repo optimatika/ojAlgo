@@ -323,7 +323,7 @@ public abstract class FinanceUtils {
 
         if (clean) {
 
-            final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
+            final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(true);
             tmpEvD.decompose(tmpCovariances);
 
             final MatrixStore<Double> tmpV = tmpEvD.getV();

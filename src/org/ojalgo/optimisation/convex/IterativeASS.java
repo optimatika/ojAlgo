@@ -214,7 +214,7 @@ abstract class IterativeASS extends ActiveSetSolver {
 
                     if (myS.count() > 1) {
 
-                        final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
+                        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(true);
                         tmpEvD.decompose(MatrixStore.PRIMITIVE.makeWrapper(myS));
                         BasicLogger.debug("Eigenvalues: {}", tmpEvD.getEigenvalues());
 

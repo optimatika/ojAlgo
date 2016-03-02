@@ -66,7 +66,7 @@ public class QRTest extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 4.0, 3.0, 2.0, 1.0 }, { 0.0, 3.0, 2.0, 1.0 }, { 0.0, 0.0, 2.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 } });
 
-        final QR<Double> tmpDecomp = QR.makePrimitive();
+        final QR<Double> tmpDecomp = QR.PRIMITIVE.make();
         tmpDecomp.decompose(tmpOriginalMatrix);
 
         if (MatrixDecompositionTests.DEBUG) {
@@ -89,7 +89,7 @@ public class QRTest extends MatrixDecompositionTests {
             BasicLogger.debug("Original", tmpOriginal);
         }
 
-        final QR<ComplexNumber> tmpDecomposition = QR.makeComplex();
+        final QR<ComplexNumber> tmpDecomposition = QR.COMPLEX.make();
         tmpDecomposition.decompose(tmpOriginal);
         final MatrixStore<ComplexNumber> tmpDecompQ = tmpDecomposition.getQ();
         final MatrixStore<ComplexNumber> tmpDecompR = tmpDecomposition.getR();
@@ -191,9 +191,9 @@ public class QRTest extends MatrixDecompositionTests {
 
         final BigMatrix tmpOriginal = P20030422Case.getProblematic();
 
-        final QR<BigDecimal> tmpBigDecomp = QR.makeBig();
-        final QR<ComplexNumber> tmpComplexDecomp = QR.makeComplex();
-        final QR<Double> tmpPrimitiveDecomp = QR.makePrimitive();
+        final QR<BigDecimal> tmpBigDecomp = QR.BIG.make();
+        final QR<ComplexNumber> tmpComplexDecomp = QR.COMPLEX.make();
+        final QR<Double> tmpPrimitiveDecomp = QR.PRIMITIVE.make();
 
         tmpBigDecomp.decompose(tmpOriginal.toBigStore());
         tmpComplexDecomp.decompose(tmpOriginal.toComplexStore());

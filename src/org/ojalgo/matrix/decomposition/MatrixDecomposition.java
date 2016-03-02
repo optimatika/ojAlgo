@@ -95,7 +95,7 @@ public interface MatrixDecomposition<N extends Number> {
             return this.make(TYPICAL);
         }
 
-        D make(Structure2D template);
+        D make(Structure2D typical);
 
     }
 

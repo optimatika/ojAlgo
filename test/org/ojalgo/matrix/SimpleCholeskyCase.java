@@ -87,7 +87,7 @@ public class SimpleCholeskyCase extends BasicMatrixTest {
     public void testProblem() {
 
         final BasicMatrix tmpMtrx = SimpleCholeskyCase.getOriginal();
-        final Cholesky<BigDecimal> tmpDecomp = Cholesky.makeBig();
+        final Cholesky<BigDecimal> tmpDecomp = Cholesky.BIG.make();
         tmpDecomp.decompose(tmpMtrx.toBigStore());
 
         TestUtils.assertEquals(tmpMtrx.toBigStore(), tmpDecomp, EVALUATION);

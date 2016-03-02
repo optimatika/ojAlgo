@@ -390,7 +390,7 @@ public abstract class ConvexSolver extends BaseSolver {
         if (!myCholesky.isSPD()) {
             // Not symmetric positive definite. Check if at least positive semidefinite.
 
-            final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
+            final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(true);
 
             tmpEvD.computeValuesOnly(tmpQ);
 

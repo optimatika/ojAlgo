@@ -46,7 +46,7 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
-        public Tridiagonal<BigDecimal> make(final Structure2D template) {
+        public Tridiagonal<BigDecimal> make(final Structure2D typical) {
             return new TridiagonalDecomposition.Big();
         }
 
@@ -54,7 +54,7 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
-        public Tridiagonal<ComplexNumber> make(final Structure2D template) {
+        public Tridiagonal<ComplexNumber> make(final Structure2D typical) {
             return new TridiagonalDecomposition.Complex();
         }
 
@@ -62,7 +62,7 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
-        public Tridiagonal<Double> make(final Structure2D template) {
+        public Tridiagonal<Double> make(final Structure2D typical) {
             return new TridiagonalDecomposition.Primitive();
         }
 

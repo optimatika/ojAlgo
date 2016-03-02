@@ -69,7 +69,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
     @Override
     public void testProblem() {
 
-        final Eigenvalue<Double> tmpEigen = Eigenvalue.makePrimitive();
+        final Eigenvalue<Double> tmpEigen = Eigenvalue.PRIMITIVE.make();
         tmpEigen.decompose(SimpleEigenvalueCase.getOriginal().toPrimitiveStore());
 
         final MatrixStore<Double> tmpV = tmpEigen.getV();

@@ -67,7 +67,7 @@ public class BigPolynomial extends AbstractPolynomial<BigDecimal> {
             tmpRHS.set(i, 0, tmpY);
         }
 
-        final QR<BigDecimal> tmpQR = QR.makeBig();
+        final QR<BigDecimal> tmpQR = QR.BIG.make();
         tmpQR.decompose(tmpBody);
         this.set(tmpQR.solve(tmpRHS));
     }

@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -41,32 +42,72 @@ import org.ojalgo.scalar.ComplexNumber;
  */
 public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
 
+    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Hessenberg<N>> {
+
+    }
+
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+
+        public Hessenberg<BigDecimal> make(final Structure2D typical) {
+            return new HessenbergDecomposition.Big();
+        }
+
+    };
+
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        public Hessenberg<ComplexNumber> make(final Structure2D typical) {
+            return new HessenbergDecomposition.Complex();
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+
+        public Hessenberg<Double> make(final Structure2D typical) {
+            return new HessenbergDecomposition.Primitive();
+        }
+
+    };
+
     @SuppressWarnings("unchecked")
     public static <N extends Number> Hessenberg<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (Hessenberg<N>) Hessenberg.makeBig();
+            return (Hessenberg<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (Hessenberg<N>) Hessenberg.makeComplex();
+            return (Hessenberg<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
-            return (Hessenberg<N>) Hessenberg.makePrimitive();
+            return (Hessenberg<N>) PRIMITIVE.make(typical);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
+    /**
+     * @deprecated v40 Use {@link #BIG}
+     */
+    @Deprecated
     public static Hessenberg<BigDecimal> makeBig() {
-        return new HessenbergDecomposition.Big();
+        return BIG.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #COMPLEX}
+     */
+    @Deprecated
     public static Hessenberg<ComplexNumber> makeComplex() {
-        return new HessenbergDecomposition.Complex();
+        return COMPLEX.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #PRIMITIVE}
+     */
+    @Deprecated
     public static Hessenberg<Double> makePrimitive() {
-        return new HessenbergDecomposition.Primitive();
+        return PRIMITIVE.make();
     }
 
     boolean compute(ElementsSupplier<N> matrix, boolean upper);

@@ -55,21 +55,25 @@ public interface Eigenvalue<N extends Number>
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<Eigenvalue<N>> {
 
-        default Eigenvalue<N> make(final Structure2D template) {
-            if (template instanceof Access2D) {
-                return this.make(template, MatrixUtils.isHermitian((Access2D<?>) template));
+        default Eigenvalue<N> make(final Structure2D typical) {
+            if (typical instanceof Access2D) {
+                return this.make(typical, MatrixUtils.isHermitian((Access2D<?>) typical));
             } else {
-                return this.make(template, false);
+                return this.make(typical, false);
             }
         }
 
-        Eigenvalue<N> make(Structure2D template, boolean hermitian);
+        default Eigenvalue<N> make(final boolean hermitian) {
+            return this.make(TYPICAL, hermitian);
+        }
+
+        Eigenvalue<N> make(Structure2D typical, boolean hermitian);
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
-        public Eigenvalue<BigDecimal> make(final Structure2D template, final boolean hermitian) {
+        public Eigenvalue<BigDecimal> make(final Structure2D typical, final boolean hermitian) {
             return hermitian ? new HermitianEvD.Big() : null;
         }
 
@@ -77,7 +81,7 @@ public interface Eigenvalue<N extends Number>
 
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
-        public Eigenvalue<ComplexNumber> make(final Structure2D template, final boolean hermitian) {
+        public Eigenvalue<ComplexNumber> make(final Structure2D typical, final boolean hermitian) {
             return hermitian ? new HermitianEvD.Complex() : null;
         }
 
@@ -85,16 +89,16 @@ public interface Eigenvalue<N extends Number>
 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
-        public Eigenvalue<Double> make(final Structure2D template) {
-            if ((8192L < template.countColumns()) && (template.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+        public Eigenvalue<Double> make(final Structure2D typical) {
+            if ((8192L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return new DynamicEvD.Primitive();
             } else {
                 return new RawEigenvalue.Dynamic();
             }
         }
 
-        public Eigenvalue<Double> make(final Structure2D template, final boolean hermitian) {
-            if ((8192L < template.countColumns()) && (template.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+        public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
+            if ((8192L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return hermitian ? new HermitianEvD.Primitive() : new GeneralEvD.Primitive();
             } else {
                 return hermitian ? new RawEigenvalue.Symmetric() : new RawEigenvalue.General();
@@ -128,7 +132,7 @@ public interface Eigenvalue<N extends Number>
      */
     @Deprecated
     public static Eigenvalue<BigDecimal> makeBig() {
-        return Eigenvalue.makeBig(true);
+        return Eigenvalue.BIG.make(true);
     }
 
     /**
@@ -144,7 +148,7 @@ public interface Eigenvalue<N extends Number>
      */
     @Deprecated
     public static Eigenvalue<ComplexNumber> makeComplex() {
-        return Eigenvalue.makeComplex(true);
+        return Eigenvalue.COMPLEX.make(true);
     }
 
     /**

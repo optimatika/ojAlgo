@@ -146,7 +146,7 @@ public final class GaussianField<K extends Comparable<K>> {
 
         if (cleanCovariances) {
 
-            final Eigenvalue<Double> tmpEvD = Eigenvalue.makePrimitive(true);
+            final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(true);
             tmpEvD.decompose(tmpCovariances);
 
             final MatrixStore<Double> tmpV = tmpEvD.getV();
@@ -238,7 +238,7 @@ public final class GaussianField<K extends Comparable<K>> {
             }
         }
 
-        final SingularValue<Double> retVal = SingularValue.makePrimitive();
+        final SingularValue<Double> retVal = SingularValue.PRIMITIVE.make();
 
         retVal.decompose(tmpMatrix);
 

@@ -50,7 +50,7 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
-        public Bidiagonal<BigDecimal> make(final Structure2D template) {
+        public Bidiagonal<BigDecimal> make(final Structure2D typical) {
             return new BidiagonalDecomposition.Big();
         }
 
@@ -58,7 +58,7 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
 
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
-        public Bidiagonal<ComplexNumber> make(final Structure2D template) {
+        public Bidiagonal<ComplexNumber> make(final Structure2D typical) {
             return new BidiagonalDecomposition.Complex();
         }
 
@@ -66,7 +66,7 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
-        public Bidiagonal<Double> make(final Structure2D template) {
+        public Bidiagonal<Double> make(final Structure2D typical) {
             return new BidiagonalDecomposition.Primitive();
         }
 

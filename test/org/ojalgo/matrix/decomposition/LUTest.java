@@ -47,13 +47,13 @@ public class LUTest extends MatrixDecompositionTests {
 
         final BigMatrix tmpProblematic = P20061119Case.getProblematic();
 
-        final LU<BigDecimal> tmpBig = LU.makeBig();
+        final LU<BigDecimal> tmpBig = LU.BIG.make();
         tmpBig.decompose(tmpProblematic.toBigStore());
 
-        final LU<ComplexNumber> tmpComplex = LU.makeComplex();
+        final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
         tmpComplex.decompose(tmpProblematic.toComplexStore());
 
-        final LU<Double> tmpPrimitive = LU.makePrimitive();
+        final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
         tmpPrimitive.decompose(tmpProblematic.toPrimitiveStore());
 
         final LU<Double> tmpJama = new RawLU();

@@ -55,7 +55,7 @@ public interface QR<N extends Number>
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
-        public QR<BigDecimal> make(final Structure2D template) {
+        public QR<BigDecimal> make(final Structure2D typical) {
             return new QRDecomposition.Big();
         }
 
@@ -63,7 +63,7 @@ public interface QR<N extends Number>
 
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
-        public QR<ComplexNumber> make(final Structure2D template) {
+        public QR<ComplexNumber> make(final Structure2D typical) {
             return new QRDecomposition.Complex();
         }
 
@@ -71,8 +71,8 @@ public interface QR<N extends Number>
 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
-        public QR<Double> make(final Structure2D template) {
-            if ((template.countColumns() > template.countRows()) || ((256L < template.countColumns()) && (template.count() <= BasicArray.MAX_ARRAY_SIZE))) {
+        public QR<Double> make(final Structure2D typical) {
+            if (typical.isFat() || ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE))) {
                 return new QRDecomposition.Primitive();
             } else {
                 return new RawQR();

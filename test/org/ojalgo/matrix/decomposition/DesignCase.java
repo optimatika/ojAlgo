@@ -58,7 +58,7 @@ public class DesignCase extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
         final MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
 
-        this.doTestSolveInverse(Cholesky.makePrimitive(), tmpMtrx);
+        this.doTestSolveInverse(Cholesky.PRIMITIVE.make(), tmpMtrx);
     }
 
     public void testLuSolveInverse() {
@@ -67,7 +67,7 @@ public class DesignCase extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpVctr = PrimitiveDenseStore.FACTORY.copy(tmpRandomComplexStore);
         final MatrixStore<Double> tmpMtrx = tmpVctr.multiply(tmpVctr.transpose());
 
-        this.doTestSolveInverse(LU.makePrimitive(), tmpMtrx);
+        this.doTestSolveInverse(LU.PRIMITIVE.make(), tmpMtrx);
     }
 
     public void testRandomUnderdetermined() {
@@ -106,7 +106,7 @@ public class DesignCase extends MatrixDecompositionTests {
 
     public void testTridiagonal() {
 
-        final Tridiagonal<Double> tmpDecomposition = Tridiagonal.makePrimitive();
+        final Tridiagonal<Double> tmpDecomposition = Tridiagonal.PRIMITIVE.make();
         //final Tridiagonal<Double> tmpDecomposition = new TridiagonalAltDecomp();
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
@@ -163,7 +163,7 @@ public class DesignCase extends MatrixDecompositionTests {
         tmpOldDecomp.getQ1();
         tmpOldDecomp.getQ2();
 
-        final SingularValue<Double> tmpNewDecomp = SingularValue.makePrimitive();
+        final SingularValue<Double> tmpNewDecomp = SingularValue.PRIMITIVE.make();
         tmpNewDecomp.decompose(tmpOriginalMatrix);
         tmpNewDecomp.getD();
         tmpNewDecomp.getQ1();

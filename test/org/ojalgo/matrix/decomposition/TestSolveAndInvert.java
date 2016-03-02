@@ -36,8 +36,8 @@ import org.ojalgo.type.context.NumberContext;
 public class TestSolveAndInvert extends MatrixDecompositionTests {
 
     static MatrixDecomposition.Solver<Double>[] getAllSquare() {
-        return (MatrixDecomposition.Solver<Double>[]) new MatrixDecomposition.Solver<?>[] { LU.makePrimitive(), new RawLU(), QR.makePrimitive(), new RawQR(),
-                SingularValue.makePrimitive(), new RawSingularValue(), new SVDold30.Primitive() };
+        return (MatrixDecomposition.Solver<Double>[]) new MatrixDecomposition.Solver<?>[] { LU.PRIMITIVE.make(), new RawLU(), QR.PRIMITIVE.make(), new RawQR(),
+                SingularValue.PRIMITIVE.make(), new RawSingularValue(), new SVDold30.Primitive() };
     }
 
     public TestSolveAndInvert() {

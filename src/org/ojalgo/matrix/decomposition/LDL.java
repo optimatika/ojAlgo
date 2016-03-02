@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -52,36 +53,76 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N> {
 
+    interface Factory<N extends Number> extends MatrixDecomposition.Factory<LDL<N>> {
+
+    }
+
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+
+        public LDL<BigDecimal> make(final Structure2D typical) {
+            return new LDLDecomposition.Big();
+        }
+
+    };
+
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        public LDL<ComplexNumber> make(final Structure2D typical) {
+            return new LDLDecomposition.Complex();
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+
+        public LDL<Double> make(final Structure2D typical) {
+            if ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+                return new LDLDecomposition.Primitive();
+            } else {
+                return new RawLDL();
+            }
+        }
+
+    };
+
     @SuppressWarnings("unchecked")
     public static <N extends Number> LDL<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (LDL<N>) new LDLDecomposition.Big();
+            return (LDL<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (LDL<N>) new LDLDecomposition.Complex();
+            return (LDL<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
-            if ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
-                return (LDL<N>) new LDLDecomposition.Primitive();
-            } else {
-                return (LDL<N>) new RawLDL();
-            }
+            return (LDL<N>) PRIMITIVE.make(typical);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
+    /**
+     * @deprecated v40 Use {@link #BIG}
+     */
+    @Deprecated
     public static LDL<BigDecimal> makeBig() {
-        return new LDLDecomposition.Big();
+        return BIG.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #COMPLEX}
+     */
+    @Deprecated
     public static LDL<ComplexNumber> makeComplex() {
-        return new LDLDecomposition.Complex();
+        return COMPLEX.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #PRIMITIVE}
+     */
+    @Deprecated
     public static LDL<Double> makePrimitive() {
-        return new LDLDecomposition.Primitive();
+        return PRIMITIVE.make();
     }
 
     default boolean equals(final MatrixStore<N> other, final NumberContext context) {

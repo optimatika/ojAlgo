@@ -58,7 +58,7 @@ public interface SingularValue<N extends Number>
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
-        public SingularValue<BigDecimal> make(final Structure2D template) {
+        public SingularValue<BigDecimal> make(final Structure2D typical) {
             return new SVDnew32.Big();
         }
 
@@ -66,7 +66,7 @@ public interface SingularValue<N extends Number>
 
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
-        public SingularValue<ComplexNumber> make(final Structure2D template) {
+        public SingularValue<ComplexNumber> make(final Structure2D typical) {
             return new SVDnew32.Complex();
         }
 
@@ -74,8 +74,8 @@ public interface SingularValue<N extends Number>
 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
-        public SingularValue<Double> make(final Structure2D template) {
-            if ((2048L < template.countColumns()) && (template.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+        public SingularValue<Double> make(final Structure2D typical) {
+            if ((2048L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
                 return new SVDnew32.Primitive();
             } else {
                 return new RawSingularValue();

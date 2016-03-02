@@ -55,7 +55,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Bidiagonal<?>[] getBidiagonalAll() {
-        return new Bidiagonal<?>[] { new BidiagonalDecomposition.Big(), Bidiagonal.makeComplex(), Bidiagonal.makePrimitive() };
+        return new Bidiagonal<?>[] { new BidiagonalDecomposition.Big(), Bidiagonal.COMPLEX.make(), Bidiagonal.PRIMITIVE.make() };
     }
 
     @SuppressWarnings("unchecked")
@@ -64,7 +64,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Cholesky<?>[] getCholeskyAll() {
-        return new Cholesky<?>[] { Cholesky.makeBig(), Cholesky.makeComplex(), Cholesky.makePrimitive(), new RawCholesky() };
+        return new Cholesky<?>[] { Cholesky.BIG.make(), Cholesky.COMPLEX.make(), Cholesky.PRIMITIVE.make(), new RawCholesky() };
     }
 
     @SuppressWarnings("unchecked")
@@ -73,15 +73,15 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllGeneral() {
-        return new Eigenvalue<?>[] { Eigenvalue.makePrimitive(), new RawEigenvalue.Dynamic() };
+        return new Eigenvalue<?>[] { Eigenvalue.PRIMITIVE.make(), new RawEigenvalue.Dynamic() };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllNonsymmetric() {
-        return new Eigenvalue<?>[] { Eigenvalue.makePrimitive(false) };
+        return new Eigenvalue<?>[] { Eigenvalue.PRIMITIVE.make(false) };
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllSymmetric() {
-        return new Eigenvalue<?>[] { Eigenvalue.makePrimitive(true) };
+        return new Eigenvalue<?>[] { Eigenvalue.PRIMITIVE.make(true) };
     }
 
     @SuppressWarnings("unchecked")
@@ -100,7 +100,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Hessenberg<?>[] getHessenbergAll() {
-        return new Hessenberg<?>[] { Hessenberg.makeBig(), Hessenberg.makeComplex(), Hessenberg.makePrimitive() };
+        return new Hessenberg<?>[] { Hessenberg.BIG.make(), Hessenberg.COMPLEX.make(), Hessenberg.PRIMITIVE.make() };
     }
 
     @SuppressWarnings("unchecked")
@@ -109,7 +109,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final LU<?>[] getLUAll() {
-        return new LU<?>[] { LU.makeBig(), LU.makeComplex(), LU.makePrimitive(), new RawLU() };
+        return new LU<?>[] { LU.BIG.make(), LU.COMPLEX.make(), LU.PRIMITIVE.make(), new RawLU() };
     }
 
     @SuppressWarnings("unchecked")
@@ -118,7 +118,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final QR<?>[] getQRAll() {
-        return new QR<?>[] { QR.makeBig(), QR.makeComplex(), QR.makePrimitive(), new RawQR() };
+        return new QR<?>[] { QR.BIG.make(), QR.COMPLEX.make(), QR.PRIMITIVE.make(), new RawQR() };
     }
 
     @SuppressWarnings("unchecked")
@@ -148,7 +148,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Tridiagonal<?>[] getTridiagonalAll() {
-        return new Tridiagonal<?>[] { Tridiagonal.makeBig(), Tridiagonal.makeComplex(), Tridiagonal.makePrimitive() };
+        return new Tridiagonal<?>[] { Tridiagonal.BIG.make(), Tridiagonal.COMPLEX.make(), Tridiagonal.PRIMITIVE.make() };
     }
 
     @SuppressWarnings("unchecked")

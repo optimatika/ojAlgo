@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -54,36 +55,76 @@ import org.ojalgo.scalar.ComplexNumber;
  */
 public interface LU<N extends Number> extends LDU<N> {
 
+    interface Factory<N extends Number> extends MatrixDecomposition.Factory<LU<N>> {
+
+    }
+
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+
+        public LU<BigDecimal> make(final Structure2D typical) {
+            return new LUDecomposition.Big();
+        }
+
+    };
+
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        public LU<ComplexNumber> make(final Structure2D typical) {
+            return new LUDecomposition.Complex();
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+
+        public LU<Double> make(final Structure2D typical) {
+            if ((16L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+                return new LUDecomposition.Primitive();
+            } else {
+                return new RawLU();
+            }
+        }
+
+    };
+
     @SuppressWarnings("unchecked")
     public static <N extends Number> LU<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (LU<N>) new LUDecomposition.Big();
+            return (LU<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (LU<N>) new LUDecomposition.Complex();
+            return (LU<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
-            if ((16L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
-                return (LU<N>) new LUDecomposition.Primitive();
-            } else {
-                return (LU<N>) new RawLU();
-            }
+            return (LU<N>) PRIMITIVE.make(typical);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
+    /**
+     * @deprecated v40 Use {@link #BIG}
+     */
+    @Deprecated
     public static LU<BigDecimal> makeBig() {
-        return new LUDecomposition.Big();
+        return BIG.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #COMPLEX}
+     */
+    @Deprecated
     public static LU<ComplexNumber> makeComplex() {
-        return new LUDecomposition.Complex();
+        return COMPLEX.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #PRIMITIVE}
+     */
+    @Deprecated
     public static LU<Double> makePrimitive() {
-        return new LUDecomposition.Primitive();
+        return PRIMITIVE.make();
     }
 
     /**

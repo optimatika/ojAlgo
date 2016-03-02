@@ -59,7 +59,7 @@ public class PrimitivePolynomial extends AbstractPolynomial<Double> {
             tmpRHS.set(i, 0, tmpY);
         }
 
-        final QR<Double> tmpQR = QR.makePrimitive();
+        final QR<Double> tmpQR = QR.PRIMITIVE.make();
         tmpQR.decompose(tmpBody);
         this.set(tmpQR.solve(tmpRHS));
     }

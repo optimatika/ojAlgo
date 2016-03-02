@@ -72,7 +72,7 @@ public class P20061119Case extends BasicMatrixTest {
 
         final BasicMatrix tmpMatrix = P20061119Case.getProblematic();
 
-        final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.makePrimitive();
+        final Eigenvalue<Double> tmpEigenvalue = Eigenvalue.PRIMITIVE.make();
         final PhysicalStore<Double> tmpPrimitiveStore = tmpMatrix.toPrimitiveStore();
         tmpEigenvalue.decompose(tmpPrimitiveStore);
 

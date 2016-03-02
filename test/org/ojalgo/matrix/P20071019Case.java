@@ -60,8 +60,8 @@ public class P20071019Case extends BasicMatrixTest {
     @Override
     public void testProblem() {
 
-        final LU<Double> tmpJamaLU = LU.makePrimitive();
-        final LU<Double> tmpDenseLU = LU.makePrimitive();
+        final LU<Double> tmpJamaLU = LU.PRIMITIVE.make();
+        final LU<Double> tmpDenseLU = LU.PRIMITIVE.make();
 
         MatrixStore<Double> tmpOriginal = P20071019Case.getFatProblematic().toPrimitiveStore();
 

@@ -71,7 +71,7 @@ public class SimpleLUCase extends BasicMatrixTest {
 
         // PLDU
 
-        final LU<BigDecimal> tmpLU = LU.makeBig();
+        final LU<BigDecimal> tmpLU = LU.BIG.make();
         tmpLU.decompose(SimpleLUCase.getOrginal().toBigStore());
 
         tmpLU.equals(SimpleLUCase.getOrginal().toBigStore(), EVALUATION);

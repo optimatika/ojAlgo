@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -49,36 +50,76 @@ import org.ojalgo.scalar.ComplexNumber;
  */
 public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.Hermitian<N> {
 
+    interface Factory<N extends Number> extends MatrixDecomposition.Factory<Cholesky<N>> {
+
+    }
+
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+
+        public Cholesky<BigDecimal> make(final Structure2D typical) {
+            return new CholeskyDecomposition.Big();
+        }
+
+    };
+
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+
+        public Cholesky<ComplexNumber> make(final Structure2D typical) {
+            return new CholeskyDecomposition.Complex();
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+
+        public Cholesky<Double> make(final Structure2D typical) {
+            if ((32L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+                return new CholeskyDecomposition.Primitive();
+            } else {
+                return new RawCholesky();
+            }
+        }
+
+    };
+
     @SuppressWarnings("unchecked")
     public static <N extends Number> Cholesky<N> make(final Access2D<N> typical) {
 
         final N tmpNumber = typical.get(0, 0);
 
         if (tmpNumber instanceof BigDecimal) {
-            return (Cholesky<N>) new CholeskyDecomposition.Big();
+            return (Cholesky<N>) BIG.make(typical);
         } else if (tmpNumber instanceof ComplexNumber) {
-            return (Cholesky<N>) new CholeskyDecomposition.Complex();
+            return (Cholesky<N>) COMPLEX.make(typical);
         } else if (tmpNumber instanceof Double) {
-            if ((32L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
-                return (Cholesky<N>) new CholeskyDecomposition.Primitive();
-            } else {
-                return (Cholesky<N>) new RawCholesky();
-            }
+            return (Cholesky<N>) PRIMITIVE.make(typical);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
+    /**
+     * @deprecated v40 Use {@link #BIG}
+     */
+    @Deprecated
     public static Cholesky<BigDecimal> makeBig() {
-        return new CholeskyDecomposition.Big();
+        return BIG.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #COMPLEX}
+     */
+    @Deprecated
     public static Cholesky<ComplexNumber> makeComplex() {
-        return new CholeskyDecomposition.Complex();
+        return COMPLEX.make();
     }
 
+    /**
+     * @deprecated v40 Use {@link #PRIMITIVE}
+     */
+    @Deprecated
     public static Cholesky<Double> makePrimitive() {
-        return new CholeskyDecomposition.Primitive();
+        return PRIMITIVE.make();
     }
 
     /**
