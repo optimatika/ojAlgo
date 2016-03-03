@@ -25,18 +25,14 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.MathContext;
-import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.Equation;
 import org.ojalgo.matrix.task.iterative.MutableSolver;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
@@ -206,24 +202,28 @@ abstract class IterativeASS extends ActiveSetSolver {
             } else {
                 // Actual/normal optimisation problem
 
-                if (this.isDebug()) {
-
-                    BasicLogger.debug(Arrays.toString(tmpIncluded), myS);
-
-                    BasicLogger.debug("Is hermitian? {}", MatrixUtils.isHermitian(myS));
-
-                    if (myS.count() > 1) {
-
-                        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(true);
-                        tmpEvD.decompose(MatrixStore.PRIMITIVE.makeWrapper(myS));
-                        BasicLogger.debug("Eigenvalues: {}", tmpEvD.getEigenvalues());
-
-                    }
-
-                    BasicLogger.debug();
-                }
+                //                if (this.isDebug()) {
+                //
+                //                    BasicLogger.debug(Arrays.toString(tmpIncluded), myS);
+                //
+                //                    BasicLogger.debug("Is hermitian? {}", MatrixUtils.isHermitian(myS));
+                //
+                //                    if (myS.count() > 1) {
+                //
+                //                        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(true);
+                //                        tmpEvD.decompose(MatrixStore.PRIMITIVE.makeWrapper(myS));
+                //                        BasicLogger.debug("Eigenvalues: {}", tmpEvD.getEigenvalues());
+                //
+                //                    }
+                //
+                //                    BasicLogger.debug();
+                //                }
 
                 myS.resolve(myIterationL);
+
+                if (this.isDebug()) {
+                    this.debug("Iteration L", this.getIterationL(tmpIncluded));
+                }
 
                 myCholesky.solve(this.getIterationL(tmpIncluded).multiplyLeft(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
             }

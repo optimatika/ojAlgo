@@ -508,7 +508,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * Issue reported at GitHub. A set of problems related to when Q is zero - a linear problem. Generally the
      * ConvexSolver is not the right option to handle linear problems, but there is some desireable behaviour.
      */
-    public void _testP20150809() {
+    public void testP20150809() {
 
         final PrimitiveArray tmpExpectedSolution = PrimitiveArray.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
         final PrimitiveArray tmpBoundedSolution = PrimitiveArray.wrap(new double[] { 99999, -99999, 99999, 99999 });

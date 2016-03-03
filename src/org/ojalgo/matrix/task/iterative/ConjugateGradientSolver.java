@@ -103,8 +103,10 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
 
             tmpStepLength = zr0 / pAp0;
 
-            current.maxpy(tmpStepLength, tmpDirection);
-            tmpResidual.maxpy(-tmpStepLength, tmpVector);
+            if (!Double.isNaN(tmpStepLength)) {
+                current.maxpy(tmpStepLength, tmpDirection);
+                tmpResidual.maxpy(-tmpStepLength, tmpVector);
+            }
 
             tmpNormErr = ZERO;
 
@@ -127,7 +129,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
                 this.debug(tmpIterations, current);
             }
 
-        } while ((tmpIterations < tmpLimit) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
+        } while ((tmpIterations < tmpLimit) && !Double.isNaN(tmpNormErr) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
 
         // BasicLogger.debug("Done in {} iterations on problem size {}", tmpIterations, current.count());
     }

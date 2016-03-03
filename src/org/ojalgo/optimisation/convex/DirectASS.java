@@ -109,6 +109,10 @@ abstract class DirectASS extends ActiveSetSolver {
 
                     //BasicLogger.debug("L", tmpIterL);
 
+                    if (this.isDebug()) {
+                        this.debug("Iteration L", tmpIterL);
+                    }
+
                     //myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
                     myCholesky.solve(tmpIterL.multiplyLeft(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
                 }
@@ -128,6 +132,15 @@ abstract class DirectASS extends ActiveSetSolver {
             options.debug_appender.println("KKT system unsolvable!");
             options.debug_appender.printmtrx("KKT", this.getIterationKKT());
             options.debug_appender.printmtrx("RHS", this.getIterationRHS());
+        }
+
+        myIterationL.fillAll(0.0);
+        final int tmpCountE = this.countEqualityConstraints();
+        for (int i = 0; i < tmpCountE; i++) {
+            myIterationL.set(i, tmpIterL.doubleValue(i));
+        }
+        for (int i = 0; i < tmpIncluded.length; i++) {
+            myIterationL.set(tmpCountE + tmpIncluded[i], tmpIterL.doubleValue(tmpCountE + i));
         }
 
         this.handleSubsolution(tmpSolvable, tmpIterX, tmpIncluded);
