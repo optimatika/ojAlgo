@@ -401,7 +401,8 @@ public abstract class ConvexSolver extends BaseSolver {
             for (final ComplexNumber tmpValue : tmpEigenvalues) {
                 if ((tmpValue.doubleValue() < ZERO) || !tmpValue.isReal()) {
                     if (this.isDebug()) {
-                        this.debug("Q not positive semidefinite!", tmpQ);
+                        this.debug("Q not positive semidefinite!");
+                        this.debug("The eigenvalues are: {}", tmpEigenvalues);
                     }
                     throw new IllegalArgumentException("Q must be positive semidefinite!");
                 }

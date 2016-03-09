@@ -141,7 +141,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
     public void testRandomProblemsComparedToEquilibrium() {
 
-        final NumberContext tmpWeightsContext = StandardType.PERCENT.newPrecision(6);
+        final NumberContext tmpWeightsContext = StandardType.PERCENT.newPrecision(5);
 
         final int tmpDim = 9;
 
