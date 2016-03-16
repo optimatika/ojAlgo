@@ -276,13 +276,13 @@ abstract class IterativeASS extends ActiveSetSolver {
             for (int i = 0; i < tmpExcluded.length; i++) {
                 final double tmpBody = tmpAIX.doubleValue(i);
                 final double tmpRHS = tmpBI.doubleValue(tmpExcluded[i]);
-                if (!options.slack.isDifferent(tmpRHS, tmpBody)) {
+                if (!options.slack.isDifferent(tmpRHS, tmpBody) && (myIterationL.doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
                     myActivator.include(tmpExcluded[i]);
                 }
             }
         }
 
-        while ((tmpNumEqus + myActivator.countIncluded()) > tmpNumVars) {
+        while (((tmpNumEqus + myActivator.countIncluded()) >= tmpNumVars) && (myActivator.countIncluded() > 0)) {
             this.shrink();
         }
 

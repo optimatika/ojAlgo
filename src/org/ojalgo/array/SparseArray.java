@@ -22,6 +22,7 @@
 package org.ojalgo.array;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
@@ -38,6 +39,7 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Sparse array - maps long indices to a localiced int.
@@ -45,6 +47,8 @@ import org.ojalgo.type.TypeUtils;
  * @author apete
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
+
+    static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
     static abstract class SparseFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -244,28 +248,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public long[] indicesInRange(final long first, final long limit) {
-
-        int tmpFirst = this.index(first);
-        if (tmpFirst < 0) {
-            tmpFirst = -tmpFirst + 1;
-        }
-        int tmpLimit = this.index(limit);
-        if (tmpLimit < 0) {
-            tmpLimit = -tmpLimit + 1;
-        }
-
-        // return Arrays.copyOfRange(myIndices, tmpFirst, tmpLimit);
-
-        final long[] retVal = new long[tmpLimit - tmpFirst];
-
-        for (int i = tmpFirst; i < tmpLimit; i++) {
-            retVal[i] = myIndices[i] - first;
-        }
-
-        return retVal;
-    }
-
     public void add(final long index, final Number addend) {
         final int tmpIndex = this.index(index);
         if (tmpIndex >= 0) {
@@ -279,10 +261,16 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myCount;
     }
 
+    public void daxpy(final double a, final Mutate1D y) {
+        for (int n = 0; n < myActualLength; n++) {
+            y.add(myIndices[n], a * myValues.doubleValue(n));
+        }
+    }
+
     @Override
     public double dot(final Access1D<?> vector) {
 
-        double retVal = 0.0;
+        double retVal = PrimitiveMath.ZERO;
 
         for (int n = 0; n < myActualLength; n++) {
             retVal += myValues.doubleValue(n) * vector.doubleValue(myIndices[n]);
@@ -386,6 +374,28 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         } else {
             return myZeroNumber;
         }
+    }
+
+    public long[] indicesInRange(final long first, final long limit) {
+
+        int tmpFirst = this.index(first);
+        if (tmpFirst < 0) {
+            tmpFirst = -tmpFirst + 1;
+        }
+        int tmpLimit = this.index(limit);
+        if (tmpLimit < 0) {
+            tmpLimit = -tmpLimit + 1;
+        }
+
+        // return Arrays.copyOfRange(myIndices, tmpFirst, tmpLimit);
+
+        final long[] retVal = new long[tmpLimit - tmpFirst];
+
+        for (int i = tmpFirst; i < tmpLimit; i++) {
+            retVal[i] = myIndices[i] - first;
+        }
+
+        return retVal;
     }
 
     public boolean isAbsolute(final long index) {
@@ -796,6 +806,23 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     boolean isPrimitive() {
         return myValues.isPrimitive();
+    }
+
+    @Override
+    public void modifyAll(final UnaryFunction<N> function) {
+
+        final double tmpZeroValue = function.invoke(myZeroValue);
+
+        if (!MATH_CONTEXT.isDifferent(myZeroValue, tmpZeroValue)) {
+
+            for (int i = 0; i < myActualLength; i++) {
+                myValues.modify(i, function);
+            }
+
+        } else {
+
+            throw new IllegalArgumentException("SparseArray zero modification!");
+        }
     }
 
 }

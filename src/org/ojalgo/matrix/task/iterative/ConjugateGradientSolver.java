@@ -56,7 +56,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         final int tmpCountRows = equations.size();
 
         double tmpNormErr = POSITIVE_INFINITY;
-        double tmpNormRHS = ZERO;
+        double tmpNormRHS = ONE;
 
         final PrimitiveDenseStore tmpResidual = this.residual(current);
         final PrimitiveDenseStore tmpDirection = this.direction(current);

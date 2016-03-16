@@ -70,7 +70,7 @@ final class SimplexTableauSolver extends LinearSolver {
         }
 
         int getColRHS() {
-            return mySolver.countVariables();
+            return mySolver.countConstraints() + mySolver.countVariables();
         }
 
         int getRowObjective() {
@@ -86,7 +86,7 @@ final class SimplexTableauSolver extends LinearSolver {
         }
 
         double objective() {
-            return mySolver.getTableauElement(this.getRowObjective(), mySolver.countVariables());
+            return mySolver.getTableauElement(this.getRowObjective(), mySolver.countConstraints() + mySolver.countVariables());
         }
 
         int phase() {
@@ -117,10 +117,10 @@ final class SimplexTableauSolver extends LinearSolver {
         final int tmpConstraintsCount = this.countConstraints();
 
         final MatrixStore.Builder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE.makeZero(1, 1);
-        tmpTableauBuilder.left(matrices.getC().transpose());
+        tmpTableauBuilder.left(matrices.getC().transpose().builder().right(MatrixStore.PRIMITIVE.makeZero(1, tmpConstraintsCount).get()).get());
 
         if (tmpConstraintsCount >= 1) {
-            tmpTableauBuilder.above(matrices.getAE(), matrices.getBE());
+            tmpTableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE.makeIdentity(tmpConstraintsCount).get(), matrices.getBE());
         }
         tmpTableauBuilder.below(1);
         //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
@@ -199,7 +199,7 @@ final class SimplexTableauSolver extends LinearSolver {
     @Override
     protected PhysicalStore<Double> extractSolution() {
 
-        final int tmpCountVariables = this.countVariables();
+        final int tmpCountVariables = this.countConstraints() + this.countVariables();
 
         this.resetX();
 
@@ -235,7 +235,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
         if (myPoint.isPhase1()) {
 
-            final double tmpPhaseOneValue = myTransposedTableau.doubleValue(this.countVariables(), myPoint.getRowObjective());
+            final double tmpPhaseOneValue = myTransposedTableau.doubleValue(this.countConstraints() + this.countVariables(), myPoint.getRowObjective());
 
             if (!this.isBasicArtificials() || options.objective.isZero(tmpPhaseOneValue)) {
 
@@ -485,7 +485,7 @@ final class SimplexTableauSolver extends LinearSolver {
      * RHS.
      */
     Array1D<Double> sliceTableauRow(final int row) {
-        return myTransposedTableau.asArray2D().sliceColumn(0, row).subList(0, this.countVariables());
+        return myTransposedTableau.asArray2D().sliceColumn(0, row).subList(0, this.countConstraints() + this.countVariables());
     }
 
     @Override
@@ -506,6 +506,23 @@ final class SimplexTableauSolver extends LinearSolver {
 
         for (int j = 0; j < retVal.length; j++) {
             retVal[j] = myTransposedTableau.doubleValue(j, tmpRowObjective);
+        }
+
+        return retVal;
+    }
+
+    @Override
+    public double[] getDualVariables() {
+
+        this.logDebugTableau("Tableau extracted");
+
+        final double[] retVal = new double[this.countConstraints()];
+
+        final int tmpRowObjective = this.countConstraints();
+
+        final int tmpCountVariables = this.countVariables();
+        for (int j = 0; j < retVal.length; j++) {
+            retVal[j] = -myTransposedTableau.doubleValue(tmpCountVariables + j, tmpRowObjective);
         }
 
         return retVal;

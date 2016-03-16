@@ -34,6 +34,7 @@ import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -363,7 +364,18 @@ public abstract class ConvexSolver extends BaseSolver {
     @Override
     protected boolean initialise(final Result kickStarter) {
 
-        myCholesky.decompose(this.getIterationQ());
+        final PhysicalStore<Double> tmpIterationQ = this.getIterationQ();
+
+        if (!myCholesky.compute(tmpIterationQ)) {
+
+            final double tmpLargest = tmpIterationQ.aggregateAll(Aggregator.LARGEST);
+
+            tmpIterationQ.modifyDiagonal(0L, 0L, ADD.second(tmpLargest * 1E-6));
+
+            this.setIterationQ(tmpIterationQ);
+
+            myCholesky.compute(tmpIterationQ);
+        }
 
         return true;
     }
@@ -415,12 +427,30 @@ public abstract class ConvexSolver extends BaseSolver {
 
     abstract MatrixStore<Double> getIterationC();
 
-    final MatrixStore<Double> getIterationQ() {
-        return this.getQ();
+    final PhysicalStore<Double> getIterationQ() {
+
+        if (myIterationQ == null) {
+
+            final MatrixStore<Double> tmpQ = this.getQ();
+
+            if (tmpQ instanceof PhysicalStore) {
+                myIterationQ = (PhysicalStore<Double>) tmpQ;
+            } else {
+                myIterationQ = tmpQ.copy();
+            }
+        }
+
+        return myIterationQ;
     }
+
+    private transient PhysicalStore<Double> myIterationQ = null;
 
     final MatrixStore<Double> getSolutionX() {
         return this.getX();
+    }
+
+    void setIterationQ(final PhysicalStore<Double> iterationQ) {
+        myIterationQ = iterationQ;
     }
 
 }

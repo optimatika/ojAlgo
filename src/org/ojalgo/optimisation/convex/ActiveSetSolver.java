@@ -26,7 +26,6 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
-import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -472,14 +471,14 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int[] tmpIncluded = myActivator.getIncluded();
 
         int tmpToExclude = tmpIncluded[0];
-        double tmpMaxLagrange = ZERO;
+        double tmpMaxWeight = ZERO;
 
-        // final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
         final MatrixStore<Double> tmpLI = myIterationL.builder().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
         for (int i = 0; i < tmpIncluded.length; i++) {
-            final double tmpVal = Math.abs(tmpLI.doubleValue(i));
-            if (tmpVal >= tmpMaxLagrange) {
-                tmpMaxLagrange = tmpVal;
+            final double tmpValue = tmpLI.doubleValue(i);
+            final double tmpWeight = Math.abs(tmpValue) * Math.max(-tmpValue, ONE);
+            if (tmpWeight > tmpMaxWeight) {
+                tmpMaxWeight = tmpWeight;
                 tmpToExclude = tmpIncluded[i];
             }
         }
@@ -542,21 +541,23 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (tmpLinearResult.getState().isFeasible()) {
 
-            final ElementsConsumer<Double> tmpLI = myIterationL.regionByOffsets(tmpNumEqus, 0);
-
             for (int i = 0; i < tmpNumVars; i++) {
                 this.setX(i, tmpLinearResult.doubleValue(i) - tmpLinearResult.doubleValue(tmpNumVars + i));
             }
+
             @SuppressWarnings("deprecation")
-            final double[] tmpResidual = tmpLinearSolver.getResidualCosts();
-            for (int i = tmpNumVars * 2; i < tmpResidual.length; i++) {
-                final int tmpIndexToInclude = i - (2 * tmpNumVars);
-                // this.setLI(tmpIndexToInclude, tmpResidual[i]);
-                tmpLI.set(tmpIndexToInclude, tmpResidual[i]);
+            final double[] tmpResidual = tmpLinearSolver.getDualVariables();
+
+            if (tmpResidual.length != (this.countEqualityConstraints() + this.countInequalityConstraints())) {
+                throw new IllegalStateException();
+            } else {
+                for (int i = 0; i < tmpResidual.length; i++) {
+                    myIterationL.set(i, tmpResidual[i]);
+                }
             }
 
-            // BasicLogger.debug();
-            // BasicLogger.debug("Initial L: {}", myIterationL.asList().copy());
+            //            BasicLogger.debug();
+            //            BasicLogger.debug("Initial L: {}", myIterationL.asList().copy());
 
             return true;
 

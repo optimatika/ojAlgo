@@ -30,6 +30,7 @@ import java.util.stream.DoubleStream;
 import java.util.stream.StreamSupport;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Mutate1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
@@ -403,12 +404,19 @@ public class PrimitiveArray extends DenseArray<Double> {
 
         double retVal = ZERO;
 
-        final int tmpCount = Math.min(data.length, (int) vector.count());
-        for (int i = 0; i < tmpCount; i++) {
+        final int tmpLength = Math.min(data.length, (int) vector.count());
+        for (int i = 0; i < tmpLength; i++) {
             retVal += data[i] * vector.doubleValue(i);
         }
 
         return retVal;
+    }
+
+    public void daxpy(final double a, final Mutate1D y) {
+        final int tmpLength = Math.min(data.length, (int) y.count());
+        for (int i = 0; i < tmpLength; i++) {
+            y.add(i, a * data[i]);
+        }
     }
 
     public OfDouble spliterator() {

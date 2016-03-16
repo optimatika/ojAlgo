@@ -120,19 +120,22 @@ public abstract class LinearSolver extends BaseSolver {
 
         final Expression tmpObjFunc = sourceModel.objective().compensate(tmpFixVariables);
 
-        final List<Expression> tmpExprsEq = sourceModel.constraints().filter((final Expression c1) -> c1.isEqualityConstraint() && !c1.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
-        final List<Expression> tmpExprsLo = sourceModel.constraints().filter((final Expression c2) -> c2.isLowerConstraint() && !c2.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
-        final List<Expression> tmpExprsUp = sourceModel.constraints().filter((final Expression c3) -> c3.isUpperConstraint() && !c3.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
+        final List<Expression> tmpExprsEq = sourceModel.constraints()
+                .filter((final Expression c1) -> c1.isEqualityConstraint() && !c1.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
+        final List<Expression> tmpExprsLo = sourceModel.constraints()
+                .filter((final Expression c2) -> c2.isLowerConstraint() && !c2.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
+        final List<Expression> tmpExprsUp = sourceModel.constraints()
+                .filter((final Expression c3) -> c3.isUpperConstraint() && !c3.isAnyQuadraticFactorNonZero()).collect(Collectors.toList());
 
-        final List<Variable> tmpVarsPosLo = sourceModel.bounds().filter((final Variable c6) -> c6.isPositive() && c6.isLowerConstraint() && (c6.getLowerLimit().signum() > 0))
-        .collect(Collectors.toList());
-        final List<Variable> tmpVarsPosUp = sourceModel.bounds().filter((final Variable c7) -> c7.isPositive() && c7.isUpperConstraint() && (c7.getUpperLimit().signum() > 0))
-        .collect(Collectors.toList());
+        final List<Variable> tmpVarsPosLo = sourceModel.bounds()
+                .filter((final Variable c6) -> c6.isPositive() && c6.isLowerConstraint() && (c6.getLowerLimit().signum() > 0)).collect(Collectors.toList());
+        final List<Variable> tmpVarsPosUp = sourceModel.bounds()
+                .filter((final Variable c7) -> c7.isPositive() && c7.isUpperConstraint() && (c7.getUpperLimit().signum() > 0)).collect(Collectors.toList());
 
-        final List<Variable> tmpVarsNegLo = sourceModel.bounds().filter((final Variable c4) -> c4.isNegative() && c4.isLowerConstraint() && (c4.getLowerLimit().signum() < 0))
-        .collect(Collectors.toList());
-        final List<Variable> tmpVarsNegUp = sourceModel.bounds().filter((final Variable c5) -> c5.isNegative() && c5.isUpperConstraint() && (c5.getUpperLimit().signum() < 0))
-        .collect(Collectors.toList());
+        final List<Variable> tmpVarsNegLo = sourceModel.bounds()
+                .filter((final Variable c4) -> c4.isNegative() && c4.isLowerConstraint() && (c4.getLowerLimit().signum() < 0)).collect(Collectors.toList());
+        final List<Variable> tmpVarsNegUp = sourceModel.bounds()
+                .filter((final Variable c5) -> c5.isNegative() && c5.isUpperConstraint() && (c5.getUpperLimit().signum() < 0)).collect(Collectors.toList());
 
         final int tmpConstraiCount = tmpExprsEq.size() + tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size()
                 + tmpVarsNegUp.size();
@@ -455,6 +458,14 @@ public abstract class LinearSolver extends BaseSolver {
      */
     @Deprecated
     public abstract double[] getResidualCosts();
+
+    /**
+     * Can only be called after a solve()
+     *
+     * @deprecated v38 Temporary api
+     */
+    @Deprecated
+    public abstract double[] getDualVariables();
 
     protected final int countBasisDeficit() {
         return this.countEqualityConstraints() - mySelector.countIncluded();
