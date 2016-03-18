@@ -147,7 +147,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             }
             myIterationRows[i] = null;
 
-            myIterationL.set(i, 0.0);
+            myIterationL.set(i, ZERO);
         }
 
     }
@@ -293,6 +293,8 @@ abstract class IterativeASS extends ActiveSetSolver {
         myInvQC = myCholesky.solve(this.getIterationC());
 
         final int[] tmpIncluded = myActivator.getIncluded();
+
+        myS.clear();
 
         if ((tmpNumEqus + tmpIncluded.length) > 0) {
 

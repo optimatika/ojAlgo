@@ -34,7 +34,6 @@ import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -366,16 +365,7 @@ public abstract class ConvexSolver extends BaseSolver {
 
         final PhysicalStore<Double> tmpIterationQ = this.getIterationQ();
 
-        if (!myCholesky.compute(tmpIterationQ)) {
-
-            final double tmpLargest = tmpIterationQ.aggregateAll(Aggregator.LARGEST);
-
-            tmpIterationQ.modifyDiagonal(0L, 0L, ADD.second(tmpLargest * 1E-6));
-
-            this.setIterationQ(tmpIterationQ);
-
-            myCholesky.compute(tmpIterationQ);
-        }
+        myCholesky.compute(tmpIterationQ);
 
         return true;
     }

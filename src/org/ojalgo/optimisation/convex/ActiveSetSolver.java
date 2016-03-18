@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -432,16 +433,53 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.performIteration();
 
+        } else if (!myCholesky.isSolvable()) {
+            // Subproblem NOT solved successfully
+            // 0 active inequalities
+            // Q not SPD
+
+            final double tmpLargestQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
+            final double tmpLargestC = this.getC().aggregateAll(Aggregator.LARGEST);
+            final double tmpLargest = Math.max(tmpLargestQ, tmpLargestC);
+
+            this.getIterationQ().modifyDiagonal(0L, 0L, ADD.second(tmpLargest * Math.sqrt(MACHINE_EPSILON)));
+
+            //this.setIterationQ(tmpIterationQ);
+
+            myCholesky.compute(this.getIterationQ());
+
+            myIterationL.modifyAll(new Unary() {
+
+                public double invoke(final double arg) {
+                    if (Double.isFinite(arg)) {
+                        return arg;
+                    } else {
+                        return ZERO;
+                    }
+                }
+            });
+
+            this.initSolution(this.getBI(), this.countVariables(), this.countEqualityConstraints());
+
+            this.performIteration();
+
+            //            BasicLogger.debug("Solvable fixed? {}", myCholesky.isSolvable());
+            //            if (!myCholesky.isSolvable()) {
+            //                BasicLogger.debug("Q", tmpIterationQ);
+            //            }
+
         } else if (this.checkFeasibility(false)) {
             // Subproblem NOT solved successfully
-            // No active inequality
+            // 0 active inequalities
+            // Q SPD
             // Feasible current solution
 
             this.setState(State.FEASIBLE);
 
         } else {
             // Subproblem NOT solved successfully
-            // No active inequality
+            // 0 active inequalities
+            // Q SPD
             // Not feasible current solution
 
             this.setState(State.INFEASIBLE);

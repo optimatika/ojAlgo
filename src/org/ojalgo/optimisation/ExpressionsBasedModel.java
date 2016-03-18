@@ -518,7 +518,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             } else {
                 retState = State.APPROXIMATE;
             }
-
         } else {
             retState = State.INFEASIBLE;
         }

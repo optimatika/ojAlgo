@@ -65,6 +65,10 @@ public abstract class MutableSolver<D extends IterativeSolverTask & IterativeSol
         return retVal;
     }
 
+    public void clear() {
+        myRows.clear();
+    }
+
     public boolean remove(final Equation row) {
         return myRows.remove(row);
     }
