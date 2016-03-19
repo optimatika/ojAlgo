@@ -1269,6 +1269,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             if (right instanceof PrimitiveDenseStore) {
                 multiplyLeft.invoke(data, left, tmpComplexity, PrimitiveDenseStore.cast(right).data);
             } else {
+                // BasicLogger.debug("{} X {}", left.getClass().getSimpleName(), right.getClass().getSimpleName());
                 multiplyBoth.invoke(this, left, tmpComplexity, right);
             }
         }

@@ -64,11 +64,11 @@ abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
 
     @Override
     public void supplyTo(final ElementsConsumer<N> consumer) {
-        this.supplyNonZerosTo(consumer);
+        this.addNonZerosTo(consumer);
     }
 
     @Override
-    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillMatching(this);
     }
 

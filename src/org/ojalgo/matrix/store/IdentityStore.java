@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
@@ -82,11 +81,11 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public MatrixStore<N> multiply(final Access1D<N> right) {
+    public MatrixStore<N> multiply(final MatrixStore<N> right) {
         if (this.getColDim() == right.count()) {
             return this.factory().columns(right);
         } else if (right instanceof MatrixStore<?>) {
-            return ((MatrixStore<N>) right).copy();
+            return right.copy();
         } else {
             return super.multiply(right);
         }
@@ -106,7 +105,7 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillDiagonal(0L, 0L, this.factory().scalar().one().getNumber());
     }
 

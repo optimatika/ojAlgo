@@ -423,11 +423,11 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         }
     }
 
-    public double doubleValue(final long row, final long column) {
-        if (row == column) {
+    public double doubleValue(final long row, final long col) {
+        if (row == col) {
             return myScalar;
         } else {
-            return this.doubleValue(row + (column * 4L));
+            return this.doubleValue(row + (col * 4L));
         }
     }
 

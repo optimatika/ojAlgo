@@ -644,8 +644,8 @@ public abstract class MatrixUtils {
                 return matrix.countRows();
             }
 
-            public double doubleValue(final long ind) {
-                return matrix.doubleValue(ind);
+            public double doubleValue(final long index) {
+                return matrix.doubleValue(index);
             }
 
             public double doubleValue(final long row, final long col) {
@@ -678,8 +678,8 @@ public abstract class MatrixUtils {
                 return matrix.countRows();
             }
 
-            public double doubleValue(final long ind) {
-                return matrix.doubleValue(ind);
+            public double doubleValue(final long index) {
+                return matrix.doubleValue(index);
             }
 
             public double doubleValue(final long row, final long col) {
@@ -712,8 +712,8 @@ public abstract class MatrixUtils {
                 return matrix.countRows();
             }
 
-            public double doubleValue(final long ind) {
-                return matrix.doubleValue(ind);
+            public double doubleValue(final long index) {
+                return matrix.doubleValue(index);
             }
 
             public double doubleValue(final long row, final long col) {

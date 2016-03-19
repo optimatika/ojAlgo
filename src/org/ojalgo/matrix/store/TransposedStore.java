@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.Scalar;
 
 final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
@@ -34,7 +33,7 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
         return this.getBase().get(aCol, aRow);
     }
 
-    public MatrixStore<N> multiply(final Access1D<N> right) {
+    public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
         MatrixStore<N> retVal;
 

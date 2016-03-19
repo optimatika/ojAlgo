@@ -55,10 +55,10 @@ abstract class DelegatingStore<N extends Number> extends LogicalStore<N> {
 
     private static final class MultiplyRight<N extends Number> implements Callable<MatrixStore<N>> {
 
-        private Access1D<N> myRightStore;
+        private MatrixStore<N> myRightStore;
         private MatrixStore<N> myThisStore;
 
-        public MultiplyRight(final MatrixStore<N> thisStore, final Access1D<N> rightStore) {
+        public MultiplyRight(final MatrixStore<N> thisStore, final MatrixStore<N> rightStore) {
 
             super();
 
@@ -83,14 +83,14 @@ abstract class DelegatingStore<N extends Number> extends LogicalStore<N> {
 
     @Override
     public void supplyTo(final ElementsConsumer<N> consumer) {
-        this.supplyNonZerosTo(consumer);
+        this.addNonZerosTo(consumer);
     }
 
     protected final Future<MatrixStore<N>> executeMultiplyLeftOnBase(final Access1D<N> left) {
         return DaemonPoolExecutor.invoke(new MultiplyLeft<N>(this.getBase(), left));
     }
 
-    protected final Future<MatrixStore<N>> executeMultiplyRightOnBase(final Access1D<N> right) {
+    protected final Future<MatrixStore<N>> executeMultiplyRightOnBase(final MatrixStore<N> right) {
         return DaemonPoolExecutor.invoke(new MultiplyRight<N>(this.getBase(), right));
     }
 

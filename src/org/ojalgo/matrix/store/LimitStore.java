@@ -27,8 +27,8 @@ final class LimitStore<N extends Number> extends SelectingStore<N> {
         super(rowsCount, columnsCount, base);
     }
 
-    public double doubleValue(final long row, final long column) {
-        return this.getBase().doubleValue(row, column);
+    public double doubleValue(final long row, final long col) {
+        return this.getBase().doubleValue(row, col);
     }
 
     public N get(final long row, final long column) {

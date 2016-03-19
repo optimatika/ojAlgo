@@ -375,8 +375,8 @@ public abstract class ArrayUtils {
                 return target.length;
             }
 
-            public double doubleValue(final long row, final long column) {
-                return target[(int) row][(int) column];
+            public double doubleValue(final long row, final long col) {
+                return target[(int) row][(int) col];
             }
 
             public Double get(final long row, final long column) {
@@ -405,8 +405,8 @@ public abstract class ArrayUtils {
                 return this.get(index).doubleValue();
             }
 
-            public double doubleValue(final long row, final long column) {
-                return this.get(row, column).doubleValue();
+            public double doubleValue(final long row, final long col) {
+                return this.get(row, col).doubleValue();
             }
 
             public N get(final long row, final long column) {

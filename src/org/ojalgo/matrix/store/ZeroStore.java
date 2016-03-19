@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
@@ -85,7 +84,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public ZeroStore<N> multiply(final Access1D<N> right) {
+    public ZeroStore<N> multiply(final MatrixStore<N> right) {
         return new ZeroStore<N>(this.factory(), this.getRowDim(), (int) (right.count() / this.getColDim()));
     }
 
@@ -99,7 +98,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
     }
 
 }

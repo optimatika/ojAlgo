@@ -25,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -63,8 +62,8 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
     /**
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
-    public double doubleValue(final long row, final long column) {
-        return (row >= mySplit) ? myBelow.doubleValue(row - mySplit, column) : this.getBase().doubleValue(row, column);
+    public double doubleValue(final long row, final long col) {
+        return (row >= mySplit) ? myBelow.doubleValue(row - mySplit, col) : this.getBase().doubleValue(row, col);
     }
 
     public int firstInColumn(final int col) {
@@ -90,7 +89,7 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
     }
 
     @Override
-    public MatrixStore<N> multiply(final Access1D<N> right) {
+    public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
         final Future<MatrixStore<N>> tmpBaseFuture = this.executeMultiplyRightOnBase(right);
 
@@ -114,7 +113,7 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
     }
 
     @Override
-    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
         this.supplyTo(consumer);
     }
 

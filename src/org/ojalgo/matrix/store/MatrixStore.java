@@ -27,6 +27,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.algebra.NormedVectorSpace;
+import org.ojalgo.algebra.Operation;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -58,7 +59,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Elements, Access2D.Visitable<N>, Access2D.Sliceable<N>,
-        NormedVectorSpace<MatrixStore<N>, N>, ElementsSupplier<N>, Access1D.Aggregatable<N> {
+        NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>>, ElementsSupplier<N>, Access1D.Aggregatable<N> {
 
     /**
      * A builder that lets you logically construct matrices and/or encode element structure.
@@ -535,7 +536,16 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         return (int) this.countColumns();
     }
 
-    default MatrixStore<N> multiply(final Access1D<N> right) {
+    default PhysicalStore<N> multiply(final Access1D<N> right, final PhysicalStore<N> target) {
+        target.fillByMultiplying(this, right);
+        return target;
+    }
+
+    default MatrixStore<N> multiply(final double scalar) {
+        return this.multiply(this.factory().scalar().cast(scalar));
+    }
+
+    default MatrixStore<N> multiply(final MatrixStore<N> right) {
 
         final long tmpCountRows = this.countRows();
         final long tmpCountColumns = right.count() / this.countColumns();
@@ -547,29 +557,24 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         return retVal;
     }
 
-    default PhysicalStore<N> multiply(final Access1D<N> right, final PhysicalStore<N> target) {
-        target.fillByMultiplying(this, right);
-        return target;
-    }
-
-    default MatrixStore<N> multiply(final double scalar) {
-        return this.multiply(this.factory().scalar().cast(scalar));
-    }
-
     default MatrixStore<N> multiply(final N scalar) {
         return this.operateOnAll(this.factory().function().multiply().second(scalar)).get();
     }
 
     /**
-     * Assumes [leftAndRight] is a vecor and will calulate [leftAndRight]<sup>H</sup>[this][leftAndRight]
+     * Assumes [leftAndRight] is a vector and will calulate [leftAndRight]<sup>H</sup>[this][leftAndRight]
      *
      * @param leftAndRight The argument vector
      * @return A scalar (extracted from the resulting 1 x 1 matrix)
      */
     N multiplyBoth(final Access1D<N> leftAndRight);
 
+    /**
+     * @deprecated v40 Use {@link #premultiply(Access1D<N>)} instead
+     */
+    @Deprecated
     default ElementsSupplier<N> multiplyLeft(final Access1D<N> left) {
-        return new MatrixProductSupplier<N>(left, this);
+        return this.premultiply(left);
     }
 
     default MatrixStore<N> negate() {
@@ -590,6 +595,21 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
 
     default ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
         return new BinaryOperatorSupplier<>(left, operator, this);
+    }
+
+    /**
+     * The <code>premultiply</code> method differs from <code>multiply</code> in 3 ways:
+     * <ol>
+     * <li>The matrix positions are swapped - left/right.</li>
+     * <li>It does NOT return a {@linkplain MatrixStore} but an {@linkplain ElementsSupplier} instead.</li>
+     * <li>It accepts an {@linkplain Access1D} as the argument left matrix.</li>
+     * </ol>
+     *
+     * @param left The left matrix
+     * @return The matrix product
+     */
+    default ElementsSupplier<N> premultiply(final Access1D<N> left) {
+        return new MatrixProductSupplier<N>(left, this);
     }
 
     default MatrixStore<N> signum() {

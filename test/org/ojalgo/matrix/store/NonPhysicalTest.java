@@ -78,8 +78,8 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
         MatrixStore<N> tmpActual = tmpLeft.multiply(matrixStore);
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
 
-        tmpExpected = tmpCopy.multiplyLeft(tmpLeft).get();
-        tmpActual = matrixStore.multiplyLeft(tmpLeft).get();
+        tmpExpected = tmpCopy.premultiply(tmpLeft).get();
+        tmpActual = matrixStore.premultiply(tmpLeft).get();
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
 
         // multiplyRight
@@ -90,8 +90,8 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
         tmpActual = matrixStore.multiply(tmpRight);
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
 
-        tmpExpected = tmpRight.multiplyLeft(tmpCopy).get();
-        tmpActual = tmpRight.multiplyLeft(matrixStore).get();
+        tmpExpected = tmpRight.premultiply(tmpCopy).get();
+        tmpActual = tmpRight.premultiply(matrixStore).get();
         TestUtils.assertEquals(tmpExpected, tmpActual, CNTXT);
     }
 

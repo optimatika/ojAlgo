@@ -353,8 +353,8 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         return myDelegate.doubleValue(index);
     }
 
-    public double doubleValue(final long row, final long column) {
-        return myDelegate.doubleValue(AccessUtils.index(myRowsCount, row, column));
+    public double doubleValue(final long row, final long col) {
+        return myDelegate.doubleValue(AccessUtils.index(myRowsCount, row, col));
     }
 
     @SuppressWarnings("unchecked")
@@ -368,12 +368,12 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         }
     }
 
-    public void exchangeColumns(final long aColA, final long aColB) {
-        myDelegate.exchange(aColA * myRowsCount, aColB * myRowsCount, 1L, myRowsCount);
+    public void exchangeColumns(final long colA, final long colB) {
+        myDelegate.exchange(colA * myRowsCount, colB * myRowsCount, 1L, myRowsCount);
     }
 
-    public void exchangeRows(final long aRowA, final long aRowB) {
-        myDelegate.exchange(aRowA, aRowB, myRowsCount, myColumnsCount);
+    public void exchangeRows(final long rowA, final long rowB) {
+        myDelegate.exchange(rowA, rowB, myRowsCount, myColumnsCount);
     }
 
     public void fillAll(final N value) {

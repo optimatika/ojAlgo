@@ -45,7 +45,7 @@ public class SuppliersAndConsumers extends AbstractMatrixStoreTest {
             tmpMtrxD.fillRow(j, 0L, 2.0 * (j + 1.0));
         }
 
-        tmpMtrxB.multiplyLeft(tmpMtrxA).transpose().supplyTo(tmpMtrxC);
+        tmpMtrxB.premultiply(tmpMtrxA).transpose().supplyTo(tmpMtrxC);
 
         TestUtils.assertEquals(tmpMtrxD, tmpMtrxC);
     }

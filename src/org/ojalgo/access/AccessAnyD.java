@@ -70,12 +70,12 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         return this.doubleValue(AccessUtils.reference(index, this.shape()));
     }
 
-    double doubleValue(long[] reference);
+    double doubleValue(long[] ref);
 
     default N get(final long index) {
         return this.get(AccessUtils.reference(index, this.shape()));
     }
 
-    N get(long[] reference);
+    N get(long[] ref);
 
 }

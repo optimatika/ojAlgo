@@ -90,7 +90,7 @@ abstract class DirectASS extends ActiveSetSolver {
 
                 // Negated Schur complement
                 // final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
-                final ElementsSupplier<Double> tmpS = tmpInvQAT.multiplyLeft(tmpIterA);
+                final ElementsSupplier<Double> tmpS = tmpInvQAT.premultiply(tmpIterA);
                 // TODO Symmetric, only need to calculate halv the Schur complement, and only 1 row/column changes per iteration
                 //BasicLogger.debug("Negated Schur complement", tmpS.get());
 
@@ -106,7 +106,7 @@ abstract class DirectASS extends ActiveSetSolver {
 
                     //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
                     //myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
-                    myLU.solve(myInvQC.multiplyLeft(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
+                    myLU.solve(myInvQC.premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
 
                     //BasicLogger.debug("L", tmpIterL);
 
@@ -115,7 +115,7 @@ abstract class DirectASS extends ActiveSetSolver {
                     }
 
                     //myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
-                    myCholesky.solve(tmpIterL.multiplyLeft(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
+                    myCholesky.solve(tmpIterL.premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
                 }
             }
         }

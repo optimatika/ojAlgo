@@ -24,8 +24,10 @@ package org.ojalgo.array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessScalar;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
@@ -47,6 +49,37 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
+
+    public final class NonzeroElement implements AccessScalar<N>, Iterator<NonzeroElement>, Iterable<NonzeroElement> {
+
+        private int myCursor = -1;
+
+        public long index() {
+            return SparseArray.this.myIndices[myCursor];
+        }
+
+        public double doubleValue() {
+            return SparseArray.this.myValues.doubleValue(myCursor);
+        }
+
+        public N getNumber() {
+            return SparseArray.this.myValues.get(myCursor);
+        }
+
+        public Iterator<SparseArray<N>.NonzeroElement> iterator() {
+            return this;
+        }
+
+        public boolean hasNext() {
+            return (myCursor + 1) < SparseArray.this.myActualLength;
+        }
+
+        public SparseArray<N>.NonzeroElement next() {
+            myCursor++;
+            return this;
+        }
+
+    }
 
     static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
@@ -439,6 +472,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public void modifyOne(final long index, final UnaryFunction<N> function) {
         this.set(index, function.invoke(this.get(index)));
+    }
+
+    public Iterable<NonzeroElement> nonzeros() {
+        return new NonzeroElement();
     }
 
     @Override

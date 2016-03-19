@@ -606,7 +606,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
 
     /**
      * <p>
-     * As in {@link MatrixStore#multiplyLeft(Access1D)} where the left/parameter matrix is a plane rotation.
+     * As in {@link MatrixStore#premultiply(Access1D)} where the left/parameter matrix is a plane rotation.
      * </p>
      * <p>
      * Multiplying by a plane rotation from the left means that [this] gets two of its rows updated to new

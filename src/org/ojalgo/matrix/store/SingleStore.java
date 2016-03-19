@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.Scalar;
 
 final class SingleStore<N extends Number> extends FactoryStore<N> {
@@ -64,7 +63,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public MatrixStore<N> multiply(final Access1D<N> right) {
+    public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
         final int tmpRowDim = this.getRowDim();
         final int tmpColDim = (int) (right.count() / this.getColDim());
@@ -80,7 +79,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     public void supplyTo(final ElementsConsumer<N> consumer) {
-        this.supplyNonZerosTo(consumer);
+        this.addNonZerosTo(consumer);
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
@@ -93,7 +92,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillOne(0L, 0L, myNumber);
     }
 

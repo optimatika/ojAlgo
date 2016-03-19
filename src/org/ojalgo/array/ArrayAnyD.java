@@ -200,8 +200,8 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return myDelegate.doubleValue(index);
     }
 
-    public double doubleValue(final long[] reference) {
-        return myDelegate.doubleValue(AccessUtils.index(myStructure, reference));
+    public double doubleValue(final long[] ref) {
+        return myDelegate.doubleValue(AccessUtils.index(myStructure, ref));
     }
 
     @SuppressWarnings("unchecked")
@@ -266,8 +266,8 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return myDelegate.get(index);
     }
 
-    public N get(final long[] reference) {
-        return myDelegate.get(AccessUtils.index(myStructure, reference));
+    public N get(final long[] ref) {
+        return myDelegate.get(AccessUtils.index(myStructure, ref));
     }
 
     @Override

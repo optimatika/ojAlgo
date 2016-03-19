@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -45,7 +44,7 @@ final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
     }
 
     @Override
-    public MatrixStore<N> multiply(final Access1D<N> right) {
+    public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
         MatrixStore<N> retVal;
 

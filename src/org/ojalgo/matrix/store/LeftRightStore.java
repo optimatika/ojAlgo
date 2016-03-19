@@ -63,8 +63,8 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
     /**
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
-    public double doubleValue(final long row, final long column) {
-        return (column >= mySplit) ? myRight.doubleValue(row, column - mySplit) : this.getBase().doubleValue(row, column);
+    public double doubleValue(final long row, final long col) {
+        return (col >= mySplit) ? myRight.doubleValue(row, col - mySplit) : this.getBase().doubleValue(row, col);
     }
 
     public int firstInColumn(final int col) {
@@ -89,11 +89,11 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
         return mySplit + myRight.limitOfRow(row);
     }
 
-    public MatrixStore<N> multiplyLeft(final Access1D<N> leftMtrx) {
+    public MatrixStore<N> premultiply(final Access1D<N> leftMtrx) {
 
         final Future<MatrixStore<N>> tmpBaseFuture = this.executeMultiplyLeftOnBase(leftMtrx);
 
-        final MatrixStore<N> tmpRight = myRight.multiplyLeft(leftMtrx).get();
+        final MatrixStore<N> tmpRight = myRight.premultiply(leftMtrx).get();
 
         try {
             return new LeftRightStore<N>(tmpBaseFuture.get(), tmpRight);
@@ -113,7 +113,7 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
     }
 
     @Override
-    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
         this.supplyTo(consumer);
     }
 

@@ -71,17 +71,17 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
         return myDimension;
     }
 
-    public double doubleValue(final long anInd) {
-        return this.doubleValue(AccessUtils.row((int) anInd, myDimension), AccessUtils.column((int) anInd, myDimension));
+    public double doubleValue(final long index) {
+        return this.doubleValue(AccessUtils.row((int) index, myDimension), AccessUtils.column((int) index, myDimension));
     }
 
-    public double doubleValue(final long aRow, final long aCol) {
-        if ((mainDiagonal != null) && (aRow == aCol)) {
-            return mainDiagonal.doubleValue(aRow);
-        } else if ((superdiagonal != null) && ((aCol - aRow) == 1)) {
-            return superdiagonal.doubleValue(aRow);
-        } else if ((subdiagonal != null) && ((aRow - aCol) == 1)) {
-            return subdiagonal.doubleValue(aCol);
+    public double doubleValue(final long row, final long col) {
+        if ((mainDiagonal != null) && (row == col)) {
+            return mainDiagonal.doubleValue(row);
+        } else if ((superdiagonal != null) && ((col - row) == 1)) {
+            return superdiagonal.doubleValue(row);
+        } else if ((subdiagonal != null) && ((row - col) == 1)) {
+            return subdiagonal.doubleValue(col);
         } else {
             return PrimitiveMath.ZERO;
         }
@@ -91,13 +91,13 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
         return this.get(AccessUtils.row(index, myDimension), AccessUtils.column(index, myDimension));
     }
 
-    public N get(final long aRow, final long aCol) {
-        if ((mainDiagonal != null) && (aRow == aCol)) {
-            return mainDiagonal.get(aRow);
-        } else if ((superdiagonal != null) && ((aCol - aRow) == 1)) {
-            return superdiagonal.get(aRow);
-        } else if ((subdiagonal != null) && ((aRow - aCol) == 1)) {
-            return subdiagonal.get(aCol);
+    public N get(final long row, final long col) {
+        if ((mainDiagonal != null) && (row == col)) {
+            return mainDiagonal.get(row);
+        } else if ((superdiagonal != null) && ((col - row) == 1)) {
+            return superdiagonal.get(row);
+        } else if ((subdiagonal != null) && ((row - col) == 1)) {
+            return subdiagonal.get(col);
         } else {
             return myZero;
         }

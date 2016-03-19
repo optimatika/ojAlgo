@@ -83,7 +83,10 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
 
     @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-        return this.getHessian(point).multiply(point);
+
+        final PhysicalStore<N> tmpPreallocated = myFactors.factory().makeZero(this.arity(), 1L);
+
+        return this.getHessian(point).multiply(point, tmpPreallocated);
     }
 
     @Override

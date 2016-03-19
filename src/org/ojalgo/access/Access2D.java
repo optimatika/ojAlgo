@@ -139,10 +139,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
      * Extracts one element of this matrix as a double.
      *
      * @param row A row index.
-     * @param column A column index.
+     * @param col A column index.
      * @return One matrix element
      */
-    double doubleValue(long row, long column);
+    double doubleValue(long row, long col);
 
     default N get(final long index) {
         final long tmpStructure = this.countRows();

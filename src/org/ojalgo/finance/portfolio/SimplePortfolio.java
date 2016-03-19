@@ -155,28 +155,28 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         return myAssetVolatilities;
     }
 
-    public double getCorrelation(final int aRow, final int aCol) {
-        return myCorrelations.doubleValue(aRow, aCol);
+    public double getCorrelation(final int row, final int col) {
+        return myCorrelations.doubleValue(row, col);
     }
 
     public BasicMatrix getCorrelations() {
         return myCorrelations;
     }
 
-    public double getCovariance(final int aRow, final int aCol) {
+    public double getCovariance(final int row, final int col) {
 
         final BasicMatrix tmpCovariances = myCovariances;
 
         if (tmpCovariances != null) {
 
-            return tmpCovariances.doubleValue(aRow, aCol);
+            return tmpCovariances.doubleValue(row, col);
 
         } else {
 
-            final double tmpRowRisk = this.getVolatility(aRow);
-            final double tmpColRisk = this.getVolatility(aCol);
+            final double tmpRowRisk = this.getVolatility(row);
+            final double tmpColRisk = this.getVolatility(col);
 
-            final double tmpCorrelation = this.getCorrelation(aRow, aCol);
+            final double tmpCorrelation = this.getCorrelation(row, col);
 
             return tmpRowRisk * tmpCorrelation * tmpColRisk;
         }

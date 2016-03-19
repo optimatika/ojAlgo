@@ -38,7 +38,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class LinearFunction<N extends Number> extends AbstractMultiary<N, LinearFunction<N>>implements MultiaryFunction.Linear<N> {
+public final class LinearFunction<N extends Number> extends AbstractMultiary<N, LinearFunction<N>> implements MultiaryFunction.Linear<N> {
 
     public static LinearFunction<BigDecimal> makeBig(final Access1D<? extends Number> factors) {
         return new LinearFunction<BigDecimal>(BigDenseStore.FACTORY.rows(factors));
@@ -100,9 +100,11 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
     @Override
     public N invoke(final Access1D<N> arg) {
 
+        final PhysicalStore<N> tmpPreallocated = myFactors.factory().makeZero(1L, 1L);
+
         Scalar<N> retVal = this.getScalarConstant();
 
-        retVal = retVal.add(myFactors.multiply(arg).get(0, 0));
+        retVal = retVal.add(myFactors.multiply(arg, tmpPreallocated).get(0, 0));
 
         return retVal.getNumber();
     }

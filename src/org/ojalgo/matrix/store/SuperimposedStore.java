@@ -68,12 +68,12 @@ final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
     /**
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
-    public double doubleValue(final long row, final long column) {
+    public double doubleValue(final long row, final long col) {
 
-        double retVal = this.getBase().doubleValue(row, column);
+        double retVal = this.getBase().doubleValue(row, col);
 
-        if (this.isCovered((int) row, (int) column)) {
-            retVal += myDiff.doubleValue(row - myRowFirst, column - myColFirst);
+        if (this.isCovered((int) row, (int) col)) {
+            retVal += myDiff.doubleValue(row - myRowFirst, col - myColFirst);
         }
 
         return retVal;
@@ -106,7 +106,7 @@ final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
     }
 
     @Override
-    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillMatching(this.getBase());
         consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.factory().function().add(), myDiff);
     }

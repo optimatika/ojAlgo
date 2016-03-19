@@ -54,11 +54,11 @@ final class WrapperStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     public void supplyTo(final ElementsConsumer<N> consumer) {
-        this.supplyNonZerosTo(consumer);
+        this.addNonZerosTo(consumer);
     }
 
     @Override
-    protected void supplyNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillMatching(myAccess);
     }
 

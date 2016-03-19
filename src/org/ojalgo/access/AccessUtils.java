@@ -68,8 +68,8 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long row, final long column) {
-                return access.doubleValue(row, column);
+            public double doubleValue(final long row, final long col) {
+                return access.doubleValue(row, col);
             }
 
             public BigDecimal get(final long index) {
@@ -98,16 +98,16 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long[] reference) {
-                return access.doubleValue(reference);
+            public double doubleValue(final long[] ref) {
+                return access.doubleValue(ref);
             }
 
             public BigDecimal get(final long index) {
                 return TypeUtils.toBigDecimal(access.get(index));
             }
 
-            public BigDecimal get(final long[] reference) {
-                return TypeUtils.toBigDecimal(access.get(reference));
+            public BigDecimal get(final long[] ref) {
+                return TypeUtils.toBigDecimal(access.get(ref));
             }
 
             public long[] shape() {
@@ -154,8 +154,8 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long row, final long column) {
-                return access.doubleValue(row, column);
+            public double doubleValue(final long row, final long col) {
+                return access.doubleValue(row, col);
             }
 
             public ComplexNumber get(final long index) {
@@ -184,16 +184,16 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long[] reference) {
-                return access.doubleValue(reference);
+            public double doubleValue(final long[] ref) {
+                return access.doubleValue(ref);
             }
 
             public ComplexNumber get(final long index) {
                 return ComplexNumber.valueOf(access.get(index));
             }
 
-            public ComplexNumber get(final long[] reference) {
-                return ComplexNumber.valueOf(access.get(reference));
+            public ComplexNumber get(final long[] ref) {
+                return ComplexNumber.valueOf(access.get(ref));
             }
 
             public long[] shape() {
@@ -240,8 +240,8 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long row, final long column) {
-                return access.doubleValue(row, column);
+            public double doubleValue(final long row, final long col) {
+                return access.doubleValue(row, col);
             }
 
             public Double get(final long index) {
@@ -270,16 +270,16 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long[] reference) {
-                return access.doubleValue(reference);
+            public double doubleValue(final long[] ref) {
+                return access.doubleValue(ref);
             }
 
             public Double get(final long index) {
                 return access.doubleValue(index);
             }
 
-            public Double get(final long[] reference) {
-                return access.doubleValue(reference);
+            public Double get(final long[] ref) {
+                return access.doubleValue(ref);
             }
 
             public long[] shape() {
@@ -326,8 +326,8 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long row, final long column) {
-                return access.doubleValue(row, column);
+            public double doubleValue(final long row, final long col) {
+                return access.doubleValue(row, col);
             }
 
             public Quaternion get(final long index) {
@@ -356,16 +356,16 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long[] reference) {
-                return access.doubleValue(reference);
+            public double doubleValue(final long[] ref) {
+                return access.doubleValue(ref);
             }
 
             public Quaternion get(final long index) {
                 return Quaternion.valueOf(access.get(index));
             }
 
-            public Quaternion get(final long[] reference) {
-                return Quaternion.valueOf(access.get(reference));
+            public Quaternion get(final long[] ref) {
+                return Quaternion.valueOf(access.get(ref));
             }
 
             public long[] shape() {
@@ -412,8 +412,8 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long row, final long column) {
-                return access.doubleValue(row, column);
+            public double doubleValue(final long row, final long col) {
+                return access.doubleValue(row, col);
             }
 
             public RationalNumber get(final long index) {
@@ -442,16 +442,16 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public double doubleValue(final long[] reference) {
-                return access.doubleValue(reference);
+            public double doubleValue(final long[] ref) {
+                return access.doubleValue(ref);
             }
 
             public RationalNumber get(final long index) {
                 return RationalNumber.valueOf(access.get(index));
             }
 
-            public RationalNumber get(final long[] reference) {
-                return RationalNumber.valueOf(access.get(reference));
+            public RationalNumber get(final long[] ref) {
+                return RationalNumber.valueOf(access.get(ref));
             }
 
             public long[] shape() {

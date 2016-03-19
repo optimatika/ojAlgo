@@ -284,12 +284,12 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         }
     }
 
-    public double doubleValue(final long row, final long column) {
-        if (row == column) {
+    public double doubleValue(final long row, final long col) {
+        if (row == col) {
             return myRealValue;
         } else if (row == 1L) {
             return i;
-        } else if (column == 1L) {
+        } else if (col == 1L) {
             return -i;
         } else {
             throw new ArrayIndexOutOfBoundsException();

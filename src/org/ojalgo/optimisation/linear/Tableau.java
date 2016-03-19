@@ -141,9 +141,9 @@ final class Tableau implements Access2D<Double> {
         return myNumberOfConstraints + 2L;
     }
 
-    public double doubleValue(final long row, final long column) {
-        if (myNumberOfVariables != column) {
-            return myRows[(int) row].doubleValue(column);
+    public double doubleValue(final long row, final long col) {
+        if (myNumberOfVariables != col) {
+            return myRows[(int) row].doubleValue(col);
         } else {
             return myRows[(int) row].getRHS();
         }

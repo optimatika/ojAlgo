@@ -47,8 +47,8 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
     /**
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
-    public double doubleValue(final long row, final long column) {
-        return this.getBase().doubleValue(row, myColumns[(int) column]);
+    public double doubleValue(final long row, final long col) {
+        return this.getBase().doubleValue(row, myColumns[(int) col]);
     }
 
     public int firstInColumn(final int col) {

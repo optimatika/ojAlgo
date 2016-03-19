@@ -731,8 +731,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return data.length;
     }
 
-    public double doubleValue(final long row, final long column) {
-        return data[(int) row][(int) column];
+    public double doubleValue(final long row, final long col) {
+        return data[(int) row][(int) col];
     }
 
     public boolean equals(final MatrixStore<Double> other, final NumberContext context) {

@@ -72,7 +72,7 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
         final PhysicalStore<N> retVal = this.factory().makeZero(this.countRows(), this.countColumns());
 
-        this.supplyNonZerosTo(retVal);
+        this.addNonZerosTo(retVal);
 
         return retVal;
     }
@@ -151,7 +151,7 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
     public void supplyTo(final ElementsConsumer<N> consumer) {
         consumer.fillAll(this.factory().scalar().zero().getNumber());
-        this.supplyNonZerosTo(consumer);
+        this.addNonZerosTo(consumer);
     }
 
     @Override
@@ -213,7 +213,7 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return myRowDim;
     }
 
-    protected abstract void supplyNonZerosTo(final ElementsConsumer<N> consumer);
+    protected abstract void addNonZerosTo(final ElementsConsumer<N> consumer);
 
     final Class<?> getComponentType() {
         if (myComponentType == null) {

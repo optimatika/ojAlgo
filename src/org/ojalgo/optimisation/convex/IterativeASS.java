@@ -29,7 +29,7 @@ import java.math.MathContext;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.Equation;
 import org.ojalgo.matrix.task.iterative.MutableSolver;
@@ -80,9 +80,9 @@ abstract class IterativeASS extends ActiveSetSolver {
             return IterativeASS.this.countEqualityConstraints() + myActivator.countIncluded();
         }
 
-        public double doubleValue(final long row, final long column) {
+        public double doubleValue(final long row, final long col) {
 
-            int tmpColumn = (int) column;
+            int tmpColumn = (int) col;
 
             if (tmpColumn >= myCountE) {
                 tmpColumn = myCountE + myActivator.getIncluded()[tmpColumn - myCountE];
@@ -105,7 +105,9 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             if (IterativeASS.this.getAE() != null) {
 
-                final MatrixStore<Double> tmpProdE = IterativeASS.this.getAE().multiply(column);
+                final PhysicalStore<Double> tmpPreallocated = IterativeASS.this.getAE().factory().makeZero(IterativeASS.this.getAE().countRows(), 1L);
+
+                final PhysicalStore<Double> tmpProdE = IterativeASS.this.getAE().multiply(column, tmpPreallocated);
                 for (int i = 0; i < myCountE; i++) {
                     final double tmpVal = tmpProdE.doubleValue(i);
                     if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
@@ -120,7 +122,9 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             if ((IterativeASS.this.getAI() != null) && (myIncluded.length > 0)) {
 
-                final MatrixStore<Double> tmpProdI = IterativeASS.this.getAI().builder().row(myIncluded).get().multiply(column);
+                final PhysicalStore<Double> tmpPreallocated = IterativeASS.this.getAI().factory().makeZero(myIncluded.length, 1L);
+
+                final PhysicalStore<Double> tmpProdI = IterativeASS.this.getAI().builder().row(myIncluded).get().multiply(column, tmpPreallocated);
                 for (int _i = 0; _i < myIncluded.length; _i++) {
                     final double tmpVal = tmpProdI.doubleValue(_i);
                     if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
@@ -177,8 +181,7 @@ abstract class IterativeASS extends ActiveSetSolver {
         final MatrixStore<Double> tmpIterA = this.getIterationA(tmpIncluded);
 
         final long tmpCountRowsIterA = tmpIterA.countRows();
-
-        final PrimitiveDenseStore tmpIterX = myIterationX;
+        final long tmpCountColsIterA = tmpIterA.countColumns();
 
         boolean tmpSolvable = false;
 
@@ -186,38 +189,20 @@ abstract class IterativeASS extends ActiveSetSolver {
 
         if (tmpToInclude >= 0) {
             final MatrixStore<Double> tmpElements = myCholesky.solve(this.getAI().builder().row(tmpToInclude).transpose());
-            final double tmpRHS = myInvQC.multiplyLeft(this.getAI().sliceRow(tmpToInclude, 0L)).get().doubleValue(0L) - this.getBI().doubleValue(tmpToInclude);
+            final double tmpRHS = myInvQC.premultiply(this.getAI().sliceRow(tmpToInclude, 0L)).get().doubleValue(0L) - this.getBI().doubleValue(tmpToInclude);
             myS.add(tmpCountE + tmpToInclude, tmpElements, tmpRHS, 3);
         }
 
-        final long tmpCountColumnsIterA = tmpIterA.countColumns();
-        if ((tmpCountRowsIterA < tmpCountColumnsIterA) && (tmpSolvable = myCholesky.isSolvable())) {
+        if ((tmpCountRowsIterA < tmpCountColsIterA) && (tmpSolvable = myCholesky.isSolvable())) {
             // Q is SPD
 
             if (tmpCountRowsIterA == 0L) {
                 // Unconstrained - can happen when PureASS and all inequalities are inactive
 
-                myCholesky.solve(tmpIterC, tmpIterX);
+                myCholesky.solve(tmpIterC, myIterationX);
 
             } else {
                 // Actual/normal optimisation problem
-
-                //                if (this.isDebug()) {
-                //
-                //                    BasicLogger.debug(Arrays.toString(tmpIncluded), myS);
-                //
-                //                    BasicLogger.debug("Is hermitian? {}", MatrixUtils.isHermitian(myS));
-                //
-                //                    if (myS.count() > 1) {
-                //
-                //                        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(true);
-                //                        tmpEvD.decompose(MatrixStore.PRIMITIVE.makeWrapper(myS));
-                //                        BasicLogger.debug("Eigenvalues: {}", tmpEvD.getEigenvalues());
-                //
-                //                    }
-                //
-                //                    BasicLogger.debug();
-                //                }
 
                 myS.resolve(myIterationL);
 
@@ -225,7 +210,7 @@ abstract class IterativeASS extends ActiveSetSolver {
                     this.debug("Iteration L", this.getIterationL(tmpIncluded));
                 }
 
-                myCholesky.solve(this.getIterationL(tmpIncluded).multiplyLeft(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
+                myCholesky.solve(this.getIterationL(tmpIncluded).premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), myIterationX);
             }
         }
 
@@ -235,7 +220,7 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             final MatrixStore<Double> tmpXL = myLU.solve(this.getIterationRHS(tmpIncluded));
             final int tmpCountVariables = this.countVariables();
-            tmpIterX.fillMatching(tmpXL.builder().rows(0, tmpCountVariables).build());
+            myIterationX.fillMatching(tmpXL.builder().rows(0, tmpCountVariables).build());
 
             for (int i = 0; i < tmpCountE; i++) {
                 myIterationL.set(i, tmpXL.doubleValue(tmpCountVariables + i));
@@ -253,7 +238,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             options.debug_appender.printmtrx("RHS", this.getIterationRHS());
         }
 
-        this.handleSubsolution(tmpSolvable, tmpIterX, tmpIncluded);
+        this.handleSubsolution(tmpSolvable, myIterationX, tmpIncluded);
 
         // BasicLogger.debug("Iteration L: {}", myIterationL.asList().copy());
     }
@@ -298,9 +283,12 @@ abstract class IterativeASS extends ActiveSetSolver {
 
         if ((tmpNumEqus + tmpIncluded.length) > 0) {
 
-            final MatrixStore<Double> tmpCols = myCholesky.solve(this.getIterationA(tmpIncluded).transpose());
-            final MatrixStore<Double> tmpRHS = myInvQC.multiplyLeft(this.getIterationA(tmpIncluded))
-                    .operateOnMatching(SUBTRACT, this.getIterationB(tmpIncluded)).get();
+            final MatrixStore<Double> tmpIterA = this.getIterationA(tmpIncluded);
+            final MatrixStore<Double> tmpIterB = this.getIterationB(tmpIncluded);
+
+            final MatrixStore<Double> tmpCols = myCholesky.solve(tmpIterA.transpose());
+            final MatrixStore<Double> tmpRHS = myInvQC.premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB).get();
+
             for (int j = 0; j < tmpNumEqus; j++) {
                 myS.add(j, tmpCols.sliceColumn(0, j), tmpRHS.doubleValue(j), tmpNumVars);
             }

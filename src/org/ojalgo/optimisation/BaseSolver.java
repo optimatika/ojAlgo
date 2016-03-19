@@ -798,8 +798,8 @@ public abstract class BaseSolver extends GenericSolver {
         return myMatrices.getSE();
     }
 
-    protected MatrixStore<Double> getSI(final int... aRowSelector) {
-        return myMatrices.getSI(aRowSelector);
+    protected MatrixStore<Double> getSI(final int... rowSelector) {
+        return myMatrices.getSI(rowSelector);
     }
 
     protected DecompositionStore<Double> getX() {

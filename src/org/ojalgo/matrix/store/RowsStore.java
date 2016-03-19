@@ -21,7 +21,9 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -47,8 +49,8 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
     /**
      * @see org.ojalgo.matrix.store.MatrixStore#doubleValue(long, long)
      */
-    public double doubleValue(final long row, final long column) {
-        return this.getBase().doubleValue(myRows[(int) row], column);
+    public double doubleValue(final long row, final long col) {
+        return this.getBase().doubleValue(myRows[(int) row], col);
     }
 
     public int firstInRow(final int row) {
@@ -64,8 +66,41 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
         return this.getBase().limitOfRow(myRows[row]);
     }
 
-    public Scalar<N> toScalar(final long row, final long column) {
-        return this.getBase().toScalar(myRows[(int) row], column);
+    public PhysicalStore<N> multiply(final Access1D<N> right, final PhysicalStore<N> target) {
+
+        if (this.isPrimitive()) {
+
+            final long tmpTargetRows = target.countRows();
+            final long tmpComplexity = this.countColumns();
+            final long tmpTargetColumns = target.countColumns();
+
+            final MatrixStore<N> tmpBase = this.getBase();
+
+            for (int i = 0; i < myRows.length; i++) {
+                final int tmpRow = myRows[i];
+
+                final int tmpFirst = tmpBase.firstInRow(tmpRow);
+                final int tmpLimit = tmpBase.limitOfRow(tmpRow);
+
+                for (long j = 0L; j < tmpTargetColumns; j++) {
+
+                    double tmpVal = PrimitiveMath.ZERO;
+
+                    for (int c = tmpFirst; c < tmpLimit; c++) {
+                        tmpVal += tmpBase.doubleValue(tmpRow, c) * right.doubleValue((long) c + (j * tmpComplexity));
+                    }
+
+                    target.set(i, j, tmpVal);
+                }
+            }
+
+            return target;
+
+        } else {
+
+            return super.multiply(right, target);
+        }
+
     }
 
     @Override
@@ -74,6 +109,10 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
         for (int r = 0; r < myRows.length; r++) {
             consumer.fillRow(r, 0, tmpBase.sliceRow(myRows[r], 0));
         }
+    }
+
+    public Scalar<N> toScalar(final long row, final long column) {
+        return this.getBase().toScalar(myRows[(int) row], column);
     }
 
 }
