@@ -111,11 +111,11 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     void flushCache();
 
     /**
-     * @param aFirst The first column to include.
-     * @param aLimit The limit (exclusive) - the first column not to include.
+     * @param first The first column to include.
+     * @param limit The limit (exclusive) - the first column not to include.
      * @return A new matrix with only the specified range of columns
      */
-    BasicMatrix getColumnsRange(final int aFirst, final int aLimit);
+    BasicMatrix getColumnsRange(final int first, final int limit);
 
     /**
      * Matrix condition (2-norm)
@@ -209,11 +209,11 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     int getRank();
 
     /**
-     * @param aFirst The first row to include.
-     * @param aLimit The limit (exclusive) - the first row not to include.
+     * @param first The first row to include.
+     * @param kimit The limit (exclusive) - the first row not to include.
      * @return A new matrix with only the specified range of rows
      */
-    BasicMatrix getRowsRange(final int aFirst, final int aLimit);
+    BasicMatrix getRowsRange(final int first, final int kimit);
 
     List<? extends Number> getSingularValues();
 

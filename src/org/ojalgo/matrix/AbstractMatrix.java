@@ -42,6 +42,7 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
@@ -221,8 +222,8 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getStore().get(aRow, aColumn);
     }
 
-    public I getColumnsRange(final int aFirst, final int aLimit) {
-        return this.getFactory().instantiate(myStore.logical().columns(aFirst, aLimit).get());
+    public I getColumnsRange(final int first, final int limit) {
+        return this.getFactory().instantiate(myStore.logical().limits((int) myStore.countRows(), limit).offsets(0, first).get());
     }
 
     public Scalar<N> getCondition() {
@@ -300,8 +301,8 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         }
     }
 
-    public I getRowsRange(final int aFirst, final int aLimit) {
-        return this.getFactory().instantiate(myStore.logical().rows(aFirst, aLimit).get());
+    public I getRowsRange(final int first, final int limit) {
+        return this.getFactory().instantiate(myStore.logical().limits(limit, (int) myStore.countColumns()).offsets(first, 0).get());
     }
 
     public List<Double> getSingularValues() {

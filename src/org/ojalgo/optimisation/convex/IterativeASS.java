@@ -220,7 +220,7 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             final MatrixStore<Double> tmpXL = myLU.solve(this.getIterationRHS(tmpIncluded));
             final int tmpCountVariables = this.countVariables();
-            myIterationX.fillMatching(tmpXL.logical().rows(0, tmpCountVariables).get());
+            myIterationX.fillMatching(tmpXL.logical().limits(tmpCountVariables, (int) tmpXL.countColumns()).get());
 
             for (int i = 0; i < tmpCountE; i++) {
                 myIterationL.set(i, tmpXL.doubleValue(tmpCountVariables + i));

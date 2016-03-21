@@ -140,8 +140,8 @@ final class QPESolver extends ConstrainedSolver {
             // Try solving the full KKT system instaed
 
             final MatrixStore<Double> tmpXL = myLU.solve(this.getIterationRHS());
-            tmpIterX.fillMatching(tmpXL.logical().rows(0, this.countVariables()).get());
-            tmpIterL.fillMatching(tmpXL.logical().rows(this.countVariables(), (int) tmpXL.count()).get());
+            tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), (int) tmpXL.countColumns()).get());
+            tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
         }
 
         if (!tmpSolvable && this.isDebug()) {

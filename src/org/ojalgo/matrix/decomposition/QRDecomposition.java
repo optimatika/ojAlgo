@@ -253,7 +253,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         preallocated.substituteBackwards(tmpStore, false, false, false);
 
         if (tmpColDim < tmpRowDim) {
-            return preallocated.logical().rows(0, tmpColDim).get();
+            return preallocated.logical().limits(tmpColDim, (int) preallocated.countColumns()).get();
         } else if (tmpColDim > tmpRowDim) {
             return preallocated.logical().below(tmpColDim - tmpRowDim).get();
         } else {

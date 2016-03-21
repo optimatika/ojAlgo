@@ -353,8 +353,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
                 SubtractScaledVector.invoke(tmpRHSdata, j * m, tmpColK, 0, tmpRHSdata[k + (j * m)], 0, k);
             }
         }
-
-        return preallocated.logical().rows(0, n).get();
+        return preallocated.logical().limits(n, (int) preallocated.countColumns()).get();
     }
 
     @Override

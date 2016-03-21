@@ -132,8 +132,8 @@ public class DesignCase extends MatrixDecompositionTests {
         tmpSVD.setFullSize(true); // Supports full size
         tmpSVD.decompose(tmpA);
 
-        final PhysicalStore<Double> tmpNullspaceQR = tmpQR.getQ().logical().columns(tmpQR.getRank(), (int) tmpA.countColumns()).get().copy();
-        final PhysicalStore<Double> tmpNullspaceSVD = tmpSVD.getQ2().logical().columns(tmpSVD.getRank(), (int) tmpA.countColumns()).get().copy();
+        final PhysicalStore<Double> tmpNullspaceQR = tmpQR.getQ().logical().offsets(0, tmpQR.getRank()).get().copy();
+        final PhysicalStore<Double> tmpNullspaceSVD = tmpSVD.getQ2().logical().offsets(0, tmpSVD.getRank()).get().copy();
 
         final double tmpScaleQR = Math.abs(tmpNullspaceQR.doubleValue(0));
         tmpNullspaceQR.modifyAll(PrimitiveFunction.DIVIDE.second(tmpScaleQR));

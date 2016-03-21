@@ -209,9 +209,8 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
          * @deprecated v40 Use {@link #offsets(int, int)} and/or {@link #limits(int, int)} instead
          */
         @Deprecated
-        public final LogicalBuilder<N> columns(final int aFirst, final int aLimit) {
-            myStore = new ColumnsStore<N>(aFirst, aLimit, myStore);
-            return this;
+        public final LogicalBuilder<N> columns(final int first, final int limit) {
+            return this.limits((int) this.countRows(), limit).offsets(0, first);
         }
 
         public final LogicalBuilder<N> conjugate() {
@@ -357,9 +356,8 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
          * @deprecated v40 Use {@link #offsets(int, int)} and/or {@link #limits(int, int)} instead
          */
         @Deprecated
-        public final LogicalBuilder<N> rows(final int aFirst, final int aLimit) {
-            myStore = new RowsStore<N>(aFirst, aLimit, myStore);
-            return this;
+        public final LogicalBuilder<N> rows(final int first, final int limit) {
+            return this.limits(limit, (int) this.countColumns()).offsets(first, 0);
         }
 
         public final LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> aStore) {
