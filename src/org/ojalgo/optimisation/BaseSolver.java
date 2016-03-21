@@ -44,17 +44,17 @@ public abstract class BaseSolver extends GenericSolver {
         static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
         private MatrixStore<Double> myAE = null;
-        private MatrixStore.Builder<Double> myAEbuilder = null;
+        private MatrixStore.LogicalBuilder<Double> myAEbuilder = null;
         private MatrixStore<Double> myAI = null;
-        private MatrixStore.Builder<Double> myAIbuilder = null;
+        private MatrixStore.LogicalBuilder<Double> myAIbuilder = null;
         private MatrixStore<Double> myBE = null;
-        private MatrixStore.Builder<Double> myBEbuilder = null;
+        private MatrixStore.LogicalBuilder<Double> myBEbuilder = null;
         private MatrixStore<Double> myBI = null;
-        private MatrixStore.Builder<Double> myBIbuilder = null;
+        private MatrixStore.LogicalBuilder<Double> myBIbuilder = null;
         private MatrixStore<Double> myC = null;
-        private MatrixStore.Builder<Double> myCbuilder = null;
+        private MatrixStore.LogicalBuilder<Double> myCbuilder = null;
         private MatrixStore<Double> myQ = null;
-        private MatrixStore.Builder<Double> myQbuilder = null;
+        private MatrixStore.LogicalBuilder<Double> myQbuilder = null;
         private PrimitiveDenseStore myX = null;
 
         protected AbstractBuilder() {
@@ -187,7 +187,7 @@ public abstract class BaseSolver extends GenericSolver {
         public MatrixStore<Double> getAE() {
             if (myAEbuilder != null) {
                 if (myAE == null) {
-                    myAE = myAEbuilder.build().copy();
+                    myAE = myAEbuilder.get().copy();
                 }
                 return myAE;
             } else {
@@ -213,7 +213,7 @@ public abstract class BaseSolver extends GenericSolver {
         public MatrixStore<Double> getAI() {
             if (myAIbuilder != null) {
                 if (myAI == null) {
-                    myAI = myAIbuilder.build().copy();
+                    myAI = myAIbuilder.get().copy();
                 }
                 return myAI;
             } else {
@@ -239,7 +239,7 @@ public abstract class BaseSolver extends GenericSolver {
             final DecompositionStore<Double> tmpX = this.getX();
 
             if ((tmpAI != null) && (tmpX != null)) {
-                return tmpAI.builder().row(selector).build().multiply(tmpX);
+                return tmpAI.logical().row(selector).get().multiply(tmpX);
             } else {
                 return null;
             }
@@ -251,7 +251,7 @@ public abstract class BaseSolver extends GenericSolver {
         public MatrixStore<Double> getBE() {
             if (myBEbuilder != null) {
                 if (myBE == null) {
-                    myBE = myBEbuilder.build().copy();
+                    myBE = myBEbuilder.get().copy();
                 }
                 return myBE;
             } else {
@@ -265,7 +265,7 @@ public abstract class BaseSolver extends GenericSolver {
         public MatrixStore<Double> getBI() {
             if (myBIbuilder != null) {
                 if (myBI == null) {
-                    myBI = myBIbuilder.build().copy();
+                    myBI = myBIbuilder.get().copy();
                 }
                 return myBI;
             } else {
@@ -274,7 +274,7 @@ public abstract class BaseSolver extends GenericSolver {
         }
 
         public MatrixStore<Double> getBI(final int[] selector) {
-            return this.getBI().builder().row(selector).build();
+            return this.getBI().logical().row(selector).get();
         }
 
         /**
@@ -283,7 +283,7 @@ public abstract class BaseSolver extends GenericSolver {
         public MatrixStore<Double> getC() {
             if (myCbuilder != null) {
                 if (myC == null) {
-                    myC = myCbuilder.build().copy();
+                    myC = myCbuilder.get().copy();
                 }
                 return myC;
             } else {
@@ -297,7 +297,7 @@ public abstract class BaseSolver extends GenericSolver {
         public MatrixStore<Double> getQ() {
             if (myQbuilder != null) {
                 if (myQ == null) {
-                    myQ = myQbuilder.build().copy();
+                    myQ = myQbuilder.get().copy();
                 }
                 return myQ;
             } else {
@@ -345,7 +345,7 @@ public abstract class BaseSolver extends GenericSolver {
         public MatrixStore<Double> getSI(final int... selector) {
             final PhysicalStore<Double> tmpSI = this.getSI();
             if (tmpSI != null) {
-                return tmpSI.builder().row(selector).build();
+                return tmpSI.logical().row(selector).get();
             } else {
                 return null;
             }
@@ -552,7 +552,7 @@ public abstract class BaseSolver extends GenericSolver {
                 this.reset();
             } else {
                 myAE = AE;
-                myAEbuilder = myAE.builder();
+                myAEbuilder = myAE.logical();
             }
 
             if (myBEbuilder != null) {
@@ -560,7 +560,7 @@ public abstract class BaseSolver extends GenericSolver {
                 this.reset();
             } else {
                 myBE = BE;
-                myBEbuilder = BE.builder();
+                myBEbuilder = BE.logical();
             }
 
             return (B) this;
@@ -578,7 +578,7 @@ public abstract class BaseSolver extends GenericSolver {
                 this.reset();
             } else {
                 myAI = AI;
-                myAIbuilder = myAI.builder();
+                myAIbuilder = myAI.logical();
             }
 
             if (myBIbuilder != null) {
@@ -586,7 +586,7 @@ public abstract class BaseSolver extends GenericSolver {
                 this.reset();
             } else {
                 myBI = BI;
-                myBIbuilder = BI.builder();
+                myBIbuilder = BI.logical();
             }
 
             return (B) this;
@@ -604,7 +604,7 @@ public abstract class BaseSolver extends GenericSolver {
                 this.reset();
             } else {
                 myC = C;
-                myCbuilder = myC.builder();
+                myCbuilder = myC.logical();
             }
 
             return (B) this;
@@ -622,7 +622,7 @@ public abstract class BaseSolver extends GenericSolver {
                 this.reset();
             } else {
                 myQ = Q;
-                myQbuilder = myQ.builder();
+                myQbuilder = myQ.logical();
             }
 
             final MatrixStore<Double> tmpC = C != null ? C : MatrixStore.PRIMITIVE.makeZero((int) Q.countRows(), 1).get();
@@ -631,7 +631,7 @@ public abstract class BaseSolver extends GenericSolver {
                 this.reset();
             } else {
                 myC = tmpC;
-                myCbuilder = myC.builder();
+                myCbuilder = myC.logical();
             }
 
             return (B) this;

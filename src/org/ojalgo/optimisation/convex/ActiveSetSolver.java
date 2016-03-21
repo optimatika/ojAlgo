@@ -138,7 +138,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     protected final MatrixStore<Double> getIterationKKT(final int[] included) {
         final MatrixStore<Double> tmpIterationQ = this.getIterationQ();
         final MatrixStore<Double> tmpIterationA = this.getIterationA(included);
-        return tmpIterationQ.builder().right(tmpIterationA.transpose()).below(tmpIterationA).build();
+        return tmpIterationQ.logical().right(tmpIterationA.transpose()).below(tmpIterationA).get();
     }
 
     @Override
@@ -149,7 +149,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     protected final MatrixStore<Double> getIterationRHS(final int[] included) {
         final MatrixStore<Double> tmpIterationC = this.getIterationC();
         final MatrixStore<Double> tmpIterationB = this.getIterationB(included);
-        return tmpIterationC.builder().below(tmpIterationB).build();
+        return tmpIterationC.logical().below(tmpIterationB).get();
     }
 
     @Override
@@ -274,7 +274,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         double tmpVal;
 
         // final MatrixStore<Double> tmpLI = this.getLI(tmpIncluded);
-        final MatrixStore<Double> tmpLI = myIterationL.builder().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
+        final MatrixStore<Double> tmpLI = myIterationL.logical().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
 
         if (this.isDebug() && (tmpLI.count() > 0L)) {
             this.debug("Looking for the largest negative lagrange multiplier among these: {}.", tmpLI.copy().asList());
@@ -357,9 +357,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         final int tmpCountE = this.countEqualityConstraints();
 
-        final MatrixStore<Double> tmpLI = myIterationL.builder().offsets(tmpCountE, 0).row(included).get();
+        final MatrixStore<Double> tmpLI = myIterationL.logical().offsets(tmpCountE, 0).row(included).get();
 
-        return myIterationL.builder().limits(tmpCountE, 1).below(tmpLI).get();
+        return myIterationL.logical().limits(tmpCountE, 1).below(tmpLI).get();
     }
 
     final void handleSubsolution(final boolean solved, final PrimitiveDenseStore iterationSolution, final int[] included) {
@@ -384,7 +384,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 if (tmpExcluded.length > 0) {
 
                     final MatrixStore<Double> tmpNumer = this.getSI(tmpExcluded);
-                    final MatrixStore<Double> tmpDenom = this.getAI().builder().row(tmpExcluded).build().multiply(iterationSolution);
+                    final MatrixStore<Double> tmpDenom = this.getAI().logical().row(tmpExcluded).get().multiply(iterationSolution);
 
                     if (this.isDebug()) {
                         final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
@@ -511,7 +511,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         int tmpToExclude = tmpIncluded[0];
         double tmpMaxWeight = ZERO;
 
-        final MatrixStore<Double> tmpLI = myIterationL.builder().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
+        final MatrixStore<Double> tmpLI = myIterationL.logical().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
         for (int i = 0; i < tmpIncluded.length; i++) {
             final double tmpValue = tmpLI.doubleValue(i);
             final double tmpWeight = Math.abs(tmpValue) * Math.max(-tmpValue, ONE);
@@ -533,7 +533,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int tmpNumEqus = this.countEqualityConstraints();
         final int tmpNumInes = this.countInequalityConstraints();
 
-        final MatrixStore<Double> tmpLinearC = convexC.negate().builder().below(convexC).below(tmpNumInes).build();
+        final MatrixStore<Double> tmpLinearC = convexC.negate().logical().below(convexC).below(tmpNumInes).get();
 
         final LinearSolver.Builder tmpLinearBuilder = LinearSolver.getBuilder(tmpLinearC);
 
@@ -541,17 +541,16 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         MatrixStore<Double> tmpBEpart = null;
 
         if (tmpNumEqus > 0) {
-            tmpAEpart = convexAE.builder().right(convexAE.negate()).right(tmpNumInes).build();
+            tmpAEpart = convexAE.logical().right(convexAE.negate()).right(tmpNumInes).get();
             tmpBEpart = convexBE;
         }
 
         if (tmpNumInes > 0) {
-            final MatrixStore<Double> tmpAIpart = convexAI.builder().right(convexAI.negate()).right(MatrixStore.PRIMITIVE.makeIdentity(tmpNumInes).get())
-                    .build();
+            final MatrixStore<Double> tmpAIpart = convexAI.logical().right(convexAI.negate()).right(MatrixStore.PRIMITIVE.makeIdentity(tmpNumInes).get()).get();
             final MatrixStore<Double> tmpBIpart = convexBI;
             if (tmpAEpart != null) {
-                tmpAEpart = tmpAEpart.builder().below(tmpAIpart).build();
-                tmpBEpart = tmpBEpart.builder().below(tmpBIpart).build();
+                tmpAEpart = tmpAEpart.logical().below(tmpAIpart).get();
+                tmpBEpart = tmpBEpart.logical().below(tmpBIpart).get();
             } else {
                 tmpAEpart = tmpAIpart;
                 tmpBEpart = tmpBIpart;

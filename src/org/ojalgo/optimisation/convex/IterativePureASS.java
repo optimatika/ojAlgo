@@ -38,7 +38,7 @@ final class IterativePureASS extends IterativeASS {
         if (included.length == 0) {
             retVal = MatrixStore.PRIMITIVE.makeZero(0, this.countVariables()).get();
         } else {
-            retVal = tmpAI.builder().row(included).get();
+            retVal = tmpAI.logical().row(included).get();
         }
 
         return retVal;
@@ -55,7 +55,7 @@ final class IterativePureASS extends IterativeASS {
         if (included.length == 0) {
             retVal = MatrixStore.PRIMITIVE.makeZero(0, 1).get();
         } else {
-            retVal = tmpBI.builder().row(included).get();
+            retVal = tmpBI.logical().row(included).get();
         }
 
         return retVal;

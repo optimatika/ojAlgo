@@ -32,7 +32,7 @@ import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.Builder;
+import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.netio.BasicLogger;
@@ -120,7 +120,7 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
 
             final int tmpRowDim = (int) matrix.countRows(); // Which is also the col-dim.
 
-            final Builder<N> aTriangularMtrx = matrix.get().builder().triangular(false, false);
+            final LogicalBuilder<N> aTriangularMtrx = matrix.get().logical().triangular(false, false);
 
             final DecompositionStore<N> tmpInPlace = this.setInPlace(aTriangularMtrx);
 

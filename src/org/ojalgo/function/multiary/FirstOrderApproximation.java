@@ -33,7 +33,7 @@ public final class FirstOrderApproximation<N extends Number> extends Approximate
 
         super(function, point);
 
-        final MatrixStore<N> tmpGradient = function.getGradient(point).builder().transpose().build();
+        final MatrixStore<N> tmpGradient = function.getGradient(point).logical().transpose().get();
 
         myDelegate = new LinearFunction<N>(tmpGradient);
         myDelegate.setConstant(function.invoke(point));

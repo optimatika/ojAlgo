@@ -226,7 +226,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     }
 
     public MatrixStore<N> getD() {
-        return this.getInPlace().builder().bidiagonal(this.isAspectRatioNormal(), false).build();
+        return this.getInPlace().logical().bidiagonal(this.isAspectRatioNormal(), false).get();
     }
 
     public MatrixStore<N> getQ1() {

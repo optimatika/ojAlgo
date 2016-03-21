@@ -139,8 +139,8 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
         final int[] tmpEconSet = AccessUtils.makeIncreasingRange(0, tmpMinDim);
 
-        TestUtils.assertEquals(JAMA_QR.getQ(), PRIMITIVE_QR.getQ().builder().column(tmpEconSet).get(), COMPARE_CONTEXT);
-        TestUtils.assertEquals(JAMA_QR.getR(), PRIMITIVE_QR.getR().builder().row(tmpEconSet).get(), COMPARE_CONTEXT);
+        TestUtils.assertEquals(JAMA_QR.getQ(), PRIMITIVE_QR.getQ().logical().column(tmpEconSet).get(), COMPARE_CONTEXT);
+        TestUtils.assertEquals(JAMA_QR.getR(), PRIMITIVE_QR.getR().logical().row(tmpEconSet).get(), COMPARE_CONTEXT);
         TestUtils.assertEquals(JAMA_QR.getRank(), PRIMITIVE_QR.getRank());
 
         TestUtils.assertEquals(JAMA_QR.isComputed(), PRIMITIVE_QR.isComputed());

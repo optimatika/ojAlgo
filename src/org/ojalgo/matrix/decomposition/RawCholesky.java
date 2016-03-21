@@ -106,7 +106,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     public MatrixStore<Double> getL() {
-        return this.getRawInPlaceStore().builder().triangular(false, false).build();
+        return this.getRawInPlaceStore().logical().triangular(false, false).get();
     }
 
     @Override
@@ -167,7 +167,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         preallocated.substituteForwards(tmpBody, false, false, true);
         preallocated.substituteBackwards(tmpBody, false, true, true);
 
-        return preallocated.builder().hermitian(false).get();
+        return preallocated.logical().hermitian(false).get();
     }
 
     boolean doDecompose(final double[][] data, final Access2D<?> input) {

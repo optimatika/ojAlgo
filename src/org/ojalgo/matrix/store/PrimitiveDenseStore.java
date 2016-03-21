@@ -1120,10 +1120,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return myUtility.asArray1D();
     }
 
-    public final MatrixStore.Builder<Double> builder() {
-        return new MatrixStore.Builder<Double>(this);
-    }
-
     public void caxpy(final double aSclrA, final int aColX, final int aColY, final int aFirstRow) {
         AXPY.invoke(data, (aColY * myRowDim) + aFirstRow, 1, aSclrA, data, (aColX * myRowDim) + aFirstRow, 1, myRowDim - aFirstRow);
     }
@@ -1490,12 +1486,12 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.modifyRow(row, column, function);
     }
 
-    public MatrixStore<Double> multiply(final Access1D<Double> right) {
+    public MatrixStore<Double> multiply(final MatrixStore<Double> right) {
 
         final PrimitiveDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
         if (right instanceof PrimitiveDenseStore) {
-            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, ((PrimitiveDenseStore) right).data);
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, PrimitiveDenseStore.cast(right).data);
         } else {
             retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
         }

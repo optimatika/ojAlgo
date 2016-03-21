@@ -403,8 +403,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     private final ComplexMultiplyBoth multiplyBoth;
     private final ComplexMultiplyLeft multiplyLeft;
-    private final ComplexMultiplyRight multiplyRight;
     private final ComplexMultiplyNeither multiplyNeither;
+    private final ComplexMultiplyRight multiplyRight;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<ComplexNumber> myUtility;
@@ -594,10 +594,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public Array1D<ComplexNumber> asList() {
         return myUtility.asArray1D();
-    }
-
-    public final MatrixStore.Builder<ComplexNumber> builder() {
-        return new MatrixStore.Builder<ComplexNumber>(this);
     }
 
     public void caxpy(final ComplexNumber scalarA, final int columnX, final int columnY, final int firstRow) {
@@ -921,12 +917,12 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myUtility.modifyRow(row, column, function);
     }
 
-    public MatrixStore<ComplexNumber> multiply(final Access1D<ComplexNumber> right) {
+    public MatrixStore<ComplexNumber> multiply(final MatrixStore<ComplexNumber> right) {
 
         final ComplexDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
         if (right instanceof ComplexDenseStore) {
-            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, ((ComplexDenseStore) right).data);
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, ComplexDenseStore.cast(right).data);
         } else {
             retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
         }

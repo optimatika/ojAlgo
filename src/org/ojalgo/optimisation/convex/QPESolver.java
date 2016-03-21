@@ -68,14 +68,14 @@ final class QPESolver extends ConstrainedSolver {
     protected final MatrixStore<Double> getIterationKKT() {
         final MatrixStore<Double> tmpIterationQ = this.getIterationQ();
         final MatrixStore<Double> tmpIterationA = this.getIterationA();
-        return tmpIterationQ.builder().right(tmpIterationA.transpose()).below(tmpIterationA).build();
+        return tmpIterationQ.logical().right(tmpIterationA.transpose()).below(tmpIterationA).get();
     }
 
     @Override
     protected final MatrixStore<Double> getIterationRHS() {
         final MatrixStore<Double> tmpIterationC = this.getIterationC();
         final MatrixStore<Double> tmpIterationB = this.getIterationB();
-        return tmpIterationC.builder().below(tmpIterationB).build();
+        return tmpIterationC.logical().below(tmpIterationB).get();
     }
 
     @Override
@@ -140,8 +140,8 @@ final class QPESolver extends ConstrainedSolver {
             // Try solving the full KKT system instaed
 
             final MatrixStore<Double> tmpXL = myLU.solve(this.getIterationRHS());
-            tmpIterX.fillMatching(tmpXL.builder().rows(0, this.countVariables()).build());
-            tmpIterL.fillMatching(tmpXL.builder().rows(this.countVariables(), (int) tmpXL.count()).build());
+            tmpIterX.fillMatching(tmpXL.logical().rows(0, this.countVariables()).get());
+            tmpIterL.fillMatching(tmpXL.logical().rows(this.countVariables(), (int) tmpXL.count()).get());
         }
 
         if (!tmpSolvable && this.isDebug()) {

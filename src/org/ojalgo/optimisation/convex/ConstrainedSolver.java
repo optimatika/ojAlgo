@@ -22,11 +22,22 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 
 abstract class ConstrainedSolver extends ConvexSolver {
 
+    private transient PhysicalStore<Double> myIterationQ = null;
+
     protected ConstrainedSolver(final Builder matrices, final Options solverOptions) {
         super(matrices, solverOptions);
+    }
+
+    @Override
+    protected boolean initialise(final Result kickStarter) {
+
+        myCholesky.compute(this.getIterationQ());
+
+        return true;
     }
 
     @Override
@@ -55,5 +66,23 @@ abstract class ConstrainedSolver extends ConvexSolver {
     abstract MatrixStore<Double> getIterationA();
 
     abstract MatrixStore<Double> getIterationB();
+
+    abstract MatrixStore<Double> getIterationC();
+
+    final PhysicalStore<Double> getIterationQ() {
+
+        if (myIterationQ == null) {
+
+            final MatrixStore<Double> tmpQ = this.getQ();
+
+            if (tmpQ instanceof PhysicalStore) {
+                myIterationQ = (PhysicalStore<Double>) tmpQ;
+            } else {
+                myIterationQ = tmpQ.copy();
+            }
+        }
+
+        return myIterationQ;
+    }
 
 }

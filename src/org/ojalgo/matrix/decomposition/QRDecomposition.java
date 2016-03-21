@@ -135,11 +135,11 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     public MatrixStore<N> getR() {
 
         //MatrixStore<N> retVal = new UpperTriangularStore<N>(this.getInPlace(), false);
-        MatrixStore<N> retVal = this.getInPlace().builder().triangular(true, false).build();
+        MatrixStore<N> retVal = this.getInPlace().logical().triangular(true, false).get();
 
         final int tmpPadding = this.getRowDim() - this.getColDim();
         if (myFullSize && (tmpPadding < 0)) {
-            retVal = retVal.builder().below(tmpPadding).build();
+            retVal = retVal.logical().below(tmpPadding).get();
         }
 
         return retVal;
@@ -253,9 +253,9 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         preallocated.substituteBackwards(tmpStore, false, false, false);
 
         if (tmpColDim < tmpRowDim) {
-            return preallocated.builder().rows(0, tmpColDim).build();
+            return preallocated.logical().rows(0, tmpColDim).get();
         } else if (tmpColDim > tmpRowDim) {
-            return preallocated.builder().below(tmpColDim - tmpRowDim).build();
+            return preallocated.logical().below(tmpColDim - tmpRowDim).get();
         } else {
             return preallocated;
         }

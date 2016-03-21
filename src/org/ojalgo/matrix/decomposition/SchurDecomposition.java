@@ -106,7 +106,7 @@ abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition
     }
 
     public MatrixStore<N> getU() {
-        return this.getInPlace().builder().hessenberg(true).build();
+        return this.getInPlace().logical().hessenberg(true).get();
     }
 
     public boolean isFullSize() {

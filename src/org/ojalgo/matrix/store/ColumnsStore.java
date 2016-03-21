@@ -33,6 +33,11 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
 
     private final int[] myColumns;
 
+    /**
+     * @deprecated v40 Use {@link LogicalBuilder#offsets(int, int)} and/or {@link LogicalBuilder##limits(int,
+     *             int)} instead
+     */
+    @Deprecated
     ColumnsStore(final int first, final int limit, final MatrixStore<N> base) {
         this(base, AccessUtils.makeIncreasingRange(first, limit - first));
     }
@@ -64,15 +69,15 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
         return this.getBase().limitOfColumn(myColumns[col]);
     }
 
-    public Scalar<N> toScalar(final long row, final long column) {
-        return this.getBase().toScalar(row, myColumns[(int) column]);
-    }
-
     @Override
     public void supplyTo(final ElementsConsumer<N> consumer) {
         final MatrixStore<N> tmpBase = this.getBase();
         for (int c = 0; c < myColumns.length; c++) {
             consumer.fillColumn(0, c, tmpBase.sliceColumn(0, myColumns[c]));
         }
+    }
+
+    public Scalar<N> toScalar(final long row, final long column) {
+        return this.getBase().toScalar(row, myColumns[(int) column]);
     }
 }

@@ -354,7 +354,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             }
         }
 
-        return preallocated.builder().rows(0, n).build();
+        return preallocated.logical().rows(0, n).get();
     }
 
     @Override

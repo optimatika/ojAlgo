@@ -299,14 +299,13 @@ public abstract class ConvexSolver extends BaseSolver {
     }
 
     final Cholesky<Double> myCholesky;
-
     final LU<Double> myLU;
 
     protected ConvexSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
         super(matrices, solverOptions);
 
-        final MatrixStore<Double> tmpQ = this.getIterationQ();
+        final MatrixStore<Double> tmpQ = this.getQ();
 
         myCholesky = Cholesky.make(tmpQ);
         myLU = LU.make(tmpQ);
@@ -344,7 +343,7 @@ public abstract class ConvexSolver extends BaseSolver {
     @Override
     protected double evaluateFunction(final Access1D<?> solution) {
 
-        final MatrixStore<Double> tmpX = this.getSolutionX();
+        final MatrixStore<Double> tmpX = this.getX();
 
         return tmpX.transpose().multiply(this.getQ().multiply(tmpX)).multiply(0.5).subtract(tmpX.transpose().multiply(this.getC())).doubleValue(0L);
     }
@@ -352,23 +351,13 @@ public abstract class ConvexSolver extends BaseSolver {
     @Override
     protected MatrixStore<Double> extractSolution() {
 
-        return this.getSolutionX().copy();
+        return this.getX().copy();
 
     }
 
     protected abstract MatrixStore<Double> getIterationKKT();
 
     protected abstract MatrixStore<Double> getIterationRHS();
-
-    @Override
-    protected boolean initialise(final Result kickStarter) {
-
-        final PhysicalStore<Double> tmpIterationQ = this.getIterationQ();
-
-        myCholesky.compute(tmpIterationQ);
-
-        return true;
-    }
 
     abstract protected void performIteration();
 
@@ -413,34 +402,6 @@ public abstract class ConvexSolver extends BaseSolver {
 
         this.setState(State.VALID);
         return true;
-    }
-
-    abstract MatrixStore<Double> getIterationC();
-
-    final PhysicalStore<Double> getIterationQ() {
-
-        if (myIterationQ == null) {
-
-            final MatrixStore<Double> tmpQ = this.getQ();
-
-            if (tmpQ instanceof PhysicalStore) {
-                myIterationQ = (PhysicalStore<Double>) tmpQ;
-            } else {
-                myIterationQ = tmpQ.copy();
-            }
-        }
-
-        return myIterationQ;
-    }
-
-    private transient PhysicalStore<Double> myIterationQ = null;
-
-    final MatrixStore<Double> getSolutionX() {
-        return this.getX();
-    }
-
-    void setIterationQ(final PhysicalStore<Double> iterationQ) {
-        myIterationQ = iterationQ;
     }
 
 }

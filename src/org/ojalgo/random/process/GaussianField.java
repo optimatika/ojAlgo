@@ -162,7 +162,7 @@ public final class GaussianField<K extends Comparable<K>> {
                 }
             }
 
-            tmpCovariances.fillMatching(tmpV.multiply(tmpD).multiply(tmpV.builder().transpose().build()));
+            tmpCovariances.fillMatching(tmpV.multiply(tmpD).multiply(tmpV.logical().transpose().get()));
         }
 
         return new Normal1D(tmpLocations, tmpCovariances);
@@ -297,7 +297,7 @@ public final class GaussianField<K extends Comparable<K>> {
     }
 
     MatrixStore<Double> getRegressionCoefficients(final K[] args) {
-        return this.getC22().solve(this.getC21(args)).builder().transpose().build();
+        return this.getC22().solve(this.getC21(args)).logical().transpose().get();
     }
 
 }

@@ -35,6 +35,11 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
 
     private final int[] myRows;
 
+    /**
+     * @deprecated v40 Use {@link LogicalBuilder#offsets(int, int)} and/or {@link LogicalBuilder##limits(int,
+     *             int)} instead
+     */
+    @Deprecated
     RowsStore(final int first, final int limit, final MatrixStore<N> base) {
         this(base, AccessUtils.makeIncreasingRange(first, limit - first));
     }
@@ -87,7 +92,7 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
                     double tmpVal = PrimitiveMath.ZERO;
 
                     for (int c = tmpFirst; c < tmpLimit; c++) {
-                        tmpVal += tmpBase.doubleValue(tmpRow, c) * right.doubleValue((long) c + (j * tmpComplexity));
+                        tmpVal += tmpBase.doubleValue(tmpRow, c) * right.doubleValue(c + (j * tmpComplexity));
                     }
 
                     target.set(i, j, tmpVal);

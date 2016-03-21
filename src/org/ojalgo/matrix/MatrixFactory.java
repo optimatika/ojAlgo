@@ -235,7 +235,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
         final int tmpMinDim = (int) Math.min(rows, columns);
 
-        MatrixStore.Builder<N> retVal = myPhysicalFactory.builder().makeIdentity(tmpMinDim);
+        MatrixStore.LogicalBuilder<N> retVal = myPhysicalFactory.builder().makeIdentity(tmpMinDim);
 
         if (rows > tmpMinDim) {
             //retVal = new AboveBelowStore<N>(retVal, new ZeroStore<N>(myPhysicalFactory, , (int) columns));

@@ -93,15 +93,15 @@ public class StoreProblems extends AbstractMatrixStoreTest {
         tmpActual = tmpMtrxC.copy();
         TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
 
-        tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB.builder().transpose().build());
+        tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB.logical().transpose().get());
         tmpExpected = tmpMtrxC.copy();
-        tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB.builder().transpose().build());
+        tmpMtrxC.fillByMultiplying(tmpMtrxA, tmpMtrxB.logical().transpose().get());
         tmpActual = tmpMtrxC.copy();
         TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
 
-        tmpMtrxC.fillByMultiplying(tmpMtrxA.builder().transpose().build(), tmpMtrxB);
+        tmpMtrxC.fillByMultiplying(tmpMtrxA.logical().transpose().get(), tmpMtrxB);
         tmpExpected = tmpMtrxC.copy();
-        tmpMtrxC.fillByMultiplying(tmpMtrxA.builder().transpose().build(), tmpMtrxB);
+        tmpMtrxC.fillByMultiplying(tmpMtrxA.logical().transpose().get(), tmpMtrxB);
         tmpActual = tmpMtrxC.copy();
         TestUtils.assertEquals(tmpExpected, tmpActual, new NumberContext(7, 6));
     }

@@ -105,11 +105,11 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         preallocated.substituteBackwards(tmpBody, false, true, true);
 
         //return new LowerHermitianStore<>(preallocated);
-        return preallocated.builder().hermitian(false).build();
+        return preallocated.logical().hermitian(false).get();
     }
 
     public MatrixStore<N> getL() {
-        return this.getInPlace().builder().triangular(false, false).build();
+        return this.getInPlace().logical().triangular(false, false).get();
     }
 
     public MatrixStore<N> invert(final Access2D<?> original) {

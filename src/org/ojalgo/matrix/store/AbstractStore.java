@@ -64,10 +64,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return tmpFunction.getNumber();
     }
 
-    public final MatrixStore.Builder<N> builder() {
-        return new MatrixStore.Builder<N>(this);
-    }
-
     public final PhysicalStore<N> copy() {
 
         final PhysicalStore<N> retVal = this.factory().makeZero(this.countRows(), this.countColumns());

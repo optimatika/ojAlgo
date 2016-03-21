@@ -678,10 +678,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         };
     }
 
-    public MatrixStore.Builder<Double> builder() {
-        return new MatrixStore.Builder<Double>(this);
-    }
-
     public void caxpy(final Double scalarA, final int columnX, final int columnY, final int firstRow) {
 
         final double tmpValA = scalarA.doubleValue();
@@ -1185,7 +1181,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.modifyRow(data, (int) row, (int) column, function);
     }
 
-    public RawStore multiply(final Access1D<Double> right) {
+    public RawStore multiply(final MatrixStore<Double> right) {
 
         final int tmpRowDim = data.length;
         final int tmpComplexity = myNumberOfColumns;

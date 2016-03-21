@@ -285,10 +285,10 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q1 unitary", BIG.getQ1().builder().conjugate().build().multiply(BIG.getQ1()));
-            BasicLogger.debug("Cmplx Q1 unitary", COMPLEX.getQ1().builder().conjugate().build().multiply(COMPLEX.getQ1()));
-            BasicLogger.debug("Jama  Q1 unitary", JAMA.getQ1().builder().conjugate().build().multiply(JAMA.getQ1()));
-            BasicLogger.debug("Direc Q1 unitary", DIRECT.getQ1().builder().conjugate().build().multiply(DIRECT.getQ1()));
+            BasicLogger.debug("Big   Q1 unitary", BIG.getQ1().logical().conjugate().get().multiply(BIG.getQ1()));
+            BasicLogger.debug("Cmplx Q1 unitary", COMPLEX.getQ1().logical().conjugate().get().multiply(COMPLEX.getQ1()));
+            BasicLogger.debug("Jama  Q1 unitary", JAMA.getQ1().logical().conjugate().get().multiply(JAMA.getQ1()));
+            BasicLogger.debug("Direc Q1 unitary", DIRECT.getQ1().logical().conjugate().get().multiply(DIRECT.getQ1()));
 
         }
 
@@ -303,10 +303,10 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q2 unitary", BIG.getQ2().multiply(BIG.getQ2().builder().conjugate().build()));
-            BasicLogger.debug("Cmplx Q2 unitary", COMPLEX.getQ2().multiply(COMPLEX.getQ2().builder().conjugate().build()));
-            BasicLogger.debug("Jama  Q2 unitary", JAMA.getQ2().multiply(JAMA.getQ2().builder().conjugate().build()));
-            BasicLogger.debug("Direc Q2 unitary", DIRECT.getQ2().multiply(DIRECT.getQ2().builder().conjugate().build()));
+            BasicLogger.debug("Big   Q2 unitary", BIG.getQ2().multiply(BIG.getQ2().logical().conjugate().get()));
+            BasicLogger.debug("Cmplx Q2 unitary", COMPLEX.getQ2().multiply(COMPLEX.getQ2().logical().conjugate().get()));
+            BasicLogger.debug("Jama  Q2 unitary", JAMA.getQ2().multiply(JAMA.getQ2().logical().conjugate().get()));
+            BasicLogger.debug("Direc Q2 unitary", DIRECT.getQ2().multiply(DIRECT.getQ2().logical().conjugate().get()));
 
         }
 

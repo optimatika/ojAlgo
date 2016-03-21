@@ -41,7 +41,7 @@ final class DirectMixedASS extends DirectASS {
         if (included.length == 0) {
             retVal = tmpAE;
         } else {
-            retVal = tmpAI.builder().row(included).above(tmpAE).get();
+            retVal = tmpAI.logical().row(included).above(tmpAE).get();
         }
 
         return retVal;
@@ -59,7 +59,7 @@ final class DirectMixedASS extends DirectASS {
         if (included.length == 0) {
             retVal = tmpBE;
         } else {
-            retVal = tmpBI.builder().row(included).above(tmpBE).get();
+            retVal = tmpBI.logical().row(included).above(tmpBE).get();
         }
 
         return retVal;

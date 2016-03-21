@@ -125,8 +125,8 @@ abstract class DirectASS extends ActiveSetSolver {
             // Try solving the full KKT system instaed
 
             final MatrixStore<Double> tmpXL = myLU.solve(this.getIterationRHS(tmpIncluded));
-            tmpIterX.fillMatching(tmpXL.builder().rows(0, this.countVariables()).build());
-            tmpIterL.fillMatching(tmpXL.builder().rows(this.countVariables(), (int) tmpXL.count()).build());
+            tmpIterX.fillMatching(tmpXL.logical().rows(0, this.countVariables()).get());
+            tmpIterL.fillMatching(tmpXL.logical().rows(this.countVariables(), (int) tmpXL.count()).get());
         }
 
         if (!tmpSolvable && this.isDebug()) {

@@ -118,7 +118,7 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
     }
 
     public final MatrixStore<N> getH() {
-        return this.getInPlace().builder().hessenberg(myUpper).build();
+        return this.getInPlace().logical().hessenberg(myUpper).get();
     }
 
     public final MatrixStore<N> getQ() {

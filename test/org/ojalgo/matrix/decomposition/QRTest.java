@@ -161,7 +161,7 @@ public class QRTest extends MatrixDecompositionTests {
         MatrixUtils.setThresholdsMinValue(100000);
 
         final int tmpDim = 3;
-        final MatrixStore<Double> tmpA = MatrixUtils.makeSPD(tmpDim).builder().below(MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get()).build();
+        final MatrixStore<Double> tmpA = MatrixUtils.makeSPD(tmpDim).logical().below(MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get()).get();
 
         final QR<Double> tmpDenseQR = new QRDecomposition.Primitive();
         final QR<Double> tmpRawQR = new RawQR();

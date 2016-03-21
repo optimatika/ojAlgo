@@ -91,7 +91,7 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
 
     @Override
     public MatrixStore<N> getHessian(final Access1D<N> point) {
-        return myFactors.builder().superimpose(0, 0, myFactors.conjugate()).build();
+        return myFactors.logical().superimpose(0, 0, myFactors.conjugate()).get();
     }
 
     @Override

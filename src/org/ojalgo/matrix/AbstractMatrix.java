@@ -111,7 +111,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         final MatrixStore<N> tmpDiff = this.cast(addend);
 
         //return this.getFactory().instantiate(new SuperimposedStore<N>(myStore, row, col, tmpDiff));
-        return this.getFactory().instantiate(myStore.builder().superimpose(row, col, tmpDiff).get());
+        return this.getFactory().instantiate(myStore.logical().superimpose(row, col, tmpDiff).get());
     }
 
     public I add(final Number scalarAddend) {
@@ -222,7 +222,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public I getColumnsRange(final int aFirst, final int aLimit) {
-        return this.getFactory().instantiate(myStore.builder().columns(aFirst, aLimit).build());
+        return this.getFactory().instantiate(myStore.logical().columns(aFirst, aLimit).get());
     }
 
     public Scalar<N> getCondition() {
@@ -301,7 +301,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public I getRowsRange(final int aFirst, final int aLimit) {
-        return this.getFactory().instantiate(myStore.builder().rows(aFirst, aLimit).build());
+        return this.getFactory().instantiate(myStore.logical().rows(aFirst, aLimit).get());
     }
 
     public List<Double> getSingularValues() {
@@ -397,7 +397,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         MatrixError.throwIfNotEqualColumnDimensions(myStore, aMtrx);
 
         //return this.getFactory().instantiate(new AboveBelowStore<N>(myStore, this.getStoreFrom(aMtrx)));
-        return this.getFactory().instantiate(myStore.builder().below(this.cast(aMtrx)).build());
+        return this.getFactory().instantiate(myStore.logical().below(this.cast(aMtrx)).get());
     }
 
     public I mergeRows(final Access2D<?> aMtrx) {
@@ -405,7 +405,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         MatrixError.throwIfNotEqualRowDimensions(myStore, aMtrx);
 
         //return this.getFactory().instantiate(new LeftRightStore<N>(myStore, this.getStoreFrom(aMtrx)));
-        return this.getFactory().instantiate(myStore.builder().right(this.cast(aMtrx)).build());
+        return this.getFactory().instantiate(myStore.logical().right(this.cast(aMtrx)).get());
     }
 
     public I modify(final UnaryFunction<? extends Number> aFunc) {
@@ -471,11 +471,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public I selectColumns(final int... someCols) {
-        return this.getFactory().instantiate(myStore.builder().column(someCols).build());
+        return this.getFactory().instantiate(myStore.logical().column(someCols).get());
     }
 
     public I selectRows(final int... someRows) {
-        return this.getFactory().instantiate(myStore.builder().row(someRows).build());
+        return this.getFactory().instantiate(myStore.logical().row(someRows).get());
     }
 
     public I signum() {

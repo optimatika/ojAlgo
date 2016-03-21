@@ -384,8 +384,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     private final BigMultiplyBoth multiplyBoth;
     private final BigMultiplyLeft multiplyLeft;
-    private final BigMultiplyRight multiplyRight;
     private final BigMultiplyNeither multiplyNeither;
+    private final BigMultiplyRight multiplyRight;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<BigDecimal> myUtility;
@@ -575,10 +575,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public Array1D<BigDecimal> asList() {
         return myUtility.asArray1D();
-    }
-
-    public final MatrixStore.Builder<BigDecimal> builder() {
-        return new MatrixStore.Builder<BigDecimal>(this);
     }
 
     public void caxpy(final BigDecimal scalarA, final int columnX, final int columnY, final int firstRow) {
@@ -902,12 +898,12 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myUtility.modifyRow(row, column, function);
     }
 
-    public MatrixStore<BigDecimal> multiply(final Access1D<BigDecimal> right) {
+    public MatrixStore<BigDecimal> multiply(final MatrixStore<BigDecimal> right) {
 
         final BigDenseStore retVal = FACTORY.makeZero(myRowDim, right.count() / myColDim);
 
         if (right instanceof BigDenseStore) {
-            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, ((BigDenseStore) right).data);
+            retVal.multiplyNeither.invoke(retVal.data, data, myColDim, BigDenseStore.cast(right).data);
         } else {
             retVal.multiplyRight.invoke(retVal.data, data, myColDim, right);
         }

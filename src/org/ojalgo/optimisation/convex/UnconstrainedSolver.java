@@ -41,17 +41,17 @@ final class UnconstrainedSolver extends ConvexSolver {
 
     @Override
     protected MatrixStore<Double> getIterationKKT() {
-        return this.getIterationQ();
+        return this.getQ();
     }
 
     @Override
     protected MatrixStore<Double> getIterationRHS() {
-        return this.getIterationC();
+        return this.getC();
     }
 
     @Override
     protected boolean initialise(final Result kickStarter) {
-        super.initialise(kickStarter);
+        myCholesky.compute(this.getQ());
         this.resetX();
         return true;
     }
@@ -64,8 +64,8 @@ final class UnconstrainedSolver extends ConvexSolver {
     @Override
     protected void performIteration() {
 
-        final MatrixStore<Double> tmpQ = this.getIterationQ();
-        final MatrixStore<Double> tmpC = this.getIterationC();
+        final MatrixStore<Double> tmpQ = this.getQ();
+        final MatrixStore<Double> tmpC = this.getC();
         final DecompositionStore<Double> tmpX = this.getX();
 
         boolean tmpSolvable = true;
@@ -94,11 +94,6 @@ final class UnconstrainedSolver extends ConvexSolver {
             this.setState(State.UNBOUNDED);
             this.resetX();
         }
-    }
-
-    @Override
-    final MatrixStore<Double> getIterationC() {
-        return this.getC();
     }
 
 }

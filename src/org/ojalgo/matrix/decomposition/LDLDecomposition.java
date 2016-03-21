@@ -35,7 +35,7 @@ import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.Builder;
+import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -126,9 +126,9 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
     public MatrixStore<N> getD() {
         final DecompositionStore<N> tmpInPlace = this.getInPlace();
-        final Builder<N> tmpBuilder = tmpInPlace.builder();
-        final Builder<N> tmpTriangular = tmpBuilder.diagonal(false);
-        return tmpTriangular.build();
+        final LogicalBuilder<N> tmpBuilder = tmpInPlace.logical();
+        final LogicalBuilder<N> tmpTriangular = tmpBuilder.diagonal(false);
+        return tmpTriangular.get();
     }
 
     public N getDeterminant() {
@@ -169,14 +169,14 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
         preallocated.substituteBackwards(tmpBody, true, true, false);
 
-        return preallocated.builder().row(tmpOrder).build();
+        return preallocated.logical().row(tmpOrder).get();
     }
 
     public MatrixStore<N> getL() {
         final DecompositionStore<N> tmpInPlace = this.getInPlace();
-        final Builder<N> tmpBuilder = tmpInPlace.builder();
-        final Builder<N> tmpTriangular = tmpBuilder.triangular(false, true);
-        return tmpTriangular.build();
+        final LogicalBuilder<N> tmpBuilder = tmpInPlace.logical();
+        final LogicalBuilder<N> tmpTriangular = tmpBuilder.triangular(false, true);
+        return tmpTriangular.get();
     }
 
     public int getRank() {
@@ -260,7 +260,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         final int[] tmpOrder = myPivot.getOrder();
 
         //        preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), tmpOrder));
-        preallocated.fillMatching(rhs.get().builder().row(tmpOrder).get());
+        preallocated.fillMatching(rhs.get().logical().row(tmpOrder).get());
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 
@@ -273,7 +273,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
         preallocated.substituteBackwards(tmpBody, true, true, false);
 
-        return preallocated.builder().row(tmpOrder).build();
+        return preallocated.logical().row(tmpOrder).get();
     }
 
 }

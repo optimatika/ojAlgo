@@ -124,7 +124,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     public MatrixStore<N> getL() {
         //return new LowerTriangularStore<N>(this.getInPlace(), true);
-        return this.getInPlace().builder().triangular(false, true).build();
+        return this.getInPlace().logical().triangular(false, true).get();
     }
 
     public int[] getPivotOrder() {
@@ -154,7 +154,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     public MatrixStore<N> getU() {
         //return new UpperTriangularStore<N>(this.getInPlace(), false);
-        return this.getInPlace().builder().triangular(true, false).build();
+        return this.getInPlace().logical().triangular(true, false).get();
     }
 
     public MatrixStore<N> invert(final Access2D<?> original) {
@@ -238,7 +238,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
     public MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
 
         //preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
-        preallocated.fillMatching(rhs.get().builder().row(myPivot.getOrder()).get());
+        preallocated.fillMatching(rhs.get().logical().row(myPivot.getOrder()).get());
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 

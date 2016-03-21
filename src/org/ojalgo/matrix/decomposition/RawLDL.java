@@ -27,7 +27,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.Builder;
+import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
@@ -61,7 +61,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     }
 
     public MatrixStore<Double> getD() {
-        return this.getRawInPlaceStore().builder().diagonal(false).build();
+        return this.getRawInPlaceStore().logical().diagonal(false).get();
     }
 
     public Double getDeterminant() {
@@ -77,9 +77,9 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
 
     public MatrixStore<Double> getL() {
         final RawStore tmpRawInPlaceStore = this.getRawInPlaceStore();
-        final Builder<Double> tmpBuilder = tmpRawInPlaceStore.builder();
-        final Builder<Double> tmpTriangular = tmpBuilder.triangular(false, true);
-        return tmpTriangular.build();
+        final LogicalBuilder<Double> tmpBuilder = tmpRawInPlaceStore.logical();
+        final LogicalBuilder<Double> tmpTriangular = tmpBuilder.triangular(false, true);
+        return tmpTriangular.get();
     }
 
     public int getRank() {

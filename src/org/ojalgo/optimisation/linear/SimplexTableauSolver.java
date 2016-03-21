@@ -116,15 +116,15 @@ final class SimplexTableauSolver extends LinearSolver {
 
         final int tmpConstraintsCount = this.countConstraints();
 
-        final MatrixStore.Builder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE.makeZero(1, 1);
-        tmpTableauBuilder.left(matrices.getC().transpose().builder().right(MatrixStore.PRIMITIVE.makeZero(1, tmpConstraintsCount).get()).get());
+        final MatrixStore.LogicalBuilder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE.makeZero(1, 1);
+        tmpTableauBuilder.left(matrices.getC().transpose().logical().right(MatrixStore.PRIMITIVE.makeZero(1, tmpConstraintsCount).get()).get());
 
         if (tmpConstraintsCount >= 1) {
             tmpTableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE.makeIdentity(tmpConstraintsCount).get(), matrices.getBE());
         }
         tmpTableauBuilder.below(1);
         //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
-        myTransposedTableau = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.build());
+        myTransposedTableau = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.get());
 
         final int[] tmpBasis = null;
         if ((tmpBasis != null) && (tmpBasis.length == tmpConstraintsCount)) {

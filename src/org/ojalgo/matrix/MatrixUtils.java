@@ -129,8 +129,8 @@ public abstract class MatrixUtils {
         final MatrixStore<N> tmpD = decomposition.getD();
         final MatrixStore<N> tmpQ2 = decomposition.getQ2();
 
-        final MatrixStore<N> tmpConjugatedQ1 = tmpQ1.builder().conjugate().build();
-        final MatrixStore<N> tmpConjugatedQ2 = tmpQ2.builder().conjugate().build();
+        final MatrixStore<N> tmpConjugatedQ1 = tmpQ1.logical().conjugate().get();
+        final MatrixStore<N> tmpConjugatedQ2 = tmpQ2.logical().conjugate().get();
 
         MatrixStore<N> tmpThis;
         MatrixStore<N> tmpThat;
@@ -173,7 +173,7 @@ public abstract class MatrixUtils {
 
         final MatrixStore<N> tmpL = decomposition.getL();
 
-        retVal = AccessUtils.equals(tmpL.multiply(tmpL.builder().conjugate().build()), matrix, context);
+        retVal = AccessUtils.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
 
         return retVal;
     }
@@ -211,7 +211,7 @@ public abstract class MatrixUtils {
         final MatrixStore<N> tmpU = decomposition.getU();
         final int[] tmpPivotOrder = decomposition.getPivotOrder();
 
-        return AccessUtils.equals(matrix.builder().row(tmpPivotOrder).build(), tmpL.multiply(tmpU), context);
+        return AccessUtils.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
     }
 
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
@@ -263,7 +263,7 @@ public abstract class MatrixUtils {
         if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
 
             tmpThis = tmpQ1.factory().makeEye(tmpRowDim, tmpRowDim);
-            tmpThat = tmpQ1.builder().conjugate().build().multiply(tmpQ1);
+            tmpThat = tmpQ1.logical().conjugate().get().multiply(tmpQ1);
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
@@ -272,7 +272,7 @@ public abstract class MatrixUtils {
         if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
 
             tmpThis = tmpQ2.factory().makeEye(tmpColDim, tmpColDim);
-            tmpThat = tmpQ2.multiply(tmpQ2.builder().conjugate().build());
+            tmpThat = tmpQ2.multiply(tmpQ2.logical().conjugate().get());
 
             retVal &= tmpThis.equals(tmpThat, context);
         }
@@ -498,7 +498,7 @@ public abstract class MatrixUtils {
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final LU<N> decomposition) {
-        return decomposition.getL().multiply(decomposition.getU()).builder().row(decomposition.getPivotOrder()).build();
+        return decomposition.getL().multiply(decomposition.getU()).logical().row(decomposition.getPivotOrder()).get();
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final QR<N> decomposition) {
@@ -507,7 +507,7 @@ public abstract class MatrixUtils {
 
     public static <N extends Number> MatrixStore<N> reconstruct(final Schur<N> decomposition) {
         final MatrixStore<N> tmpQ = decomposition.getQ();
-        return tmpQ.multiply(decomposition.getU()).multiply(tmpQ.builder().transpose().build());
+        return tmpQ.multiply(decomposition.getU()).multiply(tmpQ.logical().transpose().get());
     }
 
     public static <N extends Number> MatrixStore<N> reconstruct(final SingularValue<N> decomposition) {

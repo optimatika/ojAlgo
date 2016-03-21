@@ -87,7 +87,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.makeHouseholder(dimension);
     }
 
-    protected final MatrixStore.Builder<N> makeIdentity(final int dimension) {
+    protected final MatrixStore.LogicalBuilder<N> makeIdentity(final int dimension) {
         return myFactory.builder().makeIdentity(dimension);
     }
 
@@ -112,7 +112,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.scalar();
     }
 
-    protected final MatrixStore.Builder<N> wrap(final Access2D<?> source) {
+    protected final MatrixStore.LogicalBuilder<N> wrap(final Access2D<?> source) {
         return myFactory.builder().makeWrapper(source);
     }
 

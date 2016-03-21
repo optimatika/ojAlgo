@@ -101,7 +101,7 @@ public final class CompoundFunction<N extends Number> extends AbstractMultiary<N
 
     @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
-        return myQuadratic.getGradient(point).builder().superimpose(0, 0, myLinear.getGradient(point)).build();
+        return myQuadratic.getGradient(point).logical().superimpose(0, 0, myLinear.getGradient(point)).get();
     }
 
     @Override
