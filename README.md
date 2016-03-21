@@ -19,7 +19,7 @@ For bug reports, questions or discussions related to ojAlgo; use the ojAlgo-user
 
 If you prefer you may also use "Issues" here at GitHub, but then please make sure your post actually relates to an issue with the source code (bug reports or suggested improvements). The issue tracker is not for user support or general discussions. Use the mailing list for that.
 
-You can ofcourse also use something like [stack overflow](http://stackoverflow.com).
+You can ofcourse also use something like [stack overflow](http://stackoverflow.com/search?tab=newest&q=ojalgo).
 
 ## Contributions
 
