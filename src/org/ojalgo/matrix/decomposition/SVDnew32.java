@@ -353,14 +353,6 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
         final Array1D<Double> tmpDiagonal = SVDnew32.toDiagonal(tmpBidiagonal, tmpQ1, tmpQ2);
 
-        //        if (this.isTransposed()) {
-        //            this.setQ1(tmpQ2);
-        //            this.setQ2(tmpQ1);
-        //        } else {
-        //            this.setQ1(tmpQ1);
-        //            this.setQ2(tmpQ2);
-        //        }
-
         this.setSingularValues(tmpDiagonal);
 
         return this.computed(true);
