@@ -30,6 +30,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -106,6 +107,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
     private final int[] myBasis;
     private final PivotPoint myPoint;
+    private final Tableau myTableau;
     private final PrimitiveDenseStore myTransposedTableau;
 
     SimplexTableauSolver(final LinearSolver.Builder matrices, final Optimisation.Options solverOptions) {
@@ -115,6 +117,7 @@ final class SimplexTableauSolver extends LinearSolver {
         myPoint = new PivotPoint(this);
 
         final int tmpConstraintsCount = this.countConstraints();
+        final int tmpVariablesCount = this.countVariables();
 
         final MatrixStore.LogicalBuilder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE.makeZero(1, 1);
         tmpTableauBuilder.left(matrices.getC().transpose().logical().right(MatrixStore.PRIMITIVE.makeZero(1, tmpConstraintsCount).get()).get());
@@ -122,9 +125,28 @@ final class SimplexTableauSolver extends LinearSolver {
         if (tmpConstraintsCount >= 1) {
             tmpTableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE.makeIdentity(tmpConstraintsCount).get(), matrices.getBE());
         }
-        tmpTableauBuilder.below(1);
+        tmpTableauBuilder.below(MatrixStore.PRIMITIVE.makeZero(1, tmpVariablesCount).get(),
+                PrimitiveDenseStore.FACTORY.makeFilled(1, tmpConstraintsCount, new NullaryFunction<Double>() {
+
+                    public double doubleValue() {
+                        return ONE;
+                    }
+
+                    public Double get() {
+                        return ONE;
+                    }
+
+                    public double getAsDouble() {
+                        return ONE;
+                    }
+
+                    public Double invoke() {
+                        return ONE;
+                    }
+                }));
         //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
         myTransposedTableau = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.get());
+        myTableau = LinearSolver.make(myTransposedTableau);
 
         final int[] tmpBasis = null;
         if ((tmpBasis != null) && (tmpBasis.length == tmpConstraintsCount)) {
@@ -137,12 +159,53 @@ final class SimplexTableauSolver extends LinearSolver {
         for (int i = 0; i < tmpConstraintsCount; i++) {
             if (myBasis[i] < 0) {
                 myTransposedTableau.caxpy(NEG, i, myPoint.getRowObjective(), 0);
+                myTableau.pivot(i, tmpVariablesCount + i);
             }
         }
 
         if (this.isDebug() && this.isTableauPrintable()) {
             this.logDebugTableau("Tableau Created");
         }
+    }
+
+    @Override
+    public int[] getBasis() {
+        return myBasis.clone();
+    }
+
+    @Override
+    public double[] getDualVariables() {
+
+        this.logDebugTableau("Tableau extracted");
+
+        final double[] retVal = new double[this.countConstraints()];
+
+        final int tmpRowObjective = this.countConstraints();
+
+        final int tmpCountVariables = this.countVariables();
+        for (int j = 0; j < retVal.length; j++) {
+            retVal[j] = -myTransposedTableau.doubleValue(tmpCountVariables + j, tmpRowObjective);
+        }
+
+        return retVal;
+    }
+
+    @Override
+    public double[] getResidualCosts() {
+
+        this.logDebugTableau("Tableau extracted");
+
+        final double[] retVal = new double[this.countVariables()];
+
+        final int tmpRowObjective = this.countConstraints();
+
+        // final double tmpObjVal = myTransposedTableau.doubleValue(32, tmpRowObjective);
+
+        for (int j = 0; j < retVal.length; j++) {
+            retVal[j] = myTransposedTableau.doubleValue(j, tmpRowObjective);
+        }
+
+        return retVal;
     }
 
     public Result solve(final Result kickStarter) {
@@ -186,6 +249,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
     private final void logDebugTableau(final String message) {
         this.debug(message + "; Basics: " + Arrays.toString(myBasis), myTransposedTableau.transpose());
+        this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
     }
 
     @Override
@@ -438,6 +502,8 @@ final class SimplexTableauSolver extends LinearSolver {
             myTransposedTableau.modifyColumn(0, pivotRow, MULTIPLY.second(ONE / tmpPivotElement));
         }
 
+        myTableau.pivot(pivotRow, pivotCol);
+
         if (this.isDebug()) {
             this.debug("Iteration Point <{},{}>\tPivot: {} => {}\tRHS: {} => {}.", pivotRow, pivotCol, tmpPivotElement,
                     this.getTableauElement(pivotRow, pivotCol), tmpPivotRHS, this.getTableauElement(pivotRow, myPoint.getColRHS()));
@@ -486,46 +552,6 @@ final class SimplexTableauSolver extends LinearSolver {
      */
     Array1D<Double> sliceTableauRow(final int row) {
         return myTransposedTableau.asArray2D().sliceColumn(0, row).subList(0, this.countConstraints() + this.countVariables());
-    }
-
-    @Override
-    public int[] getBasis() {
-        return myBasis.clone();
-    }
-
-    @Override
-    public double[] getResidualCosts() {
-
-        this.logDebugTableau("Tableau extracted");
-
-        final double[] retVal = new double[this.countVariables()];
-
-        final int tmpRowObjective = this.countConstraints();
-
-        // final double tmpObjVal = myTransposedTableau.doubleValue(32, tmpRowObjective);
-
-        for (int j = 0; j < retVal.length; j++) {
-            retVal[j] = myTransposedTableau.doubleValue(j, tmpRowObjective);
-        }
-
-        return retVal;
-    }
-
-    @Override
-    public double[] getDualVariables() {
-
-        this.logDebugTableau("Tableau extracted");
-
-        final double[] retVal = new double[this.countConstraints()];
-
-        final int tmpRowObjective = this.countConstraints();
-
-        final int tmpCountVariables = this.countVariables();
-        for (int j = 0; j < retVal.length; j++) {
-            retVal[j] = -myTransposedTableau.doubleValue(tmpCountVariables + j, tmpRowObjective);
-        }
-
-        return retVal;
     }
 
 }

@@ -127,9 +127,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         this.add(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
     }
 
-    void add(long row, long column, double addend);
+    void add(long row, long col, double addend);
 
-    void add(long row, long column, Number addend);
+    void add(long row, long col, Number addend);
 
     default void add(final long index, final Number addend) {
         final long tmpStructure = this.countRows();
@@ -141,9 +141,9 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         this.set(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
     }
 
-    void set(long row, long column, double value);
+    void set(long row, long col, double value);
 
-    void set(long row, long column, Number value);
+    void set(long row, long col, Number value);
 
     default void set(final long index, final Number addend) {
         final long tmpStructure = this.countRows();

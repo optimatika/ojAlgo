@@ -35,7 +35,10 @@ import org.ojalgo.algebra.ScalarOperation;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.BigDenseStore;
+import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -46,7 +49,7 @@ import org.ojalgo.type.context.NumberContext;
  * functionality is defined here. Various matrix decompositions may be used to do some of the more advanced
  * tasks.
  * </p>
- * 
+ *
  * @author apete
  */
 public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access1D.Aggregatable<Number>, NormedVectorSpace<BasicMatrix, Number>,
@@ -352,7 +355,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @param row A row index.
      * @param column A column index.
      * @return One matrix element
+     * @deprecated v40 Use {@link #get(long, long)} instead
      */
+    @Deprecated
     BigDecimal toBigDecimal(int row, int column);
 
     /**
@@ -360,7 +365,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @see org.ojalgo.matrix.BasicMatrix#toComplexStore()
      * @see org.ojalgo.matrix.BasicMatrix#toPrimitiveStore()
+     * @deprecated Use {@linkplain BigDenseStore#FACTORY} instead
      */
+    @Deprecated
     PhysicalStore<BigDecimal> toBigStore();
 
     /**
@@ -369,7 +376,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @param row A row index.
      * @param column A column index.
      * @return One matrix element
+     * @deprecated v40 Use {@link #get(long, long)} instead
      */
+    @Deprecated
     ComplexNumber toComplexNumber(int row, int column);
 
     /**
@@ -377,7 +386,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @see org.ojalgo.matrix.BasicMatrix#toBigStore()
      * @see org.ojalgo.matrix.BasicMatrix#toPrimitiveStore()
+     * @deprecated Use {@linkplain ComplexDenseStore#FACTORY} instead
      */
+    @Deprecated
     PhysicalStore<ComplexNumber> toComplexStore();
 
     /**
@@ -406,7 +417,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      *
      * @see org.ojalgo.matrix.BasicMatrix#toBigStore()
      * @see org.ojalgo.matrix.BasicMatrix#toComplexStore()
+     * @deprecated Use {@linkplain PrimitiveDenseStore#FACTORY} instead
      */
+    @Deprecated
     PhysicalStore<Double> toPrimitiveStore();
 
     /**

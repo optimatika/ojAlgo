@@ -68,17 +68,17 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             myFactory = aPhysicalStore.factory();
         }
 
-        public final void add(final long row, final long column, final double value) {
+        public final void add(final long row, final long col, final double value) {
             if (mySafe) {
-                myPhysicalStore.add(row, column, value);
+                myPhysicalStore.add(row, col, value);
             } else {
                 throw new IllegalStateException();
             }
         }
 
-        public final void add(final long row, final long column, final Number value) {
+        public final void add(final long row, final long col, final Number value) {
             if (mySafe) {
-                myPhysicalStore.add(row, column, value);
+                myPhysicalStore.add(row, col, value);
             } else {
                 throw new IllegalStateException();
             }
@@ -146,17 +146,17 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             }
         }
 
-        public final void set(final long row, final long column, final double value) {
+        public final void set(final long row, final long col, final double value) {
             if (mySafe) {
-                myPhysicalStore.set(row, column, value);
+                myPhysicalStore.set(row, col, value);
             } else {
                 throw new IllegalStateException();
             }
         }
 
-        public final void set(final long row, final long column, final Number value) {
+        public final void set(final long row, final long col, final Number value) {
             if (mySafe) {
-                myPhysicalStore.set(row, column, value);
+                myPhysicalStore.set(row, col, value);
             } else {
                 throw new IllegalStateException();
             }

@@ -66,12 +66,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myColumns = columns;
         }
 
-        public void add(final long row, final long column, final double addend) {
-            myBase.add(row, myColumns[(int) column], addend);
+        public void add(final long row, final long col, final double addend) {
+            myBase.add(row, myColumns[(int) col], addend);
         }
 
-        public void add(final long row, final long column, final Number addend) {
-            myBase.add(row, myColumns[(int) column], addend);
+        public void add(final long row, final long col, final Number addend) {
+            myBase.add(row, myColumns[(int) col], addend);
         }
 
         public long countColumns() {
@@ -114,12 +114,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.modifyOne(row, myColumns[(int) column], function);
         }
 
-        public void set(final long row, final long column, final double value) {
-            myBase.set(row, myColumns[(int) column], value);
+        public void set(final long row, final long col, final double value) {
+            myBase.set(row, myColumns[(int) col], value);
         }
 
-        public void set(final long row, final long column, final Number value) {
-            myBase.set(row, myColumns[(int) column], value);
+        public void set(final long row, final long col, final Number value) {
+            myBase.set(row, myColumns[(int) col], value);
         }
 
     }
@@ -238,12 +238,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myColumnLimit = columnLimit;
         }
 
-        public void add(final long row, final long column, final double addend) {
-            myBase.add(row, column, addend);
+        public void add(final long row, final long col, final double addend) {
+            myBase.add(row, col, addend);
         }
 
-        public void add(final long row, final long column, final Number addend) {
-            myBase.add(row, column, addend);
+        public void add(final long row, final long col, final Number addend) {
+            myBase.add(row, col, addend);
         }
 
         public long countColumns() {
@@ -270,12 +270,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.modifyOne(row, column, function);
         }
 
-        public void set(final long row, final long column, final double value) {
-            myBase.set(row, column, value);
+        public void set(final long row, final long col, final double value) {
+            myBase.set(row, col, value);
         }
 
-        public void set(final long row, final long column, final Number value) {
-            myBase.set(row, column, value);
+        public void set(final long row, final long col, final Number value) {
+            myBase.set(row, col, value);
         }
 
     }
@@ -292,12 +292,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myColumnOffset = columnOffset;
         }
 
-        public void add(final long row, final long column, final double addend) {
-            myBase.add(myRowOffset + row, myColumnOffset + column, addend);
+        public void add(final long row, final long col, final double addend) {
+            myBase.add(myRowOffset + row, myColumnOffset + col, addend);
         }
 
-        public void add(final long row, final long column, final Number addend) {
-            myBase.add(myRowOffset + row, myColumnOffset + column, addend);
+        public void add(final long row, final long col, final Number addend) {
+            myBase.add(myRowOffset + row, myColumnOffset + col, addend);
         }
 
         public long countColumns() {
@@ -382,12 +382,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.modifyRow(myRowOffset + row, myColumnOffset + column, function);
         }
 
-        public void set(final long row, final long column, final double value) {
-            myBase.set(myRowOffset + row, myColumnOffset + column, value);
+        public void set(final long row, final long col, final double value) {
+            myBase.set(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void set(final long row, final long column, final Number value) {
-            myBase.set(myRowOffset + row, myColumnOffset + column, value);
+        public void set(final long row, final long col, final Number value) {
+            myBase.set(myRowOffset + row, myColumnOffset + col, value);
         }
 
     }
@@ -403,12 +403,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myRows = rows;
         }
 
-        public void add(final long row, final long column, final double addend) {
-            myBase.add(myRows[(int) row], column, addend);
+        public void add(final long row, final long col, final double addend) {
+            myBase.add(myRows[(int) row], col, addend);
         }
 
-        public void add(final long row, final long column, final Number addend) {
-            myBase.add(myRows[(int) row], column, addend);
+        public void add(final long row, final long col, final Number addend) {
+            myBase.add(myRows[(int) row], col, addend);
         }
 
         public long countColumns() {
@@ -451,12 +451,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.modifyRow(myRows[(int) row], column, function);
         }
 
-        public void set(final long row, final long column, final double value) {
-            myBase.set(myRows[(int) row], column, value);
+        public void set(final long row, final long col, final double value) {
+            myBase.set(myRows[(int) row], col, value);
         }
 
-        public void set(final long row, final long column, final Number value) {
-            myBase.set(myRows[(int) row], column, value);
+        public void set(final long row, final long col, final Number value) {
+            myBase.set(myRows[(int) row], col, value);
         }
 
     }
@@ -470,12 +470,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase = base;
         }
 
-        public void add(final long row, final long column, final double addend) {
-            myBase.add(column, row, addend);
+        public void add(final long row, final long col, final double addend) {
+            myBase.add(col, row, addend);
         }
 
-        public void add(final long row, final long column, final Number addend) {
-            myBase.add(column, row, addend);
+        public void add(final long row, final long col, final Number addend) {
+            myBase.add(col, row, addend);
         }
 
         public long countColumns() {
@@ -553,12 +553,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             return myBase;
         }
 
-        public void set(final long row, final long column, final double value) {
-            myBase.set(column, row, value);
+        public void set(final long row, final long col, final double value) {
+            myBase.set(col, row, value);
         }
 
-        public void set(final long row, final long column, final Number value) {
-            myBase.set(column, row, value);
+        public void set(final long row, final long col, final Number value) {
+            myBase.set(col, row, value);
         }
 
     }

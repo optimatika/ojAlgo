@@ -634,12 +634,12 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    public void add(final long row, final long column, final double addend) {
-        data[(int) row][(int) column] += addend;
+    public void add(final long row, final long col, final double addend) {
+        data[(int) row][(int) col] += addend;
     }
 
-    public void add(final long row, final long column, final Number addend) {
-        data[(int) row][(int) column] += addend.doubleValue();
+    public void add(final long row, final long col, final Number addend) {
+        data[(int) row][(int) col] += addend.doubleValue();
     }
 
     public Double aggregateAll(final Aggregator aggregator) {
@@ -1240,12 +1240,12 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return new TransposedRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns));
     }
 
-    public void set(final long row, final long column, final double value) {
-        data[(int) row][(int) column] = value;
+    public void set(final long row, final long col, final double value) {
+        data[(int) row][(int) col] = value;
     }
 
-    public void set(final long row, final long column, final Number value) {
-        data[(int) row][(int) column] = value.doubleValue();
+    public void set(final long row, final long col, final Number value) {
+        data[(int) row][(int) col] = value.doubleValue();
     }
 
     public void supplyTo(final ElementsConsumer<Double> consumer) {

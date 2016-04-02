@@ -458,12 +458,12 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
-    public void add(final long row, final long column, final double addend) {
-        myUtility.add(row, column, addend);
+    public void add(final long row, final long col, final double addend) {
+        myUtility.add(row, col, addend);
     }
 
-    public void add(final long row, final long column, final Number addend) {
-        myUtility.add(row, column, addend);
+    public void add(final long row, final long col, final Number addend) {
+        myUtility.add(row, col, addend);
     }
 
     public BigDecimal aggregateAll(final Aggregator aggregator) {

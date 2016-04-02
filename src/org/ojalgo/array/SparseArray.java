@@ -52,6 +52,14 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public final class NonzeroElement implements AccessScalar<N>, Iterator<NonzeroElement>, Iterable<NonzeroElement> {
 
+        private final int myLastCursor;
+
+        NonzeroElement() {
+            super();
+
+            myLastCursor = SparseArray.this.myActualLength - 1;
+        }
+
         private int myCursor = -1;
 
         public long index() {
@@ -71,7 +79,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
 
         public boolean hasNext() {
-            return (myCursor + 1) < SparseArray.this.myActualLength;
+            return myCursor < myLastCursor;
         }
 
         public SparseArray<N>.NonzeroElement next() {

@@ -572,7 +572,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             tmpLinearBuilder.equalities(tmpLinearAE, tmpLinearBE);
         }
 
-        final LinearSolver tmpLinearSolver = tmpLinearBuilder.build();
+        final LinearSolver tmpLinearSolver = tmpLinearBuilder.build(options);
 
         final Result tmpLinearResult = tmpLinearSolver.solve();
 

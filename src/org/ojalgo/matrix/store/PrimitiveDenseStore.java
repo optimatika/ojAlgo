@@ -1001,12 +1001,12 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public void add(final long row, final long column, final double addend) {
-        myUtility.add(row, column, addend);
+    public void add(final long row, final long col, final double addend) {
+        myUtility.add(row, col, addend);
     }
 
-    public void add(final long row, final long column, final Number addend) {
-        myUtility.add(row, column, addend);
+    public void add(final long row, final long col, final Number addend) {
+        myUtility.add(row, col, addend);
     }
 
     public Double aggregateAll(final Aggregator aggregator) {

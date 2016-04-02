@@ -110,6 +110,25 @@ public abstract class LinearSolver extends BaseSolver {
 
     static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
+    public static Tableau make(final PhysicalStore<Double> transposedTableau) {
+
+        final int tmpNumberOfConstraints = (int) (transposedTableau.countColumns() - 2L);
+        final int tmpNumberOfVariables = (int) (transposedTableau.countRows() - 1L);
+
+        final Tableau retVal = new Tableau(tmpNumberOfConstraints, tmpNumberOfVariables);
+
+        for (int i = 0; i < retVal.countRows(); i++) {
+            for (int j = 0; j < retVal.countColumns(); j++) {
+                final double tmpValue = transposedTableau.doubleValue(j, i);
+                if (tmpValue != 0.0) {
+                    retVal.set(i, j, tmpValue);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
     public static void copy(final ExpressionsBasedModel sourceModel, final LinearSolver.Builder destinationBuilder) {
 
         final boolean tmpMaximisation = sourceModel.isMaximisation();

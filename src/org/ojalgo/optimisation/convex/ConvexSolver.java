@@ -309,7 +309,6 @@ public abstract class ConvexSolver extends BaseSolver {
 
         myCholesky = Cholesky.make(tmpQ);
         myLU = LU.make(tmpQ);
-
     }
 
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {

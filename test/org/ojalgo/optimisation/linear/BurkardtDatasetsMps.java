@@ -48,9 +48,9 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
     /**
      * Defines a problem of 57 rows and 97 columns. Seems to be the same model as adlittle at netlib. Netlib
-     * also provides the solution. <a
-     * href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/adlittle.html"
-     * >adlittle@netlib</a> Found this info somewhere on the net: "With 56 constraints and 97 variables
+     * also provides the solution.
+     * <a href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/adlittle.html" >
+     * adlittle@netlib</a> Found this info somewhere on the net: "With 56 constraints and 97 variables
      * adlittle is one of its smaller members. While being in fact feasible, adlittle suffers from
      * ill--posedness. Perturbing the right hand side of the equality constraints by subtracting a tiny
      * multiple of the 96th column of the equation matrix renders the linear program infeasible. Running this
@@ -79,9 +79,9 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
     /**
      * Defines a problem of 28 rows and 32 columns. Seems to be the same model as afiro at netlib. Netlib also
-     * provides the solution. <a
-     * href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/afiro.html">afiro@netlib</a> OK!
-     * 2010-04-19 lp_solve => -464.75314286
+     * provides the solution.
+     * <a href="http://www-new.mcs.anl.gov/otc/Guide/TestProblems/LPtest/netlib/afiro.html">afiro@netlib</a>
+     * OK! 2010-04-19 lp_solve => -464.75314286
      */
     public void testMPSafiro() {
 
@@ -142,8 +142,8 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
 
     /**
      * A simple problem with 4 rows and 3 variables. I got my version from here (same numbers but different
-     * names): <a href="http://en.wikipedia.org/wiki/MPS_(format)">testprob@wikipedia</a> and/or <a
-     * href="http://lpsolve.sourceforge.net/5.5/mps-format.htm">testprob@lpsolve</a>
+     * names): <a href="http://en.wikipedia.org/wiki/MPS_(format)">testprob@wikipedia</a> and/or
+     * <a href="http://lpsolve.sourceforge.net/5.5/mps-format.htm">testprob@lpsolve</a>
      */
     public void testMPStestprob() {
 
@@ -205,24 +205,26 @@ public class BurkardtDatasetsMps extends OptimisationLinearTests {
         this.assertMinMaxVal(tmpActModel.getExpressionsBasedModel(), new BigDecimal("54"), new BigDecimal("80"));
     }
 
-    private void assertMinMaxVal(final ExpressionsBasedModel aModel, final BigDecimal aExpMinVal, final BigDecimal aExpMaxVal) {
+    private void assertMinMaxVal(final ExpressionsBasedModel model, final BigDecimal expMinVal, final BigDecimal expMaxVal) {
 
-        TestUtils.assertTrue(aModel.validate());
+        //model.options.debug(LinearSolver.class);
 
-        if (aExpMinVal != null) {
+        TestUtils.assertTrue(model.validate());
 
-            TestUtils.assertEquals(aExpMinVal.doubleValue(), aModel.minimise().getValue(), PRECISION);
+        if (expMinVal != null) {
 
-            if (!aModel.validate(PRECISION)) {
+            TestUtils.assertEquals(expMinVal.doubleValue(), model.minimise().getValue(), PRECISION);
+
+            if (!model.validate(PRECISION)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
         }
 
-        if (aExpMaxVal != null) {
+        if (expMaxVal != null) {
 
-            TestUtils.assertEquals(aExpMaxVal.doubleValue(), aModel.maximise().getValue(), PRECISION);
+            TestUtils.assertEquals(expMaxVal.doubleValue(), model.maximise().getValue(), PRECISION);
 
-            if (!aModel.validate(PRECISION)) {
+            if (!model.validate(PRECISION)) {
                 TestUtils.fail(SOLUTION_NOT_VALID);
             }
         }

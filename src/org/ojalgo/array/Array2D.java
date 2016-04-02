@@ -314,12 +314,12 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.add(index, addend);
     }
 
-    public void add(final long row, final long column, final double addend) {
-        myDelegate.add(AccessUtils.index(myRowsCount, row, column), addend);
+    public void add(final long row, final long col, final double addend) {
+        myDelegate.add(AccessUtils.index(myRowsCount, row, col), addend);
     }
 
-    public void add(final long row, final long column, final Number addend) {
-        myDelegate.add(AccessUtils.index(myRowsCount, row, column), addend);
+    public void add(final long row, final long col, final Number addend) {
+        myDelegate.add(AccessUtils.index(myRowsCount, row, col), addend);
     }
 
     public void add(final long index, final Number addend) {
@@ -592,12 +592,12 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.set(index, value);
     }
 
-    public void set(final long row, final long column, final double value) {
-        myDelegate.set(AccessUtils.index(myRowsCount, row, column), value);
+    public void set(final long row, final long col, final double value) {
+        myDelegate.set(AccessUtils.index(myRowsCount, row, col), value);
     }
 
-    public void set(final long row, final long column, final Number value) {
-        myDelegate.set(AccessUtils.index(myRowsCount, row, column), value);
+    public void set(final long row, final long col, final Number value) {
+        myDelegate.set(AccessUtils.index(myRowsCount, row, col), value);
     }
 
     public void set(final long index, final Number value) {
