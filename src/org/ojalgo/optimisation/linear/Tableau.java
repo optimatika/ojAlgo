@@ -32,15 +32,14 @@ import org.ojalgo.function.UnaryFunction;
 
 final class Tableau implements Access2D<Double>, Mutate2D {
 
+    private double myInfeasibility;
     private final long myNumberOfConstraints;
     private final long myNumberOfVariables;
-
-    private final SparseArray<Double>[] myRows;
-    private final PrimitiveArray myWeights;
+    private double myObjective;
     private final PrimitiveArray myPhase1Weights;
     private final PrimitiveArray myRHS;
-    private double myObjective;
-    private double myInfeasibility;
+    private final SparseArray<Double>[] myRows;
+    private final PrimitiveArray myWeights;
 
     @SuppressWarnings("unchecked")
     Tableau(final int numberOfConstraints, final int numberOfVariables) {
@@ -153,11 +152,21 @@ final class Tableau implements Access2D<Double>, Mutate2D {
         this.set(row, col, value.doubleValue());
     }
 
+    /**
+     * @return The phase 1 objective function value
+     */
+    double getInfeasibility() {
+        return myInfeasibility;
+    }
+
+    PrimitiveArray getRHS() {
+        return myRHS;
+    }
+
     void pivot(final int row, final int col) {
 
         final SparseArray<Double> tmpPivotRow = myRows[row];
         final double tmpPivotElement = tmpPivotRow.doubleValue(col);
-        final double tmpPivotRHS = myRHS.doubleValue(row) / tmpPivotElement;
 
         if (Math.abs(tmpPivotElement) < ONE) {
             final UnaryFunction<Double> tmpModifier = DIVIDE.second(tmpPivotElement);
@@ -168,6 +177,8 @@ final class Tableau implements Access2D<Double>, Mutate2D {
             tmpPivotRow.modifyAll(tmpModifier);
             myRHS.modifyOne(row, tmpModifier);
         }
+
+        final double tmpPivotRHS = myRHS.doubleValue(row);
 
         double tmpVal;
 

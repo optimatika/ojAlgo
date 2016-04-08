@@ -107,7 +107,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
     private final int[] myBasis;
     private final PivotPoint myPoint;
-    private final Tableau myTableau;
+    // private final Tableau myTableau;
     private final PrimitiveDenseStore myTransposedTableau;
 
     SimplexTableauSolver(final LinearSolver.Builder matrices, final Optimisation.Options solverOptions) {
@@ -146,7 +146,7 @@ final class SimplexTableauSolver extends LinearSolver {
                 }));
         //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
         myTransposedTableau = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.get());
-        myTableau = LinearSolver.make(myTransposedTableau);
+        // myTableau = LinearSolver.make(myTransposedTableau);
 
         final int[] tmpBasis = null;
         if ((tmpBasis != null) && (tmpBasis.length == tmpConstraintsCount)) {
@@ -159,7 +159,7 @@ final class SimplexTableauSolver extends LinearSolver {
         for (int i = 0; i < tmpConstraintsCount; i++) {
             if (myBasis[i] < 0) {
                 myTransposedTableau.caxpy(NEG, i, myPoint.getRowObjective(), 0);
-                myTableau.pivot(i, tmpVariablesCount + i);
+                // myTableau.pivot(i, tmpVariablesCount + i);
             }
         }
 
@@ -249,7 +249,7 @@ final class SimplexTableauSolver extends LinearSolver {
 
     private final void logDebugTableau(final String message) {
         this.debug(message + "; Basics: " + Arrays.toString(myBasis), myTransposedTableau.transpose());
-        this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
+        // this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
     }
 
     @Override
@@ -502,7 +502,7 @@ final class SimplexTableauSolver extends LinearSolver {
             myTransposedTableau.modifyColumn(0, pivotRow, MULTIPLY.second(ONE / tmpPivotElement));
         }
 
-        myTableau.pivot(pivotRow, pivotCol);
+        // myTableau.pivot(pivotRow, pivotCol);
 
         if (this.isDebug()) {
             this.debug("Iteration Point <{},{}>\tPivot: {} => {}\tRHS: {} => {}.", pivotRow, pivotCol, tmpPivotElement,
