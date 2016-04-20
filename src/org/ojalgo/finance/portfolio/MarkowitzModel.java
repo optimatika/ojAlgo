@@ -142,7 +142,7 @@ public final class MarkowitzModel extends EquilibriumModel {
         }
 
         if (marketEquilibrium.size() != (int) expectedExcessReturns.count()) {
-            throw new IllegalArgumentException("Wrong dimensiuons!");
+            throw new IllegalArgumentException("Wrong dimensions!");
         }
     }
 
