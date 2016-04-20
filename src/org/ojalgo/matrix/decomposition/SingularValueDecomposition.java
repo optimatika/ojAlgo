@@ -109,13 +109,18 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             //  N tmpZero = this.getStaticZero();
 
             double tmpSingularValue;
+            int rank = this.getRank();
             for (int i = 0; i < tmpRowDim; i++) {
                 if (tmpD.isZero(i, i)) {
                     //tmpMtrx.fillRow(i, 0, tmpZero);
                 } else {
                     tmpSingularValue = tmpD.doubleValue(i, i);
                     for (int j = 0; j < tmpColDim; j++) {
-                        tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpSingularValue).getNumber());
+                        if (i < rank) {
+                            tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpSingularValue).getNumber());
+                        } else {
+                            tmpMtrx.set(i, j, 0);
+                        }
                     }
                 }
             }
@@ -141,13 +146,18 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             final N tmpZero = this.scalar().zero().getNumber();
 
             N tmpSingularValue;
+            int rank = this.getRank();
             for (int i = 0; i < tmpRowDim; i++) {
                 if (tmpD.isZero(i, i)) {
                     tmpMtrx.fillRow(i, 0, tmpZero);
                 } else {
                     tmpSingularValue = tmpD.get(i, i);
                     for (int j = 0; j < tmpColDim; j++) {
-                        tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).divide(tmpSingularValue).getNumber());
+                        if (i < rank) {
+                            tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).divide(tmpSingularValue).getNumber());
+                        } else {
+                            tmpMtrx.set(i, j, 0);
+                        }
                     }
                 }
             }
