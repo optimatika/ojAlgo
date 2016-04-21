@@ -28,7 +28,9 @@ import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -184,12 +186,14 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         @SuppressWarnings("unchecked")
         final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
-                Eigenvalue.COMPLEX.make(Eigenvalue.TYPICAL, true)/*
-                                         * , HessenbergDecomposition. makeComplex()
-                                         */, LU.COMPLEX.make(), QR.COMPLEX.make(),
+                Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
+                        true)/*
+                              * , HessenbergDecomposition. makeComplex()
+                              */,
+                LU.COMPLEX.make(), QR.COMPLEX.make(),
                 SingularValue.COMPLEX.make() /*
-                                             * , TridiagonalDecomposition . makeComplex ( )
-                                             */ };
+                                              * , TridiagonalDecomposition . makeComplex ( )
+                                              */ };
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.decompose(tmpHermitian);
@@ -223,8 +227,8 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         @SuppressWarnings("unchecked")
         final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] {
                 Bidiagonal.COMPLEX.make()/*
-                                         * , LUDecomposition . makeComplex ( )
-                                         */, QR.COMPLEX.make(), SingularValue.COMPLEX.make() };
+                                          * , LUDecomposition . makeComplex ( )
+                                          */, QR.COMPLEX.make(), SingularValue.COMPLEX.make() };
 
         for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
             tmpDecomposition.decompose(tmpTall);
@@ -242,6 +246,27 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 TestUtils.assertEquals(tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
             }
         }
+    }
+
+    /**
+     * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
+     */
+    public void testP20160419() {
+
+        final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
+
+        final SingularValue<Double> tmpRaw = new RawSingularValue();
+
+        try {
+
+            final MatrixStore<Double> tmpInv = tmpRaw.invert(tmpOrg);
+
+            TestUtils.assertEquals(tmpOrg, tmpOrg.multiply(tmpInv).multiply(tmpOrg), NumberContext.getGeneral(6, 6));
+
+        } catch (final TaskException exception) {
+            exception.printStackTrace();
+        }
+
     }
 
 }

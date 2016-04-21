@@ -76,6 +76,9 @@ public class CalendarDateSeries<V extends Number> extends AbstractSeries<Calenda
         myResolution = aResolution;
     }
 
+    /**
+     * Will fill in missing values, inbetween the first and last keys.
+     */
     public void complete() {
 
         CalendarDate tmpKey = this.firstKey();

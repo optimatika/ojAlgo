@@ -36,6 +36,11 @@ import org.ojalgo.netio.ASCII;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 
+/**
+ * A {@link CoordinationSet} is used to coordinate a set of {@link CalendarDateSeries} instances.
+ *
+ * @author apete
+ */
 public class CoordinationSet<V extends Number> extends HashMap<String, CalendarDateSeries<V>> {
 
     private CalendarDateUnit myResolution = null;
@@ -44,11 +49,11 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         super();
     }
 
-    public CoordinationSet(final CalendarDateUnit aResolution) {
+    public CoordinationSet(final CalendarDateUnit resolution) {
 
         super();
 
-        myResolution = aResolution;
+        myResolution = resolution;
     }
 
     public CoordinationSet(final Collection<CalendarDateSeries<V>> aTimeSeriesCollection) {
@@ -60,11 +65,11 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         }
     }
 
-    public CoordinationSet(final Collection<CalendarDateSeries<V>> aTimeSeriesCollection, final CalendarDateUnit aResolution) {
+    public CoordinationSet(final Collection<CalendarDateSeries<V>> aTimeSeriesCollection, final CalendarDateUnit resolution) {
 
         super(aTimeSeriesCollection.size());
 
-        myResolution = aResolution;
+        myResolution = resolution;
 
         for (final CalendarDateSeries<V> tmpTimeSeries : aTimeSeriesCollection) {
             this.put(tmpTimeSeries);
@@ -83,6 +88,9 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         super(someM);
     }
 
+    /**
+     * Will call {@link CalendarDateSeries#complete()} on each of the instances in this set.
+     */
     public void complete() {
         for (final CalendarDateSeries<V> tmpSeries : this.values()) {
             tmpSeries.complete();
@@ -230,6 +238,9 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         }
     }
 
+    /**
+     * @return A new CoordinationSet<V> where all series have the same first and last keys.
+     */
     public CoordinationSet<V> prune() {
 
         final CoordinationSet<V> retVal = new CoordinationSet<V>(this.getResolution());
@@ -264,15 +275,18 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         return retVal;
     }
 
-    public CoordinationSet<V> prune(final CalendarDateUnit aResolution) {
+    /**
+     * Will prune and resample the data
+     */
+    public CoordinationSet<V> prune(final CalendarDateUnit resolution) {
 
-        final CoordinationSet<V> retVal = new CoordinationSet<V>(aResolution);
+        final CoordinationSet<V> retVal = new CoordinationSet<V>(resolution);
 
         final CalendarDate tmpLatestFirstKey = this.getLatestFirstKey();
         final CalendarDate tmpEarliestLastKey = this.getEarliestLastKey();
 
         for (final CalendarDateSeries<V> tmpSeries : this.values()) {
-            retVal.put(tmpSeries.resample(tmpLatestFirstKey, tmpEarliestLastKey, aResolution));
+            retVal.put(tmpSeries.resample(tmpLatestFirstKey, tmpEarliestLastKey, resolution));
         }
 
         return retVal;
@@ -282,12 +296,16 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         return this.put(aSeries.getName(), aSeries);
     }
 
-    public CoordinationSet<V> resample(final CalendarDateUnit aResolution) {
+    /**
+     * @param resolution The new resolution
+     * @return A new set of series each resampled to the supplied resolution
+     */
+    public CoordinationSet<V> resample(final CalendarDateUnit resolution) {
 
-        final CoordinationSet<V> retVal = new CoordinationSet<V>(aResolution);
+        final CoordinationSet<V> retVal = new CoordinationSet<V>(resolution);
 
         for (final CalendarDateSeries<V> tmpSeries : this.values()) {
-            retVal.put(tmpSeries.resample(aResolution));
+            retVal.put(tmpSeries.resample(resolution));
         }
 
         return retVal;

@@ -27,11 +27,11 @@ final class AccessSeries extends PrimitiveSeries {
 
     private final Access1D<?> myValues;
 
-    AccessSeries(final Access1D<?> aValues) {
+    AccessSeries(final Access1D<?> values) {
 
         super();
 
-        myValues = aValues;
+        myValues = values;
     }
 
     @Override

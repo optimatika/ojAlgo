@@ -32,7 +32,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.matrix.store.operation.SubtractScaledVector;
-import org.ojalgo.type.TypeUtils;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -283,7 +283,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
 
             for (int i = 0; i < tmpSingular.length; i++) {
-                if (TypeUtils.isZero(tmpSingular[i])) {
+                // if (TypeUtils.isZero(tmpSingular[i])) {
+                if (PrimitiveScalar.isSmall(tmpSingular[0], tmpSingular[i])) {
+
                     for (int j = 0; j < tmpQ1.length; j++) {
                         tmpMtrx.set(i, j, ZERO);
                     }

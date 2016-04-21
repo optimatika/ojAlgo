@@ -21,9 +21,16 @@
  */
 package org.ojalgo.type;
 
+import java.io.Serializable;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
+import java.util.Collections;
+import java.util.List;
+
 import org.ojalgo.constant.PrimitiveMath;
 
-public final class CalendarDateDuration extends Number implements Comparable<CalendarDateDuration> {
+public final class CalendarDateDuration extends Number implements Comparable<CalendarDateDuration>, TemporalAmount, Serializable {
 
     public final double measure;
     public final CalendarDateUnit unit;
@@ -40,14 +47,18 @@ public final class CalendarDateDuration extends Number implements Comparable<Cal
         this(PrimitiveMath.ONE, CalendarDateUnit.MILLIS);
     }
 
+    public Temporal addTo(final Temporal temporal) {
+        return temporal.plus((long) (measure * unit.size() * 1_000_000L), CalendarDateUnit.NANOS);
+    }
+
     public int compareTo(final CalendarDateDuration aReference) {
         final long tmpVal = this.toDurationInMillis();
         final long refVal = aReference.toDurationInMillis();
         return (tmpVal < refVal ? -1 : (tmpVal == refVal ? 0 : 1));
     }
 
-    public CalendarDateDuration convertTo(final CalendarDateUnit aDestinationUnit) {
-        return new CalendarDateDuration(aDestinationUnit.convert(measure, unit), aDestinationUnit);
+    public CalendarDateDuration convertTo(final CalendarDateUnit destinationUnit) {
+        return new CalendarDateDuration(destinationUnit.convert(measure, unit), destinationUnit);
     }
 
     @Override
@@ -81,6 +92,18 @@ public final class CalendarDateDuration extends Number implements Comparable<Cal
         return (float) measure;
     }
 
+    public long get(final TemporalUnit unit) {
+        if (unit == this.unit) {
+            return (long) measure;
+        } else {
+            return 0L;
+        }
+    }
+
+    public List<TemporalUnit> getUnits() {
+        return Collections.singletonList(unit);
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -100,6 +123,10 @@ public final class CalendarDateDuration extends Number implements Comparable<Cal
     @Override
     public long longValue() {
         return (long) measure;
+    }
+
+    public Temporal subtractFrom(final Temporal temporal) {
+        return temporal.minus((long) measure, unit);
     }
 
     public long toDurationInMillis() {

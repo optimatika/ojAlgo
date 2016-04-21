@@ -142,20 +142,20 @@ public final class CalendarDate implements Comparable<CalendarDate> {
         return retVal;
     }
 
-    public Calendar getCalendar(final Locale aLocale) {
-        final GregorianCalendar retVal = new GregorianCalendar(aLocale);
+    public Calendar getCalendar(final Locale locale) {
+        final GregorianCalendar retVal = new GregorianCalendar(locale);
         retVal.setTimeInMillis(millis);
         return retVal;
     }
 
-    public Calendar getCalendar(final TimeZone aTimeZone) {
-        final GregorianCalendar retVal = new GregorianCalendar(aTimeZone);
+    public Calendar getCalendar(final TimeZone zone) {
+        final GregorianCalendar retVal = new GregorianCalendar(zone);
         retVal.setTimeInMillis(millis);
         return retVal;
     }
 
-    public Calendar getCalendar(final TimeZone aTimeZone, final Locale aLocale) {
-        final GregorianCalendar retVal = new GregorianCalendar(aTimeZone, aLocale);
+    public Calendar getCalendar(final TimeZone zone, final Locale locale) {
+        final GregorianCalendar retVal = new GregorianCalendar(zone, locale);
         retVal.setTimeInMillis(millis);
         return retVal;
     }

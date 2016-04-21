@@ -23,33 +23,33 @@ package org.ojalgo.series.primitive;
 
 final class PrunedSeries extends PrimitiveSeries {
 
-    private final PrimitiveSeries mySeries;
+    private final PrimitiveSeries myBase;
     private final int myShift;
 
-    PrunedSeries(final PrimitiveSeries aSeries) {
+    PrunedSeries(final PrimitiveSeries base) {
 
         super();
 
-        mySeries = aSeries;
+        myBase = base;
         myShift = 0;
     }
 
-    PrunedSeries(final PrimitiveSeries aSeries, final int aShift) {
+    PrunedSeries(final PrimitiveSeries base, final int shift) {
 
         super();
 
-        mySeries = aSeries;
-        myShift = aShift;
+        myBase = base;
+        myShift = shift;
     }
 
     @Override
     public final int size() {
-        return mySeries.size() - Math.abs(myShift);
+        return myBase.size() - Math.abs(myShift);
     }
 
     @Override
     public final double value(final int index) {
-        return mySeries.value(index - Math.min(myShift, 0));
+        return myBase.value(index - Math.min(myShift, 0));
     }
 
 }

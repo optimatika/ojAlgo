@@ -57,8 +57,8 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         super(someM);
     }
 
-    public I colour(final ColourData aPaint) {
-        myColour = aPaint;
+    public I colour(final ColourData colour) {
+        myColour = colour;
         return (I) this;
     }
 
@@ -95,60 +95,60 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         return this.get(this.lastKey());
     }
 
-    public void modify(final BasicSeries<K, V> aLeftArg, final BinaryFunction<V> aFunc) {
+    public void modify(final BasicSeries<K, V> left, final BinaryFunction<V> func) {
         K tmpKey;
         V tmpLeftArg;
         for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
             tmpKey = tmpEntry.getKey();
-            tmpLeftArg = aLeftArg.get(tmpKey);
+            tmpLeftArg = left.get(tmpKey);
             if (tmpLeftArg != null) {
-                this.put(tmpKey, aFunc.invoke(tmpLeftArg, tmpEntry.getValue()));
+                this.put(tmpKey, func.invoke(tmpLeftArg, tmpEntry.getValue()));
             } else {
                 this.remove(tmpKey);
             }
         }
     }
 
-    public void modify(final BinaryFunction<V> aFunc, final BasicSeries<K, V> aRightArg) {
+    public void modify(final BinaryFunction<V> func, final BasicSeries<K, V> right) {
         K tmpKey;
         V tmpRightArg;
         for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
             tmpKey = tmpEntry.getKey();
-            tmpRightArg = aRightArg.get(tmpKey);
+            tmpRightArg = right.get(tmpKey);
             if (tmpRightArg != null) {
-                this.put(tmpKey, aFunc.invoke(tmpEntry.getValue(), tmpRightArg));
+                this.put(tmpKey, func.invoke(tmpEntry.getValue(), tmpRightArg));
             } else {
                 this.remove(tmpKey);
             }
         }
     }
 
-    public void modify(final BinaryFunction<V> aFunc, final V aRightArg) {
+    public void modify(final BinaryFunction<V> func, final V right) {
         for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), aFunc.invoke(tmpEntry.getValue(), aRightArg));
+            this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue(), right));
         }
     }
 
-    public void modify(final ParameterFunction<V> aFunc, final int aParam) {
+    public void modify(final ParameterFunction<V> func, final int param) {
         for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), aFunc.invoke(tmpEntry.getValue(), aParam));
+            this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue(), param));
         }
     }
 
-    public void modify(final UnaryFunction<V> aFunc) {
+    public void modify(final UnaryFunction<V> func) {
         for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), aFunc.invoke(tmpEntry.getValue()));
+            this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue()));
         }
     }
 
-    public void modify(final V aLeftArg, final BinaryFunction<V> aFunc) {
+    public void modify(final V left, final BinaryFunction<V> func) {
         for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), aFunc.invoke(aLeftArg, tmpEntry.getValue()));
+            this.put(tmpEntry.getKey(), func.invoke(left, tmpEntry.getValue()));
         }
     }
 
-    public I name(final String aName) {
-        myName = aName;
+    public I name(final String name) {
+        myName = name;
         return (I) this;
     }
 

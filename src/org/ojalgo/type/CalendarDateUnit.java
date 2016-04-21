@@ -21,77 +21,108 @@
  */
 package org.ojalgo.type;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.ojalgo.constant.PrimitiveMath;
 
-public enum CalendarDateUnit {
+public enum CalendarDateUnit implements TemporalUnit {
 
     /**
-     * 
+     *
      */
-    MILLIS(TimeUnit.MILLISECONDS),
+    NANOS(ChronoUnit.NANOS, TimeUnit.NANOSECONDS),
     /**
-     * 
+     *
      */
-    SECOND(TimeUnit.SECONDS),
+    MICROS(ChronoUnit.MICROS, TimeUnit.MICROSECONDS),
     /**
-     * 
+     *
      */
-    MINUTE(TypeUtils.MILLIS_PER_HOUR / 60L),
+    MILLIS(ChronoUnit.MILLIS, TimeUnit.MILLISECONDS),
     /**
-     * 
+     *
      */
-    HOUR(TypeUtils.MILLIS_PER_HOUR),
+    SECOND(ChronoUnit.SECONDS, TimeUnit.SECONDS),
     /**
-     * 
+     *
      */
-    DAY(24L * TypeUtils.MILLIS_PER_HOUR),
+    MINUTE(ChronoUnit.MINUTES, TimeUnit.MINUTES),
     /**
-     * 
+     *
      */
-    WEEK(7L * 24L * TypeUtils.MILLIS_PER_HOUR),
+    HOUR(ChronoUnit.HOURS, TimeUnit.HOURS),
     /**
-     * 
+     *
      */
-    MONTH((TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 1200L),
+    DAY(ChronoUnit.DAYS, 24L * TypeUtils.MILLIS_PER_HOUR),
     /**
-     * 
+     *
      */
-    QUARTER((TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 400L),
+    WEEK(ChronoUnit.WEEKS, 7L * 24L * TypeUtils.MILLIS_PER_HOUR),
     /**
-     * 
+     *
      */
-    YEAR((TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 100L),
+    MONTH(ChronoUnit.MONTHS, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 1200L),
     /**
-     * 
+     *
      */
-    DECADE((TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 10L),
+    QUARTER(null, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 400L),
     /**
-     * 
+     *
      */
-    CENTURY(TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR),
+    YEAR(ChronoUnit.YEARS, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 100L),
     /**
-     * 
+     *
      */
-    MILLENIUM(10L * TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR);
+    DECADE(ChronoUnit.DECADES, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 10L),
+    /**
+     *
+     */
+    CENTURY(ChronoUnit.CENTURIES, TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR),
+    /**
+     *
+     */
+    MILLENIUM(ChronoUnit.MILLENNIA, 10L * TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR);
 
-    private final TimeUnit myTimeUnit;
-    private final long mySize;
     private final long myHalf;
+    private final long mySize;
+    private final TemporalUnit myTemporalUnit;
+    private final TimeUnit myTimeUnit;
 
-    CalendarDateUnit(final long aMillis) {
+    CalendarDateUnit(final TemporalUnit temporalUnit, final long millis) {
+        myTemporalUnit = temporalUnit;
         myTimeUnit = null;
-        mySize = aMillis;
+        mySize = millis;
         myHalf = mySize / 2L;
     }
 
-    CalendarDateUnit(final TimeUnit aTimeUnit) {
-        myTimeUnit = aTimeUnit;
+    CalendarDateUnit(final TemporalUnit temporalUnit, final TimeUnit concurrencyUnit) {
+        myTemporalUnit = temporalUnit;
+        myTimeUnit = concurrencyUnit;
         mySize = myTimeUnit.toMillis(1L);
         myHalf = mySize / 2L;
+    }
+
+    public <R extends Temporal> R addTo(final R temporal, final long amount) {
+        if (myTemporalUnit != null) {
+            return myTemporalUnit.addTo(temporal, amount);
+        } else { // QUARTER
+            return ChronoUnit.MONTHS.addTo(temporal, 3L * amount);
+        }
+    }
+
+    public long between(final Temporal temporal1Inclusive, final Temporal temporal2Exclusive) {
+        if (myTemporalUnit != null) {
+            return myTemporalUnit.between(temporal1Inclusive, temporal2Exclusive);
+        } else { // QUARTER
+            return ChronoUnit.MONTHS.between(temporal1Inclusive, temporal2Exclusive) / 3L;
+        }
     }
 
     public CalendarDateDuration convert(final CalendarDateDuration aSourceDuration) {
@@ -145,6 +176,14 @@ public enum CalendarDateUnit {
         return ((myHalf + this.toTimeInMillis(aToValue)) - this.toTimeInMillis(aFromValue)) / mySize;
     }
 
+    public Duration getDuration() {
+        if (myTemporalUnit != null) {
+            return myTemporalUnit.getDuration();
+        } else { // QUARTER
+            return ChronoUnit.MONTHS.getDuration().multipliedBy(3L);
+        }
+    }
+
     /**
      * Note that this method may, and actually does, return null in many cases.
      */
@@ -154,6 +193,30 @@ public enum CalendarDateUnit {
 
     public boolean isCalendarUnit() {
         return DAY.size() <= this.size();
+    }
+
+    public boolean isDateBased() {
+        if (myTemporalUnit != null) {
+            return myTemporalUnit.isDateBased();
+        } else { // QUARTER
+            return ChronoUnit.MONTHS.isDateBased();
+        }
+    }
+
+    public boolean isDurationEstimated() {
+        if (myTemporalUnit != null) {
+            return myTemporalUnit.isDurationEstimated();
+        } else { // QUARTER
+            return ChronoUnit.MONTHS.isDurationEstimated();
+        }
+    }
+
+    public boolean isTimeBased() {
+        if (myTemporalUnit != null) {
+            return myTemporalUnit.isTimeBased();
+        } else { // QUARTER
+            return ChronoUnit.MONTHS.isTimeBased();
+        }
     }
 
     public void round(final Calendar aCalendar) {

@@ -39,14 +39,14 @@ import org.ojalgo.type.context.NumberContext;
 
 public class SingularValueTest extends MatrixDecompositionTests {
 
-    private static final SingularValue<BigDecimal> BIG = SingularValue.BIG.make();
-    private static final SingularValue<ComplexNumber> COMPLEX = SingularValue.COMPLEX.make();
-    private static final SingularValue<Double> DIRECT = SingularValue.PRIMITIVE.make();
-    private static final BasicMatrix FAT = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
+    private static final SingularValue<BigDecimal> IMPL_BIG = SingularValue.BIG.make();
+    private static final SingularValue<ComplexNumber> IMPL_COMPLEX = SingularValue.COMPLEX.make();
+    private static final SingularValue<Double> IMPL_PRIMITIVE = new SVDnew32.Primitive();
+    private static final SingularValue<Double> IMPL_RAW = new RawSingularValue();
 
-    private static final SingularValue<Double> JAMA = new RawSingularValue();
-    private static final BasicMatrix SQUARE = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
-    private static final BasicMatrix TALL = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 7));
+    private static final BasicMatrix MTRX_FAT = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
+    private static final BasicMatrix MTRX_SQUARE = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(8, 8));
+    private static final BasicMatrix MTRX_TALL = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(9, 7));
 
     static final NumberContext CNTXT_CPLX_DECOMP = new NumberContext(7, 5);
     static final NumberContext CNTXT_CPLX_VALUES = new NumberContext(7, 7);
@@ -195,34 +195,34 @@ public class SingularValueTest extends MatrixDecompositionTests {
     }
 
     public void testRandomFatCase() {
-        this.doTestTypes(FAT);
+        this.doTestTypes(MTRX_FAT);
     }
 
     public void testRandomSquareCase() {
-        this.doTestTypes(SQUARE);
+        this.doTestTypes(MTRX_SQUARE);
     }
 
     public void testRandomTallCase() {
-        this.doTestTypes(TALL);
+        this.doTestTypes(MTRX_TALL);
     }
 
     public void testRecreationFat() {
 
-        final PhysicalStore<Double> tmpOriginal = FAT.toPrimitiveStore();
+        final PhysicalStore<Double> tmpOriginal = MTRX_FAT.toPrimitiveStore();
 
         this.testRecreation(tmpOriginal);
     }
 
     public void testRecreationSquare() {
 
-        final PhysicalStore<Double> tmpOriginal = SQUARE.toPrimitiveStore();
+        final PhysicalStore<Double> tmpOriginal = MTRX_SQUARE.toPrimitiveStore();
 
         this.testRecreation(tmpOriginal);
     }
 
     public void testRecreationTall() {
 
-        final PhysicalStore<Double> tmpOriginal = TALL.toPrimitiveStore();
+        final PhysicalStore<Double> tmpOriginal = MTRX_TALL.toPrimitiveStore();
 
         this.testRecreation(tmpOriginal);
     }
@@ -233,15 +233,15 @@ public class SingularValueTest extends MatrixDecompositionTests {
         final PhysicalStore<ComplexNumber> tmpComplexStore = original.toComplexStore();
         final PhysicalStore<Double> tmpPrimitiveStore = original.toPrimitiveStore();
 
-        BIG.decompose(original.toBigStore());
-        COMPLEX.decompose(original.toComplexStore());
-        JAMA.decompose(original.toPrimitiveStore());
-        DIRECT.decompose(original.toPrimitiveStore());
+        IMPL_BIG.decompose(original.toBigStore());
+        IMPL_COMPLEX.decompose(original.toComplexStore());
+        IMPL_RAW.decompose(original.toPrimitiveStore());
+        IMPL_PRIMITIVE.decompose(original.toPrimitiveStore());
 
-        final Array1D<Double> tmpBigSingularValues = BIG.getSingularValues();
-        final Array1D<Double> tmpComplexSingularValues = COMPLEX.getSingularValues();
-        final Array1D<Double> tmpJamaSingularValues = JAMA.getSingularValues();
-        final Array1D<Double> tmpDirectSingularValues = DIRECT.getSingularValues();
+        final Array1D<Double> tmpBigSingularValues = IMPL_BIG.getSingularValues();
+        final Array1D<Double> tmpComplexSingularValues = IMPL_COMPLEX.getSingularValues();
+        final Array1D<Double> tmpJamaSingularValues = IMPL_RAW.getSingularValues();
+        final Array1D<Double> tmpDirectSingularValues = IMPL_PRIMITIVE.getSingularValues();
 
         UnaryFunction<Double> tmpPrimitiveRoundFunction = CNTXT_REAL_VALUES.getPrimitiveFunction();
         //        tmpBigSingularValues.modifyAll(tmpPrimitiveRoundFunction);
@@ -259,54 +259,54 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   rank: {}.", BIG.getRank());
-            BasicLogger.debug("Cmplx rank: {}.", COMPLEX.getRank());
-            BasicLogger.debug("Jama  rank: {}.", JAMA.getRank());
-            BasicLogger.debug("Direc rank: {}.", DIRECT.getRank());
+            BasicLogger.debug("Big   rank: {}.", IMPL_BIG.getRank());
+            BasicLogger.debug("Cmplx rank: {}.", IMPL_COMPLEX.getRank());
+            BasicLogger.debug("Jama  rank: {}.", IMPL_RAW.getRank());
+            BasicLogger.debug("Direc rank: {}.", IMPL_PRIMITIVE.getRank());
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   D", BIG.getD());
-            BasicLogger.debug("Cmplx D", COMPLEX.getD());
-            BasicLogger.debug("Jama  D", JAMA.getD());
-            BasicLogger.debug("Direc D", DIRECT.getD());
-
-        }
-
-        if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug();
-            BasicLogger.debug("Big   Q1", BIG.getQ1());
-            BasicLogger.debug("Cmplx Q1", COMPLEX.getQ1());
-            BasicLogger.debug("Jama  Q1", JAMA.getQ1());
-            BasicLogger.debug("Direc Q1", DIRECT.getQ1());
+            BasicLogger.debug("Big   D", IMPL_BIG.getD());
+            BasicLogger.debug("Cmplx D", IMPL_COMPLEX.getD());
+            BasicLogger.debug("Jama  D", IMPL_RAW.getD());
+            BasicLogger.debug("Direc D", IMPL_PRIMITIVE.getD());
 
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q1 unitary", BIG.getQ1().logical().conjugate().get().multiply(BIG.getQ1()));
-            BasicLogger.debug("Cmplx Q1 unitary", COMPLEX.getQ1().logical().conjugate().get().multiply(COMPLEX.getQ1()));
-            BasicLogger.debug("Jama  Q1 unitary", JAMA.getQ1().logical().conjugate().get().multiply(JAMA.getQ1()));
-            BasicLogger.debug("Direc Q1 unitary", DIRECT.getQ1().logical().conjugate().get().multiply(DIRECT.getQ1()));
+            BasicLogger.debug("Big   Q1", IMPL_BIG.getQ1());
+            BasicLogger.debug("Cmplx Q1", IMPL_COMPLEX.getQ1());
+            BasicLogger.debug("Jama  Q1", IMPL_RAW.getQ1());
+            BasicLogger.debug("Direc Q1", IMPL_PRIMITIVE.getQ1());
 
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q2", BIG.getQ2());
-            BasicLogger.debug("Cmplx Q2", COMPLEX.getQ2());
-            BasicLogger.debug("Jama  Q2", JAMA.getQ2());
-            BasicLogger.debug("Direc Q2", DIRECT.getQ2());
+            BasicLogger.debug("Big   Q1 unitary", IMPL_BIG.getQ1().logical().conjugate().get().multiply(IMPL_BIG.getQ1()));
+            BasicLogger.debug("Cmplx Q1 unitary", IMPL_COMPLEX.getQ1().logical().conjugate().get().multiply(IMPL_COMPLEX.getQ1()));
+            BasicLogger.debug("Jama  Q1 unitary", IMPL_RAW.getQ1().logical().conjugate().get().multiply(IMPL_RAW.getQ1()));
+            BasicLogger.debug("Direc Q1 unitary", IMPL_PRIMITIVE.getQ1().logical().conjugate().get().multiply(IMPL_PRIMITIVE.getQ1()));
 
         }
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Q2 unitary", BIG.getQ2().multiply(BIG.getQ2().logical().conjugate().get()));
-            BasicLogger.debug("Cmplx Q2 unitary", COMPLEX.getQ2().multiply(COMPLEX.getQ2().logical().conjugate().get()));
-            BasicLogger.debug("Jama  Q2 unitary", JAMA.getQ2().multiply(JAMA.getQ2().logical().conjugate().get()));
-            BasicLogger.debug("Direc Q2 unitary", DIRECT.getQ2().multiply(DIRECT.getQ2().logical().conjugate().get()));
+            BasicLogger.debug("Big   Q2", IMPL_BIG.getQ2());
+            BasicLogger.debug("Cmplx Q2", IMPL_COMPLEX.getQ2());
+            BasicLogger.debug("Jama  Q2", IMPL_RAW.getQ2());
+            BasicLogger.debug("Direc Q2", IMPL_PRIMITIVE.getQ2());
+
+        }
+
+        if (MatrixDecompositionTests.DEBUG) {
+            BasicLogger.debug();
+            BasicLogger.debug("Big   Q2 unitary", IMPL_BIG.getQ2().multiply(IMPL_BIG.getQ2().logical().conjugate().get()));
+            BasicLogger.debug("Cmplx Q2 unitary", IMPL_COMPLEX.getQ2().multiply(IMPL_COMPLEX.getQ2().logical().conjugate().get()));
+            BasicLogger.debug("Jama  Q2 unitary", IMPL_RAW.getQ2().multiply(IMPL_RAW.getQ2().logical().conjugate().get()));
+            BasicLogger.debug("Direc Q2 unitary", IMPL_PRIMITIVE.getQ2().multiply(IMPL_PRIMITIVE.getQ2().logical().conjugate().get()));
 
         }
 
@@ -323,17 +323,17 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug();
-            BasicLogger.debug("Big   Recreated", BIG.reconstruct());
-            BasicLogger.debug("Cmplx Recreated", COMPLEX.reconstruct());
-            BasicLogger.debug("Jama  Recreated", JAMA.reconstruct());
-            BasicLogger.debug("Direc Recreated", DIRECT.reconstruct());
+            BasicLogger.debug("Big   Recreated", IMPL_BIG.reconstruct());
+            BasicLogger.debug("Cmplx Recreated", IMPL_COMPLEX.reconstruct());
+            BasicLogger.debug("Jama  Recreated", IMPL_RAW.reconstruct());
+            BasicLogger.debug("Direc Recreated", IMPL_PRIMITIVE.reconstruct());
 
         }
 
-        TestUtils.assertEquals(tmpBigStore, BIG, CNTXT_REAL_DECOMP);
-        // JUnitUtils.assertEquals(tmpComplexStore, COMPLEX, CNTXT_CPLX_DECOMP); // Fails too often...
-        TestUtils.assertEquals(tmpPrimitiveStore, JAMA, CNTXT_REAL_DECOMP);
-        TestUtils.assertEquals(tmpPrimitiveStore, DIRECT, CNTXT_REAL_DECOMP);
+        TestUtils.assertEquals(tmpBigStore, IMPL_BIG, CNTXT_REAL_DECOMP);
+        TestUtils.assertEquals(tmpComplexStore, IMPL_COMPLEX, CNTXT_CPLX_DECOMP); // Fails too often...
+        TestUtils.assertEquals(tmpPrimitiveStore, IMPL_RAW, CNTXT_REAL_DECOMP);
+        TestUtils.assertEquals(tmpPrimitiveStore, IMPL_PRIMITIVE, CNTXT_REAL_DECOMP);
 
     }
 

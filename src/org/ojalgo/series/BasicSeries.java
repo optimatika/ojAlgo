@@ -43,7 +43,7 @@ import org.ojalgo.type.keyvalue.KeyValue;
  */
 public interface BasicSeries<K extends Comparable<K>, V extends Number> extends SortedMap<K, V> {
 
-    BasicSeries<K, V> colour(ColourData aPaint);
+    BasicSeries<K, V> colour(ColourData colour);
 
     V firstValue();
 
@@ -57,19 +57,19 @@ public interface BasicSeries<K extends Comparable<K>, V extends Number> extends 
 
     V lastValue();
 
-    void modify(BasicSeries<K, V> aLeftArg, BinaryFunction<V> aFunc);
+    void modify(BasicSeries<K, V> left, BinaryFunction<V> func);
 
-    void modify(BinaryFunction<V> aFunc, BasicSeries<K, V> aRightArg);
+    void modify(BinaryFunction<V> func, BasicSeries<K, V> right);
 
-    void modify(BinaryFunction<V> aFunc, V aRightArg);
+    void modify(BinaryFunction<V> func, V right);
 
-    void modify(ParameterFunction<V> aFunc, int aParam);
+    void modify(ParameterFunction<V> func, int param);
 
-    void modify(UnaryFunction<V> aFunc);
+    void modify(UnaryFunction<V> func);
 
-    void modify(V aLeftArg, BinaryFunction<V> aFunc);
+    void modify(V left, BinaryFunction<V> func);
 
-    BasicSeries<K, V> name(String aName);
+    BasicSeries<K, V> name(String name);
 
     void putAll(Collection<? extends KeyValue<? extends K, ? extends V>> data);
 
