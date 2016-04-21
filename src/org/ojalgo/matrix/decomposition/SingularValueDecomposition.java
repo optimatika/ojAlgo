@@ -103,25 +103,14 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
             final int tmpRowDim = (int) tmpD.countRows();
             final int tmpColDim = (int) tmpQ1.countRows();
-
             final PhysicalStore<N> tmpMtrx = this.makeZero(tmpRowDim, tmpColDim);
 
-            //  N tmpZero = this.getStaticZero();
-
             double tmpSingularValue;
-            int rank = this.getRank();
-            for (int i = 0; i < tmpRowDim; i++) {
-                if (tmpD.isZero(i, i)) {
-                    //tmpMtrx.fillRow(i, 0, tmpZero);
-                } else {
-                    tmpSingularValue = tmpD.doubleValue(i, i);
-                    for (int j = 0; j < tmpColDim; j++) {
-                        if (i < rank) {
-                            tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpSingularValue).getNumber());
-                        } else {
-                            tmpMtrx.set(i, j, 0);
-                        }
-                    }
+            final int rank = this.getRank();
+            for (int i = 0; i < rank; i++) {
+                tmpSingularValue = tmpD.doubleValue(i, i);
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpSingularValue).getNumber());
                 }
             }
 
@@ -135,30 +124,20 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         if (myInverse == null) {
 
+            preallocated.fillAll(this.scalar().zero().getNumber());
+            final PhysicalStore<N> tmpMtrx = preallocated;
+
             final MatrixStore<N> tmpQ1 = this.getQ1();
             final MatrixStore<N> tmpD = this.getD();
 
-            final int tmpRowDim = (int) tmpD.countRows();
             final int tmpColDim = (int) tmpQ1.countRows();
 
-            final PhysicalStore<N> tmpMtrx = preallocated;
-
-            final N tmpZero = this.scalar().zero().getNumber();
-
-            N tmpSingularValue;
-            int rank = this.getRank();
-            for (int i = 0; i < tmpRowDim; i++) {
-                if (tmpD.isZero(i, i)) {
-                    tmpMtrx.fillRow(i, 0, tmpZero);
-                } else {
-                    tmpSingularValue = tmpD.get(i, i);
-                    for (int j = 0; j < tmpColDim; j++) {
-                        if (i < rank) {
-                            tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).divide(tmpSingularValue).getNumber());
-                        } else {
-                            tmpMtrx.set(i, j, 0);
-                        }
-                    }
+            double tmpSingularValue;
+            final int rank = this.getRank();
+            for (int i = 0; i < rank; i++) {
+                tmpSingularValue = tmpD.doubleValue(i, i);
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpSingularValue).getNumber());
                 }
             }
 

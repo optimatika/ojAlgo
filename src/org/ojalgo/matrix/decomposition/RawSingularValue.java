@@ -282,10 +282,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
             final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
 
-            for (int i = 0; i < tmpSingular.length; i++) {
-                // if (TypeUtils.isZero(tmpSingular[i])) {
-                if (PrimitiveScalar.isSmall(tmpSingular[0], tmpSingular[i])) {
+            final double tmpEps = tmpSingular[0] * tmpSingular.length;
 
+            for (int i = 0; i < tmpSingular.length; i++) {
+                if (PrimitiveScalar.isSmall(tmpEps, tmpSingular[i])) {
                     for (int j = 0; j < tmpQ1.length; j++) {
                         tmpMtrx.set(i, j, ZERO);
                     }
@@ -296,10 +296,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 }
             }
 
-            // myPseudoinverse = new RawStore(this.getQ2().multiply(tmpMtrx));
-
-            final RawStore tmpQ2 = this.getQ2();
-            preallocated.fillByMultiplying(tmpQ2, tmpMtrx);
+            preallocated.fillByMultiplying(this.getQ2(), tmpMtrx);
             myPseudoinverse = preallocated;
         }
 

@@ -251,7 +251,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
      */
-    public void testP20160419() {
+    public void _testP20160419() {
 
         final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
 
