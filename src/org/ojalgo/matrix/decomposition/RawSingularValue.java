@@ -281,17 +281,16 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             final double[] tmpSingular = myS;
 
             final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
+            final double[][] tmpMtrxData = tmpMtrx.data;
 
             final double tmpEps = tmpSingular[0] * tmpSingular.length;
 
             for (int i = 0; i < tmpSingular.length; i++) {
-                if (PrimitiveScalar.isSmall(tmpEps, tmpSingular[i])) {
+                final double tmpVal = tmpSingular[i];
+                if (!PrimitiveScalar.isSmall(tmpEps, tmpVal)) {
+                    final double[] tmpRow = tmpMtrxData[i];
                     for (int j = 0; j < tmpQ1.length; j++) {
-                        tmpMtrx.set(i, j, ZERO);
-                    }
-                } else {
-                    for (int j = 0; j < tmpQ1.length; j++) {
-                        tmpMtrx.set(i, j, tmpQ1[j][i] / tmpSingular[i]);
+                        tmpRow[j] = tmpQ1[j][i] / tmpVal;
                     }
                 }
             }
