@@ -124,6 +124,9 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
      * <p>
      * Should produce the same results as calling {@link #invert(Access2D)}.
      * </p>
+     * <p>
+     * Use {@link #preallocate(Structure2D)} to obtain a suitbale <code>preallocated</code>.
+     * </p>
      *
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
      *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
@@ -132,10 +135,14 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
     MatrixStore<N> invert(Access2D<?> original, DecompositionStore<N> preallocated) throws TaskException;
 
     /**
+     * <p>
      * Will create a {@linkplain DecompositionStore} instance suitable for use with
-     * {@link #invert(Access2D, DecompositionStore)}. When solving an equation system [A][X]=[B]
-     * ([mxn][nxb]=[mxb]) the preallocated memory/matrix will typically be either mxb or nxb (if A is square
-     * then there is no doubt).
+     * {@link #invert(Access2D, DecompositionStore)}.
+     * </p>
+     * <p>
+     * When inverting a matrix (mxn) the preallocated memory/matrix will typically be nxm (and of course most
+     * of the time A is square).
+     * </p>
      */
     DecompositionStore<N> preallocate(Structure2D template);
 

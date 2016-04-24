@@ -132,10 +132,15 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     };
 
     /**
+     * <p>
      * Will create a {@linkplain DecompositionStore} instance suitable for use with
-     * {@link #solve(Access2D, Access2D, DecompositionStore)}. When solving an equation system [A][X]=[B]
-     * ([mxn][nxb]=[mxb]) the preallocated memory/matrix will typically be either mxb or nxb (if A is square
-     * then there is no doubt).
+     * {@link #solve(Access2D, Access2D, DecompositionStore)}. The dimensions of the returned instance is not
+     * specified by this interface - it is specified by the behaviour/requirements of each implementation.
+     * </p>
+     * <p>
+     * When solving an equation system [A][X]=[B] ([mxn][nxb]=[mxb]) the preallocated memory/matrix will
+     * typically be either mxb or nxb.
+     * </p>
      *
      * @param templateBody
      * @param templateRHS
@@ -158,6 +163,9 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * <p>
      * Should produce the same results as calling {@link #solve(Access2D, Access2D)}.
      * </p>
+     * <p>
+     * Use {@link #preallocate(Structure2D, Structure2D)} to obtain a suitbale <code>preallocated</code>.
+     * </p>
      *
      * @param rhs The Right Hand Side, wont be modfied
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
@@ -165,4 +173,5 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * @return The solution
      */
     MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, DecompositionStore<N> preallocated) throws TaskException;
+
 }
