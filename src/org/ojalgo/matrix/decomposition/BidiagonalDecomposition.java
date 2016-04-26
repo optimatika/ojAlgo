@@ -376,8 +376,8 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
         final DecompositionStore.HouseholderReference<N> tmpHouseholderReference = new DecompositionStore.HouseholderReference<N>(this.getInPlace(), false);
 
-        final int tmpMinDim = this.getMinDim();
         final int tmpColDim = this.getColDim();
+        final int tmpMinDim = this.getMinDim();
 
         DecompositionStore<N> retVal = null;
         if (myInitDiagQ2 != null) {

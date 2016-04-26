@@ -72,10 +72,12 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return tmpSingularValues.doubleValue(0) / tmpSingularValues.doubleValue(tmpSingularValues.length - 1);
     }
 
-    public MatrixStore<N> getD() {
+    public MatrixStore<N> getD(final int rank) {
 
-        if ((myD == null) && this.isComputed()) {
-            myD = this.makeD();
+        final int tmpColumns = Math.min(rank, myBidiagonal.getMinDim());
+
+        if (this.isComputed() && ((myD == null) || (myD.countColumns() != tmpColumns))) {
+            myD = this.makeD(tmpColumns);
         }
 
         return myD;
@@ -100,45 +102,17 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         return this.getInverse(this.preallocate(new Structure2D() {
 
-            public long countRows() {
-                return myTransposed ? myBidiagonal.getColDim() : myBidiagonal.getRowDim();
-            }
-
             public long countColumns() {
                 return myTransposed ? myBidiagonal.getRowDim() : myBidiagonal.getColDim();
+            }
+
+            public long countRows() {
+                return myTransposed ? myBidiagonal.getColDim() : myBidiagonal.getRowDim();
             }
         }));
     }
 
     public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
-
-        if (myInverse == null) {
-
-            final MatrixStore<N> tmpQ1 = this.getQ1();
-            final Array1D<Double> tmpSingulars = this.getSingularValues();
-            final MatrixStore<N> tmpQ2 = this.getQ2();
-
-            final int tmpRowDim = (int) tmpSingulars.count();
-            final int tmpColDim = (int) tmpQ1.countRows();
-            final PhysicalStore<N> tmpMtrx = this.makeZero(tmpRowDim, tmpColDim);
-
-            double tmpValue;
-            final int rank = this.getRank();
-            for (int i = 0; i < rank; i++) {
-                tmpValue = tmpSingulars.doubleValue(i);
-                for (int j = 0; j < tmpColDim; j++) {
-                    tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpValue).getNumber());
-                }
-            }
-
-            preallocated.fillByMultiplying(tmpQ2, tmpMtrx);
-            myInverse = preallocated;
-        }
-
-        return myInverse;
-    }
-
-    private MatrixStore<N> getTruncatedInverse(final DecompositionStore<N> preallocated) {
 
         if (myInverse == null) {
 
@@ -185,26 +159,31 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return this.getSingularValues().doubleValue(0);
     }
 
-    public MatrixStore<N> getQ1() {
+    public MatrixStore<N> getQ1(final int rank) {
 
-        if ((myQ1 == null) && !mySingularValuesOnly && this.isComputed()) {
+        final int tmpColumns = Math.min(rank, myBidiagonal.getMinDim());
+
+        if (!mySingularValuesOnly && this.isComputed() && ((myQ1 == null) || (myQ1.countColumns() != tmpColumns))) {
+
             if (myTransposed) {
-                myQ1 = this.makeQ2();
+                myQ1 = this.makeQ2(tmpColumns);
             } else {
-                myQ1 = this.makeQ1();
+                myQ1 = this.makeQ1(tmpColumns);
             }
         }
 
         return myQ1;
     }
 
-    public MatrixStore<N> getQ2() {
+    public MatrixStore<N> getQ2(final int rank) {
 
-        if ((myQ2 == null) && !mySingularValuesOnly && this.isComputed()) {
+        final int tmpColumns = Math.min(rank, myBidiagonal.getMinDim());
+
+        if (!mySingularValuesOnly && this.isComputed() && ((myQ2 == null) || (myQ2.countColumns() != tmpColumns))) {
             if (myTransposed) {
-                myQ2 = this.makeQ1();
+                myQ2 = this.makeQ1(tmpColumns);
             } else {
-                myQ2 = this.makeQ2();
+                myQ2 = this.makeQ2(tmpColumns);
             }
         }
 
@@ -305,6 +284,34 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return preallocated;
     }
 
+    private MatrixStore<N> getInverseOldVersion(final DecompositionStore<N> preallocated) {
+
+        if (myInverse == null) {
+
+            final MatrixStore<N> tmpQ1 = this.getQ1();
+            final Array1D<Double> tmpSingulars = this.getSingularValues();
+            final MatrixStore<N> tmpQ2 = this.getQ2();
+
+            final int tmpRowDim = (int) tmpSingulars.count();
+            final int tmpColDim = (int) tmpQ1.countRows();
+            final PhysicalStore<N> tmpMtrx = this.makeZero(tmpRowDim, tmpColDim);
+
+            double tmpValue;
+            final int rank = this.getRank();
+            for (int i = 0; i < rank; i++) {
+                tmpValue = tmpSingulars.doubleValue(i);
+                for (int j = 0; j < tmpColDim; j++) {
+                    tmpMtrx.set(i, j, tmpQ1.toScalar(j, i).conjugate().divide(tmpValue).getNumber());
+                }
+            }
+
+            preallocated.fillByMultiplying(tmpQ2, tmpMtrx);
+            myInverse = preallocated;
+        }
+
+        return myInverse;
+    }
+
     protected boolean compute(final ElementsSupplier<N> matrix, final boolean singularValuesOnly, final boolean fullSize) {
 
         this.reset();
@@ -358,11 +365,11 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return myTransposed;
     }
 
-    protected abstract MatrixStore<N> makeD();
+    protected abstract MatrixStore<N> makeD(int columns);
 
-    protected abstract MatrixStore<N> makeQ1();
+    protected abstract MatrixStore<N> makeQ1(int columns);
 
-    protected abstract MatrixStore<N> makeQ2();
+    protected abstract MatrixStore<N> makeQ2(int columns);
 
     protected abstract Array1D<Double> makeSingularValues();
 

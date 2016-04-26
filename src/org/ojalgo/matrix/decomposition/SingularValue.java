@@ -134,7 +134,11 @@ public interface SingularValue<N extends Number>
     /**
      * @return The diagonal matrix of singular values.
      */
-    MatrixStore<N> getD();
+    default MatrixStore<N> getD() {
+        return this.getD(Integer.MAX_VALUE);
+    }
+
+    MatrixStore<N> getD(int rank);
 
     /**
      * Sometimes also called the Schatten 2-norm or Hilbert-Schmidt norm.
@@ -170,7 +174,11 @@ public interface SingularValue<N extends Number>
      * </ul>
      * Calculating the QR decomposition of [A] is a faster alternative.
      */
-    MatrixStore<N> getQ1();
+    default MatrixStore<N> getQ1() {
+        return this.getQ1(Integer.MAX_VALUE);
+    }
+
+    MatrixStore<N> getQ1(int rank);
 
     /**
      * If [A] is m-by-n and its rank is r, then:
@@ -180,7 +188,11 @@ public interface SingularValue<N extends Number>
      * </ul>
      * Calculating the QR decomposition of [A]<sup>T</sup> is a faster alternative.
      */
-    MatrixStore<N> getQ2();
+    default MatrixStore<N> getQ2() {
+        return this.getQ2(Integer.MAX_VALUE);
+    }
+
+    MatrixStore<N> getQ2(int rank);
 
     /**
      * Effective numerical matrix rank.

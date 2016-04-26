@@ -127,7 +127,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return myS[0] / myS[n - 1];
     }
 
-    public MatrixStore<Double> getD() {
+    public MatrixStore<Double> getD(final int rank) {
+
+        final int tmpColumns = Math.min(rank, this.getMinDim());
+
         final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<Double>(this.getSingularValues(), null, null, ZERO);
         return MatrixStore.PRIMITIVE.makeWrapper(tmpDiagonal).get();
     }
@@ -170,11 +173,17 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return myS[0];
     }
 
-    public RawStore getQ1() {
+    public RawStore getQ1(final int rank) {
+
+        final int tmpColumns = Math.min(rank, this.getMinDim());
+
         return myTransposed ? this.getV().transpose() : this.getU().transpose();
     }
 
-    public RawStore getQ2() {
+    public RawStore getQ2(final int rank) {
+
+        final int tmpColumns = Math.min(rank, this.getMinDim());
+
         return myTransposed ? this.getU().transpose() : this.getV().transpose();
     }
 
@@ -277,7 +286,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         if (myPseudoinverse == null) {
 
-            final double[][] tmpQ1 = this.getQ1().data;
+            final double[][] tmpQ1 = this.getQ1(this.getRank()).data;
             final double[] tmpSingular = myS;
 
             final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
