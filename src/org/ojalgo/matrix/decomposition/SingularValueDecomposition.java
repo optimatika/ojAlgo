@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -72,12 +73,10 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return tmpSingularValues.doubleValue(0) / tmpSingularValues.doubleValue(tmpSingularValues.length - 1);
     }
 
-    public MatrixStore<N> getD(final int rank) {
+    public MatrixStore<N> getD() {
 
-        final int tmpColumns = Math.min(rank, myBidiagonal.getMinDim());
-
-        if (this.isComputed() && ((myD == null) || (myD.countColumns() != tmpColumns))) {
-            myD = this.makeD(tmpColumns);
+        if (this.isComputed() && (myD == null)) {
+            myD = this.makeD();
         }
 
         return myD;
@@ -120,22 +119,19 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             final Array1D<Double> tmpSingulars = this.getSingularValues();
             final MatrixStore<N> tmpQ2 = this.getQ2();
 
-            final PhysicalStore<N> tmpMtrx = tmpQ2.copy();
+            final int rank = this.getRank();
+            final int[] tmpColumns = AccessUtils.makeIncreasingRange(0, rank);
+
+            final PhysicalStore<N> tmpMtrx = tmpQ2.logical().column(tmpColumns).copy();
 
             final Scalar.Factory<N> tmpScalar = this.scalar();
             final BinaryFunction<N> tmpDivide = this.function().divide();
-            final N tmpZero = tmpScalar.zero().getNumber();
 
-            final int rank = this.getRank();
             for (int i = 0; i < rank; i++) {
                 tmpMtrx.modifyColumn(0L, i, tmpDivide.second(tmpScalar.cast(tmpSingulars.doubleValue(i))));
             }
-            final long tmpCountColumns = tmpMtrx.countColumns();
-            for (int i = rank; i < tmpCountColumns; i++) {
-                tmpMtrx.fillColumn(0L, i, tmpZero);
-            }
 
-            preallocated.fillByMultiplying(tmpMtrx, tmpQ1.conjugate());
+            preallocated.fillByMultiplying(tmpMtrx, tmpQ1.logical().column(tmpColumns).conjugate().get());
             myInverse = preallocated;
         }
 
@@ -159,31 +155,27 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return this.getSingularValues().doubleValue(0);
     }
 
-    public MatrixStore<N> getQ1(final int rank) {
+    public MatrixStore<N> getQ1() {
 
-        final int tmpColumns = Math.min(rank, myBidiagonal.getMinDim());
-
-        if (!mySingularValuesOnly && this.isComputed() && ((myQ1 == null) || (myQ1.countColumns() != tmpColumns))) {
+        if (!mySingularValuesOnly && this.isComputed() && (myQ1 == null)) {
 
             if (myTransposed) {
-                myQ1 = this.makeQ2(tmpColumns);
+                myQ1 = this.makeQ2();
             } else {
-                myQ1 = this.makeQ1(tmpColumns);
+                myQ1 = this.makeQ1();
             }
         }
 
         return myQ1;
     }
 
-    public MatrixStore<N> getQ2(final int rank) {
+    public MatrixStore<N> getQ2() {
 
-        final int tmpColumns = Math.min(rank, myBidiagonal.getMinDim());
-
-        if (!mySingularValuesOnly && this.isComputed() && ((myQ2 == null) || (myQ2.countColumns() != tmpColumns))) {
+        if (!mySingularValuesOnly && this.isComputed() && (myQ2 == null)) {
             if (myTransposed) {
-                myQ2 = this.makeQ1(tmpColumns);
+                myQ2 = this.makeQ1();
             } else {
-                myQ2 = this.makeQ2(tmpColumns);
+                myQ2 = this.makeQ2();
             }
         }
 
@@ -365,24 +357,16 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return myTransposed;
     }
 
-    protected abstract MatrixStore<N> makeD(int columns);
+    protected abstract MatrixStore<N> makeD();
 
-    protected abstract MatrixStore<N> makeQ1(int columns);
+    protected abstract MatrixStore<N> makeQ1();
 
-    protected abstract MatrixStore<N> makeQ2(int columns);
+    protected abstract MatrixStore<N> makeQ2();
 
     protected abstract Array1D<Double> makeSingularValues();
 
     void setD(final MatrixStore<N> someD) {
         myD = someD;
-    }
-
-    void setQ1(final MatrixStore<N> someQ1) {
-        myQ1 = someQ1;
-    }
-
-    void setQ2(final MatrixStore<N> someQ2) {
-        myQ2 = someQ2;
     }
 
     void setSingularValues(final Array1D<Double> someSingularValues) {

@@ -404,7 +404,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    protected MatrixStore<N> makeD(int columns) {
+    protected MatrixStore<N> makeD() {
 
         //        final int tmpMinDim = this..getMinDim();
         //
@@ -418,7 +418,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    protected MatrixStore<N> makeQ1(int columns) {
+    protected MatrixStore<N> makeQ1() {
         try {
             return myFutureQ1.get();
         } catch (final InterruptedException anException) {
@@ -429,7 +429,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    protected MatrixStore<N> makeQ2(int columns) {
+    protected MatrixStore<N> makeQ2() {
         try {
             return myFutureQ2.get();
         } catch (final InterruptedException anException) {
