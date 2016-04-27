@@ -318,7 +318,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         }
 
         /**
-         * Setting either limit to <0 is interpreted as "no limit" (useful when you only want to limit either
+         * Setting either limit to < 0 is interpreted as "no limit" (useful when you only want to limit either
          * the rows or columns, and don't know the size of the other)
          */
         public final LogicalBuilder<N> limits(final int rowLimit, final int columnLimit) {
@@ -328,7 +328,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         }
 
         public final LogicalBuilder<N> offsets(final int rowOffset, final int columnOffset) {
-            myStore = new OffsetStore<N>(myStore, rowOffset, columnOffset);
+            myStore = new OffsetStore<N>(myStore, rowOffset < 0 ? 0 : rowOffset, columnOffset < 0 ? 0 : columnOffset);
             return this;
         }
 

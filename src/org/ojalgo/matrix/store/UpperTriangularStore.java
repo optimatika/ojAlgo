@@ -39,7 +39,7 @@ final class UpperTriangularStore<N extends Number> extends ShadingStore<N> {
 
     UpperTriangularStore(final MatrixStore<N> base, final boolean unitDiagonal) {
 
-        super((int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns(), base);
+        super(base, (int) Math.min(base.countRows(), base.countColumns()), (int) base.countColumns());
 
         myUnitDiagonal = unitDiagonal;
     }

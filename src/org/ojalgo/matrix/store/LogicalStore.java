@@ -25,7 +25,7 @@ import org.ojalgo.ProgrammingError;
 
 /**
  * Logical stores are (intended to be) immutable. Therefore LogicalStore subclasses should be made .
- * 
+ *
  * @author apete
  */
 abstract class LogicalStore<N extends Number> extends AbstractStore<N> {

@@ -49,7 +49,7 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
 
     AboveBelowStore(final MatrixStore<N> base, final MatrixStore<N> below) {
 
-        super((int) (base.countRows() + below.countRows()), (int) base.countColumns(), base);
+        super(base, (int) (base.countRows() + below.countRows()), (int) base.countColumns());
 
         myBelow = below;
         mySplit = (int) base.countRows();

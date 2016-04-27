@@ -30,8 +30,8 @@ import org.ojalgo.scalar.Scalar;
  */
 final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
 
-    ConjugatedStore(final MatrixStore<N> aBase) {
-        super(aBase);
+    ConjugatedStore(final MatrixStore<N> base) {
+        super(base);
     }
 
     @Override

@@ -50,7 +50,7 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
 
     LeftRightStore(final MatrixStore<N> base, final MatrixStore<N> right) {
 
-        super((int) base.countRows(), (int) (base.countColumns() + right.countColumns()), base);
+        super(base, (int) base.countRows(), (int) (base.countColumns() + right.countColumns()));
 
         myRight = right;
         mySplit = (int) base.countColumns();

@@ -35,7 +35,7 @@ final class LowerHermitianStore<N extends Number> extends ShadingStore<N> {
     }
 
     LowerHermitianStore(final MatrixStore<N> base) {
-        super((int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()), base);
+        super(base, (int) base.countRows(), (int) Math.min(base.countRows(), base.countColumns()));
     }
 
     public double doubleValue(final long row, final long col) {

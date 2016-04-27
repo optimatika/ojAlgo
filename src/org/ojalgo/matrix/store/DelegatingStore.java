@@ -77,7 +77,7 @@ abstract class DelegatingStore<N extends Number> extends LogicalStore<N> {
 
     }
 
-    protected DelegatingStore(final int rowsCount, final int columnsCount, final MatrixStore<N> base) {
+    protected DelegatingStore(final MatrixStore<N> base, final int rowsCount, final int columnsCount) {
         super(base, rowsCount, columnsCount);
     }
 

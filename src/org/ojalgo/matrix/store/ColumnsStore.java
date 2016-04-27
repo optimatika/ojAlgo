@@ -44,7 +44,7 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
 
     ColumnsStore(final MatrixStore<N> base, final int... columns) {
 
-        super((int) base.countRows(), columns.length, base);
+        super(base, (int) base.countRows(), columns.length);
 
         myColumns = columns;
     }

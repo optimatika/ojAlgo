@@ -27,7 +27,7 @@ final class OffsetStore<N extends Number> extends SelectingStore<N> {
 
     OffsetStore(final MatrixStore<N> base, final int rowOffset, final int columnOffset) {
 
-        super((int) base.countRows() - rowOffset, (int) base.countColumns() - columnOffset, base);
+        super(base, (int) base.countRows() - rowOffset, (int) base.countColumns() - columnOffset);
 
         myRowOffset = rowOffset;
         myColumnOffset = columnOffset;

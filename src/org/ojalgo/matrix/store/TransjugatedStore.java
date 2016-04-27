@@ -25,7 +25,7 @@ import org.ojalgo.ProgrammingError;
 
 abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
 
-    private TransjugatedStore(final int rows, final int columns, final MatrixStore<N> base) {
+    private TransjugatedStore(final MatrixStore<N> base, final int rows, final int columns) {
 
         super(base, rows, columns);
 

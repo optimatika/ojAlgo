@@ -25,8 +25,8 @@ import org.ojalgo.scalar.Scalar;
 
 final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
 
-    TransposedStore(final MatrixStore<N> aBase) {
-        super(aBase);
+    TransposedStore(final MatrixStore<N> base) {
+        super(base);
     }
 
     public N get(final long aRow, final long aCol) {

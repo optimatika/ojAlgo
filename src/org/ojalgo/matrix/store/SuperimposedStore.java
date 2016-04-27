@@ -47,7 +47,7 @@ final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
 
     SuperimposedStore(final MatrixStore<N> base, final int row, final int column, final MatrixStore<N> diff) {
 
-        super((int) base.countRows(), (int) base.countColumns(), base);
+        super(base, (int) base.countRows(), (int) base.countColumns());
 
         myRowFirst = row;
         myColFirst = column;

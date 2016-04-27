@@ -28,7 +28,7 @@ package org.ojalgo.matrix.store;
  */
 abstract class SelectingStore<N extends Number> extends LogicalStore<N> {
 
-    protected SelectingStore(final int rowsCount, final int columnsCount, final MatrixStore<N> base) {
+    protected SelectingStore(final MatrixStore<N> base, final int rowsCount, final int columnsCount) {
         super(base, rowsCount, columnsCount);
     }
 
