@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -120,18 +119,17 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             final MatrixStore<N> tmpQ2 = this.getQ2();
 
             final int rank = this.getRank();
-            final int[] tmpColumns = AccessUtils.makeIncreasingRange(0, rank);
 
-            final PhysicalStore<N> tmpMtrx = tmpQ2.logical().column(tmpColumns).copy();
+            final PhysicalStore<N> tmpMtrx = tmpQ2.logical().limits(-1, rank).copy();
 
             final Scalar.Factory<N> tmpScalar = this.scalar();
             final BinaryFunction<N> tmpDivide = this.function().divide();
 
-            for (int i = 0; i < rank; i++) {
-                tmpMtrx.modifyColumn(0L, i, tmpDivide.second(tmpScalar.cast(tmpSingulars.doubleValue(i))));
+            for (int j = 0; j < rank; j++) {
+                tmpMtrx.modifyColumn(0L, j, tmpDivide.second(tmpScalar.cast(tmpSingulars.doubleValue(j))));
             }
 
-            preallocated.fillByMultiplying(tmpMtrx, tmpQ1.logical().column(tmpColumns).conjugate().get());
+            preallocated.fillByMultiplying(tmpMtrx, tmpQ1.logical().limits(-1, rank).conjugate().get());
             myInverse = preallocated;
         }
 

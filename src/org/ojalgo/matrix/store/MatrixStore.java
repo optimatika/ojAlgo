@@ -317,8 +317,13 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
             return this;
         }
 
+        /**
+         * Setting either limit to <0 is interpreted as "no limit" (useful when you only want to limit either
+         * the rows or columns, and don't know the size of the other)
+         */
         public final LogicalBuilder<N> limits(final int rowLimit, final int columnLimit) {
-            myStore = new LimitStore<N>(rowLimit, columnLimit, myStore);
+            myStore = new LimitStore<N>(rowLimit < 0 ? (int) myStore.countRows() : rowLimit, columnLimit < 0 ? (int) myStore.countColumns() : columnLimit,
+                    myStore);
             return this;
         }
 
