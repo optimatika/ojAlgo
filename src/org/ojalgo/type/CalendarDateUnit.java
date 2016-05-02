@@ -22,25 +22,33 @@
 package org.ojalgo.type;
 
 import java.time.Duration;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.ojalgo.constant.PrimitiveMath;
 
-public enum CalendarDateUnit implements TemporalUnit {
+/**
+ * <p>
+ * Designed to complement {@linkplain CalendarDate}. It is essentially equivalent to {@linkplain ChronoUnit},
+ * but with a sligthly smaller set of members (and the addtional {@linkplain #QUARTER}). It has been
+ * retrofitted to implement the {@linkplain TemporalUnit} interface.
+ * </p>
+ *
+ * @see CalendarDate
+ * @see CalendarDateDuration
+ * @author apete
+ */
+public enum CalendarDateUnit implements TemporalUnit, TemporalAmount, TemporalAdjuster {
 
-    /**
-     *
-     */
-    NANOS(ChronoUnit.NANOS, TimeUnit.NANOSECONDS),
-    /**
-     *
-     */
-    MICROS(ChronoUnit.MICROS, TimeUnit.MICROSECONDS),
     /**
      *
      */
@@ -90,36 +98,44 @@ public enum CalendarDateUnit implements TemporalUnit {
      */
     MILLENIUM(ChronoUnit.MILLENNIA, 10L * TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR);
 
+    private final ChronoUnit myChronoUnit;
     private final long myHalf;
     private final long mySize;
-    private final TemporalUnit myTemporalUnit;
     private final TimeUnit myTimeUnit;
 
-    CalendarDateUnit(final TemporalUnit temporalUnit, final long millis) {
-        myTemporalUnit = temporalUnit;
+    CalendarDateUnit(final ChronoUnit chronoUnit, final long millis) {
+        myChronoUnit = chronoUnit;
         myTimeUnit = null;
         mySize = millis;
         myHalf = mySize / 2L;
     }
 
-    CalendarDateUnit(final TemporalUnit temporalUnit, final TimeUnit concurrencyUnit) {
-        myTemporalUnit = temporalUnit;
-        myTimeUnit = concurrencyUnit;
+    CalendarDateUnit(final ChronoUnit chronoUnit, final TimeUnit timeUnit) {
+        myChronoUnit = chronoUnit;
+        myTimeUnit = timeUnit;
         mySize = myTimeUnit.toMillis(1L);
         myHalf = mySize / 2L;
     }
 
     public <R extends Temporal> R addTo(final R temporal, final long amount) {
-        if (myTemporalUnit != null) {
-            return myTemporalUnit.addTo(temporal, amount);
+        if (myChronoUnit != null) {
+            return myChronoUnit.addTo(temporal, amount);
         } else { // QUARTER
             return ChronoUnit.MONTHS.addTo(temporal, 3L * amount);
         }
     }
 
+    public Temporal addTo(final Temporal temporal) {
+        return temporal.plus(mySize, CalendarDateUnit.MILLIS);
+    }
+
+    public Temporal adjustInto(final Temporal temporal) {
+        return temporal.with(ChronoField.INSTANT_SECONDS, mySize / 1000L).with(ChronoField.MILLI_OF_SECOND, mySize % 1000L);
+    }
+
     public long between(final Temporal temporal1Inclusive, final Temporal temporal2Exclusive) {
-        if (myTemporalUnit != null) {
-            return myTemporalUnit.between(temporal1Inclusive, temporal2Exclusive);
+        if (myChronoUnit != null) {
+            return myChronoUnit.between(temporal1Inclusive, temporal2Exclusive);
         } else { // QUARTER
             return ChronoUnit.MONTHS.between(temporal1Inclusive, temporal2Exclusive) / 3L;
         }
@@ -176,9 +192,17 @@ public enum CalendarDateUnit implements TemporalUnit {
         return ((myHalf + this.toTimeInMillis(aToValue)) - this.toTimeInMillis(aFromValue)) / mySize;
     }
 
+    public long get(final TemporalUnit unit) {
+        if (unit == this) {
+            return mySize;
+        } else {
+            return 0;
+        }
+    }
+
     public Duration getDuration() {
-        if (myTemporalUnit != null) {
-            return myTemporalUnit.getDuration();
+        if (myChronoUnit != null) {
+            return myChronoUnit.getDuration();
         } else { // QUARTER
             return ChronoUnit.MONTHS.getDuration().multipliedBy(3L);
         }
@@ -191,95 +215,99 @@ public enum CalendarDateUnit implements TemporalUnit {
         return myTimeUnit;
     }
 
+    public List<TemporalUnit> getUnits() {
+        return Collections.singletonList(this);
+    }
+
     public boolean isCalendarUnit() {
         return DAY.size() <= this.size();
     }
 
     public boolean isDateBased() {
-        if (myTemporalUnit != null) {
-            return myTemporalUnit.isDateBased();
+        if (myChronoUnit != null) {
+            return myChronoUnit.isDateBased();
         } else { // QUARTER
-            return ChronoUnit.MONTHS.isDateBased();
+            return true;
         }
     }
 
     public boolean isDurationEstimated() {
-        if (myTemporalUnit != null) {
-            return myTemporalUnit.isDurationEstimated();
+        if (myChronoUnit != null) {
+            return myChronoUnit.isDurationEstimated();
         } else { // QUARTER
-            return ChronoUnit.MONTHS.isDurationEstimated();
+            return true;
         }
     }
 
     public boolean isTimeBased() {
-        if (myTemporalUnit != null) {
-            return myTemporalUnit.isTimeBased();
+        if (myChronoUnit != null) {
+            return myChronoUnit.isTimeBased();
         } else { // QUARTER
-            return ChronoUnit.MONTHS.isTimeBased();
+            return false;
         }
     }
 
-    public void round(final Calendar aCalendar) {
+    public void round(final Calendar calendar) {
 
         if (CalendarDateUnit.MILLIS.size() < mySize) {
 
-            aCalendar.set(Calendar.MILLISECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
 
             if (CalendarDateUnit.SECOND.size() < mySize) {
 
-                aCalendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.SECOND, 0);
 
                 if (CalendarDateUnit.MINUTE.size() < mySize) {
 
-                    aCalendar.set(Calendar.MINUTE, 0);
+                    calendar.set(Calendar.MINUTE, 0);
 
                     if (CalendarDateUnit.HOUR.size() < mySize) {
 
-                        aCalendar.set(Calendar.HOUR_OF_DAY, 12);
+                        calendar.set(Calendar.HOUR_OF_DAY, 12);
 
                         if (CalendarDateUnit.DAY.size() < mySize) {
 
                             if (CalendarDateUnit.WEEK.size() == mySize) {
 
-                                aCalendar.add(Calendar.WEEK_OF_YEAR, 1);
-                                aCalendar.set(Calendar.DAY_OF_WEEK, aCalendar.getFirstDayOfWeek());
-                                aCalendar.add(Calendar.DAY_OF_WEEK, -1);
+                                calendar.add(Calendar.WEEK_OF_YEAR, 1);
+                                calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+                                calendar.add(Calendar.DAY_OF_WEEK, -1);
 
                             } else if (CalendarDateUnit.MONTH.size() == mySize) {
 
-                                aCalendar.add(Calendar.MONTH, 1);
-                                aCalendar.set(Calendar.DAY_OF_MONTH, 1);
-                                aCalendar.add(Calendar.DAY_OF_MONTH, -1);
+                                calendar.add(Calendar.MONTH, 1);
+                                calendar.set(Calendar.DAY_OF_MONTH, 1);
+                                calendar.add(Calendar.DAY_OF_MONTH, -1);
 
                             } else if (CalendarDateUnit.QUARTER.size() == mySize) {
 
-                                aCalendar.set(Calendar.MONTH, 3 * ((aCalendar.get(Calendar.MONTH) / 3) + 1));
-                                aCalendar.set(Calendar.DAY_OF_MONTH, 1);
-                                aCalendar.add(Calendar.DAY_OF_MONTH, -1);
+                                calendar.set(Calendar.MONTH, 3 * ((calendar.get(Calendar.MONTH) / 3) + 1));
+                                calendar.set(Calendar.DAY_OF_MONTH, 1);
+                                calendar.add(Calendar.DAY_OF_MONTH, -1);
 
                             } else if (CalendarDateUnit.YEAR.size() == mySize) {
 
-                                aCalendar.add(Calendar.YEAR, 1);
-                                aCalendar.set(Calendar.DAY_OF_YEAR, 1);
-                                aCalendar.add(Calendar.DAY_OF_YEAR, -1);
+                                calendar.add(Calendar.YEAR, 1);
+                                calendar.set(Calendar.DAY_OF_YEAR, 1);
+                                calendar.add(Calendar.DAY_OF_YEAR, -1);
 
                             } else if (CalendarDateUnit.DECADE.size() == mySize) {
 
-                                aCalendar.set(Calendar.YEAR, 10 + (10 * (aCalendar.get(Calendar.YEAR) / 10)));
-                                aCalendar.set(Calendar.DAY_OF_YEAR, 1);
-                                aCalendar.add(Calendar.DAY_OF_YEAR, -1);
+                                calendar.set(Calendar.YEAR, 10 + (10 * (calendar.get(Calendar.YEAR) / 10)));
+                                calendar.set(Calendar.DAY_OF_YEAR, 1);
+                                calendar.add(Calendar.DAY_OF_YEAR, -1);
 
                             } else if (CalendarDateUnit.CENTURY.size() == mySize) {
 
-                                aCalendar.set(Calendar.YEAR, 100 + (100 * (aCalendar.get(Calendar.YEAR) / 100)));
-                                aCalendar.set(Calendar.DAY_OF_YEAR, 1);
-                                aCalendar.add(Calendar.DAY_OF_YEAR, -1);
+                                calendar.set(Calendar.YEAR, 100 + (100 * (calendar.get(Calendar.YEAR) / 100)));
+                                calendar.set(Calendar.DAY_OF_YEAR, 1);
+                                calendar.add(Calendar.DAY_OF_YEAR, -1);
 
                             } else if (CalendarDateUnit.MILLENIUM.size() == mySize) {
 
-                                aCalendar.set(Calendar.YEAR, 1000 + (1000 * (aCalendar.get(Calendar.YEAR) / 1000)));
-                                aCalendar.set(Calendar.DAY_OF_YEAR, 1);
-                                aCalendar.add(Calendar.DAY_OF_YEAR, -1);
+                                calendar.set(Calendar.YEAR, 1000 + (1000 * (calendar.get(Calendar.YEAR) / 1000)));
+                                calendar.set(Calendar.DAY_OF_YEAR, 1);
+                                calendar.add(Calendar.DAY_OF_YEAR, -1);
                             }
                         }
                     }
@@ -288,8 +316,8 @@ public enum CalendarDateUnit implements TemporalUnit {
         }
     }
 
-    public void round(final Date aDate) {
-        aDate.setTime(this.toTimeInMillis(aDate));
+    public void round(final Date date) {
+        date.setTime(this.toTimeInMillis(date));
     }
 
     public long size() {
@@ -411,6 +439,10 @@ public enum CalendarDateUnit implements TemporalUnit {
 
     public long step(final long aTimeInMillis, final int aStepCount) {
         return this.toTimeInMillis(aTimeInMillis) + (aStepCount * this.size());
+    }
+
+    public Temporal subtractFrom(final Temporal temporal) {
+        return temporal.minus(mySize, CalendarDateUnit.MILLIS);
     }
 
     public long toTimeInMillis(final Calendar aCalendar) {

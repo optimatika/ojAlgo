@@ -50,12 +50,24 @@ public abstract class FunctionUtils {
         return Math.max(Math.max(a, b), Math.max(c, d));
     }
 
+    public static long max(final long... values) {
+        long retVal = values[0];
+        for (int i = values.length; i-- != 1;) {
+            retVal = values[i] > retVal ? values[i] : retVal;
+        }
+        return retVal;
+    }
+
     public static long max(final long a, final long b) {
         return Math.max(a, b);
     }
 
     public static long max(final long a, final long b, final long c) {
         return Math.max(Math.max(a, b), c);
+    }
+
+    public static long max(final long a, final long b, final long c, final long d) {
+        return Math.max(Math.max(a, b), Math.max(c, d));
     }
 
     public static int min(final int... values) {
@@ -78,12 +90,24 @@ public abstract class FunctionUtils {
         return Math.min(Math.min(a, b), Math.min(c, d));
     }
 
+    public static long min(final long... values) {
+        long retVal = values[0];
+        for (int i = values.length; i-- != 1;) {
+            retVal = values[i] < retVal ? values[i] : retVal;
+        }
+        return retVal;
+    }
+
     public static long min(final long a, final long b) {
         return Math.min(a, b);
     }
 
     public static long min(final long a, final long b, final long c) {
         return Math.min(Math.min(a, b), c);
+    }
+
+    public static long min(final long a, final long b, final long c, final long d) {
+        return Math.min(Math.min(a, b), Math.min(c, d));
     }
 
     private FunctionUtils() {

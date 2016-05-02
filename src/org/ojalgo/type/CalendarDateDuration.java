@@ -22,7 +22,11 @@
 package org.ojalgo.type;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.Period;
+import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
 import java.util.Collections;
@@ -30,7 +34,18 @@ import java.util.List;
 
 import org.ojalgo.constant.PrimitiveMath;
 
-public final class CalendarDateDuration extends Number implements Comparable<CalendarDateDuration>, TemporalAmount, Serializable {
+/**
+ * <p>
+ * Designed to complement {@linkplain CalendarDate}. It is similar to {@linkplain Duration} or
+ * {@linkplain Period}, but supports a decimal/fractional measure. It has been retrofitted to implement the
+ * {@linkplain TemporalAmount} interface.
+ * </p>
+ *
+ * @see CalendarDate
+ * @see CalendarDateUnit
+ * @author apete
+ */
+public final class CalendarDateDuration extends Number implements TemporalAmount, TemporalAdjuster, Comparable<CalendarDateDuration>, Serializable {
 
     public final double measure;
     public final CalendarDateUnit unit;
@@ -44,17 +59,22 @@ public final class CalendarDateDuration extends Number implements Comparable<Cal
     }
 
     CalendarDateDuration() {
-        this(PrimitiveMath.ONE, CalendarDateUnit.MILLIS);
+        this(PrimitiveMath.ZERO, CalendarDateUnit.MILLIS);
     }
 
     public Temporal addTo(final Temporal temporal) {
-        return temporal.plus((long) (measure * unit.size() * 1_000_000L), CalendarDateUnit.NANOS);
+        return temporal.plus(this.toDurationInMillis(), CalendarDateUnit.MILLIS);
     }
 
-    public int compareTo(final CalendarDateDuration aReference) {
+    public Temporal adjustInto(final Temporal temporal) {
+        final long tmpSize = this.toDurationInMillis();
+        return temporal.with(ChronoField.INSTANT_SECONDS, tmpSize / 1000L).with(ChronoField.MILLI_OF_SECOND, tmpSize % 1000L);
+    }
+
+    public int compareTo(final CalendarDateDuration reference) {
         final long tmpVal = this.toDurationInMillis();
-        final long refVal = aReference.toDurationInMillis();
-        return (tmpVal < refVal ? -1 : (tmpVal == refVal ? 0 : 1));
+        final long refVal = reference.toDurationInMillis();
+        return Long.signum(tmpVal - refVal);
     }
 
     public CalendarDateDuration convertTo(final CalendarDateUnit destinationUnit) {
@@ -126,16 +146,16 @@ public final class CalendarDateDuration extends Number implements Comparable<Cal
     }
 
     public Temporal subtractFrom(final Temporal temporal) {
-        return temporal.minus((long) measure, unit);
-    }
-
-    public long toDurationInMillis() {
-        return (long) (measure * unit.size());
+        return temporal.minus(this.toDurationInMillis(), CalendarDateUnit.MILLIS);
     }
 
     @Override
     public String toString() {
         return Double.toString(measure) + unit.toString();
+    }
+
+    long toDurationInMillis() {
+        return (long) (measure * unit.size());
     }
 
 }
