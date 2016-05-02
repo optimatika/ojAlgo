@@ -161,6 +161,11 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
         }
     }
 
+    /**
+     * Copies this "instant" to the argument temporal object.
+     *
+     * @see java.time.temporal.TemporalAdjuster#adjustInto(java.time.temporal.Temporal)
+     */
     public Temporal adjustInto(final Temporal temporal) {
         return temporal.with(ChronoField.INSTANT_SECONDS, millis / 1000L).with(ChronoField.MILLI_OF_SECOND, millis % 1000L);
     }
