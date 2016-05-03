@@ -34,9 +34,8 @@ import org.ojalgo.constant.PrimitiveMath;
 
 /**
  * <p>
- * Designed to complement {@linkplain CalendarDate}. It is similar to
- * {@linkplain Duration} or {@linkplain Period}, but supports a
- * decimal/fractional measure. It has been retrofitted to implement the
+ * Designed to complement {@linkplain CalendarDate}. It is similar to {@linkplain Duration} or
+ * {@linkplain Period}, but supports a decimal/fractional measure. It has been retrofitted to implement the
  * {@linkplain TemporalAmount} interface.
  * </p>
  *
@@ -44,8 +43,7 @@ import org.ojalgo.constant.PrimitiveMath;
  * @see CalendarDateUnit
  * @author apete
  */
-public final class CalendarDateDuration extends Number
-        implements TemporalAmount, Comparable<CalendarDateDuration>, Serializable {
+public final class CalendarDateDuration extends Number implements TemporalAmount, Comparable<CalendarDateDuration>, Serializable {
 
     public final double measure;
     public final CalendarDateUnit unit;
@@ -72,12 +70,9 @@ public final class CalendarDateDuration extends Number
         return Long.signum(tmpVal - refVal);
     }
 
-    /**
-     * @deprecated v40 Use something in {@linkplain CalendarDateUnit} instead
-     */
-    @Deprecated
-    public CalendarDateDuration convertTo(final CalendarDateUnit destinationUnit) {
-        return new CalendarDateDuration(destinationUnit.convert(measure, unit), destinationUnit);
+    public CalendarDateDuration convertTo(final CalendarDateUnit newUnit) {
+        final double tmpNewMeasure = newUnit.convert(measure, unit);
+        return new CalendarDateDuration(tmpNewMeasure, newUnit);
     }
 
     @Override
