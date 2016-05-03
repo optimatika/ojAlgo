@@ -162,7 +162,10 @@ public final class MarkowitzModel extends EquilibriumModel {
      * both) of the limits may be null.
      */
     public LowerUpper addConstraint(final BigDecimal lowerLimit, final BigDecimal upperLimit, final int... assetIndeces) {
-        return myConstraints.put(assetIndeces, new LowerUpper(lowerLimit, upperLimit));
+        BigDecimal myUpperLimit = upperLimit == null ? BigDecimal.ONE : upperLimit;
+        BigDecimal myLowerLimit = lowerLimit == null ? myShortingAllowed ? BigDecimal.valueOf(-1): BigDecimal.ZERO : lowerLimit;
+
+        return myConstraints.put(assetIndeces, new LowerUpper(myLowerLimit, myUpperLimit));
     }
 
     public final void clearAllConstraints() {
