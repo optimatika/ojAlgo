@@ -44,13 +44,15 @@ import java.util.TimeZone;
 
 /**
  * <p>
- * Originally, long before Java 8 and its new Date and Time API, this class was designed to provide an
- * immutable complement to the existing {@linkplain Date} and {@linkplain Calendar} and to have easy/direct
- * access to the underlying millisecond value.
+ * Originally, long before Java 8 and its new Date and Time API, this class was
+ * designed to provide an immutable complement to the existing {@linkplain Date}
+ * and {@linkplain Calendar} and to have easy/direct access to the underlying
+ * millisecond value.
  * </p>
  * <p>
- * In terms of the newer API it most closely corresponds to an {@linkplain Instant}, but does not have its
- * nanosecond granularity. It has been retrofitted to implement the {@linkplain Temporal} and
+ * In terms of the newer API it most closely corresponds to an
+ * {@linkplain Instant}, but does not have its nanosecond granularity. It has
+ * been retrofitted to implement the {@linkplain Temporal} and
  * {@linkplain TemporalAdjuster} interfaces.
  * </p>
  *
@@ -58,7 +60,7 @@ import java.util.TimeZone;
  * @see CalendarDateUnit
  * @author apete
  */
-public final class CalendarDate implements Temporal, TemporalAdjuster, Comparable<CalendarDate> {
+public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
     static final int NANOS_PER_SECOND = 1_000_000_000;
     static final long SECONDS_PER_DAY = 24L * 60L * 60L;
@@ -75,8 +77,8 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
                 final int tmpMillisOfSecond = temporal.get(ChronoField.MILLI_OF_SECOND);
                 return new CalendarDate((tmpSeconds * 1000L) + tmpMillisOfSecond);
             } catch (final DateTimeException ex) {
-                throw new DateTimeException("Unable to obtain CalendarDate from TemporalAccessor: " + temporal + " of type " + temporal.getClass().getName(),
-                        ex);
+                throw new DateTimeException("Unable to obtain CalendarDate from TemporalAccessor: " + temporal
+                        + " of type " + temporal.getClass().getName(), ex);
             }
         }
     }
@@ -159,15 +161,6 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
         } else {
             millis = 0L;
         }
-    }
-
-    /**
-     * Copies this "instant" to the argument temporal object.
-     *
-     * @see java.time.temporal.TemporalAdjuster#adjustInto(java.time.temporal.Temporal)
-     */
-    public Temporal adjustInto(final Temporal temporal) {
-        return temporal.with(ChronoField.INSTANT_SECONDS, millis / 1000L).with(ChronoField.MILLI_OF_SECOND, millis % 1000L);
     }
 
     public int compareTo(final CalendarDate ref) {
@@ -288,7 +281,8 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
     }
 
     /**
-     * Only steps with the int part of {@linkplain CalendarDateDuration#measure}.
+     * Only steps with the int part of {@linkplain CalendarDateDuration#measure}
+     * .
      */
     public CalendarDate step(final CalendarDateDuration aStepDuration) {
         return this.step((int) aStepDuration.measure, aStepDuration.unit);

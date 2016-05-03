@@ -24,9 +24,7 @@ package org.ojalgo.type;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Period;
-import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
 import java.util.Collections;
@@ -36,8 +34,9 @@ import org.ojalgo.constant.PrimitiveMath;
 
 /**
  * <p>
- * Designed to complement {@linkplain CalendarDate}. It is similar to {@linkplain Duration} or
- * {@linkplain Period}, but supports a decimal/fractional measure. It has been retrofitted to implement the
+ * Designed to complement {@linkplain CalendarDate}. It is similar to
+ * {@linkplain Duration} or {@linkplain Period}, but supports a
+ * decimal/fractional measure. It has been retrofitted to implement the
  * {@linkplain TemporalAmount} interface.
  * </p>
  *
@@ -45,7 +44,8 @@ import org.ojalgo.constant.PrimitiveMath;
  * @see CalendarDateUnit
  * @author apete
  */
-public final class CalendarDateDuration extends Number implements TemporalAmount, TemporalAdjuster, Comparable<CalendarDateDuration>, Serializable {
+public final class CalendarDateDuration extends Number
+        implements TemporalAmount, Comparable<CalendarDateDuration>, Serializable {
 
     public final double measure;
     public final CalendarDateUnit unit;
@@ -66,17 +66,16 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
         return temporal.plus(this.toDurationInMillis(), CalendarDateUnit.MILLIS);
     }
 
-    public Temporal adjustInto(final Temporal temporal) {
-        final long tmpSize = this.toDurationInMillis();
-        return temporal.with(ChronoField.INSTANT_SECONDS, tmpSize / 1000L).with(ChronoField.MILLI_OF_SECOND, tmpSize % 1000L);
-    }
-
     public int compareTo(final CalendarDateDuration reference) {
         final long tmpVal = this.toDurationInMillis();
         final long refVal = reference.toDurationInMillis();
         return Long.signum(tmpVal - refVal);
     }
 
+    /**
+     * @deprecated v40 Use something in {@linkplain CalendarDateUnit} instead
+     */
+    @Deprecated
     public CalendarDateDuration convertTo(final CalendarDateUnit destinationUnit) {
         return new CalendarDateDuration(destinationUnit.convert(measure, unit), destinationUnit);
     }

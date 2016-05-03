@@ -141,8 +141,8 @@ public enum CalendarDateUnit implements TemporalUnit, TemporalAmount, TemporalAd
         }
     }
 
-    public CalendarDateDuration convert(final CalendarDateDuration aSourceDuration) {
-        return aSourceDuration.convertTo(this);
+    public CalendarDateDuration convert(final CalendarDateDuration sourceDuration) {
+        return sourceDuration.convertTo(this);
     }
 
     public double convert(final CalendarDateUnit aSourceDurationUnit) {
