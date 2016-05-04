@@ -34,7 +34,7 @@ final class LowerUpper {
 
         super();
 
-        lower = TypeUtils.toBigDecimal(someLower);
-        upper = TypeUtils.toBigDecimal(someUpper);
+        lower = someLower != null ? TypeUtils.toBigDecimal(someLower) : null;
+        upper = someUpper != null ? TypeUtils.toBigDecimal(someUpper) : null;
     }
 }
