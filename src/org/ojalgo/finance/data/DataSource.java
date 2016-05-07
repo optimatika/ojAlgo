@@ -32,7 +32,6 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.ResourceLocator;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.type.CalendarDateUnit;
-import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeCache;
 
 public abstract class DataSource<DP extends DatePrice> {
@@ -51,12 +50,12 @@ public abstract class DataSource<DP extends DatePrice> {
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected DataSource(final String aSymbol, final CalendarDateUnit aResolution) {
+    protected DataSource(final String symbol, final CalendarDateUnit resolution) {
 
         super();
 
-        mySymbol = aSymbol;
-        myResolution = aResolution;
+        mySymbol = symbol;
+        myResolution = resolution;
     }
 
     @Override
@@ -91,20 +90,20 @@ public abstract class DataSource<DP extends DatePrice> {
         return this.getHistoricalPrices(myResourceLocator.getStreamReader());
     }
 
-    public List<DP> getHistoricalPrices(final BufferedReader aReader) {
+    public List<DP> getHistoricalPrices(final BufferedReader reader) {
 
         final ArrayList<DP> retVal = new ArrayList<DP>();
 
         String tmpLine;
         DP tmpHistPrice;
         try {
-            tmpLine = aReader.readLine();
+            tmpLine = reader.readLine();
 
             if (DEBUG) {
                 BasicLogger.debug(tmpLine);
             }
 
-            while ((tmpLine = aReader.readLine()) != null) {
+            while ((tmpLine = reader.readLine()) != null) {
 
                 if (DEBUG) {
                     BasicLogger.debug(tmpLine);
@@ -113,7 +112,7 @@ public abstract class DataSource<DP extends DatePrice> {
                 tmpHistPrice = this.parse(tmpLine);
                 retVal.add(tmpHistPrice);
             }
-            aReader.close();
+            reader.close();
         } catch (final IOException anException) {
             anException.printStackTrace();
         }
@@ -127,11 +126,11 @@ public abstract class DataSource<DP extends DatePrice> {
         return this.getPriceSeries(myResourceLocator.getStreamReader());
     }
 
-    public CalendarDateSeries<Double> getPriceSeries(final BufferedReader aReader) {
+    public CalendarDateSeries<Double> getPriceSeries(final BufferedReader reader) {
 
-        final CalendarDateSeries<Double> retVal = new CalendarDateSeries<Double>(myResolution).name(mySymbol).colour(ColourData.random());
+        final CalendarDateSeries<Double> retVal = new CalendarDateSeries<Double>(myResolution).name(mySymbol);
 
-        for (final DatePrice tmpDatePrice : this.getHistoricalPrices(aReader)) {
+        for (final DatePrice tmpDatePrice : this.getHistoricalPrices(reader)) {
             retVal.put(tmpDatePrice.getKey(), tmpDatePrice.getValue());
         }
 
@@ -146,8 +145,8 @@ public abstract class DataSource<DP extends DatePrice> {
         return mySymbol;
     }
 
-    public TypeCache<? extends List<DP>> getSymbolCache(final long aPurgeIntervalMeassure, final CalendarDateUnit aPurgeIntervalUnit) {
-        return new TypeCache<List<DP>>(aPurgeIntervalMeassure, aPurgeIntervalUnit) {
+    public TypeCache<? extends List<DP>> getSymbolCache(final long purgeIntervalMeassure, final CalendarDateUnit purgeIntervalUnit) {
+        return new TypeCache<List<DP>>(purgeIntervalMeassure, purgeIntervalUnit) {
 
             @Override
             protected List<DP> recreateCache() {
@@ -165,18 +164,18 @@ public abstract class DataSource<DP extends DatePrice> {
         return result;
     }
 
-    protected String addQueryParameter(final String aKey, final String aValue) {
-        return myResourceLocator.addQueryParameter(aKey, aValue);
+    protected String addQueryParameter(final String key, final String value) {
+        return myResourceLocator.addQueryParameter(key, value);
     }
 
-    protected abstract DP parse(String aLine);
+    protected abstract DP parse(String line);
 
-    protected void setHost(final String aHost) {
-        myResourceLocator.setHost(aHost);
+    protected void setHost(final String host) {
+        myResourceLocator.setHost(host);
     }
 
-    protected void setPath(final String aPath) {
-        myResourceLocator.setPath(aPath);
+    protected void setPath(final String path) {
+        myResourceLocator.setPath(path);
     }
 
 }

@@ -22,6 +22,7 @@
 package org.ojalgo.series;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.SortedMap;
 
 import org.ojalgo.function.BinaryFunction;
@@ -57,17 +58,57 @@ public interface BasicSeries<K extends Comparable<K>, V extends Number> extends 
 
     V lastValue();
 
+    /**
+     * @deprecated v40
+     */
+    @Deprecated
     void modify(BasicSeries<K, V> left, BinaryFunction<V> func);
 
+    /**
+     * @deprecated v40
+     */
+    @Deprecated
     void modify(BinaryFunction<V> func, BasicSeries<K, V> right);
 
-    void modify(BinaryFunction<V> func, V right);
+    /**
+     * @deprecated v40
+     */
+    @Deprecated
+    default void modify(final BinaryFunction<V> func, final V right) {
+        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
+            this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue(), right));
+        }
+    }
 
-    void modify(ParameterFunction<V> func, int param);
+    /**
+     * @deprecated v40
+     */
+    @Deprecated
+    default void modify(final ParameterFunction<V> func, final int param) {
+        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
+            this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue(), param));
+        }
+    }
 
-    void modify(UnaryFunction<V> func);
+    /**
+     * @deprecated v40 Use {@link #modifyAll(UnaryFunction<V>)} instead
+     */
+    @Deprecated
+    default void modify(final UnaryFunction<V> func) {
+        this.modifyAll(func);
+    }
 
-    void modify(V left, BinaryFunction<V> func);
+    /**
+     * @deprecated v40
+     */
+    @Deprecated
+    default void modify(final V left, final BinaryFunction<V> func) {
+        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
+            this.put(tmpEntry.getKey(), func.invoke(left, tmpEntry.getValue()));
+        }
+    }
+
+    void modifyAll(UnaryFunction<V> function);
 
     BasicSeries<K, V> name(String name);
 

@@ -296,8 +296,8 @@ public final class SampleSet implements Access1D<Double> {
 
     @Override
     public String toString() {
-        return "Sample set size: " + this.count() + ", Mean: " + this.getMean() + ", Median: " + this.getMedian() + ", Variance: " + this.getVariance()
-                + ", Standard Deviation: " + this.getStandardDeviation() + ", Minimum: " + this.getMinimum() + ", Maximum: " + this.getMaximum();
+        return "Sample set Size=" + this.count() + ", Mean=" + this.getMean() + ", Median=" + this.getMedian() + ", Var=" + this.getVariance() + ", StdDev="
+                + this.getStandardDeviation() + ", Min=" + this.getMinimum() + ", Max=" + this.getMaximum();
     }
 
     Access1D<?> getSamples() {

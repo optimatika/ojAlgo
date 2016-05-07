@@ -28,7 +28,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.DataSeries;
@@ -36,7 +35,7 @@ import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.keyvalue.KeyValue;
 
-abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I extends AbstractSeries<K, V, I>> extends TreeMap<K, V>implements BasicSeries<K, V> {
+abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I extends AbstractSeries<K, V, I>> extends TreeMap<K, V> implements BasicSeries<K, V> {
 
     private ColourData myColour = null;
     private String myName = null;
@@ -123,27 +122,9 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         }
     }
 
-    public void modify(final BinaryFunction<V> func, final V right) {
+    public void modifyAll(final UnaryFunction<V> function) {
         for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue(), right));
-        }
-    }
-
-    public void modify(final ParameterFunction<V> func, final int param) {
-        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue(), param));
-        }
-    }
-
-    public void modify(final UnaryFunction<V> func) {
-        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue()));
-        }
-    }
-
-    public void modify(final V left, final BinaryFunction<V> func) {
-        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), func.invoke(left, tmpEntry.getValue()));
+            this.put(tmpEntry.getKey(), function.invoke(tmpEntry.getValue()));
         }
     }
 
@@ -168,23 +149,24 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         return retVal.toString();
     }
 
-    void appendLastPartToString(final StringBuilder retVal) {
-        if (this.getColour() != null) {
-            retVal.append(TypeUtils.toHexString(this.getColour().getRGB()));
-            retVal.append(ASCII.NBSP);
+    final void appendLastPartToString(final StringBuilder builder) {
+
+        if (myColour != null) {
+            builder.append(TypeUtils.toHexString(myColour.getRGB()));
+            builder.append(ASCII.NBSP);
         }
 
         if (this.size() <= 30) {
-            retVal.append(super.toString());
+            builder.append(super.toString());
         } else {
-            retVal.append("First:");
-            retVal.append(this.firstEntry());
-            retVal.append(ASCII.NBSP);
-            retVal.append("Last:");
-            retVal.append(this.lastEntry());
-            retVal.append(ASCII.NBSP);
-            retVal.append("Size:");
-            retVal.append(this.size());
+            builder.append("First:");
+            builder.append(this.firstEntry());
+            builder.append(ASCII.NBSP);
+            builder.append("Last:");
+            builder.append(this.lastEntry());
+            builder.append(ASCII.NBSP);
+            builder.append("Size:");
+            builder.append(this.size());
         }
     }
 
@@ -197,12 +179,14 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
     }
 
     StringBuilder toStringFirstPart() {
+
         final StringBuilder retVal = new StringBuilder();
 
-        if (this.getName() != null) {
-            retVal.append(this.getName());
+        if (myName != null) {
+            retVal.append(myName);
             retVal.append(ASCII.NBSP);
         }
+
         return retVal;
     }
 

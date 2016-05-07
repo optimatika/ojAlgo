@@ -56,36 +56,36 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         myResolution = resolution;
     }
 
-    public CoordinationSet(final Collection<CalendarDateSeries<V>> aTimeSeriesCollection) {
+    public CoordinationSet(final Collection<CalendarDateSeries<V>> seriesCollection) {
 
-        super(aTimeSeriesCollection.size());
+        super(seriesCollection.size());
 
-        for (final CalendarDateSeries<V> tmpTimeSeries : aTimeSeriesCollection) {
+        for (final CalendarDateSeries<V> tmpTimeSeries : seriesCollection) {
             this.put(tmpTimeSeries);
         }
     }
 
-    public CoordinationSet(final Collection<CalendarDateSeries<V>> aTimeSeriesCollection, final CalendarDateUnit resolution) {
+    public CoordinationSet(final Collection<CalendarDateSeries<V>> seriesCollection, final CalendarDateUnit resolution) {
 
-        super(aTimeSeriesCollection.size());
+        super(seriesCollection.size());
 
         myResolution = resolution;
 
-        for (final CalendarDateSeries<V> tmpTimeSeries : aTimeSeriesCollection) {
+        for (final CalendarDateSeries<V> tmpTimeSeries : seriesCollection) {
             this.put(tmpTimeSeries);
         }
     }
 
-    public CoordinationSet(final int someInitialCapacity) {
-        super(someInitialCapacity);
+    public CoordinationSet(final int initialCapacity) {
+        super(initialCapacity);
     }
 
-    public CoordinationSet(final int someInitialCapacity, final float someLoadFactor) {
-        super(someInitialCapacity, someLoadFactor);
+    public CoordinationSet(final int initialCapacity, final float loadFactor) {
+        super(initialCapacity, loadFactor);
     }
 
-    public CoordinationSet(final Map<? extends String, ? extends CalendarDateSeries<V>> someM) {
-        super(someM);
+    public CoordinationSet(final Map<? extends String, ? extends CalendarDateSeries<V>> members) {
+        super(members);
     }
 
     /**
@@ -216,25 +216,25 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         }
     }
 
-    public V getValue(final String aSeriesName, final CalendarDate aCalendarDate) {
-        return this.get(aSeriesName).get(aCalendarDate);
+    public V getValue(final String series, final CalendarDate date) {
+        return this.get(series).get(date);
     };
 
-    public void modify(final BinaryFunction<V> aFunc, final V anArg) {
+    public void modify(final BinaryFunction<V> function, final V argument) {
         for (final CalendarDateSeries<V> tmpSeries : this.values()) {
-            tmpSeries.modify(aFunc, anArg);
+            tmpSeries.modify(function, argument);
         }
     }
 
-    public void modify(final ParameterFunction<V> aFunc, final int aParam) {
+    public void modify(final ParameterFunction<V> function, final int parameter) {
         for (final CalendarDateSeries<V> tmpSeries : this.values()) {
-            tmpSeries.modify(aFunc, aParam);
+            tmpSeries.modify(function, parameter);
         }
     }
 
-    public void modify(final UnaryFunction<V> aFunc) {
+    public void modify(final UnaryFunction<V> function) {
         for (final CalendarDateSeries<V> tmpSeries : this.values()) {
-            tmpSeries.modify(aFunc);
+            tmpSeries.modifyAll(function);
         }
     }
 
@@ -285,8 +285,8 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         final CalendarDate tmpLatestFirstKey = this.getLatestFirstKey();
         final CalendarDate tmpEarliestLastKey = this.getEarliestLastKey();
 
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
-            retVal.put(tmpSeries.resample(tmpLatestFirstKey, tmpEarliestLastKey, resolution));
+        for (final java.util.Map.Entry<String, CalendarDateSeries<V>> tmpEntry : this.entrySet()) {
+            retVal.put(tmpEntry.getKey(), tmpEntry.getValue().resample(tmpLatestFirstKey, tmpEarliestLastKey, resolution));
         }
 
         return retVal;
@@ -304,8 +304,8 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
 
         final CoordinationSet<V> retVal = new CoordinationSet<V>(resolution);
 
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
-            retVal.put(tmpSeries.resample(resolution));
+        for (final java.util.Map.Entry<String, CalendarDateSeries<V>> tmpEntry : this.entrySet()) {
+            retVal.put(tmpEntry.getKey(), tmpEntry.getValue().resample(resolution));
         }
 
         return retVal;

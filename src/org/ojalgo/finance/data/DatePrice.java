@@ -31,25 +31,25 @@ public abstract class DatePrice implements KeyValue<CalendarDate, Double> {
 
     public final CalendarDate key;
 
-    protected DatePrice(final Calendar aDate) {
+    protected DatePrice(final Calendar calendar) {
 
         super();
 
-        key = new CalendarDate(aDate);
+        key = new CalendarDate(calendar);
     }
 
-    protected DatePrice(final Date aDate) {
+    protected DatePrice(final Date date) {
 
         super();
 
-        key = new CalendarDate(aDate);
+        key = new CalendarDate(date);
     }
 
-    protected DatePrice(final long aDate) {
+    protected DatePrice(final long millis) {
 
         super();
 
-        key = new CalendarDate(aDate);
+        key = new CalendarDate(millis);
     }
 
     protected DatePrice(final String sqlString) {

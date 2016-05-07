@@ -43,20 +43,20 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
         public double open;
         public double volume;
 
-        protected Data(final Date aDate) {
-            super(aDate);
+        protected Data(final Calendar calendar) {
+            super(calendar);
         }
 
-        protected Data(final long aDate) {
-            super(aDate);
+        protected Data(final Date date) {
+            super(date);
+        }
+
+        protected Data(final long millis) {
+            super(millis);
         }
 
         protected Data(final String sqlString) {
             super(sqlString);
-        }
-
-        protected Data(final Calendar aDate) {
-            super(aDate);
         }
 
         @Override
@@ -76,18 +76,18 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
     private static final String TABLE_CSV = "/table.csv";
     private static final String W = "w";
 
-    public YahooSymbol(final String aSymbol) {
-        this(aSymbol, CalendarDateUnit.DAY);
+    public YahooSymbol(final String symbol) {
+        this(symbol, CalendarDateUnit.DAY);
     }
 
-    public YahooSymbol(final String aSymbol, final CalendarDateUnit aResolution) {
+    public YahooSymbol(final String symbol, final CalendarDateUnit resolution) {
 
-        super(aSymbol, aResolution);
+        super(symbol, resolution);
 
         this.setHost(ICHART_FINANCE_YAHOO_COM);
         this.setPath(TABLE_CSV);
-        this.addQueryParameter(S, aSymbol);
-        switch (aResolution) {
+        this.addQueryParameter(S, symbol);
+        switch (resolution) {
         case MONTH:
             this.addQueryParameter(G, M);
             break;
@@ -102,42 +102,42 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
     }
 
     @Override
-    protected YahooSymbol.Data parse(final String aLine) {
+    protected YahooSymbol.Data parse(final String line) {
 
         Data retVal = null;
 
         int tmpInclusiveBegin = 0;
-        int tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        String tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        int tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        String tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         retVal = new Data(tmpString);
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         retVal.open = Double.parseDouble(tmpString);
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         retVal.high = Double.parseDouble(tmpString);
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         retVal.low = Double.parseDouble(tmpString);
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         retVal.close = Double.parseDouble(tmpString);
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         retVal.volume = Double.parseDouble(tmpString);
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpString = aLine.substring(tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin);
         retVal.adjustedClose = Double.parseDouble(tmpString);
 
         return retVal;

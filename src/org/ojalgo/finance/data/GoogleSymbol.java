@@ -41,8 +41,20 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
         public double open;
         public double volume;
 
-        protected Data(final Calendar aDate) {
-            super(aDate);
+        protected Data(final Calendar calendar) {
+            super(calendar);
+        }
+
+        protected Data(final Date date) {
+            super(date);
+        }
+
+        protected Data(final long millis) {
+            super(millis);
+        }
+
+        protected Data(final String sqlString) {
+            super(sqlString);
         }
 
         @Override
@@ -64,19 +76,19 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
     private static final String STARTDATE = "startdate";
     private static final String WEEKLY = "weekly";
 
-    public GoogleSymbol(final String aSymbol) {
-        this(aSymbol, CalendarDateUnit.DAY);
+    public GoogleSymbol(final String symbol) {
+        this(symbol, CalendarDateUnit.DAY);
     }
 
-    public GoogleSymbol(final String aSymbol, final CalendarDateUnit aResolution) {
+    public GoogleSymbol(final String symbol, final CalendarDateUnit resolution) {
 
-        super(aSymbol, aResolution);
+        super(symbol, resolution);
 
         this.setHost(FINANCE_GOOGLE_COM);
         this.setPath(FINANCE_HISTORICAL);
-        this.addQueryParameter(Q, aSymbol);
+        this.addQueryParameter(Q, symbol);
         this.addQueryParameter(STARTDATE, JAN_2_1970);
-        switch (aResolution) {
+        switch (resolution) {
         case WEEK:
             this.addQueryParameter(HISTPERIOD, WEEKLY);
             break;
@@ -88,21 +100,21 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
     }
 
     @Override
-    protected GoogleSymbol.Data parse(final String aLine) {
+    protected GoogleSymbol.Data parse(final String line) {
 
         Data retVal = null;
 
         int tmpInclusiveBegin = 0;
-        int tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        String tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        int tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        String tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         final Calendar tmpCalendar = new GregorianCalendar();
         tmpCalendar.setTime(DATE_FORMAT.parse(tmpString));
         this.getResolution().round(tmpCalendar);
         retVal = new Data(tmpCalendar);
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         try {
             retVal.open = Double.parseDouble(tmpString);
         } catch (final NumberFormatException ex) {
@@ -110,8 +122,8 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
         }
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         try {
             retVal.high = Double.parseDouble(tmpString);
         } catch (final NumberFormatException ex) {
@@ -119,8 +131,8 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
         }
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         try {
             retVal.low = Double.parseDouble(tmpString);
         } catch (final NumberFormatException ex) {
@@ -128,8 +140,8 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
         }
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = aLine.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = aLine.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         try {
             retVal.close = Double.parseDouble(tmpString);
         } catch (final NumberFormatException ex) {
@@ -137,7 +149,7 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
         }
 
         tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpString = aLine.substring(tmpInclusiveBegin);
+        tmpString = line.substring(tmpInclusiveBegin);
         try {
             retVal.volume = Double.parseDouble(tmpString);
         } catch (final NumberFormatException ex) {

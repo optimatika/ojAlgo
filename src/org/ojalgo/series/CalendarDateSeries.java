@@ -260,7 +260,7 @@ public class CalendarDateSeries<V extends Number> extends AbstractSeries<Calenda
 
         final StringBuilder retVal = this.toStringFirstPart();
 
-        retVal.append(this.getResolution());
+        retVal.append(myResolution);
         retVal.append(ASCII.NBSP);
 
         this.appendLastPartToString(retVal);
