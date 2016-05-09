@@ -100,28 +100,28 @@ public final class GaussianProcess extends AbstractProcess<Normal> {
     }
 
     @Override
-    double getExpected(final double aStepSize) {
-        return this.getDistribution(aStepSize).getExpected();
+    double getExpected(final double stepSize) {
+        return this.getDistribution(stepSize).getExpected();
     }
 
     @Override
-    double getLowerConfidenceQuantile(final double aStepSize, final double aConfidence) {
-        return this.getDistribution(aStepSize).getLowerConfidenceQuantile(aConfidence);
+    double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
+        return this.getDistribution(stepSize).getLowerConfidenceQuantile(confidence);
     }
 
     @Override
-    double getStandardDeviation(final double aStepSize) {
-        return this.getDistribution(aStepSize).getStandardDeviation();
+    double getStandardDeviation(final double stepSize) {
+        return this.getDistribution(stepSize).getStandardDeviation();
     }
 
     @Override
-    double getUpperConfidenceQuantile(final double aStepSize, final double aConfidence) {
-        return this.getDistribution(aStepSize).getUpperConfidenceQuantile(aConfidence);
+    double getUpperConfidenceQuantile(final double stepSize, final double confidence) {
+        return this.getDistribution(stepSize).getUpperConfidenceQuantile(confidence);
     }
 
     @Override
-    double getVariance(final double aStepSize) {
-        return this.getDistribution(aStepSize).getVariance();
+    double getVariance(final double stepSize) {
+        return this.getDistribution(stepSize).getVariance();
     }
 
 }

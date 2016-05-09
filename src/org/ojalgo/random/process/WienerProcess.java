@@ -62,28 +62,28 @@ public final class WienerProcess extends AbstractProcess<Normal> {
     }
 
     @Override
-    double getExpected(final double aStepSize) {
+    double getExpected(final double stepSize) {
         return this.getValue();
     }
 
     @Override
-    double getLowerConfidenceQuantile(final double aStepSize, final double aConfidence) {
-        return this.getValue() - (Math.sqrt(aStepSize) * SQRT_TWO * RandomUtils.erfi(aConfidence));
+    double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
+        return this.getValue() - (Math.sqrt(stepSize) * SQRT_TWO * RandomUtils.erfi(confidence));
     }
 
     @Override
-    double getStandardDeviation(final double aStepSize) {
-        return Math.sqrt(aStepSize);
+    double getStandardDeviation(final double stepSize) {
+        return Math.sqrt(stepSize);
     }
 
     @Override
-    double getUpperConfidenceQuantile(final double aStepSize, final double aConfidence) {
-        return this.getValue() + (Math.sqrt(aStepSize) * SQRT_TWO * RandomUtils.erfi(aConfidence));
+    double getUpperConfidenceQuantile(final double stepSize, final double confidence) {
+        return this.getValue() + (Math.sqrt(stepSize) * SQRT_TWO * RandomUtils.erfi(confidence));
     }
 
     @Override
-    double getVariance(final double aStepSize) {
-        return aStepSize;
+    double getVariance(final double stepSize) {
+        return stepSize;
     }
 
 }

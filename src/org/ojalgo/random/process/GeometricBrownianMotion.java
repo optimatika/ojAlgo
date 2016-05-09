@@ -32,7 +32,7 @@ import org.ojalgo.random.SampleSet;
 /**
  * Diffusion process defined by a stochastic differential equation: dX = r X dt + s X dW A stochastic process
  * is said to follow a geometric Brownian motion if it satisfies this stochastic differential equation.
- * 
+ *
  * @author apete
  */
 public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
@@ -40,42 +40,42 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
     private static final WienerProcess GENERATOR = new WienerProcess();
 
     /**
-     * @param aSeriesOfSamples A series of samples, evenly spaced in time.
-     * @param aSamplePeriod The amount of time (in which ever unit you prefer) between each sample in the
+     * @param seriesOfSamples A series of samples, evenly spaced in time.
+     * @param samplePeriod The amount of time (in which ever unit you prefer) between each sample in the
      *        series.
      */
-    public static GeometricBrownianMotion estimate(final Access1D<?> aSeriesOfSamples, final double aSamplePeriod) {
+    public static GeometricBrownianMotion estimate(final Access1D<?> seriesOfSamples, final double samplePeriod) {
 
-        final int tmpSizeMinusOne = (int) (aSeriesOfSamples.count() - 1);
+        final int tmpSizeMinusOne = (int) (seriesOfSamples.count() - 1);
         final Array1D<Double> tmpLogDiffSeries = Array1D.PRIMITIVE.makeZero(tmpSizeMinusOne);
         for (int i = 0; i < tmpSizeMinusOne; i++) {
-            tmpLogDiffSeries.set(i, Math.log(aSeriesOfSamples.doubleValue(i + 1) / aSeriesOfSamples.doubleValue(i)));
+            tmpLogDiffSeries.set(i, Math.log(seriesOfSamples.doubleValue(i + 1) / seriesOfSamples.doubleValue(i)));
         }
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpLogDiffSeries);
 
         final double tmpExp = tmpSampleSet.getMean();
         final double tmpVar = tmpSampleSet.getVariance();
 
-        final double tmpDiff = Math.sqrt(tmpVar / aSamplePeriod);
-        final double tmpDrift = (tmpExp / aSamplePeriod) + ((tmpDiff * tmpDiff) / TWO);
+        final double tmpDiff = Math.sqrt(tmpVar / samplePeriod);
+        final double tmpDrift = (tmpExp / samplePeriod) + ((tmpDiff * tmpDiff) / TWO);
 
         final GeometricBrownianMotion retVal = new GeometricBrownianMotion(tmpDrift, tmpDiff);
-        retVal.setValue(aSeriesOfSamples.doubleValue(0));
+        retVal.setValue(seriesOfSamples.doubleValue(0));
         return retVal;
     }
 
     /**
      * Assuming initial value = 1.0 and horizon = 1.0.
      */
-    public static GeometricBrownianMotion make(final double aExpected, final double aVariance) {
-        return GeometricBrownianMotion.make(ONE, aExpected, aVariance, ONE);
+    public static GeometricBrownianMotion make(final double expected, final double variance) {
+        return GeometricBrownianMotion.make(ONE, expected, variance, ONE);
     }
 
     /**
      * Assuming initial value = 1.0.
      */
-    public static GeometricBrownianMotion make(final double aExpected, final double aVariance, final double aHorizon) {
-        return GeometricBrownianMotion.make(ONE, aExpected, aVariance, aHorizon);
+    public static GeometricBrownianMotion make(final double expected, final double variance, final double horizon) {
+        return GeometricBrownianMotion.make(ONE, expected, variance, horizon);
     }
 
     /**
@@ -99,14 +99,14 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
     private final double myDiffusionFunction;
     private final double myLocalDrift;
 
-    public GeometricBrownianMotion(final double aLocalDrift, final double aDiffusionFunction) {
+    public GeometricBrownianMotion(final double localDrift, final double diffusionFunction) {
 
         super();
 
         this.setValue(ONE);
 
-        myLocalDrift = aLocalDrift;
-        myDiffusionFunction = aDiffusionFunction;
+        myLocalDrift = localDrift;
+        myDiffusionFunction = diffusionFunction;
     }
 
     @SuppressWarnings("unused")
@@ -115,12 +115,12 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
     }
 
     /**
-     * @param aConvertionFactor A step size change factor.
+     * @param convertionFactor A step size change factor.
      */
-    public GeometricBrownianMotion convert(final double aConvertionFactor) {
+    public GeometricBrownianMotion convert(final double convertionFactor) {
 
-        final double tmpDrift = myLocalDrift * aConvertionFactor;
-        final double tmpDiff = myDiffusionFunction * Math.sqrt(aConvertionFactor);
+        final double tmpDrift = myLocalDrift * convertionFactor;
+        final double tmpDiff = myDiffusionFunction * Math.sqrt(convertionFactor);
 
         return new GeometricBrownianMotion(tmpDrift, tmpDiff);
     }
@@ -136,12 +136,12 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
         return new LogNormal(tmpLocation, tmpScale);
     }
 
-    private final double getDistributionLocation(final double aStepSize, final double aVariance) {
-        return (Math.log(this.getValue()) + (myLocalDrift * aStepSize)) - (HALF * aVariance);
+    private final double getDistributionLocation(final double stepSize, final double variance) {
+        return (Math.log(this.getValue()) + (myLocalDrift * stepSize)) - (HALF * variance);
     }
 
-    private final double getDistributionVariance(final double aStepSize) {
-        return myDiffusionFunction * myDiffusionFunction * aStepSize;
+    private final double getDistributionVariance(final double stepSize) {
+        return myDiffusionFunction * myDiffusionFunction * stepSize;
     }
 
     @Override
@@ -164,42 +164,42 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
      * Expected future value
      */
     @Override
-    double getExpected(final double aStepSize) {
-        return this.getValue() * Math.exp(myLocalDrift * aStepSize);
+    double getExpected(final double stepSize) {
+        return this.getValue() * Math.exp(myLocalDrift * stepSize);
     }
 
     @Override
-    double getLowerConfidenceQuantile(final double aStepSize, final double aConfidence) {
+    double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
 
-        final double tmpVar = this.getDistributionVariance(aStepSize);
+        final double tmpVar = this.getDistributionVariance(stepSize);
 
-        final double tmpLocation = this.getDistributionLocation(aStepSize, tmpVar);
+        final double tmpLocation = this.getDistributionLocation(stepSize, tmpVar);
 
         final double tmpScale = Math.sqrt(tmpVar);
 
-        return Math.exp(tmpLocation - (tmpScale * SQRT_TWO * RandomUtils.erfi(aConfidence)));
+        return Math.exp(tmpLocation - (tmpScale * SQRT_TWO * RandomUtils.erfi(confidence)));
     }
 
     @Override
-    double getStandardDeviation(final double aStepSize) {
-        return Math.sqrt(this.getVariance(aStepSize));
+    double getStandardDeviation(final double stepSize) {
+        return Math.sqrt(this.getVariance(stepSize));
     }
 
     @Override
-    double getUpperConfidenceQuantile(final double aStepSize, final double aConfidence) {
+    double getUpperConfidenceQuantile(final double stepSize, final double confidence) {
 
-        final double tmpVar = this.getDistributionVariance(aStepSize);
+        final double tmpVar = this.getDistributionVariance(stepSize);
 
-        final double tmpLocation = this.getDistributionLocation(aStepSize, tmpVar);
+        final double tmpLocation = this.getDistributionLocation(stepSize, tmpVar);
 
         final double tmpScale = Math.sqrt(tmpVar);
 
-        return Math.exp(tmpLocation + (tmpScale * SQRT_TWO * RandomUtils.erfi(aConfidence)));
+        return Math.exp(tmpLocation + (tmpScale * SQRT_TWO * RandomUtils.erfi(confidence)));
     }
 
     @Override
-    double getVariance(final double aStepSize) {
-        return this.getValue() * this.getValue() * Math.exp(TWO * myLocalDrift * aStepSize) * Math.expm1(this.getDistributionVariance(aStepSize));
+    double getVariance(final double stepSize) {
+        return this.getValue() * this.getValue() * Math.exp(TWO * myLocalDrift * stepSize) * Math.expm1(this.getDistributionVariance(stepSize));
     }
 
 }

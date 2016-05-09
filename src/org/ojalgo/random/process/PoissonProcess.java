@@ -32,22 +32,22 @@ import org.ojalgo.random.Poisson;
  * these inter-arrival times is assumed to be independent of other inter-arrival times. The process is a good
  * model of radioactive decay, telephone calls and requests for a particular document on a web server, among
  * many other phenomena.
- * 
+ *
  * @author apete
  */
 public final class PoissonProcess extends AbstractProcess<Poisson> {
 
-    private final double myRate; // lambda, intensity
-
     private static final Poisson GENERATOR = new Poisson();
 
-    protected PoissonProcess(final double aRate) {
+    private final double myRate; // lambda, intensity
+
+    protected PoissonProcess(final double rate) {
 
         super();
 
         this.setValue(ZERO);
 
-        myRate = aRate;
+        myRate = rate;
     }
 
     public Poisson getDistribution(final double evaluationPoint) {
@@ -71,28 +71,28 @@ public final class PoissonProcess extends AbstractProcess<Poisson> {
     }
 
     @Override
-    double getExpected(final double aStepSize) {
-        return myRate * aStepSize;
+    double getExpected(final double stepSize) {
+        return myRate * stepSize;
     }
 
     @Override
-    double getLowerConfidenceQuantile(final double aStepSize, final double aConfidence) {
+    double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    double getStandardDeviation(final double aStepSize) {
-        return Math.sqrt(myRate * aStepSize);
+    double getStandardDeviation(final double stepSize) {
+        return Math.sqrt(myRate * stepSize);
     }
 
     @Override
-    double getUpperConfidenceQuantile(final double aStepSize, final double aConfidence) {
+    double getUpperConfidenceQuantile(final double stepSize, final double confidence) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    double getVariance(final double aStepSize) {
-        return myRate * aStepSize;
+    double getVariance(final double stepSize) {
+        return myRate * stepSize;
     }
 
 }

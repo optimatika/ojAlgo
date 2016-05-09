@@ -58,8 +58,8 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
      * <code>1.0</code>, and then {@link ContinuousDistribution#getQuantile(double)} (but with different input
      * argument).
      */
-    public final double getLowerConfidenceQuantile(final double aConfidence) {
-        return this.getLowerConfidenceQuantile(ONE, aConfidence);
+    public final double getLowerConfidenceQuantile(final double confidence) {
+        return this.getLowerConfidenceQuantile(ONE, confidence);
     }
 
     /**
@@ -75,8 +75,8 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
      * <code>1.0</code>, and then {@link ContinuousDistribution#getQuantile(double)} (but with different input
      * argument).
      */
-    public final double getUpperConfidenceQuantile(final double aConfidence) {
-        return this.getUpperConfidenceQuantile(ONE, aConfidence);
+    public final double getUpperConfidenceQuantile(final double confidence) {
+        return this.getUpperConfidenceQuantile(ONE, confidence);
     }
 
     public final double getValue() {
@@ -131,19 +131,19 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
 
     protected abstract double step(double currentValue, final double stepSize, final double normalisedRandomIncrement);
 
-    abstract double getExpected(double aStepSize);
+    abstract double getExpected(double stepSize);
 
-    abstract double getLowerConfidenceQuantile(double aStepSize, final double aConfidence);
+    abstract double getLowerConfidenceQuantile(double stepSize, final double confidence);
 
     final TreeSet<ComparableToDouble<Double>> getObservations() {
         return myObservations;
     }
 
-    abstract double getStandardDeviation(double aStepSize);
+    abstract double getStandardDeviation(double stepSize);
 
-    abstract double getUpperConfidenceQuantile(double aStepSize, final double aConfidence);
+    abstract double getUpperConfidenceQuantile(double stepSize, final double confidence);
 
-    abstract double getVariance(double aStepSize);
+    abstract double getVariance(double stepSize);
 
     final double step(final double stepSize) {
         return this.step(this.getValue(), stepSize, this.getNormalisedRandomIncrement());
