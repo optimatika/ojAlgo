@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
 import java.math.BigDecimal;
 
 import org.ojalgo.array.Array1D;
@@ -137,11 +139,14 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
         final double b = (((sPm2 + sPm1) * (sPm2 - sPm1)) + (ePm2 * ePm2)) / PrimitiveMath.TWO;
         final double c = (sPm1 * ePm2) * (sPm1 * ePm2);
 
-        double shift = Math.sqrt((b * b) + c);
-        if (b < PrimitiveMath.ZERO) {
-            shift = -shift;
+        double shift = ZERO;
+        if ((b != ZERO) | (c != ZERO)) {
+            shift = Math.sqrt((b * b) + c);
+            if (b < ZERO) {
+                shift = -shift;
+            }
+            shift = c / (b + shift);
         }
-        shift = c / (b + shift);
 
         double f = ((sK + sPm1) * (sK - sPm1)) + shift;
         double g = sK * eK;

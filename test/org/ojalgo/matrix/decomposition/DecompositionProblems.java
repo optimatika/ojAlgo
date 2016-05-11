@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -246,6 +247,33 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 TestUtils.assertEquals(tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
             }
         }
+    }
+
+    /**
+     * https://github.com/optimatika/ojAlgo/issues/22
+     */
+    public void _testP20160510InvertLargeMatrix() {
+
+        final double[][] data = new double[3000][3000];
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data.length; j++) {
+                data[i][j] = 0.9;
+            }
+        }
+        data[0][1] = 1.01;
+
+        final PrimitiveMatrix input = PrimitiveMatrix.FACTORY.rows(data);
+        try {
+            // final SingularValue<Double> svd = SingularValue.make(input);
+            final SingularValue<Double> svd = new SVDnew32.Primitive();
+            //final SingularValue<Double> svd = new RawSingularValue();
+            final double[][] inv = svd.invert(input).toRawCopy2D();
+        } catch (final TaskException exception) {
+            // TODO Auto-generated catch block
+            exception.printStackTrace();
+        }
+
+        // The issue:can't  be reached here!!!
     }
 
     /**

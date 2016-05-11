@@ -60,7 +60,7 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
         final double tmpDrift = (tmpExp / samplePeriod) + ((tmpDiff * tmpDiff) / TWO);
 
         final GeometricBrownianMotion retVal = new GeometricBrownianMotion(tmpDrift, tmpDiff);
-        retVal.setValue(seriesOfSamples.doubleValue(0));
+        retVal.setValue(seriesOfSamples.doubleValue(tmpSizeMinusOne));
         return retVal;
     }
 
