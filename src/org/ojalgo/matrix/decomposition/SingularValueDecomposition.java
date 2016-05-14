@@ -45,16 +45,16 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     private boolean myTransposed = false;
 
     @SuppressWarnings("unused")
-    private SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
-        this(aFactory, null);
+    private SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+        this(factory, null);
     }
 
-    protected SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory,
-            final BidiagonalDecomposition<N> aBidiagonal) {
+    protected SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory,
+            final BidiagonalDecomposition<N> bidiagonal) {
 
-        super(aFactory);
+        super(factory);
 
-        myBidiagonal = aBidiagonal;
+        myBidiagonal = bidiagonal;
     }
 
     public boolean computeValuesOnly(final ElementsSupplier<N> matrix) {
@@ -337,7 +337,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return myBidiagonal.decompose(matrix);
     }
 
-    protected abstract boolean doCompute(ElementsSupplier<N> aMtrx, boolean singularValuesOnly, boolean fullSize);
+    protected abstract boolean doCompute(ElementsSupplier<N> matrix, boolean singularValuesOnly, boolean fullSize);
 
     protected DiagonalAccess<N> getBidiagonalAccessD() {
         return myBidiagonal.getDiagonalAccessD();
@@ -367,8 +367,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         myD = someD;
     }
 
-    void setSingularValues(final Array1D<Double> someSingularValues) {
-        mySingularValues = someSingularValues;
+    void setSingularValues(final Array1D<Double> singularValues) {
+        mySingularValues = singularValues;
     }
 
 }

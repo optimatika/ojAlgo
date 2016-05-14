@@ -67,6 +67,11 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.aggregator();
     }
 
+    @Override
+    protected final DecompositionStore<N> allocate(final long numberOfRows, final long numberOfColumns) {
+        return myFactory.makeZero(numberOfRows, numberOfColumns);
+    }
+
     protected final DecompositionStore<N> copy(final Access2D<?> source) {
         return myFactory.copy(source);
     }
@@ -91,20 +96,15 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.builder().makeIdentity(dimension);
     }
 
-    protected final Rotation<N> makeRotation(final int aLow, final int aHigh, final double aCos, final double aSin) {
-        return myFactory.makeRotation(aLow, aHigh, aCos, aSin);
+    protected final Rotation<N> makeRotation(final int low, final int high, final double cos, final double sin) {
+        return myFactory.makeRotation(low, high, cos, sin);
     }
 
-    protected final Rotation<N> makeRotation(final int aLow, final int aHigh, final N aCos, final N aSin) {
-        return myFactory.makeRotation(aLow, aHigh, aCos, aSin);
+    protected final Rotation<N> makeRotation(final int low, final int high, final N cos, final N sin) {
+        return myFactory.makeRotation(low, high, cos, sin);
     }
 
     protected final DecompositionStore<N> makeZero(final int numberOfRows, final int numberOfColumns) {
-        return myFactory.makeZero(numberOfRows, numberOfColumns);
-    }
-
-    @Override
-    protected final DecompositionStore<N> allocate(final long numberOfRows, final long numberOfColumns) {
         return myFactory.makeZero(numberOfRows, numberOfColumns);
     }
 

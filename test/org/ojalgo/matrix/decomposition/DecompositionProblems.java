@@ -250,6 +250,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     }
 
     /**
+     * A user discovered that some large (relatively uniform) matrices causes the algorithm to never finsh
      * https://github.com/optimatika/ojAlgo/issues/22
      */
     public void _testP20160510InvertLargeMatrix() {
@@ -267,7 +268,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             // final SingularValue<Double> svd = SingularValue.make(input);
             final SingularValue<Double> svd = new SVDnew32.Primitive();
             //final SingularValue<Double> svd = new RawSingularValue();
-            final double[][] inv = svd.invert(input).toRawCopy2D();
+            final MatrixStore<Double> inv = svd.invert(input);
         } catch (final TaskException exception) {
             // TODO Auto-generated catch block
             exception.printStackTrace();

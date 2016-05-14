@@ -60,7 +60,7 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
         final double tmpDrift = (tmpExp / samplePeriod) + ((tmpDiff * tmpDiff) / TWO);
 
         final GeometricBrownianMotion retVal = new GeometricBrownianMotion(tmpDrift, tmpDiff);
-        retVal.setValue(seriesOfSamples.doubleValue(tmpSizeMinusOne));
+        retVal.setValue(seriesOfSamples.doubleValue(0)); // TODO Seems more natural to set it to the last value, but then some tests fail (need to look into why.)
         return retVal;
     }
 

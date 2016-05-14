@@ -37,12 +37,12 @@ public class Random1D {
     private final Alternator<Random> myAlternator = RandomNumber.makeRandomAlternator();
     private final MatrixStore<Double> myCholeskiedCorrelations;
 
-    public Random1D(final Access2D<?> aCorrelationsMatrix) {
+    public Random1D(final Access2D<?> correlations) {
 
         super();
 
         final Cholesky<Double> tmpCholesky = Cholesky.PRIMITIVE.make();
-        tmpCholesky.decompose(MatrixStore.PRIMITIVE.makeWrapper(aCorrelationsMatrix));
+        tmpCholesky.decompose(MatrixStore.PRIMITIVE.makeWrapper(correlations));
         myCholeskiedCorrelations = tmpCholesky.getL();
 
         tmpCholesky.reset();
@@ -53,13 +53,13 @@ public class Random1D {
     /**
      * If the variables are uncorrelated.
      */
-    public Random1D(final int aLength) {
+    public Random1D(final int size) {
 
         super();
 
         myCholeskiedCorrelations = null;
 
-        length = aLength;
+        length = size;
     }
 
     @SuppressWarnings("unused")

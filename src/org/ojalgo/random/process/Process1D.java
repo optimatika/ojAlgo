@@ -42,22 +42,22 @@ abstract class Process1D<D extends ContinuousDistribution, P extends AbstractPro
     }
 
     @SuppressWarnings("unchecked")
-    protected Process1D(final Access2D<?> aCorrelationsMatrix, final List<? extends P> someProcs) {
+    protected Process1D(final Access2D<?> correlations, final List<? extends P> processes) {
 
         super();
 
-        myGenerator = new Random1D(aCorrelationsMatrix);
-        myProcesses = someProcs.toArray(new AbstractProcess[someProcs.size()]);
+        myGenerator = new Random1D(correlations);
+        myProcesses = processes.toArray(new AbstractProcess[processes.size()]);
     }
 
     @SuppressWarnings("unchecked")
-    protected Process1D(final List<? extends P> someProcs) {
+    protected Process1D(final List<? extends P> processes) {
 
         super();
 
-        final int tmpSize = someProcs.size();
+        final int tmpSize = processes.size();
         myGenerator = new Random1D(tmpSize);
-        myProcesses = someProcs.toArray(new AbstractProcess[tmpSize]);
+        myProcesses = processes.toArray(new AbstractProcess[tmpSize]);
     }
 
     public double getValue(final int index) {
@@ -80,9 +80,9 @@ abstract class Process1D<D extends ContinuousDistribution, P extends AbstractPro
         myProcesses[index].setValue(newValue);
     }
 
-    public void setValues(final Access1D<?> aValue) {
+    public void setValues(final Access1D<?> newValues) {
         for (int p = 0; p < myProcesses.length; p++) {
-            myProcesses[p].setValue(aValue.doubleValue(p));
+            myProcesses[p].setValue(newValues.doubleValue(p));
         }
     }
 
@@ -90,12 +90,12 @@ abstract class Process1D<D extends ContinuousDistribution, P extends AbstractPro
         return myProcesses.length;
     }
 
-    public Array1D<Double> step(final double aStepSize) {
+    public Array1D<Double> step(final double stepSize) {
 
         final Array1D<Double> retVal = myGenerator.nextGaussian();
 
         for (int p = 0; p < myProcesses.length; p++) {
-            retVal.set(p, myProcesses[p].step(this.getValue(p), aStepSize, retVal.doubleValue(p)));
+            retVal.set(p, myProcesses[p].step(this.getValue(p), stepSize, retVal.doubleValue(p)));
         }
 
         return retVal;
@@ -105,36 +105,36 @@ abstract class Process1D<D extends ContinuousDistribution, P extends AbstractPro
         return myProcesses[index];
     }
 
-    D getDistribution(final int index, final double aStepSize) {
-        return myProcesses[index].getDistribution(aStepSize);
+    D getDistribution(final int index, final double stepSize) {
+        return myProcesses[index].getDistribution(stepSize);
     }
 
-    double getExpected(final int index, final double aStepSize) {
-        return myProcesses[index].getExpected(aStepSize);
+    double getExpected(final int index, final double stepSize) {
+        return myProcesses[index].getExpected(stepSize);
     }
 
-    double getLowerConfidenceQuantile(final int index, final double aStepSize, final double aConfidence) {
-        return myProcesses[index].getLowerConfidenceQuantile(aStepSize, aConfidence);
+    double getLowerConfidenceQuantile(final int index, final double stepSize, final double confidence) {
+        return myProcesses[index].getLowerConfidenceQuantile(stepSize, confidence);
     }
 
-    double getStandardDeviation(final int index, final double aStepSize) {
-        return myProcesses[index].getStandardDeviation(aStepSize);
+    double getStandardDeviation(final int index, final double stepSize) {
+        return myProcesses[index].getStandardDeviation(stepSize);
     }
 
-    double getUpperConfidenceQuantile(final int index, final double aStepSize, final double aConfidence) {
-        return myProcesses[index].getUpperConfidenceQuantile(aStepSize, aConfidence);
+    double getUpperConfidenceQuantile(final int index, final double stepSize, final double confidence) {
+        return myProcesses[index].getUpperConfidenceQuantile(stepSize, confidence);
     }
 
-    double getVariance(final int index, final double aStepSize) {
-        return myProcesses[index].getVariance(aStepSize);
+    double getVariance(final int index, final double stepSize) {
+        return myProcesses[index].getVariance(stepSize);
     }
 
-    SimulationResults simulate(final int index, final int aNumberOfRealisations, final int aNumberOfSteps, final double aStepSize) {
-        return myProcesses[index].simulate(aNumberOfRealisations, aNumberOfSteps, aStepSize);
+    SimulationResults simulate(final int index, final int numberOfRealisations, final int numberOfSteps, final double stepSize) {
+        return myProcesses[index].simulate(numberOfRealisations, numberOfSteps, stepSize);
     }
 
-    double step(final int index, final double aStepSize) {
-        return myProcesses[index].step(aStepSize);
+    double step(final int index, final double stepSize) {
+        return myProcesses[index].step(stepSize);
     }
 
 }
