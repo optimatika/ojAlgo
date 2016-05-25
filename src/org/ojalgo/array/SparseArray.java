@@ -57,12 +57,12 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         private final int myLastCursor;
 
-        NonzeroElement(final SparseArray<N> delegate) {
+        NonzeroElement(final SparseArray<N> delegate, final int actualLength) {
 
             super();
 
             myDelegate = delegate;
-            myLastCursor = myDelegate.myActualLength - 1;
+            myLastCursor = actualLength - 1;
         }
 
         public double doubleValue() {
@@ -509,7 +509,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
      */
     @Deprecated
     public Iterable<NonzeroElement<N>> nonzeros() {
-        return new NonzeroElement<N>(this);
+        return new NonzeroElement<N>(this, myActualLength);
     }
 
     @Override
