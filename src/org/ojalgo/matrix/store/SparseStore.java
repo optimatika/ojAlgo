@@ -23,9 +23,11 @@ package org.ojalgo.matrix.store;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessScalar;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.SparseArray;
@@ -36,6 +38,54 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     public static interface Factory<N extends Number> {
 
         SparseStore<N> make(long rowsCount, long columnsCount);
+
+    }
+
+    public static final class NonzeroElement<N extends Number> implements AccessScalar<N>, Iterator<NonzeroElement<N>>, Iterable<NonzeroElement<N>> {
+
+        private final SparseArray.NonzeroElement<N> myDelegate;
+        private final long myStructure;
+
+        NonzeroElement(final SparseArray.NonzeroElement<N> delegate, final long structure) {
+
+            super();
+
+            myDelegate = delegate;
+            myStructure = structure;
+        }
+
+        public long column() {
+            return AccessUtils.column(myDelegate.index(), myStructure);
+        }
+
+        public double doubleValue() {
+            return myDelegate.doubleValue();
+        }
+
+        public N getNumber() {
+            return myDelegate.getNumber();
+        }
+
+        public boolean hasNext() {
+            return myDelegate.hasNext();
+        }
+
+        public long index() {
+            return myDelegate.index();
+        }
+
+        public Iterator<SparseStore.NonzeroElement<N>> iterator() {
+            return this;
+        }
+
+        public SparseStore.NonzeroElement<N> next() {
+            myDelegate.next();
+            return this;
+        }
+
+        public long row() {
+            return AccessUtils.row(myDelegate.index(), myStructure);
+        }
 
     }
 
@@ -158,6 +208,41 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         return myLimits[row];
     }
 
+    public PhysicalStore<N> multiply(final Access1D<N> right, final PhysicalStore<N> target) {
+
+        if (this.isPrimitive()) {
+
+            final long tmpTargetRows = target.countRows();
+            final long tmpComplexity = this.countColumns();
+            final long tmpTargetColumns = target.countColumns();
+
+            target.fillAll(this.factory().scalar().zero().getNumber());
+
+            for (final SparseArray.NonzeroElement<N> tmpNonzero : myElements.nonzeros()) {
+                final long tmpIndex = tmpNonzero.index();
+                final double tmpValue = tmpNonzero.doubleValue();
+
+                final long tmpRow = AccessUtils.row(tmpIndex, tmpTargetRows);
+                final long tmpCol = AccessUtils.column(tmpIndex, tmpTargetRows);
+
+                for (long j = 0L; j < tmpTargetColumns; j++) {
+                    target.add(tmpRow, j, tmpValue * right.doubleValue(AccessUtils.index(tmpComplexity, tmpCol, j)));
+                }
+            }
+
+            return target;
+
+        } else {
+
+            return super.multiply(right, target);
+        }
+
+    }
+
+    public Iterable<NonzeroElement<N>> nonzeros() {
+        return new NonzeroElement<N>((SparseArray.NonzeroElement<N>) myElements.nonzeros(), this.countRows());
+    }
+
     public void set(final long row, final long col, final double value) {
         myElements.set(AccessUtils.index(myFirsts.length, row, col), value);
         this.updateNonZeros(row, col);
@@ -180,37 +265,6 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     void updateNonZeros(final int row, final int col) {
         myFirsts[row] = Math.min(col, myFirsts[row]);
         myLimits[row] = Math.max(col + 1, myLimits[row]);
-    }
-
-    public PhysicalStore<N> multiply(final Access1D<N> right, final PhysicalStore<N> target) {
-
-        if (this.isPrimitive()) {
-
-            final long tmpTargetRows = target.countRows();
-            final long tmpComplexity = this.countColumns();
-            final long tmpTargetColumns = target.countColumns();
-
-            target.fillAll(this.factory().scalar().zero().getNumber());
-
-            for (final SparseArray<N>.NonzeroElement tmpNonzero : myElements.nonzeros()) {
-                final long tmpIndex = tmpNonzero.index();
-                final double tmpValue = tmpNonzero.doubleValue();
-
-                final long tmpRow = AccessUtils.row(tmpIndex, tmpTargetRows);
-                final long tmpCol = AccessUtils.column(tmpIndex, tmpTargetRows);
-
-                for (long j = 0L; j < tmpTargetColumns; j++) {
-                    target.add(tmpRow, j, tmpValue * right.doubleValue(AccessUtils.index(tmpComplexity, tmpCol, j)));
-                }
-            }
-
-            return target;
-
-        } else {
-
-            return super.multiply(right, target);
-        }
-
     }
 
 }

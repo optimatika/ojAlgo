@@ -32,6 +32,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.matrix.store.operation.SubtractScaledVector;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -199,7 +200,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
-    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
 
         myTransposed = original.countRows() < original.countColumns();
 
@@ -213,7 +214,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         this.doDecompose(tmpData, true);
 
-        return this.getInverse(preallocated);
+        if (this.isSolvable()) {
+            return this.getInverse(preallocated);
+        } else {
+            throw new TaskException("Not solvable");
+        }
     }
 
     public boolean isFullSize() {

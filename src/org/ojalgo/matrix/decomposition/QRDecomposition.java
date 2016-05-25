@@ -32,6 +32,7 @@ import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -166,14 +167,26 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return retVal;
     }
 
-    public MatrixStore<N> invert(final Access2D<?> original) {
+    public final MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
+
         this.decompose(this.wrap(original));
-        return this.getInverse();
+
+        if (this.isSolvable()) {
+            return this.getInverse();
+        } else {
+            throw new TaskException("Not solvable");
+        }
     }
 
-    public MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) {
+    public final MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) throws TaskException {
+
         this.decompose(this.wrap(original));
-        return this.getInverse(preallocated);
+
+        if (this.isSolvable()) {
+            return this.getInverse(preallocated);
+        } else {
+            throw new TaskException("Not solvable");
+        }
     }
 
     /**

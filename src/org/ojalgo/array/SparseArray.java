@@ -50,46 +50,47 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
 
-    public final class NonzeroElement implements AccessScalar<N>, Iterator<NonzeroElement>, Iterable<NonzeroElement> {
+    public static final class NonzeroElement<N extends Number> implements AccessScalar<N>, Iterator<NonzeroElement<N>>, Iterable<NonzeroElement<N>> {
+
+        private int myCursor = -1;
+        private final SparseArray<N> myDelegate;
 
         private final int myLastCursor;
 
-        NonzeroElement() {
+        NonzeroElement(final SparseArray<N> delegate) {
+
             super();
 
-            myLastCursor = SparseArray.this.myActualLength - 1;
-        }
-
-        private int myCursor = -1;
-
-        public long index() {
-            return SparseArray.this.myIndices[myCursor];
+            myDelegate = delegate;
+            myLastCursor = myDelegate.myActualLength - 1;
         }
 
         public double doubleValue() {
-            return SparseArray.this.myValues.doubleValue(myCursor);
+            return myDelegate.myValues.doubleValue(myCursor);
         }
 
         public N getNumber() {
-            return SparseArray.this.myValues.get(myCursor);
-        }
-
-        public Iterator<SparseArray<N>.NonzeroElement> iterator() {
-            return this;
+            return myDelegate.myValues.get(myCursor);
         }
 
         public boolean hasNext() {
             return myCursor < myLastCursor;
         }
 
-        public SparseArray<N>.NonzeroElement next() {
+        public long index() {
+            return myDelegate.myIndices[myCursor];
+        }
+
+        public Iterator<NonzeroElement<N>> iterator() {
+            return this;
+        }
+
+        public NonzeroElement<N> next() {
             myCursor++;
             return this;
         }
 
     }
-
-    static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
     static abstract class SparseFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -140,6 +141,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     };
 
     static final int GROWTH_FACTOR = 2;
+
+    static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
     static final SparseFactory<Double> PRIMITIVE = new SparseFactory<Double>() {
 
@@ -478,12 +481,29 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
+    public void modifyAll(final UnaryFunction<N> function) {
+
+        final double tmpZeroValue = function.invoke(myZeroValue);
+
+        if (!MATH_CONTEXT.isDifferent(myZeroValue, tmpZeroValue)) {
+
+            for (int i = 0; i < myActualLength; i++) {
+                myValues.modify(i, function);
+            }
+
+        } else {
+
+            throw new IllegalArgumentException("SparseArray zero modification!");
+        }
+    }
+
     public void modifyOne(final long index, final UnaryFunction<N> function) {
         this.set(index, function.invoke(this.get(index)));
     }
 
-    public Iterable<NonzeroElement> nonzeros() {
-        return new NonzeroElement();
+    public Iterable<NonzeroElement<N>> nonzeros() {
+        return new NonzeroElement<N>(this);
     }
 
     @Override
@@ -851,23 +871,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     boolean isPrimitive() {
         return myValues.isPrimitive();
-    }
-
-    @Override
-    public void modifyAll(final UnaryFunction<N> function) {
-
-        final double tmpZeroValue = function.invoke(myZeroValue);
-
-        if (!MATH_CONTEXT.isDifferent(myZeroValue, tmpZeroValue)) {
-
-            for (int i = 0; i < myActualLength; i++) {
-                myValues.modify(i, function);
-            }
-
-        } else {
-
-            throw new IllegalArgumentException("SparseArray zero modification!");
-        }
     }
 
 }

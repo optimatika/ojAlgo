@@ -30,6 +30,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -110,13 +111,17 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     @Override
-    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
 
         final double[][] retVal = this.reset(original, false);
 
         this.doDecompose(retVal, original);
 
-        return this.getInverse(preallocated);
+        if (this.isSolvable()) {
+            return this.getInverse(preallocated);
+        } else {
+            throw new TaskException("Not solvable");
+        }
     }
 
     public boolean isSolvable() {

@@ -33,6 +33,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.matrix.store.operation.SubtractScaledVector;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -186,7 +187,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     @Override
-    public final MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+    public final MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
 
         final double[][] tmpData = this.reset(MatrixStore.PRIMITIVE.makeWrapper(original), true);
 
@@ -194,7 +195,12 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
         this.doDecompose(tmpData);
 
-        return this.getInverse(preallocated);
+        if (this.isSolvable()) {
+            return this.getInverse(preallocated);
+        } else {
+            throw new TaskException("Not solvable");
+        }
+
     }
 
     /**

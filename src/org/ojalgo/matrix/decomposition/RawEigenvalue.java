@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.HouseholderHermitian;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -281,7 +282,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     @Override
-    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
 
         final double[][] tmpData = this.reset(original, false);
 
@@ -289,7 +290,11 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         this.doDecompose(tmpData);
 
-        return this.getInverse(preallocated);
+        if (this.isSolvable()) {
+            return this.getInverse(preallocated);
+        } else {
+            throw new TaskException("Not solvable!");
+        }
     }
 
     public boolean isOrdered() {

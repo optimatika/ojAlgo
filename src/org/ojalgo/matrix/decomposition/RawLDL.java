@@ -31,6 +31,7 @@ import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
+import org.ojalgo.matrix.task.TaskException;
 
 final class RawLDL extends RawDecomposition implements LDL<Double> {
 
@@ -88,13 +89,17 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     }
 
     @Override
-    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
 
         final double[][] retVal = this.reset(original, false);
 
         this.doDecompose(retVal, original);
 
-        return this.getInverse(preallocated);
+        if (this.isSolvable()) {
+            return this.getInverse(preallocated);
+        } else {
+            throw new TaskException("Not solvable");
+        }
     }
 
     public boolean isSolvable() {

@@ -28,6 +28,7 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.matrix.task.TaskException;
 
 /**
  * In many ways similar to InPlaceDecomposition but this class is hardwired to work with double[][] data.
@@ -53,11 +54,11 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return this.doGetInverse((PrimitiveDenseStore) preallocated);
     }
 
-    public final MatrixStore<Double> invert(final Access2D<?> original) {
+    public final MatrixStore<Double> invert(final Access2D<?> original) throws TaskException {
         return this.invert(original, this.preallocate(original));
     }
 
-    public abstract MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated);
+    public abstract MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException;
 
     public final DecompositionStore<Double> preallocate(final Structure2D template) {
         return this.preallocate(template.countRows(), template.countColumns(), template.countRows());

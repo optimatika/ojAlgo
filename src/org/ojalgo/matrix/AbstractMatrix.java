@@ -664,37 +664,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return mySingularValue;
     }
 
-    protected final MatrixStore<N> doSolve(final MatrixStore<N> rhs) {
-
-        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
-                && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
-
-            return ((MatrixDecomposition.Solver<N>) myDecomposition).solve(rhs);
-
-        } else {
-
-            final SolverTask<N> tmpTask = this.getSolverTask(myStore, rhs);
-
-            if (tmpTask instanceof MatrixDecomposition.Solver) {
-
-                final MatrixDecomposition.Solver<N> tmpSolver = (MatrixDecomposition.Solver<N>) tmpTask;
-                myDecomposition = tmpSolver;
-                tmpSolver.compute(myStore);
-
-                return tmpSolver.solve(rhs);
-
-            } else {
-
-                try {
-                    return tmpTask.solve(myStore, rhs);
-                } catch (final TaskException xcptn) {
-                    xcptn.printStackTrace();
-                    return null;
-                }
-            }
-        }
-    }
-
     protected final MatrixStore<N> doInvert() {
 
         if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
@@ -727,6 +696,39 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         }
     }
 
+    protected final MatrixStore<N> doSolve(final MatrixStore<N> rhs) {
+
+        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
+                && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
+
+            return ((MatrixDecomposition.Solver<N>) myDecomposition).solve(rhs);
+
+        } else {
+
+            final SolverTask<N> tmpTask = this.getSolverTask(myStore, rhs);
+
+            if (tmpTask instanceof MatrixDecomposition.Solver) {
+
+                final MatrixDecomposition.Solver<N> tmpSolver = (MatrixDecomposition.Solver<N>) tmpTask;
+                myDecomposition = tmpSolver;
+                tmpSolver.compute(myStore);
+
+                return tmpSolver.solve(rhs);
+
+            } else {
+
+                try {
+                    return tmpTask.solve(myStore, rhs);
+                } catch (final TaskException xcptn) {
+                    xcptn.printStackTrace();
+                    return null;
+                }
+            }
+        }
+    }
+
+    abstract MatrixStore<N> cast(Access1D<?> matrix);
+
     abstract DeterminantTask<N> getDeterminantTask(final MatrixStore<N> template);
 
     abstract MatrixFactory<N, I> getFactory();
@@ -742,7 +744,5 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     final MatrixStore<N> getStore() {
         return myStore;
     }
-
-    abstract MatrixStore<N> cast(Access1D<?> matrix);
 
 }

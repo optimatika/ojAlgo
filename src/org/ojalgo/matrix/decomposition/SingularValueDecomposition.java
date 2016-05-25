@@ -29,6 +29,7 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.Scalar;
 
@@ -212,14 +213,26 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return this.getKyFanNorm(this.getSingularValues().size());
     }
 
-    public MatrixStore<N> invert(final Access2D<?> original) {
+    public final MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
+
         this.decompose(this.wrap(original));
-        return this.getInverse();
+
+        if (this.isSolvable()) {
+            return this.getInverse();
+        } else {
+            throw new TaskException("Not solvable");
+        }
     }
 
-    public MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) {
+    public final MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) throws TaskException {
+
         this.decompose(this.wrap(original));
-        return this.getInverse(preallocated);
+
+        if (this.isSolvable()) {
+            return this.getInverse(preallocated);
+        } else {
+            throw new TaskException("Not solvable");
+        }
     }
 
     public boolean isFullSize() {
