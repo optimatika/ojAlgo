@@ -239,6 +239,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     }
 
+    /**
+     * Marked as deprecated because of it's preliminary design - not because it will be removed.
+     *
+     * @deprecated v40
+     */
+    @Deprecated
     public Iterable<NonzeroElement<N>> nonzeros() {
         return new NonzeroElement<N>((SparseArray.NonzeroElement<N>) myElements.nonzeros(), this.countRows());
     }
