@@ -23,59 +23,59 @@ package org.ojalgo.access;
 
 import java.util.Iterator;
 
-public class ColumnsIterator<N extends Number> implements Access1D<N>, Iterator<Access1D<N>> {
+public final class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<N>> {
 
-    final class ColumnIterable implements Iterable<Access1D<N>> {
-
-        ColumnIterable() {
-            super();
-        }
-
-        public Iterator<Access1D<N>> iterator() {
-            return ColumnsIterator.this;
-        }
+    public static <S extends Number> Iterable<RowView<S>> make(final Access2D<S> access) {
+        return new RowView<S>(access).iterable;
     }
 
-    public static <S extends Number> Iterable<Access1D<S>> make(final Access2D<S> access) {
-        return new ColumnsIterator<S>(access).iterable;
-    }
-
-    public long column = -1L;
+    public long row = -1L;
 
     private final Access2D<N> myAccess2D;
 
-    final ColumnIterable iterable = new ColumnIterable();
+    final Iterable<RowView<N>> iterable = new Iterable<RowView<N>>() {
 
-    public ColumnsIterator(final Access2D<N> access) {
+        public Iterator<RowView<N>> iterator() {
+            return RowView.this;
+        }
+
+    };
+
+    @SuppressWarnings("unused")
+    private RowView() {
+        this(null);
+    }
+
+    protected RowView(final Access2D<N> access, final long row) {
 
         super();
 
         myAccess2D = access;
+        this.row = row;
     }
 
-    @SuppressWarnings("unused")
-    private ColumnsIterator() {
-        this(null);
+    RowView(final Access2D<N> access) {
+        this(access, -1L);
     }
 
     public long count() {
-        return myAccess2D.countRows();
+        return myAccess2D.countColumns();
     }
 
     public double doubleValue(final long index) {
-        return myAccess2D.doubleValue(index, column);
+        return myAccess2D.doubleValue(row, index);
     }
 
     public N get(final long index) {
-        return myAccess2D.get(index, column);
+        return myAccess2D.get(row, index);
     }
 
     public boolean hasNext() {
-        return (column + 1L) < myAccess2D.countColumns();
+        return (row + 1L) < myAccess2D.countRows();
     }
 
-    public Access1D<N> next() {
-        column++;
+    public RowView<N> next() {
+        row++;
         return this;
     }
 

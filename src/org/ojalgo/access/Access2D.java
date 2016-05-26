@@ -130,6 +130,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    default Iterable<ColumnView<N>> columns() {
+        return ColumnView.make(this);
+    }
+
     default double doubleValue(final long index) {
         final long tmpStructure = this.countRows();
         return this.doubleValue(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure));
@@ -151,6 +155,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     N get(long row, long column);
 
+    default Iterable<RowView<N>> rows() {
+        return RowView.make(this);
+    }
+
     default double[][] toRawCopy2D() {
 
         final int tmpRowDim = (int) this.countRows();
@@ -167,14 +175,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         }
 
         return retVal;
-    }
-
-    default Iterable<Access1D<N>> columns() {
-        return ColumnsIterator.make(this);
-    }
-
-    default Iterable<Access1D<N>> rows() {
-        return RowsIterator.make(this);
     }
 
 }

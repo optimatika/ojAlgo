@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,64 +23,56 @@ package org.ojalgo.access;
 
 import java.util.Iterator;
 
-public class RowsIterator<N extends Number> implements Access1D<N>, Iterator<Access1D<N>> {
+public final class ElementView<N extends Number> implements AccessScalar<N>, Iterator<ElementView<N>> {
 
-    final class RowIterable implements Iterable<Access1D<N>> {
+    public static <S extends Number> Iterable<ElementView<S>> make(final Access1D<S> access) {
+        return new ElementView<S>(access).iterable;
+    }
 
-        RowIterable() {
-            super();
+    public long index = -1L;
+
+    private final Access1D<N> myAccess1D;
+
+    final Iterable<ElementView<N>> iterable = new Iterable<ElementView<N>>() {
+
+        public Iterator<ElementView<N>> iterator() {
+            return ElementView.this;
         }
 
-        public Iterator<Access1D<N>> iterator() {
-            return RowsIterator.this;
-        }
-    }
-
-    public static <S extends Number> Iterable<Access1D<S>> make(final Access2D<S> access) {
-        return new RowsIterator<S>(access).iterable;
-    }
-
-    public long row = -1L;
-
-    private final Access2D<N> myAccess2D;
-
-    final RowIterable iterable = new RowIterable();
-
-    public RowsIterator(final Access2D<N> access) {
-
-        super();
-
-        myAccess2D = access;
-    }
+    };
 
     @SuppressWarnings("unused")
-    private RowsIterator() {
+    private ElementView() {
         this(null);
     }
 
-    public long count() {
-        return myAccess2D.countColumns();
+    protected ElementView(final Access1D<N> access, final long index) {
+
+        super();
+
+        myAccess1D = access;
+        this.index = index;
     }
 
-    public double doubleValue(final long index) {
-        return myAccess2D.doubleValue(row, index);
+    ElementView(final Access1D<N> access) {
+        this(access, -1L);
     }
 
-    public N get(final long index) {
-        return myAccess2D.get(row, index);
+    public double doubleValue() {
+        return myAccess1D.doubleValue(index);
+    }
+
+    public N getNumber() {
+        return myAccess1D.get(index);
     }
 
     public boolean hasNext() {
-        return (row + 1L) < myAccess2D.countRows();
+        return (index + 1L) < myAccess1D.count();
     }
 
-    public Access1D<N> next() {
-        row++;
+    public ElementView<N> next() {
+        index++;
         return this;
-    }
-
-    public void remove() {
-        throw new UnsupportedOperationException();
     }
 
 }
