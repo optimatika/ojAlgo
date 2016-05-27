@@ -131,7 +131,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     }
 
     default Iterable<ColumnView<N>> columns() {
-        return ColumnView.make(this);
+        return ColumnView.makeIterable(this);
     }
 
     default double doubleValue(final long index) {
@@ -156,7 +156,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     N get(long row, long column);
 
     default Iterable<RowView<N>> rows() {
-        return RowView.make(this);
+        return RowView.makeIterable(this);
     }
 
     default double[][] toRawCopy2D() {

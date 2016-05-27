@@ -25,13 +25,13 @@ import java.util.Iterator;
 
 public final class ColumnView<N extends Number> implements Access1D<N>, Iterator<ColumnView<N>> {
 
-    public static <S extends Number> Iterable<ColumnView<S>> make(final Access2D<S> access) {
+    public static <S extends Number> Iterable<ColumnView<S>> makeIterable(final Access2D<S> access) {
         return new ColumnView<S>(access).iterable;
     }
 
-    public long column = -1L;
-
-    private final Access2D<N> myAccess2D;
+    private final Access2D<N> myAccess;
+    private long myColumn = -1L;
+    private final long myLastColumn;
 
     final Iterable<ColumnView<N>> iterable = new Iterable<ColumnView<N>>() {
 
@@ -50,32 +50,47 @@ public final class ColumnView<N extends Number> implements Access1D<N>, Iterator
 
         super();
 
-        myAccess2D = access;
-        this.column = column;
+        myAccess = access;
+        myLastColumn = access.countColumns() - 1L;
+
+        myColumn = column;
     }
 
     ColumnView(final Access2D<N> access) {
         this(access, -1L);
     }
 
+    public long column() {
+        return myColumn;
+    }
+
     public long count() {
-        return myAccess2D.countRows();
+        return myAccess.countRows();
     }
 
     public double doubleValue(final long index) {
-        return myAccess2D.doubleValue(index, column);
+        return myAccess.doubleValue(index, myColumn);
     }
 
     public N get(final long index) {
-        return myAccess2D.get(index, column);
+        return myAccess.get(index, myColumn);
     }
 
     public boolean hasNext() {
-        return (column + 1L) < myAccess2D.countColumns();
+        return myColumn < myLastColumn;
+    }
+
+    public boolean hasPrevious() {
+        return myColumn > 0L;
     }
 
     public ColumnView<N> next() {
-        column++;
+        myColumn++;
+        return this;
+    }
+
+    public ColumnView<N> previous() {
+        myColumn--;
         return this;
     }
 

@@ -25,13 +25,13 @@ import java.util.Iterator;
 
 public final class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<N>> {
 
-    public static <S extends Number> Iterable<RowView<S>> make(final Access2D<S> access) {
+    public static <S extends Number> Iterable<RowView<S>> makeIterable(final Access2D<S> access) {
         return new RowView<S>(access).iterable;
     }
 
-    public long row = -1L;
-
-    private final Access2D<N> myAccess2D;
+    private final Access2D<N> myAccess;
+    private final long myLastRow;
+    private long myRow = -1L;
 
     final Iterable<RowView<N>> iterable = new Iterable<RowView<N>>() {
 
@@ -50,8 +50,10 @@ public final class RowView<N extends Number> implements Access1D<N>, Iterator<Ro
 
         super();
 
-        myAccess2D = access;
-        this.row = row;
+        myAccess = access;
+        myLastRow = access.countRows() - 1L;
+
+        myRow = row;
     }
 
     RowView(final Access2D<N> access) {
@@ -59,28 +61,41 @@ public final class RowView<N extends Number> implements Access1D<N>, Iterator<Ro
     }
 
     public long count() {
-        return myAccess2D.countColumns();
+        return myAccess.countColumns();
     }
 
     public double doubleValue(final long index) {
-        return myAccess2D.doubleValue(row, index);
+        return myAccess.doubleValue(myRow, index);
     }
 
     public N get(final long index) {
-        return myAccess2D.get(row, index);
+        return myAccess.get(myRow, index);
     }
 
     public boolean hasNext() {
-        return (row + 1L) < myAccess2D.countRows();
+        return myRow < myLastRow;
+    }
+
+    public boolean hasPrevious() {
+        return myRow > 0L;
     }
 
     public RowView<N> next() {
-        row++;
+        myRow++;
+        return this;
+    }
+
+    public RowView<N> previous() {
+        myRow--;
         return this;
     }
 
     public void remove() {
         throw new UnsupportedOperationException();
+    }
+
+    public long row() {
+        return myRow;
     }
 
 }

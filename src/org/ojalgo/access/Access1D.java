@@ -96,8 +96,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     /**
      * Will calculate y = y + a x, will add "a" times "this" to "y"
      *
-     * @param a The scale
-     * @param y The "vector" to update
+     * @param a
+     *            The scale
+     * @param y
+     *            The "vector" to update
      */
     default void daxpy(final double a, final Mutate1D y) {
         final long tmpLength = Math.min(this.count(), y.count());
@@ -107,9 +109,11 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     }
 
     /**
-     * Will calculate and return the dot product of this 1D-structure and another input 1D-vector.
+     * Will calculate and return the dot product of this 1D-structure and
+     * another input 1D-vector.
      *
-     * @param vector Another 1D-structure
+     * @param vector
+     *            Another 1D-structure
      * @return The dot product
      */
     default double dot(final Access1D<?> vector) {
@@ -122,6 +126,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     }
 
     double doubleValue(long index);
+
+    default Iterable<ElementView<N>> elements() {
+        return ElementView.makeIterable(this);
+    }
 
     N get(long index);
 

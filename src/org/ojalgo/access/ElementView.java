@@ -23,15 +23,15 @@ package org.ojalgo.access;
 
 import java.util.Iterator;
 
-public final class ElementView<N extends Number> implements AccessScalar<N>, Iterator<ElementView<N>> {
+public class ElementView<N extends Number> implements AccessScalar<N>, Iterator<ElementView<N>> {
 
-    public static <S extends Number> Iterable<ElementView<S>> make(final Access1D<S> access) {
+    public static <S extends Number> Iterable<ElementView<S>> makeIterable(final Access1D<S> access) {
         return new ElementView<S>(access).iterable;
     }
 
-    public long index = -1L;
-
-    private final Access1D<N> myAccess1D;
+    private final Access1D<N> myAccess;
+    private long myIndex = -1L;
+    private final long myLastIndex;
 
     final Iterable<ElementView<N>> iterable = new Iterable<ElementView<N>>() {
 
@@ -50,8 +50,10 @@ public final class ElementView<N extends Number> implements AccessScalar<N>, Ite
 
         super();
 
-        myAccess1D = access;
-        this.index = index;
+        myAccess = access;
+        myLastIndex = access.count() - 1L;
+
+        this.myIndex = index;
     }
 
     ElementView(final Access1D<N> access) {
@@ -59,20 +61,37 @@ public final class ElementView<N extends Number> implements AccessScalar<N>, Ite
     }
 
     public double doubleValue() {
-        return myAccess1D.doubleValue(index);
+        return myAccess.doubleValue(myIndex);
     }
 
     public N getNumber() {
-        return myAccess1D.get(index);
+        return myAccess.get(myIndex);
     }
 
     public boolean hasNext() {
-        return (index + 1L) < myAccess1D.count();
+        return myIndex < myLastIndex;
+    }
+
+    public boolean hasPrevious() {
+        return myIndex > 0L;
+    }
+
+    public long index() {
+        return myIndex;
     }
 
     public ElementView<N> next() {
-        index++;
+        myIndex++;
         return this;
+    }
+
+    public ElementView<N> previous() {
+        myIndex--;
+        return this;
+    }
+
+    public void remove() {
+        throw new UnsupportedOperationException();
     }
 
 }
