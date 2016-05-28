@@ -27,8 +27,8 @@ import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessScalar;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.ElementView2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.scalar.ComplexNumber;
@@ -41,12 +41,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     }
 
-    public static final class NonzeroElement<N extends Number> implements AccessScalar<N>, Iterator<NonzeroElement<N>>, Iterable<NonzeroElement<N>> {
+    public static final class NonzeroView<N extends Number> implements ElementView2D<N, NonzeroView<N>>, Iterable<NonzeroView<N>> {
 
-        private final SparseArray.NonzeroElement<N> myDelegate;
+        private final SparseArray.NonzeroView<N> myDelegate;
         private final long myStructure;
 
-        NonzeroElement(final SparseArray.NonzeroElement<N> delegate, final long structure) {
+        NonzeroView(final SparseArray.NonzeroView<N> delegate, final long structure) {
 
             super();
 
@@ -70,16 +70,25 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
             return myDelegate.hasNext();
         }
 
+        public boolean hasPrevious() {
+            return myDelegate.hasPrevious();
+        }
+
         public long index() {
             return myDelegate.index();
         }
 
-        public Iterator<SparseStore.NonzeroElement<N>> iterator() {
+        public Iterator<SparseStore.NonzeroView<N>> iterator() {
             return this;
         }
 
-        public SparseStore.NonzeroElement<N> next() {
+        public SparseStore.NonzeroView<N> next() {
             myDelegate.next();
+            return this;
+        }
+
+        public SparseStore.NonzeroView<N> previous() {
+            myDelegate.previous();
             return this;
         }
 
@@ -218,7 +227,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
             target.fillAll(this.factory().scalar().zero().getNumber());
 
-            for (final SparseArray.NonzeroElement<N> tmpNonzero : myElements.nonzeros()) {
+            for (final SparseArray.NonzeroView<N> tmpNonzero : myElements.nonzeros()) {
                 final long tmpIndex = tmpNonzero.index();
                 final double tmpValue = tmpNonzero.doubleValue();
 
@@ -245,8 +254,8 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
      * @deprecated v40
      */
     @Deprecated
-    public Iterable<NonzeroElement<N>> nonzeros() {
-        return new NonzeroElement<N>((SparseArray.NonzeroElement<N>) myElements.nonzeros(), this.countRows());
+    public NonzeroView<N> nonzeros() {
+        return new NonzeroView<N>(myElements.nonzeros(), this.countRows());
     }
 
     public void set(final long row, final long col, final double value) {

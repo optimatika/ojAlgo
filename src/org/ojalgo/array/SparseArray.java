@@ -27,8 +27,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessScalar;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.constant.PrimitiveMath;
@@ -50,43 +50,54 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
 
-    public static final class NonzeroElement<N extends Number> implements AccessScalar<N>, Iterator<NonzeroElement<N>>, Iterable<NonzeroElement<N>> {
+    public static final class NonzeroView<N extends Number> implements ElementView1D<N, NonzeroView<N>>, Iterable<NonzeroView<N>> {
 
         private int myCursor = -1;
-        private final SparseArray<N> myDelegate;
-
+        private final long[] myIndices;
         private final int myLastCursor;
 
-        NonzeroElement(final SparseArray<N> delegate, final int actualLength) {
+        private final DenseArray<N> myValues;
+
+        NonzeroView(final long[] indices, final DenseArray<N> values, final int actualLength) {
 
             super();
 
-            myDelegate = delegate;
+            myIndices = indices;
+            myValues = values;
             myLastCursor = actualLength - 1;
         }
 
         public double doubleValue() {
-            return myDelegate.myValues.doubleValue(myCursor);
+            return myValues.doubleValue(myCursor);
         }
 
         public N getNumber() {
-            return myDelegate.myValues.get(myCursor);
+            return myValues.get(myCursor);
         }
 
         public boolean hasNext() {
             return myCursor < myLastCursor;
         }
 
-        public long index() {
-            return myDelegate.myIndices[myCursor];
+        public boolean hasPrevious() {
+            return myCursor > 0L;
         }
 
-        public Iterator<NonzeroElement<N>> iterator() {
+        public long index() {
+            return myIndices[myCursor];
+        }
+
+        public Iterator<NonzeroView<N>> iterator() {
             return this;
         }
 
-        public NonzeroElement<N> next() {
+        public NonzeroView<N> next() {
             myCursor++;
+            return this;
+        }
+
+        public NonzeroView<N> previous() {
+            myCursor--;
             return this;
         }
 
@@ -508,8 +519,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
      * @deprecated v40
      */
     @Deprecated
-    public Iterable<NonzeroElement<N>> nonzeros() {
-        return new NonzeroElement<N>(this, myActualLength);
+    public NonzeroView<N> nonzeros() {
+        return new NonzeroView<N>(myIndices, myValues, myActualLength);
     }
 
     @Override

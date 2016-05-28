@@ -21,10 +21,18 @@
  */
 package org.ojalgo.access;
 
-public interface ElementView2D<N extends Number, V extends ElementView2D<N, V>> extends ElementView1D<N, V> {
+import java.util.Iterator;
 
-    long column();
+public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>> extends AccessScalar<N>, Iterator<V> {
 
-    long row();
+    boolean hasPrevious();
+
+    long index();
+
+    V previous();
+
+    default void remove() {
+        throw new UnsupportedOperationException();
+    }
 
 }
