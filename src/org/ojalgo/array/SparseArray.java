@@ -55,7 +55,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         private int myCursor = -1;
         private final long[] myIndices;
         private final int myLastCursor;
-
         private final DenseArray<N> myValues;
 
         NonzeroView(final long[] indices, final DenseArray<N> values, final int actualLength) {
@@ -80,7 +79,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
 
         public boolean hasPrevious() {
-            return myCursor > 0L;
+            return myCursor > 0;
         }
 
         public long index() {
