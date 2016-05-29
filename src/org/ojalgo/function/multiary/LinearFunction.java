@@ -104,7 +104,9 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
 
         Scalar<N> retVal = this.getScalarConstant();
 
-        retVal = retVal.add(myFactors.multiply(arg, tmpPreallocated).get(0, 0));
+        myFactors.multiply(arg, tmpPreallocated);
+
+        retVal = retVal.add(tmpPreallocated.get(0, 0));
 
         return retVal.getNumber();
     }

@@ -71,7 +71,7 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
         return this.getBase().limitOfRow(myRows[row]);
     }
 
-    public PhysicalStore<N> multiply(final Access1D<N> right, final PhysicalStore<N> target) {
+    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
 
         if (this.isPrimitive()) {
 
@@ -99,11 +99,9 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
                 }
             }
 
-            return target;
-
         } else {
 
-            return super.multiply(right, target);
+            super.multiply(right, target);
         }
 
     }

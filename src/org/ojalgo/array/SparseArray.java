@@ -366,6 +366,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    public void empty() {
+        myActualLength = 0;
+    }
+
     @Override
     public void fillAll(final NullaryFunction<N> supplier) {
 
@@ -533,7 +537,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             // values[tmpIndex] = value;
             myValues.set(tmpIndex, value);
 
-        } else {
+        } else if (value != PrimitiveMath.ZERO) {
             // Not existing value, insert new
 
             final long[] tmpOldIndeces = myIndices;
@@ -580,6 +584,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
                 myActualLength++;
             }
         }
+
     }
 
     @Override
@@ -593,7 +598,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             // values[tmpIndex] = value;
             myValues.set(tmpIndex, value);
 
-        } else {
+        } else if (!value.equals(myZeroNumber)) {
             // Not existing value, insert new
 
             final long[] tmpOldIndeces = this.myIndices;

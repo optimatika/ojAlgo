@@ -561,9 +561,8 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         return new MatrixStore.LogicalBuilder<>(this);
     }
 
-    default PhysicalStore<N> multiply(final Access1D<N> right, final PhysicalStore<N> target) {
+    default void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
         target.fillByMultiplying(this, right);
-        return target;
     }
 
     default MatrixStore<N> multiply(final double scalar) {

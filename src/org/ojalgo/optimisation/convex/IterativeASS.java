@@ -105,9 +105,9 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             if (IterativeASS.this.getAE() != null) {
 
-                final PhysicalStore<Double> tmpPreallocated = IterativeASS.this.getAE().factory().makeZero(IterativeASS.this.getAE().countRows(), 1L);
+                final PhysicalStore<Double> tmpProdE = IterativeASS.this.getAE().factory().makeZero(IterativeASS.this.getAE().countRows(), 1L);
+                IterativeASS.this.getAE().multiply(column, tmpProdE);
 
-                final PhysicalStore<Double> tmpProdE = IterativeASS.this.getAE().multiply(column, tmpPreallocated);
                 for (int i = 0; i < myCountE; i++) {
                     final double tmpVal = tmpProdE.doubleValue(i);
                     if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
@@ -122,9 +122,9 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             if ((IterativeASS.this.getAI() != null) && (myIncluded.length > 0)) {
 
-                final PhysicalStore<Double> tmpPreallocated = IterativeASS.this.getAI().factory().makeZero(myIncluded.length, 1L);
+                final PhysicalStore<Double> tmpProdI = IterativeASS.this.getAI().factory().makeZero(myIncluded.length, 1L);
+                IterativeASS.this.getAI().logical().row(myIncluded).get().multiply(column, tmpProdI);
 
-                final PhysicalStore<Double> tmpProdI = IterativeASS.this.getAI().logical().row(myIncluded).get().multiply(column, tmpPreallocated);
                 for (int _i = 0; _i < myIncluded.length; _i++) {
                     final double tmpVal = tmpProdI.doubleValue(_i);
                     if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {

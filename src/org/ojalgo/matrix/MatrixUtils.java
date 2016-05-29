@@ -314,6 +314,14 @@ public abstract class MatrixUtils {
         return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
     }
 
+    public static final long firstInColumn(final Access1D<?> matrix, final long col, final long defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn((int) col), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    public static final long firstInRow(final Access1D<?> matrix, final long row, final long defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow((int) row), defaultAndMinimum) : defaultAndMinimum;
+    }
+
     /**
      * Extracts the argument of the ComplexNumber elements to a new primitive double valued matrix.
      */
@@ -430,6 +438,14 @@ public abstract class MatrixUtils {
 
     public static final int limitOfRow(final Access1D<?> matrix, final int row, final int defaultAndMaximum) {
         return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow(row), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    public static final long limitOfColumn(final Access1D<?> matrix, final long col, final long defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn((int) col), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    public static final long limitOfRow(final Access1D<?> matrix, final long row, final long defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow((int) row), defaultAndMaximum) : defaultAndMaximum;
     }
 
     public static PhysicalStore<ComplexNumber> makeRandomComplexStore(final int aRowDim, final int aColDim) {

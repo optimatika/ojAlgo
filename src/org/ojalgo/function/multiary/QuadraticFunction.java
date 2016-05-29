@@ -86,7 +86,9 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
 
         final PhysicalStore<N> tmpPreallocated = myFactors.factory().makeZero(this.arity(), 1L);
 
-        return this.getHessian(point).multiply(point, tmpPreallocated);
+        this.getHessian(point).multiply(point, tmpPreallocated);
+
+        return tmpPreallocated;
     }
 
     @Override
