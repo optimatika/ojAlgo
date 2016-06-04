@@ -47,7 +47,8 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
     }
 
     public MatrixStore<Double> getInverse() {
-        return this.doGetInverse(this.allocate(this.getColDim(), this.getColDim()));
+        final int tmpRowDim = this.getRowDim();
+        return this.doGetInverse(this.allocate(tmpRowDim, tmpRowDim));
     }
 
     public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
