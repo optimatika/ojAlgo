@@ -82,7 +82,7 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
 
     @Override
     DeterminantTask<Double> getDeterminantTask(final MatrixStore<Double> template) {
-        return DeterminantTask.PRIMITIVE.make(template, this.isHermitian());
+        return DeterminantTask.PRIMITIVE.make(template, this.isHermitian(), false);
     }
 
     @SuppressWarnings("unchecked")
@@ -93,12 +93,12 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
 
     @Override
     InverterTask<Double> getInverterTask(final MatrixStore<Double> base) {
-        return InverterTask.PRIMITIVE.make(base, this.isHermitian());
+        return InverterTask.PRIMITIVE.make(base, this.isHermitian(), false);
     }
 
     @Override
     SolverTask<Double> getSolverTask(final MatrixStore<Double> templateBody, final MatrixStore<Double> templateRHS) {
-        return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian());
+        return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
     @SuppressWarnings("unchecked")

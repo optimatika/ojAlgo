@@ -39,25 +39,26 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     public static abstract class Factory<N extends Number> {
 
         public final SolverTask<N> make(final MatrixStore<N> templateBody, final MatrixStore<N> templateRHS) {
-            return this.make(templateBody, templateRHS, MatrixUtils.isHermitian(templateBody));
+            return this.make(templateBody, templateRHS, MatrixUtils.isHermitian(templateBody), false);
         }
 
-        public abstract SolverTask<N> make(MatrixStore<N> templateBody, MatrixStore<N> templateRHS, boolean hermitian);
+        public abstract SolverTask<N> make(MatrixStore<N> templateBody, MatrixStore<N> templateRHS, boolean symmetric, boolean positiveDefinite);
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        public SolverTask<BigDecimal> make(final MatrixStore<BigDecimal> templateBody, final MatrixStore<BigDecimal> templateRHS, final boolean hermitian) {
-            if (hermitian) {
-                return Cholesky.make(templateBody);
-            } else if (templateBody.countRows() == templateBody.countColumns()) {
-                return LU.make(templateBody);
-            } else if (templateBody.countRows() >= templateBody.countColumns()) {
-                return QR.make(templateBody);
+        public SolverTask<BigDecimal> make(final MatrixStore<BigDecimal> templateBody, final MatrixStore<BigDecimal> templateRHS, final boolean symmetric,
+                final boolean positiveDefinite) {
+            if (symmetric && positiveDefinite) {
+                return Cholesky.BIG.make(templateBody);
+            } else if (templateBody.isSquare()) {
+                return LU.BIG.make(templateBody);
+            } else if (templateBody.isTall()) {
+                return QR.BIG.make(templateBody);
             } else {
-                return SingularValue.make(templateBody);
+                return SingularValue.BIG.make(templateBody);
             }
         }
 
@@ -67,15 +68,15 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
         @Override
         public SolverTask<ComplexNumber> make(final MatrixStore<ComplexNumber> templateBody, final MatrixStore<ComplexNumber> templateRHS,
-                final boolean hermitian) {
-            if (hermitian) {
-                return Cholesky.make(templateBody);
-            } else if (templateBody.countRows() == templateBody.countColumns()) {
-                return LU.make(templateBody);
-            } else if (templateBody.countRows() >= templateBody.countColumns()) {
-                return QR.make(templateBody);
+                final boolean symmetric, final boolean positiveDefinite) {
+            if (symmetric && positiveDefinite) {
+                return Cholesky.COMPLEX.make(templateBody);
+            } else if (templateBody.isSquare()) {
+                return LU.COMPLEX.make(templateBody);
+            } else if (templateBody.isTall()) {
+                return QR.COMPLEX.make(templateBody);
             } else {
-                return SingularValue.make(templateBody);
+                return SingularValue.COMPLEX.make(templateBody);
             }
         }
 
@@ -84,48 +85,60 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        public SolverTask<Double> make(final MatrixStore<Double> templateBody, final MatrixStore<Double> templateRHS, final boolean hermitian) {
+        public SolverTask<Double> make(final MatrixStore<Double> templateBody, final MatrixStore<Double> templateRHS, final boolean symmetric,
+                final boolean positiveDefinite) {
+
             final boolean tmpVectorRHS = templateRHS.countColumns() == 1L;
-            if (hermitian) {
-                final long tmpDim = templateBody.countColumns();
-                if (tmpVectorRHS && (tmpDim == 1l)) {
+
+            final long tmpColDim = templateBody.countColumns();
+
+            if (symmetric) {
+
+                if (!tmpVectorRHS) {
+                    return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
+                } else if (tmpColDim == 1l) {
                     return AbstractSolver.FULL_1X1;
-                } else if (tmpVectorRHS && (tmpDim == 2l)) {
+                } else if (tmpColDim == 2l) {
                     return AbstractSolver.SYMMETRIC_2X2;
-                } else if (tmpVectorRHS && (tmpDim == 3l)) {
+                } else if (tmpColDim == 3l) {
                     return AbstractSolver.SYMMETRIC_3X3;
-                } else if (tmpVectorRHS && (tmpDim == 4l)) {
+                } else if (tmpColDim == 4l) {
                     return AbstractSolver.SYMMETRIC_4X4;
-                } else if (tmpVectorRHS && (tmpDim == 5l)) {
+                } else if (tmpColDim == 5l) {
                     return AbstractSolver.SYMMETRIC_5X5;
                 } else {
-                    return Cholesky.make(templateBody);
+                    return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
                 }
-            } else {
-                final long tmpDim = templateBody.countColumns();
-                if (templateBody.countRows() == tmpDim) {
-                    if (tmpVectorRHS && (tmpDim == 1l)) {
-                        return AbstractSolver.FULL_1X1;
-                    } else if (tmpVectorRHS && (tmpDim == 2l)) {
-                        return AbstractSolver.FULL_2X2;
-                    } else if (tmpVectorRHS && (tmpDim == 3l)) {
-                        return AbstractSolver.FULL_3X3;
-                    } else if (tmpVectorRHS && (tmpDim == 4l)) {
-                        return AbstractSolver.FULL_4X4;
-                    } else if (tmpVectorRHS && (tmpDim == 5l)) {
-                        return AbstractSolver.FULL_5X5;
-                    } else {
-                        return LU.make(templateBody);
-                    }
-                } else if (tmpVectorRHS && (templateBody.countRows() >= tmpDim)) {
-                    if (tmpDim <= 5) {
-                        return AbstractSolver.LEAST_SQUARES;
-                    } else {
-                        return QR.make(templateBody);
-                    }
+
+            } else if (templateBody.isSquare()) {
+
+                if (!tmpVectorRHS) {
+                    return LU.PRIMITIVE.make(templateBody);
+                } else if (tmpColDim == 1l) {
+                    return AbstractSolver.FULL_1X1;
+                } else if (tmpColDim == 2l) {
+                    return AbstractSolver.FULL_2X2;
+                } else if (tmpColDim == 3l) {
+                    return AbstractSolver.FULL_3X3;
+                } else if (tmpColDim == 4l) {
+                    return AbstractSolver.FULL_4X4;
+                } else if (tmpColDim == 5l) {
+                    return AbstractSolver.FULL_5X5;
                 } else {
-                    return SingularValue.make(templateBody);
+                    return LU.PRIMITIVE.make(templateBody);
                 }
+
+            } else if (templateBody.isTall()) {
+
+                if (tmpVectorRHS && (tmpColDim <= 5)) {
+                    return AbstractSolver.LEAST_SQUARES;
+                } else {
+                    return QR.PRIMITIVE.make(templateBody);
+                }
+
+            } else {
+
+                return SingularValue.PRIMITIVE.make(templateBody);
             }
         }
 

@@ -124,7 +124,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * Matrix condition (2-norm)
      *
      * @return ratio of largest to smallest singular value.
+     * @deprecated v40 Use {@link SingularValue}
      */
+    @Deprecated
     Scalar<?> getCondition();
 
     /**
@@ -132,6 +134,10 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      */
     Scalar<?> getDeterminant();
 
+    /**
+     * @deprecated v40 Use {@link SingularValue}
+     */
+    @Deprecated
     List<ComplexNumber> getEigenvalues();
 
     /**
@@ -160,7 +166,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @see #getOperatorNorm()
      * @see #getTraceNorm()
      * @see #getVectorNorm(int)
+     * @deprecated v40 Use {@link #norm()} or {@link #aggregateAll(org.ojalgo.function.aggregator.Aggregator)}
      */
+    @Deprecated
     Scalar<?> getInfinityNorm();
 
     /**
@@ -185,7 +193,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @see #getOperatorNorm()
      * @see #getTraceNorm()
      * @see #getVectorNorm(int)
+     * @deprecated v40 Use {@link #norm()} or {@link #aggregateAll(org.ojalgo.function.aggregator.Aggregator)}
      */
+    @Deprecated
     Scalar<?> getOneNorm();
 
     /**
@@ -208,7 +218,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * also equal to the number of nonzero singular values of the matrix.
      *
      * @return The matrix' rank.
+     * @deprecated v40 Use {@link SingularValue}
      */
+    @Deprecated
     int getRank();
 
     /**
@@ -218,6 +230,10 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      */
     BasicMatrix getRowsRange(final int first, final int kimit);
 
+    /**
+     * @deprecated v40 Use {@link SingularValue}
+     */
+    @Deprecated
     List<? extends Number> getSingularValues();
 
     /**
@@ -285,7 +301,9 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
 
     /**
      * @return true if {@linkplain #getRank()} == min({@linkplain #countRows()}, {@linkplain #countColumns()})
+     * @deprecated v40
      */
+    @Deprecated
     boolean isFullRank();
 
     boolean isHermitian();

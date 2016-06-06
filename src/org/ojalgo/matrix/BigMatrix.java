@@ -81,7 +81,7 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
 
     @Override
     DeterminantTask<BigDecimal> getDeterminantTask(final MatrixStore<BigDecimal> template) {
-        return DeterminantTask.BIG.make(template, this.isHermitian());
+        return DeterminantTask.BIG.make(template, this.isHermitian(), false);
     }
 
     @SuppressWarnings("unchecked")
@@ -92,12 +92,12 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
 
     @Override
     InverterTask<BigDecimal> getInverterTask(final MatrixStore<BigDecimal> base) {
-        return InverterTask.BIG.make(base, this.isHermitian());
+        return InverterTask.BIG.make(base, this.isHermitian(), false);
     }
 
     @Override
     SolverTask<BigDecimal> getSolverTask(final MatrixStore<BigDecimal> templateBody, final MatrixStore<BigDecimal> templateRHS) {
-        return SolverTask.BIG.make(templateBody, templateRHS, this.isHermitian());
+        return SolverTask.BIG.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
     @SuppressWarnings("unchecked")

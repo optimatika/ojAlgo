@@ -42,7 +42,6 @@ import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
@@ -61,12 +60,8 @@ import org.ojalgo.type.context.NumberContext;
 abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends Object implements BasicMatrix, Serializable {
 
     private transient MatrixDecomposition<N> myDecomposition;
-    private transient Eigenvalue<N> myEigenvalue = null;
     private transient int myHashCode = 0;
-    private transient LU<N> myLU = null;
     private final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> myPhysicalFactory;
-    private transient QR<N> myQR = null;
-    private transient SingularValue<N> mySingularValue = null;
     private final MatrixStore<N> myStore;
 
     @SuppressWarnings("unused")
@@ -208,10 +203,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         myHashCode = 0;
 
-        myEigenvalue = null;
-        myLU = null;
-        myQR = null;
-        mySingularValue = null;
+        myDecomposition = null;
     }
 
     public N get(final long index) {
@@ -242,15 +234,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
      * @see org.ojalgo.matrix.BasicMatrix#getFrobeniusNorm()
      */
     public Scalar<N> getFrobeniusNorm() {
-
-        if (this.getSingularValue().isComputed()) {
-
-            return myPhysicalFactory.scalar().convert(this.getSingularValue().getFrobeniusNorm());
-
-        } else {
-
-            return myPhysicalFactory.scalar().convert(myStore.aggregateAll(Aggregator.NORM2));
-        }
+        return myPhysicalFactory.scalar().convert(myStore.aggregateAll(Aggregator.NORM2));
     }
 
     public Scalar<N> getInfinityNorm() {
@@ -292,13 +276,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public int getRank() {
-        if (this.getSingularValue().isComputed() || this.isFat()) {
-            return this.getComputedSingularValue().getRank();
-        } else if (this.getQR().isComputed() || this.isTall()) {
-            return this.getComputedQR().getRank();
-        } else {
-            return this.getComputedLU().getRank();
-        }
+        return this.getComputedSingularValue().getRank();
     }
 
     public I getRowsRange(final int first, final int limit) {
@@ -356,15 +334,15 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         MatrixStore<N> retVal = null;
 
-        if (this.isSquare() && this.getComputedLU().isSolvable()) {
-            retVal = this.getComputedLU().getInverse();
-        } else if (this.isTall() && this.getComputedQR().isSolvable()) {
-            retVal = this.getComputedQR().getInverse();
-        } else {
-            retVal = this.getComputedSingularValue().getInverse();
-        }
+        //        if (this.isSquare() && this.getComputedLU().isSolvable()) {
+        //            retVal = this.getComputedLU().getInverse();
+        //        } else if (this.isTall() && this.getComputedQR().isSolvable()) {
+        //            retVal = this.getComputedQR().getInverse();
+        //        } else {
+        //            retVal = this.getComputedSingularValue().getInverse();
+        //        }
 
-        //        retVal = this.doInvert();
+        retVal = this.doInvert();
 
         return this.getFactory().instantiate(retVal);
     }
@@ -489,15 +467,15 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         final MatrixStore<N> tmpRHS = this.cast(rhs);
 
-        if (this.isSquare() && this.getComputedLU().isSolvable()) {
-            retVal = this.getComputedLU().solve(tmpRHS);
-        } else if (this.isTall() && this.getComputedQR().isSolvable()) {
-            retVal = this.getComputedQR().solve(tmpRHS);
-        } else {
-            retVal = this.getComputedSingularValue().solve(tmpRHS);
-        }
+        //        if (this.isSquare() && this.getComputedLU().isSolvable()) {
+        //            retVal = this.getComputedLU().solve(tmpRHS);
+        //        } else if (this.isTall() && this.getComputedQR().isSolvable()) {
+        //            retVal = this.getComputedQR().solve(tmpRHS);
+        //        } else {
+        //            retVal = this.getComputedSingularValue().solve(tmpRHS);
+        //        }
 
-        //        retVal = this.doSolve(tmpRHS);
+        retVal = this.doSolve(tmpRHS);
 
         return this.getFactory().instantiate(retVal);
     }
@@ -592,76 +570,58 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     private final Eigenvalue<N> getComputedEigenvalue() {
 
-        final Eigenvalue<N> retVal = this.getEigenvalue();
-
-        if (!retVal.isComputed()) {
-            retVal.decompose(myStore);
+        if (!this.isComputedEigenvalue()) {
+            myDecomposition = Eigenvalue.make(myStore);
+            myDecomposition.decompose(myStore);
         }
 
-        return retVal;
+        return (Eigenvalue<N>) myDecomposition;
     }
 
     private final LU<N> getComputedLU() {
 
-        final LU<N> retVal = this.getLU();
-
-        if (!retVal.isComputed()) {
-            retVal.decompose(myStore);
+        if (!this.isComputedLU()) {
+            myDecomposition = LU.make(myStore);
+            myDecomposition.decompose(myStore);
         }
 
-        return retVal;
+        return (LU<N>) myDecomposition;
     }
 
     private final QR<N> getComputedQR() {
 
-        final QR<N> retVal = this.getQR();
-
-        if (!retVal.isComputed()) {
-            retVal.decompose(myStore);
+        if (!this.isComputedQR()) {
+            myDecomposition = QR.make(myStore);
+            myDecomposition.decompose(myStore);
         }
 
-        return retVal;
+        return (QR<N>) myDecomposition;
     }
 
     private final SingularValue<N> getComputedSingularValue() {
 
-        final SingularValue<N> retVal = this.getSingularValue();
-
-        if (!retVal.isComputed()) {
-            retVal.decompose(myStore);
+        if (!this.isComputedSingularValue()) {
+            myDecomposition = SingularValue.make(myStore);
+            myDecomposition.decompose(myStore);
         }
 
-        return retVal;
+        return (SingularValue<N>) myDecomposition;
     }
 
-    private final Eigenvalue<N> getEigenvalue() {
-
-        if (myEigenvalue == null) {
-            myEigenvalue = Eigenvalue.make(myStore);
-        }
-
-        return myEigenvalue;
+    private boolean isComputedEigenvalue() {
+        return (myDecomposition != null) && (myDecomposition instanceof Eigenvalue) && myDecomposition.isComputed();
     }
 
-    private final LU<N> getLU() {
-        if (myLU == null) {
-            myLU = LU.make(myStore);
-        }
-        return myLU;
+    private boolean isComputedLU() {
+        return (myDecomposition != null) && (myDecomposition instanceof LU) && myDecomposition.isComputed();
     }
 
-    private final QR<N> getQR() {
-        if (myQR == null) {
-            myQR = QR.make(myStore);
-        }
-        return myQR;
+    private boolean isComputedQR() {
+        return (myDecomposition != null) && (myDecomposition instanceof QR) && myDecomposition.isComputed();
     }
 
-    private final SingularValue<N> getSingularValue() {
-        if (mySingularValue == null) {
-            mySingularValue = SingularValue.make(myStore);
-        }
-        return mySingularValue;
+    private boolean isComputedSingularValue() {
+        return (myDecomposition != null) && (myDecomposition instanceof SingularValue) && myDecomposition.isComputed();
     }
 
     protected final MatrixStore<N> doInvert() {
@@ -680,9 +640,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
                 final MatrixDecomposition.Solver<N> tmpSolver = (MatrixDecomposition.Solver<N>) tmpTask;
                 myDecomposition = tmpSolver;
 
-                tmpSolver.compute(myStore);
-
-                return tmpSolver.getInverse();
+                if (tmpSolver.compute(myStore)) {
+                    return tmpSolver.getInverse();
+                } else {
+                    return null;
+                }
 
             } else {
 
@@ -711,9 +673,12 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
                 final MatrixDecomposition.Solver<N> tmpSolver = (MatrixDecomposition.Solver<N>) tmpTask;
                 myDecomposition = tmpSolver;
-                tmpSolver.compute(myStore);
 
-                return tmpSolver.solve(rhs);
+                if (tmpSolver.compute(myStore)) {
+                    return tmpSolver.solve(rhs);
+                } else {
+                    return null;
+                }
 
             } else {
 

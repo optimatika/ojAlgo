@@ -114,7 +114,7 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
 
     @Override
     DeterminantTask<ComplexNumber> getDeterminantTask(final MatrixStore<ComplexNumber> template) {
-        return DeterminantTask.COMPLEX.make(template, this.isHermitian());
+        return DeterminantTask.COMPLEX.make(template, this.isHermitian(), false);
     }
 
     @SuppressWarnings("unchecked")
@@ -125,12 +125,12 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
 
     @Override
     InverterTask<ComplexNumber> getInverterTask(final MatrixStore<ComplexNumber> base) {
-        return InverterTask.COMPLEX.make(base, this.isHermitian());
+        return InverterTask.COMPLEX.make(base, this.isHermitian(), false);
     }
 
     @Override
     SolverTask<ComplexNumber> getSolverTask(final MatrixStore<ComplexNumber> templateBody, final MatrixStore<ComplexNumber> templateRHS) {
-        return SolverTask.COMPLEX.make(templateBody, templateRHS, this.isHermitian());
+        return SolverTask.COMPLEX.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 
     @SuppressWarnings("unchecked")

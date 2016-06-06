@@ -30,6 +30,8 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.decomposition.LU;
+import org.ojalgo.matrix.decomposition.QR;
+import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -38,21 +40,25 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
     public static abstract class Factory<N extends Number> {
 
         public final InverterTask<N> make(final MatrixStore<N> template) {
-            return this.make(template, MatrixUtils.isHermitian(template));
+            return this.make(template, MatrixUtils.isHermitian(template), false);
         }
 
-        public abstract InverterTask<N> make(MatrixStore<N> template, boolean symmetric);
+        public abstract InverterTask<N> make(MatrixStore<N> template, boolean symmetric, boolean positiveDefinite);
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        public InverterTask<BigDecimal> make(final MatrixStore<BigDecimal> template, final boolean symmetric) {
-            if (symmetric) {
-                return Cholesky.make(template);
+        public InverterTask<BigDecimal> make(final MatrixStore<BigDecimal> template, final boolean symmetric, final boolean positiveDefinite) {
+            if (symmetric && positiveDefinite) {
+                return Cholesky.BIG.make(template);
+            } else if (template.isSquare()) {
+                return LU.BIG.make(template);
+            } else if (template.isTall()) {
+                return QR.BIG.make(template);
             } else {
-                return LU.make(template);
+                return SingularValue.BIG.make(template);
             }
         }
 
@@ -61,11 +67,15 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        public InverterTask<ComplexNumber> make(final MatrixStore<ComplexNumber> template, final boolean symmetric) {
-            if (symmetric) {
-                return Cholesky.make(template);
+        public InverterTask<ComplexNumber> make(final MatrixStore<ComplexNumber> template, final boolean symmetric, final boolean positiveDefinite) {
+            if (symmetric && positiveDefinite) {
+                return Cholesky.COMPLEX.make(template);
+            } else if (template.isSquare()) {
+                return LU.COMPLEX.make(template);
+            } else if (template.isTall()) {
+                return QR.COMPLEX.make(template);
             } else {
-                return LU.make(template);
+                return SingularValue.COMPLEX.make(template);
             }
         }
 
@@ -74,12 +84,14 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        public InverterTask<Double> make(final MatrixStore<Double> template, final boolean symmetric) {
+        public InverterTask<Double> make(final MatrixStore<Double> template, final boolean symmetric, final boolean positiveDefinite) {
+
             final long tmpDim = template.countRows();
-            if (tmpDim == 1L) {
-                return AbstractInverter.FULL_1X1;
-            } else if (symmetric) {
-                if (tmpDim == 2L) {
+
+            if (symmetric) {
+                if (tmpDim == 1L) {
+                    return AbstractInverter.FULL_1X1;
+                } else if (tmpDim == 2L) {
                     return AbstractInverter.SYMMETRIC_2X2;
                 } else if (tmpDim == 3L) {
                     return AbstractInverter.SYMMETRIC_3X3;
@@ -88,10 +100,12 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
                 } else if (tmpDim == 5L) {
                     return AbstractInverter.SYMMETRIC_5X5;
                 } else {
-                    return Cholesky.make(template);
+                    return positiveDefinite ? Cholesky.PRIMITIVE.make(template) : LU.PRIMITIVE.make(template);
                 }
-            } else {
-                if (tmpDim == 2L) {
+            } else if (template.isSquare()) {
+                if (tmpDim == 1L) {
+                    return AbstractInverter.FULL_1X1;
+                } else if (tmpDim == 2L) {
                     return AbstractInverter.FULL_2X2;
                 } else if (tmpDim == 3L) {
                     return AbstractInverter.FULL_3X3;
@@ -100,8 +114,12 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
                 } else if (tmpDim == 5L) {
                     return AbstractInverter.FULL_5X5;
                 } else {
-                    return LU.make(template);
+                    return LU.PRIMITIVE.make(template);
                 }
+            } else if (template.isTall()) {
+                return QR.PRIMITIVE.make(template);
+            } else {
+                return SingularValue.PRIMITIVE.make(template);
             }
         }
 
