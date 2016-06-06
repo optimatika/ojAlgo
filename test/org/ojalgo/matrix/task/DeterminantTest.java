@@ -38,7 +38,7 @@ public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
         super(arg0);
     }
 
-    public void _testSymmetric1X1() {
+    public void testSymmetric1X1() {
         this.doSymmetric(AbstractDeterminator.FULL_1X1, 1);
     }
 

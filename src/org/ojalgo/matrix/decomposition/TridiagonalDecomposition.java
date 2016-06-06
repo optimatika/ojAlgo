@@ -221,12 +221,18 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
 
         if (myInitDiagQ != null) {
             retVal.set(tmpDim - 1, tmpDim - 1, myInitDiagQ.get(tmpDim - 1));
-            retVal.set(tmpDim - 2, tmpDim - 2, myInitDiagQ.get(tmpDim - 2));
+            if (tmpDim >= 2) {
+                retVal.set(tmpDim - 2, tmpDim - 2, myInitDiagQ.get(tmpDim - 2));
+            }
         } else {
             retVal.set(tmpDim - 1, tmpDim - 1, PrimitiveMath.ONE);
-            retVal.set(tmpDim - 2, tmpDim - 2, PrimitiveMath.ONE);
+            if (tmpDim >= 2) {
+                retVal.set(tmpDim - 2, tmpDim - 2, PrimitiveMath.ONE);
+            }
         }
-        retVal.set(tmpDim - 1, tmpDim - 2, PrimitiveMath.ZERO);
+        if (tmpDim >= 2) {
+            retVal.set(tmpDim - 1, tmpDim - 2, PrimitiveMath.ZERO);
+        }
 
         for (int ij = tmpDim - 3; ij >= 0; ij--) {
 
