@@ -314,31 +314,29 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
     }
 
+    /**
+     * <a href="https://github.com/optimatika/ojAlgo/issues/23">GitHub Issue 23</a> The problem was that the
+     * target return was set to exactly the mamximum possible return, and that case wasn't handled correctly.
+     */
     public void testP20160608() {
 
         final BasicMatrix.Factory<PrimitiveMatrix> matrixFactory = PrimitiveMatrix.FACTORY;
         final PrimitiveMatrix cov = matrixFactory.rows(new double[][] { { 0.01, 0.0018, 0.0011 }, { 0.0018, 0.0109, 0.0026 }, { 0.0011, 0.0026, 0.0199 } });
         final PrimitiveMatrix ret = matrixFactory.columns(new double[] { 0.0427, 0.0015, 0.0285 });
-        final BigDecimal riskAversion = new BigDecimal(1000000);
-        final MarketEquilibrium marketEquilibrium = new MarketEquilibrium(cov, riskAversion);
+
+        final MarketEquilibrium marketEquilibrium = new MarketEquilibrium(cov);
         final MarkowitzModel markowitz = new MarkowitzModel(marketEquilibrium, ret);
         markowitz.setShortingAllowed(true);
         markowitz.setTargetReturn(BigDecimal.valueOf(0.0427));
 
         final List<BigDecimal> tmpWeights = markowitz.getWeights();
 
-        TestUtils.assertEquals(0.82745, tmpWeights.get(0).doubleValue());
-        TestUtils.assertEquals(-0.09075, tmpWeights.get(1).doubleValue());
-        TestUtils.assertEquals(0.26329, tmpWeights.get(2).doubleValue());
+        TestUtils.assertEquals(0.8275, tmpWeights.get(0).doubleValue()); // 0.82745
+        TestUtils.assertEquals(-0.0907, tmpWeights.get(1).doubleValue()); // -0.09075
+        TestUtils.assertEquals(0.2633, tmpWeights.get(2).doubleValue()); // 0.26329
 
-        TestUtils.assertEquals(0.0427, markowitz.getMeanReturn());
-        TestUtils.assertEquals(0.0084, markowitz.getReturnVariance());
-
-        //        assert (FloatUtil.equal(markowitz.getWeights().get(0).doubleValue(), 0.82745, FloatUtil.Precision.P5));
-        //        assert (FloatUtil.equal(markowitz.getWeights().get(1).doubleValue(), -0.09075, FloatUtil.Precision.P5));
-        //        assert (FloatUtil.equal(markowitz.getWeights().get(2).doubleValue(), 0.26329, FloatUtil.Precision.P5));
-        //        assert (FloatUtil.equal(markowitz.getMeanReturn(), 0.0427, FloatUtil.Precision.P4));
-        //        assert (FloatUtil.equal(markowitz.getReturnVariance(), 0.0084, FloatUtil.Precision.P4));
+        TestUtils.assertEquals(0.0427, markowitz.getMeanReturn(), NumberContext.getGeneral(4, 4));
+        TestUtils.assertEquals(0.0084, markowitz.getReturnVariance(), NumberContext.getGeneral(4, 4));
 
     }
 
