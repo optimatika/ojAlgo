@@ -315,8 +315,9 @@ public class PortfolioProblems extends FinancePortfolioTests {
     }
 
     /**
-     * <a href="https://github.com/optimatika/ojAlgo/issues/23">GitHub Issue 23</a> The problem was that the
-     * target return was set to exactly the mamximum possible return, and that case wasn't handled correctly.
+     * <a href="https://github.com/optimatika/ojAlgo/issues/23">GitHub Issue 23</a> The problem was that since
+     * the model allows shorting the pure profit maximisation is unbounded (initial LP). The algorithm did not
+     * handle the case where "target" could be >= the max possible when shorting not allowed (bounded LP).
      */
     public void testP20160608() {
 
@@ -330,13 +331,20 @@ public class PortfolioProblems extends FinancePortfolioTests {
         markowitz.setTargetReturn(BigDecimal.valueOf(0.0427));
 
         final List<BigDecimal> tmpWeights = markowitz.getWeights();
+        TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
 
+        // Solution reachable without shorting, but since it is allowed the optimal solution is different
         TestUtils.assertEquals(0.8275, tmpWeights.get(0).doubleValue()); // 0.82745
         TestUtils.assertEquals(-0.0907, tmpWeights.get(1).doubleValue()); // -0.09075
         TestUtils.assertEquals(0.2633, tmpWeights.get(2).doubleValue()); // 0.26329
 
         TestUtils.assertEquals(0.0427, markowitz.getMeanReturn(), NumberContext.getGeneral(4, 4));
         TestUtils.assertEquals(0.0084, markowitz.getReturnVariance(), NumberContext.getGeneral(4, 4));
+
+        // Also verify that it's posible to reach 10% return by shorting
+        markowitz.setTargetReturn(BigDecimal.valueOf(0.1));
+        TestUtils.assertEquals(0.1, markowitz.getMeanReturn(), NumberContext.getGeneral(4, 4));
+        TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
 
     }
 

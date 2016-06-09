@@ -326,16 +326,7 @@ public final class MarkowitzModel extends EquilibriumModel {
             double tmpTargetDiff = _0_0;
             double tmpTargetLast = _0_0;
 
-            if (myTargetVariance != null) {
-                tmpTargetLast = this.calculatePortfolioVariance(retVal).doubleValue();
-            } else if (myTargetReturn != null) {
-                tmpTargetLast = this.calculatePortfolioReturn(retVal, myExpectedExcessReturns).doubleValue();
-            } else {
-                tmpTargetLast = tmpTargetValue;
-            }
-
-            if (retVal.getState().isFeasible() && (tmpTargetValue <= tmpTargetLast)) {
-                // tmpTargetLast at this point is at max possible target value
+            if (retVal.getState().isFeasible()) {
 
                 double tmpCurrent;
                 double tmpLow;
