@@ -14,32 +14,23 @@
         <property name="path.TestProj" value="..${file.separator}${alias.TestProj}" />
 
         <property name="path.ExtAMPL" value="..${file.separator}${alias.ExtAMPL}" />
-        <property name="path.ExtJavaMail"
-            value="..${file.separator}${alias.ExtJavaMail}" />
+        <property name="path.ExtJavaMail" value="..${file.separator}${alias.ExtJavaMail}" />
         <property name="path.ExtJExcel" value="..${file.separator}${alias.ExtJExcel}" />
         <property name="path.ExtJFree" value="..${file.separator}${alias.ExtJFree}" />
         <property name="path.ExtPriDE" value="..${file.separator}${alias.ExtPriDE}" />
 
-        <property name="path.doc"
-            value="..${file.separator}${dist.doc.alias}${file.separator}${dist.doc.dir}" />
-        <property name="path.dist"
-            value="${path.DevProj}${file.separator}${dir.dist}" />
+        <property name="path.doc" value="..${file.separator}${dist.doc.alias}${file.separator}${dist.doc.dir}" />
+        <property name="path.dist" value="${path.DevProj}${file.separator}${dir.dist}" />
 
-        <property name="name.ojalgo"
-            value="${dist.ojalgo}-${version.release}.${version.build}" />
-        <property name="name.ojalgo-biz"
-            value="${dist.ojalgo-biz}-${version.release}.${version.build}" />
-        <property name="name.ojalgo-ext"
-            value="${dist.ojalgo-ext}-${version.release}.${version.build}" />
+        <property name="name.ojalgo" value="${dist.ojalgo}-${version.major}.${version.minor}.${version.build}" />
+        <property name="name.ojalgo-biz" value="${dist.ojalgo-biz}-${version.major}.${version.minor}.${version.build}" />
+        <property name="name.ojalgo-ext" value="${dist.ojalgo-ext}-${version.major}.${version.minor}.${version.build}" />
 
     </target>
 
     <target name="compile_project" if="tmp.proj_path">
 
-        <javac srcdir="${param.proj_path}${file.separator}${dir.src}"
-            destdir="${param.proj_path}${file.separator}${dir.bin}"
-            classpath="${param.proj_path}${file.separator}${dir.lib}"
-            includeantruntime="false" />
+        <javac srcdir="${param.proj_path}${file.separator}${dir.src}" destdir="${param.proj_path}${file.separator}${dir.bin}" classpath="${param.proj_path}${file.separator}${dir.lib}" includeantruntime="false" />
 
     </target>
 
@@ -84,9 +75,7 @@
         <delete dir="${path.doc}" />
         <mkdir dir="${path.doc}" />
 
-        <javadoc access="public" doctitle="ojAlgo Generated Documentation"
-            destdir="${path.doc}" noindex="true" splitindex="no"
-            encoding="utf-8">
+        <javadoc access="public" doctitle="ojAlgo Generated Documentation" destdir="${path.doc}" noindex="true" splitindex="no" encoding="utf-8">
 
             <fileset dir="${path.DevProj}${file.separator}${dir.src}">
                 <include name="**/*.java" />
@@ -117,8 +106,7 @@
             </fileset>
 
             <classpath>
-                <fileset
-                    dir="${path.ExtJavaMail}${file.separator}${dir.lib}">
+                <fileset dir="${path.ExtJavaMail}${file.separator}${dir.lib}">
                     <include name="**/*.jar" />
                 </fileset>
                 <fileset dir="${path.ExtPriDE}${file.separator}${dir.lib}">
@@ -133,8 +121,7 @@
             </classpath>
 
             <link href="http://docs.oracle.com/javase/8/docs/api/" />
-            <link
-                href="http://jexcelapi.sourceforge.net/resources/javadocs/current/docs/" />
+            <link href="http://jexcelapi.sourceforge.net/resources/javadocs/current/docs/" />
             <link href="http://www.jfree.org/jfreechart/api/javadoc/" />
             <link href="http://pride.sourceforge.net/javadoc/" />
 
@@ -144,12 +131,9 @@
 
     <target name="dist" depends="init,compile">
 
-        <property name="tmp.ojalgo"
-            value="${path.dist}${file.separator}${name.ojalgo}" />
-        <property name="tmp.ojalgo-biz"
-            value="${path.dist}${file.separator}${name.ojalgo-biz}" />
-        <property name="tmp.ojalgo-ext"
-            value="${path.dist}${file.separator}${name.ojalgo-ext}" />
+        <property name="tmp.ojalgo" value="${path.dist}${file.separator}${name.ojalgo}" />
+        <property name="tmp.ojalgo-biz" value="${path.dist}${file.separator}${name.ojalgo-biz}" />
+        <property name="tmp.ojalgo-ext" value="${path.dist}${file.separator}${name.ojalgo-ext}" />
 
         <delete dir="${path.dist}" />
         <mkdir dir="${path.dist}" />
@@ -165,8 +149,7 @@
                 <attribute name="Specification-Version" value="${DSTAMP}" />
                 <attribute name="Specification-Vendor" value="Optimatika" />
                 <attribute name="Implementation-Title" value="ojAlgo" />
-                <attribute name="Implementation-Version"
-                    value="${version.release}.${version.build}" />
+                <attribute name="Implementation-Version" value="${version.major}.${version.minor}.${version.build}" />
                 <attribute name="Implementation-Vendor" value="Optimatika" />
             </manifest>
         </jar>
@@ -182,8 +165,7 @@
                 <attribute name="Specification-Version" value="${DSTAMP}" />
                 <attribute name="Specification-Vendor" value="Optimatika" />
                 <attribute name="Implementation-Title" value="ojAlgo" />
-                <attribute name="Implementation-Version"
-                    value="${version.release}.${version.build}" />
+                <attribute name="Implementation-Version" value="${version.major}.${version.minor}.${version.build}" />
                 <attribute name="Implementation-Vendor" value="Optimatika" />
             </manifest>
         </jar>
@@ -207,8 +189,7 @@
                 <attribute name="Specification-Version" value="${DSTAMP}" />
                 <attribute name="Specification-Vendor" value="Optimatika" />
                 <attribute name="Implementation-Title" value="ojAlgo Extensions" />
-                <attribute name="Implementation-Version"
-                    value="${version.release}.${version.build}" />
+                <attribute name="Implementation-Version" value="${version.major}.${version.minor}.${version.build}" />
                 <attribute name="Implementation-Vendor" value="Optimatika" />
             </manifest>
         </jar>
@@ -222,8 +203,7 @@
         </zip>
 
         <propertyfile file="build.properties">
-            <entry key="version.build" type="int" operation="+"
-                default="0" />
+            <entry key="version.build" type="int" operation="+" default="0" />
         </propertyfile>
 
     </target>
