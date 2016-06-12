@@ -441,6 +441,35 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());
     }
 
+    public void testUnboundedCase() {
+
+        final Variable[] tmpVariables = new Variable[] { new Variable("X1").weight(ONE), new Variable("X2").weight(TWO), new Variable("X3").weight(THREE) };
+
+        final ExpressionsBasedModel tmpModel = new ExpressionsBasedModel(tmpVariables);
+
+        final Expression tmpExprC1 = tmpModel.addExpression("C1");
+        for (int i = 0; i < tmpModel.countVariables(); i++) {
+            tmpExprC1.set(i, ONE);
+        }
+        tmpExprC1.level(ONE);
+
+        final Optimisation.Result tmpMinResult = tmpModel.maximise();
+
+        TestUtils.assertTrue(tmpMinResult.getState().isFeasible());
+        TestUtils.assertFalse(tmpMinResult.getState().isOptimal());
+        TestUtils.assertTrue(tmpMinResult.getState().isFailure());
+        TestUtils.assertTrue(tmpModel.validate(tmpMinResult));
+        TestUtils.assertEquals(Optimisation.State.UNBOUNDED, tmpMinResult.getState());
+
+        final Optimisation.Result tmpMaxResult = tmpModel.maximise();
+
+        TestUtils.assertTrue(tmpMaxResult.getState().isFeasible());
+        TestUtils.assertFalse(tmpMaxResult.getState().isOptimal());
+        TestUtils.assertTrue(tmpMaxResult.getState().isFailure());
+        TestUtils.assertTrue(tmpModel.validate(tmpMaxResult));
+        TestUtils.assertEquals(Optimisation.State.UNBOUNDED, tmpMaxResult.getState());
+    }
+
     private ExpressionsBasedModel buildOldKnapsackTestModel() {
 
         Variable tmpVar;
