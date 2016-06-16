@@ -330,7 +330,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         markowitz.setShortingAllowed(true);
         markowitz.setTargetReturn(BigDecimal.valueOf(0.0427));
 
-        final List<BigDecimal> tmpWeights = markowitz.getWeights();
+        List<BigDecimal> tmpWeights = markowitz.getWeights();
         TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
 
         // Solution reachable without shorting, but since it is allowed the optimal solution is different
@@ -346,6 +346,14 @@ public class PortfolioProblems extends FinancePortfolioTests {
         TestUtils.assertEquals(0.1, markowitz.getMeanReturn(), NumberContext.getGeneral(4, 4));
         TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
 
+        // Min risk portfolio, very high risk aversion means minimum risk.
+        markowitz.setTargetReturn(null);
+        markowitz.setRiskAversion(new BigDecimal(1000000));
+        tmpWeights = markowitz.getWeights();
+        TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
+        TestUtils.assertEquals(0.4411, tmpWeights.get(0).doubleValue()); // 0.4411
+        TestUtils.assertEquals(0.3656, tmpWeights.get(1).doubleValue()); // 0.3656
+        TestUtils.assertEquals(0.1933, tmpWeights.get(2).doubleValue()); // 0.1933
     }
 
 }
