@@ -378,7 +378,8 @@ public class CompareImplementations extends FunctionTests {
 
     public void testSQRT() {
 
-        this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT, POSITIVE.doubleValue());
+        this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT,
+                POSITIVE.doubleValue());
 
         this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT, PI);
         this.assertUnary(BigFunction.SQRT, ComplexFunction.SQRT, PrimitiveFunction.SQRT, QuaternionFunction.SQRT, RationalFunction.SQRT, E);

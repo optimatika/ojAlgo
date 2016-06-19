@@ -27,7 +27,7 @@ import org.ojalgo.series.BasicSeries;
 
 /**
  * An interpolator produces new data points to existing series, inbetween existing keys.
- * 
+ *
  * @author apete
  * @param <K>
  */

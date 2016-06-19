@@ -57,8 +57,8 @@ package org.ojalgo.matrix.decomposition;
  * <li>LU: [A] = [L][U] where [U<sub>LU</sub>] = [D<sub>LDU</sub>][U<sub>LDU</sub>]</li>
  * <li>Cholesky: [A] = [L][L]<sup>H</sup> where [A] is hermitian positive definite and [L<sub>Cholesky</sub>]
  * = [L<sub>LDU</sub>][D<sub>LDU</sub>]<sup>½</sup></li>
- * <li>LDL: [A] = [L][D][L]<sup>H</sup> where [A] is hermitian and [L<sub>LDL</sub>]<sup>H</sup> =
- * [U<sub>LDU</sub>]</li>
+ * <li>LDL: [A] = [L][D][L]<sup>H</sup> where [A] is hermitian and [L<sub>LDL</sub>]<sup>H</sup> = [U
+ * <sub>LDU</sub>]</li>
  * </ul>
  *
  * @author apete

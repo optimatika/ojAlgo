@@ -24,7 +24,7 @@ package org.ojalgo;
 /**
  * Incorrect use of the API. The code needs to be changed. Typically execution can't continue. Is never
  * declared to be thrown, and should not be caught.
- * 
+ *
  * @author apete
  */
 public class ProgrammingError extends RuntimeException {
@@ -46,7 +46,7 @@ public class ProgrammingError extends RuntimeException {
 
     /**
      * Instead of IllegalArgumentException and/or NullPointerException.
-     * 
+     *
      * @param obj
      */
     public static void throwIfNull(final Object obj) {

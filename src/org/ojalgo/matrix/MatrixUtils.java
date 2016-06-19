@@ -126,7 +126,7 @@ public abstract class MatrixUtils {
         final int tmpColDim = (int) matrix.countColumns();
 
         final MatrixStore<N> tmpQ1 = decomposition.getQ1();
-        final MatrixStore<N> tmpD = decomposition.getD();
+        decomposition.getD();
         final MatrixStore<N> tmpQ2 = decomposition.getQ2();
 
         final MatrixStore<N> tmpConjugatedQ1 = tmpQ1.logical().conjugate().get();

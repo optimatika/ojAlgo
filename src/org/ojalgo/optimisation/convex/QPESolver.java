@@ -104,7 +104,7 @@ final class QPESolver extends ConstrainedSolver {
     @Override
     protected void performIteration() {
 
-        final MatrixStore<Double> tmpIterQ = this.getIterationQ();
+        this.getIterationQ();
         final MatrixStore<Double> tmpIterC = this.getIterationC();
         final MatrixStore<Double> tmpIterA = this.getIterationA();
         final MatrixStore<Double> tmpIterB = this.getIterationB();

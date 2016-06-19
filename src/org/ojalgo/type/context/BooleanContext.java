@@ -28,7 +28,7 @@ import org.ojalgo.type.format.BooleanFormat;
 
 /**
  * BooleanContext
- * 
+ *
  * @author apete
  */
 public final class BooleanContext extends FormatContext<Boolean> {

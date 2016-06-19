@@ -36,8 +36,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class CompoundFunction<N extends Number> extends AbstractMultiary<N, CompoundFunction<N>> implements MultiaryFunction.Linear<N>,
-        MultiaryFunction.Quadratic<N> {
+public final class CompoundFunction<N extends Number> extends AbstractMultiary<N, CompoundFunction<N>>
+        implements MultiaryFunction.Linear<N>, MultiaryFunction.Quadratic<N> {
 
     public static CompoundFunction<BigDecimal> makeBig(final Access2D<? extends Number> quadraticFactors, final Access1D<? extends Number> linearFactors) {
         final QuadraticFunction<BigDecimal> tmpQuadratic = QuadraticFunction.makeBig(quadraticFactors);
@@ -51,7 +51,8 @@ public final class CompoundFunction<N extends Number> extends AbstractMultiary<N
         return new CompoundFunction<BigDecimal>(tmpQuadratic, tmpLinear);
     }
 
-    public static CompoundFunction<ComplexNumber> makeComplex(final Access2D<? extends Number> quadraticFactors, final Access1D<? extends Number> linearFactors) {
+    public static CompoundFunction<ComplexNumber> makeComplex(final Access2D<? extends Number> quadraticFactors,
+            final Access1D<? extends Number> linearFactors) {
         final QuadraticFunction<ComplexNumber> tmpQuadratic = QuadraticFunction.makeComplex(quadraticFactors);
         final LinearFunction<ComplexNumber> tmpLinear = LinearFunction.makeComplex(linearFactors);
         return new CompoundFunction<ComplexNumber>(tmpQuadratic, tmpLinear);

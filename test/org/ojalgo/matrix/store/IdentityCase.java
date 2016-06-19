@@ -32,7 +32,7 @@ public class IdentityCase extends NonPhysicalTest {
         super();
     }
 
-    public IdentityCase(String arg0) {
+    public IdentityCase(final String arg0) {
         super(arg0);
     }
 
@@ -41,7 +41,7 @@ public class IdentityCase extends NonPhysicalTest {
 
         super.setUp();
 
-        int tmpDim = Uniform.randomInteger(1, 9);
+        final int tmpDim = Uniform.randomInteger(1, 9);
 
         myBigStore = new IdentityStore<BigDecimal>(BigDenseStore.FACTORY, tmpDim);
         myComplexStore = new IdentityStore<ComplexNumber>(ComplexDenseStore.FACTORY, tmpDim);

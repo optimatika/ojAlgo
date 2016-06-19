@@ -33,13 +33,7 @@ public final class ColumnView<N extends Number> implements Access1D<N>, Iterator
     private long myColumn = -1L;
     private final long myLastColumn;
 
-    final Iterable<ColumnView<N>> iterable = new Iterable<ColumnView<N>>() {
-
-        public Iterator<ColumnView<N>> iterator() {
-            return ColumnView.this;
-        }
-
-    };
+    final Iterable<ColumnView<N>> iterable = () -> ColumnView.this;
 
     @SuppressWarnings("unused")
     private ColumnView() {

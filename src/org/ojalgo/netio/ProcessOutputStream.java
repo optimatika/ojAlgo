@@ -34,42 +34,42 @@ public class ProcessOutputStream extends PrintStream {
     private String myLastArgument = EMPTY;
     private String myLastCommand = EMPTY;
 
-    public ProcessOutputStream(Process aProcess) {
+    public ProcessOutputStream(final Process aProcess) {
         super(aProcess.getOutputStream(), true);
     }
 
     @SuppressWarnings("unused")
-    private ProcessOutputStream(File someFile) throws FileNotFoundException {
+    private ProcessOutputStream(final File someFile) throws FileNotFoundException {
         super(someFile);
     }
 
     @SuppressWarnings("unused")
-    private ProcessOutputStream(File someFile, String someCsn) throws FileNotFoundException, UnsupportedEncodingException {
+    private ProcessOutputStream(final File someFile, final String someCsn) throws FileNotFoundException, UnsupportedEncodingException {
         super(someFile, someCsn);
     }
 
     @SuppressWarnings("unused")
-    private ProcessOutputStream(OutputStream anOutputStream) {
+    private ProcessOutputStream(final OutputStream anOutputStream) {
         super(anOutputStream);
     }
 
     @SuppressWarnings("unused")
-    private ProcessOutputStream(OutputStream someOut, boolean autoFlush) {
+    private ProcessOutputStream(final OutputStream someOut, final boolean autoFlush) {
         super(someOut, autoFlush);
     }
 
     @SuppressWarnings("unused")
-    private ProcessOutputStream(OutputStream someOut, boolean autoFlush, String someEncoding) throws UnsupportedEncodingException {
+    private ProcessOutputStream(final OutputStream someOut, final boolean autoFlush, final String someEncoding) throws UnsupportedEncodingException {
         super(someOut, autoFlush, someEncoding);
     }
 
     @SuppressWarnings("unused")
-    private ProcessOutputStream(String someFileName) throws FileNotFoundException {
+    private ProcessOutputStream(final String someFileName) throws FileNotFoundException {
         super(someFileName);
     }
 
     @SuppressWarnings("unused")
-    private ProcessOutputStream(String someFileName, String someCsn) throws FileNotFoundException, UnsupportedEncodingException {
+    private ProcessOutputStream(final String someFileName, final String someCsn) throws FileNotFoundException, UnsupportedEncodingException {
         super(someFileName, someCsn);
     }
 
@@ -81,9 +81,9 @@ public class ProcessOutputStream extends PrintStream {
         return myLastCommand;
     }
 
-    public void sendBatch(List<Message> aBatch) {
+    public void sendBatch(final List<Message> aBatch) {
 
-        StringBuilder retVal = new StringBuilder();
+        final StringBuilder retVal = new StringBuilder();
 
         Message tmpMessage = aBatch.get(0);
         retVal.append(tmpMessage);
@@ -101,7 +101,7 @@ public class ProcessOutputStream extends PrintStream {
         this.writeString(retVal.toString());
     }
 
-    public void sendMessage(Message aMessage) {
+    public void sendMessage(final Message aMessage) {
 
         myLastCommand = aMessage.getCommand();
         myLastArgument = aMessage.getArgument();
@@ -109,7 +109,7 @@ public class ProcessOutputStream extends PrintStream {
         this.writeString(aMessage.toString());
     }
 
-    private void writeString(String aString) {
+    private void writeString(final String aString) {
         this.print(aString.length() + String.valueOf(ASCII.SP) + aString);
     }
 

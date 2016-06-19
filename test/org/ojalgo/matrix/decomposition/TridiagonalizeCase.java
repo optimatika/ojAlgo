@@ -54,10 +54,10 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
      */
     public void testFullertonExample1and2() {
 
-        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, 2.0, 2.0, 1.0 }, { 2.0, -3.0, 1.0, 1.0 },
-                { 2.0, 1.0, 3.0, 1.0 }, { 1.0, 1.0, 1.0, 2.0 } });
-        final PhysicalStore<Double> tmpMtrxD = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, -3.0, 0.0, 0.0 }, { -3.0, 2.0, 3.16227766, 0.0 },
-                { 0.0, 3.16227766, -1.4, -0.2 }, { 0.0, 0.0, -0.2, 1.4 } });
+        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 4.0, 2.0, 2.0, 1.0 }, { 2.0, -3.0, 1.0, 1.0 }, { 2.0, 1.0, 3.0, 1.0 }, { 1.0, 1.0, 1.0, 2.0 } });
+        final PhysicalStore<Double> tmpMtrxD = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 4.0, -3.0, 0.0, 0.0 }, { -3.0, 2.0, 3.16227766, 0.0 }, { 0.0, 3.16227766, -1.4, -0.2 }, { 0.0, 0.0, -0.2, 1.4 } });
 
         this.doTheTest(tmpMtrxA, tmpMtrxD);
     }
@@ -70,9 +70,9 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 5.0, 1.0, 2.0, 2.0, 4.0 }, { 1.0, 1.0, 2.0, 1.0, 0.0 },
                 { 2.0, 2.0, 0.0, 2.0, 1.0 }, { 2.0, 1.0, 2.0, 1.0, 2.0 }, { 4.0, 0.0, 1.0, 2.0, 4.0 } });
-        final PhysicalStore<Double> tmpMtrxD = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 5.0, -5.0, 0.0, 0.0, 0.0 },
-                { -5.0, 5.8, -0.8246211251, 0.0, 0.0 }, { 0.0, -0.8246211251, -0.8823529412, -1.577874704, 0.0 },
-                { 0.0, 0.0, -1.577874704, 1.373213515, 1.279015421 }, { 0.0, 0.0, 0.0, 1.279015421, -0.2908605737 } });
+        final PhysicalStore<Double> tmpMtrxD = PrimitiveDenseStore.FACTORY.rows(
+                new double[][] { { 5.0, -5.0, 0.0, 0.0, 0.0 }, { -5.0, 5.8, -0.8246211251, 0.0, 0.0 }, { 0.0, -0.8246211251, -0.8823529412, -1.577874704, 0.0 },
+                        { 0.0, 0.0, -1.577874704, 1.373213515, 1.279015421 }, { 0.0, 0.0, 0.0, 1.279015421, -0.2908605737 } });
 
         this.doTheTest(tmpMtrxA, tmpMtrxD);
     }
@@ -84,13 +84,13 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
      */
     public void testFullertonExercise4and5() {
 
-        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, 1.0, 2.0, -5.0, 1.0, 4.0 },
-                { 1.0, 2.0, 0.0, 4.0, 5.0, 3.0 }, { 2.0, 0.0, 3.0, -1.0, 2.0, 1.0 }, { -5.0, 4.0, -1.0, 1.0, 5.0, 2.0 }, { 1.0, 5.0, 2.0, 5.0, -2.0, 4.0 },
-                { 4.0, 3.0, 1.0, 2.0, 4.0, 1.0 } });
-        final PhysicalStore<Double> tmpMtrxD = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, -6.8556546, 0.0, 0.0, 0.0, 0.0 },
-                { -6.8556546, -0.1489361702, 2.924429193, 0.0, 0.0, 0.0 }, { 0.0, 2.924429193, 1.268510593, 4.758239905, 0.0, 0.0 },
-                { 0.0, 0.0, 4.758239905, 2.664908905, -7.994421195, 0.0 }, { 0.0, 0.0, 0.0, -7.994421195, 3.358186868, 1.759360415 },
-                { 0.0, 0.0, 0.0, 0.0, 1.759360415, -2.142670196 } });
+        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 4.0, 1.0, 2.0, -5.0, 1.0, 4.0 }, { 1.0, 2.0, 0.0, 4.0, 5.0, 3.0 }, { 2.0, 0.0, 3.0, -1.0, 2.0, 1.0 },
+                        { -5.0, 4.0, -1.0, 1.0, 5.0, 2.0 }, { 1.0, 5.0, 2.0, 5.0, -2.0, 4.0 }, { 4.0, 3.0, 1.0, 2.0, 4.0, 1.0 } });
+        final PhysicalStore<Double> tmpMtrxD = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 4.0, -6.8556546, 0.0, 0.0, 0.0, 0.0 }, { -6.8556546, -0.1489361702, 2.924429193, 0.0, 0.0, 0.0 },
+                        { 0.0, 2.924429193, 1.268510593, 4.758239905, 0.0, 0.0 }, { 0.0, 0.0, 4.758239905, 2.664908905, -7.994421195, 0.0 },
+                        { 0.0, 0.0, 0.0, -7.994421195, 3.358186868, 1.759360415 }, { 0.0, 0.0, 0.0, 0.0, 1.759360415, -2.142670196 } });
 
         this.doTheTest(tmpMtrxA, tmpMtrxD);
     }
@@ -139,10 +139,10 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
      */
     public void testWikipediaExample() {
 
-        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, 1.0, -2.0, 2.0 }, { 1.0, 2.0, 0.0, 1.0 },
-                { -2.0, 0.0, 3.0, -2.0 }, { 2.0, 1.0, -2.0, -1.0 } });
-        final PhysicalStore<Double> tmpMtrxD = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, -3.0, 0.0, 0.0 },
-                { -3.0, 10.0 / 3.0, -5.0 / 3.0, 0.0 }, { 0.0, -5.0 / 3.0, -33.0 / 25.0, 68.0 / 75.0 }, { 0.0, 0.0, 68.0 / 75.0, 149.0 / 75.0 } });
+        final PhysicalStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 4.0, 1.0, -2.0, 2.0 }, { 1.0, 2.0, 0.0, 1.0 }, { -2.0, 0.0, 3.0, -2.0 }, { 2.0, 1.0, -2.0, -1.0 } });
+        final PhysicalStore<Double> tmpMtrxD = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 4.0, -3.0, 0.0, 0.0 }, { -3.0, 10.0 / 3.0, -5.0 / 3.0, 0.0 },
+                { 0.0, -5.0 / 3.0, -33.0 / 25.0, 68.0 / 75.0 }, { 0.0, 0.0, 68.0 / 75.0, 149.0 / 75.0 } });
 
         this.doTheTest(tmpMtrxA, tmpMtrxD);
     }

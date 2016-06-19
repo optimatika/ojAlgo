@@ -28,7 +28,7 @@ import junit.framework.TestSuite;
 
 /**
  * TypeContextPackageTests
- * 
+ *
  * @author apete
  */
 public abstract class TypeContextTests extends FunctionalityTest {

@@ -86,7 +86,7 @@ public final class IntToObject<V extends Object> implements KeyValue<Integer, V>
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + key;
+        result = (prime * result) + key;
         return result;
     }
 

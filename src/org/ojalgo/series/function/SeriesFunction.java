@@ -32,7 +32,7 @@ import org.ojalgo.series.BasicSeries;
 /**
  * A function that maps from a (collection of) series and one or more keys to a series of numbers. The
  * interpretation of the input series data and the output series is completely free.
- * 
+ *
  * @author apete
  * @param <K> The series key type
  */

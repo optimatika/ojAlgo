@@ -67,9 +67,9 @@ public class P20150127b {
         if (result.getState().isSuccess()) {
             throw new Exception("Model should NOT be solvable due to constraints on x/y");
             /*
-             * if (!result.getState().isSuccess()) throw new
-             * Exception("Model should be solvable (e.g. x=20, y=-1)?!"); // Get the solution BigDecimal valX
-             * = result.get(0); BigDecimal valY = result.get(1); int intX = valX.setScale(0,
+             * if (!result.getState().isSuccess()) throw new Exception(
+             * "Model should be solvable (e.g. x=20, y=-1)?!"); // Get the solution BigDecimal valX =
+             * result.get(0); BigDecimal valY = result.get(1); int intX = valX.setScale(0,
              * BigDecimal.ROUND_HALF_UP).intValue(); int intY = valY.setScale(0,
              * BigDecimal.ROUND_HALF_UP).intValue(); System.out.println("x = " + valX + " ~ " + intX);
              * System.out.println("y = " + valY + " ~ " + intY); // Verify solution for (int[] coeff :

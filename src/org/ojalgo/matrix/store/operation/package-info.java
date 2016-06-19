@@ -1,7 +1,8 @@
 /**
  * <p>
- * Contents in this package loosely corresponds to BLAS. The exact selection of operations and their API:s are entirely
- * dictated by the requirements of the various {@linkplain org.ojalgo.matrix.store.MatrixStore} implementations.
+ * Contents in this package loosely corresponds to BLAS. The exact selection of operations and their API:s are
+ * entirely dictated by the requirements of the various {@linkplain org.ojalgo.matrix.store.MatrixStore}
+ * implementations.
  * </p>
  * <ul>
  * <li>http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms</li>

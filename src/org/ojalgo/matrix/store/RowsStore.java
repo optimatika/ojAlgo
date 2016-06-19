@@ -75,7 +75,7 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
 
         if (this.isPrimitive()) {
 
-            final long tmpTargetRows = target.countRows();
+            target.countRows();
             final long tmpComplexity = this.countColumns();
             final long tmpTargetColumns = target.countColumns();
 

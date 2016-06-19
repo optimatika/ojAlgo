@@ -86,7 +86,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         final DecompositionStore<N> tmpInPlace = this.setInPlace(matrix);
 
         final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
+        this.getColDim();
         final int tmpMinDim = this.getMinDim();
 
         myPivot = new Pivot(tmpRowDim);

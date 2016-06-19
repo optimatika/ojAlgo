@@ -25,7 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 /**
  * Useful as length of life distribution in reliability theory.
- * 
+ *
  * @author apete
  */
 public class Weibull extends RandomNumber {

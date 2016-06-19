@@ -60,7 +60,7 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
 
     /**
      * Subclasses must override either getStandardDeviation() or getVariance()!
-     * 
+     *
      * @see org.ojalgo.random.Distribution#getStandardDeviation()
      * @see org.ojalgo.random.Distribution#getVariance()
      */
@@ -70,7 +70,7 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
 
     /**
      * Subclasses must override either getStandardDeviation() or getVariance()!
-     * 
+     *
      * @see org.ojalgo.random.Distribution#getStandardDeviation()
      * @see org.ojalgo.random.Distribution#getVariance()
      */

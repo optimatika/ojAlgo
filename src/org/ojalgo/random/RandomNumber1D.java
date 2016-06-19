@@ -39,7 +39,7 @@ abstract class RandomNumber1D {
 
     /**
      * Subclasses must override either getStandardDeviation() or getVariance()!
-     * 
+     *
      * @see org.ojalgo.random.Distribution#getStandardDeviation()
      * @see org.ojalgo.random.Distribution#getVariance()
      */
@@ -60,7 +60,7 @@ abstract class RandomNumber1D {
 
     /**
      * Subclasses must override either getStandardDeviation() or getVariance()!
-     * 
+     *
      * @see org.ojalgo.random.Distribution#getStandardDeviation()
      * @see org.ojalgo.random.Distribution#getVariance()
      */

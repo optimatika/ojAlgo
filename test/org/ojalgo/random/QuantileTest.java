@@ -28,7 +28,7 @@ import org.ojalgo.netio.BasicLogger;
 
 /**
  * QuantileTest
- * 
+ *
  * @author apete
  */
 public class QuantileTest extends RandomTests {

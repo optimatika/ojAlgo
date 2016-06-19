@@ -30,7 +30,8 @@ import org.ojalgo.scalar.RationalNumber;
 
 public abstract class DotProduct extends MatrixOperation {
 
-    public static BigDecimal invoke(final BigDecimal[] array1, final int offset1, final BigDecimal[] array2, final int offset2, final int first, final int limit) {
+    public static BigDecimal invoke(final BigDecimal[] array1, final int offset1, final BigDecimal[] array2, final int offset2, final int first,
+            final int limit) {
         BigDecimal retVal = BigMath.ZERO;
         for (int i = first; i < limit; i++) {
             retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));

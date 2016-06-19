@@ -98,8 +98,8 @@ public class BidiagonalTest extends MatrixDecompositionTests {
 
     public void testSquareBidiagonal() {
 
-        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 4, 0, 0 }, { 0, 4, 1, 0 }, { 0, 0, 3, 4 },
-                { 0, 0, 0, 3 } });
+        final PhysicalStore<Double> tmpMatrix = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 1, 4, 0, 0 }, { 0, 4, 1, 0 }, { 0, 0, 3, 4 }, { 0, 0, 0, 3 } });
 
         this.doTestCorrect(tmpMatrix);
     }

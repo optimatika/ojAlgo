@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -346,38 +345,32 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
 
         this.getSingularValues().sortDescending();
 
-        myFutureQ1 = DaemonPoolExecutor.invoke(new Callable<PhysicalStore<N>>() {
+        myFutureQ1 = DaemonPoolExecutor.invoke(() -> {
 
-            public PhysicalStore<N> call() throws Exception {
+            final PhysicalStore<N> retVal = SVDold30.this.getBidiagonalQ1();
 
-                final PhysicalStore<N> retVal = SVDold30.this.getBidiagonalQ1();
+            final List<Rotation<N>> tmpRotations1 = myQ1Rotations;
 
-                final List<Rotation<N>> tmpRotations = myQ1Rotations;
-
-                final int tmpLimit = tmpRotations.size();
-                for (int r = 0; r < tmpLimit; r++) {
-                    retVal.transformRight(tmpRotations.get(r));
-                }
-
-                return retVal;
+            final int tmpLimit = tmpRotations1.size();
+            for (int r = 0; r < tmpLimit; r++) {
+                retVal.transformRight(tmpRotations1.get(r));
             }
+
+            return retVal;
         });
 
-        myFutureQ2 = DaemonPoolExecutor.invoke(new Callable<PhysicalStore<N>>() {
+        myFutureQ2 = DaemonPoolExecutor.invoke(() -> {
 
-            public PhysicalStore<N> call() throws Exception {
+            final PhysicalStore<N> retVal = SVDold30.this.getBidiagonalQ2();
 
-                final PhysicalStore<N> retVal = SVDold30.this.getBidiagonalQ2();
+            final List<Rotation<N>> tmpRotations1 = myQ2Rotations;
 
-                final List<Rotation<N>> tmpRotations = myQ2Rotations;
-
-                final int tmpLimit = tmpRotations.size();
-                for (int r = 0; r < tmpLimit; r++) {
-                    retVal.transformRight(tmpRotations.get(r));
-                }
-
-                return retVal;
+            final int tmpLimit = tmpRotations1.size();
+            for (int r = 0; r < tmpLimit; r++) {
+                retVal.transformRight(tmpRotations1.get(r));
             }
+
+            return retVal;
         });
 
         return this.computed(true);

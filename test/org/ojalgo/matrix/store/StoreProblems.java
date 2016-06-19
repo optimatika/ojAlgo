@@ -45,13 +45,13 @@ public class StoreProblems extends AbstractMatrixStoreTest {
      */
     public void testP20071210() {
 
-        BasicMatrix A, Bu, C, K, sx, r, currentState;
+        BasicMatrix A, Bu, K, sx, currentState;
 
         final double[][] a = { { 1, 2 }, { 3, 4 } };
         A = PrimitiveMatrix.FACTORY.rows(a);
         final double[][] bu = { { 1, 0 }, { 0, 1 } };
         Bu = PrimitiveMatrix.FACTORY.rows(bu);
-        C = PrimitiveMatrix.FACTORY.makeEye(2, 2);
+        PrimitiveMatrix.FACTORY.makeEye(2, 2);
         K = PrimitiveMatrix.FACTORY.makeEye(2, 2);
         final int hp = 2 * OjAlgoUtils.ENVIRONMENT.threads;
 
@@ -69,7 +69,7 @@ public class StoreProblems extends AbstractMatrixStoreTest {
         }
         currentState = PrimitiveMatrix.FACTORY.makeZero(A.countRows(), 1);
         currentState = currentState.add(1.0);
-        r = sx.multiply(currentState);
+        sx.multiply(currentState);
     }
 
     /**

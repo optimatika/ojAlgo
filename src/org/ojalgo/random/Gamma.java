@@ -60,7 +60,7 @@ public class Gamma extends RandomNumber {
 
     /**
      * A Convenient Way of Generating Gamma Random Variables Using Generalized Exponential Distribution
-     * 
+     *
      * @see org.ojalgo.random.RandomNumber#generate()
      */
     @Override

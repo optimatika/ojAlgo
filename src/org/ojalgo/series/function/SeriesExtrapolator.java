@@ -27,7 +27,7 @@ import org.ojalgo.series.BasicSeries;
 
 /**
  * An extrapolator produces new data points to existing series.
- * 
+ *
  * @author apete
  * @param <K>
  */

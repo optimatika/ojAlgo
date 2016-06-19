@@ -28,7 +28,7 @@ import junit.framework.TestSuite;
 
 /**
  * RandomPackageTests
- * 
+ *
  * @author apete
  */
 public abstract class RandomTests extends FunctionalityTest {

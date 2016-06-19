@@ -1166,11 +1166,11 @@ public class ConvexProblems extends OptimisationConvexTests {
         final int numElm = (int) result.count();
 
         final double[] expectedSolution = new double[] { -0.4, 0.12, -0.0196, -2.45785 };
-        final double tmpExpValue = tmpObj.invoke(ArrayUtils.wrapAccess1D(expectedSolution));
-        final double tmpActValue = tmpObj.invoke(AccessUtils.asPrimitive1D(result));
+        tmpObj.invoke(ArrayUtils.wrapAccess1D(expectedSolution));
+        tmpObj.invoke(AccessUtils.asPrimitive1D(result));
 
-        final MatrixStore<Double> tmpExpSlack = JamaBI.subtract(JamaAI.multiply(PrimitiveDenseStore.FACTORY.columns(expectedSolution)));
-        final MatrixStore<Double> tmpActSlack = JamaBI.subtract(JamaAI.multiply(PrimitiveDenseStore.FACTORY.columns(result)));
+        JamaBI.subtract(JamaAI.multiply(PrimitiveDenseStore.FACTORY.columns(expectedSolution)));
+        JamaBI.subtract(JamaAI.multiply(PrimitiveDenseStore.FACTORY.columns(result)));
 
         for (int i = 0; i < numElm; i++) {
             TestUtils.assertEquals(expectedSolution[i], result.doubleValue(i), 1e-4);

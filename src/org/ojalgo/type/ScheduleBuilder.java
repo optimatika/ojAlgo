@@ -72,7 +72,7 @@ public class ScheduleBuilder {
     }
 
     public ScheduleBuilder start(final int aDelayMeassure, final CalendarDateUnit aDelayUnit) {
-        myStartDate = new Date(System.currentTimeMillis() + aDelayMeassure * aDelayUnit.size());
+        myStartDate = new Date(System.currentTimeMillis() + (aDelayMeassure * aDelayUnit.size()));
         return this;
     }
 

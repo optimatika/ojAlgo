@@ -26,7 +26,7 @@ import org.ojalgo.access.AccessUtils;
 
 /**
  * AbstractArrayTest
- * 
+ *
  * @author apete
  */
 public class ArrayStructureTest extends ArrayTests {

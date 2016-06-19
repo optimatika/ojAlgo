@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -46,29 +45,11 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+    public static final Factory<BigDecimal> BIG = typical -> new HessenbergDecomposition.Big();
 
-        public Hessenberg<BigDecimal> make(final Structure2D typical) {
-            return new HessenbergDecomposition.Big();
-        }
+    public static final Factory<ComplexNumber> COMPLEX = typical -> new HessenbergDecomposition.Complex();
 
-    };
-
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        public Hessenberg<ComplexNumber> make(final Structure2D typical) {
-            return new HessenbergDecomposition.Complex();
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
-
-        public Hessenberg<Double> make(final Structure2D typical) {
-            return new HessenbergDecomposition.Primitive();
-        }
-
-    };
+    public static final Factory<Double> PRIMITIVE = typical -> new HessenbergDecomposition.Primitive();
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Hessenberg<N> make(final Access2D<N> typical) {

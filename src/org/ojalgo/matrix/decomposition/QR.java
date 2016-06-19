@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -53,32 +52,16 @@ public interface QR<N extends Number>
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+    public static final Factory<BigDecimal> BIG = typical -> new QRDecomposition.Big();
 
-        public QR<BigDecimal> make(final Structure2D typical) {
-            return new QRDecomposition.Big();
+    public static final Factory<ComplexNumber> COMPLEX = typical -> new QRDecomposition.Complex();
+
+    public static final Factory<Double> PRIMITIVE = typical -> {
+        if (typical.isFat() || ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE))) {
+            return new QRDecomposition.Primitive();
+        } else {
+            return new RawQR();
         }
-
-    };
-
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        public QR<ComplexNumber> make(final Structure2D typical) {
-            return new QRDecomposition.Complex();
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
-
-        public QR<Double> make(final Structure2D typical) {
-            if (typical.isFat() || ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE))) {
-                return new QRDecomposition.Primitive();
-            } else {
-                return new RawQR();
-            }
-        }
-
     };
 
     @SuppressWarnings("unchecked")

@@ -17,14 +17,14 @@
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE. 
+ * SOFTWARE.
  */
 package org.ojalgo;
 
 /**
  * Something that potentially could go wrong, actually did go wrong. The API user is expected to recover and
  * continue execution. Is always declared to be thrown, and must be caught.
- * 
+ *
  * @author apete
  */
 public class RecoverableCondition extends Exception {

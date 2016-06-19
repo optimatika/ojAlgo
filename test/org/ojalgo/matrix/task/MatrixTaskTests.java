@@ -32,7 +32,7 @@ import junit.framework.TestSuite;
 
 /**
  * MatrixDecompositionPackageTests
- * 
+ *
  * @author apete
  */
 public abstract class MatrixTaskTests extends FunctionalityTest {

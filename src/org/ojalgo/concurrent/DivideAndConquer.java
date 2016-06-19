@@ -21,7 +21,6 @@
  */
 package org.ojalgo.concurrent;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -61,20 +60,14 @@ public abstract class DivideAndConquer extends Object {
             final int tmpSplit = first + (tmpCount / 2);
             final int tmpWorkers = workers / 2;
 
-            final Future<Void> tmpFirstPart = DaemonPoolExecutor.INSTANCE.submit(new Callable<Void>() {
-
-                public Void call() {
-                    DivideAndConquer.this.divide(first, tmpSplit, threshold, tmpWorkers);
-                    return null;
-                }
+            final Future<Void> tmpFirstPart = DaemonPoolExecutor.INSTANCE.submit(() -> {
+                DivideAndConquer.this.divide(first, tmpSplit, threshold, tmpWorkers);
+                return null;
             });
 
-            final Future<Void> tmpSecondPart = DaemonPoolExecutor.INSTANCE.submit(new Callable<Void>() {
-
-                public Void call() {
-                    DivideAndConquer.this.divide(tmpSplit, limit, threshold, tmpWorkers);
-                    return null;
-                }
+            final Future<Void> tmpSecondPart = DaemonPoolExecutor.INSTANCE.submit(() -> {
+                DivideAndConquer.this.divide(tmpSplit, limit, threshold, tmpWorkers);
+                return null;
             });
 
             try {

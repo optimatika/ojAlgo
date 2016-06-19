@@ -202,13 +202,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
 
     private static final String START_END = "############################################\n";
-    static final Comparator<Expression> CE = new Comparator<Expression>() {
-
-        public int compare(final Expression o1, final Expression o2) {
-            return Integer.compare(o2.countLinearFactors(), o1.countLinearFactors());
-        }
-
-    };
+    static final Comparator<Expression> CE = (o1, o2) -> Integer.compare(o2.countLinearFactors(), o1.countLinearFactors());
 
     static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
     static final TreeSet<Presolver> PRESOLVERS = new TreeSet<>();

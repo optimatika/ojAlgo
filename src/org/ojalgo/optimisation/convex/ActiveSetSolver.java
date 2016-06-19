@@ -157,7 +157,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         super.initialise(kickStarter);
 
-        final MatrixStore<Double> tmpQ = this.getQ();
+        this.getQ();
         final MatrixStore<Double> tmpC = this.getC();
         final MatrixStore<Double> tmpAE = this.getAE();
         final MatrixStore<Double> tmpBE = this.getBE();
@@ -166,7 +166,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         final int tmpNumVars = (int) tmpC.countRows();
         final int tmpNumEqus = tmpAE != null ? (int) tmpAE.countRows() : 0;
-        final int tmpNumInes = tmpAI != null ? (int) tmpAI.countRows() : 0;
+        tmpAI.countRows();
 
         final DecompositionStore<Double> tmpX = this.getX();
 

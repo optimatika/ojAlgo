@@ -33,8 +33,7 @@ import org.ojalgo.type.context.NumberContext;
 public class P20030422Case extends BasicMatrixTest {
 
     public static BigMatrix getProblematic() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] {
-                { 0.973950, 0.132128, -0.009493, 0.052934, -0.069248, 0.015658, -0.008564, 0.004549 },
+        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 0.973950, 0.132128, -0.009493, 0.052934, -0.069248, 0.015658, -0.008564, 0.004549 },
                 { -0.006969, -0.829742, -0.036236, 0.161777, -0.210089, 0.047385, -0.025882, 0.013746 },
                 { 0.000143, 0.006440, -0.998445, -0.016720, 0.021093, -0.004711, 0.002560, -0.001359 },
                 { -0.000036, -0.001408, 0.000752, -0.955688, -0.169493, 0.027513, -0.013046, 0.006811 },

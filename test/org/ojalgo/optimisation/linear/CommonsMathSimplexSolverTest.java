@@ -187,7 +187,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @param x the first number
          * @param y the second number
          * @param eps the amount of error to allow when checking for equality
-         * @return <ul>
+         * @return
+         *         <ul>
          *         <li>0 if {@link #equals(double, double, double) equals(x, y, eps)}</li>
          *         <li>&lt; 0 if !{@link #equals(double, double, double) equals(x, y, eps)} &amp;&amp; x &lt;
          *         y</li>
@@ -206,14 +207,16 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         /**
          * Compares two numbers given some amount of allowed error. Two float numbers are considered equal if
          * there are {@code (maxUlps - 1)} (or fewer) floating point numbers between them, i.e. two adjacent
-         * floating point numbers are considered equal. Adapted from <a
-         * href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce Dawson</a>
+         * floating point numbers are considered equal. Adapted from
+         * <a href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm"> Bruce
+         * Dawson</a>
          *
          * @param x first value
          * @param y second value
          * @param maxUlps {@code (maxUlps - 1)} is the number of floating point values between {@code x} and
          *        {@code y}.
-         * @return <ul>
+         * @return
+         *         <ul>
          *         <li>0 if {@link #equals(double, double, int) equals(x, y, maxUlps)}</li>
          *         <li>&lt; 0 if !{@link #equals(double, double, int) equals(x, y, maxUlps)} &amp;&amp; x &lt;
          *         y</li>
@@ -750,8 +753,8 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         final double[] objective = new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1,
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 12, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
         final LinearObjectiveFunction f = new LinearObjectiveFunction(objective, 0);
         final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();

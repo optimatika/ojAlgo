@@ -23,7 +23,7 @@ package org.ojalgo.type;
 
 /**
  * Alternator
- * 
+ *
  * @author apete
  */
 public class Alternator<T> {

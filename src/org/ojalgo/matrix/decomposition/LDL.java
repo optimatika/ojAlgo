@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -57,32 +56,16 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+    public static final Factory<BigDecimal> BIG = typical -> new LDLDecomposition.Big();
 
-        public LDL<BigDecimal> make(final Structure2D typical) {
-            return new LDLDecomposition.Big();
+    public static final Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.Complex();
+
+    public static final Factory<Double> PRIMITIVE = typical -> {
+        if ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            return new LDLDecomposition.Primitive();
+        } else {
+            return new RawLDL();
         }
-
-    };
-
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        public LDL<ComplexNumber> make(final Structure2D typical) {
-            return new LDLDecomposition.Complex();
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
-
-        public LDL<Double> make(final Structure2D typical) {
-            if ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
-                return new LDLDecomposition.Primitive();
-            } else {
-                return new RawLDL();
-            }
-        }
-
     };
 
     @SuppressWarnings("unchecked")

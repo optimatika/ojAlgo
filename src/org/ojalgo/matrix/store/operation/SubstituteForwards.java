@@ -71,8 +71,8 @@ public final class SubstituteForwards extends MatrixOperation {
         }
     }
 
-    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit,
-            final Access2D<ComplexNumber> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
+    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit, final Access2D<ComplexNumber> body,
+            final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
 
         final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
         final ComplexNumber[] tmpBodyRow = new ComplexNumber[tmpDiagDim];

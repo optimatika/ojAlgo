@@ -94,7 +94,7 @@ public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
     public void set(final Access1D<?> someCoefficient) {
         final int tmpLimit = (int) Math.min(this.count(), someCoefficient.count());
         for (int p = 0; p < tmpLimit; p++) {
-            this.set(p, RationalNumber.valueOf((Number) someCoefficient.get(p)));
+            this.set(p, RationalNumber.valueOf(someCoefficient.get(p)));
         }
     }
 

@@ -33,8 +33,8 @@ public abstract class AXPY implements BLAS1 {
     public static void invoke(final BigDecimal[] vectorY, final int offsetY, final int stepY, final BigDecimal scalar, final BigDecimal[] vectorX,
             final int offsetX, final int stepX, final int count) {
         for (int i = 0; i < count; i++) {
-            vectorY[offsetY + (i * stepY)] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(scalar, vectorX[offsetX + (i * stepX)]), vectorY[offsetY
-                    + (i * stepY)]); // y += ax
+            vectorY[offsetY + (i * stepY)] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(scalar, vectorX[offsetX + (i * stepX)]),
+                    vectorY[offsetY + (i * stepY)]); // y += ax
         }
     }
 

@@ -174,8 +174,8 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
 
         TestUtils.assertEquals("Expected", tmpLogDiffDistr.getExpected(), tmpProcessDistr.getExpected(), PrimitiveMath.IS_ZERO);
         TestUtils.assertEquals("Geometric Mean", tmpLogDiffDistr.getGeometricMean(), tmpProcessDistr.getGeometricMean(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Geometric Standard Deviation", tmpLogDiffDistr.getGeometricStandardDeviation(),
-                tmpProcessDistr.getGeometricStandardDeviation(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("Geometric Standard Deviation", tmpLogDiffDistr.getGeometricStandardDeviation(), tmpProcessDistr.getGeometricStandardDeviation(),
+                PrimitiveMath.IS_ZERO);
         TestUtils.assertEquals("Standard Deviation", tmpLogDiffDistr.getStandardDeviation(), tmpProcessDistr.getStandardDeviation(), PrimitiveMath.IS_ZERO);
         TestUtils.assertEquals("Variance", tmpLogDiffDistr.getVariance(), tmpProcessDistr.getVariance(), PrimitiveMath.IS_ZERO);
 
@@ -230,7 +230,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
 
     public void testWikipediaCases() {
 
-        final GeometricBrownianMotion tmpBlueProc = new GeometricBrownianMotion(1.0, 0.2);
+        new GeometricBrownianMotion(1.0, 0.2);
         final GeometricBrownianMotion tmpGreenProc = new GeometricBrownianMotion(0.5, 0.5);
 
         final GeometricBrownianMotion tmpProc = tmpGreenProc;
@@ -241,7 +241,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
 
             final LogNormal tmpDist = tmpProc.getDistribution(tmpStep);
 
-            final double tmpScale = SQRT_TWO * RandomUtils.erfi(0.95);
+            RandomUtils.erfi(0.95);
 
             final double tmpProcUpper = tmpProc.getUpperConfidenceQuantile(tmpStep, 0.95);
             final double tmpProcFact = Math.sqrt(tmpProcUpper / tmpProc.getLowerConfidenceQuantile(tmpStep, 0.95));

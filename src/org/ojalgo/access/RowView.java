@@ -33,13 +33,7 @@ public final class RowView<N extends Number> implements Access1D<N>, Iterator<Ro
     private final long myLastRow;
     private long myRow = -1L;
 
-    final Iterable<RowView<N>> iterable = new Iterable<RowView<N>>() {
-
-        public Iterator<RowView<N>> iterator() {
-            return RowView.this;
-        }
-
-    };
+    final Iterable<RowView<N>> iterable = () -> RowView.this;
 
     @SuppressWarnings("unused")
     private RowView() {

@@ -51,7 +51,7 @@ public final class ResourceLocator {
         super();
     }
 
-    public String addQueryParameter(String aKey, String aValue) {
+    public String addQueryParameter(final String aKey, final String aValue) {
         return myQueryParameters.put(aKey, aValue);
     }
 
@@ -61,45 +61,45 @@ public final class ResourceLocator {
     public BufferedReader getStreamReader() {
         try {
             return new BufferedInputStreamReader(this.toURL().openStream());
-        } catch (IOException anException) {
+        } catch (final IOException anException) {
             return null;
         }
     }
 
-    public String removeQueryParameter(String aKey) {
+    public String removeQueryParameter(final String aKey) {
         return myQueryParameters.remove(aKey);
     }
 
-    public void setHost(String someHost) {
+    public void setHost(final String someHost) {
         myHost = someHost;
     }
 
-    public void setPath(String somePath) {
+    public void setPath(final String somePath) {
         myPath = somePath;
     }
 
     /**
      * The default (null) value is -1.
      */
-    public void setPort(int somePort) {
+    public void setPort(final int somePort) {
         myPort = somePort;
     }
 
-    public void setQueryParameters(Map<String, String> someQueryParameters) {
+    public void setQueryParameters(final Map<String, String> someQueryParameters) {
         myQueryParameters = someQueryParameters;
     }
 
     /**
      * Protocol The default value is "http"
      */
-    public void setScheme(String someScheme) {
+    public void setScheme(final String someScheme) {
         myScheme = someScheme;
     }
 
     private URI makeURI() {
         try {
             return new URI(myScheme, null, myHost, myPort, myPath, this.query(), null);
-        } catch (URISyntaxException anException) {
+        } catch (final URISyntaxException anException) {
             throw new ProgrammingError(anException);
         }
     }
@@ -108,10 +108,10 @@ public final class ResourceLocator {
 
         if (myQueryParameters.size() >= 1) {
 
-            StringBuilder retVal = new StringBuilder();
+            final StringBuilder retVal = new StringBuilder();
 
             Entry<String, String> tmpEntry;
-            for (Iterator<Entry<String, String>> tmpIter = myQueryParameters.entrySet().iterator(); tmpIter.hasNext();) {
+            for (final Iterator<Entry<String, String>> tmpIter = myQueryParameters.entrySet().iterator(); tmpIter.hasNext();) {
                 tmpEntry = tmpIter.next();
                 retVal.append(tmpEntry.getKey());
                 retVal.append('=');
@@ -133,7 +133,7 @@ public final class ResourceLocator {
     private URL toURL() {
         try {
             return this.makeURI().toURL();
-        } catch (MalformedURLException anException) {
+        } catch (final MalformedURLException anException) {
             throw new ProgrammingError(anException);
         }
     }

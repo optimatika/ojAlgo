@@ -33,8 +33,8 @@ import org.ojalgo.type.context.NumberContext;
 public class SimpleLeastSquaresCase extends BasicMatrixTest {
 
     public static BigMatrix getBody() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 }, { -1.0, 1.0, 0.0 },
-                { -1.0, 0.0, 1.0 }, { 0.0, -1.0, 1.0 } });
+        final BigMatrix tmpMtrx = BigMatrix.FACTORY
+                .rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 }, { -1.0, 1.0, 0.0 }, { -1.0, 0.0, 1.0 }, { 0.0, -1.0, 1.0 } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

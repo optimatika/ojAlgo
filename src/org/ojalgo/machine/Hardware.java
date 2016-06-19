@@ -45,8 +45,7 @@ import org.ojalgo.netio.ASCII;
  * nut no L3 cache; the <code>processors</code> attribute will be incorrectly set 1. A workaround that
  * currently works is to define an L3 cache anyway and set the memory/size of that cache to 0bytes. This
  * workoround may stop working in the future.</li>
- * <li>
- * <code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or
+ * <li><code>new MemoryThreads[] { SYSTEM, L3, L2, L1 }</code> or
  * <code>new MemoryThreads[] { SYSTEM, L2, L1 }</code> or <code>new MemoryThreads[] { SYSTEM, L1 }</code></li>
  * </ul>
  *
@@ -76,8 +75,8 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * </ul>
      */
-    static final Hardware PPC__01 = new Hardware("ppc", new BasicMachine[] { new BasicMachine(5L * 256L * K * K, 1), new BasicMachine(512L * K, 1),
-            new BasicMachine(64L * K, 1) });
+    static final Hardware PPC__01 = new Hardware("ppc",
+            new BasicMachine[] { new BasicMachine(5L * 256L * K * K, 1), new BasicMachine(512L * K, 1), new BasicMachine(64L * K, 1) });
 
     /**
      * <ul>
@@ -96,8 +95,8 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * </ul>
      */
-    static final Hardware X86__01 = new Hardware("x86", new BasicMachine[] { new BasicMachine(1L * K * K * K, 1), new BasicMachine(1L * K * K, 1),
-            new BasicMachine(32L * K, 1) });
+    static final Hardware X86__01 = new Hardware("x86",
+            new BasicMachine[] { new BasicMachine(1L * K * K * K, 1), new BasicMachine(1L * K * K, 1), new BasicMachine(32L * K, 1) });
 
     /**
      * <ul>
@@ -116,8 +115,8 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * </ul>
      */
-    static final Hardware X86__02 = new Hardware("x86", new BasicMachine[] { new BasicMachine(7L * 512L * K * K, 2), new BasicMachine(6L * K * K, 2),
-            new BasicMachine(32L * K, 1) });
+    static final Hardware X86__02 = new Hardware("x86",
+            new BasicMachine[] { new BasicMachine(7L * 512L * K * K, 2), new BasicMachine(6L * K * K, 2), new BasicMachine(32L * K, 1) });
 
     /**
      * <ul>
@@ -136,8 +135,8 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * </ul>
      */
-    static final Hardware X86_64__02 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(3L * K * K * K, 2), new BasicMachine(4L * K * K, 2),
-            new BasicMachine(32L * K, 1) });
+    static final Hardware X86_64__02 = new Hardware("x86_64",
+            new BasicMachine[] { new BasicMachine(3L * K * K * K, 2), new BasicMachine(4L * K * K, 2), new BasicMachine(32L * K, 1) });
 
     /**
      * <ul>

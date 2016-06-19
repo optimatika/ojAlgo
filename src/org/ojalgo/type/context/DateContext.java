@@ -34,7 +34,7 @@ import org.ojalgo.type.format.DateStyle;
 
 /**
  * DateContext
- * 
+ *
  * @author apete
  */
 public final class DateContext extends FormatContext<Date> {

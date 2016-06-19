@@ -28,7 +28,7 @@ import junit.framework.TestSuite;
 
 /**
  * ScalarPackageTests
- * 
+ *
  * @author apete
  */
 public abstract class ScalarTests extends FunctionalityTest {

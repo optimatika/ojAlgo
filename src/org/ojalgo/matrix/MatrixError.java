@@ -26,7 +26,7 @@ import org.ojalgo.access.Access2D;
 
 /**
  * MatrixError
- * 
+ *
  * @author apete
  */
 public class MatrixError extends ProgrammingError {

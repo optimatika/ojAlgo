@@ -29,7 +29,7 @@ import org.ojalgo.random.Uniform;
 
 /**
  * Password
- * 
+ *
  * @author apete
  */
 public class Password {

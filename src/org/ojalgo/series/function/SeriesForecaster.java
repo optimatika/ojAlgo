@@ -34,7 +34,7 @@ import org.ojalgo.type.CalendarDateUnit;
 /**
  * A forecaster is restricted to {@linkplain CalendarDate} keys and is intended to predict something related
  * to future keys/dates.
- * 
+ *
  * @author apete
  */
 public abstract class SeriesForecaster extends SeriesFunction<CalendarDate> {

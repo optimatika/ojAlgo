@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
@@ -56,32 +55,16 @@ public interface SingularValue<N extends Number>
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+    public static final Factory<BigDecimal> BIG = typical -> new SVDnew32.Big();
 
-        public SingularValue<BigDecimal> make(final Structure2D typical) {
-            return new SVDnew32.Big();
+    public static final Factory<ComplexNumber> COMPLEX = typical -> new SVDnew32.Complex();
+
+    public static final Factory<Double> PRIMITIVE = typical -> {
+        if ((2048L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            return new SVDnew32.Primitive();
+        } else {
+            return new RawSingularValue();
         }
-
-    };
-
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        public SingularValue<ComplexNumber> make(final Structure2D typical) {
-            return new SVDnew32.Complex();
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
-
-        public SingularValue<Double> make(final Structure2D typical) {
-            if ((2048L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
-                return new SVDnew32.Primitive();
-            } else {
-                return new RawSingularValue();
-            }
-        }
-
     };
 
     @SuppressWarnings("unchecked")

@@ -32,16 +32,17 @@ public class ZeroCase extends NonPhysicalTest {
         super();
     }
 
-    public ZeroCase(String arg0) {
+    public ZeroCase(final String arg0) {
         super(arg0);
     }
 
+    @Override
     protected void setUp() throws Exception {
 
         super.setUp();
 
-        int tmpRowDim = Uniform.randomInteger(1, 9);
-        int tmpColDim = Uniform.randomInteger(1, 9);
+        final int tmpRowDim = Uniform.randomInteger(1, 9);
+        final int tmpColDim = Uniform.randomInteger(1, 9);
 
         myBigStore = new ZeroStore<BigDecimal>(BigDenseStore.FACTORY, tmpRowDim, tmpColDim);
         myComplexStore = new ZeroStore<ComplexNumber>(ComplexDenseStore.FACTORY, tmpRowDim, tmpColDim);

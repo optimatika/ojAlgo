@@ -29,7 +29,7 @@ import org.ojalgo.TestUtils;
 
 /**
  * NumberContextTest
- * 
+ *
  * @author apete
  */
 public class NumberContextTest extends TypeContextTests {

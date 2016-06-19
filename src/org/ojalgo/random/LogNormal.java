@@ -31,7 +31,7 @@ import org.ojalgo.array.Array1D;
  * distribution results if the variable is the product of a large number of independent,
  * identically-distributed variables in the same way that a normal distribution results if the variable is the
  * sum of a large number of independent, identically-distributed variables.
- * 
+ *
  * @author apete
  */
 public class LogNormal extends AbstractContinuous {

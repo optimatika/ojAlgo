@@ -51,7 +51,7 @@ public final class DelimitedData extends Object {
     private final List<List<Object>> myLines;
     private final LineTerminator myTerminator;
 
-    public DelimitedData(char aDelimiter, LineTerminator aTerminator) {
+    public DelimitedData(final char aDelimiter, final LineTerminator aTerminator) {
 
         super();
 
@@ -60,13 +60,13 @@ public final class DelimitedData extends Object {
         myLines = new ArrayList<List<Object>>();
     }
 
-    public void addEmptyLines(int aNumberOfLines, int aNumberOfElementsOnEachLine) {
+    public void addEmptyLines(final int aNumberOfLines, final int aNumberOfElementsOnEachLine) {
         for (int i = 0; i < aNumberOfLines; i++) {
             myLines.add(new ArrayList<Object>(aNumberOfElementsOnEachLine));
         }
     }
 
-    public void addLine(List<?> aLine) {
+    public void addLine(final List<?> aLine) {
         myLines.add((List<Object>) aLine);
     }
 
@@ -74,16 +74,17 @@ public final class DelimitedData extends Object {
      * The row and column must already exist. One way to create it is to call
      * {@linkplain #addEmptyLines(int, int)}.
      */
-    public void set(int aRowIndex, int aColumnIndex, Object anElement) {
+    public void set(final int aRowIndex, final int aColumnIndex, final Object anElement) {
         myLines.get(aRowIndex).set(aColumnIndex, anElement);
     }
 
+    @Override
     public String toString() {
 
-        StringBuilder retVal = new StringBuilder();
+        final StringBuilder retVal = new StringBuilder();
 
-        for (List<Object> tmpLine : myLines) {
-            for (Object tmpElement : tmpLine) {
+        for (final List<Object> tmpLine : myLines) {
+            for (final Object tmpElement : tmpLine) {
                 if (tmpElement != null) {
                     retVal.append(tmpElement);
                 }

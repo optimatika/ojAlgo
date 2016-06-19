@@ -25,8 +25,8 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.Scalar;
 
-abstract class AbstractMultiary<N extends Number, F extends AbstractMultiary<N, ?>> implements MultiaryFunction<N>, MultiaryFunction.Constant<N, F>,
-        MultiaryFunction.TwiceDifferentiable<N> {
+abstract class AbstractMultiary<N extends Number, F extends AbstractMultiary<N, ?>>
+        implements MultiaryFunction<N>, MultiaryFunction.Constant<N, F>, MultiaryFunction.TwiceDifferentiable<N> {
 
     private Scalar<N> myConstant = null;
 

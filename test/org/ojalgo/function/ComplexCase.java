@@ -29,7 +29,7 @@ import org.ojalgo.TestUtils;
 /**
  * Tests that {@linkplain org.ojalgo.function.ComplexFunction} functions work correctly with complex valued
  * arguments and results (complex part is not zero).
- * 
+ *
  * @author apete
  */
 public class ComplexCase extends FunctionTests {

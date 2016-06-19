@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -48,29 +47,11 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+    public static final Factory<BigDecimal> BIG = typical -> new BidiagonalDecomposition.Big();
 
-        public Bidiagonal<BigDecimal> make(final Structure2D typical) {
-            return new BidiagonalDecomposition.Big();
-        }
+    public static final Factory<ComplexNumber> COMPLEX = typical -> new BidiagonalDecomposition.Complex();
 
-    };
-
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        public Bidiagonal<ComplexNumber> make(final Structure2D typical) {
-            return new BidiagonalDecomposition.Complex();
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
-
-        public Bidiagonal<Double> make(final Structure2D typical) {
-            return new BidiagonalDecomposition.Primitive();
-        }
-
-    };
+    public static final Factory<Double> PRIMITIVE = typical -> new BidiagonalDecomposition.Primitive();
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Bidiagonal<N> make(final Access2D<N> typical) {

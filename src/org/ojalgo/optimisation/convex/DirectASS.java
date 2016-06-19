@@ -63,7 +63,7 @@ abstract class DirectASS extends ActiveSetSolver {
         myConstraintToInclude = -1;
         final int[] tmpIncluded = myActivator.getIncluded();
 
-        final MatrixStore<Double> tmpIterQ = this.getIterationQ();
+        this.getIterationQ();
         final MatrixStore<Double> tmpIterC = this.getIterationC();
         final MatrixStore<Double> tmpIterA = this.getIterationA(tmpIncluded);
         final MatrixStore<Double> tmpIterB = this.getIterationB(tmpIncluded);

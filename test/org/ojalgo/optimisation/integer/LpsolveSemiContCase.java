@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.MathProgSysModel;
-import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -48,7 +47,7 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
-        final Optimisation.Result tmpSolution = tmpModel.minimise(); // vet ej om in eller max
+        tmpModel.minimise();
 
         TestUtils.assertTrue(tmpModel.validate());
 
@@ -68,7 +67,7 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
         final MathProgSysModel tmpMPS = MathProgSysModel.make(tmpFile);
         final ExpressionsBasedModel tmpModel = tmpMPS.getExpressionsBasedModel();
 
-        final Optimisation.Result tmpSolution = tmpModel.minimise(); // vet ej om in eller max
+        tmpModel.minimise();
 
         TestUtils.assertTrue(tmpModel.validate());
 

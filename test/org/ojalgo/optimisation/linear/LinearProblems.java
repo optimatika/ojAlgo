@@ -201,7 +201,6 @@ public class LinearProblems extends OptimisationLinearTests {
         tmpExprC3.set(0, ONE);
         tmpExprC3.set(2, NEG);
 
-        final State tmpExpectedState = State.OPTIMAL;
         final BasicMatrix tmpExpectedSolution = PrimitiveMatrix.FACTORY.makeZero(3, 1);
 
         final Optimisation.Result tmpResult11 = tmpModel.minimise();

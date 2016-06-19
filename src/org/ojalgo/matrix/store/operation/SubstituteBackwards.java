@@ -69,8 +69,8 @@ public final class SubstituteBackwards extends MatrixOperation {
         }
     }
 
-    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit,
-            final Access2D<ComplexNumber> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
+    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit, final Access2D<ComplexNumber> body,
+            final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
         final int tmpDiagDim = (int) Math.min(body.countRows(), body.countColumns());
         final ComplexNumber[] tmpBodyRow = new ComplexNumber[tmpDiagDim];

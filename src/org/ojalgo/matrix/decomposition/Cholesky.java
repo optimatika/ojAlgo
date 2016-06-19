@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -54,32 +53,16 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+    public static final Factory<BigDecimal> BIG = typical -> new CholeskyDecomposition.Big();
 
-        public Cholesky<BigDecimal> make(final Structure2D typical) {
-            return new CholeskyDecomposition.Big();
+    public static final Factory<ComplexNumber> COMPLEX = typical -> new CholeskyDecomposition.Complex();
+
+    public static final Factory<Double> PRIMITIVE = typical -> {
+        if ((32L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            return new CholeskyDecomposition.Primitive();
+        } else {
+            return new RawCholesky();
         }
-
-    };
-
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        public Cholesky<ComplexNumber> make(final Structure2D typical) {
-            return new CholeskyDecomposition.Complex();
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
-
-        public Cholesky<Double> make(final Structure2D typical) {
-            if ((32L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
-                return new CholeskyDecomposition.Primitive();
-            } else {
-                return new RawCholesky();
-            }
-        }
-
     };
 
     @SuppressWarnings("unchecked")

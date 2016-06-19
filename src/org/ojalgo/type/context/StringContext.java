@@ -28,7 +28,7 @@ import org.ojalgo.type.format.StringFormat;
 
 /**
  * StringContext
- * 
+ *
  * @author apete
  */
 public final class StringContext extends FormatContext<String> {

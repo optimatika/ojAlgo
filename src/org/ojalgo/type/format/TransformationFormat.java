@@ -42,10 +42,12 @@ public class TransformationFormat<N extends Number> extends NumberFormat {
         myInverseFunc = inverse;
     }
 
+    @Override
     public StringBuffer format(final double number, final StringBuffer toAppendTo, final FieldPosition pos) {
         return myFormat.format(myTransfoFunc.invoke(number), toAppendTo, pos);
     }
 
+    @Override
     public StringBuffer format(final long number, final StringBuffer toAppendTo, final FieldPosition pos) {
         return myFormat.format(myTransfoFunc.invoke(number), toAppendTo, pos);
     }
@@ -56,6 +58,7 @@ public class TransformationFormat<N extends Number> extends NumberFormat {
         return myFormat.format(myTransfoFunc.invoke((N) obj), toAppendTo, pos);
     }
 
+    @Override
     public Number parse(final String source, final ParsePosition parsePosition) {
         return myInverseFunc.invoke((N) myFormat.parseObject(source, parsePosition));
     }

@@ -71,21 +71,9 @@ public interface Eigenvalue<N extends Number>
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+    public static final Factory<BigDecimal> BIG = (typical, hermitian) -> hermitian ? new HermitianEvD.Big() : null;
 
-        public Eigenvalue<BigDecimal> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.Big() : null;
-        }
-
-    };
-
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        public Eigenvalue<ComplexNumber> make(final Structure2D typical, final boolean hermitian) {
-            return hermitian ? new HermitianEvD.Complex() : null;
-        }
-
-    };
+    public static final Factory<ComplexNumber> COMPLEX = (typical, hermitian) -> hermitian ? new HermitianEvD.Complex() : null;
 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 

@@ -23,7 +23,6 @@ package org.ojalgo.matrix.store;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
@@ -49,11 +48,9 @@ public class MergedColumnsCase extends NonPhysicalTest {
         final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
         final BasicMatrix tmpLower = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        myBigStore = new AboveBelowStore<BigDecimal>(BigDenseStore.FACTORY.copy((Access2D<?>) tmpBase), BigDenseStore.FACTORY.copy((Access2D<?>) tmpLower));
-        myComplexStore = new AboveBelowStore<ComplexNumber>(ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpBase),
-                ComplexDenseStore.FACTORY.copy((Access2D<?>) tmpLower));
-        myPrimitiveStore = new AboveBelowStore<Double>(PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpBase),
-                PrimitiveDenseStore.FACTORY.copy((Access2D<?>) tmpLower));
+        myBigStore = new AboveBelowStore<BigDecimal>(BigDenseStore.FACTORY.copy(tmpBase), BigDenseStore.FACTORY.copy(tmpLower));
+        myComplexStore = new AboveBelowStore<ComplexNumber>(ComplexDenseStore.FACTORY.copy(tmpBase), ComplexDenseStore.FACTORY.copy(tmpLower));
+        myPrimitiveStore = new AboveBelowStore<Double>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpLower));
     }
 
 }

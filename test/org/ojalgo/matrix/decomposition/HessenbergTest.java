@@ -83,8 +83,9 @@ public class HessenbergTest extends MatrixDecompositionTests {
             TestUtils.fail("Failed to reconstruct!");
         }
 
-        if (!AccessUtils.equals(tmpDecomposition.getQ(), tmpDecomposition.doQ(this.makeEye((int) aMatrix.countRows(),
-                (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))), new NumberContext(7, 6))) {
+        if (!AccessUtils.equals(tmpDecomposition.getQ(),
+                tmpDecomposition.doQ(this.makeEye((int) aMatrix.countRows(), (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))),
+                new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("get and do Q are different!");
         }

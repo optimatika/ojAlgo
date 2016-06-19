@@ -104,7 +104,7 @@ public final class IntToDouble implements KeyValue<Integer, Double> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + key;
+        result = (prime * result) + key;
         return result;
     }
 

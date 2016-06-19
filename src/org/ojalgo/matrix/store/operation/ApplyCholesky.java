@@ -37,7 +37,8 @@ public final class ApplyCholesky extends MatrixOperation {
         }
     }
 
-    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit, final ComplexNumber[] multipliers) {
+    public static void invoke(final ComplexNumber[] data, final int structure, final int firstColumn, final int columnLimit,
+            final ComplexNumber[] multipliers) {
         for (int j = firstColumn; j < columnLimit; j++) {
             SubtractScaledVector.invoke(data, j * structure, multipliers, 0, multipliers[j].conjugate(), j, structure);
         }
