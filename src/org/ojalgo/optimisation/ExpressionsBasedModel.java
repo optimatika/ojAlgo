@@ -41,9 +41,9 @@ import org.ojalgo.type.context.NumberContext;
  * Lets you construct optimisation problems by combining (mathematical) expressions in terms of variables.
  * Each expression or variable can be a constraint and/or contribute to the objective function. An expression
  * or variable is turned into a constraint by setting a lower and/or upper limit. Use
- * {@linkplain ModelEntity#lower(Number)}, {@linkplain ModelEntity#upper(Number)} or
- * {@linkplain ModelEntity#level(Number)}. An expression or variable is made part of (contributing to) the
- * objective function by setting a contribution weight. Use {@linkplain ModelEntity#weight(Number)}.
+ * {@linkplain Expression#lower(Number)}, {@linkplain Expression#upper(Number)} or
+ * {@linkplain Expression#level(Number)}. An expression or variable is made part of (contributing to) the
+ * objective function by setting a contribution weight. Use {@linkplain Expression#weight(Number)}.
  * </p>
  * <p>
  * You may think of variables as simple (the simplest possible) expressions, and of expressions as weighted
@@ -663,7 +663,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     /**
      * This is generated on demend – you should not cache this. More specifically, modifications made to this
      * expression will not be part of the optimisation model. You define the objective by setting the
-     * {@link ModelEntity#weight(Number)} on one or more variables and/or expressions.
+     * {@link Variable#weight(Number)}/{@link Expression#weight(Number)} on one or more variables and/or
+     * expressions.
      *
      * @return The generated/aggregated objective function
      */

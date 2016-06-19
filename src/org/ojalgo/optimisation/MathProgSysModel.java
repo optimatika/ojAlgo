@@ -523,9 +523,6 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * @param solution
-     * @param context
-     * @return
      * @see org.ojalgo.optimisation.ExpressionsBasedModel#validate(org.ojalgo.access.Access1D,
      *      org.ojalgo.type.context.NumberContext)
      */

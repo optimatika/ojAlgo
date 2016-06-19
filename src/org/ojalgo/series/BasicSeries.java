@@ -91,7 +91,7 @@ public interface BasicSeries<K extends Comparable<K>, V extends Number> extends 
     }
 
     /**
-     * @deprecated v40 Use {@link #modifyAll(UnaryFunction<V>)} instead
+     * @deprecated v40 Use {@link #modifyAll(UnaryFunction)} instead
      */
     @Deprecated
     default void modify(final UnaryFunction<V> func) {

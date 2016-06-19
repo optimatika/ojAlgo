@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -37,8 +38,6 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * This class adapts JAMA's SingularValueDecomposition to ojAlgo's {@linkplain SingularValue} interface.
- * speed: 52.641s
  * <p>
  * Singular Value Decomposition.
  * <P>
@@ -72,6 +71,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      * @serial internal storage of singular values.
      */
     private double[] myS;
+
     private boolean myTransposed;
     /**
      * Arrays for internal storage of U and V.
@@ -151,6 +151,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.doGetInverse(this.allocate(this.getColDim(), this.getRowDim()));
     }
 
+    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+        return this.doGetInverse((PrimitiveDenseStore) preallocated);
+    }
+
     public double getKyFanNorm(final int k) {
 
         double retVal = ZERO;
@@ -217,7 +221,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw new TaskException("Not solvable");
+            throw TaskException.newNotInvertible();
         }
     }
 
@@ -231,6 +235,14 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     public boolean isSolvable() {
         return this.isComputed();
+    }
+
+    public DecompositionStore<Double> preallocate(final Structure2D template) {
+        return this.allocate(template.countColumns(), template.countRows());
+    }
+
+    public DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+        return this.allocate(templateBody.countColumns(), templateBody.countRows());
     }
 
     public MatrixStore<Double> reconstruct() {
@@ -250,7 +262,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
-    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
 
         myTransposed = body.countRows() < body.countColumns();
 
@@ -264,8 +276,19 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         this.doDecompose(tmpData, true);
 
-        final MatrixStore<Double> tmpRHS = MatrixStore.PRIMITIVE.makeWrapper(rhs).get();
-        return this.doGetInverse((PrimitiveDenseStore) preallocated).multiply(tmpRHS);
+        if (this.isSolvable()) {
+
+            final MatrixStore<Double> tmpRHS = MatrixStore.PRIMITIVE.makeWrapper(rhs).get();
+            return this.doGetInverse((PrimitiveDenseStore) preallocated).multiply(tmpRHS);
+
+        } else {
+            throw TaskException.newNotSolvable();
+        }
+    }
+
+    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
+        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countRows());
+        return this.solve(rhs, tmpPreallocated);
     }
 
     @Override
@@ -277,37 +300,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.doGetInverse((PrimitiveDenseStore) preallocated).multiply(rhs);
     }
 
-    @Override
-    protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
-
-        if (myPseudoinverse == null) {
-
-            final double[][] tmpQ1 = this.getQ1().data;
-            final double[] tmpSingular = myS;
-
-            final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
-            final double[][] tmpMtrxData = tmpMtrx.data;
-
-            final double tmpEps = tmpSingular[0] * tmpSingular.length;
-
-            for (int i = 0; i < tmpSingular.length; i++) {
-                final double tmpVal = tmpSingular[i];
-                if (!PrimitiveScalar.isSmall(tmpEps, tmpVal)) {
-                    final double[] tmpRow = tmpMtrxData[i];
-                    for (int j = 0; j < tmpQ1.length; j++) {
-                        tmpRow[j] = tmpQ1[j][i] / tmpVal;
-                    }
-                }
-            }
-
-            preallocated.fillByMultiplying(this.getQ2(), tmpMtrx);
-            myPseudoinverse = preallocated;
-        }
-
-        return myPseudoinverse;
-    }
-
-    boolean doDecompose(final double[][] data, final boolean factors) {
+    private boolean doDecompose(final double[][] data, final boolean factors) {
         // Derived from JAMA which is derived from LINPACK code
 
         // Input is possibly transposed so that m >= n always
@@ -709,6 +702,35 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.computed(true);
     }
 
+    private MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
+
+        if (myPseudoinverse == null) {
+
+            final double[][] tmpQ1 = this.getQ1().data;
+            final double[] tmpSingular = myS;
+
+            final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
+            final double[][] tmpMtrxData = tmpMtrx.data;
+
+            final double tmpEps = tmpSingular[0] * tmpSingular.length;
+
+            for (int i = 0; i < tmpSingular.length; i++) {
+                final double tmpVal = tmpSingular[i];
+                if (!PrimitiveScalar.isSmall(tmpEps, tmpVal)) {
+                    final double[] tmpRow = tmpMtrxData[i];
+                    for (int j = 0; j < tmpQ1.length; j++) {
+                        tmpRow[j] = tmpQ1[j][i] / tmpVal;
+                    }
+                }
+            }
+
+            preallocated.fillByMultiplying(this.getQ2(), tmpMtrx);
+            myPseudoinverse = preallocated;
+        }
+
+        return myPseudoinverse;
+    }
+
     /**
      * Return the left singular vectors
      *
@@ -725,11 +747,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      */
     RawStore getV() {
         return new RawStore(myVt, n, n);
-    }
-
-    @Override
-    PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions) {
-        return this.allocate(numberOfVariables, numberOfEquations);
     }
 
 }

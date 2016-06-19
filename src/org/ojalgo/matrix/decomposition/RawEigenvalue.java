@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -108,6 +109,22 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             return true;
         }
 
+        public DecompositionStore<Double> preallocate(final Structure2D template) {
+            final long numberOfEquations = template.countRows();
+            return this.allocate(numberOfEquations, numberOfEquations);
+        }
+
+        public DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+            final long numberOfEquations = templateBody.countRows();
+            return this.allocate(numberOfEquations, numberOfEquations);
+        }
+
+        public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
+            final long numberOfEquations = rhs.countRows();
+            final DecompositionStore<Double> tmpPreallocated = this.allocate(numberOfEquations, numberOfEquations);
+            return this.solve(rhs, tmpPreallocated);
+        }
+
         @Override
         boolean doDecompose(final double[][] data) {
 
@@ -126,8 +143,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      * @serial internal storage of eigenvalues.
      */
     private double[] d;
-    private double[] e;
 
+    private double[] e;
     /**
      * Array for internal storage of nonsymmetric Hessenberg form.
      *
@@ -235,7 +252,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return retVal;
     }
 
-    @Override
     public RawStore getInverse() {
 
         if (myInverse == null) {
@@ -263,6 +279,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return myInverse;
     }
 
+    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+        return this.doGetInverse((PrimitiveDenseStore) preallocated);
+    }
+
     public ComplexNumber getTrace() {
 
         final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
@@ -281,7 +301,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return new RawStore(Vt, n, n).transpose();
     }
 
-    @Override
     public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
 
         final double[][] tmpData = this.reset(original, false);
@@ -293,7 +312,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw new TaskException("Not solvable!");
+            throw TaskException.newNotInvertible();
         }
     }
 
@@ -314,8 +333,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         myInverse = null;
     }
 
-    @Override
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
 
         final double[][] tmpData = this.reset(body, false);
 
@@ -323,12 +341,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         this.doDecompose(tmpData);
 
-        preallocated.fillMatching(rhs);
+        if (this.isSolvable()) {
 
-        return this.getInverse().multiply(preallocated);
+            preallocated.fillMatching(rhs);
+
+            return this.getInverse().multiply(preallocated);
+
+        } else {
+            throw TaskException.newNotSolvable();
+        }
     }
 
-    @Override
     public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
         return null;
     }
@@ -1024,13 +1047,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    @Override
     protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    abstract boolean doDecompose(final double[][] data);
+    abstract boolean doDecompose(double[][] data);
 
     void doDecomposeGeneral(final double[][] data) {
 
@@ -1091,11 +1113,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     double[] getRealEigenvalues() {
         return d;
-    }
-
-    @Override
-    PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions) {
-        return this.allocate(numberOfEquations, numberOfEquations);
     }
 
 }

@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -33,11 +34,6 @@ import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
-/**
- * This class adapts JAMA's CholeskyDecomposition to ojAlgo's {@linkplain Cholesky} interface.
- *
- * @author apete
- */
 final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     private boolean mySPD = false;
@@ -106,6 +102,15 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return retVal;
     }
 
+    public MatrixStore<Double> getInverse() {
+        final int tmpRowDim = this.getRowDim();
+        return this.doGetInverse(this.allocate(tmpRowDim, tmpRowDim));
+    }
+
+    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+        return this.doGetInverse((PrimitiveDenseStore) preallocated);
+    }
+
     public MatrixStore<Double> getL() {
         return this.getRawInPlaceStore().logical().triangular(false, false).get();
     }
@@ -120,7 +125,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw new TaskException("Not solvable");
+            throw TaskException.newNotInvertible();
         }
     }
 
@@ -132,21 +137,40 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return mySPD;
     }
 
+    public DecompositionStore<Double> preallocate(final Structure2D template) {
+        return this.allocate(template.countRows(), template.countRows());
+    }
+
+    public DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+        return this.allocate(templateBody.countRows(), templateRHS.countColumns());
+    }
+
     public MatrixStore<Double> reconstruct() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
 
         final double[][] retVal = this.reset(body, false);
 
         this.doDecompose(retVal, body);
 
-        preallocated.fillMatching(rhs);
+        if (this.isSolvable()) {
 
-        return this.doSolve(preallocated);
+            preallocated.fillMatching(rhs);
+
+            return this.doSolve(preallocated);
+
+        } else {
+            throw TaskException.newNotSolvable();
+        }
+    }
+
+    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
+        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
+        return this.solve(rhs, tmpPreallocated);
     }
 
     @Override
@@ -164,18 +188,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.doSolve(preallocated);
     }
 
-    @Override
-    protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
-
-        final RawStore tmpBody = this.getRawInPlaceStore();
-
-        preallocated.substituteForwards(tmpBody, false, false, true);
-        preallocated.substituteBackwards(tmpBody, false, true, true);
-
-        return preallocated.logical().hermitian(false).get();
-    }
-
-    boolean doDecompose(final double[][] data, final Access2D<?> input) {
+    private boolean doDecompose(final double[][] data, final Access2D<?> input) {
 
         final int tmpDiagDim = this.getRowDim();
         mySPD = (this.getColDim() == tmpDiagDim);
@@ -200,7 +213,17 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.computed(true);
     }
 
-    MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
+    private MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
+
+        final RawStore tmpBody = this.getRawInPlaceStore();
+
+        preallocated.substituteForwards(tmpBody, false, false, true);
+        preallocated.substituteBackwards(tmpBody, false, true, true);
+
+        return preallocated.logical().hermitian(false).get();
+    }
+
+    private MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
 
         final RawStore tmpBody = this.getRawInPlaceStore();
 
@@ -208,11 +231,6 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         preallocated.substituteBackwards(tmpBody, false, true, false);
 
         return preallocated;
-    }
-
-    @Override
-    PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions) {
-        return this.allocate(numberOfEquations, numberOfSolutions);
     }
 
 }

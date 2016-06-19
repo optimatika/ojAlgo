@@ -46,6 +46,7 @@ public interface Operation {
     public interface Division<T> extends Operation {
 
         /**
+         * @param divisor The divisor
          * @return <code>this / divisor</code>.
          */
         T divide(T divisor);
@@ -58,6 +59,7 @@ public interface Operation {
     public interface Multiplication<T> extends Operation {
 
         /**
+         * @param multiplicand The multiplicand
          * @return <code>this * multiplicand</code>.
          */
         T multiply(T multiplicand);
@@ -70,6 +72,7 @@ public interface Operation {
     public interface Subtraction<T> extends Operation {
 
         /**
+         * @param subtrahend The subtrahend
          * @return <code>this - subtrahend</code>.
          */
         T subtract(T subtrahend);

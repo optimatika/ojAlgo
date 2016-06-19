@@ -32,16 +32,13 @@ import java.text.Format;
  * <li>It translates back and forth between some specific type and {@linkplain String} - essentially a
  * {@linkplain Format}.</li>
  * </ol>
- * 
+ *
  * @author apete
  */
 public interface TypeContext<T> {
 
     /**
      * Will force the object to conform to the context's specification.
-     * 
-     * @param object
-     * @return
      */
     public abstract T enforce(T object);
 

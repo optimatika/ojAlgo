@@ -25,7 +25,15 @@ import org.ojalgo.RecoverableCondition;
 
 public class TaskException extends RecoverableCondition {
 
-    public TaskException(String description) {
+    public static TaskException newNotInvertible() {
+        return new TaskException("Matrix Not Invertible!");
+    }
+
+    public static TaskException newNotSolvable() {
+        return new TaskException("Equation System Not Solvable!");
+    }
+
+    public TaskException(final String description) {
         super(description);
     }
 

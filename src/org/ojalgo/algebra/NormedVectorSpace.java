@@ -27,12 +27,15 @@ package org.ojalgo.algebra;
 public interface NormedVectorSpace<V, F extends Number> extends VectorSpace<V, F> {
 
     /**
+     * @param comparedTo What to compare with
      * @return true if this is small compared to the magnitude of the input reference value.
      */
     boolean isSmall(double comparedTo);
 
     /**
      * <code>this == this.signum().multiply(this.norm())</code>
+     *
+     * @return The norm
      */
     double norm();
 

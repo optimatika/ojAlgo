@@ -1153,7 +1153,7 @@ public class ConvexProblems extends OptimisationConvexTests {
      * passes(!). I’ve been running this test (alone) in TestNG. I’m using Ojalgo v35 and Java 1.7.55. The Q
      * matrix is positive definite.
      *
-     * @see http://bugzilla.optimatika.se/show_bug.cgi?id=210
+     * @see "http://bugzilla.optimatika.se/show_bug.cgi?id=210"
      */
     public void testP20140522() {
 

@@ -109,9 +109,6 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
     /**
      * A positive valued shift will prune that many elements off the head of the series. A negative valued
      * shift will prune that many elements off the tail of the series.
-     *
-     * @param shift
-     * @return
      */
     public PrimitiveSeries prune(final int shift) {
         return new PrunedSeries(this, shift);

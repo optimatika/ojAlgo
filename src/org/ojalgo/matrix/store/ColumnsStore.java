@@ -34,8 +34,8 @@ final class ColumnsStore<N extends Number> extends SelectingStore<N> {
     private final int[] myColumns;
 
     /**
-     * @deprecated v40 Use {@link LogicalBuilder#offsets(int, int)} and/or {@link LogicalBuilder##limits(int,
-     *             int)} instead
+     * @deprecated v40 Use {@link LogicalBuilder#offsets(int, int)} and/or
+     *             {@link LogicalBuilder#limits(int, int)} instead
      */
     @Deprecated
     ColumnsStore(final int first, final int limit, final MatrixStore<N> base) {

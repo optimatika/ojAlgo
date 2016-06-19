@@ -43,8 +43,9 @@ import org.ojalgo.type.context.NumberContext;
  * A {@linkplain MatrixStore} is a two dimensional store of numbers/scalars.
  * </p>
  * <p>
- * A {@linkplain MatrixStore} extends {@linkplain Access2D} (as well as {@linkplain Access2D.Visitable} and
- * {@linkplain Access2D.Elements}) and defines some futher funtionality - mainly matrix multiplication.
+ * A {@linkplain MatrixStore} extends {@linkplain Access2D} (as well as
+ * {@linkplain org.ojalgo.access.Access2D.Visitable} and {@linkplain org.ojalgo.access.Access2D.Elements}) and
+ * defines some futher funtionality - mainly matrix multiplication.
  * </p>
  * <p>
  * This interface does not define any methods that require implementations to alter the matrix. Either the
@@ -318,8 +319,8 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         }
 
         /**
-         * Setting either limit to < 0 is interpreted as "no limit" (useful when you only want to limit either
-         * the rows or columns, and don't know the size of the other)
+         * Setting either limit to &lt; 0 is interpreted as "no limit" (useful when you only want to limit
+         * either the rows or columns, and don't know the size of the other)
          */
         public final LogicalBuilder<N> limits(final int rowLimit, final int columnLimit) {
             myStore = new LimitStore<N>(rowLimit < 0 ? (int) myStore.countRows() : rowLimit, columnLimit < 0 ? (int) myStore.countColumns() : columnLimit,
@@ -594,7 +595,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
     N multiplyBoth(final Access1D<N> leftAndRight);
 
     /**
-     * @deprecated v40 Use {@link #premultiply(Access1D<N>)} instead
+     * @deprecated v40 Use {@link #premultiply(Access1D)} instead
      */
     @Deprecated
     default ElementsSupplier<N> multiplyLeft(final Access1D<N> left) {

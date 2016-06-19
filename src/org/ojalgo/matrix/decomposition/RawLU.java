@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -37,11 +38,6 @@ import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
-/**
- * This class adapts JAMA's LUDecomposition to ojAlgo's {@linkplain LU} interface.
- *
- * @author apete
- */
 final class RawLU extends RawDecomposition implements LU<Double> {
 
     private Pivot myPivot;
@@ -101,6 +97,15 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return d;
     }
 
+    public MatrixStore<Double> getInverse() {
+        final int tmpRowDim = this.getRowDim();
+        return this.doGetInverse(this.allocate(tmpRowDim, tmpRowDim));
+    }
+
+    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+        return this.doGetInverse((PrimitiveDenseStore) preallocated);
+    }
+
     public MatrixStore<Double> getL() {
         return this.getRawInPlaceStore().logical().triangular(false, true).get();
     }
@@ -145,9 +150,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw new TaskException("Not solvable");
+            throw TaskException.newNotInvertible();
         }
-
     }
 
     public boolean isSolvable() {
@@ -156,6 +160,14 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     public boolean isSquareAndNotSingular() {
         return (this.getRowDim() == this.getColDim()) && this.isNonsingular();
+    }
+
+    public DecompositionStore<Double> preallocate(final Structure2D template) {
+        return this.allocate(template.countRows(), template.countRows());
+    }
+
+    public DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+        return this.allocate(templateBody.countRows(), templateRHS.countColumns());
     }
 
     @Override
@@ -167,7 +179,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     @Override
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
 
         final double[][] tmpData = this.reset(body, false);
 
@@ -175,9 +187,20 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         this.doDecompose(tmpData);
 
-        MatrixStore.PRIMITIVE.makeWrapper(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
+        if (this.isSolvable()) {
 
-        return this.doSolve(preallocated);
+            MatrixStore.PRIMITIVE.makeWrapper(rhs).row(myPivot.getOrder()).supplyTo(preallocated);
+
+            return this.doSolve(preallocated);
+
+        } else {
+            throw TaskException.newNotSolvable();
+        }
+    }
+
+    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
+        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
+        return this.solve(rhs, tmpPreallocated);
     }
 
     @Override
@@ -195,30 +218,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.doSolve(preallocated);
     }
 
-    @Override
-    protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
-
-        final int[] tmpPivotOrder = myPivot.getOrder();
-        final int tmpRowDim = this.getRowDim();
-        for (int i = 0; i < tmpRowDim; i++) {
-            preallocated.set(i, tmpPivotOrder[i], PrimitiveMath.ONE);
-        }
-
-        final RawStore tmpBody = this.getRawInPlaceStore();
-
-        preallocated.substituteForwards(tmpBody, true, false, !myPivot.isModified());
-
-        preallocated.substituteBackwards(tmpBody, false, false, false);
-
-        return preallocated;
-    }
-
     /**
      * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
      *
      * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#decompose(ElementsSupplier)
      */
-    boolean doDecompose(final double[][] data) {
+    private boolean doDecompose(final double[][] data) {
 
         final int tmpRowDim = this.getRowDim();
         final int tmpColDim = this.getColDim();
@@ -268,7 +273,24 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.computed(true);
     }
 
-    MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
+    private MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
+
+        final int[] tmpPivotOrder = myPivot.getOrder();
+        final int tmpRowDim = this.getRowDim();
+        for (int i = 0; i < tmpRowDim; i++) {
+            preallocated.set(i, tmpPivotOrder[i], PrimitiveMath.ONE);
+        }
+
+        final RawStore tmpBody = this.getRawInPlaceStore();
+
+        preallocated.substituteForwards(tmpBody, true, false, !myPivot.isModified());
+
+        preallocated.substituteBackwards(tmpBody, false, false, false);
+
+        return preallocated;
+    }
+
+    private MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
 
         final MatrixStore<Double> tmpBody = this.getRawInPlaceStore();
 
@@ -295,10 +317,4 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         }
         return true;
     }
-
-    @Override
-    PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions) {
-        return this.allocate(numberOfEquations, numberOfSolutions);
-    }
-
 }

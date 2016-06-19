@@ -159,9 +159,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     abstract public void testData();
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#divideElements(org.ojalgo.matrix.BasicMatrix)
-     */
     public void testDivideElementsBasicMatrix() {
 
         myExpMtrx = myBigAA.divideElements(myBigSafe);
@@ -189,9 +186,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#multiplyVectors(BasicMatrix)
-     */
     public void testDotAccess1D() {
 
         final int[] tmpCol = new int[] { (int) Uniform.randomInteger(myBigAA.countColumns()) };
@@ -676,9 +670,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#mergeColumns(org.ojalgo.matrix.BasicMatrix)
-     */
     public void testMergeColumnsBasicMatrix() {
 
         myExpMtrx = myBigAA.mergeColumns(myBigSafe);
@@ -691,9 +682,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#mergeRows(org.ojalgo.matrix.BasicMatrix)
-     */
     public void testMergeRowsBasicMatrix() {
 
         myExpMtrx = myBigAA.mergeRows(myBigSafe);
@@ -706,9 +694,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#multiplyElements(org.ojalgo.matrix.BasicMatrix)
-     */
     public void testMultiplyElementsBasicMatrix() {
 
         myExpMtrx = myBigAA.multiplyElements(myBigSafe);
@@ -793,9 +778,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#size()
-     */
     public void testSize() {
 
         myExpInt = (int) myBigAA.count();

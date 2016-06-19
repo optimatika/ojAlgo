@@ -24,14 +24,12 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.ElementsSupplier;
-import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.task.TaskException;
 
 /**
- * In many ways similar to InPlaceDecomposition but this class is hardwired to work with double[][] data.
+ * In many ways similar to InPlaceDecomposition but this class is hardwired to work with double[][] data. Most
+ * of it's originates from JAMA, but have been significantly refactored or even (re)written from scratch.
  *
  * @author apete
  */
@@ -46,43 +44,12 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         super();
     }
 
-    public MatrixStore<Double> getInverse() {
-        final int tmpRowDim = this.getRowDim();
-        return this.doGetInverse(this.allocate(tmpRowDim, tmpRowDim));
+    @Override
+    protected PrimitiveDenseStore allocate(final long numberOfRows, final long numberOfColumns) {
+        return PrimitiveDenseStore.FACTORY.makeZero(numberOfRows, numberOfColumns);
     }
 
-    public final MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
-        return this.doGetInverse((PrimitiveDenseStore) preallocated);
-    }
-
-    public final MatrixStore<Double> invert(final Access2D<?> original) throws TaskException {
-        return this.invert(original, this.preallocate(original));
-    }
-
-    public abstract MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException;
-
-    public final DecompositionStore<Double> preallocate(final Structure2D template) {
-        return this.preallocate(template.countRows(), template.countColumns(), template.countRows());
-    }
-
-    public final DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.preallocate(templateBody.countRows(), templateBody.countColumns(), templateRHS.countColumns());
-    }
-
-    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs) {
-        return this.solve(body, rhs, this.preallocate(body, rhs));
-    }
-
-    public abstract MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated);
-
-    public final MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
-        final DecompositionStore<Double> tmpPreallocated = this.preallocate(myRowDim, myColDim, rhs.countColumns());
-        return this.solve(rhs, tmpPreallocated);
-    }
-
-    public abstract MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated);
-
-    protected final boolean checkSymmetry() {
+    protected boolean checkSymmetry() {
         boolean retVal = myRowDim == myColDim;
         for (int i = 0; retVal && (i < myRowDim); i++) {
             for (int j = 0; retVal && (j < i); j++) {
@@ -92,35 +59,28 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return retVal;
     }
 
-    protected abstract MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated);
-
-    protected final int getColDim() {
+    protected int getColDim() {
         return myColDim;
     }
 
-    protected final int getMaxDim() {
+    protected int getMaxDim() {
         return Math.max(myRowDim, myColDim);
     }
 
-    protected final int getMinDim() {
+    protected int getMinDim() {
         return Math.min(myRowDim, myColDim);
     }
 
-    protected final double[][] getRawInPlaceData() {
+    protected double[][] getRawInPlaceData() {
         return myRawInPlaceData;
     }
 
-    protected final RawStore getRawInPlaceStore() {
+    protected RawStore getRawInPlaceStore() {
         return myRawInPlaceStore;
     }
 
-    protected final int getRowDim() {
+    protected int getRowDim() {
         return myRowDim;
-    }
-
-    @Override
-    protected final PrimitiveDenseStore allocate(final long numberOfRows, final long numberOfColumns) {
-        return PrimitiveDenseStore.FACTORY.makeZero(numberOfRows, numberOfColumns);
     }
 
     /**
@@ -130,9 +90,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         MatrixUtils.copy(source, rows, columns, destination);
     }
 
-    abstract PrimitiveDenseStore preallocate(final long numberOfEquations, final long numberOfVariables, final long numberOfSolutions);
-
-    final double[][] reset(final Structure2D matrix, final boolean transpose) {
+    double[][] reset(final Structure2D matrix, final boolean transpose) {
 
         this.reset();
 

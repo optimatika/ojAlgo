@@ -220,7 +220,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         if (this.isSolvable()) {
             return this.getInverse();
         } else {
-            throw new TaskException("Not solvable");
+            throw TaskException.newNotInvertible();
         }
     }
 
@@ -231,7 +231,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw new TaskException("Not solvable");
+            throw TaskException.newNotInvertible();
         }
     }
 
@@ -268,14 +268,26 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         myFullSize = fullSize;
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
+
         this.decompose(this.wrap(body));
-        return this.solve(this.wrap(rhs));
+
+        if (this.isSolvable()) {
+            return this.solve(this.wrap(rhs));
+        } else {
+            throw TaskException.newNotSolvable();
+        }
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) throws TaskException {
+
         this.decompose(this.wrap(body));
-        return this.solve(rhs, preallocated);
+
+        if (this.isSolvable()) {
+            return this.solve(rhs, preallocated);
+        } else {
+            throw TaskException.newNotSolvable();
+        }
     }
 
     public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {

@@ -239,7 +239,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
     }
 
     /**
-     * @return A new CoordinationSet<V> where all series have the same first and last keys.
+     * @return A new CoordinationSet where all series have the same first and last keys.
      */
     public CoordinationSet<V> prune() {
 

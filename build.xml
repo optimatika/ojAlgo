@@ -75,7 +75,7 @@
         <delete dir="${path.doc}" />
         <mkdir dir="${path.doc}" />
 
-        <javadoc access="public" doctitle="ojAlgo Generated Documentation" destdir="${path.doc}" noindex="true" splitindex="no" encoding="utf-8">
+        <javadoc access="public" doctitle="ojAlgo Generated Documentation" destdir="${path.doc}" noindex="true" splitindex="no" encoding="utf-8" verbose="false" failonerror="true" failonwarning="false">
 
             <fileset dir="${path.DevProj}${file.separator}${dir.src}">
                 <include name="**/*.java" />

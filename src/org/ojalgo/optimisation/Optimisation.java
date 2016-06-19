@@ -119,9 +119,8 @@ public interface Optimisation {
         Optimisation.Result minimise();
 
         /**
-         * @return true If eveything is ok
-         * @return false The model is structurally ok, but the "value" breaks constraints - the solution is
-         *         infeasible.
+         * @return true If eveything is ok. false The model is structurally ok, but the "value" breaks
+         *         constraints - the solution is infeasible.
          */
         boolean validate();
 
@@ -151,7 +150,7 @@ public interface Optimisation {
 
         /**
          * If this is null nothing is printed, if it is not null then debug statements are printed to that
-         * {@linkplain BasicLogger.Printer}.
+         * {@linkplain org.ojalgo.netio.BasicLogger.Printer}.
          */
         public BasicLogger.Printer debug_appender = null;
 

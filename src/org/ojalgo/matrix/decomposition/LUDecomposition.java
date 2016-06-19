@@ -165,7 +165,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         if (this.isSolvable()) {
             return this.getInverse();
         } else {
-            throw new TaskException("Not solvable");
+            throw TaskException.newNotInvertible();
         }
     }
 
@@ -176,7 +176,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw new TaskException("Not solvable");
+            throw TaskException.newNotInvertible();
         }
     }
 
@@ -215,14 +215,26 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         myPivot = null;
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
+
         this.decompose(this.wrap(body));
-        return this.solve(this.wrap(rhs));
+
+        if (this.isSolvable()) {
+            return this.solve(this.wrap(rhs));
+        } else {
+            throw TaskException.newNotSolvable();
+        }
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) throws TaskException {
+
         this.decompose(this.wrap(body));
-        return this.solve(rhs, preallocated);
+
+        if (this.isSolvable()) {
+            return this.solve(rhs, preallocated);
+        } else {
+            throw TaskException.newNotSolvable();
+        }
     }
 
     public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
@@ -244,8 +256,6 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
      *
      * @param rhs The right hand side
      * @return [X] The solution will be written to "preallocated" and then returned.
-     * @see org.ojalgo.matrix.decomposition.GenericDecomposition#doSolve(ElementsSupplier,
-     *      org.ojalgo.matrix.decomposition.DecompositionStore)
      */
     @Override
     public MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {

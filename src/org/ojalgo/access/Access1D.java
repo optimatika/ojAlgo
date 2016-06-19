@@ -47,8 +47,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
         /**
          * @see Scalar#isAbsolute()
-         * @param index
-         * @return
          */
         boolean isAbsolute(long index);
 
