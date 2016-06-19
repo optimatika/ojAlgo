@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -138,6 +138,10 @@ public final class NumberContext extends FormatContext<Number> {
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
     }
 
+    public static NumberContext getMath(final int precisionAndScale) {
+        return NumberContext.getMath(precisionAndScale, DEFAULT_MATH.getRoundingMode());
+    }
+
     public static NumberContext getMath(final int precisionAndScale, final RoundingMode roundingMode) {
 
         final NumberFormat tmpFormat = NumberStyle.GENERAL.getFormat();
@@ -146,10 +150,6 @@ public final class NumberContext extends FormatContext<Number> {
         final RoundingMode tmpRoundingMode = roundingMode;
 
         return new NumberContext(tmpFormat, tmpPrecision, tmpScale, tmpRoundingMode);
-    }
-
-    public static NumberContext getMath(final int precisionAndScale) {
-        return NumberContext.getMath(precisionAndScale, DEFAULT_MATH.getRoundingMode());
     }
 
     /**

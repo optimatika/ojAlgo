@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,10 @@ import java.util.TimerTask;
 
 public abstract class TypeCache<T> {
 
-    private transient volatile T myCachedObject;
-    private volatile boolean myDirty;
-
     private static final Timer TIMER = new Timer("TypeCache-Daemon", true);
+    private transient volatile T myCachedObject;
+
+    private volatile boolean myDirty;
 
     public TypeCache(final long aPurgeIntervalMeassure, final CalendarDateUnit aPurgeIntervalUnit) {
 

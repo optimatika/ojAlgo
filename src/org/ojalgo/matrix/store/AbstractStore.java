@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -193,6 +193,8 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         }
     }
 
+    protected abstract void addNonZerosTo(final ElementsConsumer<N> consumer);
+
     protected final int getColDim() {
         return myColDim;
     }
@@ -208,8 +210,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
     protected final int getRowDim() {
         return myRowDim;
     }
-
-    protected abstract void addNonZerosTo(final ElementsConsumer<N> consumer);
 
     final Class<?> getComponentType() {
         if (myComponentType == null) {

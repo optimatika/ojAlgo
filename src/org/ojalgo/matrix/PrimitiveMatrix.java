@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -80,6 +80,22 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
         return Double.toString(this.doubleValue(row, col));
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    MatrixStore<Double> cast(final Access1D<?> matrix) {
+        if (matrix instanceof PrimitiveMatrix) {
+            return ((PrimitiveMatrix) matrix).getStore();
+        } else if (matrix instanceof PrimitiveDenseStore) {
+            return (PrimitiveDenseStore) matrix;
+        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof Double)) {
+            return (MatrixStore<Double>) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
+        } else {
+            return this.getPhysicalFactory().columns(matrix);
+        }
+    }
+
     @Override
     DeterminantTask<Double> getDeterminantTask(final MatrixStore<Double> template) {
         return DeterminantTask.PRIMITIVE.make(template, this.isHermitian(), false);
@@ -99,22 +115,6 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
     @Override
     SolverTask<Double> getSolverTask(final MatrixStore<Double> templateBody, final MatrixStore<Double> templateRHS) {
         return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian(), false);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    MatrixStore<Double> cast(final Access1D<?> matrix) {
-        if (matrix instanceof PrimitiveMatrix) {
-            return ((PrimitiveMatrix) matrix).getStore();
-        } else if (matrix instanceof PrimitiveDenseStore) {
-            return (PrimitiveDenseStore) matrix;
-        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof Double)) {
-            return (MatrixStore<Double>) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
-        } else {
-            return this.getPhysicalFactory().columns(matrix);
-        }
     }
 
 }

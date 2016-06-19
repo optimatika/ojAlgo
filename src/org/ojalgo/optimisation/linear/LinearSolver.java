@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -109,25 +109,6 @@ public abstract class LinearSolver extends BaseSolver {
     }
 
     static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
-
-    public static Tableau make(final PhysicalStore<Double> transposedTableau) {
-
-        final int tmpNumberOfConstraints = (int) (transposedTableau.countColumns() - 2L);
-        final int tmpNumberOfVariables = (int) (transposedTableau.countRows() - 1L);
-
-        final Tableau retVal = new Tableau(tmpNumberOfConstraints, tmpNumberOfVariables);
-
-        for (int i = 0; i < retVal.countRows(); i++) {
-            for (int j = 0; j < retVal.countColumns(); j++) {
-                final double tmpValue = transposedTableau.doubleValue(j, i);
-                if (tmpValue != 0.0) {
-                    retVal.set(i, j, tmpValue);
-                }
-            }
-        }
-
-        return retVal;
-    }
 
     public static void copy(final ExpressionsBasedModel sourceModel, final LinearSolver.Builder destinationBuilder) {
 
@@ -453,6 +434,25 @@ public abstract class LinearSolver extends BaseSolver {
         return LinearSolver.getBuilder().objective(C);
     }
 
+    public static Tableau make(final PhysicalStore<Double> transposedTableau) {
+
+        final int tmpNumberOfConstraints = (int) (transposedTableau.countColumns() - 2L);
+        final int tmpNumberOfVariables = (int) (transposedTableau.countRows() - 1L);
+
+        final Tableau retVal = new Tableau(tmpNumberOfConstraints, tmpNumberOfVariables);
+
+        for (int i = 0; i < retVal.countRows(); i++) {
+            for (int j = 0; j < retVal.countColumns(); j++) {
+                final double tmpValue = transposedTableau.doubleValue(j, i);
+                if (tmpValue != 0.0) {
+                    retVal.set(i, j, tmpValue);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
     private final IndexSelector mySelector;
 
     protected LinearSolver(final BaseSolver.AbstractBuilder<LinearSolver.Builder, LinearSolver> matrices, final Optimisation.Options solverOptions) {
@@ -476,7 +476,7 @@ public abstract class LinearSolver extends BaseSolver {
      * @deprecated v38 Temporary api
      */
     @Deprecated
-    public abstract double[] getResidualCosts();
+    public abstract double[] getDualVariables();
 
     /**
      * Can only be called after a solve()
@@ -484,7 +484,7 @@ public abstract class LinearSolver extends BaseSolver {
      * @deprecated v38 Temporary api
      */
     @Deprecated
-    public abstract double[] getDualVariables();
+    public abstract double[] getResidualCosts();
 
     protected final int countBasisDeficit() {
         return this.countEqualityConstraints() - mySelector.countIncluded();

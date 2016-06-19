@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -63,10 +63,6 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
             return this.invoke(BigDecimal.valueOf(arg)).doubleValue();
         }
 
-    }
-
-    public static BigFunction getSet() {
-        return SET;
     }
 
     public static final UnaryFunction<BigDecimal> ABS = new Unary() {
@@ -415,9 +411,13 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
         }
 
     };
-    private static final MathContext CONTEXT = MathContext.DECIMAL128;
 
+    private static final MathContext CONTEXT = MathContext.DECIMAL128;
     private static final BigFunction SET = new BigFunction();
+
+    public static BigFunction getSet() {
+        return SET;
+    }
 
     private BigFunction() {
         super();

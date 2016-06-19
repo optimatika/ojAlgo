@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -58,10 +58,6 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
             return this.invoke(RationalNumber.valueOf(arg)).doubleValue();
         }
 
-    }
-
-    public static RationalFunction getSet() {
-        return SET;
     }
 
     public static final UnaryFunction<RationalNumber> ABS = new Unary() {
@@ -464,6 +460,10 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     };
 
     private static final RationalFunction SET = new RationalFunction();
+
+    public static RationalFunction getSet() {
+        return SET;
+    }
 
     private RationalFunction() {
         super();

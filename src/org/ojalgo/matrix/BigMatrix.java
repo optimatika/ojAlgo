@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -79,6 +79,22 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
         return this.toBigDecimal(row, col).toPlainString();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    MatrixStore<BigDecimal> cast(final Access1D<?> matrix) {
+        if (matrix instanceof BigMatrix) {
+            return ((BigMatrix) matrix).getStore();
+        } else if (matrix instanceof BigDenseStore) {
+            return (BigDenseStore) matrix;
+        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof BigDecimal)) {
+            return (MatrixStore<BigDecimal>) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
+        } else {
+            return this.getPhysicalFactory().columns(matrix);
+        }
+    }
+
     @Override
     DeterminantTask<BigDecimal> getDeterminantTask(final MatrixStore<BigDecimal> template) {
         return DeterminantTask.BIG.make(template, this.isHermitian(), false);
@@ -98,22 +114,6 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
     @Override
     SolverTask<BigDecimal> getSolverTask(final MatrixStore<BigDecimal> templateBody, final MatrixStore<BigDecimal> templateRHS) {
         return SolverTask.BIG.make(templateBody, templateRHS, this.isHermitian(), false);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    MatrixStore<BigDecimal> cast(final Access1D<?> matrix) {
-        if (matrix instanceof BigMatrix) {
-            return ((BigMatrix) matrix).getStore();
-        } else if (matrix instanceof BigDenseStore) {
-            return (BigDenseStore) matrix;
-        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof BigDecimal)) {
-            return (MatrixStore<BigDecimal>) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
-        } else {
-            return this.getPhysicalFactory().columns(matrix);
-        }
     }
 
 }

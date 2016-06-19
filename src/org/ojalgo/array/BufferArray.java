@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -292,6 +292,11 @@ public class BufferArray extends DenseArray<Double> {
     }
 
     @Override
+    protected void fillOneMatching(final int index, final Access1D<?> values, final long valueIndex) {
+        myBuffer.put(index, values.doubleValue(valueIndex));
+    }
+
+    @Override
     protected void finalize() throws Throwable {
 
         super.finalize();
@@ -424,11 +429,6 @@ public class BufferArray extends DenseArray<Double> {
     DenseArray<Double> newInstance(final int capacity) {
         return null;
         // return new MyTestArray(capacity);
-    }
-
-    @Override
-    protected void fillOneMatching(final int index, final Access1D<?> values, final long valueIndex) {
-        myBuffer.put(index, values.doubleValue(valueIndex));
     }
 
 }

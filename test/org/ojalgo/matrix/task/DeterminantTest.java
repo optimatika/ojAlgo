@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,10 +38,6 @@ public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
         super(arg0);
     }
 
-    public void testSymmetric1X1() {
-        this.doSymmetric(AbstractDeterminator.FULL_1X1, 1);
-    }
-
     public void testFull2X2() {
         this.doFull(AbstractDeterminator.FULL_2X2, 2);
     }
@@ -56,6 +52,10 @@ public final class DeterminantTest extends AbstractMatrixDecompositionTaskTest {
 
     public void testFull5X5() {
         this.doFull(AbstractDeterminator.FULL_5X5, 5);
+    }
+
+    public void testSymmetric1X1() {
+        this.doSymmetric(AbstractDeterminator.FULL_1X1, 1);
     }
 
     public void testSymmetric2X2() {

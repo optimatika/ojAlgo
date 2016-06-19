@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -371,6 +371,26 @@ public class PrimitiveArray extends DenseArray<Double> {
         data = new double[size];
     }
 
+    public void daxpy(final double a, final Mutate1D y) {
+        final int tmpLength = Math.min(data.length, (int) y.count());
+        for (int i = 0; i < tmpLength; i++) {
+            y.add(i, a * data[i]);
+        }
+    }
+
+    @Override
+    public double dot(final Access1D<?> vector) {
+
+        double retVal = ZERO;
+
+        final int tmpLength = Math.min(data.length, (int) vector.count());
+        for (int i = 0; i < tmpLength; i++) {
+            retVal += data[i] * vector.doubleValue(i);
+        }
+
+        return retVal;
+    }
+
     @Override
     public boolean equals(final Object anObj) {
         if (anObj instanceof PrimitiveArray) {
@@ -397,26 +417,6 @@ public class PrimitiveArray extends DenseArray<Double> {
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);
-    }
-
-    @Override
-    public double dot(final Access1D<?> vector) {
-
-        double retVal = ZERO;
-
-        final int tmpLength = Math.min(data.length, (int) vector.count());
-        for (int i = 0; i < tmpLength; i++) {
-            retVal += data[i] * vector.doubleValue(i);
-        }
-
-        return retVal;
-    }
-
-    public void daxpy(final double a, final Mutate1D y) {
-        final int tmpLength = Math.min(data.length, (int) y.count());
-        for (int i = 0; i < tmpLength; i++) {
-            y.add(i, a * data[i]);
-        }
     }
 
     public OfDouble spliterator() {

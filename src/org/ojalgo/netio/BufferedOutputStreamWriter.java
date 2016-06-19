@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -63,12 +63,12 @@ public final class BufferedOutputStreamWriter extends BufferedWriter {
         super(new OutputStreamWriter(aStream, aCharsetName), aSize);
     }
 
-    protected BufferedOutputStreamWriter(Writer aWriter, int aSize) {
-        super(aWriter, aSize);
-    }
-
     protected BufferedOutputStreamWriter(Writer aWriter) {
         super(aWriter);
+    }
+
+    protected BufferedOutputStreamWriter(Writer aWriter, int aSize) {
+        super(aWriter, aSize);
     }
 
 }

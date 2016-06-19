@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,16 +55,16 @@ public interface Eigenvalue<N extends Number>
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<Eigenvalue<N>> {
 
+        default Eigenvalue<N> make(final boolean hermitian) {
+            return this.make(TYPICAL, hermitian);
+        }
+
         default Eigenvalue<N> make(final Structure2D typical) {
             if (typical instanceof Access2D) {
                 return this.make(typical, MatrixUtils.isHermitian((Access2D<?>) typical));
             } else {
                 return this.make(typical, false);
             }
-        }
-
-        default Eigenvalue<N> make(final boolean hermitian) {
-            return this.make(TYPICAL, hermitian);
         }
 
         Eigenvalue<N> make(Structure2D typical, boolean hermitian);

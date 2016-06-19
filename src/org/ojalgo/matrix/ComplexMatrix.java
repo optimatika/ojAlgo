@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -112,6 +112,22 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
         return this.toComplexNumber(row, col).toString();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    MatrixStore<ComplexNumber> cast(final Access1D<?> matrix) {
+        if (matrix instanceof ComplexMatrix) {
+            return ((ComplexMatrix) matrix).getStore();
+        } else if (matrix instanceof ComplexDenseStore) {
+            return (ComplexDenseStore) matrix;
+        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof ComplexNumber)) {
+            return (MatrixStore<ComplexNumber>) matrix;
+        } else if (matrix instanceof Access2D<?>) {
+            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
+        } else {
+            return this.getPhysicalFactory().columns(matrix);
+        }
+    }
+
     @Override
     DeterminantTask<ComplexNumber> getDeterminantTask(final MatrixStore<ComplexNumber> template) {
         return DeterminantTask.COMPLEX.make(template, this.isHermitian(), false);
@@ -131,22 +147,6 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     @Override
     SolverTask<ComplexNumber> getSolverTask(final MatrixStore<ComplexNumber> templateBody, final MatrixStore<ComplexNumber> templateRHS) {
         return SolverTask.COMPLEX.make(templateBody, templateRHS, this.isHermitian(), false);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    MatrixStore<ComplexNumber> cast(final Access1D<?> matrix) {
-        if (matrix instanceof ComplexMatrix) {
-            return ((ComplexMatrix) matrix).getStore();
-        } else if (matrix instanceof ComplexDenseStore) {
-            return (ComplexDenseStore) matrix;
-        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof ComplexNumber)) {
-            return (MatrixStore<ComplexNumber>) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
-        } else {
-            return this.getPhysicalFactory().columns(matrix);
-        }
     }
 
 }

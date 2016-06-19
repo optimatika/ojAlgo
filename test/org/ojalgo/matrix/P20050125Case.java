@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -76,6 +76,11 @@ public class P20050125Case extends BasicMatrixTest {
     }
 
     @Override
+    public void testSolveBasicMatrix() {
+        super.testSolveBasicMatrix();
+    }
+
+    @Override
     protected void setUp() throws Exception {
 
         DEFINITION = new NumberContext(7, 9);
@@ -89,11 +94,6 @@ public class P20050125Case extends BasicMatrixTest {
         myBigSafe = BasicMatrixTest.getSafe(myBigAA.countRows(), myBigAA.countColumns(), DEFINITION);
 
         super.setUp();
-    }
-
-    @Override
-    public void testSolveBasicMatrix() {
-        super.testSolveBasicMatrix();
     }
 
 }

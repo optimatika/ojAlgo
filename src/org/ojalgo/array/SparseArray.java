@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -343,6 +343,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    public void empty() {
+        myActualLength = 0;
+    }
+
     @Override
     public void fillAll(final N value) {
 
@@ -364,10 +368,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
             myValues.fillAll(value);
         }
-    }
-
-    public void empty() {
-        myActualLength = 0;
     }
 
     @Override

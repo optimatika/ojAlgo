@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -69,8 +69,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         return myIterationsCount.get();
     }
 
-    protected abstract double evaluateFunction(final Access1D<?> solution);
-
     protected final long countTime() {
         return System.currentTimeMillis() - myResetTime;
     }
@@ -90,6 +88,8 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
     protected final void error(final String messagePattern, final Object... arguments) {
         BasicLogger.error(messagePattern, arguments);
     }
+
+    protected abstract double evaluateFunction(final Access1D<?> solution);
 
     /**
      * Should be able to feed this to {@link #evaluateFunction(Access1D)}.

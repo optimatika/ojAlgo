@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -325,6 +325,24 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         return tmpVisitor.getNumber();
     }
 
+    public final MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
+        this.decompose(this.wrap(original));
+        if (this.isSolvable()) {
+            return this.getInverse();
+        } else {
+            throw TaskException.newNotInvertible();
+        }
+    }
+
+    public final MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) throws TaskException {
+        this.decompose(this.wrap(original));
+        if (this.isSolvable()) {
+            return this.getInverse(preallocated);
+        } else {
+            throw TaskException.newNotInvertible();
+        }
+    }
+
     public final boolean isHermitian() {
         return true;
     }
@@ -337,6 +355,15 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         return this.isComputed() && this.isHermitian();
     }
 
+    public DecompositionStore<N> preallocate(final Structure2D template) {
+        final long tmpCountRows = template.countRows();
+        return this.allocate(tmpCountRows, tmpCountRows);
+    }
+
+    public DecompositionStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+        return this.allocate(templateRHS.countRows(), templateRHS.countColumns());
+    }
+
     @Override
     public void reset() {
 
@@ -345,6 +372,37 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         myTridiagonal.reset();
 
         myInverse = null;
+    }
+
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
+
+        this.decompose(this.wrap(body));
+
+        if (this.isSolvable()) {
+            return this.solve(this.wrap(rhs));
+        } else {
+            throw TaskException.newNotSolvable();
+        }
+    }
+
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) throws TaskException {
+
+        this.decompose(this.wrap(body));
+
+        if (this.isSolvable()) {
+            return this.solve(rhs, preallocated);
+        } else {
+            throw TaskException.newNotSolvable();
+        }
+    }
+
+    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
+        return this.getInverse().multiply(rhs.get());
+    }
+
+    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+        preallocated.fillByMultiplying(this.getInverse(), rhs.get());
+        return preallocated;
     }
 
     @Override
@@ -423,64 +481,6 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
     @Override
     protected MatrixStore<N> makeV() {
         return myTridiagonal.getQ();
-    }
-
-    public final MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
-        this.decompose(this.wrap(original));
-        if (this.isSolvable()) {
-            return this.getInverse();
-        } else {
-            throw TaskException.newNotInvertible();
-        }
-    }
-
-    public final MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) throws TaskException {
-        this.decompose(this.wrap(original));
-        if (this.isSolvable()) {
-            return this.getInverse(preallocated);
-        } else {
-            throw TaskException.newNotInvertible();
-        }
-    }
-
-    public DecompositionStore<N> preallocate(final Structure2D template) {
-        final long tmpCountRows = template.countRows();
-        return this.allocate(tmpCountRows, tmpCountRows);
-    }
-
-    public DecompositionStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-        return this.allocate(templateRHS.countRows(), templateRHS.countColumns());
-    }
-
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
-
-        this.decompose(this.wrap(body));
-
-        if (this.isSolvable()) {
-            return this.solve(this.wrap(rhs));
-        } else {
-            throw TaskException.newNotSolvable();
-        }
-    }
-
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) throws TaskException {
-
-        this.decompose(this.wrap(body));
-
-        if (this.isSolvable()) {
-            return this.solve(rhs, preallocated);
-        } else {
-            throw TaskException.newNotSolvable();
-        }
-    }
-
-    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
-        return this.getInverse().multiply(rhs.get());
-    }
-
-    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), rhs.get());
-        return preallocated;
     }
 
 }

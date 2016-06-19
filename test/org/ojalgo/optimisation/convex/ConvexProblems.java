@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -212,342 +212,6 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
-     * Another case of looping in the ActiveSetSolver's constraint (de)activation.
-     */
-    public void testP20080124() {
-        // create expected returns matrix
-        final PrimitiveMatrix expectedReturnsMatrix = PrimitiveMatrix.FACTORY.rows(new double[][] { { 10.012158 }, { 9.996046 }, { 10.000744 }, { 9.990585 },
-                { 9.998392 }, { 9.996614 }, { 10.010531 }, { 10.001401 }, { 9.997447 }, { 9.993817 }, { 9.998537 }, { 9.995741 }, { 9.987224 }, { 9.992392 } });
-        // create covariance matrix
-        final PrimitiveMatrix covarianceMatrix = PrimitiveMatrix.FACTORY.rows(new double[][] {
-                { 0.0013191354374342357, 7.786471466322114E-5, -3.810886655309235E-5, -2.28102405899103E-4, -1.2589115740653127E-4, -1.3247692268411991E-5,
-                        1.422624656557158E-4, -2.7176361887359125E-5, 8.675127894495302E-5, -8.116577287090551E-5, -8.468380774247271E-6, 4.930080166695193E-5,
-                        -2.774138231533918E-4, -3.148322898570031E-5 },
-                { 7.786471466322114E-5, 0.001028250547816086, 8.986425197170406E-4, -1.0341435238579975E-5, 6.472902968147139E-4, 2.9014435841747375E-4,
-                        1.0640414444602855E-4, 5.638694128451113E-4, 6.024515366195699E-4, -1.094867665517237E-4, 6.177221606260711E-6, -5.682215091954099E-5,
-                        2.7178074500896235E-4, 0.0010146062950574643 },
-                { -3.810886655309235E-5, 8.986425197170406E-4, 0.0012477403456464075, -1.8104847201530489E-4, 9.299199981666304E-4, 3.486383951982303E-4,
-                        1.0246402606579107E-4, 7.009722990366382E-4, 6.545695073447614E-4, -1.1680969171500155E-4, 7.123493385355658E-5, 1.559414390174896E-5,
-                        1.972605480880284E-4, 9.368808845809186E-4 },
-                { -2.28102405899103E-4, -1.0341435238579975E-5, -1.8104847201530489E-4, 6.250793590180099E-4, -5.4721911720097E-6, 1.3081826023829458E-4,
-                        -5.644046856412501E-5, -1.1282043806099452E-5, -6.729835202722053E-5, 1.3929681542737307E-4, 3.698155248637573E-6,
-                        5.0269944317023966E-5, 5.344931460074395E-4, -1.1654882792112444E-4 },
-                { -1.2589115740653127E-4, 6.472902968147139E-4, 9.299199981666304E-4, -5.4721911720097E-6, 0.001181357476541527, 3.0334522038028824E-4,
-                        2.6983840497611894E-4, 6.983493701701867E-4, 5.68816790613126E-4, -7.899505299987754E-5, 1.05074262063586E-5, 1.137295188785598E-4,
-                        1.9732025136606058E-4, 6.631330613471645E-4 },
-                { -1.3247692268411991E-5, 2.9014435841747375E-4, 3.486383951982303E-4, 1.3081826023829458E-4, 3.0334522038028824E-4, 3.372068413122505E-4,
-                        1.1067468759384309E-4, 2.6589126866881173E-4, 2.1364931019670806E-4, -4.201239472520589E-5, 2.32769639721745E-5, 5.847559594073046E-6,
-                        1.9925897592339058E-4, 1.9671375386540353E-4 },
-                { 1.422624656557158E-4, 1.0640414444602855E-4, 1.0246402606579107E-4, -5.644046856412501E-5, 2.6983840497611894E-4, 1.1067468759384309E-4,
-                        0.001484755064835215, 1.2295961703024863E-4, 1.0843198781689372E-4, -2.1292328294313923E-5, -4.152686600769749E-6, 1.163599038579726E-4,
-                        -3.14739599261259E-4, 2.4519847977412686E-4 },
-                { -2.7176361887359125E-5, 5.638694128451113E-4, 7.009722990366382E-4, -1.1282043806099452E-5, 6.983493701701867E-4, 2.6589126866881173E-4,
-                        1.2295961703024863E-4, 5.563328439145604E-4, 4.4816730200338125E-4, -3.4729832814007256E-5, -6.028818604193519E-7, 3.192976987126335E-5,
-                        1.7402262469809026E-4, 5.182632389125651E-4 },
-                { 8.675127894495302E-5, 6.024515366195699E-4, 6.545695073447614E-4, -6.729835202722053E-5, 5.68816790613126E-4, 2.1364931019670806E-4,
-                        1.0843198781689372E-4, 4.4816730200338125E-4, 6.277134808325468E-4, -4.988229718603287E-5, -5.5018781802344255E-6,
-                        -1.3231260300518203E-5, 8.214207901880769E-5, 5.841470978796527E-4 },
-                { -8.116577287090551E-5, -1.094867665517237E-4, -1.1680969171500155E-4, 1.3929681542737307E-4, -7.899505299987754E-5, -4.201239472520589E-5,
-                        -2.1292328294313923E-5, -3.4729832814007256E-5, -4.988229718603287E-5, 3.5152692612068785E-4, -9.358092257358399E-6,
-                        4.962216896551324E-6, 1.291957229930161E-4, -1.5046975508620905E-4 },
-                { -8.468380774247271E-6, 6.177221606260711E-6, 7.123493385355658E-5, 3.698155248637573E-6, 1.05074262063586E-5, 2.32769639721745E-5,
-                        -4.152686600769749E-6, -6.028818604193519E-7, -5.5018781802344255E-6, -9.358092257358399E-6, 4.8495980378967104E-5,
-                        1.1704645004909169E-5, 1.814918597253607E-5, 1.2448218299234062E-5 },
-                { 4.930080166695193E-5, -5.682215091954099E-5, 1.559414390174896E-5, 5.0269944317023966E-5, 1.137295188785598E-4, 5.847559594073046E-6,
-                        1.163599038579726E-4, 3.192976987126335E-5, -1.3231260300518203E-5, 4.962216896551324E-6, 1.1704645004909169E-5, 1.802684481609152E-4,
-                        1.0475986793792914E-5, -4.113641419540392E-5 },
-                { -2.774138231533918E-4, 2.7178074500896235E-4, 1.972605480880284E-4, 5.344931460074395E-4, 1.9732025136606058E-4, 1.9925897592339058E-4,
-                        -3.14739599261259E-4, 1.7402262469809026E-4, 8.214207901880769E-5, 1.291957229930161E-4, 1.814918597253607E-5, 1.0475986793792914E-5,
-                        7.843917688960864E-4, 1.231995848356005E-4 },
-                { -3.148322898570031E-5, 0.0010146062950574643, 9.368808845809186E-4, -1.1654882792112444E-4, 6.631330613471645E-4, 1.9671375386540353E-4,
-                        2.4519847977412686E-4, 5.182632389125651E-4, 5.841470978796527E-4, -1.5046975508620905E-4, 1.2448218299234062E-5, -4.113641419540392E-5,
-                        1.231995848356005E-4, 0.0011885193322126312 } });
-
-        // create asset variables - cost and weighting constraints
-        final Variable[] tmpVariables = new Variable[(int) expectedReturnsMatrix.countRows()];
-        for (int i = 0; i < tmpVariables.length; i++) {
-            tmpVariables[i] = new Variable("VAR" + i);
-            tmpVariables[i].weight(expectedReturnsMatrix.toBigDecimal(i, 0).negate());
-            // set the constraints on the asset weights
-            // require at least a 2% allocation to each asset
-            tmpVariables[i].lower(new BigDecimal("0.05"));
-            // require no more than 80% allocation to each asset
-            tmpVariables[i].upper(new BigDecimal("0.35"));
-            // tmpVariables[i].setUpperLimit(new BigDecimal("1.00"));
-        }
-
-        final BigMatrix tmpExpected = BigMatrix.FACTORY
-                .rows(new double[][] { { 0.3166116715239731 }, { 0.050000000001624065 }, { 0.04999999999827016 }, { 0.05000000000034928 },
-                        { 0.049999999999891145 }, { 0.049999999997416125 }, { 0.08338832846287945 }, { 0.05000000000178943 }, { 0.05000000000085164 },
-                        { 0.04999999999937388 }, { 0.050000000012470555 }, { 0.04999999999966884 }, { 0.050000000000484546 }, { 0.049999999995857476 } });
-
-        ConvexProblems.doEarly2008(tmpVariables, covarianceMatrix, tmpExpected);
-    }
-
-    /**
-     * <p>
-     * I'm trying to solve some quadratic programming systems using version 24. The ActiveSetSolver does not
-     * always converge to a solution, but throws an exception, "Matrix is singular" (The exception is thrown
-     * by org.ojalgo.matrix.jama.LUDecomposition). The thing is that if I run Matlabs quadprog method on the
-     * exact same system, a solution is found without problems. Here is the code that produces the exception:
-     * </p>
-     * <p>
-     * 2015-02-21: Extended the test case with a few alternatives using ExpressionsBasedModel. Numerically
-     * difficult problem as the formulation includes both large and very small parameters (like 1000000000 and
-     * -7.646043242556307E-15).
-     * </p>
-     */
-    public void testP20081014() {
-
-        final PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
-
-        final PrimitiveDenseStore[] tmpSystem = new PrimitiveDenseStore[6];
-        // {[AE], [BE], [Q], [C], [AI], [BI]}
-
-        tmpSystem[0] = tmpFactory.rows(new double[][] {
-                { -0.0729971273939726, -0.31619624199405116, -0.14365990081105298, -3.4914813388431334E-15, 0.9963066090106673, 0.9989967493404447, 1.0, 0.0,
-                        0.0 },
-                { -2.5486810808521023E-16, 3.6687950405257466, 3.2047109656515507, 1.0, 0.08586699506600544, 0.04478275122437895, 0.0, 1.0, 0.0 },
-                { -7.646043242556307E-15, -107.21808503782593, -97.434268076846, 30.0, -11.54276933307617, 7.647488207332634, 0.0, 0, 1.0 } }); // AE
-        tmpSystem[1] = tmpFactory.rows(new double[][] { { 10.461669614447484 }, { -0.5328532701990767 }, { 15.782527136201711 } }); // BE
-
-        final PrimitiveDenseStore tmpQ = tmpFactory.makeEye(9, 9);
-        tmpQ.set(3, 3, 10);
-        tmpQ.set(4, 4, 10);
-        tmpQ.set(5, 5, 10);
-        tmpQ.set(6, 6, 1000000000);
-        tmpQ.set(7, 7, 1000000000);
-        tmpQ.set(8, 8, 1000000000);
-        tmpSystem[2] = tmpQ; // Q
-
-        tmpSystem[3] = tmpFactory.rows(new double[][] { { 0 }, { 0 }, { 0 }, { -1 }, { -1 }, { -1 }, { 0 }, { 0 }, { 0 } }); // C
-
-        final double[][] tmpAI = new double[18][9];
-        for (int i = 0; i < 9; i++) {
-            tmpAI[i][i] = 1;
-            tmpAI[i + 9][i] = -1;
-        }
-        tmpSystem[4] = tmpFactory.rows(tmpAI); // AI
-
-        tmpSystem[5] = tmpFactory.rows(new double[][] { { 0 }, { 0.0175 }, { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 }, { 0 },
-                { 0.0175 }, { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 } }); // BI
-
-        final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { 0.00000000000000, -0.01750000000000, -0.01750000000000,
-                0.88830035195990, 4.56989525276369, 5.00000000000000, 0.90562154243124, -1.91718419629399, 0.06390614020590 });
-
-        // Compare to MatLab using 3 digits and 6 decimal places
-        final NumberContext tmpAccuracy = NumberContext.getGeneral(3, 6);
-
-        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, tmpAccuracy, false);
-    }
-
-    /**
-     * <p>
-     * Continuation of {@link #testP20081014()}.
-     * </p>
-     * <p>
-     * Thanks for your answer, Anders, it did solve my system (even though the result state was FAILED). As
-     * you might have guessed, I am using the ActiveSetSolver as a part of a larger system where the system
-     * matrixes to be solved changes all the time (not the dimensions but the values of the matrixes). I still
-     * get errors in certain situations. I will present a system that triggers an
-     * ArrayIndexOutOfBoundsException in ActiveSetSolver. Again, Matlabs quadprog produces a correct result.
-     * </p>
-     * <p>
-     * 2015-02-28: Var tvungen att ändra från new NumberContext(7, 6) till new NumberContext(5, 6) för
-     * lösningen.
-     * </p>
-     */
-    public void testP20081015() {
-
-        final PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
-
-        final PrimitiveDenseStore[] tmpSystem = new PrimitiveDenseStore[6];
-        // {[AE], [BE], [Q], [C], [AI], [BI]}
-
-        tmpSystem[0] = tmpFactory
-                .rows(new double[][] {
-                        { -0.6864742690952357, -0.5319998214213948, 1.2385363215384646, -3.4914813388431334E-15, 0.976619978072726, 0.8727726942384015, 1.0,
-                                0.0, 0.0 },
-                        { -2.396812100141995E-15, 2.4168686217298863, -2.2145077177955423, 1.0, 0.21497306442721648, 0.48812685256175126, 0.0, 1.0, 0.0 },
-                        { -7.190436300425984E-14, -67.71806025910404, 77.58205842771245, 30.0, -15.23877173547103, -6.788851328706924, 0.0, 0.0, 1.0 } }); // AE
-        tmpSystem[1] = tmpFactory.rows(new double[][] { { 0.459002008118756 }, { 0.002566161917554134 }, { -0.03315618953218959 } }); // BE
-
-        tmpSystem[2] = tmpFactory.makeEye(9, 9); // Q
-        tmpSystem[2].set(3, 3, 10);
-        tmpSystem[2].set(4, 4, 10);
-        tmpSystem[2].set(5, 5, 10);
-        tmpSystem[2].set(6, 6, 1000000000);
-        tmpSystem[2].set(7, 7, 1000000000);
-        tmpSystem[2].set(8, 8, 1000000000);
-        tmpSystem[3] = tmpFactory.rows(new double[][] { { 0 }, { 0 }, { 0 }, { -1 }, { -1 }, { 1 }, { 0 }, { 0 }, { 0 } }); // C
-
-        final double[][] tmpAI = new double[18][9];
-        for (int i = 0; i < 9; i++) {
-            tmpAI[i][i] = 1;
-            tmpAI[i + 9][i] = -1;
-        }
-        tmpSystem[4] = tmpFactory.rows(tmpAI); // AI
-        tmpSystem[5] = tmpFactory.rows(new double[][] { { 0 }, { 0.0175 }, { 0.0175 }, { 0.5 }, { 0.5 }, { 0.5 }, { 100000 }, { 100000 }, { 100000 }, { 0 },
-                { 0.0175 }, { 0.0175 }, { 0.5 }, { 0.5 }, { 0.5 }, { 100000 }, { 100000 }, { 100000 } }); // BI
-
-        final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { -0.00000000000000, -0.01750000000000, 0.01750000000000,
-                0.13427356981778, 0.50000000000000, -0.14913060410765, 0.06986475572103, -0.08535020176844, 0.00284500680371 });
-
-        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(4, 14), true);
-    }
-
-    /**
-     * <p>
-     * Continuation of {@link #testP20081014()} and {@link #testP20081015()}.
-     * </p>
-     * <p>
-     * Originally the problem was an ArrayIndexOutOfBoundsException. When that was fixed it had the same
-     * numerical difficulties as the previous versions.
-     * </p>
-     * <p>
-     * 2015-02-28: Var tvungen att ändra från new NumberContext(7, 11) till new NumberContext(3, 3) för
-     * lösningen.
-     * </p>
-     */
-    public void testP20081119() {
-
-        final PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
-
-        final PrimitiveDenseStore[] tmpSystem = new PrimitiveDenseStore[6];
-        // {[AE], [BE], [Q], [C], [AI], [BI]}
-
-        tmpSystem[0] = tmpFactory.rows(new double[][] {
-                { -10.630019918689772, 0.15715259580856766, -24.006889886456438, -3.4914813388431334E-15, 0.9987922086746552, 0.9018272287390979, 1.0, 0.0,
-                        0.0 },
-                { -3.711451617763614E-14, -3.1946032406211518, 50.10466796063192, 1.0, 0.04913373475326318, 0.4320968057099691, 0.0, 1.0, 0.0 },
-                { -1.1134354853290842E-12, 94.42372385635744, -1719.2020477970657, 30.0, -10.463141920669791, -4.8464591126471905, 0.0, 0.0, 1.0 } }); // AE
-        tmpSystem[1] = tmpFactory.rows(new double[][] { { 14.272908058664967 }, { -3.888270819999793 }, { -0.06992907379067503 } }); // BE
-
-        tmpSystem[2] = tmpFactory.makeEye(9, 9); // Q
-        tmpSystem[2].set(3, 3, 10);
-        tmpSystem[2].set(4, 4, 10);
-        tmpSystem[2].set(5, 5, 10);
-        tmpSystem[2].set(6, 6, 1000000000);
-        tmpSystem[2].set(7, 7, 1000000000);
-        tmpSystem[2].set(8, 8, 1000000000);
-        tmpSystem[3] = tmpFactory.rows(new double[][] { { 0 }, { 0 }, { 0 }, { -1 }, { -1 }, { 1 }, { 0 }, { 0 }, { 0 } }); // C
-
-        final double[][] tmpAI = new double[18][9];
-        for (int i = 0; i < 9; i++) {
-            tmpAI[i][i] = 1;
-            tmpAI[i + 9][i] = -1;
-        }
-        tmpSystem[4] = tmpFactory.rows(tmpAI); // AI
-        tmpSystem[5] = tmpFactory.rows(new double[][] { { 0 }, { 0.0175 }, { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 }, { 0 },
-                { 0.0175 }, { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 } }); // BI
-
-        final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { 0.00000000000000, 0.01750000000000, -0.01750000000000, 1.46389524463679,
-                5.00000000000000, 4.87681260745493, 4.45803387299108, -6.77235264210831, 0.22574508859158 });
-
-        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(2, 14), false);
-    }
-
-    /**
-     * Continuation of P20111129 http://bugzilla.optimatika.se/show_bug.cgi?id=15 Have to turn off validation
-     * as Q is not positive semidefinite.
-     * <p>
-     * 2016-03-07: Initially the solution (from AMPL/LOQO) was stated to be:
-     *
-     * <pre>
-     * 1.78684, 0.000326128, 1.78665, 0.000136478, 495.429, 0.00358488, 495.427, 0.00178874, 8.90701, 0.000339811, 8.90684, 0.000174032
-     * </pre>
-     *
-     * The ExpressionsBasedModel can only validate this solution to be correct using a very "poor" accuracy
-     * context. When ExpressionsBasedModel uses CPLEX as the solver a slightly different solution is returned
-     * that validates much better. Switched to using that solution as the expected solution in this test:
-     *
-     * <pre>
-     * 1.7856570552, 1.216415374E-5, 1.78565097263, 6.08157995E-6, 495.426247828, 2.478968927E-5, 495.426235433, 1.239483719E-5, 8.90673094088, 6.04347562E-6, 8.90672791911, 3.02171321E-6
-     * </pre>
-     * </p>
-     */
-    public void testP20111205() {
-
-        final PrimitiveDenseStore tmpAE = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, -1.0, -1.0, 1.0 },
-                { 1.0, -1.0, -1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0, -1.0, -1.0, 1.0, 0.0, 0.0, 0.0, 0.0 } });
-        final PrimitiveDenseStore tmpBE = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 } });
-        final PrimitiveDenseStore tmpQ = PrimitiveDenseStore.FACTORY.rows(new double[][] {
-                { 42.58191012032541, -42.58191012032541, 0.0, 0.0, 0.029666091804595635, -0.029666091804595635, 0.0, 0.0, 9.954580659495097, -9.954580659495097,
-                        0.0, 0.0 },
-                { -42.58191012032541, 42.58191012032541, 0.0, 0.0, -0.029666091804595635, 0.029666091804595635, 0.0, 0.0, -9.954580659495097, 9.954580659495097,
-                        0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.029666091804595635, -0.029666091804595635, 0.0, 0.0, 0.8774199042430086, -0.8774199042430086, 0.0, 0.0, -3.537087573378497,
-                        3.537087573378497, 0.0, 0.0 },
-                { -0.029666091804595635, 0.029666091804595635, 0.0, 0.0, -0.8774199042430086, 0.8774199042430086, 0.0, 0.0, 3.537087573378497,
-                        -3.537087573378497, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 9.954580659495097, -9.954580659495097, 0.0, 0.0, -3.537087573378497, 3.537087573378497, 0.0, 0.0, 153.76101274121527, -153.76101274121527,
-                        0.0, 0.0 },
-                { -9.954580659495097, 9.954580659495097, 0.0, 0.0, 3.537087573378497, -3.537087573378497, 0.0, 0.0, -153.76101274121527, 153.76101274121527,
-                        0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } });
-        final PrimitiveDenseStore tmpC = PrimitiveDenseStore.FACTORY.rows(
-                new double[][] { { 185.8491751747291 }, { -192.3021967647291 }, { -6.45302159 }, { -6.45302159 }, { 406.4118818820076 }, { -409.5778277520076 },
-                        { -3.16594587 }, { -3.16594587 }, { -352.0970015985486 }, { 339.11043506854867 }, { -12.986566530000001 }, { -12.986566530000001 } });
-        final PrimitiveDenseStore tmpAI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0 },
-                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0 } });
-        final PrimitiveDenseStore tmpBI = PrimitiveDenseStore.FACTORY
-                .rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
-
-        // Optimisation.Result from CPLEX (via ExpressionsBasedModel)
-        final double[] tmpExpected = new double[] { 1.7856570552, 1.216415374E-5, 1.78565097263, 6.08157995E-6, 495.426247828, 2.478968927E-5, 495.426235433,
-                1.239483719E-5, 8.90673094088, 6.04347562E-6, 8.90672791911, 3.02171321E-6 };
-
-        final PrimitiveDenseStore[] tmpMatrices = new PrimitiveDenseStore[6];
-        tmpMatrices[0] = tmpAE;
-        tmpMatrices[1] = tmpBE;
-        tmpMatrices[2] = tmpQ;
-        tmpMatrices[3] = tmpC;
-        tmpMatrices[4] = tmpAI;
-        tmpMatrices[5] = tmpBI;
-
-        // The original AMPL/LOQO solution was given with 6 digits precision and never more than 9 decimals
-        final NumberContext tmpAccuracy = NumberContext.getGeneral(3, 3); // ojAlgo can only get roughly the same solution
-
-        ConvexProblems.builAndTestModel(tmpMatrices, tmpExpected, tmpAccuracy, true);
-    }
-
-    /**
-     * Issue reported at GitHub. A set of problems related to when Q is zero - a linear problem. Generally the
-     * ConvexSolver is not the right option to handle linear problems, but there is some desireable behaviour.
-     */
-    public void testP20150809() {
-
-        final PrimitiveArray tmpExpectedSolution = PrimitiveArray.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
-        final PrimitiveArray tmpBoundedSolution = PrimitiveArray.wrap(new double[] { 99999, -99999, 99999, 99999 });
-
-        ConvexSolver tmpSolver = P20150809.buildModel(true, false);
-        Result tmpResult = tmpSolver.solve();
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertEquals(tmpExpectedSolution, tmpResult);
-
-        tmpSolver = P20150809.buildModel(true, true);
-        tmpResult = tmpSolver.solve();
-        TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertEquals(tmpExpectedSolution, tmpResult);
-
-        tmpSolver = P20150809.buildModel(false, false);
-        tmpResult = tmpSolver.solve();
-        TestUtils.assertEquals(Optimisation.State.UNBOUNDED, tmpResult.getState());
-
-        tmpSolver = P20150809.buildModel(false, true);
-        tmpResult = tmpSolver.solve();
-        TestUtils.assertStateNotLessThanOptimal(tmpResult); // Since it is now constrained, the solver should be able find the optimal solution.
-        TestUtils.assertEquals(tmpBoundedSolution, tmpResult);
-    }
-
-    /**
      * Just make sure an obviously infeasible problem is recognised as such - this has been a problem in the
      * past
      */
@@ -687,6 +351,79 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         final BigMatrix tmpExpected = BigMatrix.FACTORY
                 .rows(new double[][] { { 0.35 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.25 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 }, { 0.05 } });
+
+        ConvexProblems.doEarly2008(tmpVariables, covarianceMatrix, tmpExpected);
+    }
+
+    /**
+     * Another case of looping in the ActiveSetSolver's constraint (de)activation.
+     */
+    public void testP20080124() {
+        // create expected returns matrix
+        final PrimitiveMatrix expectedReturnsMatrix = PrimitiveMatrix.FACTORY.rows(new double[][] { { 10.012158 }, { 9.996046 }, { 10.000744 }, { 9.990585 },
+                { 9.998392 }, { 9.996614 }, { 10.010531 }, { 10.001401 }, { 9.997447 }, { 9.993817 }, { 9.998537 }, { 9.995741 }, { 9.987224 }, { 9.992392 } });
+        // create covariance matrix
+        final PrimitiveMatrix covarianceMatrix = PrimitiveMatrix.FACTORY.rows(new double[][] {
+                { 0.0013191354374342357, 7.786471466322114E-5, -3.810886655309235E-5, -2.28102405899103E-4, -1.2589115740653127E-4, -1.3247692268411991E-5,
+                        1.422624656557158E-4, -2.7176361887359125E-5, 8.675127894495302E-5, -8.116577287090551E-5, -8.468380774247271E-6, 4.930080166695193E-5,
+                        -2.774138231533918E-4, -3.148322898570031E-5 },
+                { 7.786471466322114E-5, 0.001028250547816086, 8.986425197170406E-4, -1.0341435238579975E-5, 6.472902968147139E-4, 2.9014435841747375E-4,
+                        1.0640414444602855E-4, 5.638694128451113E-4, 6.024515366195699E-4, -1.094867665517237E-4, 6.177221606260711E-6, -5.682215091954099E-5,
+                        2.7178074500896235E-4, 0.0010146062950574643 },
+                { -3.810886655309235E-5, 8.986425197170406E-4, 0.0012477403456464075, -1.8104847201530489E-4, 9.299199981666304E-4, 3.486383951982303E-4,
+                        1.0246402606579107E-4, 7.009722990366382E-4, 6.545695073447614E-4, -1.1680969171500155E-4, 7.123493385355658E-5, 1.559414390174896E-5,
+                        1.972605480880284E-4, 9.368808845809186E-4 },
+                { -2.28102405899103E-4, -1.0341435238579975E-5, -1.8104847201530489E-4, 6.250793590180099E-4, -5.4721911720097E-6, 1.3081826023829458E-4,
+                        -5.644046856412501E-5, -1.1282043806099452E-5, -6.729835202722053E-5, 1.3929681542737307E-4, 3.698155248637573E-6,
+                        5.0269944317023966E-5, 5.344931460074395E-4, -1.1654882792112444E-4 },
+                { -1.2589115740653127E-4, 6.472902968147139E-4, 9.299199981666304E-4, -5.4721911720097E-6, 0.001181357476541527, 3.0334522038028824E-4,
+                        2.6983840497611894E-4, 6.983493701701867E-4, 5.68816790613126E-4, -7.899505299987754E-5, 1.05074262063586E-5, 1.137295188785598E-4,
+                        1.9732025136606058E-4, 6.631330613471645E-4 },
+                { -1.3247692268411991E-5, 2.9014435841747375E-4, 3.486383951982303E-4, 1.3081826023829458E-4, 3.0334522038028824E-4, 3.372068413122505E-4,
+                        1.1067468759384309E-4, 2.6589126866881173E-4, 2.1364931019670806E-4, -4.201239472520589E-5, 2.32769639721745E-5, 5.847559594073046E-6,
+                        1.9925897592339058E-4, 1.9671375386540353E-4 },
+                { 1.422624656557158E-4, 1.0640414444602855E-4, 1.0246402606579107E-4, -5.644046856412501E-5, 2.6983840497611894E-4, 1.1067468759384309E-4,
+                        0.001484755064835215, 1.2295961703024863E-4, 1.0843198781689372E-4, -2.1292328294313923E-5, -4.152686600769749E-6, 1.163599038579726E-4,
+                        -3.14739599261259E-4, 2.4519847977412686E-4 },
+                { -2.7176361887359125E-5, 5.638694128451113E-4, 7.009722990366382E-4, -1.1282043806099452E-5, 6.983493701701867E-4, 2.6589126866881173E-4,
+                        1.2295961703024863E-4, 5.563328439145604E-4, 4.4816730200338125E-4, -3.4729832814007256E-5, -6.028818604193519E-7, 3.192976987126335E-5,
+                        1.7402262469809026E-4, 5.182632389125651E-4 },
+                { 8.675127894495302E-5, 6.024515366195699E-4, 6.545695073447614E-4, -6.729835202722053E-5, 5.68816790613126E-4, 2.1364931019670806E-4,
+                        1.0843198781689372E-4, 4.4816730200338125E-4, 6.277134808325468E-4, -4.988229718603287E-5, -5.5018781802344255E-6,
+                        -1.3231260300518203E-5, 8.214207901880769E-5, 5.841470978796527E-4 },
+                { -8.116577287090551E-5, -1.094867665517237E-4, -1.1680969171500155E-4, 1.3929681542737307E-4, -7.899505299987754E-5, -4.201239472520589E-5,
+                        -2.1292328294313923E-5, -3.4729832814007256E-5, -4.988229718603287E-5, 3.5152692612068785E-4, -9.358092257358399E-6,
+                        4.962216896551324E-6, 1.291957229930161E-4, -1.5046975508620905E-4 },
+                { -8.468380774247271E-6, 6.177221606260711E-6, 7.123493385355658E-5, 3.698155248637573E-6, 1.05074262063586E-5, 2.32769639721745E-5,
+                        -4.152686600769749E-6, -6.028818604193519E-7, -5.5018781802344255E-6, -9.358092257358399E-6, 4.8495980378967104E-5,
+                        1.1704645004909169E-5, 1.814918597253607E-5, 1.2448218299234062E-5 },
+                { 4.930080166695193E-5, -5.682215091954099E-5, 1.559414390174896E-5, 5.0269944317023966E-5, 1.137295188785598E-4, 5.847559594073046E-6,
+                        1.163599038579726E-4, 3.192976987126335E-5, -1.3231260300518203E-5, 4.962216896551324E-6, 1.1704645004909169E-5, 1.802684481609152E-4,
+                        1.0475986793792914E-5, -4.113641419540392E-5 },
+                { -2.774138231533918E-4, 2.7178074500896235E-4, 1.972605480880284E-4, 5.344931460074395E-4, 1.9732025136606058E-4, 1.9925897592339058E-4,
+                        -3.14739599261259E-4, 1.7402262469809026E-4, 8.214207901880769E-5, 1.291957229930161E-4, 1.814918597253607E-5, 1.0475986793792914E-5,
+                        7.843917688960864E-4, 1.231995848356005E-4 },
+                { -3.148322898570031E-5, 0.0010146062950574643, 9.368808845809186E-4, -1.1654882792112444E-4, 6.631330613471645E-4, 1.9671375386540353E-4,
+                        2.4519847977412686E-4, 5.182632389125651E-4, 5.841470978796527E-4, -1.5046975508620905E-4, 1.2448218299234062E-5, -4.113641419540392E-5,
+                        1.231995848356005E-4, 0.0011885193322126312 } });
+
+        // create asset variables - cost and weighting constraints
+        final Variable[] tmpVariables = new Variable[(int) expectedReturnsMatrix.countRows()];
+        for (int i = 0; i < tmpVariables.length; i++) {
+            tmpVariables[i] = new Variable("VAR" + i);
+            tmpVariables[i].weight(expectedReturnsMatrix.toBigDecimal(i, 0).negate());
+            // set the constraints on the asset weights
+            // require at least a 2% allocation to each asset
+            tmpVariables[i].lower(new BigDecimal("0.05"));
+            // require no more than 80% allocation to each asset
+            tmpVariables[i].upper(new BigDecimal("0.35"));
+            // tmpVariables[i].setUpperLimit(new BigDecimal("1.00"));
+        }
+
+        final BigMatrix tmpExpected = BigMatrix.FACTORY
+                .rows(new double[][] { { 0.3166116715239731 }, { 0.050000000001624065 }, { 0.04999999999827016 }, { 0.05000000000034928 },
+                        { 0.049999999999891145 }, { 0.049999999997416125 }, { 0.08338832846287945 }, { 0.05000000000178943 }, { 0.05000000000085164 },
+                        { 0.04999999999937388 }, { 0.050000000012470555 }, { 0.04999999999966884 }, { 0.050000000000484546 }, { 0.049999999995857476 } });
 
         ConvexProblems.doEarly2008(tmpVariables, covarianceMatrix, tmpExpected);
     }
@@ -857,6 +594,169 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
         TestUtils.assertEquals(tmpMatrices[6], BigMatrix.FACTORY.columns(tmpResult), tmpEvalCntxt);
+    }
+
+    /**
+     * <p>
+     * I'm trying to solve some quadratic programming systems using version 24. The ActiveSetSolver does not
+     * always converge to a solution, but throws an exception, "Matrix is singular" (The exception is thrown
+     * by org.ojalgo.matrix.jama.LUDecomposition). The thing is that if I run Matlabs quadprog method on the
+     * exact same system, a solution is found without problems. Here is the code that produces the exception:
+     * </p>
+     * <p>
+     * 2015-02-21: Extended the test case with a few alternatives using ExpressionsBasedModel. Numerically
+     * difficult problem as the formulation includes both large and very small parameters (like 1000000000 and
+     * -7.646043242556307E-15).
+     * </p>
+     */
+    public void testP20081014() {
+
+        final PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
+
+        final PrimitiveDenseStore[] tmpSystem = new PrimitiveDenseStore[6];
+        // {[AE], [BE], [Q], [C], [AI], [BI]}
+
+        tmpSystem[0] = tmpFactory.rows(new double[][] {
+                { -0.0729971273939726, -0.31619624199405116, -0.14365990081105298, -3.4914813388431334E-15, 0.9963066090106673, 0.9989967493404447, 1.0, 0.0,
+                        0.0 },
+                { -2.5486810808521023E-16, 3.6687950405257466, 3.2047109656515507, 1.0, 0.08586699506600544, 0.04478275122437895, 0.0, 1.0, 0.0 },
+                { -7.646043242556307E-15, -107.21808503782593, -97.434268076846, 30.0, -11.54276933307617, 7.647488207332634, 0.0, 0, 1.0 } }); // AE
+        tmpSystem[1] = tmpFactory.rows(new double[][] { { 10.461669614447484 }, { -0.5328532701990767 }, { 15.782527136201711 } }); // BE
+
+        final PrimitiveDenseStore tmpQ = tmpFactory.makeEye(9, 9);
+        tmpQ.set(3, 3, 10);
+        tmpQ.set(4, 4, 10);
+        tmpQ.set(5, 5, 10);
+        tmpQ.set(6, 6, 1000000000);
+        tmpQ.set(7, 7, 1000000000);
+        tmpQ.set(8, 8, 1000000000);
+        tmpSystem[2] = tmpQ; // Q
+
+        tmpSystem[3] = tmpFactory.rows(new double[][] { { 0 }, { 0 }, { 0 }, { -1 }, { -1 }, { -1 }, { 0 }, { 0 }, { 0 } }); // C
+
+        final double[][] tmpAI = new double[18][9];
+        for (int i = 0; i < 9; i++) {
+            tmpAI[i][i] = 1;
+            tmpAI[i + 9][i] = -1;
+        }
+        tmpSystem[4] = tmpFactory.rows(tmpAI); // AI
+
+        tmpSystem[5] = tmpFactory.rows(new double[][] { { 0 }, { 0.0175 }, { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 }, { 0 },
+                { 0.0175 }, { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 } }); // BI
+
+        final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { 0.00000000000000, -0.01750000000000, -0.01750000000000,
+                0.88830035195990, 4.56989525276369, 5.00000000000000, 0.90562154243124, -1.91718419629399, 0.06390614020590 });
+
+        // Compare to MatLab using 3 digits and 6 decimal places
+        final NumberContext tmpAccuracy = NumberContext.getGeneral(3, 6);
+
+        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, tmpAccuracy, false);
+    }
+
+    /**
+     * <p>
+     * Continuation of {@link #testP20081014()}.
+     * </p>
+     * <p>
+     * Thanks for your answer, Anders, it did solve my system (even though the result state was FAILED). As
+     * you might have guessed, I am using the ActiveSetSolver as a part of a larger system where the system
+     * matrixes to be solved changes all the time (not the dimensions but the values of the matrixes). I still
+     * get errors in certain situations. I will present a system that triggers an
+     * ArrayIndexOutOfBoundsException in ActiveSetSolver. Again, Matlabs quadprog produces a correct result.
+     * </p>
+     * <p>
+     * 2015-02-28: Var tvungen att ändra från new NumberContext(7, 6) till new NumberContext(5, 6) för
+     * lösningen.
+     * </p>
+     */
+    public void testP20081015() {
+
+        final PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
+
+        final PrimitiveDenseStore[] tmpSystem = new PrimitiveDenseStore[6];
+        // {[AE], [BE], [Q], [C], [AI], [BI]}
+
+        tmpSystem[0] = tmpFactory
+                .rows(new double[][] {
+                        { -0.6864742690952357, -0.5319998214213948, 1.2385363215384646, -3.4914813388431334E-15, 0.976619978072726, 0.8727726942384015, 1.0,
+                                0.0, 0.0 },
+                        { -2.396812100141995E-15, 2.4168686217298863, -2.2145077177955423, 1.0, 0.21497306442721648, 0.48812685256175126, 0.0, 1.0, 0.0 },
+                        { -7.190436300425984E-14, -67.71806025910404, 77.58205842771245, 30.0, -15.23877173547103, -6.788851328706924, 0.0, 0.0, 1.0 } }); // AE
+        tmpSystem[1] = tmpFactory.rows(new double[][] { { 0.459002008118756 }, { 0.002566161917554134 }, { -0.03315618953218959 } }); // BE
+
+        tmpSystem[2] = tmpFactory.makeEye(9, 9); // Q
+        tmpSystem[2].set(3, 3, 10);
+        tmpSystem[2].set(4, 4, 10);
+        tmpSystem[2].set(5, 5, 10);
+        tmpSystem[2].set(6, 6, 1000000000);
+        tmpSystem[2].set(7, 7, 1000000000);
+        tmpSystem[2].set(8, 8, 1000000000);
+        tmpSystem[3] = tmpFactory.rows(new double[][] { { 0 }, { 0 }, { 0 }, { -1 }, { -1 }, { 1 }, { 0 }, { 0 }, { 0 } }); // C
+
+        final double[][] tmpAI = new double[18][9];
+        for (int i = 0; i < 9; i++) {
+            tmpAI[i][i] = 1;
+            tmpAI[i + 9][i] = -1;
+        }
+        tmpSystem[4] = tmpFactory.rows(tmpAI); // AI
+        tmpSystem[5] = tmpFactory.rows(new double[][] { { 0 }, { 0.0175 }, { 0.0175 }, { 0.5 }, { 0.5 }, { 0.5 }, { 100000 }, { 100000 }, { 100000 }, { 0 },
+                { 0.0175 }, { 0.0175 }, { 0.5 }, { 0.5 }, { 0.5 }, { 100000 }, { 100000 }, { 100000 } }); // BI
+
+        final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { -0.00000000000000, -0.01750000000000, 0.01750000000000,
+                0.13427356981778, 0.50000000000000, -0.14913060410765, 0.06986475572103, -0.08535020176844, 0.00284500680371 });
+
+        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(4, 14), true);
+    }
+
+    /**
+     * <p>
+     * Continuation of {@link #testP20081014()} and {@link #testP20081015()}.
+     * </p>
+     * <p>
+     * Originally the problem was an ArrayIndexOutOfBoundsException. When that was fixed it had the same
+     * numerical difficulties as the previous versions.
+     * </p>
+     * <p>
+     * 2015-02-28: Var tvungen att ändra från new NumberContext(7, 11) till new NumberContext(3, 3) för
+     * lösningen.
+     * </p>
+     */
+    public void testP20081119() {
+
+        final PhysicalStore.Factory<Double, PrimitiveDenseStore> tmpFactory = PrimitiveDenseStore.FACTORY;
+
+        final PrimitiveDenseStore[] tmpSystem = new PrimitiveDenseStore[6];
+        // {[AE], [BE], [Q], [C], [AI], [BI]}
+
+        tmpSystem[0] = tmpFactory.rows(new double[][] {
+                { -10.630019918689772, 0.15715259580856766, -24.006889886456438, -3.4914813388431334E-15, 0.9987922086746552, 0.9018272287390979, 1.0, 0.0,
+                        0.0 },
+                { -3.711451617763614E-14, -3.1946032406211518, 50.10466796063192, 1.0, 0.04913373475326318, 0.4320968057099691, 0.0, 1.0, 0.0 },
+                { -1.1134354853290842E-12, 94.42372385635744, -1719.2020477970657, 30.0, -10.463141920669791, -4.8464591126471905, 0.0, 0.0, 1.0 } }); // AE
+        tmpSystem[1] = tmpFactory.rows(new double[][] { { 14.272908058664967 }, { -3.888270819999793 }, { -0.06992907379067503 } }); // BE
+
+        tmpSystem[2] = tmpFactory.makeEye(9, 9); // Q
+        tmpSystem[2].set(3, 3, 10);
+        tmpSystem[2].set(4, 4, 10);
+        tmpSystem[2].set(5, 5, 10);
+        tmpSystem[2].set(6, 6, 1000000000);
+        tmpSystem[2].set(7, 7, 1000000000);
+        tmpSystem[2].set(8, 8, 1000000000);
+        tmpSystem[3] = tmpFactory.rows(new double[][] { { 0 }, { 0 }, { 0 }, { -1 }, { -1 }, { 1 }, { 0 }, { 0 }, { 0 } }); // C
+
+        final double[][] tmpAI = new double[18][9];
+        for (int i = 0; i < 9; i++) {
+            tmpAI[i][i] = 1;
+            tmpAI[i + 9][i] = -1;
+        }
+        tmpSystem[4] = tmpFactory.rows(tmpAI); // AI
+        tmpSystem[5] = tmpFactory.rows(new double[][] { { 0 }, { 0.0175 }, { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 }, { 0 },
+                { 0.0175 }, { 0.0175 }, { 5 }, { 5 }, { 5 }, { 100000 }, { 100000 }, { 100000 } }); // BI
+
+        final PrimitiveDenseStore tmpMatlabSolution = tmpFactory.columns(new double[] { 0.00000000000000, 0.01750000000000, -0.01750000000000, 1.46389524463679,
+                5.00000000000000, 4.87681260745493, 4.45803387299108, -6.77235264210831, 0.22574508859158 });
+
+        ConvexProblems.builAndTestModel(tmpSystem, tmpMatlabSolution, NumberContext.getGeneral(2, 14), false);
     }
 
     /**
@@ -1095,6 +995,77 @@ public class ConvexProblems extends OptimisationConvexTests {
     }
 
     /**
+     * Continuation of P20111129 http://bugzilla.optimatika.se/show_bug.cgi?id=15 Have to turn off validation
+     * as Q is not positive semidefinite.
+     * <p>
+     * 2016-03-07: Initially the solution (from AMPL/LOQO) was stated to be:
+     *
+     * <pre>
+     * 1.78684, 0.000326128, 1.78665, 0.000136478, 495.429, 0.00358488, 495.427, 0.00178874, 8.90701, 0.000339811, 8.90684, 0.000174032
+     * </pre>
+     *
+     * The ExpressionsBasedModel can only validate this solution to be correct using a very "poor" accuracy
+     * context. When ExpressionsBasedModel uses CPLEX as the solver a slightly different solution is returned
+     * that validates much better. Switched to using that solution as the expected solution in this test:
+     *
+     * <pre>
+     * 1.7856570552, 1.216415374E-5, 1.78565097263, 6.08157995E-6, 495.426247828, 2.478968927E-5, 495.426235433, 1.239483719E-5, 8.90673094088, 6.04347562E-6, 8.90672791911, 3.02171321E-6
+     * </pre>
+     * </p>
+     */
+    public void testP20111205() {
+
+        final PrimitiveDenseStore tmpAE = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, -1.0, -1.0, 1.0 },
+                { 1.0, -1.0, -1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 1.0, -1.0, -1.0, 1.0, 0.0, 0.0, 0.0, 0.0 } });
+        final PrimitiveDenseStore tmpBE = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 } });
+        final PrimitiveDenseStore tmpQ = PrimitiveDenseStore.FACTORY.rows(new double[][] {
+                { 42.58191012032541, -42.58191012032541, 0.0, 0.0, 0.029666091804595635, -0.029666091804595635, 0.0, 0.0, 9.954580659495097, -9.954580659495097,
+                        0.0, 0.0 },
+                { -42.58191012032541, 42.58191012032541, 0.0, 0.0, -0.029666091804595635, 0.029666091804595635, 0.0, 0.0, -9.954580659495097, 9.954580659495097,
+                        0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.029666091804595635, -0.029666091804595635, 0.0, 0.0, 0.8774199042430086, -0.8774199042430086, 0.0, 0.0, -3.537087573378497,
+                        3.537087573378497, 0.0, 0.0 },
+                { -0.029666091804595635, 0.029666091804595635, 0.0, 0.0, -0.8774199042430086, 0.8774199042430086, 0.0, 0.0, 3.537087573378497,
+                        -3.537087573378497, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 9.954580659495097, -9.954580659495097, 0.0, 0.0, -3.537087573378497, 3.537087573378497, 0.0, 0.0, 153.76101274121527, -153.76101274121527,
+                        0.0, 0.0 },
+                { -9.954580659495097, 9.954580659495097, 0.0, 0.0, 3.537087573378497, -3.537087573378497, 0.0, 0.0, -153.76101274121527, 153.76101274121527,
+                        0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } });
+        final PrimitiveDenseStore tmpC = PrimitiveDenseStore.FACTORY.rows(
+                new double[][] { { 185.8491751747291 }, { -192.3021967647291 }, { -6.45302159 }, { -6.45302159 }, { 406.4118818820076 }, { -409.5778277520076 },
+                        { -3.16594587 }, { -3.16594587 }, { -352.0970015985486 }, { 339.11043506854867 }, { -12.986566530000001 }, { -12.986566530000001 } });
+        final PrimitiveDenseStore tmpAI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0 },
+                { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0 } });
+        final PrimitiveDenseStore tmpBI = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
+
+        // Optimisation.Result from CPLEX (via ExpressionsBasedModel)
+        final double[] tmpExpected = new double[] { 1.7856570552, 1.216415374E-5, 1.78565097263, 6.08157995E-6, 495.426247828, 2.478968927E-5, 495.426235433,
+                1.239483719E-5, 8.90673094088, 6.04347562E-6, 8.90672791911, 3.02171321E-6 };
+
+        final PrimitiveDenseStore[] tmpMatrices = new PrimitiveDenseStore[6];
+        tmpMatrices[0] = tmpAE;
+        tmpMatrices[1] = tmpBE;
+        tmpMatrices[2] = tmpQ;
+        tmpMatrices[3] = tmpC;
+        tmpMatrices[4] = tmpAI;
+        tmpMatrices[5] = tmpBI;
+
+        // The original AMPL/LOQO solution was given with 6 digits precision and never more than 9 decimals
+        final NumberContext tmpAccuracy = NumberContext.getGeneral(3, 3); // ojAlgo can only get roughly the same solution
+
+        ConvexProblems.builAndTestModel(tmpMatrices, tmpExpected, tmpAccuracy, true);
+    }
+
+    /**
      * <p>
      * I tried to use ojAlgo to implement a norm minimization problem, but the solver fails even for very
      * simple instances. The following example is one particular simple instance. Q is the identity matrix, C
@@ -1281,6 +1252,35 @@ public class ConvexProblems extends OptimisationConvexTests {
             TestUtils.assertEquals("Model 3 Solution @" + l, tmpBaseResult3, tmpResult3);
         }
 
+    }
+
+    /**
+     * Issue reported at GitHub. A set of problems related to when Q is zero - a linear problem. Generally the
+     * ConvexSolver is not the right option to handle linear problems, but there is some desireable behaviour.
+     */
+    public void testP20150809() {
+
+        final PrimitiveArray tmpExpectedSolution = PrimitiveArray.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
+        final PrimitiveArray tmpBoundedSolution = PrimitiveArray.wrap(new double[] { 99999, -99999, 99999, 99999 });
+
+        ConvexSolver tmpSolver = P20150809.buildModel(true, false);
+        Result tmpResult = tmpSolver.solve();
+        TestUtils.assertStateNotLessThanOptimal(tmpResult);
+        TestUtils.assertEquals(tmpExpectedSolution, tmpResult);
+
+        tmpSolver = P20150809.buildModel(true, true);
+        tmpResult = tmpSolver.solve();
+        TestUtils.assertStateNotLessThanOptimal(tmpResult);
+        TestUtils.assertEquals(tmpExpectedSolution, tmpResult);
+
+        tmpSolver = P20150809.buildModel(false, false);
+        tmpResult = tmpSolver.solve();
+        TestUtils.assertEquals(Optimisation.State.UNBOUNDED, tmpResult.getState());
+
+        tmpSolver = P20150809.buildModel(false, true);
+        tmpResult = tmpSolver.solve();
+        TestUtils.assertStateNotLessThanOptimal(tmpResult); // Since it is now constrained, the solver should be able find the optimal solution.
+        TestUtils.assertEquals(tmpBoundedSolution, tmpResult);
     }
 
     /**

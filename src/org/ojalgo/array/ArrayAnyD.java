@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -275,6 +275,14 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return myDelegate.hashCode();
     }
 
+    public long indexOfLargest() {
+        return myDelegate.indexOfLargest();
+    }
+
+    public long indexOfLargestInRange(final long first, final long limit) {
+        return myDelegate.indexOfLargestInRange(first, limit);
+    }
+
     public boolean isAbsolute(final long index) {
         return myDelegate.isAbsolute(index);
     }
@@ -442,14 +450,6 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     final BasicArray<N> getDelegate() {
         return myDelegate;
-    }
-
-    public long indexOfLargest() {
-        return myDelegate.indexOfLargest();
-    }
-
-    public long indexOfLargestInRange(final long first, final long limit) {
-        return myDelegate.indexOfLargestInRange(first, limit);
     }
 
 }

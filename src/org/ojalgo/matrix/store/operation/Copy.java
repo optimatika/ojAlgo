@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,14 @@ package org.ojalgo.matrix.store.operation;
 
 public class Copy extends MatrixOperation {
 
+    public static void invoke(final double[] source, final int sourceOffset, final double[] destination, final int destinationOffset, final int first,
+            final int limit) {
+        for (int i = first; i < limit; i++) {
+            destination[destinationOffset + i] = source[sourceOffset + i];
+        }
+
+    }
+
     private Copy() {
         super();
     }
@@ -31,14 +39,6 @@ public class Copy extends MatrixOperation {
     public int threshold() {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    public static void invoke(final double[] source, final int sourceOffset, final double[] destination, final int destinationOffset, final int first,
-            final int limit) {
-        for (int i = first; i < limit; i++) {
-            destination[destinationOffset + i] = source[sourceOffset + i];
-        }
-
     }
 
 }

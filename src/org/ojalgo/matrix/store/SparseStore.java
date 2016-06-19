@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -197,6 +197,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         return myElements.doubleValue(AccessUtils.index(myFirsts.length, row, col));
     }
 
+    public void empty() {
+        myElements.empty();
+        Arrays.fill(myFirsts, (int) this.countColumns());
+        Arrays.fill(myLimits, 0);
+    }
+
     public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
         myMultiplyer.invoke(this, left, (int) (left.count() / this.countRows()), right);
     }
@@ -261,6 +267,19 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         return myLimits[row];
     }
 
+    public void modifyAll(final UnaryFunction<N> function) {
+        final long tmpLimit = this.count();
+        if (this.isPrimitive()) {
+            for (long i = 0L; i < tmpLimit; i++) {
+                this.set(i, function.invoke(this.doubleValue(i)));
+            }
+        } else {
+            for (long i = 0L; i < tmpLimit; i++) {
+                this.set(i, function.invoke(this.get(i)));
+            }
+        }
+    }
+
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         final long tmpLimit = Math.min(left.count(), this.count());
         if (this.isPrimitive()) {
@@ -287,30 +306,11 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         }
     }
 
-    public void empty() {
-        myElements.empty();
-        Arrays.fill(myFirsts, (int) this.countColumns());
-        Arrays.fill(myLimits, 0);
-    }
-
     public void modifyOne(final long row, final long col, final UnaryFunction<N> function) {
         if (this.isPrimitive()) {
             this.set(row, col, function.invoke(this.doubleValue(row, col)));
         } else {
             this.set(row, col, function.invoke(this.get(row, col)));
-        }
-    }
-
-    public void modifyAll(final UnaryFunction<N> function) {
-        final long tmpLimit = this.count();
-        if (this.isPrimitive()) {
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(this.doubleValue(i)));
-            }
-        } else {
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(this.get(i)));
-            }
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -694,6 +694,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#multiply(org.ojalgo.matrix.BasicMatrix)
+     */
+    public void testMultiplyBasicMatrix() {
+
+        myExpMtrx = myBigAA.multiply(myBigAX);
+
+        myActMtrx = myComplexAA.multiply(myComplexAX);
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+
+        myActMtrx = myPrimitiveAA.multiply(myPrimitiveAX);
+        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
+
+    }
+
     public void testMultiplyElementsBasicMatrix() {
 
         myExpMtrx = myBigAA.multiplyElements(myBigSafe);
@@ -717,21 +732,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
         myActMtrx = myPrimitiveAA.multiply(myNmbr);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
-
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#multiply(org.ojalgo.matrix.BasicMatrix)
-     */
-    public void testMultiplyBasicMatrix() {
-
-        myExpMtrx = myBigAA.multiply(myBigAX);
-
-        myActMtrx = myComplexAA.multiply(myComplexAX);
-        TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
-
-        myActMtrx = myPrimitiveAA.multiply(myPrimitiveAX);
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
     }

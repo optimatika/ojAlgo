@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,10 +52,6 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
             return this.invoke(ComplexNumber.valueOf(arg)).doubleValue();
         }
 
-    }
-
-    public static ComplexFunction getSet() {
-        return SET;
     }
 
     public static final UnaryFunction<ComplexNumber> ABS = new Unary() {
@@ -466,6 +462,10 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     };
 
     private static final ComplexFunction SET = new ComplexFunction();
+
+    public static ComplexFunction getSet() {
+        return SET;
+    }
 
     private ComplexFunction() {
         super();

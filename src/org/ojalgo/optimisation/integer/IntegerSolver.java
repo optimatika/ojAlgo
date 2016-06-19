@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,6 @@ import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 
 public abstract class IntegerSolver extends GenericSolver {
-
-    private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
 
     final class NodeStatistics {
 
@@ -126,10 +124,19 @@ public abstract class IntegerSolver extends GenericSolver {
 
     }
 
+    public static OldIntegerSolver make(final ExpressionsBasedModel model) {
+        return new OldIntegerSolver(model, model.options);
+        //return new NewIntegerSolver(model, model.options);
+    }
+
+    private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     private volatile Optimisation.Result myBestResultSoFar = null;
     private final AtomicInteger myIntegerSolutionsCount = new AtomicInteger();
     private final boolean myMinimisation;
+
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
+
+    private final ExpressionsBasedModel myModel;
 
     @SuppressWarnings("unused")
     private IntegerSolver(final Options solverOptions) {
@@ -146,12 +153,17 @@ public abstract class IntegerSolver extends GenericSolver {
         myMinimisation = model.isMinimisation();
     }
 
-    protected final boolean isFunctionSet() {
-        return myFunction != null;
-    }
-
     protected int countIntegerSolutions() {
         return myIntegerSolutionsCount.intValue();
+    }
+
+    @Override
+    protected final double evaluateFunction(final Access1D<?> solution) {
+        if ((myFunction != null) && (solution != null) && (myFunction.arity() == solution.count())) {
+            return myFunction.invoke(AccessUtils.asPrimitive1D(solution));
+        } else {
+            return Double.NaN;
+        }
     }
 
     protected Optimisation.Result getBestResultSoFar() {
@@ -172,14 +184,16 @@ public abstract class IntegerSolver extends GenericSolver {
         }
     }
 
-    private final ExpressionsBasedModel myModel;
+    protected final MatrixStore<Double> getGradient(final Access1D<Double> solution) {
+        return myFunction.getGradient(solution);
+    }
 
     protected final ExpressionsBasedModel getModel() {
         return myModel;
     }
 
-    protected final boolean isModelSet() {
-        return myModel != null;
+    protected final boolean isFunctionSet() {
+        return myFunction != null;
     }
 
     protected boolean isGoodEnoughToContinueBranching(final double nonIntegerValue) {
@@ -223,6 +237,10 @@ public abstract class IntegerSolver extends GenericSolver {
         }
     }
 
+    protected final boolean isModelSet() {
+        return myModel != null;
+    }
+
     protected synchronized void markInteger(final NodeKey node, final Optimisation.Result result) {
 
         final Optimisation.Result tmpCurrentlyTheBest = myBestResultSoFar;
@@ -241,24 +259,6 @@ public abstract class IntegerSolver extends GenericSolver {
         }
 
         myIntegerSolutionsCount.incrementAndGet();
-    }
-
-    protected final MatrixStore<Double> getGradient(final Access1D<Double> solution) {
-        return myFunction.getGradient(solution);
-    }
-
-    @Override
-    protected final double evaluateFunction(final Access1D<?> solution) {
-        if ((myFunction != null) && (solution != null) && (myFunction.arity() == solution.count())) {
-            return myFunction.invoke(AccessUtils.asPrimitive1D(solution));
-        } else {
-            return Double.NaN;
-        }
-    }
-
-    public static OldIntegerSolver make(final ExpressionsBasedModel model) {
-        return new OldIntegerSolver(model, model.options);
-        //return new NewIntegerSolver(model, model.options);
     }
 
 }

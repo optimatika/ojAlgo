@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,8 +43,6 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class IterativeSolverTask implements SolverTask<Double> {
-
-    static final NumberContext DEFAULT = NumberContext.getMath(MathContext.DECIMAL128);
 
     public static final class Configurator {
 
@@ -95,6 +93,8 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
         void resolve(List<Equation> equations, final PhysicalStore<Double> current);
 
     }
+
+    static final NumberContext DEFAULT = NumberContext.getMath(MathContext.DECIMAL128);
 
     static List<Equation> toListOfRows(final Access2D<?> body, final Access2D<?> rhs) {
 
@@ -150,16 +150,20 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
         }
     }
 
-    protected final int getIterationsLimit() {
-        return myIterationsLimit;
-    }
-
     protected final NumberContext getAccuracyContext() {
         return myAccuracyContext;
     }
 
+    protected final int getIterationsLimit() {
+        return myIterationsLimit;
+    }
+
     protected final boolean isDebugPrinterSet() {
         return myDebugPrinter != null;
+    }
+
+    protected void setAccuracyContext(final NumberContext accuracyContext) {
+        myAccuracyContext = accuracyContext;
     }
 
     protected void setDebugPrinter(final BasicLogger.Printer debugPrinter) {
@@ -168,10 +172,6 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
 
     protected void setIterationsLimit(final int iterationsLimit) {
         myIterationsLimit = iterationsLimit;
-    }
-
-    protected void setAccuracyContext(final NumberContext accuracyContext) {
-        myAccuracyContext = accuracyContext;
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,14 @@ import org.ojalgo.netio.BasicLogger;
 
 public final class VirtualMachine extends AbstractMachine {
 
+    private static final String AMD64 = "amd64";
+
+    private static final String I386 = "i386";
+
+    private static final String X86 = "x86";
+
+    private static final String X86_64 = "x86_64";
+
     public static String getArchitecture() {
 
         // http://fantom.org/sidewalk/topic/756
@@ -49,14 +57,6 @@ public final class VirtualMachine extends AbstractMachine {
     public static int getThreads() {
         return Runtime.getRuntime().availableProcessors();
     }
-
-    private static final String AMD64 = "amd64";
-
-    private static final String I386 = "i386";
-
-    private static final String X86 = "x86";
-
-    private static final String X86_64 = "x86_64";
 
     private final Hardware myHardware;
     private final Runtime myRuntime;

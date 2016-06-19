@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -310,12 +310,12 @@ public abstract class MatrixUtils {
         return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn(col), defaultAndMinimum) : defaultAndMinimum;
     }
 
-    public static final int firstInRow(final Access1D<?> matrix, final int row, final int defaultAndMinimum) {
-        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
-    }
-
     public static final long firstInColumn(final Access1D<?> matrix, final long col, final long defaultAndMinimum) {
         return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInColumn((int) col), defaultAndMinimum) : defaultAndMinimum;
+    }
+
+    public static final int firstInRow(final Access1D<?> matrix, final int row, final int defaultAndMinimum) {
+        return matrix instanceof MatrixStore<?> ? Math.max(((MatrixStore<?>) matrix).firstInRow(row), defaultAndMinimum) : defaultAndMinimum;
     }
 
     public static final long firstInRow(final Access1D<?> matrix, final long row, final long defaultAndMinimum) {
@@ -436,12 +436,12 @@ public abstract class MatrixUtils {
         return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn(col), defaultAndMaximum) : defaultAndMaximum;
     }
 
-    public static final int limitOfRow(final Access1D<?> matrix, final int row, final int defaultAndMaximum) {
-        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow(row), defaultAndMaximum) : defaultAndMaximum;
-    }
-
     public static final long limitOfColumn(final Access1D<?> matrix, final long col, final long defaultAndMaximum) {
         return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfColumn((int) col), defaultAndMaximum) : defaultAndMaximum;
+    }
+
+    public static final int limitOfRow(final Access1D<?> matrix, final int row, final int defaultAndMaximum) {
+        return matrix instanceof MatrixStore<?> ? Math.min(((MatrixStore<?>) matrix).limitOfRow(row), defaultAndMaximum) : defaultAndMaximum;
     }
 
     public static final long limitOfRow(final Access1D<?> matrix, final long row, final long defaultAndMaximum) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,15 +54,15 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
-    public interface Visitable<N extends Number> extends StructureAnyD, Access1D.Visitable<N> {
-
-        void visitOne(long[] reference, VoidFunction<N> visitor);
-
-    }
-
     public interface Sliceable<N extends Number> extends StructureAnyD, Access1D.Sliceable<N> {
 
         Access1D<N> slice(final long[] first, final int dimension);
+
+    }
+
+    public interface Visitable<N extends Number> extends StructureAnyD, Access1D.Visitable<N> {
+
+        void visitOne(long[] reference, VoidFunction<N> visitor);
 
     }
 

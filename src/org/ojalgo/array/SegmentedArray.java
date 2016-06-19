@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -277,12 +277,12 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, value);
     }
 
-    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-        mySegments[(int) (index >> myIndexBits)].fillOneMatching(index & myIndexMask, values, valueIndex);
-    }
-
     public void fillOne(final long index, final NullaryFunction<N> supplier) {
         mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, supplier);
+    }
+
+    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
+        mySegments[(int) (index >> myIndexBits)].fillOneMatching(index & myIndexMask, values, valueIndex);
     }
 
     public void fillRange(final long first, final long limit, final N value) {

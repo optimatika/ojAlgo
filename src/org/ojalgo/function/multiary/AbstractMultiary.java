@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,16 +44,16 @@ abstract class AbstractMultiary<N extends Number, F extends AbstractMultiary<N, 
         return this.getScalarConstant().getNumber();
     }
 
+    public final void setConstant(final Number constant) {
+        myConstant = constant != null ? this.factory().scalar().convert(constant) : null;
+    }
+
     public final FirstOrderApproximation<N> toFirstOrderApproximation(final Access1D<N> arg) {
         return new FirstOrderApproximation<N>(this, arg);
     }
 
     public final SecondOrderApproximation<N> toSecondOrderApproximation(final Access1D<N> arg) {
         return new SecondOrderApproximation<N>(this, arg);
-    }
-
-    public final void setConstant(final Number constant) {
-        myConstant = constant != null ? this.factory().scalar().convert(constant) : null;
     }
 
     protected abstract PhysicalStore.Factory<N, ?> factory();

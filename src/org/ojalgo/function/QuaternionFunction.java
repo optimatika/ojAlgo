@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,10 +52,6 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
             return this.invoke(Quaternion.valueOf(arg)).doubleValue();
         }
 
-    }
-
-    public static QuaternionFunction getSet() {
-        return SET;
     }
 
     public static final UnaryFunction<Quaternion> ABS = new Unary() {
@@ -471,6 +467,10 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     private static final double _1_0 = 1.0;
 
     private static final QuaternionFunction SET = new QuaternionFunction();
+
+    public static QuaternionFunction getSet() {
+        return SET;
+    }
 
     private QuaternionFunction() {
         super();

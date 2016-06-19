@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2015 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,55 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
     public DecompositionProblems(final String arg0) {
         super(arg0);
+    }
+
+    /**
+     * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
+     */
+    public void _testP20160419() {
+
+        final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
+
+        final SingularValue<Double> tmpRaw = new RawSingularValue();
+
+        try {
+
+            final MatrixStore<Double> tmpInv = tmpRaw.invert(tmpOrg);
+
+            TestUtils.assertEquals(tmpOrg, tmpOrg.multiply(tmpInv).multiply(tmpOrg), NumberContext.getGeneral(6, 6));
+
+        } catch (final TaskException exception) {
+            exception.printStackTrace();
+        }
+
+    }
+
+    /**
+     * A user discovered that some large (relatively uniform) matrices causes the algorithm to never finsh
+     * https://github.com/optimatika/ojAlgo/issues/22
+     */
+    public void _testP20160510InvertLargeMatrix() {
+
+        final double[][] data = new double[3000][3000];
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data.length; j++) {
+                data[i][j] = 0.9;
+            }
+        }
+        data[0][1] = 1.01;
+
+        final PrimitiveMatrix input = PrimitiveMatrix.FACTORY.rows(data);
+        try {
+            // final SingularValue<Double> svd = SingularValue.make(input);
+            final SingularValue<Double> svd = new SVDnew32.Primitive();
+            //final SingularValue<Double> svd = new RawSingularValue();
+            final MatrixStore<Double> inv = svd.invert(input);
+        } catch (final TaskException exception) {
+            // TODO Auto-generated catch block
+            exception.printStackTrace();
+        }
+
+        // The issue:can't  be reached here!!!
     }
 
     /**
@@ -247,55 +296,6 @@ public class DecompositionProblems extends MatrixDecompositionTests {
                 TestUtils.assertEquals(tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
             }
         }
-    }
-
-    /**
-     * A user discovered that some large (relatively uniform) matrices causes the algorithm to never finsh
-     * https://github.com/optimatika/ojAlgo/issues/22
-     */
-    public void _testP20160510InvertLargeMatrix() {
-
-        final double[][] data = new double[3000][3000];
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data.length; j++) {
-                data[i][j] = 0.9;
-            }
-        }
-        data[0][1] = 1.01;
-
-        final PrimitiveMatrix input = PrimitiveMatrix.FACTORY.rows(data);
-        try {
-            // final SingularValue<Double> svd = SingularValue.make(input);
-            final SingularValue<Double> svd = new SVDnew32.Primitive();
-            //final SingularValue<Double> svd = new RawSingularValue();
-            final MatrixStore<Double> inv = svd.invert(input);
-        } catch (final TaskException exception) {
-            // TODO Auto-generated catch block
-            exception.printStackTrace();
-        }
-
-        // The issue:can't  be reached here!!!
-    }
-
-    /**
-     * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
-     */
-    public void _testP20160419() {
-
-        final PrimitiveDenseStore tmpOrg = PrimitiveDenseStore.FACTORY.makeFilled(2000, 2000, new Normal());
-
-        final SingularValue<Double> tmpRaw = new RawSingularValue();
-
-        try {
-
-            final MatrixStore<Double> tmpInv = tmpRaw.invert(tmpOrg);
-
-            TestUtils.assertEquals(tmpOrg, tmpOrg.multiply(tmpInv).multiply(tmpOrg), NumberContext.getGeneral(6, 6));
-
-        } catch (final TaskException exception) {
-            exception.printStackTrace();
-        }
-
     }
 
 }
