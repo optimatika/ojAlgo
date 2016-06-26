@@ -483,14 +483,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         return this.operateOnMatching(this.factory().function().add(), addend).get();
     }
 
-    /**
-     * @deprecated v40 Use {@link #logical()} instead
-     */
-    @Deprecated
-    default MatrixStore.LogicalBuilder<N> builder() {
-        return this.logical();
-    }
-
     default MatrixStore<N> conjugate() {
         return new ConjugatedStore<>(this);
     }
@@ -593,14 +585,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
      * @return A scalar (extracted from the resulting 1 x 1 matrix)
      */
     N multiplyBoth(final Access1D<N> leftAndRight);
-
-    /**
-     * @deprecated v40 Use {@link #premultiply(Access1D)} instead
-     */
-    @Deprecated
-    default ElementsSupplier<N> multiplyLeft(final Access1D<N> left) {
-        return this.premultiply(left);
-    }
 
     default MatrixStore<N> negate() {
         return this.operateOnAll(this.factory().function().negate()).get();

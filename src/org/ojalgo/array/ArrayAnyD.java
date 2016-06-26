@@ -294,35 +294,12 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return myDelegate.isAbsolute(AccessUtils.index(myStructure, reference));
     }
 
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public boolean isAllZeros() {
-        return myDelegate.isSmall(0L, myDelegate.count(), 1L, PrimitiveMath.ONE);
-    }
-
     public boolean isSmall(final long index, final double comparedTo) {
         return myDelegate.isSmall(index, comparedTo);
     }
 
     public boolean isSmall(final long[] reference, final double comparedTo) {
         return myDelegate.isSmall(AccessUtils.index(myStructure, reference), comparedTo);
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public boolean isZeros(final long[] first, final int dimension) {
-
-        final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
-
-        final long tmpFirst = AccessUtils.index(myStructure, first);
-        final long tmpStep = AccessUtils.step(myStructure, dimension);
-        final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
-
-        return myDelegate.isSmall(tmpFirst, tmpLimit, tmpStep, PrimitiveMath.ONE);
     }
 
     public void modifyAll(final UnaryFunction<N> function) {

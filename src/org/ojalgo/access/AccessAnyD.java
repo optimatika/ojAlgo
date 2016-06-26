@@ -21,7 +21,6 @@
  */
 package org.ojalgo.access;
 
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 
@@ -43,10 +42,6 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
          * @see Scalar#isSmall(double)
          */
         boolean isSmall(long[] reference, double comparedTo);
-
-        default boolean isZero(final long[] reference) {
-            return this.isSmall(reference, PrimitiveMath.ONE);
-        }
 
     }
 

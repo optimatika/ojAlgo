@@ -84,30 +84,6 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         }
     }
 
-    /**
-     * @deprecated v40 Use {@link #BIG}
-     */
-    @Deprecated
-    public static LDL<BigDecimal> makeBig() {
-        return BIG.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #COMPLEX}
-     */
-    @Deprecated
-    public static LDL<ComplexNumber> makeComplex() {
-        return COMPLEX.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #PRIMITIVE}
-     */
-    @Deprecated
-    public static LDL<Double> makePrimitive() {
-        return PRIMITIVE.make();
-    }
-
     default boolean equals(final MatrixStore<N> other, final NumberContext context) {
         return MatrixUtils.equals(other, this, context);
     }

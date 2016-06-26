@@ -192,7 +192,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         final int tmpMinDim = (int) Math.min(tmpStore.countRows(), tmpStore.countColumns());
 
         for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
-            retVal &= !tmpStore.isZero(ij, ij);
+            retVal &= !tmpStore.isSmall(ij, ij, PrimitiveMath.ONE);
         }
 
         return retVal;
@@ -330,7 +330,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         int tmpRedInd = 0;
         for (int ij = 0; ij < tmpFullPivots.length; ij++) {
-            if (!tmpInPlace.isZero(ij, ij)) {
+            if (!tmpInPlace.isSmall(ij, ij, PrimitiveMath.ONE)) {
                 retVal[tmpRedInd++] = tmpFullPivots[ij];
             }
         }

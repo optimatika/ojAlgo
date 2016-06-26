@@ -557,22 +557,6 @@ public final class Expression extends ModelEntity<Expression> {
      * @deprecated v39
      */
     @Deprecated
-    public void setLinearFactor(final int index, final Number value) {
-        this.set(index, value);
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public void setLinearFactor(final IntIndex key, final Number value) {
-        this.set(key, value);
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
     public void setLinearFactor(final Variable variable, final Number value) {
         this.set(variable, value);
     }
@@ -599,14 +583,6 @@ public final class Expression extends ModelEntity<Expression> {
         for (final Variable tmpVariable : variables) {
             this.set(tmpVariable, BigMath.ONE);
         }
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public void setQuadraticFactor(final int row, final int column, final Number value) {
-        this.set(row, column, value);
     }
 
     /**

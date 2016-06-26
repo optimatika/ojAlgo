@@ -87,30 +87,6 @@ public interface LU<N extends Number> extends LDU<N> {
     }
 
     /**
-     * @deprecated v40 Use {@link #BIG}
-     */
-    @Deprecated
-    public static LU<BigDecimal> makeBig() {
-        return BIG.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #COMPLEX}
-     */
-    @Deprecated
-    public static LU<ComplexNumber> makeComplex() {
-        return COMPLEX.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #PRIMITIVE}
-     */
-    @Deprecated
-    public static LU<Double> makePrimitive() {
-        return PRIMITIVE.make();
-    }
-
-    /**
      * The normal {@link #decompose(ElementsSupplier)} method must handle cases where pivoting is required. If
      * you know that pivoting is not needed you may call this method instead - it may be faster. Note that the
      * algorithm implementation may still pivot. Pivoting is optional not forbidden (or required).

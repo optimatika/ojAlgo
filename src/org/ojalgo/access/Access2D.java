@@ -21,7 +21,6 @@
  */
 package org.ojalgo.access;
 
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 
@@ -53,14 +52,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
          * @see Scalar#isSmall(double)
          */
         boolean isSmall(long row, long column, double comparedTo);
-
-        /**
-         * @deprecated v37
-         */
-        @Deprecated
-        default boolean isZero(final long row, final long column) {
-            return this.isSmall(row, column, PrimitiveMath.ONE);
-        }
 
     }
 

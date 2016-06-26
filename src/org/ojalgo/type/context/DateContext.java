@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
@@ -77,15 +78,15 @@ public final class DateContext extends FormatContext<Date> {
 
         case DATE:
 
-            return TypeUtils.makeSqlDate(object.getTime());
+            return new CalendarDate(object.getTime()).toSqlDate();
 
         case TIME:
 
-            return TypeUtils.makeSqlTime(object.getTime());
+            return new CalendarDate(object.getTime()).toSqlTime();
 
         default:
 
-            return TypeUtils.makeSqlTimestamp(object.getTime());
+            return new CalendarDate(object.getTime()).toSqlTimestamp();
         }
     }
 

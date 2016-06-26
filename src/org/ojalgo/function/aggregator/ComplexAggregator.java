@@ -631,14 +631,6 @@ public abstract class ComplexAggregator {
 
     };
 
-    /**
-     * @deprecated v38 Use {@link #getSet()} instead
-     */
-    @Deprecated
-    public static AggregatorSet<ComplexNumber> getCollection() {
-        return ComplexAggregator.getSet();
-    }
-
     public static AggregatorSet<ComplexNumber> getSet() {
         return SET;
     }

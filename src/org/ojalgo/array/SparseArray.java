@@ -474,15 +474,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public boolean isZero(final long index) {
-        final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.isZero(tmpIndex);
-        } else {
-            return true;
-        }
-    }
-
     public long limitOfRange(final long rangeFirst, final long rangeLimit) {
         int tmpFoundAt = this.index(rangeLimit - 1L);
         if (tmpFoundAt < 0) {

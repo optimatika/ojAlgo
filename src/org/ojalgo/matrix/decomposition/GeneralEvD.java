@@ -172,7 +172,7 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
         final BinaryFunction<N> tmpDivide = this.function().divide();
 
         for (int i = 0; i < tmpDim; i++) {
-            if (tmpD.isZero(i, i)) {
+            if (tmpD.isSmall(i, i, PrimitiveMath.ONE)) {
                 tmpMtrx.fillRow(i, 0, tmpZero);
             } else {
                 tmpMtrx.modifyRow(i, 0, tmpDivide.second(tmpD.get(i, i)));

@@ -116,54 +116,6 @@ public interface Eigenvalue<N extends Number>
     }
 
     /**
-     * @deprecated v40 Use {@link #BIG} instead
-     */
-    @Deprecated
-    public static Eigenvalue<BigDecimal> makeBig() {
-        return Eigenvalue.BIG.make(true);
-    }
-
-    /**
-     * @deprecated v40 Use {@link #BIG} instead
-     */
-    @Deprecated
-    public static Eigenvalue<BigDecimal> makeBig(final boolean symmetric) {
-        return BIG.make(TYPICAL, symmetric);
-    }
-
-    /**
-     * @deprecated v40 Use {@link #COMPLEX} instead
-     */
-    @Deprecated
-    public static Eigenvalue<ComplexNumber> makeComplex() {
-        return Eigenvalue.COMPLEX.make(true);
-    }
-
-    /**
-     * @deprecated v40 Use {@link #COMPLEX} instead
-     */
-    @Deprecated
-    public static Eigenvalue<ComplexNumber> makeComplex(final boolean hermitian) {
-        return COMPLEX.make(TYPICAL, hermitian);
-    }
-
-    /**
-     * @deprecated v40 Use {@link #PRIMITIVE}
-     */
-    @Deprecated
-    public static Eigenvalue<Double> makePrimitive() {
-        return PRIMITIVE.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #PRIMITIVE}
-     */
-    @Deprecated
-    public static Eigenvalue<Double> makePrimitive(final boolean symmetric) {
-        return PRIMITIVE.make(TYPICAL, symmetric);
-    }
-
-    /**
      * The only requirements on [D] are that it should contain the eigenvalues and that [A][V] = [V][D]. The
      * ordering of the eigenvalues is not specified.
      * <ul>

@@ -67,30 +67,6 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
         }
     }
 
-    /**
-     * @deprecated v40 Use {@link #BIG}
-     */
-    @Deprecated
-    public static Hessenberg<BigDecimal> makeBig() {
-        return BIG.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #COMPLEX}
-     */
-    @Deprecated
-    public static Hessenberg<ComplexNumber> makeComplex() {
-        return COMPLEX.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #PRIMITIVE}
-     */
-    @Deprecated
-    public static Hessenberg<Double> makePrimitive() {
-        return PRIMITIVE.make();
-    }
-
     boolean compute(ElementsSupplier<N> matrix, boolean upper);
 
     MatrixStore<N> getH();

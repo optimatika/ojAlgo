@@ -55,14 +55,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
          */
         boolean isSmall(long index, double comparedTo);
 
-        /**
-         * @deprecated v37
-         */
-        @Deprecated
-        default boolean isZero(final long index) {
-            return this.isSmall(index, PrimitiveMath.ONE);
-        }
-
     }
 
     public interface IndexOf extends Structure1D {

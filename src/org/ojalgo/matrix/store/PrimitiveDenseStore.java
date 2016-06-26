@@ -1412,10 +1412,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return myUtility.isSmall(row, column, comparedTo);
     }
 
-    public boolean isZero(final long row, final long column) {
-        return myUtility.isZero(row, column);
-    }
-
     public void maxpy(final Double aSclrA, final MatrixStore<Double> aMtrxX) {
 
         final int tmpRowDim = myRowDim;

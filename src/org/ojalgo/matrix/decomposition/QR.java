@@ -80,30 +80,6 @@ public interface QR<N extends Number>
         }
     }
 
-    /**
-     * @deprecated v40 Use {@link #BIG}
-     */
-    @Deprecated
-    public static QR<BigDecimal> makeBig() {
-        return BIG.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #COMPLEX}
-     */
-    @Deprecated
-    public static QR<ComplexNumber> makeComplex() {
-        return COMPLEX.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #PRIMITIVE}
-     */
-    @Deprecated
-    public static QR<Double> makePrimitive() {
-        return PRIMITIVE.make();
-    }
-
     MatrixStore<N> getQ();
 
     MatrixStore<N> getR();

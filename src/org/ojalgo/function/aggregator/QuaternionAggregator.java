@@ -631,14 +631,6 @@ public abstract class QuaternionAggregator {
 
     };
 
-    /**
-     * @deprecated v38 Use {@link #getSet()} instead
-     */
-    @Deprecated
-    public static AggregatorSet<Quaternion> getCollection() {
-        return QuaternionAggregator.getSet();
-    }
-
     public static AggregatorSet<Quaternion> getSet() {
         return SET;
     }

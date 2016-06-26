@@ -632,14 +632,6 @@ public abstract class PrimitiveAggregator {
 
     };
 
-    /**
-     * @deprecated v38 Use {@link #getSet()} instead
-     */
-    @Deprecated
-    public static AggregatorSet<Double> getCollection() {
-        return PrimitiveAggregator.getSet();
-    }
-
     public static AggregatorSet<Double> getSet() {
         return SET;
     }

@@ -84,30 +84,6 @@ public interface SingularValue<N extends Number>
     }
 
     /**
-     * @deprecated v40 Use {@link #BIG}
-     */
-    @Deprecated
-    public static SingularValue<BigDecimal> makeBig() {
-        return BIG.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #COMPLEX}
-     */
-    @Deprecated
-    public static SingularValue<ComplexNumber> makeComplex() {
-        return COMPLEX.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #PRIMITIVE}
-     */
-    @Deprecated
-    public static SingularValue<Double> makePrimitive() {
-        return PRIMITIVE.make();
-    }
-
-    /**
      * The condition number.
      *
      * @return The largest singular value divided by the smallest singular value.

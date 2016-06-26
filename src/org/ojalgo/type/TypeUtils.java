@@ -23,15 +23,11 @@ package org.ojalgo.type;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -46,14 +42,14 @@ public abstract class TypeUtils {
     /**
      * Compatible with slf4j. {} in the message pattern will be replaced by the arguments.
      */
-    public static String format(final String aMessagePattern, final Object... someArgs) {
+    public static String format(final String messagePattern, final Object... args) {
 
-        if (aMessagePattern == null) {
+        if (messagePattern == null) {
             return null;
         }
 
-        final int tmpPatternSize = aMessagePattern.length();
-        final int tmpArgsCount = someArgs.length;
+        final int tmpPatternSize = messagePattern.length();
+        final int tmpArgsCount = args.length;
 
         int tmpFirst = 0;
         int tmpLimit = tmpPatternSize;
@@ -62,19 +58,19 @@ public abstract class TypeUtils {
 
         for (int a = 0; a < tmpArgsCount; a++) {
 
-            tmpLimit = aMessagePattern.indexOf(TypeUtils.START, tmpFirst);
+            tmpLimit = messagePattern.indexOf(TypeUtils.START, tmpFirst);
 
             if (tmpLimit == -1) {
                 retVal.append(ASCII.SP);
-                retVal.append(someArgs[a]);
+                retVal.append(args[a]);
             } else {
-                retVal.append(aMessagePattern.substring(tmpFirst, tmpLimit));
-                retVal.append(someArgs[a]);
+                retVal.append(messagePattern.substring(tmpFirst, tmpLimit));
+                retVal.append(args[a]);
                 tmpFirst = tmpLimit + 2;
             }
         }
 
-        retVal.append(aMessagePattern.substring(tmpFirst, tmpPatternSize));
+        retVal.append(messagePattern.substring(tmpFirst, tmpPatternSize));
 
         return retVal.toString();
     }
@@ -120,30 +116,6 @@ public abstract class TypeUtils {
     @Deprecated
     public static boolean isZero(final double value, final double tolerance) {
         return (Math.abs(value) <= tolerance);
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public static Date makeSqlDate(final long aTimeInMillis) {
-        return new CalendarDate(aTimeInMillis).toSqlDate();
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public static Date makeSqlTime(final long aTimeInMillis) {
-        return new CalendarDate(aTimeInMillis).toSqlTime();
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public static Date makeSqlTimestamp(final long aTimeInMillis) {
-        return new CalendarDate(aTimeInMillis).toSqlTimestamp();
     }
 
     /**
@@ -198,34 +170,10 @@ public abstract class TypeUtils {
     }
 
     /**
-     * @deprecated v38 Use {@link ComplexNumber#valueOf(Number)} instead.
-     */
-    @Deprecated
-    public static ComplexNumber toComplexNumber(final Number number) {
-        return ComplexNumber.valueOf(number);
-    }
-
-    /**
      * The way colours are specified in html pages.
      */
     public static String toHexString(final int colour) {
         return HEX + Integer.toHexString(colour).substring(2);
-    }
-
-    /**
-     * @deprecated v38 Use {@link Quaternion#valueOf(Number)} instead.
-     */
-    @Deprecated
-    public static Quaternion toQuaternion(final Number number) {
-        return Quaternion.valueOf(number);
-    }
-
-    /**
-     * @deprecated v38 Use {@link RationalNumber#valueOf(Number)} instead.
-     */
-    @Deprecated
-    public static RationalNumber toRationalNumber(final Number number) {
-        return RationalNumber.valueOf(number);
     }
 
     static boolean isSameDate(final Calendar aCal1, final Calendar aCal2) {

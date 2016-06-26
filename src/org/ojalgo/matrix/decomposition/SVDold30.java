@@ -297,7 +297,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
                 for (int j = 0; j < (tmpMinDim - i0); j++) {
                     i = i0 + j;
 
-                    if (!tmpSimilar.isZero(i, j) || !tmpSimilar.isZero(j, i)) {
+                    if (!tmpSimilar.isSmall(i, j, PrimitiveMath.ONE) || !tmpSimilar.isSmall(j, i, PrimitiveMath.ONE)) {
 
                         tmpNotAllZeros = true;
 
@@ -322,7 +322,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
         double tmpSingularValue;
         for (int ij = 0; ij < tmpMinDim; ij++) {
 
-            if (tmpSimilar.isZero(ij, ij)) {
+            if (tmpSimilar.isSmall(ij, ij, PrimitiveMath.ONE)) {
 
                 tmpSingularValue = PrimitiveMath.ZERO;
 

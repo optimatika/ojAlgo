@@ -69,30 +69,6 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
         }
     }
 
-    /**
-     * @deprecated v40 Use {@link #BIG} instead
-     */
-    @Deprecated
-    public static Bidiagonal<BigDecimal> makeBig() {
-        return BIG.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #COMPLEX} instead
-     */
-    @Deprecated
-    public static Bidiagonal<ComplexNumber> makeComplex() {
-        return COMPLEX.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #PRIMITIVE} instead
-     */
-    @Deprecated
-    public static Bidiagonal<Double> makePrimitive() {
-        return PRIMITIVE.make();
-    }
-
     MatrixStore<N> getD();
 
     MatrixStore<N> getQ1();

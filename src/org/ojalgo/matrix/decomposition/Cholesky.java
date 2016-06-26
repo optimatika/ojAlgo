@@ -82,30 +82,6 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
     }
 
     /**
-     * @deprecated v40 Use {@link #BIG}
-     */
-    @Deprecated
-    public static Cholesky<BigDecimal> makeBig() {
-        return BIG.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #COMPLEX}
-     */
-    @Deprecated
-    public static Cholesky<ComplexNumber> makeComplex() {
-        return COMPLEX.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #PRIMITIVE}
-     */
-    @Deprecated
-    public static Cholesky<Double> makePrimitive() {
-        return PRIMITIVE.make();
-    }
-
-    /**
      * To use the Cholesky decomposition rather than the LU decomposition the matrix must be symmetric and
      * positive definite. It is recommended that the decomposition algorithm checks for this during
      * calculation. Possibly the matrix could be assumed to be symmetric (to improve performance) but tests

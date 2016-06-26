@@ -191,46 +191,6 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         }
     }
 
-    /**
-     * @deprecated v40 Use {@link #toCalendar()} instead
-     */
-    @Deprecated
-    public Calendar getCalendar() {
-        return this.toCalendar();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #toCalendar(Locale)} instead
-     */
-    @Deprecated
-    public Calendar getCalendar(final Locale locale) {
-        return this.toCalendar(locale);
-    }
-
-    /**
-     * @deprecated v40 Use {@link #toCalendar(TimeZone)} instead
-     */
-    @Deprecated
-    public Calendar getCalendar(final TimeZone zone) {
-        return this.toCalendar(zone);
-    }
-
-    /**
-     * @deprecated v40 Use {@link #toCalendar(TimeZone,Locale)} instead
-     */
-    @Deprecated
-    public Calendar getCalendar(final TimeZone zone, final Locale locale) {
-        return this.toCalendar(zone, locale);
-    }
-
-    /**
-     * @deprecated v40 Use {@link #toDate()} instead
-     */
-    @Deprecated
-    public Date getDate() {
-        return this.toDate();
-    }
-
     public long getLong(final TemporalField field) {
         if (field instanceof ChronoField) {
             if (field == ChronoField.INSTANT_SECONDS) {
@@ -325,38 +285,6 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         return new Date(millis);
     }
 
-    /**
-     * @deprecated v40 Use {@link #toLocalDateTime()} instead
-     */
-    @Deprecated
-    public LocalDateTime toDateAndTime() {
-        return this.toLocalDateTime();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #toLocalDateTime(ZoneOffset)} instead
-     */
-    @Deprecated
-    public LocalDateTime toDateAndTime(final ZoneOffset offset) {
-        return this.toLocalDateTime(offset);
-    }
-
-    /**
-     * @deprecated v40 Use {@link #toLocalDate()} instead
-     */
-    @Deprecated
-    public LocalDate toDateOnly() {
-        return this.toLocalDate();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #toLocalDate(ZoneOffset)} instead
-     */
-    @Deprecated
-    public LocalDate toDateOnly(final ZoneOffset offset) {
-        return this.toLocalDate(offset);
-    }
-
     public Instant toInstant() {
         return Instant.ofEpochMilli(millis);
     }
@@ -448,22 +376,6 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         } else {
             return resolution.toTimeInMillis(millis);
         }
-    }
-
-    /**
-     * @deprecated v40 Use {@link #toLocalTime()} instead
-     */
-    @Deprecated
-    public LocalTime toTimeOnly() {
-        return this.toLocalTime();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #toLocalTime(ZoneOffset)} instead
-     */
-    @Deprecated
-    public LocalTime toTimeOnly(final ZoneOffset offset) {
-        return this.toLocalTime(offset);
     }
 
     public long until(final Temporal endExclusive, final TemporalUnit unit) {

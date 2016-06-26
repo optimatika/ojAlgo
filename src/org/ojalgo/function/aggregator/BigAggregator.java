@@ -633,14 +633,6 @@ public abstract class BigAggregator {
 
     };
 
-    /**
-     * @deprecated v38 Use {@link #getSet()} instead
-     */
-    @Deprecated
-    public static AggregatorSet<BigDecimal> getCollection() {
-        return BigAggregator.getSet();
-    }
-
     public static AggregatorSet<BigDecimal> getSet() {
         return SET;
     }

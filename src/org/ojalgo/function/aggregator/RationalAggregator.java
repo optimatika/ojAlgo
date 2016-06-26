@@ -632,14 +632,6 @@ public abstract class RationalAggregator {
 
     };
 
-    /**
-     * @deprecated v38 Use {@link #getSet()} instead
-     */
-    @Deprecated
-    public static AggregatorSet<RationalNumber> getCollection() {
-        return RationalAggregator.getSet();
-    }
-
     public static AggregatorSet<RationalNumber> getSet() {
         return SET;
     }

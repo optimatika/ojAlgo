@@ -65,30 +65,6 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
         }
     }
 
-    /**
-     * @deprecated v40 Use {@link #BIG}
-     */
-    @Deprecated
-    public static Tridiagonal<BigDecimal> makeBig() {
-        return BIG.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #COMPLEX}
-     */
-    @Deprecated
-    public static Tridiagonal<ComplexNumber> makeComplex() {
-        return COMPLEX.make();
-    }
-
-    /**
-     * @deprecated v40 Use {@link #PRIMITIVE}
-     */
-    @Deprecated
-    public static Tridiagonal<Double> makePrimitive() {
-        return PRIMITIVE.make();
-    }
-
     MatrixStore<N> getD();
 
     MatrixStore<N> getQ();
