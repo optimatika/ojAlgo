@@ -730,7 +730,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
-        final double tmpError = PrimitiveMath.IS_ZERO;
+        final double tmpError = 1E-14 / PrimitiveMath.THREE;
         TestUtils.assertEquals(1.0, solution.getPoint()[0], tmpError);
         TestUtils.assertEquals(1.0, solution.getPoint()[1], tmpError);
         TestUtils.assertEquals(0.0, solution.getPoint()[2], tmpError);
@@ -1134,7 +1134,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MAXIMIZE, false);
-        final double tmpError = 10.0 * PrimitiveMath.IS_ZERO;
+        final double tmpError = 10.0 * (1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals(-2.0, solution.getPoint()[0], tmpError);
         TestUtils.assertEquals(8.0, solution.getPoint()[1], tmpError);
         TestUtils.assertEquals(12.0, solution.getValue(), tmpError);

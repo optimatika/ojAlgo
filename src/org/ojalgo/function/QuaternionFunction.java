@@ -22,6 +22,7 @@
 package org.ojalgo.function;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.type.TypeUtils;
 
@@ -146,7 +147,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     public static final UnaryFunction<Quaternion> CARDINALITY = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
-            return TypeUtils.isZero(arg.norm()) ? Quaternion.ZERO : Quaternion.ONE;
+            return PrimitiveScalar.isSmall(PrimitiveMath.ONE, arg.norm()) ? Quaternion.ZERO : Quaternion.ONE;
         }
 
     };

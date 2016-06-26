@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.netio.ASCII;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -100,22 +101,6 @@ public abstract class TypeUtils {
         retVal.add(Calendar.YEAR, 1000);
 
         return retVal;
-    }
-
-    /**
-     * @deprecated v37
-     */
-    @Deprecated
-    public static boolean isZero(final double value) {
-        return TypeUtils.isZero(value, PrimitiveMath.IS_ZERO);
-    }
-
-    /**
-     * @deprecated v37
-     */
-    @Deprecated
-    public static boolean isZero(final double value, final double tolerance) {
-        return (Math.abs(value) <= tolerance);
     }
 
     /**

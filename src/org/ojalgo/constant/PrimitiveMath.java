@@ -65,20 +65,6 @@ public abstract class PrimitiveMath {
     public static final double SQRT_PI = BigMath.SQRT_PI.doubleValue();
     public static final double SQRT_TWO_PI = BigMath.SQRT_TWO_PI.doubleValue();
 
-    /**
-     * ≈ 1.6E-291
-     *
-     * @deprecated v37 Will at least be renamed
-     */
-    @Deprecated
-    public static final double TINY = Math.pow(2.0, -966.0);
-    /**
-     * ≈ 3.33E-15
-     *
-     * @deprecated v37 Bad idea!
-     */
-    @Deprecated
-    public static final double IS_ZERO = 1E-14 / THREE;
     public static final double POSITIVE_INFINITY = Double.POSITIVE_INFINITY;
     public static final double NEGATIVE_INFINITY = Double.NEGATIVE_INFINITY;
     public static final double NaN = Double.NaN;

@@ -23,6 +23,8 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.TypeUtils;
 
 /**
@@ -75,7 +77,7 @@ public class Gamma extends RandomNumber {
         }
 
         double tmpFractionalPart = ZERO;
-        if (!TypeUtils.isZero(tmpFraction)) {
+        if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpFraction)) {
 
             final double tmpFractionMinusOne = tmpFraction - ONE;
 

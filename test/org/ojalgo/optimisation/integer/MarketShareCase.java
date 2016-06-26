@@ -123,11 +123,11 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         final Result tmpResult = tmpModel.minimise();
 
-        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), 1E-14 / PrimitiveMath.THREE);
 
         for (final Variable tmpVariable : tmpModel.getVariables()) {
             TestUtils.assertEquals(tmpVariable.getName(), SOLUTION.get(tmpVariable.getName()).doubleValue(), tmpVariable.getValue().doubleValue(),
-                    PrimitiveMath.IS_ZERO);
+                    1E-14 / PrimitiveMath.THREE);
         }
     }
 
@@ -144,11 +144,11 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         final Result tmpResult = tmpModel.minimise();
 
-        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), 1E-14 / PrimitiveMath.THREE);
 
         for (final Variable tmpVariable : tmpModel.getVariables()) {
             TestUtils.assertEquals(tmpVariable.getName(), SOLUTION.get(tmpVariable.getName()).doubleValue(), tmpVariable.getValue().doubleValue(),
-                    PrimitiveMath.IS_ZERO);
+                    1E-14 / PrimitiveMath.THREE);
         }
     }
 
@@ -294,11 +294,11 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         final Result tmpResult = tmpModel.minimise();
 
-        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), 1E-14 / PrimitiveMath.THREE);
 
         for (final Variable tmpVariable : tmpModel.getVariables()) {
             TestUtils.assertEquals(tmpVariable.getName(), SOLUTION.get(tmpVariable.getName()).doubleValue(), tmpVariable.getValue().doubleValue(),
-                    PrimitiveMath.IS_ZERO);
+                    1E-14 / PrimitiveMath.THREE);
         }
 
     }
@@ -317,11 +317,11 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
         final Result tmpResult = tmpModel.minimise();
 
-        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("OBJECTIVE_MIP", OBJECTIVE_MIP.doubleValue(), tmpResult.getValue(), 1E-14 / PrimitiveMath.THREE);
 
         for (final Variable tmpVariable : tmpModel.getVariables()) {
             TestUtils.assertEquals(tmpVariable.getName(), SOLUTION.get(tmpVariable.getName()).doubleValue(), tmpVariable.getValue().doubleValue(),
-                    PrimitiveMath.IS_ZERO);
+                    1E-14 / PrimitiveMath.THREE);
         }
     }
 

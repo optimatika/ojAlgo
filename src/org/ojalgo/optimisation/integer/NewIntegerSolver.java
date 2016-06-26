@@ -39,6 +39,7 @@ import org.ojalgo.netio.CharacterRing.PrinterBuffer;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.TypeUtils;
 
 /**
@@ -459,7 +460,8 @@ public final class NewIntegerSolver extends IntegerSolver {
         }
 
         double tmpScale = tmpMaxValue - tmpMinValue;
-        if (TypeUtils.isZero(tmpScale)) {
+        final double value = tmpScale;
+        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, value)) {
             tmpScale = PrimitiveMath.ONE;
         }
         for (int i = 0; i < tmpSignificance.length; i++) {

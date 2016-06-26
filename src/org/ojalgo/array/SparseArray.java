@@ -37,6 +37,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -350,7 +351,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     public void fillAll(final N value) {
 
-        if (TypeUtils.isZero(value.doubleValue())) {
+        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, value.doubleValue())) {
 
             myValues.fillAll(myZeroNumber);
 
@@ -788,7 +789,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO);
 
-        if (TypeUtils.isZero(tmpZeroValue)) {
+        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpZeroValue)) {
 
             for (int i = 0; i < myIndices.length; i++) {
                 final long tmpIndex = myIndices[i];
@@ -810,7 +811,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO, PrimitiveMath.ZERO);
 
-        if (TypeUtils.isZero(tmpZeroValue)) {
+        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpZeroValue)) {
 
             for (int i = 0; i < myIndices.length; i++) {
                 final long tmpIndex = myIndices[i];
@@ -830,7 +831,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         final double tmpZeroValue = function.invoke(PrimitiveMath.ZERO);
 
-        if (TypeUtils.isZero(tmpZeroValue)) {
+        if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpZeroValue)) {
 
             for (int i = 0; i < myIndices.length; i++) {
                 final long tmpIndex = myIndices[i];

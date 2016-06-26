@@ -24,6 +24,8 @@ package org.ojalgo.function;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.TypeUtils;
 
 /**
@@ -131,7 +133,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     public static final UnaryFunction<Double> CARDINALITY = new Unary() {
 
         public final double invoke(final double arg) {
-            return TypeUtils.isZero(arg) ? ZERO : ONE;
+            return PrimitiveScalar.isSmall(PrimitiveMath.ONE, arg) ? ZERO : ONE;
         }
 
     };

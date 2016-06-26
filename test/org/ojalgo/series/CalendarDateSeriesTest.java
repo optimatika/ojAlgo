@@ -79,14 +79,14 @@ public class CalendarDateSeriesTest extends SeriesTests {
         tmpCenturySeries.complete();
         tmpMilleniumSeries.complete();
 
-        TestUtils.assertEquals("Day Series Last Value", tmpLastPrice, tmpDaySeries.lastValue(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Week Series Last Value", tmpLastPrice, tmpWeekSeries.lastValue(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Month Series Last Value", tmpLastPrice, tmpMonthSeries.lastValue(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Quarter Series Last Value", tmpLastPrice, tmpQuarterSeries.lastValue(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Year Series Last Value", tmpLastPrice, tmpYearSeries.lastValue(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Decade Series Last Value", tmpLastPrice, tmpDecadeSeries.lastValue(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Century Series Last Value", tmpLastPrice, tmpCenturySeries.lastValue(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Millenium Series Last Value", tmpLastPrice, tmpMilleniumSeries.lastValue(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("Day Series Last Value", tmpLastPrice, tmpDaySeries.lastValue(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Week Series Last Value", tmpLastPrice, tmpWeekSeries.lastValue(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Month Series Last Value", tmpLastPrice, tmpMonthSeries.lastValue(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Quarter Series Last Value", tmpLastPrice, tmpQuarterSeries.lastValue(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Year Series Last Value", tmpLastPrice, tmpYearSeries.lastValue(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Decade Series Last Value", tmpLastPrice, tmpDecadeSeries.lastValue(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Century Series Last Value", tmpLastPrice, tmpCenturySeries.lastValue(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Millenium Series Last Value", tmpLastPrice, tmpMilleniumSeries.lastValue(), 1E-14 / PrimitiveMath.THREE);
 
         TestUtils.assertEquals(tmpMilleniumSeries, tmpCenturySeries.resample(CalendarDateUnit.MILLENIUM));
         TestUtils.assertEquals(tmpMilleniumSeries, tmpDecadeSeries.resample(CalendarDateUnit.MILLENIUM));

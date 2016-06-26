@@ -22,12 +22,13 @@
 package org.ojalgo.function;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.TypeUtils;
 
 public abstract class FunctionUtils {
 
     public static <N extends Number> boolean isZeroModified(final UnaryFunction<N> function) {
-        return !TypeUtils.isZero(function.invoke(PrimitiveMath.ZERO));
+        return !PrimitiveScalar.isSmall(PrimitiveMath.ONE, function.invoke(PrimitiveMath.ZERO));
     }
 
     public static int max(final int... values) {

@@ -26,6 +26,7 @@ import static org.ojalgo.function.RationalFunction.*;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.RationalFunction;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
@@ -57,7 +58,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final RationalNumber anArg) {
-                    if (!TypeUtils.isZero(Math.abs(anArg.doubleValue()))) {
+                    if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, Math.abs(anArg.doubleValue()))) {
                         myCount++;
                     }
                 }

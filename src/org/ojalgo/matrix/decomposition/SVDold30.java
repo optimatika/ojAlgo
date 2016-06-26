@@ -45,6 +45,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -198,10 +199,10 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
             final double cg; // cos Givens
             final double sg; // sin Givens
 
-            if (TypeUtils.isZero(y)) {
+            if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, y)) {
                 cg = Math.signum(x);
                 sg = PrimitiveMath.ZERO;
-            } else if (TypeUtils.isZero(x)) {
+            } else if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, x)) {
                 sg = Math.signum(y);
                 cg = PrimitiveMath.ZERO;
             } else if (Math.abs(y) > Math.abs(x)) {

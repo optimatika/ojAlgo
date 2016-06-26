@@ -26,6 +26,7 @@ import static org.ojalgo.function.QuaternionFunction.*;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.QuaternionFunction;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
@@ -57,7 +58,7 @@ public abstract class QuaternionAggregator {
                 }
 
                 public void invoke(final Quaternion anArg) {
-                    if (!TypeUtils.isZero(anArg.norm())) {
+                    if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, anArg.norm())) {
                         myCount++;
                     }
                 }

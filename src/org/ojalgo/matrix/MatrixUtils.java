@@ -38,6 +38,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -405,11 +406,11 @@ public abstract class MatrixUtils {
             ComplexNumber tmpUpperRight;
 
             for (int j = 0; retVal && (j < tmpColDim); j++) {
-                retVal &= TypeUtils.isZero(ComplexNumber.valueOf(matrix.get(j, j)).i);
+                retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, ComplexNumber.valueOf(matrix.get(j, j)).i);
                 for (int i = j + 1; retVal && (i < tmpRowDim); i++) {
                     tmpLowerLeft = ComplexNumber.valueOf(matrix.get(i, j)).conjugate();
                     tmpUpperRight = ComplexNumber.valueOf(matrix.get(j, i));
-                    retVal &= TypeUtils.isZero(tmpLowerLeft.subtract(tmpUpperRight).norm());
+                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpLowerLeft.subtract(tmpUpperRight).norm());
                 }
             }
 
@@ -417,7 +418,7 @@ public abstract class MatrixUtils {
 
             for (int j = 0; retVal && (j < tmpColDim); j++) {
                 for (int i = j + 1; retVal && (i < tmpRowDim); i++) {
-                    retVal &= TypeUtils.isZero(matrix.doubleValue(i, j) - matrix.doubleValue(j, i));
+                    retVal &= PrimitiveScalar.isSmall(PrimitiveMath.ONE, matrix.doubleValue(i, j) - matrix.doubleValue(j, i));
                 }
             }
         }

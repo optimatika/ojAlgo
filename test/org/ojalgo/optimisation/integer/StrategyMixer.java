@@ -63,7 +63,7 @@ public class StrategyMixer extends OptimisationIntegerTests {
         }
 
         TestUtils.assertEquals(tmpExpectedNumberOfStrategies, tmpUseCount);
-        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE);
     }
 
     public void testStratCombPortfolioMixerRandom() {
@@ -95,7 +95,7 @@ public class StrategyMixer extends OptimisationIntegerTests {
         }
 
         TestUtils.assertEquals(tmpExpectedNumberOfStrategies, tmpUseCount);
-        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, PrimitiveMath.IS_ZERO / PrimitiveMath.HUNDRED);
+        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE / PrimitiveMath.HUNDRED);
     }
 
     /**
@@ -197,7 +197,7 @@ public class StrategyMixer extends OptimisationIntegerTests {
         }
 
         TestUtils.assertEquals(TWO.intValue(), tmpUseCount);
-        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE);
     }
 
 }

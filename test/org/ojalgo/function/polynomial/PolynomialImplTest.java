@@ -74,19 +74,19 @@ public class PolynomialImplTest extends FunctionPolynomialTests {
         tmpPoly.set(0, 5.0);
 
         for (double i = -100.0; i <= 100; i = i + 10.0) {
-            TestUtils.assertEquals(5.0, tmpPoly.invoke(i), PrimitiveMath.IS_ZERO);
+            TestUtils.assertEquals(5.0, tmpPoly.invoke(i), 1E-14 / PrimitiveMath.THREE);
         }
 
         tmpPoly.set(1, 1.0);
 
         for (double i = -100.0; i <= 100; i = i + 10.0) {
-            TestUtils.assertEquals(5.0 + i, tmpPoly.invoke(i), PrimitiveMath.IS_ZERO);
+            TestUtils.assertEquals(5.0 + i, tmpPoly.invoke(i), 1E-14 / PrimitiveMath.THREE);
         }
 
         tmpPoly.set(2, 10.0);
 
         for (double i = -100.0; i <= 100; i = i + 10.0) {
-            TestUtils.assertEquals(5.0 + i + (10.0 * (i * i)), tmpPoly.invoke(i), PrimitiveMath.IS_ZERO);
+            TestUtils.assertEquals(5.0 + i + (10.0 * (i * i)), tmpPoly.invoke(i), 1E-14 / PrimitiveMath.THREE);
         }
     }
 

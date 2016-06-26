@@ -148,8 +148,8 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         final double tmpFactoryExpected = 1.05;
         final double tmpFactoryStdDev = Math.abs(new Normal(0.0, (tmpFactoryExpected - ONE)).doubleValue());
         final Normal tmpFactoryDistr = new Normal(tmpFactoryExpected, tmpFactoryStdDev);
-        TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
 
         final PrimitiveArray tmpRawValues = PrimitiveArray.make(tmpPeriods + 1);
         tmpRawValues.data[0] = ONE;
@@ -172,12 +172,12 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         final LogNormal tmpLogDiffDistr = new LogNormal(tmpLogDiffsSet.getMean(), tmpLogDiffsSet.getStandardDeviation());
         final LogNormal tmpProcessDistr = tmpProcess.getDistribution(ONE);
 
-        TestUtils.assertEquals("Expected", tmpLogDiffDistr.getExpected(), tmpProcessDistr.getExpected(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Geometric Mean", tmpLogDiffDistr.getGeometricMean(), tmpProcessDistr.getGeometricMean(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("Expected", tmpLogDiffDistr.getExpected(), tmpProcessDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Geometric Mean", tmpLogDiffDistr.getGeometricMean(), tmpProcessDistr.getGeometricMean(), 1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals("Geometric Standard Deviation", tmpLogDiffDistr.getGeometricStandardDeviation(), tmpProcessDistr.getGeometricStandardDeviation(),
-                PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Standard Deviation", tmpLogDiffDistr.getStandardDeviation(), tmpProcessDistr.getStandardDeviation(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Variance", tmpLogDiffDistr.getVariance(), tmpProcessDistr.getVariance(), PrimitiveMath.IS_ZERO);
+                1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Standard Deviation", tmpLogDiffDistr.getStandardDeviation(), tmpProcessDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Variance", tmpLogDiffDistr.getVariance(), tmpProcessDistr.getVariance(), 1E-14 / PrimitiveMath.THREE);
 
         double tmpFactoryVal = tmpFactoryDistr.getExpected();
         double tmpQuotienVal = tmpQuotienDistr.getExpected();
@@ -187,7 +187,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Expected", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaExpected = IS_ZERO * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
+        final double tmpDeltaExpected = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
         TestUtils.assertEquals(tmpQuotienVal, tmpLogDiffVal, tmpDeltaExpected);
         TestUtils.assertEquals(tmpQuotienVal, tmpProcessVal, tmpDeltaExpected);
         TestUtils.assertEquals(true, tmpGeometrVal <= tmpProcessVal);
@@ -200,7 +200,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Std Dev", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaStdDev = IS_ZERO * THOUSAND * THOUSAND * THOUSAND * THOUSAND;
+        final double tmpDeltaStdDev = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * THOUSAND;
         TestUtils.assertEquals(tmpQuotienVal, tmpLogDiffVal, tmpDeltaStdDev);
         TestUtils.assertEquals(tmpQuotienVal, tmpProcessVal, tmpDeltaStdDev);
 
@@ -212,7 +212,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Var", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaVar = IS_ZERO * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
+        final double tmpDeltaVar = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
         TestUtils.assertEquals(tmpQuotienVal, tmpLogDiffVal, tmpDeltaVar);
         TestUtils.assertEquals(tmpQuotienVal, tmpProcessVal, tmpDeltaVar);
 
@@ -224,7 +224,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Final Value", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaFinal = IS_ZERO * THOUSAND;
+        final double tmpDeltaFinal = 1E-14 / THREE * THOUSAND;
         TestUtils.assertEquals(ONE, tmpGeometrVal / tmpFactoryVal, tmpDeltaFinal);
     }
 
@@ -281,16 +281,16 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         LogNormal tmpExpDistr = new LogNormal(tmpSetY.getMean(), tmpSetY.getStandardDeviation());
         LogNormal tmpActDistr = tmpProcY.getDistribution(1.0);
 
-        TestUtils.assertEquals("Yearly Expected", tmpExpDistr.getExpected(), tmpActDistr.getExpected(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Yearly Var", tmpExpDistr.getVariance(), tmpActDistr.getVariance(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Yearly StdDev", tmpExpDistr.getStandardDeviation(), tmpActDistr.getStandardDeviation(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("Yearly Expected", tmpExpDistr.getExpected(), tmpActDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Yearly Var", tmpExpDistr.getVariance(), tmpActDistr.getVariance(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Yearly StdDev", tmpExpDistr.getStandardDeviation(), tmpActDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
 
         tmpExpDistr = new LogNormal(tmpSetM.getMean() * 12.0, tmpSetM.getStandardDeviation() * Math.sqrt(12.0));
         tmpActDistr = tmpProcM.getDistribution(1.0);
 
-        TestUtils.assertEquals("Monthly Expected", tmpExpDistr.getExpected(), tmpActDistr.getExpected(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Monthly Var", tmpExpDistr.getVariance(), tmpActDistr.getVariance(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Monthly StdDev", tmpExpDistr.getStandardDeviation(), tmpActDistr.getStandardDeviation(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("Monthly Expected", tmpExpDistr.getExpected(), tmpActDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Monthly Var", tmpExpDistr.getVariance(), tmpActDistr.getVariance(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Monthly StdDev", tmpExpDistr.getStandardDeviation(), tmpActDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
     }
 
     private void logDebug(final String aLabel, final double aGiven, final double aPlain, final double aLog, final double aProc, final double aGeom) {

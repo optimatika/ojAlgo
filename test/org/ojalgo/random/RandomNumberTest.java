@@ -27,6 +27,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -141,7 +142,7 @@ public class RandomNumberTest extends RandomTests {
 
     public void testERFandERFI() {
 
-        final double tmpError = PrimitiveMath.IS_ZERO;
+        final double tmpError = 1E-14 / PrimitiveMath.THREE;
         double tmpExpected = -1.5;
         double tmpActual;
 
@@ -218,7 +219,7 @@ public class RandomNumberTest extends RandomTests {
         final double tmpEps = 0.000005;
 
         // From a table of values 1.0 <= x <= 2.0
-        TestUtils.assertEquals(ONE, RandomUtils.gamma(1.0), IS_ZERO);
+        TestUtils.assertEquals(ONE, RandomUtils.gamma(1.0), 1E-14 / THREE);
         TestUtils.assertEquals(0.95135, RandomUtils.gamma(1.10), tmpEps);
         TestUtils.assertEquals(0.91817, RandomUtils.gamma(1.20), tmpEps);
         TestUtils.assertEquals(0.89747, RandomUtils.gamma(1.30), tmpEps);
@@ -228,12 +229,12 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals(0.90864, RandomUtils.gamma(1.70), tmpEps);
         TestUtils.assertEquals(0.93138, RandomUtils.gamma(1.80), tmpEps);
         TestUtils.assertEquals(0.96177, RandomUtils.gamma(1.90), tmpEps);
-        TestUtils.assertEquals(ONE, RandomUtils.gamma(2.0), IS_ZERO);
+        TestUtils.assertEquals(ONE, RandomUtils.gamma(2.0), 1E-14 / THREE);
 
         // Values larger than 2.0 and smaller than 1.0
-        TestUtils.assertEquals("π", RandomUtils.gamma(PI), (PI - ONE) * (PI - TWO) * RandomUtils.gamma(PI - TWO), IS_ZERO);
-        TestUtils.assertEquals("0.5", RandomUtils.gamma(HALF), RandomUtils.gamma(HALF + ONE) / HALF, IS_ZERO);
-        TestUtils.assertEquals("0.25", RandomUtils.gamma(QUARTER), RandomUtils.gamma(QUARTER + ONE) / QUARTER, IS_ZERO);
+        TestUtils.assertEquals("π", RandomUtils.gamma(PI), (PI - ONE) * (PI - TWO) * RandomUtils.gamma(PI - TWO), 1E-14 / THREE);
+        TestUtils.assertEquals("0.5", RandomUtils.gamma(HALF), RandomUtils.gamma(HALF + ONE) / HALF, 1E-14 / THREE);
+        TestUtils.assertEquals("0.25", RandomUtils.gamma(QUARTER), RandomUtils.gamma(QUARTER + ONE) / QUARTER, 1E-14 / THREE);
         TestUtils.assertEquals("0.1", RandomUtils.gamma(TENTH), RandomUtils.gamma(TENTH + ONE) / TENTH, tmpEps);
         TestUtils.assertEquals("0.01", RandomUtils.gamma(HUNDREDTH), RandomUtils.gamma(HUNDREDTH + ONE) / HUNDREDTH, tmpEps);
         TestUtils.assertEquals("0.001", RandomUtils.gamma(THOUSANDTH), RandomUtils.gamma(THOUSANDTH + ONE) / THOUSANDTH, tmpEps);
@@ -272,8 +273,8 @@ public class RandomNumberTest extends RandomTests {
         final double tmpFactoryExpected = 1.05;
         final double tmpFactoryStdDev = Math.abs(new Normal(0.0, (tmpFactoryExpected - ONE)).doubleValue());
         final Normal tmpFactoryDistr = new Normal(tmpFactoryExpected, tmpFactoryStdDev);
-        TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), PrimitiveMath.IS_ZERO);
-        TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
 
         final PrimitiveArray tmpRawValues = PrimitiveArray.make(tmpSize);
         final PrimitiveArray tmpLogValues = PrimitiveArray.make(tmpSize);
@@ -291,13 +292,13 @@ public class RandomNumberTest extends RandomTests {
         for (int i = 0; i < tmpSize; i++) {
             tmpRawProduct *= tmpRawValues.data[i];
         }
-        TestUtils.assertEquals(tmpGeometricMean, Math.pow(tmpRawProduct, ONE / tmpSize), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals(tmpGeometricMean, Math.pow(tmpRawProduct, ONE / tmpSize), 1E-14 / PrimitiveMath.THREE);
 
         double tmpLogSum = ZERO;
         for (int i = 0; i < tmpSize; i++) {
             tmpLogSum += tmpLogValues.data[i];
         }
-        TestUtils.assertEquals(tmpGeometricMean, Math.exp(tmpLogSum / tmpSize), PrimitiveMath.IS_ZERO);
+        TestUtils.assertEquals(tmpGeometricMean, Math.exp(tmpLogSum / tmpSize), 1E-14 / PrimitiveMath.THREE);
 
         final double tmpLogGeoMean = Math.log(tmpGeometricMean);
 
@@ -400,8 +401,8 @@ public class RandomNumberTest extends RandomTests {
             final double tmpSampledValue = tmpSamples.getMean();
             final double tmpQuotient = tmpSampledValue / tmpDistrValue;
 
-            final double tmpExpected = TypeUtils.isZero(tmpDistrValue) ? tmpDistrValue : ONE;
-            final double tmpActual = TypeUtils.isZero(tmpDistrValue) ? tmpSampledValue : tmpQuotient;
+            final double tmpExpected = PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpDistrValue) ? tmpDistrValue : ONE;
+            final double tmpActual = PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpDistrValue) ? tmpSampledValue : tmpQuotient;
 
             //            BasicLogger.logDebug("Name={}: Value={} <=> Sampled={} == Quotient={}", tmpDistrName, tmpDistrValue, tmpSampledValue, tmpQuotient);
 
@@ -423,7 +424,7 @@ public class RandomNumberTest extends RandomTests {
 
         tmpExpectedVar = tmpSampleSet.getSumOfSquares() / (tmpSampleSet.size() - 1);
 
-        TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, IS_ZERO);
+        TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, 1E-14 / THREE);
 
         final double[] tmpValues = tmpSampleSet.getValues();
         double s = ZERO, s2 = ZERO;
@@ -434,7 +435,7 @@ public class RandomNumberTest extends RandomTests {
 
         tmpActualVar = RandomUtils.calculateVariance(s, s2, tmpValues.length);
 
-        TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, THOUSAND * IS_ZERO); // TODO Large numerical difference, which is better?
+        TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, THOUSAND * (1E-14 / THREE)); // TODO Large numerical difference, which is better?
     }
 
     public void testWeibull() {
@@ -453,7 +454,7 @@ public class RandomNumberTest extends RandomTests {
     public void testWeibullWithShape1() {
 
         // Weibull with shape=1.0 shoud be equivalent to Exponential with the same lambda
-        final double tmpEpsilon = IS_ZERO * THOUSAND * TEN;
+        final double tmpEpsilon = 1E-14 / THREE * THOUSAND * TEN;
 
         for (double lambda = HUNDREDTH; lambda <= HUNDRED; lambda *= TEN) {
             final Exponential tmpExpected = new Exponential(lambda);

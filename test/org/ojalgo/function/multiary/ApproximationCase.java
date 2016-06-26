@@ -70,7 +70,7 @@ public class ApproximationCase extends FunctionMultiaryTests {
 
         final PhysicalStore<Double> tmpX = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
 
-        TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), Math.sqrt(PrimitiveMath.IS_ZERO));
+        TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), Math.sqrt(1E-14 / PrimitiveMath.THREE));
     }
 
 }

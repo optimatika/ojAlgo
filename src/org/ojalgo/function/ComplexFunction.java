@@ -23,6 +23,7 @@ package org.ojalgo.function;
 
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.TypeUtils;
 
 public final class ComplexFunction extends FunctionSet<ComplexNumber> {
@@ -144,7 +145,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final UnaryFunction<ComplexNumber> CARDINALITY = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return TypeUtils.isZero(arg.norm()) ? ComplexNumber.ZERO : ComplexNumber.ONE;
+            return PrimitiveScalar.isSmall(PrimitiveMath.ONE, arg.norm()) ? ComplexNumber.ZERO : ComplexNumber.ONE;
         }
 
     };

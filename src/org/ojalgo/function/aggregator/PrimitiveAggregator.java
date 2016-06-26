@@ -24,6 +24,7 @@ package org.ojalgo.function.aggregator;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
@@ -51,7 +52,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    if (!TypeUtils.isZero(anArg)) {
+                    if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, anArg)) {
                         myCount++;
                     }
                 }

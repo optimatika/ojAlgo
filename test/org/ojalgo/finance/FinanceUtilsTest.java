@@ -49,13 +49,13 @@ public class FinanceUtilsTest extends FinanceTests {
             final double tmpExpRate = FinanceUtils.toGrowthRateFromAnnualReturn(tmpExpReturn, CalendarDateUnit.MONTH);
 
             double tmpActReturn = FinanceUtils.toAnnualReturnFromGrowthFactor(tmpExpFactor, CalendarDateUnit.MONTH);
-            TestUtils.assertEquals(tmpExpReturn, tmpActReturn, PrimitiveMath.IS_ZERO);
+            TestUtils.assertEquals(tmpExpReturn, tmpActReturn, 1E-14 / PrimitiveMath.THREE);
 
             tmpActReturn = FinanceUtils.toAnnualReturnFromGrowthRate(tmpExpRate, CalendarDateUnit.MONTH);
-            TestUtils.assertEquals(tmpExpReturn, tmpActReturn, PrimitiveMath.IS_ZERO);
+            TestUtils.assertEquals(tmpExpReturn, tmpActReturn, 1E-14 / PrimitiveMath.THREE);
 
-            TestUtils.assertEquals(tmpExpFactor, Math.exp(tmpExpRate), PrimitiveMath.IS_ZERO);
-            TestUtils.assertEquals(tmpExpRate, Math.log(tmpExpFactor), PrimitiveMath.IS_ZERO);
+            TestUtils.assertEquals(tmpExpFactor, Math.exp(tmpExpRate), 1E-14 / PrimitiveMath.THREE);
+            TestUtils.assertEquals(tmpExpRate, Math.log(tmpExpFactor), 1E-14 / PrimitiveMath.THREE);
         }
 
     }

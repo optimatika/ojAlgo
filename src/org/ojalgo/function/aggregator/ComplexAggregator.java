@@ -27,6 +27,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.TypeUtils;
 
@@ -53,7 +54,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public void invoke(final ComplexNumber anArg) {
-                    if (!TypeUtils.isZero(anArg.norm())) {
+                    if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, anArg.norm())) {
                         myCount++;
                     }
                 }

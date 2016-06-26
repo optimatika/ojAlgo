@@ -37,6 +37,7 @@ import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.HouseholderHermitian;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -262,7 +263,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             final RawStore tmpMtrx = new RawStore(tmpEigen.length, tmpQ1.length);
 
             for (int i = 0; i < tmpEigen.length; i++) {
-                if (TypeUtils.isZero(tmpEigen[i])) {
+                if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpEigen[i])) {
                     for (int j = 0; j < tmpQ1.length; j++) {
                         tmpMtrx.set(i, j, PrimitiveMath.ZERO);
                     }

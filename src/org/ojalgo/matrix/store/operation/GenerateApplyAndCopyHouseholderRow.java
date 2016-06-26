@@ -29,6 +29,7 @@ import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.TypeUtils;
 
 public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
@@ -59,7 +60,7 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
                 tmpNorm2 = BigFunction.ADD.invoke(tmpNorm2, BigFunction.MULTIPLY.invoke(tmpVal, tmpVal));
                 tmpVector[j] = tmpVal;
             }
-            retVal = !TypeUtils.isZero(tmpNorm2.doubleValue());
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2.doubleValue());
         }
 
         if (retVal) {
@@ -110,7 +111,8 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
                 tmpNorm2 += tmpVal.norm() * tmpVal.norm();
                 tmpVector[j] = tmpVal;
             }
-            retVal = !TypeUtils.isZero(tmpNorm2);
+            final double value = tmpNorm2;
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 
         if (retVal) {
@@ -155,7 +157,8 @@ public final class GenerateApplyAndCopyHouseholderRow extends MatrixOperation {
                 tmpVal = tmpVector[j] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
-            retVal = !TypeUtils.isZero(tmpNorm2);
+            final double value = tmpNorm2;
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
         }
 
         if (retVal) {

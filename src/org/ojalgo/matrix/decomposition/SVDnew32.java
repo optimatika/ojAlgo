@@ -68,6 +68,12 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
     }
 
+    /**
+     * ≈ 1.6E-291
+     */
+    @Deprecated
+    static final double TINY = Math.pow(2.0, -966.0);
+
     static void doCase1(final double[] s, final double[] e, final int p, final int k, final DecompositionStore<?> mtrxQ2) {
 
         double f = e[p - 2];
@@ -264,7 +270,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
                 if (k == -1) {
                     break;
                 }
-                if (Math.abs(e[k]) <= (TINY + (MACHINE_EPSILON * (Math.abs(s[k]) + Math.abs(s[k + 1]))))) {
+                if (Math.abs(e[k]) <= (SVDnew32.TINY + (MACHINE_EPSILON * (Math.abs(s[k]) + Math.abs(s[k + 1]))))) {
                     e[k] = ZERO;
                     break;
                 }
@@ -278,7 +284,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
                         break;
                     }
                     final double t = (ks != p ? Math.abs(e[ks]) : ZERO) + (ks != (k + 1) ? Math.abs(e[ks - 1]) : ZERO);
-                    if (Math.abs(s[ks]) <= (TINY + (MACHINE_EPSILON * t))) {
+                    if (Math.abs(s[ks]) <= (SVDnew32.TINY + (MACHINE_EPSILON * t))) {
                         s[ks] = ZERO;
                         break;
                     }

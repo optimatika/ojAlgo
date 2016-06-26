@@ -35,6 +35,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -299,7 +300,8 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         double tmpSingular;
         for (int j = 0; j < tmpDim; j++) {
             tmpSingular = aMtrxD.doubleValue(j, j);
-            if (TypeUtils.isZero(tmpSingular)) {
+            final double value = tmpSingular;
+            if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, value)) {
                 for (int i = 0; i < tmpDim; i++) {
                     aMtrxV.set(i, j, PrimitiveMath.ZERO);
                 }
@@ -324,7 +326,8 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         double tmpSingular;
         for (int j = 0; j < tmpDim; j++) {
             tmpSingular = aMtrxD.doubleValue(j, j);
-            if (TypeUtils.isZero(tmpSingular)) {
+            final double value = tmpSingular;
+            if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, value)) {
                 for (int i = 0; i < tmpDim; i++) {
                     retVal.set(i, j, aMtrxV.doubleValue(i, j));
                 }
