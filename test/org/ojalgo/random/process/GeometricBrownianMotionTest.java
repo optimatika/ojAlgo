@@ -176,7 +176,8 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         TestUtils.assertEquals("Geometric Mean", tmpLogDiffDistr.getGeometricMean(), tmpProcessDistr.getGeometricMean(), 1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals("Geometric Standard Deviation", tmpLogDiffDistr.getGeometricStandardDeviation(), tmpProcessDistr.getGeometricStandardDeviation(),
                 1E-14 / PrimitiveMath.THREE);
-        TestUtils.assertEquals("Standard Deviation", tmpLogDiffDistr.getStandardDeviation(), tmpProcessDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals("Standard Deviation", tmpLogDiffDistr.getStandardDeviation(), tmpProcessDistr.getStandardDeviation(),
+                1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals("Variance", tmpLogDiffDistr.getVariance(), tmpProcessDistr.getVariance(), 1E-14 / PrimitiveMath.THREE);
 
         double tmpFactoryVal = tmpFactoryDistr.getExpected();

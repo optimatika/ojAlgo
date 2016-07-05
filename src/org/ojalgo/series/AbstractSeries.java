@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.DataSeries;
@@ -92,34 +91,6 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
 
     public V lastValue() {
         return this.get(this.lastKey());
-    }
-
-    public void modify(final BasicSeries<K, V> left, final BinaryFunction<V> func) {
-        K tmpKey;
-        V tmpLeftArg;
-        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            tmpKey = tmpEntry.getKey();
-            tmpLeftArg = left.get(tmpKey);
-            if (tmpLeftArg != null) {
-                this.put(tmpKey, func.invoke(tmpLeftArg, tmpEntry.getValue()));
-            } else {
-                this.remove(tmpKey);
-            }
-        }
-    }
-
-    public void modify(final BinaryFunction<V> func, final BasicSeries<K, V> right) {
-        K tmpKey;
-        V tmpRightArg;
-        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            tmpKey = tmpEntry.getKey();
-            tmpRightArg = right.get(tmpKey);
-            if (tmpRightArg != null) {
-                this.put(tmpKey, func.invoke(tmpEntry.getValue(), tmpRightArg));
-            } else {
-                this.remove(tmpKey);
-            }
-        }
     }
 
     public void modifyAll(final UnaryFunction<V> function) {

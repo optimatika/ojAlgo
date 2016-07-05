@@ -33,7 +33,7 @@ import org.ojalgo.access.IntIndex;
 import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PrimitiveArray;
-import org.ojalgo.function.multiary.MultiaryFunction;
+import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -425,22 +425,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     /**
-     * @deprecated v40 Use {@link #objective()} instead
-     */
-    @Deprecated
-    public Expression getObjectiveExpression() {
-        return this.objective();
-    }
-
-    /**
-     * @deprecated v39 Use {@link #objective()} and {@link Expression#toFunction()} instead.
-     */
-    @Deprecated
-    public MultiaryFunction.TwiceDifferentiable<Double> getObjectiveFunction() {
-        return this.objective().toFunction();
-    }
-
-    /**
      * @return A list of the variables that are not fixed at a specific value and whos range include positive
      *         values and/or zero
      */
@@ -817,21 +801,29 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public boolean validate(final Access1D<BigDecimal> solution) {
-        return this.validate(solution, options.slack);
+        return this.validate(solution, options.slack, options.debug_appender);
     }
 
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context) {
+        return this.validate(solution, context, options.debug_appender);
+    }
+
+    public boolean validate(final Access1D<BigDecimal> solution, final Printer appender) {
+        return this.validate(solution, options.slack, appender);
+    }
+
+    public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final Printer appender) {
 
         final int tmpSize = myVariables.size();
 
         boolean retVal = tmpSize == solution.count();
 
         for (int i = 0; retVal && (i < tmpSize); i++) {
-            retVal &= myVariables.get(i).validate(solution.get(i), context, options.debug_appender);
+            retVal &= myVariables.get(i).validate(solution.get(i), context, appender);
         }
 
         for (final Expression tmpExpression : myExpressions.values()) {
-            retVal &= retVal && tmpExpression.validate(solution, context, options.debug_appender);
+            retVal &= retVal && tmpExpression.validate(solution, context, appender);
         }
 
         return retVal;

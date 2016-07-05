@@ -29,8 +29,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.ComplexNumber;
@@ -206,14 +204,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
             return this;
         }
 
-        /**
-         * @deprecated v40 Use {@link #offsets(int, int)} and/or {@link #limits(int, int)} instead
-         */
-        @Deprecated
-        public final LogicalBuilder<N> columns(final int first, final int limit) {
-            return this.limits((int) this.countRows(), limit).offsets(0, first);
-        }
-
         public final LogicalBuilder<N> conjugate() {
             if (myStore instanceof ConjugatedStore) {
                 myStore = ((ConjugatedStore<N>) myStore).getOriginal();
@@ -356,14 +346,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         public final LogicalBuilder<N> row(final int... row) {
             myStore = new RowsStore<N>(myStore, row);
             return this;
-        }
-
-        /**
-         * @deprecated v40 Use {@link #offsets(int, int)} and/or {@link #limits(int, int)} instead
-         */
-        @Deprecated
-        public final LogicalBuilder<N> rows(final int first, final int limit) {
-            return this.limits(limit, (int) this.countColumns()).offsets(first, 0);
         }
 
         public final LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> aStore) {
@@ -592,18 +574,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
 
     default double norm() {
         return this.aggregateAll(Aggregator.NORM2).doubleValue();
-    }
-
-    default ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {
-        return new UnaryOperatorSupplier<>(operator, this);
-    }
-
-    default ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
-        return new BinaryOperatorSupplier<>(this, operator, right);
-    }
-
-    default ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
-        return new BinaryOperatorSupplier<>(left, operator, this);
     }
 
     /**

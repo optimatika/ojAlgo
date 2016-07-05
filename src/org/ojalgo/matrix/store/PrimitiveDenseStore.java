@@ -39,6 +39,7 @@ import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -925,8 +926,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     private final PrimitiveMultiplyBoth multiplyBoth;
     private final PrimitiveMultiplyLeft multiplyLeft;
-    private final PrimitiveMultiplyRight multiplyRight;
     private final PrimitiveMultiplyNeither multiplyNeither;
+    private final PrimitiveMultiplyRight multiplyRight;
     private final int myColDim;
     private final int myRowDim;
     private final Array2D<Double> myUtility;
@@ -994,8 +995,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     public void accept(final Access2D<Double> supplied) {
-        for (long j = 0; j < supplied.countColumns(); j++) {
-            for (long i = 0; i < supplied.countRows(); i++) {
+        for (long j = 0L; j < supplied.countColumns(); j++) {
+            for (long i = 0L; i < supplied.countRows(); i++) {
                 this.set(i, j, supplied.doubleValue(i, j));
             }
         }
@@ -1467,6 +1468,20 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public void modifyDiagonal(final long row, final long column, final UnaryFunction<Double> function) {
         myUtility.modifyDiagonal(row, column, function);
+    }
+
+    public void modifyMatching(final Access1D<Double> left, final BinaryFunction<Double> function) {
+        final long tmpLimit = FunctionUtils.min(left.count(), this.count(), this.count());
+        for (long i = 0L; i < tmpLimit; i++) {
+            this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
+        }
+    }
+
+    public void modifyMatching(final BinaryFunction<Double> function, final Access1D<Double> right) {
+        final long tmpLimit = FunctionUtils.min(this.count(), right.count(), this.count());
+        for (long i = 0L; i < tmpLimit; i++) {
+            this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
+        }
     }
 
     public void modifyOne(final long row, final long column, final UnaryFunction<Double> function) {

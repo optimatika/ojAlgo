@@ -809,14 +809,6 @@ public abstract class AccessUtils {
         return retVal;
     }
 
-    /**
-     * @deprecated v39 Use {@link #shape(StructureAnyD)} instead
-     */
-    @Deprecated
-    public static long[] structure(final StructureAnyD structure) {
-        return AccessUtils.shape(structure);
-    }
-
     private AccessUtils() {
         super();
     }

@@ -76,7 +76,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
         if ((myAI != null) && (myBI != null)) {
 
             final PhysicalStore<Double> tmpSlack = myBI.copy();
-            tmpSlack.fillMatching(tmpSlack, PrimitiveFunction.SUBTRACT, myAI.multiply(myXI));
+            tmpSlack.modifyMatching(PrimitiveFunction.SUBTRACT, myAI.multiply(myXI));
 
             for (int i = 0; i < tmpSlack.countRows(); i++) {
                 TestUtils.assertTrue(tmpSlack.doubleValue(i, 0) > -myEvaluationContext.epsilon());

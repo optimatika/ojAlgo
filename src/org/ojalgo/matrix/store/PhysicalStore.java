@@ -156,7 +156,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
         public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
             // TODO very inefficient implemention - must invent something better
             final long tmpLimit = FunctionUtils.min(left.count(), this.count());
-            for (long i = 0; i < tmpLimit; i++) {
+            for (long i = 0L; i < tmpLimit; i++) {
                 this.modifyOne(i, function.first(left.get(i)));
             }
         }
@@ -164,7 +164,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
         public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
             // TODO very inefficient implemention - must invent something better
             final long tmpLimit = FunctionUtils.min(this.count(), right.count());
-            for (long i = 0; i < tmpLimit; i++) {
+            for (long i = 0L; i < tmpLimit; i++) {
                 this.modifyOne(i, function.second(right.get(i)));
             }
         }

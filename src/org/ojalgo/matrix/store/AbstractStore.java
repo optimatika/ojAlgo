@@ -136,8 +136,8 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
             tmpStep1.fillByMultiplying(leftAndRight, this);
         } else {
             final PhysicalStore<N> tmpLeft = this.factory().rows(leftAndRight);
-            tmpLeft.fillMatching(this.factory().function().conjugate(), leftAndRight);
-            tmpStep1.fillByMultiplying(tmpLeft, this);
+            tmpLeft.modifyAll(this.factory().function().conjugate());
+            tmpStep1.fillByMultiplying(tmpLeft.conjugate(), this);
         }
 
         tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);

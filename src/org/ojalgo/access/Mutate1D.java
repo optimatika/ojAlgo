@@ -33,6 +33,18 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface Mutate1D extends Structure1D {
 
+    interface BiModifiable<N extends Number> extends Mutate1D {
+
+        void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function);
+
+        void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right);
+
+        // void modifyOneMatching(long index, final Access1D<N> left, final BinaryFunction<N> function);
+
+        // void modifyOneMatching(long index, final BinaryFunction<N> function, final Access1D<N> right);
+
+    }
+
     interface Fillable<N extends Number> extends Mutate1D {
 
         void fillAll(N value);
@@ -48,7 +60,7 @@ public interface Mutate1D extends Structure1D {
          */
         default void fillMatching(final Access1D<?> values) {
             final long tmpLimit = FunctionUtils.min(this.count(), values.count());
-            for (long i = 0; i < tmpLimit; i++) {
+            for (long i = 0L; i < tmpLimit; i++) {
                 this.fillOneMatching(i, values, i);
             }
         }
@@ -59,10 +71,14 @@ public interface Mutate1D extends Structure1D {
          * funtion:
          * </p>
          * <code>this(i) = function.invoke(left(i),right(i))</code>
+         *
+         * @deprecated v41 Use {@link BiModifiable#modifyMatching(Access1D, BinaryFunction)} or
+         *             {@link BiModifiable#modifyMatching(BinaryFunction, Access1D)} instaed
          */
+        @Deprecated
         default void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
             final long tmpLimit = FunctionUtils.min(left.count(), right.count(), this.count());
-            for (long i = 0; i < tmpLimit; i++) {
+            for (long i = 0L; i < tmpLimit; i++) {
                 this.fillOne(i, function.invoke(left.get(i), right.get(i)));
             }
         }
@@ -73,7 +89,10 @@ public interface Mutate1D extends Structure1D {
          * funtion:
          * </p>
          * <code>this(i) = function.invoke(arguments(i))</code>
+         *
+         * @deprecated v41 Use {@link Modifiable#modifyAll(UnaryFunction)} instaed
          */
+        @Deprecated
         default void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
             final long tmpLimit = FunctionUtils.min(this.count(), arguments.count());
             for (long i = 0L; i < tmpLimit; i++) {
@@ -96,14 +115,6 @@ public interface Mutate1D extends Structure1D {
     interface Modifiable<N extends Number> extends Mutate1D {
 
         void modifyAll(UnaryFunction<N> function);
-
-        void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function);
-
-        void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right);
-
-        // void modifyOneMatching(long index, final Access1D<N> left, final BinaryFunction<N> function);
-
-        // void modifyOneMatching(long index, final BinaryFunction<N> function, final Access1D<N> right);
 
         void modifyOne(long index, UnaryFunction<N> function);
 

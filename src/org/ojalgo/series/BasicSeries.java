@@ -62,18 +62,6 @@ public interface BasicSeries<K extends Comparable<K>, V extends Number> extends 
      * @deprecated v40
      */
     @Deprecated
-    void modify(BasicSeries<K, V> left, BinaryFunction<V> func);
-
-    /**
-     * @deprecated v40
-     */
-    @Deprecated
-    void modify(BinaryFunction<V> func, BasicSeries<K, V> right);
-
-    /**
-     * @deprecated v40
-     */
-    @Deprecated
     default void modify(final BinaryFunction<V> func, final V right) {
         for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
             this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue(), right));
@@ -87,24 +75,6 @@ public interface BasicSeries<K extends Comparable<K>, V extends Number> extends 
     default void modify(final ParameterFunction<V> func, final int param) {
         for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
             this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue(), param));
-        }
-    }
-
-    /**
-     * @deprecated v40 Use {@link #modifyAll(UnaryFunction)} instead
-     */
-    @Deprecated
-    default void modify(final UnaryFunction<V> func) {
-        this.modifyAll(func);
-    }
-
-    /**
-     * @deprecated v40
-     */
-    @Deprecated
-    default void modify(final V left, final BinaryFunction<V> func) {
-        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), func.invoke(left, tmpEntry.getValue()));
         }
     }
 

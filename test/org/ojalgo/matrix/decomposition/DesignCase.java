@@ -82,7 +82,7 @@ public class DesignCase extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpX = tmpQR.solve(tmpB).copy();
 
         // BasicLogger.debug("Straigt X: " + tmpX.toString());
-        tmpB.fillMatching(tmpB, PrimitiveFunction.SUBTRACT, tmpA.multiply(tmpX));
+        tmpB.modifyMatching(PrimitiveFunction.SUBTRACT, tmpA.multiply(tmpX));
         // BasicLogger.debug("Residual B: " + tmpB.toString());
 
     }

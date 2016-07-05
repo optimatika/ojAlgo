@@ -58,7 +58,7 @@ public abstract class MatrixUtils {
      */
     public static void copyComplexArgument(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
         final long tmpCount = FunctionUtils.min(source.count(), destination.count());
-        for (long i = 0; i < tmpCount; i++) {
+        for (long i = 0L; i < tmpCount; i++) {
             destination.set(i, source.get(i).getArgument());
         }
     }
@@ -68,7 +68,7 @@ public abstract class MatrixUtils {
      */
     public static void copyComplexImaginary(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
         final long tmpCount = FunctionUtils.min(source.count(), destination.count());
-        for (long i = 0; i < tmpCount; i++) {
+        for (long i = 0L; i < tmpCount; i++) {
             destination.set(i, source.get(i).getImaginary());
         }
     }
@@ -78,7 +78,7 @@ public abstract class MatrixUtils {
      */
     public static void copyComplexModulus(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
         final long tmpCount = FunctionUtils.min(source.count(), destination.count());
-        for (long i = 0; i < tmpCount; i++) {
+        for (long i = 0L; i < tmpCount; i++) {
             destination.set(i, source.get(i).getModulus());
         }
     }
@@ -90,7 +90,7 @@ public abstract class MatrixUtils {
             final ElementsConsumer<?> argDest) {
         final long tmpCount = FunctionUtils.min(source.count(), modDest.count(), argDest.count());
         ComplexNumber tmpComplexNumber;
-        for (long i = 0; i < tmpCount; i++) {
+        for (long i = 0L; i < tmpCount; i++) {
             tmpComplexNumber = source.get(i);
             modDest.set(i, tmpComplexNumber.getModulus());
             argDest.set(i, tmpComplexNumber.getArgument());
@@ -102,7 +102,7 @@ public abstract class MatrixUtils {
      */
     public static void copyComplexReal(final Access2D<ComplexNumber> source, final ElementsConsumer<?> destination) {
         final long tmpCount = FunctionUtils.min(source.count(), destination.count());
-        for (long i = 0; i < tmpCount; i++) {
+        for (long i = 0L; i < tmpCount; i++) {
             destination.set(i, source.get(i).getReal());
         }
     }
@@ -114,7 +114,7 @@ public abstract class MatrixUtils {
             final ElementsConsumer<?> imagDest) {
         final long tmpCount = FunctionUtils.min(source.count(), realDest.count(), imagDest.count());
         ComplexNumber tmpComplexNumber;
-        for (long i = 0; i < tmpCount; i++) {
+        for (long i = 0L; i < tmpCount; i++) {
             tmpComplexNumber = source.get(i);
             realDest.set(i, tmpComplexNumber.getReal());
             imagDest.set(i, tmpComplexNumber.getImaginary());

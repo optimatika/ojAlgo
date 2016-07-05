@@ -49,7 +49,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.Fillable<N>,
-        Mutate1D.Modifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
+        Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
@@ -261,7 +261,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
             retVal = (BasicArray<N>) new PrimitiveArray((int) length);
 
-            for (long i = 0; i < length; i++) {
+            for (long i = 0L; i < length; i++) {
                 retVal.set(i, this.doubleValue(i));
             }
 
@@ -271,7 +271,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
             retVal = (BasicArray<N>) new ComplexArray((int) length);
 
-            for (long i = 0; i < length; i++) {
+            for (long i = 0L; i < length; i++) {
                 retVal.set(i, this.get(i));
             }
 
@@ -281,7 +281,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
             retVal = (BasicArray<N>) new BigArray((int) length);
 
-            for (long i = 0; i < length; i++) {
+            for (long i = 0L; i < length; i++) {
                 retVal.set(i, this.get(i));
             }
 
@@ -456,11 +456,11 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
         final long tmpLength = Math.min(length, right.count());
         if (myDelegate instanceof PrimitiveArray) {
-            for (long i = 0; i < tmpLength; i++) {
+            for (long i = 0L; i < tmpLength; i++) {
                 this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
             }
         } else {
-            for (long i = 0; i < tmpLength; i++) {
+            for (long i = 0L; i < tmpLength; i++) {
                 this.set(i, function.invoke(this.get(i), right.get(i)));
             }
         }

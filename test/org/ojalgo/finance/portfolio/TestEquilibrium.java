@@ -152,7 +152,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
         final PhysicalStore<Double> tmpCovariances = PrimitiveDenseStore.FACTORY.makeFilled(tmpDim, tmpDim, tmpRndmCorrelation);
         tmpCovariances.fillDiagonal(0, 0, 0.5);
-        tmpCovariances.fillMatching(tmpCovariances, PrimitiveFunction.ADD, tmpCovariances.transpose());
+        tmpCovariances.modifyMatching(PrimitiveFunction.ADD, tmpCovariances.transpose());
         for (int ij = 0; ij < tmpDim; ij++) {
             final UnaryFunction<Double> tmpFunc = PrimitiveFunction.MULTIPLY.first(tmpRndmVolatility.doubleValue());
             tmpCovariances.modifyRow(ij, 0, tmpFunc);

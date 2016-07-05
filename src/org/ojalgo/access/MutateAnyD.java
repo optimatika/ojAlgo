@@ -31,6 +31,10 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
+    interface BiModifiable<N extends Number> extends MutateAnyD, Mutate1D.BiModifiable<N> {
+
+    }
+
     interface Fillable<N extends Number> extends MutateAnyD, Mutate1D.Fillable<N> {
 
         void fillOne(long[] reference, N value);

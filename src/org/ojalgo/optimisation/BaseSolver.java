@@ -316,7 +316,7 @@ public abstract class BaseSolver extends GenericSolver {
 
                 retVal = this.getBE().copy();
 
-                retVal.fillMatching(retVal, PrimitiveFunction.SUBTRACT, this.getAEX());
+                retVal.modifyMatching(PrimitiveFunction.SUBTRACT, this.getAEX());
             }
 
             return retVal;
@@ -333,7 +333,7 @@ public abstract class BaseSolver extends GenericSolver {
 
                 retVal = this.getBI().copy();
 
-                retVal.fillMatching(retVal, PrimitiveFunction.SUBTRACT, this.getAIX());
+                retVal.modifyMatching(PrimitiveFunction.SUBTRACT, this.getAIX());
             }
 
             return retVal;

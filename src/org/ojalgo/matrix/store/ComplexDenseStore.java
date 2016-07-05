@@ -36,6 +36,7 @@ import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -470,8 +471,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public void accept(final Access2D<ComplexNumber> supplied) {
-        for (long j = 0; j < supplied.countColumns(); j++) {
-            for (long i = 0; i < supplied.countRows(); i++) {
+        for (long j = 0L; j < supplied.countColumns(); j++) {
+            for (long i = 0L; i < supplied.countRows(); i++) {
                 this.set(i, j, supplied.get(i, j));
             }
         }
@@ -904,6 +905,20 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myUtility.modifyDiagonal(row, column, function);
     }
 
+    public void modifyMatching(final Access1D<ComplexNumber> left, final BinaryFunction<ComplexNumber> function) {
+        final long tmpLimit = FunctionUtils.min(left.count(), this.count(), this.count());
+        for (long i = 0L; i < tmpLimit; i++) {
+            this.fillOne(i, function.invoke(left.get(i), this.get(i)));
+        }
+    }
+
+    public void modifyMatching(final BinaryFunction<ComplexNumber> function, final Access1D<ComplexNumber> right) {
+        final long tmpLimit = FunctionUtils.min(this.count(), right.count(), this.count());
+        for (long i = 0L; i < tmpLimit; i++) {
+            this.fillOne(i, function.invoke(this.get(i), right.get(i)));
+        }
+    }
+
     public void modifyOne(final long row, final long column, final UnaryFunction<ComplexNumber> function) {
 
         ComplexNumber tmpValue = this.get(row, column);
@@ -936,7 +951,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         final PhysicalStore<ComplexNumber> tmpStep2 = FACTORY.makeZero(1L, 1L);
 
         final PhysicalStore<ComplexNumber> tmpLeft = FACTORY.rows(leftAndRight);
-        tmpLeft.fillMatching(FACTORY.function().conjugate(), leftAndRight);
+        tmpLeft.modifyAll(FACTORY.function().conjugate());
         tmpStep1.fillByMultiplying(tmpLeft, this);
 
         tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);

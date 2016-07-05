@@ -367,76 +367,12 @@ public final class Expression extends ModelEntity<Expression> {
         return myLinear.entrySet();
     }
 
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public BigDecimal getLinearFactor(final int index) {
-        return this.get(myModel.getVariable(index));
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public BigDecimal getLinearFactor(final IntIndex key) {
-        return this.get(key);
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public BigDecimal getLinearFactor(final Variable variable) {
-        return this.get(variable);
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public Set<IntIndex> getLinearFactorKeys() {
-        return this.getLinearKeySet();
-    }
-
     public Set<IntIndex> getLinearKeySet() {
         return myLinear.keySet();
     }
 
     public Set<Entry<IntRowColumn, BigDecimal>> getQuadraticEntrySet() {
         return myQuadratic.entrySet();
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public BigDecimal getQuadraticFactor(final int row, final int column) {
-        return this.get(new IntRowColumn(row, column));
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public BigDecimal getQuadraticFactor(final IntRowColumn key) {
-        return this.get(key);
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public BigDecimal getQuadraticFactor(final Variable variable1, final Variable variable2) {
-        return this.get(new IntRowColumn(variable1.getIndex().index, variable2.getIndex().index));
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public Set<IntRowColumn> getQuadraticFactorKeys() {
-        return this.getQuadraticKeySet();
     }
 
     public Set<IntRowColumn> getQuadraticKeySet() {
@@ -553,14 +489,6 @@ public final class Expression extends ModelEntity<Expression> {
         }
     }
 
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public void setLinearFactor(final Variable variable, final Number value) {
-        this.set(variable, value);
-    }
-
     public void setLinearFactors(final List<Variable> variables, final Access1D<?> factors) {
 
         final int tmpLimit = variables.size();
@@ -583,22 +511,6 @@ public final class Expression extends ModelEntity<Expression> {
         for (final Variable tmpVariable : variables) {
             this.set(tmpVariable, BigMath.ONE);
         }
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public void setQuadraticFactor(final IntRowColumn key, final Number value) {
-        this.set(key, value);
-    }
-
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
-    public void setQuadraticFactor(final Variable variable1, final Variable variable2, final Number value) {
-        this.set(variable1, variable2, value);
     }
 
     public void setQuadraticFactors(final List<Variable> variables, final Access2D<?> factors) {

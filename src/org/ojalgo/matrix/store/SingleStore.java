@@ -65,14 +65,11 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
     @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = (int) (right.count() / this.getColDim());
-
         final PhysicalStore.Factory<N, ?> tmpFactory = this.factory();
 
-        final PhysicalStore<N> retVal = tmpFactory.makeZero(tmpRowDim, tmpColDim);
+        final PhysicalStore<N> retVal = tmpFactory.copy(right);
 
-        retVal.fillMatching(tmpFactory.function().multiply().first(myNumber), right);
+        retVal.modifyAll(tmpFactory.function().multiply().first(myNumber));
 
         return retVal;
     }

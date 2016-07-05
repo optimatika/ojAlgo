@@ -25,20 +25,27 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.type.context.NumberContext;
 
-public abstract class OptimisationUtils {
+abstract class OptimisationUtils {
+
+    private static final double _16_0 = EIGHT + EIGHT;
 
     static final NumberContext DISPLAY = NumberContext.getGeneral(6);
 
     static int getAdjustmentExponent(final double largest, final double smallest) {
 
         final double tmpLargestExp = largest > ZERO ? Math.log10(largest) : ZERO;
-        double tmpSmallestExp = smallest > ZERO ? Math.log10(smallest) : -EIGHT;
+        final double tmpSmallestExp = smallest > ZERO ? Math.log10(smallest) : -EIGHT;
 
-        tmpSmallestExp = Math.max(tmpSmallestExp, tmpLargestExp - EIGHT - EIGHT);
+        if ((tmpLargestExp > _16_0) || (tmpSmallestExp < -_16_0)) {
 
-        final double tmpNegatedAverage = (tmpLargestExp + tmpSmallestExp) / (-TWO);
+            return 0;
 
-        return (int) Math.rint(tmpNegatedAverage);
+        } else {
+
+            final double tmpNegatedAverage = (tmpLargestExp + tmpSmallestExp) / (-TWO);
+
+            return (int) Math.rint(tmpNegatedAverage);
+        }
     }
 
     private OptimisationUtils() {

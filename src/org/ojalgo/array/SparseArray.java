@@ -673,7 +673,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
             double tmpVal;
 
-            for (long i = 0; i < count; i++) {
+            for (long i = 0L; i < count; i++) {
 
                 tmpVal = this.doubleValue(tmpIndexA);
                 this.set(tmpIndexA, this.doubleValue(tmpIndexB));
@@ -690,7 +690,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
             N tmpVal;
 
-            for (long i = 0; i < count; i++) {
+            for (long i = 0L; i < count; i++) {
 
                 tmpVal = this.get(tmpIndexA);
                 this.set(tmpIndexA, this.get(tmpIndexB));

@@ -43,7 +43,7 @@ public class SetGetTest extends BasicArrayTest {
             array.set(INDICES[i], 1.0);
         }
 
-        for (long i = 0; i < COUNT; i++) {
+        for (long i = 0L; i < COUNT; i++) {
 
             final int tmpIndex = Arrays.binarySearch(INDICES, i);
 

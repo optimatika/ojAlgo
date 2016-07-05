@@ -198,7 +198,7 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final String message, final Access1D<?> expected, final Access1D<?> actual, final NumberContext context) {
-        for (long i = 0; i < expected.count(); i++) {
+        for (long i = 0L; i < expected.count(); i++) {
             TestUtils.assertEquals(message + " @ " + i, expected.get(i), actual.get(i), context);
         }
     }

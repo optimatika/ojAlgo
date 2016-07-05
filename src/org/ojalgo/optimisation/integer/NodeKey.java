@@ -193,11 +193,11 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         return Math.min(Math.max(myLowerBounds[index], value), myUpperBounds[index]);
     }
 
-    private int[] getLowerBounds() {
+    int[] getLowerBounds() {
         return ArrayUtils.copyOf(myLowerBounds);
     }
 
-    private int[] getUpperBounds() {
+    int[] getUpperBounds() {
         return ArrayUtils.copyOf(myUpperBounds);
     }
 

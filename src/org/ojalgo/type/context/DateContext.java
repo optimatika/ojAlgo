@@ -29,7 +29,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.StandardType;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.format.DatePart;
 import org.ojalgo.type.format.DateStyle;
 

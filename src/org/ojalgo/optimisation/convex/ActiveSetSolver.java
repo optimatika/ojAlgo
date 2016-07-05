@@ -388,7 +388,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                     if (this.isDebug()) {
                         final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
-                        tmpStepLengths.fillMatching(tmpStepLengths, DIVIDE, tmpDenom);
+                        tmpStepLengths.modifyMatching(DIVIDE, tmpDenom);
                         this.debug("Looking for the largest possible step length (smallest positive scalar) among these: {}).", tmpStepLengths.asList());
                     }
 

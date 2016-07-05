@@ -29,13 +29,13 @@ import org.ojalgo.access.Mutate2D;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 
-public interface ElementsConsumer<N extends Number> extends Consumer2D<Access2D<N>>, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N> {
+public interface ElementsConsumer<N extends Number> extends Consumer2D<Access2D<N>>, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N> {
 
     default void accept(final Access2D<N> supplied) {
         final long tmpCountRows = supplied.countRows();
         final long tmpCountColumns = supplied.countColumns();
-        for (long j = 0; j < tmpCountColumns; j++) {
-            for (long i = 0; i < tmpCountRows; i++) {
+        for (long j = 0L; j < tmpCountColumns; j++) {
+            for (long i = 0L; i < tmpCountRows; i++) {
                 this.set(i, j, supplied.get(i, j));
             }
         }

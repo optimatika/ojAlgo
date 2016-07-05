@@ -77,7 +77,7 @@ abstract class ApproximateFunction<N extends Number> implements MultiaryFunction
 
     protected PhysicalStore<N> shift(final Access1D<?> arg) {
         final PhysicalStore<N> retVal = this.factory().columns(arg);
-        retVal.fillMatching(retVal, this.factory().function().subtract(), myPoint);
+        retVal.modifyMatching(this.factory().function().subtract(), myPoint);
         return retVal;
     }
 

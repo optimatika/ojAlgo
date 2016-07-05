@@ -33,14 +33,6 @@ public interface AggregatorFunction<N extends Number> extends VoidFunction<N>, A
 
     AggregatorFunction<N> reset();
 
-    /**
-     * @deprecated v40 Use {@link #getNumber()} instead
-     */
-    @Deprecated
-    default AggregationResults<N> snapshot() {
-        return new AggregationResults<N>(this.getNumber(), this.doubleValue(), this.intValue(), this.intValue());
-    }
-
     Scalar<N> toScalar();
 
 }

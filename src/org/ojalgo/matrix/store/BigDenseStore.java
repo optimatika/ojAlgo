@@ -39,6 +39,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
@@ -451,8 +452,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     }
 
     public void accept(final Access2D<BigDecimal> supplied) {
-        for (long j = 0; j < supplied.countColumns(); j++) {
-            for (long i = 0; i < supplied.countRows(); i++) {
+        for (long j = 0L; j < supplied.countColumns(); j++) {
+            for (long i = 0L; i < supplied.countRows(); i++) {
                 this.set(i, j, supplied.get(i, j));
             }
         }
@@ -883,6 +884,20 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void modifyDiagonal(final long row, final long column, final UnaryFunction<BigDecimal> function) {
         myUtility.modifyDiagonal(row, column, function);
+    }
+
+    public void modifyMatching(final Access1D<BigDecimal> left, final BinaryFunction<BigDecimal> function) {
+        final long tmpLimit = FunctionUtils.min(left.count(), this.count(), this.count());
+        for (long i = 0L; i < tmpLimit; i++) {
+            this.fillOne(i, function.invoke(left.get(i), this.get(i)));
+        }
+    }
+
+    public void modifyMatching(final BinaryFunction<BigDecimal> function, final Access1D<BigDecimal> right) {
+        final long tmpLimit = FunctionUtils.min(this.count(), right.count(), this.count());
+        for (long i = 0L; i < tmpLimit; i++) {
+            this.fillOne(i, function.invoke(this.get(i), right.get(i)));
+        }
     }
 
     public void modifyOne(final long row, final long column, final UnaryFunction<BigDecimal> function) {

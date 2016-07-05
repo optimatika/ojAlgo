@@ -31,6 +31,10 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface Mutate2D extends Structure2D, Mutate1D {
 
+    interface BiModifiable<N extends Number> extends Mutate2D, Mutate1D.BiModifiable<N> {
+
+    }
+
     interface Fillable<N extends Number> extends Mutate2D, Mutate1D.Fillable<N> {
 
         default void fillColumn(final long row, final long column, final Access1D<N> values) {

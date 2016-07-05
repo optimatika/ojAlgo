@@ -627,8 +627,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public void accept(final Access2D<Double> supplied) {
-        for (long j = 0; j < supplied.countColumns(); j++) {
-            for (long i = 0; i < supplied.countRows(); i++) {
+        for (long j = 0L; j < supplied.countColumns(); j++) {
+            for (long i = 0L; i < supplied.countRows(); i++) {
                 this.set(i, j, supplied.doubleValue(i, j));
             }
         }
