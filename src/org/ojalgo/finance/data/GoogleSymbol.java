@@ -66,7 +66,7 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
 
     private static final String CSV = "csv";
     private static final String DAILY = "daily";
-    private static final GenericContext<Date> DATE_FORMAT = new GenericContext<Date>(new SimpleDateFormat("dd-MMM-yy", Locale.US));
+    private static final GenericContext<Date> DATE_FORMAT = new GenericContext<>(new SimpleDateFormat("dd-MMM-yy", Locale.US));
     private static final String FINANCE_GOOGLE_COM = "finance.google.com";
     private static final String FINANCE_HISTORICAL = "/finance/historical";
     private static final String HISTPERIOD = "histperiod";

@@ -25,7 +25,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * Distribution of the sum of aCount random variables with an exponential distribution with parameter aLambda.

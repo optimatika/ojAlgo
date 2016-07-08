@@ -55,7 +55,7 @@ public class SymbolDataTest extends FinanceDataTests {
         final GoogleSymbol tmpGoogleSource = new GoogleSymbol(tmpGoogleSymbol, CalendarDateUnit.DAY);
         final CalendarDateSeries<Double> tmpGooglePrices = tmpGoogleSource.getPriceSeries();
 
-        CoordinationSet<Double> tmpCoordinator = new CoordinationSet<Double>();
+        CoordinationSet<Double> tmpCoordinator = new CoordinationSet<>();
         tmpCoordinator.put(tmpYahooPrices);
         tmpCoordinator.put(tmpGooglePrices);
         tmpCoordinator.complete();

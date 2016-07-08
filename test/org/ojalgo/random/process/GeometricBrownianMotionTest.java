@@ -188,7 +188,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Expected", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaExpected = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
+        final double tmpDeltaExpected = (1E-14 / THREE) * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
         TestUtils.assertEquals(tmpQuotienVal, tmpLogDiffVal, tmpDeltaExpected);
         TestUtils.assertEquals(tmpQuotienVal, tmpProcessVal, tmpDeltaExpected);
         TestUtils.assertEquals(true, tmpGeometrVal <= tmpProcessVal);
@@ -201,7 +201,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Std Dev", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaStdDev = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * THOUSAND;
+        final double tmpDeltaStdDev = (1E-14 / THREE) * THOUSAND * THOUSAND * THOUSAND * THOUSAND;
         TestUtils.assertEquals(tmpQuotienVal, tmpLogDiffVal, tmpDeltaStdDev);
         TestUtils.assertEquals(tmpQuotienVal, tmpProcessVal, tmpDeltaStdDev);
 
@@ -213,7 +213,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Var", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaVar = 1E-14 / THREE * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
+        final double tmpDeltaVar = (1E-14 / THREE) * THOUSAND * THOUSAND * THOUSAND * HUNDRED;
         TestUtils.assertEquals(tmpQuotienVal, tmpLogDiffVal, tmpDeltaVar);
         TestUtils.assertEquals(tmpQuotienVal, tmpProcessVal, tmpDeltaVar);
 
@@ -225,7 +225,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         if (RandomProcessTests.DEBUG) {
             this.logDebug("Final Value", tmpFactoryVal, tmpQuotienVal, tmpLogDiffVal, tmpProcessVal, tmpGeometrVal);
         }
-        final double tmpDeltaFinal = 1E-14 / THREE * THOUSAND;
+        final double tmpDeltaFinal = (1E-14 / THREE) * THOUSAND;
         TestUtils.assertEquals(ONE, tmpGeometrVal / tmpFactoryVal, tmpDeltaFinal);
     }
 
@@ -263,7 +263,7 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
 
         final List<? extends DatePrice> tmpRows = tmpYahoo.getHistoricalPrices();
 
-        final CalendarDateSeries<Double> tmpDaySeries = new CalendarDateSeries<Double>(CalendarDateUnit.DAY);
+        final CalendarDateSeries<Double> tmpDaySeries = new CalendarDateSeries<>(CalendarDateUnit.DAY);
         tmpDaySeries.putAll(tmpRows);
         final CalendarDateSeries<Double> tmpYearSeries = tmpDaySeries.resample(CalendarDateUnit.YEAR);
         final CalendarDateSeries<Double> tmpMonthSeries = tmpDaySeries.resample(CalendarDateUnit.MONTH);

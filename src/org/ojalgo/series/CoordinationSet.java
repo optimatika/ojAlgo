@@ -116,17 +116,17 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
 
     public List<CalendarDate> getAllCalendarDates() {
 
-        final TreeSet<CalendarDate> retVal = new TreeSet<CalendarDate>();
+        final TreeSet<CalendarDate> retVal = new TreeSet<>();
 
         for (final CalendarDateSeries<V> tmpSeries : this.values()) {
             retVal.addAll(tmpSeries.keySet());
         }
 
-        return new ArrayList<CalendarDate>(retVal);
+        return new ArrayList<>(retVal);
     }
 
     public List<String> getAllSeriesNames() {
-        return new ArrayList<String>(this.keySet());
+        return new ArrayList<>(this.keySet());
     }
 
     public CalendarDate getEarliestFirstKey() {
@@ -243,7 +243,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
      */
     public CoordinationSet<V> prune() {
 
-        final CoordinationSet<V> retVal = new CoordinationSet<V>(this.getResolution());
+        final CoordinationSet<V> retVal = new CoordinationSet<>(this.getResolution());
 
         final CalendarDate tmpFirstKey = this.getLatestFirstKey();
         final CalendarDate tmpLastKey = this.getEarliestLastKey();
@@ -280,7 +280,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
      */
     public CoordinationSet<V> prune(final CalendarDateUnit resolution) {
 
-        final CoordinationSet<V> retVal = new CoordinationSet<V>(resolution);
+        final CoordinationSet<V> retVal = new CoordinationSet<>(resolution);
 
         final CalendarDate tmpLatestFirstKey = this.getLatestFirstKey();
         final CalendarDate tmpEarliestLastKey = this.getEarliestLastKey();
@@ -302,7 +302,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
      */
     public CoordinationSet<V> resample(final CalendarDateUnit resolution) {
 
-        final CoordinationSet<V> retVal = new CoordinationSet<V>(resolution);
+        final CoordinationSet<V> retVal = new CoordinationSet<>(resolution);
 
         for (final java.util.Map.Entry<String, CalendarDateSeries<V>> tmpEntry : this.entrySet()) {
             retVal.put(tmpEntry.getKey(), tmpEntry.getValue().resample(resolution));

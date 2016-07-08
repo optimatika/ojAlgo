@@ -100,7 +100,7 @@ public final class MarkowitzModel extends EquilibriumModel {
     private static final NumberContext TARGET_CONTEXT = NumberContext.getGeneral(7, 14);
     private static final String VARIANCE = "Variance";
 
-    private final HashMap<int[], LowerUpper> myConstraints = new HashMap<int[], LowerUpper>();
+    private final HashMap<int[], LowerUpper> myConstraints = new HashMap<>();
     private final BasicMatrix myExpectedExcessReturns;
     private transient ExpressionsBasedModel myOptimisationModel;
     private transient State myOptimisationState = State.UNEXPLORED;

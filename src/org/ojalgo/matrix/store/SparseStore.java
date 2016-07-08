@@ -336,27 +336,27 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
      */
     @Deprecated
     public NonzeroView<N> nonzeros() {
-        return new NonzeroView<N>(myElements.nonzeros(), this.countRows());
+        return new NonzeroView<>(myElements.nonzeros(), this.countRows());
     }
 
     public final ElementsConsumer<N> regionByColumns(final int... columns) {
-        return new ColumnsRegion<N>(this, myMultiplyer, columns);
+        return new ColumnsRegion<>(this, myMultiplyer, columns);
     }
 
     public final ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new LimitRegion<N>(this, myMultiplyer, rowLimit, columnLimit);
+        return new LimitRegion<>(this, myMultiplyer, rowLimit, columnLimit);
     }
 
     public final ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new OffsetRegion<N>(this, myMultiplyer, rowOffset, columnOffset);
+        return new OffsetRegion<>(this, myMultiplyer, rowOffset, columnOffset);
     }
 
     public final ElementsConsumer<N> regionByRows(final int... rows) {
-        return new RowsRegion<N>(this, myMultiplyer, rows);
+        return new RowsRegion<>(this, myMultiplyer, rows);
     }
 
     public final ElementsConsumer<N> regionByTransposing() {
-        return new TransposedRegion<N>(this, myMultiplyer);
+        return new TransposedRegion<>(this, myMultiplyer);
     }
 
     public void set(final long row, final long col, final double value) {

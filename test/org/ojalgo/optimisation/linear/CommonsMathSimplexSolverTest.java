@@ -711,7 +711,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testDegeneracy() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.8, 0.7 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.LEQ, 18.0));
         constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.GEQ, 10.0));
         constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 8.0));
@@ -723,7 +723,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testEpsilon() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 10, 5, 1 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 9, 8, 0 }, Relationship.EQ, 17));
         constraints.add(new LinearConstraint(new double[] { 0, 7, 8 }, Relationship.LEQ, 7));
         constraints.add(new LinearConstraint(new double[] { 10, 0, 2 }, Relationship.LEQ, 10));
@@ -740,7 +740,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     //@Test(expected = NoFeasibleSolutionException.class)
     public void testInfeasibleSolution() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1 }, Relationship.LEQ, 1));
         constraints.add(new LinearConstraint(new double[] { 1 }, Relationship.GEQ, 3));
 
@@ -757,7 +757,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
         final LinearObjectiveFunction f = new LinearObjectiveFunction(objective, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(this.equationFromString(objective.length, "x0 + x1 + x2 + x3 - x12 = 0"));
         constraints.add(this.equationFromString(objective.length, "x4 + x5 + x6 + x7 + x8 + x9 + x10 + x11 - x13 = 0"));
         constraints.add(this.equationFromString(objective.length, "x4 + x5 + x6 + x7 + x8 + x9 + x10 + x11 >= 49"));
@@ -859,7 +859,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testMath272() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 2, 2, 1 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 1, 0 }, Relationship.GEQ, 1));
         constraints.add(new LinearConstraint(new double[] { 1, 0, 1 }, Relationship.GEQ, 1));
         constraints.add(new LinearConstraint(new double[] { 0, 1, 0 }, Relationship.GEQ, 1));
@@ -875,7 +875,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testMath286() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.8, 0.2, 0.7, 0.3, 0.6, 0.4 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0, 1, 0, 1, 0 }, Relationship.EQ, 23.0));
         constraints.add(new LinearConstraint(new double[] { 0, 1, 0, 1, 0, 1 }, Relationship.EQ, 23.0));
         constraints.add(new LinearConstraint(new double[] { 1, 0, 0, 0, 0, 0 }, Relationship.GEQ, 10.0));
@@ -895,7 +895,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testMath288() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 7, 3, 0, 0 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 3, 0, -5, 0 }, Relationship.LEQ, 0.0));
         constraints.add(new LinearConstraint(new double[] { 2, 0, 0, -5 }, Relationship.LEQ, 0.0));
         constraints.add(new LinearConstraint(new double[] { 0, 3, 0, -5 }, Relationship.LEQ, 0.0));
@@ -909,7 +909,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testMath290GEQ() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 5 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 2, 0 }, Relationship.GEQ, -1.0));
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair solution = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
@@ -921,7 +921,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     //@Test(expected = NoFeasibleSolutionException.class)
     public void testMath290LEQ() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 5 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 2, 0 }, Relationship.LEQ, -1.0));
         final SimplexSolver solver = new SimplexSolver();
         final PointValuePair tmpResult = solver.optimize(f, constraints, GoalType.MINIMIZE, true);
@@ -933,7 +933,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
      */
     public void testMath293() {
         LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.8, 0.2, 0.7, 0.3, 0.4, 0.6 }, 0);
-        Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0, 1, 0, 1, 0 }, Relationship.EQ, 30.0));
         constraints.add(new LinearConstraint(new double[] { 0, 1, 0, 1, 0, 1 }, Relationship.EQ, 30.0));
         constraints.add(new LinearConstraint(new double[] { 0.8, 0.2, 0.0, 0.0, 0.0, 0.0 }, Relationship.GEQ, 10.0));
@@ -956,7 +956,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         final double valC = (0.4 * solution1.getPoint()[4]) + (0.6 * solution1.getPoint()[5]);
 
         f = new LinearObjectiveFunction(new double[] { 0.8, 0.2, 0.7, 0.3, 0.4, 0.6 }, 0);
-        constraints = new ArrayList<LinearConstraint>();
+        constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0, 1, 0, 1, 0 }, Relationship.EQ, 30.0));
         constraints.add(new LinearConstraint(new double[] { 0, 1, 0, 1, 0, 1 }, Relationship.EQ, 30.0));
         constraints.add(new LinearConstraint(new double[] { 0.8, 0.2, 0.0, 0.0, 0.0, 0.0 }, Relationship.GEQ, valA));
@@ -969,7 +969,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testMath434NegativeVariable() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.0, 0.0, 1.0 }, 0.0d);
-        final ArrayList<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final ArrayList<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 1, 0 }, Relationship.EQ, 5));
         constraints.add(new LinearConstraint(new double[] { 0, 0, 1 }, Relationship.GEQ, -10));
 
@@ -987,7 +987,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0 }, 0.0);
 
         final double epsilon = 1e-6;
-        final ArrayList<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final ArrayList<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 200 }, Relationship.GEQ, 1));
         constraints.add(new LinearConstraint(new double[] { 100 }, Relationship.GEQ, 0.499900001));
 
@@ -1001,7 +1001,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     public void testMath434PivotRowSelection2() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 0.0d, 1.0d, 1.0d, 0.0d, 0.0d, 0.0d, 0.0d }, 0.0d);
 
-        final ArrayList<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final ArrayList<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1.0d, -0.1d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d }, Relationship.EQ, -0.1d));
         constraints.add(new LinearConstraint(new double[] { 1.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d }, Relationship.GEQ, -1e-18d));
         constraints.add(new LinearConstraint(new double[] { 0.0d, 1.0d, 0.0d, 0.0d, 0.0d, 0.0d, 0.0d }, Relationship.GEQ, 0.0d));
@@ -1027,7 +1027,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
         final double epsilon = 1e-6;
 
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0, 0.0 }, 0.0);
-        final ArrayList<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final ArrayList<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { epsilon / 2, 0.5 }, Relationship.EQ, 0));
         constraints.add(new LinearConstraint(new double[] { 1e-3, 0.1 }, Relationship.EQ, 10));
 
@@ -1039,7 +1039,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testMath713NegativeVariable() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1.0, 1.0 }, 0.0d);
-        final ArrayList<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final ArrayList<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.EQ, 1));
 
         final double epsilon = 1e-6;
@@ -1052,7 +1052,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testMinimization() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { -2, 1 }, -5);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 2 }, Relationship.LEQ, 6));
         constraints.add(new LinearConstraint(new double[] { 3, 2 }, Relationship.LEQ, 12));
         constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 0));
@@ -1070,7 +1070,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
      */
     public void testModelWithNoArtificialVars() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.LEQ, 2));
         constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.LEQ, 3));
         constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.LEQ, 4));
@@ -1084,7 +1084,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testRestrictVariablesToNonNegative() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 409, 523, 70, 204, 339 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 43, 56, 345, 56, 5 }, Relationship.LEQ, 4567456));
         constraints.add(new LinearConstraint(new double[] { 12, 45, 7, 56, 23 }, Relationship.LEQ, 56454));
         constraints.add(new LinearConstraint(new double[] { 8, 768, 0, 34, 7456 }, Relationship.LEQ, 1923421));
@@ -1103,7 +1103,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testSimplexSolver() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 7);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.LEQ, 2));
         constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.LEQ, 3));
         constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.EQ, 4));
@@ -1117,7 +1117,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testSingleVariableAndConstraint() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 3 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1 }, Relationship.LEQ, 10));
 
         final SimplexSolver solver = new SimplexSolver();
@@ -1128,7 +1128,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testSolutionWithNegativeDecisionVariable() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { -2, 1 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.GEQ, 6));
         constraints.add(new LinearConstraint(new double[] { 1, 2 }, Relationship.LEQ, 14));
 
@@ -1142,7 +1142,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
     public void testTrivialModel() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 1, 1 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 1 }, Relationship.EQ, 0));
 
         final SimplexSolver solver = new SimplexSolver();
@@ -1153,7 +1153,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
     //@Test(expected = UnboundedSolutionException.class)
     public void testUnboundedSolution() {
         final LinearObjectiveFunction f = new LinearObjectiveFunction(new double[] { 15, 10 }, 0);
-        final Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
+        final Collection<LinearConstraint> constraints = new ArrayList<>();
         constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.EQ, 2));
 
         final SimplexSolver solver = new SimplexSolver();

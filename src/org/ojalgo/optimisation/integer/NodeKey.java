@@ -193,14 +193,6 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         return Math.min(Math.max(myLowerBounds[index], value), myUpperBounds[index]);
     }
 
-    int[] getLowerBounds() {
-        return ArrayUtils.copyOf(myLowerBounds);
-    }
-
-    int[] getUpperBounds() {
-        return ArrayUtils.copyOf(myUpperBounds);
-    }
-
     long calculateTreeSize() {
 
         long retVal = 1L;
@@ -265,6 +257,10 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         }
     }
 
+    int[] getLowerBounds() {
+        return ArrayUtils.copyOf(myLowerBounds);
+    }
+
     BigDecimal getUpperBound(final int index) {
         final int tmpUpper = myUpperBounds[index];
         if (tmpUpper != Integer.MAX_VALUE) {
@@ -272,6 +268,10 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
         } else {
             return null;
         }
+    }
+
+    int[] getUpperBounds() {
+        return ArrayUtils.copyOf(myUpperBounds);
     }
 
 }

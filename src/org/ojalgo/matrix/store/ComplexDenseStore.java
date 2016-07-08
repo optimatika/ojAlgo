@@ -969,23 +969,23 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public final ElementsConsumer<ComplexNumber> regionByColumns(final int... columns) {
-        return new ColumnsRegion<ComplexNumber>(this, multiplyBoth, columns);
+        return new ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
     public final ElementsConsumer<ComplexNumber> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new LimitRegion<ComplexNumber>(this, multiplyBoth, rowLimit, columnLimit);
+        return new LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
     public final ElementsConsumer<ComplexNumber> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new OffsetRegion<ComplexNumber>(this, multiplyBoth, rowOffset, columnOffset);
+        return new OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
     public final ElementsConsumer<ComplexNumber> regionByRows(final int... rows) {
-        return new RowsRegion<ComplexNumber>(this, multiplyBoth, rows);
+        return new RowsRegion<>(this, multiplyBoth, rows);
     }
 
     public final ElementsConsumer<ComplexNumber> regionByTransposing() {
-        return new TransposedRegion<ComplexNumber>(this, multiplyBoth);
+        return new TransposedRegion<>(this, multiplyBoth);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

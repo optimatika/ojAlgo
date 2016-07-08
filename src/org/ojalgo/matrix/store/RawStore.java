@@ -369,7 +369,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         tokenizer.wordChars(0, 255);
         tokenizer.whitespaceChars(0, ' ');
         tokenizer.eolIsSignificant(true);
-        final java.util.Vector<Double> vD = new java.util.Vector<Double>();
+        final java.util.Vector<Double> vD = new java.util.Vector<>();
 
         // Ignore initial empty lines
         while (tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
@@ -387,7 +387,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         for (int j = 0; j < n; j++) {
             row[j] = vD.elementAt(j).doubleValue();
         }
-        final java.util.Vector<double[]> v = new java.util.Vector<double[]>();
+        final java.util.Vector<double[]> v = new java.util.Vector<>();
         v.addElement(row); // Start storing rows instead of columns.
         while (tokenizer.nextToken() == StreamTokenizer.TT_WORD) {
             // While non-empty lines
@@ -1221,23 +1221,23 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public final ElementsConsumer<Double> regionByColumns(final int... columns) {
-        return new ColumnsRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), columns);
+        return new ColumnsRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), columns);
     }
 
     public final ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new LimitRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowLimit, columnLimit);
+        return new LimitRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowLimit, columnLimit);
     }
 
     public final ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new OffsetRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowOffset, columnOffset);
+        return new OffsetRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rowOffset, columnOffset);
     }
 
     public final ElementsConsumer<Double> regionByRows(final int... rows) {
-        return new RowsRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rows);
+        return new RowsRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns), rows);
     }
 
     public final ElementsConsumer<Double> regionByTransposing() {
-        return new TransposedRegion<Double>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns));
+        return new TransposedRegion<>(this, MultiplyBoth.getPrimitive(data.length, myNumberOfColumns));
     }
 
     public void set(final long row, final long col, final double value) {

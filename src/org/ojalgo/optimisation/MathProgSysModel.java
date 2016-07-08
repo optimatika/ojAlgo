@@ -414,13 +414,13 @@ public final class MathProgSysModel extends AbstractModel<GenericSolver> {
         return retVal;
     }
 
-    private final HashMap<String, Column> myColumns = new HashMap<String, Column>();
+    private final HashMap<String, Column> myColumns = new HashMap<>();
     private final ExpressionsBasedModel myDelegate;
     private final String[] myFields = new String[6];
     private boolean myIntegerMarker = false;
     private String myName;
 
-    private final HashMap<String, Row> myRows = new HashMap<String, Row>();
+    private final HashMap<String, Row> myRows = new HashMap<>();
 
     MathProgSysModel() {
 

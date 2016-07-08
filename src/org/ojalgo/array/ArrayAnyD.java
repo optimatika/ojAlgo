@@ -368,7 +368,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         final long tmpStep = AccessUtils.step(myStructure, dimension);
         final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
-        return new Array1D<N>(myDelegate, tmpFirst, tmpLimit, tmpStep);
+        return new Array1D<>(myDelegate, tmpFirst, tmpLimit, tmpStep);
     }
 
     public Array1D<N> sliceRange(final long first, final long limit) {

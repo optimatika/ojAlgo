@@ -41,8 +41,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatrix> {
 
-    public static final BasicMatrix.Factory<PrimitiveMatrix> FACTORY = new MatrixFactory<Double, PrimitiveMatrix>(PrimitiveMatrix.class,
-            PrimitiveDenseStore.FACTORY);
+    public static final BasicMatrix.Factory<PrimitiveMatrix> FACTORY = new MatrixFactory<>(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
 
     public static Builder<PrimitiveMatrix> getBuilder(final int aLength) {
         return FACTORY.getBuilder(aLength);

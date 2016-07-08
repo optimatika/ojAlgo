@@ -170,23 +170,23 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
         }
 
         public final ElementsConsumer<N> regionByColumns(final int... columns) {
-            return new ColumnsRegion<N>(this, myMultiplier, columns);
+            return new ColumnsRegion<>(this, myMultiplier, columns);
         }
 
         public final ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
-            return new LimitRegion<N>(this, myMultiplier, rowLimit, columnLimit);
+            return new LimitRegion<>(this, myMultiplier, rowLimit, columnLimit);
         }
 
         public final ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
-            return new OffsetRegion<N>(this, myMultiplier, rowOffset, columnOffset);
+            return new OffsetRegion<>(this, myMultiplier, rowOffset, columnOffset);
         }
 
         public final ElementsConsumer<N> regionByRows(final int... rows) {
-            return new RowsRegion<N>(this, myMultiplier, rows);
+            return new RowsRegion<>(this, myMultiplier, rows);
         }
 
         public ElementsConsumer<N> regionByTransposing() {
-            return new TransposedRegion<N>(this, myMultiplier);
+            return new TransposedRegion<>(this, myMultiplier);
         }
 
         @Override

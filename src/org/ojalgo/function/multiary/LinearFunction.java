@@ -41,27 +41,27 @@ import org.ojalgo.scalar.Scalar;
 public final class LinearFunction<N extends Number> extends AbstractMultiary<N, LinearFunction<N>> implements MultiaryFunction.Linear<N> {
 
     public static LinearFunction<BigDecimal> makeBig(final Access1D<? extends Number> factors) {
-        return new LinearFunction<BigDecimal>(BigDenseStore.FACTORY.rows(factors));
+        return new LinearFunction<>(BigDenseStore.FACTORY.rows(factors));
     }
 
     public static LinearFunction<BigDecimal> makeBig(final int arity) {
-        return new LinearFunction<BigDecimal>(BigDenseStore.FACTORY.makeZero(1, arity));
+        return new LinearFunction<>(BigDenseStore.FACTORY.makeZero(1, arity));
     }
 
     public static LinearFunction<ComplexNumber> makeComplex(final Access1D<? extends Number> factors) {
-        return new LinearFunction<ComplexNumber>(ComplexDenseStore.FACTORY.rows(factors));
+        return new LinearFunction<>(ComplexDenseStore.FACTORY.rows(factors));
     }
 
     public static LinearFunction<ComplexNumber> makeComplex(final int arity) {
-        return new LinearFunction<ComplexNumber>(ComplexDenseStore.FACTORY.makeZero(1, arity));
+        return new LinearFunction<>(ComplexDenseStore.FACTORY.makeZero(1, arity));
     }
 
     public static LinearFunction<Double> makePrimitive(final Access1D<? extends Number> factors) {
-        return new LinearFunction<Double>(PrimitiveDenseStore.FACTORY.rows(factors));
+        return new LinearFunction<>(PrimitiveDenseStore.FACTORY.rows(factors));
     }
 
     public static LinearFunction<Double> makePrimitive(final int arity) {
-        return new LinearFunction<Double>(PrimitiveDenseStore.FACTORY.makeZero(1, arity));
+        return new LinearFunction<>(PrimitiveDenseStore.FACTORY.makeZero(1, arity));
     }
 
     private final MatrixStore<N> myFactors;

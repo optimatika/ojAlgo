@@ -29,7 +29,6 @@ import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 public abstract class ComplexAggregator {
 

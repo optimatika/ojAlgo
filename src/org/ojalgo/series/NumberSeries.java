@@ -51,11 +51,11 @@ public class NumberSeries<N extends Number & Comparable<N>> extends AbstractSeri
     }
 
     public Access1D<N> accessKeys() {
-        return ArrayUtils.wrapAccess1D(new ArrayList<N>(this.keySet()));
+        return ArrayUtils.wrapAccess1D(new ArrayList<>(this.keySet()));
     }
 
     public Access1D<N> accessValues() {
-        return ArrayUtils.wrapAccess1D(new ArrayList<N>(this.values()));
+        return ArrayUtils.wrapAccess1D(new ArrayList<>(this.values()));
     }
 
     public double invoke(final double arg) {

@@ -129,7 +129,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> getD() {
-        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<Double>(this.getSingularValues(), null, null, ZERO);
+        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<>(this.getSingularValues(), null, null, ZERO);
         return MatrixStore.PRIMITIVE.makeWrapper(tmpDiagonal).get();
     }
 

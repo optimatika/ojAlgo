@@ -96,7 +96,7 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
         final MatrixStore<N> tmpRight = myRight.premultiply(leftMtrx).get();
 
         try {
-            return new LeftRightStore<N>(tmpBaseFuture.get(), tmpRight);
+            return new LeftRightStore<>(tmpBaseFuture.get(), tmpRight);
         } catch (final InterruptedException | ExecutionException ex) {
             return null;
         }

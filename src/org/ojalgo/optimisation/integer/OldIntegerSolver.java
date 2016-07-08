@@ -70,12 +70,6 @@ public final class OldIntegerSolver extends IntegerSolver {
             myKey = new NodeKey(OldIntegerSolver.this.getModel());
         }
 
-        void flush(final BasicLogger.Printer receiver) {
-            if ((myPrinter != null) && (receiver != null)) {
-                myPrinter.flush(receiver);
-            }
-        }
-
         @Override
         public String toString() {
             return myKey.toString();
@@ -238,6 +232,12 @@ public final class OldIntegerSolver extends IntegerSolver {
             final NodeKey tmpKey = myKey.createUpperBranch(branchIndex, nonIntegerValue, parentObjectiveValue);
 
             return new BranchAndBoundNodeTask(tmpKey);
+        }
+
+        void flush(final BasicLogger.Printer receiver) {
+            if ((myPrinter != null) && (receiver != null)) {
+                myPrinter.flush(receiver);
+            }
         }
 
         NodeKey getKey() {

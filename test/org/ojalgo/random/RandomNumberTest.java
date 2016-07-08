@@ -29,7 +29,6 @@ import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.series.CalendarDateSeries;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -319,7 +318,7 @@ public class RandomNumberTest extends RandomTests {
 
         final RandomNumber tmpRandomNumber = new Normal(ONE, TENTH);
         double tmpValue = HUNDRED;
-        final CalendarDateSeries<Double> tmpSeries = new CalendarDateSeries<Double>();
+        final CalendarDateSeries<Double> tmpSeries = new CalendarDateSeries<>();
         for (int i = 0; i < 1000; i++) {
             tmpSeries.put(i, tmpValue);
             tmpValue *= tmpRandomNumber.doubleValue();
@@ -454,7 +453,7 @@ public class RandomNumberTest extends RandomTests {
     public void testWeibullWithShape1() {
 
         // Weibull with shape=1.0 shoud be equivalent to Exponential with the same lambda
-        final double tmpEpsilon = 1E-14 / THREE * THOUSAND * TEN;
+        final double tmpEpsilon = (1E-14 / THREE) * THOUSAND * TEN;
 
         for (double lambda = HUNDREDTH; lambda <= HUNDRED; lambda *= TEN) {
             final Exponential tmpExpected = new Exponential(lambda);

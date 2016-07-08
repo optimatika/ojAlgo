@@ -45,14 +45,14 @@ public final class GaussianProcess extends AbstractProcess<Normal> {
 
         super();
 
-        myDelegate = new GaussianField<Double>(covarFunc, this.getObservations());
+        myDelegate = new GaussianField<>(covarFunc, this.getObservations());
     }
 
     public GaussianProcess(final GaussianField.Mean<Double> meanFunc, final GaussianField.Covariance<Double> covarFunc) {
 
         super();
 
-        myDelegate = new GaussianField<Double>(meanFunc, covarFunc, this.getObservations());
+        myDelegate = new GaussianField<>(meanFunc, covarFunc, this.getObservations());
     }
 
     @SuppressWarnings("unused")

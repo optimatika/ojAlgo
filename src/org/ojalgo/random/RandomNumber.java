@@ -39,7 +39,7 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
     private static final long serialVersionUID = -5871398825698010936L;
 
     static Alternator<Random> makeRandomAlternator() {
-        return new Alternator<Random>(new Random(SEED.nextLong()), new Random(SEED.nextLong()));
+        return new Alternator<>(new Random(SEED.nextLong()), new Random(SEED.nextLong()));
     }
 
     private final Alternator<Random> myAlternator = RandomNumber.makeRandomAlternator();

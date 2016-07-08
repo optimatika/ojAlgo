@@ -73,7 +73,7 @@ public abstract class BasicArray<N extends Number>
             if (tmpTotal > MAX_ARRAY_SIZE) {
                 return this.getSegmentedFactory().makeStructuredZero(structure);
             } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getDenseFactory().getElementSize())) {
-                return new SparseArray<N>(tmpTotal, this.getDenseFactory(), SparseArray.capacity(tmpTotal));
+                return new SparseArray<>(tmpTotal, this.getDenseFactory(), SparseArray.capacity(tmpTotal));
             } else {
                 return this.getDenseFactory().makeStructuredZero(structure);
             }
@@ -281,7 +281,7 @@ public abstract class BasicArray<N extends Number>
      * </p>
      */
     protected final Array1D<N> asArray1D() {
-        return new Array1D<N>(this);
+        return new Array1D<>(this);
     }
 
     /**
@@ -297,7 +297,7 @@ public abstract class BasicArray<N extends Number>
      * </p>
      */
     protected final Array2D<N> asArray2D(final long structure) {
-        return new Array2D<N>(this, structure);
+        return new Array2D<>(this, structure);
     }
 
     /**
@@ -308,7 +308,7 @@ public abstract class BasicArray<N extends Number>
      * </p>
      */
     protected final ArrayAnyD<N> asArrayAnyD(final long[] structure) {
-        return new ArrayAnyD<N>(this, structure);
+        return new ArrayAnyD<>(this, structure);
     }
 
     protected abstract void exchange(long firstA, long firstB, long step, long count);

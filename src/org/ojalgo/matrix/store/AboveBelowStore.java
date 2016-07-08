@@ -96,7 +96,7 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
         final MatrixStore<N> tmpLower = myBelow.multiply(right);
 
         try {
-            return new AboveBelowStore<N>(tmpBaseFuture.get(), tmpLower);
+            return new AboveBelowStore<>(tmpBaseFuture.get(), tmpLower);
         } catch (final InterruptedException | ExecutionException ex) {
             return null;
         }

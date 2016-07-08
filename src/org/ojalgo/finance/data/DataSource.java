@@ -92,7 +92,7 @@ public abstract class DataSource<DP extends DatePrice> {
 
     public List<DP> getHistoricalPrices(final BufferedReader reader) {
 
-        final ArrayList<DP> retVal = new ArrayList<DP>();
+        final ArrayList<DP> retVal = new ArrayList<>();
 
         String tmpLine;
         DP tmpHistPrice;

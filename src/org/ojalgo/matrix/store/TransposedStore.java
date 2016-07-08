@@ -41,7 +41,7 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
 
             retVal = ((TransposedStore<N>) right).getOriginal().multiply(this.getBase());
 
-            retVal = new TransposedStore<N>(retVal);
+            retVal = new TransposedStore<>(retVal);
 
         } else {
 

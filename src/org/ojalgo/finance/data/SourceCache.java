@@ -49,7 +49,7 @@ public final class SourceCache {
 
             super();
 
-            series = new CalendarDateSeries<Double>(resolution);
+            series = new CalendarDateSeries<>(resolution);
             series.name(name);
         }
 

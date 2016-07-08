@@ -52,7 +52,7 @@ final class ConjugatedStore<N extends Number> extends TransjugatedStore<N> {
 
             retVal = ((ConjugatedStore<N>) right).getOriginal().multiply(this.getBase());
 
-            retVal = new ConjugatedStore<N>(retVal);
+            retVal = new ConjugatedStore<>(retVal);
 
         } else {
 

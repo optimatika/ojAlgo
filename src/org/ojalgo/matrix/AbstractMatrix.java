@@ -525,7 +525,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         final int tmpColDim = (int) this.countColumns();
 
-        final List<BasicMatrix> retVal = new ArrayList<BasicMatrix>(tmpColDim);
+        final List<BasicMatrix> retVal = new ArrayList<>(tmpColDim);
 
         for (int j = 0; j < tmpColDim; j++) {
             retVal.add(j, this.selectColumns(j));
@@ -542,7 +542,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         final int tmpRowDim = (int) this.countRows();
 
-        final List<BasicMatrix> retVal = new ArrayList<BasicMatrix>(tmpRowDim);
+        final List<BasicMatrix> retVal = new ArrayList<>(tmpRowDim);
 
         for (int i = 0; i < tmpRowDim; i++) {
             retVal.add(i, this.selectRows(i));

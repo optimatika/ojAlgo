@@ -39,10 +39,10 @@ public final class SecondOrderApproximation<N extends Number> extends Approximat
 
         tmpHessian.modifyAll(tmpHessian.factory().function().multiply().first(0.5));
 
-        final QuadraticFunction<N> tmpQuadratic = new QuadraticFunction<N>(tmpHessian);
-        final LinearFunction<N> tmpLinear = new LinearFunction<N>(tmpGradient);
+        final QuadraticFunction<N> tmpQuadratic = new QuadraticFunction<>(tmpHessian);
+        final LinearFunction<N> tmpLinear = new LinearFunction<>(tmpGradient);
 
-        myDelegate = new CompoundFunction<N>(tmpQuadratic, tmpLinear);
+        myDelegate = new CompoundFunction<>(tmpQuadratic, tmpLinear);
         myDelegate.setConstant(function.invoke(point));
     }
 

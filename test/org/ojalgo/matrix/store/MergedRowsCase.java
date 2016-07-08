@@ -21,11 +21,8 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
 
 public class MergedRowsCase extends NonPhysicalTest {
 
@@ -48,9 +45,9 @@ public class MergedRowsCase extends NonPhysicalTest {
         final BasicMatrix tmpBase = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
         final BasicMatrix tmpRight = NonPhysicalTest.makeRandomMatrix(tmpRowDim, tmpColDim);
 
-        myBigStore = new LeftRightStore<BigDecimal>(BigDenseStore.FACTORY.copy(tmpBase), BigDenseStore.FACTORY.copy(tmpRight));
-        myComplexStore = new LeftRightStore<ComplexNumber>(ComplexDenseStore.FACTORY.copy(tmpBase), ComplexDenseStore.FACTORY.copy(tmpRight));
-        myPrimitiveStore = new LeftRightStore<Double>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpRight));
+        myBigStore = new LeftRightStore<>(BigDenseStore.FACTORY.copy(tmpBase), BigDenseStore.FACTORY.copy(tmpRight));
+        myComplexStore = new LeftRightStore<>(ComplexDenseStore.FACTORY.copy(tmpBase), ComplexDenseStore.FACTORY.copy(tmpRight));
+        myPrimitiveStore = new LeftRightStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), PrimitiveDenseStore.FACTORY.copy(tmpRight));
     }
 
 }

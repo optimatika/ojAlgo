@@ -45,7 +45,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
 
     static {
 
-        final HashMap<String, BigDecimal> tmpSolution = new HashMap<String, BigDecimal>();
+        final HashMap<String, BigDecimal> tmpSolution = new HashMap<>();
 
         tmpSolution.put("s1", new BigDecimal(0));
         tmpSolution.put("s2", new BigDecimal(0));

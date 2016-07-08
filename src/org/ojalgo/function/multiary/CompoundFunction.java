@@ -42,38 +42,38 @@ public final class CompoundFunction<N extends Number> extends AbstractMultiary<N
     public static CompoundFunction<BigDecimal> makeBig(final Access2D<? extends Number> quadraticFactors, final Access1D<? extends Number> linearFactors) {
         final QuadraticFunction<BigDecimal> tmpQuadratic = QuadraticFunction.makeBig(quadraticFactors);
         final LinearFunction<BigDecimal> tmpLinear = LinearFunction.makeBig(linearFactors);
-        return new CompoundFunction<BigDecimal>(tmpQuadratic, tmpLinear);
+        return new CompoundFunction<>(tmpQuadratic, tmpLinear);
     }
 
     public static CompoundFunction<BigDecimal> makeBig(final int arity) {
         final QuadraticFunction<BigDecimal> tmpQuadratic = QuadraticFunction.makeBig(arity);
         final LinearFunction<BigDecimal> tmpLinear = LinearFunction.makeBig(arity);
-        return new CompoundFunction<BigDecimal>(tmpQuadratic, tmpLinear);
+        return new CompoundFunction<>(tmpQuadratic, tmpLinear);
     }
 
     public static CompoundFunction<ComplexNumber> makeComplex(final Access2D<? extends Number> quadraticFactors,
             final Access1D<? extends Number> linearFactors) {
         final QuadraticFunction<ComplexNumber> tmpQuadratic = QuadraticFunction.makeComplex(quadraticFactors);
         final LinearFunction<ComplexNumber> tmpLinear = LinearFunction.makeComplex(linearFactors);
-        return new CompoundFunction<ComplexNumber>(tmpQuadratic, tmpLinear);
+        return new CompoundFunction<>(tmpQuadratic, tmpLinear);
     }
 
     public static CompoundFunction<ComplexNumber> makeComplex(final int arity) {
         final QuadraticFunction<ComplexNumber> tmpQuadratic = QuadraticFunction.makeComplex(arity);
         final LinearFunction<ComplexNumber> tmpLinear = LinearFunction.makeComplex(arity);
-        return new CompoundFunction<ComplexNumber>(tmpQuadratic, tmpLinear);
+        return new CompoundFunction<>(tmpQuadratic, tmpLinear);
     }
 
     public static CompoundFunction<Double> makePrimitive(final Access2D<? extends Number> quadraticFactors, final Access1D<? extends Number> linearFactors) {
         final QuadraticFunction<Double> tmpQuadratic = QuadraticFunction.makePrimitive(quadraticFactors);
         final LinearFunction<Double> tmpLinear = LinearFunction.makePrimitive(linearFactors);
-        return new CompoundFunction<Double>(tmpQuadratic, tmpLinear);
+        return new CompoundFunction<>(tmpQuadratic, tmpLinear);
     }
 
     public static CompoundFunction<Double> makePrimitive(final int arity) {
         final QuadraticFunction<Double> tmpQuadratic = QuadraticFunction.makePrimitive(arity);
         final LinearFunction<Double> tmpLinear = LinearFunction.makePrimitive(arity);
-        return new CompoundFunction<Double>(tmpQuadratic, tmpLinear);
+        return new CompoundFunction<>(tmpQuadratic, tmpLinear);
     }
 
     private final LinearFunction<N> myLinear;

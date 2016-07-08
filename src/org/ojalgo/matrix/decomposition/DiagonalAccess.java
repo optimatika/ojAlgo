@@ -114,7 +114,7 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
         final Array1D<N> tmpSuperdiagonal = superdiagonal != null ? superdiagonal.subList(Math.max(first - 1, 0), limit - 1) : null;
         final Array1D<N> tmpSubdiagonal = subdiagonal != null ? subdiagonal.subList(first, Math.min(limit, myDimension - 1)) : null;
 
-        return new DiagonalAccess<N>(tmpMainDiagonal, tmpSuperdiagonal, tmpSubdiagonal, myZero);
+        return new DiagonalAccess<>(tmpMainDiagonal, tmpSuperdiagonal, tmpSubdiagonal, myZero);
     }
 
     int getDimension() {
@@ -127,11 +127,11 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
         final Array1D<N> tmpSuperdiagonal = superdiagonal != null ? superdiagonal.subList(first, Math.min(limit, myDimension - 1)) : null;
         final Array1D<N> tmpSubdiagonal = subdiagonal != null ? subdiagonal.subList(Math.max(first - 1, 0), limit - 1) : null;
 
-        return new DiagonalAccess<N>(tmpMainDiagonal, tmpSuperdiagonal, tmpSubdiagonal, myZero);
+        return new DiagonalAccess<>(tmpMainDiagonal, tmpSuperdiagonal, tmpSubdiagonal, myZero);
     }
 
     DiagonalAccess<N> transpose() {
-        return new DiagonalAccess<N>(mainDiagonal, subdiagonal, superdiagonal, myZero);
+        return new DiagonalAccess<>(mainDiagonal, subdiagonal, superdiagonal, myZero);
     }
 
 }

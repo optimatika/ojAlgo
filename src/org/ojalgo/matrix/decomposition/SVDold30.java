@@ -47,7 +47,6 @@ import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -236,8 +235,8 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
 
     private Future<PhysicalStore<N>> myFutureQ1;
     private Future<PhysicalStore<N>> myFutureQ2;
-    private final List<Rotation<N>> myQ1Rotations = new ArrayList<Rotation<N>>();
-    private final List<Rotation<N>> myQ2Rotations = new ArrayList<Rotation<N>>();
+    private final List<Rotation<N>> myQ1Rotations = new ArrayList<>();
+    private final List<Rotation<N>> myQ2Rotations = new ArrayList<>();
 
     protected SVDold30(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final BidiagonalDecomposition<N> aBidiagonal) {
         super(aFactory, aBidiagonal);
@@ -387,13 +386,13 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
 
             final Array1D<N> tmpSuper = tmpArray2D.sliceDiagonal(0, 1);
 
-            return new DiagonalAccess<N>(tmpMain, tmpSuper, null, this.scalar().zero().getNumber());
+            return new DiagonalAccess<>(tmpMain, tmpSuper, null, this.scalar().zero().getNumber());
 
         } else {
 
             final Array1D<N> tmpSub = tmpArray2D.sliceDiagonal(1, 0);
 
-            return new DiagonalAccess<N>(tmpMain, null, tmpSub, this.scalar().zero().getNumber());
+            return new DiagonalAccess<>(tmpMain, null, tmpSub, this.scalar().zero().getNumber());
         }
     }
 

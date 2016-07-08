@@ -57,12 +57,12 @@ public final class DelimitedData extends Object {
 
         myDelimiter = aDelimiter;
         myTerminator = aTerminator;
-        myLines = new ArrayList<List<Object>>();
+        myLines = new ArrayList<>();
     }
 
     public void addEmptyLines(final int aNumberOfLines, final int aNumberOfElementsOnEachLine) {
         for (int i = 0; i < aNumberOfLines; i++) {
-            myLines.add(new ArrayList<Object>(aNumberOfElementsOnEachLine));
+            myLines.add(new ArrayList<>(aNumberOfElementsOnEachLine));
         }
     }
 

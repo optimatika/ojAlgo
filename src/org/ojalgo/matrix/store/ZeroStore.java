@@ -49,7 +49,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     public MatrixStore<N> conjugate() {
-        return new ZeroStore<N>(this.factory(), this.getColDim(), this.getRowDim());
+        return new ZeroStore<>(this.factory(), this.getColDim(), this.getRowDim());
     }
 
     @Override
@@ -85,7 +85,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     public ZeroStore<N> multiply(final MatrixStore<N> right) {
-        return new ZeroStore<N>(this.factory(), this.getRowDim(), (int) (right.count() / this.getColDim()));
+        return new ZeroStore<>(this.factory(), this.getRowDim(), (int) (right.count() / this.getColDim()));
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
@@ -94,7 +94,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     public MatrixStore<N> transpose() {
-        return new ZeroStore<N>(this.factory(), this.getColDim(), this.getRowDim());
+        return new ZeroStore<>(this.factory(), this.getColDim(), this.getRowDim());
     }
 
     @Override

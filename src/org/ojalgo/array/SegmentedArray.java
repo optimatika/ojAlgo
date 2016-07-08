@@ -204,7 +204,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
         final int tmpShift = (int) (Math.log(tmpUniformSegmentSize) / Math.log(2));
 
-        return new SegmentedArray<N>(tmpCount, tmpShift, segmentFactory);
+        return new SegmentedArray<>(tmpCount, tmpShift, segmentFactory);
     }
 
     private final int myIndexBits;

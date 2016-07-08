@@ -56,7 +56,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
     /**
      * Should contain all available hardware in ascending "power" order.
      */
-    public static final TreeSet<Hardware> PREDEFINED = new TreeSet<Hardware>();
+    public static final TreeSet<Hardware> PREDEFINED = new TreeSet<>();
 
     /**
      * <ul>

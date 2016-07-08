@@ -30,7 +30,6 @@ import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.type.TypeUtils;
 
 public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation {
 

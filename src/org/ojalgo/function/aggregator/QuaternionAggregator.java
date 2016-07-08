@@ -29,7 +29,6 @@ import org.ojalgo.function.QuaternionFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 public abstract class QuaternionAggregator {
 

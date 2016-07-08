@@ -44,7 +44,7 @@ public class KnapsackTest extends OptimisationIntegerTests {
 
     static class KnapsackProblemBuilder {
 
-        final ArrayList<KnapsackItem> items = new ArrayList<KnapsackItem>();
+        final ArrayList<KnapsackItem> items = new ArrayList<>();
 
         final BigDecimal maxWeight;
 

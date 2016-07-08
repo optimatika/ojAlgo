@@ -21,10 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
 
 public class IdentityCase extends NonPhysicalTest {
 
@@ -43,9 +40,9 @@ public class IdentityCase extends NonPhysicalTest {
 
         final int tmpDim = Uniform.randomInteger(1, 9);
 
-        myBigStore = new IdentityStore<BigDecimal>(BigDenseStore.FACTORY, tmpDim);
-        myComplexStore = new IdentityStore<ComplexNumber>(ComplexDenseStore.FACTORY, tmpDim);
-        myPrimitiveStore = new IdentityStore<Double>(PrimitiveDenseStore.FACTORY, tmpDim);
+        myBigStore = new IdentityStore<>(BigDenseStore.FACTORY, tmpDim);
+        myComplexStore = new IdentityStore<>(ComplexDenseStore.FACTORY, tmpDim);
+        myPrimitiveStore = new IdentityStore<>(PrimitiveDenseStore.FACTORY, tmpDim);
     }
 
 }

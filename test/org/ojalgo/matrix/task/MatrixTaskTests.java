@@ -41,7 +41,7 @@ public abstract class MatrixTaskTests extends FunctionalityTest {
 
     public static final List<DeterminantTask<Double>> getPrimitiveFull() {
 
-        final ArrayList<DeterminantTask<Double>> retVal = new ArrayList<DeterminantTask<Double>>();
+        final ArrayList<DeterminantTask<Double>> retVal = new ArrayList<>();
 
         for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getLUPrimitive()) {
             retVal.add(tmpDeterminantTask);
@@ -60,7 +60,7 @@ public abstract class MatrixTaskTests extends FunctionalityTest {
 
     public static final List<DeterminantTask<Double>> getPrimitiveSymmetric() {
 
-        final ArrayList<DeterminantTask<Double>> retVal = new ArrayList<DeterminantTask<Double>>();
+        final ArrayList<DeterminantTask<Double>> retVal = new ArrayList<>();
 
         for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getCholeskyPrimitive()) {
             retVal.add(tmpDeterminantTask);

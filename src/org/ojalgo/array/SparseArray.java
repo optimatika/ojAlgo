@@ -41,7 +41,6 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -515,7 +514,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
      */
     @Deprecated
     public NonzeroView<N> nonzeros() {
-        return new NonzeroView<N>(myIndices, myValues, myActualLength);
+        return new NonzeroView<>(myIndices, myValues, myActualLength);
     }
 
     @Override

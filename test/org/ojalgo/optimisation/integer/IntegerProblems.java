@@ -335,4 +335,8 @@ public class IntegerProblems extends OptimisationIntegerTests {
         TestUtils.assertStateLessThanFeasible(tmpResult);
     }
 
+    public void testP20160701() {
+        P20160701.main(new String[0]);
+    }
+
 }

@@ -605,12 +605,12 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     public Array1D<N> sliceColumn(final long row, final long column) {
-        return new Array1D<N>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, myRowsCount, column), 1L);
+        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, myRowsCount, column), 1L);
     }
 
     public Array1D<N> sliceDiagonal(final long row, final long column) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
-        return new Array1D<N>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount),
+        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount),
                 1L + myRowsCount);
     }
 
@@ -619,7 +619,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     public Array1D<N> sliceRow(final long row, final long column) {
-        return new Array1D<N>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount);
+        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount);
     }
 
     @Override

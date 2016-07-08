@@ -66,11 +66,11 @@ abstract class ApproximateFunction<N extends Number> implements MultiaryFunction
     }
 
     public final FirstOrderApproximation<N> toFirstOrderApproximation(final Access1D<N> arg) {
-        return new FirstOrderApproximation<N>(this, arg);
+        return new FirstOrderApproximation<>(this, arg);
     }
 
     public final SecondOrderApproximation<N> toSecondOrderApproximation(final Access1D<N> arg) {
-        return new SecondOrderApproximation<N>(this, arg);
+        return new SecondOrderApproximation<>(this, arg);
     }
 
     protected abstract PhysicalStore.Factory<N, ?> factory();

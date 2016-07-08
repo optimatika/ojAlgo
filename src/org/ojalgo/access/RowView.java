@@ -26,7 +26,7 @@ import java.util.Iterator;
 public final class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<N>> {
 
     public static <S extends Number> Iterable<RowView<S>> makeIterable(final Access2D<S> access) {
-        return new RowView<S>(access).iterable;
+        return new RowView<>(access).iterable;
     }
 
     private final Access2D<N> myAccess;

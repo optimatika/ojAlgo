@@ -89,7 +89,7 @@ public class MultidimensionalSimulatorTest extends RandomProcessTests {
                 0.1673146496232647, 0.02771164170051353, 0.1088216213067869, 0.12277592098780352, 0.22070588630919719, 0.10976390274674515, 0.10976390274674515,
                 0.24176577517424258 };
 
-        final ArrayList<SimpleAsset> tmpAssets = new ArrayList<SimpleAsset>(tmpReturns.length);
+        final ArrayList<SimpleAsset> tmpAssets = new ArrayList<>(tmpReturns.length);
 
         for (int i = 0; i < tmpReturns.length; i++) {
 
@@ -135,12 +135,12 @@ public class MultidimensionalSimulatorTest extends RandomProcessTests {
         TestUtils.assertEquals(0.02, tmpOrgProc2.getStandardDeviation(1.0), 0.005);
         TestUtils.assertEquals(0.03, tmpOrgProc3.getStandardDeviation(1.0), 0.005);
 
-        final ArrayList<GeometricBrownianMotion> tmpProcs = new ArrayList<GeometricBrownianMotion>();
+        final ArrayList<GeometricBrownianMotion> tmpProcs = new ArrayList<>();
         tmpProcs.add(tmpOrgProc1);
         tmpProcs.add(tmpOrgProc2);
         tmpProcs.add(tmpOrgProc3);
         final GeometricBrownian1D tmpGB1D = new GeometricBrownian1D(tmpCorrelation, tmpProcs);
-        final List<CalendarDateSeries<Double>> tmpSeries = new ArrayList<CalendarDateSeries<Double>>();
+        final List<CalendarDateSeries<Double>> tmpSeries = new ArrayList<>();
 
         tmpSeries.add(new CalendarDateSeries<Double>(CalendarDateUnit.MONTH));
         tmpSeries.add(new CalendarDateSeries<Double>(CalendarDateUnit.MONTH));

@@ -29,7 +29,6 @@ import org.ojalgo.function.RationalFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.TypeUtils;
 
 public abstract class RationalAggregator {
 

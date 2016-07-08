@@ -21,11 +21,8 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
 
 public class SuperimposedMatrixColumnCase extends NonPhysicalTest {
 
@@ -49,9 +46,9 @@ public class SuperimposedMatrixColumnCase extends NonPhysicalTest {
         final BasicMatrix tmpColumn = NonPhysicalTest.makeRandomMatrix(tmpRowDim, 1);
         final int tmpIndex = Uniform.randomInteger(tmpColDim);
 
-        myBigStore = new SuperimposedStore<BigDecimal>(BigDenseStore.FACTORY.copy(tmpBase), 0, tmpIndex, BigDenseStore.FACTORY.copy(tmpColumn));
-        myComplexStore = new SuperimposedStore<ComplexNumber>(ComplexDenseStore.FACTORY.copy(tmpBase), 0, tmpIndex, ComplexDenseStore.FACTORY.copy(tmpColumn));
-        myPrimitiveStore = new SuperimposedStore<Double>(PrimitiveDenseStore.FACTORY.copy(tmpBase), 0, tmpIndex, PrimitiveDenseStore.FACTORY.copy(tmpColumn));
+        myBigStore = new SuperimposedStore<>(BigDenseStore.FACTORY.copy(tmpBase), 0, tmpIndex, BigDenseStore.FACTORY.copy(tmpColumn));
+        myComplexStore = new SuperimposedStore<>(ComplexDenseStore.FACTORY.copy(tmpBase), 0, tmpIndex, ComplexDenseStore.FACTORY.copy(tmpColumn));
+        myPrimitiveStore = new SuperimposedStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), 0, tmpIndex, PrimitiveDenseStore.FACTORY.copy(tmpColumn));
     }
 
 }

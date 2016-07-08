@@ -40,27 +40,27 @@ import org.ojalgo.scalar.ComplexNumber;
 public final class ConstantFunction<N extends Number> extends AbstractMultiary<N, ConstantFunction<N>> {
 
     public static ConstantFunction<BigDecimal> makeBig(final int arity) {
-        return new ConstantFunction<BigDecimal>(arity, BigDenseStore.FACTORY, null);
+        return new ConstantFunction<>(arity, BigDenseStore.FACTORY, null);
     }
 
     public static ConstantFunction<BigDecimal> makeBig(final int arity, final Number constant) {
-        return new ConstantFunction<BigDecimal>(arity, BigDenseStore.FACTORY, constant);
+        return new ConstantFunction<>(arity, BigDenseStore.FACTORY, constant);
     }
 
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity) {
-        return new ConstantFunction<ComplexNumber>(arity, ComplexDenseStore.FACTORY, null);
+        return new ConstantFunction<>(arity, ComplexDenseStore.FACTORY, null);
     }
 
     public static ConstantFunction<ComplexNumber> makeComplex(final int arity, final Number constant) {
-        return new ConstantFunction<ComplexNumber>(arity, ComplexDenseStore.FACTORY, constant);
+        return new ConstantFunction<>(arity, ComplexDenseStore.FACTORY, constant);
     }
 
     public static ConstantFunction<Double> makePrimitive(final int arity) {
-        return new ConstantFunction<Double>(arity, PrimitiveDenseStore.FACTORY, null);
+        return new ConstantFunction<>(arity, PrimitiveDenseStore.FACTORY, null);
     }
 
     public static ConstantFunction<Double> makePrimitive(final int arity, final Number constant) {
-        return new ConstantFunction<Double>(arity, PrimitiveDenseStore.FACTORY, constant);
+        return new ConstantFunction<>(arity, PrimitiveDenseStore.FACTORY, constant);
     }
 
     private final int myArity;

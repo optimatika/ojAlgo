@@ -179,7 +179,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
         final BlackLittermanModel tmpBLM = new BlackLittermanModel(tmpEquilibrium, tmpGeneratedWeights);
         for (int i = 0; i < tmpDim; i++) {
-            final List<BigDecimal> tmpViewAssetWeights = new ArrayList<BigDecimal>();
+            final List<BigDecimal> tmpViewAssetWeights = new ArrayList<>();
             for (int j = 0; j < tmpDim; j++) {
                 if (i == j) {
                     tmpViewAssetWeights.add(BigMath.ONE);

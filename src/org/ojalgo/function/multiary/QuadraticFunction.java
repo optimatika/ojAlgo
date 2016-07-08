@@ -41,27 +41,27 @@ import org.ojalgo.scalar.Scalar;
 public final class QuadraticFunction<N extends Number> extends AbstractMultiary<N, QuadraticFunction<N>> implements MultiaryFunction.Quadratic<N> {
 
     public static QuadraticFunction<BigDecimal> makeBig(final Access2D<? extends Number> factors) {
-        return new QuadraticFunction<BigDecimal>(BigDenseStore.FACTORY.copy(factors));
+        return new QuadraticFunction<>(BigDenseStore.FACTORY.copy(factors));
     }
 
     public static QuadraticFunction<BigDecimal> makeBig(final int arity) {
-        return new QuadraticFunction<BigDecimal>(BigDenseStore.FACTORY.makeZero(arity, arity));
+        return new QuadraticFunction<>(BigDenseStore.FACTORY.makeZero(arity, arity));
     }
 
     public static QuadraticFunction<ComplexNumber> makeComplex(final Access2D<? extends Number> factors) {
-        return new QuadraticFunction<ComplexNumber>(ComplexDenseStore.FACTORY.copy(factors));
+        return new QuadraticFunction<>(ComplexDenseStore.FACTORY.copy(factors));
     }
 
     public static QuadraticFunction<ComplexNumber> makeComplex(final int arity) {
-        return new QuadraticFunction<ComplexNumber>(ComplexDenseStore.FACTORY.makeZero(arity, arity));
+        return new QuadraticFunction<>(ComplexDenseStore.FACTORY.makeZero(arity, arity));
     }
 
     public static QuadraticFunction<Double> makePrimitive(final Access2D<? extends Number> factors) {
-        return new QuadraticFunction<Double>(PrimitiveDenseStore.FACTORY.copy(factors));
+        return new QuadraticFunction<>(PrimitiveDenseStore.FACTORY.copy(factors));
     }
 
     public static QuadraticFunction<Double> makePrimitive(final int arity) {
-        return new QuadraticFunction<Double>(PrimitiveDenseStore.FACTORY.makeZero(arity, arity));
+        return new QuadraticFunction<>(PrimitiveDenseStore.FACTORY.makeZero(arity, arity));
     }
 
     private final MatrixStore<N> myFactors;

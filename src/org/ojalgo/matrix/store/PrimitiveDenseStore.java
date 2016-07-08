@@ -1531,23 +1531,23 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     public final ElementsConsumer<Double> regionByColumns(final int... columns) {
-        return new ColumnsRegion<Double>(this, multiplyBoth, columns);
+        return new ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
     public final ElementsConsumer<Double> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new LimitRegion<Double>(this, multiplyBoth, rowLimit, columnLimit);
+        return new LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
     public final ElementsConsumer<Double> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new OffsetRegion<Double>(this, multiplyBoth, rowOffset, columnOffset);
+        return new OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
     public final ElementsConsumer<Double> regionByRows(final int... rows) {
-        return new RowsRegion<Double>(this, multiplyBoth, rows);
+        return new RowsRegion<>(this, multiplyBoth, rows);
     }
 
     public final ElementsConsumer<Double> regionByTransposing() {
-        return new TransposedRegion<Double>(this, multiplyBoth);
+        return new TransposedRegion<>(this, multiplyBoth);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

@@ -21,11 +21,8 @@
  */
 package org.ojalgo.matrix.store;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.random.Uniform;
-import org.ojalgo.scalar.ComplexNumber;
 
 public class SelectedRowsCase extends NonPhysicalTest {
 
@@ -52,9 +49,9 @@ public class SelectedRowsCase extends NonPhysicalTest {
             tmpRows[i] = Uniform.randomInteger(tmpRowDim);
         }
 
-        myBigStore = new RowsStore<BigDecimal>(BigDenseStore.FACTORY.copy(tmpBase), tmpRows);
-        myComplexStore = new RowsStore<ComplexNumber>(ComplexDenseStore.FACTORY.copy(tmpBase), tmpRows);
-        myPrimitiveStore = new RowsStore<Double>(PrimitiveDenseStore.FACTORY.copy(tmpBase), tmpRows);
+        myBigStore = new RowsStore<>(BigDenseStore.FACTORY.copy(tmpBase), tmpRows);
+        myComplexStore = new RowsStore<>(ComplexDenseStore.FACTORY.copy(tmpBase), tmpRows);
+        myPrimitiveStore = new RowsStore<>(PrimitiveDenseStore.FACTORY.copy(tmpBase), tmpRows);
     }
 
 }

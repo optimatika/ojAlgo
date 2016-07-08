@@ -745,6 +745,13 @@ public final class Expression extends ModelEntity<Expression> {
         return ConstantFunction.makePrimitive(myModel.countVariables());
     }
 
+    boolean includes(final Variable variable) {
+        final IntIndex tmpVarInd = variable.getIndex();
+        return myLinear.containsKey(tmpVarInd) || myQuadratic.keySet().stream().anyMatch(k -> {
+            return (k.row == tmpVarInd.index) || (k.column == tmpVarInd.index);
+        });
+    }
+
     boolean isInfeasible() {
         return myInfeasible;
     }

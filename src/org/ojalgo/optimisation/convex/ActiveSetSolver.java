@@ -448,14 +448,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             myCholesky.compute(this.getIterationQ());
 
-            myIterationL.modifyAll(new Unary() {
-
-                public double invoke(final double arg) {
-                    if (Double.isFinite(arg)) {
-                        return arg;
-                    } else {
-                        return ZERO;
-                    }
+            myIterationL.modifyAll((Unary) arg -> {
+                if (Double.isFinite(arg)) {
+                    return arg;
+                } else {
+                    return ZERO;
                 }
             });
 

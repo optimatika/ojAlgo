@@ -44,7 +44,7 @@ public class DesignCase extends OptimisationIntegerTests {
      */
     public void testFacilityLocation() {
 
-        final ArrayList<Variable> tmpVariables = new ArrayList<Variable>();
+        final ArrayList<Variable> tmpVariables = new ArrayList<>();
         tmpVariables.add(Variable.makeBinary("Factory in LA").weight(9));
         tmpVariables.add(Variable.makeBinary("Factory in SF").weight(5));
         tmpVariables.add(Variable.makeBinary("Warehouse in LA").weight(6));

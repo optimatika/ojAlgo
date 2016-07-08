@@ -67,7 +67,7 @@ final class NormalisedPortfolio extends FinancePortfolio {
     @Override
     public List<BigDecimal> getWeights() {
 
-        final List<BigDecimal> retVal = new ArrayList<BigDecimal>();
+        final List<BigDecimal> retVal = new ArrayList<>();
 
         final BigDecimal tmpTotalWeight = this.getTotalWeight();
 

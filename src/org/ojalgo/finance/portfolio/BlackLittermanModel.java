@@ -137,7 +137,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
         super(context);
 
         myOriginalWeights = MATRIX_FACTORY.columns(originalWeights.getWeights());
-        myViews = new ArrayList<FinancePortfolio>();
+        myViews = new ArrayList<>();
     }
 
     /**
@@ -149,7 +149,7 @@ public final class BlackLittermanModel extends EquilibriumModel {
         super(marketEquilibrium);
 
         myOriginalWeights = originalWeights;
-        myViews = new ArrayList<FinancePortfolio>();
+        myViews = new ArrayList<>();
     }
 
     private BlackLittermanModel(final MarketEquilibrium aMarketEquilibrium) {

@@ -170,7 +170,7 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         final BasicMatrix tmpCovariances = this.getCovariances();
         final List<BigDecimal> tmpWeights = this.getWeights();
 
-        final ArrayList<SimpleAsset> retVal = new ArrayList<SimpleAsset>(tmpWeights.size());
+        final ArrayList<SimpleAsset> retVal = new ArrayList<>(tmpWeights.size());
 
         for (int i = 0; i < tmpWeights.size(); i++) {
             final double tmpMeanReturn = tmpReturns.doubleValue(i, 0);

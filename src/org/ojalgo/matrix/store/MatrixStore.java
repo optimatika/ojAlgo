@@ -83,11 +83,11 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         static <N extends Number> MatrixStore<N> buildColumn(final int aMinRowDim, final MatrixStore<N>... aColStore) {
             MatrixStore<N> retVal = aColStore[0];
             for (int i = 1; i < aColStore.length; i++) {
-                retVal = new AboveBelowStore<N>(retVal, aColStore[i]);
+                retVal = new AboveBelowStore<>(retVal, aColStore[i]);
             }
             final int tmpRowDim = (int) retVal.countRows();
             if (tmpRowDim < aMinRowDim) {
-                retVal = new AboveBelowStore<N>(retVal, new ZeroStore<N>(retVal.factory(), aMinRowDim - tmpRowDim, (int) retVal.countColumns()));
+                retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(retVal.factory(), aMinRowDim - tmpRowDim, (int) retVal.countColumns()));
             }
             return retVal;
         }
@@ -97,7 +97,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
             MatrixStore<N> retVal = factory.columns(aColStore);
             final int tmpRowDim = (int) retVal.countRows();
             if (tmpRowDim < aMinRowDim) {
-                retVal = new AboveBelowStore<N>(retVal, new ZeroStore<N>(factory, aMinRowDim - tmpRowDim, (int) retVal.countColumns()));
+                retVal = new AboveBelowStore<>(retVal, new ZeroStore<>(factory, aMinRowDim - tmpRowDim, (int) retVal.countColumns()));
             }
             return retVal;
         }
@@ -106,21 +106,21 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         static <N extends Number> MatrixStore<N> buildRow(final int aMinColDim, final MatrixStore<N>... aRowStore) {
             MatrixStore<N> retVal = aRowStore[0];
             for (int j = 1; j < aRowStore.length; j++) {
-                retVal = new LeftRightStore<N>(retVal, aRowStore[j]);
+                retVal = new LeftRightStore<>(retVal, aRowStore[j]);
             }
             final int tmpColDim = (int) retVal.countColumns();
             if (tmpColDim < aMinColDim) {
-                retVal = new LeftRightStore<N>(retVal, new ZeroStore<N>(retVal.factory(), (int) retVal.countRows(), aMinColDim - tmpColDim));
+                retVal = new LeftRightStore<>(retVal, new ZeroStore<>(retVal.factory(), (int) retVal.countRows(), aMinColDim - tmpColDim));
             }
             return retVal;
         }
 
         @SafeVarargs
         static <N extends Number> MatrixStore<N> buildRow(final PhysicalStore.Factory<N, ?> factory, final int aMinColDim, final N... aRowStore) {
-            MatrixStore<N> retVal = new TransposedStore<N>(factory.columns(aRowStore));
+            MatrixStore<N> retVal = new TransposedStore<>(factory.columns(aRowStore));
             final int tmpColDim = (int) retVal.countColumns();
             if (tmpColDim < aMinColDim) {
-                retVal = new LeftRightStore<N>(retVal, new ZeroStore<N>(factory, (int) retVal.countRows(), aMinColDim - tmpColDim));
+                retVal = new LeftRightStore<>(retVal, new ZeroStore<>(factory, (int) retVal.countRows(), aMinColDim - tmpColDim));
             }
             return retVal;
         }
@@ -143,50 +143,50 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         }
 
         public final LogicalBuilder<N> above(final int aRowDim) {
-            final ZeroStore<N> tmpUpperStore = new ZeroStore<N>(myStore.factory(), aRowDim, (int) myStore.countColumns());
-            myStore = new AboveBelowStore<N>(tmpUpperStore, myStore);
+            final ZeroStore<N> tmpUpperStore = new ZeroStore<>(myStore.factory(), aRowDim, (int) myStore.countColumns());
+            myStore = new AboveBelowStore<>(tmpUpperStore, myStore);
             return this;
         }
 
         @SafeVarargs
         public final LogicalBuilder<N> above(final MatrixStore<N>... upperStore) {
             final MatrixStore<N> tmpUpperStore = LogicalBuilder.buildRow((int) myStore.countColumns(), upperStore);
-            myStore = new AboveBelowStore<N>(tmpUpperStore, myStore);
+            myStore = new AboveBelowStore<>(tmpUpperStore, myStore);
             return this;
         }
 
         @SafeVarargs
         public final LogicalBuilder<N> above(final N... anUpperStore) {
             final MatrixStore<N> tmpUpperStore = LogicalBuilder.buildRow(myStore.factory(), (int) myStore.countColumns(), anUpperStore);
-            myStore = new AboveBelowStore<N>(tmpUpperStore, myStore);
+            myStore = new AboveBelowStore<>(tmpUpperStore, myStore);
             return this;
         }
 
         public final LogicalBuilder<N> below(final int aRowDim) {
-            final ZeroStore<N> tmpLowerStore = new ZeroStore<N>(myStore.factory(), aRowDim, (int) myStore.countColumns());
-            myStore = new AboveBelowStore<N>(myStore, tmpLowerStore);
+            final ZeroStore<N> tmpLowerStore = new ZeroStore<>(myStore.factory(), aRowDim, (int) myStore.countColumns());
+            myStore = new AboveBelowStore<>(myStore, tmpLowerStore);
             return this;
         }
 
         @SafeVarargs
         public final LogicalBuilder<N> below(final MatrixStore<N>... aLowerStore) {
             final MatrixStore<N> tmpLowerStore = LogicalBuilder.buildRow((int) myStore.countColumns(), aLowerStore);
-            myStore = new AboveBelowStore<N>(myStore, tmpLowerStore);
+            myStore = new AboveBelowStore<>(myStore, tmpLowerStore);
             return this;
         }
 
         @SafeVarargs
         public final LogicalBuilder<N> below(final N... aLowerStore) {
             final MatrixStore<N> tmpLowerStore = LogicalBuilder.buildRow(myStore.factory(), (int) myStore.countColumns(), aLowerStore);
-            myStore = new AboveBelowStore<N>(myStore, tmpLowerStore);
+            myStore = new AboveBelowStore<>(myStore, tmpLowerStore);
             return this;
         }
 
         public final LogicalBuilder<N> bidiagonal(final boolean upper, final boolean assumeOne) {
             if (upper) {
-                myStore = new UpperTriangularStore<N>(new LowerHessenbergStore<N>(myStore), assumeOne);
+                myStore = new UpperTriangularStore<>(new LowerHessenbergStore<>(myStore), assumeOne);
             } else {
-                myStore = new LowerTriangularStore<N>(new UpperHessenbergStore<N>(myStore), assumeOne);
+                myStore = new LowerTriangularStore<>(new UpperHessenbergStore<>(myStore), assumeOne);
             }
             return this;
         }
@@ -200,7 +200,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         }
 
         public final LogicalBuilder<N> column(final int... col) {
-            myStore = new ColumnsStore<N>(myStore, col);
+            myStore = new ColumnsStore<>(myStore, col);
             return this;
         }
 
@@ -208,7 +208,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
             if (myStore instanceof ConjugatedStore) {
                 myStore = ((ConjugatedStore<N>) myStore).getOriginal();
             } else {
-                myStore = new ConjugatedStore<N>(myStore);
+                myStore = new ConjugatedStore<>(myStore);
             }
             return this;
         }
@@ -230,7 +230,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         }
 
         public final LogicalBuilder<N> diagonal(final boolean assumeOne) {
-            myStore = new UpperTriangularStore<N>(new LowerTriangularStore<N>(myStore, assumeOne), assumeOne);
+            myStore = new UpperTriangularStore<>(new LowerTriangularStore<>(myStore, assumeOne), assumeOne);
             return this;
         }
 
@@ -250,13 +250,13 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
                 final int tmpDiagRowDim = (int) tmpDiagonalStore.countRows();
                 final int tmpDiagColDim = (int) tmpDiagonalStore.countColumns();
 
-                final MatrixStore<N> tmpRightStore = new ZeroStore<N>(tmpFactory, tmpBaseRowDim, tmpDiagColDim);
-                final MatrixStore<N> tmpAboveStore = new LeftRightStore<N>(myStore, tmpRightStore);
+                final MatrixStore<N> tmpRightStore = new ZeroStore<>(tmpFactory, tmpBaseRowDim, tmpDiagColDim);
+                final MatrixStore<N> tmpAboveStore = new LeftRightStore<>(myStore, tmpRightStore);
 
-                final MatrixStore<N> tmpLeftStore = new ZeroStore<N>(tmpFactory, tmpDiagRowDim, tmpBaseColDim);
-                final MatrixStore<N> tmpBelowStore = new LeftRightStore<N>(tmpLeftStore, tmpDiagonalStore);
+                final MatrixStore<N> tmpLeftStore = new ZeroStore<>(tmpFactory, tmpDiagRowDim, tmpBaseColDim);
+                final MatrixStore<N> tmpBelowStore = new LeftRightStore<>(tmpLeftStore, tmpDiagonalStore);
 
-                myStore = new AboveBelowStore<N>(tmpAboveStore, tmpBelowStore);
+                myStore = new AboveBelowStore<>(tmpAboveStore, tmpBelowStore);
             }
 
             return this;
@@ -272,39 +272,39 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
 
         public final LogicalBuilder<N> hermitian(final boolean upper) {
             if (upper) {
-                myStore = new UpperHermitianStore<N>(myStore);
+                myStore = new UpperHermitianStore<>(myStore);
             } else {
-                myStore = new LowerHermitianStore<N>(myStore);
+                myStore = new LowerHermitianStore<>(myStore);
             }
             return this;
         }
 
         public final LogicalBuilder<N> hessenberg(final boolean upper) {
             if (upper) {
-                myStore = new UpperHessenbergStore<N>(myStore);
+                myStore = new UpperHessenbergStore<>(myStore);
             } else {
-                myStore = new LowerHessenbergStore<N>(myStore);
+                myStore = new LowerHessenbergStore<>(myStore);
             }
             return this;
         }
 
         public final LogicalBuilder<N> left(final int aColDim) {
-            final MatrixStore<N> tmpLeftStore = new ZeroStore<N>(myStore.factory(), (int) myStore.countRows(), aColDim);
-            myStore = new LeftRightStore<N>(tmpLeftStore, myStore);
+            final MatrixStore<N> tmpLeftStore = new ZeroStore<>(myStore.factory(), (int) myStore.countRows(), aColDim);
+            myStore = new LeftRightStore<>(tmpLeftStore, myStore);
             return this;
         }
 
         @SafeVarargs
         public final LogicalBuilder<N> left(final MatrixStore<N>... aLeftStore) {
             final MatrixStore<N> tmpLeftStore = LogicalBuilder.buildColumn((int) myStore.countRows(), aLeftStore);
-            myStore = new LeftRightStore<N>(tmpLeftStore, myStore);
+            myStore = new LeftRightStore<>(tmpLeftStore, myStore);
             return this;
         }
 
         @SafeVarargs
         public final LogicalBuilder<N> left(final N... aLeftStore) {
             final MatrixStore<N> tmpLeftStore = LogicalBuilder.buildColumn(myStore.factory(), (int) myStore.countRows(), aLeftStore);
-            myStore = new LeftRightStore<N>(tmpLeftStore, myStore);
+            myStore = new LeftRightStore<>(tmpLeftStore, myStore);
             return this;
         }
 
@@ -313,53 +313,53 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
          * either the rows or columns, and don't know the size of the other)
          */
         public final LogicalBuilder<N> limits(final int rowLimit, final int columnLimit) {
-            myStore = new LimitStore<N>(rowLimit < 0 ? (int) myStore.countRows() : rowLimit, columnLimit < 0 ? (int) myStore.countColumns() : columnLimit,
+            myStore = new LimitStore<>(rowLimit < 0 ? (int) myStore.countRows() : rowLimit, columnLimit < 0 ? (int) myStore.countColumns() : columnLimit,
                     myStore);
             return this;
         }
 
         public final LogicalBuilder<N> offsets(final int rowOffset, final int columnOffset) {
-            myStore = new OffsetStore<N>(myStore, rowOffset < 0 ? 0 : rowOffset, columnOffset < 0 ? 0 : columnOffset);
+            myStore = new OffsetStore<>(myStore, rowOffset < 0 ? 0 : rowOffset, columnOffset < 0 ? 0 : columnOffset);
             return this;
         }
 
         public final LogicalBuilder<N> right(final int aColDim) {
-            final MatrixStore<N> tmpRightStore = new ZeroStore<N>(myStore.factory(), (int) myStore.countRows(), aColDim);
-            myStore = new LeftRightStore<N>(myStore, tmpRightStore);
+            final MatrixStore<N> tmpRightStore = new ZeroStore<>(myStore.factory(), (int) myStore.countRows(), aColDim);
+            myStore = new LeftRightStore<>(myStore, tmpRightStore);
             return this;
         }
 
         @SafeVarargs
         public final LogicalBuilder<N> right(final MatrixStore<N>... aRightStore) {
             final MatrixStore<N> tmpRightStore = LogicalBuilder.buildColumn((int) myStore.countRows(), aRightStore);
-            myStore = new LeftRightStore<N>(myStore, tmpRightStore);
+            myStore = new LeftRightStore<>(myStore, tmpRightStore);
             return this;
         }
 
         @SafeVarargs
         public final LogicalBuilder<N> right(final N... aRightStore) {
             final MatrixStore<N> tmpRightStore = LogicalBuilder.buildColumn(myStore.factory(), (int) myStore.countRows(), aRightStore);
-            myStore = new LeftRightStore<N>(myStore, tmpRightStore);
+            myStore = new LeftRightStore<>(myStore, tmpRightStore);
             return this;
         }
 
         public final LogicalBuilder<N> row(final int... row) {
-            myStore = new RowsStore<N>(myStore, row);
+            myStore = new RowsStore<>(myStore, row);
             return this;
         }
 
         public final LogicalBuilder<N> superimpose(final int row, final int col, final MatrixStore<N> aStore) {
-            myStore = new SuperimposedStore<N>(myStore, row, col, aStore);
+            myStore = new SuperimposedStore<>(myStore, row, col, aStore);
             return this;
         }
 
         public final LogicalBuilder<N> superimpose(final int row, final int col, final Number aStore) {
-            myStore = new SuperimposedStore<N>(myStore, row, col, new SingleStore<N>(myStore.factory(), aStore));
+            myStore = new SuperimposedStore<>(myStore, row, col, new SingleStore<>(myStore.factory(), aStore));
             return this;
         }
 
         public final LogicalBuilder<N> superimpose(final MatrixStore<N> aStore) {
-            myStore = new SuperimposedStore<N>(myStore, 0, 0, aStore);
+            myStore = new SuperimposedStore<>(myStore, 0, 0, aStore);
             return this;
         }
 
@@ -380,22 +380,22 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
             if (myStore instanceof TransposedStore) {
                 myStore = ((TransposedStore<N>) myStore).getOriginal();
             } else {
-                myStore = new TransposedStore<N>(myStore);
+                myStore = new TransposedStore<>(myStore);
             }
             return this;
         }
 
         public final LogicalBuilder<N> triangular(final boolean upper, final boolean assumeOne) {
             if (upper) {
-                myStore = new UpperTriangularStore<N>(myStore, assumeOne);
+                myStore = new UpperTriangularStore<>(myStore, assumeOne);
             } else {
-                myStore = new LowerTriangularStore<N>(myStore, assumeOne);
+                myStore = new LowerTriangularStore<>(myStore, assumeOne);
             }
             return this;
         }
 
         public final LogicalBuilder<N> tridiagonal() {
-            myStore = new UpperHessenbergStore<N>(new LowerHessenbergStore<N>(myStore));
+            myStore = new UpperHessenbergStore<>(new LowerHessenbergStore<>(myStore));
             return this;
         }
 
@@ -404,19 +404,19 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         public LogicalBuilder<BigDecimal> makeIdentity(final int dimension) {
-            return new LogicalBuilder<BigDecimal>(new IdentityStore<BigDecimal>(BigDenseStore.FACTORY, dimension));
+            return new LogicalBuilder<>(new IdentityStore<>(BigDenseStore.FACTORY, dimension));
         }
 
         public LogicalBuilder<BigDecimal> makeSingle(final BigDecimal element) {
-            return new LogicalBuilder<BigDecimal>(new SingleStore<BigDecimal>(BigDenseStore.FACTORY, element));
+            return new LogicalBuilder<>(new SingleStore<>(BigDenseStore.FACTORY, element));
         }
 
         public LogicalBuilder<BigDecimal> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<BigDecimal>(new WrapperStore<BigDecimal>(BigDenseStore.FACTORY, access));
+            return new LogicalBuilder<>(new WrapperStore<>(BigDenseStore.FACTORY, access));
         }
 
         public LogicalBuilder<BigDecimal> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<BigDecimal>(new ZeroStore<BigDecimal>(BigDenseStore.FACTORY, rowsCount, columnsCount));
+            return new LogicalBuilder<>(new ZeroStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount));
         }
 
     };
@@ -424,19 +424,19 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         public LogicalBuilder<ComplexNumber> makeIdentity(final int dimension) {
-            return new LogicalBuilder<ComplexNumber>(new IdentityStore<ComplexNumber>(ComplexDenseStore.FACTORY, dimension));
+            return new LogicalBuilder<>(new IdentityStore<>(ComplexDenseStore.FACTORY, dimension));
         }
 
         public LogicalBuilder<ComplexNumber> makeSingle(final ComplexNumber element) {
-            return new LogicalBuilder<ComplexNumber>(new SingleStore<ComplexNumber>(ComplexDenseStore.FACTORY, element));
+            return new LogicalBuilder<>(new SingleStore<>(ComplexDenseStore.FACTORY, element));
         }
 
         public LogicalBuilder<ComplexNumber> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<ComplexNumber>(new WrapperStore<ComplexNumber>(ComplexDenseStore.FACTORY, access));
+            return new LogicalBuilder<>(new WrapperStore<>(ComplexDenseStore.FACTORY, access));
         }
 
         public LogicalBuilder<ComplexNumber> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<ComplexNumber>(new ZeroStore<ComplexNumber>(ComplexDenseStore.FACTORY, rowsCount, columnsCount));
+            return new LogicalBuilder<>(new ZeroStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount));
         }
 
     };
@@ -444,19 +444,19 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         public LogicalBuilder<Double> makeIdentity(final int dimension) {
-            return new LogicalBuilder<Double>(new IdentityStore<Double>(PrimitiveDenseStore.FACTORY, dimension));
+            return new LogicalBuilder<>(new IdentityStore<>(PrimitiveDenseStore.FACTORY, dimension));
         }
 
         public LogicalBuilder<Double> makeSingle(final Double element) {
-            return new LogicalBuilder<Double>(new SingleStore<Double>(PrimitiveDenseStore.FACTORY, element));
+            return new LogicalBuilder<>(new SingleStore<>(PrimitiveDenseStore.FACTORY, element));
         }
 
         public LogicalBuilder<Double> makeWrapper(final Access2D<?> access) {
-            return new LogicalBuilder<Double>(new WrapperStore<Double>(PrimitiveDenseStore.FACTORY, access));
+            return new LogicalBuilder<>(new WrapperStore<>(PrimitiveDenseStore.FACTORY, access));
         }
 
         public LogicalBuilder<Double> makeZero(final int rowsCount, final int columnsCount) {
-            return new LogicalBuilder<Double>(new ZeroStore<Double>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount));
+            return new LogicalBuilder<>(new ZeroStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount));
         }
 
     };
@@ -588,7 +588,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
      * @return The matrix product
      */
     default ElementsSupplier<N> premultiply(final Access1D<N> left) {
-        return new MatrixProductSupplier<N>(left, this);
+        return new MatrixProductSupplier<>(left, this);
     }
 
     default MatrixStore<N> signum() {

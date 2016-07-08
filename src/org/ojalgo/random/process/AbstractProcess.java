@@ -35,14 +35,14 @@ import org.ojalgo.type.keyvalue.ComparableToDouble;
 
 abstract class AbstractProcess<D extends Distribution> implements RandomProcess<D> {
 
-    private final TreeSet<ComparableToDouble<Double>> myObservations = new TreeSet<ComparableToDouble<Double>>();
+    private final TreeSet<ComparableToDouble<Double>> myObservations = new TreeSet<>();
 
     protected AbstractProcess() {
         super();
     }
 
     public final boolean addObservation(final Double x, final double y) {
-        return myObservations.add(new ComparableToDouble<Double>(x, y));
+        return myObservations.add(new ComparableToDouble<>(x, y));
     }
 
     /**
@@ -93,9 +93,9 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
 
     public final void setValue(final double newValue) {
         if (myObservations.size() <= 0) {
-            myObservations.add(new ComparableToDouble<Double>(ZERO, newValue));
+            myObservations.add(new ComparableToDouble<>(ZERO, newValue));
         } else {
-            myObservations.add(new ComparableToDouble<Double>(myObservations.pollLast().key, newValue));
+            myObservations.add(new ComparableToDouble<>(myObservations.pollLast().key, newValue));
         }
     }
 
@@ -105,7 +105,7 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
      */
     public final RandomProcess.SimulationResults simulate(final int numberOfRealisations, final int numberOfSteps, final double stepSize) {
 
-        final List<ComparableToDouble<Double>> tmpInitialState = new ArrayList<ComparableToDouble<Double>>(myObservations);
+        final List<ComparableToDouble<Double>> tmpInitialState = new ArrayList<>(myObservations);
         final double tmpInitialValue = this.getValue();
 
         final Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE.makeZero(numberOfRealisations, numberOfSteps);

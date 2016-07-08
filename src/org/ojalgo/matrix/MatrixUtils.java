@@ -39,7 +39,6 @@ import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 public abstract class MatrixUtils {

@@ -44,7 +44,7 @@ public final class ResourceLocator {
     private String myHost = null;
     private String myPath = null;
     private int myPort = -1; // -1 ==> undefined
-    private Map<String, String> myQueryParameters = new TreeMap<String, String>();
+    private Map<String, String> myQueryParameters = new TreeMap<>();
     private String myScheme = "http";
 
     public ResourceLocator() {

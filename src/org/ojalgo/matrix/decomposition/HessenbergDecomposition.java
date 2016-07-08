@@ -157,7 +157,7 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
 
         final int tmpRowAndColDim = (int) aStoreToTransform.countRows();
 
-        final DecompositionStore.HouseholderReference<N> tmpHouseholderReference = new DecompositionStore.HouseholderReference<N>(this.getInPlace(), tmpUpper);
+        final DecompositionStore.HouseholderReference<N> tmpHouseholderReference = new DecompositionStore.HouseholderReference<>(this.getInPlace(), tmpUpper);
 
         for (int ij = tmpRowAndColDim - 3; ij >= 0; ij--) {
 

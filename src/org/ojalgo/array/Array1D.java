@@ -265,7 +265,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
                 retVal.set(i, this.doubleValue(i));
             }
 
-            return new Array1D<N>(retVal);
+            return new Array1D<>(retVal);
 
         } else if (myDelegate instanceof ComplexArray) {
 
@@ -275,7 +275,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
                 retVal.set(i, this.get(i));
             }
 
-            return new Array1D<N>(retVal);
+            return new Array1D<>(retVal);
 
         } else if (myDelegate instanceof BigArray) {
 
@@ -285,7 +285,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
                 retVal.set(i, this.get(i));
             }
 
-            return new Array1D<N>(retVal);
+            return new Array1D<>(retVal);
 
         } else {
 
@@ -311,7 +311,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
                 retVal.set(i, this.doubleValue(indices[i]));
             }
 
-            return new Array1D<N>(retVal);
+            return new Array1D<>(retVal);
 
         } else if (myDelegate instanceof ComplexArray) {
 
@@ -321,7 +321,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
                 retVal.set(i, this.get(indices[i]));
             }
 
-            return new Array1D<N>(retVal);
+            return new Array1D<>(retVal);
 
         } else if (myDelegate instanceof BigArray) {
 
@@ -331,7 +331,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
                 retVal.set(i, this.get(indices[i]));
             }
 
-            return new Array1D<N>(retVal);
+            return new Array1D<>(retVal);
 
         } else {
 
@@ -564,7 +564,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     }
 
     public Array1D<N> sliceRange(final long first, final long limit) {
-        return new Array1D<N>(myDelegate, myFirst + (myStep * first), myFirst + (myStep * limit), myStep);
+        return new Array1D<>(myDelegate, myFirst + (myStep * first), myFirst + (myStep * limit), myStep);
     }
 
     /**

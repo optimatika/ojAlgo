@@ -41,7 +41,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
 
-    public static final BasicMatrix.Factory<BigMatrix> FACTORY = new MatrixFactory<BigDecimal, BigMatrix>(BigMatrix.class, BigDenseStore.FACTORY);
+    public static final BasicMatrix.Factory<BigMatrix> FACTORY = new MatrixFactory<>(BigMatrix.class, BigDenseStore.FACTORY);
 
     public static Builder<BigMatrix> getBuilder(final int aLength) {
         return FACTORY.getBuilder(aLength);

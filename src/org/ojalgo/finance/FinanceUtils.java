@@ -85,7 +85,7 @@ public abstract class FinanceUtils {
     public static CalendarDateSeries<RandomNumber> forecast(final CalendarDateSeries<? extends Number> aSeries, final int aPointCount,
             final CalendarDateUnit aTimeUnit, final boolean includeOriginalSeries) {
 
-        final CalendarDateSeries<RandomNumber> retVal = new CalendarDateSeries<RandomNumber>(aTimeUnit);
+        final CalendarDateSeries<RandomNumber> retVal = new CalendarDateSeries<>(aTimeUnit);
         retVal.name(aSeries.getName()).colour(aSeries.getColour());
 
         final double tmpSamplePeriod = (double) aSeries.getAverageStepSize() / (double) aTimeUnit.size();
@@ -112,7 +112,7 @@ public abstract class FinanceUtils {
     public static CalendarDateSeries<BigDecimal> makeCalendarPriceSeries(final double[] somePrices, final Calendar aStartCalendar,
             final CalendarDateUnit aResolution) {
 
-        final CalendarDateSeries<BigDecimal> retVal = new CalendarDateSeries<BigDecimal>(aResolution);
+        final CalendarDateSeries<BigDecimal> retVal = new CalendarDateSeries<>(aResolution);
 
         FinanceUtils.copyValues(retVal, new CalendarDate(aStartCalendar), somePrices);
 
@@ -125,9 +125,9 @@ public abstract class FinanceUtils {
      */
     public static <V extends Number> BasicMatrix makeCovarianceMatrix(final Collection<CalendarDateSeries<V>> timeSeriesCollection) {
 
-        final CoordinationSet<V> tmpCoordinator = new CoordinationSet<V>(timeSeriesCollection).prune();
+        final CoordinationSet<V> tmpCoordinator = new CoordinationSet<>(timeSeriesCollection).prune();
 
-        final ArrayList<SampleSet> tmpSampleSets = new ArrayList<SampleSet>();
+        final ArrayList<SampleSet> tmpSampleSets = new ArrayList<>();
         for (final CalendarDateSeries<V> tmpTimeSeries : timeSeriesCollection) {
             final double[] someValues = tmpCoordinator.get(tmpTimeSeries.getName()).getPrimitiveValues();
             final int tmpSize1 = someValues.length - 1;
@@ -167,7 +167,7 @@ public abstract class FinanceUtils {
 
     public static CalendarDateSeries<BigDecimal> makeDatePriceSeries(final double[] somePrices, final Date aStartDate, final CalendarDateUnit aResolution) {
 
-        final CalendarDateSeries<BigDecimal> retVal = new CalendarDateSeries<BigDecimal>(aResolution);
+        final CalendarDateSeries<BigDecimal> retVal = new CalendarDateSeries<>(aResolution);
 
         FinanceUtils.copyValues(retVal, new CalendarDate(aStartDate), somePrices);
 
@@ -250,7 +250,7 @@ public abstract class FinanceUtils {
 
         final CalendarDateUnit tmpResolution = aPriceSeries.getResolution();
 
-        final CalendarDateSeries<Double> retVal = new CalendarDateSeries<Double>(tmpResolution);
+        final CalendarDateSeries<Double> retVal = new CalendarDateSeries<>(tmpResolution);
 
         double tmpThisRiskFree, tmpLastRiskFree, tmpAvgRiskFree, tmpRiskFreeGrowthFactor, tmpThisPrice, tmpLastPrice, tmpPriceGrowthFactor,
                 tmpAdjustedPriceGrowthFactor;

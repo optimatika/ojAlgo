@@ -41,8 +41,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMatrix> {
 
-    public static final BasicMatrix.Factory<ComplexMatrix> FACTORY = new MatrixFactory<ComplexNumber, ComplexMatrix>(ComplexMatrix.class,
-            ComplexDenseStore.FACTORY);
+    public static final BasicMatrix.Factory<ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, ComplexDenseStore.FACTORY);
 
     public static Builder<ComplexMatrix> getBuilder(final int aLength) {
         return FACTORY.getBuilder(aLength);

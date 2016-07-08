@@ -460,7 +460,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
 
     @Override
     protected MatrixStore<N> makeD() {
-        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<Double>(myDiagonalValues, null, null, PrimitiveMath.ZERO);
+        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<>(myDiagonalValues, null, null, PrimitiveMath.ZERO);
         return this.wrap(tmpDiagonal).diagonal(false).get();
     }
 

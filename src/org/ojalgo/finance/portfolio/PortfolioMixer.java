@@ -49,8 +49,8 @@ public final class PortfolioMixer {
 
     private final ArrayList<FinancePortfolio> myComponents;
     private final FinancePortfolio myTarget;
-    private final HashMap<int[], LowerUpper> myAssetConstraints = new HashMap<int[], LowerUpper>();
-    private final HashMap<int[], LowerUpper> myComponentConstraints = new HashMap<int[], LowerUpper>();
+    private final HashMap<int[], LowerUpper> myAssetConstraints = new HashMap<>();
+    private final HashMap<int[], LowerUpper> myComponentConstraints = new HashMap<>();
 
     public PortfolioMixer(final FinancePortfolio target, final Collection<? extends FinancePortfolio> components) {
         this(target, components.toArray(new FinancePortfolio[components.size()]));
@@ -64,7 +64,7 @@ public final class PortfolioMixer {
 
         final int tmpSize = myTarget.getWeights().size();
 
-        myComponents = new ArrayList<FinancePortfolio>();
+        myComponents = new ArrayList<>();
         for (final FinancePortfolio tmpCompPortf : components) {
             if (tmpCompPortf.getWeights().size() != tmpSize) {
                 throw new IllegalArgumentException(DIMENSION_MISMATCH);
@@ -197,7 +197,7 @@ public final class PortfolioMixer {
 
         tmpModel.minimise();
 
-        final ArrayList<BigDecimal> retVal = new ArrayList<BigDecimal>(tmpNumberOfComponents);
+        final ArrayList<BigDecimal> retVal = new ArrayList<>(tmpNumberOfComponents);
         for (int v = 0; v < tmpNumberOfComponents; v++) {
             retVal.add(tmpVariables[v].getValue());
         }

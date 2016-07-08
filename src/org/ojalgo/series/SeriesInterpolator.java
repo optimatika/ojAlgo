@@ -33,8 +33,8 @@ public class SeriesInterpolator {
 
     private final NumberContext myContext;
     private CoordinationSet<Double> myCoordinatedSet = null;
-    private final TreeMap<BigDecimal, String> myKeys = new TreeMap<BigDecimal, String>();
-    private final CoordinationSet<Double> myOriginalSet = new CoordinationSet<Double>();
+    private final TreeMap<BigDecimal, String> myKeys = new TreeMap<>();
+    private final CoordinationSet<Double> myOriginalSet = new CoordinationSet<>();
 
     public SeriesInterpolator() {
         this(NumberContext.getGeneral(15));
@@ -65,7 +65,7 @@ public class SeriesInterpolator {
             myCoordinatedSet.complete();
         }
 
-        final CalendarDateSeries<Double> retVal = new CalendarDateSeries<Double>(myCoordinatedSet.getResolution());
+        final CalendarDateSeries<Double> retVal = new CalendarDateSeries<>(myCoordinatedSet.getResolution());
 
         BigDecimal tmpLowerKey = null;
         BigDecimal tmpUpperKey = null;

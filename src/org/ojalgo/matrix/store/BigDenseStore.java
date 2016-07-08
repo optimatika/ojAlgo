@@ -947,23 +947,23 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     }
 
     public final ElementsConsumer<BigDecimal> regionByColumns(final int... columns) {
-        return new ColumnsRegion<BigDecimal>(this, multiplyBoth, columns);
+        return new ColumnsRegion<>(this, multiplyBoth, columns);
     }
 
     public final ElementsConsumer<BigDecimal> regionByLimits(final int rowLimit, final int columnLimit) {
-        return new LimitRegion<BigDecimal>(this, multiplyBoth, rowLimit, columnLimit);
+        return new LimitRegion<>(this, multiplyBoth, rowLimit, columnLimit);
     }
 
     public final ElementsConsumer<BigDecimal> regionByOffsets(final int rowOffset, final int columnOffset) {
-        return new OffsetRegion<BigDecimal>(this, multiplyBoth, rowOffset, columnOffset);
+        return new OffsetRegion<>(this, multiplyBoth, rowOffset, columnOffset);
     }
 
     public final ElementsConsumer<BigDecimal> regionByRows(final int... rows) {
-        return new RowsRegion<BigDecimal>(this, multiplyBoth, rows);
+        return new RowsRegion<>(this, multiplyBoth, rows);
     }
 
     public final ElementsConsumer<BigDecimal> regionByTransposing() {
-        return new TransposedRegion<BigDecimal>(this, multiplyBoth);
+        return new TransposedRegion<>(this, multiplyBoth);
     }
 
     public void rotateRight(final int aLow, final int aHigh, final double aCos, final double aSin) {

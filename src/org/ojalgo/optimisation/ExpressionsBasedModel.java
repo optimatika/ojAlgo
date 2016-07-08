@@ -195,17 +195,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     }
 
+    private static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
     private static final String NEW_LINE = "\n";
-
     private static final String OBJ_FUNC_AS_CONSTR_KEY = UUID.randomUUID().toString();
-
     private static final String OBJECTIVE = "Generated/Aggregated Objective";
-
+    private static final TreeSet<Presolver> PRESOLVERS = new TreeSet<>();
     private static final String START_END = "############################################\n";
-    static final Comparator<Expression> CE = (o1, o2) -> Integer.compare(o2.countLinearFactors(), o1.countLinearFactors());
-
-    static final List<ExpressionsBasedModel.Integration<?>> INTEGRATIONS = new ArrayList<>();
-    static final TreeSet<Presolver> PRESOLVERS = new TreeSet<>();
 
     static {
         ExpressionsBasedModel.addPresolver(Presolvers.ZERO_ONE_TWO);
@@ -238,7 +233,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
     private final HashMap<String, Expression> myExpressions = new HashMap<String, Expression>();
     private final HashSet<IntIndex> myFixedVariables = new HashSet<IntIndex>();
-
     private transient int[] myFreeIndices = null;
     private final List<Variable> myFreeVariables = new ArrayList<>();
     private transient int[] myIntegerIndices = null;
@@ -247,7 +241,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private final List<Variable> myNegativeVariables = new ArrayList<>();
     private transient int[] myPositiveIndices = null;
     private final List<Variable> myPositiveVariables = new ArrayList<>();
-
     private final ArrayList<Variable> myVariables = new ArrayList<Variable>();
     private final boolean myWorkCopy;
 
@@ -808,10 +801,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return this.validate(solution, context, options.debug_appender);
     }
 
-    public boolean validate(final Access1D<BigDecimal> solution, final Printer appender) {
-        return this.validate(solution, options.slack, appender);
-    }
-
     public boolean validate(final Access1D<BigDecimal> solution, final NumberContext context, final Printer appender) {
 
         final int tmpSize = myVariables.size();
@@ -827,6 +816,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         return retVal;
+    }
+
+    public boolean validate(final Access1D<BigDecimal> solution, final Printer appender) {
+        return this.validate(solution, options.slack, appender);
     }
 
     public boolean validate(final NumberContext context) {
@@ -934,6 +927,10 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
 
         return this.getFixedVariables();
+    }
+
+    private boolean isUncorrelated(final Variable variable) {
+        return !this.constraints().anyMatch(c -> c.includes(variable));
     }
 
     protected void flushCaches() {

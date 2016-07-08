@@ -28,7 +28,7 @@ public final class KeyCounter<K> {
 
     protected static final int INT_ZERO = 0;
 
-    private final HashMap<K, AtomicInteger> myDelegate = new HashMap<K, AtomicInteger>();
+    private final HashMap<K, AtomicInteger> myDelegate = new HashMap<>();
 
     public KeyCounter() {
         super();

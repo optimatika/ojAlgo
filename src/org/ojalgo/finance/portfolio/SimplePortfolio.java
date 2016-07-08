@@ -37,7 +37,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
 
     static List<SimpleAsset> toSimpleAssets(final Number[] someWeights) {
 
-        final ArrayList<SimpleAsset> retVal = new ArrayList<SimpleAsset>(someWeights.length);
+        final ArrayList<SimpleAsset> retVal = new ArrayList<>(someWeights.length);
 
         for (int i = 0; i < someWeights.length; i++) {
             retVal.add(new SimpleAsset(someWeights[i]));
@@ -84,7 +84,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
             throw new IllegalArgumentException("Input dimensions don't match!");
         }
 
-        myComponents = new ArrayList<SimpleAsset>(tmpWeights.size());
+        myComponents = new ArrayList<>(tmpWeights.size());
         for (int i = 0; i < tmpWeights.size(); i++) {
             final double tmpMeanReturn = tmpAssetReturns.doubleValue(i, 0);
             final double tmpVolatilty = Math.sqrt(tmpCovariances.doubleValue(i, i));
@@ -236,7 +236,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
 
     public PortfolioSimulator getSimulator() {
 
-        final List<GeometricBrownianMotion> tmpAssetProcesses = new ArrayList<GeometricBrownianMotion>(myComponents.size());
+        final List<GeometricBrownianMotion> tmpAssetProcesses = new ArrayList<>(myComponents.size());
 
         for (final SimpleAsset tmpAsset : myComponents) {
             final GeometricBrownianMotion tmpForecast = tmpAsset.forecast();
@@ -261,7 +261,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
 
         if (myWeights == null) {
 
-            myWeights = new ArrayList<BigDecimal>(myComponents.size());
+            myWeights = new ArrayList<>(myComponents.size());
 
             for (final SimpleAsset tmpAsset : myComponents) {
                 myWeights.add(tmpAsset.getWeight());

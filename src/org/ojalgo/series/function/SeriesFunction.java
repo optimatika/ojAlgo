@@ -70,7 +70,7 @@ public abstract class SeriesFunction<K extends Comparable<K>> {
     public abstract Map<String, Access1D<?>> invoke(K... key);
 
     protected List<String> getAllSeriesNames() {
-        return new ArrayList<String>(myData.keySet());
+        return new ArrayList<>(myData.keySet());
     }
 
     protected BasicSeries<K, ? extends Number> getSeries(final String name) {

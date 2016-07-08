@@ -120,7 +120,7 @@ public final class GaussianField<K extends Comparable<K>> {
     }
 
     public void addObservation(final K key, final double value) {
-        myObservations.add(new ComparableToDouble<K>(key, value));
+        myObservations.add(new ComparableToDouble<>(key, value));
     }
 
     public void calibrate() {
@@ -293,7 +293,7 @@ public final class GaussianField<K extends Comparable<K>> {
     }
 
     List<ComparableToDouble<K>> getObservations() {
-        return new ArrayList<ComparableToDouble<K>>(myObservations);
+        return new ArrayList<>(myObservations);
     }
 
     MatrixStore<Double> getRegressionCoefficients(final K[] args) {

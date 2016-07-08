@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation.integer;
 
+import org.ojalgo.TestUtils;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
@@ -41,6 +42,13 @@ import org.ojalgo.optimisation.Variable;
  * this same problem, which always returns the optimal solution, hence the problem seems not to be due to
  * AnyLogic. As shown by the above Java code, the problem is not due to Ojalgo as well, but only related to
  * the coupling of AnyLogic and Ojalgo. Thank you very much for Ojalgo and your help!
+ * </p>
+ * <p>
+ * apete: ExpressionsBasedModel has a feature that automatically rescales model parameters (to maximize
+ * numerical accuracy) before invoking the solver. The current implementation of that feature (apparently)
+ * doesn?t work very well with extremely large parameters in the model. I have now modified the behavior of
+ * that feature to not scale anything when/if there are extremely large or small parameters present. As far as
+ * I can see that solves the problem with your model.
  * </p>
  *
  * @author apete
@@ -95,8 +103,10 @@ public class P20160701 {
         final Variable[][] x = new Variable[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                x[i][j] = Variable.make("x" + i + "_" + j).binary().weight(c[i][j]);
-                model.addVariable(x[i][j]);
+                if (i != j) {
+                    x[i][j] = Variable.make("x" + i + "_" + j).binary().weight(c[i][j]);
+                    model.addVariable(x[i][j]);
+                }
             }
         }
         final Variable[] u = new Variable[n];
@@ -146,6 +156,9 @@ public class P20160701 {
 
         final Optimisation.Result result = model.minimise();
 
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(917.3134949394164, result.getValue());
+
         System.out.print("u=\n\t  ");
         for (int i = 1; i < n; i++) {
             System.out.print(u[i].getValue().intValue() + " ");
@@ -158,7 +171,12 @@ public class P20160701 {
         for (int i = 0; i < n; i++) {
             System.out.print(i + "\t");
             for (int j = 0; j < n; j++) {
-                System.out.print(x[i][j].getValue().intValue() + " ");
+                if (i != j) {
+                    System.out.print(x[i][j].getValue().intValue() + " ");
+                } else {
+                    System.out.print(0 + " ");
+                }
+
             }
             System.out.println();
         }

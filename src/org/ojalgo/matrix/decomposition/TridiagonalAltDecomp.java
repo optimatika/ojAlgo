@@ -62,7 +62,7 @@ class TridiagonalAltDecomp extends InPlaceDecomposition<Double> implements Tridi
         final Array1D<Double> tmpMain = Array1D.PRIMITIVE.wrap(myMain);
         final Array1D<Double> tmpOff = Array1D.PRIMITIVE.wrap(myOff).subList(1, (int) myOff.count());
 
-        final DiagonalAccess<Double> tmpAccess = new DiagonalAccess<Double>(tmpMain, tmpOff, tmpOff, PrimitiveMath.ZERO);
+        final DiagonalAccess<Double> tmpAccess = new DiagonalAccess<>(tmpMain, tmpOff, tmpOff, PrimitiveMath.ZERO);
 
         return this.wrap(tmpAccess).get();
     }

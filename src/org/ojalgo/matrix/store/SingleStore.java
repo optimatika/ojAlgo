@@ -46,7 +46,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     public MatrixStore<N> conjugate() {
-        return new SingleStore<N>(this.factory(), this.factory().scalar().convert(myNumber).conjugate().getNumber());
+        return new SingleStore<>(this.factory(), this.factory().scalar().convert(myNumber).conjugate().getNumber());
     }
 
     @Override

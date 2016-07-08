@@ -87,11 +87,11 @@ abstract class DelegatingStore<N extends Number> extends LogicalStore<N> {
     }
 
     protected final Future<MatrixStore<N>> executeMultiplyLeftOnBase(final Access1D<N> left) {
-        return DaemonPoolExecutor.invoke(new MultiplyLeft<N>(this.getBase(), left));
+        return DaemonPoolExecutor.invoke(new MultiplyLeft<>(this.getBase(), left));
     }
 
     protected final Future<MatrixStore<N>> executeMultiplyRightOnBase(final MatrixStore<N> right) {
-        return DaemonPoolExecutor.invoke(new MultiplyRight<N>(this.getBase(), right));
+        return DaemonPoolExecutor.invoke(new MultiplyRight<>(this.getBase(), right));
     }
 
 }

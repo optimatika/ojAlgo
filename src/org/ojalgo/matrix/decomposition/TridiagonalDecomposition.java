@@ -137,7 +137,7 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
             final Array1D<N> tmpMain = tmpArray2D.sliceDiagonal(0, 0).copy();
             final Array1D<N> tmpSub = tmpArray2D.sliceDiagonal(1, 0).copy(); // Super differs only in possible conjugate values
 
-            myDiagonalAccessD = new DiagonalAccess<N>(tmpMain, tmpSub, tmpSub, this.scalar().zero().getNumber());
+            myDiagonalAccessD = new DiagonalAccess<>(tmpMain, tmpSub, tmpSub, this.scalar().zero().getNumber());
             myInitDiagQ = this.makeReal(myDiagonalAccessD);
 
             retVal = true;
@@ -217,7 +217,7 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
         final DecompositionStore<N> retVal = this.getInPlace();
         final int tmpDim = (int) Math.min(retVal.countRows(), retVal.countColumns());
 
-        final DecompositionStore.HouseholderReference<N> tmpHouseholderReference = new DecompositionStore.HouseholderReference<N>(retVal, true);
+        final DecompositionStore.HouseholderReference<N> tmpHouseholderReference = new DecompositionStore.HouseholderReference<>(retVal, true);
 
         if (myInitDiagQ != null) {
             retVal.set(tmpDim - 1, tmpDim - 1, myInitDiagQ.get(tmpDim - 1));

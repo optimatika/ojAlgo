@@ -36,7 +36,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Bidiagonal<N> {
@@ -285,7 +284,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
             tmpSuper = null;
         }
 
-        return new DiagonalAccess<N>(tmpMain, tmpSuper, tmpSub, this.scalar().zero().getNumber());
+        return new DiagonalAccess<>(tmpMain, tmpSuper, tmpSub, this.scalar().zero().getNumber());
     }
 
     /**
@@ -346,7 +345,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
     protected DecompositionStore<N> makeQ1() {
 
-        final DecompositionStore.HouseholderReference<N> tmpHouseholderReference = new DecompositionStore.HouseholderReference<N>(this.getInPlace(), true);
+        final DecompositionStore.HouseholderReference<N> tmpHouseholderReference = new DecompositionStore.HouseholderReference<>(this.getInPlace(), true);
 
         final int tmpRowDim = this.getRowDim();
         final int tmpMinDim = this.getMinDim();
@@ -377,7 +376,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
     protected DecompositionStore<N> makeQ2() {
 
-        final DecompositionStore.HouseholderReference<N> tmpHouseholderReference = new DecompositionStore.HouseholderReference<N>(this.getInPlace(), false);
+        final DecompositionStore.HouseholderReference<N> tmpHouseholderReference = new DecompositionStore.HouseholderReference<>(this.getInPlace(), false);
 
         final int tmpColDim = this.getColDim();
         final int tmpMinDim = this.getMinDim();
