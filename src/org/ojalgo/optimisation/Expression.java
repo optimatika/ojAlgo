@@ -753,7 +753,7 @@ public final class Expression extends ModelEntity<Expression> {
     }
 
     boolean isInfeasible() {
-        return myInfeasible;
+        return myInfeasible || super.isInfeasible();
     }
 
     /**

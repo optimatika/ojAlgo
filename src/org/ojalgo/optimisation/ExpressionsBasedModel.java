@@ -729,6 +729,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
             retVal = new Optimisation.Result(State.INFEASIBLE, tmpSolution);
 
+        } else if (this.isUnbounded()) {
+
+            final Optimisation.Result tmpSolution = this.getVariableValues();
+
+            retVal = new Optimisation.Result(State.UNBOUNDED, tmpSolution);
+
         } else if (this.isFixed()) {
 
             final Optimisation.Result tmpSolution = this.getVariableValues();
@@ -833,7 +839,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return myVariables.stream().filter((final Variable v) -> (!v.isEqualityConstraint()));
     }
 
-    private Set<IntIndex> categoriseVariables() {
+    private void categoriseVariables() {
 
         final int tmpLength = myVariables.size();
 
@@ -857,12 +863,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
             final Variable tmpVariable = myVariables.get(i);
 
-            if (tmpVariable.isEqualityConstraint()) {
-
-                tmpVariable.setValue(tmpVariable.getLowerLimit());
-                myFixedVariables.add(tmpVariable.getIndex());
-
-            } else {
+            if (!tmpVariable.isEqualityConstraint()) {
 
                 myFreeVariables.add(tmpVariable);
                 myFreeIndices[i] = myFreeVariables.size() - 1;
@@ -883,8 +884,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
                 }
             }
         }
-
-        return this.getFixedVariables();
     }
 
     private Optimisation.Result handleResult(final Result solverResult) {
@@ -980,6 +979,22 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         for (final Expression tmpExpression : myExpressions.values()) {
             if (tmpExpression.isInfeasible()) {
                 return true;
+            }
+        }
+        for (final Variable tmpVariable : myVariables) {
+            if (tmpVariable.isInfeasible()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    boolean isUnbounded() {
+        for (final Variable tmpVariable : myVariables) {
+            if (tmpVariable.isUnbounded()) {
+                if (!this.constraints().anyMatch(c -> c.includes(tmpVariable))) {
+                    return true;
+                }
             }
         }
         return false;
