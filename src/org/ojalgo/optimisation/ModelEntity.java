@@ -372,13 +372,6 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return (myLowerLimit != null) && (myUpperLimit != null) && (myLowerLimit.compareTo(myUpperLimit) > 0);
     }
 
-    /**
-     * @return true if it contributes to the objective function value and that contribution is unbounded (when only considering this entity).
-     */
-    boolean isUnbounded() {
-        return (myContributionWeight != null) && ((myLowerLimit == null) || (myUpperLimit == null));
-    }
-
     void visitAllParameters(final VoidFunction<BigDecimal> largest, final VoidFunction<BigDecimal> smallest) {
         largest.invoke(ONE);
         smallest.invoke(ONE);

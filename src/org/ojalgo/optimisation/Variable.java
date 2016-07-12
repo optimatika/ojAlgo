@@ -47,6 +47,8 @@ public final class Variable extends ModelEntity<Variable> {
 
     private IntIndex myIndex = null;
     private boolean myInteger = false;
+    private transient boolean myUnbounded = false;
+
     private BigDecimal myValue = null;
 
     public Variable(final String name) {
@@ -237,6 +239,10 @@ public final class Variable extends ModelEntity<Variable> {
         return myIndex;
     }
 
+    boolean isUnbounded() {
+        return myUnbounded;
+    }
+
     void setIndex(final IntIndex index) {
         if (index == null) {
             throw new IllegalArgumentException("The index cannot be null!");
@@ -244,6 +250,10 @@ public final class Variable extends ModelEntity<Variable> {
             throw new IllegalStateException("Cannot change a variable's index, or add a variable to more than one model!");
         }
         myIndex = index;
+    }
+
+    void setUnbounded(final boolean uncorrelated) {
+        myUnbounded = uncorrelated;
     }
 
 }

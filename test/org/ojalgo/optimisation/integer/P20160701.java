@@ -50,10 +50,15 @@ import org.ojalgo.optimisation.Variable;
  * that feature to not scale anything when/if there are extremely large or small parameters present. As far as
  * I can see that solves the problem with your model.
  * </p>
+ * <p>
+ * apete (later): Have also improved the presolve functionality to fix (not-include) uncorrelated and/or
+ * unbounded variables. (Doesn't handle every case, but this one a a few more.) This was the real fix for this
+ * problem!
+ * </p>
  *
  * @author apete
  */
-public class P20160701 {
+class P20160701 {
 
     public static void main(final String[] arg) {
         final int n = 6;
@@ -97,16 +102,12 @@ public class P20160701 {
 
         final ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        model.options.debug(IntegerSolver.class);
-
         //DECISION VARIABLES
         final Variable[][] x = new Variable[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (i != j) {
-                    x[i][j] = Variable.make("x" + i + "_" + j).binary().weight(c[i][j]);
-                    model.addVariable(x[i][j]);
-                }
+                x[i][j] = Variable.make("x" + i + "_" + j).binary().weight(c[i][j]);
+                model.addVariable(x[i][j]);
             }
         }
         final Variable[] u = new Variable[n];
@@ -156,9 +157,6 @@ public class P20160701 {
 
         final Optimisation.Result result = model.minimise();
 
-        TestUtils.assertStateNotLessThanOptimal(result);
-        TestUtils.assertEquals(917.3134949394164, result.getValue());
-
         System.out.print("u=\n\t  ");
         for (int i = 1; i < n; i++) {
             System.out.print(u[i].getValue().intValue() + " ");
@@ -171,15 +169,13 @@ public class P20160701 {
         for (int i = 0; i < n; i++) {
             System.out.print(i + "\t");
             for (int j = 0; j < n; j++) {
-                if (i != j) {
-                    System.out.print(x[i][j].getValue().intValue() + " ");
-                } else {
-                    System.out.print(0 + " ");
-                }
-
+                System.out.print(x[i][j].getValue().intValue() + " ");
             }
             System.out.println();
         }
         System.out.println("\nResult = " + result);
+
+        TestUtils.assertStateNotLessThanOptimal(result);
+        TestUtils.assertEquals(917.3134949394164, result.getValue());
     }
 }

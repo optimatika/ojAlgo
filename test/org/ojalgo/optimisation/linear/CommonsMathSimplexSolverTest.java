@@ -689,7 +689,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
             //model.myModel.options.debug(LinearSolver.class);
 
-            Optimisation.Result tmpResult;
+            Optimisation.Result tmpResult = null;
             if (minOrMax == GoalType.MINIMIZE) {
                 tmpResult = model.minimise();
             } else {
