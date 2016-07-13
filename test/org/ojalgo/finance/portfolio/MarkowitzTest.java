@@ -2,17 +2,14 @@ package org.ojalgo.finance.portfolio;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
 import org.ojalgo.matrix.PrimitiveMatrix;
 
-public class MarkowitzTest {
+public class MarkowitzTest extends FinancePortfolioTests {
 
-    @Test
     public void testHanging() throws Exception {
         this.testMarkowitzModel(2.5E-5);
     }
 
-    @Test
     public void testSuccess() throws Exception {
         this.testMarkowitzModel(0.015);
     }

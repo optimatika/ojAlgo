@@ -157,23 +157,25 @@ class P20160701 {
 
         final Optimisation.Result result = model.minimise();
 
-        System.out.print("u=\n\t  ");
-        for (int i = 1; i < n; i++) {
-            System.out.print(u[i].getValue().intValue() + " ");
-        }
-        System.out.print("\nx=\n\t");
-        for (int i = 0; i < n; i++) {
-            System.out.print(i + " ");
-        }
-        System.out.println();
-        for (int i = 0; i < n; i++) {
-            System.out.print(i + "\t");
-            for (int j = 0; j < n; j++) {
-                System.out.print(x[i][j].getValue().intValue() + " ");
+        if (OptimisationIntegerTests.DEBUG) {
+            System.out.print("u=\n\t  ");
+            for (int i = 1; i < n; i++) {
+                System.out.print(u[i].getValue().intValue() + " ");
+            }
+            System.out.print("\nx=\n\t");
+            for (int i = 0; i < n; i++) {
+                System.out.print(i + " ");
             }
             System.out.println();
+            for (int i = 0; i < n; i++) {
+                System.out.print(i + "\t");
+                for (int j = 0; j < n; j++) {
+                    System.out.print(x[i][j].getValue().intValue() + " ");
+                }
+                System.out.println();
+            }
+            System.out.println("\nResult = " + result);
         }
-        System.out.println("\nResult = " + result);
 
         TestUtils.assertStateNotLessThanOptimal(result);
         TestUtils.assertEquals(917.3134949394164, result.getValue());
