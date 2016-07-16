@@ -51,17 +51,17 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         super();
     }
 
-    public void resolve(final List<Equation> equations, final PhysicalStore<Double> current) {
+    public double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
 
         final int tmpCountRows = equations.size();
 
         double tmpNormErr = POSITIVE_INFINITY;
         double tmpNormRHS = ONE;
 
-        final PrimitiveDenseStore tmpResidual = this.residual(current);
-        final PrimitiveDenseStore tmpDirection = this.direction(current);
-        final PrimitiveDenseStore tmpPreconditioned = this.preconditioned(current);
-        final PrimitiveDenseStore tmpVector = this.vector(current);
+        final PrimitiveDenseStore tmpResidual = this.residual(solution);
+        final PrimitiveDenseStore tmpDirection = this.direction(solution);
+        final PrimitiveDenseStore tmpPreconditioned = this.preconditioned(solution);
+        final PrimitiveDenseStore tmpVector = this.vector(solution);
 
         double tmpStepLength;
         double tmpGradientCorrectionFactor;
@@ -74,7 +74,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             final Equation tmpRow = equations.get(r);
             double tmpVal = tmpRow.getRHS();
             tmpNormRHS = Math.hypot(tmpNormRHS, tmpVal);
-            tmpVal -= tmpRow.dot(current);
+            tmpVal -= tmpRow.dot(solution);
             tmpResidual.set(tmpRow.index, tmpVal);
             tmpPreconditioned.set(tmpRow.index, tmpVal / tmpRow.getPivot()); // precondition
         }
@@ -104,7 +104,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             tmpStepLength = zr0 / pAp0;
 
             if (!Double.isNaN(tmpStepLength)) {
-                current.maxpy(tmpStepLength, tmpDirection);
+                solution.maxpy(tmpStepLength, tmpDirection);
                 tmpResidual.maxpy(-tmpStepLength, tmpVector);
             }
 
@@ -126,12 +126,14 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             tmpIterations++;
 
             if (this.isDebugPrinterSet()) {
-                this.debug(tmpIterations, current);
+                this.debug(tmpIterations, solution);
             }
 
         } while ((tmpIterations < tmpLimit) && !Double.isNaN(tmpNormErr) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
 
         // BasicLogger.debug("Done in {} iterations on problem size {}", tmpIterations, current.count());
+
+        return tmpNormErr / tmpNormRHS;
     }
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {

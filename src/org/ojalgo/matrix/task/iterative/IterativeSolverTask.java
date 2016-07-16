@@ -90,7 +90,7 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
 
     static interface SparseDelegate {
 
-        void resolve(List<Equation> equations, final PhysicalStore<Double> current);
+        double resolve(List<Equation> equations, final PhysicalStore<Double> solution);
 
     }
 

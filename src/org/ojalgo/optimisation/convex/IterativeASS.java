@@ -204,10 +204,11 @@ abstract class IterativeASS extends ActiveSetSolver {
             } else {
                 // Actual/normal optimisation problem
 
-                myS.resolve(myIterationL);
+                final double tmpRelativeError = myS.resolve(myIterationL);
 
                 if (this.isDebug()) {
-                    this.debug("Iteration L", this.getIterationL(tmpIncluded));
+                    this.debug("Relative error in solution for L={}", tmpRelativeError);
+                    // this.debug("Iteration L", this.getIterationL(tmpIncluded));
                 }
 
                 myCholesky.solve(this.getIterationL(tmpIncluded).premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), myIterationX);
@@ -234,8 +235,10 @@ abstract class IterativeASS extends ActiveSetSolver {
 
         if (!tmpSolvable && this.isDebug()) {
             options.debug_appender.println("KKT system unsolvable!");
-            options.debug_appender.printmtrx("KKT", this.getIterationKKT());
-            options.debug_appender.printmtrx("RHS", this.getIterationRHS());
+            if ((this.countVariables() + tmpCountColsIterA) < 20) {
+                options.debug_appender.printmtrx("KKT", this.getIterationKKT());
+                options.debug_appender.printmtrx("RHS", this.getIterationRHS());
+            }
         }
 
         this.handleSubsolution(tmpSolvable, myIterationX, tmpIncluded);
@@ -251,7 +254,6 @@ abstract class IterativeASS extends ActiveSetSolver {
 
     @Override
     void initSolution(final MatrixStore<Double> tmpBI, final int tmpNumVars, final int tmpNumEqus) {
-        this.setState(State.FEASIBLE);
 
         if (this.hasInequalityConstraints()) {
 

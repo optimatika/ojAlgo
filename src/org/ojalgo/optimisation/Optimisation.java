@@ -269,9 +269,9 @@ public interface Optimisation {
          * @param solver
          */
         public void debug(final Class<? extends Optimisation.Solver> solver) {
-            debug_appender = BasicLogger.DEBUG;
+            debug_appender = solver != null ? BasicLogger.DEBUG : null;
             debug_solver = solver;
-            validate = true;
+            validate = solver != null ? true : false;
         }
 
         @Override

@@ -186,6 +186,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (tmpFeasible) {
 
+            this.setState(State.FEASIBLE);
+
             this.initSolution(tmpBI, tmpNumVars, tmpNumEqus);
 
         } else {
@@ -485,6 +487,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         if (this.isDebug()) {
             this.debug("Post iteration");
             this.debug("\tSolution: {}", this.getX().copy().asList());
+            this.debug("\tL: {}", myIterationL.asList());
             if ((this.getAE() != null) && (this.getAE().count() > 0)) {
                 this.debug("\tE-slack: {}", this.getSE().copy().asList());
             }

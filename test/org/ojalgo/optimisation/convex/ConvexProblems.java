@@ -34,6 +34,8 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.BigMath;
+import org.ojalgo.finance.portfolio.MarkowitzModel;
+import org.ojalgo.finance.portfolio.MarkowitzTest;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.BasicMatrix;
@@ -1345,6 +1347,16 @@ public class ConvexProblems extends OptimisationConvexTests {
         if (DEBUG) {
             BasicLogger.debug(solved2);
         }
+
+    }
+
+    public void testP20160705() {
+
+        final MarkowitzModel tmpModel = MarkowitzTest.buildProblematicMarkowitzModel(true, true, DEBUG);
+
+        tmpModel.getWeights();
+
+        TestUtils.assertTrue(tmpModel.getOptimisationState().isFeasible());
 
     }
 

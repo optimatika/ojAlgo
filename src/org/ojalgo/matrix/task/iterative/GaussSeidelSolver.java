@@ -38,7 +38,7 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
         super();
     }
 
-    public void resolve(final List<Equation> equations, final PhysicalStore<Double> current) {
+    public double resolve(final List<Equation> equations, final PhysicalStore<Double> solution) {
 
         double tmpNormErr = POSITIVE_INFINITY;
         double tmpNormRHS = ZERO;
@@ -58,16 +58,18 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
             tmpNormErr = ZERO;
 
             for (int r = 0; r < tmpCountRows; r++) {
-                tmpNormErr = Math.hypot(tmpNormErr, equations.get(r).adjust(current, tmpRelaxationFactor));
+                tmpNormErr = Math.hypot(tmpNormErr, equations.get(r).adjust(solution, tmpRelaxationFactor));
             }
 
             tmpIterations++;
 
             if (this.isDebugPrinterSet()) {
-                this.debug(tmpIterations, current);
+                this.debug(tmpIterations, solution);
             }
 
         } while ((tmpIterations < tmpLimit) && !tmpCntxt.isSmall(tmpNormRHS, tmpNormErr));
+
+        return tmpNormErr / tmpNormRHS;
     }
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> current) throws TaskException {

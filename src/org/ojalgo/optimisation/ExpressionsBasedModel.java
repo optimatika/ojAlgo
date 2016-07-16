@@ -262,6 +262,13 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myWorkCopy = false;
     }
 
+    public ExpressionsBasedModel(final Options someOptions) {
+
+        super(someOptions);
+
+        myWorkCopy = false;
+    }
+
     public ExpressionsBasedModel(final Variable... variables) {
 
         super();
@@ -292,13 +299,6 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         }
     }
 
-    ExpressionsBasedModel(final Options someOptions) {
-
-        super(someOptions);
-
-        myWorkCopy = false;
-    }
-
     public Expression addExpression(final String name) {
 
         final Expression retVal = new Expression(name, this);
@@ -318,6 +318,12 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     }
 
     public void addVariables(final Collection<? extends Variable> variables) {
+        for (final Variable tmpVariable : variables) {
+            this.addVariable(tmpVariable);
+        }
+    }
+
+    public void addVariables(final Variable[] variables) {
         for (final Variable tmpVariable : variables) {
             this.addVariable(tmpVariable);
         }

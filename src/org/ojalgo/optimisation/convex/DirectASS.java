@@ -154,7 +154,6 @@ abstract class DirectASS extends ActiveSetSolver {
 
     @Override
     void initSolution(final MatrixStore<Double> tmpBI, final int tmpNumVars, final int tmpNumEqus) {
-        this.setState(State.FEASIBLE);
 
         if (this.hasInequalityConstraints()) {
 

@@ -4,17 +4,19 @@ import java.math.BigDecimal;
 
 import org.ojalgo.matrix.PrimitiveMatrix;
 
+/**
+ * <a href="https://github.com/optimatika/ojAlgo/issues/24">Issue 24 @ GitHub</a>
+ */
 public class MarkowitzTest extends FinancePortfolioTests {
 
-    public void testHanging() throws Exception {
-        this.testMarkowitzModel(2.5E-5);
+    public static MarkowitzModel buildProblematicMarkowitzModel(final boolean cleanCovariances, final boolean validateOptimisationModel,
+            final boolean debugOptimisationSolver) {
+        return MarkowitzTest.buildMarkowitzModel(2.5E-5, cleanCovariances, validateOptimisationModel, debugOptimisationSolver);
     }
 
-    public void testSuccess() throws Exception {
-        this.testMarkowitzModel(0.015);
-    }
+    static MarkowitzModel buildMarkowitzModel(final double targetVariance, final boolean cleanCovariances, final boolean validateOptimisationModel,
+            final boolean debugOptimisationSolver) {
 
-    private void testMarkowitzModel(final double targetVariance) {
         final double[] expectedReturns = { 0.055, 0.02, 0.17300000000000001, 0.094, 0.106, 0.10400000000000001, 0.263, 0.052000000000000005, 0.049, 0.18, 0.139,
                 0.121, 0.212, 0.08, 0.1, 0.0, 0.1847, 0.1, 0.098, 0.21300000000000002, 0.203, 0.053, 0.13699999999999998, 0.09699999999999999, 0.087,
                 0.054000000000000006, 0.18100000000000002, 0.196, 0.077, 0.21300000000000002, 0.068, 0.034, 0.22100000000000003, 0.20500000000000002, 0.0 };
@@ -223,16 +225,36 @@ public class MarkowitzTest extends FinancePortfolioTests {
                         3.9609092637332395E-4, -0.0012151819283578002, 0.00637053301651962, 0.006696955305486993, -1.5727884198208E-4, 0.004083169149099768,
                         0.00288619107186696, -3.18539969399288E-4, 0.006329914612237217, 0.006494430855358576, 0.0064963600000000005 } };
 
-        final MarketEquilibrium marketEquilibrium = new MarketEquilibrium(PrimitiveMatrix.FACTORY.rows(covariance));
+        MarketEquilibrium marketEquilibrium = new MarketEquilibrium(PrimitiveMatrix.FACTORY.rows(covariance));
 
-        final MarkowitzModel markowitzModel = new MarkowitzModel(marketEquilibrium, PrimitiveMatrix.FACTORY.rows(expectedReturns));
+        if (cleanCovariances) {
+            marketEquilibrium = marketEquilibrium.clean();
+        }
 
-        markowitzModel.setTargetVariance(BigDecimal.valueOf(targetVariance));
+        final MarkowitzModel retVal = new MarkowitzModel(marketEquilibrium, PrimitiveMatrix.FACTORY.rows(expectedReturns));
+
+        retVal.optimisation().debug(debugOptimisationSolver).validate(validateOptimisationModel);
+
+        retVal.setTargetVariance(BigDecimal.valueOf(targetVariance));
 
         for (int index = 0; index < expectedReturns.length; index++) {
-            markowitzModel.setLowerLimit(index, BigDecimal.ZERO);
-            markowitzModel.setUpperLimit(index, BigDecimal.ONE);
+            retVal.setLowerLimit(index, BigDecimal.ZERO);
+            retVal.setUpperLimit(index, BigDecimal.ONE);
         }
+
+        return retVal;
+    }
+
+    public void _testHanging() throws Exception {
+
+        final MarkowitzModel markowitzModel = MarkowitzTest.buildMarkowitzModel(2.5E-5, false, false, false);
+
+        System.out.println(markowitzModel.getMeanReturn());
+    }
+
+    public void _testSuccess() throws Exception {
+
+        final MarkowitzModel markowitzModel = MarkowitzTest.buildMarkowitzModel(0.015, false, false, false);
 
         System.out.println(markowitzModel.getMeanReturn());
     }

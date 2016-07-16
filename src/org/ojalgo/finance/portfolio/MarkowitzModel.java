@@ -32,12 +32,14 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -87,10 +89,45 @@ import org.ojalgo.type.context.NumberContext;
  * <p>
  * To get the optimal asset weighs you simply call {@link #getWeights()} or {@link #getAssetWeights()}.
  * </p>
+ * <p>
+ * If the results are not what you expect the first thing you should try is to turn on optimisation model
+ * validation: <code>model.optimisation().validate(true);</code>
+ * </p>
  *
  * @author apete
  */
 public final class MarkowitzModel extends EquilibriumModel {
+
+    final class OptimisationOptions {
+
+        /**
+         * Will turn on debug logging for the optimisation solver.
+         */
+        public OptimisationOptions debug(final boolean debug) {
+
+            final boolean tmpValidate = myOptimisationOptions.validate;
+
+            if (debug) {
+                myOptimisationOptions.debug(Optimisation.Solver.class);
+            } else {
+                myOptimisationOptions.debug(null);
+            }
+
+            myOptimisationOptions.validate = tmpValidate;
+
+            return this;
+        }
+
+        /**
+         * Will validate the generated optimisation problem and throws an excption if it's not ok. This should
+         * typically not be enabled in a production environment.
+         */
+        public OptimisationOptions validate(final boolean validate) {
+            myOptimisationOptions.validate = validate;
+            return this;
+        }
+
+    }
 
     private static final double _0_0 = ZERO.doubleValue();
     private static final String BALANCE = "Balance";
@@ -103,6 +140,7 @@ public final class MarkowitzModel extends EquilibriumModel {
     private final HashMap<int[], LowerUpper> myConstraints = new HashMap<>();
     private final BasicMatrix myExpectedExcessReturns;
     private transient ExpressionsBasedModel myOptimisationModel;
+    private final Optimisation.Options myOptimisationOptions = new Optimisation.Options();
     private transient State myOptimisationState = State.UNEXPLORED;
     private transient Expression myOptimisationVariance;
     private boolean myShortingAllowed = false;
@@ -124,7 +162,7 @@ public final class MarkowitzModel extends EquilibriumModel {
         myVariables = new Variable[tmpSymbols.length];
         for (int i = 0; i < tmpSymbols.length; i++) {
             myVariables[i] = new Variable(tmpSymbols[i]);
-            myVariables[i].weight(myExpectedExcessReturns.toBigDecimal(i, 0).negate());
+            myVariables[i].weight(TypeUtils.toBigDecimal(myExpectedExcessReturns.get(i)).negate());
         }
     }
 
@@ -138,7 +176,7 @@ public final class MarkowitzModel extends EquilibriumModel {
         myVariables = new Variable[tmpSymbols.length];
         for (int i = 0; i < tmpSymbols.length; i++) {
             myVariables[i] = new Variable(tmpSymbols[i]);
-            myVariables[i].weight(myExpectedExcessReturns.toBigDecimal(i, 0).negate());
+            myVariables[i].weight(TypeUtils.toBigDecimal(myExpectedExcessReturns.get(i)).negate());
         }
 
         if (marketEquilibrium.size() != (int) expectedExcessReturns.count()) {
@@ -175,6 +213,10 @@ public final class MarkowitzModel extends EquilibriumModel {
             myOptimisationState = State.UNEXPLORED;
         }
         return myOptimisationState;
+    }
+
+    public OptimisationOptions optimisation() {
+        return new OptimisationOptions();
     }
 
     public final void setLowerLimit(final int assetIndex, final BigDecimal lowerLimit) {
@@ -263,7 +305,9 @@ public final class MarkowitzModel extends EquilibriumModel {
                 }
             }
 
-            myOptimisationModel = new ExpressionsBasedModel(tmpVariables);
+            myOptimisationModel = new ExpressionsBasedModel(myOptimisationOptions);
+
+            myOptimisationModel.addVariables(tmpVariables);
 
             myOptimisationVariance = myOptimisationModel.addExpression(VARIANCE);
             final BasicMatrix tmpCovariances = this.getCovariances();
@@ -294,18 +338,18 @@ public final class MarkowitzModel extends EquilibriumModel {
 
         myOptimisationVariance.weight(riskAversion / 2.0);
 
-        // myOptimisationModel.options.debug(ConvexSolver.class);
-
         return myOptimisationModel;
     }
 
     private Optimisation.Result optimise() {
 
-        //        BasicLogger.debug();
-        //        BasicLogger.debug("###################################################");
-        //        BasicLogger.debug("BEGIN RAF: {} MarkowitzModel optimisation", this.getRiskAversion());
-        //        BasicLogger.debug("###################################################");
-        //        BasicLogger.debug();
+        if (myOptimisationOptions.debug_appender != null) {
+            BasicLogger.debug();
+            BasicLogger.debug("###################################################");
+            BasicLogger.debug("BEGIN RAF: {} MarkowitzModel optimisation", this.getRiskAversion());
+            BasicLogger.debug("###################################################");
+            BasicLogger.debug();
+        }
 
         Optimisation.Result retVal;
 
@@ -362,13 +406,14 @@ public final class MarkowitzModel extends EquilibriumModel {
                     }
                     tmpCurrent = Math.sqrt(tmpLow * tmpHigh);
 
-                    //                        BasicLogger.debug();
-                    //                        BasicLogger.debug("Iter:   {}", tmpIterCount);
-                    //                        BasicLogger.debug("RAF:   {}", tmpCurrent);
-                    //                        BasicLogger.debug("Last: {}", tmpTargetLast);
-                    //                        BasicLogger.debug("Now: {}", tmpTargetNow);
-                    //                        BasicLogger.debug("Target: {}", tmpTargetValue);
-                    //                        BasicLogger.debug("Diff:   {}", tmpTargetDiff);
+                    if (myOptimisationOptions.debug_appender != null) {
+                        BasicLogger.debug();
+                        BasicLogger.debug("RAF:   {}", tmpCurrent);
+                        BasicLogger.debug("Last: {}", tmpTargetLast);
+                        BasicLogger.debug("Now: {}", tmpTargetNow);
+                        BasicLogger.debug("Target: {}", tmpTargetValue);
+                        BasicLogger.debug("Diff:   {}", tmpTargetDiff);
+                    }
 
                 } while (!TARGET_CONTEXT.isSmall(tmpTargetValue, tmpTargetDiff) && TARGET_CONTEXT.isDifferent(tmpTargetLast, tmpTargetNow));
             }
@@ -378,14 +423,6 @@ public final class MarkowitzModel extends EquilibriumModel {
             retVal = this.generateOptimisationModel(this.getRiskAversion().doubleValue()).minimise();
 
         }
-
-        //        if (retVal.getState().isFeasible()) {
-        //            final List<Variable> tmpVariables = myOptimisationModel.getVariables();
-        //            for (int v = 0; v < tmpVariables.size(); v++) {
-        //                final BigDecimal tmpBigDecimal = TypeUtils.toBigDecimal(retVal.get(v), WEIGHT_CONTEXT);
-        //                tmpVariables.get(v).setValue(tmpBigDecimal);
-        //            }
-        //        }
 
         return retVal;
     }
