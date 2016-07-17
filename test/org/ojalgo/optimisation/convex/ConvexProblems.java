@@ -35,7 +35,7 @@ import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.finance.portfolio.MarkowitzModel;
-import org.ojalgo.finance.portfolio.MarkowitzTest;
+import org.ojalgo.finance.portfolio.GitHubIssue24;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.BasicMatrix;
@@ -80,8 +80,10 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         final ExpressionsBasedModel tmpModel = ConvexProblems.buildModel(matrices, expectedSolution);
 
-        //        tmpModel.options.debug(ConvexSolver.class);
-        //        tmpModel.options.validate = false;
+        if (DEBUG) {
+            tmpModel.options.debug(ConvexSolver.class);
+            tmpModel.options.validate = false;
+        }
 
         TestUtils.assertTrue("Expected solution not ok!", tmpModel.validate(tmpExpectedResult, modelValidationContext));
         TestUtils.assertTrue("Expected solution not ok!", tmpModel.validate(modelValidationContext)); // The expected solution is written to the variables
@@ -1352,7 +1354,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
     public void testP20160705() {
 
-        final MarkowitzModel tmpModel = MarkowitzTest.buildProblematicMarkowitzModel(true, true, DEBUG);
+        final MarkowitzModel tmpModel = GitHubIssue24.buildProblematicMarkowitzModel(true, true, DEBUG);
 
         tmpModel.getWeights();
 

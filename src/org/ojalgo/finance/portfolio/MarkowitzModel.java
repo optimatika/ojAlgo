@@ -351,6 +351,8 @@ public final class MarkowitzModel extends EquilibriumModel {
             BasicLogger.debug();
         }
 
+        myOptimisationOptions.solution = myOptimisationOptions.solution.newPrecision(8).newScale(10);
+
         Optimisation.Result retVal;
 
         if ((myTargetReturn != null) || (myTargetVariance != null)) {

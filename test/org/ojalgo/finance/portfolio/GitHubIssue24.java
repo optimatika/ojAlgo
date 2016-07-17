@@ -2,16 +2,19 @@ package org.ojalgo.finance.portfolio;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.optimisation.Optimisation.State;
 
 /**
  * <a href="https://github.com/optimatika/ojAlgo/issues/24">Issue 24 @ GitHub</a>
  */
-public class MarkowitzTest extends FinancePortfolioTests {
+public class GitHubIssue24 extends FinancePortfolioTests {
 
     public static MarkowitzModel buildProblematicMarkowitzModel(final boolean cleanCovariances, final boolean validateOptimisationModel,
             final boolean debugOptimisationSolver) {
-        return MarkowitzTest.buildMarkowitzModel(2.5E-5, cleanCovariances, validateOptimisationModel, debugOptimisationSolver);
+        return GitHubIssue24.buildMarkowitzModel(2.5E-5, cleanCovariances, validateOptimisationModel, debugOptimisationSolver);
     }
 
     static MarkowitzModel buildMarkowitzModel(final double targetVariance, final boolean cleanCovariances, final boolean validateOptimisationModel,
@@ -247,15 +250,38 @@ public class MarkowitzTest extends FinancePortfolioTests {
 
     public void _testHanging() throws Exception {
 
-        final MarkowitzModel markowitzModel = MarkowitzTest.buildMarkowitzModel(2.5E-5, false, false, false);
+        final MarkowitzModel markowitzModel = GitHubIssue24.buildMarkowitzModel(2.5E-5, false, false, false);
 
-        System.out.println(markowitzModel.getMeanReturn());
+        final double tmpMeanReturn = markowitzModel.getMeanReturn();
+        if (DEBUG) {
+            BasicLogger.debug(tmpMeanReturn);
+        }
+
+        TestUtils.assertTrue(markowitzModel.getOptimisationState().isOptimal()); // Won't reach here...
     }
 
-    public void _testSuccess() throws Exception {
+    public void testOriginallyHangingButNowCleaned() throws Exception {
 
-        final MarkowitzModel markowitzModel = MarkowitzTest.buildMarkowitzModel(0.015, false, false, false);
+        final MarkowitzModel markowitzModel = GitHubIssue24.buildMarkowitzModel(2.5E-5, true, false, false);
 
-        System.out.println(markowitzModel.getMeanReturn());
+        final double tmpMeanReturn = markowitzModel.getMeanReturn();
+        if (DEBUG) {
+            BasicLogger.debug(tmpMeanReturn);
+        }
+
+        TestUtils.assertTrue(markowitzModel.getOptimisationState().isOptimal()); // Won't reach here...
+    }
+
+    public void testSuccess() throws Exception {
+
+        final MarkowitzModel markowitzModel = GitHubIssue24.buildMarkowitzModel(0.015, false, false, false);
+
+        final double tmpMeanReturn = markowitzModel.getMeanReturn();
+        if (DEBUG) {
+            BasicLogger.debug(tmpMeanReturn);
+        }
+
+        final State tmpOptimisationState = markowitzModel.getOptimisationState();
+        TestUtils.assertTrue(tmpOptimisationState.isOptimal());
     }
 }

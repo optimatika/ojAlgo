@@ -377,8 +377,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             final double tmpNormCurrentX = this.getX().aggregateAll(Aggregator.NORM2);
             final double tmpNormStepX = iterationSolution.aggregateAll(Aggregator.NORM2);
-            if (!options.solution.isSmall(tmpNormCurrentX, tmpNormStepX)) {
-                // Non-zero solution
+            if (!options.solution.isSmall(tmpNormCurrentX, tmpNormStepX)
+                    && (options.solution.isSmall(ONE, tmpNormCurrentX) || !options.solution.isSmall(tmpNormStepX, tmpNormCurrentX))) {
+                // Non-zero solution && non-freak-solution
 
                 double tmpStepLength = ONE;
 
