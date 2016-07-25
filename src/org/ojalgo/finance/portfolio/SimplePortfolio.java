@@ -69,14 +69,14 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         myComponents = someAssets;
     }
 
-    public SimplePortfolio(final Context aContext, final FinancePortfolio weightsPortfolio) {
+    public SimplePortfolio(final Context portfolioContext, final FinancePortfolio weightsPortfolio) {
 
         super();
 
-        myCorrelations = aContext.getCorrelations();
+        myCorrelations = portfolioContext.getCorrelations();
 
-        final BasicMatrix tmpCovariances = aContext.getCovariances();
-        final BasicMatrix tmpAssetReturns = aContext.getAssetReturns();
+        final BasicMatrix tmpCovariances = portfolioContext.getCovariances();
+        final BasicMatrix tmpAssetReturns = portfolioContext.getAssetReturns();
 
         final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
 
@@ -244,8 +244,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
             tmpAssetProcesses.add(tmpForecast);
         }
 
-        return new PortfolioSimulator(myCorrelations.toPrimitiveStore(), tmpAssetProcesses);
-
+        return new PortfolioSimulator(myCorrelations, tmpAssetProcesses);
     }
 
     public double getVolatility(final int index) {

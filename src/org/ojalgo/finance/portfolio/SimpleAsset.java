@@ -40,29 +40,29 @@ public final class SimpleAsset extends FinancePortfolio {
     private final double myVolatility;
     private final BigDecimal myWeight;
 
-    public SimpleAsset(final FinancePortfolio aPortfolio) {
-        this(aPortfolio.getMeanReturn(), aPortfolio.getVolatility(), BigMath.ONE);
+    public SimpleAsset(final FinancePortfolio portfolio) {
+        this(portfolio.getMeanReturn(), portfolio.getVolatility(), BigMath.ONE);
     }
 
-    public SimpleAsset(final FinancePortfolio aPortfolio, final Number aWeight) {
-        this(aPortfolio.getMeanReturn(), aPortfolio.getVolatility(), aWeight);
+    public SimpleAsset(final FinancePortfolio portfolio, final Number weight) {
+        this(portfolio.getMeanReturn(), portfolio.getVolatility(), weight);
     }
 
-    public SimpleAsset(final Number aWeight) {
-        this(PrimitiveMath.ZERO, PrimitiveMath.ZERO, aWeight);
+    public SimpleAsset(final Number weight) {
+        this(PrimitiveMath.ZERO, PrimitiveMath.ZERO, weight);
     }
 
-    public SimpleAsset(final Number aMeanReturn, final Number aVolatility) {
-        this(aMeanReturn, aVolatility, BigMath.ONE);
+    public SimpleAsset(final Number meanReturn, final Number volatility) {
+        this(meanReturn, volatility, BigMath.ONE);
     }
 
-    public SimpleAsset(final Number aMeanReturn, final Number aVolatility, final Number aWeight) {
+    public SimpleAsset(final Number meanReturn, final Number volatility, final Number weight) {
 
         super();
 
-        myMeanReturn = aMeanReturn.doubleValue();
-        myVolatility = aVolatility.doubleValue();
-        myWeight = TypeUtils.toBigDecimal(aWeight, WEIGHT_CONTEXT);
+        myMeanReturn = meanReturn.doubleValue();
+        myVolatility = volatility.doubleValue();
+        myWeight = TypeUtils.toBigDecimal(weight);
     }
 
     @SuppressWarnings("unused")

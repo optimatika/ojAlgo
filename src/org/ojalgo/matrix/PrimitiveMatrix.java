@@ -89,9 +89,9 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
         } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof Double)) {
             return (MatrixStore<Double>) matrix;
         } else if (matrix instanceof Access2D<?>) {
-            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
+            return this.getStore().factory().copy((Access2D<?>) matrix);
         } else {
-            return this.getPhysicalFactory().columns(matrix);
+            return this.getStore().factory().columns(matrix);
         }
     }
 

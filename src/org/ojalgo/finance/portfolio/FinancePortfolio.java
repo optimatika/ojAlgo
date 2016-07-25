@@ -32,7 +32,6 @@ import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.process.GeometricBrownianMotion;
-import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -62,8 +61,6 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
     }
 
     protected static final Factory<PrimitiveMatrix> MATRIX_FACTORY = PrimitiveMatrix.FACTORY;
-
-    protected static final NumberContext WEIGHT_CONTEXT = StandardType.PERCENT;
 
     protected FinancePortfolio() {
         super();
@@ -177,6 +174,13 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
      */
     public final FinancePortfolio normalise() {
         return new NormalisedPortfolio(this);
+    }
+
+    /**
+     * Normalised weights Portfolio
+     */
+    public final FinancePortfolio normalise(final NumberContext weightsContext) {
+        return new NormalisedPortfolio(this, weightsContext);
     }
 
     @Override

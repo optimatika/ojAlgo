@@ -28,6 +28,8 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
+import org.ojalgo.type.StandardType;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Normalised weights Portfolio
@@ -36,14 +38,20 @@ import org.ojalgo.function.BigFunction;
  */
 final class NormalisedPortfolio extends FinancePortfolio {
 
-    private final FinancePortfolio myPortfolio;
+    private final FinancePortfolio myBasePortfolio;
     private transient BigDecimal myTotalWeight;
+    private final NumberContext myWeightsContext;
 
-    public NormalisedPortfolio(final FinancePortfolio aPortfolio) {
+    public NormalisedPortfolio(final FinancePortfolio basePortfolio) {
+        this(basePortfolio, StandardType.PERCENT);
+    }
+
+    public NormalisedPortfolio(final FinancePortfolio basePortfolio, final NumberContext weightsContext) {
 
         super();
 
-        myPortfolio = aPortfolio;
+        myBasePortfolio = basePortfolio;
+        myWeightsContext = weightsContext;
     }
 
     @SuppressWarnings("unused")
@@ -56,12 +64,12 @@ final class NormalisedPortfolio extends FinancePortfolio {
 
     @Override
     public double getMeanReturn() {
-        return myPortfolio.getMeanReturn() / this.getTotalWeight().doubleValue();
+        return myBasePortfolio.getMeanReturn() / this.getTotalWeight().doubleValue();
     }
 
     @Override
     public double getVolatility() {
-        return myPortfolio.getVolatility() / this.getTotalWeight().doubleValue();
+        return myBasePortfolio.getVolatility() / this.getTotalWeight().doubleValue();
     }
 
     @Override
@@ -73,15 +81,15 @@ final class NormalisedPortfolio extends FinancePortfolio {
 
         BigDecimal tmpSum = BigMath.ZERO;
         BigDecimal tmpLargest = BigMath.ZERO;
-        int tmpIndex = -1;
+        int tmpIndexOfLargest = -1;
 
-        final List<BigDecimal> tmpWeights = myPortfolio.getWeights();
+        final List<BigDecimal> tmpWeights = myBasePortfolio.getWeights();
         BigDecimal tmpWeight;
         for (int i = 0; i < tmpWeights.size(); i++) {
 
             tmpWeight = tmpWeights.get(i);
             tmpWeight = BigFunction.DIVIDE.invoke(tmpWeight, tmpTotalWeight);
-            tmpWeight = WEIGHT_CONTEXT.enforce(tmpWeight);
+            tmpWeight = myWeightsContext.enforce(tmpWeight);
 
             retVal.add(tmpWeight);
 
@@ -89,12 +97,12 @@ final class NormalisedPortfolio extends FinancePortfolio {
 
             if (tmpWeight.abs().compareTo(tmpLargest) == 1) {
                 tmpLargest = tmpWeight.abs();
-                tmpIndex = i;
+                tmpIndexOfLargest = i;
             }
         }
 
-        if ((tmpSum.compareTo(BigMath.ONE) != 0) && (tmpIndex != -1)) {
-            retVal.set(tmpIndex, retVal.get(tmpIndex).subtract(tmpSum.subtract(BigMath.ONE)));
+        if ((tmpSum.compareTo(BigMath.ONE) != 0) && (tmpIndexOfLargest != -1)) {
+            retVal.set(tmpIndexOfLargest, retVal.get(tmpIndexOfLargest).subtract(tmpSum.subtract(BigMath.ONE)));
         }
 
         return retVal;
@@ -104,7 +112,7 @@ final class NormalisedPortfolio extends FinancePortfolio {
 
         if (myTotalWeight == null) {
             myTotalWeight = BigMath.ZERO;
-            for (final BigDecimal tmpWeight : myPortfolio.getWeights()) {
+            for (final BigDecimal tmpWeight : myBasePortfolio.getWeights()) {
                 myTotalWeight = myTotalWeight.add(tmpWeight);
             }
             if (myTotalWeight.signum() == 0) {
@@ -118,7 +126,7 @@ final class NormalisedPortfolio extends FinancePortfolio {
     @Override
     protected void reset() {
 
-        myPortfolio.reset();
+        myBasePortfolio.reset();
 
         myTotalWeight = null;
     }

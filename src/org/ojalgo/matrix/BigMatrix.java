@@ -89,9 +89,9 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
         } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof BigDecimal)) {
             return (MatrixStore<BigDecimal>) matrix;
         } else if (matrix instanceof Access2D<?>) {
-            return this.getPhysicalFactory().copy((Access2D<?>) matrix);
+            return this.getStore().factory().copy((Access2D<?>) matrix);
         } else {
-            return this.getPhysicalFactory().columns(matrix);
+            return this.getStore().factory().columns(matrix);
         }
     }
 

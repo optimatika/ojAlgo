@@ -90,10 +90,7 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
 
     public final BasicMatrix getAssetWeights() {
         if (myAssetWeights == null) {
-            final BasicMatrix tmpAssetWeights = this.calculateAssetWeights();
-            if (tmpAssetWeights != null) {
-                myAssetWeights = tmpAssetWeights.enforce(WEIGHT_CONTEXT);
-            }
+            myAssetWeights = this.calculateAssetWeights();
         }
         return myAssetWeights;
     }

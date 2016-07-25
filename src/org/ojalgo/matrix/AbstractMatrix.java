@@ -61,7 +61,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     private transient MatrixDecomposition<N> myDecomposition;
     private transient int myHashCode = 0;
-    private final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> myPhysicalFactory;
     private final MatrixStore<N> myStore;
 
     @SuppressWarnings("unused")
@@ -77,27 +76,26 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         super();
 
         myStore = store;
-        myPhysicalFactory = this.getFactory().getPhysicalFactory();
     }
 
     public I add(final BasicMatrix addend) {
 
         MatrixError.throwIfNotEqualDimensions(myStore, addend);
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(addend);
+        final PhysicalStore<N> retVal = myStore.factory().copy(addend);
 
-        retVal.modifyMatching(myStore, myPhysicalFactory.function().add());
+        retVal.modifyMatching(myStore, myStore.factory().function().add());
 
         return this.getFactory().instantiate(retVal);
     }
 
     public I add(final double scalarAddend) {
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(myStore);
+        final PhysicalStore<N> retVal = myStore.factory().copy(myStore);
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(scalarAddend);
+        final N tmpRight = myStore.factory().scalar().cast(scalarAddend);
 
-        retVal.modifyAll(myPhysicalFactory.function().add().second(tmpRight));
+        retVal.modifyAll(myStore.factory().function().add().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -112,11 +110,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I add(final Number scalarAddend) {
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(myStore);
+        final PhysicalStore<N> retVal = myStore.factory().copy(myStore);
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(scalarAddend);
+        final N tmpRight = myStore.factory().scalar().cast(scalarAddend);
 
-        retVal.modifyAll(myPhysicalFactory.function().add().second(tmpRight));
+        retVal.modifyAll(myStore.factory().function().add().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -147,22 +145,22 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I divide(final double scalarDivisor) {
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(myStore);
+        final PhysicalStore<N> retVal = myStore.factory().copy(myStore);
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(scalarDivisor);
+        final N tmpRight = myStore.factory().scalar().cast(scalarDivisor);
 
-        retVal.modifyAll(myPhysicalFactory.function().divide().second(tmpRight));
+        retVal.modifyAll(myStore.factory().function().divide().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
     }
 
     public I divide(final Number scalarDivisor) {
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(myStore);
+        final PhysicalStore<N> retVal = myStore.factory().copy(myStore);
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(scalarDivisor);
+        final N tmpRight = myStore.factory().scalar().cast(scalarDivisor);
 
-        retVal.modifyAll(myPhysicalFactory.function().divide().second(tmpRight));
+        retVal.modifyAll(myStore.factory().function().divide().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -171,9 +169,9 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         MatrixError.throwIfNotEqualDimensions(myStore, divisor);
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(divisor);
+        final PhysicalStore<N> retVal = myStore.factory().copy(divisor);
 
-        retVal.modifyMatching(myStore, myPhysicalFactory.function().divide());
+        retVal.modifyMatching(myStore, myStore.factory().function().divide());
 
         return this.getFactory().instantiate(retVal);
     }
@@ -219,11 +217,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public Scalar<N> getCondition() {
-        return myPhysicalFactory.scalar().convert(this.getComputedSingularValue().getCondition());
+        return myStore.factory().scalar().convert(this.getComputedSingularValue().getCondition());
     }
 
     public Scalar<N> getDeterminant() {
-        return myPhysicalFactory.scalar().convert(this.getComputedLU().getDeterminant());
+        return myStore.factory().scalar().convert(this.getComputedLU().getDeterminant());
     }
 
     public List<ComplexNumber> getEigenvalues() {
@@ -234,13 +232,13 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
      * @see org.ojalgo.matrix.BasicMatrix#getFrobeniusNorm()
      */
     public Scalar<N> getFrobeniusNorm() {
-        return myPhysicalFactory.scalar().convert(myStore.aggregateAll(Aggregator.NORM2));
+        return myStore.factory().scalar().convert(myStore.aggregateAll(Aggregator.NORM2));
     }
 
     public Scalar<N> getInfinityNorm() {
 
         double retVal = PrimitiveMath.ZERO;
-        final AggregatorFunction<N> tmpRowSumAggr = myPhysicalFactory.aggregator().norm1();
+        final AggregatorFunction<N> tmpRowSumAggr = myStore.factory().aggregator().norm1();
 
         final int tmpRowDim = (int) myStore.countRows();
         for (int i = 0; i < tmpRowDim; i++) {
@@ -249,17 +247,17 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
             tmpRowSumAggr.reset();
         }
 
-        return myPhysicalFactory.scalar().convert(retVal);
+        return myStore.factory().scalar().convert(retVal);
     }
 
     public Scalar<N> getKyFanNorm(final int k) {
-        return myPhysicalFactory.scalar().convert(this.getComputedSingularValue().getKyFanNorm(k));
+        return myStore.factory().scalar().convert(this.getComputedSingularValue().getKyFanNorm(k));
     }
 
     public Scalar<N> getOneNorm() {
 
         double retVal = PrimitiveMath.ZERO;
-        final AggregatorFunction<N> tmpColSumAggr = myPhysicalFactory.aggregator().norm1();
+        final AggregatorFunction<N> tmpColSumAggr = myStore.factory().aggregator().norm1();
 
         final int tmpColDim = (int) this.countColumns();
         for (int j = 0; j < tmpColDim; j++) {
@@ -268,11 +266,11 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
             tmpColSumAggr.reset();
         }
 
-        return myPhysicalFactory.scalar().convert(retVal);
+        return myStore.factory().scalar().convert(retVal);
     }
 
     public Scalar<N> getOperatorNorm() {
-        return myPhysicalFactory.scalar().convert(this.getComputedSingularValue().getOperatorNorm());
+        return myStore.factory().scalar().convert(this.getComputedSingularValue().getOperatorNorm());
     }
 
     public int getRank() {
@@ -289,15 +287,15 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public Scalar<N> getTrace() {
 
-        final AggregatorFunction<N> tmpAggr = myPhysicalFactory.aggregator().sum();
+        final AggregatorFunction<N> tmpAggr = myStore.factory().aggregator().sum();
 
         myStore.visitDiagonal(0, 0, tmpAggr);
 
-        return myPhysicalFactory.scalar().convert(tmpAggr.getNumber());
+        return myStore.factory().scalar().convert(tmpAggr.getNumber());
     }
 
     public Scalar<N> getTraceNorm() {
-        return myPhysicalFactory.scalar().convert(this.getComputedSingularValue().getTraceNorm());
+        return myStore.factory().scalar().convert(this.getComputedSingularValue().getTraceNorm());
     }
 
     public Scalar<N> getVectorNorm(final int aDegree) {
@@ -306,19 +304,19 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         case 0:
 
-            return myPhysicalFactory.scalar().convert(myStore.aggregateAll(Aggregator.CARDINALITY));
+            return myStore.factory().scalar().convert(myStore.aggregateAll(Aggregator.CARDINALITY));
 
         case 1:
 
-            return myPhysicalFactory.scalar().convert(myStore.aggregateAll(Aggregator.NORM1));
+            return myStore.factory().scalar().convert(myStore.aggregateAll(Aggregator.NORM1));
 
         case 2:
 
-            return myPhysicalFactory.scalar().convert(myStore.aggregateAll(Aggregator.NORM2));
+            return myStore.factory().scalar().convert(myStore.aggregateAll(Aggregator.NORM2));
 
         default:
 
-            return myPhysicalFactory.scalar().convert(myStore.aggregateAll(Aggregator.LARGEST));
+            return myStore.factory().scalar().convert(myStore.aggregateAll(Aggregator.LARGEST));
         }
     }
 
@@ -405,22 +403,22 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I multiply(final double scalarMultiplicand) {
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(myStore);
+        final PhysicalStore<N> retVal = myStore.factory().copy(myStore);
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(scalarMultiplicand);
+        final N tmpRight = myStore.factory().scalar().cast(scalarMultiplicand);
 
-        retVal.modifyAll(myPhysicalFactory.function().multiply().second(tmpRight));
+        retVal.modifyAll(myStore.factory().function().multiply().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
     }
 
     public I multiply(final Number scalarMultiplicand) {
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(myStore);
+        final PhysicalStore<N> retVal = myStore.factory().copy(myStore);
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(scalarMultiplicand);
+        final N tmpRight = myStore.factory().scalar().cast(scalarMultiplicand);
 
-        retVal.modifyAll(myPhysicalFactory.function().multiply().second(tmpRight));
+        retVal.modifyAll(myStore.factory().function().multiply().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -429,9 +427,9 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         MatrixError.throwIfNotEqualDimensions(myStore, multiplicand);
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(multiplicand);
+        final PhysicalStore<N> retVal = myStore.factory().copy(multiplicand);
 
-        retVal.modifyMatching(myStore, myPhysicalFactory.function().multiply());
+        retVal.modifyMatching(myStore, myStore.factory().function().multiply());
 
         return this.getFactory().instantiate(retVal);
     }
@@ -440,7 +438,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         final PhysicalStore<N> retVal = myStore.copy();
 
-        retVal.modifyAll(myPhysicalFactory.function().negate());
+        retVal.modifyAll(myStore.factory().function().negate());
 
         return this.getFactory().instantiate(retVal);
     }
@@ -484,31 +482,31 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         MatrixError.throwIfNotEqualDimensions(myStore, subtrahend);
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(subtrahend);
+        final PhysicalStore<N> retVal = myStore.factory().copy(subtrahend);
 
-        retVal.modifyMatching(myStore, myPhysicalFactory.function().subtract());
+        retVal.modifyMatching(myStore, myStore.factory().function().subtract());
 
         return this.getFactory().instantiate(retVal);
     }
 
     public BasicMatrix subtract(final double scalarSubtrahend) {
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(myStore);
+        final PhysicalStore<N> retVal = myStore.factory().copy(myStore);
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(scalarSubtrahend);
+        final N tmpRight = myStore.factory().scalar().cast(scalarSubtrahend);
 
-        retVal.modifyAll(myPhysicalFactory.function().subtract().second(tmpRight));
+        retVal.modifyAll(myStore.factory().function().subtract().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
     }
 
     public I subtract(final Number scalarSubtrahend) {
 
-        final PhysicalStore<N> retVal = myPhysicalFactory.copy(myStore);
+        final PhysicalStore<N> retVal = myStore.factory().copy(myStore);
 
-        final N tmpRight = myPhysicalFactory.scalar().cast(scalarSubtrahend);
+        final N tmpRight = myStore.factory().scalar().cast(scalarSubtrahend);
 
-        retVal.modifyAll(myPhysicalFactory.function().subtract().second(tmpRight));
+        retVal.modifyAll(myStore.factory().function().subtract().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
     }
@@ -699,10 +697,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     abstract MatrixFactory<N, I> getFactory();
 
     abstract InverterTask<N> getInverterTask(final MatrixStore<N> template);
-
-    final PhysicalStore.Factory<N, ? extends PhysicalStore<N>> getPhysicalFactory() {
-        return myPhysicalFactory;
-    }
 
     abstract SolverTask<N> getSolverTask(MatrixStore<N> templateBody, MatrixStore<N> templateRHS);
 

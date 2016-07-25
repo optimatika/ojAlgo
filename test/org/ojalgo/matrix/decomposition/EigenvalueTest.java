@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import java.math.MathContext;
+
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
@@ -131,6 +133,21 @@ public class EigenvalueTest extends MatrixDecompositionTests {
         final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
 
         EigenvalueTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 6));
+    }
+
+    /**
+     * A matrix that has been problematic for another library...
+     */
+    public void testProblemFoundInTheWild() {
+
+        final PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
+
+        for (final Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getEigenvaluePrimitiveNonsymmetric()) {
+
+            tmpEigenvalue.decompose(matrix);
+
+            TestUtils.assertEquals(matrix, tmpEigenvalue, NumberContext.getGeneral(MathContext.DECIMAL64));
+        }
     }
 
 }

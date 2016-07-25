@@ -333,17 +333,19 @@ public class PortfolioProblems extends FinancePortfolioTests {
         List<BigDecimal> tmpWeights = markowitz.getWeights();
         TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
 
-        // Solution reachable without shorting, but since it is allowed the optimal solution is different
-        TestUtils.assertEquals(0.8275, tmpWeights.get(0).doubleValue()); // 0.82745
-        TestUtils.assertEquals(-0.0907, tmpWeights.get(1).doubleValue()); // -0.09075
-        TestUtils.assertEquals(0.2633, tmpWeights.get(2).doubleValue()); // 0.26329
+        final NumberContext tmpTestPrecision = StandardType.PERCENT.newPrecision(4);
 
-        TestUtils.assertEquals(0.0427, markowitz.getMeanReturn(), NumberContext.getGeneral(4, 4));
-        TestUtils.assertEquals(0.0084, markowitz.getReturnVariance(), NumberContext.getGeneral(4, 4));
+        // Solution reachable without shorting, but since it is allowed the optimal solution is different
+        TestUtils.assertEquals(0.82745, tmpWeights.get(0).doubleValue(), tmpTestPrecision); // 0.82745
+        TestUtils.assertEquals(-0.09075, tmpWeights.get(1).doubleValue(), tmpTestPrecision); // -0.09075
+        TestUtils.assertEquals(0.26329, tmpWeights.get(2).doubleValue(), tmpTestPrecision); // 0.26329
+
+        TestUtils.assertEquals(0.0427, markowitz.getMeanReturn(), tmpTestPrecision);
+        TestUtils.assertEquals(0.0084, markowitz.getReturnVariance(), tmpTestPrecision);
 
         // Also verify that it's posible to reach 10% return by shorting
         markowitz.setTargetReturn(BigDecimal.valueOf(0.1));
-        TestUtils.assertEquals(0.1, markowitz.getMeanReturn(), NumberContext.getGeneral(4, 4));
+        TestUtils.assertEquals(0.1, markowitz.getMeanReturn(), tmpTestPrecision);
         TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
 
         // Min risk portfolio, very high risk aversion means minimum risk.
@@ -351,9 +353,9 @@ public class PortfolioProblems extends FinancePortfolioTests {
         markowitz.setRiskAversion(new BigDecimal(1000000));
         tmpWeights = markowitz.getWeights();
         TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
-        TestUtils.assertEquals(0.4411, tmpWeights.get(0).doubleValue()); // 0.4411
-        TestUtils.assertEquals(0.3656, tmpWeights.get(1).doubleValue()); // 0.3656
-        TestUtils.assertEquals(0.1933, tmpWeights.get(2).doubleValue()); // 0.1933
+        TestUtils.assertEquals(0.4411, tmpWeights.get(0).doubleValue(), tmpTestPrecision); // 0.4411
+        TestUtils.assertEquals(0.3656, tmpWeights.get(1).doubleValue(), tmpTestPrecision); // 0.3656
+        TestUtils.assertEquals(0.1933, tmpWeights.get(2).doubleValue(), tmpTestPrecision); // 0.1933
     }
 
 }
