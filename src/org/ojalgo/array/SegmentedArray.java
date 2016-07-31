@@ -31,6 +31,7 @@ import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -184,7 +185,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         int tmpNumberOfUniformSegments = 1; // NumberOfUniformSegments
         long tmpUniformSegmentSize = tmpCount;
 
-        final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, Math.sqrt(tmpCount));
+        final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, PrimitiveFunction.SQRT.invoke(tmpCount));
 
         for (int i = 0; i < structure.length; i++) {
             final long tmpNoS = (tmpNumberOfUniformSegments * structure[i]);
@@ -202,7 +203,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
             tmpUniformSegmentSize = tmpUniformSegmentSize / tmpUnits;
         }
 
-        final int tmpShift = (int) (Math.log(tmpUniformSegmentSize) / Math.log(2));
+        final int tmpShift = (int) (PrimitiveFunction.LOG.invoke(tmpUniformSegmentSize) / PrimitiveFunction.LOG.invoke(2));
 
         return new SegmentedArray<>(tmpCount, tmpShift, segmentFactory);
     }
@@ -461,7 +462,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
         for (long tmpIndex = first; tmpIndex < limit; tmpIndex += step) {
             if (this.doubleValue(tmpIndex) > tmpVal) {
-                tmpVal = Math.abs(this.doubleValue(tmpIndex));
+                tmpVal = PrimitiveFunction.ABS.invoke(this.doubleValue(tmpIndex));
                 retVal = tmpIndex;
             }
         }

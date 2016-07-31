@@ -23,6 +23,8 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.ojalgo.function.PrimitiveFunction;
+
 /**
  * Under general conditions, the sum of a large number of random variables is approximately normally
  * distributed (the central limit theorem).
@@ -60,7 +62,7 @@ public class Normal extends AbstractContinuous {
 
         final double tmpVal = (aValue - myLocation) / myScale;
 
-        return Math.exp((tmpVal * tmpVal) / -TWO) / (myScale * SQRT_TWO_PI);
+        return PrimitiveFunction.EXP.invoke((tmpVal * tmpVal) / -TWO) / (myScale * SQRT_TWO_PI);
     }
 
     public double getQuantile(final double aProbality) {

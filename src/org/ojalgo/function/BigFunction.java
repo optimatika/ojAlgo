@@ -65,7 +65,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     }
 
-    public static final UnaryFunction<BigDecimal> ABS = new Unary() {
+    public static final Unary ABS = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return arg.abs();
@@ -73,7 +73,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> ACOS = new Unary() {
+    public static final Unary ACOS = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.ACOS.invoke(arg.doubleValue()));
@@ -81,7 +81,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> ACOSH = new Unary() {
+    public static final Unary ACOSH = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.ACOSH.invoke(arg.doubleValue()));
@@ -89,7 +89,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final BinaryFunction<BigDecimal> ADD = new Binary() {
+    public static final Binary ADD = new Binary() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg1, final BigDecimal arg2) {
@@ -98,7 +98,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> ASIN = new Unary() {
+    public static final Unary ASIN = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.ASIN.invoke(arg.doubleValue()));
@@ -106,7 +106,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> ASINH = new Unary() {
+    public static final Unary ASINH = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.ASINH.invoke(arg.doubleValue()));
@@ -114,7 +114,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> ATAN = new Unary() {
+    public static final Unary ATAN = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.ATAN.invoke(arg.doubleValue()));
@@ -122,7 +122,15 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> ATANH = new Unary() {
+    public static final Binary ATAN2 = new Binary() {
+
+        public final BigDecimal invoke(final BigDecimal arg1, final BigDecimal arg2) {
+            return BigDecimal.valueOf(PrimitiveFunction.ATAN2.invoke(arg1.doubleValue(), arg2.doubleValue()));
+        }
+
+    };
+
+    public static final Unary ATANH = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.ATANH.invoke(arg.doubleValue()));
@@ -130,7 +138,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> CARDINALITY = new Unary() {
+    public static final Unary CARDINALITY = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return arg.signum() == 0 ? ZERO : ONE;
@@ -138,7 +146,23 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> CONJUGATE = new Unary() {
+    public static final Unary CBRT = new Unary() {
+
+        public final BigDecimal invoke(final BigDecimal arg) {
+            return ROOT.invoke(arg, 3);
+        }
+
+    };
+
+    public static final Unary CEIL = new Unary() {
+
+        public final BigDecimal invoke(final BigDecimal arg) {
+            return arg.setScale(0, RoundingMode.CEILING);
+        }
+
+    };
+
+    public static final Unary CONJUGATE = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return arg;
@@ -146,7 +170,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> COS = new Unary() {
+    public static final Unary COS = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.COS.invoke(arg.doubleValue()));
@@ -154,7 +178,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> COSH = new Unary() {
+    public static final Unary COSH = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.COSH.invoke(arg.doubleValue()));
@@ -162,7 +186,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final BinaryFunction<BigDecimal> DIVIDE = new Binary() {
+    public static final Binary DIVIDE = new Binary() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg1, final BigDecimal arg2) {
@@ -171,7 +195,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> EXP = new Unary() {
+    public static final Unary EXP = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.EXP.invoke(arg.doubleValue()));
@@ -179,7 +203,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> EXPM1 = new Unary() {
+    public static final Unary EXPM1 = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.EXPM1.invoke(arg.doubleValue()));
@@ -187,7 +211,15 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final BinaryFunction<BigDecimal> HYPOT = new Binary() {
+    public static final Unary FLOOR = new Unary() {
+
+        public final BigDecimal invoke(final BigDecimal arg) {
+            return arg.setScale(0, RoundingMode.FLOOR);
+        }
+
+    };
+
+    public static final Binary HYPOT = new Binary() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg1, final BigDecimal arg2) {
@@ -196,7 +228,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> INVERT = new Unary() {
+    public static final Unary INVERT = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return DIVIDE.invoke(ONE, arg);
@@ -204,7 +236,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> LOG = new Unary() {
+    public static final Unary LOG = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.LOG.invoke(arg.doubleValue()));
@@ -212,7 +244,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> LOG10 = new Unary() {
+    public static final Unary LOG10 = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.LOG10.invoke(arg.doubleValue()));
@@ -220,7 +252,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> LOG1P = new Unary() {
+    public static final Unary LOG1P = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.LOG1P.invoke(arg.doubleValue()));
@@ -228,7 +260,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final BinaryFunction<BigDecimal> MAX = new Binary() {
+    public static final Binary MAX = new Binary() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg1, final BigDecimal arg2) {
@@ -237,7 +269,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final BinaryFunction<BigDecimal> MIN = new Binary() {
+    public static final Binary MIN = new Binary() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg1, final BigDecimal arg2) {
@@ -246,7 +278,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final BinaryFunction<BigDecimal> MULTIPLY = new Binary() {
+    public static final Binary MULTIPLY = new Binary() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg1, final BigDecimal arg2) {
@@ -255,7 +287,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> NEGATE = new Unary() {
+    public static final Unary NEGATE = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return arg.negate();
@@ -263,7 +295,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final BinaryFunction<BigDecimal> POW = new Binary() {
+    public static final Binary POW = new Binary() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg1, final BigDecimal arg2) {
@@ -282,7 +314,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final ParameterFunction<BigDecimal> POWER = new Parameter() {
+    public static final Parameter POWER = new Parameter() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg, final int param) {
@@ -291,24 +323,55 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final ParameterFunction<BigDecimal> ROOT = new Parameter() {
+    public static final Unary RINT = new Unary() {
+
+        @Override
+        public final BigDecimal invoke(final BigDecimal arg) {
+            return arg.setScale(0, CONTEXT.getRoundingMode());
+        }
+
+    };
+
+    public static final Parameter ROOT = new Parameter() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg, final int param) {
+
             if (param <= 0) {
+
                 throw new IllegalArgumentException();
+
             } else if (param == 1) {
+
                 return arg;
+
             } else if (param == 2) {
+
                 return SQRT.invoke(arg);
+
             } else {
-                return BigDecimal.valueOf(PrimitiveFunction.ROOT.invoke(arg.doubleValue(), param));
+
+                final BigDecimal tmpArg = arg.round(CONTEXT);
+                final BigDecimal tmpParam = BigDecimal.valueOf(param);
+
+                BigDecimal retVal = ZERO;
+                final double tmpDoubleArg = arg.doubleValue();
+                if (!Double.isInfinite(tmpDoubleArg) && !Double.isNaN(tmpDoubleArg)) {
+                    retVal = BigDecimal.valueOf(PrimitiveFunction.ROOT.invoke(tmpDoubleArg, param)); // Intial guess
+                }
+
+                BigDecimal tmpShouldBeZero;
+                while ((tmpShouldBeZero = retVal.pow(param, CONTEXT).subtract(tmpArg)).signum() != 0) {
+                    retVal = retVal.subtract(tmpShouldBeZero.divide(tmpParam.multiply(retVal.pow(param - 1)), CONTEXT));
+                }
+
+                return retVal;
             }
         }
 
     };
 
-    public static final ParameterFunction<BigDecimal> SCALE = new Parameter() {
+    public static final Parameter SCALE = new Parameter() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg, final int param) {
@@ -317,7 +380,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> SIGNUM = new Unary() {
+    public static final Unary SIGNUM = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             switch (arg.signum()) {
@@ -332,7 +395,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> SIN = new Unary() {
+    public static final Unary SIN = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.SIN.invoke(arg.doubleValue()));
@@ -340,7 +403,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> SINH = new Unary() {
+    public static final Unary SINH = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.SINH.invoke(arg.doubleValue()));
@@ -348,21 +411,20 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> SQRT = new Unary() {
+    public static final Unary SQRT = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
 
-            final double tmpArg = arg.doubleValue();
+            final BigDecimal tmpArg = arg.round(CONTEXT);
+
             BigDecimal retVal = ZERO;
-            if (!Double.isInfinite(tmpArg) && !Double.isNaN(tmpArg)) {
-                retVal = BigDecimal.valueOf(Math.sqrt(tmpArg));
+            final double tmpDoubleArg = arg.doubleValue();
+            if (!Double.isInfinite(tmpDoubleArg) && !Double.isNaN(tmpDoubleArg)) {
+                retVal = BigDecimal.valueOf(PrimitiveFunction.SQRT.invoke(tmpDoubleArg)); // Intial guess
             }
 
-            final int tmpScale = CONTEXT.getPrecision();
-            final RoundingMode tmpRoundingMode = CONTEXT.getRoundingMode();
-
             BigDecimal tmpShouldBeZero;
-            while ((tmpShouldBeZero = retVal.multiply(retVal).subtract(arg).setScale(tmpScale, tmpRoundingMode)).signum() != 0) {
+            while ((tmpShouldBeZero = retVal.multiply(retVal, CONTEXT).subtract(tmpArg)).signum() != 0) {
                 retVal = retVal.subtract(tmpShouldBeZero.divide(TWO.multiply(retVal), CONTEXT));
             }
 
@@ -371,7 +433,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> SQRT1PX2 = new Unary() {
+    public static final Unary SQRT1PX2 = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return SQRT.invoke(ONE.add(arg.multiply(arg)));
@@ -379,7 +441,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final BinaryFunction<BigDecimal> SUBTRACT = new Binary() {
+    public static final Binary SUBTRACT = new Binary() {
 
         @Override
         public final BigDecimal invoke(final BigDecimal arg1, final BigDecimal arg2) {
@@ -388,7 +450,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> TAN = new Unary() {
+    public static final Unary TAN = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.TAN.invoke(arg.doubleValue()));
@@ -396,7 +458,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> TANH = new Unary() {
+    public static final Unary TANH = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return BigDecimal.valueOf(PrimitiveFunction.TANH.invoke(arg.doubleValue()));
@@ -404,7 +466,7 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
-    public static final UnaryFunction<BigDecimal> VALUE = new Unary() {
+    public static final Unary VALUE = new Unary() {
 
         public final BigDecimal invoke(final BigDecimal arg) {
             return arg;
@@ -459,6 +521,11 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     @Override
+    public BinaryFunction<BigDecimal> atan2() {
+        return ATAN2;
+    }
+
+    @Override
     public UnaryFunction<BigDecimal> atanh() {
         return ATANH;
     }
@@ -466,6 +533,16 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     @Override
     public UnaryFunction<BigDecimal> cardinality() {
         return CARDINALITY;
+    }
+
+    @Override
+    public UnaryFunction<BigDecimal> cbrt() {
+        return CBRT;
+    }
+
+    @Override
+    public UnaryFunction<BigDecimal> ceil() {
+        return CEIL;
     }
 
     @Override
@@ -496,6 +573,11 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     @Override
     public UnaryFunction<BigDecimal> expm1() {
         return EXPM1;
+    }
+
+    @Override
+    public UnaryFunction<BigDecimal> floor() {
+        return FLOOR;
     }
 
     @Override
@@ -551,6 +633,11 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     @Override
     public ParameterFunction<BigDecimal> power() {
         return POWER;
+    }
+
+    @Override
+    public UnaryFunction<BigDecimal> rint() {
+        return RINT;
     }
 
     @Override

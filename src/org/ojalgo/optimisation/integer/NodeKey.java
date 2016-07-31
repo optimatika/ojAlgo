@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Variable;
 
@@ -190,7 +191,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     }
 
     private double feasible(final int index, final double value) {
-        return Math.min(Math.max(myLowerBounds[index], value), myUpperBounds[index]);
+        return PrimitiveFunction.MIN.invoke(PrimitiveFunction.MAX.invoke(myLowerBounds[index], value), myUpperBounds[index]);
     }
 
     long calculateTreeSize() {
@@ -212,7 +213,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
         final double tmpFeasibleValue = this.feasible(index, value);
 
-        final int tmpFloor = (int) Math.floor(tmpFeasibleValue);
+        final int tmpFloor = (int) PrimitiveFunction.FLOOR.invoke(tmpFeasibleValue);
 
         if ((tmpFloor >= tmpUBs[index]) && (tmpFloor > tmpLBs[index])) {
             tmpUBs[index] = tmpFloor - 1;
@@ -230,7 +231,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
         final double tmpFeasibleValue = this.feasible(index, value);
 
-        final int tmpCeil = (int) Math.ceil(tmpFeasibleValue);
+        final int tmpCeil = (int) PrimitiveFunction.CEIL.invoke(tmpFeasibleValue);
 
         if ((tmpCeil <= tmpLBs[index]) && (tmpCeil < tmpUBs[index])) {
             tmpLBs[index] = tmpCeil + 1;
@@ -245,7 +246,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
 
         final double tmpFeasibleValue = this.feasible(index, value);
 
-        return Math.abs(tmpFeasibleValue - Math.rint(tmpFeasibleValue));
+        return PrimitiveFunction.ABS.invoke(tmpFeasibleValue - PrimitiveFunction.RINT.invoke(tmpFeasibleValue));
     }
 
     BigDecimal getLowerBound(final int index) {

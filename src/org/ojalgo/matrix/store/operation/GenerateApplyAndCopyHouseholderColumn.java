@@ -27,6 +27,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.ComplexFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -97,7 +98,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
 
         double tmpNormInf = PrimitiveMath.ZERO;
         for (int i = row; i < structure; i++) {
-            tmpNormInf = Math.max(tmpNormInf, (tmpVector[i] = data[i + tmpColBase]).norm());
+            tmpNormInf = PrimitiveFunction.MAX.invoke(tmpNormInf, (tmpVector[i] = data[i + tmpColBase]).norm());
         }
 
         boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
@@ -118,7 +119,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
 
             ComplexNumber tmpScale = tmpVector[row].divide(tmpNormInf);
             tmpNorm2 += tmpScale.norm() * tmpScale.norm();
-            tmpNorm2 = Math.sqrt(tmpNorm2);
+            tmpNorm2 = PrimitiveFunction.SQRT.invoke(tmpNorm2);
 
             data[row + tmpColBase] = ComplexNumber.makePolar(tmpNorm2 * tmpNormInf, tmpScale.phase());
             tmpScale = tmpScale.subtract(ComplexNumber.makePolar(tmpNorm2, tmpScale.phase()));
@@ -144,7 +145,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
 
         double tmpNormInf = PrimitiveMath.ZERO; // Copy column and calculate its infinity-norm.
         for (int i = row; i < structure; i++) {
-            tmpNormInf = Math.max(tmpNormInf, Math.abs(tmpVector[i] = data[i + tmpColBase]));
+            tmpNormInf = PrimitiveFunction.MAX.invoke(tmpNormInf, PrimitiveFunction.ABS.invoke(tmpVector[i] = data[i + tmpColBase]));
         }
 
         boolean retVal = tmpNormInf != PrimitiveMath.ZERO;
@@ -164,7 +165,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
 
             double tmpScale = tmpVector[row] / tmpNormInf;
             tmpNorm2 += tmpScale * tmpScale;
-            tmpNorm2 = Math.sqrt(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
+            tmpNorm2 = PrimitiveFunction.SQRT.invoke(tmpNorm2); // 2-norm of the vector to transform (scaled by inf-norm)
 
             if (tmpScale <= PrimitiveMath.ZERO) {
                 data[(row + tmpColBase)] = tmpNorm2 * tmpNormInf;
@@ -180,7 +181,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
                 data[i + tmpColBase] = tmpVector[i] /= tmpScale;
             }
 
-            destination.beta = Math.abs(tmpScale) / tmpNorm2;
+            destination.beta = PrimitiveFunction.ABS.invoke(tmpScale) / tmpNorm2;
         }
 
         return retVal;

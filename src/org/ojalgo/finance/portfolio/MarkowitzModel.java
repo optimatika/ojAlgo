@@ -31,6 +31,7 @@ import java.util.Map;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
@@ -131,7 +132,7 @@ public final class MarkowitzModel extends EquilibriumModel {
 
     private static final double _0_0 = ZERO.doubleValue();
     private static final String BALANCE = "Balance";
-    private static final double INIT = Math.sqrt(PrimitiveMath.TEN);
+    private static final double INIT = PrimitiveFunction.SQRT.invoke(PrimitiveMath.TEN);
     private static final double MAX = PrimitiveMath.HUNDRED * PrimitiveMath.HUNDRED;
     private static final double MIN = PrimitiveMath.HUNDREDTH;
     private static final NumberContext TARGET_CONTEXT = NumberContext.getGeneral(7, 14);
@@ -406,7 +407,7 @@ public final class MarkowitzModel extends EquilibriumModel {
                     } else if (tmpTargetDiff > _0_0) {
                         tmpHigh = tmpCurrent;
                     }
-                    tmpCurrent = Math.sqrt(tmpLow * tmpHigh);
+                    tmpCurrent = PrimitiveFunction.SQRT.invoke(tmpLow * tmpHigh);
 
                     if (myOptimisationOptions.debug_appender != null) {
                         BasicLogger.debug();

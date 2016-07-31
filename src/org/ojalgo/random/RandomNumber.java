@@ -26,6 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.Random;
 
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.Alternator;
 
 /**
@@ -65,7 +66,7 @@ public abstract class RandomNumber extends Number implements Distribution, Nulla
      * @see org.ojalgo.random.Distribution#getVariance()
      */
     public double getStandardDeviation() {
-        return Math.sqrt(this.getVariance());
+        return PrimitiveFunction.SQRT.invoke(this.getVariance());
     }
 
     /**

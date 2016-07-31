@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -208,7 +209,7 @@ public abstract class IntegerSolver extends GenericSolver {
 
             final double tmpBestIntegerValue = tmpCurrentlyTheBest.getValue();
 
-            final double tmpMipGap = Math.abs(tmpBestIntegerValue - nonIntegerValue) / Math.abs(tmpBestIntegerValue);
+            final double tmpMipGap = PrimitiveFunction.ABS.invoke(tmpBestIntegerValue - nonIntegerValue) / PrimitiveFunction.ABS.invoke(tmpBestIntegerValue);
 
             if (myMinimisation) {
                 return (nonIntegerValue < tmpBestIntegerValue) && (tmpMipGap > options.mip_gap);

@@ -32,6 +32,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.ojalgo.concurrent.DaemonPoolExecutor;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -368,7 +369,7 @@ public final class NewIntegerSolver extends IntegerSolver {
 
         if (this.isIntegerSolutionFound()) {
             final double tmpBestValue = this.getBestResultSoFar().getValue();
-            final double tmpGap = Math.abs(tmpBestValue * options.mip_gap);
+            final double tmpGap = PrimitiveFunction.ABS.invoke(tmpBestValue * options.mip_gap);
             if (retVal.isMinimisation()) {
                 retVal.limitObjective(null, TypeUtils.toBigDecimal(tmpBestValue - tmpGap, options.problem));
             } else {
@@ -455,7 +456,7 @@ public final class NewIntegerSolver extends IntegerSolver {
             }
 
             if (!Double.isNaN(tmpUpperValue) && !Double.isNaN(tmpLowerValue)) {
-                tmpSignificance[i] = Math.abs(tmpUpperValue - tmpLowerValue);
+                tmpSignificance[i] = PrimitiveFunction.ABS.invoke(tmpUpperValue - tmpLowerValue);
             }
         }
 

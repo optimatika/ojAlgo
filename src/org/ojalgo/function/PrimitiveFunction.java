@@ -26,7 +26,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.type.TypeUtils;
 
 /**
  * Only the primitive parameter (double) methods are actually implemented. The methods with the reference type
@@ -65,7 +64,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     }
 
-    public static final UnaryFunction<Double> ABS = new Unary() {
+    public static final Unary ABS = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.abs(arg);
@@ -73,7 +72,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> ACOS = new Unary() {
+    public static final Unary ACOS = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.acos(arg);
@@ -81,15 +80,15 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> ACOSH = new Unary() {
+    public static final Unary ACOSH = new Unary() {
 
         public final double invoke(final double arg) {
-            return Math.log(arg + Math.sqrt((arg * arg) - ONE));
+            return LOG.invoke(arg + SQRT.invoke((arg * arg) - ONE));
         }
 
     };
 
-    public static final BinaryFunction<Double> ADD = new Binary() {
+    public static final Binary ADD = new Binary() {
 
         @Override
         public final double invoke(final double arg1, final double arg2) {
@@ -98,7 +97,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> ASIN = new Unary() {
+    public static final Unary ASIN = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.asin(arg);
@@ -106,15 +105,15 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> ASINH = new Unary() {
+    public static final Unary ASINH = new Unary() {
 
         public final double invoke(final double arg) {
-            return Math.log(arg + Math.sqrt((arg * arg) + ONE));
+            return LOG.invoke(arg + SQRT.invoke((arg * arg) + ONE));
         }
 
     };
 
-    public static final UnaryFunction<Double> ATAN = new Unary() {
+    public static final Unary ATAN = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.atan(arg);
@@ -122,15 +121,23 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> ATANH = new Unary() {
+    public static final Binary ATAN2 = new Binary() {
 
-        public final double invoke(final double arg) {
-            return Math.log((ONE + arg) / (ONE - arg)) / TWO;
+        public final double invoke(final double arg1, final double arg2) {
+            return Math.atan2(arg1, arg2);
         }
 
     };
 
-    public static final UnaryFunction<Double> CARDINALITY = new Unary() {
+    public static final Unary ATANH = new Unary() {
+
+        public final double invoke(final double arg) {
+            return LOG.invoke((ONE + arg) / (ONE - arg)) / TWO;
+        }
+
+    };
+
+    public static final Unary CARDINALITY = new Unary() {
 
         public final double invoke(final double arg) {
             return PrimitiveScalar.isSmall(PrimitiveMath.ONE, arg) ? ZERO : ONE;
@@ -138,7 +145,23 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> CONJUGATE = new Unary() {
+    public static final Unary CBRT = new Unary() {
+
+        public final double invoke(final double arg) {
+            return Math.cbrt(arg);
+        }
+
+    };
+
+    public static final Unary CEIL = new Unary() {
+
+        public final double invoke(final double arg) {
+            return Math.ceil(arg);
+        }
+
+    };
+
+    public static final Unary CONJUGATE = new Unary() {
 
         public final double invoke(final double arg) {
             return arg;
@@ -146,7 +169,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> COS = new Unary() {
+    public static final Unary COS = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.cos(arg);
@@ -154,7 +177,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> COSH = new Unary() {
+    public static final Unary COSH = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.cosh(arg);
@@ -162,7 +185,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final BinaryFunction<Double> DIVIDE = new Binary() {
+    public static final Binary DIVIDE = new Binary() {
 
         @Override
         public final double invoke(final double arg1, final double arg2) {
@@ -171,7 +194,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> EXP = new Unary() {
+    public static final Unary EXP = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.exp(arg);
@@ -179,7 +202,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> EXPM1 = new Unary() {
+    public static final Unary EXPM1 = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.expm1(arg);
@@ -187,17 +210,25 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final BinaryFunction<Double> HYPOT = new Binary() {
+    public static final Unary FLOOR = new Unary() {
+
+        public final double invoke(final double arg) {
+            return Math.floor(arg);
+        }
+
+    };
+
+    public static final Binary HYPOT = new Binary() {
 
         @Override
         public final double invoke(final double arg1, final double arg2) {
             double retVal;
-            if (Math.abs(arg1) > Math.abs(arg2)) {
+            if (ABS.invoke(arg1) > ABS.invoke(arg2)) {
                 retVal = arg2 / arg1;
-                retVal = Math.abs(arg1) * Math.sqrt(ONE + (retVal * retVal));
+                retVal = ABS.invoke(arg1) * SQRT.invoke(ONE + (retVal * retVal));
             } else if (arg2 != ZERO) {
                 retVal = arg1 / arg2;
-                retVal = Math.abs(arg2) * Math.sqrt(ONE + (retVal * retVal));
+                retVal = ABS.invoke(arg2) * SQRT.invoke(ONE + (retVal * retVal));
             } else {
                 retVal = ZERO;
             }
@@ -206,7 +237,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> INVERT = new Unary() {
+    public static final Unary INVERT = new Unary() {
 
         public final double invoke(final double arg) {
             return ONE / arg;
@@ -214,7 +245,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> LOG = new Unary() {
+    public static final Unary LOG = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.log(arg);
@@ -222,7 +253,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> LOG10 = new Unary() {
+    public static final Unary LOG10 = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.log10(arg);
@@ -230,7 +261,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> LOG1P = new Unary() {
+    public static final Unary LOG1P = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.log1p(arg);
@@ -238,7 +269,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final BinaryFunction<Double> MAX = new Binary() {
+    public static final Binary MAX = new Binary() {
 
         @Override
         public final double invoke(final double arg1, final double arg2) {
@@ -247,7 +278,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final BinaryFunction<Double> MIN = new Binary() {
+    public static final Binary MIN = new Binary() {
 
         @Override
         public final double invoke(final double arg1, final double arg2) {
@@ -256,7 +287,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final BinaryFunction<Double> MULTIPLY = new Binary() {
+    public static final Binary MULTIPLY = new Binary() {
 
         @Override
         public final double invoke(final double arg1, final double arg2) {
@@ -265,7 +296,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> NEGATE = new Unary() {
+    public static final Unary NEGATE = new Unary() {
 
         public final double invoke(final double arg) {
             return -arg;
@@ -273,7 +304,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final BinaryFunction<Double> POW = new Binary() {
+    public static final Binary POW = new Binary() {
 
         @Override
         public final double invoke(final double arg1, final double arg2) {
@@ -282,7 +313,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final ParameterFunction<Double> POWER = new Parameter() {
+    public static final Parameter POWER = new Parameter() {
 
         @Override
         public final double invoke(final double arg, int param) {
@@ -306,13 +337,21 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final ParameterFunction<Double> ROOT = new Parameter() {
+    public static final Unary RINT = new Unary() {
+
+        public final double invoke(final double arg) {
+            return Math.rint(arg);
+        }
+
+    };
+
+    public static final Parameter ROOT = new Parameter() {
 
         @Override
         public final double invoke(final double arg, final int param) {
 
             if (param != 0) {
-                return Math.pow(arg, ONE / param);
+                return POW.invoke(arg, ONE / param);
             } else {
                 throw new IllegalArgumentException();
             }
@@ -320,7 +359,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final ParameterFunction<Double> SCALE = new Parameter() {
+    public static final Parameter SCALE = new Parameter() {
 
         @Override
         public final double invoke(final double arg, int param) {
@@ -337,12 +376,12 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
                 param--;
             }
 
-            return Math.rint(tmpFactor * arg) / tmpFactor;
+            return RINT.invoke(tmpFactor * arg) / tmpFactor;
         }
 
     };
 
-    public static final UnaryFunction<Double> SIGNUM = new Unary() {
+    public static final Unary SIGNUM = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.signum(arg);
@@ -350,7 +389,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> SIN = new Unary() {
+    public static final Unary SIN = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.sin(arg);
@@ -358,7 +397,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> SINH = new Unary() {
+    public static final Unary SINH = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.sinh(arg);
@@ -366,7 +405,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> SQRT = new Unary() {
+    public static final Unary SQRT = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.sqrt(arg);
@@ -374,15 +413,15 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> SQRT1PX2 = new Unary() {
+    public static final Unary SQRT1PX2 = new Unary() {
 
         public final double invoke(final double arg) {
-            return Math.sqrt(ONE + (arg * arg));
+            return SQRT.invoke(ONE + (arg * arg));
         }
 
     };
 
-    public static final BinaryFunction<Double> SUBTRACT = new Binary() {
+    public static final Binary SUBTRACT = new Binary() {
 
         @Override
         public final double invoke(final double arg1, final double arg2) {
@@ -391,7 +430,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> TAN = new Unary() {
+    public static final Unary TAN = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.tan(arg);
@@ -399,7 +438,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> TANH = new Unary() {
+    public static final Unary TANH = new Unary() {
 
         public final double invoke(final double arg) {
             return Math.tanh(arg);
@@ -407,7 +446,7 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
-    public static final UnaryFunction<Double> VALUE = new Unary() {
+    public static final Unary VALUE = new Unary() {
 
         public final double invoke(final double arg) {
             return arg;
@@ -461,6 +500,11 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     @Override
+    public BinaryFunction<Double> atan2() {
+        return ATAN2;
+    }
+
+    @Override
     public UnaryFunction<Double> atanh() {
         return ATANH;
     }
@@ -468,6 +512,16 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @Override
     public UnaryFunction<Double> cardinality() {
         return CARDINALITY;
+    }
+
+    @Override
+    public UnaryFunction<Double> cbrt() {
+        return CBRT;
+    }
+
+    @Override
+    public UnaryFunction<Double> ceil() {
+        return CEIL;
     }
 
     @Override
@@ -498,6 +552,11 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @Override
     public UnaryFunction<Double> expm1() {
         return EXPM1;
+    }
+
+    @Override
+    public UnaryFunction<Double> floor() {
+        return FLOOR;
     }
 
     @Override
@@ -553,6 +612,11 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @Override
     public ParameterFunction<Double> power() {
         return POWER;
+    }
+
+    @Override
+    public UnaryFunction<Double> rint() {
+        return RINT;
     }
 
     @Override

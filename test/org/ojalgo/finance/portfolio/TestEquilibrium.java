@@ -159,7 +159,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
             tmpCovariances.modifyColumn(0, ij, tmpFunc);
         }
 
-        final BigDecimal tmpRAF = new BigDecimal(Math.pow(10.0, tmpRndmRiskAversionExponent.doubleValue()));
+        final BigDecimal tmpRAF = new BigDecimal(PrimitiveFunction.POW.invoke(10.0, tmpRndmRiskAversionExponent.doubleValue()));
 
         final MarketEquilibrium tmpEquilibrium = new MarketEquilibrium(PrimitiveMatrix.FACTORY.copy(tmpCovariances), tmpRAF).clean();
 

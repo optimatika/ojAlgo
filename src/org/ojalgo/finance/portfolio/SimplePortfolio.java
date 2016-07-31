@@ -28,6 +28,7 @@ import java.util.List;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.finance.portfolio.FinancePortfolio.Context;
 import org.ojalgo.finance.portfolio.simulator.PortfolioSimulator;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.PrimitiveMatrix;
@@ -87,7 +88,7 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         myComponents = new ArrayList<>(tmpWeights.size());
         for (int i = 0; i < tmpWeights.size(); i++) {
             final double tmpMeanReturn = tmpAssetReturns.doubleValue(i, 0);
-            final double tmpVolatilty = Math.sqrt(tmpCovariances.doubleValue(i, i));
+            final double tmpVolatilty = PrimitiveFunction.SQRT.invoke(tmpCovariances.doubleValue(i, i));
             final BigDecimal tmpWeight = tmpWeights.get(i);
             myComponents.add(new SimpleAsset(tmpMeanReturn, tmpVolatilty, tmpWeight));
         }

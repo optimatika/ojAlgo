@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.function.PrimitiveFunction;
 
 /**
  * A continuous distribution in which the logarithm of a variable has a normal distribution. A log normal
@@ -45,7 +46,7 @@ public class LogNormal extends AbstractContinuous {
         final Array1D<Double> tmpLogSamples = Array1D.PRIMITIVE.makeZero(tmpSize);
 
         for (int i = 0; i < tmpSize; i++) {
-            tmpLogSamples.set(i, Math.log(rawSamples.doubleValue(i)));
+            tmpLogSamples.set(i, PrimitiveFunction.LOG.invoke(rawSamples.doubleValue(i)));
         }
 
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpLogSamples);
@@ -55,10 +56,10 @@ public class LogNormal extends AbstractContinuous {
 
     public static LogNormal make(final double aExpected, final double aVariance) {
 
-        final double tmpVar = Math.log1p(aVariance / (aExpected * aExpected));
+        final double tmpVar = PrimitiveFunction.LOG1P.invoke(aVariance / (aExpected * aExpected));
 
-        final double tmpMean = Math.log(aExpected) - (HALF * tmpVar);
-        final double tmpStdDev = Math.sqrt(tmpVar);
+        final double tmpMean = PrimitiveFunction.LOG.invoke(aExpected) - (HALF * tmpVar);
+        final double tmpStdDev = PrimitiveFunction.SQRT.invoke(tmpVar);
 
         return new LogNormal(tmpMean, tmpStdDev);
     }
@@ -81,44 +82,44 @@ public class LogNormal extends AbstractContinuous {
     }
 
     public double getDistribution(final double aValue) {
-        return myNormal.getDistribution(Math.log(aValue));
+        return myNormal.getDistribution(PrimitiveFunction.LOG.invoke(aValue));
     }
 
     public double getExpected() {
-        return Math.exp(myNormal.getExpected() + (myNormal.getVariance() * HALF));
+        return PrimitiveFunction.EXP.invoke(myNormal.getExpected() + (myNormal.getVariance() * HALF));
     }
 
     /**
      * The geometric mean is also the median
      */
     public double getGeometricMean() {
-        return Math.exp(myNormal.getExpected());
+        return PrimitiveFunction.EXP.invoke(myNormal.getExpected());
     }
 
     public double getGeometricStandardDeviation() {
-        return Math.exp(myNormal.getStandardDeviation());
+        return PrimitiveFunction.EXP.invoke(myNormal.getStandardDeviation());
     }
 
     public double getProbability(final double aValue) {
-        return myNormal.getProbability(Math.log(aValue)) / aValue;
+        return myNormal.getProbability(PrimitiveFunction.LOG.invoke(aValue)) / aValue;
     }
 
     public double getQuantile(final double aProbality) {
 
         this.checkProbabilty(aProbality);
 
-        return Math.exp(myNormal.getQuantile(aProbality));
+        return PrimitiveFunction.EXP.invoke(myNormal.getQuantile(aProbality));
     }
 
     @Override
     public double getVariance() {
         final double tmpVariance = myNormal.getVariance();
-        return Math.expm1(tmpVariance) * Math.exp((TWO * myNormal.getExpected()) + tmpVariance);
+        return PrimitiveFunction.EXPM1.invoke(tmpVariance) * PrimitiveFunction.EXP.invoke((TWO * myNormal.getExpected()) + tmpVariance);
     }
 
     @Override
     protected double generate() {
-        return Math.exp(myNormal.generate());
+        return PrimitiveFunction.EXP.invoke(myNormal.generate());
     }
 
 }

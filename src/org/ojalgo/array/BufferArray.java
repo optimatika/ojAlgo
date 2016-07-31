@@ -22,6 +22,7 @@
 package org.ojalgo.array;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -319,7 +320,7 @@ public class BufferArray extends DenseArray<Double> {
         double tmpValue;
 
         for (int i = first; i < limit; i += step) {
-            tmpValue = Math.abs(myBuffer.get(i));
+            tmpValue = ABS.invoke(myBuffer.get(i));
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i;

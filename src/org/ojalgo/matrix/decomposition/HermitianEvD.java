@@ -29,6 +29,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
@@ -81,7 +82,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
 
     }
 
-    private static final double EPSILON = Math.pow(2.0, -52.0);
+    private static final double EPSILON = PrimitiveFunction.POW.invoke(2.0, -52.0);
 
     static Array1D<Double> toDiagonal(final DiagonalAccess<?> aTridiagonal, final DecompositionStore<?> transformationAccumulator) {
 
@@ -118,12 +119,12 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
             //BasicLogger.logDebug("Loop l=" + l, tmpMainDiagonal, tmpOffDiagonal);
 
             // Find small subdiagonal element
-            tmpMagnitude = Math.max(tmpMagnitude, Math.abs(tmpMainDiagData[l]) + Math.abs(tmpOffDiagData[l]));
+            tmpMagnitude = PrimitiveFunction.MAX.invoke(tmpMagnitude, PrimitiveFunction.ABS.invoke(tmpMainDiagData[l]) + PrimitiveFunction.ABS.invoke(tmpOffDiagData[l]));
             tmpLocalEpsilon = EPSILON * tmpMagnitude;
 
             m = l;
             while (m < tmpDim) {
-                if (Math.abs(tmpOffDiagData[m]) <= tmpLocalEpsilon) {
+                if (PrimitiveFunction.ABS.invoke(tmpOffDiagData[m]) <= tmpLocalEpsilon) {
                     break;
                 }
                 m++;
@@ -141,7 +142,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
                     // Compute implicit shift
 
                     double p = (tmp1Ml1 - tmp1Ml0) / (tmp1Sl0 + tmp1Sl0);
-                    double r = Math.hypot(p, PrimitiveMath.ONE);
+                    double r = PrimitiveFunction.HYPOT.invoke(p, PrimitiveMath.ONE);
                     if (p < 0) {
                         r = -r;
                     }
@@ -175,7 +176,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
                         final double tmp1Mi0 = tmpMainDiagData[i];
                         final double tmp1Si0 = tmpOffDiagData[i];
 
-                        r = Math.hypot(p, tmp1Si0);
+                        r = PrimitiveFunction.HYPOT.invoke(p, tmp1Si0);
 
                         tmpRotCos3 = tmpRotCos2;
 
@@ -207,7 +208,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
                     tmpMainDiagData[l] = tmpRotCos * p;
                     tmpOffDiagData[l] = tmpRotSin * p;
 
-                } while (Math.abs(tmpOffDiagData[l]) > tmpLocalEpsilon); // Check for convergence
+                } while (PrimitiveFunction.ABS.invoke(tmpOffDiagData[l]) > tmpLocalEpsilon); // Check for convergence
             } // End if (m > l)
 
             tmpMainDiagData[l] = tmpMainDiagData[l] + tmpShift;
@@ -436,7 +437,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
             for (int ij2exp = ij1 + 1; ij2exp < tmpDim; ij2exp++) {
                 final double tmpValue2exp = tmpDiagonal.doubleValue(ij2exp);
 
-                if ((Math.abs(tmpValue2exp) > Math.abs(tmpValue1)) || ((Math.abs(tmpValue2exp) == Math.abs(tmpValue1)) && (tmpValue2exp > tmpValue1))) {
+                if ((PrimitiveFunction.ABS.invoke(tmpValue2exp) > PrimitiveFunction.ABS.invoke(tmpValue1)) || ((PrimitiveFunction.ABS.invoke(tmpValue2exp) == PrimitiveFunction.ABS.invoke(tmpValue1)) && (tmpValue2exp > tmpValue1))) {
                     ij2 = ij2exp;
                     tmpValue2 = tmpValue2exp;
                 }

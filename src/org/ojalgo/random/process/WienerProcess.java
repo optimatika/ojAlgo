@@ -23,6 +23,7 @@ package org.ojalgo.random.process;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.RandomUtils;
 
@@ -46,7 +47,7 @@ public final class WienerProcess extends AbstractProcess<Normal> {
     }
 
     public Normal getDistribution(final double evaluationPoint) {
-        return new Normal(this.getValue(), Math.sqrt(evaluationPoint));
+        return new Normal(this.getValue(), PrimitiveFunction.SQRT.invoke(evaluationPoint));
     }
 
     @Override
@@ -56,7 +57,7 @@ public final class WienerProcess extends AbstractProcess<Normal> {
 
     @Override
     protected double step(final double currentValue, final double stepSize, final double normalisedRandomIncrement) {
-        final double retVal = currentValue + (Math.sqrt(stepSize) * normalisedRandomIncrement);
+        final double retVal = currentValue + (PrimitiveFunction.SQRT.invoke(stepSize) * normalisedRandomIncrement);
         this.setValue(retVal);
         return retVal;
     }
@@ -68,17 +69,17 @@ public final class WienerProcess extends AbstractProcess<Normal> {
 
     @Override
     double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
-        return this.getValue() - (Math.sqrt(stepSize) * SQRT_TWO * RandomUtils.erfi(confidence));
+        return this.getValue() - (PrimitiveFunction.SQRT.invoke(stepSize) * SQRT_TWO * RandomUtils.erfi(confidence));
     }
 
     @Override
     double getStandardDeviation(final double stepSize) {
-        return Math.sqrt(stepSize);
+        return PrimitiveFunction.SQRT.invoke(stepSize);
     }
 
     @Override
     double getUpperConfidenceQuantile(final double stepSize, final double confidence) {
-        return this.getValue() + (Math.sqrt(stepSize) * SQRT_TWO * RandomUtils.erfi(confidence));
+        return this.getValue() + (PrimitiveFunction.SQRT.invoke(stepSize) * SQRT_TWO * RandomUtils.erfi(confidence));
     }
 
     @Override

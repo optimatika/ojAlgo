@@ -25,6 +25,7 @@ import static org.ojalgo.function.QuaternionFunction.*;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.QuaternionFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
@@ -291,7 +292,7 @@ public abstract class QuaternionAggregator {
                 }
 
                 public Quaternion getNumber() {
-                    return Quaternion.valueOf(Math.sqrt(myNumber.norm()));
+                    return Quaternion.valueOf(PrimitiveFunction.SQRT.invoke(myNumber.norm()));
                 }
 
                 public int intValue() {

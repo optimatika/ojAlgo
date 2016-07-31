@@ -31,6 +31,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -243,7 +244,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         final int tmpRowDim = (int) myStore.countRows();
         for (int i = 0; i < tmpRowDim; i++) {
             myStore.visitRow(i, 0, tmpRowSumAggr);
-            retVal = Math.max(retVal, tmpRowSumAggr.doubleValue());
+            retVal = PrimitiveFunction.MAX.invoke(retVal, tmpRowSumAggr.doubleValue());
             tmpRowSumAggr.reset();
         }
 
@@ -262,7 +263,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         final int tmpColDim = (int) this.countColumns();
         for (int j = 0; j < tmpColDim; j++) {
             myStore.visitColumn(0, j, tmpColSumAggr);
-            retVal = Math.max(retVal, tmpColSumAggr.doubleValue());
+            retVal = PrimitiveFunction.MAX.invoke(retVal, tmpColSumAggr.doubleValue());
             tmpColSumAggr.reset();
         }
 

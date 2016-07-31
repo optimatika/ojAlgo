@@ -505,7 +505,7 @@ public class PrimitiveArray extends DenseArray<Double> {
         double tmpValue;
 
         for (int i = first; i < limit; i += step) {
-            tmpValue = Math.abs(data[i]);
+            tmpValue = PrimitiveFunction.ABS.invoke(data[i]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i;

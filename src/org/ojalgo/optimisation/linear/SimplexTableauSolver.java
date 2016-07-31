@@ -31,6 +31,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -440,7 +441,7 @@ final class SimplexTableauSolver extends LinearSolver {
             tmpDenom = myTransposedTableau.doubleValue(tmpDenomCol, i);
 
             // Should always be >=0.0, but very small numbers may "accidentally" get a negative sign.
-            tmpNumer = Math.abs(myTransposedTableau.doubleValue(tmpNumerCol, i));
+            tmpNumer = PrimitiveFunction.ABS.invoke(myTransposedTableau.doubleValue(tmpNumerCol, i));
 
             if (options.problem.isSmall(tmpNumer, tmpDenom)) {
 
@@ -496,7 +497,7 @@ final class SimplexTableauSolver extends LinearSolver {
             }
         }
 
-        if (Math.abs(tmpPivotElement) < ONE) {
+        if (PrimitiveFunction.ABS.invoke(tmpPivotElement) < ONE) {
             myTransposedTableau.modifyColumn(0, pivotRow, DIVIDE.second(tmpPivotElement));
         } else if (tmpPivotElement != ONE) {
             myTransposedTableau.modifyColumn(0, pivotRow, MULTIPLY.second(ONE / tmpPivotElement));

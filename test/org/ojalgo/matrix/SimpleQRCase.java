@@ -24,6 +24,7 @@ package org.ojalgo.matrix;
 import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.MatrixStore;
 
@@ -36,12 +37,12 @@ public class SimpleQRCase extends BasicMatrixTest {
 
     public static BigMatrix getFactorQ() {
         final BigMatrix tmpMtrx = BigMatrix.FACTORY
-                .rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / Math.sqrt(2.0) }, { 2.0 / 3.0, -1.0 / Math.sqrt(2.0) } });
+                .rows(new double[][] { { 1.0 / 3.0, 0.0 }, { 2.0 / 3.0, 1.0 / PrimitiveFunction.SQRT.invoke(2.0) }, { 2.0 / 3.0, -1.0 / PrimitiveFunction.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 
     public static BigMatrix getFactorR() {
-        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, Math.sqrt(2.0) } });
+        final BigMatrix tmpMtrx = BigMatrix.FACTORY.rows(new double[][] { { 3.0, 3.0 }, { 0.0, PrimitiveFunction.SQRT.invoke(2.0) } });
         return tmpMtrx.enforce(DEFINITION);
     }
 

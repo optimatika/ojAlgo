@@ -32,6 +32,7 @@ import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.process.GeometricBrownianMotion;
+import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -86,8 +87,8 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         final BasicMatrix tmpRefWeights = MATRIX_FACTORY.columns(reference.getWeights());
 
         final double tmpNumerator = tmpMyWeights.dot(tmpRefWeights);
-        final double tmpDenom1 = Math.sqrt(tmpMyWeights.dot(tmpMyWeights));
-        final double tmpDenom2 = Math.sqrt(tmpRefWeights.dot(tmpRefWeights));
+        final double tmpDenom1 = PrimitiveFunction.SQRT.invoke(tmpMyWeights.dot(tmpMyWeights));
+        final double tmpDenom2 = PrimitiveFunction.SQRT.invoke(tmpRefWeights.dot(tmpRefWeights));
 
         return tmpNumerator / (tmpDenom1 * tmpDenom2);
     }
@@ -145,7 +146,7 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
         final double tmpConfidenceScale = SQRT_TWO * RandomUtils.erfi(ONE - (TWO * (ONE - confidenceLevel.doubleValue())));
         final double tmpTimePeriod = timePeriod.doubleValue();
 
-        return Math.max((Math.sqrt(tmpTimePeriod) * aStdDev * tmpConfidenceScale) - (tmpTimePeriod * aReturn), ZERO);
+        return PrimitiveFunction.MAX.invoke((PrimitiveFunction.SQRT.invoke(tmpTimePeriod) * aStdDev * tmpConfidenceScale) - (tmpTimePeriod * aReturn), ZERO);
     }
 
     public final double getValueAtRisk95() {
@@ -173,7 +174,7 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
      * Normalised weights Portfolio
      */
     public final FinancePortfolio normalise() {
-        return new NormalisedPortfolio(this);
+        return new NormalisedPortfolio(this, StandardType.PERCENT);
     }
 
     /**

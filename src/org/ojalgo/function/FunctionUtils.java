@@ -23,7 +23,6 @@ package org.ojalgo.function;
 
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.type.TypeUtils;
 
 public abstract class FunctionUtils {
 

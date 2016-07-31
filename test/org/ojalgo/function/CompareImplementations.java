@@ -135,6 +135,17 @@ public class CompareImplementations extends FunctionTests {
         this.assertUnary(BigFunction.ATAN, ComplexFunction.ATAN, PrimitiveFunction.ATAN, QuaternionFunction.ATAN, RationalFunction.ATAN, MACHINE_SMALLEST);
     }
 
+    public void testATAN2() {
+
+        this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, ONE, TWO);
+        this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, TWO, ONE);
+        this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, ONE, HALF);
+        this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, HALF, ONE);
+
+        this.assertBinary(BigFunction.ATAN2, ComplexFunction.ATAN2, PrimitiveFunction.ATAN2, QuaternionFunction.ATAN2, RationalFunction.ATAN2, ZERO, ONE);
+
+    }
+
     public void testATANH() {
 
         this.assertUnary(BigFunction.ATANH, ComplexFunction.ATANH, PrimitiveFunction.ATANH, QuaternionFunction.ATANH, RationalFunction.ATANH,
@@ -148,6 +159,27 @@ public class CompareImplementations extends FunctionTests {
     public void testCARDINALITY() {
         this.assertUnary(BigFunction.CARDINALITY, ComplexFunction.CARDINALITY, PrimitiveFunction.CARDINALITY, QuaternionFunction.CARDINALITY,
                 RationalFunction.CARDINALITY, AROUND_ZERO.doubleValue());
+    }
+
+    public void testCBRT() {
+
+        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT,
+                POSITIVE.doubleValue());
+
+        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, PI);
+        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, E);
+        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, TWO);
+        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, HALF_PI);
+        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, ONE);
+
+        this.assertUnary(BigFunction.CBRT, ComplexFunction.CBRT, PrimitiveFunction.CBRT, QuaternionFunction.CBRT, RationalFunction.CBRT, ZERO);
+    }
+
+    public void testCEIL() {
+        this.assertUnary(BigFunction.CEIL, ComplexFunction.CEIL, PrimitiveFunction.CEIL, QuaternionFunction.CEIL, RationalFunction.CEIL,
+                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigFunction.CEIL, ComplexFunction.CEIL, PrimitiveFunction.CEIL, QuaternionFunction.CEIL, RationalFunction.CEIL, HALF);
+        this.assertUnary(BigFunction.CEIL, ComplexFunction.CEIL, PrimitiveFunction.CEIL, QuaternionFunction.CEIL, RationalFunction.CEIL, -HALF);
     }
 
     public void testCONJUGATE() {
@@ -228,6 +260,13 @@ public class CompareImplementations extends FunctionTests {
     public void testEXPM1() {
         this.assertUnary(BigFunction.EXPM1, ComplexFunction.EXPM1, PrimitiveFunction.EXPM1, QuaternionFunction.EXPM1, RationalFunction.EXPM1,
                 AROUND_ZERO.doubleValue());
+    }
+
+    public void testFLOOR() {
+        this.assertUnary(BigFunction.FLOOR, ComplexFunction.FLOOR, PrimitiveFunction.FLOOR, QuaternionFunction.FLOOR, RationalFunction.FLOOR,
+                AROUND_ZERO.doubleValue());
+        this.assertUnary(BigFunction.FLOOR, ComplexFunction.FLOOR, PrimitiveFunction.FLOOR, QuaternionFunction.FLOOR, RationalFunction.FLOOR, HALF);
+        this.assertUnary(BigFunction.FLOOR, ComplexFunction.FLOOR, PrimitiveFunction.FLOOR, QuaternionFunction.FLOOR, RationalFunction.FLOOR, -HALF);
     }
 
     public void testHYPOT() {
@@ -320,6 +359,21 @@ public class CompareImplementations extends FunctionTests {
         this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER, ONE, 6);
 
         this.assertParameter(BigFunction.POWER, ComplexFunction.POWER, PrimitiveFunction.POWER, QuaternionFunction.POWER, RationalFunction.POWER, ZERO, 7);
+    }
+
+    public void testRINT() {
+
+        this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT,
+                AROUND_ZERO.doubleValue());
+
+        this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT, HALF);
+
+        this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT, -HALF);
+
+        this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT, ONE + HALF);
+
+        this.assertUnary(BigFunction.RINT, ComplexFunction.RINT, PrimitiveFunction.RINT, QuaternionFunction.RINT, RationalFunction.RINT, -(ONE + HALF));
+
     }
 
     public void testROOT() {

@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
@@ -308,7 +309,8 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             // Compute 2-norm of k-th column without under/overflow.
             nrm = ZERO;
             for (int i = k; i < m; i++) {
-                nrm = Maths.hypot(nrm, tmpColK[i]);
+                final double a = nrm;
+                nrm = PrimitiveFunction.HYPOT.invoke(a, tmpColK[i]);
             }
 
             if (nrm != ZERO) {

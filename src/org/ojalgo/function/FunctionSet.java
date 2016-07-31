@@ -33,12 +33,12 @@ public abstract class FunctionSet<N extends Number> {
     }
 
     /**
-     * @see StrictMath#abs(double)
+     * @see Math#abs(double)
      */
     public abstract UnaryFunction<N> abs();
 
     /**
-     * @see StrictMath#acos(double)
+     * @see Math#acos(double)
      */
     public abstract UnaryFunction<N> acos();
 
@@ -50,30 +50,45 @@ public abstract class FunctionSet<N extends Number> {
     public abstract BinaryFunction<N> add();
 
     /**
-     * @see StrictMath#asin(double)
+     * @see Math#asin(double)
      */
     public abstract UnaryFunction<N> asin();
 
     public abstract UnaryFunction<N> asinh();
 
     /**
-     * @see StrictMath#atan(double)
+     * @see Math#atan(double)
      */
     public abstract UnaryFunction<N> atan();
+
+    /**
+     * @see Math#atan2(double,double)
+     */
+    public abstract BinaryFunction<N> atan2();
 
     public abstract UnaryFunction<N> atanh();
 
     public abstract UnaryFunction<N> cardinality();
 
+    /**
+     * @see Math#cbrt(double)
+     */
+    public abstract UnaryFunction<N> cbrt();
+
+    /**
+     * @see Math#ceil(double)
+     */
+    public abstract UnaryFunction<N> ceil();
+
     public abstract UnaryFunction<N> conjugate();
 
     /**
-     * @see StrictMath#cos(double)
+     * @see Math#cos(double)
      */
     public abstract UnaryFunction<N> cos();
 
     /**
-     * @see StrictMath#cosh(double)
+     * @see Math#cosh(double)
      */
     public abstract UnaryFunction<N> cosh();
 
@@ -83,44 +98,49 @@ public abstract class FunctionSet<N extends Number> {
     public abstract BinaryFunction<N> divide();
 
     /**
-     * @see StrictMath#exp(double)
+     * @see Math#exp(double)
      */
     public abstract UnaryFunction<N> exp();
 
     /**
-     * @see StrictMath#expm1(double)
+     * @see Math#expm1(double)
      */
     public abstract UnaryFunction<N> expm1();
 
     /**
-     * @see StrictMath#hypot(double, double)
+     * @see Math#floor(double)
+     */
+    public abstract UnaryFunction<N> floor();
+
+    /**
+     * @see Math#hypot(double, double)
      */
     public abstract BinaryFunction<N> hypot();
 
     public abstract UnaryFunction<N> invert();
 
     /**
-     * @see StrictMath#log(double)
+     * @see Math#log(double)
      */
     public abstract UnaryFunction<N> log();
 
     /**
-     * @see StrictMath#log10(double)
+     * @see Math#log10(double)
      */
     public abstract UnaryFunction<N> log10();
 
     /**
-     * @see StrictMath#log1p(double)
+     * @see Math#log1p(double)
      */
     public abstract UnaryFunction<N> log1p();
 
     /**
-     * @see StrictMath#max(double, double)
+     * @see Math#max(double, double)
      */
     public abstract BinaryFunction<N> max();
 
     /**
-     * @see StrictMath#min(double, double)
+     * @see Math#min(double, double)
      */
     public abstract BinaryFunction<N> min();
 
@@ -132,33 +152,38 @@ public abstract class FunctionSet<N extends Number> {
     public abstract UnaryFunction<N> negate();
 
     /**
-     * @see StrictMath#pow(double, double)
+     * @see Math#pow(double, double)
      */
     public abstract BinaryFunction<N> pow();
 
     public abstract ParameterFunction<N> power();
+
+    /**
+     * @see Math#rint(double)
+     */
+    public abstract UnaryFunction<N> rint();
 
     public abstract ParameterFunction<N> root();
 
     public abstract ParameterFunction<N> scale();
 
     /**
-     * @see StrictMath#signum(double)
+     * @see Math#signum(double)
      */
     public abstract UnaryFunction<N> signum();
 
     /**
-     * @see StrictMath#sin(double)
+     * @see Math#sin(double)
      */
     public abstract UnaryFunction<N> sin();
 
     /**
-     * @see StrictMath#sinh(double)
+     * @see Math#sinh(double)
      */
     public abstract UnaryFunction<N> sinh();
 
     /**
-     * @see StrictMath#sqrt(double)
+     * @see Math#sqrt(double)
      */
     public abstract UnaryFunction<N> sqrt();
 
@@ -173,12 +198,12 @@ public abstract class FunctionSet<N extends Number> {
     public abstract BinaryFunction<N> subtract();
 
     /**
-     * @see StrictMath#tan(double)
+     * @see Math#tan(double)
      */
     public abstract UnaryFunction<N> tan();
 
     /**
-     * @see StrictMath#tanh(double)
+     * @see Math#tanh(double)
      */
     public abstract UnaryFunction<N> tanh();
 

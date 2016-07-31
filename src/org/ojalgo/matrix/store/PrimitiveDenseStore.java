@@ -392,7 +392,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     static void doAfter(final double[] aMtrxH, final double[] aMtrxV, final double[] tmpMainDiagonal, final double[] tmpOffDiagonal, double r, double s,
             double z, final double aNorm1) {
 
-        final int tmpDiagDim = (int) Math.sqrt(aMtrxH.length);
+        final int tmpDiagDim = (int) PrimitiveFunction.SQRT.invoke(aMtrxH.length);
         final int tmpDiagDimMinusOne = tmpDiagDim - 1;
 
         //        BasicLogger.logDebug("r={}, s={}, z={}", r, s, z);
@@ -438,7 +438,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                             q = ((tmpMainDiagonal[i] - p) * (tmpMainDiagonal[i] - p)) + (tmpOffDiagonal[i] * tmpOffDiagonal[i]);
                             t = ((x * s) - (z * r)) / q;
                             aMtrxH[i + (tmpDiagDim * ij)] = t;
-                            if (Math.abs(x) > Math.abs(z)) {
+                            if (PrimitiveFunction.ABS.invoke(x) > PrimitiveFunction.ABS.invoke(z)) {
                                 aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-r - (w * t)) / x;
                             } else {
                                 aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-s - (y * t)) / z;
@@ -446,7 +446,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                         }
 
                         // Overflow control
-                        t = Math.abs(aMtrxH[i + (tmpDiagDim * ij)]);
+                        t = PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * ij)]);
                         if (((PrimitiveMath.MACHINE_EPSILON * t) * t) > 1) {
                             for (int j = i; j <= ij; j++) {
                                 aMtrxH[j + (tmpDiagDim * ij)] = aMtrxH[j + (tmpDiagDim * ij)] / t;
@@ -460,7 +460,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                 int l = ij - 1;
 
                 // Last vector component imaginary so matrix is triangular
-                if (Math.abs(aMtrxH[ij + (tmpDiagDim * (ij - 1))]) > Math.abs(aMtrxH[(ij - 1) + (tmpDiagDim * ij)])) {
+                if (PrimitiveFunction.ABS.invoke(aMtrxH[ij + (tmpDiagDim * (ij - 1))]) > PrimitiveFunction.ABS.invoke(aMtrxH[(ij - 1) + (tmpDiagDim * ij)])) {
                     aMtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] = q / aMtrxH[ij + (tmpDiagDim * (ij - 1))];
                     aMtrxH[(ij - 1) + (tmpDiagDim * ij)] = -(aMtrxH[ij + (tmpDiagDim * ij)] - p) / aMtrxH[ij + (tmpDiagDim * (ij - 1))];
                 } else {
@@ -510,7 +510,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                             vr = (((tmpMainDiagonal[i] - p) * (tmpMainDiagonal[i] - p)) + (tmpOffDiagonal[i] * tmpOffDiagonal[i])) - (q * q);
                             vi = (tmpMainDiagonal[i] - p) * 2.0 * q;
                             if ((vr == PrimitiveMath.ZERO) & (vi == PrimitiveMath.ZERO)) {
-                                vr = PrimitiveMath.MACHINE_EPSILON * aNorm1 * (Math.abs(w) + Math.abs(q) + Math.abs(x) + Math.abs(y) + Math.abs(z));
+                                vr = PrimitiveMath.MACHINE_EPSILON * aNorm1 * (PrimitiveFunction.ABS.invoke(w) + PrimitiveFunction.ABS.invoke(q)
+                                        + PrimitiveFunction.ABS.invoke(x) + PrimitiveFunction.ABS.invoke(y) + PrimitiveFunction.ABS.invoke(z));
                             }
 
                             final ComplexNumber tmpX = ComplexNumber.of((((x * r) - (z * ra)) + (q * sa)), ((x * s) - (z * sa) - (q * ra)));
@@ -523,7 +524,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                             aMtrxH[i + (tmpDiagDim * (ij - 1))] = tmpZ.doubleValue();
                             aMtrxH[i + (tmpDiagDim * ij)] = tmpZ.i;
 
-                            if (Math.abs(x) > (Math.abs(z) + Math.abs(q))) {
+                            if (PrimitiveFunction.ABS.invoke(x) > (PrimitiveFunction.ABS.invoke(z) + PrimitiveFunction.ABS.invoke(q))) {
                                 aMtrxH[(i + 1)
                                         + (tmpDiagDim * (ij - 1))] = ((-ra - (w * aMtrxH[i + (tmpDiagDim * (ij - 1))])) + (q * aMtrxH[i + (tmpDiagDim * ij)]))
                                                 / x;
@@ -544,7 +545,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                         }
 
                         // Overflow control
-                        t = Math.max(Math.abs(aMtrxH[i + (tmpDiagDim * (ij - 1))]), Math.abs(aMtrxH[i + (tmpDiagDim * ij)]));
+                        t = PrimitiveFunction.MAX.invoke(PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * (ij - 1))]),
+                                PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * ij)]));
                         if (((PrimitiveMath.MACHINE_EPSILON * t) * t) > 1) {
                             for (int j = i; j <= ij; j++) {
                                 aMtrxH[j + (tmpDiagDim * (ij - 1))] = aMtrxH[j + (tmpDiagDim * (ij - 1))] / t;
@@ -570,7 +572,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     static int doHessenberg(final double[] aMtrxH, final double[] aMtrxV) {
 
-        final int tmpDiagDim = (int) Math.sqrt(aMtrxH.length);
+        final int tmpDiagDim = (int) PrimitiveFunction.SQRT.invoke(aMtrxH.length);
         final int tmpDiagDimMinusTwo = tmpDiagDim - 2;
 
         final double[] tmpWorkCopy = new double[tmpDiagDim];
@@ -580,7 +582,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             // Scale column.
             double tmpColNorm1 = PrimitiveMath.ZERO;
             for (int i = ij + 1; i < tmpDiagDim; i++) {
-                tmpColNorm1 += Math.abs(aMtrxH[i + (tmpDiagDim * ij)]);
+                tmpColNorm1 += PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * ij)]);
             }
 
             if (tmpColNorm1 != PrimitiveMath.ZERO) {
@@ -591,7 +593,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     tmpWorkCopy[i] = aMtrxH[i + (tmpDiagDim * ij)] / tmpColNorm1;
                     tmpInvBeta += tmpWorkCopy[i] * tmpWorkCopy[i];
                 }
-                double g = Math.sqrt(tmpInvBeta);
+                double g = PrimitiveFunction.SQRT.invoke(tmpInvBeta);
                 if (tmpWorkCopy[ij + 1] > 0) {
                     g = -g;
                 }
@@ -662,14 +664,14 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     static double[][] doSchur(final double[] aMtrxH, final double[] aMtrxV, final boolean allTheWay) {
 
-        final int tmpDiagDim = (int) Math.sqrt(aMtrxH.length);
+        final int tmpDiagDim = (int) PrimitiveFunction.SQRT.invoke(aMtrxH.length);
         final int tmpDiagDimMinusOne = tmpDiagDim - 1;
 
         // Store roots isolated by balanc and compute matrix norm
         double tmpVal = PrimitiveMath.ZERO;
         for (int j = 0; j < tmpDiagDim; j++) {
             for (int i = Math.min(j + 1, tmpDiagDim - 1); i >= 0; i--) {
-                tmpVal += Math.abs(aMtrxH[i + (tmpDiagDim * j)]);
+                tmpVal += PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * j)]);
             }
         }
         final double tmpNorm1 = tmpVal;
@@ -689,11 +691,11 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             // Look for single small sub-diagonal element
             int l = tmpMainIterIndex;
             while (l > 0) {
-                s = Math.abs(aMtrxH[(l - 1) + (tmpDiagDim * (l - 1))]) + Math.abs(aMtrxH[l + (tmpDiagDim * l)]);
+                s = PrimitiveFunction.ABS.invoke(aMtrxH[(l - 1) + (tmpDiagDim * (l - 1))]) + PrimitiveFunction.ABS.invoke(aMtrxH[l + (tmpDiagDim * l)]);
                 if (s == PrimitiveMath.ZERO) {
                     s = tmpNorm1;
                 }
-                if (Math.abs(aMtrxH[l + (tmpDiagDim * (l - 1))]) < (PrimitiveMath.MACHINE_EPSILON * s)) {
+                if (PrimitiveFunction.ABS.invoke(aMtrxH[l + (tmpDiagDim * (l - 1))]) < (PrimitiveMath.MACHINE_EPSILON * s)) {
                     break;
                 }
                 l--;
@@ -713,7 +715,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                 w = aMtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))] * aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * tmpMainIterIndex)];
                 p = (aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))] - aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)]) / 2.0;
                 q = (p * p) + w;
-                z = Math.sqrt(Math.abs(q));
+                z = PrimitiveFunction.SQRT.invoke(PrimitiveFunction.ABS.invoke(q));
                 aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] = aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] + exshift;
                 aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))] = aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))]
                         + exshift;
@@ -734,10 +736,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     tmpOffDiagonal[tmpMainIterIndex - 1] = PrimitiveMath.ZERO;
                     tmpOffDiagonal[tmpMainIterIndex] = PrimitiveMath.ZERO;
                     x = aMtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))];
-                    s = Math.abs(x) + Math.abs(z);
+                    s = PrimitiveFunction.ABS.invoke(x) + PrimitiveFunction.ABS.invoke(z);
                     p = x / s;
                     q = z / s;
-                    r = Math.sqrt((p * p) + (q * q));
+                    r = PrimitiveFunction.SQRT.invoke((p * p) + (q * q));
                     p = p / r;
                     q = q / r;
 
@@ -790,8 +792,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     for (int i = 0; i <= tmpMainIterIndex; i++) {
                         aMtrxH[i + (tmpDiagDim * i)] -= x;
                     }
-                    s = Math.abs(aMtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))])
-                            + Math.abs(aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 2))]);
+                    s = PrimitiveFunction.ABS.invoke(aMtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))])
+                            + PrimitiveFunction.ABS.invoke(aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 2))]);
                     x = y = 0.75 * s;
                     w = -0.4375 * s * s;
                 }
@@ -801,7 +803,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     s = (y - x) / 2.0;
                     s = (s * s) + w;
                     if (s > 0) {
-                        s = Math.sqrt(s);
+                        s = PrimitiveFunction.SQRT.invoke(s);
                         if (y < x) {
                             s = -s;
                         }
@@ -825,15 +827,17 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                     p = (((r * s) - w) / aMtrxH[(m + 1) + (tmpDiagDim * m)]) + aMtrxH[m + (tmpDiagDim * (m + 1))];
                     q = aMtrxH[(m + 1) + (tmpDiagDim * (m + 1))] - z - r - s;
                     r = aMtrxH[(m + 2) + (tmpDiagDim * (m + 1))];
-                    s = Math.abs(p) + Math.abs(q) + Math.abs(r);
+                    s = PrimitiveFunction.ABS.invoke(p) + PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(r);
                     p = p / s;
                     q = q / s;
                     r = r / s;
                     if (m == l) {
                         break;
                     }
-                    if ((Math.abs(aMtrxH[m + (tmpDiagDim * (m - 1))]) * (Math.abs(q) + Math.abs(r))) < (PrimitiveMath.MACHINE_EPSILON * (Math.abs(p)
-                            * (Math.abs(aMtrxH[(m - 1) + (tmpDiagDim * (m - 1))]) + Math.abs(z) + Math.abs(aMtrxH[(m + 1) + (tmpDiagDim * (m + 1))]))))) {
+                    if ((PrimitiveFunction.ABS.invoke(aMtrxH[m + (tmpDiagDim * (m - 1))])
+                            * (PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(r))) < (PrimitiveMath.MACHINE_EPSILON
+                                    * (PrimitiveFunction.ABS.invoke(p) * (PrimitiveFunction.ABS.invoke(aMtrxH[(m - 1) + (tmpDiagDim * (m - 1))])
+                                            + PrimitiveFunction.ABS.invoke(z) + PrimitiveFunction.ABS.invoke(aMtrxH[(m + 1) + (tmpDiagDim * (m + 1))]))))) {
                         break;
                     }
                     m--;
@@ -853,7 +857,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                         p = aMtrxH[k + (tmpDiagDim * (k - 1))];
                         q = aMtrxH[(k + 1) + (tmpDiagDim * (k - 1))];
                         r = (notlast ? aMtrxH[(k + 2) + (tmpDiagDim * (k - 1))] : PrimitiveMath.ZERO);
-                        x = Math.abs(p) + Math.abs(q) + Math.abs(r);
+                        x = PrimitiveFunction.ABS.invoke(p) + PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(r);
                         if (x == PrimitiveMath.ZERO) {
                             continue;
                         }
@@ -862,7 +866,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                         r = r / x;
                     }
 
-                    s = Math.sqrt((p * p) + (q * q) + (r * r));
+                    s = PrimitiveFunction.SQRT.invoke((p * p) + (q * q) + (r * r));
                     if (p < 0) {
                         s = -s;
                     }

@@ -199,18 +199,18 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
             final double sg; // sin Givens
 
             if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, y)) {
-                cg = Math.signum(x);
+                cg = PrimitiveFunction.SIGNUM.invoke(x);
                 sg = PrimitiveMath.ZERO;
             } else if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, x)) {
-                sg = Math.signum(y);
+                sg = PrimitiveFunction.SIGNUM.invoke(y);
                 cg = PrimitiveMath.ZERO;
-            } else if (Math.abs(y) > Math.abs(x)) {
+            } else if (PrimitiveFunction.ABS.invoke(y) > PrimitiveFunction.ABS.invoke(x)) {
                 t = x / y; // cot
-                sg = Math.signum(y) / PrimitiveFunction.SQRT1PX2.invoke(t);
+                sg = PrimitiveFunction.SIGNUM.invoke(y) / PrimitiveFunction.SQRT1PX2.invoke(t);
                 cg = sg * t;
             } else {
                 t = y / x; // tan
-                cg = Math.signum(x) / PrimitiveFunction.SQRT1PX2.invoke(t);
+                cg = PrimitiveFunction.SIGNUM.invoke(x) / PrimitiveFunction.SQRT1PX2.invoke(t);
                 sg = cg * t;
             }
 
@@ -219,7 +219,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
             final double b2 = (cg * (a01 + a10)) + (sg * (a11 - a00)); // b01 + b10
 
             t = (b11 - b00) / b2;
-            t = Math.signum(t) / (PrimitiveFunction.SQRT1PX2.invoke(t) + Math.abs(t)); // tan Jacobi
+            t = PrimitiveFunction.SIGNUM.invoke(t) / (PrimitiveFunction.SQRT1PX2.invoke(t) + PrimitiveFunction.ABS.invoke(t)); // tan Jacobi
 
             // Annihilate - Jacobi
             final double cj = PrimitiveMath.ONE / PrimitiveFunction.SQRT1PX2.invoke(t); // cos Jacobi

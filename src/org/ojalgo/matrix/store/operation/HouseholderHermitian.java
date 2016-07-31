@@ -29,6 +29,7 @@ import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.ComplexFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -240,7 +241,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
             // Calc the norm of the row/col to zero out - to avoid under/overflow.
             for (int k = 0; k < i; k++) {
-                scale += Math.abs(d[k]);
+                scale += PrimitiveFunction.ABS.invoke(d[k]);
             }
 
             if (scale == PrimitiveMath.ZERO) {
@@ -260,7 +261,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                     h += tmpVal * tmpVal; // d[k] * d[k]
                 }
                 f = d[l];
-                g = Math.sqrt(h);
+                g = PrimitiveFunction.SQRT.invoke(h);
                 if (f > 0) {
                     g = -g;
                 }
@@ -373,7 +374,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
             // Calc the norm of the row/col to zero out - to avoid under/overflow.
             for (int k = 0; k < i; k++) {
-                scale += Math.abs(d[k]);
+                scale += PrimitiveFunction.ABS.invoke(d[k]);
             }
             if (scale == PrimitiveMath.ZERO) {
                 // Skip generation, already zero
@@ -392,7 +393,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                     h += tmpVal * tmpVal; // d[k] * d[k]
                 }
                 f = d[l];
-                g = Math.sqrt(h);
+                g = PrimitiveFunction.SQRT.invoke(h);
                 if (f > 0) {
                     g = -g;
                 }
@@ -505,7 +506,7 @@ public final class HouseholderHermitian extends MatrixOperation {
             if (l > 0) {
 
                 for (int k = 0; k < i; k++) {
-                    scale += Math.abs(data[i + (k * tmpRowDim)]);
+                    scale += PrimitiveFunction.ABS.invoke(data[i + (k * tmpRowDim)]);
                 }
 
                 if (scale == PrimitiveMath.ZERO) {
@@ -516,7 +517,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                         h += data[i + (k * tmpRowDim)] * data[i + (k * tmpRowDim)];
                     }
                     f = data[i + (l * tmpRowDim)];
-                    g = (f >= PrimitiveMath.ZERO) ? -Math.sqrt(h) : Math.sqrt(h);
+                    g = (f >= PrimitiveMath.ZERO) ? -PrimitiveFunction.SQRT.invoke(h) : PrimitiveFunction.SQRT.invoke(h);
                     e[i] = scale * g;
                     h -= f * g;
                     data[i + (l * tmpRowDim)] = f - g;

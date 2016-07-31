@@ -27,6 +27,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 
 public final class SampleSet implements Access1D<Double> {
 
@@ -132,7 +133,7 @@ public final class SampleSet implements Access1D<Double> {
         double retVal = PrimitiveMath.ZERO;
 
         for (int i = 0; i < mySamples.count(); i++) {
-            retVal = Math.max(retVal, Math.abs(mySamples.doubleValue(i)));
+            retVal = PrimitiveFunction.MAX.invoke(retVal, PrimitiveFunction.ABS.invoke(mySamples.doubleValue(i)));
         }
 
         return retVal;
@@ -150,7 +151,7 @@ public final class SampleSet implements Access1D<Double> {
         double retVal = PrimitiveMath.NEGATIVE_INFINITY;
 
         for (int i = 0; i < mySamples.count(); i++) {
-            retVal = Math.max(retVal, mySamples.doubleValue(i));
+            retVal = PrimitiveFunction.MAX.invoke(retVal, mySamples.doubleValue(i));
         }
 
         return retVal;
@@ -197,7 +198,7 @@ public final class SampleSet implements Access1D<Double> {
         double retVal = PrimitiveMath.POSITIVE_INFINITY;
 
         for (int i = 0; i < mySamples.count(); i++) {
-            retVal = Math.min(retVal, mySamples.doubleValue(i));
+            retVal = PrimitiveFunction.MIN.invoke(retVal, mySamples.doubleValue(i));
         }
 
         return retVal;
@@ -211,14 +212,14 @@ public final class SampleSet implements Access1D<Double> {
         double retVal = PrimitiveMath.POSITIVE_INFINITY;
 
         for (int i = 0; i < mySamples.count(); i++) {
-            retVal = Math.min(retVal, Math.abs(mySamples.doubleValue(i)));
+            retVal = PrimitiveFunction.MIN.invoke(retVal, PrimitiveFunction.ABS.invoke(mySamples.doubleValue(i)));
         }
 
         return retVal;
     }
 
     public double getStandardDeviation() {
-        return Math.sqrt(this.getVariance());
+        return PrimitiveFunction.SQRT.invoke(this.getVariance());
     }
 
     /**

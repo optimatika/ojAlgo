@@ -73,7 +73,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         for (int r = 0; r < tmpCountRows; r++) {
             final Equation tmpRow = equations.get(r);
             double tmpVal = tmpRow.getRHS();
-            tmpNormRHS = Math.hypot(tmpNormRHS, tmpVal);
+            tmpNormRHS = PrimitiveFunction.HYPOT.invoke(tmpNormRHS, tmpVal);
             tmpVal -= tmpRow.dot(solution);
             tmpResidual.set(tmpRow.index, tmpVal);
             tmpPreconditioned.set(tmpRow.index, tmpVal / tmpRow.getPivot()); // precondition
@@ -113,7 +113,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             for (int r = 0; r < tmpCountRows; r++) {
                 final Equation tmpRow = equations.get(r);
                 final double tmpValue = tmpResidual.doubleValue(tmpRow.index);
-                tmpNormErr = Math.hypot(tmpNormErr, tmpValue);
+                tmpNormErr = PrimitiveFunction.HYPOT.invoke(tmpNormErr, tmpValue);
                 tmpPreconditioned.set(tmpRow.index, tmpValue / tmpRow.getPivot());
             }
 

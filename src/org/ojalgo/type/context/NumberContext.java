@@ -184,7 +184,7 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     private static boolean isZero(final double value, final double tolerance) {
-        return (Math.abs(value) <= tolerance);
+        return (PrimitiveFunction.ABS.invoke(value) <= tolerance);
     }
 
     private final double myEpsilon;
@@ -205,7 +205,7 @@ public final class NumberContext extends FormatContext<Number> {
         myMathContext = new MathContext(precision, mode);
 
         if (precision > 0) {
-            myEpsilon = Math.max(PrimitiveMath.MACHINE_EPSILON, Math.pow(PrimitiveMath.TEN, 1 - precision));
+            myEpsilon = PrimitiveFunction.MAX.invoke(PrimitiveMath.MACHINE_EPSILON, PrimitiveFunction.POW.invoke(PrimitiveMath.TEN, 1 - precision));
         } else {
             myEpsilon = PrimitiveMath.MACHINE_EPSILON;
         }
@@ -213,7 +213,7 @@ public final class NumberContext extends FormatContext<Number> {
         myScale = scale;
 
         if (scale > Integer.MIN_VALUE) {
-            myZeroError = Math.max(PrimitiveMath.MACHINE_SMALLEST, PrimitiveMath.HALF * Math.pow(PrimitiveMath.TEN, -scale));
+            myZeroError = PrimitiveFunction.MAX.invoke(PrimitiveMath.MACHINE_SMALLEST, PrimitiveMath.HALF * PrimitiveFunction.POW.invoke(PrimitiveMath.TEN, -scale));
             myRoundingFactor = PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, scale);
         } else {
             myZeroError = PrimitiveMath.MACHINE_SMALLEST;
@@ -264,7 +264,7 @@ public final class NumberContext extends FormatContext<Number> {
      * {@linkplain StrictMath#rint(double)}.
      */
     public double enforce(final double number) {
-        return Math.rint(myRoundingFactor * number) / myRoundingFactor;
+        return PrimitiveFunction.RINT.invoke(myRoundingFactor * number) / myRoundingFactor;
     }
 
     @Override
@@ -426,7 +426,7 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     public boolean isSmall(final double comparedTo, final double value) {
-        final double tmpComparedTo = Math.abs(comparedTo);
+        final double tmpComparedTo = PrimitiveFunction.ABS.invoke(comparedTo);
         if (NumberContext.isZero(tmpComparedTo, myZeroError)) {
             return NumberContext.isZero(value, myZeroError);
         } else {
@@ -529,7 +529,7 @@ public final class NumberContext extends FormatContext<Number> {
 
             final DecimalFormat tmpDF = (DecimalFormat) format;
 
-            final int tmpModScale = myScale - (int) Math.log10(tmpDF.getMultiplier());
+            final int tmpModScale = myScale - (int) PrimitiveFunction.LOG10.invoke(tmpDF.getMultiplier());
 
             tmpDF.setMaximumFractionDigits(tmpModScale);
             tmpDF.setMinimumFractionDigits(tmpModScale);

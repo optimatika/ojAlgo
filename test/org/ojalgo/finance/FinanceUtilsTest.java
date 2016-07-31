@@ -23,6 +23,7 @@ package org.ojalgo.finance;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
@@ -54,8 +55,8 @@ public class FinanceUtilsTest extends FinanceTests {
             tmpActReturn = FinanceUtils.toAnnualReturnFromGrowthRate(tmpExpRate, CalendarDateUnit.MONTH);
             TestUtils.assertEquals(tmpExpReturn, tmpActReturn, 1E-14 / PrimitiveMath.THREE);
 
-            TestUtils.assertEquals(tmpExpFactor, Math.exp(tmpExpRate), 1E-14 / PrimitiveMath.THREE);
-            TestUtils.assertEquals(tmpExpRate, Math.log(tmpExpFactor), 1E-14 / PrimitiveMath.THREE);
+            TestUtils.assertEquals(tmpExpFactor, PrimitiveFunction.EXP.invoke(tmpExpRate), 1E-14 / PrimitiveMath.THREE);
+            TestUtils.assertEquals(tmpExpRate, PrimitiveFunction.LOG.invoke(tmpExpFactor), 1E-14 / PrimitiveMath.THREE);
         }
 
     }

@@ -26,6 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.List;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -45,7 +46,7 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
 
         final int tmpCountRows = equations.size();
         for (int r = 0; r < tmpCountRows; r++) {
-            tmpNormRHS = Math.hypot(tmpNormRHS, equations.get(r).getRHS());
+            tmpNormRHS = PrimitiveFunction.HYPOT.invoke(tmpNormRHS, equations.get(r).getRHS());
         }
 
         int tmpIterations = 0;
@@ -58,7 +59,7 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
             tmpNormErr = ZERO;
 
             for (int r = 0; r < tmpCountRows; r++) {
-                tmpNormErr = Math.hypot(tmpNormErr, equations.get(r).adjust(solution, tmpRelaxationFactor));
+                tmpNormErr = PrimitiveFunction.HYPOT.invoke(tmpNormErr, equations.get(r).adjust(solution, tmpRelaxationFactor));
             }
 
             tmpIterations++;

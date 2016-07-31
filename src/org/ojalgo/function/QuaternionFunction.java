@@ -24,7 +24,6 @@ package org.ojalgo.function;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.type.TypeUtils;
 
 public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
@@ -55,7 +54,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     }
 
-    public static final UnaryFunction<Quaternion> ABS = new Unary() {
+    public static final Unary ABS = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return Quaternion.valueOf(arg.norm());
@@ -63,7 +62,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> ACOS = new Unary() {
+    public static final Unary ACOS = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
 
@@ -80,7 +79,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> ACOSH = new Unary() {
+    public static final Unary ACOSH = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return LOG.invoke(arg.add(SQRT.invoke(arg.multiply(arg).subtract(PrimitiveMath.ONE))));
@@ -88,7 +87,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final BinaryFunction<Quaternion> ADD = new Binary() {
+    public static final Binary ADD = new Binary() {
 
         @Override
         public final Quaternion invoke(final Quaternion arg1, final Quaternion arg2) {
@@ -97,7 +96,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> ASIN = new Unary() {
+    public static final Unary ASIN = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
 
@@ -111,7 +110,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> ASINH = new Unary() {
+    public static final Unary ASINH = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
 
@@ -122,7 +121,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> ATAN = new Unary() {
+    public static final Unary ATAN = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
 
@@ -133,7 +132,16 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> ATANH = new Unary() {
+    public static final Binary ATAN2 = new Binary() {
+
+        @Override
+        public final Quaternion invoke(final Quaternion arg1, final Quaternion arg2) {
+            return ATAN.invoke(arg1.divide(arg2));
+        }
+
+    };
+
+    public static final Unary ATANH = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
 
@@ -144,7 +152,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> CARDINALITY = new Unary() {
+    public static final Unary CARDINALITY = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return PrimitiveScalar.isSmall(PrimitiveMath.ONE, arg.norm()) ? Quaternion.ZERO : Quaternion.ONE;
@@ -152,7 +160,28 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> CONJUGATE = new Unary() {
+    public static final Unary CBRT = new Unary() {
+
+        public final Quaternion invoke(final Quaternion arg) {
+            return ROOT.invoke(arg, 3);
+        }
+
+    };
+
+    public static final Unary CEIL = new Unary() {
+
+        @Override
+        public final Quaternion invoke(final Quaternion arg) {
+            final double tmpScalar = PrimitiveFunction.CEIL.invoke(arg.scalar());
+            final double tmpI = PrimitiveFunction.CEIL.invoke(arg.i);
+            final double tmpJ = PrimitiveFunction.CEIL.invoke(arg.j);
+            final double tmpK = PrimitiveFunction.CEIL.invoke(arg.k);
+            return Quaternion.of(tmpScalar, tmpI, tmpJ, tmpK);
+        }
+
+    };
+
+    public static final Unary CONJUGATE = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return arg.conjugate();
@@ -160,7 +189,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> COS = new Unary() {
+    public static final Unary COS = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return COSH.invoke(arg.multiply(Quaternion.I));
@@ -168,7 +197,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> COSH = new Unary() {
+    public static final Unary COSH = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return (EXP.invoke(arg).add(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
@@ -176,7 +205,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final BinaryFunction<Quaternion> DIVIDE = new Binary() {
+    public static final Binary DIVIDE = new Binary() {
 
         @Override
         public final Quaternion invoke(final Quaternion arg1, final Quaternion arg2) {
@@ -185,26 +214,26 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> EXP = new Unary() {
+    public static final Unary EXP = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
 
             if (arg.isReal()) {
 
-                final double tmpScalar = Math.exp(arg.scalar());
+                final double tmpScalar = PrimitiveFunction.EXP.invoke(arg.scalar());
 
                 return Quaternion.valueOf(tmpScalar);
 
             } else {
 
-                final double tmpNorm = Math.exp(arg.scalar());
+                final double tmpNorm = PrimitiveFunction.EXP.invoke(arg.scalar());
                 final double[] tmpUnit = arg.unit();
                 final double tmpPhase = arg.getVectorLength();
 
                 return Quaternion.makePolar(tmpNorm, tmpUnit, tmpPhase);
             }
 
-            // final double tmpNorm = Math.exp(arg.doubleValue());
+            // final double tmpNorm = PrimitiveFunction.EXP.invoke(arg.doubleValue());
             // final double tmpPhase = arg.i;
             //
             // return ComplexNumber.makePolar(tmpNorm, tmpPhase);
@@ -212,7 +241,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> EXPM1 = new Unary() {
+    public static final Unary EXPM1 = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return EXP.invoke(arg).subtract(_1_0);
@@ -220,16 +249,29 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final BinaryFunction<Quaternion> HYPOT = new Binary() {
+    public static final Unary FLOOR = new Unary() {
 
         @Override
-        public final Quaternion invoke(final Quaternion arg1, final Quaternion arg2) {
-            return Quaternion.valueOf(Math.hypot(arg1.norm(), arg2.norm()));
+        public final Quaternion invoke(final Quaternion arg) {
+            final double tmpScalar = PrimitiveFunction.FLOOR.invoke(arg.scalar());
+            final double tmpI = PrimitiveFunction.FLOOR.invoke(arg.i);
+            final double tmpJ = PrimitiveFunction.FLOOR.invoke(arg.j);
+            final double tmpK = PrimitiveFunction.FLOOR.invoke(arg.k);
+            return Quaternion.of(tmpScalar, tmpI, tmpJ, tmpK);
         }
 
     };
 
-    public static final UnaryFunction<Quaternion> INVERT = new Unary() {
+    public static final Binary HYPOT = new Binary() {
+
+        @Override
+        public final Quaternion invoke(final Quaternion arg1, final Quaternion arg2) {
+            return Quaternion.valueOf(PrimitiveFunction.HYPOT.invoke(arg1.norm(), arg2.norm()));
+        }
+
+    };
+
+    public static final Unary INVERT = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return POWER.invoke(arg, -1);
@@ -237,15 +279,15 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> LOG = new Unary() {
+    public static final Unary LOG = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
 
             final double tmpNorm = arg.norm();
             final double[] tmpUnitVector = arg.unit();
-            final double tmpPhase = Math.acos(arg.scalar() / tmpNorm);
+            final double tmpPhase = PrimitiveFunction.ACOS.invoke(arg.scalar() / tmpNorm);
 
-            final double tmpScalar = Math.log(tmpNorm);
+            final double tmpScalar = PrimitiveFunction.LOG.invoke(tmpNorm);
             final double tmpI = tmpUnitVector[0] * tmpPhase;
             final double tmpJ = tmpUnitVector[1] * tmpPhase;
             final double tmpK = tmpUnitVector[2] * tmpPhase;
@@ -255,7 +297,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> LOG10 = new Unary() {
+    public static final Unary LOG10 = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return LOG.invoke(arg).divide(PrimitiveFunction.LOG.invoke(10.0));
@@ -263,7 +305,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> LOG1P = new Unary() {
+    public static final Unary LOG1P = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return LOG.invoke(arg.add(_1_0));
@@ -271,7 +313,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final BinaryFunction<Quaternion> MAX = new Binary() {
+    public static final Binary MAX = new Binary() {
 
         @Override
         public final Quaternion invoke(final Quaternion arg1, final Quaternion arg2) {
@@ -289,7 +331,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final BinaryFunction<Quaternion> MIN = new Binary() {
+    public static final Binary MIN = new Binary() {
 
         @Override
         public final Quaternion invoke(final Quaternion arg1, final Quaternion arg2) {
@@ -307,7 +349,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final BinaryFunction<Quaternion> MULTIPLY = new Binary() {
+    public static final Binary MULTIPLY = new Binary() {
 
         @Override
         public final Quaternion invoke(final Quaternion arg1, final Quaternion arg2) {
@@ -316,7 +358,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> NEGATE = new Unary() {
+    public static final Unary NEGATE = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return arg.negate();
@@ -324,7 +366,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final BinaryFunction<Quaternion> POW = new Binary() {
+    public static final Binary POW = new Binary() {
 
         @Override
         public final Quaternion invoke(final Quaternion arg1, final Quaternion arg2) {
@@ -333,7 +375,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final ParameterFunction<Quaternion> POWER = new Parameter() {
+    public static final Parameter POWER = new Parameter() {
 
         @Override
         public final Quaternion invoke(final Quaternion arg, final int param) {
@@ -345,7 +387,20 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final ParameterFunction<Quaternion> ROOT = new Parameter() {
+    public static final Unary RINT = new Unary() {
+
+        @Override
+        public final Quaternion invoke(final Quaternion arg) {
+            final double tmpScalar = PrimitiveFunction.RINT.invoke(arg.scalar());
+            final double tmpI = PrimitiveFunction.RINT.invoke(arg.i);
+            final double tmpJ = PrimitiveFunction.RINT.invoke(arg.j);
+            final double tmpK = PrimitiveFunction.RINT.invoke(arg.k);
+            return Quaternion.of(tmpScalar, tmpI, tmpJ, tmpK);
+        }
+
+    };
+
+    public static final Parameter ROOT = new Parameter() {
 
         @Override
         public final Quaternion invoke(final Quaternion arg, final int param) {
@@ -362,7 +417,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final ParameterFunction<Quaternion> SCALE = new Parameter() {
+    public static final Parameter SCALE = new Parameter() {
 
         @Override
         public final Quaternion invoke(final Quaternion arg, final int param) {
@@ -375,7 +430,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> SIGNUM = new Unary() {
+    public static final Unary SIGNUM = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return arg.signum();
@@ -383,7 +438,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> SIN = new Unary() {
+    public static final Unary SIN = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return SINH.invoke(arg.multiply(Quaternion.I)).multiply(Quaternion.I.negate());
@@ -391,7 +446,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> SINH = new Unary() {
+    public static final Unary SINH = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return (EXP.invoke(arg).subtract(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
@@ -399,7 +454,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> SQRT = new Unary() {
+    public static final Unary SQRT = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return ROOT.invoke(arg, 2);
@@ -407,7 +462,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> SQRT1PX2 = new Unary() {
+    public static final Unary SQRT1PX2 = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return SQRT.invoke(Quaternion.ONE.add(arg.multiply(arg)));
@@ -415,7 +470,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final BinaryFunction<Quaternion> SUBTRACT = new Binary() {
+    public static final Binary SUBTRACT = new Binary() {
 
         @Override
         public final Quaternion invoke(final Quaternion arg1, final Quaternion arg2) {
@@ -424,7 +479,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> TAN = new Unary() {
+    public static final Unary TAN = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return TANH.invoke(arg.multiply(Quaternion.I)).multiply(Quaternion.I.negate());
@@ -432,7 +487,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> TANH = new Unary() {
+    public static final Unary TANH = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
 
@@ -457,7 +512,7 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
-    public static final UnaryFunction<Quaternion> VALUE = new Unary() {
+    public static final Unary VALUE = new Unary() {
 
         public final Quaternion invoke(final Quaternion arg) {
             return arg;
@@ -513,6 +568,11 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     }
 
     @Override
+    public BinaryFunction<Quaternion> atan2() {
+        return ATAN2;
+    }
+
+    @Override
     public UnaryFunction<Quaternion> atanh() {
         return ATANH;
     }
@@ -520,6 +580,16 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     @Override
     public UnaryFunction<Quaternion> cardinality() {
         return CARDINALITY;
+    }
+
+    @Override
+    public UnaryFunction<Quaternion> cbrt() {
+        return CBRT;
+    }
+
+    @Override
+    public UnaryFunction<Quaternion> ceil() {
+        return CEIL;
     }
 
     @Override
@@ -550,6 +620,11 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     @Override
     public UnaryFunction<Quaternion> expm1() {
         return EXPM1;
+    }
+
+    @Override
+    public UnaryFunction<Quaternion> floor() {
+        return FLOOR;
     }
 
     @Override
@@ -605,6 +680,11 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     @Override
     public ParameterFunction<Quaternion> power() {
         return POWER;
+    }
+
+    @Override
+    public UnaryFunction<Quaternion> rint() {
+        return RINT;
     }
 
     @Override

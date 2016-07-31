@@ -21,6 +21,8 @@
  */
 package org.ojalgo.type;
 
+import org.ojalgo.function.PrimitiveFunction;
+
 /**
  * @author apete
  */
@@ -33,9 +35,9 @@ public class ColourData extends Object {
 
     public static ColourData random() {
 
-        final int tmpR = (int) Math.floor(LIMIT * Math.random());
-        final int tmpG = (int) Math.floor(LIMIT * Math.random());
-        final int tmpB = (int) Math.floor(LIMIT * Math.random());
+        final int tmpR = (int) PrimitiveFunction.FLOOR.invoke(LIMIT * Math.random());
+        final int tmpG = (int) PrimitiveFunction.FLOOR.invoke(LIMIT * Math.random());
+        final int tmpB = (int) PrimitiveFunction.FLOOR.invoke(LIMIT * Math.random());
 
         return new ColourData(tmpR, tmpG, tmpB);
     }

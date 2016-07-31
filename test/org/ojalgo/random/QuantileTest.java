@@ -24,6 +24,7 @@ package org.ojalgo.random;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.netio.BasicLogger;
 
 /**
@@ -45,7 +46,7 @@ public class QuantileTest extends RandomTests {
 
         for (int e = -2; e <= 2; e++) {
 
-            final Exponential tmpDistribution = new Exponential(Math.pow(TEN, e));
+            final Exponential tmpDistribution = new Exponential(PrimitiveFunction.POW.invoke(TEN, e));
 
             this.doTest(tmpDistribution);
         }
@@ -57,7 +58,7 @@ public class QuantileTest extends RandomTests {
 
             for (int s = -2; s <= 2; s++) {
 
-                final LogNormal tmpDistribution = new LogNormal(Math.pow(TEN, m), Math.pow(TEN, s));
+                final LogNormal tmpDistribution = new LogNormal(PrimitiveFunction.POW.invoke(TEN, m), PrimitiveFunction.POW.invoke(TEN, s));
 
                 this.doTest(tmpDistribution);
             }
@@ -70,7 +71,7 @@ public class QuantileTest extends RandomTests {
 
             for (int s = -2; s <= 2; s++) {
 
-                final Normal tmpDistribution = new Normal(Math.pow(TEN, m), Math.pow(TEN, s));
+                final Normal tmpDistribution = new Normal(PrimitiveFunction.POW.invoke(TEN, m), PrimitiveFunction.POW.invoke(TEN, s));
 
                 this.doTest(tmpDistribution);
             }
@@ -83,7 +84,7 @@ public class QuantileTest extends RandomTests {
 
             for (int s = -2; s <= 2; s++) {
 
-                final Uniform tmpDistribution = new Uniform(Math.pow(TEN, m), Math.pow(TEN, s));
+                final Uniform tmpDistribution = new Uniform(PrimitiveFunction.POW.invoke(TEN, m), PrimitiveFunction.POW.invoke(TEN, s));
 
                 this.doTest(tmpDistribution);
             }

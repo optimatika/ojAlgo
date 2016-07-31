@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -75,7 +76,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
 
-        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE.copy(new double[] { 4.0, 3.0, Math.sqrt(5.0), 0.0 });
+        final Array1D<Double> tmpSingularValues = Array1D.PRIMITIVE.copy(new double[] { 4.0, 3.0, PrimitiveFunction.SQRT.invoke(5.0), 0.0 });
 
         this.doTest(tmpMtrx, tmpSingularValues);
     }
@@ -111,8 +112,8 @@ public class SVDbyEvD extends MatrixDecompositionTests {
         // Check that the, left and right, singular values are correct
         for (int ij = 0; ij < singularValues.length; ij++) {
             final double tmpExpected = singularValues.doubleValue(ij);
-            final double tmpLeftSqrt = Math.sqrt(Math.abs(tmpLeftD.doubleValue(ij, ij)));
-            final double tmpRightSqrt = Math.sqrt(Math.abs(tmpRightD.doubleValue(ij, ij)));
+            final double tmpLeftSqrt = PrimitiveFunction.SQRT.invoke(PrimitiveFunction.ABS.invoke(tmpLeftD.doubleValue(ij, ij)));
+            final double tmpRightSqrt = PrimitiveFunction.SQRT.invoke(PrimitiveFunction.ABS.invoke(tmpRightD.doubleValue(ij, ij)));
             TestUtils.assertEquals("Left " + ij, tmpExpected, tmpLeftSqrt, new NumberContext(7, 6));
             TestUtils.assertEquals("Right " + ij, tmpExpected, tmpRightSqrt, new NumberContext(7, 6));
         }

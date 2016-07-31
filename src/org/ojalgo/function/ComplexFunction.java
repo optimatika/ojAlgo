@@ -24,7 +24,6 @@ package org.ojalgo.function;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.type.TypeUtils;
 
 public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
@@ -55,7 +54,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     }
 
-    public static final UnaryFunction<ComplexNumber> ABS = new Unary() {
+    public static final Unary ABS = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return ComplexNumber.valueOf(arg.norm());
@@ -63,7 +62,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> ACOS = new Unary() {
+    public static final Unary ACOS = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
@@ -78,7 +77,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> ACOSH = new Unary() {
+    public static final Unary ACOSH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return LOG.invoke(arg.add(SQRT.invoke(arg.multiply(arg).subtract(PrimitiveMath.ONE))));
@@ -86,7 +85,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final BinaryFunction<ComplexNumber> ADD = new Binary() {
+    public static final Binary ADD = new Binary() {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
@@ -95,7 +94,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> ASIN = new Unary() {
+    public static final Unary ASIN = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
@@ -109,7 +108,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> ASINH = new Unary() {
+    public static final Unary ASINH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
@@ -120,7 +119,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> ATAN = new Unary() {
+    public static final Unary ATAN = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
@@ -131,7 +130,15 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> ATANH = new Unary() {
+    public static final Binary ATAN2 = new Binary() {
+
+        public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
+            return ATAN.invoke(arg1.divide(arg2));
+        }
+
+    };
+
+    public static final Unary ATANH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
@@ -142,7 +149,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> CARDINALITY = new Unary() {
+    public static final Unary CARDINALITY = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return PrimitiveScalar.isSmall(PrimitiveMath.ONE, arg.norm()) ? ComplexNumber.ZERO : ComplexNumber.ONE;
@@ -150,7 +157,30 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> CONJUGATE = new Unary() {
+    public static final Unary CBRT = new Unary() {
+
+        public final ComplexNumber invoke(final ComplexNumber arg) {
+
+            final double retMod = PrimitiveFunction.CBRT.invoke(arg.norm());
+            final double retArg = arg.phase() * PrimitiveMath.THIRD;
+
+            return ComplexNumber.makePolar(retMod, retArg);
+        }
+
+    };
+
+    public static final Unary CEIL = new Unary() {
+
+        @Override
+        public final ComplexNumber invoke(final ComplexNumber arg) {
+            final double tmpRe = PrimitiveFunction.CEIL.invoke(arg.doubleValue());
+            final double tmpIm = PrimitiveFunction.CEIL.invoke(arg.i);
+            return ComplexNumber.of(tmpRe, tmpIm);
+        }
+
+    };
+
+    public static final Unary CONJUGATE = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return arg.conjugate();
@@ -158,7 +188,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> COS = new Unary() {
+    public static final Unary COS = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return COSH.invoke(arg.multiply(ComplexNumber.I));
@@ -166,7 +196,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> COSH = new Unary() {
+    public static final Unary COSH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return (EXP.invoke(arg).add(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
@@ -174,7 +204,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final BinaryFunction<ComplexNumber> DIVIDE = new Binary() {
+    public static final Binary DIVIDE = new Binary() {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
@@ -183,11 +213,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> EXP = new Unary() {
+    public static final Unary EXP = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final double tmpNorm = Math.exp(arg.doubleValue());
+            final double tmpNorm = PrimitiveFunction.EXP.invoke(arg.doubleValue());
             final double tmpPhase = arg.i;
 
             return ComplexNumber.makePolar(tmpNorm, tmpPhase);
@@ -195,11 +225,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> EXPM1 = new Unary() {
+    public static final Unary EXPM1 = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final double retMod = Math.expm1(arg.doubleValue());
+            final double retMod = PrimitiveFunction.EXPM1.invoke(arg.doubleValue());
             final double retArg = arg.i;
 
             return ComplexNumber.makePolar(retMod, retArg);
@@ -207,16 +237,27 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final BinaryFunction<ComplexNumber> HYPOT = new Binary() {
+    public static final Unary FLOOR = new Unary() {
 
         @Override
-        public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
-            return ComplexNumber.valueOf(Math.hypot(arg1.norm(), arg2.norm()));
+        public final ComplexNumber invoke(final ComplexNumber arg) {
+            final double tmpRe = PrimitiveFunction.FLOOR.invoke(arg.doubleValue());
+            final double tmpIm = PrimitiveFunction.FLOOR.invoke(arg.i);
+            return ComplexNumber.of(tmpRe, tmpIm);
         }
 
     };
 
-    public static final UnaryFunction<ComplexNumber> INVERT = new Unary() {
+    public static final Binary HYPOT = new Binary() {
+
+        @Override
+        public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
+            return ComplexNumber.valueOf(PrimitiveFunction.HYPOT.invoke(arg1.norm(), arg2.norm()));
+        }
+
+    };
+
+    public static final Unary INVERT = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return POWER.invoke(arg, -1);
@@ -224,11 +265,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> LOG = new Unary() {
+    public static final Unary LOG = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final double tmpRe = Math.log(arg.norm());
+            final double tmpRe = PrimitiveFunction.LOG.invoke(arg.norm());
             final double tmpIm = arg.phase();
 
             return ComplexNumber.of(tmpRe, tmpIm);
@@ -236,11 +277,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> LOG10 = new Unary() {
+    public static final Unary LOG10 = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final double retRe = Math.log10(arg.norm());
+            final double retRe = PrimitiveFunction.LOG10.invoke(arg.norm());
             final double retIm = arg.phase();
 
             return ComplexNumber.of(retRe, retIm);
@@ -248,11 +289,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> LOG1P = new Unary() {
+    public static final Unary LOG1P = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final double retRe = Math.log1p(arg.norm());
+            final double retRe = PrimitiveFunction.LOG1P.invoke(arg.norm());
             final double retIm = arg.phase();
 
             return ComplexNumber.of(retRe, retIm);
@@ -260,7 +301,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final BinaryFunction<ComplexNumber> MAX = new Binary() {
+    public static final Binary MAX = new Binary() {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
@@ -278,7 +319,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final BinaryFunction<ComplexNumber> MIN = new Binary() {
+    public static final Binary MIN = new Binary() {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
@@ -296,7 +337,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final BinaryFunction<ComplexNumber> MULTIPLY = new Binary() {
+    public static final Binary MULTIPLY = new Binary() {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
@@ -305,7 +346,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> NEGATE = new Unary() {
+    public static final Unary NEGATE = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return arg.negate();
@@ -313,7 +354,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final BinaryFunction<ComplexNumber> POW = new Binary() {
+    public static final Binary POW = new Binary() {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
@@ -322,7 +363,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final ParameterFunction<ComplexNumber> POWER = new Parameter() {
+    public static final Parameter POWER = new Parameter() {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg, final int param) {
@@ -335,7 +376,18 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final ParameterFunction<ComplexNumber> ROOT = new Parameter() {
+    public static final Unary RINT = new Unary() {
+
+        @Override
+        public final ComplexNumber invoke(final ComplexNumber arg) {
+            final double tmpRe = PrimitiveFunction.RINT.invoke(arg.doubleValue());
+            final double tmpIm = PrimitiveFunction.RINT.invoke(arg.i);
+            return ComplexNumber.of(tmpRe, tmpIm);
+        }
+
+    };
+
+    public static final Parameter ROOT = new Parameter() {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg, final int param) {
@@ -344,7 +396,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
                 final double tmpExp = PrimitiveMath.ONE / param;
 
-                final double retMod = Math.pow(arg.norm(), tmpExp);
+                final double retMod = PrimitiveFunction.POW.invoke(arg.norm(), tmpExp);
                 final double retArg = arg.phase() * tmpExp;
 
                 return ComplexNumber.makePolar(retMod, retArg);
@@ -357,7 +409,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final ParameterFunction<ComplexNumber> SCALE = new Parameter() {
+    public static final Parameter SCALE = new Parameter() {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg, final int param) {
@@ -368,7 +420,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> SIGNUM = new Unary() {
+    public static final Unary SIGNUM = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return arg.signum();
@@ -376,7 +428,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> SIN = new Unary() {
+    public static final Unary SIN = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return SINH.invoke(arg.multiply(ComplexNumber.I)).multiply(ComplexNumber.I.negate());
@@ -384,7 +436,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> SINH = new Unary() {
+    public static final Unary SINH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return (EXP.invoke(arg).subtract(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
@@ -392,11 +444,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> SQRT = new Unary() {
+    public static final Unary SQRT = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final double retMod = Math.sqrt(arg.norm());
+            final double retMod = PrimitiveFunction.SQRT.invoke(arg.norm());
             final double retArg = arg.phase() * PrimitiveMath.HALF;
 
             return ComplexNumber.makePolar(retMod, retArg);
@@ -404,7 +456,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> SQRT1PX2 = new Unary() {
+    public static final Unary SQRT1PX2 = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return SQRT.invoke(ComplexNumber.ONE.add(arg.multiply(arg)));
@@ -412,7 +464,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final BinaryFunction<ComplexNumber> SUBTRACT = new Binary() {
+    public static final Binary SUBTRACT = new Binary() {
 
         @Override
         public final ComplexNumber invoke(final ComplexNumber arg1, final ComplexNumber arg2) {
@@ -421,7 +473,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> TAN = new Unary() {
+    public static final Unary TAN = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return TANH.invoke(arg.multiply(ComplexNumber.I)).multiply(ComplexNumber.I.negate());
@@ -429,7 +481,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> TANH = new Unary() {
+    public static final Unary TANH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
@@ -454,7 +506,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
-    public static final UnaryFunction<ComplexNumber> VALUE = new Unary() {
+    public static final Unary VALUE = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
             return arg;
@@ -508,6 +560,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     }
 
     @Override
+    public BinaryFunction<ComplexNumber> atan2() {
+        return ATAN2;
+    }
+
+    @Override
     public UnaryFunction<ComplexNumber> atanh() {
         return ATANH;
     }
@@ -515,6 +572,16 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     @Override
     public UnaryFunction<ComplexNumber> cardinality() {
         return CARDINALITY;
+    }
+
+    @Override
+    public UnaryFunction<ComplexNumber> cbrt() {
+        return CBRT;
+    }
+
+    @Override
+    public UnaryFunction<ComplexNumber> ceil() {
+        return CEIL;
     }
 
     @Override
@@ -545,6 +612,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     @Override
     public UnaryFunction<ComplexNumber> expm1() {
         return EXPM1;
+    }
+
+    @Override
+    public UnaryFunction<ComplexNumber> floor() {
+        return FLOOR;
     }
 
     @Override
@@ -600,6 +672,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     @Override
     public ParameterFunction<ComplexNumber> power() {
         return POWER;
+    }
+
+    @Override
+    public UnaryFunction<ComplexNumber> rint() {
+        return RINT;
     }
 
     @Override

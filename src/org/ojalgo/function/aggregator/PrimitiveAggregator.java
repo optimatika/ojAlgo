@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
@@ -101,7 +102,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue = Math.max(myValue, Math.abs(anArg));
+                    myValue = PrimitiveFunction.MAX.invoke(myValue, PrimitiveFunction.ABS.invoke(anArg));
                 }
 
                 public void invoke(final Double anArg) {
@@ -113,7 +114,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Double merge(final Double result1, final Double result2) {
-                    return Math.max(result1, result2);
+                    return PrimitiveFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -149,7 +150,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue = Math.max(myValue, anArg);
+                    myValue = PrimitiveFunction.MAX.invoke(myValue, anArg);
                 }
 
                 public void invoke(final Double anArg) {
@@ -161,7 +162,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Double merge(final Double result1, final Double result2) {
-                    return Math.max(result1, result2);
+                    return PrimitiveFunction.MAX.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -201,7 +202,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue = Math.min(myValue, anArg);
+                    myValue = PrimitiveFunction.MIN.invoke(myValue, anArg);
                 }
 
                 public void invoke(final Double anArg) {
@@ -213,7 +214,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Double merge(final Double result1, final Double result2) {
-                    return Math.min(result1, result2);
+                    return PrimitiveFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -249,7 +250,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    myValue += Math.abs(anArg);
+                    myValue += PrimitiveFunction.ABS.invoke(anArg);
                 }
 
                 public void invoke(final Double anArg) {
@@ -261,7 +262,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Double merge(final Double result1, final Double result2) {
-                    return Math.abs(result1) + Math.abs(result2);
+                    return PrimitiveFunction.ABS.invoke(result1) + PrimitiveFunction.ABS.invoke(result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -286,7 +287,7 @@ public abstract class PrimitiveAggregator {
 
                 public double doubleValue() {
                     //return myValue; // more than 100x slower
-                    return Math.sqrt(myValue);
+                    return PrimitiveFunction.SQRT.invoke(myValue);
                 }
 
                 public Double getNumber() {
@@ -299,7 +300,7 @@ public abstract class PrimitiveAggregator {
 
                 public void invoke(final double anArg) {
                     myValue += anArg * anArg;
-                    //myValue = Math.hypot(myValue, anArg); // more than 100x slower
+                    //myValue = PrimitiveFunction.HYPOT.invoke(myValue, anArg); // more than 100x slower
                 }
 
                 public void invoke(final Double anArg) {
@@ -311,7 +312,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Double merge(final Double result1, final Double result2) {
-                    return Math.hypot(result1, result2);
+                    return PrimitiveFunction.HYPOT.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {
@@ -447,9 +448,9 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public void invoke(final double anArg) {
-                    final double tmpArg = Math.abs(anArg);
+                    final double tmpArg = PrimitiveFunction.ABS.invoke(anArg);
                     if (tmpArg != ZERO) {
-                        myValue = Math.min(myValue, tmpArg);
+                        myValue = PrimitiveFunction.MIN.invoke(myValue, tmpArg);
                     }
                 }
 
@@ -462,7 +463,7 @@ public abstract class PrimitiveAggregator {
                 }
 
                 public Double merge(final Double result1, final Double result2) {
-                    return Math.min(result1, result2);
+                    return PrimitiveFunction.MIN.invoke(result1, result2);
                 }
 
                 public AggregatorFunction<Double> reset() {

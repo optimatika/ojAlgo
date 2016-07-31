@@ -23,6 +23,8 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.ojalgo.function.PrimitiveFunction;
+
 /**
  * The number of required trials until an event with probability aProbability occurs has a geometric
  * distribution.
@@ -51,7 +53,7 @@ public class Geometric extends AbstractDiscrete {
     }
 
     public double getProbability(final int aVal) {
-        return myProbability * Math.pow(ONE - myProbability, aVal - ONE);
+        return myProbability * PrimitiveFunction.POW.invoke(ONE - myProbability, aVal - ONE);
     }
 
     @Override

@@ -26,6 +26,7 @@ import java.math.MathContext;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -111,7 +112,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
 
             return new ComplexNumber(norm);
 
-        } else if (Math.abs(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
+        } else if (PrimitiveFunction.ABS.invoke(tmpStdPhase - PrimitiveMath.PI) <= ARGUMENT_TOLERANCE) {
 
             return new ComplexNumber(-norm);
 
@@ -119,7 +120,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
 
             double tmpRe = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpCos = Math.cos(tmpStdPhase);
+                final double tmpCos = PrimitiveFunction.COS.invoke(tmpStdPhase);
                 if (tmpCos != PrimitiveMath.ZERO) {
                     tmpRe = norm * tmpCos;
                 }
@@ -127,7 +128,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
 
             double tmpIm = PrimitiveMath.ZERO;
             if (norm != PrimitiveMath.ZERO) {
-                final double tmpSin = Math.sin(tmpStdPhase);
+                final double tmpSin = PrimitiveFunction.SIN.invoke(tmpStdPhase);
                 if (tmpSin != PrimitiveMath.ZERO) {
                     tmpIm = norm * tmpSin;
                 }
@@ -241,7 +242,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         final double tmpRe = arg.doubleValue();
         final double tmpIm = arg.i;
 
-        if (Math.abs(tmpRe) > Math.abs(tmpIm)) {
+        if (PrimitiveFunction.ABS.invoke(tmpRe) > PrimitiveFunction.ABS.invoke(tmpIm)) {
 
             final double r = tmpIm / tmpRe;
             final double d = tmpRe + (r * tmpIm);
@@ -433,7 +434,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
     }
 
     public double norm() {
-        return Math.hypot(myRealValue, i);
+        return PrimitiveFunction.HYPOT.invoke(myRealValue, i);
     }
 
     public double phase() {
@@ -479,7 +480,7 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         } else {
             retVal.append(PLUS);
         }
-        retVal.append(Double.toString(Math.abs(tmpIm)));
+        retVal.append(Double.toString(PrimitiveFunction.ABS.invoke(tmpIm)));
 
         return retVal.append(RIGHT).toString();
     }

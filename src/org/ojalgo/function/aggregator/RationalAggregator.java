@@ -25,6 +25,7 @@ import static org.ojalgo.function.RationalFunction.*;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.RationalFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.RationalNumber;
@@ -57,7 +58,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final RationalNumber anArg) {
-                    if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, Math.abs(anArg.doubleValue()))) {
+                    if (!PrimitiveScalar.isSmall(PrimitiveMath.ONE, PrimitiveFunction.ABS.invoke(anArg.doubleValue()))) {
                         myCount++;
                     }
                 }
@@ -255,7 +256,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final RationalNumber anArg) {
-                    myNumber = myNumber.add(Math.abs(anArg.doubleValue()));
+                    myNumber = myNumber.add(PrimitiveFunction.ABS.invoke(anArg.doubleValue()));
                 }
 
                 public void merge(final RationalNumber result) {
@@ -291,7 +292,7 @@ public abstract class RationalAggregator {
                 }
 
                 public RationalNumber getNumber() {
-                    return RationalNumber.valueOf(Math.sqrt(Math.abs(myNumber.doubleValue())));
+                    return RationalNumber.valueOf(PrimitiveFunction.SQRT.invoke(PrimitiveFunction.ABS.invoke(myNumber.doubleValue())));
                 }
 
                 public int intValue() {
@@ -303,7 +304,7 @@ public abstract class RationalAggregator {
                 }
 
                 public void invoke(final RationalNumber anArg) {
-                    final double tmpMod = Math.abs(anArg.doubleValue());
+                    final double tmpMod = PrimitiveFunction.ABS.invoke(anArg.doubleValue());
                     myNumber = myNumber.add(tmpMod * tmpMod);
                 }
 

@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.optimisation.linear.LinearSolver;
 
 final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
@@ -82,13 +83,13 @@ final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Inte
         for (int p = 0; p < tmpCountPositives; p++) {
             final Variable tmpVariable = tmpPositives.get(p);
             final int tmpIndex = model.indexOf(tmpVariable);
-            tmpSolverSolution.set(p, Math.max(modelState.doubleValue(tmpIndex), 0.0));
+            tmpSolverSolution.set(p, PrimitiveFunction.MAX.invoke(modelState.doubleValue(tmpIndex), 0.0));
         }
 
         for (int n = 0; n < tmpCountNegatives; n++) {
             final Variable tmpVariable = tmpNegatives.get(n);
             final int tmpIndex = model.indexOf(tmpVariable);
-            tmpSolverSolution.set(tmpCountPositives + n, Math.max(-modelState.doubleValue(tmpIndex), 0.0));
+            tmpSolverSolution.set(tmpCountPositives + n, PrimitiveFunction.MAX.invoke(-modelState.doubleValue(tmpIndex), 0.0));
         }
 
         return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);

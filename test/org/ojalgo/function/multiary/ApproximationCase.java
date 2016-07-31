@@ -23,6 +23,7 @@ package org.ojalgo.function.multiary;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
@@ -70,7 +71,7 @@ public class ApproximationCase extends FunctionMultiaryTests {
 
         final PhysicalStore<Double> tmpX = PrimitiveDenseStore.FACTORY.makeFilled(tmpArity, 1, new Uniform(-10, 20));
 
-        TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), Math.sqrt(1E-14 / PrimitiveMath.THREE));
+        TestUtils.assertEquals(tmpOrgFunc.invoke(tmpX), tmpApprFunc.invoke(tmpX), PrimitiveFunction.SQRT.invoke(1E-14 / PrimitiveMath.THREE));
     }
 
 }

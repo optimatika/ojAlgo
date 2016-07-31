@@ -23,6 +23,7 @@ package org.ojalgo.random;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.function.PrimitiveFunction;
 
 abstract class RandomNumber1D {
 
@@ -52,7 +53,7 @@ abstract class RandomNumber1D {
         final Array1D<Double> retVal = Array1D.PRIMITIVE.makeZero(tmpLength);
 
         for (int i = 0; i < tmpLength; i++) {
-            retVal.set(i, Math.sqrt(tmpVar.doubleValue(i)));
+            retVal.set(i, PrimitiveFunction.SQRT.invoke(tmpVar.doubleValue(i)));
         }
 
         return retVal;

@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
@@ -166,7 +167,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         final int tmpNumVars = (int) tmpC.countRows();
         final int tmpNumEqus = tmpAE != null ? (int) tmpAE.countRows() : 0;
-        tmpAI.countRows();
 
         final DecompositionStore<Double> tmpX = this.getX();
 
@@ -443,9 +443,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             final double tmpLargestQ = this.getIterationQ().aggregateAll(Aggregator.LARGEST);
             final double tmpLargestC = this.getC().aggregateAll(Aggregator.LARGEST);
-            final double tmpLargest = Math.max(tmpLargestQ, tmpLargestC);
+            final double tmpLargest = PrimitiveFunction.MAX.invoke(tmpLargestQ, tmpLargestC);
 
-            this.getIterationQ().modifyDiagonal(0L, 0L, ADD.second(tmpLargest * Math.sqrt(MACHINE_EPSILON)));
+            this.getIterationQ().modifyDiagonal(0L, 0L, ADD.second(tmpLargest * PrimitiveFunction.SQRT.invoke(MACHINE_EPSILON)));
 
             //this.setIterationQ(tmpIterationQ);
 
@@ -515,7 +515,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final MatrixStore<Double> tmpLI = myIterationL.logical().offsets(this.countEqualityConstraints(), 0).row(tmpIncluded).get();
         for (int i = 0; i < tmpIncluded.length; i++) {
             final double tmpValue = tmpLI.doubleValue(i);
-            final double tmpWeight = Math.abs(tmpValue) * Math.max(-tmpValue, ONE);
+            final double tmpWeight = PrimitiveFunction.ABS.invoke(tmpValue) * PrimitiveFunction.MAX.invoke(-tmpValue, ONE);
             if (tmpWeight > tmpMaxWeight) {
                 tmpMaxWeight = tmpWeight;
                 tmpToExclude = tmpIncluded[i];

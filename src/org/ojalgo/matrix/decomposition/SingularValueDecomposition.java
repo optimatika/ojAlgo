@@ -26,6 +26,7 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -94,7 +95,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             retVal += tmpVal * tmpVal;
         }
 
-        return Math.sqrt(retVal);
+        return PrimitiveFunction.SQRT.invoke(retVal);
     }
 
     public MatrixStore<N> getInverse() {

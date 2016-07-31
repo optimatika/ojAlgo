@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
@@ -72,7 +73,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
      * ≈ 1.6E-291
      */
     @Deprecated
-    static final double TINY = Math.pow(2.0, -966.0);
+    static final double TINY = PrimitiveFunction.POW.invoke(2.0, -966.0);
 
     static void doCase1(final double[] s, final double[] e, final int p, final int k, final DecompositionStore<?> mtrxQ2) {
 
@@ -85,7 +86,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
         for (int j = p - 2; j >= k; j--) {
 
-            t = Math.hypot(s[j], f);
+            t = PrimitiveFunction.HYPOT.invoke(s[j], f);
             cs = s[j] / t;
             sn = f / t;
 
@@ -112,7 +113,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
         for (int j = k; j < p; j++) {
 
-            t = Math.hypot(s[j], f);
+            t = PrimitiveFunction.HYPOT.invoke(s[j], f);
             cs = s[j] / t;
             sn = f / t;
 
@@ -132,8 +133,8 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
         final int indPm2 = p - 2;
 
         // Calculate the shift.
-        final double scale = Math.max(Math.max(Math.max(Math.max(Math.abs(s[indPm1]), Math.abs(s[indPm2])), Math.abs(e[indPm2])), Math.abs(s[k])),
-                Math.abs(e[k]));
+        final double scale = PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(PrimitiveFunction.ABS.invoke(s[indPm1]), PrimitiveFunction.ABS.invoke(s[indPm2])), PrimitiveFunction.ABS.invoke(e[indPm2])), PrimitiveFunction.ABS.invoke(s[k])),
+                PrimitiveFunction.ABS.invoke(e[k]));
 
         final double sPm1 = s[indPm1] / scale;
         final double sPm2 = s[indPm2] / scale;
@@ -145,7 +146,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
         final double c = (sPm1 * ePm2) * (sPm1 * ePm2);
         double shift = ZERO;
         if ((c != ZERO) || (b != ZERO)) {
-            shift = Math.sqrt((b * b) + c);
+            shift = PrimitiveFunction.SQRT.invoke((b * b) + c);
             if (b < ZERO) {
                 shift = -shift;
             }
@@ -162,7 +163,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
         // Chase zeros.
         for (int j = k; j < indPm1; j++) {
 
-            t = Math.hypot(f, g);
+            t = PrimitiveFunction.HYPOT.invoke(f, g);
             cs = f / t;
             sn = g / t;
             if (j != k) {
@@ -178,7 +179,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
             }
 
-            t = Math.hypot(f, g);
+            t = PrimitiveFunction.HYPOT.invoke(f, g);
             cs = f / t;
             sn = g / t;
             s[j] = t;
@@ -270,7 +271,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
                 if (k == -1) {
                     break;
                 }
-                if (Math.abs(e[k]) <= (SVDnew32.TINY + (MACHINE_EPSILON * (Math.abs(s[k]) + Math.abs(s[k + 1]))))) {
+                if (PrimitiveFunction.ABS.invoke(e[k]) <= (SVDnew32.TINY + (MACHINE_EPSILON * (PrimitiveFunction.ABS.invoke(s[k]) + PrimitiveFunction.ABS.invoke(s[k + 1]))))) {
                     e[k] = ZERO;
                     break;
                 }
@@ -283,8 +284,8 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
                     if (ks == k) {
                         break;
                     }
-                    final double t = (ks != p ? Math.abs(e[ks]) : ZERO) + (ks != (k + 1) ? Math.abs(e[ks - 1]) : ZERO);
-                    if (Math.abs(s[ks]) <= (SVDnew32.TINY + (MACHINE_EPSILON * t))) {
+                    final double t = (ks != p ? PrimitiveFunction.ABS.invoke(e[ks]) : ZERO) + (ks != (k + 1) ? PrimitiveFunction.ABS.invoke(e[ks - 1]) : ZERO);
+                    if (PrimitiveFunction.ABS.invoke(s[ks]) <= (SVDnew32.TINY + (MACHINE_EPSILON * t))) {
                         s[ks] = ZERO;
                         break;
                     }

@@ -54,27 +54,27 @@ import org.ojalgo.type.CalendarDateUnit;
 
 public abstract class FinanceUtils {
 
-    public static double calculateValueAtRisk(final double aReturn, final double aStdDev, final double aConfidence, final double aTime) {
+    public static double calculateValueAtRisk(final double expRet, final double stdDev, final double confidence, final double time) {
 
-        final double tmpConfidenceScale = SQRT_TWO * RandomUtils.erfi(ONE - (TWO * (ONE - aConfidence)));
+        final double tmpConfidenceScale = SQRT_TWO * RandomUtils.erfi(ONE - (TWO * (ONE - confidence)));
 
-        return Math.max((Math.sqrt(aTime) * aStdDev * tmpConfidenceScale) - (aTime * aReturn), ZERO);
+        return PrimitiveFunction.MAX.invoke((PrimitiveFunction.SQRT.invoke(time) * stdDev * tmpConfidenceScale) - (time * expRet), ZERO);
     }
 
-    public static GeometricBrownianMotion estimateExcessDiffusionProcess(final CalendarDateSeries<?> aPriceSeries,
-            final CalendarDateSeries<?> aRiskFreeInterestRateSeries, final CalendarDateUnit aTimeUnit) {
+    public static GeometricBrownianMotion estimateExcessDiffusionProcess(final CalendarDateSeries<?> priceSeries,
+            final CalendarDateSeries<?> riskFreeInterestRateSeries, final CalendarDateUnit timeUnit) {
 
-        final SampleSet tmpSampleSet = FinanceUtils.makeExcessGrowthRateSampleSet(aPriceSeries, aRiskFreeInterestRateSeries);
+        final SampleSet tmpSampleSet = FinanceUtils.makeExcessGrowthRateSampleSet(priceSeries, riskFreeInterestRateSeries);
 
         // The average number of millis between to subsequent keys in the series.
-        double tmpStepSize = aPriceSeries.getResolution().size();
+        double tmpStepSize = priceSeries.getResolution().size();
         // The time between to keys expressed in terms of the specified time meassure and unit.
-        tmpStepSize /= aTimeUnit.size();
+        tmpStepSize /= timeUnit.size();
 
         final double tmpExp = tmpSampleSet.getMean();
         final double tmpVar = tmpSampleSet.getVariance();
 
-        final double tmpDiff = Math.sqrt(tmpVar / tmpStepSize);
+        final double tmpDiff = PrimitiveFunction.SQRT.invoke(tmpVar / tmpStepSize);
         final double tmpDrift = (tmpExp / tmpStepSize) + ((tmpDiff * tmpDiff) / TWO);
 
         final GeometricBrownianMotion retVal = new GeometricBrownianMotion(tmpDrift, tmpDiff);
@@ -82,39 +82,39 @@ public abstract class FinanceUtils {
         return retVal;
     }
 
-    public static CalendarDateSeries<RandomNumber> forecast(final CalendarDateSeries<? extends Number> aSeries, final int aPointCount,
-            final CalendarDateUnit aTimeUnit, final boolean includeOriginalSeries) {
+    public static CalendarDateSeries<RandomNumber> forecast(final CalendarDateSeries<? extends Number> series, final int pointCount,
+            final CalendarDateUnit timeUnit, final boolean includeOriginalSeries) {
 
-        final CalendarDateSeries<RandomNumber> retVal = new CalendarDateSeries<>(aTimeUnit);
-        retVal.name(aSeries.getName()).colour(aSeries.getColour());
+        final CalendarDateSeries<RandomNumber> retVal = new CalendarDateSeries<>(timeUnit);
+        retVal.name(series.getName()).colour(series.getColour());
 
-        final double tmpSamplePeriod = (double) aSeries.getAverageStepSize() / (double) aTimeUnit.size();
-        final GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.estimate(aSeries.getDataSeries(), tmpSamplePeriod);
+        final double tmpSamplePeriod = (double) series.getAverageStepSize() / (double) timeUnit.size();
+        final GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.estimate(series.getDataSeries(), tmpSamplePeriod);
 
         if (includeOriginalSeries) {
-            for (final Entry<CalendarDate, ? extends Number> tmpEntry : aSeries.entrySet()) {
+            for (final Entry<CalendarDate, ? extends Number> tmpEntry : series.entrySet()) {
                 retVal.put(tmpEntry.getKey(), new Deterministic(tmpEntry.getValue()));
             }
         }
 
-        final CalendarDate tmpLastKey = aSeries.lastKey();
-        final double tmpLastValue = aSeries.lastValue().doubleValue();
+        final CalendarDate tmpLastKey = series.lastKey();
+        final double tmpLastValue = series.lastValue().doubleValue();
 
         tmpProcess.setValue(tmpLastValue);
 
-        for (int i = 1; i <= aPointCount; i++) {
-            retVal.put(tmpLastKey.millis + (i * aTimeUnit.size()), tmpProcess.getDistribution(i));
+        for (int i = 1; i <= pointCount; i++) {
+            retVal.put(tmpLastKey.millis + (i * timeUnit.size()), tmpProcess.getDistribution(i));
         }
 
         return retVal;
     }
 
-    public static CalendarDateSeries<BigDecimal> makeCalendarPriceSeries(final double[] somePrices, final Calendar aStartCalendar,
-            final CalendarDateUnit aResolution) {
+    public static CalendarDateSeries<BigDecimal> makeCalendarPriceSeries(final double[] prices, final Calendar startCalendar,
+            final CalendarDateUnit resolution) {
 
-        final CalendarDateSeries<BigDecimal> retVal = new CalendarDateSeries<>(aResolution);
+        final CalendarDateSeries<BigDecimal> retVal = new CalendarDateSeries<>(resolution);
 
-        FinanceUtils.copyValues(retVal, new CalendarDate(aStartCalendar), somePrices);
+        FinanceUtils.copyValues(retVal, new CalendarDate(startCalendar), prices);
 
         return retVal;
     }
@@ -129,13 +129,13 @@ public abstract class FinanceUtils {
 
         final ArrayList<SampleSet> tmpSampleSets = new ArrayList<>();
         for (final CalendarDateSeries<V> tmpTimeSeries : timeSeriesCollection) {
-            final double[] someValues = tmpCoordinator.get(tmpTimeSeries.getName()).getPrimitiveValues();
-            final int tmpSize1 = someValues.length - 1;
+            final double[] values = tmpCoordinator.get(tmpTimeSeries.getName()).getPrimitiveValues();
+            final int tmpSize1 = values.length - 1;
 
             final double[] retVal = new double[tmpSize1];
 
             for (int i = 0; i < tmpSize1; i++) {
-                retVal[i] = Math.log(someValues[i + 1] / someValues[i]);
+                retVal[i] = PrimitiveFunction.LOG.invoke(values[i + 1] / values[i]);
             }
             final SampleSet tmpMakeUsingLogarithmicChanges = SampleSet.wrap(ArrayUtils.wrapAccess1D(retVal));
             tmpSampleSets.add(tmpMakeUsingLogarithmicChanges);
@@ -165,41 +165,41 @@ public abstract class FinanceUtils {
         return retValStore.build();
     }
 
-    public static CalendarDateSeries<BigDecimal> makeDatePriceSeries(final double[] somePrices, final Date aStartDate, final CalendarDateUnit aResolution) {
+    public static CalendarDateSeries<BigDecimal> makeDatePriceSeries(final double[] prices, final Date startDate, final CalendarDateUnit resolution) {
 
-        final CalendarDateSeries<BigDecimal> retVal = new CalendarDateSeries<>(aResolution);
+        final CalendarDateSeries<BigDecimal> retVal = new CalendarDateSeries<>(resolution);
 
-        FinanceUtils.copyValues(retVal, new CalendarDate(aStartDate), somePrices);
+        FinanceUtils.copyValues(retVal, new CalendarDate(startDate), prices);
 
         return retVal;
     }
 
     /**
-     * @param aPriceSeries A series of prices
-     * @param aRiskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0
+     * @param priceSeries A series of prices
+     * @param riskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0
      *        means 5.0% annualized risk free return)
      * @return A sample set of price growth rates adjusted for risk free return
      */
-    public static SampleSet makeExcessGrowthRateSampleSet(final CalendarDateSeries<?> aPriceSeries, final CalendarDateSeries<?> aRiskFreeInterestRateSeries) {
+    public static SampleSet makeExcessGrowthRateSampleSet(final CalendarDateSeries<?> priceSeries, final CalendarDateSeries<?> riskFreeInterestRateSeries) {
 
-        if (aPriceSeries.size() != aRiskFreeInterestRateSeries.size()) {
+        if (priceSeries.size() != riskFreeInterestRateSeries.size()) {
             throw new IllegalArgumentException("The two series must have the same size (number of elements).");
         }
 
-        if (!aPriceSeries.firstKey().equals(aRiskFreeInterestRateSeries.firstKey())) {
+        if (!priceSeries.firstKey().equals(riskFreeInterestRateSeries.firstKey())) {
             throw new IllegalArgumentException("The two series must have the same first key (date or calendar).");
         }
 
-        if (!aPriceSeries.lastKey().equals(aRiskFreeInterestRateSeries.lastKey())) {
+        if (!priceSeries.lastKey().equals(riskFreeInterestRateSeries.lastKey())) {
             throw new IllegalArgumentException("The two series must have the same last key (date or calendar).");
         }
 
-        final double[] tmpPrices = aPriceSeries.getPrimitiveValues();
-        final double[] tmpRiskFreeInterestRates = aRiskFreeInterestRateSeries.getPrimitiveValues();
+        final double[] tmpPrices = priceSeries.getPrimitiveValues();
+        final double[] tmpRiskFreeInterestRates = riskFreeInterestRateSeries.getPrimitiveValues();
 
         final Array1D<Double> retVal = Array1D.PRIMITIVE.makeZero(tmpPrices.length - 1);
 
-        final CalendarDateUnit tmpUnit = aPriceSeries.getResolution();
+        final CalendarDateUnit tmpUnit = priceSeries.getResolution();
         double tmpThisRiskFree, tmpNextRiskFree, tmpAvgRiskFree, tmpRiskFreeGrowthRate, tmpThisPrice, tmpNextPrice, tmpPriceGrowthFactor, tmpPriceGrowthRate,
                 tmpAdjustedPriceGrowthRate;
 
@@ -213,7 +213,7 @@ public abstract class FinanceUtils {
             tmpThisPrice = tmpPrices[i];
             tmpNextPrice = tmpPrices[i + 1];
             tmpPriceGrowthFactor = tmpNextPrice / tmpThisPrice;
-            tmpPriceGrowthRate = Math.log(tmpPriceGrowthFactor);
+            tmpPriceGrowthRate = PrimitiveFunction.LOG.invoke(tmpPriceGrowthFactor);
 
             tmpAdjustedPriceGrowthRate = tmpPriceGrowthRate - tmpRiskFreeGrowthRate;
 
@@ -224,31 +224,31 @@ public abstract class FinanceUtils {
     }
 
     /**
-     * @param aPriceSeries A series of prices
-     * @param aRiskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0
+     * @param priceSeries A series of prices
+     * @param riskFreeInterestRateSeries A series of interest rates (risk free return expressed in %, 5.0
      *        means 5.0% annualized risk free return)
      * @return A sample set of price growth rates adjusted for risk free return
      */
-    public static CalendarDateSeries<Double> makeNormalisedExcessPrice(final CalendarDateSeries<?> aPriceSeries,
-            final CalendarDateSeries<?> aRiskFreeInterestRateSeries) {
+    public static CalendarDateSeries<Double> makeNormalisedExcessPrice(final CalendarDateSeries<?> priceSeries,
+            final CalendarDateSeries<?> riskFreeInterestRateSeries) {
 
-        if (aPriceSeries.size() != aRiskFreeInterestRateSeries.size()) {
+        if (priceSeries.size() != riskFreeInterestRateSeries.size()) {
             throw new IllegalArgumentException("The two series must have the same size (number of elements).");
         }
 
-        if (!aPriceSeries.firstKey().equals(aRiskFreeInterestRateSeries.firstKey())) {
+        if (!priceSeries.firstKey().equals(riskFreeInterestRateSeries.firstKey())) {
             throw new IllegalArgumentException("The two series must have the same first key (date or calendar).");
         }
 
-        if (!aPriceSeries.lastKey().equals(aRiskFreeInterestRateSeries.lastKey())) {
+        if (!priceSeries.lastKey().equals(riskFreeInterestRateSeries.lastKey())) {
             throw new IllegalArgumentException("The two series must have the same last key (date or calendar).");
         }
 
-        final long[] tmpDates = aPriceSeries.getPrimitiveKeys();
-        final double[] tmpPrices = aPriceSeries.getPrimitiveValues();
-        final double[] tmpRiskFreeInterestRates = aRiskFreeInterestRateSeries.getPrimitiveValues();
+        final long[] tmpDates = priceSeries.getPrimitiveKeys();
+        final double[] tmpPrices = priceSeries.getPrimitiveValues();
+        final double[] tmpRiskFreeInterestRates = riskFreeInterestRateSeries.getPrimitiveValues();
 
-        final CalendarDateUnit tmpResolution = aPriceSeries.getResolution();
+        final CalendarDateUnit tmpResolution = priceSeries.getResolution();
 
         final CalendarDateSeries<Double> retVal = new CalendarDateSeries<>(tmpResolution);
 
@@ -257,7 +257,7 @@ public abstract class FinanceUtils {
 
         double tmpAggregatedExcessPrice = PrimitiveMath.ONE;
         retVal.put(new CalendarDate(tmpDates[0]), tmpAggregatedExcessPrice);
-        for (int i = 1; i < aPriceSeries.size(); i++) {
+        for (int i = 1; i < priceSeries.size(); i++) {
 
             tmpThisRiskFree = tmpRiskFreeInterestRates[i] / PrimitiveMath.HUNDRED;
             tmpLastRiskFree = tmpRiskFreeInterestRates[i - 1] / PrimitiveMath.HUNDRED;
@@ -275,7 +275,7 @@ public abstract class FinanceUtils {
             retVal.put(new CalendarDate(tmpDates[i]), tmpAggregatedExcessPrice);
         }
 
-        return retVal.name(aPriceSeries.getName()).colour(aPriceSeries.getColour());
+        return retVal.name(priceSeries.getName()).colour(priceSeries.getColour());
     }
 
     /**
@@ -309,7 +309,7 @@ public abstract class FinanceUtils {
         final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.getBuilder(tmpSize);
 
         for (int ij = 0; ij < tmpSize; ij++) {
-            retVal.set(ij, Math.sqrt(covariances.doubleValue(ij, ij)));
+            retVal.set(ij, PrimitiveFunction.SQRT.invoke(covariances.doubleValue(ij, ij)));
         }
 
         return retVal.build();
@@ -330,7 +330,7 @@ public abstract class FinanceUtils {
             final PhysicalStore<Double> tmpD = tmpEvD.getD().copy();
 
             final double tmpLargest = tmpD.doubleValue(0, 0);
-            final double tmpLimit = Math.max(PrimitiveMath.MACHINE_EPSILON * tmpLargest, 1E-12);
+            final double tmpLimit = PrimitiveFunction.MAX.invoke(PrimitiveMath.MACHINE_EPSILON * tmpLargest, 1E-12);
 
             for (int ij = 0; ij < tmpSize; ij++) {
                 if (tmpD.doubleValue(ij, ij) < tmpLimit) {
@@ -349,7 +349,7 @@ public abstract class FinanceUtils {
 
         final double[] tmpVolatilities = new double[tmpSize];
         for (int ij = 0; ij < tmpSize; ij++) {
-            tmpVolatilities[ij] = Math.sqrt(tmpCovariances.doubleValue(ij, ij));
+            tmpVolatilities[ij] = PrimitiveFunction.SQRT.invoke(tmpCovariances.doubleValue(ij, ij));
         }
 
         for (int j = 0; j < tmpSize; j++) {
@@ -411,16 +411,15 @@ public abstract class FinanceUtils {
         return tmpAnnualGrowthRate * tmpYearsPerGrowthRateUnit;
     }
 
-    private static <K extends Comparable<K>> void copyValues(final CalendarDateSeries<BigDecimal> aSeries, final CalendarDate aFirstKey,
-            final double[] someValues) {
+    private static <K extends Comparable<K>> void copyValues(final CalendarDateSeries<BigDecimal> series, final CalendarDate firstKey, final double[] values) {
 
-        CalendarDate tmpKey = aFirstKey;
+        CalendarDate tmpKey = firstKey;
 
-        for (int tmpValueIndex = 0; tmpValueIndex < someValues.length; tmpValueIndex++) {
+        for (int tmpValueIndex = 0; tmpValueIndex < values.length; tmpValueIndex++) {
 
-            aSeries.put(tmpKey, new BigDecimal(someValues[tmpValueIndex]));
+            series.put(tmpKey, new BigDecimal(values[tmpValueIndex]));
 
-            tmpKey = aSeries.step(tmpKey);
+            tmpKey = series.step(tmpKey);
         }
     }
 

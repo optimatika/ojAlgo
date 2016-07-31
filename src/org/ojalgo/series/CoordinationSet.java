@@ -41,7 +41,7 @@ import org.ojalgo.type.CalendarDateUnit;
  *
  * @author apete
  */
-public class CoordinationSet<V extends Number> extends HashMap<String, CalendarDateSeries<V>> {
+public class CoordinationSet<N extends Number> extends HashMap<String, CalendarDateSeries<N>> {
 
     private CalendarDateUnit myResolution = null;
 
@@ -56,22 +56,22 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         myResolution = resolution;
     }
 
-    public CoordinationSet(final Collection<CalendarDateSeries<V>> seriesCollection) {
+    public CoordinationSet(final Collection<CalendarDateSeries<N>> seriesCollection) {
 
         super(seriesCollection.size());
 
-        for (final CalendarDateSeries<V> tmpTimeSeries : seriesCollection) {
+        for (final CalendarDateSeries<N> tmpTimeSeries : seriesCollection) {
             this.put(tmpTimeSeries);
         }
     }
 
-    public CoordinationSet(final Collection<CalendarDateSeries<V>> seriesCollection, final CalendarDateUnit resolution) {
+    public CoordinationSet(final Collection<CalendarDateSeries<N>> seriesCollection, final CalendarDateUnit resolution) {
 
         super(seriesCollection.size());
 
         myResolution = resolution;
 
-        for (final CalendarDateSeries<V> tmpTimeSeries : seriesCollection) {
+        for (final CalendarDateSeries<N> tmpTimeSeries : seriesCollection) {
             this.put(tmpTimeSeries);
         }
     }
@@ -84,7 +84,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         super(initialCapacity, loadFactor);
     }
 
-    public CoordinationSet(final Map<? extends String, ? extends CalendarDateSeries<V>> members) {
+    public CoordinationSet(final Map<? extends String, ? extends CalendarDateSeries<N>> members) {
         super(members);
     }
 
@@ -92,17 +92,17 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
      * Will call {@link CalendarDateSeries#complete()} on each of the instances in this set.
      */
     public void complete() {
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
             tmpSeries.complete();
         }
     }
 
-    public CoordinationSet<V> copy() {
+    public CoordinationSet<N> copy() {
         return this.resample(this.getResolution());
     }
 
     @Override
-    public CalendarDateSeries<V> get(final Object key) {
+    public CalendarDateSeries<N> get(final Object key) {
         if (key instanceof CalendarDateSeries<?>) {
             return super.get(((CalendarDateSeries<?>) key).getName());
         } else {
@@ -110,15 +110,15 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         }
     }
 
-    public CalendarDateSeries<V> get(final String aSeriesName) {
-        return super.get(aSeriesName);
+    public CalendarDateSeries<N> get(final String seriesName) {
+        return super.get(seriesName);
     }
 
     public List<CalendarDate> getAllCalendarDates() {
 
         final TreeSet<CalendarDate> retVal = new TreeSet<>();
 
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
             retVal.addAll(tmpSeries.keySet());
         }
 
@@ -133,7 +133,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
 
         CalendarDate retVal = null, tmpVal = null;
 
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
 
             tmpVal = tmpSeries.firstKey();
 
@@ -149,7 +149,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
 
         CalendarDate retVal = null, tmpVal = null;
 
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
 
             tmpVal = tmpSeries.lastKey();
 
@@ -165,7 +165,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
 
         CalendarDate retVal = null, tmpVal = null;
 
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
 
             tmpVal = tmpSeries.firstKey();
 
@@ -181,7 +181,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
 
         CalendarDate retVal = null, tmpVal = null;
 
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
 
             tmpVal = tmpSeries.lastKey();
 
@@ -203,7 +203,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
 
             CalendarDateUnit retVal = null, tmpVal = null;
 
-            for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+            for (final CalendarDateSeries<N> tmpSeries : this.values()) {
 
                 tmpVal = tmpSeries.getResolution();
 
@@ -216,24 +216,24 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
         }
     }
 
-    public V getValue(final String series, final CalendarDate date) {
+    public N getValue(final String series, final CalendarDate date) {
         return this.get(series).get(date);
     };
 
-    public void modify(final BinaryFunction<V> function, final V argument) {
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+    public void modify(final BinaryFunction<N> function, final N argument) {
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
             tmpSeries.modify(function, argument);
         }
     }
 
-    public void modify(final ParameterFunction<V> function, final int parameter) {
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+    public void modify(final ParameterFunction<N> function, final int parameter) {
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
             tmpSeries.modify(function, parameter);
         }
     }
 
-    public void modify(final UnaryFunction<V> function) {
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+    public void modify(final UnaryFunction<N> function) {
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
             tmpSeries.modifyAll(function);
         }
     }
@@ -241,16 +241,16 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
     /**
      * @return A new CoordinationSet where all series have the same first and last keys.
      */
-    public CoordinationSet<V> prune() {
+    public CoordinationSet<N> prune() {
 
-        final CoordinationSet<V> retVal = new CoordinationSet<>(this.getResolution());
+        final CoordinationSet<N> retVal = new CoordinationSet<>(this.getResolution());
 
         final CalendarDate tmpFirstKey = this.getLatestFirstKey();
         final CalendarDate tmpLastKey = this.getEarliestLastKey();
 
         if (tmpLastKey.compareTo(tmpFirstKey) != -1) {
-            for (final CalendarDateSeries<V> tmpSeries : this.values()) {
-                final CalendarDateSeries<V> tmpSubMap = tmpSeries.subMap(tmpFirstKey, true, tmpLastKey, true);
+            for (final CalendarDateSeries<N> tmpSeries : this.values()) {
+                final CalendarDateSeries<N> tmpSubMap = tmpSeries.subMap(tmpFirstKey, true, tmpLastKey, true);
                 retVal.put(tmpSubMap);
             }
         }
@@ -278,33 +278,37 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
     /**
      * Will prune and resample the data
      */
-    public CoordinationSet<V> prune(final CalendarDateUnit resolution) {
+    public CoordinationSet<N> prune(final CalendarDateUnit resolution) {
 
-        final CoordinationSet<V> retVal = new CoordinationSet<>(resolution);
+        final CoordinationSet<N> retVal = new CoordinationSet<>(resolution);
 
         final CalendarDate tmpLatestFirstKey = this.getLatestFirstKey();
         final CalendarDate tmpEarliestLastKey = this.getEarliestLastKey();
 
-        for (final java.util.Map.Entry<String, CalendarDateSeries<V>> tmpEntry : this.entrySet()) {
+        for (final java.util.Map.Entry<String, CalendarDateSeries<N>> tmpEntry : this.entrySet()) {
             retVal.put(tmpEntry.getKey(), tmpEntry.getValue().resample(tmpLatestFirstKey, tmpEarliestLastKey, resolution));
         }
 
         return retVal;
     }
 
-    public CalendarDateSeries<V> put(final CalendarDateSeries<V> aSeries) {
-        return this.put(aSeries.getName(), aSeries);
+    /**
+     * Vill use the series' name as the key. Make sure you have set the name to something that uniquely
+     * identifies the series.
+     */
+    public CalendarDateSeries<N> put(final CalendarDateSeries<N> series) {
+        return this.put(series.getName(), series);
     }
 
     /**
      * @param resolution The new resolution
      * @return A new set of series each resampled to the supplied resolution
      */
-    public CoordinationSet<V> resample(final CalendarDateUnit resolution) {
+    public CoordinationSet<N> resample(final CalendarDateUnit resolution) {
 
-        final CoordinationSet<V> retVal = new CoordinationSet<>(resolution);
+        final CoordinationSet<N> retVal = new CoordinationSet<>(resolution);
 
-        for (final java.util.Map.Entry<String, CalendarDateSeries<V>> tmpEntry : this.entrySet()) {
+        for (final java.util.Map.Entry<String, CalendarDateSeries<N>> tmpEntry : this.entrySet()) {
             retVal.put(tmpEntry.getKey(), tmpEntry.getValue().resample(resolution));
         }
 
@@ -316,7 +320,7 @@ public class CoordinationSet<V extends Number> extends HashMap<String, CalendarD
 
         final StringBuilder retVal = new StringBuilder(this.getClass().getSimpleName() + '@' + Integer.toHexString(this.hashCode()));
 
-        for (final CalendarDateSeries<V> tmpSeries : this.values()) {
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
             retVal.append(ASCII.LF);
             retVal.append(tmpSeries.toString());
         }

@@ -33,6 +33,7 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -254,7 +255,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          *         of each other.
          */
         public static boolean equals(final double x, final double y, final double eps) {
-            return Precision.equals(x, y, 1) || (Math.abs(y - x) <= eps);
+            return Precision.equals(x, y, 1) || (PrimitiveFunction.ABS.invoke(y - x) <= eps);
         }
 
         /**
@@ -283,7 +284,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 yInt = SGN_MASK - yInt;
             }
 
-            final boolean isEqual = Math.abs(xInt - yInt) <= maxUlps;
+            final boolean isEqual = PrimitiveFunction.ABS.invoke(xInt - yInt) <= maxUlps;
 
             return isEqual && !Double.isNaN(x) && !Double.isNaN(y);
         }
@@ -309,7 +310,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 2.2
          */
         public static boolean equals(final float x, final float y, final float eps) {
-            return Precision.equals(x, y, 1) || (Math.abs(y - x) <= eps);
+            return Precision.equals(x, y, 1) || (PrimitiveFunction.ABS.invoke(y - x) <= eps);
         }
 
         /**
@@ -339,7 +340,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
                 yInt = SGN_MASK_FLOAT - yInt;
             }
 
-            final boolean isEqual = Math.abs(xInt - yInt) <= maxUlps;
+            final boolean isEqual = PrimitiveFunction.ABS.invoke(xInt - yInt) <= maxUlps;
 
             return isEqual && !Float.isNaN(x) && !Float.isNaN(y);
         }
@@ -368,7 +369,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final double x, final double y, final double eps) {
-            return Precision.equalsIncludingNaN(x, y) || (Math.abs(y - x) <= eps);
+            return Precision.equalsIncludingNaN(x, y) || (PrimitiveFunction.ABS.invoke(y - x) <= eps);
         }
 
         /**
@@ -411,7 +412,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          * @since 2.2
          */
         public static boolean equalsIncludingNaN(final float x, final float y, final float eps) {
-            return Precision.equalsIncludingNaN(x, y) || (Math.abs(y - x) <= eps);
+            return Precision.equalsIncludingNaN(x, y) || (PrimitiveFunction.ABS.invoke(y - x) <= eps);
         }
 
         /**
@@ -516,7 +517,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
          */
         public static float round(final float x, final int scale, final int roundingMethod) {
             final float sign = Math.copySign(1f, x);
-            final float factor = (float) Math.pow(10.0f, scale) * sign;
+            final float factor = (float) PrimitiveFunction.POW.invoke(10.0f, scale) * sign;
             return (float) Precision.roundUnscaled(x * factor, sign, roundingMethod) / factor;
         }
 
@@ -535,64 +536,64 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
             switch (roundingMethod) {
             case BigDecimal.ROUND_CEILING:
                 if (sign == -1) {
-                    unscaled = Math.floor(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
+                    unscaled = PrimitiveFunction.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
                 } else {
-                    unscaled = Math.ceil(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
+                    unscaled = PrimitiveFunction.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
                 }
                 break;
             case BigDecimal.ROUND_DOWN:
-                unscaled = Math.floor(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
+                unscaled = PrimitiveFunction.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
                 break;
             case BigDecimal.ROUND_FLOOR:
                 if (sign == -1) {
-                    unscaled = Math.ceil(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
+                    unscaled = PrimitiveFunction.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
                 } else {
-                    unscaled = Math.floor(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
+                    unscaled = PrimitiveFunction.FLOOR.invoke(Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY));
                 }
                 break;
             case BigDecimal.ROUND_HALF_DOWN: {
                 unscaled = Math.nextAfter(unscaled, Double.NEGATIVE_INFINITY);
-                final double fraction = unscaled - Math.floor(unscaled);
+                final double fraction = unscaled - PrimitiveFunction.FLOOR.invoke(unscaled);
                 if (fraction > 0.5) {
-                    unscaled = Math.ceil(unscaled);
+                    unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
                 } else {
-                    unscaled = Math.floor(unscaled);
+                    unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
                 }
                 break;
             }
             case BigDecimal.ROUND_HALF_EVEN: {
-                final double fraction = unscaled - Math.floor(unscaled);
+                final double fraction = unscaled - PrimitiveFunction.FLOOR.invoke(unscaled);
                 if (fraction > 0.5) {
-                    unscaled = Math.ceil(unscaled);
+                    unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
                 } else if (fraction < 0.5) {
-                    unscaled = Math.floor(unscaled);
+                    unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
                 } else {
                     // The following equality test is intentional and needed for rounding purposes
-                    if ((Math.floor(unscaled) / 2.0) == Math.floor(Math.floor(unscaled) / 2.0)) { // even
-                        unscaled = Math.floor(unscaled);
+                    if ((PrimitiveFunction.FLOOR.invoke(unscaled) / 2.0) == PrimitiveFunction.FLOOR.invoke(PrimitiveFunction.FLOOR.invoke(unscaled) / 2.0)) { // even
+                        unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
                     } else { // odd
-                        unscaled = Math.ceil(unscaled);
+                        unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
                     }
                 }
                 break;
             }
             case BigDecimal.ROUND_HALF_UP: {
                 unscaled = Math.nextAfter(unscaled, Double.POSITIVE_INFINITY);
-                final double fraction = unscaled - Math.floor(unscaled);
+                final double fraction = unscaled - PrimitiveFunction.FLOOR.invoke(unscaled);
                 if (fraction >= 0.5) {
-                    unscaled = Math.ceil(unscaled);
+                    unscaled = PrimitiveFunction.CEIL.invoke(unscaled);
                 } else {
-                    unscaled = Math.floor(unscaled);
+                    unscaled = PrimitiveFunction.FLOOR.invoke(unscaled);
                 }
                 break;
             }
             case BigDecimal.ROUND_UNNECESSARY:
-                if (unscaled != Math.floor(unscaled)) {
+                if (unscaled != PrimitiveFunction.FLOOR.invoke(unscaled)) {
                     throw new RuntimeException();
                 }
                 break;
             case BigDecimal.ROUND_UP:
-                unscaled = Math.ceil(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
+                unscaled = PrimitiveFunction.CEIL.invoke(Math.nextAfter(unscaled, Double.POSITIVE_INFINITY));
                 break;
             default:
                 throw new RuntimeException();

@@ -988,7 +988,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
             tmpRow = data[i];
 
             for (int j = 0; j < myNumberOfColumns; j++) {
-                tmpValue = Math.abs(tmpRow[j]);
+                tmpValue = PrimitiveFunction.ABS.invoke(tmpRow[j]);
                 if (tmpValue > tmpLargest) {
                     tmpLargest = tmpValue;
                     retVal = i + (j * tmpRowDim);
@@ -1008,7 +1008,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         double tmpValue;
 
         for (int i = (int) row; i < tmpRowDim; i++) {
-            tmpValue = Math.abs(data[i][(int) column]);
+            tmpValue = PrimitiveFunction.ABS.invoke(data[i][(int) column]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i;
@@ -1028,7 +1028,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         double tmpValue;
 
         for (int i = (int) row, j = (int) column; (i < tmpRowDim) && (j < myNumberOfColumns); i++, j++) {
-            tmpValue = Math.abs(data[i][j]);
+            tmpValue = PrimitiveFunction.ABS.invoke(data[i][j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i + (j * tmpRowDim);
@@ -1049,7 +1049,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         for (int index = 0; index < this.count(); index++) {
             final int i = AccessUtils.row(index, tmpRowDim);
             final int j = AccessUtils.column(index, tmpRowDim);
-            tmpValue = Math.abs(data[i][j]);
+            tmpValue = PrimitiveFunction.ABS.invoke(data[i][j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = index;
@@ -1067,7 +1067,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         final double[] tmpRow = data[(int) row];
 
         for (int j = (int) column; j < myNumberOfColumns; j++) {
-            tmpValue = Math.abs(tmpRow[j]);
+            tmpValue = PrimitiveFunction.ABS.invoke(tmpRow[j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = j;

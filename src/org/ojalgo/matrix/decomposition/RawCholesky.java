@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -200,7 +201,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         for (int ij = 0; ij < tmpDiagDim; ij++) { // For each row/column, along the diagonal
             tmpRowIJ = data[ij];
 
-            final double tmpD = tmpRowIJ[ij] = Math.sqrt(Math.max(input.doubleValue(ij, ij) - DotProduct.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO));
+            final double tmpD = tmpRowIJ[ij] = PrimitiveFunction.SQRT.invoke(PrimitiveFunction.MAX.invoke(input.doubleValue(ij, ij) - DotProduct.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO));
             mySPD &= (tmpD > ZERO);
 
             for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row

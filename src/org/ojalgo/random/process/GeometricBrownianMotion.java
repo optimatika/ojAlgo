@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.random.LogNormal;
 import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.SampleSet;
@@ -49,14 +50,14 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
         final int tmpSizeMinusOne = (int) (seriesOfSamples.count() - 1);
         final Array1D<Double> tmpLogDiffSeries = Array1D.PRIMITIVE.makeZero(tmpSizeMinusOne);
         for (int i = 0; i < tmpSizeMinusOne; i++) {
-            tmpLogDiffSeries.set(i, Math.log(seriesOfSamples.doubleValue(i + 1) / seriesOfSamples.doubleValue(i)));
+            tmpLogDiffSeries.set(i, PrimitiveFunction.LOG.invoke(seriesOfSamples.doubleValue(i + 1) / seriesOfSamples.doubleValue(i)));
         }
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpLogDiffSeries);
 
         final double tmpExp = tmpSampleSet.getMean();
         final double tmpVar = tmpSampleSet.getVariance();
 
-        final double tmpDiff = Math.sqrt(tmpVar / samplePeriod);
+        final double tmpDiff = PrimitiveFunction.SQRT.invoke(tmpVar / samplePeriod);
         final double tmpDrift = (tmpExp / samplePeriod) + ((tmpDiff * tmpDiff) / TWO);
 
         final GeometricBrownianMotion retVal = new GeometricBrownianMotion(tmpDrift, tmpDiff);
@@ -86,8 +87,8 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
      */
     public static GeometricBrownianMotion make(final double initialValue, final double expectedFutureValue, final double aVariance, final double aHorizon) {
 
-        final double tmpDrift = Math.log(expectedFutureValue / initialValue) / aHorizon;
-        final double tmpDiff = Math.sqrt(Math.log1p(aVariance / (expectedFutureValue * expectedFutureValue)) / aHorizon);
+        final double tmpDrift = PrimitiveFunction.LOG.invoke(expectedFutureValue / initialValue) / aHorizon;
+        final double tmpDiff = PrimitiveFunction.SQRT.invoke(PrimitiveFunction.LOG1P.invoke(aVariance / (expectedFutureValue * expectedFutureValue)) / aHorizon);
 
         final GeometricBrownianMotion retVal = new GeometricBrownianMotion(tmpDrift, tmpDiff);
 
@@ -120,7 +121,7 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
     public GeometricBrownianMotion convert(final double convertionFactor) {
 
         final double tmpDrift = myLocalDrift * convertionFactor;
-        final double tmpDiff = myDiffusionFunction * Math.sqrt(convertionFactor);
+        final double tmpDiff = myDiffusionFunction * PrimitiveFunction.SQRT.invoke(convertionFactor);
 
         return new GeometricBrownianMotion(tmpDrift, tmpDiff);
     }
@@ -131,13 +132,13 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
 
         final double tmpLocation = this.getDistributionLocation(evaluationPoint, tmpVar);
 
-        final double tmpScale = Math.sqrt(tmpVar);
+        final double tmpScale = PrimitiveFunction.SQRT.invoke(tmpVar);
 
         return new LogNormal(tmpLocation, tmpScale);
     }
 
     private final double getDistributionLocation(final double stepSize, final double variance) {
-        return (Math.log(this.getValue()) + (myLocalDrift * stepSize)) - (HALF * variance);
+        return (PrimitiveFunction.LOG.invoke(this.getValue()) + (myLocalDrift * stepSize)) - (HALF * variance);
     }
 
     private final double getDistributionVariance(final double stepSize) {
@@ -153,9 +154,9 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
     protected double step(final double currentValue, final double stepSize, final double normalisedRandomIncrement) {
 
         final double tmpDetPart = (myLocalDrift - ((myDiffusionFunction * myDiffusionFunction) / TWO)) * stepSize;
-        final double tmpRandPart = myDiffusionFunction * Math.sqrt(stepSize) * normalisedRandomIncrement;
+        final double tmpRandPart = myDiffusionFunction * PrimitiveFunction.SQRT.invoke(stepSize) * normalisedRandomIncrement;
 
-        final double retVal = currentValue * Math.exp(tmpDetPart + tmpRandPart);
+        final double retVal = currentValue * PrimitiveFunction.EXP.invoke(tmpDetPart + tmpRandPart);
         this.setValue(retVal);
         return retVal;
     }
@@ -165,7 +166,7 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
      */
     @Override
     double getExpected(final double stepSize) {
-        return this.getValue() * Math.exp(myLocalDrift * stepSize);
+        return this.getValue() * PrimitiveFunction.EXP.invoke(myLocalDrift * stepSize);
     }
 
     @Override
@@ -175,14 +176,14 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
 
         final double tmpLocation = this.getDistributionLocation(stepSize, tmpVar);
 
-        final double tmpScale = Math.sqrt(tmpVar);
+        final double tmpScale = PrimitiveFunction.SQRT.invoke(tmpVar);
 
-        return Math.exp(tmpLocation - (tmpScale * SQRT_TWO * RandomUtils.erfi(confidence)));
+        return PrimitiveFunction.EXP.invoke(tmpLocation - (tmpScale * SQRT_TWO * RandomUtils.erfi(confidence)));
     }
 
     @Override
     double getStandardDeviation(final double stepSize) {
-        return Math.sqrt(this.getVariance(stepSize));
+        return PrimitiveFunction.SQRT.invoke(this.getVariance(stepSize));
     }
 
     @Override
@@ -192,14 +193,14 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
 
         final double tmpLocation = this.getDistributionLocation(stepSize, tmpVar);
 
-        final double tmpScale = Math.sqrt(tmpVar);
+        final double tmpScale = PrimitiveFunction.SQRT.invoke(tmpVar);
 
-        return Math.exp(tmpLocation + (tmpScale * SQRT_TWO * RandomUtils.erfi(confidence)));
+        return PrimitiveFunction.EXP.invoke(tmpLocation + (tmpScale * SQRT_TWO * RandomUtils.erfi(confidence)));
     }
 
     @Override
     double getVariance(final double stepSize) {
-        return this.getValue() * this.getValue() * Math.exp(TWO * myLocalDrift * stepSize) * Math.expm1(this.getDistributionVariance(stepSize));
+        return this.getValue() * this.getValue() * PrimitiveFunction.EXP.invoke(TWO * myLocalDrift * stepSize) * PrimitiveFunction.EXPM1.invoke(this.getDistributionVariance(stepSize));
     }
 
 }

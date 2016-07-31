@@ -21,6 +21,7 @@
  */
 package org.ojalgo.machine;
 
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.IntCount;
 
 abstract class AbstractMachine extends BasicMachine {
@@ -138,7 +139,7 @@ abstract class AbstractMachine extends BasicMachine {
     }
 
     public int getCacheDim2D(final long elementSize) {
-        return (int) Math.sqrt(AbstractMachine.elements(cache, elementSize));
+        return (int) PrimitiveFunction.SQRT.invoke(AbstractMachine.elements(cache, elementSize));
     }
 
     public int getMemoryDim1D(final long elementSize) {
@@ -146,7 +147,7 @@ abstract class AbstractMachine extends BasicMachine {
     }
 
     public int getMemoryDim2D(final long elementSize) {
-        return (int) Math.sqrt(AbstractMachine.elements(memory, elementSize));
+        return (int) PrimitiveFunction.SQRT.invoke(AbstractMachine.elements(memory, elementSize));
     }
 
     @Override

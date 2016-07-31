@@ -34,6 +34,7 @@ import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -261,10 +262,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         double tmpInitialCapacity = count;
 
         while (tmpInitialCapacity > BasicArray.MAX_ARRAY_SIZE) {
-            tmpInitialCapacity = Math.sqrt(tmpInitialCapacity);
+            tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
         }
 
-        tmpInitialCapacity = Math.sqrt(tmpInitialCapacity);
+        tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
         return GROWTH_FACTOR * (int) tmpInitialCapacity;
     }
 
@@ -756,7 +757,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             if ((tmpIndex >= first) && (tmpIndex < limit)) {
                 if (((tmpIndex - first) % step) == 0L) {
                     if (myValues.doubleValue(i) > tmpVal) {
-                        tmpVal = Math.abs(myValues.doubleValue(i));
+                        tmpVal = PrimitiveFunction.ABS.invoke(myValues.doubleValue(i));
                         retVal = tmpIndex;
                     }
                 }

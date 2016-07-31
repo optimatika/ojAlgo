@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.netio.ASCII;
@@ -73,6 +74,9 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
     }
 
     public String getName() {
+        if (myName == null) {
+            myName = UUID.randomUUID().toString();
+        }
         return myName;
     }
 

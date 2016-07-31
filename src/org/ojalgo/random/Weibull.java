@@ -23,6 +23,8 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.ojalgo.function.PrimitiveFunction;
+
 /**
  * Useful as length of life distribution in reliability theory.
  *
@@ -62,7 +64,7 @@ public class Weibull extends RandomNumber {
 
     @Override
     protected double generate() {
-        return Math.pow(-Math.log(this.random().nextDouble()), ONE / myShape) / myRate;
+        return PrimitiveFunction.POW.invoke(-PrimitiveFunction.LOG.invoke(this.random().nextDouble()), ONE / myShape) / myRate;
     }
 
 }

@@ -22,6 +22,7 @@
 package org.ojalgo.scalar;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
 
@@ -206,9 +207,9 @@ public class FundamentalScalarTest extends ScalarTests {
         final double tmpExp = UNIFORM.doubleValue();
 
         if (tmpbase > tmpExp) {
-            return Math.pow(tmpbase, tmpExp);
+            return PrimitiveFunction.POW.invoke(tmpbase, tmpExp);
         } else {
-            return -Math.pow(tmpbase, tmpExp);
+            return -PrimitiveFunction.POW.invoke(tmpbase, tmpExp);
         }
     }
 

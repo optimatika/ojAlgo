@@ -23,6 +23,8 @@ package org.ojalgo.random;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.ojalgo.function.PrimitiveFunction;
+
 public abstract class RandomUtils {
 
     private static final double[] C;
@@ -98,7 +100,7 @@ public abstract class RandomUtils {
         double retVal = ZERO;
 
         for (int k = 500; k >= 0; k--) {
-            retVal += (C[k] * (Math.pow((SQRT_PI * anArg) / TWO, (2 * k) + 1))) / ((2 * k) + 1);
+            retVal += (C[k] * (PrimitiveFunction.POW.invoke((SQRT_PI * anArg) / TWO, (2 * k) + 1))) / ((2 * k) + 1);
         }
 
         return retVal;
@@ -122,7 +124,7 @@ public abstract class RandomUtils {
      */
     public static double gamma(final double arg) {
 
-        if ((arg <= ZERO) && (Math.abs(arg % ONE) < MACHINE_EPSILON)) {
+        if ((arg <= ZERO) && (PrimitiveFunction.ABS.invoke(arg % ONE) < MACHINE_EPSILON)) {
 
             return NaN;
 
@@ -130,7 +132,7 @@ public abstract class RandomUtils {
 
             if (arg < HALF) {
 
-                return PI / (Math.sin(PI * arg) * RandomUtils.gamma(ONE - arg));
+                return PI / (PrimitiveFunction.SIN.invoke(PI * arg) * RandomUtils.gamma(ONE - arg));
 
             } else {
 
@@ -143,7 +145,7 @@ public abstract class RandomUtils {
 
                 final double t = z + (7 + HALF);
 
-                return SQRT_TWO_PI * Math.pow(t, z + HALF) * Math.exp(-t) * x;
+                return SQRT_TWO_PI * PrimitiveFunction.POW.invoke(t, z + HALF) * PrimitiveFunction.EXP.invoke(-t) * x;
             }
         }
     }

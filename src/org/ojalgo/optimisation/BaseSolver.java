@@ -457,7 +457,7 @@ public abstract class BaseSolver extends GenericSolver {
             }
 
             final double tmpExponent = OptimisationUtils.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
-            final double tmpFactor = Math.pow(TEN, tmpExponent);
+            final double tmpFactor = PrimitiveFunction.POW.invoke(TEN, tmpExponent);
 
             final UnaryFunction<Double> tmpModifier = PrimitiveFunction.MULTIPLY.second(tmpFactor);
 
@@ -515,8 +515,8 @@ public abstract class BaseSolver extends GenericSolver {
                 tmpRHS.visitRow(i, 0, tmpSmallestAggr);
 
                 tmpExponent = OptimisationUtils.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
-                tmpFactor = Math.pow(TEN, tmpExponent);
-                if (assertPositiveRHS && (Math.signum(tmpRHS.doubleValue(i, 0)) < ZERO)) {
+                tmpFactor = PrimitiveFunction.POW.invoke(TEN, tmpExponent);
+                if (assertPositiveRHS && (PrimitiveFunction.SIGNUM.invoke(tmpRHS.doubleValue(i, 0)) < ZERO)) {
                     tmpFactor = -tmpFactor;
                 }
 

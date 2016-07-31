@@ -24,6 +24,7 @@ package org.ojalgo.scalar;
 import java.math.BigDecimal;
 import java.math.MathContext;
 
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
@@ -216,7 +217,7 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
     }
 
     public double norm() {
-        return Math.abs(this.doubleValue());
+        return PrimitiveFunction.ABS.invoke(this.doubleValue());
     }
 
     public Money signum() {

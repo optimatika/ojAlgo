@@ -26,6 +26,7 @@ import static org.ojalgo.function.ComplexFunction.*;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.ComplexFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -291,7 +292,7 @@ public abstract class ComplexAggregator {
                 }
 
                 public ComplexNumber getNumber() {
-                    return ComplexNumber.valueOf(Math.sqrt(myNumber.norm()));
+                    return ComplexNumber.valueOf(PrimitiveFunction.SQRT.invoke(myNumber.norm()));
                 }
 
                 public int intValue() {

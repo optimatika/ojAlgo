@@ -59,10 +59,6 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
         }
     }
 
-    public long count() {
-        return (int) this.count();
-    }
-
     public long countColumns() {
         return myDimension;
     }

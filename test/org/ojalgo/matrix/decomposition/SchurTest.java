@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -96,8 +97,8 @@ public class SchurTest extends MatrixDecompositionTests {
     public void testMathWorldCase() {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 3, 2, 1 }, { 4, 2, 1 }, { 4, 4, 0 } });
-        final double tmp00 = 3.0 + Math.sqrt(13.0);
-        final double tmp11 = 3.0 - Math.sqrt(13.0);
+        final double tmp00 = 3.0 + PrimitiveFunction.SQRT.invoke(13.0);
+        final double tmp11 = 3.0 - PrimitiveFunction.SQRT.invoke(13.0);
         final double tmp22 = -1.0;
         final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX
                 .copy(new ComplexNumber[] { ComplexNumber.valueOf(tmp00), ComplexNumber.valueOf(tmp11), ComplexNumber.valueOf(tmp22) });

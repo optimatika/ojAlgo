@@ -28,6 +28,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 
 final class Tableau implements Access2D<Double>, Mutate2D {
@@ -168,7 +169,7 @@ final class Tableau implements Access2D<Double>, Mutate2D {
         final SparseArray<Double> tmpPivotRow = myRows[row];
         final double tmpPivotElement = tmpPivotRow.doubleValue(col);
 
-        if (Math.abs(tmpPivotElement) < ONE) {
+        if (PrimitiveFunction.ABS.invoke(tmpPivotElement) < ONE) {
             final UnaryFunction<Double> tmpModifier = DIVIDE.second(tmpPivotElement);
             tmpPivotRow.modifyAll(tmpModifier);
             myRHS.modifyOne(row, tmpModifier);

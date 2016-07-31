@@ -60,7 +60,7 @@ public class PrimitiveCase extends FunctionTests {
     public void testMinMax() {
 
         TestUtils.assertEquals(Math.min(2, -78), FunctionUtils.min(2, -78));
-        TestUtils.assertEquals(Math.max(2, -78), FunctionUtils.max(2, -78));
+        TestUtils.assertEquals(PrimitiveFunction.MAX.invoke(2, -78), FunctionUtils.max(2, -78));
 
         TestUtils.assertEquals(67, FunctionUtils.max(new int[] { 67 }));
         TestUtils.assertEquals(67, FunctionUtils.min(new int[] { 67 }));

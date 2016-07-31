@@ -27,6 +27,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.type.context.NumberContext;
@@ -55,7 +56,7 @@ public class RandomNumberTest extends RandomTests {
             if (p0 < 1.0) {
                 throw new IllegalArgumentException("The first argument must be at least 1");
             }
-            return new Erlang((int) Math.floor(p0), p1);
+            return new Erlang((int) PrimitiveFunction.FLOOR.invoke(p0), p1);
         }
     }
 
@@ -259,7 +260,7 @@ public class RandomNumberTest extends RandomTests {
 
         // Positive half integer
         for (int n = 0; n < 10; n++) {
-            TestUtils.assertEquals(n + ".5", (SQRT_PI * RandomUtils.factorial(2 * n)) / (Math.pow(FOUR, n) * RandomUtils.factorial(n)),
+            TestUtils.assertEquals(n + ".5", (SQRT_PI * RandomUtils.factorial(2 * n)) / (PrimitiveFunction.POW.invoke(FOUR, n) * RandomUtils.factorial(n)),
                     RandomUtils.gamma(n + HALF), tmpEval);
         }
 
@@ -270,7 +271,7 @@ public class RandomNumberTest extends RandomTests {
         final int tmpSize = 1000;
 
         final double tmpFactoryExpected = 1.05;
-        final double tmpFactoryStdDev = Math.abs(new Normal(0.0, (tmpFactoryExpected - ONE)).doubleValue());
+        final double tmpFactoryStdDev = PrimitiveFunction.ABS.invoke(new Normal(0.0, (tmpFactoryExpected - ONE)).doubleValue());
         final Normal tmpFactoryDistr = new Normal(tmpFactoryExpected, tmpFactoryStdDev);
         TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
@@ -279,7 +280,7 @@ public class RandomNumberTest extends RandomTests {
         final PrimitiveArray tmpLogValues = PrimitiveArray.make(tmpSize);
         for (int i = 0; i < tmpSize; i++) {
             tmpRawValues.data[i] = tmpFactoryDistr.doubleValue();
-            tmpLogValues.data[i] = Math.log(tmpRawValues.data[i]);
+            tmpLogValues.data[i] = PrimitiveFunction.LOG.invoke(tmpRawValues.data[i]);
         }
         final SampleSet tmpLogValuesSet = SampleSet.wrap(tmpLogValues);
         final LogNormal tmpLogDistribut = new LogNormal(tmpLogValuesSet.getMean(), tmpLogValuesSet.getStandardDeviation());
@@ -291,15 +292,15 @@ public class RandomNumberTest extends RandomTests {
         for (int i = 0; i < tmpSize; i++) {
             tmpRawProduct *= tmpRawValues.data[i];
         }
-        TestUtils.assertEquals(tmpGeometricMean, Math.pow(tmpRawProduct, ONE / tmpSize), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals(tmpGeometricMean, PrimitiveFunction.POW.invoke(tmpRawProduct, ONE / tmpSize), 1E-14 / PrimitiveMath.THREE);
 
         double tmpLogSum = ZERO;
         for (int i = 0; i < tmpSize; i++) {
             tmpLogSum += tmpLogValues.data[i];
         }
-        TestUtils.assertEquals(tmpGeometricMean, Math.exp(tmpLogSum / tmpSize), 1E-14 / PrimitiveMath.THREE);
+        TestUtils.assertEquals(tmpGeometricMean, PrimitiveFunction.EXP.invoke(tmpLogSum / tmpSize), 1E-14 / PrimitiveMath.THREE);
 
-        final double tmpLogGeoMean = Math.log(tmpGeometricMean);
+        final double tmpLogGeoMean = PrimitiveFunction.LOG.invoke(tmpGeometricMean);
 
         double tmpVal;
         double tmpSumSqrDiff = ZERO;
@@ -308,7 +309,7 @@ public class RandomNumberTest extends RandomTests {
             tmpSumSqrDiff += (tmpVal * tmpVal);
         }
         TestUtils.assertEquals(tmpGeometricStandardDeviation / tmpGeometricStandardDeviation,
-                Math.exp(Math.sqrt(tmpSumSqrDiff / tmpSize)) / tmpGeometricStandardDeviation, 0.00005);
+                PrimitiveFunction.EXP.invoke(PrimitiveFunction.SQRT.invoke(tmpSumSqrDiff / tmpSize)) / tmpGeometricStandardDeviation, 0.00005);
         // Check that the geometric standard deviation is within ±0.005% of what it should be.
     }
 
@@ -339,7 +340,7 @@ public class RandomNumberTest extends RandomTests {
         final double[] retVal = new double[tmpSize];
 
         for (int i = 0; i < tmpSize; i++) {
-            retVal[i] = Math.log(someValues[i + 1] / someValues[i]);
+            retVal[i] = PrimitiveFunction.LOG.invoke(someValues[i + 1] / someValues[i]);
         }
         final SampleSet tmpLogChanges = SampleSet.wrap(ArrayUtils.wrapAccess1D(retVal));
 
@@ -419,7 +420,7 @@ public class RandomNumberTest extends RandomTests {
 
         double tmpActualVar = tmpSampleSet.getVariance();
 
-        TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, Math.sqrt(TEN)); // Won't always pass - it's random...
+        TestUtils.assertEquals(tmpExpectedVar, tmpActualVar, PrimitiveFunction.SQRT.invoke(TEN)); // Won't always pass - it's random...
 
         tmpExpectedVar = tmpSampleSet.getSumOfSquares() / (tmpSampleSet.size() - 1);
 
@@ -470,7 +471,7 @@ public class RandomNumberTest extends RandomTests {
                 final RandomNumber tmpDistribution = dist.getDist(p0, p1);
                 final SampleSet tmpSamples = SampleSet.make(tmpDistribution, samples);
                 // Used to estimate an upper bound on how much the sample should deviate from the analytic expected value.
-                final double stErr = Math.sqrt(tmpDistribution.getVariance() / samples);
+                final double stErr = PrimitiveFunction.SQRT.invoke(tmpDistribution.getVariance() / samples);
 
                 // Within 4 standard errors of the mean. False failures should be rare under this scheme.
                 TestUtils.assertEquals("Sample mean was " + tmpSamples.getMean() + ", distribution mean was " + tmpDistribution.getExpected() + ".",

@@ -135,10 +135,10 @@ public class DesignCase extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpNullspaceQR = tmpQR.getQ().logical().offsets(0, tmpQR.getRank()).get().copy();
         final PhysicalStore<Double> tmpNullspaceSVD = tmpSVD.getQ2().logical().offsets(0, tmpSVD.getRank()).get().copy();
 
-        final double tmpScaleQR = Math.abs(tmpNullspaceQR.doubleValue(0));
+        final double tmpScaleQR = PrimitiveFunction.ABS.invoke(tmpNullspaceQR.doubleValue(0));
         tmpNullspaceQR.modifyAll(PrimitiveFunction.DIVIDE.second(tmpScaleQR));
 
-        final double tmpScaleSVD = Math.abs(tmpNullspaceSVD.doubleValue(0));
+        final double tmpScaleSVD = PrimitiveFunction.ABS.invoke(tmpNullspaceSVD.doubleValue(0));
         tmpNullspaceSVD.modifyAll(PrimitiveFunction.DIVIDE.second(tmpScaleSVD));
 
         final PrimitiveDenseStore tmpExpected = PrimitiveDenseStore.FACTORY.columns(new double[] { -1, -26, 16 });
@@ -155,7 +155,7 @@ public class DesignCase extends MatrixDecompositionTests {
 
         final PhysicalStore<Double> tmpOriginalMatrix = PrimitiveDenseStore.FACTORY
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
-        Array1D.PRIMITIVE.copy(new double[] { 4.0, 3.0, Math.sqrt(5.0), 0.0 });
+        Array1D.PRIMITIVE.copy(new double[] { 4.0, 3.0, PrimitiveFunction.SQRT.invoke(5.0), 0.0 });
 
         final SingularValue<Double> tmpOldDecomp = new SVDold30.Primitive();
         tmpOldDecomp.decompose(tmpOriginalMatrix);

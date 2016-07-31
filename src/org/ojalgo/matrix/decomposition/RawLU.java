@@ -27,6 +27,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
@@ -249,7 +250,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
             // Find pivot and exchange if necessary.
             int p = j;
             for (int i = j + 1; i < tmpRowDim; i++) {
-                if (Math.abs(tmpColJ[i]) > Math.abs(tmpColJ[p])) {
+                if (PrimitiveFunction.ABS.invoke(tmpColJ[i]) > PrimitiveFunction.ABS.invoke(tmpColJ[p])) {
                     p = i;
                 }
             }
