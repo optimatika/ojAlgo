@@ -392,6 +392,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     if (this.isDebug()) {
                         final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
                         tmpStepLengths.modifyMatching(DIVIDE, tmpDenom);
+                        this.debug("Numer/slack: {}", tmpNumer.copy().asList());
+                        this.debug("Denom/chang: {}", tmpDenom.copy().asList());
                         this.debug("Looking for the largest possible step length (smallest positive scalar) among these: {}).", tmpStepLengths.asList());
                     }
 
@@ -407,6 +409,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                             if (this.isDebug()) {
                                 this.debug("Best so far: {} @ {} ({}).", tmpStepLength, i, myConstraintToInclude);
                             }
+                        } else if ((tmpVal == ZERO) && this.isDebug()) {
+                            this.debug("Zero, but still not good...");
+                            this.debug("Numer/slack: {}", tmpN);
+                            this.debug("Denom/chang: {}", tmpD);
+                            this.debug("Small:       {}", options.solution.isSmall(tmpNormStepX, tmpD));
                         }
                     }
 
@@ -414,6 +421,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 if (tmpStepLength > ZERO) { // It is possible that it becomes == 0.0
                     this.getX().maxpy(tmpStepLength, iterationSolution);
+                } else if (((myConstraintToInclude >= 0) && (myActivator.getLastExcluded() == myConstraintToInclude))
+                        && (myActivator.getLastIncluded() == myConstraintToInclude)) {
+                    myConstraintToInclude = -1;
                 }
 
                 this.setState(State.APPROXIMATE);
@@ -491,13 +501,22 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             this.debug("\tL: {}", myIterationL.asList());
             if ((this.getAE() != null) && (this.getAE().count() > 0)) {
                 this.debug("\tE-slack: {}", this.getSE().copy().asList());
+                if (!options.slack.isZero(this.getSE().aggregateAll(Aggregator.LARGEST).doubleValue())) {
+                    // throw new IllegalStateException("Slack!");
+                }
             }
             if ((this.getAI() != null) && (this.getAI().count() > 0)) {
                 if (included.length != 0) {
                     this.debug("\tI-included-slack: {}", this.getSI(included).copy().asList());
+                    if (!options.slack.isZero(this.getSI(included).aggregateAll(Aggregator.LARGEST).doubleValue())) {
+                        // throw new IllegalStateException("Slack!");
+                    }
                 }
                 if (myActivator.getExcluded().length != 0) {
                     this.debug("\tI-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy().asList());
+                    if (this.getSI(myActivator.getExcluded()).aggregateAll(Aggregator.MAXIMUM).doubleValue() < ZERO) {
+                        //  throw new IllegalStateException("Slack!");
+                    }
                 }
             }
         }

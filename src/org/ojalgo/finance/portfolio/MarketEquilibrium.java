@@ -187,7 +187,7 @@ public class MarketEquilibrium {
      */
     public MarketEquilibrium clean() {
 
-        final PrimitiveMatrix tmpAssetVolatilities = FinanceUtils.toAssetVolatilities(myCovariances);
+        final PrimitiveMatrix tmpAssetVolatilities = FinanceUtils.toVolatilities(myCovariances, true);
         final PrimitiveMatrix tmpCleanedCorrelations = FinanceUtils.toCorrelations(myCovariances, true);
 
         final PrimitiveMatrix tmpCovariances = FinanceUtils.toCovariances(tmpAssetVolatilities, tmpCleanedCorrelations);

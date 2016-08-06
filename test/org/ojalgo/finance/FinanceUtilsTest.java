@@ -24,7 +24,12 @@ package org.ojalgo.finance;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.CalendarDateUnit;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * SymbolDataTest
@@ -33,12 +38,51 @@ import org.ojalgo.type.CalendarDateUnit;
  */
 public class FinanceUtilsTest extends FinanceTests {
 
+    private static void doTestCleaning(final double[][] original) {
+
+        final NumberContext tmpEvalCntx = NumberContext.getGeneral(6, 12);
+
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(original);
+
+        final SingularValue<Double> tmpSVD = SingularValue.make(tmpOriginal);
+
+        tmpSVD.decompose(tmpOriginal);
+        final double tmpRefCond = tmpSVD.getCondition();
+        final int tmpRefRank = tmpSVD.getRank();
+        final double tmpRefNorm = tmpSVD.getFrobeniusNorm();
+
+        final PrimitiveMatrix tmpCorrelations = FinanceUtils.toCorrelations(tmpOriginal, true);
+        final PrimitiveMatrix tmpVolatilities = FinanceUtils.toVolatilities(tmpOriginal, true);
+        final PrimitiveMatrix tmpCovariances = FinanceUtils.toCovariances(tmpVolatilities, tmpCorrelations);
+
+        tmpSVD.decompose(tmpCovariances.toPrimitiveStore());
+        final double tmpNewCond = tmpSVD.getCondition();
+        final int tmpNewRank = tmpSVD.getRank();
+        final double tmpNewNorm = tmpSVD.getFrobeniusNorm();
+
+        TestUtils.assertTrue("Improved the condition", tmpNewCond <= tmpRefCond);
+        TestUtils.assertTrue("Improved the rank", tmpNewRank >= tmpRefRank);
+        TestUtils.assertEquals("Full rank", original.length, tmpNewRank);
+        TestUtils.assertEquals("Roughly the same frob norm", tmpRefNorm, tmpNewNorm, tmpEvalCntx);
+
+        if (DEBUG) {
+            BasicLogger.debug("Original", tmpOriginal);
+            BasicLogger.debug("Cleaned", tmpCovariances);
+            BasicLogger.debug("Difference", tmpOriginal.subtract(tmpCovariances.toPrimitiveStore()), tmpEvalCntx);
+        }
+
+    }
+
     public FinanceUtilsTest() {
         super();
     }
 
     public FinanceUtilsTest(final String name) {
         super(name);
+    }
+
+    public void testCleaningNextGen50() {
+        FinanceUtilsTest.doTestCleaning(DirtyCovarianceMatrices.NextGen50);
     }
 
     public void testConversions() {

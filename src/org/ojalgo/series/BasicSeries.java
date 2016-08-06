@@ -22,11 +22,8 @@
 package org.ojalgo.series;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.SortedMap;
 
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.ParameterFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.primitive.DataSeries;
 import org.ojalgo.type.ColourData;
@@ -59,25 +56,9 @@ public interface BasicSeries<K extends Comparable<K>, V extends Number> extends 
     V lastValue();
 
     /**
-     * @deprecated v40
+     * @deprecated v41
      */
     @Deprecated
-    default void modify(final BinaryFunction<V> func, final V right) {
-        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue(), right));
-        }
-    }
-
-    /**
-     * @deprecated v40
-     */
-    @Deprecated
-    default void modify(final ParameterFunction<V> func, final int param) {
-        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), func.invoke(tmpEntry.getValue(), param));
-        }
-    }
-
     void modifyAll(UnaryFunction<V> function);
 
     BasicSeries<K, V> name(String name);

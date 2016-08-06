@@ -77,7 +77,7 @@ public class PortfolioContext implements FinancePortfolio.Context {
 
     public PrimitiveMatrix getAssetVolatilities() {
         if (myAssetVolatilities == null) {
-            myAssetVolatilities = FinanceUtils.toAssetVolatilities(myCovariances);
+            myAssetVolatilities = FinanceUtils.toVolatilities(myCovariances);
         }
         return myAssetVolatilities;
     }

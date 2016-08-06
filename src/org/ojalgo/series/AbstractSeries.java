@@ -44,16 +44,16 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         super();
     }
 
-    protected AbstractSeries(final Comparator<? super K> someC) {
-        super(someC);
+    protected AbstractSeries(final Comparator<? super K> comparator) {
+        super(comparator);
     }
 
-    protected AbstractSeries(final Map<? extends K, ? extends V> someM) {
-        super(someM);
+    protected AbstractSeries(final Map<? extends K, ? extends V> map) {
+        super(map);
     }
 
-    protected AbstractSeries(final SortedMap<K, ? extends V> someM) {
-        super(someM);
+    protected AbstractSeries(final SortedMap<K, ? extends V> sortedMap) {
+        super(sortedMap);
     }
 
     public I colour(final ColourData colour) {
@@ -145,12 +145,12 @@ abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I exten
         }
     }
 
-    void setColour(final ColourData aPaint) {
-        this.colour(aPaint);
+    void setColour(final ColourData colour) {
+        this.colour(colour);
     }
 
-    void setName(final String aName) {
-        this.name(aName);
+    void setName(final String name) {
+        this.name(name);
     }
 
     StringBuilder toStringFirstPart() {

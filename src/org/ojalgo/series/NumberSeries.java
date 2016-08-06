@@ -38,16 +38,16 @@ public class NumberSeries<N extends Number & Comparable<N>> extends AbstractSeri
         super();
     }
 
-    public NumberSeries(final Comparator<? super N> someC) {
-        super(someC);
+    public NumberSeries(final Comparator<? super N> comparator) {
+        super(comparator);
     }
 
-    public NumberSeries(final Map<? extends N, ? extends N> someM) {
-        super(someM);
+    public NumberSeries(final Map<? extends N, ? extends N> map) {
+        super(map);
     }
 
-    public NumberSeries(final SortedMap<N, ? extends N> someM) {
-        super(someM);
+    public NumberSeries(final SortedMap<N, ? extends N> sortedMap) {
+        super(sortedMap);
     }
 
     public Access1D<N> accessKeys() {

@@ -220,18 +220,43 @@ public class CoordinationSet<N extends Number> extends HashMap<String, CalendarD
         return this.get(series).get(date);
     };
 
+    /**
+     * @deprecated v41
+     */
+    @Deprecated
     public void modify(final BinaryFunction<N> function, final N argument) {
+        final UnaryFunction<N> tmpUnaryFunction = function.second(argument);
         for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-            tmpSeries.modify(function, argument);
+            tmpSeries.modifyAll(tmpUnaryFunction);
         }
     }
 
+    /**
+     * @deprecated v41
+     */
+    @Deprecated
+    public void modify(final N argument, final BinaryFunction<N> function) {
+        final UnaryFunction<N> tmpUnaryFunction = function.first(argument);
+        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
+            tmpSeries.modifyAll(tmpUnaryFunction);
+        }
+    }
+
+    /**
+     * @deprecated v41
+     */
+    @Deprecated
     public void modify(final ParameterFunction<N> function, final int parameter) {
+        final UnaryFunction<N> tmpUnaryFunction = function.parameter(parameter);
         for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-            tmpSeries.modify(function, parameter);
+            tmpSeries.modifyAll(tmpUnaryFunction);
         }
     }
 
+    /**
+     * @deprecated v41
+     */
+    @Deprecated
     public void modify(final UnaryFunction<N> function) {
         for (final CalendarDateSeries<N> tmpSeries : this.values()) {
             tmpSeries.modifyAll(function);
@@ -259,6 +284,7 @@ public class CoordinationSet<N extends Number> extends HashMap<String, CalendarD
         final CalendarDate tmpLatestFirstKey = retVal.getLatestFirstKey();
         final CalendarDate tmpEarliestLastKey = retVal.getEarliestLastKey();
         final CalendarDate tmpLatestLastKey = retVal.getLatestLastKey();
+
         if ((tmpEarliestFirstKey == null) || !tmpEarliestFirstKey.equals(tmpFirstKey)) {
             throw new ProgrammingError("Something went wrong!");
         }
@@ -285,7 +311,7 @@ public class CoordinationSet<N extends Number> extends HashMap<String, CalendarD
         final CalendarDate tmpLatestFirstKey = this.getLatestFirstKey();
         final CalendarDate tmpEarliestLastKey = this.getEarliestLastKey();
 
-        for (final java.util.Map.Entry<String, CalendarDateSeries<N>> tmpEntry : this.entrySet()) {
+        for (final Map.Entry<String, CalendarDateSeries<N>> tmpEntry : this.entrySet()) {
             retVal.put(tmpEntry.getKey(), tmpEntry.getValue().resample(tmpLatestFirstKey, tmpEarliestLastKey, resolution));
         }
 

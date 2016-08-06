@@ -60,8 +60,8 @@ public final class SimpleAsset extends FinancePortfolio {
 
         super();
 
-        myMeanReturn = meanReturn.doubleValue();
-        myVolatility = volatility.doubleValue();
+        myMeanReturn = meanReturn != null ? meanReturn.doubleValue() : PrimitiveMath.ZERO;
+        myVolatility = volatility != null ? volatility.doubleValue() : PrimitiveMath.ZERO;
         myWeight = TypeUtils.toBigDecimal(weight);
     }
 

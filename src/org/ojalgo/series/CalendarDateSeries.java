@@ -44,36 +44,36 @@ public class CalendarDateSeries<V extends Number> extends AbstractSeries<Calenda
         myResolution = CalendarDateUnit.MILLIS;
     }
 
-    public CalendarDateSeries(final CalendarDateUnit aResolution) {
+    public CalendarDateSeries(final CalendarDateUnit resolution) {
 
         super();
 
-        myResolution = aResolution;
+        myResolution = resolution;
     }
 
     @SuppressWarnings("unused")
-    private CalendarDateSeries(final Comparator<? super CalendarDate> someC) {
-        super(someC);
+    private CalendarDateSeries(final Comparator<? super CalendarDate> comparator) {
+        super(comparator);
         myResolution = null;
     }
 
     @SuppressWarnings("unused")
-    private CalendarDateSeries(final Map<? extends CalendarDate, ? extends V> someM) {
-        super(someM);
+    private CalendarDateSeries(final Map<? extends CalendarDate, ? extends V> map) {
+        super(map);
         myResolution = null;
     }
 
     @SuppressWarnings("unused")
-    private CalendarDateSeries(final SortedMap<CalendarDate, ? extends V> someM) {
-        super(someM);
+    private CalendarDateSeries(final SortedMap<CalendarDate, ? extends V> sortedMap) {
+        super(sortedMap);
         myResolution = null;
     }
 
-    CalendarDateSeries(final SortedMap<CalendarDate, ? extends V> someM, final CalendarDateUnit aResolution) {
+    CalendarDateSeries(final SortedMap<CalendarDate, ? extends V> sortedMap, final CalendarDateUnit resolution) {
 
-        super(someM);
+        super(sortedMap);
 
-        myResolution = aResolution;
+        myResolution = resolution;
     }
 
     /**
@@ -154,37 +154,37 @@ public class CalendarDateSeries<V extends Number> extends AbstractSeries<Calenda
         return retVal;
     }
 
-    public V put(final Calendar aKey, final V aValue) {
-        return super.put(CalendarDate.make(aKey, myResolution), aValue);
+    public V put(final Calendar key, final V value) {
+        return super.put(CalendarDate.make(key, myResolution), value);
     }
 
     @Override
-    public V put(final CalendarDate aKey, final V aValue) {
-        return super.put(aKey.filter(myResolution), aValue);
+    public V put(final CalendarDate key, final V value) {
+        return super.put(key.filter(myResolution), value);
     }
 
-    public V put(final Date aKey, final V aValue) {
-        return super.put(CalendarDate.make(aKey, myResolution), aValue);
+    public V put(final Date key, final V value) {
+        return super.put(CalendarDate.make(key, myResolution), value);
     }
 
-    public V put(final long aKey, final V aValue) {
-        return super.put(CalendarDate.make(aKey, myResolution), aValue);
+    public V put(final long key, final V value) {
+        return super.put(CalendarDate.make(key, myResolution), value);
     }
 
     @Override
-    public void putAll(final Map<? extends CalendarDate, ? extends V> aMap) {
-        for (final java.util.Map.Entry<? extends CalendarDate, ? extends V> tmpEntry : aMap.entrySet()) {
+    public void putAll(final Map<? extends CalendarDate, ? extends V> data) {
+        for (final Map.Entry<? extends CalendarDate, ? extends V> tmpEntry : data.entrySet()) {
             this.put(tmpEntry.getKey(), tmpEntry.getValue());
         }
     }
 
-    public CalendarDateSeries<V> resample(final CalendarDate aFirstKey, final CalendarDate aLastKey, final CalendarDateUnit aResolution) {
+    public CalendarDateSeries<V> resample(final CalendarDate firstKey, final CalendarDate lastKey, final CalendarDateUnit resolution) {
 
-        final CalendarDateSeries<V> retVal = new CalendarDateSeries<>(aResolution);
+        final CalendarDateSeries<V> retVal = new CalendarDateSeries<>(resolution);
         retVal.setColour(this.getColour());
         retVal.setName(this.getName());
 
-        final SortedMap<CalendarDate, V> tmpSubMap = this.subMap(aFirstKey, true, aLastKey, true);
+        final SortedMap<CalendarDate, V> tmpSubMap = this.subMap(firstKey, true, lastKey, true);
 
         retVal.putAll(tmpSubMap);
 
@@ -192,9 +192,9 @@ public class CalendarDateSeries<V extends Number> extends AbstractSeries<Calenda
 
     }
 
-    public CalendarDateSeries<V> resample(final CalendarDateUnit aResolution) {
+    public CalendarDateSeries<V> resample(final CalendarDateUnit resolution) {
 
-        final CalendarDateSeries<V> retVal = new CalendarDateSeries<>(aResolution);
+        final CalendarDateSeries<V> retVal = new CalendarDateSeries<>(resolution);
         retVal.setColour(this.getColour());
         retVal.setName(this.getName());
 
@@ -203,14 +203,14 @@ public class CalendarDateSeries<V extends Number> extends AbstractSeries<Calenda
         return retVal;
     }
 
-    public CalendarDate step(final CalendarDate aKey) {
-        return aKey.step(1, myResolution);
+    public CalendarDate step(final CalendarDate key) {
+        return key.step(1, myResolution);
     }
 
     @Override
-    public CalendarDateSeries<V> subMap(final CalendarDate aFromKey, final boolean inclusiveFromKey, final CalendarDate aToKey, final boolean inclusiveToKey) {
+    public CalendarDateSeries<V> subMap(final CalendarDate fromKey, final boolean inclusiveFromKey, final CalendarDate toKey, final boolean inclusiveToKey) {
 
-        final NavigableMap<CalendarDate, V> tmpMap = super.subMap(aFromKey, inclusiveFromKey, aToKey, inclusiveToKey);
+        final NavigableMap<CalendarDate, V> tmpMap = super.subMap(fromKey, inclusiveFromKey, toKey, inclusiveToKey);
 
         final CalendarDateSeries<V> retVal = new CalendarDateSeries<>(tmpMap, this.getResolution());
         retVal.setColour(this.getColour());
@@ -220,21 +220,9 @@ public class CalendarDateSeries<V extends Number> extends AbstractSeries<Calenda
     }
 
     @Override
-    public CalendarDateSeries<V> subMap(final CalendarDate aFromKey, final CalendarDate aKeyLimit) {
+    public CalendarDateSeries<V> subMap(final CalendarDate fromKey, final CalendarDate keyLimit) {
 
-        final SortedMap<CalendarDate, V> tmpMap = super.subMap(aFromKey, aKeyLimit);
-
-        final CalendarDateSeries<V> retVal = new CalendarDateSeries<>(tmpMap, this.getResolution());
-        retVal.setColour(this.getColour());
-        retVal.setName(this.getName());
-
-        return retVal;
-    }
-
-    @Override
-    public CalendarDateSeries<V> tailMap(final CalendarDate aFromKey) {
-
-        final SortedMap<CalendarDate, V> tmpMap = super.tailMap(aFromKey);
+        final SortedMap<CalendarDate, V> tmpMap = super.subMap(fromKey, keyLimit);
 
         final CalendarDateSeries<V> retVal = new CalendarDateSeries<>(tmpMap, this.getResolution());
         retVal.setColour(this.getColour());
@@ -244,9 +232,21 @@ public class CalendarDateSeries<V extends Number> extends AbstractSeries<Calenda
     }
 
     @Override
-    public CalendarDateSeries<V> tailMap(final CalendarDate aFromKey, final boolean inclusive) {
+    public CalendarDateSeries<V> tailMap(final CalendarDate fromKey) {
 
-        final NavigableMap<CalendarDate, V> tmpMap = super.tailMap(aFromKey, inclusive);
+        final SortedMap<CalendarDate, V> tmpMap = super.tailMap(fromKey);
+
+        final CalendarDateSeries<V> retVal = new CalendarDateSeries<>(tmpMap, this.getResolution());
+        retVal.setColour(this.getColour());
+        retVal.setName(this.getName());
+
+        return retVal;
+    }
+
+    @Override
+    public CalendarDateSeries<V> tailMap(final CalendarDate fromKey, final boolean inclusive) {
+
+        final NavigableMap<CalendarDate, V> tmpMap = super.tailMap(fromKey, inclusive);
 
         final CalendarDateSeries<V> retVal = new CalendarDateSeries<>(tmpMap, this.getResolution());
         retVal.setColour(this.getColour());

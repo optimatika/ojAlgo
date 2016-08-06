@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.ojalgo.access.Access1D;
@@ -36,6 +37,8 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.PrimitiveMatrix;
@@ -49,6 +52,7 @@ import org.ojalgo.random.SampleSet;
 import org.ojalgo.random.process.GeometricBrownianMotion;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.series.CoordinationSet;
+import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 
@@ -163,6 +167,52 @@ public abstract class FinanceUtils {
         }
 
         return retValStore.build();
+    }
+
+    /**
+     * @param listOfTimeSeries An ordered collection of time series
+     * @param mayBeMissingValues Individual series may be missing some values - try to fix this or not
+     * @return Annualised covariances
+     */
+    public static <N extends Number> PrimitiveMatrix makeCovarianceMatrix(final List<CalendarDateSeries<N>> listOfTimeSeries,
+            final boolean mayBeMissingValues) {
+
+        final int tmpSize = listOfTimeSeries.size();
+
+        final CoordinationSet<N> tmpUncoordinated = new CoordinationSet<N>(listOfTimeSeries);
+        final CalendarDateUnit tmpDataResolution = tmpUncoordinated.getResolution();
+        if (mayBeMissingValues) {
+            tmpUncoordinated.complete();
+        }
+
+        final CoordinationSet<N> tmpCoordinated = tmpUncoordinated.prune(tmpDataResolution);
+
+        final Builder<PrimitiveMatrix> tmpMatrixBuilder = PrimitiveMatrix.getBuilder(tmpSize, tmpSize);
+
+        final double tmpToYearFactor = (double) CalendarDateUnit.YEAR.size() / (double) tmpDataResolution.size();
+
+        SampleSet tmpSampleSet;
+        final SampleSet[] tmpSampleSets = new SampleSet[tmpSize];
+
+        for (int j = 0; j < tmpSize; j++) {
+
+            final PrimitiveSeries tmpPrimitiveSeries = tmpCoordinated.get(listOfTimeSeries.get(j).getName()).getDataSeries();
+
+            tmpSampleSet = SampleSet.wrap(tmpPrimitiveSeries.quotients().log().toDataSeries());
+
+            tmpMatrixBuilder.set(j, j, tmpToYearFactor * tmpSampleSet.getVariance());
+
+            for (int i = 0; i < j; i++) {
+
+                final double tmpCovariance = tmpToYearFactor * tmpSampleSets[i].getCovariance(tmpSampleSet);
+                tmpMatrixBuilder.set(i, j, tmpCovariance);
+                tmpMatrixBuilder.set(j, i, tmpCovariance);
+            }
+
+            tmpSampleSets[j] = tmpSampleSet;
+        }
+
+        return tmpMatrixBuilder.get();
     }
 
     public static CalendarDateSeries<BigDecimal> makeDatePriceSeries(final double[] prices, final Date startDate, final CalendarDateUnit resolution) {
@@ -302,19 +352,22 @@ public abstract class FinanceUtils {
         return PrimitiveFunction.EXPM1.invoke(growthRate * tmpGrowthRateUnitsPerYear);
     }
 
+    /**
+     * @deprecated v41 Use {@link #toVolatilities(Access2D)} instead
+     */
+    @Deprecated
     public static PrimitiveMatrix toAssetVolatilities(final Access2D<?> covariances) {
-
-        final int tmpSize = (int) Math.min(covariances.countRows(), covariances.countColumns());
-
-        final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.getBuilder(tmpSize);
-
-        for (int ij = 0; ij < tmpSize; ij++) {
-            retVal.set(ij, PrimitiveFunction.SQRT.invoke(covariances.doubleValue(ij, ij)));
-        }
-
-        return retVal.build();
+        return FinanceUtils.toVolatilities(covariances);
     }
 
+    public static PrimitiveMatrix toCorrelations(final Access2D<?> covariances) {
+        return FinanceUtils.toCorrelations(covariances, false);
+    }
+
+    /**
+     * Will extract the correlation coefficients from the input covariance matrix. If "cleaning" is enabled
+     * small and negative eigenvalues of the covariance matrix will be replaced with a new minimal value.
+     */
     public static PrimitiveMatrix toCorrelations(final Access2D<?> covariances, final boolean clean) {
 
         final int tmpSize = (int) Math.min(covariances.countRows(), covariances.countColumns());
@@ -329,8 +382,8 @@ public abstract class FinanceUtils {
             final MatrixStore<Double> tmpV = tmpEvD.getV();
             final PhysicalStore<Double> tmpD = tmpEvD.getD().copy();
 
-            final double tmpLargest = tmpD.doubleValue(0, 0);
-            final double tmpLimit = PrimitiveFunction.MAX.invoke(PrimitiveMath.MACHINE_EPSILON * tmpLargest, 1E-12);
+            final double tmpLargest = tmpEvD.getEigenvalues().get(0).norm();
+            final double tmpLimit = tmpLargest * tmpSize * PrimitiveFunction.SQRT.invoke(PrimitiveMath.MACHINE_EPSILON);
 
             for (int ij = 0; ij < tmpSize; ij++) {
                 if (tmpD.doubleValue(ij, ij) < tmpLimit) {
@@ -363,26 +416,30 @@ public abstract class FinanceUtils {
             }
         }
 
-        return retVal.build();
+        return retVal.get();
     }
 
-    public static PrimitiveMatrix toCovariances(final Access1D<?> assetVolatilities, final Access2D<?> correlations) {
+    /**
+     * Vill constract a covariance matrix from the standard deviations (volatilities) and correlation
+     * coefficient,
+     */
+    public static PrimitiveMatrix toCovariances(final Access1D<?> volatilities, final Access2D<?> correlations) {
 
-        final int tmpSize = (int) assetVolatilities.count();
+        final int tmpSize = (int) volatilities.count();
 
         final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.getBuilder(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
-            final double tmpColumnVolatility = assetVolatilities.doubleValue(j);
+            final double tmpColumnVolatility = volatilities.doubleValue(j);
             retVal.set(j, j, tmpColumnVolatility * tmpColumnVolatility);
             for (int i = j + 1; i < tmpSize; i++) {
-                final double tmpCovariance = assetVolatilities.doubleValue(i) * correlations.doubleValue(i, j) * tmpColumnVolatility;
+                final double tmpCovariance = volatilities.doubleValue(i) * correlations.doubleValue(i, j) * tmpColumnVolatility;
                 retVal.set(i, j, tmpCovariance);
                 retVal.set(j, i, tmpCovariance);
             }
         }
 
-        return retVal.build();
+        return retVal.get();
     }
 
     /**
@@ -409,6 +466,45 @@ public abstract class FinanceUtils {
         final double tmpAnnualGrowthRate = PrimitiveFunction.LOG1P.invoke(annualReturn);
         final double tmpYearsPerGrowthRateUnit = CalendarDateUnit.YEAR.convert(growthRateUnit);
         return tmpAnnualGrowthRate * tmpYearsPerGrowthRateUnit;
+    }
+
+    public static PrimitiveMatrix toVolatilities(final Access2D<?> covariances) {
+        return FinanceUtils.toVolatilities(covariances, false);
+    }
+
+    /**
+     * Will extract the standard deviations (volatilities) from the input covariance matrix. If "cleaning" is
+     * enabled small variances will be replaced with a new minimal value.
+     */
+    public static PrimitiveMatrix toVolatilities(final Access2D<?> covariances, final boolean clean) {
+
+        final int tmpSize = (int) Math.min(covariances.countRows(), covariances.countColumns());
+
+        final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.getBuilder(tmpSize);
+
+        if (clean) {
+
+            final AggregatorFunction<Double> tmpLargest = PrimitiveAggregator.LARGEST.get();
+            MatrixStore.PRIMITIVE.makeWrapper(covariances).get().visitDiagonal(0, 0, tmpLargest);
+            final double tmpLimit = tmpLargest.doubleValue() * tmpSize * PrimitiveFunction.SQRT.invoke(PrimitiveMath.MACHINE_EPSILON);
+
+            for (int ij = 0; ij < tmpSize; ij++) {
+                final double tmpVariance = covariances.doubleValue(ij, ij);
+                if (tmpVariance < tmpLimit) {
+                    retVal.set(ij, PrimitiveFunction.SQRT.invoke(tmpLimit));
+                } else {
+                    retVal.set(ij, PrimitiveFunction.SQRT.invoke(tmpVariance));
+                }
+            }
+
+        } else {
+
+            for (int ij = 0; ij < tmpSize; ij++) {
+                retVal.set(ij, PrimitiveFunction.SQRT.invoke(covariances.doubleValue(ij, ij)));
+            }
+        }
+
+        return retVal.get();
     }
 
     private static <K extends Comparable<K>> void copyValues(final CalendarDateSeries<BigDecimal> series, final CalendarDate firstKey, final double[] values) {
