@@ -61,6 +61,10 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
+    /**
+     * Will pass through each matching element position calling the {@code through} function. What happens is
+     * entirely dictated by how you implement the callback.
+     */
     default double doubleValue(final long index) {
         return this.doubleValue(AccessUtils.reference(index, this.shape()));
     }
@@ -72,5 +76,9 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
     }
 
     N get(long[] ref);
+
+    default void passMatching(final CallbackAnyD<N> through, final MutateAnyD to) {
+        CallbackAnyD.onMatching(this, through, to);
+    }
 
 }

@@ -146,6 +146,14 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     N get(long row, long column);
 
+    /**
+     * Will pass through each matching element position calling the {@code through} function. What happens is
+     * entirely dictated by how you implement the callback.
+     */
+    default void passMatching(final Callback2D<N> through, final Mutate2D to) {
+        Callback2D.onMatching(this, through, to);
+    }
+
     default Iterable<RowView<N>> rows() {
         return RowView.makeIterable(this);
     }

@@ -446,7 +446,7 @@ public final class MarkowitzModel extends EquilibriumModel {
         myOptimisationState = tmpResult.getState();
 
         for (int i = 0; i < myVariables.length; i++) {
-            myVariables[i].setValue(tmpResult.get(i));
+            myVariables[i].setValue(myShortingAllowed ? tmpResult.get(i) : tmpResult.get(i).max(ZERO));
         }
 
         return MATRIX_FACTORY.columns(tmpResult);

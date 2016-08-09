@@ -39,10 +39,6 @@ public interface Mutate1D extends Structure1D {
 
         void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right);
 
-        // void modifyOneMatching(long index, final Access1D<N> left, final BinaryFunction<N> function);
-
-        // void modifyOneMatching(long index, final BinaryFunction<N> function, final Access1D<N> right);
-
     }
 
     interface Fillable<N extends Number> extends Mutate1D {
@@ -125,6 +121,14 @@ public interface Mutate1D extends Structure1D {
     void add(long index, double addend);
 
     void add(long index, Number addend);
+
+    /**
+     * Will pass through each matching element position calling the {@code through} function. What happens is
+     * entirely dictated by how you implement the callback.
+     */
+    default <N extends Number> void passMatching(final Access1D<N> from, final Callback1D<N> through) {
+        Callback1D.onMatching(from, through, this);
+    }
 
     void set(long index, double value);
 
