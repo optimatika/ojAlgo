@@ -346,8 +346,8 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
-    public boolean isAbsolute(final long row, final long column) {
-        return myStore.isAbsolute(row, column);
+    public boolean isAbsolute(final long row, final long col) {
+        return myStore.isAbsolute(row, col);
     }
 
     public boolean isFullRank() {
@@ -362,8 +362,8 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return myStore.isSmall(comparedTo);
     }
 
-    public boolean isSmall(final long row, final long column, final double comparedTo) {
-        return myStore.isSmall(row, column, comparedTo);
+    public boolean isSmall(final long row, final long col, final double comparedTo) {
+        return myStore.isSmall(row, col, comparedTo);
     }
 
     public boolean isSymmetric() {

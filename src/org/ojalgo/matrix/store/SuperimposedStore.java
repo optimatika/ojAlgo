@@ -79,12 +79,12 @@ final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
         return retVal;
     }
 
-    public N get(final long row, final long column) {
+    public N get(final long row, final long col) {
 
-        N retVal = this.getBase().get(row, column);
+        N retVal = this.getBase().get(row, col);
 
-        if (this.isCovered((int) row, (int) column)) {
-            retVal = myDiff.toScalar((int) row - myRowFirst, (int) column - myColFirst).add(retVal).getNumber();
+        if (this.isCovered((int) row, (int) col)) {
+            retVal = myDiff.toScalar((int) row - myRowFirst, (int) col - myColFirst).add(retVal).getNumber();
         }
 
         return retVal;

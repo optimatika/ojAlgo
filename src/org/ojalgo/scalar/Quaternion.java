@@ -478,8 +478,8 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         return this.doubleValue(index);
     }
 
-    public Double get(final long row, final long column) {
-        return this.doubleValue(row, column);
+    public Double get(final long row, final long col) {
+        return this.doubleValue(row, col);
     }
 
     /**

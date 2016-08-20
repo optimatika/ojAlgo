@@ -21,12 +21,15 @@
  */
 package org.ojalgo.access;
 
+import java.util.Iterator;
+
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 
 /**
  * 2-dimensional accessor methods
  *
+ * @see Access1D
  * @author apete
  */
 public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
@@ -41,7 +44,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         /**
          * @see Scalar#isAbsolute()
          */
-        boolean isAbsolute(long row, long column);
+        boolean isAbsolute(long row, long col);
 
         default boolean isSmall(final long index, final double comparedTo) {
             final long tmpStructure = this.countRows();
@@ -51,7 +54,64 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         /**
          * @see Scalar#isSmall(double)
          */
-        boolean isSmall(long row, long column, double comparedTo);
+        boolean isSmall(long row, long col, double comparedTo);
+
+    }
+
+    public static final class ElementView<N extends Number> implements ElementView2D<N, ElementView<N>> {
+
+        private final ElementView1D<N, ?> myDelegate;
+        private final long myStructure;
+
+        public ElementView(final ElementView1D<N, ?> delegate, final long structure) {
+
+            super();
+
+            myDelegate = delegate;
+            myStructure = structure;
+        }
+
+        public long column() {
+            return AccessUtils.column(myDelegate.index(), myStructure);
+        }
+
+        public double doubleValue() {
+            return myDelegate.doubleValue();
+        }
+
+        public N getNumber() {
+            return myDelegate.getNumber();
+        }
+
+        public boolean hasNext() {
+            return myDelegate.hasNext();
+        }
+
+        public boolean hasPrevious() {
+            return myDelegate.hasPrevious();
+        }
+
+        public long index() {
+            return myDelegate.index();
+        }
+
+        public Iterator<ElementView<N>> iterator() {
+            return this;
+        }
+
+        public ElementView<N> next() {
+            myDelegate.next();
+            return this;
+        }
+
+        public ElementView<N> previous() {
+            myDelegate.previous();
+            return this;
+        }
+
+        public long row() {
+            return AccessUtils.row(myDelegate.index(), myStructure);
+        }
 
     }
 
@@ -59,65 +119,67 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         /**
          * @param row
-         * @param column
+         * @param col
          * @return The row-index of the largest absolute value in a column, starting at the specified row.
          */
-        long indexOfLargestInColumn(final long row, final long column);
+        long indexOfLargestInColumn(final long row, final long col);
 
         /**
          * @param row
-         * @param column
+         * @param col
          * @return The matrix-index of the largest absolute value on a diagonal, starting at the specified
          *         row-column pair.
          */
-        long indexOfLargestInDiagonal(final long row, final long column);
+        long indexOfLargestInDiagonal(final long row, final long col);
 
         /**
          * @param row
-         * @param column
+         * @param col
          * @return The column-index of the largest absolute value in a row, starting at the specified column.
          */
-        long indexOfLargestInRow(final long row, final long column);
+        long indexOfLargestInRow(final long row, final long col);
 
     }
 
     public interface Sliceable<N extends Number> extends Structure2D, Access1D.Sliceable<N> {
 
-        Access1D<N> sliceColumn(long row, long column);
+        Access1D<N> sliceColumn(long row, long col);
 
-        Access1D<N> sliceDiagonal(long row, long column);
+        Access1D<N> sliceDiagonal(long row, long col);
 
-        Access1D<N> sliceRow(long row, long column);
-
-    }
-
-    /**
-     * A few operations with no 1D or AnyD counterpart.
-     *
-     * @author apete
-     */
-    public interface Special<N extends Number> extends Structure2D {
-
-        void exchangeColumns(final long colA, final long colB);
-
-        void exchangeRows(final long rowA, final long rowB);
+        Access1D<N> sliceRow(long row, long col);
 
     }
 
     public interface Visitable<N extends Number> extends Structure2D, Access1D.Visitable<N> {
 
-        void visitColumn(long row, long column, VoidFunction<N> visitor);
+        default void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
+            final long tmpLimit = this.countRows();
+            for (long i = row; i < tmpLimit; i++) {
+                this.visitOne(i, col, visitor);
+            }
+        }
 
-        void visitDiagonal(long row, long column, VoidFunction<N> visitor);
+        default void visitDiagonal(final long row, final long col, final VoidFunction<N> visitor) {
+            final long tmpLimit = Math.min(this.countRows() - row, this.countColumns() - col);
+            for (long ij = 0L; ij < tmpLimit; ij++) {
+                this.visitOne(row + ij, col + ij, visitor);
+            }
+        }
 
-        void visitOne(long row, long column, VoidFunction<N> visitor);
+        void visitOne(long row, long col, VoidFunction<N> visitor);
 
         default void visitOne(final long index, final VoidFunction<N> visitor) {
             final long tmpStructure = this.countRows();
             this.visitOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), visitor);
         }
 
-        void visitRow(long row, long column, VoidFunction<N> visitor);
+        default void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
+            final long tmpLimit = this.countColumns();
+            for (long j = col; j < tmpLimit; j++) {
+                this.visitOne(row, j, visitor);
+            }
+        }
 
     }
 
@@ -139,12 +201,16 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
      */
     double doubleValue(long row, long col);
 
+    default ElementView2D<N, ?> elements() {
+        return new Access2D.ElementView<N>(Access1D.super.elements(), this.countRows());
+    }
+
     default N get(final long index) {
         final long tmpStructure = this.countRows();
         return this.get(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure));
     }
 
-    N get(long row, long column);
+    N get(long row, long col);
 
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is

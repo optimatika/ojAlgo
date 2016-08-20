@@ -47,7 +47,7 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N>,
-        Mutate2D.BiModifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Access2D.Special<N>, Serializable {
+        Mutate2D.BiModifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Mutate2D.Special<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
@@ -384,32 +384,32 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.fill(0L, this.count(), 1L, supplier);
     }
 
-    public void fillColumn(final long row, final long column, final N value) {
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, myRowsCount, column), 1L, value);
+    public void fillColumn(final long row, final long col, final N value) {
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L, value);
     }
 
-    public void fillColumn(final long row, final long column, final NullaryFunction<N> supplier) {
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, myRowsCount, column), 1L, supplier);
+    public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L, supplier);
     }
 
-    public void fillDiagonal(final long row, final long column, final N value) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount), 1L + myRowsCount,
+    public void fillDiagonal(final long row, final long col, final N value) {
+        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount,
                 value);
     }
 
-    public void fillDiagonal(final long row, final long column, final NullaryFunction<N> supplier) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount), 1L + myRowsCount,
+    public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount,
                 supplier);
     }
 
-    public void fillOne(final long row, final long column, final N value) {
-        myDelegate.fillOne(AccessUtils.index(myRowsCount, row, column), value);
+    public void fillOne(final long row, final long col, final N value) {
+        myDelegate.fillOne(AccessUtils.index(myRowsCount, row, col), value);
     }
 
-    public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
-        myDelegate.fillOne(AccessUtils.index(myRowsCount, row, column), supplier);
+    public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        myDelegate.fillOne(AccessUtils.index(myRowsCount, row, col), supplier);
     }
 
     public void fillOne(final long index, final N value) {
@@ -420,12 +420,12 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.fillOne(index, supplier);
     }
 
-    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-        myDelegate.fillOneMatching(index, values, valueIndex);
+    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
+        myDelegate.fillOne(index, values, valueIndex);
     }
 
-    public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-        myDelegate.fillOneMatching(AccessUtils.index(myRowsCount, row, column), values, valueIndex);
+    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+        myDelegate.fillOne(AccessUtils.index(myRowsCount, row, col), values, valueIndex);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
@@ -436,20 +436,20 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.fill(first, limit, 1L, supplier);
     }
 
-    public void fillRow(final long row, final long column, final N value) {
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, value);
+    public void fillRow(final long row, final long col, final N value) {
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, value);
     }
 
-    public void fillRow(final long row, final long column, final NullaryFunction<N> supplier) {
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, supplier);
+    public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, supplier);
     }
 
     public N get(final long index) {
         return myDelegate.get(index);
     }
 
-    public N get(final long row, final long column) {
-        return myDelegate.get(AccessUtils.index(myRowsCount, row, column));
+    public N get(final long row, final long col) {
+        return myDelegate.get(AccessUtils.index(myRowsCount, row, col));
     }
 
     @Override
@@ -463,22 +463,22 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     /**
      * @param row
-     * @param column
+     * @param col
      * @return The row-index of the largest absolute value in a column, starting at the specified row.
      */
-    public long indexOfLargestInColumn(final long row, final long column) {
-        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, myRowsCount, column), 1L) % myRowsCount;
+    public long indexOfLargestInColumn(final long row, final long col) {
+        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L) % myRowsCount;
     }
 
     /**
      * @param row
-     * @param column
+     * @param col
      * @return The matrix-index of the largest absolute value on a diagonal, starting at the specified
      *         row-column pair.
      */
-    public long indexOfLargestInDiagonal(final long row, final long column) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
-        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount),
+    public long indexOfLargestInDiagonal(final long row, final long col) {
+        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount),
                 1L + myRowsCount);
     }
 
@@ -488,11 +488,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     /**
      * @param row
-     * @param column
+     * @param col
      * @return The column-index of the largest absolute value in a row, starting at the specified column.
      */
-    public long indexOfLargestInRow(final long row, final long column) {
-        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount)
+    public long indexOfLargestInRow(final long row, final long col) {
+        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount)
                 / myRowsCount;
     }
 
@@ -503,8 +503,8 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     /**
      * @see Scalar#isAbsolute()
      */
-    public boolean isAbsolute(final long row, final long column) {
-        return myDelegate.isAbsolute(AccessUtils.index(myRowsCount, row, column));
+    public boolean isAbsolute(final long row, final long col) {
+        return myDelegate.isAbsolute(AccessUtils.index(myRowsCount, row, col));
     }
 
     /**
@@ -546,22 +546,22 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         return myDelegate.isSmall(index, comparedTo);
     }
 
-    public boolean isSmall(final long row, final long column, final double comparedTo) {
-        return myDelegate.isSmall(AccessUtils.index(myRowsCount, row, column), comparedTo);
+    public boolean isSmall(final long row, final long col, final double comparedTo) {
+        return myDelegate.isSmall(AccessUtils.index(myRowsCount, row, col), comparedTo);
     }
 
-    public void modifyAll(final UnaryFunction<N> function) {
-        myDelegate.modify(0L, this.count(), 1L, function);
+    public void modifyAll(final UnaryFunction<N> modifier) {
+        myDelegate.modify(0L, this.count(), 1L, modifier);
     }
 
-    public void modifyColumn(final long row, final long column, final UnaryFunction<N> function) {
-        myDelegate.modify(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, myRowsCount, column), 1L, function);
+    public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
+        myDelegate.modify(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L, modifier);
     }
 
-    public void modifyDiagonal(final long row, final long column, final UnaryFunction<N> function) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
-        myDelegate.modify(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount), 1L + myRowsCount,
-                function);
+    public void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
+        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        myDelegate.modify(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount,
+                modifier);
     }
 
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
@@ -572,20 +572,20 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.modify(0L, this.count(), 1L, function, right);
     }
 
-    public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
-        myDelegate.modifyOne(AccessUtils.index(myRowsCount, row, column), function);
+    public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+        myDelegate.modifyOne(AccessUtils.index(myRowsCount, row, col), modifier);
     }
 
-    public void modifyOne(final long index, final UnaryFunction<N> function) {
-        myDelegate.modifyOne(index, function);
+    public void modifyOne(final long index, final UnaryFunction<N> modifier) {
+        myDelegate.modifyOne(index, modifier);
     }
 
-    public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
-        myDelegate.modify(first, limit, 1L, function);
+    public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
+        myDelegate.modify(first, limit, 1L, modifier);
     }
 
-    public void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
-        myDelegate.modify(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, function);
+    public void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
+        myDelegate.modify(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, modifier);
     }
 
     public void set(final long index, final double value) {
@@ -604,13 +604,13 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.set(index, value);
     }
 
-    public Array1D<N> sliceColumn(final long row, final long column) {
-        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, myRowsCount, column), 1L);
+    public Array1D<N> sliceColumn(final long row, final long col) {
+        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L);
     }
 
-    public Array1D<N> sliceDiagonal(final long row, final long column) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
-        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount),
+    public Array1D<N> sliceDiagonal(final long row, final long col) {
+        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount),
                 1L + myRowsCount);
     }
 
@@ -618,8 +618,8 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         return myDelegate.asArray1D().sliceRange(first, limit);
     }
 
-    public Array1D<N> sliceRow(final long row, final long column) {
-        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount);
+    public Array1D<N> sliceRow(final long row, final long col) {
+        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount);
     }
 
     @Override
@@ -631,18 +631,17 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.visit(0L, this.count(), 1L, visitor);
     }
 
-    public void visitColumn(final long row, final long column, final VoidFunction<N> visitor) {
-        myDelegate.visit(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, myRowsCount, column), 1L, visitor);
+    public void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
+        myDelegate.visit(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L, visitor);
     }
 
-    public void visitDiagonal(final long row, final long column, final VoidFunction<N> visitor) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - column);
-        myDelegate.visit(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row + tmpCount, column + tmpCount), 1L + myRowsCount,
-                visitor);
+    public void visitDiagonal(final long row, final long col, final VoidFunction<N> visitor) {
+        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
+        myDelegate.visit(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, visitor);
     }
 
-    public void visitOne(final long row, final long column, final VoidFunction<N> visitor) {
-        myDelegate.visitOne(AccessUtils.index(myRowsCount, row, column), visitor);
+    public void visitOne(final long row, final long col, final VoidFunction<N> visitor) {
+        myDelegate.visitOne(AccessUtils.index(myRowsCount, row, col), visitor);
     }
 
     public void visitOne(final long index, final VoidFunction<N> visitor) {
@@ -653,8 +652,8 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.visit(first, limit, 1L, visitor);
     }
 
-    public void visitRow(final long row, final long column, final VoidFunction<N> visitor) {
-        myDelegate.visit(AccessUtils.index(myRowsCount, row, column), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, visitor);
+    public void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
+        myDelegate.visit(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, visitor);
     }
 
     BasicArray<N> getDelegate() {

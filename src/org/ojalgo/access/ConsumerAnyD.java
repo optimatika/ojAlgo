@@ -23,6 +23,7 @@ package org.ojalgo.access;
 
 import java.util.function.Consumer;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.FunctionUtils;
 
 /**
@@ -30,9 +31,25 @@ import org.ojalgo.function.FunctionUtils;
  *
  * @author apete
  */
-public interface ConsumerAnyD<I extends AccessAnyD<?>> extends StructureAnyD, Consumer<I> {
+public interface ConsumerAnyD<I extends StructureAnyD> extends StructureAnyD, Consumer<I> {
 
-    default boolean isAcceptable(final SupplierAnyD<? extends I> supplier) {
+    interface Elements<N extends Number, I extends AccessAnyD<N>>
+            extends ConsumerAnyD<I>, MutateAnyD, MutateAnyD.Fillable<N>, MutateAnyD.Modifiable<N>, MutateAnyD.BiModifiable<N> {
+
+        default void accept(final I supplied) {
+            if (this.isAcceptable(supplied)) {
+                final long tmpLimit = supplied.count();
+                for (long i = 0L; i < tmpLimit; i++) {
+                    this.set(i, supplied.get(i));
+                }
+            } else {
+                throw new ProgrammingError("Not acceptable!");
+            }
+        }
+
+    }
+
+    default boolean isAcceptable(final StructureAnyD supplier) {
 
         boolean retVal = true;
 

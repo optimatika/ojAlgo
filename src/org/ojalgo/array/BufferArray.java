@@ -293,7 +293,7 @@ public class BufferArray extends DenseArray<Double> {
     }
 
     @Override
-    protected void fillOneMatching(final int index, final Access1D<?> values, final long valueIndex) {
+    protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
         myBuffer.put(index, values.doubleValue(valueIndex));
     }
 

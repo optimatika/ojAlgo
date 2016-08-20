@@ -74,8 +74,8 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
         return (row < mySplit) ? this.getBase().firstInRow(row) : myBelow.firstInRow(row - mySplit);
     }
 
-    public N get(final long row, final long column) {
-        return (row >= mySplit) ? myBelow.get(row - mySplit, column) : this.getBase().get(row, column);
+    public N get(final long row, final long col) {
+        return (row >= mySplit) ? myBelow.get(row - mySplit, col) : this.getBase().get(row, col);
     }
 
     @Override

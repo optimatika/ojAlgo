@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.RandomAccess;
 import java.util.Spliterator;
-import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Factory1D;
@@ -48,8 +47,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D.Fillable<N>,
-        Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
+public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D,
+        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
@@ -355,6 +354,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         myDelegate.fill(myFirst, myLimit, myStep, supplier);
     }
 
+    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
+        myDelegate.fillOne(myFirst + (myStep * index), values, valueIndex);
+    }
+
     public void fillOne(final long index, final N value) {
         final long tmpIndex = myFirst + (myStep * index);
         myDelegate.fillOne(tmpIndex, value);
@@ -363,10 +366,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public void fillOne(final long index, final NullaryFunction<N> supplier) {
         final long tmpIndex = myFirst + (myStep * index);
         myDelegate.fillOne(tmpIndex, supplier);
-    }
-
-    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-        myDelegate.fillOneMatching(myFirst + (myStep * index), values, valueIndex);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
@@ -436,8 +435,8 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return myDelegate.isSmall(myFirst + (myStep * index), comparedTo);
     }
 
-    public void modifyAll(final UnaryFunction<N> function) {
-        myDelegate.modify(myFirst, myLimit, myStep, function);
+    public void modifyAll(final UnaryFunction<N> modifier) {
+        myDelegate.modify(myFirst, myLimit, myStep, modifier);
     }
 
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
@@ -466,14 +465,14 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         }
     }
 
-    public void modifyOne(final long index, final UnaryFunction<N> function) {
-        myDelegate.modifyOne(myFirst + (myStep * index), function);
+    public void modifyOne(final long index, final UnaryFunction<N> modifier) {
+        myDelegate.modifyOne(myFirst + (myStep * index), modifier);
     }
 
-    public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
+    public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
         final long tmpFirst = myFirst + (myStep * first);
         final long tmpLimit = myFirst + (myStep * limit);
-        myDelegate.modify(tmpFirst, tmpLimit, myStep, function);
+        myDelegate.modify(tmpFirst, tmpLimit, myStep, modifier);
     }
 
     /**
@@ -617,7 +616,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     }
 
     public Spliterator<N> spliterator() {
-        return Spliterators.spliterator(this, Spliterator.ORDERED | Spliterator.IMMUTABLE);
+        return myDelegate.spliterator();
     }
 
     @Override

@@ -341,8 +341,8 @@ public final class ComplexNumber extends Number implements Scalar<ComplexNumber>
         return this.doubleValue(index);
     }
 
-    public Double get(final long row, final long column) {
-        return this.doubleValue(row, column);
+    public Double get(final long row, final long col) {
+        return this.doubleValue(row, col);
     }
 
     public double getArgument() {

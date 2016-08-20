@@ -23,14 +23,32 @@ package org.ojalgo.access;
 
 import java.util.function.Consumer;
 
+import org.ojalgo.ProgrammingError;
+
 /**
  * You can query the size/count before accepting.
  *
  * @author apete
  */
-public interface Consumer1D<I extends Access1D<?>> extends Structure1D, Consumer<I> {
+public interface Consumer1D<I extends Structure1D> extends Structure1D, Consumer<I> {
 
-    default boolean isAcceptable(final Supplier1D<? extends I> supplier) {
+    interface Elements<N extends Number, I extends Access1D<N>>
+            extends Consumer1D<I>, Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N> {
+
+        default void accept(final I supplied) {
+            if (this.isAcceptable(supplied)) {
+                final long tmpLimit = supplied.count();
+                for (long i = 0L; i < tmpLimit; i++) {
+                    this.set(i, supplied.get(i));
+                }
+            } else {
+                throw new ProgrammingError("Not acceptable!");
+            }
+        }
+
+    }
+
+    default boolean isAcceptable(final Structure1D supplier) {
         return this.count() >= supplier.count();
     }
 

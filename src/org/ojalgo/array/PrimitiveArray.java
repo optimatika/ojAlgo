@@ -488,7 +488,7 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
-    protected void fillOneMatching(final int index, final Access1D<?> values, final long valueIndex) {
+    protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
         data[index] = values.doubleValue(valueIndex);
     }
 

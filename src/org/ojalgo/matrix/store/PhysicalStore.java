@@ -27,6 +27,7 @@ import java.util.List;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Factory2D;
+import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -53,7 +54,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Number> extends MatrixStore<N>, ElementsConsumer<N>, Access2D.IndexOf, Access2D.Special<N> {
+public interface PhysicalStore<N extends Number> extends MatrixStore<N>, ElementsConsumer<N>, Access2D.IndexOf, Mutate2D.Special<N> {
 
     public static final class ColumnsRegion<N extends Number> extends ConsumerRegion<N> {
 
@@ -82,36 +83,36 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             return myBase.countRows();
         }
 
-        public void fillColumn(final long row, final long column, final Access1D<N> values) {
-            myBase.fillColumn(row, myColumns[(int) column], values);
+        public void fillColumn(final long row, final long col, final Access1D<N> values) {
+            myBase.fillColumn(row, myColumns[(int) col], values);
         }
 
-        public void fillColumn(final long row, final long column, final N value) {
-            myBase.fillColumn(row, myColumns[(int) column], value);
+        public void fillColumn(final long row, final long col, final N value) {
+            myBase.fillColumn(row, myColumns[(int) col], value);
         }
 
-        public void fillColumn(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillColumn(row, myColumns[(int) column], supplier);
+        public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillColumn(row, myColumns[(int) col], supplier);
         }
 
-        public void fillOne(final long row, final long column, final N value) {
-            myBase.fillOne(row, myColumns[(int) column], value);
+        public void fillOne(final long row, final long col, final N value) {
+            myBase.fillOne(row, myColumns[(int) col], value);
         }
 
-        public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillOne(row, myColumns[(int) column], supplier);
+        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillOne(row, myColumns[(int) col], supplier);
         }
 
-        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOneMatching(row, myColumns[(int) column], values, valueIndex);
+        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOne(row, myColumns[(int) col], values, valueIndex);
         }
 
-        public void modifyColumn(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyColumn(row, myColumns[(int) column], function);
+        public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyColumn(row, myColumns[(int) col], modifier);
         }
 
-        public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyOne(row, myColumns[(int) column], function);
+        public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyOne(row, myColumns[(int) col], modifier);
         }
 
         public void set(final long row, final long col, final double value) {
@@ -254,20 +255,20 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             return myRowLimit;
         }
 
-        public void fillOne(final long row, final long column, final N value) {
-            myBase.fillOne(row, column, value);
+        public void fillOne(final long row, final long col, final N value) {
+            myBase.fillOne(row, col, value);
         }
 
-        public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillOne(row, column, supplier);
+        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillOne(row, col, supplier);
         }
 
-        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOneMatching(row, column, values, valueIndex);
+        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOne(row, col, values, valueIndex);
         }
 
-        public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyOne(row, column, function);
+        public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyOne(row, col, modifier);
         }
 
         public void set(final long row, final long col, final double value) {
@@ -324,62 +325,62 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             }
         }
 
-        public void fillColumn(final long row, final long column, final N value) {
-            myBase.fillColumn(myRowOffset + row, myColumnOffset + column, value);
+        public void fillColumn(final long row, final long col, final N value) {
+            myBase.fillColumn(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillColumn(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillColumn(myRowOffset + row, myColumnOffset + column, supplier);
+        public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillColumn(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
-        public void fillDiagonal(final long row, final long column, final N value) {
-            myBase.fillDiagonal(myRowOffset + row, myColumnOffset + column, value);
+        public void fillDiagonal(final long row, final long col, final N value) {
+            myBase.fillDiagonal(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillDiagonal(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillDiagonal(myRowOffset + row, myColumnOffset + column, supplier);
+        public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillDiagonal(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
-        public void fillOne(final long row, final long column, final N value) {
-            myBase.fillOne(myRowOffset + row, myColumnOffset + column, value);
+        public void fillOne(final long row, final long col, final N value) {
+            myBase.fillOne(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillOne(myRowOffset + row, myColumnOffset + column, supplier);
+        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillOne(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
-        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOneMatching(myRowOffset + row, myColumnOffset + column, values, valueIndex);
+        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOne(myRowOffset + row, myColumnOffset + col, values, valueIndex);
         }
 
-        public void fillRow(final long row, final long column, final N value) {
-            myBase.fillRow(myRowOffset + row, myColumnOffset + column, value);
+        public void fillRow(final long row, final long col, final N value) {
+            myBase.fillRow(myRowOffset + row, myColumnOffset + col, value);
         }
 
-        public void fillRow(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillRow(myRowOffset + row, myColumnOffset + column, supplier);
+        public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillRow(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
-        public void modifyAll(final UnaryFunction<N> function) {
+        public void modifyAll(final UnaryFunction<N> modifier) {
             for (long j = myColumnOffset; j < myBase.countColumns(); j++) {
-                myBase.modifyColumn(myRowOffset, j, function);
+                myBase.modifyColumn(myRowOffset, j, modifier);
             }
         }
 
-        public void modifyColumn(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyColumn(myRowOffset + row, myColumnOffset + column, function);
+        public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyColumn(myRowOffset + row, myColumnOffset + col, modifier);
         }
 
-        public void modifyDiagonal(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyDiagonal(myRowOffset + row, myColumnOffset + column, function);
+        public void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyDiagonal(myRowOffset + row, myColumnOffset + col, modifier);
         }
 
-        public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyOne(myRowOffset + row, myColumnOffset + column, function);
+        public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyOne(myRowOffset + row, myColumnOffset + col, modifier);
         }
 
-        public void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyRow(myRowOffset + row, myColumnOffset + column, function);
+        public void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyRow(myRowOffset + row, myColumnOffset + col, modifier);
         }
 
         public void set(final long row, final long col, final double value) {
@@ -419,36 +420,36 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             return myRows.length;
         }
 
-        public void fillOne(final long row, final long column, final N value) {
-            myBase.fillOne(myRows[(int) row], column, value);
+        public void fillOne(final long row, final long col, final N value) {
+            myBase.fillOne(myRows[(int) row], col, value);
         }
 
-        public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillOne(myRows[(int) row], column, supplier);
+        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillOne(myRows[(int) row], col, supplier);
         }
 
-        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOneMatching(myRows[(int) row], column, values, valueIndex);
+        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOne(myRows[(int) row], col, values, valueIndex);
         }
 
-        public void fillRow(final long row, final long column, final Access1D<N> values) {
-            myBase.fillRow(myRows[(int) row], column, values);
+        public void fillRow(final long row, final long col, final Access1D<N> values) {
+            myBase.fillRow(myRows[(int) row], col, values);
         }
 
-        public void fillRow(final long row, final long column, final N value) {
-            myBase.fillRow(myRows[(int) row], column, value);
+        public void fillRow(final long row, final long col, final N value) {
+            myBase.fillRow(myRows[(int) row], col, value);
         }
 
-        public void fillRow(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillRow(myRows[(int) row], column, supplier);
+        public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillRow(myRows[(int) row], col, supplier);
         }
 
-        public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyOne(myRows[(int) row], column, function);
+        public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyOne(myRows[(int) row], col, modifier);
         }
 
-        public void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyRow(myRows[(int) row], column, function);
+        public void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyRow(myRows[(int) row], col, modifier);
         }
 
         public void set(final long row, final long col, final double value) {
@@ -486,48 +487,48 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             return myBase.countColumns();
         }
 
-        public void fillColumn(final long row, final long column, final N value) {
-            myBase.fillRow(column, row, value);
+        public void fillColumn(final long row, final long col, final N value) {
+            myBase.fillRow(col, row, value);
         }
 
-        public void fillColumn(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillRow(column, row, supplier);
+        public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillRow(col, row, supplier);
         }
 
-        public void fillDiagonal(final long row, final long column, final N value) {
-            myBase.fillDiagonal(column, row, value);
+        public void fillDiagonal(final long row, final long col, final N value) {
+            myBase.fillDiagonal(col, row, value);
         }
 
-        public void fillDiagonal(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillRow(column, row, supplier);
+        public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillRow(col, row, supplier);
         }
 
-        public void fillOne(final long row, final long column, final N value) {
-            myBase.fillOne(column, row, value);
+        public void fillOne(final long row, final long col, final N value) {
+            myBase.fillOne(col, row, value);
         }
 
-        public void fillOne(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillOne(column, row, supplier);
+        public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillOne(col, row, supplier);
         }
 
-        public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOneMatching(column, row, values, valueIndex);
+        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOne(col, row, values, valueIndex);
         }
 
-        public void fillRow(final long row, final long column, final N value) {
-            myBase.fillDiagonal(column, row, value);
+        public void fillRow(final long row, final long col, final N value) {
+            myBase.fillDiagonal(col, row, value);
         }
 
-        public void fillRow(final long row, final long column, final NullaryFunction<N> supplier) {
-            myBase.fillDiagonal(column, row, supplier);
+        public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
+            myBase.fillDiagonal(col, row, supplier);
         }
 
-        public void modifyColumn(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyRow(column, row, function);
+        public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyRow(col, row, modifier);
         }
 
-        public void modifyDiagonal(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyDiagonal(column, row, function);
+        public void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyDiagonal(col, row, modifier);
         }
 
         @Override
@@ -540,12 +541,12 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.modifyMatching(function, right);
         }
 
-        public void modifyOne(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyOne(column, row, function);
+        public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyOne(col, row, modifier);
         }
 
-        public void modifyRow(final long row, final long column, final UnaryFunction<N> function) {
-            myBase.modifyColumn(column, row, function);
+        public void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
+            myBase.modifyColumn(col, row, modifier);
         }
 
         @Override

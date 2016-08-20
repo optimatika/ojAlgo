@@ -998,7 +998,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         multiplyNeither = MultiplyNeither.getPrimitive(myRowDim, myColDim);
     }
 
-    public void accept(final Access2D<Double> supplied) {
+    public void accept(final Access2D<?> supplied) {
         for (long j = 0L; j < supplied.countColumns(); j++) {
             for (long i = 0L; i < supplied.countRows(); i++) {
                 this.set(i, j, supplied.doubleValue(i, j));
@@ -1276,28 +1276,28 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public void fillColumn(final long row, final long column, final Access1D<Double> values) {
-        final long tmpOffset = row + (column * myRowDim);
+    public void fillColumn(final long row, final long col, final Access1D<Double> values) {
+        final long tmpOffset = row + (col * myRowDim);
         final long tmpCount = values.count();
         for (long i = 0L; i < tmpCount; i++) {
             this.set(tmpOffset + i, values.doubleValue(i));
         }
     }
 
-    public void fillColumn(final long row, final long column, final Double value) {
-        myUtility.fillColumn(row, column, value);
+    public void fillColumn(final long row, final long col, final Double value) {
+        myUtility.fillColumn(row, col, value);
     }
 
-    public void fillColumn(final long row, final long column, final NullaryFunction<Double> supplier) {
-        myUtility.fillColumn(row, column, supplier);
+    public void fillColumn(final long row, final long col, final NullaryFunction<Double> supplier) {
+        myUtility.fillColumn(row, col, supplier);
     }
 
-    public void fillDiagonal(final long row, final long column, final Double value) {
-        myUtility.fillDiagonal(row, column, value);
+    public void fillDiagonal(final long row, final long col, final Double value) {
+        myUtility.fillDiagonal(row, col, value);
     }
 
-    public void fillDiagonal(final long row, final long column, final NullaryFunction<Double> supplier) {
-        myUtility.fillDiagonal(row, column, supplier);
+    public void fillDiagonal(final long row, final long col, final NullaryFunction<Double> supplier) {
+        myUtility.fillDiagonal(row, col, supplier);
     }
 
     public void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
@@ -1348,24 +1348,24 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public void fillOne(final long row, final long column, final Double value) {
-        myUtility.fillOne(row, column, value);
+    public void fillOne(final long row, final long col, final Double value) {
+        myUtility.fillOne(row, col, value);
     }
 
-    public void fillOne(final long row, final long column, final NullaryFunction<Double> supplier) {
-        myUtility.fillOne(row, column, supplier);
+    public void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
+        myUtility.fillOne(row, col, supplier);
     }
 
-    public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-        this.set(row, column, values.doubleValue(valueIndex));
+    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+        this.set(row, col, values.doubleValue(valueIndex));
     }
 
-    public void fillRow(final long row, final long column, final Double value) {
-        myUtility.fillRow(row, column, value);
+    public void fillRow(final long row, final long col, final Double value) {
+        myUtility.fillRow(row, col, value);
     }
 
-    public void fillRow(final long row, final long column, final NullaryFunction<Double> supplier) {
-        myUtility.fillRow(row, column, supplier);
+    public void fillRow(final long row, final long col, final NullaryFunction<Double> supplier) {
+        myUtility.fillRow(row, col, supplier);
     }
 
     public boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<Double> destination) {
@@ -1393,28 +1393,28 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return (int) myUtility.indexOfLargestInColumn(row, column);
     }
 
-    public long indexOfLargestInColumn(final long row, final long column) {
-        return myUtility.indexOfLargestInColumn(row, column);
+    public long indexOfLargestInColumn(final long row, final long col) {
+        return myUtility.indexOfLargestInColumn(row, col);
     }
 
     public int indexOfLargestInDiagonal(final int row, final int column) {
         return (int) myUtility.indexOfLargestInDiagonal(row, column);
     }
 
-    public long indexOfLargestInDiagonal(final long row, final long column) {
-        return myUtility.indexOfLargestInDiagonal(row, column);
+    public long indexOfLargestInDiagonal(final long row, final long col) {
+        return myUtility.indexOfLargestInDiagonal(row, col);
     }
 
-    public long indexOfLargestInRow(final long row, final long column) {
-        return myUtility.indexOfLargestInRow(row, column);
+    public long indexOfLargestInRow(final long row, final long col) {
+        return myUtility.indexOfLargestInRow(row, col);
     }
 
-    public boolean isAbsolute(final long row, final long column) {
-        return myUtility.isAbsolute(row, column);
+    public boolean isAbsolute(final long row, final long col) {
+        return myUtility.isAbsolute(row, col);
     }
 
-    public boolean isSmall(final long row, final long column, final double comparedTo) {
-        return myUtility.isSmall(row, column, comparedTo);
+    public boolean isSmall(final long row, final long col, final double comparedTo) {
+        return myUtility.isSmall(row, col, comparedTo);
     }
 
     public void maxpy(final Double aSclrA, final MatrixStore<Double> aMtrxX) {
@@ -1442,7 +1442,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     @Override
-    public void modifyAll(final UnaryFunction<Double> function) {
+    public void modifyAll(final UnaryFunction<Double> modifier) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1453,7 +1453,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
                 @Override
                 public void conquer(final int first, final int limit) {
-                    PrimitiveDenseStore.this.modify(tmpRowDim * first, tmpRowDim * limit, 1, function);
+                    PrimitiveDenseStore.this.modify(tmpRowDim * first, tmpRowDim * limit, 1, modifier);
                 }
 
             };
@@ -1462,16 +1462,16 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
         } else {
 
-            this.modify(tmpRowDim * 0, tmpRowDim * tmpColDim, 1, function);
+            this.modify(tmpRowDim * 0, tmpRowDim * tmpColDim, 1, modifier);
         }
     }
 
-    public void modifyColumn(final long row, final long column, final UnaryFunction<Double> function) {
-        myUtility.modifyColumn(row, column, function);
+    public void modifyColumn(final long row, final long col, final UnaryFunction<Double> modifier) {
+        myUtility.modifyColumn(row, col, modifier);
     }
 
-    public void modifyDiagonal(final long row, final long column, final UnaryFunction<Double> function) {
-        myUtility.modifyDiagonal(row, column, function);
+    public void modifyDiagonal(final long row, final long col, final UnaryFunction<Double> modifier) {
+        myUtility.modifyDiagonal(row, col, modifier);
     }
 
     public void modifyMatching(final Access1D<Double> left, final BinaryFunction<Double> function) {
@@ -1488,17 +1488,17 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public void modifyOne(final long row, final long column, final UnaryFunction<Double> function) {
+    public void modifyOne(final long row, final long col, final UnaryFunction<Double> modifier) {
 
-        double tmpValue = this.doubleValue(row, column);
+        double tmpValue = this.doubleValue(row, col);
 
-        tmpValue = function.invoke(tmpValue);
+        tmpValue = modifier.invoke(tmpValue);
 
-        this.set(row, column, tmpValue);
+        this.set(row, col, tmpValue);
     }
 
-    public void modifyRow(final long row, final long column, final UnaryFunction<Double> function) {
-        myUtility.modifyRow(row, column, function);
+    public void modifyRow(final long row, final long col, final UnaryFunction<Double> modifier) {
+        myUtility.modifyRow(row, col, modifier);
     }
 
     public MatrixStore<Double> multiply(final MatrixStore<Double> right) {
@@ -1571,20 +1571,20 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.fillColumn(aCol + 1, aCol, ZERO);
     }
 
-    public Array1D<Double> sliceColumn(final long row, final long column) {
-        return myUtility.sliceColumn(row, column);
+    public Array1D<Double> sliceColumn(final long row, final long col) {
+        return myUtility.sliceColumn(row, col);
     }
 
-    public Array1D<Double> sliceDiagonal(final long row, final long column) {
-        return myUtility.sliceDiagonal(row, column);
+    public Array1D<Double> sliceDiagonal(final long row, final long col) {
+        return myUtility.sliceDiagonal(row, col);
     }
 
     public Array1D<Double> sliceRange(final long first, final long limit) {
         return myUtility.sliceRange(first, limit);
     }
 
-    public Array1D<Double> sliceRow(final long row, final long column) {
-        return myUtility.sliceRow(row, column);
+    public Array1D<Double> sliceRow(final long row, final long col) {
+        return myUtility.sliceRow(row, col);
     }
 
     public void substituteBackwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
@@ -1766,21 +1766,16 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         HouseholderHermitian.tred2j(data, ((PrimitiveArray) mainDiagonal).data, ((PrimitiveArray) offDiagonal).data, yesvecs);
     }
 
-    @Override
-    public void visitAll(final VoidFunction<Double> visitor) {
-        myUtility.visitAll(visitor);
+    public void visitColumn(final long row, final long col, final VoidFunction<Double> visitor) {
+        myUtility.visitColumn(row, col, visitor);
     }
 
-    public void visitColumn(final long row, final long column, final VoidFunction<Double> visitor) {
-        myUtility.visitColumn(row, column, visitor);
+    public void visitDiagonal(final long row, final long col, final VoidFunction<Double> visitor) {
+        myUtility.visitDiagonal(row, col, visitor);
     }
 
-    public void visitDiagonal(final long row, final long column, final VoidFunction<Double> visitor) {
-        myUtility.visitDiagonal(row, column, visitor);
-    }
-
-    public void visitRow(final long row, final long column, final VoidFunction<Double> visitor) {
-        myUtility.visitRow(row, column, visitor);
+    public void visitRow(final long row, final long col, final VoidFunction<Double> visitor) {
+        myUtility.visitRow(row, col, visitor);
     }
 
     int getColDim() {

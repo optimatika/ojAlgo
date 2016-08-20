@@ -62,8 +62,8 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
         return this.getBase().firstInRow(myRows[row]);
     }
 
-    public N get(final long row, final long column) {
-        return this.getBase().get(myRows[(int) row], column);
+    public N get(final long row, final long col) {
+        return this.getBase().get(myRows[(int) row], col);
     }
 
     @Override

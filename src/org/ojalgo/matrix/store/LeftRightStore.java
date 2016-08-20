@@ -75,8 +75,8 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
         return this.getBase().firstInRow(row);
     }
 
-    public N get(final long row, final long column) {
-        return (column >= mySplit) ? myRight.get(row, column - mySplit) : this.getBase().get(row, column);
+    public N get(final long row, final long col) {
+        return (col >= mySplit) ? myRight.get(row, col - mySplit) : this.getBase().get(row, col);
     }
 
     @Override

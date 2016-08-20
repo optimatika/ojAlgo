@@ -28,6 +28,16 @@ import java.util.function.Supplier;
  *
  * @author apete
  */
-public interface SupplierAnyD<I extends AccessAnyD<?>> extends StructureAnyD, Supplier<I> {
+public interface SupplierAnyD<I extends StructureAnyD> extends StructureAnyD, Supplier<I> {
+
+    interface Elements<N extends Number, C extends ConsumerAnyD.Elements<N, ?>, I extends StructureAnyD> extends Pipeline<N, C>, SupplierAnyD<I> {
+
+    }
+
+    interface Pipeline<N extends Number, C extends ConsumerAnyD.Elements<N, ?>> extends StructureAnyD {
+
+        void supplyTo(C consumer);
+
+    }
 
 }

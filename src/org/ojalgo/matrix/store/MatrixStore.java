@@ -595,7 +595,7 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         return this.multiply(PrimitiveMath.ONE / this.norm());
     }
 
-    default Access1D<N> sliceColumn(final long row, final long column) {
+    default Access1D<N> sliceColumn(final long row, final long col) {
         return new Access1D<N>() {
 
             public long count() {
@@ -603,29 +603,29 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
             }
 
             public double doubleValue(final long index) {
-                return MatrixStore.this.doubleValue(row + index, column);
+                return MatrixStore.this.doubleValue(row + index, col);
             }
 
             public N get(final long index) {
-                return MatrixStore.this.get(row + index, column);
+                return MatrixStore.this.get(row + index, col);
             }
 
         };
     }
 
-    default Access1D<N> sliceDiagonal(final long row, final long column) {
+    default Access1D<N> sliceDiagonal(final long row, final long col) {
         return new Access1D<N>() {
 
             public long count() {
-                return Math.min(MatrixStore.this.countRows() - row, MatrixStore.this.countColumns() - column);
+                return Math.min(MatrixStore.this.countRows() - row, MatrixStore.this.countColumns() - col);
             }
 
             public double doubleValue(final long index) {
-                return MatrixStore.this.doubleValue(row + index, column + index);
+                return MatrixStore.this.doubleValue(row + index, col + index);
             }
 
             public N get(final long index) {
-                return MatrixStore.this.get(row + index, column + index);
+                return MatrixStore.this.get(row + index, col + index);
             }
 
         };
@@ -649,19 +649,19 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         };
     }
 
-    default Access1D<N> sliceRow(final long row, final long column) {
+    default Access1D<N> sliceRow(final long row, final long col) {
         return new Access1D<N>() {
 
             public long count() {
-                return MatrixStore.this.countColumns() - column;
+                return MatrixStore.this.countColumns() - col;
             }
 
             public double doubleValue(final long index) {
-                return MatrixStore.this.doubleValue(row, column + index);
+                return MatrixStore.this.doubleValue(row, col + index);
             }
 
             public N get(final long index) {
-                return MatrixStore.this.get(row, column + index);
+                return MatrixStore.this.get(row, col + index);
             }
 
         };
@@ -682,8 +682,8 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
         return new TransposedStore<>(this);
     }
 
-    default void visitOne(final long row, final long column, final VoidFunction<N> visitor) {
-        visitor.invoke(this.get(row, column));
+    default void visitOne(final long row, final long col, final VoidFunction<N> visitor) {
+        visitor.invoke(this.get(row, col));
     }
 
 }

@@ -19,16 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.access;
+package org.ojalgo.matrix.convert;
 
-import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.matrix.store.ElementsSupplier;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-public interface FactoryAnyD<I extends StructureAnyD> {
+public abstract class MatrixSupplier<T> implements ElementsSupplier<Double> {
 
-    I copy(AccessAnyD<?> source);
+    private final T mySource;
 
-    I makeFilled(long[] structure, NullaryFunction<?> supplier);
+    public MatrixSupplier(final T source) {
+        super();
+        mySource = source;
+    }
 
-    I makeZero(long... structure);
+    public PhysicalStore.Factory<Double, PrimitiveDenseStore> factory() {
+        return PrimitiveDenseStore.FACTORY;
+    }
+
+    protected final T getSource() {
+        return mySource;
+    }
 
 }

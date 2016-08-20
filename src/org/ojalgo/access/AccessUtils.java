@@ -76,8 +76,8 @@ public abstract class AccessUtils {
                 return TypeUtils.toBigDecimal(access.get(index));
             }
 
-            public BigDecimal get(final long row, final long column) {
-                return TypeUtils.toBigDecimal(access.get(row, column));
+            public BigDecimal get(final long row, final long col) {
+                return TypeUtils.toBigDecimal(access.get(row, col));
             }
 
         };
@@ -162,8 +162,8 @@ public abstract class AccessUtils {
                 return ComplexNumber.valueOf(access.get(index));
             }
 
-            public ComplexNumber get(final long row, final long column) {
-                return ComplexNumber.valueOf(access.get(row, column));
+            public ComplexNumber get(final long row, final long col) {
+                return ComplexNumber.valueOf(access.get(row, col));
             }
 
         };
@@ -248,8 +248,8 @@ public abstract class AccessUtils {
                 return access.doubleValue(index);
             }
 
-            public Double get(final long row, final long column) {
-                return access.doubleValue(row, column);
+            public Double get(final long row, final long col) {
+                return access.doubleValue(row, col);
             }
 
         };
@@ -334,8 +334,8 @@ public abstract class AccessUtils {
                 return Quaternion.valueOf(access.get(index));
             }
 
-            public Quaternion get(final long row, final long column) {
-                return Quaternion.valueOf(access.get(row, column));
+            public Quaternion get(final long row, final long col) {
+                return Quaternion.valueOf(access.get(row, col));
             }
 
         };
@@ -420,8 +420,8 @@ public abstract class AccessUtils {
                 return RationalNumber.valueOf(access.get(index));
             }
 
-            public RationalNumber get(final long row, final long column) {
-                return RationalNumber.valueOf(access.get(row, column));
+            public RationalNumber get(final long row, final long col) {
+                return RationalNumber.valueOf(access.get(row, col));
             }
 
         };

@@ -28,6 +28,16 @@ import java.util.function.Supplier;
  *
  * @author apete
  */
-public interface Supplier2D<I extends Access2D<?>> extends Structure2D, Supplier<I> {
+public interface Supplier2D<I extends Structure2D> extends Structure2D, Supplier<I> {
+
+    interface Elements<N extends Number, C extends Consumer2D.Elements<N>, I extends Structure2D> extends Pipeline<N, C>, Supplier2D<I> {
+
+    }
+
+    interface Pipeline<N extends Number, C extends Consumer2D.Elements<N>> extends Structure2D {
+
+        void supplyTo(C consumer);
+
+    }
 
 }

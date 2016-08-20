@@ -23,14 +23,34 @@ package org.ojalgo.access;
 
 import java.util.function.Consumer;
 
+import org.ojalgo.ProgrammingError;
+
 /**
  * You can query the size/shape before accepting.
  *
  * @author apete
  */
-public interface Consumer2D<I extends Access2D<?>> extends Structure2D, Consumer<I> {
+public interface Consumer2D extends Structure2D, Consumer<Access2D<?>> {
 
-    default boolean isAcceptable(final Supplier2D<? extends I> supplier) {
+    interface Elements<N extends Number> extends Consumer2D, Mutate2D, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N> {
+
+        default void accept(final Access2D<?> supplied) {
+            if (this.isAcceptable(supplied)) {
+                final long tmpCountRows = supplied.countRows();
+                final long tmpCountColumns = supplied.countColumns();
+                for (long j = 0L; j < tmpCountColumns; j++) {
+                    for (long i = 0L; i < tmpCountRows; i++) {
+                        this.set(i, j, supplied.get(i, j));
+                    }
+                }
+            } else {
+                throw new ProgrammingError("Not acceptable!");
+            }
+        }
+
+    }
+
+    default boolean isAcceptable(final Structure2D supplier) {
         return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
     }
 

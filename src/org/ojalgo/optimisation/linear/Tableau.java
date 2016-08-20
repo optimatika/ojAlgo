@@ -123,8 +123,8 @@ final class Tableau implements Access2D<Double>, Mutate2D {
         }
     }
 
-    public Double get(final long row, final long column) {
-        return this.doubleValue(row, column);
+    public Double get(final long row, final long col) {
+        return this.doubleValue(row, col);
     }
 
     public void set(final long row, final long col, final double value) {

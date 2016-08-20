@@ -282,8 +282,8 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, supplier);
     }
 
-    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-        mySegments[(int) (index >> myIndexBits)].fillOneMatching(index & myIndexMask, values, valueIndex);
+    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
+        mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, values, valueIndex);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
@@ -328,10 +328,10 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return mySegments[(int) (index >> myIndexBits)].isSmall(index & myIndexMask, comparedTo);
     }
 
-    public void modifyOne(final long index, final UnaryFunction<N> function) {
+    public void modifyOne(final long index, final UnaryFunction<N> modifier) {
         final BasicArray<N> tmpSegment = mySegments[(int) (index >> myIndexBits)];
         final long tmpIndex = index & myIndexMask;
-        tmpSegment.set(tmpIndex, function.invoke(tmpSegment.get(tmpIndex)));
+        tmpSegment.set(tmpIndex, modifier.invoke(tmpSegment.get(tmpIndex)));
     }
 
     public void set(final long index, final double value) {

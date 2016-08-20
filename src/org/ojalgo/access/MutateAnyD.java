@@ -31,11 +31,11 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
-    interface BiModifiable<N extends Number> extends MutateAnyD, Mutate1D.BiModifiable<N> {
+    interface BiModifiable<N extends Number> extends StructureAnyD, Mutate1D.BiModifiable<N> {
 
     }
 
-    interface Fillable<N extends Number> extends MutateAnyD, Mutate1D.Fillable<N> {
+    interface Fillable<N extends Number> extends StructureAnyD, Mutate1D.Fillable<N> {
 
         void fillOne(long[] reference, N value);
 
@@ -55,13 +55,13 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
     }
 
-    interface Modifiable<N extends Number> extends MutateAnyD, Mutate1D.Modifiable<N> {
+    interface Modifiable<N extends Number> extends StructureAnyD, Mutate1D.Modifiable<N> {
 
-        void modifyOne(long[] reference, UnaryFunction<N> function);
+        void modifyOne(long[] reference, UnaryFunction<N> modifier);
 
-        default void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
+        default void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
             for (long i = first; i < limit; i++) {
-                this.modifyOne(i, function);
+                this.modifyOne(i, modifier);
             }
         }
 

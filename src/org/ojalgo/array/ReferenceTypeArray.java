@@ -203,7 +203,7 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
     }
 
     @Override
-    protected final void fillOneMatching(final int index, final Access1D<?> values, final long valueIndex) {
+    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
         data[index] = this.valueOf(values.get(valueIndex));
     }
 

@@ -38,7 +38,7 @@ import org.ojalgo.function.UnaryFunction;
  *
  * @author apete
  */
-public interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixStore<N>> {
+public interface ElementsSupplier<N extends Number> extends Supplier2D.Pipeline<N, ElementsConsumer<N>> {
 
     PhysicalStore.Factory<N, ?> factory();
 
@@ -128,8 +128,6 @@ public interface ElementsSupplier<N extends Number> extends Supplier2D<MatrixSto
         };
 
     }
-
-    void supplyTo(final ElementsConsumer<N> consumer);
 
     default ElementsSupplier<N> transpose() {
 

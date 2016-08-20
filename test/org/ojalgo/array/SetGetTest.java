@@ -23,7 +23,7 @@ package org.ojalgo.array;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
+import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 
 public class SetGetTest extends BasicArrayTest {
@@ -49,18 +49,18 @@ public class SetGetTest extends BasicArrayTest {
 
             if (tmpIndex >= 0) {
 
-                Assert.assertEquals(i, INDICES[tmpIndex]);
+                TestUtils.assertEquals(i, INDICES[tmpIndex]);
 
-                Assert.assertEquals(1.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
+                TestUtils.assertEquals(1.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
 
             } else {
 
-                Assert.assertEquals(0.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
+                TestUtils.assertEquals(0.0, array.doubleValue(i), PrimitiveMath.MACHINE_EPSILON);
             }
         }
 
         for (int i = 0; i < INDICES.length; i++) {
-            Assert.assertEquals(1.0, array.doubleValue(INDICES[i]), PrimitiveMath.MACHINE_EPSILON);
+            TestUtils.assertEquals(1.0, array.doubleValue(INDICES[i]), PrimitiveMath.MACHINE_EPSILON);
         }
 
     }

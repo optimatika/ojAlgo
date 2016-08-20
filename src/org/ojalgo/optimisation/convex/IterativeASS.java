@@ -91,8 +91,8 @@ abstract class IterativeASS extends ActiveSetSolver {
             return this.doubleValue((int) row, tmpColumn);
         }
 
-        public Double get(final long row, final long column) {
-            return this.doubleValue(row, column);
+        public Double get(final long row, final long col) {
+            return this.doubleValue(row, col);
         }
 
         void add(final int j, final Access1D<Double> column, final double rhs, final int numberOfNonzeros) {

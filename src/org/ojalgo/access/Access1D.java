@@ -31,7 +31,10 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * 1-dimensional accessor methods
+ * 1-dimensional accessor (get) methods. The nested interfaces declare additional methods that indirectly
+ * requires that the elements has been accessed, but they do not extends the main/outer interface. A
+ * 1D-structure can be vistiable, aggregatable and/or expose various element properties without allowing
+ * explicit access to its elements.
  *
  * @author apete
  */
@@ -57,6 +60,52 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
+    public static final class ElementView<N extends Number> implements ElementView1D<N, ElementView<N>> {
+
+        private long myCursor = -1;
+        private final long myLastCursor;
+        private final Access1D<N> myValues;
+
+        ElementView(final Access1D<N> values) {
+
+            super();
+
+            myValues = values;
+            myLastCursor = values.count() - 1;
+        }
+
+        public double doubleValue() {
+            return myValues.doubleValue(myCursor);
+        }
+
+        public N getNumber() {
+            return myValues.get(myCursor);
+        }
+
+        public boolean hasNext() {
+            return myCursor < myLastCursor;
+        }
+
+        public boolean hasPrevious() {
+            return myCursor > 0;
+        }
+
+        public long index() {
+            return myCursor;
+        }
+
+        public ElementView<N> next() {
+            myCursor++;
+            return this;
+        }
+
+        public ElementView<N> previous() {
+            myCursor--;
+            return this;
+        }
+
+    }
+
     public interface IndexOf extends Structure1D {
 
         default long indexOfLargest() {
@@ -75,12 +124,17 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     public interface Visitable<N extends Number> extends Structure1D {
 
-        void visitAll(VoidFunction<N> visitor);
+        default void visitAll(final VoidFunction<N> visitor) {
+            this.visitRange(0L, this.count(), visitor);
+        }
 
         void visitOne(long index, VoidFunction<N> visitor);
 
-        void visitRange(long first, long limit, VoidFunction<N> visitor);
-
+        default void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
+            for (long i = first; i < limit; i++) {
+                this.visitOne(i, visitor);
+            }
+        }
     }
 
     /**
@@ -90,8 +144,8 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
      * @param y The "vector" to update
      */
     default void daxpy(final double a, final Mutate1D y) {
-        final long tmpLength = Math.min(this.count(), y.count());
-        for (long i = 0L; i < tmpLength; i++) {
+        final long tmpLimit = Math.min(this.count(), y.count());
+        for (long i = 0L; i < tmpLimit; i++) {
             y.add(i, a * this.doubleValue(i));
         }
     }
@@ -104,14 +158,22 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
      */
     default double dot(final Access1D<?> vector) {
         double retVal = PrimitiveMath.ZERO;
-        final long tmpLength = Math.min(this.count(), vector.count());
-        for (long i = 0L; i < tmpLength; i++) {
+        final long tmpLimit = Math.min(this.count(), vector.count());
+        for (long i = 0L; i < tmpLimit; i++) {
             retVal += this.doubleValue(i) * vector.doubleValue(i);
         }
         return retVal;
     }
 
     double doubleValue(long index);
+
+    /**
+     * Returns an Iterable of ElementView1D. It allows to iterate over the instance's element "positions"
+     * without actually extracting the elements (unless you explicitly do so).
+     */
+    default ElementView1D<N, ?> elements() {
+        return new Access1D.ElementView<N>(this);
+    }
 
     N get(long index);
 

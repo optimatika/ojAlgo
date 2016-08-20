@@ -626,7 +626,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         myNumberOfColumns = numberOfColumns;
     }
 
-    public void accept(final Access2D<Double> supplied) {
+    public void accept(final Access2D<?> supplied) {
         for (long j = 0L; j < supplied.countColumns(); j++) {
             for (long i = 0L; i < supplied.countRows(); i++) {
                 this.set(i, j, supplied.doubleValue(i, j));
@@ -770,20 +770,20 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         RawStore.multiply(data, tmpLeft, tmpRight);
     }
 
-    public void fillColumn(final long row, final long column, final Double value) {
-        ArrayUtils.fillColumn(data, (int) row, (int) column, value);
+    public void fillColumn(final long row, final long col, final Double value) {
+        ArrayUtils.fillColumn(data, (int) row, (int) col, value);
     }
 
-    public void fillColumn(final long row, final long column, final NullaryFunction<Double> supplier) {
-        ArrayUtils.fillColumn(data, (int) row, (int) column, supplier);
+    public void fillColumn(final long row, final long col, final NullaryFunction<Double> supplier) {
+        ArrayUtils.fillColumn(data, (int) row, (int) col, supplier);
     }
 
-    public void fillDiagonal(final long row, final long column, final Double value) {
-        ArrayUtils.fillDiagonal(data, (int) row, (int) column, value);
+    public void fillDiagonal(final long row, final long col, final Double value) {
+        ArrayUtils.fillDiagonal(data, (int) row, (int) col, value);
     }
 
-    public void fillDiagonal(final long row, final long column, final NullaryFunction<Double> supplier) {
-        ArrayUtils.fillDiagonal(data, (int) row, (int) column, supplier);
+    public void fillDiagonal(final long row, final long col, final NullaryFunction<Double> supplier) {
+        ArrayUtils.fillDiagonal(data, (int) row, (int) col, supplier);
     }
 
     public void fillMatching(final Access1D<?> source) {
@@ -881,16 +881,16 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.fillMatching(data, left, function, RawStore.convert(right, data.length).data);
     }
 
-    public void fillOne(final long row, final long column, final Double value) {
-        data[(int) row][(int) column] = value;
+    public void fillOne(final long row, final long col, final Double value) {
+        data[(int) row][(int) col] = value;
     }
 
-    public void fillOne(final long row, final long column, final NullaryFunction<Double> supplier) {
-        data[(int) row][(int) column] = supplier.doubleValue();
+    public void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
+        data[(int) row][(int) col] = supplier.doubleValue();
     }
 
-    public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-        this.set(row, column, values.doubleValue(valueIndex));
+    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+        this.set(row, col, values.doubleValue(valueIndex));
     }
 
     public void fillRange(final long first, final long limit, final Double value) {
@@ -901,20 +901,20 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.fillRange(data, (int) first, (int) limit, supplier);
     }
 
-    public void fillRow(final long row, final long column, final Double value) {
-        ArrayUtils.fillRow(data, (int) row, (int) column, value);
+    public void fillRow(final long row, final long col, final Double value) {
+        ArrayUtils.fillRow(data, (int) row, (int) col, value);
     }
 
-    public void fillRow(final long row, final long column, final NullaryFunction<Double> supplier) {
-        ArrayUtils.fillRow(data, (int) row, (int) column, supplier);
+    public void fillRow(final long row, final long col, final NullaryFunction<Double> supplier) {
+        ArrayUtils.fillRow(data, (int) row, (int) col, supplier);
     }
 
     public final MatrixStore<Double> get() {
         return this;
     }
 
-    public Double get(final long row, final long column) {
-        return data[(int) row][(int) column];
+    public Double get(final long row, final long col) {
+        return data[(int) row][(int) col];
     }
 
     /**
@@ -999,7 +999,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
-    public long indexOfLargestInColumn(final long row, final long column) {
+    public long indexOfLargestInColumn(final long row, final long col) {
 
         final int tmpRowDim = data.length;
 
@@ -1008,7 +1008,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         double tmpValue;
 
         for (int i = (int) row; i < tmpRowDim; i++) {
-            tmpValue = PrimitiveFunction.ABS.invoke(data[i][(int) column]);
+            tmpValue = PrimitiveFunction.ABS.invoke(data[i][(int) col]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i;
@@ -1019,15 +1019,15 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
-    public long indexOfLargestInDiagonal(final long row, final long column) {
+    public long indexOfLargestInDiagonal(final long row, final long col) {
 
         final int tmpRowDim = data.length;
 
-        int retVal = (int) (row + (column * tmpRowDim));
+        int retVal = (int) (row + (col * tmpRowDim));
         double tmpLargest = ZERO;
         double tmpValue;
 
-        for (int i = (int) row, j = (int) column; (i < tmpRowDim) && (j < myNumberOfColumns); i++, j++) {
+        for (int i = (int) row, j = (int) col; (i < tmpRowDim) && (j < myNumberOfColumns); i++, j++) {
             tmpValue = PrimitiveFunction.ABS.invoke(data[i][j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
@@ -1059,14 +1059,14 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
-    public long indexOfLargestInRow(final long row, final long column) {
+    public long indexOfLargestInRow(final long row, final long col) {
 
-        int retVal = (int) column;
+        int retVal = (int) col;
         double tmpLargest = ZERO;
         double tmpValue;
         final double[] tmpRow = data[(int) row];
 
-        for (int j = (int) column; j < myNumberOfColumns; j++) {
+        for (int j = (int) col; j < myNumberOfColumns; j++) {
             tmpValue = PrimitiveFunction.ABS.invoke(tmpRow[j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
@@ -1082,8 +1082,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return PrimitiveScalar.isAbsolute(this.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
     }
 
-    public boolean isAbsolute(final long row, final long column) {
-        return PrimitiveScalar.isAbsolute(this.get((int) row, (int) column));
+    public boolean isAbsolute(final long row, final long col) {
+        return PrimitiveScalar.isAbsolute(this.get((int) row, (int) col));
     }
 
     public boolean isSmall(final long index, final double comparedTo) {
@@ -1091,8 +1091,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return PrimitiveScalar.isSmall(comparedTo, this.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
     }
 
-    public boolean isSmall(final long row, final long column, final double comparedTo) {
-        return PrimitiveScalar.isSmall(comparedTo, this.doubleValue(row, column));
+    public boolean isSmall(final long row, final long col, final double comparedTo) {
+        return PrimitiveScalar.isSmall(comparedTo, this.doubleValue(row, col));
     }
 
     public void maxpy(final Double aSclrA, final MatrixStore<Double> aMtrxX) {
@@ -1110,24 +1110,24 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    public void modifyAll(final UnaryFunction<Double> function) {
-        ArrayUtils.modifyAll(data, function);
+    public void modifyAll(final UnaryFunction<Double> modifier) {
+        ArrayUtils.modifyAll(data, modifier);
     }
 
-    public void modifyColumn(final long row, final long column, final UnaryFunction<Double> function) {
-        ArrayUtils.modifyColumn(data, (int) row, (int) column, function);
+    public void modifyColumn(final long row, final long col, final UnaryFunction<Double> modifier) {
+        ArrayUtils.modifyColumn(data, (int) row, (int) col, modifier);
     }
 
-    public void modifyDiagonal(final long row, final long column, final UnaryFunction<Double> function) {
+    public void modifyDiagonal(final long row, final long col, final UnaryFunction<Double> modifier) {
 
-        final long tmpCount = Math.min(data.length - row, myNumberOfColumns - column);
+        final long tmpCount = Math.min(data.length - row, myNumberOfColumns - col);
 
-        final int tmpFirst = (int) (row + (column * data.length));
-        final int tmpLimit = (int) (row + tmpCount + ((column + tmpCount) * data.length));
+        final int tmpFirst = (int) (row + (col * data.length));
+        final int tmpLimit = (int) (row + tmpCount + ((col + tmpCount) * data.length));
         final int tmpStep = 1 + data.length;
 
         for (int ij = tmpFirst; ij < tmpLimit; ij += tmpStep) {
-            this.set(ij, function.invoke(this.doubleValue(ij)));
+            this.set(ij, modifier.invoke(this.doubleValue(ij)));
         }
 
     }
@@ -1162,23 +1162,23 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
     }
 
-    public void modifyOne(final long row, final long column, final UnaryFunction<Double> function) {
+    public void modifyOne(final long row, final long col, final UnaryFunction<Double> modifier) {
 
-        double tmpValue = this.doubleValue(row, column);
+        double tmpValue = this.doubleValue(row, col);
 
-        tmpValue = function.invoke(tmpValue);
+        tmpValue = modifier.invoke(tmpValue);
 
-        this.set(row, column, tmpValue);
+        this.set(row, col, tmpValue);
     }
 
-    public void modifyRange(final long first, final long limit, final UnaryFunction<Double> function) {
+    public void modifyRange(final long first, final long limit, final UnaryFunction<Double> modifier) {
         for (long index = first; index < limit; index++) {
-            this.set(index, function.invoke(this.doubleValue(index)));
+            this.set(index, modifier.invoke(this.doubleValue(index)));
         }
     }
 
-    public void modifyRow(final long row, final long column, final UnaryFunction<Double> function) {
-        ArrayUtils.modifyRow(data, (int) row, (int) column, function);
+    public void modifyRow(final long row, final long col, final UnaryFunction<Double> modifier) {
+        ArrayUtils.modifyRow(data, (int) row, (int) col, modifier);
     }
 
     public RawStore multiply(final MatrixStore<Double> right) {
@@ -1412,20 +1412,20 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.visitAll(data, visitor);
     }
 
-    public void visitColumn(final long row, final long column, final VoidFunction<Double> visitor) {
-        ArrayUtils.visitColumn(data, (int) row, (int) column, visitor);
+    public void visitColumn(final long row, final long col, final VoidFunction<Double> visitor) {
+        ArrayUtils.visitColumn(data, (int) row, (int) col, visitor);
     }
 
-    public void visitDiagonal(final long row, final long column, final VoidFunction<Double> visitor) {
-        ArrayUtils.visitDiagonal(data, (int) row, (int) column, visitor);
+    public void visitDiagonal(final long row, final long col, final VoidFunction<Double> visitor) {
+        ArrayUtils.visitDiagonal(data, (int) row, (int) col, visitor);
     }
 
     public void visitRange(final long first, final long limit, final VoidFunction<Double> visitor) {
         ArrayUtils.visitRange(data, (int) first, (int) limit, visitor);
     }
 
-    public void visitRow(final long row, final long column, final VoidFunction<Double> visitor) {
-        ArrayUtils.visitRow(data, (int) row, (int) column, visitor);
+    public void visitRow(final long row, final long col, final VoidFunction<Double> visitor) {
+        ArrayUtils.visitRow(data, (int) row, (int) col, visitor);
     }
 
 }

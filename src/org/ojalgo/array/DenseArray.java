@@ -96,8 +96,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         this.fillOne((int) index, supplier);
     }
 
-    public final void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-        this.fillOneMatching((int) index, values, valueIndex);
+    public final void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
+        this.fillOne((int) index, values, valueIndex);
     }
 
     public final void fillRange(final long first, final long limit, final N number) {
@@ -126,8 +126,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         return this.isSmall((int) index, comparedTo);
     }
 
-    public final void modifyOne(final long index, final UnaryFunction<N> function) {
-        this.modify((int) index, function);
+    public final void modifyOne(final long index, final UnaryFunction<N> modifier) {
+        this.modify((int) index, modifier);
     }
 
     public final void set(final long index, final double value) {
@@ -190,7 +190,7 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     protected abstract void fillOne(int index, NullaryFunction<N> supplier);
 
-    protected abstract void fillOneMatching(final int index, final Access1D<?> values, final long valueIndex);
+    protected abstract void fillOne(final int index, final Access1D<?> values, final long valueIndex);
 
     protected abstract N get(final int index);
 

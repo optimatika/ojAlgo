@@ -31,8 +31,8 @@ final class LimitStore<N extends Number> extends SelectingStore<N> {
         return this.getBase().doubleValue(row, col);
     }
 
-    public N get(final long row, final long column) {
-        return this.getBase().get(row, column);
+    public N get(final long row, final long col) {
+        return this.getBase().get(row, col);
     }
 
 }

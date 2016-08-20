@@ -54,8 +54,8 @@ import org.ojalgo.scalar.RationalNumber;
  *
  * @author apete
  */
-public abstract class BasicArray<N extends Number>
-        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
+public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
+        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
 
     static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 
@@ -232,12 +232,12 @@ public abstract class BasicArray<N extends Number>
         return this.indexOfLargest(first, limit, 1L);
     }
 
-    public void modifyAll(final UnaryFunction<N> function) {
-        this.modify(0L, this.count(), 1L, function);
+    public void modifyAll(final UnaryFunction<N> modifier) {
+        this.modify(0L, this.count(), 1L, modifier);
     }
 
-    public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
-        this.modify(first, limit, 1L, function);
+    public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
+        this.modify(first, limit, 1L, modifier);
     }
 
     @Override

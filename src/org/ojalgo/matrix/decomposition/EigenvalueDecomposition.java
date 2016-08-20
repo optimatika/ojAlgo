@@ -54,7 +54,7 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
     }
 
     public final boolean decompose(final ElementsSupplier<N> matrix) {
-        return this.compute(matrix.get(), this.isHermitian(), false);
+        return this.compute(matrix, this.isHermitian(), false);
     }
 
     public final MatrixStore<N> getD() {

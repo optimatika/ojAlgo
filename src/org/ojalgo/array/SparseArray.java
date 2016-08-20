@@ -24,7 +24,6 @@ package org.ojalgo.array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
@@ -51,7 +50,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
 
-    public static final class NonzeroView<N extends Number> implements ElementView1D<N, NonzeroView<N>>, Iterable<NonzeroView<N>> {
+    public static final class NonzeroView<N extends Number> implements ElementView1D<N, NonzeroView<N>> {
 
         private int myCursor = -1;
         private final long[] myIndices;
@@ -85,10 +84,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         public long index() {
             return myIndices[myCursor];
-        }
-
-        public Iterator<NonzeroView<N>> iterator() {
-            return this;
         }
 
         public NonzeroView<N> next() {
@@ -387,20 +382,20 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         myValues.fillAll(supplier);
     }
 
+    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
+        if (this.isPrimitive()) {
+            this.set(index, values.doubleValue(valueIndex));
+        } else {
+            this.set(index, values.get(valueIndex));
+        }
+    }
+
     public void fillOne(final long index, final N value) {
         this.set(index, value);
     }
 
     public void fillOne(final long index, final NullaryFunction<N> supplier) {
         this.set(index, supplier.get());
-    }
-
-    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-        if (this.isPrimitive()) {
-            this.set(index, values.doubleValue(valueIndex));
-        } else {
-            this.set(index, values.get(valueIndex));
-        }
     }
 
     @Override
@@ -488,14 +483,14 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    public void modifyAll(final UnaryFunction<N> function) {
+    public void modifyAll(final UnaryFunction<N> modifier) {
 
-        final double tmpZeroValue = function.invoke(myZeroValue);
+        final double tmpZeroValue = modifier.invoke(myZeroValue);
 
         if (!MATH_CONTEXT.isDifferent(myZeroValue, tmpZeroValue)) {
 
             for (int i = 0; i < myActualLength; i++) {
-                myValues.modify(i, function);
+                myValues.modify(i, modifier);
             }
 
         } else {
@@ -504,8 +499,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public void modifyOne(final long index, final UnaryFunction<N> function) {
-        this.set(index, function.invoke(this.get(index)));
+    public void modifyOne(final long index, final UnaryFunction<N> modifier) {
+        this.set(index, modifier.invoke(this.get(index)));
     }
 
     /**

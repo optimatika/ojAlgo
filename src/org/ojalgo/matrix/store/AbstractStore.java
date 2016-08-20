@@ -26,7 +26,6 @@ import java.io.Serializable;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
@@ -108,15 +107,15 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return MatrixUtils.hashCode(this);
     }
 
-    public boolean isAbsolute(final long row, final long column) {
-        return this.toScalar(row, column).isAbsolute();
+    public boolean isAbsolute(final long row, final long col) {
+        return this.toScalar(row, col).isAbsolute();
     }
 
     /**
      * @see org.ojalgo.access.Access2D.Elements#isSmall(long, long, double)
      */
-    public boolean isSmall(final long row, final long column, final double comparedTo) {
-        return this.toScalar(row, column).isSmall(comparedTo);
+    public boolean isSmall(final long row, final long col, final double comparedTo) {
+        return this.toScalar(row, col).isSmall(comparedTo);
     }
 
     public int limitOfColumn(final int col) {
@@ -153,44 +152,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
     @Override
     public final String toString() {
         return MatrixUtils.toString(this);
-    }
-
-    public void visitAll(final VoidFunction<N> visitor) {
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
-        for (int j = 0; j < tmpColDim; j++) {
-            for (int i = 0; i < tmpRowDim; i++) {
-                visitor.invoke(this.get(i, j));
-            }
-        }
-    }
-
-    public void visitColumn(final long row, final long column, final VoidFunction<N> visitor) {
-        final long tmpRowDim = this.countRows();
-        for (long i = row; i < tmpRowDim; i++) {
-            visitor.invoke(this.get(i, column));
-        }
-    }
-
-    public void visitDiagonal(final long row, final long column, final VoidFunction<N> visitor) {
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
-        for (int ij = 0; ((row + ij) < tmpRowDim) && ((column + ij) < tmpColDim); ij++) {
-            visitor.invoke(this.get(row + ij, column + ij));
-        }
-    }
-
-    public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
-        for (long i = first; i < limit; i++) {
-            visitor.invoke(this.get(i));
-        }
-    }
-
-    public void visitRow(final long row, final long column, final VoidFunction<N> visitor) {
-        final long tmpColDim = this.countColumns();
-        for (long j = column; j < tmpColDim; j++) {
-            visitor.invoke(this.get(row, j));
-        }
     }
 
     protected abstract void addNonZerosTo(final ElementsConsumer<N> consumer);

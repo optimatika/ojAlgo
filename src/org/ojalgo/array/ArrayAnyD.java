@@ -238,8 +238,8 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         myDelegate.fillOne(AccessUtils.index(myStructure, reference), supplier);
     }
 
-    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-        myDelegate.fillOneMatching(index, values, valueIndex);
+    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
+        myDelegate.fillOne(index, values, valueIndex);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
@@ -301,8 +301,8 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return myDelegate.isSmall(AccessUtils.index(myStructure, reference), comparedTo);
     }
 
-    public void modifyAll(final UnaryFunction<N> function) {
-        myDelegate.modify(0L, this.count(), 1L, function);
+    public void modifyAll(final UnaryFunction<N> modifier) {
+        myDelegate.modify(0L, this.count(), 1L, modifier);
     }
 
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
@@ -313,16 +313,16 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         myDelegate.modify(0L, this.count(), 1L, function, right);
     }
 
-    public void modifyOne(final long index, final UnaryFunction<N> function) {
-        myDelegate.modifyOne(index, function);
+    public void modifyOne(final long index, final UnaryFunction<N> modifier) {
+        myDelegate.modifyOne(index, modifier);
     }
 
-    public void modifyOne(final long[] reference, final UnaryFunction<N> function) {
-        myDelegate.modifyOne(AccessUtils.index(myStructure, reference), function);
+    public void modifyOne(final long[] reference, final UnaryFunction<N> modifier) {
+        myDelegate.modifyOne(AccessUtils.index(myStructure, reference), modifier);
     }
 
-    public void modifyRange(final long first, final long limit, final UnaryFunction<N> function) {
-        myDelegate.modify(first, limit, 1L, function);
+    public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
+        myDelegate.modify(first, limit, 1L, modifier);
     }
 
     public void modifySet(final long[] first, final int dimension, final UnaryFunction<N> function) {

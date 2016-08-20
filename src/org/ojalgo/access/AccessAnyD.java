@@ -27,6 +27,7 @@ import org.ojalgo.scalar.Scalar;
 /**
  * N-dimensional accessor methods
  *
+ * @see Access1D
  * @author apete
  */
 public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N> {

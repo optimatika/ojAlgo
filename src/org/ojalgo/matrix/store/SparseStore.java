@@ -23,10 +23,10 @@ package org.ojalgo.matrix.store;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.ElementView2D;
 import org.ojalgo.array.SparseArray;
@@ -49,63 +49,6 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     public static interface Factory<N extends Number> {
 
         SparseStore<N> make(long rowsCount, long columnsCount);
-
-    }
-
-    public static final class NonzeroView<N extends Number> implements ElementView2D<N, NonzeroView<N>>, Iterable<NonzeroView<N>> {
-
-        private final SparseArray.NonzeroView<N> myDelegate;
-        private final long myStructure;
-
-        NonzeroView(final SparseArray.NonzeroView<N> delegate, final long structure) {
-
-            super();
-
-            myDelegate = delegate;
-            myStructure = structure;
-        }
-
-        public long column() {
-            return AccessUtils.column(myDelegate.index(), myStructure);
-        }
-
-        public double doubleValue() {
-            return myDelegate.doubleValue();
-        }
-
-        public N getNumber() {
-            return myDelegate.getNumber();
-        }
-
-        public boolean hasNext() {
-            return myDelegate.hasNext();
-        }
-
-        public boolean hasPrevious() {
-            return myDelegate.hasPrevious();
-        }
-
-        public long index() {
-            return myDelegate.index();
-        }
-
-        public Iterator<SparseStore.NonzeroView<N>> iterator() {
-            return this;
-        }
-
-        public SparseStore.NonzeroView<N> next() {
-            myDelegate.next();
-            return this;
-        }
-
-        public SparseStore.NonzeroView<N> previous() {
-            myDelegate.previous();
-            return this;
-        }
-
-        public long row() {
-            return AccessUtils.row(myDelegate.index(), myStructure);
-        }
 
     }
 
@@ -189,6 +132,10 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         myMultiplyer.invoke(this, left, (int) (left.count() / this.countRows()), right);
     }
 
+    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+        this.set(row, col, values.get(valueIndex));
+    }
+
     public void fillOne(final long row, final long col, final N value) {
         myElements.fillOne(AccessUtils.index(myFirsts.length, row, col), value);
         this.updateNonZeros(row, col);
@@ -197,10 +144,6 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
         myElements.fillOne(AccessUtils.index(myFirsts.length, row, col), supplier);
         this.updateNonZeros(row, col);
-    }
-
-    public void fillOneMatching(final long row, final long column, final Access1D<?> values, final long valueIndex) {
-        this.set(row, column, values.get(valueIndex));
     }
 
     public int firstInColumn(final int col) {
@@ -249,15 +192,15 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         return myLimits[row];
     }
 
-    public void modifyAll(final UnaryFunction<N> function) {
+    public void modifyAll(final UnaryFunction<N> modifier) {
         final long tmpLimit = this.count();
         if (this.isPrimitive()) {
             for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(this.doubleValue(i)));
+                this.set(i, modifier.invoke(this.doubleValue(i)));
             }
         } else {
             for (long i = 0L; i < tmpLimit; i++) {
-                this.set(i, function.invoke(this.get(i)));
+                this.set(i, modifier.invoke(this.get(i)));
             }
         }
     }
@@ -288,11 +231,11 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         }
     }
 
-    public void modifyOne(final long row, final long col, final UnaryFunction<N> function) {
+    public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
         if (this.isPrimitive()) {
-            this.set(row, col, function.invoke(this.doubleValue(row, col)));
+            this.set(row, col, modifier.invoke(this.doubleValue(row, col)));
         } else {
-            this.set(row, col, function.invoke(this.get(row, col)));
+            this.set(row, col, modifier.invoke(this.get(row, col)));
         }
     }
 
@@ -309,7 +252,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                 target.fillAll(this.factory().scalar().zero().getNumber());
             }
 
-            for (final NonzeroView<N> tmpNonzero : this.nonzeros()) {
+            for (final ElementView2D<N, ?> tmpNonzero : this.nonzeros()) {
                 final long tmpRow = tmpNonzero.row();
                 final long tmpCol = tmpNonzero.column();
                 final double tmpValue = tmpNonzero.doubleValue();
@@ -335,8 +278,8 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
      * @deprecated v40
      */
     @Deprecated
-    public NonzeroView<N> nonzeros() {
-        return new NonzeroView<>(myElements.nonzeros(), this.countRows());
+    public ElementView2D<N, ?> nonzeros() {
+        return new Access2D.ElementView<N>(myElements.nonzeros(), this.countRows());
     }
 
     public final ElementsConsumer<N> regionByColumns(final int... columns) {

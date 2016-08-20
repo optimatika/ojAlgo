@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.ojalgo.function.NullaryFunction;
 
-public interface Factory2D<I extends Access2D<?>> {
+public interface Factory2D<I extends Structure2D> {
 
     I columns(Access1D<?>... source);
 

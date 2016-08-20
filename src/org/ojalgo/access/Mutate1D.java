@@ -33,7 +33,7 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface Mutate1D extends Structure1D {
 
-    interface BiModifiable<N extends Number> extends Mutate1D {
+    interface BiModifiable<N extends Number> extends Structure1D {
 
         void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function);
 
@@ -41,11 +41,26 @@ public interface Mutate1D extends Structure1D {
 
     }
 
-    interface Fillable<N extends Number> extends Mutate1D {
+    /**
+     * Fills the target
+     *
+     * @author apete
+     */
+    interface Fillable<N extends Number> extends Structure1D {
 
-        void fillAll(N value);
+        default void fillAll(final N value) {
+            final long tmpLimit = this.count();
+            for (long i = 0L; i < tmpLimit; i++) {
+                this.fillOne(i, value);
+            }
+        }
 
-        void fillAll(NullaryFunction<N> supplier);
+        default void fillAll(final NullaryFunction<N> supplier) {
+            final long tmpLimit = this.count();
+            for (long i = 0L; i < tmpLimit; i++) {
+                this.fillOne(i, supplier);
+            }
+        }
 
         /**
          * <p>
@@ -57,7 +72,7 @@ public interface Mutate1D extends Structure1D {
         default void fillMatching(final Access1D<?> values) {
             final long tmpLimit = FunctionUtils.min(this.count(), values.count());
             for (long i = 0L; i < tmpLimit; i++) {
-                this.fillOneMatching(i, values, i);
+                this.fillOne(i, values, i);
             }
         }
 
@@ -96,25 +111,49 @@ public interface Mutate1D extends Structure1D {
             }
         }
 
+        void fillOne(long index, final Access1D<?> values, long valueIndex);
+
         void fillOne(long index, N value);
 
         void fillOne(long index, NullaryFunction<N> supplier);
 
-        void fillOneMatching(long index, final Access1D<?> values, long valueIndex);
+        /**
+         * @deprecated v41 Use {@link #fillOne(long,Access1D,long)} instead
+         */
+        @Deprecated
+        default void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
+            this.fillOne(index, values, valueIndex);
+        }
 
-        void fillRange(long first, long limit, N value);
+        default void fillRange(final long first, final long limit, final N value) {
+            for (long i = first; i < limit; i++) {
+                this.fillOne(i, value);
+            }
+        }
 
-        void fillRange(long first, long limit, NullaryFunction<N> supplier);
-
+        default void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
+            for (long i = first; i < limit; i++) {
+                this.fillOne(i, supplier);
+            }
+        }
     }
 
-    interface Modifiable<N extends Number> extends Mutate1D {
+    interface Modifiable<N extends Number> extends Structure1D {
 
-        void modifyAll(UnaryFunction<N> function);
+        default void modifyAll(final UnaryFunction<N> modifier) {
+            final long tmpLimit = this.count();
+            for (long i = 0L; i < tmpLimit; i++) {
+                this.modifyOne(i, modifier);
+            }
+        }
 
-        void modifyOne(long index, UnaryFunction<N> function);
+        void modifyOne(long index, UnaryFunction<N> modifier);
 
-        void modifyRange(long first, long limit, UnaryFunction<N> function);
+        default void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
+            for (long i = first; i < limit; i++) {
+                this.modifyOne(i, modifier);
+            }
+        }
 
     }
 

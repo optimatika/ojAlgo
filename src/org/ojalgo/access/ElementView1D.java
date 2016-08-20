@@ -23,11 +23,15 @@ package org.ojalgo.access;
 
 import java.util.Iterator;
 
-public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>> extends AccessScalar<N>, Iterator<V> {
+public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>> extends AccessScalar<N>, Iterator<V>, Iterable<V> {
 
     boolean hasPrevious();
 
     long index();
+
+    default Iterator<V> iterator() {
+        return this;
+    }
 
     V previous();
 
