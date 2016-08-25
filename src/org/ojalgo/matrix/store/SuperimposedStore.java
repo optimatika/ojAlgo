@@ -108,7 +108,7 @@ final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
     @Override
     protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillMatching(this.getBase());
-        consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.factory().function().add(), myDiff);
+        consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.physical().function().add(), myDiff);
     }
 
 }

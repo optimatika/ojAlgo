@@ -60,9 +60,9 @@ final class LowerTriangularStore<N extends Number> extends ShadingStore<N> {
 
     public N get(final long row, final long col) {
         if (row < col) {
-            return this.factory().scalar().zero().getNumber();
+            return this.physical().scalar().zero().getNumber();
         } else if (myUnitDiagonal && (row == col)) {
-            return this.factory().scalar().one().getNumber();
+            return this.physical().scalar().one().getNumber();
         } else {
             return this.getBase().get(row, col);
         }
@@ -75,9 +75,9 @@ final class LowerTriangularStore<N extends Number> extends ShadingStore<N> {
 
     public Scalar<N> toScalar(final long row, final long col) {
         if (row < col) {
-            return this.factory().scalar().zero();
+            return this.physical().scalar().zero();
         } else if (myUnitDiagonal && (row == col)) {
-            return this.factory().scalar().one();
+            return this.physical().scalar().one();
         } else {
             return this.getBase().toScalar(row, col);
         }

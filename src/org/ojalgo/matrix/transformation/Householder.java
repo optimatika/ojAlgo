@@ -104,16 +104,8 @@ public interface Householder<N extends Number> extends Access1D<N> {
             return first;
         }
 
-        public BigDecimal get(final int index) {
-            return vector[index];
-        }
-
         public BigDecimal get(final long index) {
             return vector[(int) index];
-        }
-
-        public int size() {
-            return vector.length;
         }
 
         @Override
@@ -215,16 +207,8 @@ public interface Householder<N extends Number> extends Access1D<N> {
             return first;
         }
 
-        public ComplexNumber get(final int index) {
-            return vector[index];
-        }
-
         public ComplexNumber get(final long index) {
             return vector[(int) index];
-        }
-
-        public int size() {
-            return vector.length;
         }
 
         @Override
@@ -324,16 +308,8 @@ public interface Householder<N extends Number> extends Access1D<N> {
             return first;
         }
 
-        public Double get(final int index) {
-            return vector[index];
-        }
-
         public Double get(final long index) {
             return vector[(int) index];
-        }
-
-        public int size() {
-            return vector.length;
         }
 
         @Override

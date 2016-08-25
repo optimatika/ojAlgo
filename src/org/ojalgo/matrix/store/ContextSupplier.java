@@ -32,8 +32,8 @@ abstract class ContextSupplier<N extends Number> implements ElementsSupplier<N> 
         myContext = context;
     }
 
-    public Factory<N, ?> factory() {
-        return myContext.factory();
+    public final Factory<N, ?> physical() {
+        return myContext.physical();
     }
 
     public abstract void supplyTo(final ElementsConsumer<N> consumer);

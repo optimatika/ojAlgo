@@ -105,7 +105,7 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             if (IterativeASS.this.getAE() != null) {
 
-                final PhysicalStore<Double> tmpProdE = IterativeASS.this.getAE().factory().makeZero(IterativeASS.this.getAE().countRows(), 1L);
+                final PhysicalStore<Double> tmpProdE = IterativeASS.this.getAE().physical().makeZero(IterativeASS.this.getAE().countRows(), 1L);
                 IterativeASS.this.getAE().multiply(column, tmpProdE);
 
                 for (int i = 0; i < myCountE; i++) {
@@ -122,7 +122,7 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             if ((IterativeASS.this.getAI() != null) && (myIncluded.length > 0)) {
 
-                final PhysicalStore<Double> tmpProdI = IterativeASS.this.getAI().factory().makeZero(myIncluded.length, 1L);
+                final PhysicalStore<Double> tmpProdI = IterativeASS.this.getAI().physical().makeZero(myIncluded.length, 1L);
                 IterativeASS.this.getAI().logical().row(myIncluded).get().multiply(column, tmpProdI);
 
                 for (int _i = 0; _i < myIncluded.length; _i++) {

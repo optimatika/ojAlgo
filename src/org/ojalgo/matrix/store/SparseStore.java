@@ -249,7 +249,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
             if (target instanceof SparseStore) {
                 ((SparseStore<?>) target).empty();
             } else {
-                target.fillAll(this.factory().scalar().zero().getNumber());
+                target.fillAll(this.physical().scalar().zero().getNumber());
             }
 
             for (final ElementView2D<N, ?> tmpNonzero : this.nonzeros()) {

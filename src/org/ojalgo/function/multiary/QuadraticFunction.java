@@ -84,7 +84,7 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
     @Override
     public MatrixStore<N> getGradient(final Access1D<N> point) {
 
-        final PhysicalStore<N> tmpPreallocated = myFactors.factory().makeZero(this.arity(), 1L);
+        final PhysicalStore<N> tmpPreallocated = myFactors.physical().makeZero(this.arity(), 1L);
 
         this.getHessian(point).multiply(point, tmpPreallocated);
 
@@ -112,7 +112,7 @@ public final class QuadraticFunction<N extends Number> extends AbstractMultiary<
 
     @Override
     protected org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> factory() {
-        return myFactors.factory();
+        return myFactors.physical();
     }
 
 }

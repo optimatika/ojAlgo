@@ -34,7 +34,7 @@ public abstract class MatrixSupplier<T> implements ElementsSupplier<Double> {
         mySource = source;
     }
 
-    public PhysicalStore.Factory<Double, PrimitiveDenseStore> factory() {
+    public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
         return PrimitiveDenseStore.FACTORY;
     }
 

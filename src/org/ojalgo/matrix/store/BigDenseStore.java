@@ -673,10 +673,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         myUtility.exchangeRows(rowA, rowB);
     }
 
-    public PhysicalStore.Factory<BigDecimal, BigDenseStore> factory() {
-        return FACTORY;
-    }
-
     public void fillByMultiplying(final Access1D<BigDecimal> left, final Access1D<BigDecimal> right) {
 
         final int tmpComplexity = ((int) left.count()) / myRowDim;
@@ -760,16 +756,16 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
+    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+        this.set(row, col, values.get(valueIndex));
+    }
+
     public void fillOne(final long row, final long col, final BigDecimal value) {
         myUtility.fillOne(row, col, value);
     }
 
     public void fillOne(final long row, final long col, final NullaryFunction<BigDecimal> supplier) {
         myUtility.fillOne(row, col, supplier);
-    }
-
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        this.set(row, col, values.get(valueIndex));
     }
 
     public void fillRow(final long row, final long col, final BigDecimal value) {
@@ -939,6 +935,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void negateColumn(final int column) {
         myUtility.modifyColumn(0, column, BigFunction.NEGATE);
+    }
+
+    public PhysicalStore.Factory<BigDecimal, BigDenseStore> physical() {
+        return FACTORY;
     }
 
     public void raxpy(final BigDecimal scalarA, final int rowX, final int rowY, final int firstColumn) {

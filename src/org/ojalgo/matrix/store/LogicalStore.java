@@ -40,7 +40,7 @@ abstract class LogicalStore<N extends Number> extends AbstractStore<N> {
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected LogicalStore(final MatrixStore<N> base, final int rowsCount, final int columnsCount) {
+    protected LogicalStore(final MatrixStore<N>base, final int rowsCount, final int columnsCount) {
 
         super(rowsCount, columnsCount);
 
@@ -51,8 +51,8 @@ abstract class LogicalStore<N extends Number> extends AbstractStore<N> {
         }
     }
 
-    public final PhysicalStore.Factory<N, ?> factory() {
-        return myBase.factory();
+    public final PhysicalStore.Factory<N, ?> physical() {
+        return myBase.physical();
     }
 
     protected final MatrixStore<N> getBase() {

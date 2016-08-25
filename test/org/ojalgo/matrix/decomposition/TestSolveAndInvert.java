@@ -97,7 +97,7 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
 
         TestUtils.assertEquals(solution, decomposition.solve(rhs), accuracy);
 
-        final MatrixStore<Double> tmpI = body.factory().makeEye(body.countRows(), body.countColumns());
+        final MatrixStore<Double> tmpI = body.physical().makeEye(body.countRows(), body.countColumns());
 
         final MatrixStore<Double> tmpExpectedInverse = decomposition.solve(tmpI);
         decomposition.reset();

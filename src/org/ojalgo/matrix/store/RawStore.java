@@ -752,10 +752,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.exchangeRows(data, (int) rowA, (int) rowB);
     }
 
-    public PhysicalStore.Factory<Double, RawStore> factory() {
-        return FACTORY;
-    }
-
     public void fillAll(final Double value) {
         ArrayUtils.fillAll(data, value);
     }
@@ -881,16 +877,16 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         ArrayUtils.fillMatching(data, left, function, RawStore.convert(right, data.length).data);
     }
 
+    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+        this.set(row, col, values.doubleValue(valueIndex));
+    }
+
     public void fillOne(final long row, final long col, final Double value) {
         data[(int) row][(int) col] = value;
     }
 
     public void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
         data[(int) row][(int) col] = supplier.doubleValue();
-    }
-
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        this.set(row, col, values.doubleValue(valueIndex));
     }
 
     public void fillRange(final long first, final long limit, final Double value) {
@@ -1205,6 +1201,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
 
         return tmpStep2.get(0L);
+    }
+
+    public PhysicalStore.Factory<Double, RawStore> physical() {
+        return FACTORY;
     }
 
     public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {

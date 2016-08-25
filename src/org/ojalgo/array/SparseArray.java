@@ -503,12 +503,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         this.set(index, modifier.invoke(this.get(index)));
     }
 
-    /**
-     * Marked as deprecated because of it's preliminary design - not because it will be removed.
-     *
-     * @deprecated v40
-     */
-    @Deprecated
     public NonzeroView<N> nonzeros() {
         return new NonzeroView<>(myIndices, myValues, myActualLength);
     }

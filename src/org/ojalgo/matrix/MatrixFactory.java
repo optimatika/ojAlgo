@@ -65,7 +65,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             super();
 
             myPhysicalStore = aPhysicalStore;
-            myFactory = aPhysicalStore.factory();
+            myFactory = aPhysicalStore.physical();
         }
 
         public final void add(final long row, final long col, final double value) {

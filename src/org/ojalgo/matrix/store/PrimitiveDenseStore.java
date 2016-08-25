@@ -1252,10 +1252,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         myUtility.exchangeRows(rowA, rowB);
     }
 
-    public PhysicalStore.Factory<Double, PrimitiveDenseStore> factory() {
-        return FACTORY;
-    }
-
     public void fillByMultiplying(final Access1D<Double> left, final Access1D<Double> right) {
 
         final int tmpComplexity = ((int) left.count()) / myRowDim;
@@ -1348,16 +1344,16 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
+    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+        this.set(row, col, values.doubleValue(valueIndex));
+    }
+
     public void fillOne(final long row, final long col, final Double value) {
         myUtility.fillOne(row, col, value);
     }
 
     public void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
         myUtility.fillOne(row, col, supplier);
-    }
-
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        this.set(row, col, values.doubleValue(valueIndex));
     }
 
     public void fillRow(final long row, final long col, final Double value) {
@@ -1527,6 +1523,10 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
 
     public void negateColumn(final int column) {
         myUtility.modifyColumn(0, column, PrimitiveFunction.NEGATE);
+    }
+
+    public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
+        return FACTORY;
     }
 
     public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {

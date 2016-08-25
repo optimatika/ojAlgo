@@ -72,7 +72,7 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
 
         // multiplyLeft
         final BasicMatrix tmpLeftMtrx = NonPhysicalTest.makeRandomMatrix(tmpNewDim, tmpRowDim);
-        final PhysicalStore<N> tmpLeft = matrixStore.factory().copy(tmpLeftMtrx);
+        final PhysicalStore<N> tmpLeft = matrixStore.physical().copy(tmpLeftMtrx);
 
         MatrixStore<N> tmpExpected = tmpLeft.multiply(tmpCopy);
         MatrixStore<N> tmpActual = tmpLeft.multiply(matrixStore);
@@ -84,7 +84,7 @@ public abstract class NonPhysicalTest extends AbstractMatrixStoreTest {
 
         // multiplyRight
         final BasicMatrix tmpRightMtrx = NonPhysicalTest.makeRandomMatrix(tmpColDim, tmpNewDim);
-        final PhysicalStore<N> tmpRight = matrixStore.factory().copy(tmpRightMtrx);
+        final PhysicalStore<N> tmpRight = matrixStore.physical().copy(tmpRightMtrx);
 
         tmpExpected = tmpCopy.multiply(tmpRight);
         tmpActual = matrixStore.multiply(tmpRight);

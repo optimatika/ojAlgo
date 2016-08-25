@@ -59,12 +59,12 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
             this(null, true);
         }
 
-        HouseholderReference(final DecompositionStore<N> aStore, final boolean aColumn) {
+        HouseholderReference(final DecompositionStore<N> store, final boolean column) {
 
             super();
 
-            myStore = aStore;
-            myColumn = aColumn;
+            myStore = store;
+            myColumn = column;
         }
 
         public long count() {
@@ -104,17 +104,17 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
                 if (index > row) {
                     return myStore.get((int) index, col);
                 } else if (index == row) {
-                    return myStore.factory().scalar().one().getNumber();
+                    return myStore.physical().scalar().one().getNumber();
                 } else {
-                    return myStore.factory().scalar().zero().getNumber();
+                    return myStore.physical().scalar().zero().getNumber();
                 }
             } else {
                 if (index > col) {
                     return myStore.get(row, (int) index);
                 } else if (index == col) {
-                    return myStore.factory().scalar().one().getNumber();
+                    return myStore.physical().scalar().one().getNumber();
                 } else {
-                    return myStore.factory().scalar().zero().getNumber();
+                    return myStore.physical().scalar().zero().getNumber();
                 }
             }
         }

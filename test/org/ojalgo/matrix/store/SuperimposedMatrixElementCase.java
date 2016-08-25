@@ -56,12 +56,12 @@ public class SuperimposedMatrixElementCase extends NonPhysicalTest {
         //        myComplexStore = new SuperimposedMatrixStore<ComplexNumber>(ComplexDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, ComplexNumber.makeReal(tmpElement.doubleValue()));
         //        myPrimitiveStore = new SuperimposedMatrixStore<Double>(PrimitiveDenseStore.FACTORY.copyMatrix(tmpBase), tmpRowIndex, tmpColumnIndex, tmpElement.doubleValue());
 
-        myBigStore = new SuperimposedStore<>(aBase, tmpRowIndex, tmpColumnIndex, new SingleStore<>(aBase.factory(), tmpElement));
+        myBigStore = new SuperimposedStore<>(aBase, tmpRowIndex, tmpColumnIndex, new SingleStore<>(aBase.physical(), tmpElement));
         final MatrixStore<ComplexNumber> aBase1 = ComplexDenseStore.FACTORY.copy(tmpBase);
         myComplexStore = new SuperimposedStore<>(aBase1, tmpRowIndex, tmpColumnIndex,
-                new SingleStore<>(aBase1.factory(), ComplexNumber.valueOf(tmpElement.doubleValue())));
+                new SingleStore<>(aBase1.physical(), ComplexNumber.valueOf(tmpElement.doubleValue())));
         final MatrixStore<Double> aBase2 = PrimitiveDenseStore.FACTORY.copy(tmpBase);
-        myPrimitiveStore = new SuperimposedStore<>(aBase2, tmpRowIndex, tmpColumnIndex, new SingleStore<>(aBase2.factory(), tmpElement.doubleValue()));
+        myPrimitiveStore = new SuperimposedStore<>(aBase2, tmpRowIndex, tmpColumnIndex, new SingleStore<>(aBase2.physical(), tmpElement.doubleValue()));
     }
 
 }

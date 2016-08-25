@@ -37,7 +37,7 @@ public final class SecondOrderApproximation<N extends Number> extends Approximat
         final PhysicalStore<N> tmpHessian = function.getHessian(point).copy();
         final MatrixStore<N> tmpGradient = function.getGradient(point).logical().transpose().get();
 
-        tmpHessian.modifyAll(tmpHessian.factory().function().multiply().first(0.5));
+        tmpHessian.modifyAll(tmpHessian.physical().function().multiply().first(0.5));
 
         final QuadraticFunction<N> tmpQuadratic = new QuadraticFunction<>(tmpHessian);
         final LinearFunction<N> tmpLinear = new LinearFunction<>(tmpGradient);

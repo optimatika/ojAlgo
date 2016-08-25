@@ -692,10 +692,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         myUtility.exchangeRows(rowA, rowB);
     }
 
-    public PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> factory() {
-        return FACTORY;
-    }
-
     public void fillByMultiplying(final Access1D<ComplexNumber> left, final Access1D<ComplexNumber> right) {
 
         final int tmpComplexity = ((int) left.count()) / myRowDim;
@@ -779,16 +775,16 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
+    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+        this.set(row, col, values.get(valueIndex));
+    }
+
     public void fillOne(final long row, final long col, final ComplexNumber value) {
         myUtility.fillOne(row, col, value);
     }
 
     public void fillOne(final long row, final long col, final NullaryFunction<ComplexNumber> supplier) {
         myUtility.fillOne(row, col, supplier);
-    }
-
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        this.set(row, col, values.get(valueIndex));
     }
 
     public void fillRow(final long row, final long col, final ComplexNumber value) {
@@ -961,6 +957,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public void negateColumn(final int column) {
         myUtility.modifyColumn(0, column, ComplexFunction.NEGATE);
+    }
+
+    public PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> physical() {
+        return FACTORY;
     }
 
     public void raxpy(final ComplexNumber scalarA, final int rowX, final int rowY, final int firstColumn) {

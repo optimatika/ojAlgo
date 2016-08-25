@@ -64,9 +64,9 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
 
     public N get(final long aRow, final long aCol) {
         if (aRow == aCol) {
-            return this.factory().scalar().one().getNumber();
+            return this.physical().scalar().one().getNumber();
         } else {
-            return this.factory().scalar().zero().getNumber();
+            return this.physical().scalar().zero().getNumber();
         }
     }
 
@@ -83,7 +83,7 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
     @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
         if (this.getColDim() == right.count()) {
-            return this.factory().columns(right);
+            return this.physical().columns(right);
         } else if (right instanceof MatrixStore<?>) {
             return right.copy();
         } else {
@@ -93,9 +93,9 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
 
     public Scalar<N> toScalar(final long row, final long column) {
         if (row == column) {
-            return this.factory().scalar().one();
+            return this.physical().scalar().one();
         } else {
-            return this.factory().scalar().zero();
+            return this.physical().scalar().zero();
         }
     }
 
@@ -106,7 +106,7 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
-        consumer.fillDiagonal(0L, 0L, this.factory().scalar().one().getNumber());
+        consumer.fillDiagonal(0L, 0L, this.physical().scalar().one().getNumber());
     }
 
 }

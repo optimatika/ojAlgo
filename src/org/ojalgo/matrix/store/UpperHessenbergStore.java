@@ -63,7 +63,7 @@ final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
 
     public N get(final long row, final long col) {
         if (row > (col + 1)) {
-            return this.factory().scalar().zero().getNumber();
+            return this.physical().scalar().zero().getNumber();
         } else {
             return this.getBase().get(row, col);
         }
@@ -76,7 +76,7 @@ final class UpperHessenbergStore<N extends Number> extends ShadingStore<N> {
 
     public Scalar<N> toScalar(final long row, final long col) {
         if (row > (col + 1)) {
-            return this.factory().scalar().zero();
+            return this.physical().scalar().zero();
         } else {
             return this.getBase().toScalar(row, col);
         }

@@ -42,7 +42,14 @@ abstract class FactoryStore<N extends Number> extends AbstractStore<N> {
         myFactory = factory;
     }
 
+    /**
+     * @deprecated Use {@link #physical()} instead
+     */
     public final PhysicalStore.Factory<N, ?> factory() {
+        return physical();
+    }
+
+    public final PhysicalStore.Factory<N, ?> physical() {
         return myFactory;
     }
 

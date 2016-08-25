@@ -262,7 +262,7 @@ public abstract class MatrixUtils {
         // If Q1 is square, then check if it is orthogonal/unitary.
         if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
 
-            tmpThis = tmpQ1.factory().makeEye(tmpRowDim, tmpRowDim);
+            tmpThis = tmpQ1.physical().makeEye(tmpRowDim, tmpRowDim);
             tmpThat = tmpQ1.logical().conjugate().get().multiply(tmpQ1);
 
             retVal &= tmpThis.equals(tmpThat, context);
@@ -271,7 +271,7 @@ public abstract class MatrixUtils {
         // If Q2 is square, then check if it is orthogonal/unitary.
         if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
 
-            tmpThis = tmpQ2.factory().makeEye(tmpColDim, tmpColDim);
+            tmpThis = tmpQ2.physical().makeEye(tmpColDim, tmpColDim);
             tmpThat = tmpQ2.multiply(tmpQ2.logical().conjugate().get());
 
             retVal &= tmpThis.equals(tmpThat, context);

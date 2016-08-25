@@ -65,7 +65,7 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
     public final PhysicalStore<N> copy() {
 
-        final PhysicalStore<N> retVal = this.factory().makeZero(this.countRows(), this.countColumns());
+        final PhysicalStore<N> retVal = this.physical().makeZero(this.countRows(), this.countColumns());
 
         this.addNonZerosTo(retVal);
 
@@ -128,14 +128,14 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
     public N multiplyBoth(final Access1D<N> leftAndRight) {
 
-        final PhysicalStore<N> tmpStep1 = this.factory().makeZero(1L, leftAndRight.count());
-        final PhysicalStore<N> tmpStep2 = this.factory().makeZero(1L, 1L);
+        final PhysicalStore<N> tmpStep1 = this.physical().makeZero(1L, leftAndRight.count());
+        final PhysicalStore<N> tmpStep2 = this.physical().makeZero(1L, 1L);
 
         if (this.isPrimitive()) {
             tmpStep1.fillByMultiplying(leftAndRight, this);
         } else {
-            final PhysicalStore<N> tmpLeft = this.factory().rows(leftAndRight);
-            tmpLeft.modifyAll(this.factory().function().conjugate());
+            final PhysicalStore<N> tmpLeft = this.physical().rows(leftAndRight);
+            tmpLeft.modifyAll(this.physical().function().conjugate());
             tmpStep1.fillByMultiplying(tmpLeft.conjugate(), this);
         }
 
@@ -145,7 +145,7 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
     }
 
     public void supplyTo(final ElementsConsumer<N> consumer) {
-        consumer.fillAll(this.factory().scalar().zero().getNumber());
+        consumer.fillAll(this.physical().scalar().zero().getNumber());
         this.addNonZerosTo(consumer);
     }
 

@@ -49,7 +49,7 @@ final class WrapperStore<N extends Number> extends FactoryStore<N> {
     }
 
     public N get(final long aRow, final long aCol) {
-        return this.factory().scalar().cast(myAccess.get(aRow, aCol));
+        return this.physical().scalar().cast(myAccess.get(aRow, aCol));
     }
 
     @Override

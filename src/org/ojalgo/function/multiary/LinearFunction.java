@@ -100,7 +100,7 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
     @Override
     public N invoke(final Access1D<N> arg) {
 
-        final PhysicalStore<N> tmpPreallocated = myFactors.factory().makeZero(1L, 1L);
+        final PhysicalStore<N> tmpPreallocated = myFactors.physical().makeZero(1L, 1L);
 
         Scalar<N> retVal = this.getScalarConstant();
 
@@ -117,7 +117,7 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
 
     @Override
     protected Factory<N, ?> factory() {
-        return myFactors.factory();
+        return myFactors.physical();
     }
 
 }
