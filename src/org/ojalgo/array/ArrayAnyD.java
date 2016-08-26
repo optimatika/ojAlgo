@@ -222,6 +222,10 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         myDelegate.fill(0L, this.count(), 1L, supplier);
     }
 
+    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
+        myDelegate.fillOne(index, values, valueIndex);
+    }
+
     public void fillOne(final long index, final N value) {
         myDelegate.fillOne(index, value);
     }
@@ -236,10 +240,6 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public void fillOne(final long[] reference, final NullaryFunction<N> supplier) {
         myDelegate.fillOne(AccessUtils.index(myStructure, reference), supplier);
-    }
-
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        myDelegate.fillOne(index, values, valueIndex);
     }
 
     public void fillRange(final long first, final long limit, final N value) {

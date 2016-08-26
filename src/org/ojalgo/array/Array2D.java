@@ -31,7 +31,6 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.BasicArray.BasicFactory;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -46,8 +45,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array2D<N extends Number>
-        implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N>,
+public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N>,
         Mutate2D.BiModifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Mutate2D.Special<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements Factory2D<Array2D<N>> {
@@ -328,9 +326,8 @@ public final class Array2D<N extends Number>
     }
 
     /**
-     * Flattens this two dimensional array to a one dimensional array. The
-     * (internal/actual) array is not copied, it is just accessed through a
-     * different adaptor.
+     * Flattens this two dimensional array to a one dimensional array. The (internal/actual) array is not
+     * copied, it is just accessed through a different adaptor.
      *
      * @deprecated v39 Not needed
      */
@@ -364,8 +361,7 @@ public final class Array2D<N extends Number>
     public boolean equals(final Object obj) {
         if (obj instanceof Array2D) {
             final Array2D<N> tmpObj = (Array2D<N>) obj;
-            return (myRowsCount == tmpObj.countRows()) && (myColumnsCount == tmpObj.countColumns())
-                    && myDelegate.equals(tmpObj.getDelegate());
+            return (myRowsCount == tmpObj.countRows()) && (myColumnsCount == tmpObj.countColumns()) && myDelegate.equals(tmpObj.getDelegate());
         } else {
             return super.equals(obj);
         }
@@ -388,25 +384,21 @@ public final class Array2D<N extends Number>
     }
 
     public void fillColumn(final long row, final long col, final N value) {
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L,
-                value);
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L, value);
     }
 
     public void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L,
-                supplier);
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L, supplier);
     }
 
     public void fillDiagonal(final long row, final long col, final N value) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, value);
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, value);
     }
 
     public void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, supplier);
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, supplier);
     }
 
     public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
@@ -442,13 +434,11 @@ public final class Array2D<N extends Number>
     }
 
     public void fillRow(final long row, final long col, final N value) {
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount),
-                myRowsCount, value);
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, value);
     }
 
     public void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
-        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount),
-                myRowsCount, supplier);
+        myDelegate.fill(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, supplier);
     }
 
     public N get(final long index) {
@@ -471,24 +461,22 @@ public final class Array2D<N extends Number>
     /**
      * @param row
      * @param col
-     * @return The row-index of the largest absolute value in a column, starting
-     *         at the specified row.
+     * @return The row-index of the largest absolute value in a column, starting at the specified row.
      */
     public long indexOfLargestInColumn(final long row, final long col) {
-        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, myRowsCount, col), 1L) % myRowsCount;
+        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L) % myRowsCount;
     }
 
     /**
      * @param row
      * @param col
-     * @return The matrix-index of the largest absolute value on a diagonal,
-     *         starting at the specified row-column pair.
+     * @return The matrix-index of the largest absolute value on a diagonal, starting at the specified
+     *         row-column pair.
      */
     public long indexOfLargestInDiagonal(final long row, final long col) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
-        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount);
+        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount),
+                1L + myRowsCount);
     }
 
     public long indexOfLargestInRange(final long first, final long limit) {
@@ -498,12 +486,11 @@ public final class Array2D<N extends Number>
     /**
      * @param row
      * @param col
-     * @return The column-index of the largest absolute value in a row, starting
-     *         at the specified column.
+     * @return The column-index of the largest absolute value in a row, starting at the specified column.
      */
     public long indexOfLargestInRow(final long row, final long col) {
-        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount) / myRowsCount;
+        return myDelegate.indexOfLargest(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount)
+                / myRowsCount;
     }
 
     public boolean isAbsolute(final long index) {
@@ -517,18 +504,16 @@ public final class Array2D<N extends Number>
         return myDelegate.isAbsolute(AccessUtils.index(myRowsCount, row, col));
     }
 
-    public boolean isAllSmall(double comparedTo) {
+    public boolean isAllSmall(final double comparedTo) {
         return myDelegate.isSmall(0L, this.count(), 1L, comparedTo);
     }
 
-    public boolean isColumnSmall(long row, long col, double comparedTo) {
-        return myDelegate.isSmall(AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, myRowsCount, col), 1L, comparedTo);
+    public boolean isColumnSmall(final long row, final long col, final double comparedTo) {
+        return myDelegate.isSmall(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L, comparedTo);
     }
 
-    public boolean isRowSmall(long row, long col, double comparedTo) {
-        return myDelegate.isSmall(AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, comparedTo);
+    public boolean isRowSmall(final long row, final long col, final double comparedTo) {
+        return myDelegate.isSmall(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, comparedTo);
     }
 
     public boolean isSmall(final long index, final double comparedTo) {
@@ -544,14 +529,12 @@ public final class Array2D<N extends Number>
     }
 
     public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
-        myDelegate.modify(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col),
-                1L, modifier);
+        myDelegate.modify(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L, modifier);
     }
 
     public void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
-        myDelegate.modify(AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, modifier);
+        myDelegate.modify(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, modifier);
     }
 
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
@@ -575,8 +558,7 @@ public final class Array2D<N extends Number>
     }
 
     public void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
-        myDelegate.modify(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount),
-                myRowsCount, modifier);
+        myDelegate.modify(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, modifier);
     }
 
     public void set(final long index, final double value) {
@@ -596,14 +578,13 @@ public final class Array2D<N extends Number>
     }
 
     public Array1D<N> sliceColumn(final long row, final long col) {
-        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, myRowsCount, col), 1L);
+        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L);
     }
 
     public Array1D<N> sliceDiagonal(final long row, final long col) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
-        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount);
+        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount),
+                1L + myRowsCount);
     }
 
     public Array1D<N> sliceRange(final long first, final long limit) {
@@ -611,8 +592,7 @@ public final class Array2D<N extends Number>
     }
 
     public Array1D<N> sliceRow(final long row, final long col) {
-        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount);
+        return new Array1D<>(myDelegate, AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount);
     }
 
     @Override
@@ -625,14 +605,12 @@ public final class Array2D<N extends Number>
     }
 
     public void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
-        myDelegate.visit(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L,
-                visitor);
+        myDelegate.visit(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, myRowsCount, col), 1L, visitor);
     }
 
     public void visitDiagonal(final long row, final long col, final VoidFunction<N> visitor) {
         final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
-        myDelegate.visit(AccessUtils.index(myRowsCount, row, col),
-                AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, visitor);
+        myDelegate.visit(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row + tmpCount, col + tmpCount), 1L + myRowsCount, visitor);
     }
 
     public void visitOne(final long row, final long col, final VoidFunction<N> visitor) {
@@ -648,8 +626,7 @@ public final class Array2D<N extends Number>
     }
 
     public void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
-        myDelegate.visit(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount),
-                myRowsCount, visitor);
+        myDelegate.visit(AccessUtils.index(myRowsCount, row, col), AccessUtils.index(myRowsCount, row, myColumnsCount), myRowsCount, visitor);
     }
 
     BasicArray<N> getDelegate() {

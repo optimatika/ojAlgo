@@ -59,8 +59,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class ComplexDenseStore extends ComplexArray
-        implements PhysicalStore<ComplexNumber>, DecompositionStore<ComplexNumber> {
+public final class ComplexDenseStore extends ComplexArray implements PhysicalStore<ComplexNumber>, DecompositionStore<ComplexNumber> {
 
     public static interface ComplexMultiplyBoth extends FillByMultiplying<ComplexNumber> {
 
@@ -168,8 +167,7 @@ public final class ComplexDenseStore extends ComplexArray
 
         public ComplexDenseStore conjugate(final Access2D<?> source) {
 
-            final ComplexDenseStore retVal = new ComplexDenseStore((int) source.countColumns(),
-                    (int) source.countRows());
+            final ComplexDenseStore retVal = new ComplexDenseStore((int) source.countColumns(), (int) source.countRows());
 
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
@@ -260,8 +258,7 @@ public final class ComplexDenseStore extends ComplexArray
             return new Householder.Complex(length);
         }
 
-        public Rotation.Complex makeRotation(final int low, final int high, final ComplexNumber cos,
-                final ComplexNumber sin) {
+        public Rotation.Complex makeRotation(final int low, final int high, final ComplexNumber cos, final ComplexNumber sin) {
             return new Rotation.Complex(low, high, cos, sin);
         }
 
@@ -351,8 +348,7 @@ public final class ComplexDenseStore extends ComplexArray
 
         public ComplexDenseStore transpose(final Access2D<?> source) {
 
-            final ComplexDenseStore retVal = new ComplexDenseStore((int) source.countColumns(),
-                    (int) source.countRows());
+            final ComplexDenseStore retVal = new ComplexDenseStore((int) source.countColumns(), (int) source.countRows());
 
             final int tmpRowDim = retVal.getRowDim();
             final int tmpColDim = retVal.getColDim();
@@ -393,8 +389,7 @@ public final class ComplexDenseStore extends ComplexArray
         if (transformation instanceof Householder.Complex) {
             return (Householder.Complex) transformation;
         } else if (transformation instanceof HouseholderReference<?>) {
-            return ((HouseholderReference<ComplexNumber>) transformation).getComplexWorker()
-                    .copy(transformation);
+            return ((HouseholderReference<ComplexNumber>) transformation).getComplexWorker().copy(transformation);
         } else {
             return new Householder.Complex(transformation);
         }
@@ -604,12 +599,10 @@ public final class ComplexDenseStore extends ComplexArray
     }
 
     public void caxpy(final ComplexNumber scalarA, final int columnX, final int columnY, final int firstRow) {
-        AXPY.invoke(data, (columnY * myRowDim) + firstRow, 1, scalarA, data, (columnX * myRowDim) + firstRow, 1,
-                myRowDim - firstRow);
+        AXPY.invoke(data, (columnY * myRowDim) + firstRow, 1, scalarA, data, (columnX * myRowDim) + firstRow, 1, myRowDim - firstRow);
     }
 
-    public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<ComplexNumber> transformationCollector,
-            final boolean eigenvalue) {
+    public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<ComplexNumber> transformationCollector, final boolean eigenvalue) {
         throw new UnsupportedOperationException();
     }
 
@@ -706,8 +699,7 @@ public final class ComplexDenseStore extends ComplexArray
 
         if (left instanceof ComplexDenseStore) {
             if (right instanceof ComplexDenseStore) {
-                multiplyNeither.invoke(data, ComplexDenseStore.cast(left).data, tmpComplexity,
-                        ComplexDenseStore.cast(right).data);
+                multiplyNeither.invoke(data, ComplexDenseStore.cast(left).data, tmpComplexity, ComplexDenseStore.cast(right).data);
             } else {
                 multiplyRight.invoke(data, ComplexDenseStore.cast(left).data, tmpComplexity, right);
             }
@@ -736,8 +728,7 @@ public final class ComplexDenseStore extends ComplexArray
         myUtility.fillDiagonal(row, col, supplier);
     }
 
-    public void fillMatching(final Access1D<ComplexNumber> aLeftArg, final BinaryFunction<ComplexNumber> aFunc,
-            final ComplexNumber aRightArg) {
+    public void fillMatching(final Access1D<ComplexNumber> aLeftArg, final BinaryFunction<ComplexNumber> aFunc, final ComplexNumber aRightArg) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -761,8 +752,7 @@ public final class ComplexDenseStore extends ComplexArray
         }
     }
 
-    public void fillMatching(final ComplexNumber aLeftArg, final BinaryFunction<ComplexNumber> aFunc,
-            final Access1D<ComplexNumber> aRightArg) {
+    public void fillMatching(final ComplexNumber aLeftArg, final BinaryFunction<ComplexNumber> aFunc, final Access1D<ComplexNumber> aRightArg) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -806,16 +796,12 @@ public final class ComplexDenseStore extends ComplexArray
         myUtility.fillRow(row, col, supplier);
     }
 
-    public boolean generateApplyAndCopyHouseholderColumn(final int row, final int column,
-            final Householder<ComplexNumber> destination) {
-        return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column,
-                (Householder.Complex) destination);
+    public boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<ComplexNumber> destination) {
+        return GenerateApplyAndCopyHouseholderColumn.invoke(data, myRowDim, row, column, (Householder.Complex) destination);
     }
 
-    public boolean generateApplyAndCopyHouseholderRow(final int row, final int column,
-            final Householder<ComplexNumber> destination) {
-        return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column,
-                (Householder.Complex) destination);
+    public boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<ComplexNumber> destination) {
+        return GenerateApplyAndCopyHouseholderRow.invoke(data, myRowDim, row, column, (Householder.Complex) destination);
     }
 
     public final MatrixStore<ComplexNumber> get() {
@@ -855,11 +841,11 @@ public final class ComplexDenseStore extends ComplexArray
         return myUtility.isAbsolute(row, col);
     }
 
-    public boolean isColumnSmall(long row, long col, double comparedTo) {
+    public boolean isColumnSmall(final long row, final long col, final double comparedTo) {
         return myUtility.isColumnSmall(row, col, comparedTo);
     }
 
-    public boolean isRowSmall(long row, long col, double comparedTo) {
+    public boolean isRowSmall(final long row, final long col, final double comparedTo) {
         return myUtility.isRowSmall(row, col, comparedTo);
     }
 
@@ -1044,8 +1030,7 @@ public final class ComplexDenseStore extends ComplexArray
         return myUtility.sliceRow(row, col);
     }
 
-    public void substituteBackwards(final Access2D<ComplexNumber> body, final boolean unitDiagonal,
-            final boolean conjugated, final boolean hermitian) {
+    public void substituteBackwards(final Access2D<ComplexNumber> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1056,8 +1041,7 @@ public final class ComplexDenseStore extends ComplexArray
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteBackwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body,
-                            unitDiagonal, conjugated, hermitian);
+                    SubstituteBackwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, hermitian);
                 }
 
             };
@@ -1070,8 +1054,7 @@ public final class ComplexDenseStore extends ComplexArray
         }
     }
 
-    public void substituteForwards(final Access2D<ComplexNumber> body, final boolean unitDiagonal,
-            final boolean conjugated, final boolean identity) {
+    public void substituteForwards(final Access2D<ComplexNumber> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
 
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
@@ -1082,8 +1065,7 @@ public final class ComplexDenseStore extends ComplexArray
 
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
-                    SubstituteForwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body,
-                            unitDiagonal, conjugated, identity);
+                    SubstituteForwards.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, body, unitDiagonal, conjugated, identity);
                 }
 
             };
@@ -1214,16 +1196,14 @@ public final class ComplexDenseStore extends ComplexArray
     }
 
     public void transformSymmetric(final Householder<ComplexNumber> transformation) {
-        HouseholderHermitian.invoke(data, ComplexDenseStore.cast(transformation),
-                new ComplexNumber[(int) transformation.count()]);
+        HouseholderHermitian.invoke(data, ComplexDenseStore.cast(transformation), new ComplexNumber[(int) transformation.count()]);
     }
 
     public MatrixStore<ComplexNumber> transpose() {
         return new TransposedStore<>(this);
     }
 
-    public void tred2(final BasicArray<ComplexNumber> mainDiagonal, final BasicArray<ComplexNumber> offDiagonal,
-            final boolean yesvecs) {
+    public void tred2(final BasicArray<ComplexNumber> mainDiagonal, final BasicArray<ComplexNumber> offDiagonal, final boolean yesvecs) {
         throw new UnsupportedOperationException();
     }
 

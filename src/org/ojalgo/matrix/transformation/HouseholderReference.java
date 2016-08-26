@@ -13,17 +13,17 @@ public final class HouseholderReference<N extends Number> implements Householder
     private transient Householder.Primitive myPrimitiveWorker = null;
     private final DecompositionStore<N> myStore;
 
-    @SuppressWarnings("unused")
-    private HouseholderReference() {
-        this(null, true);
-    }
-
     public HouseholderReference(final DecompositionStore<N> store, final boolean column) {
 
         super();
 
         myStore = store;
         myColumn = column;
+    }
+
+    @SuppressWarnings("unused")
+    private HouseholderReference() {
+        this(null, true);
     }
 
     public long count() {
