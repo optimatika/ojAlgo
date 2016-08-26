@@ -43,8 +43,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
     final class MatrixBuilder implements Builder<I> {
 
-        private final PhysicalStore.Factory<N, ?> myFactory;
-        private final PhysicalStore<N> myPhysicalStore;
+        private final PhysicalStore<N> myStore;
         private boolean mySafe = true;
 
         @SuppressWarnings("unused")
@@ -52,25 +51,23 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
             this(null, 0, 0);
         }
 
-        protected MatrixBuilder(final PhysicalStore.Factory<N, ?> aFactory, final int aRowDim, final int aColDim) {
+        protected MatrixBuilder(final PhysicalStore.Factory<N, ?> factory, final int rowDim, final int colDim) {
 
             super();
 
-            myPhysicalStore = aFactory.makeZero(aRowDim, aColDim);
-            myFactory = aFactory;
+            myStore = factory.makeZero(rowDim, colDim);
         }
 
-        MatrixBuilder(final PhysicalStore<N> aPhysicalStore) {
+        MatrixBuilder(final PhysicalStore<N> physicalStore) {
 
             super();
 
-            myPhysicalStore = aPhysicalStore;
-            myFactory = aPhysicalStore.physical();
+            myStore = physicalStore;
         }
 
         public final void add(final long row, final long col, final double value) {
             if (mySafe) {
-                myPhysicalStore.add(row, col, value);
+                myStore.add(row, col, value);
             } else {
                 throw new IllegalStateException();
             }
@@ -78,27 +75,27 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
         public final void add(final long row, final long col, final Number value) {
             if (mySafe) {
-                myPhysicalStore.add(row, col, value);
+                myStore.add(row, col, value);
             } else {
                 throw new IllegalStateException();
             }
         }
 
         public final long count() {
-            return myPhysicalStore.count();
+            return myStore.count();
         }
 
         public final long countColumns() {
-            return myPhysicalStore.countColumns();
+            return myStore.countColumns();
         }
 
         public final long countRows() {
-            return myPhysicalStore.countRows();
+            return myStore.countRows();
         }
 
         public final MatrixBuilder fillAll(final Number value) {
             if (mySafe) {
-                myPhysicalStore.fillAll(myFactory.scalar().cast(value));
+                myStore.fillAll(myStore.physical().scalar().cast(value));
             } else {
                 throw new IllegalStateException();
             }
@@ -107,7 +104,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
         public final MatrixBuilder fillColumn(final long row, final long column, final Number value) {
             if (mySafe) {
-                myPhysicalStore.fillColumn((int) row, (int) column, myFactory.scalar().cast(value));
+                myStore.fillColumn((int) row, (int) column, myStore.physical().scalar().cast(value));
             } else {
                 throw new IllegalStateException();
             }
@@ -116,7 +113,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
         public final MatrixBuilder fillDiagonal(final long row, final long column, final Number value) {
             if (mySafe) {
-                myPhysicalStore.fillDiagonal((int) row, (int) column, myFactory.scalar().cast(value));
+                myStore.fillDiagonal((int) row, (int) column, myStore.physical().scalar().cast(value));
             } else {
                 throw new IllegalStateException();
             }
@@ -125,7 +122,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
         public final MatrixBuilder fillRow(final long row, final long column, final Number value) {
             if (mySafe) {
-                myPhysicalStore.fillRow((int) row, (int) column, myFactory.scalar().cast(value));
+                myStore.fillRow((int) row, (int) column, myStore.physical().scalar().cast(value));
             } else {
                 throw new IllegalStateException();
             }
@@ -135,12 +132,12 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         @Override
         public final I get() {
             mySafe = false;
-            return MatrixFactory.this.instantiate(myPhysicalStore);
+            return MatrixFactory.this.instantiate(myStore);
         }
 
         public final void set(final long index, final double value) {
             if (mySafe) {
-                myPhysicalStore.set(index, value);
+                myStore.set(index, value);
             } else {
                 throw new IllegalStateException();
             }
@@ -148,7 +145,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
         public final void set(final long row, final long col, final double value) {
             if (mySafe) {
-                myPhysicalStore.set(row, col, value);
+                myStore.set(row, col, value);
             } else {
                 throw new IllegalStateException();
             }
@@ -156,7 +153,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
         public final void set(final long row, final long col, final Number value) {
             if (mySafe) {
-                myPhysicalStore.set(row, col, value);
+                myStore.set(row, col, value);
             } else {
                 throw new IllegalStateException();
             }
@@ -164,7 +161,7 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
         public final void set(final long index, final Number value) {
             if (mySafe) {
-                myPhysicalStore.set(index, myFactory.scalar().cast(value));
+                myStore.set(index, myStore.physical().scalar().cast(value));
             } else {
                 throw new IllegalStateException();
             }
@@ -195,12 +192,13 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    MatrixFactory(final Class<I> aTemplate, final PhysicalStore.Factory<N, ?> aPhysical) {
+    @SuppressWarnings("unchecked")
+    MatrixFactory(final Class<I> template, final PhysicalStore.Factory<N, ?> factory) {
 
         super();
 
-        myPhysicalFactory = aPhysical;
-        myConstructor = (Constructor<I>) MatrixFactory.getConstructor(aTemplate);
+        myPhysicalFactory = factory;
+        myConstructor = (Constructor<I>) MatrixFactory.getConstructor(template);
     }
 
     public I columns(final Access1D<?>... source) {
@@ -238,10 +236,8 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         MatrixStore.LogicalBuilder<N> retVal = myPhysicalFactory.builder().makeIdentity(tmpMinDim);
 
         if (rows > tmpMinDim) {
-            //retVal = new AboveBelowStore<N>(retVal, new ZeroStore<N>(myPhysicalFactory, , (int) columns));
             retVal = retVal.below((int) rows - tmpMinDim);
         } else if (columns > tmpMinDim) {
-            //retVal = new LeftRightStore<N>(retVal, new ZeroStore<N>(myPhysicalFactory, (int) rows, (int) columns - tmpMinDim));
             retVal = retVal.right((int) columns - tmpMinDim);
         }
 
@@ -274,16 +270,12 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         return this.instantiate(myPhysicalFactory.rows(source));
     }
 
-    protected final PhysicalStore.Factory<N, ?> getPhysicalFactory() {
-        return myPhysicalFactory;
-    }
-
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
-    final I instantiate(final MatrixStore<N> aStore) {
+    final I instantiate(final MatrixStore<N> store) {
         try {
-            return myConstructor.newInstance(aStore);
+            return myConstructor.newInstance(store);
         } catch (final IllegalArgumentException anException) {
             throw new ProgrammingError(anException);
         } catch (final InstantiationException anException) {
@@ -295,8 +287,8 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         }
     }
 
-    final MatrixBuilder wrap(final PhysicalStore<N> aStore) {
-        return new MatrixBuilder(aStore);
+    final MatrixBuilder wrap(final PhysicalStore<N> store) {
+        return new MatrixBuilder(store);
     }
 
 }
