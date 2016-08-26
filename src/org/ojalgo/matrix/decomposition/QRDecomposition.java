@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.matrix.transformation.Householder;
+import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -118,7 +119,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         final DecompositionStore<N> retVal = this.makeEye(this.getRowDim(), myFullSize ? this.getRowDim() : this.getMinDim());
 
-        final DecompositionStore.HouseholderReference<N> tmpReference = new DecompositionStore.HouseholderReference<>(this.getInPlace(), true);
+        final HouseholderReference<N> tmpReference = new HouseholderReference<>(this.getInPlace(), true);
 
         for (int j = this.getMinDim() - 1; j >= 0; j--) {
 
@@ -260,7 +261,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         final int tmpRowDim = this.getRowDim();
         final int tmpColDim = this.getColDim();
 
-        final DecompositionStore.HouseholderReference<N> tmpReference = new DecompositionStore.HouseholderReference<>(tmpStore, true);
+        final HouseholderReference<N> tmpReference = new HouseholderReference<>(tmpStore, true);
 
         final int tmpLimit = this.getMinDim();
         for (int j = 0; j < tmpLimit; j++) {

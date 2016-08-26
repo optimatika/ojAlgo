@@ -31,10 +31,11 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * 1-dimensional accessor (get) methods. The nested interfaces declare additional methods that indirectly
- * requires that the elements has been accessed, but they do not extends the main/outer interface. A
- * 1D-structure can be vistiable, aggregatable and/or expose various element properties without allowing
- * explicit access to its elements.
+ * 1-dimensional accessor (get) methods. The nested interfaces declare
+ * additional methods that indirectly requires that the elements has been
+ * accessed, but they do not extends the main/outer interface. A 1D-structure
+ * can be vistiable, aggregatable and/or expose various element properties
+ * without allowing explicit access to its elements.
  *
  * @author apete
  */
@@ -52,6 +53,18 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
          * @see Scalar#isAbsolute()
          */
         boolean isAbsolute(long index);
+
+        /**
+         * @see Scalar#isSmall(double)
+         */
+        default boolean isAllSmall(double comparedTo) {
+            boolean retVal = true;
+            final long tmpLimit = this.count();
+            for (long i = 0L; retVal && (i < tmpLimit); i++) {
+                retVal &= this.isSmall(i, comparedTo);
+            }
+            return retVal;
+        }
 
         /**
          * @see Scalar#isSmall(double)
@@ -140,8 +153,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     /**
      * Will calculate y = y + a x, will add "a" times "this" to "y"
      *
-     * @param a The scale
-     * @param y The "vector" to update
+     * @param a
+     *            The scale
+     * @param y
+     *            The "vector" to update
      */
     default void daxpy(final double a, final Mutate1D y) {
         final long tmpLimit = Math.min(this.count(), y.count());
@@ -151,9 +166,11 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     }
 
     /**
-     * Will calculate and return the dot product of this 1D-structure and another input 1D-vector.
+     * Will calculate and return the dot product of this 1D-structure and
+     * another input 1D-vector.
      *
-     * @param vector Another 1D-structure
+     * @param vector
+     *            Another 1D-structure
      * @return The dot product
      */
     default double dot(final Access1D<?> vector) {
@@ -168,8 +185,9 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     double doubleValue(long index);
 
     /**
-     * Returns an Iterable of ElementView1D. It allows to iterate over the instance's element "positions"
-     * without actually extracting the elements (unless you explicitly do so).
+     * Returns an Iterable of ElementView1D. It allows to iterate over the
+     * instance's element "positions" without actually extracting the elements
+     * (unless you explicitly do so).
      */
     default ElementView1D<N, ?> elements() {
         return new Access1D.ElementView<N>(this);
@@ -182,8 +200,9 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     }
 
     /**
-     * Will pass through each matching element position calling the {@code through} function. What happens is
-     * entirely dictated by how you implement the callback.
+     * Will pass through each matching element position calling the
+     * {@code through} function. What happens is entirely dictated by how you
+     * implement the callback.
      */
     default void passMatching(final Callback1D<N> through, final Mutate1D to) {
         Callback1D.onMatching(this, through, to);

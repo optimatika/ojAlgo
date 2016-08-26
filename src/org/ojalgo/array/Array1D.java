@@ -47,8 +47,9 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D,
-        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
+public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements,
+        Access1D.IndexOf, Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>,
+        Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
 
     public static abstract class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
@@ -293,7 +294,8 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     }
 
     /**
-     * Creates a copy of this containing only the selected elements, in the specified order.
+     * Creates a copy of this containing only the selected elements, in the
+     * specified order.
      */
     @SuppressWarnings("unchecked")
     public Array1D<N> copy(final int... indices) {
@@ -413,7 +415,8 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     }
 
     public long indexOfLargestInRange(final long first, final long limit) {
-        return (myDelegate.indexOfLargest(myFirst + (myStep * first), myFirst + (myStep * limit), myStep) - myFirst) / myStep;
+        return (myDelegate.indexOfLargest(myFirst + (myStep * first), myFirst + (myStep * limit), myStep) - myFirst)
+                / myStep;
     }
 
     /**
@@ -421,6 +424,10 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
      */
     public boolean isAbsolute(final long index) {
         return myDelegate.isAbsolute(myFirst + (myStep * index));
+    }
+
+    public boolean isAllSmall(double comparedTo) {
+        return myDelegate.isSmall(myFirst, myLimit, myStep, comparedTo);
     }
 
     @Override

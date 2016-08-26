@@ -25,16 +25,16 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * <p>
- * Only classes that will act as a delegate to a {@linkplain MatrixDecomposition} implementation from this
- * package should implement this interface. The interface specifications are entirely dictated by the classes
- * in this package.
+ * Only classes that will act as a delegate to a
+ * {@linkplain MatrixDecomposition} implementation from this package should
+ * implement this interface. The interface specifications are entirely dictated
+ * by the classes in this package.
  * </p>
  * <p>
  * Do not use it for anything else!
@@ -43,147 +43,6 @@ import org.ojalgo.scalar.ComplexNumber;
  * @author apete
  */
 public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
-
-    public static final class HouseholderReference<N extends Number> implements Householder<N> {
-
-        public int col = 0;
-        public int row = 0;
-        private transient Householder.Big myBigWorker = null;
-        private final boolean myColumn;
-        private transient Householder.Complex myComplexWorker = null;
-        private transient Householder.Primitive myPrimitiveWorker = null;
-        private final DecompositionStore<N> myStore;
-
-        @SuppressWarnings("unused")
-        private HouseholderReference() {
-            this(null, true);
-        }
-
-        HouseholderReference(final DecompositionStore<N> store, final boolean column) {
-
-            super();
-
-            myStore = store;
-            myColumn = column;
-        }
-
-        public long count() {
-            if (myColumn) {
-                return myStore.countRows();
-            } else {
-                return myStore.countColumns();
-            }
-        }
-
-        public double doubleValue(final long index) {
-            if (myColumn) {
-                if (index > row) {
-                    return myStore.doubleValue((int) index, col);
-                } else if (index == row) {
-                    return PrimitiveMath.ONE;
-                } else {
-                    return PrimitiveMath.ZERO;
-                }
-            } else {
-                if (index > col) {
-                    return myStore.doubleValue(row, (int) index);
-                } else if (index == col) {
-                    return PrimitiveMath.ONE;
-                } else {
-                    return PrimitiveMath.ZERO;
-                }
-            }
-        }
-
-        public int first() {
-            return myColumn ? row : col;
-        }
-
-        public N get(final long index) {
-            if (myColumn) {
-                if (index > row) {
-                    return myStore.get((int) index, col);
-                } else if (index == row) {
-                    return myStore.physical().scalar().one().getNumber();
-                } else {
-                    return myStore.physical().scalar().zero().getNumber();
-                }
-            } else {
-                if (index > col) {
-                    return myStore.get(row, (int) index);
-                } else if (index == col) {
-                    return myStore.physical().scalar().one().getNumber();
-                } else {
-                    return myStore.physical().scalar().zero().getNumber();
-                }
-            }
-        }
-
-        public final Householder.Big getBigWorker() {
-
-            if (myBigWorker == null) {
-                if (myColumn) {
-                    myBigWorker = new Householder.Big((int) myStore.countRows());
-                } else {
-                    myBigWorker = new Householder.Big((int) myStore.countColumns());
-                }
-            }
-
-            return myBigWorker;
-        }
-
-        public final Householder.Complex getComplexWorker() {
-
-            if (myComplexWorker == null) {
-                if (myColumn) {
-                    myComplexWorker = new Householder.Complex((int) myStore.countRows());
-                } else {
-                    myComplexWorker = new Householder.Complex((int) myStore.countColumns());
-                }
-            }
-
-            return myComplexWorker;
-        }
-
-        public final Householder.Primitive getPrimitiveWorker() {
-
-            if (myPrimitiveWorker == null) {
-                if (myColumn) {
-                    myPrimitiveWorker = new Householder.Primitive((int) myStore.countRows());
-                } else {
-                    myPrimitiveWorker = new Householder.Primitive((int) myStore.countColumns());
-                }
-            }
-
-            return myPrimitiveWorker;
-        }
-
-        public final boolean isZero() {
-            if (myColumn) {
-                return myStore.asArray2D().isColumnZeros(row + 1, col);
-            } else {
-                return myStore.asArray2D().isRowZeros(row, col + 1);
-            }
-        }
-
-        @Override
-        public String toString() {
-
-            final StringBuilder retVal = new StringBuilder("{ ");
-
-            final int tmpLastIndex = (int) this.count() - 1;
-            for (int i = 0; i < tmpLastIndex; i++) {
-                retVal.append(this.get(i));
-                retVal.append(", ");
-            }
-            retVal.append(this.get(tmpLastIndex));
-
-            retVal.append(" }");
-
-            return retVal.toString();
-        }
-
-    }
 
     /**
      * Cholesky transformations
@@ -225,30 +84,37 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
     /**
      * Will solve the equation system [A][X]=[B] where:
      * <ul>
-     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
-     * the solution).</li>
+     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and
+     * it will be overwritten with the solution).</li>
      * <li>[A] is upper/right triangular</li>
      * </ul>
      *
-     * @param body The equation system body parameters [A]
-     * @param unitDiagonal TODO
-     * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
-     *        matrix, and the elements conjugated.
-     * @param hermitian TODO
+     * @param body
+     *            The equation system body parameters [A]
+     * @param unitDiagonal
+     *            TODO
+     * @param conjugated
+     *            true if the upper/right part of body is actually stored in the
+     *            lower/left part of the matrix, and the elements conjugated.
+     * @param hermitian
+     *            TODO
      */
     void substituteBackwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean hermitian);
 
     /**
      * Will solve the equation system [A][X]=[B] where:
      * <ul>
-     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
-     * the solution).</li>
+     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and
+     * it will be overwritten with the solution).</li>
      * <li>[A] is lower/left triangular</li>
      * </ul>
      *
-     * @param body The equation system body parameters [A]
-     * @param unitDiagonal true if body as ones on the diagonal
-     * @param conjugated TODO
+     * @param body
+     *            The equation system body parameters [A]
+     * @param unitDiagonal
+     *            true if body as ones on the diagonal
+     * @param conjugated
+     *            TODO
      * @param identity
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);

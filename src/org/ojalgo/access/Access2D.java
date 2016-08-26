@@ -46,9 +46,34 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
          */
         boolean isAbsolute(long row, long col);
 
+        /**
+         * @see Scalar#isSmall(double)
+         */
+        default boolean isColumnSmall(long row, long col, double comparedTo) {
+            boolean retVal = true;
+            final long tmpLimit = this.countRows();
+            for (long i = row; retVal && (i < tmpLimit); i++) {
+                retVal &= this.isSmall(i, col, comparedTo);
+            }
+            return retVal;
+        }
+
+        /**
+         * @see Scalar#isSmall(double)
+         */
+        default boolean isRowSmall(long row, long col, double comparedTo) {
+            boolean retVal = true;
+            final long tmpLimit = this.countColumns();
+            for (long j = col; retVal && (j < tmpLimit); j++) {
+                retVal &= this.isSmall(row, j, comparedTo);
+            }
+            return retVal;
+        }
+
         default boolean isSmall(final long index, final double comparedTo) {
             final long tmpStructure = this.countRows();
-            return this.isSmall(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), comparedTo);
+            return this.isSmall(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure),
+                    comparedTo);
         }
 
         /**
@@ -120,22 +145,24 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         /**
          * @param row
          * @param col
-         * @return The row-index of the largest absolute value in a column, starting at the specified row.
+         * @return The row-index of the largest absolute value in a column,
+         *         starting at the specified row.
          */
         long indexOfLargestInColumn(final long row, final long col);
 
         /**
          * @param row
          * @param col
-         * @return The matrix-index of the largest absolute value on a diagonal, starting at the specified
-         *         row-column pair.
+         * @return The matrix-index of the largest absolute value on a diagonal,
+         *         starting at the specified row-column pair.
          */
         long indexOfLargestInDiagonal(final long row, final long col);
 
         /**
          * @param row
          * @param col
-         * @return The column-index of the largest absolute value in a row, starting at the specified column.
+         * @return The column-index of the largest absolute value in a row,
+         *         starting at the specified column.
          */
         long indexOfLargestInRow(final long row, final long col);
 
@@ -195,8 +222,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     /**
      * Extracts one element of this matrix as a double.
      *
-     * @param row A row index.
-     * @param col A column index.
+     * @param row
+     *            A row index.
+     * @param col
+     *            A column index.
      * @return One matrix element
      */
     double doubleValue(long row, long col);
@@ -213,8 +242,9 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     N get(long row, long col);
 
     /**
-     * Will pass through each matching element position calling the {@code through} function. What happens is
-     * entirely dictated by how you implement the callback.
+     * Will pass through each matching element position calling the
+     * {@code through} function. What happens is entirely dictated by how you
+     * implement the callback.
      */
     default void passMatching(final Callback2D<N> through, final Mutate2D to) {
         Callback2D.onMatching(this, through, to);

@@ -31,6 +31,7 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Householder;
+import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -157,7 +158,7 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
 
         final int tmpRowAndColDim = (int) aStoreToTransform.countRows();
 
-        final DecompositionStore.HouseholderReference<N> tmpHouseholderReference = new DecompositionStore.HouseholderReference<>(this.getInPlace(), tmpUpper);
+        final HouseholderReference<N> tmpHouseholderReference = new HouseholderReference<>(this.getInPlace(), tmpUpper);
 
         for (int ij = tmpRowAndColDim - 3; ij >= 0; ij--) {
 
