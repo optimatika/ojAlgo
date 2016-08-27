@@ -119,12 +119,11 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         final DecompositionStore<N> retVal = this.makeEye(this.getRowDim(), myFullSize ? this.getRowDim() : this.getMinDim());
 
-        final HouseholderReference<N> tmpReference = new HouseholderReference<>(this.getInPlace(), true);
+        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(this.getInPlace());
 
         for (int j = this.getMinDim() - 1; j >= 0; j--) {
 
-            tmpReference.row = j;
-            tmpReference.col = j;
+            tmpReference.point(j, j);
 
             if (!tmpReference.isZero()) {
                 retVal.transformLeft(tmpReference, j);
@@ -261,13 +260,12 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         final int tmpRowDim = this.getRowDim();
         final int tmpColDim = this.getColDim();
 
-        final HouseholderReference<N> tmpReference = new HouseholderReference<>(tmpStore, true);
+        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(tmpStore);
 
         final int tmpLimit = this.getMinDim();
         for (int j = 0; j < tmpLimit; j++) {
 
-            tmpReference.row = j;
-            tmpReference.col = j;
+            tmpReference.point(j, j);
 
             if (!tmpReference.isZero()) {
                 preallocated.transformLeft(tmpReference, 0);

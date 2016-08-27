@@ -376,7 +376,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         if (transformation instanceof Householder.Primitive) {
             return (Householder.Primitive) transformation;
         } else if (transformation instanceof HouseholderReference<?>) {
-            return ((HouseholderReference<Double>) transformation).getPrimitiveWorker().copy(transformation);
+            return ((Householder.Primitive) ((HouseholderReference<Double>) transformation).getWorker(FACTORY)).copy(transformation);
         } else {
             return new Householder.Primitive(transformation);
         }

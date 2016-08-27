@@ -23,13 +23,13 @@ package org.ojalgo.access;
 
 import java.util.Iterator;
 
-public final class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<N>> {
+public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<N>> {
 
     public static <S extends Number> Iterable<RowView<S>> makeIterable(final Access2D<S> access) {
         return new RowView<>(access).iterable;
     }
 
-    private final Access2D<N> myAccess;
+    private final Access2D<N> myDelegate2D;
     private final long myLastRow;
     private long myRow = -1L;
 
@@ -40,30 +40,30 @@ public final class RowView<N extends Number> implements Access1D<N>, Iterator<Ro
         this(null);
     }
 
-    protected RowView(final Access2D<N> access, final long row) {
+    protected RowView(final Access2D<N> access) {
+        this(access, -1L);
+    }
+
+    RowView(final Access2D<N> access, final long row) {
 
         super();
 
-        myAccess = access;
+        myDelegate2D = access;
         myLastRow = access.countRows() - 1L;
 
         myRow = row;
     }
 
-    RowView(final Access2D<N> access) {
-        this(access, -1L);
-    }
-
     public long count() {
-        return myAccess.countColumns();
+        return myDelegate2D.countColumns();
     }
 
     public double doubleValue(final long index) {
-        return myAccess.doubleValue(myRow, index);
+        return myDelegate2D.doubleValue(myRow, index);
     }
 
     public N get(final long index) {
-        return myAccess.get(myRow, index);
+        return myDelegate2D.get(myRow, index);
     }
 
     public boolean hasNext() {
@@ -90,6 +90,10 @@ public final class RowView<N extends Number> implements Access1D<N>, Iterator<Ro
 
     public long row() {
         return myRow;
+    }
+
+    protected void setRow(final long row) {
+        myRow = row;
     }
 
 }

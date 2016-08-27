@@ -23,14 +23,14 @@ package org.ojalgo.access;
 
 import java.util.Iterator;
 
-public final class ColumnView<N extends Number> implements Access1D<N>, Iterator<ColumnView<N>> {
+public class ColumnView<N extends Number> implements Access1D<N>, Iterator<ColumnView<N>> {
 
     public static <S extends Number> Iterable<ColumnView<S>> makeIterable(final Access2D<S> access) {
         return new ColumnView<>(access).iterable;
     }
 
-    private final Access2D<N> myAccess;
     private long myColumn = -1L;
+    private final Access2D<N> myDelegate2D;
     private final long myLastColumn;
 
     final Iterable<ColumnView<N>> iterable = () -> ColumnView.this;
@@ -40,18 +40,18 @@ public final class ColumnView<N extends Number> implements Access1D<N>, Iterator
         this(null);
     }
 
-    protected ColumnView(final Access2D<N> access, final long column) {
+    protected ColumnView(final Access2D<N> access) {
+        this(access, -1L);
+    }
+
+    ColumnView(final Access2D<N> access, final long column) {
 
         super();
 
-        myAccess = access;
+        myDelegate2D = access;
         myLastColumn = access.countColumns() - 1L;
 
         myColumn = column;
-    }
-
-    ColumnView(final Access2D<N> access) {
-        this(access, -1L);
     }
 
     public long column() {
@@ -59,15 +59,15 @@ public final class ColumnView<N extends Number> implements Access1D<N>, Iterator
     }
 
     public long count() {
-        return myAccess.countRows();
+        return myDelegate2D.countRows();
     }
 
     public double doubleValue(final long index) {
-        return myAccess.doubleValue(index, myColumn);
+        return myDelegate2D.doubleValue(index, myColumn);
     }
 
     public N get(final long index) {
-        return myAccess.get(index, myColumn);
+        return myDelegate2D.get(index, myColumn);
     }
 
     public boolean hasNext() {
@@ -90,6 +90,10 @@ public final class ColumnView<N extends Number> implements Access1D<N>, Iterator
 
     public void remove() {
         throw new UnsupportedOperationException();
+    }
+
+    protected void setColumn(final long column) {
+        myColumn = column;
     }
 
 }

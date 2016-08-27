@@ -154,23 +154,22 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
         throw new UnsupportedOperationException();
     }
 
-    private final DecompositionStore<N> makeQ(final DecompositionStore<N> aStoreToTransform, final boolean tmpUpper, final boolean eye) {
+    private final DecompositionStore<N> makeQ(final DecompositionStore<N> storeToTransform, final boolean upper, final boolean eye) {
 
-        final int tmpRowAndColDim = (int) aStoreToTransform.countRows();
+        final int tmpRowAndColDim = (int) storeToTransform.countRows();
 
-        final HouseholderReference<N> tmpHouseholderReference = new HouseholderReference<>(this.getInPlace(), tmpUpper);
+        final HouseholderReference<N> tmpReference = HouseholderReference.make(this.getInPlace(), upper);
 
         for (int ij = tmpRowAndColDim - 3; ij >= 0; ij--) {
 
-            tmpHouseholderReference.row = tmpUpper ? ij + 1 : ij;
-            tmpHouseholderReference.col = tmpUpper ? ij : ij + 1;
+            tmpReference.point(upper ? ij + 1 : ij, upper ? ij : ij + 1);
 
-            if (!tmpHouseholderReference.isZero()) {
-                aStoreToTransform.transformLeft(tmpHouseholderReference, eye ? ij : 0);
+            if (!tmpReference.isZero()) {
+                storeToTransform.transformLeft(tmpReference, eye ? ij : 0);
             }
         }
 
-        return aStoreToTransform;
+        return storeToTransform;
     }
 
     final DecompositionStore<N> doQ(final DecompositionStore<N> aStoreToTransform) {

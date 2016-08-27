@@ -389,7 +389,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         if (transformation instanceof Householder.Complex) {
             return (Householder.Complex) transformation;
         } else if (transformation instanceof HouseholderReference<?>) {
-            return ((HouseholderReference<ComplexNumber>) transformation).getComplexWorker().copy(transformation);
+            return ((Householder.Complex) ((HouseholderReference<ComplexNumber>) transformation).getWorker(FACTORY)).copy(transformation);
         } else {
             return new Householder.Complex(transformation);
         }

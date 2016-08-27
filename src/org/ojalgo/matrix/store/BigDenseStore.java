@@ -370,7 +370,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         if (transformation instanceof Householder.Big) {
             return (Householder.Big) transformation;
         } else if (transformation instanceof HouseholderReference<?>) {
-            return ((HouseholderReference<BigDecimal>) transformation).getBigWorker().copy(transformation);
+            return ((Householder.Big) ((HouseholderReference<BigDecimal>) transformation).getWorker(FACTORY)).copy(transformation);
         } else {
             return new Householder.Big(transformation);
         }

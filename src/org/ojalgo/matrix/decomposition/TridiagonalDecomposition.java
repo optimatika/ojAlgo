@@ -218,7 +218,7 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
         final DecompositionStore<N> retVal = this.getInPlace();
         final int tmpDim = (int) Math.min(retVal.countRows(), retVal.countColumns());
 
-        final HouseholderReference<N> tmpHouseholderReference = new HouseholderReference<>(retVal, true);
+        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(retVal);
 
         if (myInitDiagQ != null) {
             retVal.set(tmpDim - 1, tmpDim - 1, myInitDiagQ.get(tmpDim - 1));
@@ -237,11 +237,10 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
 
         for (int ij = tmpDim - 3; ij >= 0; ij--) {
 
-            tmpHouseholderReference.row = ij + 1;
-            tmpHouseholderReference.col = ij;
+            tmpReference.point(ij + 1, ij);
 
-            if (!tmpHouseholderReference.isZero()) {
-                retVal.transformLeft(tmpHouseholderReference, ij);
+            if (!tmpReference.isZero()) {
+                retVal.transformLeft(tmpReference, ij);
             }
 
             retVal.setToIdentity(ij);

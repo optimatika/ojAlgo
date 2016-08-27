@@ -183,13 +183,11 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
             for (int ij = 0; ij < tmpLimit; ij++) {
 
-                if (((ij + 1) < tmpRowDim)
-                        && tmpStore.generateApplyAndCopyHouseholderColumn(ij, ij, tmpHouseholderCol)) {
+                if (((ij + 1) < tmpRowDim) && tmpStore.generateApplyAndCopyHouseholderColumn(ij, ij, tmpHouseholderCol)) {
                     tmpStore.transformLeft(tmpHouseholderCol, ij + 1);
                 }
 
-                if (((ij + 2) < tmpColDim)
-                        && tmpStore.generateApplyAndCopyHouseholderRow(ij, ij + 1, tmpHouseholderRow)) {
+                if (((ij + 2) < tmpColDim) && tmpStore.generateApplyAndCopyHouseholderRow(ij, ij + 1, tmpHouseholderRow)) {
                     tmpStore.transformRight(tmpHouseholderRow, ij + 1);
                 }
             }
@@ -208,8 +206,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
                     tmpStore.transformRight(tmpHouseholderRow, ij + 1);
                 }
 
-                if (((ij + 2) < tmpRowDim)
-                        && tmpStore.generateApplyAndCopyHouseholderColumn(ij + 1, ij, tmpHouseholderCol)) {
+                if (((ij + 2) < tmpRowDim) && tmpStore.generateApplyAndCopyHouseholderColumn(ij + 1, ij, tmpHouseholderCol)) {
                     tmpStore.transformLeft(tmpHouseholderCol, ij + 1);
                 }
             }
@@ -292,12 +289,10 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
     }
 
     /**
-     * Will solve the equation system
-     * [aMtrxV][aMtrxD][X]=[aMtrxSimilar]<sup>T</sup> and overwrite the solution
-     * [X] to [aV].
+     * Will solve the equation system [aMtrxV][aMtrxD][X]=[aMtrxSimilar]<sup>T</sup> and overwrite the
+     * solution [X] to [aV].
      */
-    private void solve(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD,
-            final DiagonalAccess<N> aMtrxSimilar) {
+    private void solve(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD, final DiagonalAccess<N> aMtrxSimilar) {
 
         final int tmpDim = (int) aMtrxV.countRows();
         final int tmpLim = tmpDim - 1;
@@ -313,18 +308,15 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
             } else {
                 for (int i = 0; i < tmpLim; i++) {
                     aMtrxV.set(i, j,
-                            ((aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j))
-                                    + (aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j)))
+                            ((aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j)) + (aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j)))
                                     / tmpSingular);
                 }
-                aMtrxV.set(tmpLim, j,
-                        (aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j)) / tmpSingular);
+                aMtrxV.set(tmpLim, j, (aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j)) / tmpSingular);
             }
         }
     }
 
-    private DecompositionStore<N> solve2(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD,
-            final DiagonalAccess<N> aMtrxSimilar) {
+    private DecompositionStore<N> solve2(final PhysicalStore<N> aMtrxV, final MatrixStore<N> aMtrxD, final DiagonalAccess<N> aMtrxSimilar) {
 
         final int tmpDim = (int) aMtrxV.countRows();
         final int tmpLim = tmpDim - 1;
@@ -342,12 +334,10 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
             } else {
                 for (int i = 0; i < tmpLim; i++) {
                     retVal.set(i, j,
-                            ((aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j))
-                                    + (aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j)))
+                            ((aMtrxSimilar.doubleValue(i, i) * aMtrxV.doubleValue(i, j)) + (aMtrxSimilar.doubleValue(i, i + 1) * aMtrxV.doubleValue(i + 1, j)))
                                     / tmpSingular);
                 }
-                retVal.set(tmpLim, j,
-                        (aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j)) / tmpSingular);
+                retVal.set(tmpLim, j, (aMtrxSimilar.doubleValue(tmpLim, tmpLim) * aMtrxV.doubleValue(tmpLim, j)) / tmpSingular);
             }
         }
 
@@ -356,7 +346,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
     protected DecompositionStore<N> makeQ1() {
 
-        final HouseholderReference<N> tmpHouseholderReference = new HouseholderReference<>(this.getInPlace(), true);
+        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(this.getInPlace());
 
         final int tmpRowDim = this.getRowDim();
         final int tmpMinDim = this.getMinDim();
@@ -374,11 +364,10 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         final boolean tmpUpper = this.isUpper();
         for (int ij = (tmpUpper && (tmpRowDim != tmpMinDim)) ? tmpMinDim - 1 : tmpMinDim - 2; ij >= 0; ij--) {
 
-            tmpHouseholderReference.row = tmpUpper ? ij : ij + 1;
-            tmpHouseholderReference.col = ij;
+            tmpReference.point(tmpUpper ? ij : ij + 1, ij);
 
-            if (!tmpHouseholderReference.isZero()) {
-                retVal.transformLeft(tmpHouseholderReference, ij);
+            if (!tmpReference.isZero()) {
+                retVal.transformLeft(tmpReference, ij);
             }
         }
 
@@ -387,7 +376,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
     protected DecompositionStore<N> makeQ2() {
 
-        final HouseholderReference<N> tmpHouseholderReference = new HouseholderReference<>(this.getInPlace(), false);
+        final HouseholderReference<N> tmpReference = HouseholderReference.makeRow(this.getInPlace());
 
         final int tmpColDim = this.getColDim();
         final int tmpMinDim = this.getMinDim();
@@ -405,11 +394,10 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         final boolean tmpUpper = this.isUpper();
         for (int ij = tmpUpper ? tmpMinDim - 2 : tmpMinDim - 1; ij >= 0; ij--) {
 
-            tmpHouseholderReference.row = ij;
-            tmpHouseholderReference.col = tmpUpper ? ij + 1 : ij;
+            tmpReference.point(ij, tmpUpper ? ij + 1 : ij);
 
-            if (!tmpHouseholderReference.isZero()) {
-                retVal.transformLeft(tmpHouseholderReference, ij);
+            if (!tmpReference.isZero()) {
+                retVal.transformLeft(tmpReference, ij);
             }
         }
 
