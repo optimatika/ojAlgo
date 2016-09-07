@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.transformation.Householder;
@@ -31,10 +30,9 @@ import org.ojalgo.scalar.ComplexNumber;
 
 /**
  * <p>
- * Only classes that will act as a delegate to a
- * {@linkplain MatrixDecomposition} implementation from this package should
- * implement this interface. The interface specifications are entirely dictated
- * by the classes in this package.
+ * Only classes that will act as a delegate to a {@linkplain MatrixDecomposition} implementation from this
+ * package should implement this interface. The interface specifications are entirely dictated by the classes
+ * in this package.
  * </p>
  * <p>
  * Do not use it for anything else!
@@ -59,8 +57,6 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
      */
     void applyLU(final int iterationPoint, final BasicArray<N> multipliers);
 
-    Array2D<N> asArray2D();
-
     Array1D<ComplexNumber> computeInPlaceSchur(PhysicalStore<N> transformationCollector, boolean eigenvalue);
 
     void divideAndCopyColumn(int row, int column, BasicArray<N> destination);
@@ -71,10 +67,6 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
 
     boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<N> destination);
 
-    int indexOfLargestInColumn(final int row, final int column);
-
-    int indexOfLargestInDiagonal(final int row, final int column);
-
     void negateColumn(int column);
 
     void rotateRight(int aLow, int aHigh, double aCos, double aSin);
@@ -84,37 +76,30 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
     /**
      * Will solve the equation system [A][X]=[B] where:
      * <ul>
-     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and
-     * it will be overwritten with the solution).</li>
+     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
+     * the solution).</li>
      * <li>[A] is upper/right triangular</li>
      * </ul>
      *
-     * @param body
-     *            The equation system body parameters [A]
-     * @param unitDiagonal
-     *            TODO
-     * @param conjugated
-     *            true if the upper/right part of body is actually stored in the
-     *            lower/left part of the matrix, and the elements conjugated.
-     * @param hermitian
-     *            TODO
+     * @param body The equation system body parameters [A]
+     * @param unitDiagonal TODO
+     * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
+     *        matrix, and the elements conjugated.
+     * @param hermitian TODO
      */
     void substituteBackwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean hermitian);
 
     /**
      * Will solve the equation system [A][X]=[B] where:
      * <ul>
-     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and
-     * it will be overwritten with the solution).</li>
+     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
+     * the solution).</li>
      * <li>[A] is lower/left triangular</li>
      * </ul>
      *
-     * @param body
-     *            The equation system body parameters [A]
-     * @param unitDiagonal
-     *            true if body as ones on the diagonal
-     * @param conjugated
-     *            TODO
+     * @param body The equation system body parameters [A]
+     * @param unitDiagonal true if body as ones on the diagonal
+     * @param conjugated TODO
      * @param identity
      */
     void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);

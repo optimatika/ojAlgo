@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Array2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
@@ -133,10 +132,10 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
                     tmpInPlace.transformSymmetric(tmpHouseholder);
                 }
             }
-            final Array2D<N> tmpArray2D = this.getInPlace().asArray2D();
+            final DecompositionStore<N> tmpArray2D = this.getInPlace();
 
-            final Array1D<N> tmpMain = tmpArray2D.sliceDiagonal(0, 0).copy();
-            final Array1D<N> tmpSub = tmpArray2D.sliceDiagonal(1, 0).copy(); // Super differs only in possible conjugate values
+            final Array1D<N> tmpMain = ((Array1D<N>) tmpArray2D.sliceDiagonal(0, 0)).copy();
+            final Array1D<N> tmpSub = ((Array1D<N>) tmpArray2D.sliceDiagonal(1, 0)).copy(); // Super differs only in possible conjugate values
 
             myDiagonalAccessD = new DiagonalAccess<>(tmpMain, tmpSub, tmpSub, this.scalar().zero().getNumber());
             myInitDiagQ = this.makeReal(myDiagonalAccessD);

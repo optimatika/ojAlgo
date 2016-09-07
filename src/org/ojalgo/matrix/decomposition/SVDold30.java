@@ -29,7 +29,6 @@ import java.util.concurrent.Future;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Array2D;
 import org.ojalgo.concurrent.DaemonPoolExecutor;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
@@ -378,19 +377,19 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
 
     protected DiagonalAccess<N> extractSimilar(final PhysicalStore<N> aStore, final boolean aNormalAspectRatio) {
 
-        final Array2D<N> tmpArray2D = ((DecompositionStore<N>) aStore).asArray2D();
+        final DecompositionStore<N> tmpArray2D = ((DecompositionStore<N>) aStore);
 
-        final Array1D<N> tmpMain = tmpArray2D.sliceDiagonal(0, 0);
+        final Array1D<N> tmpMain = (Array1D<N>) tmpArray2D.sliceDiagonal(0, 0);
 
         if (aNormalAspectRatio) {
 
-            final Array1D<N> tmpSuper = tmpArray2D.sliceDiagonal(0, 1);
+            final Array1D<N> tmpSuper = (Array1D<N>) tmpArray2D.sliceDiagonal(0, 1);
 
             return new DiagonalAccess<>(tmpMain, tmpSuper, null, this.scalar().zero().getNumber());
 
         } else {
 
-            final Array1D<N> tmpSub = tmpArray2D.sliceDiagonal(1, 0);
+            final Array1D<N> tmpSub = (Array1D<N>) tmpArray2D.sliceDiagonal(1, 0);
 
             return new DiagonalAccess<>(tmpMain, null, tmpSub, this.scalar().zero().getNumber());
         }

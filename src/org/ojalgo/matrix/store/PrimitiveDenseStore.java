@@ -1121,10 +1121,6 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         }
     }
 
-    public Array2D<Double> asArray2D() {
-        return myUtility;
-    }
-
     public Array1D<Double> asList() {
         return myUtility.asArray1D();
     }
@@ -1391,16 +1387,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         return MatrixUtils.hashCode(this);
     }
 
-    public int indexOfLargestInColumn(final int row, final int column) {
-        return (int) myUtility.indexOfLargestInColumn(row, column);
-    }
-
     public long indexOfLargestInColumn(final long row, final long col) {
         return myUtility.indexOfLargestInColumn(row, col);
-    }
-
-    public int indexOfLargestInDiagonal(final int row, final int column) {
-        return (int) myUtility.indexOfLargestInDiagonal(row, column);
     }
 
     public long indexOfLargestInDiagonal(final long row, final long col) {

@@ -544,7 +544,7 @@ final class SimplexTableauSolver extends LinearSolver {
      * the objective(s).
      */
     Array1D<Double> sliceTableauColumn(final int col) {
-        return myTransposedTableau.asArray2D().sliceRow(col, 0).subList(0, this.countConstraints());
+        return myTransposedTableau.sliceRow(col, 0).subList(0, this.countConstraints());
     }
 
     /**
@@ -552,7 +552,7 @@ final class SimplexTableauSolver extends LinearSolver {
      * RHS.
      */
     Array1D<Double> sliceTableauRow(final int row) {
-        return myTransposedTableau.asArray2D().sliceColumn(0, row).subList(0, this.countConstraints() + this.countVariables());
+        return myTransposedTableau.sliceColumn(0, row).subList(0, this.countConstraints() + this.countVariables());
     }
 
 }

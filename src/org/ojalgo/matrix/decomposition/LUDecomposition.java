@@ -291,7 +291,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
             if (!assumeNoPivotingRequired) {
                 // Find next pivot row
-                final int tmpPivotRow = tmpInPlace.indexOfLargestInColumn(ij, ij);
+                final int tmpPivotRow = (int) tmpInPlace.indexOfLargestInColumn(ij, ij);
 
                 // Pivot?
                 if (tmpPivotRow != ij) {

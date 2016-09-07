@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 
@@ -40,22 +39,22 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
         this(null, null, null, null);
     }
 
-    DiagonalAccess(final Array1D<N> aMainDiagonal, final Array1D<N> aSuperdiagonal, final Array1D<N> aSubdiagonal, final N aZero) {
+    DiagonalAccess(final Array1D<N> mainDiag, final Array1D<N> superdiag, final Array1D<N> subdiag, final N zero) {
 
         super();
 
-        mainDiagonal = aMainDiagonal;
-        superdiagonal = aSuperdiagonal;
-        subdiagonal = aSubdiagonal;
+        mainDiagonal = mainDiag;
+        superdiagonal = superdiag;
+        subdiagonal = subdiag;
 
-        myZero = aZero;
+        myZero = zero;
 
-        if (aMainDiagonal != null) {
-            myDimension = aMainDiagonal.size();
-        } else if (aSuperdiagonal != null) {
-            myDimension = aSuperdiagonal.size() + 1;
+        if (mainDiag != null) {
+            myDimension = mainDiag.size();
+        } else if (superdiag != null) {
+            myDimension = superdiag.size() + 1;
         } else {
-            myDimension = aSubdiagonal.size() + 1;
+            myDimension = subdiag.size() + 1;
         }
     }
 
@@ -67,32 +66,24 @@ final class DiagonalAccess<N extends Number> implements Access2D<N> {
         return myDimension;
     }
 
-    public double doubleValue(final long index) {
-        return this.doubleValue(AccessUtils.row((int) index, myDimension), AccessUtils.column((int) index, myDimension));
-    }
-
     public double doubleValue(final long row, final long col) {
         if ((mainDiagonal != null) && (row == col)) {
             return mainDiagonal.doubleValue(row);
-        } else if ((superdiagonal != null) && ((col - row) == 1)) {
+        } else if ((superdiagonal != null) && ((col - row) == 1L)) {
             return superdiagonal.doubleValue(row);
-        } else if ((subdiagonal != null) && ((row - col) == 1)) {
+        } else if ((subdiagonal != null) && ((row - col) == 1L)) {
             return subdiagonal.doubleValue(col);
         } else {
             return PrimitiveMath.ZERO;
         }
     }
 
-    public N get(final long index) {
-        return this.get(AccessUtils.row(index, myDimension), AccessUtils.column(index, myDimension));
-    }
-
     public N get(final long row, final long col) {
         if ((mainDiagonal != null) && (row == col)) {
             return mainDiagonal.get(row);
-        } else if ((superdiagonal != null) && ((col - row) == 1)) {
+        } else if ((superdiagonal != null) && ((col - row) == 1L)) {
             return superdiagonal.get(row);
-        } else if ((subdiagonal != null) && ((row - col) == 1)) {
+        } else if ((subdiagonal != null) && ((row - col) == 1L)) {
             return subdiagonal.get(col);
         } else {
             return myZero;

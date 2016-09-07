@@ -571,10 +571,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
-    public Array2D<BigDecimal> asArray2D() {
-        return myUtility;
-    }
-
     public Array1D<BigDecimal> asList() {
         return myUtility.asArray1D();
     }
@@ -798,16 +794,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return MatrixUtils.hashCode(this);
     }
 
-    public int indexOfLargestInColumn(final int row, final int column) {
-        return (int) myUtility.indexOfLargestInColumn(row, column);
-    }
-
     public long indexOfLargestInColumn(final long row, final long col) {
         return myUtility.indexOfLargestInColumn(row, col);
-    }
-
-    public int indexOfLargestInDiagonal(final int row, final int column) {
-        return (int) myUtility.indexOfLargestInDiagonal(row, column);
     }
 
     public long indexOfLargestInDiagonal(final long row, final long col) {

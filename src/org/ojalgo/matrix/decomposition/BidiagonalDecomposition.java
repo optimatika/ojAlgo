@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Array2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -271,17 +270,17 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
     private DiagonalAccess<N> makeDiagonalAccessD() {
 
-        final Array2D<N> tmpArray2D = this.getInPlace().asArray2D();
+        final DecompositionStore<N> tmpArray2D = this.getInPlace();
 
-        final Array1D<N> tmpMain = tmpArray2D.sliceDiagonal(0, 0);
+        final Array1D<N> tmpMain = (Array1D<N>) tmpArray2D.sliceDiagonal(0, 0);
         Array1D<N> tmpSuper;
         Array1D<N> tmpSub;
 
         if (this.isAspectRatioNormal()) {
-            tmpSuper = tmpArray2D.sliceDiagonal(0, 1);
+            tmpSuper = (Array1D<N>) tmpArray2D.sliceDiagonal(0, 1);
             tmpSub = null;
         } else {
-            tmpSub = tmpArray2D.sliceDiagonal(1, 0);
+            tmpSub = (Array1D<N>) tmpArray2D.sliceDiagonal(1, 0);
             tmpSuper = null;
         }
 

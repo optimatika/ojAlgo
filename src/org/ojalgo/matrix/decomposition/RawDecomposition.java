@@ -21,9 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 
@@ -83,13 +81,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         return myRowDim;
     }
 
-    /**
-     * Possible to override to, possibly, only copy part of the matrix.
-     */
-    void copy(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
-        MatrixUtils.copy(source, rows, columns, destination);
-    }
-
     double[][] reset(final Structure2D matrix, final boolean transpose) {
 
         this.reset();
@@ -112,18 +103,6 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         this.aspectRatioNormal(tmpInputRowDim >= tmpInputColDim);
 
         return myRawInPlaceData;
-    }
-
-    /**
-     * Possible to override to, possibly, only copy/transpose part of the matrix.
-     */
-    void transpose(final Access2D<?> source, final int rows, final int columns, final double[][] destination) {
-        for (int j = 0; j < columns; j++) {
-            final double[] tmpColumn = destination[j];
-            for (int i = 0; i < rows; i++) {
-                tmpColumn[i] = source.doubleValue(i, j);
-            }
-        }
     }
 
 }
