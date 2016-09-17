@@ -221,9 +221,11 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
             final List<BigDecimal> tmpWeights = tmpMarkowitzModel.getWeights();
 
-            final State tmpOptimisationState = tmpMarkowitzModel.getOptimisationState();
+            final State tmpOptimisationState = tmpMarkowitzModel.optimiser().getState();
 
-            //BasicLogger.debug("State {} {}", tmpOptimisationState, tmpWeights);
+            if (DEBUG) {
+                BasicLogger.debug("State {} {}", tmpOptimisationState, tmpWeights);
+            }
 
             TestUtils.assertTrue("Optimisation State", tmpOptimisationState.isOptimal());
 
@@ -331,7 +333,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         markowitz.setTargetReturn(BigDecimal.valueOf(0.0427));
 
         List<BigDecimal> tmpWeights = markowitz.getWeights();
-        TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
+        TestUtils.assertTrue(markowitz.optimiser().getState().isFeasible());
 
         final NumberContext tmpTestPrecision = StandardType.PERCENT.newPrecision(4);
 
@@ -346,13 +348,13 @@ public class PortfolioProblems extends FinancePortfolioTests {
         // Also verify that it's posible to reach 10% return by shorting
         markowitz.setTargetReturn(BigDecimal.valueOf(0.1));
         TestUtils.assertEquals(0.1, markowitz.getMeanReturn(), tmpTestPrecision);
-        TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
+        TestUtils.assertTrue(markowitz.optimiser().getState().isFeasible());
 
         // Min risk portfolio, very high risk aversion means minimum risk.
         markowitz.setTargetReturn(null);
         markowitz.setRiskAversion(new BigDecimal(1000000));
         tmpWeights = markowitz.getWeights();
-        TestUtils.assertTrue(markowitz.getOptimisationState().isFeasible());
+        TestUtils.assertTrue(markowitz.optimiser().getState().isFeasible());
         TestUtils.assertEquals(0.4411, tmpWeights.get(0).doubleValue(), tmpTestPrecision); // 0.4411
         TestUtils.assertEquals(0.3656, tmpWeights.get(1).doubleValue(), tmpTestPrecision); // 0.3656
         TestUtils.assertEquals(0.1933, tmpWeights.get(2).doubleValue(), tmpTestPrecision); // 0.1933

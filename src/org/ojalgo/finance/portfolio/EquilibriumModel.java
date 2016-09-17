@@ -48,11 +48,11 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected EquilibriumModel(final Context context) {
+    protected EquilibriumModel(final FinancePortfolio.Context portfolioContext) {
 
         super();
 
-        myMarketEquilibrium = new MarketEquilibrium(context.getCovariances());
+        myMarketEquilibrium = new MarketEquilibrium(portfolioContext.getCovariances());
     }
 
     protected EquilibriumModel(final MarketEquilibrium marketEquilibrium) {

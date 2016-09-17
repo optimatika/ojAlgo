@@ -172,15 +172,15 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return myRowDim;
     }
 
+    protected final boolean isPrimitive() {
+        return this.getComponentType().equals(Double.class);
+    }
+
     final Class<?> getComponentType() {
         if (myComponentType == null) {
             myComponentType = this.get(0, 0).getClass();
         }
         return myComponentType;
-    }
-
-    final boolean isPrimitive() {
-        return this.getComponentType().equals(Double.class);
     }
 
 }

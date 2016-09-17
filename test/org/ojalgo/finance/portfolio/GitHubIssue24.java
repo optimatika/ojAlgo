@@ -236,7 +236,7 @@ public class GitHubIssue24 extends FinancePortfolioTests {
 
         final MarkowitzModel retVal = new MarkowitzModel(marketEquilibrium, PrimitiveMatrix.FACTORY.rows(expectedReturns));
 
-        retVal.optimisation().debug(debugOptimisationSolver).validate(validateOptimisationModel);
+        retVal.optimiser().debug(debugOptimisationSolver).validate(validateOptimisationModel);
 
         retVal.setTargetVariance(BigDecimal.valueOf(targetVariance));
 
@@ -257,7 +257,7 @@ public class GitHubIssue24 extends FinancePortfolioTests {
             BasicLogger.debug(tmpMeanReturn);
         }
 
-        TestUtils.assertTrue(markowitzModel.getOptimisationState().isOptimal()); // Won't reach here...
+        TestUtils.assertTrue(markowitzModel.optimiser().getState().isOptimal()); // Won't reach here...
     }
 
     public void testOriginallyHangingButNowCleaned() throws Exception {
@@ -269,7 +269,7 @@ public class GitHubIssue24 extends FinancePortfolioTests {
             BasicLogger.debug(tmpMeanReturn);
         }
 
-        TestUtils.assertTrue(markowitzModel.getOptimisationState().isOptimal()); // Won't reach here...
+        TestUtils.assertTrue(markowitzModel.optimiser().getState().isOptimal()); // Won't reach here...
     }
 
     public void testSuccess() throws Exception {
@@ -281,7 +281,7 @@ public class GitHubIssue24 extends FinancePortfolioTests {
             BasicLogger.debug(tmpMeanReturn);
         }
 
-        final State tmpOptimisationState = markowitzModel.getOptimisationState();
+        final State tmpOptimisationState = markowitzModel.optimiser().getState();
         TestUtils.assertTrue(tmpOptimisationState.isOptimal());
     }
 }

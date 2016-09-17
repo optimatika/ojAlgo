@@ -54,6 +54,7 @@ public class PortfolioSimulator {
         }
     }
 
+    @SuppressWarnings("unused")
     private PortfolioSimulator() {
         super();
     }

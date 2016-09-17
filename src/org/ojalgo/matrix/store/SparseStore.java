@@ -244,7 +244,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         if (this.isPrimitive()) {
 
             final long tmpRightStructure = this.countColumns();
-            final long tmpRightColumns = (int) target.countColumns();
+            final long tmpRightColumns = target.countColumns();
 
             if (target instanceof SparseStore) {
                 ((SparseStore<?>) target).empty();
@@ -252,16 +252,24 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                 target.fillAll(this.physical().scalar().zero().getNumber());
             }
 
+            long tmpRow;
+            long tmpCol;
+            double tmpValue;
+
+            long tmpFirst;
+            long tmpLimit;
+            long tmpIndex;
+
             for (final ElementView2D<N, ?> tmpNonzero : this.nonzeros()) {
-                final long tmpRow = tmpNonzero.row();
-                final long tmpCol = tmpNonzero.column();
-                final double tmpValue = tmpNonzero.doubleValue();
+                tmpRow = tmpNonzero.row();
+                tmpCol = tmpNonzero.column();
+                tmpValue = tmpNonzero.doubleValue();
 
-                final long tmpFirst = MatrixUtils.firstInRow(right, tmpRow, 0L);
-                final long tmpLimit = MatrixUtils.limitOfRow(right, tmpRow, tmpRightColumns);
-
+                tmpFirst = MatrixUtils.firstInRow(right, tmpRow, 0L);
+                tmpLimit = MatrixUtils.limitOfRow(right, tmpRow, tmpRightColumns);
                 for (long j = tmpFirst; j < tmpLimit; j++) {
-                    target.add(tmpRow, j, tmpValue * right.doubleValue(AccessUtils.index(tmpRightStructure, tmpCol, j)));
+                    tmpIndex = AccessUtils.index(tmpRightStructure, tmpCol, j);
+                    target.add(tmpRow, j, tmpValue * right.doubleValue(tmpIndex));
                 }
             }
 

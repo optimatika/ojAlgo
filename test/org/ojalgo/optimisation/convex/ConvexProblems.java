@@ -1358,7 +1358,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         tmpModel.getWeights();
 
-        TestUtils.assertTrue(tmpModel.getOptimisationState().isFeasible());
+        TestUtils.assertTrue(tmpModel.optimiser().getState().isFeasible());
 
     }
 
