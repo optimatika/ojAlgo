@@ -43,10 +43,18 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
 
     public static final BasicMatrix.Factory<BigMatrix> FACTORY = new MatrixFactory<>(BigMatrix.class, BigDenseStore.FACTORY);
 
+    /**
+     * @deprecated v41 Use {@link #FACTORY} instead
+     */
+    @Deprecated
     public static Builder<BigMatrix> getBuilder(final int aLength) {
         return FACTORY.getBuilder(aLength);
     }
 
+    /**
+     * @deprecated v41 Use {@link #FACTORY} instead
+     */
+    @Deprecated
     public static Builder<BigMatrix> getBuilder(final int aRowDim, final int aColDim) {
         return FACTORY.getBuilder(aRowDim, aColDim);
     }
@@ -107,7 +115,7 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
     }
 
     @Override
-    InverterTask<BigDecimal> getInverterTask(final MatrixStore<BigDecimal> base) {
+    InverterTask<BigDecimal> getInverterTask(final MatrixStore<BigDecimal>base) {
         return InverterTask.BIG.make(base, this.isHermitian(), false);
     }
 

@@ -111,17 +111,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final Builder<BigMatrix> tmpBigBuilder = myBigAA.copyToBuilder();
+        final Builder<BigMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.add(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
-        final Builder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copyToBuilder();
+        final Builder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
         tmpComplexBuilder.add(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final Builder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copyToBuilder();
+        final Builder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
         tmpPrimitiveBuilder.add(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpPrimitiveBuilder.build();
 
@@ -762,17 +762,17 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = Uniform.randomInteger((int) myBigAA.countRows());
         final int tmpCol = Uniform.randomInteger((int) myBigAA.countColumns());
 
-        final Builder<BigMatrix> tmpBigBuilder = myBigAA.copyToBuilder();
+        final Builder<BigMatrix> tmpBigBuilder = myBigAA.copy();
         tmpBigBuilder.set(tmpRow, tmpCol, myNmbr);
         myExpMtrx = tmpBigBuilder.build();
 
-        final Builder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copyToBuilder();
+        final Builder<ComplexMatrix> tmpComplexBuilder = myComplexAA.copy();
         tmpComplexBuilder.set(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpComplexBuilder.build();
 
         TestUtils.assertEquals(myExpMtrx, myActMtrx, EVALUATION);
 
-        final Builder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copyToBuilder();
+        final Builder<PrimitiveMatrix> tmpPrimitiveBuilder = myPrimitiveAA.copy();
         tmpPrimitiveBuilder.set(tmpRow, tmpCol, myNmbr);
         myActMtrx = tmpPrimitiveBuilder.build();
 

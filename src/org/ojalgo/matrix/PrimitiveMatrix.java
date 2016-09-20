@@ -43,10 +43,18 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
 
     public static final BasicMatrix.Factory<PrimitiveMatrix> FACTORY = new MatrixFactory<>(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
 
+    /**
+     * @deprecated v41 Use {@link #FACTORY} instead
+     */
+    @Deprecated
     public static Builder<PrimitiveMatrix> getBuilder(final int aLength) {
         return FACTORY.getBuilder(aLength);
     }
 
+    /**
+     * @deprecated v41 Use {@link #FACTORY} instead
+     */
+    @Deprecated
     public static Builder<PrimitiveMatrix> getBuilder(final int aRowDim, final int aColDim) {
         return FACTORY.getBuilder(aRowDim, aColDim);
     }
@@ -107,7 +115,7 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
     }
 
     @Override
-    InverterTask<Double> getInverterTask(final MatrixStore<Double> base) {
+    InverterTask<Double> getInverterTask(final MatrixStore<Double>base) {
         return InverterTask.PRIMITIVE.make(base, this.isHermitian(), false);
     }
 

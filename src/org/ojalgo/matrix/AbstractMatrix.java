@@ -128,7 +128,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(myStore.conjugate());
     }
 
-    public Builder<I> copyToBuilder() {
+    public Builder<I> copy() {
         return this.getFactory().wrap(myStore.copy());
     }
 

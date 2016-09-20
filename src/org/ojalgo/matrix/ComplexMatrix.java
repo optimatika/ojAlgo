@@ -43,10 +43,18 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
 
     public static final BasicMatrix.Factory<ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, ComplexDenseStore.FACTORY);
 
+    /**
+     * @deprecated v41 Use {@link #FACTORY} instead
+     */
+    @Deprecated
     public static Builder<ComplexMatrix> getBuilder(final int aLength) {
         return FACTORY.getBuilder(aLength);
     }
 
+    /**
+     * @deprecated v41 Use {@link #FACTORY} instead
+     */
+    @Deprecated
     public static Builder<ComplexMatrix> getBuilder(final int aRowDim, final int aColDim) {
         return FACTORY.getBuilder(aRowDim, aColDim);
     }
@@ -139,7 +147,7 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     }
 
     @Override
-    InverterTask<ComplexNumber> getInverterTask(final MatrixStore<ComplexNumber> base) {
+    InverterTask<ComplexNumber> getInverterTask(final MatrixStore<ComplexNumber>base) {
         return InverterTask.COMPLEX.make(base, this.isHermitian(), false);
     }
 
