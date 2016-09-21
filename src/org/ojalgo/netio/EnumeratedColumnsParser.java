@@ -23,7 +23,8 @@ package org.ojalgo.netio;
 
 import org.ojalgo.type.context.TypeContext;
 
-public class EnumeratedColumnsParser<E extends Enum<E>> implements BasicParser<EnumeratedColumnsParser<E>.LineView> {
+public class EnumeratedColumnsParser<E extends Enum<E>> extends AbstractParser
+        implements BasicParser<EnumeratedColumnsParser<E>.LineView> {
 
     public class Configuration {
 
@@ -50,7 +51,7 @@ public class EnumeratedColumnsParser<E extends Enum<E>> implements BasicParser<E
 
     public class LineView {
 
-        private final int[] indexOfs;
+        private final int[] indices;
 
         private char quoteChar = _NULL;
 
@@ -62,12 +63,12 @@ public class EnumeratedColumnsParser<E extends Enum<E>> implements BasicParser<E
 
             super();
 
-            indexOfs = new int[numberOfColumns + 1];
+            indices = new int[numberOfColumns + 1];
         }
 
         public String get(final E column) {
             final int tmpOrdinal = column.ordinal();
-            return line.substring(indexOfs[tmpOrdinal], indexOfs[tmpOrdinal + 1]);
+            return line.substring(indices[tmpOrdinal], indices[tmpOrdinal + 1]);
         }
 
         public <P> P get(final E column, final TypeContext<P> context) {
@@ -84,18 +85,18 @@ public class EnumeratedColumnsParser<E extends Enum<E>> implements BasicParser<E
 
             int tmpIndex = 0;
             int tmpPosition = quoteChar == _NULL ? 0 : 1;
-            indexOfs[tmpIndex] = tmpPosition;
+            indices[tmpIndex] = tmpPosition;
 
             while ((tmpPosition = line.indexOf(splitter, tmpPosition)) >= 0) {
                 tmpPosition += tmpSplitterLength;
-                indexOfs[++tmpIndex] = tmpPosition;
+                indices[++tmpIndex] = tmpPosition;
             }
 
             tmpPosition = line.length() + tmpSplitterLength;
             if (quoteChar != _NULL) {
                 tmpPosition--;
             }
-            indexOfs[++tmpIndex] = tmpPosition;
+            indices[++tmpIndex] = tmpPosition;
 
         }
 
