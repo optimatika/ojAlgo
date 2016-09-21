@@ -25,30 +25,49 @@ import org.ojalgo.type.context.TypeContext;
 
 public class EnumeratedColumnsParser<E extends Enum<E>> implements BasicParser<EnumeratedColumnsParser<E>.LineView> {
 
-    public static class Configuration {
+    public class Configuration {
 
-        private final char delimiter = ',';
-        private final char quote = '"';
-        private final boolean heading = false;
+        public Configuration delimiter(char d) {
+            delimiter = d;
+            return this;
+        }
+
+        public Configuration heading(boolean h) {
+            heading = h;
+            return this;
+        }
+
+        public boolean isQuoted() {
+            return quote != _NULL;
+        }
+
+        public Configuration quote(char q) {
+            quote = q;
+            return this;
+        }
 
     }
 
     public class LineView {
 
-        private final int[] begin;
-        private final int[] end;
+        private final int[] indexOfs;
+
+        private char quoteChar = _NULL;
+
+        private char splitChar = ',';
+
+        private String splitter;
 
         LineView(final int numberOfColumns) {
 
             super();
 
-            begin = new int[numberOfColumns + 1];
-            end = new int[numberOfColumns + 1];
+            indexOfs = new int[numberOfColumns + 1];
         }
 
         public String get(final E column) {
             final int tmpOrdinal = column.ordinal();
-            return line.substring(begin[tmpOrdinal], end[tmpOrdinal]);
+            return line.substring(indexOfs[tmpOrdinal], indexOfs[tmpOrdinal + 1]);
         }
 
         public <P> P get(final E column, final TypeContext<P> context) {
@@ -61,22 +80,33 @@ public class EnumeratedColumnsParser<E extends Enum<E>> implements BasicParser<E
 
         void index(final String line) {
 
+            int tmpSplitterLength = splitter.length();
+
             int tmpIndex = 0;
-            int tmpBreakpoint = 0;
+            int tmpPosition = quoteChar == _NULL ? 0 : 1;
+            indexOfs[tmpIndex] = tmpPosition;
 
-            begin[tmpIndex] = tmpBreakpoint;
-
-            while ((tmpBreakpoint = line.indexOf(',', tmpBreakpoint)) != -1) {
-                end[++tmpIndex] = begin[tmpIndex];
-                begin[tmpIndex] = tmpBreakpoint;
+            while ((tmpPosition = line.indexOf(splitter, tmpPosition)) >= 0) {
+                tmpPosition += tmpSplitterLength;
+                indexOfs[++tmpIndex] = tmpPosition;
             }
 
-            end[tmpIndex] = line.length();
+            tmpPosition = line.length() + tmpSplitterLength;
+            if (quoteChar != _NULL) {
+                tmpPosition--;
+            }
+            indexOfs[++tmpIndex] = tmpPosition;
+
         }
 
     }
 
+    private static final char _NULL = (char) 0;
+
+    private char delimiter = ',';
+    private boolean heading = false;
     private final LineView myLineView;
+    private char quote = '"';
     transient String line = null;
 
     public EnumeratedColumnsParser(final Class<E> clazz) {
