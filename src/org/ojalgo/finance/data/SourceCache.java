@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.type.CalendarDate;
@@ -57,7 +58,7 @@ public final class SourceCache {
 
     private static final Timer TIMER = new Timer("SourceCache-Daemon", true);
 
-    private final Map<DataSource<?>, SourceCache.Value> myCache = Collections.synchronizedMap(new HashMap<DataSource<?>, SourceCache.Value>());
+    private final Map<DataSource<?>, SourceCache.Value> myCache = new ConcurrentHashMap<DataSource<?>, SourceCache.Value>();
     private final CalendarDateUnit myResolution;
 
     public SourceCache(final CalendarDateUnit aResolution) {
