@@ -21,8 +21,6 @@
  */
 package org.ojalgo.finance.data;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Timer;
@@ -37,9 +35,9 @@ public final class SourceCache {
 
     private static final class Value {
 
-        CalendarDate used = new CalendarDate();
         final CalendarDateSeries<Double> series;
         CalendarDate updated = new CalendarDate();
+        CalendarDate used = new CalendarDate();
 
         @SuppressWarnings("unused")
         private Value() {
