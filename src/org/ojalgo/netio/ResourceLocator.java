@@ -23,6 +23,7 @@ package org.ojalgo.netio;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -60,7 +61,7 @@ public final class ResourceLocator {
      */
     public BufferedReader getStreamReader() {
         try {
-            return new BufferedInputStreamReader(this.toURL().openStream());
+            return new BufferedReader(new InputStreamReader(this.toURL().openStream()));
         } catch (final IOException anException) {
             return null;
         }

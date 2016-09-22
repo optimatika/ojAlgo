@@ -102,7 +102,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
     }
 
     @Override
-    protected YahooSymbol.Data parse(final String line) {
+    public YahooSymbol.Data parse(final String line) {
 
         Data retVal = null;
 

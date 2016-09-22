@@ -100,7 +100,7 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
     }
 
     @Override
-    protected GoogleSymbol.Data parse(final String line) {
+    public GoogleSymbol.Data parse(final String line) {
 
         Data retVal = null;
 

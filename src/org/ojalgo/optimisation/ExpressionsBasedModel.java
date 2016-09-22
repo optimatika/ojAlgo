@@ -262,7 +262,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         myWorkCopy = false;
     }
 
-    public ExpressionsBasedModel(final Options someOptions) {
+    public ExpressionsBasedModel(final Optimisation.Options someOptions) {
 
         super(someOptions);
 

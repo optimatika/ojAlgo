@@ -32,22 +32,15 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
     public static class Builder implements Supplier<EnumeratedColumnsParser> {
 
-        private int myColumns = 0;
         private char myDelimiter = ',';
-        private ParseStrategy myStrategy = ParseStrategy.SIMPLEST;
+        private final int myNumberOfColumns;
+        private ParseStrategy myStrategy = ParseStrategy.RFC4180;
 
-        public Builder() {
+        Builder(final int numberOfColumns) {
+
             super();
-        }
 
-        public Builder columns(final Class<? extends Enum<?>> columns) {
-            myColumns = columns.getFields().length;
-            return this;
-        }
-
-        public Builder columns(final int columns) {
-            myColumns = columns;
-            return this;
+            myNumberOfColumns = numberOfColumns;
         }
 
         public Builder delimiter(final char delimiter) {
@@ -56,7 +49,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
         }
 
         public EnumeratedColumnsParser get() {
-            return new EnumeratedColumnsParser(myColumns, myDelimiter, myStrategy);
+            return new EnumeratedColumnsParser(myNumberOfColumns, myDelimiter, myStrategy);
         }
 
         public Builder strategy(final ParseStrategy quoted) {
@@ -92,14 +85,23 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
             }
         }
 
+        public final double floatValue(final Enum<?> column) {
+            final String tmpStringValue = this.get(column.ordinal());
+            if ((tmpStringValue != null) && (tmpStringValue.length() > 0)) {
+                return Float.parseFloat(tmpStringValue);
+            } else {
+                return Float.NaN;
+            }
+        }
+
         public final String get(final Enum<?> column) {
             return this.get(column.ordinal());
         }
 
-        public final <P> P get(final Enum<?> column, final TypeContext<P> context) {
+        public final <P> P get(final Enum<?> column, final TypeContext<P> typeContext) {
             final String tmpStringValue = this.get(column.ordinal());
             if ((tmpStringValue != null) && (tmpStringValue.length() > 0)) {
-                return context.parse(tmpStringValue);
+                return typeContext.parse(tmpStringValue);
             } else {
                 return null;
             }
@@ -145,16 +147,27 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
     public static enum ParseStrategy {
 
         /**
-         * Same as {@link #SIMPLEST} but assumes ALL values are quoted (they
-         * have to be).
+         * Simplest possible. Just delimited data. No quoting or any special characters...
+         */
+        FAST {
+
+            @Override
+            public LineView make(final int numberOfColumns, final char delimiter) {
+                return new FastViewStrategy(numberOfColumns, delimiter);
+            }
+        },
+
+        /**
+         * Same as {@link #FAST} but assumes values are quoted (they have to be, ALL of them).
          */
         QUOTED() {
 
             @Override
             public LineView make(final int numberOfColumns, final char delimiter) {
-                return new AlwaysQuoted(numberOfColumns, delimiter);
+                return new QuotedViewStrategy(numberOfColumns, delimiter);
             }
         },
+
         /**
          * As specified by the RFC4180 standard. (Not yet implemented!)
          */
@@ -162,18 +175,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
             @Override
             public LineView make(final int numberOfColumns, final char delimiter) {
-                return new SometimesQuoted(numberOfColumns, delimiter);
-            }
-        },
-        /**
-         * Simplest possible. Just delimited data. No quoting or any special
-         * characters...
-         */
-        SIMPLEST {
-
-            @Override
-            public LineView make(final int numberOfColumns, final char delimiter) {
-                return new NeverQuoted(numberOfColumns, delimiter);
+                return new ViewStrategyRFC4180(numberOfColumns, delimiter);
             }
         };
 
@@ -181,81 +183,81 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
     }
 
-    static class AlwaysQuoted extends LineView {
+    static class FastViewStrategy extends LineView {
 
-        private final int[] indices;
-        private final String splitter;
+        private final int[] myIndices;
 
-        AlwaysQuoted(final int numberOfColumns, final char delimiter) {
+        FastViewStrategy(final int numberOfColumns, final char delimiter) {
 
             super(numberOfColumns, delimiter);
 
-            indices = new int[numberOfColumns + 1];
-            splitter = String.valueOf(new char[] { '"', delimiter, '"' });
+            myIndices = new int[numberOfColumns + 1];
         }
 
         @Override
         public String get(final int column) {
-            return line.substring(indices[column], indices[column + 1] - 3);
+            return line.substring(myIndices[column], myIndices[column + 1] - 1);
         }
 
         @Override
-        void index(final String line, BufferedReader bufferedReader) {
-
-            int tmpIndex = 0;
-            int tmpPosition = 1;
-            indices[tmpIndex] = tmpPosition;
-
-            while ((tmpPosition = line.indexOf(splitter, tmpPosition)) >= 0) {
-                tmpPosition += 3;
-                indices[++tmpIndex] = tmpPosition;
-            }
-
-            tmpPosition = line.length() + 2;
-            indices[++tmpIndex] = tmpPosition;
-
-            this.line = line;
-        }
-
-    }
-
-    static class NeverQuoted extends LineView {
-
-        private final int[] indices;
-
-        NeverQuoted(final int numberOfColumns, final char delimiter) {
-
-            super(numberOfColumns, delimiter);
-
-            indices = new int[numberOfColumns + 1];
-        }
-
-        @Override
-        public String get(final int column) {
-            return line.substring(indices[column], indices[column + 1] - 1);
-        }
-
-        @Override
-        void index(final String line, BufferedReader bufferedReader) {
+        void index(final String line, final BufferedReader bufferedReader) {
 
             int tmpIndex = 0;
             int tmpPosition = 0;
-            indices[tmpIndex] = tmpPosition;
+            myIndices[tmpIndex] = tmpPosition;
 
             while ((tmpPosition = line.indexOf(delimiter, tmpPosition)) >= 0) {
-                indices[++tmpIndex] = ++tmpPosition;
+                myIndices[++tmpIndex] = ++tmpPosition;
             }
 
             tmpPosition = line.length();
-            indices[++tmpIndex] = tmpPosition;
+            myIndices[++tmpIndex] = tmpPosition;
 
             this.line = line;
         }
     }
 
-    static class SometimesQuoted extends LineView {
+    static class QuotedViewStrategy extends LineView {
 
-        SometimesQuoted(final int numberOfColumns, final char delimiter) {
+        private final int[] myIndices;
+        private final String mySplitter;
+
+        QuotedViewStrategy(final int numberOfColumns, final char delimiter) {
+
+            super(numberOfColumns, delimiter);
+
+            myIndices = new int[numberOfColumns + 1];
+            mySplitter = String.valueOf(new char[] { '"', delimiter, '"' });
+        }
+
+        @Override
+        public String get(final int column) {
+            return line.substring(myIndices[column], myIndices[column + 1] - 3);
+        }
+
+        @Override
+        void index(final String line, final BufferedReader bufferedReader) {
+
+            int tmpIndex = 0;
+            int tmpPosition = 1;
+            myIndices[tmpIndex] = tmpPosition;
+
+            while ((tmpPosition = line.indexOf(mySplitter, tmpPosition)) >= 0) {
+                tmpPosition += 3;
+                myIndices[++tmpIndex] = tmpPosition;
+            }
+
+            tmpPosition = line.length() + 2;
+            myIndices[++tmpIndex] = tmpPosition;
+
+            this.line = line;
+        }
+
+    }
+
+    static class ViewStrategyRFC4180 extends LineView {
+
+        ViewStrategyRFC4180(final int numberOfColumns, final char delimiter) {
 
             super(numberOfColumns, delimiter);
 
@@ -267,17 +269,21 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
         }
 
         @Override
-        void index(final String line, BufferedReader bufferedReader) {
+        void index(final String line, final BufferedReader bufferedReader) {
 
             this.line = line;
 
             throw new RuntimeException("Not yet implemented!");
-
         }
+
     }
 
-    public static EnumeratedColumnsParser.Builder make() {
-        return new EnumeratedColumnsParser.Builder();
+    public static EnumeratedColumnsParser.Builder make(final Class<? extends Enum<?>> columns) {
+        return new EnumeratedColumnsParser.Builder(columns.getFields().length);
+    }
+
+    public static EnumeratedColumnsParser.Builder make(final int numberOfColumns) {
+        return new EnumeratedColumnsParser.Builder(numberOfColumns);
     }
 
     private final LineView myLineView;
@@ -295,7 +301,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
     }
 
     @Override
-    LineView parse(String line, BufferedReader bufferedReader) {
+    LineView parse(final String line, final BufferedReader bufferedReader) {
 
         myLineView.index(line, bufferedReader);
 

@@ -29,12 +29,13 @@ import java.util.List;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.BasicParser;
 import org.ojalgo.netio.ResourceLocator;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.TypeCache;
 
-public abstract class DataSource<DP extends DatePrice> {
+public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP> {
 
     protected static final boolean DEBUG = false;
 
@@ -167,8 +168,6 @@ public abstract class DataSource<DP extends DatePrice> {
     protected String addQueryParameter(final String key, final String value) {
         return myResourceLocator.addQueryParameter(key, value);
     }
-
-    protected abstract DP parse(String line);
 
     protected void setHost(final String host) {
         myResourceLocator.setHost(host);
