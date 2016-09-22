@@ -33,7 +33,7 @@ public class EnumeratedColumnsParser implements BasicParser<LineView> {
 
         private int myColumns = 0;
         private char myDelimiter = ',';
-        private Quoted myQuoted = Quoted.NEVER;
+        private ParseStrategy myStrategy = ParseStrategy.SIMPLEST;
 
         public Builder() {
             super();
@@ -55,11 +55,11 @@ public class EnumeratedColumnsParser implements BasicParser<LineView> {
         }
 
         public EnumeratedColumnsParser get() {
-            return new EnumeratedColumnsParser(myColumns, myDelimiter, myQuoted);
+            return new EnumeratedColumnsParser(myColumns, myDelimiter, myStrategy);
         }
 
-        public Builder quoted(final Quoted quoted) {
-            myQuoted = quoted;
+        public Builder strategy(final ParseStrategy quoted) {
+            myStrategy = quoted;
             return this;
         }
 
@@ -141,27 +141,38 @@ public class EnumeratedColumnsParser implements BasicParser<LineView> {
 
     }
 
-    public static enum Quoted {
+    public static enum ParseStrategy {
 
-        ALWAYS() {
+        /**
+         * Same as {@link #SIMPLEST} but assumes ALL values are quoted (they
+         * have to be).
+         */
+        QUOTED() {
 
             @Override
             public LineView make(final int numberOfColumns, final char delimiter) {
                 return new AlwaysQuoted(numberOfColumns, delimiter);
             }
         },
-        NEVER {
-
-            @Override
-            public LineView make(final int numberOfColumns, final char delimiter) {
-                return new NeverQuoted(numberOfColumns, delimiter);
-            }
-        },
-        SOMETIMES {
+        /**
+         * As specified by the RFC4180 standard. (Not yet implemented!)
+         */
+        RFC4180 {
 
             @Override
             public LineView make(final int numberOfColumns, final char delimiter) {
                 return new SometimesQuoted(numberOfColumns, delimiter);
+            }
+        },
+        /**
+         * Simplest possible. Just delimited data. No quoting or any special
+         * characters...
+         */
+        SIMPLEST {
+
+            @Override
+            public LineView make(final int numberOfColumns, final char delimiter) {
+                return new NeverQuoted(numberOfColumns, delimiter);
             }
         };
 
@@ -275,11 +286,11 @@ public class EnumeratedColumnsParser implements BasicParser<LineView> {
         this(0, ',', null);
     }
 
-    EnumeratedColumnsParser(final int columns, final char delimiter, final Quoted quoted) {
+    EnumeratedColumnsParser(final int columns, final char delimiter, final ParseStrategy strategy) {
 
         super();
 
-        myLineView = quoted.make(columns, delimiter);
+        myLineView = strategy.make(columns, delimiter);
     }
 
     @Override
