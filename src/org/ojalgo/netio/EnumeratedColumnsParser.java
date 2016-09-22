@@ -21,13 +21,14 @@
  */
 package org.ojalgo.netio;
 
+import java.io.BufferedReader;
 import java.math.BigDecimal;
 import java.util.function.Supplier;
 
 import org.ojalgo.netio.EnumeratedColumnsParser.LineView;
 import org.ojalgo.type.context.TypeContext;
 
-public class EnumeratedColumnsParser implements BasicParser<LineView> {
+public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
     public static class Builder implements Supplier<EnumeratedColumnsParser> {
 
@@ -137,7 +138,7 @@ public class EnumeratedColumnsParser implements BasicParser<LineView> {
             }
         }
 
-        abstract void index(final String line);
+        abstract void index(final String line, BufferedReader bufferedReader);
 
     }
 
@@ -199,7 +200,7 @@ public class EnumeratedColumnsParser implements BasicParser<LineView> {
         }
 
         @Override
-        void index(final String line) {
+        void index(final String line, BufferedReader bufferedReader) {
 
             int tmpIndex = 0;
             int tmpPosition = 1;
@@ -235,7 +236,7 @@ public class EnumeratedColumnsParser implements BasicParser<LineView> {
         }
 
         @Override
-        void index(final String line) {
+        void index(final String line, BufferedReader bufferedReader) {
 
             int tmpIndex = 0;
             int tmpPosition = 0;
@@ -266,7 +267,7 @@ public class EnumeratedColumnsParser implements BasicParser<LineView> {
         }
 
         @Override
-        void index(final String line) {
+        void index(final String line, BufferedReader bufferedReader) {
 
             this.line = line;
 
@@ -294,9 +295,9 @@ public class EnumeratedColumnsParser implements BasicParser<LineView> {
     }
 
     @Override
-    public LineView parse(final String line) {
+    LineView parse(String line, BufferedReader bufferedReader) {
 
-        myLineView.index(line);
+        myLineView.index(line, bufferedReader);
 
         return myLineView;
     }
