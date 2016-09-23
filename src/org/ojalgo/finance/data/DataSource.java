@@ -21,14 +21,12 @@
  */
 package org.ojalgo.finance.data;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.BasicParser;
 import org.ojalgo.netio.ResourceLocator;
 import org.ojalgo.series.CalendarDateSeries;
@@ -91,32 +89,11 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
         return this.getHistoricalPrices(myResourceLocator.getStreamReader());
     }
 
-    public List<DP> getHistoricalPrices(final BufferedReader reader) {
+    public List<DP> getHistoricalPrices(final Reader reader) {
 
         final ArrayList<DP> retVal = new ArrayList<>();
 
-        String tmpLine;
-        DP tmpHistPrice;
-        try {
-            tmpLine = reader.readLine();
-
-            if (DEBUG) {
-                BasicLogger.debug(tmpLine);
-            }
-
-            while ((tmpLine = reader.readLine()) != null) {
-
-                if (DEBUG) {
-                    BasicLogger.debug(tmpLine);
-                }
-
-                tmpHistPrice = this.parse(tmpLine);
-                retVal.add(tmpHistPrice);
-            }
-            reader.close();
-        } catch (final IOException anException) {
-            anException.printStackTrace();
-        }
+        this.parse(reader, i -> retVal.add(i));
 
         Collections.sort(retVal);
 
@@ -127,7 +104,7 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
         return this.getPriceSeries(myResourceLocator.getStreamReader());
     }
 
-    public CalendarDateSeries<Double> getPriceSeries(final BufferedReader reader) {
+    public CalendarDateSeries<Double> getPriceSeries(final Reader reader) {
 
         final CalendarDateSeries<Double> retVal = new CalendarDateSeries<Double>(myResolution).name(mySymbol);
 
