@@ -27,16 +27,17 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 public final class SampleSet implements Access1D<Double> {
 
     public static SampleSet make(final RandomNumber randomNumber, final int size) {
 
         final PrimitiveArray retVal = PrimitiveArray.make(size);
+        double[] tmpData = retVal.data;
 
         for (int i = 0; i < size; i++) {
-            retVal.data[i] = randomNumber.doubleValue();
+            tmpData[i] = randomNumber.doubleValue();
         }
 
         return new SampleSet(retVal);
@@ -76,10 +77,6 @@ public final class SampleSet implements Access1D<Double> {
         return mySamples.doubleValue(index);
     }
 
-    public Double get(final int index) {
-        return mySamples.doubleValue(index);
-    }
-
     public Double get(final long index) {
         return mySamples.doubleValue(index);
     }
@@ -108,15 +105,15 @@ public final class SampleSet implements Access1D<Double> {
         final double tmpThisMean = this.getMean();
         final double tmpThatMean = anotherSampleSet.getMean();
 
-        final int tmpCount = (int) Math.min(mySamples.count(), anotherSampleSet.count());
+        final long tmpLimit = Math.min(mySamples.count(), anotherSampleSet.count());
 
         final Access1D<?> tmpValues = anotherSampleSet.getSamples();
 
-        for (int i = 0; i < tmpCount; i++) {
+        for (long i = 0L; i < tmpLimit; i++) {
             retVal += (mySamples.doubleValue(i) - tmpThisMean) * (tmpValues.doubleValue(i) - tmpThatMean);
         }
 
-        retVal /= (tmpCount - 1);
+        retVal /= (tmpLimit - 1L);
 
         return retVal;
     }
@@ -132,8 +129,9 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = PrimitiveMath.ZERO;
 
-        for (int i = 0; i < mySamples.count(); i++) {
-            retVal = PrimitiveFunction.MAX.invoke(retVal, PrimitiveFunction.ABS.invoke(mySamples.doubleValue(i)));
+        long tmpLimit = mySamples.count();
+        for (long i = 0L; i < tmpLimit; i++) {
+            retVal = MAX.invoke(retVal, ABS.invoke(mySamples.doubleValue(i)));
         }
 
         return retVal;
@@ -150,8 +148,9 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = PrimitiveMath.NEGATIVE_INFINITY;
 
-        for (int i = 0; i < mySamples.count(); i++) {
-            retVal = PrimitiveFunction.MAX.invoke(retVal, mySamples.doubleValue(i));
+        long tmpLimit = mySamples.count();
+        for (long i = 0L; i < tmpLimit; i++) {
+            retVal = MAX.invoke(retVal, mySamples.doubleValue(i));
         }
 
         return retVal;
@@ -163,7 +162,8 @@ public final class SampleSet implements Access1D<Double> {
 
             myMean = PrimitiveMath.ZERO;
 
-            for (int i = 0; i < mySamples.count(); i++) {
+            long tmpLimit = mySamples.count();
+            for (long i = 0L; i < tmpLimit; i++) {
                 myMean += mySamples.doubleValue(i);
             }
 
@@ -184,7 +184,7 @@ public final class SampleSet implements Access1D<Double> {
 
             Arrays.sort(tmpCopy);
 
-            myMedian = tmpCopy[(int) (mySamples.count() / 2)];
+            myMedian = tmpCopy[tmpCopy.length / 2];
         }
 
         return myMedian;
@@ -197,8 +197,9 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = PrimitiveMath.POSITIVE_INFINITY;
 
-        for (int i = 0; i < mySamples.count(); i++) {
-            retVal = PrimitiveFunction.MIN.invoke(retVal, mySamples.doubleValue(i));
+        long tmpLimit = mySamples.count();
+        for (long i = 0L; i < tmpLimit; i++) {
+            retVal = MIN.invoke(retVal, mySamples.doubleValue(i));
         }
 
         return retVal;
@@ -211,23 +212,25 @@ public final class SampleSet implements Access1D<Double> {
 
         double retVal = PrimitiveMath.POSITIVE_INFINITY;
 
-        for (int i = 0; i < mySamples.count(); i++) {
-            retVal = PrimitiveFunction.MIN.invoke(retVal, PrimitiveFunction.ABS.invoke(mySamples.doubleValue(i)));
+        long tmpLimit = mySamples.count();
+        for (long i = 0L; i < tmpLimit; i++) {
+            retVal = MIN.invoke(retVal, ABS.invoke(mySamples.doubleValue(i)));
         }
 
         return retVal;
     }
 
     public double getStandardDeviation() {
-        return PrimitiveFunction.SQRT.invoke(this.getVariance());
+        return SQRT.invoke(this.getVariance());
     }
 
     /**
-     * The standard score is the (signed) number of standard deviations an observation or datum is above the
-     * mean. Thus, a positive standard score indicates a datum above the mean, while a negative standard score
-     * indicates a datum below the mean. It is a dimensionless quantity obtained by subtracting the population
-     * mean from an individual raw score and then dividing the difference by the population standard
-     * deviation.
+     * The standard score is the (signed) number of standard deviations an
+     * observation or datum is above the mean. Thus, a positive standard score
+     * indicates a datum above the mean, while a negative standard score
+     * indicates a datum below the mean. It is a dimensionless quantity obtained
+     * by subtracting the population mean from an individual raw score and then
+     * dividing the difference by the population standard deviation.
      *
      * @see <a href="https://en.wikipedia.org/wiki/Standard_score">WikipediA</a>
      */
@@ -236,10 +239,12 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     /**
-     * Sum of squares is a concept that permeates much of inferential statistics and descriptive statistics.
-     * More properly, it is "the sum of the squared deviations". Mathematically, it is an unscaled, or
-     * unadjusted measure of dispersion (also called variability). When scaled for the number of degrees of
-     * freedom, it estimates the variance, or spread of the observations about their mean value.
+     * Sum of squares is a concept that permeates much of inferential statistics
+     * and descriptive statistics. More properly, it is "the sum of the squared
+     * deviations". Mathematically, it is an unscaled, or unadjusted measure of
+     * dispersion (also called variability). When scaled for the number of
+     * degrees of freedom, it estimates the variance, or spread of the
+     * observations about their mean value.
      *
      * @see <a href="http://en.wikipedia.org/wiki/Sum_of_squares">WikipediA</a>
      */
@@ -249,8 +254,8 @@ public final class SampleSet implements Access1D<Double> {
 
         final double tmpMean = this.getMean();
         double tmpVal;
-        final int tmpLimit = (int) mySamples.count();
-        for (int i = 0; i < tmpLimit; i++) {
+        final long tmpLimit = mySamples.count();
+        for (long i = 0L; i < tmpLimit; i++) {
             tmpVal = mySamples.doubleValue(i) - tmpMean;
             retVal += (tmpVal * tmpVal);
         }
@@ -275,7 +280,8 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     /**
-     * If the underlying {@link Access1D} of samples is modified you must reset the sample set before using.
+     * If the underlying {@link Access1D} of samples is modified you must reset
+     * the sample set before using.
      */
     public void reset() {
         myMean = Double.NaN;
@@ -297,8 +303,9 @@ public final class SampleSet implements Access1D<Double> {
 
     @Override
     public String toString() {
-        return "Sample set Size=" + this.count() + ", Mean=" + this.getMean() + ", Median=" + this.getMedian() + ", Var=" + this.getVariance() + ", StdDev="
-                + this.getStandardDeviation() + ", Min=" + this.getMinimum() + ", Max=" + this.getMaximum();
+        return "Sample set Size=" + this.count() + ", Mean=" + this.getMean() + ", Median=" + this.getMedian()
+                + ", Var=" + this.getVariance() + ", StdDev=" + this.getStandardDeviation() + ", Min="
+                + this.getMinimum() + ", Max=" + this.getMaximum();
     }
 
     Access1D<?> getSamples() {
