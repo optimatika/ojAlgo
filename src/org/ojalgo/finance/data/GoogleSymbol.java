@@ -104,56 +104,63 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
 
         Data retVal = null;
 
-        int tmpInclusiveBegin = 0;
-        int tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        String tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        final Calendar tmpCalendar = new GregorianCalendar();
-        tmpCalendar.setTime(DATE_FORMAT.parse(tmpString));
-        this.getResolution().round(tmpCalendar);
-        retVal = new Data(tmpCalendar);
-
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
         try {
-            retVal.open = Double.parseDouble(tmpString);
-        } catch (final NumberFormatException ex) {
-            retVal.open = Double.NaN;
-        }
 
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        try {
-            retVal.high = Double.parseDouble(tmpString);
-        } catch (final NumberFormatException ex) {
-            retVal.high = Double.NaN;
-        }
+            int tmpInclusiveBegin = 0;
+            int tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            String tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            final Calendar tmpCalendar = new GregorianCalendar();
+            tmpCalendar.setTime(DATE_FORMAT.parse(tmpString));
+            this.getResolution().round(tmpCalendar);
+            retVal = new Data(tmpCalendar);
 
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        try {
-            retVal.low = Double.parseDouble(tmpString);
-        } catch (final NumberFormatException ex) {
-            retVal.low = Double.NaN;
-        }
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            try {
+                retVal.open = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.open = Double.NaN;
+            }
 
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        try {
-            retVal.close = Double.parseDouble(tmpString);
-        } catch (final NumberFormatException ex) {
-            retVal.close = Double.NaN;
-        }
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            try {
+                retVal.high = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.high = Double.NaN;
+            }
 
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpString = line.substring(tmpInclusiveBegin);
-        try {
-            retVal.volume = Double.parseDouble(tmpString);
-        } catch (final NumberFormatException ex) {
-            retVal.volume = Double.NaN;
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            try {
+                retVal.low = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.low = Double.NaN;
+            }
+
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            try {
+                retVal.close = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.close = Double.NaN;
+            }
+
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpString = line.substring(tmpInclusiveBegin);
+            try {
+                retVal.volume = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.volume = Double.NaN;
+            }
+
+        } catch (final Exception exception) {
+
+            retVal = null;
         }
 
         return retVal;

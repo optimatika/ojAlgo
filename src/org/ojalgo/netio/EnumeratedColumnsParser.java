@@ -22,6 +22,7 @@
 package org.ojalgo.netio;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.function.Supplier;
 
@@ -63,6 +64,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
         final char delimiter;
         transient String line = null;
+        final int numberOfColumns;
 
         @SuppressWarnings("unused")
         private LineView() {
@@ -73,6 +75,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
             super();
 
+            this.numberOfColumns = numberOfColumns;
             this.delimiter = delimiter;
         }
 
@@ -140,7 +143,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
             }
         }
 
-        abstract void index(final String line, BufferedReader bufferedReader);
+        abstract boolean index(final String line, BufferedReader reader);
 
     }
 
@@ -175,7 +178,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
             @Override
             public LineView make(final int numberOfColumns, final char delimiter) {
-                return new ViewStrategyRFC4180(numberOfColumns, delimiter);
+                return new RFC4180(numberOfColumns, delimiter);
             }
         };
 
@@ -200,7 +203,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
         }
 
         @Override
-        void index(final String line, final BufferedReader bufferedReader) {
+        boolean index(final String line, final BufferedReader reader) {
 
             int tmpIndex = 0;
             int tmpPosition = 0;
@@ -210,10 +213,14 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
                 myIndices[++tmpIndex] = ++tmpPosition;
             }
 
+            final boolean retVal = tmpIndex == numberOfColumns;
+
             tmpPosition = line.length();
             myIndices[++tmpIndex] = tmpPosition;
 
             this.line = line;
+
+            return retVal;
         }
     }
 
@@ -236,7 +243,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
         }
 
         @Override
-        void index(final String line, final BufferedReader bufferedReader) {
+        boolean index(final String line, final BufferedReader reader) {
 
             int tmpIndex = 0;
             int tmpPosition = 1;
@@ -247,33 +254,114 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
                 myIndices[++tmpIndex] = tmpPosition;
             }
 
+            final boolean retVal = tmpIndex == numberOfColumns;
+
             tmpPosition = line.length() + 2;
             myIndices[++tmpIndex] = tmpPosition;
 
             this.line = line;
+
+            return retVal;
         }
 
     }
 
-    static class ViewStrategyRFC4180 extends LineView {
+    static class RFC4180 extends LineView {
 
-        ViewStrategyRFC4180(final int numberOfColumns, final char delimiter) {
+        private static final char QUOTE = '"';
+
+        private final int[] myBegin;
+        private final int[] myEnd;
+        private boolean myEscaped;
+
+        RFC4180(final int numberOfColumns, final char delimiter) {
 
             super(numberOfColumns, delimiter);
 
+            myBegin = new int[numberOfColumns];
+            myEnd = new int[numberOfColumns];
         }
 
         @Override
         public String get(final int column) {
-            return null;
+            if (myEscaped) {
+                return line.substring(myBegin[column], myEnd[column]).replace("\"\"", "\"");
+            } else {
+                return line.substring(myBegin[column], myEnd[column]);
+            }
         }
 
         @Override
-        void index(final String line, final BufferedReader bufferedReader) {
+        boolean index(final String line, final BufferedReader reader) {
 
-            this.line = line;
+            myEscaped = false;
 
-            throw new RuntimeException("Not yet implemented!");
+            String tmpLine = line;
+
+            int c = 0;
+            myBegin[0] = 0;
+            int tmpMode = 0;
+            int tmpNumberOfQuotes = 0;
+
+            char tmpCurChar;
+            int tmpNextInd;
+            for (int i = 0; i < tmpLine.length(); i++) {
+                tmpCurChar = tmpLine.charAt(i);
+                tmpNextInd = i + 1;
+
+                switch (tmpMode) {
+
+                case 1: // Within quotes - look for the end of the quote
+
+                    if (tmpCurChar == QUOTE) {
+                        tmpNumberOfQuotes++;
+                        if (((tmpNumberOfQuotes % 2) == 0) && (tmpLine.charAt(tmpNextInd) != QUOTE)) {
+                            myEnd[c++] = i;
+                            tmpMode = 2;
+                        } else {
+                            myEscaped = true;
+                        }
+                    } else if (tmpNextInd == tmpLine.length()) {
+                        try {
+                            tmpLine = tmpLine + '\n' + reader.readLine();
+                        } catch (final IOException exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+
+                    break;
+
+                case 2: // Quote ended but not yet found next delimiter
+
+                    if (tmpCurChar == delimiter) {
+                        myBegin[c] = tmpNextInd;
+                        tmpMode = 0;
+                    } else if (tmpNextInd == tmpLine.length()) {
+                        myEnd[c++] = tmpNextInd;
+                    }
+
+                    break;
+
+                default: // Not quoted
+
+                    if (tmpCurChar == QUOTE) {
+                        tmpNumberOfQuotes++;
+                        myBegin[c] = tmpNextInd;
+                        tmpMode = 1;
+                    } else if (tmpCurChar == delimiter) {
+                        myEnd[c++] = i;
+                        myBegin[c] = tmpNextInd;
+                    } else if (tmpNextInd == tmpLine.length()) {
+                        myEnd[c++] = tmpNextInd;
+                    }
+
+                    break;
+                }
+            }
+
+            this.line = tmpLine;
+
+            return myBegin.length == c;
         }
 
     }
@@ -301,11 +389,13 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
     }
 
     @Override
-    LineView parse(final String line, final BufferedReader bufferedReader) {
+    LineView parse(final String line, final BufferedReader reader) {
 
-        myLineView.index(line, bufferedReader);
-
-        return myLineView;
+        if (myLineView.index(line, reader)) {
+            return myLineView;
+        } else {
+            return null;
+        }
     }
 
 }

@@ -106,39 +106,70 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
         Data retVal = null;
 
-        int tmpInclusiveBegin = 0;
-        int tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        String tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        retVal = new Data(tmpString);
+        try {
 
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        retVal.open = Double.parseDouble(tmpString);
+            int tmpInclusiveBegin = 0;
+            int tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            String tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            retVal = new Data(tmpString);
 
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        retVal.high = Double.parseDouble(tmpString);
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            try {
+                retVal.open = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.open = Double.NaN;
+            }
 
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        retVal.low = Double.parseDouble(tmpString);
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            try {
+                retVal.high = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.open = Double.NaN;
+            }
 
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        retVal.close = Double.parseDouble(tmpString);
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            try {
+                retVal.low = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.open = Double.NaN;
+            }
 
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
-        tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
-        retVal.volume = Double.parseDouble(tmpString);
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            try {
+                retVal.close = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.open = Double.NaN;
+            }
 
-        tmpInclusiveBegin = tmpExclusiveEnd + 1;
-        tmpString = line.substring(tmpInclusiveBegin);
-        retVal.adjustedClose = Double.parseDouble(tmpString);
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
+            tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
+            try {
+                retVal.volume = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.open = Double.NaN;
+            }
+
+            tmpInclusiveBegin = tmpExclusiveEnd + 1;
+            tmpString = line.substring(tmpInclusiveBegin);
+            try {
+                retVal.adjustedClose = Double.parseDouble(tmpString);
+            } catch (final NumberFormatException ex) {
+                retVal.open = Double.NaN;
+            }
+
+        } catch (final Exception exception) {
+
+            retVal = null;
+        }
 
         return retVal;
     }

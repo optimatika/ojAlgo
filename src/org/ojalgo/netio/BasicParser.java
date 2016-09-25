@@ -34,6 +34,14 @@ import java.util.zip.ZipInputStream;
 public interface BasicParser<T> {
 
     /**
+     * Parse one line into some custom object.
+     *
+     * @param line The text line to parse
+     * @return An object containing (referencing) the parsed data
+     */
+    public abstract T parse(String line);
+
+    /**
      * Will parse this file, line by line, passing the reulting objects (1 per line) to the supplied consumer.
      *
      * @param file The CSV file to parse
@@ -79,7 +87,5 @@ public interface BasicParser<T> {
             exception.printStackTrace();
         }
     }
-
-    public abstract T parse(String line);
 
 }
