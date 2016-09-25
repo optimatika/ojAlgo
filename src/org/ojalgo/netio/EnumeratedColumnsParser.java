@@ -172,7 +172,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
         },
 
         /**
-         * As specified by the RFC4180 standard. (Not yet implemented!)
+         * As specified by the RFC4180 standard.
          */
         RFC4180 {
 

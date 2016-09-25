@@ -21,12 +21,8 @@ abstract class AbstractParser<T> implements BasicParser<T> {
         try (final BufferedReader tmpBufferedReader = new BufferedReader(reader)) {
             myBufferedReader = tmpBufferedReader;
             while ((tmpLine = tmpBufferedReader.readLine()) != null) {
-                BasicLogger.debug();
-                BasicLogger.debug(tmpLine);
                 if ((tmpLine.length() > 0) && !tmpLine.startsWith("#") && ((tmpItem = this.parse(tmpLine, tmpBufferedReader)) != null)) {
                     consumer.accept(tmpItem);
-                } else {
-                    BasicLogger.debug();
                 }
             }
         } catch (final IOException exception) {

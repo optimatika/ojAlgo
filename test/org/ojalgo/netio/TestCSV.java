@@ -22,6 +22,9 @@
 package org.ojalgo.netio;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.ojalgo.TestUtils;
 
 public class TestCSV extends NetioTests {
 
@@ -37,14 +40,23 @@ public class TestCSV extends NetioTests {
 
         final File tmpFile = new File("./test/org/ojalgo/netio/example.csv");
 
+        final String[][] tmpExpected = new String[][] { { "Year", "Make", "Model", "Description", "Price" },
+                { "1997", "Ford", "E350", "ac, abs, moon", "3000.00" }, { "1999", "Chevy", "Venture \"Extended Edition\"", "", "4900.00" },
+                { "1996", "Jeep", "Grand Cherokee", "MUST SELL!\nair, moon roof, loaded", "4799.00" },
+                { "1999", "Chevy", "Venture \"Extended Edition, Very Large\"", "", "5000.00" }, { "", "", "Venture \"Extended Edition\"", "", "4900.00" } };
+
         final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(5).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.RFC4180).get();
 
+        final AtomicInteger tmpRow = new AtomicInteger(0);
+
         tmpParser.parse(tmpFile, t -> {
+            final int tmpAndIncrement = tmpRow.getAndIncrement();
             for (int i = 0; i < 5; i++) {
-                BasicLogger.debug("{}: {}", i, t.get(i));
+                TestUtils.assertEquals(tmpExpected[tmpAndIncrement][i], t.get(i));
             }
-            BasicLogger.debug();
         });
+
+        TestUtils.assertEquals(6, tmpRow.get());
     }
 
 }
