@@ -326,6 +326,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
                             tmpLine = tmpLine + '\n' + reader.readLine();
                         } catch (final IOException exception) {
                             exception.printStackTrace();
+                            return false;
                         }
                     }
 
@@ -361,7 +362,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
             this.line = tmpLine;
 
-            return myBegin.length == c;
+            return numberOfColumns == c;
         }
 
     }
