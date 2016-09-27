@@ -50,7 +50,10 @@ public final class SampleSet implements Access1D<Double> {
 
     private transient double myMean = Double.NaN;
     private transient double myMedian = Double.NaN;
+    private transient double myQuartile1 = Double.NaN;
+    private transient double myQuartile3 = Double.NaN;
     private Access1D<?> mySamples;
+    private transient double[] mySortedCopy = null;
     private transient double myVariance = Double.NaN;
 
     @SuppressWarnings("unused")
@@ -123,6 +126,10 @@ public final class SampleSet implements Access1D<Double> {
         return mySamples.doubleValue(0);
     }
 
+    public double getInterquartileRange() {
+        return this.getQuartile3() - this.getQuartile1();
+    }
+
     /**
      * max(abs(value))
      */
@@ -180,12 +187,7 @@ public final class SampleSet implements Access1D<Double> {
     public double getMedian() {
 
         if (Double.isNaN(myMedian)) {
-
-            final double[] tmpCopy = mySamples.toRawCopy1D();
-
-            Arrays.sort(tmpCopy);
-
-            myMedian = tmpCopy[tmpCopy.length / 2];
+            this.calculateQuartiles();
         }
 
         return myMedian;
@@ -204,6 +206,28 @@ public final class SampleSet implements Access1D<Double> {
         }
 
         return retVal;
+    }
+
+    public double getQuartile1() {
+
+        if (Double.isNaN(myQuartile1)) {
+            this.calculateQuartiles();
+        }
+
+        return myQuartile1;
+    }
+
+    public double getQuartile2() {
+        return this.getMedian();
+    }
+
+    public double getQuartile3() {
+
+        if (Double.isNaN(myQuartile3)) {
+            this.calculateQuartiles();
+        }
+
+        return myQuartile3;
     }
 
     /**
@@ -281,9 +305,16 @@ public final class SampleSet implements Access1D<Double> {
      * If the underlying {@link Access1D} of samples is modified you must reset the sample set before using.
      */
     public void reset() {
+
         myMean = Double.NaN;
         myMedian = Double.NaN;
         myVariance = Double.NaN;
+        myQuartile1 = Double.NaN;
+        myQuartile3 = Double.NaN;
+
+        if (mySortedCopy != null) {
+            Arrays.fill(mySortedCopy, Double.POSITIVE_INFINITY);
+        }
     }
 
     public int size() {
@@ -304,8 +335,62 @@ public final class SampleSet implements Access1D<Double> {
                 + this.getStandardDeviation() + ", Min=" + this.getMinimum() + ", Max=" + this.getMaximum();
     }
 
+    private void calculateQuartiles() {
+
+        final int tmpSize = (int) this.getSamples().count();
+        final double[] tmpSortedCopy = this.getSortedCopy();
+
+        final int n = tmpSize / 4;
+        final int r = tmpSize % 4;
+
+        switch (r) {
+
+        case 1:
+
+            myQuartile1 = (0.25 * tmpSortedCopy[n - 1]) + (0.75 * tmpSortedCopy[n]);
+            myMedian = tmpSortedCopy[2 * n];
+            myQuartile3 = (0.75 * tmpSortedCopy[3 * n]) + (0.25 * tmpSortedCopy[(3 * n) + 1]);
+
+            break;
+
+        case 3:
+
+            myQuartile1 = (0.75 * tmpSortedCopy[n]) + (0.25 * tmpSortedCopy[n + 1]);
+            myMedian = tmpSortedCopy[2 * n];
+            myQuartile3 = (0.25 * tmpSortedCopy[(3 * n) + 1]) + (0.75 * tmpSortedCopy[(3 * n) + 2]);
+
+            break;
+
+        default:
+
+            myQuartile1 = tmpSortedCopy[n];
+            myMedian = (0.5 * tmpSortedCopy[2 * n]) + (0.5 * tmpSortedCopy[(2 * n) + 1]);
+            myQuartile3 = tmpSortedCopy[(3 * n) + 1];
+
+            break;
+        }
+    }
+
     Access1D<?> getSamples() {
         return mySamples;
+    }
+
+    double[] getSortedCopy() {
+
+        final Access1D<?> tmpSamples = this.getSamples();
+        final long tmpSamplesCount = tmpSamples.count();
+
+        if ((mySortedCopy == null) || (mySortedCopy.length < tmpSamplesCount)) {
+            mySortedCopy = tmpSamples.toRawCopy1D();
+            Arrays.sort(mySortedCopy);
+        } else if (mySortedCopy[0] == Double.POSITIVE_INFINITY) {
+            for (int i = 0; i < tmpSamplesCount; i++) {
+                mySortedCopy[i] = tmpSamples.doubleValue(i);
+            }
+            Arrays.sort(mySortedCopy);
+        }
+
+        return mySortedCopy;
     }
 
 }

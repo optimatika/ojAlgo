@@ -150,8 +150,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
     public static enum ParseStrategy {
 
         /**
-         * Simplest possible. Just delimited data. No quoting or any special
-         * characters...
+         * Simplest possible. Just delimited data. No quoting or any special characters...
          */
         FAST {
 
@@ -162,8 +161,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
         },
 
         /**
-         * Same as {@link #FAST} but assumes values are quoted (they have to be,
-         * ALL of them).
+         * Same as {@link #FAST} but assumes values are quoted (they have to be, ALL of them).
          */
         QUOTED() {
 
@@ -308,52 +306,52 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
                 switch (tmpMode) {
 
-                    case 1: // Within quotes - look for the end of the quote
+                case 1: // Within quotes - look for the end of the quote
 
-                        if (tmpCurChar == QUOTE) {
-                            tmpNumberOfQuotes++;
-                            if (((tmpNumberOfQuotes % 2) == 0) && (tmpLine.charAt(tmpNextInd) != QUOTE)) {
-                                myEnd[c++] = i;
-                                tmpMode = 2;
-                            } else {
-                                myEscaped = true;
-                            }
-                        } else if (tmpNextInd == tmpLine.length()) {
-                            try {
-                                tmpLine = tmpLine + '\n' + reader.readLine();
-                            } catch (final IOException exception) {
-                                exception.printStackTrace();
-                                return false;
-                            }
-                        }
-
-                        break;
-
-                    case 2: // Quote ended but not yet found next delimiter
-
-                        if (tmpCurChar == delimiter) {
-                            myBegin[c] = tmpNextInd;
-                            tmpMode = 0;
-                        } else if (tmpNextInd == tmpLine.length()) {
-                            myEnd[c++] = tmpNextInd;
-                        }
-
-                        break;
-
-                    default: // Not quoted
-
-                        if (tmpCurChar == QUOTE) {
-                            tmpNumberOfQuotes++;
-                            myBegin[c] = tmpNextInd;
-                            tmpMode = 1;
-                        } else if (tmpCurChar == delimiter) {
+                    if (tmpCurChar == QUOTE) {
+                        tmpNumberOfQuotes++;
+                        if (((tmpNumberOfQuotes % 2) == 0) && (tmpLine.charAt(tmpNextInd) != QUOTE)) {
                             myEnd[c++] = i;
-                            myBegin[c] = tmpNextInd;
-                        } else if (tmpNextInd == tmpLine.length()) {
-                            myEnd[c++] = tmpNextInd;
+                            tmpMode = 2;
+                        } else {
+                            myEscaped = true;
                         }
+                    } else if (tmpNextInd == tmpLine.length()) {
+                        try {
+                            tmpLine = tmpLine + '\n' + reader.readLine();
+                        } catch (final IOException exception) {
+                            exception.printStackTrace();
+                            return false;
+                        }
+                    }
 
-                        break;
+                    break;
+
+                case 2: // Quote ended but not yet found next delimiter
+
+                    if (tmpCurChar == delimiter) {
+                        myBegin[c] = tmpNextInd;
+                        tmpMode = 0;
+                    } else if (tmpNextInd == tmpLine.length()) {
+                        myEnd[c++] = tmpNextInd;
+                    }
+
+                    break;
+
+                default: // Not quoted
+
+                    if (tmpCurChar == QUOTE) {
+                        tmpNumberOfQuotes++;
+                        myBegin[c] = tmpNextInd;
+                        tmpMode = 1;
+                    } else if (tmpCurChar == delimiter) {
+                        myEnd[c++] = i;
+                        myBegin[c] = tmpNextInd;
+                    } else if (tmpNextInd == tmpLine.length()) {
+                        myEnd[c++] = tmpNextInd;
+                    }
+
+                    break;
                 }
             }
 
