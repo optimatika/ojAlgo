@@ -22,10 +22,13 @@
 package org.ojalgo.access;
 
 import java.util.Iterator;
+import java.util.ListIterator;
 
-public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>> extends AccessScalar<N>, Iterator<V>, Iterable<V> {
+public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>> extends AccessScalar<N>, ListIterator<V>, Iterable<V> {
 
-    boolean hasPrevious();
+    default void add(final V e) {
+        throw new UnsupportedOperationException();
+    }
 
     long index();
 
@@ -33,9 +36,19 @@ public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>> 
         return this;
     }
 
-    V previous();
+    default int nextIndex() {
+        return (int) (this.index() + 1);
+    }
+
+    default int previousIndex() {
+        return (int) (this.index() - 1);
+    }
 
     default void remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    default void set(final V e) {
         throw new UnsupportedOperationException();
     }
 

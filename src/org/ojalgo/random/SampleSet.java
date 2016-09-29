@@ -208,6 +208,9 @@ public final class SampleSet implements Access1D<Double> {
         return retVal;
     }
 
+    /**
+     * Potentially expensive as it requires copying and sorting of the samples.
+     */
     public double getQuartile1() {
 
         if (Double.isNaN(myQuartile1)) {
@@ -217,10 +220,16 @@ public final class SampleSet implements Access1D<Double> {
         return myQuartile1;
     }
 
+    /**
+     * Potentially expensive as it requires copying and sorting of the samples.
+     */
     public double getQuartile2() {
         return this.getMedian();
     }
 
+    /**
+     * Potentially expensive as it requires copying and sorting of the samples.
+     */
     public double getQuartile3() {
 
         if (Double.isNaN(myQuartile3)) {
@@ -307,9 +316,10 @@ public final class SampleSet implements Access1D<Double> {
     public void reset() {
 
         myMean = Double.NaN;
-        myMedian = Double.NaN;
         myVariance = Double.NaN;
+
         myQuartile1 = Double.NaN;
+        myMedian = Double.NaN;
         myQuartile3 = Double.NaN;
 
         if (mySortedCopy != null) {
