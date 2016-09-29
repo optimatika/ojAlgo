@@ -334,7 +334,7 @@ public final class SampleSet implements Access1D<Double> {
     /**
      * Replace the underlying samples and reset the sample set.
      */
-    public void swap(final SampleSet samples) {
+    public void swap(final Access1D<?> samples) {
         mySamples = samples;
         this.reset();
     }
