@@ -310,7 +310,7 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
                     if (tmpCurChar == QUOTE) {
                         tmpNumberOfQuotes++;
-                        if (((tmpNumberOfQuotes % 2) == 0) && (tmpLine.charAt(tmpNextInd) != QUOTE)) {
+                        if (((tmpNumberOfQuotes % 2) == 0) && ((tmpNextInd == tmpLine.length()) || (tmpLine.charAt(tmpNextInd) != QUOTE))) {
                             myEnd[c++] = i;
                             tmpMode = 2;
                         } else {
@@ -331,6 +331,9 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
 
                     if (tmpCurChar == delimiter) {
                         myBegin[c] = tmpNextInd;
+                        if (tmpNextInd == tmpLine.length()) {
+                            myEnd[c++] = tmpNextInd;
+                        }
                         tmpMode = 0;
                     } else if (tmpNextInd == tmpLine.length()) {
                         myEnd[c++] = tmpNextInd;
@@ -347,6 +350,9 @@ public class EnumeratedColumnsParser extends AbstractParser<LineView> {
                     } else if (tmpCurChar == delimiter) {
                         myEnd[c++] = i;
                         myBegin[c] = tmpNextInd;
+                        if (tmpNextInd == tmpLine.length()) {
+                            myEnd[c++] = tmpNextInd;
+                        }
                     } else if (tmpNextInd == tmpLine.length()) {
                         myEnd[c++] = tmpNextInd;
                     }

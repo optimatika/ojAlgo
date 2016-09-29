@@ -28,6 +28,17 @@ import org.ojalgo.TestUtils;
 
 public class TestCSV extends NetioTests {
 
+    static final String[][] EXPECTED = new String[][] { { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" },
+            { "", "B", "C", "D", "E", "F", "G", "H", "I", "J" }, { "A", "", "C", "D", "E", "F", "G", "H", "I", "J" },
+            { "A", "B", "", "D", "E", "F", "G", "H", "I", "J" }, { "A", "B", "C", "", "E", "F", "G", "H", "I", "J" },
+            { "A", "B", "C", "D", "", "F", "G", "H", "I", "J" }, { "A", "B", "C", "D", "E", "", "G", "H", "I", "J" },
+            { "A", "B", "C", "D", "E", "F", "", "H", "I", "J" }, { "A", "B", "C", "D", "E", "F", "G", "", "I", "J" },
+            { "A", "B", "C", "D", "E", "F", "G", "H", "", "J" }, { "A", "B", "C", "D", "E", "F", "G", "H", "I", "" },
+            { "", "", "", "", "", "", "", "", "", "" }, { "A", "", "", "", "", "", "", "", "", "" }, { "", "B", "", "", "", "", "", "", "", "" },
+            { "", "", "C", "", "", "", "", "", "", "" }, { "", "", "", "D", "", "", "", "", "", "" }, { "", "", "", "", "E", "", "", "", "", "" },
+            { "", "", "", "", "", "F", "", "", "", "" }, { "", "", "", "", "", "", "G", "", "", "" }, { "", "", "", "", "", "", "", "H", "", "" },
+            { "", "", "", "", "", "", "", "", "I", "" }, { "", "", "", "", "", "", "", "", "", "J" } };
+
     public TestCSV() {
         super();
     }
@@ -38,66 +49,83 @@ public class TestCSV extends NetioTests {
 
     public void testRFC4180() {
 
-        final File tmpFile = new File("./test/org/ojalgo/netio/example.csv");
+        final AtomicInteger tmpCounter = new AtomicInteger(0);
 
-        final String[][] tmpExpected = new String[][] { { "Year", "Make", "Model", "Description", "Price" },
-                { "1997", "Ford", "E350", "ac, abs, moon", "3000.00" },
-                { "1999", "Chevy", "Venture \"Extended Edition\"", "", "4900.00" },
-                { "1996", "Jeep", "Grand Cherokee", "MUST SELL!\nair, moon roof, loaded", "4799.00" },
-                { "1999", "Chevy", "Venture \"Extended Edition, Very Large\"", "", "5000.00" },
-                { "", "", "Venture \"Extended Edition\"", "", "4900.00" } };
+        final EnumeratedColumnsParser tmpParserFast = EnumeratedColumnsParser.make(10).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.RFC4180)
+                .get();
+        final EnumeratedColumnsParser tmpParserQuoted = EnumeratedColumnsParser.make(10).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.RFC4180)
+                .get();
+        final EnumeratedColumnsParser tmpParserRFC4180 = EnumeratedColumnsParser.make(5).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.RFC4180)
+                .get();
 
-        final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(5).delimiter(',')
-                .strategy(EnumeratedColumnsParser.ParseStrategy.RFC4180).get();
+        final File tmpFileFast = new File("./test/org/ojalgo/netio/fast.csv");
+        final File tmpFileQuoted = new File("./test/org/ojalgo/netio/quoted.csv");
+        final File tmpFileExample = new File("./test/org/ojalgo/netio/example.csv");
 
-        final AtomicInteger tmpRow = new AtomicInteger(0);
-
-        tmpParser.parse(tmpFile, t -> {
-            final int tmpAndIncrement = tmpRow.getAndIncrement();
-            for (int i = 0; i < 5; i++) {
-                TestUtils.assertEquals(tmpExpected[tmpAndIncrement][i], t.get(i));
+        tmpCounter.set(0);
+        tmpParserFast.parse(tmpFileFast, t -> {
+            final int tmpRowIndex = tmpCounter.getAndIncrement();
+            final String[] tmpStrings = EXPECTED[tmpRowIndex];
+            for (int i = 0; i < 10; i++) {
+                final String tmpExpected = tmpStrings[i];
+                final String tmpActual = t.get(i);
+                TestUtils.assertEquals(tmpExpected, tmpActual);
             }
         });
+        TestUtils.assertEquals(22, tmpCounter.get());
 
-        TestUtils.assertEquals(6, tmpRow.get());
+        tmpCounter.set(0);
+        tmpParserQuoted.parse(tmpFileQuoted, t -> {
+            final int tmpRowIndex = tmpCounter.getAndIncrement();
+            for (int i = 0; i < 10; i++) {
+                TestUtils.assertEquals(EXPECTED[tmpRowIndex][i], t.get(i));
+            }
+        });
+        TestUtils.assertEquals(22, tmpCounter.get());
+
+        final String[][] tmpExpected = new String[][] { { "Year", "Make", "Model", "Description", "Price" },
+                { "1997", "Ford", "E350", "ac, abs, moon", "3000.00" }, { "1999", "Chevy", "Venture \"Extended Edition\"", "", "4900.00" },
+                { "1996", "Jeep", "Grand Cherokee", "MUST SELL!\nair, moon roof, loaded", "4799.00" },
+                { "1999", "Chevy", "Venture \"Extended Edition, Very Large\"", "", "5000.00" }, { "", "", "Venture \"Extended Edition\"", "", "4900.00" } };
+
+        tmpCounter.set(0);
+        tmpParserRFC4180.parse(tmpFileExample, t -> {
+            final int tmpRowIndex = tmpCounter.getAndIncrement();
+            for (int i = 0; i < 5; i++) {
+                TestUtils.assertEquals(tmpExpected[tmpRowIndex][i], t.get(i));
+            }
+        });
+        TestUtils.assertEquals(6, tmpCounter.get());
     }
 
     public void testFast() {
 
         final File tmpFile = new File("./test/org/ojalgo/netio/fast.csv");
+        final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(10).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.FAST).get();
 
-        final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(10).delimiter(',')
-                .strategy(EnumeratedColumnsParser.ParseStrategy.FAST).get();
-
-        final AtomicInteger tmpRow = new AtomicInteger(0);
-
+        final AtomicInteger tmpCounter = new AtomicInteger(0);
         tmpParser.parse(tmpFile, t -> {
-            final int tmpAndIncrement = tmpRow.getAndIncrement();
-            for (int i = 0; i < 10; i++) {
-                t.get(i);
+            final int tmpRowIndex = tmpCounter.getAndIncrement();
+            for (int i = 0; i < 5; i++) {
+                TestUtils.assertEquals(EXPECTED[tmpRowIndex][i], t.get(i));
             }
         });
-
-        TestUtils.assertEquals(22, tmpRow.get());
+        TestUtils.assertEquals(22, tmpCounter.get());
     }
 
     public void testQuoted() {
 
         final File tmpFile = new File("./test/org/ojalgo/netio/quoted.csv");
+        final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(10).delimiter(',').strategy(EnumeratedColumnsParser.ParseStrategy.QUOTED).get();
 
-        final EnumeratedColumnsParser tmpParser = EnumeratedColumnsParser.make(10).delimiter(',')
-                .strategy(EnumeratedColumnsParser.ParseStrategy.QUOTED).get();
-
-        final AtomicInteger tmpRow = new AtomicInteger(0);
-
+        final AtomicInteger tmpCounter = new AtomicInteger(0);
         tmpParser.parse(tmpFile, t -> {
-            final int tmpAndIncrement = tmpRow.getAndIncrement();
-            for (int i = 0; i < 10; i++) {
-                t.get(i);
+            final int tmpRowIndex = tmpCounter.getAndIncrement();
+            for (int i = 0; i < 5; i++) {
+                TestUtils.assertEquals(EXPECTED[tmpRowIndex][i], t.get(i));
             }
         });
-
-        TestUtils.assertEquals(22, tmpRow.get());
+        TestUtils.assertEquals(22, tmpCounter.get());
     }
 
 }
