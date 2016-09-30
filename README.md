@@ -24,3 +24,5 @@ You can ofcourse also use something like [stack overflow](http://stackoverflow.c
 ## Contributions
 
 Feel free to contribute any way you want. One very good way to contribute is to supply test cases that verify that the functionality you use works as expected. The ojAlgo code base is often refactored. Test cases specific to your use case can be very beneficial (for you) in assuring future releases.
+
+Q
