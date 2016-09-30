@@ -28,38 +28,78 @@ import java.util.ListIterator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.Array1D;
+import org.ojalgo.array.ArrayFactory;
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.ComplexArray;
+import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.SegmentedArray;
+import org.ojalgo.scalar.ComplexNumber;
 
-public final class PrimitiveDoubleList implements List<Double>, Access1D<Double>, Mutate1D {
+public final class BasicList<N extends Number> implements List<N>, Access1D<N>, Mutate1D {
 
-    private long myActualCount = 0L;
-    private final Array1D<Double> myStorage;
+    private static long INITIAL_CAPACITY = 16L;
 
-    public PrimitiveDoubleList() {
+    private static int SEGMENT_BITS = 14;
 
-        super();
+    private static long SEGMENT_CAPACITY = 16_384L;
 
-        myStorage = Array1D.PRIMITIVE.makeZero(999);
+    public static BasicList<ComplexNumber> makeComplexe() {
+        return new BasicList<ComplexNumber>(ComplexArray.FACTORY);
     }
 
-    PrimitiveDoubleList(final Array1D<Double> storage) {
+    public static BasicList<Double> makePrimitive() {
+        return new BasicList<Double>(PrimitiveArray.FACTORY);
+    }
+
+    private long myActualCount;
+    private final ArrayFactory<N> myArrayFactory;
+    private BasicArray<N> myStorage;
+
+    BasicList(ArrayFactory<N> arrayFactory) {
 
         super();
 
-        myStorage = storage;
-        myActualCount = storage.count();
+        myArrayFactory = arrayFactory;
+
+        myStorage = arrayFactory.makeZero(INITIAL_CAPACITY);
+        myActualCount = 0L;
     }
 
     public boolean add(final double e) {
-        myActualCount++;
-        return false;
+
+        this.ensureCapacity();
+
+        myStorage.set(myActualCount++, e);
+
+        return true;
     }
 
-    public boolean add(final Double e) {
-        return this.add(e.doubleValue());
+    private void ensureCapacity() {
+
+        if (myStorage.count() > myActualCount) {
+            // It fits, just add to the end
+
+        } else if ((myStorage.count() % SEGMENT_CAPACITY) == 0L) {
+            // Doesn't fit, grow by 1 segment, then add
+
+            if (myStorage instanceof SegmentedArray) {
+                myStorage = ((SegmentedArray<N>) myStorage).grow();
+            } else if (myStorage.count() == SEGMENT_CAPACITY) {
+                myStorage = myArrayFactory.wrapAsSegments(myStorage, myArrayFactory.makeZero(SEGMENT_CAPACITY));
+            } else {
+                throw new IllegalStateException();
+            }
+
+        } else {
+            // Doesn't fit, grow by doubling the capacity, then add
+
+            BasicArray<N> tmpStorage = myArrayFactory.makeZero(myStorage.count() * 2L);
+            tmpStorage.fillMatching(myStorage);
+            myStorage = tmpStorage;
+        }
     }
 
-    public void add(final int index, final Double element) {
+    public void add(int index, N element) {
         throw new UnsupportedOperationException();
     }
 
@@ -79,12 +119,21 @@ public final class PrimitiveDoubleList implements List<Double>, Access1D<Double>
         }
     }
 
-    public boolean addAll(final Collection<? extends Double> c) {
+    public boolean add(N e) {
+
+        this.ensureCapacity();
+
+        myStorage.set(myActualCount++, e);
+
+        return true;
+    }
+
+    public boolean addAll(Collection<? extends N> c) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public boolean addAll(final int index, final Collection<? extends Double> c) {
+    public boolean addAll(int index, Collection<? extends N> c) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -115,11 +164,15 @@ public final class PrimitiveDoubleList implements List<Double>, Access1D<Double>
         }
     }
 
-    public Double get(final int index) {
-        return this.doubleValue(index);
+    public N get(final int index) {
+        if (index >= myActualCount) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            return myStorage.get(index);
+        }
     }
 
-    public Double get(final long index) {
+    public N get(final long index) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
@@ -136,7 +189,7 @@ public final class PrimitiveDoubleList implements List<Double>, Access1D<Double>
         return myActualCount == 0L;
     }
 
-    public Iterator<Double> iterator() {
+    public Iterator<N> iterator() {
         return Access1D.super.iterator();
     }
 
@@ -145,17 +198,17 @@ public final class PrimitiveDoubleList implements List<Double>, Access1D<Double>
         return 0;
     }
 
-    public ListIterator<Double> listIterator() {
+    public ListIterator<N> listIterator() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public ListIterator<Double> listIterator(final int index) {
+    public ListIterator<N> listIterator(final int index) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Double remove(final int index) {
+    public N remove(final int index) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -175,7 +228,7 @@ public final class PrimitiveDoubleList implements List<Double>, Access1D<Double>
         return false;
     }
 
-    public Double set(final int index, final Double element) {
+    public N set(int index, N element) {
         throw new UnsupportedOperationException();
     }
 
@@ -199,7 +252,7 @@ public final class PrimitiveDoubleList implements List<Double>, Access1D<Double>
         return (int) myActualCount;
     }
 
-    public List<Double> subList(final int fromIndex, final int toIndex) {
+    public List<N> subList(final int fromIndex, final int toIndex) {
         // TODO Auto-generated method stub
         return null;
     }

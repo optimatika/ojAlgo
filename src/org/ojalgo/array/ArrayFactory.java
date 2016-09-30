@@ -21,13 +21,15 @@
  */
 package org.ojalgo.array;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Factory1D;
 import org.ojalgo.function.NullaryFunction;
 
-abstract class ArrayFactory<N extends Number> extends Object implements Factory1D<BasicArray<N>> {
+public abstract class ArrayFactory<N extends Number> extends Object implements Factory1D<BasicArray<N>> {
 
     public final BasicArray<N> copy(final Access1D<?> source) {
         final long tmpCount = source.count();
@@ -75,6 +77,33 @@ abstract class ArrayFactory<N extends Number> extends Object implements Factory1
 
     public final BasicArray<N> makeZero(final long count) {
         return this.makeStructuredZero(count);
+    }
+
+    @SafeVarargs
+    public final SegmentedArray<N> wrapAsSegments(BasicArray<N>... segments) {
+
+        BasicArray<N> tmpFirstSegment = segments[0];
+        long tmpSegmentSize = tmpFirstSegment.count();
+
+        int tmpIndexBits = Arrays.binarySearch(POWERS_OF_2, (int) tmpSegmentSize);
+
+        if ((tmpIndexBits >= 0) && (tmpSegmentSize != (1L << tmpIndexBits))) {
+            throw new IllegalArgumentException("The segment size must be a power of 2!");
+        }
+
+        int tmpLastIndex = segments.length - 1;
+        for (int s = 1; s < tmpLastIndex; s++) {
+            if (segments[s].count() != tmpSegmentSize) {
+                throw new IllegalArgumentException("All segments (except possibly the last) must have the same size!");
+            }
+        }
+        if (segments[tmpLastIndex].count() <= tmpSegmentSize) {
+            throw new IllegalArgumentException("The last segment cannot be larger than the others!");
+        }
+
+        long tmpIndexMask = tmpSegmentSize - 1L;
+
+        return new SegmentedArray<N>(segments, tmpSegmentSize, tmpIndexBits, tmpIndexMask);
     }
 
     abstract long getElementSize();

@@ -38,9 +38,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
 
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(ComplexNumber.class);
-
-    static final DenseFactory<ComplexNumber> FACTORY = new DenseFactory<ComplexNumber>() {
+    public static final DenseFactory<ComplexNumber> FACTORY = new DenseFactory<ComplexNumber>() {
 
         @Override
         long getElementSize() {
@@ -58,6 +56,8 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
         }
 
     };
+
+    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(ComplexNumber.class);
 
     public static final ComplexArray make(final int size) {
         return new ComplexArray(size);

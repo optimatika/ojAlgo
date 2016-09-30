@@ -52,9 +52,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class PrimitiveArray extends DenseArray<Double> {
 
-    static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
-
-    static final DenseFactory<Double> FACTORY = new DenseFactory<Double>() {
+    public static final DenseFactory<Double> FACTORY = new DenseFactory<Double>() {
 
         @Override
         public final BasicArray<Double> makeFilled(final long count, final NullaryFunction<?> supplier) {
@@ -82,6 +80,8 @@ public class PrimitiveArray extends DenseArray<Double> {
         }
 
     };
+
+    static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
 
     public static final PrimitiveArray make(final int size) {
         return new PrimitiveArray(size);
@@ -478,6 +478,11 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
+    protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
+        data[index] = values.doubleValue(valueIndex);
+    }
+
+    @Override
     protected void fillOne(final int index, final Double value) {
         data[index] = value;
     }
@@ -485,11 +490,6 @@ public class PrimitiveArray extends DenseArray<Double> {
     @Override
     protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
         data[index] = supplier.doubleValue();
-    }
-
-    @Override
-    protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        data[index] = values.doubleValue(valueIndex);
     }
 
     @Override
