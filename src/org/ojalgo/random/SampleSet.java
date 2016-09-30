@@ -366,7 +366,7 @@ public final class SampleSet implements Access1D<Double> {
         case 3:
 
             myQuartile1 = (0.75 * tmpSortedCopy[n]) + (0.25 * tmpSortedCopy[n + 1]);
-            myMedian = tmpSortedCopy[2 * n];
+            myMedian = tmpSortedCopy[tmpSize / 2];
             myQuartile3 = (0.25 * tmpSortedCopy[(3 * n) + 1]) + (0.75 * tmpSortedCopy[(3 * n) + 2]);
 
             break;

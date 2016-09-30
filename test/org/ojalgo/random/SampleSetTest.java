@@ -21,35 +21,44 @@
  */
 package org.ojalgo.random;
 
-import org.ojalgo.FunctionalityTest;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.ojalgo.TestUtils;
+import org.ojalgo.array.PrimitiveArray;
 
 /**
- * RandomPackageTests
+ * SampleSetTest
  *
  * @author apete
  */
-public abstract class RandomTests extends FunctionalityTest {
+public class SampleSetTest extends RandomTests {
 
-    static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(RandomTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(QuantileTest.class);
-        suite.addTestSuite(RandomNumberTest.class);
-        suite.addTestSuite(SampleSetTest.class);
-        //$JUnit-END$
-        return suite;
-    }
-
-    protected RandomTests() {
+    public SampleSetTest() {
         super();
     }
 
-    protected RandomTests(final String name) {
-        super(name);
+    public SampleSetTest(final String someName) {
+        super(someName);
     }
+
+    public void testQuartileEx1() {
+
+        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 6, 7, 15, 36, 39, 40, 41, 42, 43, 47, 49 });
+        final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+
+        TestUtils.assertEquals(20.25, tmpSampleSet.getQuartile1());
+        TestUtils.assertEquals(40.0, tmpSampleSet.getQuartile2());
+        TestUtils.assertEquals(42.75, tmpSampleSet.getQuartile3());
+
+    }
+
+    public void testQuartileEx2() {
+
+        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 7, 15, 36, 39, 40, 41 });
+        final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+
+        TestUtils.assertEquals(15.0, tmpSampleSet.getQuartile1());
+        TestUtils.assertEquals(37.5, tmpSampleSet.getQuartile2());
+        TestUtils.assertEquals(40.0, tmpSampleSet.getQuartile3());
+
+    }
+
 }
