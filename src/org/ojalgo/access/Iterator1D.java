@@ -21,36 +21,65 @@
  */
 package org.ojalgo.access;
 
-import java.util.Iterator;
+import java.util.ListIterator;
 
-public final class Iterator1D<N extends Number> implements Iterator<N> {
+public final class Iterator1D<N extends Number> implements ListIterator<N> {
 
-    private long cursor = 0L;
     private final Access1D<? extends N> myAccess;
     private final long myCount;
+    private long myNextIndex;
+
+    public Iterator1D(final Access1D<? extends N> access) {
+        this(access, 0L);
+    }
+
+    public Iterator1D(final Access1D<? extends N> access, final long cursor) {
+
+        super();
+
+        myAccess = access;
+        myCount = access.count();
+        myNextIndex = cursor;
+    }
 
     @SuppressWarnings("unused")
     private Iterator1D() {
         this(null);
     }
 
-    Iterator1D(final Access1D<? extends N> access) {
-
-        super();
-
-        myAccess = access;
-        myCount = access.count();
+    public void add(final N e) {
+        throw new UnsupportedOperationException();
     }
 
     public boolean hasNext() {
-        return cursor < myCount;
+        return myNextIndex < myCount;
+    }
+
+    public boolean hasPrevious() {
+        return myNextIndex > 0L;
     }
 
     public N next() {
-        return myAccess.get(cursor++);
+        return myAccess.get(myNextIndex++);
+    }
+
+    public int nextIndex() {
+        return (int) myNextIndex;
+    }
+
+    public N previous() {
+        return myAccess.get(--myNextIndex);
+    }
+
+    public int previousIndex() {
+        return (int) (myNextIndex - 1L);
     }
 
     public void remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void set(final N e) {
         throw new UnsupportedOperationException();
     }
 

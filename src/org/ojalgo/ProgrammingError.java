@@ -21,6 +21,8 @@
  */
 package org.ojalgo;
 
+import java.util.Objects;
+
 /**
  * Incorrect use of the API. The code needs to be changed. Typically execution can't continue. Is never
  * declared to be thrown, and should not be caught.
@@ -48,12 +50,11 @@ public class ProgrammingError extends RuntimeException {
      * Instead of IllegalArgumentException and/or NullPointerException.
      *
      * @param obj
+     * @deprecated v41 Use {@link Objects#requireNonNull(Object)} instead.
      */
+    @Deprecated
     public static void throwIfNull(final Object obj) {
-
-        if (obj == null) {
-            throw new ProgrammingError("Null object reference!");
-        }
+        Objects.requireNonNull(obj);
     }
 
     public ProgrammingError(final String aString) {

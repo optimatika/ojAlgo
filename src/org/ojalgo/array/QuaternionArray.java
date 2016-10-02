@@ -38,9 +38,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
 
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(Quaternion.class);
-
-    static final DenseFactory<Quaternion> FACTORY = new DenseFactory<Quaternion>() {
+    public static final DenseFactory<Quaternion> FACTORY = new DenseFactory<Quaternion>() {
 
         @Override
         long getElementSize() {
@@ -59,10 +57,16 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
 
     };
 
+    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(Quaternion.class);
+
     public static final QuaternionArray make(final int size) {
         return new QuaternionArray(size);
     }
 
+    /**
+     * @deprecated v41 Use {@link #FACTORY} and {@link ArrayFactory#makeSegmented(long)} instead.
+     */
+    @Deprecated
     public static final SegmentedArray<Quaternion> makeSegmented(final long count) {
         return SegmentedArray.make(FACTORY, count);
     }

@@ -36,9 +36,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class RationalArray extends ReferenceTypeArray<RationalNumber> {
 
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(RationalNumber.class);
-
-    static final DenseFactory<RationalNumber> FACTORY = new DenseFactory<RationalNumber>() {
+    public static final DenseFactory<RationalNumber> FACTORY = new DenseFactory<RationalNumber>() {
 
         @Override
         long getElementSize() {
@@ -56,10 +54,16 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
         }
     };
 
+    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(RationalNumber.class);
+
     public static final RationalArray make(final int size) {
         return new RationalArray(size);
     }
 
+    /**
+     * @deprecated v41 Use {@link #FACTORY} and {@link ArrayFactory#makeSegmented(long)} instead.
+     */
+    @Deprecated
     public static final SegmentedArray<RationalNumber> makeSegmented(final long count) {
         return SegmentedArray.make(FACTORY, count);
     }

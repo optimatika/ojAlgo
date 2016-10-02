@@ -19,29 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.collection;
+package org.ojalgo.array;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.RandomAccess;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.ArrayFactory;
-import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.ComplexArray;
-import org.ojalgo.array.PrimitiveArray;
-import org.ojalgo.array.SegmentedArray;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 
-public final class BasicList<N extends Number> implements List<N>, Access1D<N>, Mutate1D {
+public final class BasicList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Mutate1D {
 
     private static long INITIAL_CAPACITY = 16L;
-
-    private static int SEGMENT_BITS = 14;
-
     private static long SEGMENT_CAPACITY = 16_384L;
+
+    public static BasicList<BigDecimal> makeBig() {
+        return new BasicList<BigDecimal>(BigArray.FACTORY);
+    }
 
     public static BasicList<ComplexNumber> makeComplexe() {
         return new BasicList<ComplexNumber>(ComplexArray.FACTORY);
@@ -51,11 +52,19 @@ public final class BasicList<N extends Number> implements List<N>, Access1D<N>, 
         return new BasicList<Double>(PrimitiveArray.FACTORY);
     }
 
+    public static BasicList<Quaternion> makeQuaternion() {
+        return new BasicList<Quaternion>(QuaternionArray.FACTORY);
+    }
+
+    public static BasicList<RationalNumber> makeRational() {
+        return new BasicList<RationalNumber>(RationalArray.FACTORY);
+    }
+
     private long myActualCount;
     private final ArrayFactory<N> myArrayFactory;
     private BasicArray<N> myStorage;
 
-    BasicList(ArrayFactory<N> arrayFactory) {
+    public BasicList(final ArrayFactory<N> arrayFactory) {
 
         super();
 
@@ -74,32 +83,7 @@ public final class BasicList<N extends Number> implements List<N>, Access1D<N>, 
         return true;
     }
 
-    private void ensureCapacity() {
-
-        if (myStorage.count() > myActualCount) {
-            // It fits, just add to the end
-
-        } else if ((myStorage.count() % SEGMENT_CAPACITY) == 0L) {
-            // Doesn't fit, grow by 1 segment, then add
-
-            if (myStorage instanceof SegmentedArray) {
-                myStorage = ((SegmentedArray<N>) myStorage).grow();
-            } else if (myStorage.count() == SEGMENT_CAPACITY) {
-                myStorage = myArrayFactory.wrapAsSegments(myStorage, myArrayFactory.makeZero(SEGMENT_CAPACITY));
-            } else {
-                throw new IllegalStateException();
-            }
-
-        } else {
-            // Doesn't fit, grow by doubling the capacity, then add
-
-            BasicArray<N> tmpStorage = myArrayFactory.makeZero(myStorage.count() * 2L);
-            tmpStorage.fillMatching(myStorage);
-            myStorage = tmpStorage;
-        }
-    }
-
-    public void add(int index, N element) {
+    public void add(final int index, final N element) {
         throw new UnsupportedOperationException();
     }
 
@@ -119,7 +103,7 @@ public final class BasicList<N extends Number> implements List<N>, Access1D<N>, 
         }
     }
 
-    public boolean add(N e) {
+    public boolean add(final N e) {
 
         this.ensureCapacity();
 
@@ -128,28 +112,36 @@ public final class BasicList<N extends Number> implements List<N>, Access1D<N>, 
         return true;
     }
 
-    public boolean addAll(Collection<? extends N> c) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean addAll(final Collection<? extends N> elements) {
+        for (final N tmpElement : elements) {
+            this.add(tmpElement);
+        }
+        return true;
     }
 
-    public boolean addAll(int index, Collection<? extends N> c) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean addAll(final int index, final Collection<? extends N> c) {
+        throw new UnsupportedOperationException();
     }
 
     public void clear() {
         myActualCount = 0L;
     }
 
-    public boolean contains(final Object o) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean contains(final Object object) {
+        if (object instanceof Number) {
+            return this.indexOf(object) >= 0;
+        } else {
+            return false;
+        }
     }
 
     public boolean containsAll(final Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
+        for (final Object tmpObject : c) {
+            if (!this.contains(tmpObject)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public long count() {
@@ -180,9 +172,22 @@ public final class BasicList<N extends Number> implements List<N>, Access1D<N>, 
         }
     }
 
-    public int indexOf(final Object o) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int indexOf(final Object object) {
+        final ListIterator<N> tmpIterator = this.listIterator();
+        if (object == null) {
+            while (tmpIterator.hasNext()) {
+                if (tmpIterator.next() == null) {
+                    return tmpIterator.previousIndex();
+                }
+            }
+        } else {
+            while (tmpIterator.hasNext()) {
+                if (object.equals(tmpIterator.next())) {
+                    return tmpIterator.previousIndex();
+                }
+            }
+        }
+        return -1;
     }
 
     public boolean isEmpty() {
@@ -193,42 +198,49 @@ public final class BasicList<N extends Number> implements List<N>, Access1D<N>, 
         return Access1D.super.iterator();
     }
 
-    public int lastIndexOf(final Object o) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int lastIndexOf(final Object object) {
+        final ListIterator<N> tmpIterator = this.listIterator(this.size());
+        if (object == null) {
+            while (tmpIterator.hasPrevious()) {
+                if (tmpIterator.previous() == null) {
+                    return tmpIterator.nextIndex();
+                }
+            }
+        } else {
+            while (tmpIterator.hasPrevious()) {
+                if (object.equals(tmpIterator.previous())) {
+                    return tmpIterator.nextIndex();
+                }
+            }
+        }
+        return -1;
     }
 
     public ListIterator<N> listIterator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Iterator1D<N>(this);
     }
 
     public ListIterator<N> listIterator(final int index) {
-        // TODO Auto-generated method stub
-        return null;
+        return new Iterator1D<N>(this, index);
     }
 
     public N remove(final int index) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public boolean remove(final Object o) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     public boolean removeAll(final Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     public boolean retainAll(final Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException();
     }
 
-    public N set(int index, N element) {
+    public N set(final int index, final N element) {
         throw new UnsupportedOperationException();
     }
 
@@ -253,18 +265,54 @@ public final class BasicList<N extends Number> implements List<N>, Access1D<N>, 
     }
 
     public List<N> subList(final int fromIndex, final int toIndex) {
-        // TODO Auto-generated method stub
-        return null;
+        final BasicList<N> retVal = new BasicList<>(myArrayFactory);
+        if (myStorage instanceof PrimitiveArray) {
+            for (int i = 0; i < toIndex; i++) {
+                retVal.add(this.doubleValue(i));
+            }
+        } else {
+            for (int i = 0; i < toIndex; i++) {
+                retVal.add(this.get(i));
+            }
+        }
+        return retVal;
     }
 
     public Object[] toArray() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.toArray(new Object[this.size()]);
     }
 
-    public <T> T[] toArray(final T[] a) {
-        // TODO Auto-generated method stub
-        return null;
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(final T[] array) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = (T) myStorage.get(i);
+        }
+        return array;
+    }
+
+    private void ensureCapacity() {
+
+        if (myStorage.count() > myActualCount) {
+            // It fits, just add to the end
+
+        } else if ((myStorage.count() % SEGMENT_CAPACITY) == 0L) {
+            // Doesn't fit, grow by 1 segment, then add
+
+            if (myStorage instanceof SegmentedArray) {
+                myStorage = ((SegmentedArray<N>) myStorage).grow();
+            } else if (myStorage.count() == SEGMENT_CAPACITY) {
+                myStorage = myArrayFactory.wrapAsSegments(myStorage, myArrayFactory.makeZero(SEGMENT_CAPACITY));
+            } else {
+                throw new IllegalStateException();
+            }
+
+        } else {
+            // Doesn't fit, grow by doubling the capacity, then add
+
+            final BasicArray<N> tmpStorage = myArrayFactory.makeZero(myStorage.count() * 2L);
+            tmpStorage.fillMatching(myStorage);
+            myStorage = tmpStorage;
+        }
     }
 
 }

@@ -40,9 +40,7 @@ import org.ojalgo.type.TypeUtils;
  */
 public class BigArray extends ReferenceTypeArray<BigDecimal> {
 
-    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(BigDecimal.class);
-
-    static final DenseFactory<BigDecimal> FACTORY = new DenseFactory<BigDecimal>() {
+    public static final DenseFactory<BigDecimal> FACTORY = new DenseFactory<BigDecimal>() {
 
         @Override
         long getElementSize() {
@@ -61,10 +59,16 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
 
     };
 
+    static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(BigDecimal.class);
+
     public static final BigArray make(final int size) {
         return new BigArray(size);
     }
 
+    /**
+     * @deprecated v41 Use {@link #FACTORY} and {@link ArrayFactory#makeSegmented(long)} instead.
+     */
+    @Deprecated
     public static final SegmentedArray<BigDecimal> makeSegmented(final long count) {
         return SegmentedArray.make(FACTORY, count);
     }

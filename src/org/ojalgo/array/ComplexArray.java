@@ -63,6 +63,10 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
         return new ComplexArray(size);
     }
 
+    /**
+     * @deprecated v41 Use {@link #FACTORY} and {@link ArrayFactory#makeSegmented(long)} instead.
+     */
+    @Deprecated
     public static final SegmentedArray<ComplexNumber> makeSegmented(final long count) {
         return SegmentedArray.make(FACTORY, count);
     }

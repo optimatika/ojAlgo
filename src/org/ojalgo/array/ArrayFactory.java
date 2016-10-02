@@ -22,6 +22,7 @@
 package org.ojalgo.array;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -80,18 +81,18 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
     }
 
     @SafeVarargs
-    public final SegmentedArray<N> wrapAsSegments(BasicArray<N>... segments) {
+    public final SegmentedArray<N> wrapAsSegments(final BasicArray<N>... segments) {
 
-        BasicArray<N> tmpFirstSegment = segments[0];
-        long tmpSegmentSize = tmpFirstSegment.count();
+        final BasicArray<N> tmpFirstSegment = segments[0];
+        final long tmpSegmentSize = tmpFirstSegment.count();
 
-        int tmpIndexBits = Arrays.binarySearch(POWERS_OF_2, (int) tmpSegmentSize);
+        final int tmpIndexBits = Arrays.binarySearch(POWERS_OF_2, (int) tmpSegmentSize);
 
         if ((tmpIndexBits >= 0) && (tmpSegmentSize != (1L << tmpIndexBits))) {
             throw new IllegalArgumentException("The segment size must be a power of 2!");
         }
 
-        int tmpLastIndex = segments.length - 1;
+        final int tmpLastIndex = segments.length - 1;
         for (int s = 1; s < tmpLastIndex; s++) {
             if (segments[s].count() != tmpSegmentSize) {
                 throw new IllegalArgumentException("All segments (except possibly the last) must have the same size!");
@@ -101,9 +102,13 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
             throw new IllegalArgumentException("The last segment cannot be larger than the others!");
         }
 
-        long tmpIndexMask = tmpSegmentSize - 1L;
+        final long tmpIndexMask = tmpSegmentSize - 1L;
 
         return new SegmentedArray<N>(segments, tmpSegmentSize, tmpIndexBits, tmpIndexMask);
+    }
+
+    public final SegmentedArray<N> makeSegmented(final long count) {
+        return SegmentedArray.make(this, count);
     }
 
     abstract long getElementSize();

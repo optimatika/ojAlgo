@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.access.Factory1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
@@ -219,8 +218,18 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
      */
     private final long mySegmentSize;
 
+    SegmentedArray(final BasicArray<N>[] segments, final long segmentSize, final int indexBits, final long indexMask) {
+
+        super();
+
+        mySegments = segments;
+        mySegmentSize = segmentSize;
+        myIndexBits = indexBits;
+        myIndexMask = indexMask;
+    }
+
     @SuppressWarnings("unchecked")
-    SegmentedArray(final long count, final int indexBits, final Factory1D<BasicArray<N>> segmentFactory) {
+    SegmentedArray(final long count, final int indexBits, final ArrayFactory<N> segmentFactory) {
 
         super();
 
@@ -245,14 +254,6 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         myIndexMask = tmpSegmentSize - 1L;
     }
 
-    SegmentedArray(BasicArray<N>[] segments, long segmentSize, int indexBits, long indexMask) {
-        super();
-        this.mySegments = segments;
-        this.mySegmentSize = segmentSize;
-        this.myIndexBits = indexBits;
-        this.myIndexMask = indexMask;
-    }
-
     public void add(final long index, final double addend) {
         mySegments[(int) (index >> myIndexBits)].add(index & myIndexMask, addend);
     }
@@ -265,22 +266,6 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     public long count() {
         final int tmpVal = mySegments.length - 1;
         return (mySegments[0].count() * tmpVal) + mySegments[tmpVal].count();
-    }
-
-    public SegmentedArray<N> grow() {
-
-        if (mySegments[mySegments.length - 1].count() != mySegmentSize) {
-            throw new IllegalStateException("Only works if all segments have equal length!");
-        }
-
-        BasicArray<N>[] tmpSegments = (BasicArray<N>[]) new BasicArray<?>[mySegments.length + 1];
-
-        for (int i = 0; i < mySegments.length; i++) {
-            tmpSegments[i] = mySegments[i];
-        }
-        tmpSegments[mySegments.length] = ((DenseArray<N>) mySegments[0]).newInstance((int) mySegmentSize);
-
-        return new SegmentedArray<>(tmpSegments, mySegmentSize, myIndexBits, myIndexMask);
     }
 
     public double doubleValue(final long index) {
@@ -299,16 +284,16 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
+        mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, values, valueIndex);
+    }
+
     public void fillOne(final long index, final N value) {
         mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, value);
     }
 
     public void fillOne(final long index, final NullaryFunction<N> supplier) {
         mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, supplier);
-    }
-
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        mySegments[(int) (index >> myIndexBits)].fillOne(index & myIndexMask, values, valueIndex);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
@@ -343,6 +328,22 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     public N get(final long index) {
         return mySegments[(int) (index >> myIndexBits)].get(index & myIndexMask);
+    }
+
+    public SegmentedArray<N> grow() {
+
+        if (mySegments[mySegments.length - 1].count() != mySegmentSize) {
+            throw new IllegalStateException("Only works if all segments have equal length!");
+        }
+
+        final BasicArray<N>[] tmpSegments = (BasicArray<N>[]) new BasicArray<?>[mySegments.length + 1];
+
+        for (int i = 0; i < mySegments.length; i++) {
+            tmpSegments[i] = mySegments[i];
+        }
+        tmpSegments[mySegments.length] = ((DenseArray<N>) mySegments[0]).newInstance((int) mySegmentSize);
+
+        return new SegmentedArray<>(tmpSegments, mySegmentSize, myIndexBits, myIndexMask);
     }
 
     public boolean isAbsolute(final long index) {
