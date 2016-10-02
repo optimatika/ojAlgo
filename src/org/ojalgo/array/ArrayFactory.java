@@ -80,6 +80,16 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
         return this.makeStructuredZero(count);
     }
 
+    /**
+     * There are several requirements on the segments:
+     * <ol>
+     * <li>All segements, except possibly the last, must have the same length/size/count.</li>
+     * <li>The size must be a power of 2.</li>
+     * <li>The size of the last segment must be <= "the segment size".</li>
+     * </ol>
+     *
+     * @throws IllegalArgumentException if either of the 3 requirements are broken.
+     */
     @SafeVarargs
     public final SegmentedArray<N> wrapAsSegments(final BasicArray<N>... segments) {
 
@@ -104,7 +114,7 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
 
         final long tmpIndexMask = tmpSegmentSize - 1L;
 
-        return new SegmentedArray<N>(segments, tmpSegmentSize, tmpIndexBits, tmpIndexMask);
+        return new SegmentedArray<N>(segments, tmpSegmentSize, tmpIndexBits, tmpIndexMask, this);
     }
 
     public final SegmentedArray<N> makeSegmented(final long count) {

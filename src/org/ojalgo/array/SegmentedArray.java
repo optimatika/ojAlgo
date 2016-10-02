@@ -211,6 +211,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     private final int myIndexBits;
     private final long myIndexMask;
     private final BasicArray<N>[] mySegments;
+    private final ArrayFactory<N> mySegmentFactory;
 
     /**
      * All segments except the last one are assumed to (must) be of equal length. The last segment cannot be
@@ -218,7 +219,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
      */
     private final long mySegmentSize;
 
-    SegmentedArray(final BasicArray<N>[] segments, final long segmentSize, final int indexBits, final long indexMask) {
+    SegmentedArray(final BasicArray<N>[] segments, final long segmentSize, final int indexBits, final long indexMask, final ArrayFactory<N> segmentFactory) {
 
         super();
 
@@ -226,6 +227,8 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         mySegmentSize = segmentSize;
         myIndexBits = indexBits;
         myIndexMask = indexMask;
+
+        mySegmentFactory = segmentFactory;
     }
 
     @SuppressWarnings("unchecked")
@@ -252,6 +255,8 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
         myIndexBits = indexBits;
         myIndexMask = tmpSegmentSize - 1L;
+
+        mySegmentFactory = segmentFactory;
     }
 
     public void add(final long index, final double addend) {
@@ -330,20 +335,42 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return mySegments[(int) (index >> myIndexBits)].get(index & myIndexMask);
     }
 
+    /**
+     * Will either grow the last segment to be the same size as all the others, or add another segment (with
+     * the same size). The returned (could be the same) instance is guaranteed to have the last segement the
+     * same size as the others and at least one more "space" in the array.
+     */
     public SegmentedArray<N> grow() {
 
-        if (mySegments[mySegments.length - 1].count() != mySegmentSize) {
-            throw new IllegalStateException("Only works if all segments have equal length!");
+        final BasicArray<N> tmpLastSegment = mySegments[mySegments.length - 1];
+        final BasicArray<N> tmpNewSegment = mySegmentFactory.makeZero(mySegmentSize);
+
+        final long tmpLastSegmentSize = tmpLastSegment.count();
+
+        if (tmpLastSegmentSize < mySegmentSize) {
+
+            mySegments[mySegments.length - 1] = tmpNewSegment;
+
+            tmpNewSegment.fillMatching(tmpLastSegment);
+
+            return this;
+
+        } else if (tmpLastSegmentSize == mySegmentSize) {
+
+            @SuppressWarnings("unchecked")
+            final BasicArray<N>[] tmpSegments = (BasicArray<N>[]) new BasicArray<?>[mySegments.length + 1];
+
+            for (int i = 0; i < mySegments.length; i++) {
+                tmpSegments[i] = mySegments[i];
+            }
+            tmpSegments[mySegments.length] = tmpNewSegment;
+
+            return new SegmentedArray<>(tmpSegments, mySegmentSize, myIndexBits, myIndexMask, mySegmentFactory);
+
+        } else {
+
+            throw new IllegalStateException();
         }
-
-        final BasicArray<N>[] tmpSegments = (BasicArray<N>[]) new BasicArray<?>[mySegments.length + 1];
-
-        for (int i = 0; i < mySegments.length; i++) {
-            tmpSegments[i] = mySegments[i];
-        }
-        tmpSegments[mySegments.length] = ((DenseArray<N>) mySegments[0]).newInstance((int) mySegmentSize);
-
-        return new SegmentedArray<>(tmpSegments, mySegmentSize, myIndexBits, myIndexMask);
     }
 
     public boolean isAbsolute(final long index) {
