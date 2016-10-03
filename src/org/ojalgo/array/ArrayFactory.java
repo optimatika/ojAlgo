@@ -76,9 +76,19 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
         return retVal;
     }
 
+    public final SegmentedArray<N> makeSegmented(final long count) {
+        return SegmentedArray.make(this, count);
+    }
+
     public final BasicArray<N> makeZero(final long count) {
         return this.makeStructuredZero(count);
     }
+
+    abstract long getElementSize();
+
+    abstract BasicArray<N> makeStructuredZero(final long... structure);
+
+    abstract BasicArray<N> makeToBeFilled(final long... structure);
 
     /**
      * There are several requirements on the segments:
@@ -91,7 +101,7 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
      * @throws IllegalArgumentException if either of the 3 requirements are broken.
      */
     @SafeVarargs
-    public final SegmentedArray<N> wrapAsSegments(final BasicArray<N>... segments) {
+    final SegmentedArray<N> wrapAsSegments(final BasicArray<N>... segments) {
 
         final BasicArray<N> tmpFirstSegment = segments[0];
         final long tmpSegmentSize = tmpFirstSegment.count();
@@ -116,15 +126,5 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
 
         return new SegmentedArray<N>(segments, tmpSegmentSize, tmpIndexBits, tmpIndexMask, this);
     }
-
-    public final SegmentedArray<N> makeSegmented(final long count) {
-        return SegmentedArray.make(this, count);
-    }
-
-    abstract long getElementSize();
-
-    abstract BasicArray<N> makeStructuredZero(final long... structure);
-
-    abstract BasicArray<N> makeToBeFilled(final long... structure);
 
 }

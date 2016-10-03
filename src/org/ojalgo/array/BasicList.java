@@ -48,6 +48,10 @@ public final class BasicList<N extends Number> implements List<N>, RandomAccess,
         return new BasicList<ComplexNumber>(ComplexArray.FACTORY);
     }
 
+    public static BasicList<Double> makeOffHeap() {
+        return new BasicList<Double>(OffHeapArray.FACTORY);
+    }
+
     public static BasicList<Double> makePrimitive() {
         return new BasicList<Double>(PrimitiveArray.FACTORY);
     }

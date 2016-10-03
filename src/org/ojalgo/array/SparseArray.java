@@ -866,6 +866,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return retVal;
     }
 
+    int getActualLength() {
+        return myActualLength;
+    }
+
     final int index(final long index) {
         return Arrays.binarySearch(myIndices, 0, myActualLength, index);
     }

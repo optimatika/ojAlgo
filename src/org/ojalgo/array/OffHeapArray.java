@@ -44,7 +44,7 @@ import sun.misc.Unsafe;
  */
 public final class OffHeapArray extends BasicArray<Double> {
 
-    static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
+    public static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
 
         @Override
         long getElementSize() {
@@ -104,13 +104,13 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     public void add(final long index, final double addend) {
-        // TODO Auto-generated method stub
-
+        long tmpAddress = this.address(index);
+        double tmpCurrentValue = UNSAFE.getDouble(tmpAddress);
+        UNSAFE.putDouble(tmpAddress, tmpCurrentValue + addend);
     }
 
     public void add(final long index, final Number addend) {
-        // TODO Auto-generated method stub
-
+        this.add(index, addend.doubleValue());
     }
 
     public long count() {
@@ -121,52 +121,34 @@ public final class OffHeapArray extends BasicArray<Double> {
         return UNSAFE.getDouble(this.address(index));
     }
 
-    public void fillAll(final Double value) {
-        this.fill(0L, myCount, 1L, value);
+    public void fillOne(long index, Access1D<?> values, long valueIndex) {
+        this.set(index, values.doubleValue(valueIndex));
     }
 
-    public void fillAll(final NullaryFunction<Double> supplier) {
-        this.fill(0L, myCount, 1L, supplier);
+    public void fillOne(long index, Double value) {
+        this.set(index, value.doubleValue());
     }
 
-    public void fillOne(final long index, final Double value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-        this.set(index, values.get(valueIndex));
-    }
-
-    public void fillOne(final long index, final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillRange(final long first, final long limit, final Double value) {
-        this.fill(first, limit, 1L, value);
-    }
-
-    public void fillRange(final long first, final long limit, final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
-
+    public void fillOne(long index, NullaryFunction<Double> supplier) {
+        this.set(index, supplier.doubleValue());
     }
 
     public Double get(final long index) {
-        return UNSAFE.getDouble(this.address(index));
+        return this.doubleValue(index);
     }
 
     public boolean isAbsolute(final long index) {
-        return PrimitiveScalar.isAbsolute(UNSAFE.getDouble(this.address(index)));
+        return PrimitiveScalar.isAbsolute(this.doubleValue(index));
     }
 
     public boolean isSmall(final long index, final double comparedTo) {
-        return PrimitiveScalar.isSmall(UNSAFE.getDouble(this.address(index)), comparedTo);
+        return PrimitiveScalar.isSmall(this.doubleValue(index), comparedTo);
     }
 
-    public void modifyOne(final long index, final UnaryFunction<Double> modifier) {
-        // TODO Auto-generated method stub
-
+    public void modifyOne(long index, UnaryFunction<Double> modifier) {
+        long tmpAddress = this.address(index);
+        double tmpCurrentValue = UNSAFE.getDouble(tmpAddress);
+        UNSAFE.putDouble(tmpAddress, modifier.invoke(tmpCurrentValue));
     }
 
     public void set(final long index, final double value) {
@@ -174,12 +156,11 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     public void set(final long index, final Number value) {
-        UNSAFE.putDouble(this.address(index), value.doubleValue());
+        this.set(index, value.doubleValue());
     }
 
-    public void visitOne(final long index, final VoidFunction<Double> visitor) {
-        // TODO Auto-generated method stub
-
+    public void visitOne(long index, VoidFunction<Double> visitor) {
+        visitor.accept(this.doubleValue(index));
     }
 
     private final long address(final long index) {
@@ -221,9 +202,13 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     @Override
-    protected void fill(final long first, final long limit, final long step, final NullaryFunction<Double> supplier) {
-        // TODO Auto-generated method stub
-
+    protected void fill(long first, long limit, long step, NullaryFunction<Double> supplier) {
+        final long tmpFirst = this.address(first);
+        final long tmpLimit = this.address(limit);
+        final long tmpStep = this.increment(step);
+        for (long a = tmpFirst; a < tmpLimit; a += tmpStep) {
+            UNSAFE.putDouble(a, supplier.doubleValue());
+        }
     }
 
     @Override
@@ -302,11 +287,6 @@ public final class OffHeapArray extends BasicArray<Double> {
     @Override
     boolean isPrimitive() {
         return true;
-    }
-
-    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        // TODO Auto-generated method stub
-
     }
 
 }
