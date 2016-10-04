@@ -78,6 +78,16 @@ public final class BasicList<N extends Number> implements List<N>, RandomAccess,
         myActualCount = 0L;
     }
 
+    BasicList(final BasicArray<N> storage, final ArrayFactory<N> arrayFactory, final long actualCount) {
+
+        super();
+
+        myArrayFactory = arrayFactory;
+
+        myStorage = storage;
+        myActualCount = actualCount;
+    }
+
     public boolean add(final double e) {
 
         this.ensureCapacity();

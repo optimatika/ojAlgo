@@ -12,10 +12,16 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
 
     private static int INITIAL_CAPACITY = 16;
 
+    private final DenseFactory<N> myArrayFactory;
+
     private final SparseArray<N> myStorage;
 
-    public BasicMap(DenseFactory<N> arrayFactory) {
+    public BasicMap(final DenseFactory<N> arrayFactory) {
+
         super();
+
+        myArrayFactory = arrayFactory;
+
         myStorage = new SparseArray<N>(Long.MAX_VALUE, arrayFactory, INITIAL_CAPACITY);
     }
 
@@ -28,11 +34,11 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
         return null;
     }
 
-    public boolean containsKey(long key) {
+    public boolean containsKey(final long key) {
         return myStorage.index(key) >= 0;
     }
 
-    public boolean containsKey(Object key) {
+    public boolean containsKey(final Object key) {
         if (key instanceof Number) {
             return this.containsKey(((Number) key).longValue());
         } else {
@@ -40,12 +46,12 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
         }
     }
 
-    public boolean containsValue(double value) {
+    public boolean containsValue(final double value) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public boolean containsValue(Object value) {
+    public boolean containsValue(final Object value) {
         if (value instanceof Number) {
             return this.containsValue(((Number) value).doubleValue());
         } else {
@@ -57,7 +63,7 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
         return myStorage.getActualLength();
     }
 
-    public double doubleValue(long key) {
+    public double doubleValue(final long key) {
         // TODO Auto-generated method stub
         return Double.NaN;
     }
@@ -72,29 +78,28 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
         return null;
     }
 
-    public N get(long key) {
+    public N get(final long key) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public N get(Object key) {
+    public N get(final Object key) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public BasicMap<N> headMap(long toKey) {
+    public BasicMap<N> headMap(final long toKey) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public BasicMap<N> headMap(Long toKey) {
+    public BasicMap<N> headMap(final Long toKey) {
         // TODO Auto-generated method stub
         return null;
     }
 
     public boolean isEmpty() {
-        // TODO Auto-generated method stub
-        return false;
+        return myStorage.getActualLength() == 0;
     }
 
     public Set<Long> keySet() {
@@ -107,37 +112,38 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
         return null;
     }
 
-    public double put(long key, double value) {
-        // TODO Auto-generated method stub
-        return Double.NaN;
+    public double put(final long key, final double value) {
+        final double tmpOldValue = myStorage.doubleValue(key);
+        myStorage.set(key, value);
+        return tmpOldValue;
     }
 
-    public N put(long key, N value) {
+    public N put(final long key, final N value) {
+        final N tmpOldValue = myStorage.get(key);
+        myStorage.set(key, value);
+        return tmpOldValue;
+    }
+
+    public N put(final Long key, final N value) {
+        return this.put(key.longValue(), value);
+    }
+
+    public void putAll(final BasicMap<N> m) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void putAll(final Map<? extends Long, ? extends N> m) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public N remove(final long key) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public N put(Long key, N value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void putAll(BasicMap<N> m) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void putAll(Map<? extends Long, ? extends N> m) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public N remove(long key) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public N remove(Object key) {
+    public N remove(final Object key) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -146,29 +152,28 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
         return myStorage.getActualLength();
     }
 
-    public BasicMap<N> subMap(long fromKey, long toKey) {
+    public BasicMap<N> subMap(final long fromKey, final long toKey) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public BasicMap<N> subMap(Long fromKey, Long toKey) {
+    public BasicMap<N> subMap(final Long fromKey, final Long toKey) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public BasicMap<N> tailMap(long fromKey) {
+    public BasicMap<N> tailMap(final long fromKey) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public BasicMap<N> tailMap(Long fromKey) {
+    public BasicMap<N> tailMap(final Long fromKey) {
         // TODO Auto-generated method stub
         return null;
     }
 
     public BasicList<N> values() {
-        // TODO Auto-generated method stub
-        return null;
+        return new BasicList<>(myStorage, myArrayFactory, myStorage.getActualLength());
     }
 
 }
