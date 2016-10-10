@@ -332,11 +332,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     public double doubleValue(final long index) {
         final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.doubleValue(tmpIndex);
-        } else {
-            return myZeroValue;
-        }
+        return this.doDoubleValue(tmpIndex);
     }
 
     public void empty() {
@@ -423,11 +419,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     public N get(final long index) {
         final int tmpIndex = this.index(index);
-        if (tmpIndex >= 0) {
-            return myValues.get(tmpIndex);
-        } else {
-            return myZeroNumber;
-        }
+        return this.doGet(tmpIndex);
     }
 
     public long[] indicesInRange(final long first, final long limit) {
@@ -512,60 +504,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         final int tmpIndex = this.index(index);
 
-        if (tmpIndex >= 0) {
-            // Existing value, just update
-
-            // values[tmpIndex] = value;
-            myValues.set(tmpIndex, value);
-
-        } else if (value != PrimitiveMath.ZERO) {
-            // Not existing value, insert new
-
-            final long[] tmpOldIndeces = myIndices;
-
-            final int tmpInsInd = -(tmpIndex + 1);
-
-            if ((myActualLength + 1) <= tmpOldIndeces.length) {
-                // No need to grow the backing arrays
-
-                for (int i = myActualLength; i > tmpInsInd; i--) {
-                    tmpOldIndeces[i] = tmpOldIndeces[i - 1];
-                    // values[i] = values[i - 1];
-                    myValues.set(i, myValues.doubleValue(i - 1));
-                }
-                tmpOldIndeces[tmpInsInd] = index;
-                // values[tmpInsInd] = value;
-                myValues.set(tmpInsInd, value);
-
-                myActualLength++;
-
-            } else {
-                // Needs to grow the backing arrays
-
-                final int tmpCapacity = tmpOldIndeces.length * GROWTH_FACTOR;
-                final long[] tmpIndices = new long[tmpCapacity];
-                final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
-
-                for (int i = 0; i < tmpInsInd; i++) {
-                    tmpIndices[i] = tmpOldIndeces[i];
-                    tmpValues.set(i, myValues.doubleValue(i));
-                }
-                tmpIndices[tmpInsInd] = index;
-                tmpValues.set(tmpInsInd, value);
-                for (int i = tmpInsInd; i < tmpOldIndeces.length; i++) {
-                    tmpIndices[i + 1] = tmpOldIndeces[i];
-                    tmpValues.set(i + 1, myValues.doubleValue(i));
-                }
-                for (int i = tmpOldIndeces.length + 1; i < tmpIndices.length; i++) {
-                    tmpIndices[i] = Long.MAX_VALUE;
-                }
-
-                myIndices = tmpIndices;
-                myValues = tmpValues;
-                myActualLength++;
-            }
-        }
-
+        this.doSet(index, tmpIndex, value);
     }
 
     @Override
@@ -573,63 +512,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         final int tmpIndex = this.index(index);
 
-        if (tmpIndex >= 0) {
-            // Existing value, just update
-
-            // values[tmpIndex] = value;
-            myValues.set(tmpIndex, value);
-
-        } else if (!value.equals(myZeroNumber)) {
-            // Not existing value, insert new
-
-            final long[] tmpOldIndeces = this.myIndices;
-
-            final int tmpInsInd = -(tmpIndex + 1);
-
-            if ((myActualLength + 1) <= tmpOldIndeces.length) {
-                // No need to grow the backing arrays
-
-                for (int i = myActualLength; i > tmpInsInd; i--) {
-                    tmpOldIndeces[i] = tmpOldIndeces[i - 1];
-                    // values[i] = values[i - 1];
-                    myValues.set(i, myValues.get(i - 1));
-                }
-                tmpOldIndeces[tmpInsInd] = index;
-                // values[tmpInsInd] = value;
-                myValues.set(tmpInsInd, value);
-
-                myActualLength++;
-
-            } else {
-                // Needs to grow the backing arrays
-
-                final int tmpCapacity = tmpOldIndeces.length * GROWTH_FACTOR;
-                final long[] tmpIndices = new long[tmpCapacity];
-                final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
-
-                for (int i = 0; i < tmpInsInd; i++) {
-                    tmpIndices[i] = tmpOldIndeces[i];
-                    // tmpValues[i] = values[i];
-                    tmpValues.set(i, myValues.get(i));
-                }
-                tmpIndices[tmpInsInd] = index;
-                // tmpValues[tmpInsInd] = value;
-                tmpValues.set(tmpInsInd, value);
-                for (int i = tmpInsInd; i < tmpOldIndeces.length; i++) {
-                    tmpIndices[i + 1] = tmpOldIndeces[i];
-                    // tmpValues[i + 1] = values[i];
-                    tmpValues.set(i + 1, myValues.get(i));
-
-                }
-                for (int i = tmpOldIndeces.length + 1; i < tmpIndices.length; i++) {
-                    tmpIndices[i] = Long.MAX_VALUE;
-                }
-
-                myIndices = tmpIndices;
-                myValues = tmpValues;
-                myActualLength++;
-            }
-        }
+        this.doSet(index, tmpIndex, value);
     }
 
     public void supplyNonZerosTo(final Mutate1D consumer) {
@@ -864,6 +747,139 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
 
         return retVal;
+    }
+
+    double doDoubleValue(final int intIndex) {
+        if (intIndex >= 0) {
+            return myValues.doubleValue(intIndex);
+        } else {
+            return myZeroValue;
+        }
+    }
+
+    N doGet(final int intIndex) {
+        if (intIndex >= 0) {
+            return myValues.get(intIndex);
+        } else {
+            return myZeroNumber;
+        }
+    }
+
+    void doSet(final long extIndex, final int intIndex, final double value) {
+
+        if (intIndex >= 0) {
+            // Existing value, just update
+
+            // values[tmpIndex] = value;
+            myValues.set(intIndex, value);
+
+        } else if (value != PrimitiveMath.ZERO) {
+            // Not existing value, insert new
+
+            final long[] tmpOldIndeces = myIndices;
+
+            final int tmpInsInd = -(intIndex + 1);
+
+            if ((myActualLength + 1) <= tmpOldIndeces.length) {
+                // No need to grow the backing arrays
+
+                for (int i = myActualLength; i > tmpInsInd; i--) {
+                    tmpOldIndeces[i] = tmpOldIndeces[i - 1];
+                    // values[i] = values[i - 1];
+                    myValues.set(i, myValues.doubleValue(i - 1));
+                }
+                tmpOldIndeces[tmpInsInd] = extIndex;
+                // values[tmpInsInd] = value;
+                myValues.set(tmpInsInd, value);
+
+                myActualLength++;
+
+            } else {
+                // Needs to grow the backing arrays
+
+                final int tmpCapacity = tmpOldIndeces.length * GROWTH_FACTOR;
+                final long[] tmpIndices = new long[tmpCapacity];
+                final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
+
+                for (int i = 0; i < tmpInsInd; i++) {
+                    tmpIndices[i] = tmpOldIndeces[i];
+                    tmpValues.set(i, myValues.doubleValue(i));
+                }
+                tmpIndices[tmpInsInd] = extIndex;
+                tmpValues.set(tmpInsInd, value);
+                for (int i = tmpInsInd; i < tmpOldIndeces.length; i++) {
+                    tmpIndices[i + 1] = tmpOldIndeces[i];
+                    tmpValues.set(i + 1, myValues.doubleValue(i));
+                }
+                for (int i = tmpOldIndeces.length + 1; i < tmpIndices.length; i++) {
+                    tmpIndices[i] = Long.MAX_VALUE;
+                }
+
+                myIndices = tmpIndices;
+                myValues = tmpValues;
+                myActualLength++;
+            }
+        }
+    }
+
+    void doSet(final long extIndex, final int intIndex, final Number value) {
+        if (intIndex >= 0) {
+            // Existing value, just update
+
+            // values[tmpIndex] = value;
+            myValues.set(intIndex, value);
+
+        } else if (!value.equals(myZeroNumber)) {
+            // Not existing value, insert new
+
+            final long[] tmpOldIndeces = this.myIndices;
+
+            final int tmpInsInd = -(intIndex + 1);
+
+            if ((myActualLength + 1) <= tmpOldIndeces.length) {
+                // No need to grow the backing arrays
+
+                for (int i = myActualLength; i > tmpInsInd; i--) {
+                    tmpOldIndeces[i] = tmpOldIndeces[i - 1];
+                    // values[i] = values[i - 1];
+                    myValues.set(i, myValues.get(i - 1));
+                }
+                tmpOldIndeces[tmpInsInd] = extIndex;
+                // values[tmpInsInd] = value;
+                myValues.set(tmpInsInd, value);
+
+                myActualLength++;
+
+            } else {
+                // Needs to grow the backing arrays
+
+                final int tmpCapacity = tmpOldIndeces.length * GROWTH_FACTOR;
+                final long[] tmpIndices = new long[tmpCapacity];
+                final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
+
+                for (int i = 0; i < tmpInsInd; i++) {
+                    tmpIndices[i] = tmpOldIndeces[i];
+                    // tmpValues[i] = values[i];
+                    tmpValues.set(i, myValues.get(i));
+                }
+                tmpIndices[tmpInsInd] = extIndex;
+                // tmpValues[tmpInsInd] = value;
+                tmpValues.set(tmpInsInd, value);
+                for (int i = tmpInsInd; i < tmpOldIndeces.length; i++) {
+                    tmpIndices[i + 1] = tmpOldIndeces[i];
+                    // tmpValues[i + 1] = values[i];
+                    tmpValues.set(i + 1, myValues.get(i));
+
+                }
+                for (int i = tmpOldIndeces.length + 1; i < tmpIndices.length; i++) {
+                    tmpIndices[i] = Long.MAX_VALUE;
+                }
+
+                myIndices = tmpIndices;
+                myValues = tmpValues;
+                myActualLength++;
+            }
+        }
     }
 
     int getActualLength() {

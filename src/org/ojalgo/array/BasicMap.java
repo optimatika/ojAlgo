@@ -7,6 +7,7 @@ import java.util.SortedMap;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
+import org.ojalgo.constant.PrimitiveMath;
 
 public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Access1D<N> {
 
@@ -53,7 +54,11 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
 
     public boolean containsValue(final Object value) {
         if (value instanceof Number) {
-            return this.containsValue(((Number) value).doubleValue());
+            if (myStorage.isPrimitive()) {
+                return this.containsValue(((Number) value).doubleValue());
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
@@ -64,8 +69,12 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
     }
 
     public double doubleValue(final long key) {
-        // TODO Auto-generated method stub
-        return Double.NaN;
+        int tmpIndex = myStorage.index(key);
+        if (tmpIndex >= 0) {
+            return myStorage.doDoubleValue(tmpIndex);
+        } else {
+            return PrimitiveMath.NaN;
+        }
     }
 
     public Set<java.util.Map.Entry<Long, N>> entrySet() {
@@ -74,18 +83,20 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
     }
 
     public Long firstKey() {
-        // TODO Auto-generated method stub
-        return null;
+        return myStorage.firstInRange(0L, Long.MAX_VALUE);
     }
 
     public N get(final long key) {
-        // TODO Auto-generated method stub
-        return null;
+        int tmpIndex = myStorage.index(key);
+        if (tmpIndex >= 0) {
+            return myStorage.doGet(tmpIndex);
+        } else {
+            return null;
+        }
     }
 
     public N get(final Object key) {
-        // TODO Auto-generated method stub
-        return null;
+        return key instanceof Number ? get(((Number) key).longValue()) : null;
     }
 
     public BasicMap<N> headMap(final long toKey) {
@@ -113,14 +124,16 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
     }
 
     public double put(final long key, final double value) {
-        final double tmpOldValue = myStorage.doubleValue(key);
-        myStorage.set(key, value);
+        int tmpIndex = myStorage.index(key);
+        final double tmpOldValue = myStorage.doDoubleValue(tmpIndex);
+        myStorage.doSet(key, tmpIndex, value);
         return tmpOldValue;
     }
 
     public N put(final long key, final N value) {
-        final N tmpOldValue = myStorage.get(key);
-        myStorage.set(key, value);
+        int tmpIndex = myStorage.index(key);
+        final N tmpOldValue = myStorage.doGet(tmpIndex);
+        myStorage.doSet(key, tmpIndex, value);
         return tmpOldValue;
     }
 

@@ -21,6 +21,9 @@
  */
 package org.ojalgo.type;
 
+import static java.time.temporal.ChronoField.*;
+
+import java.io.Serializable;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -45,21 +48,24 @@ import java.util.TimeZone;
 /**
  * <p>
  * Originally, long before Java 8 and its new Date and Time API, this class was designed to provide an
- * immutable complement to the existing {@linkplain Date} and {@linkplain Calendar} and to have easy/direct
- * access to the underlying millisecond value.
+ * immutable complement to the existing {@linkplain Date} and {@linkplain Calendar} classes and to have
+ * easy/direct access to the underlying millisecond value.
  * </p>
  * <p>
  * In terms of the newer API it most closely corresponds to an {@linkplain Instant}, but does not have its
- * nanosecond granularity. It has been retrofitted to implement the {@linkplain Temporal} and
- * {@linkplain TemporalAdjuster} interfaces.
+ * nanosecond granularity. At one point the plan was to remove and replace this class with
+ * {@linkplain Instant}, but working with a single long as an "instant" representation is very practical and
+ * efficient. It has been retrofitted to implement the {@linkplain Temporal} and {@linkplain TemporalAdjuster}
+ * interfaces.
  * </p>
  *
  * @see CalendarDateDuration
  * @see CalendarDateUnit
  * @author apete
  */
-public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
+public final class CalendarDate implements Temporal, TemporalAdjuster, Comparable<CalendarDate>, Serializable {
 
+    static final long MILLIS_PER_SECOND = 1_000L;
     static final int NANOS_PER_SECOND = 1_000_000_000;
     static final long SECONDS_PER_DAY = 24L * 60L * 60L;
 
@@ -73,7 +79,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
             try {
                 final long tmpSeconds = temporal.getLong(ChronoField.INSTANT_SECONDS);
                 final int tmpMillisOfSecond = temporal.get(ChronoField.MILLI_OF_SECOND);
-                return new CalendarDate((tmpSeconds * 1000L) + tmpMillisOfSecond);
+                return new CalendarDate((tmpSeconds * MILLIS_PER_SECOND) + tmpMillisOfSecond);
             } catch (final DateTimeException ex) {
                 throw new DateTimeException("Unable to obtain CalendarDate from TemporalAccessor: " + temporal + " of type " + temporal.getClass().getName(),
                         ex);
@@ -97,6 +103,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         return new CalendarDate(resolution.toTimeInMillis(timeInMIllis));
     }
 
+    public static CalendarDate valueOf(Instant instant) {
+        return new CalendarDate(instant.toEpochMilli());
+    }
+
     static long millis(final TemporalAccessor temporal) {
         if (temporal instanceof CalendarDate) {
             return ((CalendarDate) temporal).millis;
@@ -106,7 +116,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
             try {
                 final long tmpSeconds = temporal.getLong(ChronoField.INSTANT_SECONDS);
                 final int tmpMillisOfSecond = temporal.get(ChronoField.MILLI_OF_SECOND);
-                return (tmpSeconds * 1000L) + tmpMillisOfSecond;
+                return (tmpSeconds * MILLIS_PER_SECOND) + tmpMillisOfSecond;
             } catch (final DateTimeException ex) {
                 throw new DateTimeException("No millis!");
             }
@@ -161,6 +171,12 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
         }
     }
 
+    public Temporal adjustInto(Temporal temporal) {
+        long tmpSeconds = millis / MILLIS_PER_SECOND;
+        long tmpNanos = (millis % MILLIS_PER_SECOND) * (NANOS_PER_SECOND / MILLIS_PER_SECOND);
+        return temporal.with(INSTANT_SECONDS, tmpSeconds).with(NANO_OF_SECOND, tmpNanos);
+    }
+
     public int compareTo(final CalendarDate ref) {
         return Long.signum(millis - ref.millis);
     }
@@ -194,7 +210,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     public long getLong(final TemporalField field) {
         if (field instanceof ChronoField) {
             if (field == ChronoField.INSTANT_SECONDS) {
-                return millis / 1000L;
+                return millis / MILLIS_PER_SECOND;
             } else {
                 throw new UnsupportedTemporalTypeException("Unsupported field: " + field);
             }
@@ -294,7 +310,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     }
 
     public LocalDate toLocalDate(final ZoneOffset offset) {
-        final long tmpSeconds = Math.floorDiv(millis, 1000L);
+        final long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
         final long tmpLocalSeconds = tmpSeconds + offset.getTotalSeconds();
         final long tmpLocalDay = Math.floorDiv(tmpLocalSeconds, CalendarDate.SECONDS_PER_DAY);
         return LocalDate.ofEpochDay(tmpLocalDay);
@@ -305,8 +321,8 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     }
 
     public LocalDateTime toLocalDateTime(final ZoneOffset offset) {
-        final long tmpSeconds = Math.floorDiv(millis, 1000L);
-        final int tmpNanos = (int) Math.floorMod(millis, 1000L);
+        final long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
+        final int tmpNanos = (int) Math.floorMod(millis, MILLIS_PER_SECOND);
         return LocalDateTime.ofEpochSecond(tmpSeconds, tmpNanos, offset);
     }
 
@@ -316,9 +332,9 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
 
     public LocalTime toLocalTime(final ZoneOffset offset) {
 
-        final long tmpSeconds = Math.floorDiv(millis, 1000L);
+        final long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
 
-        final int tmpNanos = (int) Math.floorMod(millis, 1000L);
+        final int tmpNanos = (int) Math.floorMod(millis, MILLIS_PER_SECOND);
 
         final long tmpLocalSeconds = tmpSeconds + offset.getTotalSeconds();
 
@@ -391,11 +407,11 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate> {
     public CalendarDate with(final TemporalField field, final long newValue) {
         if (field instanceof ChronoField) {
             if (field == ChronoField.INSTANT_SECONDS) {
-                final long tmpMillisOfSecond = millis % 1000L;
-                return new CalendarDate((newValue * 1000L) + tmpMillisOfSecond);
+                final long tmpMillisOfSecond = millis % MILLIS_PER_SECOND;
+                return new CalendarDate((newValue * MILLIS_PER_SECOND) + tmpMillisOfSecond);
             } else if (field == ChronoField.MILLI_OF_SECOND) {
-                final long tmpSeconds = millis / 1000L;
-                return new CalendarDate((tmpSeconds * 1000L) + newValue);
+                final long tmpSeconds = millis / MILLIS_PER_SECOND;
+                return new CalendarDate((tmpSeconds * MILLIS_PER_SECOND) + newValue);
             } else {
                 throw new UnsupportedTemporalTypeException("Unsupported field: " + field);
             }
