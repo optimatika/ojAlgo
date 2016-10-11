@@ -111,11 +111,13 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I add(final Number scalarAddend) {
 
-        final PhysicalStore<N> retVal = myStore.physical().copy(myStore);
+        final org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> tmpPhysical = myStore.physical();
 
-        final N tmpRight = myStore.physical().scalar().cast(scalarAddend);
+        final PhysicalStore<N> retVal = tmpPhysical.copy(myStore);
 
-        retVal.modifyAll(myStore.physical().function().add().second(tmpRight));
+        final N tmpRight = tmpPhysical.scalar().cast(scalarAddend);
+
+        retVal.modifyAll(tmpPhysical.function().add().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
     }
