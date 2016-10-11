@@ -11,6 +11,10 @@ import org.ojalgo.constant.PrimitiveMath;
 
 public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Access1D<N> {
 
+    public static BasicMap<Double> makePrimitive() {
+        return new BasicMap<Double>(PrimitiveArray.FACTORY);
+    }
+
     private static int INITIAL_CAPACITY = 16;
 
     private final DenseFactory<N> myArrayFactory;
