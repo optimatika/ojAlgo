@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
+import java.util.stream.LongStream;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
@@ -882,6 +883,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    long firstIndex() {
+        return myIndices[0];
+    }
+
     int getActualLength() {
         return myActualLength;
     }
@@ -890,9 +895,17 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return Arrays.binarySearch(myIndices, 0, myActualLength, index);
     }
 
+    final LongStream indices() {
+        return Arrays.stream(myIndices, 0, myActualLength);
+    }
+
     @Override
     boolean isPrimitive() {
         return myValues.isPrimitive();
+    }
+
+    long lastIndex() {
+        return myIndices[myActualLength - 1];
     }
 
 }

@@ -148,7 +148,7 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
         return Double.toString(measure) + unit.toString();
     }
 
-    public long toDurationInMillis() {
+    long toDurationInMillis() {
         return (long) (measure * unit.size());
     }
 
