@@ -23,7 +23,6 @@ package org.ojalgo.array;
 
 import java.util.Arrays;
 
-import org.ojalgo.FunctionalityTest;
 import org.ojalgo.random.Uniform;
 
 /**
@@ -31,7 +30,7 @@ import org.ojalgo.random.Uniform;
  *
  * @author apete
  */
-public abstract class BasicArrayTest extends FunctionalityTest {
+public abstract class BasicArrayTest extends ArrayTests {
 
     static final int COUNT = 100;
     static final long[] INDICES = new long[10];
@@ -49,6 +48,10 @@ public abstract class BasicArrayTest extends FunctionalityTest {
 
     public BasicArrayTest(final String aName) {
         super(aName);
+    }
+
+    public void testOffHeap() {
+        this.doTest(OffHeapArray.make(COUNT));
     }
 
     public void testPrimitive() {

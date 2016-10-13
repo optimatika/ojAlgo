@@ -117,6 +117,9 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
                     }
 
                     public Map.Entry<Long, N> next() {
+
+                        tmpNonzeros.next();
+
                         return new Map.Entry<Long, N>() {
 
                             public Long getKey() {
@@ -251,9 +254,13 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
 
         final BasicMap<N> retVal = new BasicMap<N>(myArrayFactory);
 
-        final long[] tmpIndices = myStorage.indicesInRange(fromKey, toKey);
-        for (int i = 0; i < tmpIndices.length; i++) {
-            retVal.put(tmpIndices[i], myStorage.get(tmpIndices[i]));
+        long tmpKey;
+        for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {
+            tmpKey = tmpView.index();
+            if ((fromKey <= tmpKey) && (tmpKey <= toKey)) {
+                final N tmpValue = tmpView.getNumber();
+                retVal.put(tmpKey, tmpValue);
+            }
         }
 
         return retVal;

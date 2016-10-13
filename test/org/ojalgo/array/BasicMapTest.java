@@ -21,40 +21,53 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.FunctionalityTest;
+import java.util.Map.Entry;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.ojalgo.TestUtils;
 
 /**
- * ArrayPackageTests
+ * BasicMapTest
  *
  * @author apete
  */
-public abstract class ArrayTests extends FunctionalityTest {
+public class BasicMapTest extends ArrayTests {
 
-    static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(ArrayTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(AggregatorCardinality.class);
-        suite.addTestSuite(AggregatorProduct.class);
-        suite.addTestSuite(AggregatorSum.class);
-        suite.addTestSuite(BasicMapTest.class);
-        suite.addTestSuite(ArrayStructureTest.class);
-        suite.addTestSuite(BufferArrayTest.class);
-        suite.addTestSuite(SegmentedArrayTest.class);
-        suite.addTestSuite(SetGetTest.class);
-        //$JUnit-END$
-        return suite;
-    }
-
-    protected ArrayTests() {
+    public BasicMapTest() {
         super();
     }
 
-    protected ArrayTests(final String name) {
-        super(name);
+    public BasicMapTest(final String aName) {
+        super(aName);
     }
+
+    public void testSubmap() {
+
+        final BasicMap<Double> tmpMap = BasicMap.makePrimitive();
+
+        tmpMap.put(10, 1);
+        tmpMap.put(20, 2);
+        tmpMap.put(50, 5);
+        tmpMap.put(100, 1);
+        tmpMap.put(200, 2);
+        tmpMap.put(500, 5);
+        tmpMap.put(1000, 1);
+
+        final BasicMap<Double> tmpHeadMap = tmpMap.headMap(100L);
+        TestUtils.assertEquals(4, tmpHeadMap.size());
+        double tmpHeadSum = 0.0;
+        for (final Entry<Long, Double> tmpEntry : tmpHeadMap.entrySet()) {
+            tmpHeadSum += tmpEntry.getValue();
+        }
+        TestUtils.assertEquals(9.0, tmpHeadSum);
+
+        final BasicMap<Double> tmpTailMap = tmpMap.tailMap(100L);
+        TestUtils.assertEquals(4, tmpTailMap.size());
+        double tmpTailSum = 0.0;
+        for (final Entry<Long, Double> tmpEntry : tmpTailMap.entrySet()) {
+            tmpTailSum += tmpEntry.getValue();
+        }
+        TestUtils.assertEquals(9.0, tmpTailSum);
+
+    }
+
 }
