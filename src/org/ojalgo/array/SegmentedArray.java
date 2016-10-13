@@ -210,8 +210,8 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     private final int myIndexBits;
     private final long myIndexMask;
-    private final BasicArray<N>[] mySegments;
     private final ArrayFactory<N> mySegmentFactory;
+    private final BasicArray<N>[] mySegments;
 
     /**
      * All segments except the last one are assumed to (must) be of equal length. The last segment cannot be
@@ -619,6 +619,13 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
             for (long i = first; i < limit; i += step) {
                 visitor.invoke(this.get(i));
             }
+        }
+    }
+
+    @Override
+    void clear() {
+        for (BasicArray<N> tmpSegment : mySegments) {
+            tmpSegment.clear();
         }
     }
 

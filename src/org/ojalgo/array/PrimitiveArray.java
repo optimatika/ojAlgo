@@ -614,6 +614,11 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
+    final void clear() {
+        ;
+    }
+
+    @Override
     boolean isPrimitive() {
         return true;
     }

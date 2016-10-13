@@ -247,6 +247,11 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     }
 
     @Override
+    public void clear() {
+        myDelegate.clear();
+    }
+
+    @Override
     public boolean contains(final Object obj) {
         return this.indexOf(obj) != -1;
     }

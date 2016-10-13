@@ -336,6 +336,10 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         return myDelegate.asArray1D();
     }
 
+    public void clear() {
+        myDelegate.clear();
+    }
+
     public long count() {
         return myDelegate.count();
     }

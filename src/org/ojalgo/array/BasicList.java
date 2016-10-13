@@ -139,6 +139,7 @@ public final class BasicList<N extends Number> implements List<N>, RandomAccess,
 
     public void clear() {
         myActualCount = 0L;
+        myStorage.clear();
     }
 
     public boolean contains(final Object object) {

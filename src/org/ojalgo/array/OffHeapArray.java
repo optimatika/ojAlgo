@@ -285,6 +285,11 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     @Override
+    void clear() {
+        ;
+    }
+
+    @Override
     boolean isPrimitive() {
         return true;
     }

@@ -192,6 +192,11 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
     }
 
     @Override
+    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
+        data[index] = this.valueOf(values.get(valueIndex));
+    }
+
+    @Override
     protected final void fillOne(final int index, final N value) {
         data[index] = value;
 
@@ -200,11 +205,6 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
     @Override
     protected final void fillOne(final int index, final NullaryFunction<N> supplier) {
         data[index] = supplier.get();
-    }
-
-    @Override
-    protected final void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        data[index] = this.valueOf(values.get(valueIndex));
     }
 
     @Override
@@ -290,6 +290,11 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
     @Override
     protected void visitOne(final int index, final VoidFunction<N> visitor) {
         visitor.invoke(data[index]);
+    }
+
+    @Override
+    final void clear() {
+        Arrays.fill(data, this.valueOf(0.0));
     }
 
     @Override

@@ -187,6 +187,10 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         return myDelegate.asArray1D();
     }
 
+    public void clear() {
+        myDelegate.clear();
+    }
+
     public long count() {
         return myDelegate.count();
     }

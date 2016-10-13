@@ -283,6 +283,11 @@ public class BufferArray extends DenseArray<Double> {
     }
 
     @Override
+    protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
+        myBuffer.put(index, values.doubleValue(valueIndex));
+    }
+
+    @Override
     protected void fillOne(final int index, final Double value) {
         myBuffer.put(index, value);
     }
@@ -290,11 +295,6 @@ public class BufferArray extends DenseArray<Double> {
     @Override
     protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
         myBuffer.put(index, supplier.doubleValue());
-    }
-
-    @Override
-    protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        myBuffer.put(index, values.doubleValue(valueIndex));
     }
 
     @Override
@@ -419,6 +419,11 @@ public class BufferArray extends DenseArray<Double> {
     @Override
     protected void visitOne(final int index, final VoidFunction<Double> visitor) {
         visitor.invoke(myBuffer.get(index));
+    }
+
+    @Override
+    void clear() {
+        myBuffer.clear();
     }
 
     @Override

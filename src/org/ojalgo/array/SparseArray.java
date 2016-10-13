@@ -308,6 +308,12 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
+    @Override
+    public void clear() {
+        myActualLength = 0;
+        myValues.clear();
+    }
+
     public final long count() {
         return myCount;
     }
@@ -334,10 +340,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     public double doubleValue(final long index) {
         final int tmpIndex = this.index(index);
         return this.doDoubleValue(tmpIndex);
-    }
-
-    public void empty() {
-        myActualLength = 0;
     }
 
     @Override

@@ -53,7 +53,7 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
     }
 
     public void clear() {
-        myStorage.empty();
+        myStorage.clear();
     }
 
     public Comparator<? super Long> comparator() {
