@@ -68,6 +68,36 @@ public class BasicMapTest extends ArrayTests {
         }
         TestUtils.assertEquals(9.0, tmpTailSum);
 
+        final BasicMap<Double> tmpSubMap = tmpMap.subMap(35, 350);
+        TestUtils.assertEquals(3, tmpSubMap.size());
+        double tmpSubSum = 0.0;
+        for (final Entry<Long, Double> tmpEntry : tmpSubMap.entrySet()) {
+            tmpSubSum += tmpEntry.getValue();
+        }
+        TestUtils.assertEquals(8.0, tmpSubSum);
+
+        TestUtils.assertEquals(7, tmpMap.size());
+        double tmpKeySum = 0.0;
+        double tmpValSum = 0.0;
+        for (final Entry<Long, Double> tmpEntry : tmpMap.entrySet()) {
+            tmpKeySum += tmpEntry.getKey();
+            tmpValSum += tmpEntry.getValue();
+        }
+        TestUtils.assertEquals(1880.0, tmpKeySum);
+        TestUtils.assertEquals(17.0, tmpValSum);
+
+        tmpKeySum = 0.0;
+        for (final Long tmpKey : tmpMap.keySet()) {
+            tmpKeySum += tmpKey;
+        }
+        TestUtils.assertEquals(1880.0, tmpKeySum);
+
+        tmpValSum = 0.0;
+        for (final Double tmpValue : tmpMap.values()) {
+            tmpValSum += tmpValue;
+        }
+        TestUtils.assertEquals(17.0, tmpValSum);
+
     }
 
 }

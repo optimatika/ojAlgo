@@ -279,7 +279,7 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
     }
 
     public BasicList<N> values() {
-        return new BasicList<>(myStorage, myArrayFactory, myStorage.getActualLength());
+        return new BasicList<>(myStorage.getValues(), myArrayFactory, myStorage.getActualLength());
     }
 
     SparseArray<N> getStorage() {

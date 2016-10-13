@@ -122,7 +122,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         return myElements.doubleValue(AccessUtils.index(myFirsts.length, row, col));
     }
 
-    public void empty() {
+    public void clear() {
         myElements.clear();
         Arrays.fill(myFirsts, (int) this.countColumns());
         Arrays.fill(myLimits, 0);
@@ -247,7 +247,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
             final long tmpRightColumns = target.countColumns();
 
             if (target instanceof SparseStore) {
-                ((SparseStore<?>) target).empty();
+                ((SparseStore<?>) target).clear();
             } else {
                 target.fillAll(this.physical().scalar().zero().getNumber());
             }
