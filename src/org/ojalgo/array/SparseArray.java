@@ -751,7 +751,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         if (intIndex >= 0) {
             // Existing value, just update
 
-            // values[tmpIndex] = value;
             myValues.set(intIndex, value);
 
         } else if (value != PrimitiveMath.ZERO) {
@@ -807,7 +806,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         if (intIndex >= 0) {
             // Existing value, just update
 
-            // values[tmpIndex] = value;
             myValues.set(intIndex, value);
 
         } else if (!value.equals(myZeroNumber)) {
