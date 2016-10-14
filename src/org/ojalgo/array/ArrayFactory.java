@@ -118,7 +118,7 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
                 throw new IllegalArgumentException("All segments (except possibly the last) must have the same size!");
             }
         }
-        if (segments[tmpLastIndex].count() <= tmpSegmentSize) {
+        if (segments[tmpLastIndex].count() > tmpSegmentSize) {
             throw new IllegalArgumentException("The last segment cannot be larger than the others!");
         }
 
