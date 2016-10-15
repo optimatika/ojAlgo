@@ -12,6 +12,14 @@ User documentation: https://github.com/optimatika/ojAlgo/wiki
 
 ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.ojalgo%22%20AND%20a%3A%22ojalgo%22) to be used with your favourite dependency management tool.
 
+```xml
+<dependency>
+    <groupId>org.ojalgo</groupId>
+    <artifactId>ojalgo</artifactId>
+    <version>40.0.0</version>
+</dependency>
+```
+
 ## Issues and Discussions
 
 For bug reports, questions or discussions related to ojAlgo; use the ojAlgo-user mailing list: http://sourceforge.net/p/ojalgo/mailman/ojalgo-user/
