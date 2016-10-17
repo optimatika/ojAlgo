@@ -30,7 +30,7 @@ import java.util.function.DoubleUnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Structure2D;
 
 public abstract class ArrayUtils {
 
@@ -162,8 +162,8 @@ public abstract class ArrayUtils {
         final int tmpLength = target.length;
 
         for (int index = first; index < limit; index++) {
-            final int tmpRow = AccessUtils.row(index, tmpLength);
-            final int tmpColumn = AccessUtils.column(index, tmpLength);
+            final int tmpRow = Structure2D.row(index, tmpLength);
+            final int tmpColumn = Structure2D.column(index, tmpLength);
             target[tmpRow][tmpColumn] = value;
         }
     }
@@ -173,8 +173,8 @@ public abstract class ArrayUtils {
         final int tmpLength = target.length;
 
         for (int index = first; index < limit; index++) {
-            final int tmpRow = AccessUtils.row(index, tmpLength);
-            final int tmpColumn = AccessUtils.column(index, tmpLength);
+            final int tmpRow = Structure2D.row(index, tmpLength);
+            final int tmpColumn = Structure2D.column(index, tmpLength);
             target[tmpRow][tmpColumn] = supplier.getAsDouble();
         }
     }
@@ -295,7 +295,7 @@ public abstract class ArrayUtils {
     public static void visitRange(final double[][] target, final int first, final int limit, final DoubleConsumer visitor) {
         final int tmpStructure = target.length;
         for (int index = first; index < limit; index++) {
-            visitor.accept(target[AccessUtils.row(index, tmpStructure)][AccessUtils.column(index, tmpStructure)]);
+            visitor.accept(target[Structure2D.row(index, tmpStructure)][Structure2D.column(index, tmpStructure)]);
         }
     }
 

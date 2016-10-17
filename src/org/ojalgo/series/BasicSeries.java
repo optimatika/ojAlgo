@@ -21,12 +21,17 @@
  */
 package org.ojalgo.series;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.SortedMap;
 
+import org.ojalgo.array.ArrayFactory;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.primitive.DataSeries;
+import org.ojalgo.type.CalendarDate;
+import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.ColourData;
+import org.ojalgo.type.TimeIndex;
 import org.ojalgo.type.keyvalue.KeyValue;
 
 /**
@@ -40,6 +45,41 @@ import org.ojalgo.type.keyvalue.KeyValue;
  * @author apete
  */
 public interface BasicSeries<K extends Comparable<K>, V extends Number> extends SortedMap<K, V> {
+
+    public class Builder<K extends Comparable<K>> {
+
+        private transient K myReference = null;
+        private transient CalendarDateDuration myResolution = null;
+        private final TimeIndex<K> myTimeIndex;
+
+        private Builder(final TimeIndex<K> timeIndex) {
+            super();
+            myTimeIndex = timeIndex;
+        }
+
+        public <N extends Number> BasicSeries<K, N> build(final ArrayFactory<N> arrayFactory) {
+            if ((myResolution != null) && (myReference != null)) {
+                return new DenseSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution));
+            } else {
+                return new SparseSeries<>(arrayFactory, myTimeIndex.plain());
+            }
+        }
+
+        public Builder<K> resolution(final CalendarDateDuration resolution) {
+            myResolution = resolution;
+            return this;
+        }
+
+        public Builder<K> resolution(final K reference) {
+            myReference = reference;
+            return this;
+        }
+
+    }
+
+    public static final BasicSeries.Builder<CalendarDate> CALENDAR_DATE = new BasicSeries.Builder<CalendarDate>(TimeIndex.CALENDAR_DATE);
+    public static final BasicSeries.Builder<Instant> INSTANT = new BasicSeries.Builder<Instant>(TimeIndex.INSTANT);
+    public static final BasicSeries.Builder<Long> LONG = new BasicSeries.Builder<Long>(TimeIndex.LONG);
 
     BasicSeries<K, V> colour(ColourData colour);
 
@@ -62,6 +102,11 @@ public interface BasicSeries<K extends Comparable<K>, V extends Number> extends 
     void modifyAll(UnaryFunction<V> function);
 
     BasicSeries<K, V> name(String name);
+
+    /**
+     * @return The next, after the {@link #lastKey()}, key.
+     */
+    K nextKey();
 
     void putAll(Collection<? extends KeyValue<? extends K, ? extends V>> data);
 

@@ -30,6 +30,7 @@ import org.ojalgo.access.AccessAnyD;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.FactoryAnyD;
 import org.ojalgo.access.MutateAnyD;
+import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -169,11 +170,11 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public void add(final long[] reference, final double addend) {
-        myDelegate.add(AccessUtils.index(myStructure, reference), addend);
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 
     public void add(final long[] reference, final Number addend) {
-        myDelegate.add(AccessUtils.index(myStructure, reference), addend);
+        myDelegate.add(StructureAnyD.index(myStructure, reference), addend);
     }
 
     /**
@@ -204,7 +205,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public double doubleValue(final long[] ref) {
-        return myDelegate.doubleValue(AccessUtils.index(myStructure, ref));
+        return myDelegate.doubleValue(StructureAnyD.index(myStructure, ref));
     }
 
     @SuppressWarnings("unchecked")
@@ -239,11 +240,11 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public void fillOne(final long[] reference, final N value) {
-        myDelegate.fillOne(AccessUtils.index(myStructure, reference), value);
+        myDelegate.fillOne(StructureAnyD.index(myStructure, reference), value);
     }
 
     public void fillOne(final long[] reference, final NullaryFunction<N> supplier) {
-        myDelegate.fillOne(AccessUtils.index(myStructure, reference), supplier);
+        myDelegate.fillOne(StructureAnyD.index(myStructure, reference), supplier);
     }
 
     public void fillRange(final long first, final long limit, final N value) {
@@ -258,8 +259,8 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
 
-        final long tmpFirst = AccessUtils.index(myStructure, first);
-        final long tmpStep = AccessUtils.step(myStructure, dimension);
+        final long tmpFirst = StructureAnyD.index(myStructure, first);
+        final long tmpStep = StructureAnyD.step(myStructure, dimension);
         final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         myDelegate.fill(tmpFirst, tmpLimit, tmpStep, number);
@@ -270,7 +271,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public N get(final long[] ref) {
-        return myDelegate.get(AccessUtils.index(myStructure, ref));
+        return myDelegate.get(StructureAnyD.index(myStructure, ref));
     }
 
     @Override
@@ -294,7 +295,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
      * @see Scalar#isAbsolute()
      */
     public boolean isAbsolute(final long[] reference) {
-        return myDelegate.isAbsolute(AccessUtils.index(myStructure, reference));
+        return myDelegate.isAbsolute(StructureAnyD.index(myStructure, reference));
     }
 
     public boolean isSmall(final long index, final double comparedTo) {
@@ -302,7 +303,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public boolean isSmall(final long[] reference, final double comparedTo) {
-        return myDelegate.isSmall(AccessUtils.index(myStructure, reference), comparedTo);
+        return myDelegate.isSmall(StructureAnyD.index(myStructure, reference), comparedTo);
     }
 
     public void modifyAll(final UnaryFunction<N> modifier) {
@@ -322,7 +323,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public void modifyOne(final long[] reference, final UnaryFunction<N> modifier) {
-        myDelegate.modifyOne(AccessUtils.index(myStructure, reference), modifier);
+        myDelegate.modifyOne(StructureAnyD.index(myStructure, reference), modifier);
     }
 
     public void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
@@ -333,8 +334,8 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
 
-        final long tmpFirst = AccessUtils.index(myStructure, first);
-        final long tmpStep = AccessUtils.step(myStructure, dimension);
+        final long tmpFirst = StructureAnyD.index(myStructure, first);
+        final long tmpStep = StructureAnyD.step(myStructure, dimension);
         final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         myDelegate.modify(tmpFirst, tmpLimit, tmpStep, function);
@@ -353,11 +354,11 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public void set(final long[] reference, final double value) {
-        myDelegate.set(AccessUtils.index(myStructure, reference), value);
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
     }
 
     public void set(final long[] reference, final Number value) {
-        myDelegate.set(AccessUtils.index(myStructure, reference), value);
+        myDelegate.set(StructureAnyD.index(myStructure, reference), value);
     }
 
     public long[] shape() {
@@ -368,8 +369,8 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
 
-        final long tmpFirst = AccessUtils.index(myStructure, first);
-        final long tmpStep = AccessUtils.step(myStructure, dimension);
+        final long tmpFirst = StructureAnyD.index(myStructure, first);
+        final long tmpStep = StructureAnyD.step(myStructure, dimension);
         final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         return new Array1D<>(myDelegate, tmpFirst, tmpLimit, tmpStep);
@@ -410,7 +411,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public void visitOne(final long[] reference, final VoidFunction<N> visitor) {
-        myDelegate.visitOne(AccessUtils.index(myStructure, reference), visitor);
+        myDelegate.visitOne(StructureAnyD.index(myStructure, reference), visitor);
     }
 
     public void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
@@ -421,8 +422,8 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
         final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
 
-        final long tmpFirst = AccessUtils.index(myStructure, first);
-        final long tmpStep = AccessUtils.step(myStructure, dimension);
+        final long tmpFirst = StructureAnyD.index(myStructure, first);
+        final long tmpStep = StructureAnyD.step(myStructure, dimension);
         final long tmpLimit = tmpFirst + (tmpStep * tmpCount);
 
         myDelegate.visit(tmpFirst, tmpLimit, tmpStep, visitor);

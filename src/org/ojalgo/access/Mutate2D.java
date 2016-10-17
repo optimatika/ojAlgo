@@ -82,7 +82,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         default void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
             final long tmpStructure = this.countRows();
-            this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), values, valueIndex);
+            this.fillOne(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), values, valueIndex);
         }
 
         void fillOne(long row, long col, final Access1D<?> values, final long valueIndex);
@@ -93,12 +93,12 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         default void fillOne(final long index, final N value) {
             final long tmpStructure = this.countRows();
-            this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), value);
+            this.fillOne(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), value);
         }
 
         default void fillOne(final long index, final NullaryFunction<N> supplier) {
             final long tmpStructure = this.countRows();
-            this.fillOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), supplier);
+            this.fillOne(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), supplier);
         }
 
         /**
@@ -152,7 +152,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         default void modifyOne(final long index, final UnaryFunction<N> modifier) {
             final long tmpStructure = this.countRows();
-            this.modifyOne(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), modifier);
+            this.modifyOne(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), modifier);
         }
 
         default void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -179,7 +179,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     default void add(final long index, final double addend) {
         final long tmpStructure = this.countRows();
-        this.add(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
+        this.add(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), addend);
     }
 
     void add(long row, long col, double addend);
@@ -188,7 +188,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     default void add(final long index, final Number addend) {
         final long tmpStructure = this.countRows();
-        this.add(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
+        this.add(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), addend);
     }
 
     /**
@@ -201,7 +201,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     default void set(final long index, final double addend) {
         final long tmpStructure = this.countRows();
-        this.set(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
+        this.set(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), addend);
     }
 
     void set(long row, long col, double value);
@@ -210,7 +210,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     default void set(final long index, final Number addend) {
         final long tmpStructure = this.countRows();
-        this.set(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure), addend);
+        this.set(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), addend);
     }
 
 }

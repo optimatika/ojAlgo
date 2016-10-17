@@ -46,24 +46,24 @@ public class AccessUtilsTest extends FunctionalityTest {
 
         final long tmpExpIndex = Uniform.randomInteger(tmpCount);
 
-        final long tmpRow = AccessUtils.row(tmpExpIndex, tmpStructure);
-        final long tmpColumn = AccessUtils.column(tmpExpIndex, tmpStructure);
+        final long tmpRow = Structure2D.row(tmpExpIndex, tmpStructure);
+        final long tmpColumn = Structure2D.column(tmpExpIndex, tmpStructure);
 
         final long[] tmpReference = new long[] { tmpRow, tmpColumn };
-        TestUtils.assertEquals(tmpReference, AccessUtils.reference(tmpExpIndex, tmpStructure));
+        TestUtils.assertEquals(tmpReference, StructureAnyD.reference(tmpExpIndex, tmpStructure));
 
-        TestUtils.assertEquals(tmpExpIndex, AccessUtils.index(tmpStructure, tmpReference));
-        TestUtils.assertEquals(tmpExpIndex, AccessUtils.index(tmpCountRows, tmpRow, tmpColumn));
+        TestUtils.assertEquals(tmpExpIndex, StructureAnyD.index(tmpStructure, tmpReference));
+        TestUtils.assertEquals(tmpExpIndex, Structure2D.index(tmpCountRows, tmpRow, tmpColumn));
 
         final long tmpExpRow = Uniform.randomInteger(tmpCountRows);
         final long tmpExpColumn = Uniform.randomInteger(tmpCountColumns);
 
-        final long tmpIndex1 = AccessUtils.index(tmpCountRows, tmpExpRow, tmpExpColumn);
-        final long tmpIndex2 = AccessUtils.index(tmpCountRows, tmpExpRow, tmpExpColumn);
+        final long tmpIndex1 = Structure2D.index(tmpCountRows, tmpExpRow, tmpExpColumn);
+        final long tmpIndex2 = Structure2D.index(tmpCountRows, tmpExpRow, tmpExpColumn);
         TestUtils.assertEquals(tmpIndex1, tmpIndex2);
 
-        TestUtils.assertEquals(tmpExpRow, AccessUtils.row(tmpIndex1, tmpStructure));
-        TestUtils.assertEquals(tmpExpColumn, AccessUtils.column(tmpIndex1, tmpStructure));
+        TestUtils.assertEquals(tmpExpRow, Structure2D.row(tmpIndex1, tmpStructure));
+        TestUtils.assertEquals(tmpExpColumn, Structure2D.column(tmpIndex1, tmpStructure));
     }
 
     public void testAccessAnyD() {
@@ -76,20 +76,20 @@ public class AccessUtilsTest extends FunctionalityTest {
         final long tmpMatchingInd1 = 50;
         final long[] tmpMatchingRef1 = new long[] { 2, 1, 1, 1 };
 
-        TestUtils.assertEquals(tmpMatchingInd1, AccessUtils.index(tmpStructure, tmpMatchingRef1));
-        TestUtils.assertEquals(tmpMatchingRef1, AccessUtils.reference(tmpMatchingInd1, tmpStructure));
+        TestUtils.assertEquals(tmpMatchingInd1, StructureAnyD.index(tmpStructure, tmpMatchingRef1));
+        TestUtils.assertEquals(tmpMatchingRef1, StructureAnyD.reference(tmpMatchingInd1, tmpStructure));
 
         final long tmpMatchingInd2 = 49;
         final long[] tmpMatchingRef2 = new long[] { 1, 1, 1, 1 };
 
-        TestUtils.assertEquals(tmpMatchingInd2, AccessUtils.index(tmpStructure, tmpMatchingRef2));
-        TestUtils.assertEquals(tmpMatchingRef2, AccessUtils.reference(tmpMatchingInd2, tmpStructure));
+        TestUtils.assertEquals(tmpMatchingInd2, StructureAnyD.index(tmpStructure, tmpMatchingRef2));
+        TestUtils.assertEquals(tmpMatchingRef2, StructureAnyD.reference(tmpMatchingInd2, tmpStructure));
 
         final long tmpMatchingInd3 = 71; // 1x36 + 3x9 + 2x3 + 2x1 == 36 + 27 + 6 +2 == 71
         final long[] tmpMatchingRef3 = new long[] { 2, 2, 3, 1 };
 
-        TestUtils.assertEquals(tmpMatchingInd3, AccessUtils.index(tmpStructure, tmpMatchingRef3));
-        TestUtils.assertEquals(tmpMatchingRef3, AccessUtils.reference(tmpMatchingInd3, tmpStructure));
+        TestUtils.assertEquals(tmpMatchingInd3, StructureAnyD.index(tmpStructure, tmpMatchingRef3));
+        TestUtils.assertEquals(tmpMatchingRef3, StructureAnyD.reference(tmpMatchingInd3, tmpStructure));
     }
 
 }

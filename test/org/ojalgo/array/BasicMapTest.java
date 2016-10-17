@@ -42,7 +42,7 @@ public class BasicMapTest extends ArrayTests {
 
     public void testSubmap() {
 
-        final BasicMap<Double> tmpMap = BasicMap.makePrimitive();
+        final LongToNumberMap<Double> tmpMap = LongToNumberMap.makePrimitive();
 
         tmpMap.put(10, 1);
         tmpMap.put(20, 2);
@@ -52,15 +52,15 @@ public class BasicMapTest extends ArrayTests {
         tmpMap.put(500, 5);
         tmpMap.put(1000, 1);
 
-        final BasicMap<Double> tmpHeadMap = tmpMap.headMap(100L);
-        TestUtils.assertEquals(4, tmpHeadMap.size());
+        final LongToNumberMap<Double> tmpHeadMap = tmpMap.headMap(100L);
+        TestUtils.assertEquals(3, tmpHeadMap.size());
         double tmpHeadSum = 0.0;
         for (final Entry<Long, Double> tmpEntry : tmpHeadMap.entrySet()) {
             tmpHeadSum += tmpEntry.getValue();
         }
-        TestUtils.assertEquals(9.0, tmpHeadSum);
+        TestUtils.assertEquals(8.0, tmpHeadSum);
 
-        final BasicMap<Double> tmpTailMap = tmpMap.tailMap(100L);
+        final LongToNumberMap<Double> tmpTailMap = tmpMap.tailMap(100L);
         TestUtils.assertEquals(4, tmpTailMap.size());
         double tmpTailSum = 0.0;
         for (final Entry<Long, Double> tmpEntry : tmpTailMap.entrySet()) {
@@ -68,7 +68,7 @@ public class BasicMapTest extends ArrayTests {
         }
         TestUtils.assertEquals(9.0, tmpTailSum);
 
-        final BasicMap<Double> tmpSubMap = tmpMap.subMap(35, 350);
+        final LongToNumberMap<Double> tmpSubMap = tmpMap.subMap(35, 350);
         TestUtils.assertEquals(3, tmpSubMap.size());
         double tmpSubSum = 0.0;
         for (final Entry<Long, Double> tmpEntry : tmpSubMap.entrySet()) {

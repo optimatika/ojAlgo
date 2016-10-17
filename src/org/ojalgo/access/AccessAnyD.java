@@ -67,13 +67,13 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
      * entirely dictated by how you implement the callback.
      */
     default double doubleValue(final long index) {
-        return this.doubleValue(AccessUtils.reference(index, this.shape()));
+        return this.doubleValue(StructureAnyD.reference(index, this.shape()));
     }
 
     double doubleValue(long[] ref);
 
     default N get(final long index) {
-        return this.get(AccessUtils.reference(index, this.shape()));
+        return this.get(StructureAnyD.reference(index, this.shape()));
     }
 
     N get(long[] ref);

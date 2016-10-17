@@ -16,40 +16,44 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
-public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Access1D<N> {
+public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N> {
 
     private static int INITIAL_CAPACITY = 16;
 
-    public static BasicMap<BigDecimal> makeBig() {
-        return new BasicMap<BigDecimal>(BigArray.FACTORY);
+    public static LongToNumberMap<BigDecimal> makeBig() {
+        return new LongToNumberMap<BigDecimal>(BigArray.FACTORY);
     }
 
-    public static BasicMap<ComplexNumber> makeComplexe() {
-        return new BasicMap<ComplexNumber>(ComplexArray.FACTORY);
+    public static LongToNumberMap<ComplexNumber> makeComplexe() {
+        return new LongToNumberMap<ComplexNumber>(ComplexArray.FACTORY);
     }
 
-    public static BasicMap<Double> makePrimitive() {
-        return new BasicMap<Double>(PrimitiveArray.FACTORY);
+    public static LongToNumberMap<Double> makePrimitive() {
+        return new LongToNumberMap<Double>(PrimitiveArray.FACTORY);
     }
 
-    public static BasicMap<Quaternion> makeQuaternion() {
-        return new BasicMap<Quaternion>(QuaternionArray.FACTORY);
+    public static LongToNumberMap<Quaternion> makeQuaternion() {
+        return new LongToNumberMap<Quaternion>(QuaternionArray.FACTORY);
     }
 
-    public static BasicMap<RationalNumber> makeRational() {
-        return new BasicMap<RationalNumber>(RationalArray.FACTORY);
+    public static LongToNumberMap<RationalNumber> makeRational() {
+        return new LongToNumberMap<RationalNumber>(RationalArray.FACTORY);
     }
 
     private final DenseFactory<N> myArrayFactory;
     private final SparseArray<N> myStorage;
 
-    public BasicMap(final DenseFactory<N> arrayFactory) {
+    public LongToNumberMap(final ArrayFactory<N> arrayFactory) {
 
         super();
 
-        myArrayFactory = arrayFactory;
+        if (!(arrayFactory instanceof DenseFactory<?>)) {
+            throw new IllegalArgumentException();
+        }
 
-        myStorage = new SparseArray<N>(Long.MAX_VALUE, arrayFactory, INITIAL_CAPACITY);
+        myArrayFactory = (DenseFactory<N>) arrayFactory;
+
+        myStorage = new SparseArray<N>(Long.MAX_VALUE, myArrayFactory, INITIAL_CAPACITY);
     }
 
     public void clear() {
@@ -164,11 +168,11 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
         return key instanceof Number ? this.get(((Number) key).longValue()) : null;
     }
 
-    public BasicMap<N> headMap(final long toKey) {
+    public LongToNumberMap<N> headMap(final long toKey) {
         return this.subMap(myStorage.firstIndex(), toKey);
     }
 
-    public BasicMap<N> headMap(final Long toKey) {
+    public LongToNumberMap<N> headMap(final Long toKey) {
         return this.headMap(toKey.longValue());
     }
 
@@ -214,7 +218,7 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
         return this.put(key.longValue(), value);
     }
 
-    public void putAll(final BasicMap<N> m) {
+    public void putAll(final LongToNumberMap<N> m) {
         if (myStorage.isPrimitive()) {
             for (final NonzeroView<N> tmpView : m.getStorage().nonzeros()) {
                 myStorage.set(tmpView.index(), tmpView.doubleValue());
@@ -250,14 +254,14 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
         return myStorage.getActualLength();
     }
 
-    public BasicMap<N> subMap(final long fromKey, final long toKey) {
+    public LongToNumberMap<N> subMap(final long fromKey, final long toKey) {
 
-        final BasicMap<N> retVal = new BasicMap<N>(myArrayFactory);
+        final LongToNumberMap<N> retVal = new LongToNumberMap<N>(myArrayFactory);
 
         long tmpKey;
         for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {
             tmpKey = tmpView.index();
-            if ((fromKey <= tmpKey) && (tmpKey <= toKey)) {
+            if ((fromKey <= tmpKey) && (tmpKey < toKey)) {
                 final N tmpValue = tmpView.getNumber();
                 retVal.put(tmpKey, tmpValue);
             }
@@ -266,15 +270,15 @@ public final class BasicMap<N extends Number> implements SortedMap<Long, N>, Acc
         return retVal;
     }
 
-    public BasicMap<N> subMap(final Long fromKey, final Long toKey) {
+    public LongToNumberMap<N> subMap(final Long fromKey, final Long toKey) {
         return this.subMap(fromKey.longValue(), toKey.longValue());
     }
 
-    public BasicMap<N> tailMap(final long fromKey) {
-        return this.subMap(fromKey, myStorage.lastIndex());
+    public LongToNumberMap<N> tailMap(final long fromKey) {
+        return this.subMap(fromKey, myStorage.lastIndex() + 1L);
     }
 
-    public BasicMap<N> tailMap(final Long fromKey) {
+    public LongToNumberMap<N> tailMap(final Long fromKey) {
         return this.tailMap(fromKey.longValue());
     }
 

@@ -33,7 +33,7 @@ import org.ojalgo.series.primitive.ExplicitTimeSeries;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 
-public class CalendarDateSeries<V extends Number> extends AbstractSeries<CalendarDate, V, CalendarDateSeries<V>> {
+public class CalendarDateSeries<V extends Number> extends OldAbstractSeries<CalendarDate, V, CalendarDateSeries<V>> {
 
     private final CalendarDateUnit myResolution;
 
@@ -152,6 +152,10 @@ public class CalendarDateSeries<V extends Number> extends AbstractSeries<Calenda
         retVal.setName(this.getName());
 
         return retVal;
+    }
+
+    public CalendarDate nextKey() {
+        return this.lastKey().step(1, myResolution);
     }
 
     public V put(final Calendar key, final V value) {

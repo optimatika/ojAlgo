@@ -32,7 +32,7 @@ import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.UnaryFunction;
 
-public class NumberSeries<N extends Number & Comparable<N>> extends AbstractSeries<N, N, NumberSeries<N>> implements UnaryFunction<N> {
+public class NumberSeries<N extends Number & Comparable<N>> extends OldAbstractSeries<N, N, NumberSeries<N>> implements UnaryFunction<N> {
 
     public NumberSeries() {
         super();
@@ -65,6 +65,11 @@ public class NumberSeries<N extends Number & Comparable<N>> extends AbstractSeri
 
     public N invoke(final N arg) {
         return this.get(arg);
+    }
+
+    public N nextKey() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

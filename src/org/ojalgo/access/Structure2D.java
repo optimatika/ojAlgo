@@ -23,6 +23,54 @@ package org.ojalgo.access;
 
 public interface Structure2D extends Structure1D {
 
+    static int column(final int index, final int structure) {
+        return index / structure;
+    }
+
+    static int column(final int index, final int[] structure) {
+        return Structure2D.column(index, structure[0]);
+    }
+
+    static int column(final long index, final int structure) {
+        return (int) (index / structure);
+    }
+
+    static long column(final long index, final long structure) {
+        return index / structure;
+    }
+
+    static long column(final long index, final long[] structure) {
+        return Structure2D.column(index, structure[0]);
+    }
+
+    static int index(final int structure, final int row, final int column) {
+        return row + (column * structure);
+    }
+
+    static long index(final long structure, final long row, final long column) {
+        return row + (column * structure);
+    }
+
+    static int row(final int index, final int structure) {
+        return index % structure;
+    }
+
+    static int row(final int index, final int[] structure) {
+        return Structure2D.row(index, structure[0]);
+    }
+
+    static int row(final long index, final int structure) {
+        return (int) (index % structure);
+    }
+
+    static long row(final long index, final long structure) {
+        return index % structure;
+    }
+
+    static long row(final long index, final long[] structure) {
+        return Structure2D.row(index, structure[0]);
+    }
+
     /**
      * count() == countRows() * countColumns()
      */

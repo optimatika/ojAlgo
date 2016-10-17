@@ -27,8 +27,8 @@ import java.util.Arrays;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.ElementView2D;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -108,18 +108,18 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public void add(final long row, final long col, final double addend) {
         if (addend != PrimitiveMath.ZERO) {
-            myElements.add(AccessUtils.index(myFirsts.length, row, col), addend);
+            myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
             this.updateNonZeros(row, col);
         }
     }
 
     public void add(final long row, final long col, final Number addend) {
-        myElements.add(AccessUtils.index(myFirsts.length, row, col), addend);
+        myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
         this.updateNonZeros(row, col);
     }
 
     public double doubleValue(final long row, final long col) {
-        return myElements.doubleValue(AccessUtils.index(myFirsts.length, row, col));
+        return myElements.doubleValue(Structure2D.index(myFirsts.length, row, col));
     }
 
     public void clear() {
@@ -137,12 +137,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public void fillOne(final long row, final long col, final N value) {
-        myElements.fillOne(AccessUtils.index(myFirsts.length, row, col), value);
+        myElements.fillOne(Structure2D.index(myFirsts.length, row, col), value);
         this.updateNonZeros(row, col);
     }
 
     public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
-        myElements.fillOne(AccessUtils.index(myFirsts.length, row, col), supplier);
+        myElements.fillOne(Structure2D.index(myFirsts.length, row, col), supplier);
         this.updateNonZeros(row, col);
     }
 
@@ -167,7 +167,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public N get(final long row, final long col) {
-        return myElements.get(AccessUtils.index(myFirsts.length, row, col));
+        return myElements.get(Structure2D.index(myFirsts.length, row, col));
     }
 
     @Override
@@ -268,7 +268,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                 tmpFirst = MatrixUtils.firstInRow(right, tmpRow, 0L);
                 tmpLimit = MatrixUtils.limitOfRow(right, tmpRow, tmpRightColumns);
                 for (long j = tmpFirst; j < tmpLimit; j++) {
-                    tmpIndex = AccessUtils.index(tmpRightStructure, tmpCol, j);
+                    tmpIndex = Structure2D.index(tmpRightStructure, tmpCol, j);
                     target.add(tmpRow, j, tmpValue * right.doubleValue(tmpIndex));
                 }
             }
@@ -311,12 +311,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public void set(final long row, final long col, final double value) {
-        myElements.set(AccessUtils.index(myFirsts.length, row, col), value);
+        myElements.set(Structure2D.index(myFirsts.length, row, col), value);
         this.updateNonZeros(row, col);
     }
 
     public void set(final long row, final long col, final Number value) {
-        myElements.set(AccessUtils.index(myFirsts.length, row, col), value);
+        myElements.set(Structure2D.index(myFirsts.length, row, col), value);
         this.updateNonZeros(row, col);
     }
 

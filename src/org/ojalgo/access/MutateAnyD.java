@@ -68,11 +68,11 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
     }
 
     default void add(final long index, final double addend) {
-        this.add(AccessUtils.reference(index, this.shape()), addend);
+        this.add(StructureAnyD.reference(index, this.shape()), addend);
     }
 
     default void add(final long index, final Number addend) {
-        this.add(AccessUtils.reference(index, this.shape()), addend);
+        this.add(StructureAnyD.reference(index, this.shape()), addend);
     }
 
     void add(long[] reference, double addend);
@@ -88,11 +88,11 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
     }
 
     default void set(final long index, final double value) {
-        this.set(AccessUtils.reference(index, this.shape()), value);
+        this.set(StructureAnyD.reference(index, this.shape()), value);
     }
 
     default void set(final long index, final Number value) {
-        this.set(AccessUtils.reference(index, this.shape()), value);
+        this.set(StructureAnyD.reference(index, this.shape()), value);
     }
 
     void set(long[] reference, double value);

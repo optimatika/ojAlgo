@@ -34,6 +34,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.PrimitiveArray;
@@ -659,13 +660,13 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
             @Override
             public Double get(final int index) {
-                return RawStore.this.get(AccessUtils.row(index, tmpStructure), AccessUtils.column(index, tmpStructure));
+                return RawStore.this.get(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure));
             }
 
             @Override
             public Double set(final int index, final Double value) {
-                final int tmpRow = AccessUtils.row(index, tmpStructure);
-                final int tmpColumn = AccessUtils.column(index, tmpStructure);
+                final int tmpRow = Structure2D.row(index, tmpStructure);
+                final int tmpColumn = Structure2D.column(index, tmpStructure);
                 final Double retVal = RawStore.this.get(tmpRow, tmpColumn);
                 RawStore.this.set(tmpRow, tmpColumn, value);
                 return retVal;
@@ -1043,8 +1044,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         double tmpValue;
 
         for (int index = 0; index < this.count(); index++) {
-            final int i = AccessUtils.row(index, tmpRowDim);
-            final int j = AccessUtils.column(index, tmpRowDim);
+            final int i = Structure2D.row(index, tmpRowDim);
+            final int j = Structure2D.column(index, tmpRowDim);
             tmpValue = PrimitiveFunction.ABS.invoke(data[i][j]);
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
@@ -1075,7 +1076,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public boolean isAbsolute(final long index) {
         final int tmpRowDim = data.length;
-        return PrimitiveScalar.isAbsolute(this.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
+        return PrimitiveScalar.isAbsolute(this.get(Structure2D.row(index, tmpRowDim), Structure2D.column(index, tmpRowDim)));
     }
 
     public boolean isAbsolute(final long row, final long col) {
@@ -1084,7 +1085,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public boolean isSmall(final long index, final double comparedTo) {
         final int tmpRowDim = data.length;
-        return PrimitiveScalar.isSmall(comparedTo, this.get(AccessUtils.row(index, tmpRowDim), AccessUtils.column(index, tmpRowDim)));
+        return PrimitiveScalar.isSmall(comparedTo, this.get(Structure2D.row(index, tmpRowDim), Structure2D.column(index, tmpRowDim)));
     }
 
     public boolean isSmall(final long row, final long col, final double comparedTo) {

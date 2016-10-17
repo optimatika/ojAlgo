@@ -279,7 +279,7 @@ public final class BasicList<N extends Number> implements List<N>, RandomAccess,
         return (int) myActualCount;
     }
 
-    public List<N> subList(final int fromIndex, final int toIndex) {
+    public BasicList<N> subList(final int fromIndex, final int toIndex) {
         final BasicList<N> retVal = new BasicList<>(myArrayFactory);
         if (myStorage instanceof PrimitiveArray) {
             for (int i = 0; i < toIndex; i++) {

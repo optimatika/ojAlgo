@@ -35,24 +35,24 @@ import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.keyvalue.KeyValue;
 
-abstract class AbstractSeries<K extends Comparable<K>, V extends Number, I extends AbstractSeries<K, V, I>> extends TreeMap<K, V> implements BasicSeries<K, V> {
+abstract class OldAbstractSeries<K extends Comparable<K>, V extends Number, I extends OldAbstractSeries<K, V, I>> extends TreeMap<K, V> implements BasicSeries<K, V> {
 
     private ColourData myColour = null;
     private String myName = null;
 
-    protected AbstractSeries() {
+    protected OldAbstractSeries() {
         super();
     }
 
-    protected AbstractSeries(final Comparator<? super K> comparator) {
+    protected OldAbstractSeries(final Comparator<? super K> comparator) {
         super(comparator);
     }
 
-    protected AbstractSeries(final Map<? extends K, ? extends V> map) {
+    protected OldAbstractSeries(final Map<? extends K, ? extends V> map) {
         super(map);
     }
 
-    protected AbstractSeries(final SortedMap<K, ? extends V> sortedMap) {
+    protected OldAbstractSeries(final SortedMap<K, ? extends V> sortedMap) {
         super(sortedMap);
     }
 

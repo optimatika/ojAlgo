@@ -23,6 +23,7 @@ package org.ojalgo.array;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.StructureAnyD;
 
 /**
  * AbstractArrayTest
@@ -119,10 +120,10 @@ public class ArrayStructureTest extends ArrayTests {
         final int[] tmpRef3 = new int[] { 3, 0, 1 };
         final int[] tmpRef4 = new int[] { 4, 0, 2, 1 };
 
-        TestUtils.assertEquals(1, AccessUtils.index(STRUCTURE_1D, tmpRef1));
-        TestUtils.assertEquals(2, AccessUtils.index(STRUCTURE_2D, tmpRef2));
-        TestUtils.assertEquals(15, AccessUtils.index(STRUCTURE_3D, tmpRef3));
-        TestUtils.assertEquals(104, AccessUtils.index(STRUCTURE_4D, tmpRef4));
+        TestUtils.assertEquals(1, StructureAnyD.index(STRUCTURE_1D, tmpRef1));
+        TestUtils.assertEquals(2, StructureAnyD.index(STRUCTURE_2D, tmpRef2));
+        TestUtils.assertEquals(15, StructureAnyD.index(STRUCTURE_3D, tmpRef3));
+        TestUtils.assertEquals(104, StructureAnyD.index(STRUCTURE_4D, tmpRef4));
     }
 
     public void testGetNumberOfDimensions() {
