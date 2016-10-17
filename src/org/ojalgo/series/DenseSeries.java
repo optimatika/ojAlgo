@@ -29,18 +29,18 @@ import java.util.Set;
 import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.ArrayFactory;
-import org.ojalgo.array.BasicList;
+import org.ojalgo.array.NumberList;
 
 final class DenseSeries<K extends Comparable<K>, N extends Number> extends NewAbstractSeries<K, N, DenseSeries<K, N>> {
 
-    private final BasicList<N> myDelegate;
+    private final NumberList<N> myDelegate;
 
     DenseSeries(final ArrayFactory<N> arrayFactory, final IndexMapper<K> indexMapper) {
         super(indexMapper);
-        myDelegate = new BasicList<>(arrayFactory);
+        myDelegate = new NumberList<>(arrayFactory);
     }
 
-    DenseSeries(final IndexMapper<K> indexMapper, final BasicList<N> delegate) {
+    DenseSeries(final IndexMapper<K> indexMapper, final NumberList<N> delegate) {
         super(indexMapper);
         myDelegate = delegate;
     }

@@ -35,40 +35,40 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
-public final class BasicList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Mutate1D {
+public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Mutate1D {
 
     private static long INITIAL_CAPACITY = 16L;
     private static long SEGMENT_CAPACITY = 16_384L;
 
-    public static BasicList<BigDecimal> makeBig() {
-        return new BasicList<BigDecimal>(BigArray.FACTORY);
+    public static NumberList<BigDecimal> makeBig() {
+        return new NumberList<BigDecimal>(BigArray.FACTORY);
     }
 
-    public static BasicList<ComplexNumber> makeComplexe() {
-        return new BasicList<ComplexNumber>(ComplexArray.FACTORY);
+    public static NumberList<ComplexNumber> makeComplexe() {
+        return new NumberList<ComplexNumber>(ComplexArray.FACTORY);
     }
 
-    public static BasicList<Double> makeOffHeap() {
-        return new BasicList<Double>(OffHeapArray.FACTORY);
+    public static NumberList<Double> makeOffHeap() {
+        return new NumberList<Double>(OffHeapArray.FACTORY);
     }
 
-    public static BasicList<Double> makePrimitive() {
-        return new BasicList<Double>(PrimitiveArray.FACTORY);
+    public static NumberList<Double> makePrimitive() {
+        return new NumberList<Double>(PrimitiveArray.FACTORY);
     }
 
-    public static BasicList<Quaternion> makeQuaternion() {
-        return new BasicList<Quaternion>(QuaternionArray.FACTORY);
+    public static NumberList<Quaternion> makeQuaternion() {
+        return new NumberList<Quaternion>(QuaternionArray.FACTORY);
     }
 
-    public static BasicList<RationalNumber> makeRational() {
-        return new BasicList<RationalNumber>(RationalArray.FACTORY);
+    public static NumberList<RationalNumber> makeRational() {
+        return new NumberList<RationalNumber>(RationalArray.FACTORY);
     }
 
     private long myActualCount;
     private final ArrayFactory<N> myArrayFactory;
     private BasicArray<N> myStorage;
 
-    public BasicList(final ArrayFactory<N> arrayFactory) {
+    public NumberList(final ArrayFactory<N> arrayFactory) {
 
         super();
 
@@ -78,7 +78,7 @@ public final class BasicList<N extends Number> implements List<N>, RandomAccess,
         myActualCount = 0L;
     }
 
-    BasicList(final BasicArray<N> storage, final ArrayFactory<N> arrayFactory, final long actualCount) {
+    NumberList(final BasicArray<N> storage, final ArrayFactory<N> arrayFactory, final long actualCount) {
 
         super();
 
@@ -279,8 +279,8 @@ public final class BasicList<N extends Number> implements List<N>, RandomAccess,
         return (int) myActualCount;
     }
 
-    public BasicList<N> subList(final int fromIndex, final int toIndex) {
-        final BasicList<N> retVal = new BasicList<>(myArrayFactory);
+    public NumberList<N> subList(final int fromIndex, final int toIndex) {
+        final NumberList<N> retVal = new NumberList<>(myArrayFactory);
         if (myStorage instanceof PrimitiveArray) {
             for (int i = 0; i < toIndex; i++) {
                 retVal.add(this.doubleValue(i));

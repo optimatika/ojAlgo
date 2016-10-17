@@ -282,8 +282,8 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         return this.tailMap(fromKey.longValue());
     }
 
-    public BasicList<N> values() {
-        return new BasicList<>(myStorage.getValues(), myArrayFactory, myStorage.getActualLength());
+    public NumberList<N> values() {
+        return new NumberList<>(myStorage.getValues(), myArrayFactory, myStorage.getActualLength());
     }
 
     SparseArray<N> getStorage() {
