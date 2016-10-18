@@ -35,7 +35,8 @@ import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.keyvalue.KeyValue;
 
-abstract class OldAbstractSeries<K extends Comparable<K>, V extends Number, I extends OldAbstractSeries<K, V, I>> extends TreeMap<K, V> implements BasicSeries<K, V> {
+abstract class OldAbstractSeries<K extends Comparable<? super K>, V extends Number, I extends OldAbstractSeries<K, V, I>> extends TreeMap<K, V>
+        implements BasicSeries<K, V> {
 
     private ColourData myColour = null;
     private String myName = null;

@@ -23,7 +23,7 @@ package org.ojalgo.type.keyvalue;
 
 import org.ojalgo.netio.ASCII;
 
-public final class ComparableToDouble<K extends Comparable<K>> implements KeyValue<K, Double> {
+public final class ComparableToDouble<K extends Comparable<? super K>> implements KeyValue<K, Double> {
 
     public final K key;
     public final double value;

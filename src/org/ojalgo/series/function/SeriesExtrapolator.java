@@ -31,7 +31,7 @@ import org.ojalgo.series.BasicSeries;
  * @author apete
  * @param <K>
  */
-public abstract class SeriesExtrapolator<K extends Comparable<K>> extends SeriesFunction<K> {
+public abstract class SeriesExtrapolator<K extends Comparable<? super K>> extends SeriesFunction<K> {
 
     protected SeriesExtrapolator(final BasicSeries<K, ? extends Number> data) {
         super(data);

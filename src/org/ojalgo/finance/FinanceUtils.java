@@ -507,7 +507,8 @@ public abstract class FinanceUtils {
         return retVal.get();
     }
 
-    private static <K extends Comparable<K>> void copyValues(final CalendarDateSeries<BigDecimal> series, final CalendarDate firstKey, final double[] values) {
+    private static <K extends Comparable<? super K>> void copyValues(final CalendarDateSeries<BigDecimal> series, final CalendarDate firstKey,
+            final double[] values) {
 
         CalendarDate tmpKey = firstKey;
 

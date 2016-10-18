@@ -36,7 +36,7 @@ import org.ojalgo.series.BasicSeries;
  * @author apete
  * @param <K> The series key type
  */
-public abstract class SeriesFunction<K extends Comparable<K>> {
+public abstract class SeriesFunction<K extends Comparable<? super K>> {
 
     private final Map<String, ? extends BasicSeries<K, ? extends Number>> myData;
 
