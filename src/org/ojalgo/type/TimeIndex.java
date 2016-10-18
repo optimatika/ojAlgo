@@ -1,16 +1,80 @@
 package org.ojalgo.type;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.ojalgo.access.IndexMapper;
 
-public abstract class TimeIndex<T extends Comparable<T>> {
+public abstract class TimeIndex<T extends Comparable<? super T>> {
+
+    public static final TimeIndex<Calendar> CALENDAR = new TimeIndex<Calendar>() {
+
+        @Override
+        public IndexMapper<Calendar> from(final Calendar reference) {
+            return new IndexMapper<Calendar>() {
+
+                public long toIndex(final Calendar key) {
+                    return key.getTimeInMillis() - reference.getTimeInMillis();
+                }
+
+                public Calendar toKey(final long index) {
+                    final long tmpTimeInMillis = index * +reference.getTimeInMillis();
+                    final GregorianCalendar retVal = new GregorianCalendar();
+                    retVal.setTimeInMillis(tmpTimeInMillis);
+                    return retVal;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<Calendar> from(final Calendar reference, final CalendarDateDuration resolution) {
+            return new IndexMapper<Calendar>() {
+
+                public long toIndex(final Calendar key) {
+                    return (key.getTimeInMillis() - reference.getTimeInMillis()) / resolution.toDurationInMillis();
+                }
+
+                public Calendar toKey(final long index) {
+                    final long tmpTimeInMillis = (index * resolution.toDurationInMillis()) + reference.getTimeInMillis();
+                    final GregorianCalendar retVal = new GregorianCalendar();
+                    retVal.setTimeInMillis(tmpTimeInMillis);
+                    return retVal;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<Calendar> plain() {
+            return new IndexMapper<Calendar>() {
+
+                public long toIndex(final Calendar key) {
+                    return key.getTimeInMillis();
+                }
+
+                public Calendar toKey(final long index) {
+                    final GregorianCalendar retVal = new GregorianCalendar();
+                    retVal.setTimeInMillis(index);
+                    return retVal;
+                }
+
+            };
+        }
+
+    };
 
     public static final TimeIndex<CalendarDate> CALENDAR_DATE = new TimeIndex<CalendarDate>() {
 
         @Override
-        public IndexMapper<CalendarDate> from(CalendarDate reference) {
+        public IndexMapper<CalendarDate> from(final CalendarDate reference) {
             return new IndexMapper<CalendarDate>() {
 
                 public long toIndex(final CalendarDate key) {
@@ -56,12 +120,70 @@ public abstract class TimeIndex<T extends Comparable<T>> {
 
     };
 
+    public static final TimeIndex<Date> DATE = new TimeIndex<Date>() {
+
+        @Override
+        public IndexMapper<Date> from(final Date reference) {
+            return new IndexMapper<Date>() {
+
+                public long toIndex(final Date key) {
+                    return key.getTime() - reference.getTime();
+                }
+
+                public Date toKey(final long index) {
+                    return new Date(index + reference.getTime());
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<Date> from(final Date reference, final CalendarDateDuration resolution) {
+            return new IndexMapper<Date>() {
+
+                public long toIndex(final Date key) {
+                    return (key.getTime() - reference.getTime()) / resolution.toDurationInMillis();
+                }
+
+                public Date toKey(final long index) {
+                    return new Date((index * resolution.toDurationInMillis()) + reference.getTime());
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<Date> plain() {
+            return new IndexMapper<Date>() {
+
+                public long toIndex(final Date key) {
+                    return key.getTime();
+                }
+
+                public Date toKey(final long index) {
+                    return new Date(index);
+                }
+
+            };
+        }
+
+    };
+
     public static final TimeIndex<Instant> INSTANT = new TimeIndex<Instant>() {
 
         @Override
-        public IndexMapper<Instant> from(Instant reference) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<Instant> from(final Instant reference) {
+            return new IndexMapper<Instant>() {
+
+                public long toIndex(final Instant key) {
+                    return reference.until(key, ChronoUnit.MILLIS);
+                }
+
+                public Instant toKey(final long index) {
+                    return Instant.ofEpochMilli(index + reference.toEpochMilli());
+                }
+
+            };
         }
 
         @Override
@@ -96,12 +218,186 @@ public abstract class TimeIndex<T extends Comparable<T>> {
 
     };
 
+    public static final TimeIndex<LocalDate> LOCAL_DATE = new TimeIndex<LocalDate>() {
+
+        @Override
+        public IndexMapper<LocalDate> from(final LocalDate reference) {
+            return new IndexMapper<LocalDate>() {
+
+                public long toIndex(final LocalDate key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public LocalDate toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<LocalDate> from(final LocalDate reference, final CalendarDateDuration resolution) {
+            return new IndexMapper<LocalDate>() {
+
+                public long toIndex(final LocalDate key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public LocalDate toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<LocalDate> plain() {
+            return new IndexMapper<LocalDate>() {
+
+                public long toIndex(final LocalDate key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public LocalDate toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+    };
+
+    public static final TimeIndex<LocalDateTime> LOCAL_DATE_TIME = new TimeIndex<LocalDateTime>() {
+
+        @Override
+        public IndexMapper<LocalDateTime> from(final LocalDateTime reference) {
+            return new IndexMapper<LocalDateTime>() {
+
+                public long toIndex(final LocalDateTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public LocalDateTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<LocalDateTime> from(final LocalDateTime reference, final CalendarDateDuration resolution) {
+            return new IndexMapper<LocalDateTime>() {
+
+                public long toIndex(final LocalDateTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public LocalDateTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<LocalDateTime> plain() {
+            return new IndexMapper<LocalDateTime>() {
+
+                public long toIndex(final LocalDateTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public LocalDateTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+    };
+
+    public static final TimeIndex<LocalTime> LOCAL_TIME = new TimeIndex<LocalTime>() {
+
+        @Override
+        public IndexMapper<LocalTime> from(final LocalTime reference) {
+            return new IndexMapper<LocalTime>() {
+
+                public long toIndex(final LocalTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public LocalTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<LocalTime> from(final LocalTime reference, final CalendarDateDuration resolution) {
+            return new IndexMapper<LocalTime>() {
+
+                public long toIndex(final LocalTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public LocalTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<LocalTime> plain() {
+            return new IndexMapper<LocalTime>() {
+
+                public long toIndex(final LocalTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public LocalTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+    };
+
     public static final TimeIndex<Long> LONG = new TimeIndex<Long>() {
 
         @Override
-        public IndexMapper<Long> from(Long reference) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<Long> from(final Long reference) {
+            return new IndexMapper<Long>() {
+
+                public long toIndex(final Long key) {
+                    return key - reference;
+                }
+
+                public Long toKey(final long index) {
+                    return index + reference;
+                }
+
+            };
         }
 
         @Override
@@ -129,6 +425,61 @@ public abstract class TimeIndex<T extends Comparable<T>> {
 
                 public Long toKey(final long index) {
                     return index;
+                }
+
+            };
+        }
+
+    };
+
+    public static final TimeIndex<ZonedDateTime> ZONED_DATE_TIME = new TimeIndex<ZonedDateTime>() {
+
+        @Override
+        public IndexMapper<ZonedDateTime> from(final ZonedDateTime reference) {
+            return new IndexMapper<ZonedDateTime>() {
+
+                public long toIndex(final ZonedDateTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public ZonedDateTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<ZonedDateTime> from(final ZonedDateTime reference, final CalendarDateDuration resolution) {
+            return new IndexMapper<ZonedDateTime>() {
+
+                public long toIndex(final ZonedDateTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public ZonedDateTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<ZonedDateTime> plain() {
+            return new IndexMapper<ZonedDateTime>() {
+
+                public long toIndex(final ZonedDateTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public ZonedDateTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
                 }
 
             };

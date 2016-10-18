@@ -30,7 +30,7 @@ import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.ArrayFactory;
 import org.ojalgo.array.LongToNumberMap;
 
-final class SparseSeries<K extends Comparable<K>, N extends Number> extends NewAbstractSeries<K, N, SparseSeries<K, N>> {
+final class SparseSeries<K extends Comparable<? super K>, N extends Number> extends NewAbstractSeries<K, N, SparseSeries<K, N>> {
 
     private final LongToNumberMap<N> myDelegate;
 

@@ -31,7 +31,7 @@ import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.ArrayFactory;
 import org.ojalgo.array.NumberList;
 
-final class DenseSeries<K extends Comparable<K>, N extends Number> extends NewAbstractSeries<K, N, DenseSeries<K, N>> {
+final class DenseSeries<K extends Comparable<? super K>, N extends Number> extends NewAbstractSeries<K, N, DenseSeries<K, N>> {
 
     private final NumberList<N> myDelegate;
 

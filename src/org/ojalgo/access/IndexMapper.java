@@ -21,7 +21,7 @@
  */
 package org.ojalgo.access;
 
-public interface IndexMapper<T extends Comparable<T>> {
+public interface IndexMapper<T extends Comparable<? super T>> {
 
     long toIndex(T key);
 

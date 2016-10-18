@@ -37,7 +37,7 @@ import org.ojalgo.type.CalendarDateUnit;
  *
  * @author apete
  */
-public abstract class SeriesForecaster extends SeriesFunction<CalendarDate> {
+public abstract class SeriesForecaster extends SeriesExtrapolator<CalendarDate> {
 
     private final CalendarDate myLastKey;
     private final CalendarDateUnit myResolution;

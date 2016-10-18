@@ -22,7 +22,13 @@
 package org.ojalgo.series;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.SortedMap;
 
 import org.ojalgo.array.ArrayFactory;
@@ -44,9 +50,9 @@ import org.ojalgo.type.keyvalue.KeyValue;
  *
  * @author apete
  */
-public interface BasicSeries<K extends Comparable<K>, V extends Number> extends SortedMap<K, V> {
+public interface BasicSeries<K extends Comparable<? super K>, V extends Number> extends SortedMap<K, V> {
 
-    public class Builder<K extends Comparable<K>> {
+    public class Builder<K extends Comparable<? super K>> {
 
         private transient K myReference = null;
         private transient CalendarDateDuration myResolution = null;
@@ -77,9 +83,15 @@ public interface BasicSeries<K extends Comparable<K>, V extends Number> extends 
 
     }
 
+    public static final BasicSeries.Builder<Calendar> CALENDAR = new BasicSeries.Builder<Calendar>(TimeIndex.CALENDAR);
     public static final BasicSeries.Builder<CalendarDate> CALENDAR_DATE = new BasicSeries.Builder<CalendarDate>(TimeIndex.CALENDAR_DATE);
+    public static final BasicSeries.Builder<Date> DATE = new BasicSeries.Builder<Date>(TimeIndex.DATE);
     public static final BasicSeries.Builder<Instant> INSTANT = new BasicSeries.Builder<Instant>(TimeIndex.INSTANT);
+    public static final BasicSeries.Builder<LocalDate> LOCAL_DATE = new BasicSeries.Builder<LocalDate>(TimeIndex.LOCAL_DATE);
+    public static final BasicSeries.Builder<LocalDateTime> LOCAL_DATE_TIME = new BasicSeries.Builder<LocalDateTime>(TimeIndex.LOCAL_DATE_TIME);
+    public static final BasicSeries.Builder<LocalTime> LOCAL_TIME = new BasicSeries.Builder<LocalTime>(TimeIndex.LOCAL_TIME);
     public static final BasicSeries.Builder<Long> LONG = new BasicSeries.Builder<Long>(TimeIndex.LONG);
+    public static final BasicSeries.Builder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.Builder<ZonedDateTime>(TimeIndex.ZONED_DATE_TIME);
 
     BasicSeries<K, V> colour(ColourData colour);
 
