@@ -29,6 +29,7 @@ import java.util.Set;
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.ArrayFactory;
 import org.ojalgo.array.LongToNumberMap;
+import org.ojalgo.series.primitive.PrimitiveSeries;
 
 final class SparseSeries<K extends Comparable<? super K>, N extends Number> extends NewAbstractSeries<K, N, SparseSeries<K, N>> {
 
@@ -98,6 +99,10 @@ final class SparseSeries<K extends Comparable<? super K>, N extends Number> exte
     @Override
     public N get(final Object key) {
         return myDelegate.get(indexMapper.toIndex((K) key));
+    }
+
+    public PrimitiveSeries getPrimitiveSeries() {
+        return PrimitiveSeries.wrap(myDelegate.values());
     }
 
     public K lastKey() {

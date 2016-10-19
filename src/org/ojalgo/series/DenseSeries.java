@@ -30,6 +30,7 @@ import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.ArrayFactory;
 import org.ojalgo.array.NumberList;
+import org.ojalgo.series.primitive.PrimitiveSeries;
 
 final class DenseSeries<K extends Comparable<? super K>, N extends Number> extends NewAbstractSeries<K, N, DenseSeries<K, N>> {
 
@@ -99,6 +100,10 @@ final class DenseSeries<K extends Comparable<? super K>, N extends Number> exten
     @Override
     public N get(final Object key) {
         return myDelegate.get(indexMapper.toIndex((K) key));
+    }
+
+    public PrimitiveSeries getPrimitiveSeries() {
+        return PrimitiveSeries.wrap(myDelegate);
     }
 
     public K lastKey() {

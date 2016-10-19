@@ -31,6 +31,7 @@ import java.util.UUID;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.DataSeries;
+import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.keyvalue.KeyValue;
@@ -79,6 +80,10 @@ abstract class OldAbstractSeries<K extends Comparable<? super K>, V extends Numb
             myName = UUID.randomUUID().toString();
         }
         return myName;
+    }
+
+    public PrimitiveSeries getPrimitiveSeries() {
+        return DataSeries.wrap(this.getPrimitiveValues());
     }
 
     public double[] getPrimitiveValues() {

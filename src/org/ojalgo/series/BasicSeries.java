@@ -34,6 +34,7 @@ import java.util.SortedMap;
 import org.ojalgo.array.ArrayFactory;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.primitive.DataSeries;
+import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.ColourData;
@@ -99,16 +100,26 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
 
     ColourData getColour();
 
+    /**
+     * @deprecated v41 Use {@link #getPrimitiveSeries()} instead
+     */
+    @Deprecated
     DataSeries getDataSeries();
 
     String getName();
 
+    PrimitiveSeries getPrimitiveSeries();
+
+    /**
+     * @deprecated v41 Use {@link #getPrimitiveSeries()} instead
+     */
+    @Deprecated
     double[] getPrimitiveValues();
 
     V lastValue();
 
     /**
-     * @deprecated v41
+     * @deprecated v41 Use {@link #getPrimitiveSeries()} instead
      */
     @Deprecated
     void modifyAll(UnaryFunction<V> function);
