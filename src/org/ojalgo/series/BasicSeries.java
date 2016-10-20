@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Collection;
@@ -44,8 +45,9 @@ import org.ojalgo.type.keyvalue.KeyValue;
 /**
  * A BasicSeries is a {@linkplain SortedMap} with:
  * <ul>
- * <li>Sligthly restricted type parameters</li>
- * <li>The option to set a name and colour</li>
+ * <li>Keys restricted to Comparable</li>
+ * <li>Values restricted to Number</li>
+ * <li>The option to associate a name and colour with the data</li>
  * <li>A few additional methods to help access and modify series entries</li>
  * </ul>
  *
@@ -65,8 +67,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         }
 
         public <N extends Number> BasicSeries<K, N> build(final ArrayFactory<N> arrayFactory) {
-            if ((myResolution != null) && (myReference != null)) {
-                return new DenseSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution));
+            if (myReference != null) {
+                if (myResolution != null) {
+                    return new DenseSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution));
+                } else {
+                    return new DenseSeries<>(arrayFactory, myTimeIndex.from(myReference));
+                }
             } else {
                 return new SparseSeries<>(arrayFactory, myTimeIndex.plain());
             }
@@ -92,9 +98,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     public static final BasicSeries.Builder<LocalDateTime> LOCAL_DATE_TIME = new BasicSeries.Builder<LocalDateTime>(TimeIndex.LOCAL_DATE_TIME);
     public static final BasicSeries.Builder<LocalTime> LOCAL_TIME = new BasicSeries.Builder<LocalTime>(TimeIndex.LOCAL_TIME);
     public static final BasicSeries.Builder<Long> LONG = new BasicSeries.Builder<Long>(TimeIndex.LONG);
+    public static final BasicSeries.Builder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.Builder<OffsetDateTime>(TimeIndex.OFFSET_DATE_TIME);
     public static final BasicSeries.Builder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.Builder<ZonedDateTime>(TimeIndex.ZONED_DATE_TIME);
 
     BasicSeries<K, V> colour(ColourData colour);
+
+    double doubleValue(final K key);
 
     V firstValue();
 
@@ -131,6 +140,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
      */
     K nextKey();
 
-    void putAll(Collection<? extends KeyValue<? extends K, ? extends V>> data);
+    double put(final K key, final double value);
+
+    default void putAll(final Collection<? extends KeyValue<? extends K, ? extends V>> data) {
+        for (final KeyValue<? extends K, ? extends V> tmpKeyValue : data) {
+            this.put(tmpKeyValue.getKey(), tmpKeyValue.getValue());
+        }
+    }
 
 }

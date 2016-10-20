@@ -46,6 +46,10 @@ final class DenseSeries<K extends Comparable<? super K>, N extends Number> exten
         myDelegate = delegate;
     }
 
+    public double doubleValue(final K key) {
+        return myDelegate.doubleValue(indexMapper.toIndex(key));
+    }
+
     @Override
     public Set<Map.Entry<K, N>> entrySet() {
         return new AbstractSet<Map.Entry<K, N>>() {
@@ -97,6 +101,7 @@ final class DenseSeries<K extends Comparable<? super K>, N extends Number> exten
         return indexMapper.toKey(0L);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public N get(final Object key) {
         return myDelegate.get(indexMapper.toIndex((K) key));
@@ -112,6 +117,17 @@ final class DenseSeries<K extends Comparable<? super K>, N extends Number> exten
 
     public K nextKey() {
         return indexMapper.toKey(myDelegate.count());
+    }
+
+    public double put(final K key, final double value) {
+
+        final long tmpIndex = indexMapper.toIndex(key);
+
+        final double tmpOldVal = myDelegate.doubleValue(tmpIndex);
+
+        myDelegate.set(tmpIndex, value);
+
+        return tmpOldVal;
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
@@ -425,6 +426,61 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
                 public Long toKey(final long index) {
                     return index;
+                }
+
+            };
+        }
+
+    };
+
+    public static final TimeIndex<OffsetDateTime> OFFSET_DATE_TIME = new TimeIndex<OffsetDateTime>() {
+
+        @Override
+        public IndexMapper<OffsetDateTime> from(final OffsetDateTime reference) {
+            return new IndexMapper<OffsetDateTime>() {
+
+                public long toIndex(final OffsetDateTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public OffsetDateTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<OffsetDateTime> from(final OffsetDateTime reference, final CalendarDateDuration resolution) {
+            return new IndexMapper<OffsetDateTime>() {
+
+                public long toIndex(final OffsetDateTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public OffsetDateTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+
+            };
+        }
+
+        @Override
+        public IndexMapper<OffsetDateTime> plain() {
+            return new IndexMapper<OffsetDateTime>() {
+
+                public long toIndex(final OffsetDateTime key) {
+                    // TODO Auto-generated method stub
+                    return 0;
+                }
+
+                public OffsetDateTime toKey(final long index) {
+                    // TODO Auto-generated method stub
+                    return null;
                 }
 
             };

@@ -22,7 +22,6 @@
 package org.ojalgo.series;
 
 import java.util.AbstractMap;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +32,6 @@ import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.DataSeries;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.keyvalue.KeyValue;
 
 abstract class NewAbstractSeries<K extends Comparable<? super K>, V extends Number, I extends NewAbstractSeries<K, V, I>> extends AbstractMap<K, V>
         implements BasicSeries<K, V> {
@@ -42,6 +40,7 @@ abstract class NewAbstractSeries<K extends Comparable<? super K>, V extends Numb
     private String myName = null;
     IndexMapper<K> indexMapper = null;
 
+    @SuppressWarnings("unused")
     private NewAbstractSeries() {
         this(null);
     }
@@ -51,6 +50,7 @@ abstract class NewAbstractSeries<K extends Comparable<? super K>, V extends Numb
         this.indexMapper = indexMapper;
     }
 
+    @SuppressWarnings("unchecked")
     public I colour(final ColourData colour) {
         myColour = colour;
         return (I) this;
@@ -65,6 +65,9 @@ abstract class NewAbstractSeries<K extends Comparable<? super K>, V extends Numb
     }
 
     public ColourData getColour() {
+        if (myColour == null) {
+            myColour = ColourData.random();
+        }
         return myColour;
     }
 
@@ -107,15 +110,10 @@ abstract class NewAbstractSeries<K extends Comparable<? super K>, V extends Numb
         }
     }
 
+    @SuppressWarnings("unchecked")
     public I name(final String name) {
         myName = name;
         return (I) this;
-    }
-
-    public void putAll(final Collection<? extends KeyValue<? extends K, ? extends V>> data) {
-        for (final KeyValue<? extends K, ? extends V> tmpKeyValue : data) {
-            this.put(tmpKeyValue.getKey(), tmpKeyValue.getValue());
-        }
     }
 
     public abstract I subMap(final K fromKey, final K toKey);
@@ -127,42 +125,36 @@ abstract class NewAbstractSeries<K extends Comparable<? super K>, V extends Numb
     @Override
     public String toString() {
 
-        final StringBuilder retVal = this.toStringFirstPart();
+        final StringBuilder retVal = new StringBuilder();
 
-        this.appendLastPartToString(retVal);
-
-        return retVal.toString();
-    }
-
-    private Object firstEntry() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    private Object lastEntry() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    final void appendLastPartToString(final StringBuilder builder) {
+        if (myName != null) {
+            retVal.append(myName);
+            retVal.append(ASCII.NBSP);
+        }
 
         if (myColour != null) {
-            builder.append(TypeUtils.toHexString(myColour.getRGB()));
-            builder.append(ASCII.NBSP);
+            retVal.append(TypeUtils.toHexString(myColour.getRGB()));
+            retVal.append(ASCII.NBSP);
         }
 
         if (this.size() <= 30) {
-            builder.append(super.toString());
+            retVal.append(super.toString());
         } else {
-            builder.append("First:");
-            builder.append(this.firstEntry());
-            builder.append(ASCII.NBSP);
-            builder.append("Last:");
-            builder.append(this.lastEntry());
-            builder.append(ASCII.NBSP);
-            builder.append("Size:");
-            builder.append(this.size());
+            retVal.append("First:");
+            retVal.append(this.firstKey());
+            retVal.append(ASCII.EQUALS);
+            retVal.append(this.firstValue());
+            retVal.append(ASCII.NBSP);
+            retVal.append("Last:");
+            retVal.append(this.lastKey());
+            retVal.append(ASCII.EQUALS);
+            retVal.append(this.lastValue());
+            retVal.append(ASCII.NBSP);
+            retVal.append("Size:");
+            retVal.append(this.size());
         }
+
+        return retVal.toString();
     }
 
     void setColour(final ColourData colour) {
@@ -171,18 +163,6 @@ abstract class NewAbstractSeries<K extends Comparable<? super K>, V extends Numb
 
     void setName(final String name) {
         this.name(name);
-    }
-
-    StringBuilder toStringFirstPart() {
-
-        final StringBuilder retVal = new StringBuilder();
-
-        if (myName != null) {
-            retVal.append(myName);
-            retVal.append(ASCII.NBSP);
-        }
-
-        return retVal;
     }
 
 }

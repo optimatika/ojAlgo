@@ -72,4 +72,9 @@ public class NumberSeries<N extends Number & Comparable<N>> extends OldAbstractS
         return null;
     }
 
+    public double put(final N key, final double value) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
 }

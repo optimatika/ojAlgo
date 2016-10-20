@@ -21,7 +21,6 @@
  */
 package org.ojalgo.series;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.SortedMap;
@@ -34,7 +33,6 @@ import org.ojalgo.series.primitive.DataSeries;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.keyvalue.KeyValue;
 
 abstract class OldAbstractSeries<K extends Comparable<? super K>, V extends Number, I extends OldAbstractSeries<K, V, I>> extends TreeMap<K, V>
         implements BasicSeries<K, V> {
@@ -114,10 +112,8 @@ abstract class OldAbstractSeries<K extends Comparable<? super K>, V extends Numb
         return (I) this;
     }
 
-    public void putAll(final Collection<? extends KeyValue<? extends K, ? extends V>> data) {
-        for (final KeyValue<? extends K, ? extends V> tmpKeyValue : data) {
-            this.put(tmpKeyValue.getKey(), tmpKeyValue.getValue());
-        }
+    public final double doubleValue(final K key) {
+        return this.get(key).doubleValue();
     }
 
     @Override

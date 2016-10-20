@@ -162,6 +162,11 @@ public class CalendarDateSeries<V extends Number> extends OldAbstractSeries<Cale
         return super.put(CalendarDate.make(key, myResolution), value);
     }
 
+    public double put(final CalendarDate key, final double value) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
     @Override
     public V put(final CalendarDate key, final V value) {
         return super.put(key.filter(myResolution), value);

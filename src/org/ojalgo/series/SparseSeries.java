@@ -45,6 +45,10 @@ final class SparseSeries<K extends Comparable<? super K>, N extends Number> exte
         myDelegate = delegate;
     }
 
+    public double doubleValue(final K key) {
+        return myDelegate.doubleValue(indexMapper.toIndex(key));
+    }
+
     @Override
     public Set<Map.Entry<K, N>> entrySet() {
         return new AbstractSet<Map.Entry<K, N>>() {
@@ -96,6 +100,7 @@ final class SparseSeries<K extends Comparable<? super K>, N extends Number> exte
         return indexMapper.toKey(myDelegate.firstKey());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public N get(final Object key) {
         return myDelegate.get(indexMapper.toIndex((K) key));
@@ -111,6 +116,13 @@ final class SparseSeries<K extends Comparable<? super K>, N extends Number> exte
 
     public K nextKey() {
         return indexMapper.toKey(myDelegate.lastKey() + 1L);
+    }
+
+    public double put(final K key, final double value) {
+
+        final long tmpIndex = indexMapper.toIndex(key);
+
+        return myDelegate.put(tmpIndex, value);
     }
 
     @Override
