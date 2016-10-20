@@ -350,32 +350,71 @@ public final class SampleSet implements Access1D<Double> {
         final int tmpSize = (int) this.getSamples().count();
         final double[] tmpSortedCopy = this.getSortedCopy();
 
-        final int n = tmpSize / 4;
-        final int r = tmpSize % 4;
+        switch (tmpSize) {
 
-        switch (r) {
+        case 0:
+
+            myQuartile1 = 0.0;
+            myMedian = 0.0;
+            myQuartile3 = 0.0;
+
+            break;
 
         case 1:
 
-            myQuartile1 = (0.25 * tmpSortedCopy[n - 1]) + (0.75 * tmpSortedCopy[n]);
-            myMedian = tmpSortedCopy[2 * n];
-            myQuartile3 = (0.75 * tmpSortedCopy[3 * n]) + (0.25 * tmpSortedCopy[(3 * n) + 1]);
+            myQuartile1 = tmpSortedCopy[0];
+            myMedian = tmpSortedCopy[0];
+            myQuartile3 = tmpSortedCopy[0];
+
+            break;
+
+        case 2:
+
+            myQuartile1 = tmpSortedCopy[0];
+            myMedian = (tmpSortedCopy[0] + tmpSortedCopy[1]) / 2.0;
+            myQuartile3 = tmpSortedCopy[1];
 
             break;
 
         case 3:
 
-            myQuartile1 = (0.75 * tmpSortedCopy[n]) + (0.25 * tmpSortedCopy[n + 1]);
-            myMedian = tmpSortedCopy[(2 * n) + 1];
-            myQuartile3 = (0.25 * tmpSortedCopy[(3 * n) + 1]) + (0.75 * tmpSortedCopy[(3 * n) + 2]);
+            myQuartile1 = tmpSortedCopy[0];
+            myMedian = tmpSortedCopy[1];
+            myQuartile3 = tmpSortedCopy[2];
 
             break;
 
         default:
 
-            myQuartile1 = tmpSortedCopy[n];
-            myMedian = (0.5 * tmpSortedCopy[2 * n]) + (0.5 * tmpSortedCopy[(2 * n) + 1]);
-            myQuartile3 = tmpSortedCopy[(3 * n) + 1];
+            final int n = tmpSize / 4;
+            final int r = tmpSize % 4;
+
+            switch (r) {
+
+            case 1:
+
+                myQuartile1 = (0.25 * tmpSortedCopy[n - 1]) + (0.75 * tmpSortedCopy[n]);
+                myMedian = tmpSortedCopy[2 * n];
+                myQuartile3 = (0.75 * tmpSortedCopy[3 * n]) + (0.25 * tmpSortedCopy[(3 * n) + 1]);
+
+                break;
+
+            case 3:
+
+                myQuartile1 = (0.75 * tmpSortedCopy[n]) + (0.25 * tmpSortedCopy[n + 1]);
+                myMedian = tmpSortedCopy[(2 * n) + 1];
+                myQuartile3 = (0.25 * tmpSortedCopy[(3 * n) + 1]) + (0.75 * tmpSortedCopy[(3 * n) + 2]);
+
+                break;
+
+            default:
+
+                myQuartile1 = tmpSortedCopy[n];
+                myMedian = (0.5 * tmpSortedCopy[2 * n]) + (0.5 * tmpSortedCopy[(2 * n) + 1]);
+                myQuartile3 = tmpSortedCopy[(3 * n) + 1];
+
+                break;
+            }
 
             break;
         }
