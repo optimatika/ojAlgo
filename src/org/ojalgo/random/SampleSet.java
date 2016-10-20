@@ -24,6 +24,7 @@ package org.ojalgo.random;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
@@ -49,8 +50,8 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     private transient double myMean = Double.NaN;
-    private transient double myMedian = Double.NaN;
     private transient double myQuartile1 = Double.NaN;
+    private transient double myQuartile2 = Double.NaN;
     private transient double myQuartile3 = Double.NaN;
     private Access1D<?> mySamples;
     private transient double[] mySortedCopy = null;
@@ -185,12 +186,7 @@ public final class SampleSet implements Access1D<Double> {
      * Potentially expensive as it requires copying and sorting of the samples.
      */
     public double getMedian() {
-
-        if (Double.isNaN(myMedian)) {
-            this.calculateQuartiles();
-        }
-
-        return myMedian;
+        return this.getQuartile2();
     }
 
     /**
@@ -224,7 +220,12 @@ public final class SampleSet implements Access1D<Double> {
      * Potentially expensive as it requires copying and sorting of the samples.
      */
     public double getQuartile2() {
-        return this.getMedian();
+
+        if (Double.isNaN(myQuartile2)) {
+            this.calculateQuartiles();
+        }
+
+        return myQuartile2;
     }
 
     /**
@@ -319,7 +320,7 @@ public final class SampleSet implements Access1D<Double> {
         myVariance = Double.NaN;
 
         myQuartile1 = Double.NaN;
-        myMedian = Double.NaN;
+        myQuartile2 = Double.NaN;
         myQuartile3 = Double.NaN;
 
         if (mySortedCopy != null) {
@@ -335,14 +336,15 @@ public final class SampleSet implements Access1D<Double> {
      * Replace the underlying samples and reset the sample set.
      */
     public void swap(final Access1D<?> samples) {
+        Objects.requireNonNull(samples);
         mySamples = samples;
         this.reset();
     }
 
     @Override
     public String toString() {
-        return "Sample set Size=" + this.count() + ", Mean=" + this.getMean() + ", Median=" + this.getMedian() + ", Var=" + this.getVariance() + ", StdDev="
-                + this.getStandardDeviation() + ", Min=" + this.getMinimum() + ", Max=" + this.getMaximum();
+        return "Sample set Size=" + this.count() + ", Mean=" + this.getMean() + ", Var=" + this.getVariance() + ", StdDev=" + this.getStandardDeviation()
+                + ", Min=" + this.getMinimum() + ", Max=" + this.getMaximum();
     }
 
     private void calculateQuartiles() {
@@ -355,7 +357,7 @@ public final class SampleSet implements Access1D<Double> {
         case 0:
 
             myQuartile1 = 0.0;
-            myMedian = 0.0;
+            myQuartile2 = 0.0;
             myQuartile3 = 0.0;
 
             break;
@@ -363,24 +365,8 @@ public final class SampleSet implements Access1D<Double> {
         case 1:
 
             myQuartile1 = tmpSortedCopy[0];
-            myMedian = tmpSortedCopy[0];
+            myQuartile2 = tmpSortedCopy[0];
             myQuartile3 = tmpSortedCopy[0];
-
-            break;
-
-        case 2:
-
-            myQuartile1 = tmpSortedCopy[0];
-            myMedian = (tmpSortedCopy[0] + tmpSortedCopy[1]) / 2.0;
-            myQuartile3 = tmpSortedCopy[1];
-
-            break;
-
-        case 3:
-
-            myQuartile1 = tmpSortedCopy[0];
-            myMedian = tmpSortedCopy[1];
-            myQuartile3 = tmpSortedCopy[2];
 
             break;
 
@@ -394,7 +380,7 @@ public final class SampleSet implements Access1D<Double> {
             case 1:
 
                 myQuartile1 = (0.25 * tmpSortedCopy[n - 1]) + (0.75 * tmpSortedCopy[n]);
-                myMedian = tmpSortedCopy[2 * n];
+                myQuartile2 = tmpSortedCopy[2 * n];
                 myQuartile3 = (0.75 * tmpSortedCopy[3 * n]) + (0.25 * tmpSortedCopy[(3 * n) + 1]);
 
                 break;
@@ -402,7 +388,7 @@ public final class SampleSet implements Access1D<Double> {
             case 3:
 
                 myQuartile1 = (0.75 * tmpSortedCopy[n]) + (0.25 * tmpSortedCopy[n + 1]);
-                myMedian = tmpSortedCopy[(2 * n) + 1];
+                myQuartile2 = tmpSortedCopy[(2 * n) + 1];
                 myQuartile3 = (0.25 * tmpSortedCopy[(3 * n) + 1]) + (0.75 * tmpSortedCopy[(3 * n) + 2]);
 
                 break;
@@ -410,7 +396,7 @@ public final class SampleSet implements Access1D<Double> {
             default:
 
                 myQuartile1 = tmpSortedCopy[n];
-                myMedian = (0.5 * tmpSortedCopy[2 * n]) + (0.5 * tmpSortedCopy[(2 * n) + 1]);
+                myQuartile2 = (0.5 * tmpSortedCopy[2 * n]) + (0.5 * tmpSortedCopy[(2 * n) + 1]);
                 myQuartile3 = tmpSortedCopy[(3 * n) + 1];
 
                 break;

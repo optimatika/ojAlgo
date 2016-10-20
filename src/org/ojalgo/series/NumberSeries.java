@@ -73,8 +73,13 @@ public class NumberSeries<N extends Number & Comparable<N>> extends OldAbstractS
     }
 
     public double put(final N key, final double value) {
-        // TODO Auto-generated method stub
-        return 0;
+        Double tmpValue = value;
+        N tmpOldValue = super.put(key, (N) tmpValue);
+        if (tmpOldValue != null) {
+            return tmpOldValue.doubleValue();
+        } else {
+            return Double.NaN;
+        }
     }
 
 }

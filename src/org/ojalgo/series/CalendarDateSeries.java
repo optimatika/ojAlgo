@@ -162,9 +162,20 @@ public class CalendarDateSeries<V extends Number> extends OldAbstractSeries<Cale
         return super.put(CalendarDate.make(key, myResolution), value);
     }
 
+    /**
+     * Will only work if values are types as Double.
+     *
+     * @see org.ojalgo.series.BasicSeries#put(java.lang.Comparable, double)
+     */
+    @SuppressWarnings("unchecked")
     public double put(final CalendarDate key, final double value) {
-        // TODO Auto-generated method stub
-        return 0;
+        Double tmpValue = value;
+        V tmpOldValue = super.put(key.filter(myResolution), (V) tmpValue);
+        if (tmpOldValue != null) {
+            return tmpOldValue.doubleValue();
+        } else {
+            return Double.NaN;
+        }
     }
 
     @Override
