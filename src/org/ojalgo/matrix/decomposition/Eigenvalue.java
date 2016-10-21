@@ -47,6 +47,9 @@ import org.ojalgo.scalar.ComplexNumber;
  * always possible to calculate [V]<sup>-1</sup>. (Check the rank and/or the condition number of [V] to
  * determine the validity of [V][D][V]<sup>-1</sup>.)
  * </p>
+ * <p>
+ * The eigenvalues (and their corresponding eigenvectors) of a non-symmetric matrix could be complex.
+ * </p>
  *
  * @author apete
  */
