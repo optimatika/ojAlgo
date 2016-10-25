@@ -385,6 +385,14 @@ public final class SampleSet implements Access1D<Double> {
 
                 break;
 
+            case 2:
+
+                myQuartile1 = tmpSortedCopy[n];
+                myQuartile2 = (0.5 * tmpSortedCopy[2 * n]) + (0.5 * tmpSortedCopy[(2 * n) + 1]);
+                myQuartile3 = tmpSortedCopy[(3 * n) + 1];
+
+                break;
+
             case 3:
 
                 myQuartile1 = (0.75 * tmpSortedCopy[n]) + (0.25 * tmpSortedCopy[n + 1]);
@@ -395,9 +403,9 @@ public final class SampleSet implements Access1D<Double> {
 
             default:
 
-                myQuartile1 = tmpSortedCopy[n];
-                myQuartile2 = (0.5 * tmpSortedCopy[2 * n]) + (0.5 * tmpSortedCopy[(2 * n) + 1]);
-                myQuartile3 = tmpSortedCopy[(3 * n) + 1];
+                myQuartile1 = (0.5 * tmpSortedCopy[n - 1]) + (0.5 * tmpSortedCopy[n]);
+                myQuartile2 = (0.5 * tmpSortedCopy[(2 * n) - 1]) + (0.5 * tmpSortedCopy[2 * n]);
+                myQuartile3 = (0.5 * tmpSortedCopy[(3 * n) - 1]) + (0.5 * tmpSortedCopy[3 * n]);
 
                 break;
             }

@@ -61,4 +61,81 @@ public class SampleSetTest extends RandomTests {
 
     }
 
+    public void testQuartileSize0() {
+
+        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { });
+        final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+
+        TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile1());
+        TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile2());
+        TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile3());
+
+    }
+
+    public void testQuartileSize1() {
+
+        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0 });
+        final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+
+        TestUtils.assertEquals(100.0, tmpSampleSet.getQuartile1());
+        TestUtils.assertEquals(100.0, tmpSampleSet.getQuartile2());
+        TestUtils.assertEquals(100.0, tmpSampleSet.getQuartile3());
+
+    }
+
+    public void testQuartileSize2() {
+
+        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0, 200.0 });
+        final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+
+        TestUtils.assertEquals(100.0, tmpSampleSet.getQuartile1());
+        TestUtils.assertEquals(150.0, tmpSampleSet.getQuartile2());
+        TestUtils.assertEquals(200.0, tmpSampleSet.getQuartile3());
+
+    }
+
+    public void testQuartileSize3() {
+
+        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0, 200.0, 300.0 });
+        final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+
+        TestUtils.assertEquals(125.0, tmpSampleSet.getQuartile1());
+        TestUtils.assertEquals(200.0, tmpSampleSet.getQuartile2());
+        TestUtils.assertEquals(275.0, tmpSampleSet.getQuartile3());
+
+    }
+
+    public void testQuartileSize4() {
+
+        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0, 200.0, 300.0, 400.0 });
+        final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+
+        TestUtils.assertEquals(150.0, tmpSampleSet.getQuartile1());
+        TestUtils.assertEquals(250.0, tmpSampleSet.getQuartile2());
+        TestUtils.assertEquals(350.0, tmpSampleSet.getQuartile3());
+
+    }
+
+    public void testQuartileSize6() {
+
+        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0, 200.0, 300.0, 400.0, 500.0, 600.0 });
+        final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+
+        TestUtils.assertEquals(200.0, tmpSampleSet.getQuartile1());
+        TestUtils.assertEquals(350.0, tmpSampleSet.getQuartile2());
+        TestUtils.assertEquals(500.0, tmpSampleSet.getQuartile3());
+
+    }
+
+    public void testQuartileSize8() {
+
+        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0 });
+        final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+
+        TestUtils.assertEquals(250.0, tmpSampleSet.getQuartile1());
+        TestUtils.assertEquals(450.0, tmpSampleSet.getQuartile2());
+        TestUtils.assertEquals(650.0, tmpSampleSet.getQuartile3());
+
+    }
+
 }
