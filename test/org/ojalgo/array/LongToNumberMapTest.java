@@ -30,13 +30,13 @@ import org.ojalgo.TestUtils;
  *
  * @author apete
  */
-public class BasicMapTest extends ArrayTests {
+public class LongToNumberMapTest extends ArrayTests {
 
-    public BasicMapTest() {
+    public LongToNumberMapTest() {
         super();
     }
 
-    public BasicMapTest(final String aName) {
+    public LongToNumberMapTest(final String aName) {
         super(aName);
     }
 

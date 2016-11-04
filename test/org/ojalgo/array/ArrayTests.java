@@ -41,7 +41,7 @@ public abstract class ArrayTests extends FunctionalityTest {
         suite.addTestSuite(AggregatorCardinality.class);
         suite.addTestSuite(AggregatorProduct.class);
         suite.addTestSuite(AggregatorSum.class);
-        suite.addTestSuite(BasicMapTest.class);
+        suite.addTestSuite(LongToNumberMapTest.class);
         suite.addTestSuite(ArrayStructureTest.class);
         suite.addTestSuite(BufferArrayTest.class);
         suite.addTestSuite(SegmentedArrayTest.class);

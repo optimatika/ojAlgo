@@ -248,7 +248,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             retVal.set(i, ComplexNumber.of(tmpRe[i], tmpIm[i]));
         }
 
-        retVal.sortDescending();
+        // retVal.sortDescending();
 
         return retVal;
     }

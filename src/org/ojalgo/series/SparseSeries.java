@@ -103,7 +103,11 @@ final class SparseSeries<K extends Comparable<? super K>, N extends Number> exte
     @SuppressWarnings("unchecked")
     @Override
     public N get(final Object key) {
-        return myDelegate.get(indexMapper.toIndex((K) key));
+        if (key instanceof Comparable<?>) {
+            return myDelegate.get(indexMapper.toIndex((K) key));
+        } else {
+            return null;
+        }
     }
 
     public PrimitiveSeries getPrimitiveSeries() {

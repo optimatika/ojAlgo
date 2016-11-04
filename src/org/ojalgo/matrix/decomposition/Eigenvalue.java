@@ -28,6 +28,7 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -119,6 +120,35 @@ public interface Eigenvalue<N extends Number>
     }
 
     /**
+     * @deprecated With Java 9 this will be made private. Use {@link #getEigenvectors()} or
+     *             {@link #getEigenvector(int)} instead.
+     */
+    @Deprecated
+    default void copyEigenvector(final int index, final Array1D<ComplexNumber> destination) {
+
+        final MatrixStore<N> tmpV = this.getV();
+        final MatrixStore<N> tmpD = this.getD();
+        final long tmpDimension = tmpD.countColumns();
+
+        final int prevCol = index - 1;
+        final int nextCol = index + 1;
+
+        if ((index < (tmpDimension - 1L)) && (tmpD.doubleValue(nextCol, index) != 0.0)) {
+            for (int i = 0; i < tmpDimension; i++) {
+                destination.set(i, ComplexNumber.of(tmpV.doubleValue(i, index), tmpV.doubleValue(i, nextCol)));
+            }
+        } else if ((index > 0) && (tmpD.doubleValue(prevCol, index) != 0.0)) {
+            for (int i = 0; i < tmpDimension; i++) {
+                destination.set(i, ComplexNumber.of(tmpV.doubleValue(i, prevCol), -tmpV.doubleValue(i, index)));
+            }
+        } else {
+            for (int i = 0; i < tmpDimension; i++) {
+                destination.set(i, tmpV.doubleValue(i, index));
+            }
+        }
+    }
+
+    /**
      * The only requirements on [D] are that it should contain the eigenvalues and that [A][V] = [V][D]. The
      * ordering of the eigenvalues is not specified.
      * <ul>
@@ -134,16 +164,50 @@ public interface Eigenvalue<N extends Number>
 
     /**
      * <p>
-     * Even for real matrices the eigenvalues are potentially complex numbers. Typically they need to be
-     * expressed as complex numbers when [A] is not symmetric.
+     * Even for real matrices the eigenvalues (and eigenvectors) are potentially complex numbers. Typically
+     * they need to be expressed as complex numbers when [A] is not symmetric.
      * </p>
      * <p>
-     * The eigenvalues in this array should always be ordered in descending order - largest (modulus) first.
+     * Prior to v41 this array should always be ordered in descending order - largest (modulus) first. As of
+     * v41 the values should be in the same order as the matrices "V" and "D", and if that is ordered or not
+     * is indicated by the {@link #isOrdered()} method.
      * </p>
      *
-     * @return The eigenvalues in an ordered array.
+     * @return The eigenvalues.
      */
     Array1D<ComplexNumber> getEigenvalues();
+
+    /**
+     * @param index Index corresponding to an entry in {@link #getEigenvalues()} and/or a column in
+     *        {@link #getEigenvectors()}.
+     * @return One eigenvector
+     */
+    default MatrixStore<ComplexNumber> getEigenvector(final int index) {
+
+        final long tmpDimension = this.getV().countColumns();
+
+        final ComplexDenseStore retVal = ComplexDenseStore.FACTORY.makeZero(tmpDimension, 1L);
+
+        this.copyEigenvector(index, retVal.sliceColumn(0, index));
+
+        return retVal;
+    }
+
+    /**
+     * @return A complex valued alternative to {@link #getV()}.
+     */
+    default MatrixStore<ComplexNumber> getEigenvectors() {
+
+        final long tmpDimension = this.getV().countColumns();
+
+        final ComplexDenseStore retVal = ComplexDenseStore.FACTORY.makeZero(tmpDimension, tmpDimension);
+
+        for (int j = 0; j < tmpDimension; j++) {
+            this.copyEigenvector(j, retVal.sliceColumn(0, j));
+        }
+
+        return retVal;
+    }
 
     /**
      * A matrix' trace is the sum of the diagonal elements. It is also the sum of the eigenvalues. This method
