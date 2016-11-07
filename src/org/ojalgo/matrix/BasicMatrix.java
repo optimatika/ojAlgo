@@ -73,8 +73,8 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     }
 
     /**
-     * @param row The row index of where to superimpose the top left element of aMtrx
-     * @param col The column index of where to superimpose the top left element of aMtrx
+     * @param row The row index of where to superimpose the top left element of the addend
+     * @param col The column index of where to superimpose the top left element of the addend
      * @param addend A matrix to superimpose
      * @return A new matrix
      */
