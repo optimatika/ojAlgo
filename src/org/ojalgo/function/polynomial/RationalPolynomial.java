@@ -65,7 +65,7 @@ public class RationalPolynomial extends AbstractPolynomial<RationalNumber> {
 
         final QR<BigDecimal> tmpQR = QR.BIG.make();
         tmpQR.decompose(tmpBody);
-        this.set(tmpQR.solve(tmpRHS));
+        this.set(tmpQR.getSolution(tmpRHS));
     }
 
     public RationalNumber integrate(final RationalNumber fromPoint, final RationalNumber toPoint) {

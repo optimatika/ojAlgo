@@ -298,7 +298,7 @@ public final class GaussianField<K extends Comparable<? super K>> {
     }
 
     MatrixStore<Double> getRegressionCoefficients(final K[] args) {
-        return this.getC22().solve(this.getC21(args)).logical().transpose().get();
+        return this.getC22().getSolution(this.getC21(args)).logical().transpose().get();
     }
 
 }

@@ -67,7 +67,7 @@ public class P20050125Case extends BasicMatrixTest {
         final Cholesky<BigDecimal> tmpDelegate = Cholesky.BIG.make();
         tmpDelegate.decompose(myBigAA.toBigStore());
 
-        final MatrixStore<BigDecimal> tmpInv = tmpDelegate.solve(myBigI.toBigStore());
+        final MatrixStore<BigDecimal> tmpInv = tmpDelegate.getSolution(myBigI.toBigStore());
 
         final MatrixStore<BigDecimal> tmpExpMtrx = myBigI.toBigStore();
         final MatrixStore<BigDecimal> tmpActMtrx = myBigAA.toBigStore().multiply(tmpInv);

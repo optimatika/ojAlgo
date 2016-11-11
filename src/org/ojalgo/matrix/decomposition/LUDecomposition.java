@@ -220,7 +220,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
-            return this.solve(this.wrap(rhs));
+            return this.getSolution(this.wrap(rhs));
         } else {
             throw TaskException.newNotSolvable();
         }
@@ -231,14 +231,14 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
-            return this.solve(rhs, preallocated);
+            return this.getSolution(this.wrap(rhs), preallocated);
         } else {
             throw TaskException.newNotSolvable();
         }
     }
 
-    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
-        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
+        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     /**
@@ -258,7 +258,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
      * @return [X] The solution will be written to "preallocated" and then returned.
      */
     @Override
-    public MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
 
         //preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
         preallocated.fillMatching(rhs.get().logical().row(myPivot.getOrder()).get());

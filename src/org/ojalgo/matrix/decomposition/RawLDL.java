@@ -145,24 +145,21 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         this.doDecompose(retVal, body);
 
         if (this.isSolvable()) {
-            return this.solve(rhs, preallocated);
+
+            return this.doSolve(MatrixStore.PRIMITIVE.makeWrapper(rhs), preallocated);
         } else {
             throw TaskException.newNotSolvable();
         }
     }
 
-    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
         final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
-        return this.solve(rhs, tmpPreallocated);
+        return this.getSolution(rhs, tmpPreallocated);
     }
 
     @Override
-    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
-    }
-
-    public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doSolve(rhs, (PrimitiveDenseStore) preallocated);
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.doSolve(rhs, preallocated);
     }
 
     private boolean doDecompose(final double[][] data, final Access2D<?> input) {
@@ -211,7 +208,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return preallocated;
     }
 
-    private MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final PrimitiveDenseStore preallocated) {
+    private MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
 
         rhs.supplyTo(preallocated);
 

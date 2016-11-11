@@ -162,6 +162,13 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
     }
 
     @Override
+    protected final void exchange(final int indexA, final int indexB) {
+        final N tmpVal = this.get(indexA);
+        this.set(indexA, this.get(indexB));
+        this.set(indexB, tmpVal);
+    }
+
+    @Override
     protected final void exchange(final int firstA, final int firstB, final int step, final int count) {
         ReferenceTypeArray.exchange(data, firstA, firstB, step, count);
     }

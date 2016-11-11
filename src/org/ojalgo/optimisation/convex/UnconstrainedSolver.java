@@ -73,13 +73,13 @@ final class UnconstrainedSolver extends ConvexSolver {
         if (tmpSolvable = myCholesky.isSolvable()) {
             // Q is SPD
 
-            myCholesky.solve(tmpC, tmpX);
+            myCholesky.getSolution(tmpC, tmpX);
 
         } else if (tmpSolvable = myLU.compute(tmpQ)) {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
 
-            myLU.solve(tmpC, tmpX);
+            myLU.getSolution(tmpC, tmpX);
         }
 
         if (!tmpSolvable && this.isDebug()) {

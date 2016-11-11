@@ -88,16 +88,16 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         this.fill(0, this.size(), 1, supplier);
     }
 
+    public final void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
+        this.fillOne((int) index, values, valueIndex);
+    }
+
     public void fillOne(final long index, final N value) {
         this.fillOne((int) index, value);
     }
 
     public void fillOne(final long index, final NullaryFunction<N> supplier) {
         this.fillOne((int) index, supplier);
-    }
-
-    public final void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
-        this.fillOne((int) index, values, valueIndex);
     }
 
     public final void fillRange(final long first, final long limit, final N number) {
@@ -159,7 +159,14 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     protected abstract double doubleValue(final int index);
 
+    protected abstract void exchange(int indexA, int indexB);
+
     protected abstract void exchange(int firstA, int firstB, int step, int count);
+
+    @Override
+    protected void exchange(final long indexA, final long indexB) {
+        this.exchange((int) indexA, (int) indexB);
+    }
 
     @Override
     protected final void exchange(final long firstA, final long firstB, final long step, final long count) {
@@ -186,11 +193,11 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         this.fill((int) first, (int) limit, (int) step, supplier);
     }
 
+    protected abstract void fillOne(final int index, final Access1D<?> values, final long valueIndex);
+
     protected abstract void fillOne(int index, N value);
 
     protected abstract void fillOne(int index, NullaryFunction<N> supplier);
-
-    protected abstract void fillOne(final int index, final Access1D<?> values, final long valueIndex);
 
     protected abstract N get(final int index);
 

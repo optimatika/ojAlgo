@@ -178,7 +178,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
         TestUtils.assertEquals(tmpA, tmpDecomp, new NumberContext(7, 6));
 
-        final MatrixStore<Double> tmpExpected = tmpDecomp.solve(tmpI);
+        final MatrixStore<Double> tmpExpected = tmpDecomp.getSolution(tmpI);
 
         tmpDecomp.decompose(tmpA);
         final MatrixStore<Double> tmpActual = tmpDecomp.getInverse();
@@ -253,7 +253,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             }
             TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), new NumberContext(8, 5));
             if ((tmpDecomposition instanceof MatrixDecomposition.Solver<?>) && ((Solver) tmpDecomposition).isSolvable()) {
-                tmpActual = ((Solver) tmpDecomposition).solve(tmpHermitian);
+                tmpActual = ((Solver) tmpDecomposition).getSolution(tmpHermitian);
                 if (MatrixDecompositionTests.DEBUG) {
                     BasicLogger.debug("Actual", tmpActual);
                 }
@@ -288,7 +288,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             }
             TestUtils.assertEquals(tmpDecomposition.toString(), tmpTall, tmpDecomposition.reconstruct(), new NumberContext(7, 5));
             if ((tmpDecomposition instanceof MatrixDecomposition.Solver<?>) && ((Solver) tmpDecomposition).isSolvable()) {
-                tmpActual = ((Solver) tmpDecomposition).solve(tmpTall);
+                tmpActual = ((Solver) tmpDecomposition).getSolution(tmpTall);
                 if (MatrixDecompositionTests.DEBUG) {
                     BasicLogger.debug("Actual", tmpActual);
                 }

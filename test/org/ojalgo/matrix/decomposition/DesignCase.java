@@ -79,7 +79,7 @@ public class DesignCase extends MatrixDecompositionTests {
         tmpQR.setFullSize(false);
         tmpQR.decompose(tmpA);
 
-        final PhysicalStore<Double> tmpX = tmpQR.solve(tmpB).copy();
+        final PhysicalStore<Double> tmpX = tmpQR.getSolution(tmpB).copy();
 
         // BasicLogger.debug("Straigt X: " + tmpX.toString());
         tmpB.modifyMatching(PrimitiveFunction.SUBTRACT, tmpA.multiply(tmpX));
@@ -188,7 +188,7 @@ public class DesignCase extends MatrixDecompositionTests {
         final PhysicalStore<Double> tmpEye = PrimitiveDenseStore.FACTORY.makeEye(tmpMinDim, tmpMinDim);
 
         final MatrixStore<Double> tmpDirInv = aDecomp.getInverse();
-        final MatrixStore<Double> tmpSolInv = aDecomp.solve(tmpEye);
+        final MatrixStore<Double> tmpSolInv = aDecomp.getSolution(tmpEye);
 
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Direct Inverse", tmpDirInv);

@@ -79,12 +79,12 @@ abstract class DirectASS extends ActiveSetSolver {
             if (tmpIterA.countRows() == 0L) {
                 // Unconstrained - can happen when PureASS and all inequalities are inactive
 
-                myCholesky.solve(tmpIterC, tmpIterX);
+                myCholesky.getSolution(tmpIterC, tmpIterX);
 
             } else {
                 // Actual/normal optimisation problem
 
-                final MatrixStore<Double> tmpInvQAT = myCholesky.solve(tmpIterA.transpose());
+                final MatrixStore<Double> tmpInvQAT = myCholesky.getSolution(tmpIterA.transpose());
                 // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
                 // BasicLogger.debug("tmpInvQAT", tmpInvQAT);
 
@@ -106,7 +106,7 @@ abstract class DirectASS extends ActiveSetSolver {
 
                     //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
                     //myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
-                    myLU.solve(myInvQC.premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
+                    myLU.getSolution(myInvQC.premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
 
                     //BasicLogger.debug("L", tmpIterL);
 
@@ -115,7 +115,7 @@ abstract class DirectASS extends ActiveSetSolver {
                     }
 
                     //myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
-                    myCholesky.solve(tmpIterL.premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
+                    myCholesky.getSolution(tmpIterL.premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
                 }
             }
         }
@@ -124,7 +124,7 @@ abstract class DirectASS extends ActiveSetSolver {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = myLU.solve(this.getIterationRHS(tmpIncluded));
+            final MatrixStore<Double> tmpXL = myLU.getSolution(this.getIterationRHS(tmpIncluded));
             tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), (int) tmpXL.countColumns()).get());
             tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
         }
@@ -177,7 +177,7 @@ abstract class DirectASS extends ActiveSetSolver {
             this.debug("Redundant contraints!");
         }
 
-        myInvQC = myCholesky.solve(this.getIterationC());
+        myInvQC = myCholesky.getSolution(this.getIterationC());
     }
 
 }

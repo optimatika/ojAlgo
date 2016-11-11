@@ -119,7 +119,8 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
             //BasicLogger.logDebug("Loop l=" + l, tmpMainDiagonal, tmpOffDiagonal);
 
             // Find small subdiagonal element
-            tmpMagnitude = PrimitiveFunction.MAX.invoke(tmpMagnitude, PrimitiveFunction.ABS.invoke(tmpMainDiagData[l]) + PrimitiveFunction.ABS.invoke(tmpOffDiagData[l]));
+            tmpMagnitude = PrimitiveFunction.MAX.invoke(tmpMagnitude,
+                    PrimitiveFunction.ABS.invoke(tmpMainDiagData[l]) + PrimitiveFunction.ABS.invoke(tmpOffDiagData[l]));
             tmpLocalEpsilon = EPSILON * tmpMagnitude;
 
             m = l;
@@ -380,7 +381,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
-            return this.solve(this.wrap(rhs));
+            return this.getSolution(this.wrap(rhs));
         } else {
             throw TaskException.newNotSolvable();
         }
@@ -391,17 +392,17 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
-            return this.solve(rhs, preallocated);
+            return this.getSolution(this.wrap(rhs), preallocated);
         } else {
             throw TaskException.newNotSolvable();
         }
     }
 
-    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
         return this.getInverse().multiply(rhs.get());
     }
 
-    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
         preallocated.fillByMultiplying(this.getInverse(), rhs.get());
         return preallocated;
     }
@@ -437,7 +438,8 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
             for (int ij2exp = ij1 + 1; ij2exp < tmpDim; ij2exp++) {
                 final double tmpValue2exp = tmpDiagonal.doubleValue(ij2exp);
 
-                if ((PrimitiveFunction.ABS.invoke(tmpValue2exp) > PrimitiveFunction.ABS.invoke(tmpValue1)) || ((PrimitiveFunction.ABS.invoke(tmpValue2exp) == PrimitiveFunction.ABS.invoke(tmpValue1)) && (tmpValue2exp > tmpValue1))) {
+                if ((PrimitiveFunction.ABS.invoke(tmpValue2exp) > PrimitiveFunction.ABS.invoke(tmpValue1))
+                        || ((PrimitiveFunction.ABS.invoke(tmpValue2exp) == PrimitiveFunction.ABS.invoke(tmpValue1)) && (tmpValue2exp > tmpValue1))) {
                     ij2 = ij2exp;
                     tmpValue2 = tmpValue2exp;
                 }

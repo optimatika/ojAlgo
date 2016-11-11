@@ -274,7 +274,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
-            return this.solve(this.wrap(rhs));
+            return this.getSolution(this.wrap(rhs));
         } else {
             throw TaskException.newNotSolvable();
         }
@@ -285,17 +285,17 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
-            return this.solve(rhs, preallocated);
+            return this.getSolution(this.wrap(rhs), preallocated);
         } else {
             throw TaskException.newNotSolvable();
         }
     }
 
-    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
         return this.getInverse().multiply(rhs.get());
     }
 
-    public MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
         preallocated.fillByMultiplying(this.getInverse(), rhs.get());
         return preallocated;
     }

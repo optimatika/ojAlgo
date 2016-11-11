@@ -664,7 +664,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
                 && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
 
-            return ((MatrixDecomposition.Solver<N>) myDecomposition).solve(rhs);
+            return ((MatrixDecomposition.Solver<N>) myDecomposition).getSolution(rhs);
 
         } else {
 
@@ -676,7 +676,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
                 myDecomposition = tmpSolver;
 
                 if (tmpSolver.compute(myStore)) {
-                    return tmpSolver.solve(rhs);
+                    return tmpSolver.getSolution(rhs);
                 } else {
                     return null;
                 }

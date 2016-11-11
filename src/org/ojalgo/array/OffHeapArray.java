@@ -104,8 +104,8 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     public void add(final long index, final double addend) {
-        long tmpAddress = this.address(index);
-        double tmpCurrentValue = UNSAFE.getDouble(tmpAddress);
+        final long tmpAddress = this.address(index);
+        final double tmpCurrentValue = UNSAFE.getDouble(tmpAddress);
         UNSAFE.putDouble(tmpAddress, tmpCurrentValue + addend);
     }
 
@@ -121,15 +121,15 @@ public final class OffHeapArray extends BasicArray<Double> {
         return UNSAFE.getDouble(this.address(index));
     }
 
-    public void fillOne(long index, Access1D<?> values, long valueIndex) {
+    public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
         this.set(index, values.doubleValue(valueIndex));
     }
 
-    public void fillOne(long index, Double value) {
+    public void fillOne(final long index, final Double value) {
         this.set(index, value.doubleValue());
     }
 
-    public void fillOne(long index, NullaryFunction<Double> supplier) {
+    public void fillOne(final long index, final NullaryFunction<Double> supplier) {
         this.set(index, supplier.doubleValue());
     }
 
@@ -145,9 +145,9 @@ public final class OffHeapArray extends BasicArray<Double> {
         return PrimitiveScalar.isSmall(this.doubleValue(index), comparedTo);
     }
 
-    public void modifyOne(long index, UnaryFunction<Double> modifier) {
-        long tmpAddress = this.address(index);
-        double tmpCurrentValue = UNSAFE.getDouble(tmpAddress);
+    public void modifyOne(final long index, final UnaryFunction<Double> modifier) {
+        final long tmpAddress = this.address(index);
+        final double tmpCurrentValue = UNSAFE.getDouble(tmpAddress);
         UNSAFE.putDouble(tmpAddress, modifier.invoke(tmpCurrentValue));
     }
 
@@ -159,7 +159,7 @@ public final class OffHeapArray extends BasicArray<Double> {
         this.set(index, value.doubleValue());
     }
 
-    public void visitOne(long index, VoidFunction<Double> visitor) {
+    public void visitOne(final long index, final VoidFunction<Double> visitor) {
         visitor.accept(this.doubleValue(index));
     }
 
@@ -169,6 +169,13 @@ public final class OffHeapArray extends BasicArray<Double> {
 
     private final long increment(final long step) {
         return step * Unsafe.ARRAY_DOUBLE_INDEX_SCALE;
+    }
+
+    @Override
+    protected final void exchange(final long indexA, final long indexB) {
+        final double tmpVal = this.doubleValue(indexA);
+        this.set(indexA, this.doubleValue(indexB));
+        this.set(indexB, tmpVal);
     }
 
     @Override
@@ -202,7 +209,7 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     @Override
-    protected void fill(long first, long limit, long step, NullaryFunction<Double> supplier) {
+    protected void fill(final long first, final long limit, final long step, final NullaryFunction<Double> supplier) {
         final long tmpFirst = this.address(first);
         final long tmpLimit = this.address(limit);
         final long tmpStep = this.increment(step);

@@ -278,13 +278,13 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         }
     }
 
-    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
         final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
-        return this.solve(rhs, tmpPreallocated);
+        return this.getSolution(rhs, tmpPreallocated);
     }
 
     @Override
-    public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
 
         rhs.supplyTo(preallocated);
 

@@ -188,7 +188,7 @@ abstract class IterativeASS extends ActiveSetSolver {
         final int tmpCountE = this.countEqualityConstraints();
 
         if (tmpToInclude >= 0) {
-            final MatrixStore<Double> tmpElements = myCholesky.solve(this.getAI().logical().row(tmpToInclude).transpose());
+            final MatrixStore<Double> tmpElements = myCholesky.getSolution(this.getAI().logical().row(tmpToInclude).transpose());
             final double tmpRHS = myInvQC.premultiply(this.getAI().sliceRow(tmpToInclude, 0L)).get().doubleValue(0L) - this.getBI().doubleValue(tmpToInclude);
             myS.add(tmpCountE + tmpToInclude, tmpElements, tmpRHS, 3);
         }
@@ -199,7 +199,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             if (tmpCountRowsIterA == 0L) {
                 // Unconstrained - can happen when PureASS and all inequalities are inactive
 
-                myCholesky.solve(tmpIterC, myIterationX);
+                myCholesky.getSolution(tmpIterC, myIterationX);
 
             } else {
                 // Actual/normal optimisation problem
@@ -211,7 +211,7 @@ abstract class IterativeASS extends ActiveSetSolver {
                     // this.debug("Iteration L", this.getIterationL(tmpIncluded));
                 }
 
-                myCholesky.solve(this.getIterationL(tmpIncluded).premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), myIterationX);
+                myCholesky.getSolution(this.getIterationL(tmpIncluded).premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), myIterationX);
             }
         }
 
@@ -219,7 +219,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = myLU.solve(this.getIterationRHS(tmpIncluded));
+            final MatrixStore<Double> tmpXL = myLU.getSolution(this.getIterationRHS(tmpIncluded));
             final int tmpCountVariables = this.countVariables();
             myIterationX.fillMatching(tmpXL.logical().limits(tmpCountVariables, (int) tmpXL.countColumns()).get());
 
@@ -277,7 +277,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             this.debug("Redundant contraints!");
         }
 
-        myInvQC = myCholesky.solve(this.getIterationC());
+        myInvQC = myCholesky.getSolution(this.getIterationC());
 
         final int[] tmpIncluded = myActivator.getIncluded();
 
@@ -288,7 +288,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             final MatrixStore<Double> tmpIterA = this.getIterationA(tmpIncluded);
             final MatrixStore<Double> tmpIterB = this.getIterationB(tmpIncluded);
 
-            final MatrixStore<Double> tmpCols = myCholesky.solve(tmpIterA.transpose());
+            final MatrixStore<Double> tmpCols = myCholesky.getSolution(tmpIterA.transpose());
             final MatrixStore<Double> tmpRHS = myInvQC.premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB).get();
 
             for (int j = 0; j < tmpNumEqus; j++) {

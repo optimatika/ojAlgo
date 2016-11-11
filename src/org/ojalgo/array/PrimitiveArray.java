@@ -427,12 +427,59 @@ public class PrimitiveArray extends DenseArray<Double> {
         return Arrays.hashCode(data);
     }
 
+    public void sort() {
+
+        this.quicksort(0, this.count() - 1L);
+    }
+
     public OfDouble spliterator() {
         return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
     }
 
     public DoubleStream stream(final boolean parallel) {
         return StreamSupport.doubleStream(this.spliterator(), parallel);
+    }
+
+    private void quicksort(final long low, final long high) {
+
+        long i = low, j = high;
+        // Get the pivot element from the middle of the list
+        final double pivot = this.doubleValue(low + ((high - low) / 2));
+
+        // Divide into two lists
+        while (i <= j) {
+
+            // If the current value from the left list is smaller than the pivot
+            // element then get the next element from the left list
+            while (this.doubleValue(i) < pivot) {
+                i++;
+            }
+            // If the current value from the right list is larger than the pivot
+            // element then get the previous element from the right list
+            while (this.doubleValue(j) > pivot) {
+                j--;
+            }
+
+            // If found a value in the left list that is larger than
+            // the pivot element and if found a value in the right list
+            // that is smaller then the pivot element then we exchange the
+            // values.
+            // As we are done we can increase i and j
+            if (i <= j) {
+                this.exchange(i, j);
+                i++;
+                j--;
+            }
+
+        }
+
+        // Recursion
+        if (low < j) {
+            this.quicksort(low, j);
+        }
+        if (i < high) {
+            this.quicksort(i, high);
+        }
     }
 
     @Override
@@ -452,6 +499,13 @@ public class PrimitiveArray extends DenseArray<Double> {
     @Override
     protected final double doubleValue(final int index) {
         return data[index];
+    }
+
+    @Override
+    protected final void exchange(final int indexA, final int indexB) {
+        final double tmpVal = data[indexA];
+        data[indexA] = data[indexB];
+        data[indexB] = tmpVal;
     }
 
     @Override

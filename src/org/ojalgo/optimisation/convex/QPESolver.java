@@ -118,7 +118,7 @@ final class QPESolver extends ConstrainedSolver {
             // Q is SPD
             // Actual/normal optimisation problem
 
-            final MatrixStore<Double> tmpInvQAT = myCholesky.solve(tmpIterA.transpose());
+            final MatrixStore<Double> tmpInvQAT = myCholesky.getSolution(tmpIterA.transpose());
             // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
 
             // Negated Schur complement
@@ -127,10 +127,10 @@ final class QPESolver extends ConstrainedSolver {
             if (tmpSolvable = myLU.compute(tmpS)) {
 
                 // tmpX temporarely used to store tmpInvQC
-                final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpIterC, tmpIterX); //TODO Constant if C doesn't change
+                final MatrixStore<Double> tmpInvQC = myCholesky.getSolution(tmpIterC, tmpIterX); //TODO Constant if C doesn't change
 
-                myLU.solve(tmpIterA.multiply(tmpInvQC).subtract(tmpIterB), tmpIterL);
-                myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
+                myLU.getSolution(tmpIterA.multiply(tmpInvQC).subtract(tmpIterB), tmpIterL);
+                myCholesky.getSolution(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
             }
 
         }
@@ -139,7 +139,7 @@ final class QPESolver extends ConstrainedSolver {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = myLU.solve(this.getIterationRHS());
+            final MatrixStore<Double> tmpXL = myLU.getSolution(this.getIterationRHS());
             tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), (int) tmpXL.countColumns()).get());
             tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
         }

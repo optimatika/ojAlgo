@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
@@ -164,17 +163,9 @@ public interface MatrixDecomposition<N extends Number> {
         MatrixStore<N> getInverse(DecompositionStore<N> preallocated);
 
         /**
-         * @return true if it is ok to call {@linkplain #solve(ElementsSupplier)} (computation was
-         *         successful); false if not
-         * @see #solve(ElementsSupplier)
-         * @see #isComputed()
-         */
-        boolean isSolvable();
-
-        /**
          * [A][X]=[B] or [this][return]=[rhs]
          */
-        MatrixStore<N> solve(ElementsSupplier<N> rhs);
+        MatrixStore<N> getSolution(ElementsSupplier<N> rhs);
 
         /**
          * <p>
@@ -185,7 +176,7 @@ public interface MatrixDecomposition<N extends Number> {
          * this interface. It must be documented for each implementation.
          * </p>
          * <p>
-         * Should produce the same results as calling {@link #solve(ElementsSupplier)}.
+         * Should produce the same results as calling {@link #getSolution(ElementsSupplier)}.
          * </p>
          *
          * @param rhs The Right Hand Side, wont be modfied
@@ -195,14 +186,49 @@ public interface MatrixDecomposition<N extends Number> {
          * @return The solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
-        MatrixStore<N> solve(ElementsSupplier<N> rhs, DecompositionStore<N> preallocated);
+        MatrixStore<N> getSolution(ElementsSupplier<N> rhs, DecompositionStore<N> preallocated);
 
         /**
-         * To differentiate between {@link SolverTask#solve(Access2D, Access2D)} and
-         * {@link #solve(ElementsSupplier, DecompositionStore)} when the RHS is a {@link MatrixStore}.
+         * @return true if it is ok to call {@linkplain #getSolution(ElementsSupplier)} (computation was
+         *         successful); false if not
+         * @see #getSolution(ElementsSupplier)
+         * @see #isComputed()
          */
-        default MatrixStore<N> solve(final MatrixStore<N> rhs, final DecompositionStore<N> preallocated) {
-            return this.solve((ElementsSupplier<N>) rhs, preallocated);
+        boolean isSolvable();
+
+        /**
+         * [A][X]=[B] or [this][return]=[rhs]
+         *
+         * @deprecated v41 Use {@link #getSolution(ElementsSupplier<N>)} instead
+         */
+        @Deprecated
+        default MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
+            return this.getSolution(rhs);
+        }
+
+        /**
+         * <p>
+         * Implementiong this method is optional.
+         * </p>
+         * <p>
+         * Exactly how a specific implementation makes use of <code>preallocated</code> is not specified by
+         * this interface. It must be documented for each implementation.
+         * </p>
+         * <p>
+         * Should produce the same results as calling {@link #getSolution(ElementsSupplier)}.
+         * </p>
+         *
+         * @param rhs The Right Hand Side, wont be modfied
+         * @param preallocated Preallocated memory for the results, possibly some intermediate results. You
+         *        must assume this is modified, but you cannot assume it will contain the full/final/correct
+         *        solution.
+         * @return The solution
+         * @throws UnsupportedOperationException When/if this feature is not implemented
+         * @deprecated v41 Use {@link #getSolution(ElementsSupplier<N>,DecompositionStore<N>)} instead
+         */
+        @Deprecated
+        default MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+            return this.getSolution(rhs, preallocated);
         }
 
     }

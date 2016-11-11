@@ -69,7 +69,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         TestUtils.assertEquals(JAMA_CHOLESKY.isSolvable(), PRIMITIVE_CHOLESKY.isSolvable());
 
         if (JAMA_CHOLESKY.isSolvable()) {
-            TestUtils.assertEquals(JAMA_CHOLESKY.solve(tmpMtrxA), PRIMITIVE_CHOLESKY.solve(tmpMtrxA), COMPARE_CONTEXT);
+            TestUtils.assertEquals(JAMA_CHOLESKY.getSolution(tmpMtrxA), PRIMITIVE_CHOLESKY.getSolution(tmpMtrxA), COMPARE_CONTEXT);
         }
     }
 
@@ -109,7 +109,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         TestUtils.assertEquals(JAMA_LU.isSolvable(), PRIMITIVE_DENSE_LU.isSolvable());
 
         if (JAMA_LU.isSolvable()) {
-            TestUtils.assertEquals(JAMA_LU.solve(tmpMtrxA), PRIMITIVE_DENSE_LU.solve(tmpMtrxA), COMPARE_CONTEXT);
+            TestUtils.assertEquals(JAMA_LU.getSolution(tmpMtrxA), PRIMITIVE_DENSE_LU.getSolution(tmpMtrxA), COMPARE_CONTEXT);
         }
 
         // Raw
@@ -126,7 +126,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         TestUtils.assertEquals(JAMA_LU.isSolvable(), PRIMITIVE_RAW_LU.isSolvable());
 
         if (JAMA_LU.isSolvable()) {
-            TestUtils.assertEquals(JAMA_LU.solve(tmpMtrxA), PRIMITIVE_RAW_LU.solve(tmpMtrxA), COMPARE_CONTEXT);
+            TestUtils.assertEquals(JAMA_LU.getSolution(tmpMtrxA), PRIMITIVE_RAW_LU.getSolution(tmpMtrxA), COMPARE_CONTEXT);
         }
     }
 
@@ -147,7 +147,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         TestUtils.assertEquals(JAMA_QR.isSolvable(), PRIMITIVE_QR.isSolvable());
 
         if (JAMA_QR.isSolvable()) {
-            TestUtils.assertEquals(JAMA_QR.solve(tmpMtrxA), PRIMITIVE_QR.solve(tmpMtrxA), COMPARE_CONTEXT);
+            TestUtils.assertEquals(JAMA_QR.getSolution(tmpMtrxA), PRIMITIVE_QR.getSolution(tmpMtrxA), COMPARE_CONTEXT);
         }
     }
 

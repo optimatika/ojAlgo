@@ -257,7 +257,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
-            return this.solve(this.wrap(rhs));
+            return this.getSolution(this.wrap(rhs));
         } else {
             throw TaskException.newNotSolvable();
         }
@@ -268,18 +268,18 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
-            return this.solve(rhs, preallocated);
+            return this.getSolution(this.wrap(rhs), preallocated);
         } else {
             throw TaskException.newNotSolvable();
         }
     }
 
-    public final MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
-        return this.solve(rhs, this.preallocate(this.getInPlace(), rhs));
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
+        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
     @Override
-    public MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
 
         final int tmpRowDim = this.getRowDim();
         final int[] tmpOrder = myPivot.getOrder();

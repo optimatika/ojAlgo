@@ -51,10 +51,12 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
         @Override
         public SolverTask<BigDecimal> make(final MatrixStore<BigDecimal> templateBody, final MatrixStore<BigDecimal> templateRHS, final boolean symmetric,
                 final boolean positiveDefinite) {
-            if (symmetric && positiveDefinite) {
-                return Cholesky.BIG.make(templateBody);
-            } else if (templateBody.isSquare()) {
-                return LU.BIG.make(templateBody);
+            if (templateBody.isSquare()) {
+                if (symmetric && positiveDefinite) {
+                    return Cholesky.BIG.make(templateBody);
+                } else {
+                    return LU.BIG.make(templateBody);
+                }
             } else if (templateBody.isTall()) {
                 return QR.BIG.make(templateBody);
             } else {
@@ -69,10 +71,12 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
         @Override
         public SolverTask<ComplexNumber> make(final MatrixStore<ComplexNumber> templateBody, final MatrixStore<ComplexNumber> templateRHS,
                 final boolean symmetric, final boolean positiveDefinite) {
-            if (symmetric && positiveDefinite) {
-                return Cholesky.COMPLEX.make(templateBody);
-            } else if (templateBody.isSquare()) {
-                return LU.COMPLEX.make(templateBody);
+            if (templateBody.isSquare()) {
+                if (symmetric && positiveDefinite) {
+                    return Cholesky.COMPLEX.make(templateBody);
+                } else {
+                    return LU.COMPLEX.make(templateBody);
+                }
             } else if (templateBody.isTall()) {
                 return QR.COMPLEX.make(templateBody);
             } else {
@@ -92,40 +96,43 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
             final long tmpColDim = templateBody.countColumns();
 
-            if (symmetric) {
+            if (templateBody.isSquare()) {
 
-                if (!tmpVectorRHS) {
-                    return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
-                } else if (tmpColDim == 1l) {
-                    return AbstractSolver.FULL_1X1;
-                } else if (tmpColDim == 2l) {
-                    return AbstractSolver.SYMMETRIC_2X2;
-                } else if (tmpColDim == 3l) {
-                    return AbstractSolver.SYMMETRIC_3X3;
-                } else if (tmpColDim == 4l) {
-                    return AbstractSolver.SYMMETRIC_4X4;
-                } else if (tmpColDim == 5l) {
-                    return AbstractSolver.SYMMETRIC_5X5;
+                if (symmetric) {
+
+                    if (!tmpVectorRHS) {
+                        return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
+                    } else if (tmpColDim == 1l) {
+                        return AbstractSolver.FULL_1X1;
+                    } else if (tmpColDim == 2l) {
+                        return AbstractSolver.SYMMETRIC_2X2;
+                    } else if (tmpColDim == 3l) {
+                        return AbstractSolver.SYMMETRIC_3X3;
+                    } else if (tmpColDim == 4l) {
+                        return AbstractSolver.SYMMETRIC_4X4;
+                    } else if (tmpColDim == 5l) {
+                        return AbstractSolver.SYMMETRIC_5X5;
+                    } else {
+                        return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
+                    }
+
                 } else {
-                    return positiveDefinite ? Cholesky.PRIMITIVE.make(templateBody) : LU.PRIMITIVE.make(templateBody);
-                }
 
-            } else if (templateBody.isSquare()) {
-
-                if (!tmpVectorRHS) {
-                    return LU.PRIMITIVE.make(templateBody);
-                } else if (tmpColDim == 1l) {
-                    return AbstractSolver.FULL_1X1;
-                } else if (tmpColDim == 2l) {
-                    return AbstractSolver.FULL_2X2;
-                } else if (tmpColDim == 3l) {
-                    return AbstractSolver.FULL_3X3;
-                } else if (tmpColDim == 4l) {
-                    return AbstractSolver.FULL_4X4;
-                } else if (tmpColDim == 5l) {
-                    return AbstractSolver.FULL_5X5;
-                } else {
-                    return LU.PRIMITIVE.make(templateBody);
+                    if (!tmpVectorRHS) {
+                        return LU.PRIMITIVE.make(templateBody);
+                    } else if (tmpColDim == 1l) {
+                        return AbstractSolver.FULL_1X1;
+                    } else if (tmpColDim == 2l) {
+                        return AbstractSolver.FULL_2X2;
+                    } else if (tmpColDim == 3l) {
+                        return AbstractSolver.FULL_3X3;
+                    } else if (tmpColDim == 4l) {
+                        return AbstractSolver.FULL_4X4;
+                    } else if (tmpColDim == 5l) {
+                        return AbstractSolver.FULL_5X5;
+                    } else {
+                        return LU.PRIMITIVE.make(templateBody);
+                    }
                 }
 
             } else if (templateBody.isTall()) {
@@ -173,7 +180,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * specified by this interface. It must be documented for each implementation.
      * </p>
      * <p>
-     * Should produce the same results as calling {@link #solve(Access2D, Access2D)}.
+     * Should produce the same results as calling {@link #getSolution(Access2D, Access2D)}.
      * </p>
      * <p>
      * Use {@link #preallocate(Structure2D, Structure2D)} to obtain a suitbale <code>preallocated</code>.

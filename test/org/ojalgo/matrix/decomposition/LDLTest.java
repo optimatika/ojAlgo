@@ -65,14 +65,14 @@ public class LDLTest extends MatrixDecompositionTests {
         TestUtils.assertEquals(tmpL, tmpRawLDL.getL());
         TestUtils.assertEquals(tmpD, tmpRawLDL.getD());
 
-        final MatrixStore<Double> tmpRawInv = tmpRawLDL.solve(MatrixStore.PRIMITIVE.makeIdentity(3).get());
-        final MatrixStore<Double> tmpPrimInv = tmpPrimLDL.solve(MatrixStore.PRIMITIVE.makeIdentity(3).get());
+        final MatrixStore<Double> tmpRawInv = tmpRawLDL.getSolution(MatrixStore.PRIMITIVE.makeIdentity(3).get());
+        final MatrixStore<Double> tmpPrimInv = tmpPrimLDL.getSolution(MatrixStore.PRIMITIVE.makeIdentity(3).get());
 
         tmpRawInv.multiply(tmpA);
         tmpPrimInv.multiply(tmpA);
 
         tmpRawLDL.decompose(tmpRawInv);
-        final MatrixStore<Double> tmpInverse2 = tmpRawLDL.solve(MatrixStore.PRIMITIVE.makeIdentity(3).get());
+        final MatrixStore<Double> tmpInverse2 = tmpRawLDL.getSolution(MatrixStore.PRIMITIVE.makeIdentity(3).get());
 
         TestUtils.assertEquals(tmpA, tmpInverse2);
     }
