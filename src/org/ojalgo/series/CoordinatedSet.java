@@ -28,7 +28,7 @@ import java.util.Map;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.CalendarDateDuration;
 
-public class CoordinatedSet<K extends Comparable<? super K>> {
+class CoordinatedSet<K extends Comparable<? super K>> {
 
     public static <K extends Comparable<? super K>> CoordinatedSet<K> from(final List<? extends BasicSeries<K, ?>> series) {
         return new CoordinatedSet<K>(series, null);
