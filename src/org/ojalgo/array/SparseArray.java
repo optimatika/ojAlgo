@@ -517,23 +517,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    protected final void exchange(final long indexA, final long indexB) {
-
-        if (this.isPrimitive()) {
-
-            final double tmpVal = this.doubleValue(indexA);
-            this.set(indexA, this.doubleValue(indexB));
-            this.set(indexB, tmpVal);
-
-        } else {
-
-            final N tmpVal = this.get(indexA);
-            this.set(indexA, this.get(indexB));
-            this.set(indexB, tmpVal);
-        }
-    }
-
-    @Override
     protected void exchange(final long firstA, final long firstB, final long step, final long count) {
 
         if (this.isPrimitive()) {

@@ -25,6 +25,7 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Comparator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.FunctionUtils;
@@ -147,6 +148,16 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return BigScalar.isSmall(comparedTo, data[index]);
+    }
+
+    @Override
+    protected final void sortAscending() {
+        Arrays.parallelSort(data);
+    }
+
+    @Override
+    protected void sortDescending() {
+        Arrays.parallelSort(data, Comparator.reverseOrder());
     }
 
     @Override

@@ -159,14 +159,7 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     protected abstract double doubleValue(final int index);
 
-    protected abstract void exchange(int indexA, int indexB);
-
     protected abstract void exchange(int firstA, int firstB, int step, int count);
-
-    @Override
-    protected void exchange(final long indexA, final long indexB) {
-        this.exchange((int) indexA, (int) indexB);
-    }
 
     @Override
     protected final void exchange(final long firstA, final long firstB, final long step, final long count) {
@@ -256,13 +249,7 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
         this.modify((int) first, (int) limit, (int) step, function);
     }
 
-    /**
-     * @see java.util.Arrays#binarySearch(Object[], Object)
-     * @see #sortAscending()
-     * @throws UnsupportedOperationException if the this operation is not supported by this
-     *         implementation/subclass
-     */
-    protected abstract int searchAscending(N number);
+    protected abstract int searchAscending(final N number);
 
     protected abstract void set(final int index, final double value);
 
@@ -270,13 +257,9 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> implements Ran
 
     protected abstract int size();
 
-    /**
-     * @see java.util.Arrays#sort(Object[])
-     * @see #searchAscending(Number)
-     * @throws UnsupportedOperationException if the this operation is not supported by this
-     *         implementation/subclass
-     */
     protected abstract void sortAscending();
+
+    protected abstract void sortDescending();
 
     protected abstract void visit(int first, int limit, int step, VoidFunction<N> visitor);
 

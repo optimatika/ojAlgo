@@ -313,8 +313,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     protected abstract void exchange(long firstA, long firstB, long step, long count);
 
-    protected abstract void exchange(long indexA, long indexB);
-
     protected abstract void fill(long first, long limit, long step, N value);
 
     protected abstract void fill(long first, long limit, long step, NullaryFunction<N> supplier);

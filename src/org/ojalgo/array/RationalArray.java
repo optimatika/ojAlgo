@@ -22,6 +22,7 @@
 package org.ojalgo.array;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.FunctionUtils;
@@ -142,6 +143,16 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return RationalNumber.isSmall(comparedTo, data[index]);
+    }
+
+    @Override
+    protected final void sortAscending() {
+        Arrays.parallelSort(data);
+    }
+
+    @Override
+    protected void sortDescending() {
+        Arrays.parallelSort(data, Comparator.reverseOrder());
     }
 
     @Override

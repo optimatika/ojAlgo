@@ -172,13 +172,6 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     @Override
-    protected final void exchange(final long indexA, final long indexB) {
-        final double tmpVal = this.doubleValue(indexA);
-        this.set(indexA, this.doubleValue(indexB));
-        this.set(indexB, tmpVal);
-    }
-
-    @Override
     protected void exchange(final long firstA, final long firstB, final long step, final long count) {
 
         long tmpIndexA = firstA;

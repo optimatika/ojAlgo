@@ -239,13 +239,6 @@ public class BufferArray extends DenseArray<Double> {
     }
 
     @Override
-    protected final void exchange(final int indexA, final int indexB) {
-        final double tmpVal = this.doubleValue(indexA);
-        this.set(indexA, this.doubleValue(indexB));
-        this.set(indexB, tmpVal);
-    }
-
-    @Override
     protected void exchange(final int firstA, final int firstB, final int step, final int count) {
 
         int tmpIndexA = firstA;
@@ -415,7 +408,12 @@ public class BufferArray extends DenseArray<Double> {
 
     @Override
     protected void sortAscending() {
+        throw new UnsupportedOperationException();
+    }
 
+    @Override
+    protected void sortDescending() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

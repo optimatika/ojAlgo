@@ -24,7 +24,6 @@ package org.ojalgo.array;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.AbstractList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.RandomAccess;
 import java.util.Spliterator;
@@ -190,21 +189,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         }
 
     };
-
-    @SuppressWarnings("unchecked")
-    private static <T extends Number> T[] copyAndSort(final Array1D<T> anArray) {
-
-        final int tmpLength = (int) anArray.length;
-        final T[] retVal = (T[]) new Number[tmpLength];
-
-        for (int i = 0; i < tmpLength; i++) {
-            retVal[i] = anArray.get(i);
-        }
-
-        Arrays.sort(retVal);
-
-        return retVal;
-    }
 
     public final long length;
 
@@ -484,72 +468,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         myDelegate.modify(tmpFirst, tmpLimit, myStep, modifier);
     }
 
-    /**
-     * Assumes you have first called {@linkplain #sortAscending()}.
-     *
-     * @deprecated v39
-     */
-    @Deprecated
-    public int searchAscending(final N key) {
-
-        if (myDelegate instanceof DenseArray<?>) {
-
-            if (this.count() != myDelegate.count()) {
-
-                final int tmpLength = (int) length;
-
-                final Number[] tmpArray = new Number[tmpLength];
-
-                for (int i = 0; i < tmpLength; i++) {
-                    tmpArray[i] = this.get(i);
-                }
-
-                return Arrays.binarySearch(tmpArray, key);
-
-            } else {
-
-                return ((DenseArray<N>) myDelegate).searchAscending(key);
-            }
-
-        } else {
-
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    /**
-     * Asssumes you have first called {@linkplain #sortDescending()}.
-     *
-     * @deprecated v39
-     */
-    @Deprecated
-    public int searchDescending(final N key) {
-
-        if (myDelegate instanceof DenseArray<?>) {
-
-            final int tmpLength = (int) length;
-            final Number[] tmpArray = new Number[tmpLength];
-
-            for (int i = 0; i < tmpLength; i++) {
-                tmpArray[i] = this.get(tmpLength - 1 - i);
-            }
-
-            final int tmpInd = Arrays.binarySearch(tmpArray, key);
-
-            if (tmpInd >= 0) {
-                return tmpLength - 1 - tmpInd;
-            } else if (tmpInd < -1) {
-                return -tmpLength - tmpInd - 1;
-            } else {
-                return -1;
-            }
-
-        } else {
-
-            throw new UnsupportedOperationException();
-        }
-    }
-
     @Override
     public N set(final int index, final Number value) {
         final long tmpIndex = myFirst + (myStep * index);
@@ -575,52 +493,27 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         return new Array1D<>(myDelegate, myFirst + (myStep * first), myFirst + (myStep * limit), myStep);
     }
 
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
     public void sortAscending() {
 
-        if (myDelegate instanceof DenseArray<?>) {
+        if ((myDelegate instanceof DenseArray<?>) && (this.count() == myDelegate.count())) {
 
-            if (this.count() != myDelegate.count()) {
-
-                final N[] tmpArray = Array1D.copyAndSort(this);
-
-                final int tmpLength = (int) length;
-                for (int i = 0; i < tmpLength; i++) {
-                    this.set(i, tmpArray[i]);
-                }
-
-            } else {
-
-                ((DenseArray<N>) myDelegate).sortAscending();
-            }
+            ((DenseArray<N>) myDelegate).sortAscending();
 
         } else {
 
-            throw new UnsupportedOperationException();
+            this.sortAscending(0L, this.count() - 1L);
         }
     }
 
-    /**
-     * @deprecated v39
-     */
-    @Deprecated
     public void sortDescending() {
 
-        if (myDelegate instanceof DenseArray<?>) {
+        if ((myDelegate instanceof DenseArray<?>) && (this.count() == myDelegate.count())) {
 
-            final N[] tmpArray = Array1D.copyAndSort(this);
-
-            final int tmpLength = (int) length;
-            for (int i = 0; i < tmpLength; i++) {
-                this.set(i, tmpArray[tmpLength - 1 - i]);
-            }
+            ((DenseArray<N>) myDelegate).sortDescending();
 
         } else {
 
-            throw new UnsupportedOperationException();
+            this.sortDescending(0L, this.count() - 1L);
         }
     }
 
@@ -647,8 +540,84 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         myDelegate.visit(tmpFirst, tmpLimit, myStep, visitor);
     }
 
+    private final void exchange(final long indexA, final long indexB) {
+
+        if (myDelegate.isPrimitive()) {
+
+            final double tmpVal = this.doubleValue(indexA);
+            this.set(indexA, this.doubleValue(indexB));
+            this.set(indexB, tmpVal);
+
+        } else {
+
+            final N tmpVal = this.get(indexA);
+            this.set(indexA, this.get(indexB));
+            this.set(indexB, tmpVal);
+        }
+    }
+
     BasicArray<N> getDelegate() {
         return myDelegate;
+    }
+
+    void sortAscending(final long low, final long high) {
+
+        long i = low, j = high;
+
+        final double pivot = this.doubleValue(low + ((high - low) / 2));
+
+        while (i <= j) {
+
+            while (this.doubleValue(i) < pivot) {
+                i++;
+            }
+            while (this.doubleValue(j) > pivot) {
+                j--;
+            }
+
+            if (i <= j) {
+                this.exchange(i, j);
+                i++;
+                j--;
+            }
+        }
+
+        if (low < j) {
+            this.sortAscending(low, j);
+        }
+        if (i < high) {
+            this.sortAscending(i, high);
+        }
+    }
+
+    void sortDescending(final long low, final long high) {
+
+        long i = low, j = high;
+
+        final double pivot = this.doubleValue(low + ((high - low) / 2));
+
+        while (i <= j) {
+
+            while (this.doubleValue(i) > pivot) {
+                i++;
+            }
+            while (this.doubleValue(j) < pivot) {
+                j--;
+            }
+
+            if (i <= j) {
+                this.exchange(i, j);
+                i++;
+                j--;
+            }
+        }
+
+        if (low < j) {
+            this.sortDescending(low, j);
+        }
+        if (i < high) {
+            this.sortDescending(i, high);
+        }
     }
 
 }

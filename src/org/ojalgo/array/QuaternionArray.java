@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.FunctionUtils;
@@ -145,6 +146,16 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return Quaternion.isSmall(comparedTo, data[index]);
+    }
+
+    @Override
+    protected final void sortAscending() {
+        Arrays.parallelSort(data);
+    }
+
+    @Override
+    protected void sortDescending() {
+        Arrays.parallelSort(data, Comparator.reverseOrder());
     }
 
     @Override
