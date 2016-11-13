@@ -199,7 +199,7 @@ public interface MatrixDecomposition<N extends Number> {
         /**
          * [A][X]=[B] or [this][return]=[rhs]
          *
-         * @deprecated v41 Use {@link #getSolution(ElementsSupplier<N>)} instead
+         * @deprecated v41 Use {@link #getSolution(ElementsSupplier)} instead
          */
         @Deprecated
         default MatrixStore<N> solve(final ElementsSupplier<N> rhs) {
@@ -224,7 +224,7 @@ public interface MatrixDecomposition<N extends Number> {
          *        solution.
          * @return The solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
-         * @deprecated v41 Use {@link #getSolution(ElementsSupplier<N>,DecompositionStore<N>)} instead
+         * @deprecated v41 Use {@link #getSolution(ElementsSupplier,DecompositionStore)} instead
          */
         @Deprecated
         default MatrixStore<N> solve(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {

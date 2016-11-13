@@ -180,7 +180,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * specified by this interface. It must be documented for each implementation.
      * </p>
      * <p>
-     * Should produce the same results as calling {@link #getSolution(Access2D, Access2D)}.
+     * Should produce the same results as calling {@link #solve(Access2D, Access2D)}.
      * </p>
      * <p>
      * Use {@link #preallocate(Structure2D, Structure2D)} to obtain a suitbale <code>preallocated</code>.
