@@ -133,8 +133,10 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
         final int indPm2 = p - 2;
 
         // Calculate the shift.
-        final double scale = PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(PrimitiveFunction.ABS.invoke(s[indPm1]), PrimitiveFunction.ABS.invoke(s[indPm2])), PrimitiveFunction.ABS.invoke(e[indPm2])), PrimitiveFunction.ABS.invoke(s[k])),
-                PrimitiveFunction.ABS.invoke(e[k]));
+        final double scale = PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(
+                PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(PrimitiveFunction.ABS.invoke(s[indPm1]), PrimitiveFunction.ABS.invoke(s[indPm2])),
+                        PrimitiveFunction.ABS.invoke(e[indPm2])),
+                PrimitiveFunction.ABS.invoke(s[k])), PrimitiveFunction.ABS.invoke(e[k]));
 
         final double sPm1 = s[indPm1] / scale;
         final double sPm2 = s[indPm2] / scale;
@@ -271,7 +273,8 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
                 if (k == -1) {
                     break;
                 }
-                if (PrimitiveFunction.ABS.invoke(e[k]) <= (SVDnew32.TINY + (MACHINE_EPSILON * (PrimitiveFunction.ABS.invoke(s[k]) + PrimitiveFunction.ABS.invoke(s[k + 1]))))) {
+                if (PrimitiveFunction.ABS
+                        .invoke(e[k]) <= (SVDnew32.TINY + (MACHINE_EPSILON * (PrimitiveFunction.ABS.invoke(s[k]) + PrimitiveFunction.ABS.invoke(s[k + 1]))))) {
                     e[k] = ZERO;
                     break;
                 }

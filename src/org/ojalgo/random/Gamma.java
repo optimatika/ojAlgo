@@ -91,7 +91,8 @@ public class Gamma extends RandomNumber {
                 tmpNegHalfFraction = -tmpFractionalPart / TWO;
 
                 tmpNumer = PrimitiveFunction.POW.invoke(tmpFractionalPart, tmpFractionMinusOne) * PrimitiveFunction.EXP.invoke(tmpNegHalfFraction);
-                tmpDenom = PrimitiveFunction.POW.invoke(TWO, tmpFractionMinusOne) * PrimitiveFunction.POW.invoke(-PrimitiveFunction.EXPM1.invoke(tmpNegHalfFraction), tmpFractionMinusOne);
+                tmpDenom = PrimitiveFunction.POW.invoke(TWO, tmpFractionMinusOne)
+                        * PrimitiveFunction.POW.invoke(-PrimitiveFunction.EXPM1.invoke(tmpNegHalfFraction), tmpFractionMinusOne);
 
             } while (this.random().nextDouble() > (tmpNumer / tmpDenom));
         }

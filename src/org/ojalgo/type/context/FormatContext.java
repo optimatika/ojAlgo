@@ -26,7 +26,6 @@ import java.text.Format;
 import java.text.ParseException;
 import java.util.Objects;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.netio.ASCII;
 
 /**

@@ -179,7 +179,7 @@ public abstract class FinanceUtils {
 
         final int tmpSize = listOfTimeSeries.size();
 
-        final CoordinationSet<N> tmpUncoordinated = new CoordinationSet<N>(listOfTimeSeries);
+        final CoordinationSet<N> tmpUncoordinated = new CoordinationSet<>(listOfTimeSeries);
         final CalendarDateUnit tmpDataResolution = tmpUncoordinated.getResolution();
         if (mayBeMissingValues) {
             tmpUncoordinated.complete();

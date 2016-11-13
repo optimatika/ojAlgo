@@ -135,6 +135,19 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return retVal;
     }
 
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
+        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
+        return this.getSolution(rhs, tmpPreallocated);
+    }
+
+    @Override
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+
+        rhs.get().logical().row(myPivot.getOrder()).supplyTo(preallocated);
+
+        return this.doSolve(preallocated);
+    }
+
     public MatrixStore<Double> getU() {
         return this.getRawInPlaceStore().logical().triangular(true, false).get();
     }
@@ -197,19 +210,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         } else {
             throw TaskException.newNotSolvable();
         }
-    }
-
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
-        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
-        return this.getSolution(rhs, tmpPreallocated);
-    }
-
-    @Override
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-
-        rhs.get().logical().row(myPivot.getOrder()).supplyTo(preallocated);
-
-        return this.doSolve(preallocated);
     }
 
     /**

@@ -73,8 +73,8 @@ public class NumberSeries<N extends Number & Comparable<N>> extends OldAbstractS
     }
 
     public double put(final N key, final double value) {
-        Double tmpValue = value;
-        N tmpOldValue = super.put(key, (N) tmpValue);
+        final Double tmpValue = value;
+        final N tmpOldValue = super.put(key, (N) tmpValue);
         if (tmpOldValue != null) {
             return tmpOldValue.doubleValue();
         } else {

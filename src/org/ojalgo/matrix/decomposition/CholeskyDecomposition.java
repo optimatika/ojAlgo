@@ -113,6 +113,41 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.getInPlace().logical().triangular(false, false).get();
     }
 
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
+        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
+    }
+
+    /**
+     * Solves [this][X] = [rhs] by first solving
+     *
+     * <pre>
+     * [L][Y] = [RHS]
+     * </pre>
+     *
+     * and then
+     *
+     * <pre>
+     * [U][X] = [Y]
+     * </pre>
+     *
+     * .
+     *
+     * @param rhs The right hand side
+     * @return [X] The solution will be written to "preallocated" and then returned.
+     */
+    @Override
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+
+        rhs.supplyTo(preallocated);
+
+        final DecompositionStore<N> tmpBody = this.getInPlace();
+
+        preallocated.substituteForwards(tmpBody, false, false, false);
+        preallocated.substituteBackwards(tmpBody, false, true, false);
+
+        return preallocated;
+    }
+
     public final MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
 
         this.decompose(this.wrap(original));
@@ -184,41 +219,6 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         } else {
             throw TaskException.newNotSolvable();
         }
-    }
-
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
-        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
-    }
-
-    /**
-     * Solves [this][X] = [rhs] by first solving
-     *
-     * <pre>
-     * [L][Y] = [RHS]
-     * </pre>
-     *
-     * and then
-     *
-     * <pre>
-     * [U][X] = [Y]
-     * </pre>
-     *
-     * .
-     *
-     * @param rhs The right hand side
-     * @return [X] The solution will be written to "preallocated" and then returned.
-     */
-    @Override
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
-
-        rhs.supplyTo(preallocated);
-
-        final DecompositionStore<N> tmpBody = this.getInPlace();
-
-        preallocated.substituteForwards(tmpBody, false, false, false);
-        preallocated.substituteBackwards(tmpBody, false, true, false);
-
-        return preallocated;
     }
 
     final boolean compute(final ElementsSupplier<N> matrix, final boolean checkHermitian) {

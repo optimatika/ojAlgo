@@ -31,12 +31,12 @@ import org.ojalgo.type.CalendarDateDuration;
 class CoordinatedSet<K extends Comparable<? super K>> {
 
     public static <K extends Comparable<? super K>> CoordinatedSet<K> from(final List<? extends BasicSeries<K, ?>> series) {
-        return new CoordinatedSet<K>(series, null);
+        return new CoordinatedSet<>(series, null);
     }
 
     public static <K extends Comparable<? super K>> CoordinatedSet<K> from(final List<? extends BasicSeries<K, ?>> series,
             final CalendarDateDuration resolution) {
-        return new CoordinatedSet<K>(series, resolution);
+        return new CoordinatedSet<>(series, resolution);
     }
 
     private final K myFirst = null;

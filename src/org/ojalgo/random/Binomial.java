@@ -54,7 +54,8 @@ public class Binomial extends AbstractDiscrete {
     }
 
     public double getProbability(final int aVal) {
-        return RandomUtils.subsets(myCount, aVal) * PrimitiveFunction.POW.invoke(myProbability, aVal) * PrimitiveFunction.POW.invoke(ONE - myProbability, myCount - aVal);
+        return RandomUtils.subsets(myCount, aVal) * PrimitiveFunction.POW.invoke(myProbability, aVal)
+                * PrimitiveFunction.POW.invoke(ONE - myProbability, myCount - aVal);
     }
 
     @Override

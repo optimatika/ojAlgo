@@ -115,7 +115,7 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
     }
 
     @Override
-    InverterTask<Double> getInverterTask(final MatrixStore<Double>base) {
+    InverterTask<Double> getInverterTask(final MatrixStore<Double> base) {
         return InverterTask.PRIMITIVE.make(base, this.isHermitian(), false);
     }
 

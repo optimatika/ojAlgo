@@ -201,6 +201,33 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return retVal;
     }
 
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
+        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
+    }
+
+    @Override
+    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+
+        final int tmpRowDim = this.getRowDim();
+        final int[] tmpOrder = myPivot.getOrder();
+
+        //        preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), tmpOrder));
+        preallocated.fillMatching(rhs.get().logical().row(tmpOrder).get());
+
+        final DecompositionStore<N> tmpBody = this.getInPlace();
+
+        preallocated.substituteForwards(tmpBody, true, false, false);
+
+        final BinaryFunction<N> tmpDivide = this.function().divide();
+        for (int i = 0; i < tmpRowDim; i++) {
+            preallocated.modifyRow(i, 0, tmpDivide.second(tmpBody.doubleValue(i, i)));
+        }
+
+        preallocated.substituteBackwards(tmpBody, true, true, false);
+
+        return preallocated.logical().row(tmpOrder).get();
+    }
+
     public final MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
 
         this.decompose(this.wrap(original));
@@ -272,33 +299,6 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         } else {
             throw TaskException.newNotSolvable();
         }
-    }
-
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
-        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
-    }
-
-    @Override
-    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
-
-        final int tmpRowDim = this.getRowDim();
-        final int[] tmpOrder = myPivot.getOrder();
-
-        //        preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), tmpOrder));
-        preallocated.fillMatching(rhs.get().logical().row(tmpOrder).get());
-
-        final DecompositionStore<N> tmpBody = this.getInPlace();
-
-        preallocated.substituteForwards(tmpBody, true, false, false);
-
-        final BinaryFunction<N> tmpDivide = this.function().divide();
-        for (int i = 0; i < tmpRowDim; i++) {
-            preallocated.modifyRow(i, 0, tmpDivide.second(tmpBody.doubleValue(i, i)));
-        }
-
-        preallocated.substituteBackwards(tmpBody, true, true, false);
-
-        return preallocated.logical().row(tmpOrder).get();
     }
 
 }

@@ -167,6 +167,50 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return retVal;
     }
 
+    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
+        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
+    }
+
+    /**
+     * Solve [A]*[X]=[B] by first solving [Q]*[Y]=[B] and then [R]*[X]=[Y]. [X] minimises the 2-norm of
+     * [Q]*[R]*[X]-[B].
+     *
+     * @param rhs The right hand side [B]
+     * @return [X] "preallocated" is used to form the results, but the solution is in the returned
+     *         MatrixStore.
+     */
+    @Override
+    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+
+        rhs.supplyTo(preallocated);
+
+        final DecompositionStore<N> tmpStore = this.getInPlace();
+        final int tmpRowDim = this.getRowDim();
+        final int tmpColDim = this.getColDim();
+
+        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(tmpStore);
+
+        final int tmpLimit = this.getMinDim();
+        for (int j = 0; j < tmpLimit; j++) {
+
+            tmpReference.point(j, j);
+
+            if (!tmpReference.isZero()) {
+                preallocated.transformLeft(tmpReference, 0);
+            }
+        }
+
+        preallocated.substituteBackwards(tmpStore, false, false, false);
+
+        if (tmpColDim < tmpRowDim) {
+            return preallocated.logical().limits(tmpColDim, (int) preallocated.countColumns()).get();
+        } else if (tmpColDim > tmpRowDim) {
+            return preallocated.logical().below(tmpColDim - tmpRowDim).get();
+        } else {
+            return preallocated;
+        }
+    }
+
     public final MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
 
         this.decompose(this.wrap(original));
@@ -236,50 +280,6 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
             return this.getSolution(this.wrap(rhs), preallocated);
         } else {
             throw TaskException.newNotSolvable();
-        }
-    }
-
-    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
-        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
-    }
-
-    /**
-     * Solve [A]*[X]=[B] by first solving [Q]*[Y]=[B] and then [R]*[X]=[Y]. [X] minimises the 2-norm of
-     * [Q]*[R]*[X]-[B].
-     *
-     * @param rhs The right hand side [B]
-     * @return [X] "preallocated" is used to form the results, but the solution is in the returned
-     *         MatrixStore.
-     */
-    @Override
-    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
-
-        rhs.supplyTo(preallocated);
-
-        final DecompositionStore<N> tmpStore = this.getInPlace();
-        final int tmpRowDim = this.getRowDim();
-        final int tmpColDim = this.getColDim();
-
-        final HouseholderReference<N> tmpReference = HouseholderReference.makeColumn(tmpStore);
-
-        final int tmpLimit = this.getMinDim();
-        for (int j = 0; j < tmpLimit; j++) {
-
-            tmpReference.point(j, j);
-
-            if (!tmpReference.isZero()) {
-                preallocated.transformLeft(tmpReference, 0);
-            }
-        }
-
-        preallocated.substituteBackwards(tmpStore, false, false, false);
-
-        if (tmpColDim < tmpRowDim) {
-            return preallocated.logical().limits(tmpColDim, (int) preallocated.countColumns()).get();
-        } else if (tmpColDim > tmpRowDim) {
-            return preallocated.logical().below(tmpColDim - tmpRowDim).get();
-        } else {
-            return preallocated;
         }
     }
 

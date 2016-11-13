@@ -82,7 +82,7 @@ public interface ParameterFunction<N extends Number> extends BasicFunction<N>, B
      * @return The resulting unary function.
      */
     default UnaryFunction<N> parameter(final int param) {
-        return new FixedParameter<N>(this, param);
+        return new FixedParameter<>(this, param);
     }
 
 }

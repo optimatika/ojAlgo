@@ -153,6 +153,41 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return retVal;
     }
 
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
+        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
+    }
+
+    /**
+     * Solves [this][X] = [rhs] by first solving
+     *
+     * <pre>
+     * [L][Y] = [rhs]
+     * </pre>
+     *
+     * and then
+     *
+     * <pre>
+     * [U][X] = [Y]
+     * </pre>
+     *
+     * @param rhs The right hand side
+     * @return [X] The solution will be written to "preallocated" and then returned.
+     */
+    @Override
+    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+
+        //preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
+        preallocated.fillMatching(rhs.get().logical().row(myPivot.getOrder()).get());
+
+        final DecompositionStore<N> tmpBody = this.getInPlace();
+
+        preallocated.substituteForwards(tmpBody, true, false, false);
+
+        preallocated.substituteBackwards(tmpBody, false, false, false);
+
+        return preallocated;
+    }
+
     public MatrixStore<N> getU() {
         //return new UpperTriangularStore<N>(this.getInPlace(), false);
         return this.getInPlace().logical().triangular(true, false).get();
@@ -235,41 +270,6 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         } else {
             throw TaskException.newNotSolvable();
         }
-    }
-
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
-        return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
-    }
-
-    /**
-     * Solves [this][X] = [rhs] by first solving
-     *
-     * <pre>
-     * [L][Y] = [rhs]
-     * </pre>
-     *
-     * and then
-     *
-     * <pre>
-     * [U][X] = [Y]
-     * </pre>
-     *
-     * @param rhs The right hand side
-     * @return [X] The solution will be written to "preallocated" and then returned.
-     */
-    @Override
-    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
-
-        //preallocated.fillMatching(new RowsStore<N>(new WrapperStore<>(preallocated.factory(), rhs), myPivot.getOrder()));
-        preallocated.fillMatching(rhs.get().logical().row(myPivot.getOrder()).get());
-
-        final DecompositionStore<N> tmpBody = this.getInPlace();
-
-        preallocated.substituteForwards(tmpBody, true, false, false);
-
-        preallocated.substituteBackwards(tmpBody, false, false, false);
-
-        return preallocated;
     }
 
     private final boolean compute(final ElementsSupplier<N> aStore, final boolean assumeNoPivotingRequired) {

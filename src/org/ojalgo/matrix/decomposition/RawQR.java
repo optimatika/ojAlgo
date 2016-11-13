@@ -196,6 +196,19 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return retVal;
     }
 
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
+        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
+        return this.getSolution(rhs, tmpPreallocated);
+    }
+
+    @Override
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+
+        rhs.supplyTo(preallocated);
+
+        return this.doSolve((PrimitiveDenseStore) preallocated);
+    }
+
     @Override
     public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
 
@@ -276,19 +289,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
             throw TaskException.newNotSolvable();
         }
-    }
-
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
-        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
-        return this.getSolution(rhs, tmpPreallocated);
-    }
-
-    @Override
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-
-        rhs.supplyTo(preallocated);
-
-        return this.doSolve((PrimitiveDenseStore) preallocated);
     }
 
     private boolean doDecompose(final double[][] data) {

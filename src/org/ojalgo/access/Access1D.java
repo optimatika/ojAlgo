@@ -184,7 +184,7 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
      * without actually extracting the elements (unless you explicitly do so).
      */
     default ElementView1D<N, ?> elements() {
-        return new Access1D.ElementView<N>(this);
+        return new Access1D.ElementView<>(this);
     }
 
     N get(long index);

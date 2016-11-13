@@ -41,27 +41,27 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     private static long SEGMENT_CAPACITY = 16_384L;
 
     public static NumberList<BigDecimal> makeBig() {
-        return new NumberList<BigDecimal>(BigArray.FACTORY);
+        return new NumberList<>(BigArray.FACTORY);
     }
 
     public static NumberList<ComplexNumber> makeComplexe() {
-        return new NumberList<ComplexNumber>(ComplexArray.FACTORY);
+        return new NumberList<>(ComplexArray.FACTORY);
     }
 
     public static NumberList<Double> makeOffHeap() {
-        return new NumberList<Double>(OffHeapArray.FACTORY);
+        return new NumberList<>(OffHeapArray.FACTORY);
     }
 
     public static NumberList<Double> makePrimitive() {
-        return new NumberList<Double>(PrimitiveArray.FACTORY);
+        return new NumberList<>(PrimitiveArray.FACTORY);
     }
 
     public static NumberList<Quaternion> makeQuaternion() {
-        return new NumberList<Quaternion>(QuaternionArray.FACTORY);
+        return new NumberList<>(QuaternionArray.FACTORY);
     }
 
     public static NumberList<RationalNumber> makeRational() {
-        return new NumberList<RationalNumber>(RationalArray.FACTORY);
+        return new NumberList<>(RationalArray.FACTORY);
     }
 
     private long myActualCount;
@@ -232,11 +232,11 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public ListIterator<N> listIterator() {
-        return new Iterator1D<N>(this);
+        return new Iterator1D<>(this);
     }
 
     public ListIterator<N> listIterator(final int index) {
-        return new Iterator1D<N>(this, index);
+        return new Iterator1D<>(this, index);
     }
 
     public N remove(final int index) {

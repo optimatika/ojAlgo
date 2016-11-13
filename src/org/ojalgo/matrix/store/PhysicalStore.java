@@ -95,16 +95,16 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.fillColumn(row, myColumns[(int) col], supplier);
         }
 
+        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOne(row, myColumns[(int) col], values, valueIndex);
+        }
+
         public void fillOne(final long row, final long col, final N value) {
             myBase.fillOne(row, myColumns[(int) col], value);
         }
 
         public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
             myBase.fillOne(row, myColumns[(int) col], supplier);
-        }
-
-        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOne(row, myColumns[(int) col], values, valueIndex);
         }
 
         public void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -255,16 +255,16 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             return myRowLimit;
         }
 
+        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOne(row, col, values, valueIndex);
+        }
+
         public void fillOne(final long row, final long col, final N value) {
             myBase.fillOne(row, col, value);
         }
 
         public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
             myBase.fillOne(row, col, supplier);
-        }
-
-        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOne(row, col, values, valueIndex);
         }
 
         public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -341,16 +341,16 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.fillDiagonal(myRowOffset + row, myColumnOffset + col, supplier);
         }
 
+        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOne(myRowOffset + row, myColumnOffset + col, values, valueIndex);
+        }
+
         public void fillOne(final long row, final long col, final N value) {
             myBase.fillOne(myRowOffset + row, myColumnOffset + col, value);
         }
 
         public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
             myBase.fillOne(myRowOffset + row, myColumnOffset + col, supplier);
-        }
-
-        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOne(myRowOffset + row, myColumnOffset + col, values, valueIndex);
         }
 
         public void fillRow(final long row, final long col, final N value) {
@@ -420,16 +420,16 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             return myRows.length;
         }
 
+        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOne(myRows[(int) row], col, values, valueIndex);
+        }
+
         public void fillOne(final long row, final long col, final N value) {
             myBase.fillOne(myRows[(int) row], col, value);
         }
 
         public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
             myBase.fillOne(myRows[(int) row], col, supplier);
-        }
-
-        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOne(myRows[(int) row], col, values, valueIndex);
         }
 
         public void fillRow(final long row, final long col, final Access1D<N> values) {
@@ -503,16 +503,16 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
             myBase.fillRow(col, row, supplier);
         }
 
+        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+            myBase.fillOne(col, row, values, valueIndex);
+        }
+
         public void fillOne(final long row, final long col, final N value) {
             myBase.fillOne(col, row, value);
         }
 
         public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
             myBase.fillOne(col, row, supplier);
-        }
-
-        public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            myBase.fillOne(col, row, values, valueIndex);
         }
 
         public void fillRow(final long row, final long col, final N value) {

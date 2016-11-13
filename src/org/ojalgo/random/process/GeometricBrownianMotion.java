@@ -88,7 +88,8 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
     public static GeometricBrownianMotion make(final double initialValue, final double expectedFutureValue, final double aVariance, final double aHorizon) {
 
         final double tmpDrift = PrimitiveFunction.LOG.invoke(expectedFutureValue / initialValue) / aHorizon;
-        final double tmpDiff = PrimitiveFunction.SQRT.invoke(PrimitiveFunction.LOG1P.invoke(aVariance / (expectedFutureValue * expectedFutureValue)) / aHorizon);
+        final double tmpDiff = PrimitiveFunction.SQRT
+                .invoke(PrimitiveFunction.LOG1P.invoke(aVariance / (expectedFutureValue * expectedFutureValue)) / aHorizon);
 
         final GeometricBrownianMotion retVal = new GeometricBrownianMotion(tmpDrift, tmpDiff);
 
@@ -200,7 +201,8 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
 
     @Override
     double getVariance(final double stepSize) {
-        return this.getValue() * this.getValue() * PrimitiveFunction.EXP.invoke(TWO * myLocalDrift * stepSize) * PrimitiveFunction.EXPM1.invoke(this.getDistributionVariance(stepSize));
+        return this.getValue() * this.getValue() * PrimitiveFunction.EXP.invoke(TWO * myLocalDrift * stepSize)
+                * PrimitiveFunction.EXPM1.invoke(this.getDistributionVariance(stepSize));
     }
 
 }

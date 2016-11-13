@@ -116,6 +116,19 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.getRawInPlaceStore().logical().triangular(false, false).get();
     }
 
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
+        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
+        return this.getSolution(rhs, tmpPreallocated);
+    }
+
+    @Override
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+
+        rhs.supplyTo(preallocated);
+
+        return this.doSolve(preallocated);
+    }
+
     @Override
     public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
 
@@ -167,19 +180,6 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         } else {
             throw TaskException.newNotSolvable();
         }
-    }
-
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
-        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
-        return this.getSolution(rhs, tmpPreallocated);
-    }
-
-    @Override
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-
-        rhs.supplyTo(preallocated);
-
-        return this.doSolve(preallocated);
     }
 
     private boolean doDecompose(final double[][] data, final Access2D<?> input) {

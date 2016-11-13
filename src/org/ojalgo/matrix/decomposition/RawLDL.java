@@ -98,6 +98,16 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return 0;
     }
 
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
+        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
+        return this.getSolution(rhs, tmpPreallocated);
+    }
+
+    @Override
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return this.doSolve(rhs, preallocated);
+    }
+
     @Override
     public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
 
@@ -150,16 +160,6 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         } else {
             throw TaskException.newNotSolvable();
         }
-    }
-
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
-        final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
-        return this.getSolution(rhs, tmpPreallocated);
-    }
-
-    @Override
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doSolve(rhs, preallocated);
     }
 
     private boolean doDecompose(final double[][] data, final Access2D<?> input) {

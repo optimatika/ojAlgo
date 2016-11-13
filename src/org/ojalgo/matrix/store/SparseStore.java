@@ -118,14 +118,14 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         this.updateNonZeros(row, col);
     }
 
-    public double doubleValue(final long row, final long col) {
-        return myElements.doubleValue(Structure2D.index(myFirsts.length, row, col));
-    }
-
     public void clear() {
         myElements.clear();
         Arrays.fill(myFirsts, (int) this.countColumns());
         Arrays.fill(myLimits, 0);
+    }
+
+    public double doubleValue(final long row, final long col) {
+        return myElements.doubleValue(Structure2D.index(myFirsts.length, row, col));
     }
 
     public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
@@ -287,7 +287,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
      */
     @Deprecated
     public ElementView2D<N, ?> nonzeros() {
-        return new Access2D.ElementView<N>(myElements.nonzeros(), this.countRows());
+        return new Access2D.ElementView<>(myElements.nonzeros(), this.countRows());
     }
 
     public final ElementsConsumer<N> regionByColumns(final int... columns) {

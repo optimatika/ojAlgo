@@ -72,39 +72,39 @@ public interface StructureAnyD extends Structure1D {
     }
 
     static long[] reference(final long index, final long[] structure) {
-    
+
         final long[] retVal = new long[structure.length];
-    
+
         long tmpPrev = 1L;
         long tmpNext = 1L;
-    
+
         for (int s = 0; s < structure.length; s++) {
             tmpNext *= structure[s];
             retVal[s] = (index % tmpNext) / tmpPrev;
             tmpPrev = tmpNext;
         }
-    
+
         return retVal;
     }
 
     static long[] shape(final StructureAnyD structure) {
-    
+
         final long tmpSize = structure.count();
-    
+
         long tmpTotal = structure.count(0);
         int tmpRank = 1;
-    
+
         while (tmpTotal < tmpSize) {
             tmpTotal *= structure.count(tmpRank);
             tmpRank++;
         }
-    
+
         final long[] retVal = new long[tmpRank];
-    
+
         for (int i = 0; i < retVal.length; i++) {
             retVal[i] = structure.count(i);
         }
-    
+
         return retVal;
     }
 

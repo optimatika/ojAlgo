@@ -166,7 +166,7 @@ public interface BinaryFunction<N extends Number> extends BasicFunction<N>, Bina
      * @see #first(Number)
      */
     default UnaryFunction<N> first(final double arg1) {
-        return new FixedFirst<N>(arg1, this);
+        return new FixedFirst<>(arg1, this);
     }
 
     /**
@@ -177,14 +177,14 @@ public interface BinaryFunction<N extends Number> extends BasicFunction<N>, Bina
      * @return The resulting unary function.
      */
     default UnaryFunction<N> first(final N arg1) {
-        return new FixedFirst<N>(arg1, this);
+        return new FixedFirst<>(arg1, this);
     }
 
     /**
      * @see #second(Number)
      */
     default UnaryFunction<N> second(final double arg2) {
-        return new FixedSecond<N>(this, arg2);
+        return new FixedSecond<>(this, arg2);
     }
 
     /**
@@ -195,7 +195,7 @@ public interface BinaryFunction<N extends Number> extends BasicFunction<N>, Bina
      * @return The resulting unary function.
      */
     default UnaryFunction<N> second(final N arg2) {
-        return new FixedSecond<N>(this, arg2);
+        return new FixedSecond<>(this, arg2);
     }
 
 }

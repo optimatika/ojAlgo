@@ -37,7 +37,7 @@ final class SparseSeries<K extends Comparable<? super K>, N extends Number> exte
 
     SparseSeries(final ArrayFactory<N> arrayFactory, final IndexMapper<K> indexMapper) {
         super(indexMapper);
-        myDelegate = new LongToNumberMap<N>(arrayFactory);
+        myDelegate = new LongToNumberMap<>(arrayFactory);
     }
 
     SparseSeries(final IndexMapper<K> indexMapper, final LongToNumberMap<N> delegate) {

@@ -106,6 +106,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             super();
         }
 
+        public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
+            final long numberOfEquations = rhs.countRows();
+            final DecompositionStore<Double> tmpPreallocated = this.allocate(numberOfEquations, numberOfEquations);
+            return this.getSolution(rhs, tmpPreallocated);
+        }
+
         public boolean isHermitian() {
             return true;
         }
@@ -126,12 +132,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         @Deprecated
         public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
             return this.getSolution(rhs);
-        }
-
-        public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
-            final long numberOfEquations = rhs.countRows();
-            final DecompositionStore<Double> tmpPreallocated = this.allocate(numberOfEquations, numberOfEquations);
-            return this.getSolution(rhs, tmpPreallocated);
         }
 
         @Override
@@ -292,6 +292,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return this.doGetInverse((PrimitiveDenseStore) preallocated);
     }
 
+    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+        return null;
+    }
+
     public ComplexNumber getTrace() {
 
         final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
@@ -359,10 +363,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         } else {
             throw TaskException.newNotSolvable();
         }
-    }
-
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return null;
     }
 
     public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {

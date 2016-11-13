@@ -210,6 +210,15 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return mySingularValues;
     }
 
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
+        return this.getInverse().multiply(rhs.get());
+    }
+
+    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+        preallocated.fillByMultiplying(this.getInverse(), rhs.get());
+        return preallocated;
+    }
+
     public double getTraceNorm() {
         return this.getKyFanNorm(this.getSingularValues().size());
     }
@@ -289,15 +298,6 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         } else {
             throw TaskException.newNotSolvable();
         }
-    }
-
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
-        return this.getInverse().multiply(rhs.get());
-    }
-
-    public MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), rhs.get());
-        return preallocated;
     }
 
     private MatrixStore<N> getInverseOldVersion(final DecompositionStore<N> preallocated) {

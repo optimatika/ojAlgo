@@ -231,8 +231,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
         return PRESOLVERS.remove(presolver);
     }
 
-    private final HashMap<String, Expression> myExpressions = new HashMap<String, Expression>();
-    private final HashSet<IntIndex> myFixedVariables = new HashSet<IntIndex>();
+    private final HashMap<String, Expression> myExpressions = new HashMap<>();
+    private final HashSet<IntIndex> myFixedVariables = new HashSet<>();
     private transient int[] myFreeIndices = null;
     private final List<Variable> myFreeVariables = new ArrayList<>();
     private transient int[] myIntegerIndices = null;
@@ -241,7 +241,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
     private final List<Variable> myNegativeVariables = new ArrayList<>();
     private transient int[] myPositiveIndices = null;
     private final List<Variable> myPositiveVariables = new ArrayList<>();
-    private final ArrayList<Variable> myVariables = new ArrayList<Variable>();
+    private final ArrayList<Variable> myVariables = new ArrayList<>();
     private final boolean myWorkCopy;
 
     public ExpressionsBasedModel() {

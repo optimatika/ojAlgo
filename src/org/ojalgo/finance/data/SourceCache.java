@@ -56,7 +56,7 @@ public final class SourceCache {
 
     private static final Timer TIMER = new Timer("SourceCache-Daemon", true);
 
-    private final Map<DataSource<?>, SourceCache.Value> myCache = new ConcurrentHashMap<DataSource<?>, SourceCache.Value>();
+    private final Map<DataSource<?>, SourceCache.Value> myCache = new ConcurrentHashMap<>();
     private final CalendarDateUnit myResolution;
 
     public SourceCache(final CalendarDateUnit aResolution) {

@@ -318,6 +318,15 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         return myInverse;
     }
 
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
+        return this.getInverse().multiply(rhs.get());
+    }
+
+    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+        preallocated.fillByMultiplying(this.getInverse(), rhs.get());
+        return preallocated;
+    }
+
     public final ComplexNumber getTrace() {
 
         final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().sum();
@@ -396,15 +405,6 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         } else {
             throw TaskException.newNotSolvable();
         }
-    }
-
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
-        return this.getInverse().multiply(rhs.get());
-    }
-
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), rhs.get());
-        return preallocated;
     }
 
     @Override

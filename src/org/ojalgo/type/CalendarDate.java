@@ -103,7 +103,7 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
         return new CalendarDate(resolution.toTimeInMillis(timeInMIllis));
     }
 
-    public static CalendarDate valueOf(Instant instant) {
+    public static CalendarDate valueOf(final Instant instant) {
         return new CalendarDate(instant.toEpochMilli());
     }
 
@@ -171,9 +171,9 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
         }
     }
 
-    public Temporal adjustInto(Temporal temporal) {
-        long tmpSeconds = millis / MILLIS_PER_SECOND;
-        long tmpNanos = (millis % MILLIS_PER_SECOND) * (NANOS_PER_SECOND / MILLIS_PER_SECOND);
+    public Temporal adjustInto(final Temporal temporal) {
+        final long tmpSeconds = millis / MILLIS_PER_SECOND;
+        final long tmpNanos = (millis % MILLIS_PER_SECOND) * (NANOS_PER_SECOND / MILLIS_PER_SECOND);
         return temporal.with(INSTANT_SECONDS, tmpSeconds).with(NANO_OF_SECOND, tmpNanos);
     }
 

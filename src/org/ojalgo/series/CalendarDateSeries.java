@@ -169,8 +169,8 @@ public class CalendarDateSeries<V extends Number> extends OldAbstractSeries<Cale
      */
     @SuppressWarnings("unchecked")
     public double put(final CalendarDate key, final double value) {
-        Double tmpValue = value;
-        V tmpOldValue = super.put(key.filter(myResolution), (V) tmpValue);
+        final Double tmpValue = value;
+        final V tmpOldValue = super.put(key.filter(myResolution), (V) tmpValue);
         if (tmpOldValue != null) {
             return tmpOldValue.doubleValue();
         } else {

@@ -21,23 +21,23 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     private static int INITIAL_CAPACITY = 16;
 
     public static LongToNumberMap<BigDecimal> makeBig() {
-        return new LongToNumberMap<BigDecimal>(BigArray.FACTORY);
+        return new LongToNumberMap<>(BigArray.FACTORY);
     }
 
     public static LongToNumberMap<ComplexNumber> makeComplexe() {
-        return new LongToNumberMap<ComplexNumber>(ComplexArray.FACTORY);
+        return new LongToNumberMap<>(ComplexArray.FACTORY);
     }
 
     public static LongToNumberMap<Double> makePrimitive() {
-        return new LongToNumberMap<Double>(PrimitiveArray.FACTORY);
+        return new LongToNumberMap<>(PrimitiveArray.FACTORY);
     }
 
     public static LongToNumberMap<Quaternion> makeQuaternion() {
-        return new LongToNumberMap<Quaternion>(QuaternionArray.FACTORY);
+        return new LongToNumberMap<>(QuaternionArray.FACTORY);
     }
 
     public static LongToNumberMap<RationalNumber> makeRational() {
-        return new LongToNumberMap<RationalNumber>(RationalArray.FACTORY);
+        return new LongToNumberMap<>(RationalArray.FACTORY);
     }
 
     private final DenseFactory<N> myArrayFactory;
@@ -53,7 +53,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
         myArrayFactory = (DenseFactory<N>) arrayFactory;
 
-        myStorage = new SparseArray<N>(Long.MAX_VALUE, myArrayFactory, INITIAL_CAPACITY);
+        myStorage = new SparseArray<>(Long.MAX_VALUE, myArrayFactory, INITIAL_CAPACITY);
     }
 
     public void clear() {
@@ -256,7 +256,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
     public LongToNumberMap<N> subMap(final long fromKey, final long toKey) {
 
-        final LongToNumberMap<N> retVal = new LongToNumberMap<N>(myArrayFactory);
+        final LongToNumberMap<N> retVal = new LongToNumberMap<>(myArrayFactory);
 
         long tmpKey;
         for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {

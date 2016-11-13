@@ -61,6 +61,10 @@ abstract class OldAbstractSeries<K extends Comparable<? super K>, V extends Numb
         return (I) this;
     }
 
+    public final double doubleValue(final K key) {
+        return this.get(key).doubleValue();
+    }
+
     public V firstValue() {
         return this.get(this.firstKey());
     }
@@ -110,10 +114,6 @@ abstract class OldAbstractSeries<K extends Comparable<? super K>, V extends Numb
     public I name(final String name) {
         myName = name;
         return (I) this;
-    }
-
-    public final double doubleValue(final K key) {
-        return this.get(key).doubleValue();
     }
 
     @Override

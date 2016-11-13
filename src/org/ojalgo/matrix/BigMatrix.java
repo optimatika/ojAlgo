@@ -115,7 +115,7 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
     }
 
     @Override
-    InverterTask<BigDecimal> getInverterTask(final MatrixStore<BigDecimal>base) {
+    InverterTask<BigDecimal> getInverterTask(final MatrixStore<BigDecimal> base) {
         return InverterTask.BIG.make(base, this.isHermitian(), false);
     }
 

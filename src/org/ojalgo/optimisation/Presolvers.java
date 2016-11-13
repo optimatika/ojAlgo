@@ -134,7 +134,7 @@ public abstract class Presolvers {
 
                 final BigDecimal tmpFixedValue = expression.calculateFixedValue(fixedVariables);
 
-                final HashSet<IntIndex> tmpRemainingLinear = new HashSet<IntIndex>(expression.getLinearKeySet());
+                final HashSet<IntIndex> tmpRemainingLinear = new HashSet<>(expression.getLinearKeySet());
                 tmpRemainingLinear.removeAll(fixedVariables);
 
                 switch (tmpRemainingLinear.size()) {

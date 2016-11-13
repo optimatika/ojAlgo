@@ -464,6 +464,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#column(int,int)} instead
      */
+    @Deprecated
     public static int column(final int index, final int structure) {
         return Structure2D.column(index, structure);
     }
@@ -471,6 +472,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#column(int,int[])} instead
      */
+    @Deprecated
     public static int column(final int index, final int[] structure) {
         return Structure2D.column(index, structure);
     }
@@ -478,6 +480,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#column(long,int)} instead
      */
+    @Deprecated
     public static int column(final long index, final int structure) {
         return Structure2D.column(index, structure);
     }
@@ -485,6 +488,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#column(long,long)} instead
      */
+    @Deprecated
     public static long column(final long index, final long structure) {
         return Structure2D.column(index, structure);
     }
@@ -492,6 +496,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#column(long,long[])} instead
      */
+    @Deprecated
     public static long column(final long index, final long[] structure) {
         return Structure2D.column(index, structure);
     }
@@ -599,6 +604,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#index(int,int,int)} instead
      */
+    @Deprecated
     public static int index(final int structure, final int row, final int column) {
         return Structure2D.index(structure, row, column);
     }
@@ -609,6 +615,7 @@ public abstract class AccessUtils {
      * @return The index of that element
      * @deprecated Use {@link StructureAnyD#index(int[],int[])} instead
      */
+    @Deprecated
     public static int index(final int[] structure, final int[] reference) {
         return StructureAnyD.index(structure, reference);
     }
@@ -619,6 +626,7 @@ public abstract class AccessUtils {
      * @return The index of that element
      * @deprecated Use {@link StructureAnyD#index(int[],long[])} instead
      */
+    @Deprecated
     public static int index(final int[] structure, final long[] reference) {
         return StructureAnyD.index(structure, reference);
     }
@@ -626,6 +634,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#index(long,long,long)} instead
      */
+    @Deprecated
     public static long index(final long structure, final long row, final long column) {
         return Structure2D.index(structure, row, column);
     }
@@ -636,6 +645,7 @@ public abstract class AccessUtils {
      * @return The index of that element
      * @deprecated Use {@link StructureAnyD#index(long[],long[])} instead
      */
+    @Deprecated
     public static long index(final long[] structure, final long[] reference) {
         return StructureAnyD.index(structure, reference);
     }
@@ -675,6 +685,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link StructureAnyD#reference(long,long[])} instead
      */
+    @Deprecated
     public static long[] reference(final long index, final long[] structure) {
         return StructureAnyD.reference(index, structure);
     }
@@ -682,6 +693,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#row(int,int)} instead
      */
+    @Deprecated
     public static int row(final int index, final int structure) {
         return Structure2D.row(index, structure);
     }
@@ -689,6 +701,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#row(int,int[])} instead
      */
+    @Deprecated
     public static int row(final int index, final int[] structure) {
         return Structure2D.row(index, structure);
     }
@@ -696,6 +709,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#row(long,int)} instead
      */
+    @Deprecated
     public static int row(final long index, final int structure) {
         return Structure2D.row(index, structure);
     }
@@ -703,6 +717,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#row(long,long)} instead
      */
+    @Deprecated
     public static long row(final long index, final long structure) {
         return Structure2D.row(index, structure);
     }
@@ -710,6 +725,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link Structure2D#row(long,long[])} instead
      */
+    @Deprecated
     public static long row(final long index, final long[] structure) {
         return Structure2D.row(index, structure);
     }
@@ -717,6 +733,7 @@ public abstract class AccessUtils {
     /**
      * @deprecated Use {@link StructureAnyD#shape(StructureAnyD)} instead
      */
+    @Deprecated
     public static long[] shape(final StructureAnyD structure) {
         return StructureAnyD.shape(structure);
     }
@@ -748,6 +765,7 @@ public abstract class AccessUtils {
      * @return The step size (index change) in that direction
      * @deprecated Use {@link StructureAnyD#step(int[],int)} instead
      */
+    @Deprecated
     public static int step(final int[] structure, final int dimension) {
         return StructureAnyD.step(structure, dimension);
     }
@@ -760,6 +778,7 @@ public abstract class AccessUtils {
      * @return The step size (index change)
      * @deprecated Use {@link StructureAnyD#step(int[],int[])} instead
      */
+    @Deprecated
     public static int step(final int[] structure, final int[] increment) {
         return StructureAnyD.step(structure, increment);
     }
@@ -770,6 +789,7 @@ public abstract class AccessUtils {
      * @return The step size (index change) in that direction
      * @deprecated Use {@link StructureAnyD#step(long[],int)} instead
      */
+    @Deprecated
     public static long step(final long[] structure, final int dimension) {
         return StructureAnyD.step(structure, dimension);
     }
@@ -782,6 +802,7 @@ public abstract class AccessUtils {
      * @return The step size (index change)
      * @deprecated Use {@link StructureAnyD#step(long[],long[])} instead
      */
+    @Deprecated
     public static long step(final long[] structure, final long[] increment) {
         return StructureAnyD.step(structure, increment);
     }

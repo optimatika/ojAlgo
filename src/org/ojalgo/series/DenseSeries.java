@@ -144,7 +144,7 @@ final class DenseSeries<K extends Comparable<? super K>, N extends Number> exten
 
     @Override
     public DenseSeries<K, N> subMap(final K fromKey, final K toKey) {
-        return new DenseSeries<K, N>(indexMapper, myDelegate.subList((int) indexMapper.toIndex(fromKey), (int) indexMapper.toIndex(toKey)));
+        return new DenseSeries<>(indexMapper, myDelegate.subList((int) indexMapper.toIndex(fromKey), (int) indexMapper.toIndex(toKey)));
     }
 
 }

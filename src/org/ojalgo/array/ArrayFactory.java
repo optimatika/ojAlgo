@@ -124,7 +124,7 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
 
         final long tmpIndexMask = tmpSegmentSize - 1L;
 
-        return new SegmentedArray<N>(segments, tmpSegmentSize, tmpIndexBits, tmpIndexMask, this);
+        return new SegmentedArray<>(segments, tmpSegmentSize, tmpIndexBits, tmpIndexMask, this);
     }
 
 }

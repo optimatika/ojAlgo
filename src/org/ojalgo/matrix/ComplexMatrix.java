@@ -147,7 +147,7 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     }
 
     @Override
-    InverterTask<ComplexNumber> getInverterTask(final MatrixStore<ComplexNumber>base) {
+    InverterTask<ComplexNumber> getInverterTask(final MatrixStore<ComplexNumber> base) {
         return InverterTask.COMPLEX.make(base, this.isHermitian(), false);
     }
 

@@ -226,7 +226,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     double doubleValue(long row, long col);
 
     default ElementView2D<N, ?> elements() {
-        return new Access2D.ElementView<N>(Access1D.super.elements(), this.countRows());
+        return new Access2D.ElementView<>(Access1D.super.elements(), this.countRows());
     }
 
     default N get(final long index) {
