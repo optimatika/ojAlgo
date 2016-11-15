@@ -38,6 +38,10 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     interface Fillable<N extends Number> extends Structure2D, Mutate1D.Fillable<N> {
 
+        default void fillColumn(final long col, final Access1D<N> values) {
+            this.fillColumn(0L, col, values);
+        }
+
         default void fillColumn(final long row, final long col, final Access1D<N> values) {
             final long tmpLimit = Math.min(this.countRows() - row, values.count());
             for (long i = 0L; i < tmpLimit; i++) {
@@ -57,6 +61,14 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             for (long i = row; i < tmpLimit; i++) {
                 this.fillOne(i, col, supplier);
             }
+        }
+
+        default void fillColumn(final long col, final N value) {
+            this.fillColumn(0L, col, value);
+        }
+
+        default void fillColumn(final long col, final NullaryFunction<N> supplier) {
+            this.fillColumn(0L, col, supplier);
         }
 
         default void fillDiagonal(final long row, final long col, final Access1D<N> values) {
@@ -109,6 +121,10 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillOne(row, col, values, valueIndex);
         }
 
+        default void fillRow(final long row, final Access1D<N> values) {
+            this.fillRow(row, 0L, values);
+        }
+
         default void fillRow(final long row, final long col, final Access1D<N> values) {
             final long tmpLimit = Math.min(this.countColumns() - col, values.count());
             for (long j = 0L; j < tmpLimit; j++) {
@@ -130,6 +146,14 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             }
         }
 
+        default void fillRow(final long row, final N value) {
+            this.fillRow(row, 0L, value);
+        }
+
+        default void fillRow(final long row, final NullaryFunction<N> supplier) {
+            this.fillRow(row, 0L, supplier);
+        }
+
     }
 
     interface Modifiable<N extends Number> extends Structure2D, Mutate1D.Modifiable<N> {
@@ -139,6 +163,10 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             for (long i = row; i < tmpLimit; i++) {
                 this.modifyOne(i, col, modifier);
             }
+        }
+
+        default void modifyColumn(final long col, final UnaryFunction<N> modifier) {
+            this.modifyColumn(0L, col, modifier);
         }
 
         default void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
@@ -160,6 +188,10 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             for (long j = col; j < tmpCountColumns; j++) {
                 this.modifyOne(row, j, modifier);
             }
+        }
+
+        default void modifyRow(final long row, final UnaryFunction<N> modifier) {
+            this.modifyRow(row, 0L, modifier);
         }
 
     }

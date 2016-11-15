@@ -49,6 +49,13 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         /**
          * @see Scalar#isSmall(double)
          */
+        default boolean isColumnSmall(final long col, final double comparedTo) {
+            return this.isColumnSmall(0L, col, comparedTo);
+        }
+
+        /**
+         * @see Scalar#isSmall(double)
+         */
         default boolean isColumnSmall(final long row, final long col, final double comparedTo) {
             boolean retVal = true;
             final long tmpLimit = this.countRows();
@@ -56,6 +63,13 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
                 retVal &= this.isSmall(i, col, comparedTo);
             }
             return retVal;
+        }
+
+        /**
+         * @see Scalar#isSmall(double)
+         */
+        default boolean isRowSmall(final long row, final double comparedTo) {
+            return this.isRowSmall(row, 0L, comparedTo);
         }
 
         /**
@@ -141,6 +155,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     public interface IndexOf extends Structure2D, Access1D.IndexOf {
 
+        default long indexOfLargestInColumn(final long col) {
+            return this.indexOfLargestInColumn(0L, col);
+        }
+
         /**
          * @param row
          * @param col
@@ -156,6 +174,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
          */
         long indexOfLargestInDiagonal(final long row, final long col);
 
+        default long indexOfLargestInRow(final long row) {
+            return this.indexOfLargestInRow(row, 0L);
+        }
+
         /**
          * @param row
          * @param col
@@ -167,9 +189,17 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     public interface Sliceable<N extends Number> extends Structure2D, Access1D.Sliceable<N> {
 
+        default Access1D<N> sliceColumn(final long col) {
+            return this.sliceColumn(0L, col);
+        }
+
         Access1D<N> sliceColumn(long row, long col);
 
         Access1D<N> sliceDiagonal(long row, long col);
+
+        default Access1D<N> sliceRow(final long row) {
+            return this.sliceRow(row, 0L);
+        }
 
         Access1D<N> sliceRow(long row, long col);
 
@@ -182,6 +212,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             for (long i = row; i < tmpLimit; i++) {
                 this.visitOne(i, col, visitor);
             }
+        }
+
+        default void visitColumn(final long col, final VoidFunction<N> visitor) {
+            this.visitColumn(0L, col, visitor);
         }
 
         default void visitDiagonal(final long row, final long col, final VoidFunction<N> visitor) {
@@ -203,6 +237,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             for (long j = col; j < tmpLimit; j++) {
                 this.visitOne(row, j, visitor);
             }
+        }
+
+        default void visitRow(final long row, final VoidFunction<N> visitor) {
+            this.visitRow(row, 0L, visitor);
         }
 
     }
