@@ -44,22 +44,6 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     public static final BasicMatrix.Factory<ComplexMatrix> FACTORY = new MatrixFactory<>(ComplexMatrix.class, ComplexDenseStore.FACTORY);
 
     /**
-     * @deprecated v41 Use {@link #FACTORY} instead
-     */
-    @Deprecated
-    public static Builder<ComplexMatrix> getBuilder(final int aLength) {
-        return FACTORY.getBuilder(aLength);
-    }
-
-    /**
-     * @deprecated v41 Use {@link #FACTORY} instead
-     */
-    @Deprecated
-    public static Builder<ComplexMatrix> getBuilder(final int aRowDim, final int aColDim) {
-        return FACTORY.getBuilder(aRowDim, aColDim);
-    }
-
-    /**
      * This method is for internal use only - YOU should NOT use it!
      */
     ComplexMatrix(final MatrixStore<ComplexNumber> aStore) {

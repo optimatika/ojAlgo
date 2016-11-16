@@ -117,14 +117,6 @@ public interface Mutate1D extends Structure1D {
 
         void fillOne(long index, NullaryFunction<N> supplier);
 
-        /**
-         * @deprecated v41 Use {@link #fillOne(long,Access1D,long)} instead
-         */
-        @Deprecated
-        default void fillOneMatching(final long index, final Access1D<?> values, final long valueIndex) {
-            this.fillOne(index, values, valueIndex);
-        }
-
         default void fillRange(final long first, final long limit, final N value) {
             for (long i = first; i < limit; i++) {
                 this.fillOne(i, value);

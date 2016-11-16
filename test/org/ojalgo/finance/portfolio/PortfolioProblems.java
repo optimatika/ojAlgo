@@ -99,7 +99,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
      */
     public void testP20110614() {
 
-        final Builder<PrimitiveMatrix> tmpCovarsBuilder = PrimitiveMatrix.getBuilder(3, 3);
+        final Builder<PrimitiveMatrix> tmpCovarsBuilder = PrimitiveMatrix.FACTORY.getBuilder(3, 3);
         tmpCovarsBuilder.set(0, 0, 0.04);
         tmpCovarsBuilder.set(0, 1, 0.01);
         tmpCovarsBuilder.set(0, 2, 0.02);
@@ -110,7 +110,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpCovarsBuilder.set(2, 1, 0.01);
         tmpCovarsBuilder.set(2, 2, 0.16);
         final BasicMatrix tmpCovars = tmpCovarsBuilder.build();
-        final Builder<PrimitiveMatrix> tmpReturnsBuilder = PrimitiveMatrix.getBuilder(3, 1);
+        final Builder<PrimitiveMatrix> tmpReturnsBuilder = PrimitiveMatrix.FACTORY.getBuilder(3, 1);
         tmpReturnsBuilder.set(0, 0, 0.10);
         tmpReturnsBuilder.set(1, 0, 0.15);
         tmpReturnsBuilder.set(2, 0, 0.18);

@@ -24,6 +24,7 @@ package org.ojalgo.optimisation;
 import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.VoidFunction;
@@ -71,7 +72,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
         myName = name;
 
-        ProgrammingError.throwIfNull(name);
+        Objects.requireNonNull(name);
     }
 
     public final int compareTo(final ME obj) {

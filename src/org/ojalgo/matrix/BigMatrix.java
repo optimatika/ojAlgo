@@ -44,22 +44,6 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
     public static final BasicMatrix.Factory<BigMatrix> FACTORY = new MatrixFactory<>(BigMatrix.class, BigDenseStore.FACTORY);
 
     /**
-     * @deprecated v41 Use {@link #FACTORY} instead
-     */
-    @Deprecated
-    public static Builder<BigMatrix> getBuilder(final int aLength) {
-        return FACTORY.getBuilder(aLength);
-    }
-
-    /**
-     * @deprecated v41 Use {@link #FACTORY} instead
-     */
-    @Deprecated
-    public static Builder<BigMatrix> getBuilder(final int aRowDim, final int aColDim) {
-        return FACTORY.getBuilder(aRowDim, aColDim);
-    }
-
-    /**
      * This method is for internal use only - YOU should NOT use it!
      */
     BigMatrix(final MatrixStore<BigDecimal> aStore) {

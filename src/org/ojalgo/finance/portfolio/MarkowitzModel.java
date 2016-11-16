@@ -128,14 +128,6 @@ public final class MarkowitzModel extends OptimisedPortfolio {
         this.reset();
     }
 
-    /**
-     * @deprecated v41 Use {@link #optimiser()} instead,
-     */
-    @Deprecated
-    public Optimisation.State getOptimisationState() {
-        return this.optimiser().getState();
-    }
-
     public final void setLowerLimit(final int assetIndex, final BigDecimal lowerLimit) {
         this.getVariable(assetIndex).lower(lowerLimit);
         this.reset();

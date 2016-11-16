@@ -46,17 +46,6 @@ public class ProgrammingError extends RuntimeException {
         throw new ProgrammingError("Unsupported optional operation!");
     }
 
-    /**
-     * Instead of IllegalArgumentException and/or NullPointerException.
-     *
-     * @param obj
-     * @deprecated v41 Use {@link Objects#requireNonNull(Object)} instead.
-     */
-    @Deprecated
-    public static void throwIfNull(final Object obj) {
-        Objects.requireNonNull(obj);
-    }
-
     public ProgrammingError(final String aString) {
         super(aString);
     }

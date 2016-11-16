@@ -126,14 +126,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             return this.allocate(numberOfEquations, numberOfEquations);
         }
 
-        /**
-         * @deprecated Use {@link #getSolution(ElementsSupplier<Double>)} instead
-         */
-        @Deprecated
-        public MatrixStore<Double> solve(final ElementsSupplier<Double> rhs) {
-            return this.getSolution(rhs);
-        }
-
         @Override
         boolean doDecompose(final double[][] data) {
 

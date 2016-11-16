@@ -24,6 +24,7 @@ package org.ojalgo.optimisation;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
@@ -294,8 +295,8 @@ public interface Optimisation {
 
             super();
 
-            ProgrammingError.throwIfNull(state);
-            ProgrammingError.throwIfNull(solution);
+            Objects.requireNonNull(state);
+            Objects.requireNonNull(solution);
 
             myState = state;
             myValue = value;

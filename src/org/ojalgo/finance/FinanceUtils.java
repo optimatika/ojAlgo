@@ -147,7 +147,7 @@ public abstract class FinanceUtils {
 
         final int tmpSize = timeSeriesCollection.size();
 
-        final Builder<PrimitiveMatrix> retValStore = PrimitiveMatrix.getBuilder(tmpSize, tmpSize);
+        final Builder<PrimitiveMatrix> retValStore = PrimitiveMatrix.FACTORY.getBuilder(tmpSize, tmpSize);
 
         final double tmpToYearFactor = (double) CalendarDateUnit.YEAR.size() / (double) tmpCoordinator.getResolution().size();
 
@@ -187,7 +187,7 @@ public abstract class FinanceUtils {
 
         final CoordinationSet<N> tmpCoordinated = tmpUncoordinated.prune(tmpDataResolution);
 
-        final Builder<PrimitiveMatrix> tmpMatrixBuilder = PrimitiveMatrix.getBuilder(tmpSize, tmpSize);
+        final Builder<PrimitiveMatrix> tmpMatrixBuilder = PrimitiveMatrix.FACTORY.getBuilder(tmpSize, tmpSize);
 
         final double tmpToYearFactor = (double) CalendarDateUnit.YEAR.size() / (double) tmpDataResolution.size();
 
@@ -352,14 +352,6 @@ public abstract class FinanceUtils {
         return PrimitiveFunction.EXPM1.invoke(growthRate * tmpGrowthRateUnitsPerYear);
     }
 
-    /**
-     * @deprecated v41 Use {@link #toVolatilities(Access2D)} instead
-     */
-    @Deprecated
-    public static PrimitiveMatrix toAssetVolatilities(final Access2D<?> covariances) {
-        return FinanceUtils.toVolatilities(covariances);
-    }
-
     public static PrimitiveMatrix toCorrelations(final Access2D<?> covariances) {
         return FinanceUtils.toCorrelations(covariances, false);
     }
@@ -398,7 +390,7 @@ public abstract class FinanceUtils {
             tmpCovariances = tmpLeft.multiply(tmpMiddle).multiply(tmpRight);
         }
 
-        final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.getBuilder(tmpSize, tmpSize);
+        final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.FACTORY.getBuilder(tmpSize, tmpSize);
 
         final double[] tmpVolatilities = new double[tmpSize];
         for (int ij = 0; ij < tmpSize; ij++) {
@@ -427,7 +419,7 @@ public abstract class FinanceUtils {
 
         final int tmpSize = (int) volatilities.count();
 
-        final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.getBuilder(tmpSize, tmpSize);
+        final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.FACTORY.getBuilder(tmpSize, tmpSize);
 
         for (int j = 0; j < tmpSize; j++) {
             final double tmpColumnVolatility = volatilities.doubleValue(j);
@@ -480,7 +472,7 @@ public abstract class FinanceUtils {
 
         final int tmpSize = (int) Math.min(covariances.countRows(), covariances.countColumns());
 
-        final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.getBuilder(tmpSize);
+        final Builder<PrimitiveMatrix> retVal = PrimitiveMatrix.FACTORY.getBuilder(tmpSize);
 
         if (clean) {
 

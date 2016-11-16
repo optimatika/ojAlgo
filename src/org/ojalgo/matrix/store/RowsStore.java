@@ -35,15 +35,6 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
 
     private final int[] myRows;
 
-    /**
-     * @deprecated v40 Use {@link LogicalBuilder#offsets(int, int)} and/or
-     *             {@link LogicalBuilder#limits(int, int)} instead
-     */
-    @Deprecated
-    RowsStore(final int first, final int limit, final MatrixStore<N> base) {
-        this(base, AccessUtils.makeIncreasingRange(first, limit - first));
-    }
-
     RowsStore(final MatrixStore<N> base, final int... rows) {
 
         super(base, rows.length, (int) base.countColumns());

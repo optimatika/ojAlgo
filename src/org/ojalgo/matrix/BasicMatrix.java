@@ -86,15 +86,6 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     Builder<? extends BasicMatrix> copy();
 
     /**
-     * @return A fully mutable matrix builder with the elements initially set to a copy of this matrix.
-     * @deprecated v41 Use {@link #copy()} instead
-     */
-    @Deprecated
-    default Builder<? extends BasicMatrix> copyToBuilder() {
-        return this.copy();
-    }
-
-    /**
      * Divides the elements of this with the elements of aMtrx. The matrices must have equal dimensions.
      *
      * @param aMtrx The denominator elements.

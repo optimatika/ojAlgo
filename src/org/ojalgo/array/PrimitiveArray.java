@@ -87,22 +87,6 @@ public class PrimitiveArray extends DenseArray<Double> {
         return new PrimitiveArray(size);
     }
 
-    /**
-     * @deprecated v41 Use {@link #FACTORY} and {@link ArrayFactory#makeSegmented(long)} instead.
-     */
-    @Deprecated
-    public static final SegmentedArray<Double> makeSegmented(final int size) {
-        return SegmentedArray.make(FACTORY, size);
-    }
-
-    /**
-     * @deprecated v41 Use {@link #FACTORY} and {@link ArrayFactory#makeSegmented(long)} instead.
-     */
-    @Deprecated
-    public static final SegmentedArray<Double> makeSegmented(final long count) {
-        return SegmentedArray.make(FACTORY, count);
-    }
-
     public static final PrimitiveArray wrap(final double[] data) {
         return new PrimitiveArray(data);
     }

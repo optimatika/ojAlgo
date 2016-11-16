@@ -533,20 +533,8 @@ abstract class AbstractSolver implements SolverTask<Double> {
         super();
     }
 
-    public final MatrixStore<Double> getSolution(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
-        return this.solve(body, rhs, this.preallocate(body, rhs));
-    }
-
     public final DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return PrimitiveDenseStore.FACTORY.makeZero(templateBody.countColumns(), 1L);
-    }
-
-    /**
-     * @deprecated Use {@link #getSolution(Access2D<?>,Access2D<?>)} instead
-     */
-    @Deprecated
-    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
-        return this.getSolution(body, rhs);
     }
 
 }

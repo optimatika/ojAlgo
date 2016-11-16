@@ -59,7 +59,7 @@ public abstract class BasicArrayTest extends ArrayTests {
     }
 
     public void testSegmentedPrimitive() {
-        this.doTest(PrimitiveArray.makeSegmented(COUNT));
+        this.doTest(SegmentedArray.make(PrimitiveArray.FACTORY, COUNT));
     }
 
     public void testSegmentedSparse() {

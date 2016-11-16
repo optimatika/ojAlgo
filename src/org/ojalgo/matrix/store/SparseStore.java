@@ -280,12 +280,6 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     }
 
-    /**
-     * Marked as deprecated because of it's preliminary design - not because it will be removed.
-     *
-     * @deprecated v40
-     */
-    @Deprecated
     public ElementView2D<N, ?> nonzeros() {
         return new Access2D.ElementView<>(myElements.nonzeros(), this.countRows());
     }

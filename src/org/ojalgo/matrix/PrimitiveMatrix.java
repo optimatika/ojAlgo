@@ -44,22 +44,6 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
     public static final BasicMatrix.Factory<PrimitiveMatrix> FACTORY = new MatrixFactory<>(PrimitiveMatrix.class, PrimitiveDenseStore.FACTORY);
 
     /**
-     * @deprecated v41 Use {@link #FACTORY} instead
-     */
-    @Deprecated
-    public static Builder<PrimitiveMatrix> getBuilder(final int aLength) {
-        return FACTORY.getBuilder(aLength);
-    }
-
-    /**
-     * @deprecated v41 Use {@link #FACTORY} instead
-     */
-    @Deprecated
-    public static Builder<PrimitiveMatrix> getBuilder(final int aRowDim, final int aColDim) {
-        return FACTORY.getBuilder(aRowDim, aColDim);
-    }
-
-    /**
      * This method is for internal use only - YOU should NOT use it!
      */
     PrimitiveMatrix(final MatrixStore<Double> aStore) {

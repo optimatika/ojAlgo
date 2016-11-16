@@ -66,14 +66,6 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         return new BigArray(size);
     }
 
-    /**
-     * @deprecated v41 Use {@link #FACTORY} and {@link ArrayFactory#makeSegmented(long)} instead.
-     */
-    @Deprecated
-    public static final SegmentedArray<BigDecimal> makeSegmented(final long count) {
-        return SegmentedArray.make(FACTORY, count);
-    }
-
     public static final BigArray wrap(final BigDecimal[] data) {
         return new BigArray(data);
     }

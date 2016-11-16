@@ -191,14 +191,6 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
             return this;
         }
 
-        /**
-         * @deprecated v40 Use {@link #get()} instead
-         */
-        @Deprecated
-        public final MatrixStore<N> build() {
-            return this.get();
-        }
-
         public final LogicalBuilder<N> column(final int... col) {
             myStore = new ColumnsStore<>(myStore, col);
             return this;

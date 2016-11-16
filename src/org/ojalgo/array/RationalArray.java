@@ -61,14 +61,6 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
         return new RationalArray(size);
     }
 
-    /**
-     * @deprecated v41 Use {@link #FACTORY} and {@link ArrayFactory#makeSegmented(long)} instead.
-     */
-    @Deprecated
-    public static final SegmentedArray<RationalNumber> makeSegmented(final long count) {
-        return SegmentedArray.make(FACTORY, count);
-    }
-
     public static final RationalArray wrap(final RationalNumber[] data) {
         return new RationalArray(data);
     }

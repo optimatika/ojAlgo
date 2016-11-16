@@ -111,8 +111,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
                 tmpNorm2 += tmpVal.norm() * tmpVal.norm();
                 tmpVector[i] = tmpVal;
             }
-            final double value = tmpNorm2;
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
         }
 
         if (retVal) {
@@ -157,8 +156,7 @@ public final class GenerateApplyAndCopyHouseholderColumn extends MatrixOperation
                 tmpVal = tmpVector[i] /= tmpNormInf;
                 tmpNorm2 += tmpVal * tmpVal;
             }
-            final double value = tmpNorm2;
-            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, value);
+            retVal = !PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpNorm2);
         }
 
         if (retVal) {

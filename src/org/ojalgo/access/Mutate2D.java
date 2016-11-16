@@ -113,14 +113,6 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillOne(Structure2D.row(index, tmpStructure), Structure2D.column(index, tmpStructure), supplier);
         }
 
-        /**
-         * @deprecated v41 Use {@link #fillOne(long,long,Access1D,long)} instead
-         */
-        @Deprecated
-        default void fillOneMatching(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-            this.fillOne(row, col, values, valueIndex);
-        }
-
         default void fillRow(final long row, final Access1D<N> values) {
             this.fillRow(row, 0L, values);
         }

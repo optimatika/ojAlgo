@@ -64,14 +64,6 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
         return new QuaternionArray(size);
     }
 
-    /**
-     * @deprecated v41 Use {@link #FACTORY} and {@link ArrayFactory#makeSegmented(long)} instead.
-     */
-    @Deprecated
-    public static final SegmentedArray<Quaternion> makeSegmented(final long count) {
-        return SegmentedArray.make(FACTORY, count);
-    }
-
     public static final QuaternionArray wrap(final Quaternion[] data) {
         return new QuaternionArray(data);
     }

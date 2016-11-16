@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import org.ojalgo.ProgrammingError;
@@ -133,9 +134,9 @@ public final class Expression extends ModelEntity<Expression> {
         myLinear = new HashMap<>();
         myQuadratic = new HashMap<>();
 
-        ProgrammingError.throwIfNull(myModel);
-        ProgrammingError.throwIfNull(myLinear);
-        ProgrammingError.throwIfNull(myQuadratic);
+        Objects.requireNonNull(myModel);
+        Objects.requireNonNull(myLinear);
+        Objects.requireNonNull(myQuadratic);
     }
 
     public Expression add(final IntIndex key, final Number value) {

@@ -40,14 +40,6 @@ import org.ojalgo.function.UnaryFunction;
  */
 public interface ElementsSupplier<N extends Number> extends Supplier2D.Pipeline<N, ElementsConsumer<N>> {
 
-    /**
-     * @deprecated v41 Use {@link #physical()} instead
-     */
-    @Deprecated
-    default PhysicalStore.Factory<N, ?> factory() {
-        return this.physical();
-    }
-
     default MatrixStore<N> get() {
 
         final PhysicalStore<N> retVal = this.physical().makeZero(this.countRows(), this.countColumns());
