@@ -238,7 +238,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
      * @see org.ojalgo.matrix.BasicMatrix#getFrobeniusNorm()
      */
     public Scalar<N> getFrobeniusNorm() {
-        return myStore.physical().scalar().convert(myStore.aggregateAll(Aggregator.NORM2));
+        return myStore.physical().scalar().convert(myStore.norm());
     }
 
     public Scalar<N> getInfinityNorm() {

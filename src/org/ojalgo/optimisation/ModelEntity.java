@@ -26,7 +26,6 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -178,10 +177,17 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return myUpperLimit != null;
     }
 
+    /**
+     * @see #getLowerLimit()
+     * @see #getUpperLimit()
+     */
     public final ME level(final Number level) {
         return this.lower(level).upper(level);
     }
 
+    /**
+     * @see #getLowerLimit()
+     */
     @SuppressWarnings("unchecked")
     public final ME lower(final Number lower) {
         myAdjustmentExponent = Integer.MIN_VALUE;
@@ -203,6 +209,9 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return retVal.toString();
     }
 
+    /**
+     * @see #getUpperLimit()
+     */
     @SuppressWarnings("unchecked")
     public final ME upper(final Number upper) {
         myAdjustmentExponent = Integer.MIN_VALUE;
@@ -214,6 +223,9 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
         return (ME) this;
     }
 
+    /**
+     * @see #getContributionWeight()
+     */
     @SuppressWarnings("unchecked")
     public final ME weight(final Number weight) {
         final BigDecimal tmpWeight = weight != null ? TypeUtils.toBigDecimal(weight) : null;

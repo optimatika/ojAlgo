@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.netio.BasicLogger;
@@ -45,12 +44,12 @@ public interface Optimisation {
     public static interface Constraint extends Optimisation {
 
         /**
-         * May return null
+         * The lower limit/bound - may return null.
          */
         BigDecimal getLowerLimit();
 
         /**
-         * May return null
+         * The upper limit/bound - may return null.
          */
         BigDecimal getUpperLimit();
 
@@ -135,7 +134,8 @@ public interface Optimisation {
     public static interface Objective extends Optimisation {
 
         /**
-         * May return null
+         * The weight/factor by which this model entity's value contributes to the objective function - may
+         * return null.
          */
         BigDecimal getContributionWeight();
 

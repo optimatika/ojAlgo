@@ -64,6 +64,12 @@ public final class Variable extends ModelEntity<Variable> {
         myValue = variableToCopy.getValue();
     }
 
+    /**
+     * @see #getLowerLimit()
+     * @see #getUpperLimit()
+     * @see #isInteger()
+     * @see #isBinary()
+     */
     public Variable binary() {
         return this.lower(ZERO).upper(ONE).integer(true);
     }
@@ -122,11 +128,17 @@ public final class Variable extends ModelEntity<Variable> {
         return myValue;
     }
 
+    /**
+     * @see #isInteger()
+     */
     public Variable integer(final boolean integer) {
         this.setInteger(integer);
         return this;
     }
 
+    /**
+     * Variable can only be 0 or 1.
+     */
     public boolean isBinary() {
 
         boolean retVal = this.isInteger();
@@ -138,6 +150,9 @@ public final class Variable extends ModelEntity<Variable> {
         return retVal;
     }
 
+    /**
+     * @return true if this is an integer variable, otherwise false
+     */
     public boolean isInteger() {
         return myInteger;
     }
