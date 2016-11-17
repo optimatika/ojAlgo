@@ -25,6 +25,8 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.store.ElementsConsumer;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -73,17 +75,70 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
 
     @SuppressWarnings("unchecked")
     @Override
-    MatrixStore<Double> cast(final Access1D<?> matrix) {
+    ElementsSupplier<Double> cast(final Access1D<?> matrix) {
+
         if (matrix instanceof PrimitiveMatrix) {
+
             return ((PrimitiveMatrix) matrix).getStore();
+
         } else if (matrix instanceof PrimitiveDenseStore) {
+
             return (PrimitiveDenseStore) matrix;
-        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof Double)) {
-            return (MatrixStore<Double>) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return this.getStore().physical().copy((Access2D<?>) matrix);
+
+        } else if ((matrix instanceof ElementsSupplier) && !this.isEmpty() && (matrix.get(0) instanceof Double)) {
+
+            return (ElementsSupplier<Double>) matrix;
+
+        } else if (matrix instanceof Access2D) {
+            final Access2D<?> tmpAccess2D = (Access2D<?>) matrix;
+
+            return new ElementsSupplier<Double>() {
+
+                public long countColumns() {
+                    return tmpAccess2D.countColumns();
+                }
+
+                public long countRows() {
+                    return tmpAccess2D.countRows();
+                }
+
+                public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
+                    return PrimitiveDenseStore.FACTORY;
+                }
+
+                public void supplyTo(final ElementsConsumer<Double> consumer) {
+                    final long tmpLimit = tmpAccess2D.count();
+                    for (long i = 0L; i < tmpLimit; i++) {
+                        consumer.set(i, tmpAccess2D.doubleValue(i));
+                    }
+                }
+
+            };
+
         } else {
-            return this.getStore().physical().columns(matrix);
+
+            return new ElementsSupplier<Double>() {
+
+                public long countColumns() {
+                    return 1L;
+                }
+
+                public long countRows() {
+                    return matrix.count();
+                }
+
+                public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
+                    return PrimitiveDenseStore.FACTORY;
+                }
+
+                public void supplyTo(final ElementsConsumer<Double> consumer) {
+                    final long tmpLimit = matrix.count();
+                    for (long i = 0L; i < tmpLimit; i++) {
+                        consumer.set(i, matrix.doubleValue(i));
+                    }
+                }
+
+            };
         }
     }
 
@@ -104,7 +159,7 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
     }
 
     @Override
-    SolverTask<Double> getSolverTask(final MatrixStore<Double> templateBody, final MatrixStore<Double> templateRHS) {
+    SolverTask<Double> getSolverTask(final MatrixStore<Double> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.PRIMITIVE.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

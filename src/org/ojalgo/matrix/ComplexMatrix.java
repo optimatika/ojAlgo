@@ -26,6 +26,8 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.ElementsConsumer;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
@@ -105,17 +107,70 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
 
     @SuppressWarnings("unchecked")
     @Override
-    MatrixStore<ComplexNumber> cast(final Access1D<?> matrix) {
+    ElementsSupplier<ComplexNumber> cast(final Access1D<?> matrix) {
+
         if (matrix instanceof ComplexMatrix) {
+
             return ((ComplexMatrix) matrix).getStore();
+
         } else if (matrix instanceof ComplexDenseStore) {
+
             return (ComplexDenseStore) matrix;
-        } else if ((matrix instanceof MatrixStore) && !this.isEmpty() && (matrix.get(0) instanceof ComplexNumber)) {
-            return (MatrixStore<ComplexNumber>) matrix;
-        } else if (matrix instanceof Access2D<?>) {
-            return this.getStore().physical().copy((Access2D<?>) matrix);
+
+        } else if ((matrix instanceof ElementsSupplier) && !this.isEmpty() && (matrix.get(0) instanceof ComplexNumber)) {
+
+            return (ElementsSupplier<ComplexNumber>) matrix;
+
+        } else if (matrix instanceof Access2D) {
+            final Access2D<?> tmpAccess2D = (Access2D<?>) matrix;
+
+            return new ElementsSupplier<ComplexNumber>() {
+
+                public long countColumns() {
+                    return tmpAccess2D.countColumns();
+                }
+
+                public long countRows() {
+                    return tmpAccess2D.countRows();
+                }
+
+                public PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> physical() {
+                    return ComplexDenseStore.FACTORY;
+                }
+
+                public void supplyTo(final ElementsConsumer<ComplexNumber> consumer) {
+                    final long tmpLimit = tmpAccess2D.count();
+                    for (long i = 0L; i < tmpLimit; i++) {
+                        consumer.set(i, tmpAccess2D.get(i));
+                    }
+                }
+
+            };
+
         } else {
-            return this.getStore().physical().columns(matrix);
+
+            return new ElementsSupplier<ComplexNumber>() {
+
+                public long countColumns() {
+                    return 1L;
+                }
+
+                public long countRows() {
+                    return matrix.count();
+                }
+
+                public PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> physical() {
+                    return ComplexDenseStore.FACTORY;
+                }
+
+                public void supplyTo(final ElementsConsumer<ComplexNumber> consumer) {
+                    final long tmpLimit = matrix.count();
+                    for (long i = 0L; i < tmpLimit; i++) {
+                        consumer.set(i, matrix.get(i));
+                    }
+                }
+
+            };
         }
     }
 
@@ -136,7 +191,7 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     }
 
     @Override
-    SolverTask<ComplexNumber> getSolverTask(final MatrixStore<ComplexNumber> templateBody, final MatrixStore<ComplexNumber> templateRHS) {
+    SolverTask<ComplexNumber> getSolverTask(final MatrixStore<ComplexNumber> templateBody, final Access2D<?> templateRHS) {
         return SolverTask.COMPLEX.make(templateBody, templateRHS, this.isHermitian(), false);
     }
 

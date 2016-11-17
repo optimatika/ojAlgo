@@ -42,14 +42,14 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
             return this.make(templateBody, templateRHS, MatrixUtils.isHermitian(templateBody), false);
         }
 
-        public abstract SolverTask<N> make(MatrixStore<N> templateBody, MatrixStore<N> templateRHS, boolean symmetric, boolean positiveDefinite);
+        public abstract SolverTask<N> make(Structure2D templateBody, Structure2D templateRHS, boolean symmetric, boolean positiveDefinite);
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        public SolverTask<BigDecimal> make(final MatrixStore<BigDecimal> templateBody, final MatrixStore<BigDecimal> templateRHS, final boolean symmetric,
+        public SolverTask<BigDecimal> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
                 final boolean positiveDefinite) {
             if (templateBody.isSquare()) {
                 if (symmetric && positiveDefinite) {
@@ -69,7 +69,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        public SolverTask<ComplexNumber> make(final MatrixStore<ComplexNumber> templateBody, final MatrixStore<ComplexNumber> templateRHS,
+        public SolverTask<ComplexNumber> make(final Structure2D templateBody, final Structure2D templateRHS,
                 final boolean symmetric, final boolean positiveDefinite) {
             if (templateBody.isSquare()) {
                 if (symmetric && positiveDefinite) {
@@ -89,7 +89,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        public SolverTask<Double> make(final MatrixStore<Double> templateBody, final MatrixStore<Double> templateRHS, final boolean symmetric,
+        public SolverTask<Double> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
                 final boolean positiveDefinite) {
 
             final boolean tmpVectorRHS = templateRHS.countColumns() == 1L;
