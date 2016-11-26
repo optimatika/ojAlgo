@@ -23,7 +23,6 @@ package org.ojalgo.function.aggregator;
 
 import static org.ojalgo.function.ComplexFunction.*;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
@@ -31,7 +30,7 @@ import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class ComplexAggregator {
+public final class ComplexAggregator extends AggregatorSet<ComplexNumber> {
 
     public static final ThreadLocal<AggregatorFunction<ComplexNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<ComplexNumber>>() {
 
@@ -573,74 +572,69 @@ public abstract class ComplexAggregator {
         }
     };
 
-    private static final AggregatorSet<ComplexNumber> SET = new AggregatorSet<ComplexNumber>() {
+    private static final ComplexAggregator SET = new ComplexAggregator();
 
-        @Override
-        public AggregatorFunction<ComplexNumber> cardinality() {
-            return CARDINALITY.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<ComplexNumber> largest() {
-            return LARGEST.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<ComplexNumber> maximum() {
-            return MAX.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<ComplexNumber> minimum() {
-            return MIN.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<ComplexNumber> norm1() {
-            return NORM1.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<ComplexNumber> norm2() {
-            return NORM2.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<ComplexNumber> product() {
-            return PRODUCT.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<ComplexNumber> product2() {
-            return PRODUCT2.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<ComplexNumber> smallest() {
-            return SMALLEST.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<ComplexNumber> sum() {
-            return SUM.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<ComplexNumber> sum2() {
-            return SUM2.get().reset();
-        }
-
-    };
-
-    public static AggregatorSet<ComplexNumber> getSet() {
+    public static ComplexAggregator getSet() {
         return SET;
     }
 
     private ComplexAggregator() {
-
         super();
+    }
 
-        ProgrammingError.throwForIllegalInvocation();
+    @Override
+    public AggregatorFunction<ComplexNumber> cardinality() {
+        return CARDINALITY.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<ComplexNumber> largest() {
+        return LARGEST.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<ComplexNumber> maximum() {
+        return MAX.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<ComplexNumber> minimum() {
+        return MIN.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<ComplexNumber> norm1() {
+        return NORM1.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<ComplexNumber> norm2() {
+        return NORM2.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<ComplexNumber> product() {
+        return PRODUCT.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<ComplexNumber> product2() {
+        return PRODUCT2.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<ComplexNumber> smallest() {
+        return SMALLEST.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<ComplexNumber> sum() {
+        return SUM.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<ComplexNumber> sum2() {
+        return SUM2.get().reset();
     }
 
 }

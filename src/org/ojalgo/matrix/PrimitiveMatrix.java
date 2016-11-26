@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.ElementsConsumer;
@@ -33,7 +31,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -54,19 +51,6 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
 
     public PrimitiveMatrix enforce(final NumberContext context) {
         return this.modify(context.getPrimitiveFunction());
-    }
-
-    public BigDecimal toBigDecimal(final int row, final int column) {
-        return new BigDecimal(this.getStore().doubleValue(row, column));
-    }
-
-    public ComplexNumber toComplexNumber(final int row, final int column) {
-        return ComplexNumber.valueOf(this.getStore().doubleValue(row, column));
-    }
-
-    @Override
-    public PhysicalStore<Double> toPrimitiveStore() {
-        return this.getStore().copy();
     }
 
     public String toString(final int row, final int col) {

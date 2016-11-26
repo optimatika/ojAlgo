@@ -30,6 +30,7 @@ import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.*;
+import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -79,7 +80,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
     }
 
     public void testBasicMatrixP20050827Case() {
-        this.doTestTypes(PrimitiveMatrix.FACTORY.copy(P20050827Case.getProblematic().toPrimitiveStore()));
+        this.doTestTypes(PrimitiveMatrix.FACTORY.copy(PrimitiveDenseStore.FACTORY.copy(P20050827Case.getProblematic())));
     }
 
     public void testBasicMatrixP20061119Case() {
@@ -209,35 +210,35 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
     public void testRecreationFat() {
 
-        final PhysicalStore<Double> tmpOriginal = MTRX_FAT.toPrimitiveStore();
+        final PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_FAT);
 
         this.testRecreation(tmpOriginal);
     }
 
     public void testRecreationSquare() {
 
-        final PhysicalStore<Double> tmpOriginal = MTRX_SQUARE.toPrimitiveStore();
+        final PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_SQUARE);
 
         this.testRecreation(tmpOriginal);
     }
 
     public void testRecreationTall() {
 
-        final PhysicalStore<Double> tmpOriginal = MTRX_TALL.toPrimitiveStore();
+        final PhysicalStore<Double> tmpOriginal = PrimitiveDenseStore.FACTORY.copy(MTRX_TALL);
 
         this.testRecreation(tmpOriginal);
     }
 
     private void doTestTypes(final BasicMatrix original) {
 
-        final PhysicalStore<BigDecimal> tmpBigStore = original.toBigStore();
-        final PhysicalStore<ComplexNumber> tmpComplexStore = original.toComplexStore();
-        final PhysicalStore<Double> tmpPrimitiveStore = original.toPrimitiveStore();
+        final PhysicalStore<BigDecimal> tmpBigStore = BigDenseStore.FACTORY.copy(original);
+        final PhysicalStore<ComplexNumber> tmpComplexStore = ComplexDenseStore.FACTORY.copy(original);
+        final PhysicalStore<Double> tmpPrimitiveStore = PrimitiveDenseStore.FACTORY.copy(original);
 
-        IMPL_BIG.decompose(original.toBigStore());
-        IMPL_COMPLEX.decompose(original.toComplexStore());
-        IMPL_RAW.decompose(original.toPrimitiveStore());
-        IMPL_PRIMITIVE.decompose(original.toPrimitiveStore());
+        IMPL_BIG.decompose((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(original));
+        IMPL_COMPLEX.decompose((PhysicalStore<ComplexNumber>) ComplexDenseStore.FACTORY.copy(original));
+        IMPL_RAW.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(original));
+        IMPL_PRIMITIVE.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(original));
 
         final Array1D<Double> tmpBigSingularValues = IMPL_BIG.getSingularValues();
         final Array1D<Double> tmpComplexSingularValues = IMPL_COMPLEX.getSingularValues();

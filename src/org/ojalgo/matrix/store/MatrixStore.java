@@ -31,6 +31,7 @@ import org.ojalgo.algebra.Operation;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -57,8 +58,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Elements, Access2D.Visitable<N>, Access2D.Sliceable<N>,
-        NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>>, ElementsSupplier<N>, Access1D.Aggregatable<N> {
+public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Elements, Access2D.Visitable<N>, Access2D.Aggregatable<N>, Access2D.Sliceable<N>,
+        NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>>, ElementsSupplier<N> {
 
     public static interface Factory<N extends Number> {
 
@@ -455,6 +456,51 @@ public interface MatrixStore<N extends Number> extends Access2D<N>, Access2D.Ele
 
     default MatrixStore<N> add(final MatrixStore<N> addend) {
         return this.operateOnMatching(this.physical().function().add(), addend).get();
+    }
+
+    default N aggregateAll(final Aggregator aggregator) {
+
+        final AggregatorFunction<N> tmpVisitor = this.physical().aggregator().get(aggregator);
+
+        this.visitAll(tmpVisitor);
+
+        return tmpVisitor.getNumber();
+    }
+
+    default N aggregateColumn(final long row, final long col, final Aggregator aggregator) {
+
+        final AggregatorFunction<N> tmpVisitor = this.physical().aggregator().get(aggregator);
+
+        this.visitColumn(row, col, tmpVisitor);
+
+        return tmpVisitor.getNumber();
+    }
+
+    default N aggregateDiagonal(final long row, final long col, final Aggregator aggregator) {
+
+        final AggregatorFunction<N> tmpVisitor = this.physical().aggregator().get(aggregator);
+
+        this.visitDiagonal(row, col, tmpVisitor);
+
+        return tmpVisitor.getNumber();
+    }
+
+    default N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
+
+        final AggregatorFunction<N> tmpVisitor = this.physical().aggregator().get(aggregator);
+
+        this.visitRange(first, limit, tmpVisitor);
+
+        return tmpVisitor.getNumber();
+    }
+
+    default N aggregateRow(final long row, final long col, final Aggregator aggregator) {
+
+        final AggregatorFunction<N> tmpVisitor = this.physical().aggregator().get(aggregator);
+
+        this.visitRow(row, col, tmpVisitor);
+
+        return tmpVisitor.getNumber();
     }
 
     default MatrixStore<N> conjugate() {

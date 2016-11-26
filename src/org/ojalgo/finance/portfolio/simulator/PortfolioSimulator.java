@@ -31,6 +31,7 @@ import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.finance.portfolio.SimplePortfolio;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.random.process.GeometricBrownian1D;
 import org.ojalgo.random.process.GeometricBrownianMotion;
 import org.ojalgo.random.process.RandomProcess;
@@ -97,7 +98,7 @@ public class PortfolioSimulator {
 
                 final Array1D<Double> tmpRealisation = myProcess.step(aStepSize);
 
-                final AggregatorFunction<Double> tmpAggregator = Aggregator.SUM.getPrimitiveFunction();
+                final AggregatorFunction<Double> tmpAggregator = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
                 tmpRealisation.visitAll(tmpAggregator);
                 tmpRealisationValues.set(r, s, tmpAggregator.doubleValue());
             }
@@ -105,7 +106,7 @@ public class PortfolioSimulator {
             myProcess.setValues(tmpInitialValues);
         }
 
-        final AggregatorFunction<Double> tmpAggregator = Aggregator.SUM.getPrimitiveFunction();
+        final AggregatorFunction<Double> tmpAggregator = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
         for (int i = 0; i < tmpInitialValues.count(); i++) {
             tmpAggregator.invoke(tmpInitialValues.doubleValue(i));
         }

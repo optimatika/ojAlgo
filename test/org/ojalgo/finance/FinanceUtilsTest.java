@@ -26,6 +26,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.SingularValue;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.CalendarDateUnit;
@@ -55,7 +56,7 @@ public class FinanceUtilsTest extends FinanceTests {
         final PrimitiveMatrix tmpVolatilities = FinanceUtils.toVolatilities(tmpOriginal, true);
         final PrimitiveMatrix tmpCovariances = FinanceUtils.toCovariances(tmpVolatilities, tmpCorrelations);
 
-        tmpSVD.decompose(tmpCovariances.toPrimitiveStore());
+        tmpSVD.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpCovariances));
         final double tmpNewCond = tmpSVD.getCondition();
         final int tmpNewRank = tmpSVD.getRank();
         final double tmpNewNorm = tmpSVD.getFrobeniusNorm();
@@ -68,7 +69,7 @@ public class FinanceUtilsTest extends FinanceTests {
         if (DEBUG) {
             BasicLogger.debug("Original", tmpOriginal);
             BasicLogger.debug("Cleaned", tmpCovariances);
-            BasicLogger.debug("Difference", tmpOriginal.subtract(tmpCovariances.toPrimitiveStore()), tmpEvalCntx);
+            BasicLogger.debug("Difference", tmpOriginal.subtract(PrimitiveDenseStore.FACTORY.copy(tmpCovariances)), tmpEvalCntx);
         }
 
     }

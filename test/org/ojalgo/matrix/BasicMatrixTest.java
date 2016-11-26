@@ -28,11 +28,15 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix.Builder;
+import org.ojalgo.matrix.store.BigDenseStore;
+import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -58,6 +62,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     BasicMatrix myActMtrx;
     Number myActNmbr;
     Scalar<?> myActSclr;
+    double myActVal;
     BigMatrix myBigAA;
     BigMatrix myBigAB;
     BigMatrix myBigAX;
@@ -73,6 +78,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
     BasicMatrix myExpMtrx;
     Number myExpNmbr;
     Scalar<?> myExpSclr;
+    double myExpVal;
     Number myNmbr;
     PrimitiveMatrix myPrimitiveAA;
     PrimitiveMatrix myPrimitiveAB;
@@ -303,7 +309,7 @@ public abstract class BasicMatrixTest extends MatrixTests {
             final List<ComplexNumber> tmpExpStore = myPrimitiveAA.getEigenvalues();
             List<ComplexNumber> tmpActStore;
 
-            if (MatrixUtils.isHermitian(myBigAA.toPrimitiveStore())) {
+            if (MatrixUtils.isHermitian(PrimitiveDenseStore.FACTORY.copy(myBigAA))) {
 
                 tmpActStore = myBigAA.getEigenvalues();
                 for (int i = 0; i < tmpExpStore.size(); i++) {
@@ -317,21 +323,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
             }
 
         }
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getFrobeniusNorm()
-     */
-    public void testGetFrobeniusNorm() {
-
-        myExpNmbr = myBigAA.getFrobeniusNorm().getNumber();
-
-        myActNmbr = myComplexAA.getFrobeniusNorm().getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-        myActNmbr = myPrimitiveAA.getFrobeniusNorm().getNumber();
-        TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
     }
 
     /**
@@ -752,6 +743,21 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
     }
 
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#norm()
+     */
+    public void testNorm() {
+
+        myExpVal = myBigAA.norm();
+
+        myActVal = myComplexAA.norm();
+        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
+
+        myActVal = myPrimitiveAA.norm();
+        TestUtils.assertEquals(myExpVal, myActVal, EVALUATION);
+
+    }
+
     abstract public void testProblem();
 
     /**
@@ -847,12 +853,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = (int) Uniform.randomInteger(myBigAA.countRows());
         final int tmpCol = (int) Uniform.randomInteger(myBigAA.countColumns());
 
-        myExpNmbr = myBigAA.toBigDecimal(tmpRow, tmpCol);
+        myExpNmbr = TypeUtils.toBigDecimal(myBigAA.get(tmpRow, tmpCol));
 
-        myActNmbr = myComplexAA.toBigDecimal(tmpRow, tmpCol);
+        myActNmbr = TypeUtils.toBigDecimal(myComplexAA.get(tmpRow, tmpCol));
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.toBigDecimal(tmpRow, tmpCol);
+        myActNmbr = TypeUtils.toBigDecimal(myPrimitiveAA.get(tmpRow, tmpCol));
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
@@ -862,13 +868,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
      */
     public void testToBigStore() {
 
-        final PhysicalStore<BigDecimal> tmpExpStore = myBigAA.toBigStore();
+        final PhysicalStore<BigDecimal> tmpExpStore = BigDenseStore.FACTORY.copy(myBigAA);
         PhysicalStore<BigDecimal> tmpActStore;
 
-        tmpActStore = myComplexAA.toBigStore();
+        tmpActStore = BigDenseStore.FACTORY.copy(myComplexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = myPrimitiveAA.toBigStore();
+        tmpActStore = BigDenseStore.FACTORY.copy(myPrimitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
     }
@@ -881,12 +887,12 @@ public abstract class BasicMatrixTest extends MatrixTests {
         final int tmpRow = (int) Uniform.randomInteger(myBigAA.countRows());
         final int tmpCol = (int) Uniform.randomInteger(myBigAA.countColumns());
 
-        myExpNmbr = myBigAA.toComplexNumber(tmpRow, tmpCol);
+        myExpNmbr = ComplexNumber.valueOf(myBigAA.get(tmpRow, tmpCol));
 
-        myActNmbr = myComplexAA.toComplexNumber(tmpRow, tmpCol);
+        myActNmbr = ComplexNumber.valueOf(myComplexAA.get(tmpRow, tmpCol));
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
-        myActNmbr = myPrimitiveAA.toComplexNumber(tmpRow, tmpCol);
+        myActNmbr = ComplexNumber.valueOf(myPrimitiveAA.get(tmpRow, tmpCol));
         TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
 
     }
@@ -896,13 +902,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
      */
     public void testToComplexStore() {
 
-        final PhysicalStore<ComplexNumber> tmpExpStore = myBigAA.toComplexStore();
+        final PhysicalStore<ComplexNumber> tmpExpStore = ComplexDenseStore.FACTORY.copy(myBigAA);
         PhysicalStore<ComplexNumber> tmpActStore;
 
-        tmpActStore = myComplexAA.toComplexStore();
+        tmpActStore = ComplexDenseStore.FACTORY.copy(myComplexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = myPrimitiveAA.toComplexStore();
+        tmpActStore = ComplexDenseStore.FACTORY.copy(myPrimitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
     }
@@ -983,13 +989,13 @@ public abstract class BasicMatrixTest extends MatrixTests {
      */
     public void testToPrimitiveStore() {
 
-        final PhysicalStore<Double> tmpExpStore = myBigAA.toPrimitiveStore();
+        final PhysicalStore<Double> tmpExpStore = PrimitiveDenseStore.FACTORY.copy(myBigAA);
         PhysicalStore<Double> tmpActStore;
 
-        tmpActStore = myComplexAA.toPrimitiveStore();
+        tmpActStore = PrimitiveDenseStore.FACTORY.copy(myComplexAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
-        tmpActStore = myPrimitiveAA.toPrimitiveStore();
+        tmpActStore = PrimitiveDenseStore.FACTORY.copy(myPrimitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
 
     }

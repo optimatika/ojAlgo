@@ -24,7 +24,6 @@ package org.ojalgo.matrix;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
@@ -32,7 +31,10 @@ import org.ojalgo.access.Supplier2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.algebra.ScalarOperation;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -52,9 +54,49 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access1D.Aggregatable<Number>, NormedVectorSpace<BasicMatrix, Number>,
+public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access2D.Aggregatable<Number>, NormedVectorSpace<BasicMatrix, Number>,
         Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>, ScalarOperation.Addition<BasicMatrix, Number>,
         ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
+
+    /**
+     * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
+     * the sum of the square of the singular values.
+     *
+     * @return The matrix' Frobenius norm
+     */
+    public static double calculateFrobeniusNorm(final BasicMatrix matrix) {
+        return matrix.norm();
+    }
+
+    /**
+     * @return The inf-norm or maximum row sum
+     */
+    public static double calculateInfinityNorm(final BasicMatrix matrix) {
+
+        double retVal = PrimitiveMath.ZERO;
+
+        final long tmpLimit = matrix.countRows();
+        for (long i = 0L; i < tmpLimit; i++) {
+            retVal = PrimitiveFunction.MAX.invoke(retVal, matrix.aggregateRow(i, Aggregator.NORM1).doubleValue());
+        }
+
+        return retVal;
+    }
+
+    /**
+     * @return The 1-norm or maximum column sum
+     */
+    public static double calculateOneNorm(final BasicMatrix matrix) {
+
+        double retVal = PrimitiveMath.ZERO;
+
+        final long tmpLimit = matrix.countColumns();
+        for (long j = 0L; j < tmpLimit; j++) {
+            retVal = PrimitiveFunction.MAX.invoke(retVal, matrix.aggregateColumn(j, Aggregator.NORM1).doubleValue());
+        }
+
+        return retVal;
+    }
 
     public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier2D<I> {
 
@@ -141,79 +183,6 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     List<ComplexNumber> getEigenvalues();
 
     /**
-     * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
-     * the sum of the square of the singular values.
-     *
-     * @return The matrix' Frobenius norm
-     * @see #getFrobeniusNorm()
-     * @see #getInfinityNorm()
-     * @see #getKyFanNorm(int)
-     * @see #getOneNorm()
-     * @see #getOperatorNorm()
-     * @see #getTraceNorm()
-     * @see #getVectorNorm(int)
-     * @deprecated v40 Use {@link #norm()} or {@link #aggregateAll(org.ojalgo.function.aggregator.Aggregator)}
-     */
-    @Deprecated
-    Scalar<?> getFrobeniusNorm();
-
-    /**
-     * @return Max row sum
-     * @see #getFrobeniusNorm()
-     * @see #getInfinityNorm()
-     * @see #getKyFanNorm(int)
-     * @see #getOneNorm()
-     * @see #getOperatorNorm()
-     * @see #getTraceNorm()
-     * @see #getVectorNorm(int)
-     * @deprecated v40 Use {@link #norm()} or {@link #aggregateAll(org.ojalgo.function.aggregator.Aggregator)}
-     */
-    @Deprecated
-    Scalar<?> getInfinityNorm();
-
-    /**
-     * @see #getFrobeniusNorm()
-     * @see #getInfinityNorm()
-     * @see #getKyFanNorm(int)
-     * @see #getOneNorm()
-     * @see #getOperatorNorm()
-     * @see #getTraceNorm()
-     * @see #getVectorNorm(int)
-     * @deprecated v40 Use {@link SingularValue}
-     */
-    @Deprecated
-    Scalar<?> getKyFanNorm(int k);
-
-    /**
-     * @return Max col sum
-     * @see #getFrobeniusNorm()
-     * @see #getInfinityNorm()
-     * @see #getKyFanNorm(int)
-     * @see #getOneNorm()
-     * @see #getOperatorNorm()
-     * @see #getTraceNorm()
-     * @see #getVectorNorm(int)
-     * @deprecated v40 Use {@link #norm()} or {@link #aggregateAll(org.ojalgo.function.aggregator.Aggregator)}
-     */
-    @Deprecated
-    Scalar<?> getOneNorm();
-
-    /**
-     * 2-norm, max singular value
-     *
-     * @see #getFrobeniusNorm()
-     * @see #getInfinityNorm()
-     * @see #getKyFanNorm(int)
-     * @see #getOneNorm()
-     * @see #getOperatorNorm()
-     * @see #getTraceNorm()
-     * @see #getVectorNorm(int)
-     * @deprecated v40 Use {@link SingularValue}
-     */
-    @Deprecated
-    Scalar<?> getOperatorNorm();
-
-    /**
      * The rank of a matrix is the (maximum) number of linearly independent rows or columns it contains. It is
      * also equal to the number of nonzero singular values of the matrix.
      *
@@ -242,35 +211,6 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      * @return The matrix' trace.
      */
     Scalar<?> getTrace();
-
-    /**
-     * @see #getFrobeniusNorm()
-     * @see #getInfinityNorm()
-     * @see #getKyFanNorm(int)
-     * @see #getOneNorm()
-     * @see #getOperatorNorm()
-     * @see #getTraceNorm()
-     * @see #getVectorNorm(int)
-     * @deprecated v40 Use {@link SingularValue}
-     */
-    @Deprecated
-    Scalar<?> getTraceNorm();
-
-    /**
-     * Treats [this] as if it is one dimensional (a vector) and calculates the vector norm. The interface only
-     * requires that implementations can handle arguments 0, 1, 2 and {@linkplain Integer#MAX_VALUE}.
-     *
-     * @see #getFrobeniusNorm()
-     * @see #getInfinityNorm()
-     * @see #getKyFanNorm(int)
-     * @see #getOneNorm()
-     * @see #getOperatorNorm()
-     * @see #getTraceNorm()
-     * @see #getVectorNorm(int)
-     * @deprecated v40 Use {@link #aggregateAll(org.ojalgo.function.aggregator.Aggregator)}
-     */
-    @Deprecated
-    Scalar<?> getVectorNorm(int aDegree);
 
     /**
      * <p>
@@ -368,48 +308,6 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     BasicMatrix solve(Access2D<?> aRHS);
 
     /**
-     * Extracts one element of this matrix as a BigDecimal.
-     *
-     * @param row A row index.
-     * @param column A column index.
-     * @return One matrix element
-     * @deprecated v40 Use {@link #get(long, long)} instead
-     */
-    @Deprecated
-    BigDecimal toBigDecimal(int row, int column);
-
-    /**
-     * Must be a copy that is safe to modify.
-     *
-     * @see org.ojalgo.matrix.BasicMatrix#toComplexStore()
-     * @see org.ojalgo.matrix.BasicMatrix#toPrimitiveStore()
-     * @deprecated Use {@linkplain BigDenseStore#FACTORY} instead
-     */
-    @Deprecated
-    PhysicalStore<BigDecimal> toBigStore();
-
-    /**
-     * Extracts one element of this matrix as a ComplexNumber.
-     *
-     * @param row A row index.
-     * @param column A column index.
-     * @return One matrix element
-     * @deprecated v40 Use {@link #get(long, long)} instead
-     */
-    @Deprecated
-    ComplexNumber toComplexNumber(int row, int column);
-
-    /**
-     * Must be a copy that is safe to modify.
-     *
-     * @see org.ojalgo.matrix.BasicMatrix#toBigStore()
-     * @see org.ojalgo.matrix.BasicMatrix#toPrimitiveStore()
-     * @deprecated Use {@linkplain ComplexDenseStore#FACTORY} instead
-     */
-    @Deprecated
-    PhysicalStore<ComplexNumber> toComplexStore();
-
-    /**
      * @deprecated v40 Use {@link #columns()}
      */
     @Deprecated
@@ -429,16 +327,6 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      */
     @Deprecated
     List<BasicMatrix> toListOfRows();
-
-    /**
-     * Must be a copy that is safe to modify.
-     *
-     * @see org.ojalgo.matrix.BasicMatrix#toBigStore()
-     * @see org.ojalgo.matrix.BasicMatrix#toComplexStore()
-     * @deprecated Use {@linkplain PrimitiveDenseStore#FACTORY} instead
-     */
-    @Deprecated
-    PhysicalStore<Double> toPrimitiveStore();
 
     /**
      * Extracts one element of this matrix as a Scalar.

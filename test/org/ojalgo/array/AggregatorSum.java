@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 
 public class AggregatorSum extends BasicArrayTest {
 
@@ -42,7 +43,7 @@ public class AggregatorSum extends BasicArrayTest {
             array.set(INDICES[i], 1.0);
         }
 
-        final AggregatorFunction<Double> tmpVisitor = Aggregator.SUM.getPrimitiveFunction();
+        final AggregatorFunction<Double> tmpVisitor = Aggregator.SUM.getFunction(PrimitiveAggregator.getSet());
 
         array.visitAll(tmpVisitor);
 

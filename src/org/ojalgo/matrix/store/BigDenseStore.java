@@ -473,7 +473,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        final AggregatorFunction<BigDecimal> tmpMainAggr = aggregator.getBigFunction();
+        final AggregatorFunction<BigDecimal> tmpMainAggr = aggregator.getFunction(BigAggregator.getSet());
 
         if (tmpColDim > AggregateAll.THRESHOLD) {
 
@@ -482,7 +482,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
 
-                    final AggregatorFunction<BigDecimal> tmpPartAggr = aggregator.getBigFunction();
+                    final AggregatorFunction<BigDecimal> tmpPartAggr = aggregator.getFunction(BigAggregator.getSet());
 
                     BigDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
 

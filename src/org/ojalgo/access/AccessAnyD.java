@@ -32,6 +32,10 @@ import org.ojalgo.scalar.Scalar;
  */
 public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N> {
 
+    public interface Aggregatable<N extends Number> extends StructureAnyD, Access1D.Aggregatable<N> {
+
+    }
+
     public interface Elements extends StructureAnyD, Access1D.Elements {
 
         /**

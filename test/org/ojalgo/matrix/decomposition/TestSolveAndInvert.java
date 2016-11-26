@@ -81,9 +81,9 @@ public class TestSolveAndInvert extends MatrixDecompositionTests {
 
     public void testSimpleEquationCase() {
 
-        final MatrixStore<Double> tmpBody = SimpleEquationCase.getBody().toPrimitiveStore();
-        final MatrixStore<Double> tmpRHS = SimpleEquationCase.getRHS().toPrimitiveStore();
-        final MatrixStore<Double> tmpSolution = SimpleEquationCase.getSolution().toPrimitiveStore();
+        final MatrixStore<Double> tmpBody = PrimitiveDenseStore.FACTORY.copy(SimpleEquationCase.getBody());
+        final MatrixStore<Double> tmpRHS = PrimitiveDenseStore.FACTORY.copy(SimpleEquationCase.getRHS());
+        final MatrixStore<Double> tmpSolution = PrimitiveDenseStore.FACTORY.copy(SimpleEquationCase.getSolution());
 
         for (final MatrixDecomposition.Solver<Double> tmpDecomp : TestSolveAndInvert.getAllSquare()) {
             this.doTest(tmpDecomp, tmpBody, tmpRHS, tmpSolution, new NumberContext(7, 6));

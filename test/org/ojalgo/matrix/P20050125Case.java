@@ -25,7 +25,9 @@ import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
+import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.context.NumberContext;
 
@@ -56,21 +58,21 @@ public class P20050125Case extends BasicMatrixTest {
     public void testData() {
 
         final Cholesky<BigDecimal> tmpDelegate = Cholesky.BIG.make();
-        tmpDelegate.decompose(myBigAA.toBigStore());
+        tmpDelegate.decompose((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(myBigAA));
 
-        TestUtils.assertEquals(myBigAA.toBigStore(), tmpDelegate, EVALUATION);
+        TestUtils.assertEquals(BigDenseStore.FACTORY.copy(myBigAA), tmpDelegate, EVALUATION);
     }
 
     @Override
     public void testProblem() {
 
         final Cholesky<BigDecimal> tmpDelegate = Cholesky.BIG.make();
-        tmpDelegate.decompose(myBigAA.toBigStore());
+        tmpDelegate.decompose((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(myBigAA));
 
-        final MatrixStore<BigDecimal> tmpInv = tmpDelegate.getSolution(myBigI.toBigStore());
+        final MatrixStore<BigDecimal> tmpInv = tmpDelegate.getSolution((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(myBigI));
 
-        final MatrixStore<BigDecimal> tmpExpMtrx = myBigI.toBigStore();
-        final MatrixStore<BigDecimal> tmpActMtrx = myBigAA.toBigStore().multiply(tmpInv);
+        final MatrixStore<BigDecimal> tmpExpMtrx = BigDenseStore.FACTORY.copy(myBigI);
+        final MatrixStore<BigDecimal> tmpActMtrx = BigDenseStore.FACTORY.copy(myBigAA).multiply(tmpInv);
 
         TestUtils.assertEquals(tmpExpMtrx, tmpActMtrx, EVALUATION);
     }

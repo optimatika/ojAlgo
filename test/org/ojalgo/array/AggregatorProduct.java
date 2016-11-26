@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import org.ojalgo.TestUtils;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 
 public class AggregatorProduct extends BasicArrayTest {
 
@@ -42,7 +43,7 @@ public class AggregatorProduct extends BasicArrayTest {
             array.set(INDICES[i], 1.0);
         }
 
-        final AggregatorFunction<Double> tmpVisitor = Aggregator.PRODUCT.getPrimitiveFunction();
+        final AggregatorFunction<Double> tmpVisitor = Aggregator.PRODUCT.getFunction(PrimitiveAggregator.getSet());
 
         array.visitAll(tmpVisitor);
 

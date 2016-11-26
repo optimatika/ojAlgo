@@ -40,6 +40,60 @@ public abstract class AggregatorSet<N extends Number> {
      */
     public abstract AggregatorFunction<N> cardinality();
 
+    public final AggregatorFunction<N> get(final Aggregator aggregator) {
+
+        switch (aggregator) {
+
+        case CARDINALITY:
+
+            return this.cardinality();
+
+        case LARGEST:
+
+            return this.largest();
+
+        case MAXIMUM:
+
+            return this.maximum();
+
+        case MINIMUM:
+
+            return this.minimum();
+
+        case NORM1:
+
+            return this.norm1();
+
+        case NORM2:
+
+            return this.norm2();
+
+        case PRODUCT:
+
+            return this.product();
+
+        case PRODUCT2:
+
+            return this.product2();
+
+        case SMALLEST:
+
+            return this.smallest();
+
+        case SUM:
+
+            return this.sum();
+
+        case SUM2:
+
+            return this.sum2();
+
+        default:
+
+            return null;
+        }
+    }
+
     /**
      * Largest absolute value
      */

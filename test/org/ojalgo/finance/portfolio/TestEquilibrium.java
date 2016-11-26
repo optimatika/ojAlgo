@@ -36,6 +36,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.type.StandardType;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 public class TestEquilibrium extends FinancePortfolioTests {
@@ -187,7 +188,8 @@ public class TestEquilibrium extends FinancePortfolioTests {
                     tmpViewAssetWeights.add(BigMath.ZERO);
                 }
             }
-            final BigDecimal tmpViewReturn = tmpMatchingReturns.toBigDecimal(i, 0);
+            final int row = i;
+            final BigDecimal tmpViewReturn = TypeUtils.toBigDecimal(tmpMatchingReturns.get(row, 0));
             tmpBLM.addViewWithScaledConfidence(tmpViewAssetWeights, tmpViewReturn, BigMath.ONE);
         }
         TestUtils.assertEquals(tmpGeneratedWeights, tmpBLM.getAssetWeights(), tmpWeightsContext);

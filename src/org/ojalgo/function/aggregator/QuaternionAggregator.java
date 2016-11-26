@@ -23,7 +23,6 @@ package org.ojalgo.function.aggregator;
 
 import static org.ojalgo.function.QuaternionFunction.*;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.QuaternionFunction;
@@ -31,7 +30,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class QuaternionAggregator {
+public final class QuaternionAggregator extends AggregatorSet<Quaternion> {
 
     public static final ThreadLocal<AggregatorFunction<Quaternion>> CARDINALITY = new ThreadLocal<AggregatorFunction<Quaternion>>() {
 
@@ -573,74 +572,69 @@ public abstract class QuaternionAggregator {
         }
     };
 
-    private static final AggregatorSet<Quaternion> SET = new AggregatorSet<Quaternion>() {
+    private static final QuaternionAggregator SET = new QuaternionAggregator();
 
-        @Override
-        public AggregatorFunction<Quaternion> cardinality() {
-            return CARDINALITY.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Quaternion> largest() {
-            return LARGEST.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Quaternion> maximum() {
-            return MAX.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Quaternion> minimum() {
-            return MIN.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Quaternion> norm1() {
-            return NORM1.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Quaternion> norm2() {
-            return NORM2.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Quaternion> product() {
-            return PRODUCT.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Quaternion> product2() {
-            return PRODUCT2.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Quaternion> smallest() {
-            return SMALLEST.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Quaternion> sum() {
-            return SUM.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Quaternion> sum2() {
-            return SUM2.get().reset();
-        }
-
-    };
-
-    public static AggregatorSet<Quaternion> getSet() {
+    public static QuaternionAggregator getSet() {
         return SET;
     }
 
     private QuaternionAggregator() {
-
         super();
+    }
 
-        ProgrammingError.throwForIllegalInvocation();
+    @Override
+    public AggregatorFunction<Quaternion> cardinality() {
+        return CARDINALITY.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> largest() {
+        return LARGEST.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> maximum() {
+        return MAX.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> minimum() {
+        return MIN.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> norm1() {
+        return NORM1.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> norm2() {
+        return NORM2.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> product() {
+        return PRODUCT.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> product2() {
+        return PRODUCT2.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> smallest() {
+        return SMALLEST.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> sum() {
+        return SUM.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Quaternion> sum2() {
+        return SUM2.get().reset();
     }
 
 }

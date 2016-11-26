@@ -24,6 +24,7 @@ package org.ojalgo.access;
 import java.util.Iterator;
 
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -33,6 +34,24 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
+
+    public interface Aggregatable<N extends Number> extends Structure2D, Access1D.Aggregatable<N> {
+
+        N aggregateColumn(long row, long col, Aggregator aggregator);
+
+        default N aggregateColumn(final long col, final Aggregator aggregator) {
+            return this.aggregateColumn(0L, col, aggregator);
+        }
+
+        N aggregateDiagonal(long row, long col, Aggregator aggregator);
+
+        N aggregateRow(long row, long col, Aggregator aggregator);
+
+        default N aggregateRow(final long row, final Aggregator aggregator) {
+            return this.aggregateRow(row, 0L, aggregator);
+        }
+
+    }
 
     public interface Elements extends Structure2D, Access1D.Elements {
 

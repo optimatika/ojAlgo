@@ -26,8 +26,6 @@ import java.io.Serializable;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -51,16 +49,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
         myRowDim = rowsCount;
         myColDim = columnsCount;
-    }
-
-    @SuppressWarnings("unchecked")
-    public N aggregateAll(final Aggregator aggregator) {
-
-        final AggregatorFunction<N> tmpFunction = (AggregatorFunction<N>) aggregator.getFunction(this.getComponentType());
-
-        this.visitAll(tmpFunction);
-
-        return tmpFunction.getNumber();
     }
 
     public final PhysicalStore<N> copy() {

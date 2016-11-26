@@ -645,7 +645,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public Double aggregateAll(final Aggregator aggregator) {
 
-        final AggregatorFunction<Double> tmpVisitor = aggregator.getPrimitiveFunction();
+        final AggregatorFunction<Double> tmpVisitor = aggregator.getFunction(PrimitiveAggregator.getSet());
 
         this.visitAll(tmpVisitor);
 

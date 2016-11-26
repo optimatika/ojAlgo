@@ -27,6 +27,7 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20030422Case;
+import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -195,9 +196,9 @@ public class QRTest extends MatrixDecompositionTests {
         final QR<ComplexNumber> tmpComplexDecomp = QR.COMPLEX.make();
         final QR<Double> tmpPrimitiveDecomp = QR.PRIMITIVE.make();
 
-        tmpBigDecomp.decompose(tmpOriginal.toBigStore());
-        tmpComplexDecomp.decompose(tmpOriginal.toComplexStore());
-        tmpPrimitiveDecomp.decompose(tmpOriginal.toPrimitiveStore());
+        tmpBigDecomp.decompose((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(tmpOriginal));
+        tmpComplexDecomp.decompose((PhysicalStore<ComplexNumber>) ComplexDenseStore.FACTORY.copy(tmpOriginal));
+        tmpPrimitiveDecomp.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpOriginal));
 
         final MatrixStore<BigDecimal> tmpBigQ = tmpBigDecomp.getQ();
         final MatrixStore<ComplexNumber> tmpComplexQ = tmpComplexDecomp.getQ();
@@ -219,9 +220,9 @@ public class QRTest extends MatrixDecompositionTests {
             BasicLogger.debug("Primitive R", tmpPrimitiveR);
         }
 
-        TestUtils.assertEquals(tmpOriginal.toBigStore(), tmpBigDecomp, new NumberContext(7, 14));
-        TestUtils.assertEquals(tmpOriginal.toComplexStore(), tmpComplexDecomp, new NumberContext(7, 14));
-        TestUtils.assertEquals(tmpOriginal.toPrimitiveStore(), tmpPrimitiveDecomp, new NumberContext(7, 14));
+        TestUtils.assertEquals(BigDenseStore.FACTORY.copy(tmpOriginal), tmpBigDecomp, new NumberContext(7, 14));
+        TestUtils.assertEquals(ComplexDenseStore.FACTORY.copy(tmpOriginal), tmpComplexDecomp, new NumberContext(7, 14));
+        TestUtils.assertEquals(PrimitiveDenseStore.FACTORY.copy(tmpOriginal), tmpPrimitiveDecomp, new NumberContext(7, 14));
     }
 
 }

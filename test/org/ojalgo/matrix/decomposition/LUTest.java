@@ -26,6 +26,10 @@ import java.math.BigDecimal;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.P20061119Case;
+import org.ojalgo.matrix.store.BigDenseStore;
+import org.ojalgo.matrix.store.ComplexDenseStore;
+import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -48,16 +52,16 @@ public class LUTest extends MatrixDecompositionTests {
         final BigMatrix tmpProblematic = P20061119Case.getProblematic();
 
         final LU<BigDecimal> tmpBig = LU.BIG.make();
-        tmpBig.decompose(tmpProblematic.toBigStore());
+        tmpBig.decompose((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(tmpProblematic));
 
         final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
-        tmpComplex.decompose(tmpProblematic.toComplexStore());
+        tmpComplex.decompose((PhysicalStore<ComplexNumber>) ComplexDenseStore.FACTORY.copy(tmpProblematic));
 
         final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
-        tmpPrimitive.decompose(tmpProblematic.toPrimitiveStore());
+        tmpPrimitive.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
 
         final LU<Double> tmpJama = new RawLU();
-        tmpJama.decompose(tmpProblematic.toPrimitiveStore());
+        tmpJama.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
 
         final NumberContext tmpPrintContext = NumberContext.getGeneral(20);
 
@@ -76,7 +80,7 @@ public class LUTest extends MatrixDecompositionTests {
         }
 
         final SingularValue<Double> tmpSVD = new RawSingularValue();
-        tmpSVD.decompose(tmpProblematic.toPrimitiveStore());
+        tmpSVD.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
 
         TestUtils.assertEquals("LU.rank SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
         TestUtils.assertEquals("LU.rank SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());

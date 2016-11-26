@@ -29,6 +29,7 @@ import org.ojalgo.matrix.SimpleLUCase;
 import org.ojalgo.matrix.SimpleQRCase;
 import org.ojalgo.matrix.SimpleSingularValueCase;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
 
 public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
@@ -56,7 +57,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
     public void testSimpleCholeskyCase() {
 
-        final MatrixStore<Double> tmpMtrxA = SimpleCholeskyCase.getOriginal().toPrimitiveStore();
+        final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleCholeskyCase.getOriginal());
 
         TestUtils.assertEquals(JAMA_CHOLESKY.decompose(tmpMtrxA), PRIMITIVE_CHOLESKY.decompose(tmpMtrxA));
 
@@ -75,7 +76,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
     public void testSimpleEigenvalueCase() {
 
-        final MatrixStore<Double> tmpMtrxA = SimpleEigenvalueCase.getOriginal().toPrimitiveStore();
+        final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal());
 
         TestUtils.assertEquals(JAMA_EvD.decompose(tmpMtrxA), PRIMITIVE_EvD.decompose(tmpMtrxA));
 
@@ -95,7 +96,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
         // Dense
 
-        final MatrixStore<Double> tmpMtrxA = SimpleLUCase.getOrginal().toPrimitiveStore();
+        final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleLUCase.getOrginal());
 
         TestUtils.assertEquals(JAMA_LU.decompose(tmpMtrxA), PRIMITIVE_DENSE_LU.decompose(tmpMtrxA));
 
@@ -132,7 +133,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
     public void testSimpleQRCase() {
 
-        final MatrixStore<Double> tmpMtrxA = SimpleQRCase.getOriginal().toPrimitiveStore();
+        final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleQRCase.getOriginal());
         final int tmpMinDim = (int) Math.min(tmpMtrxA.countRows(), tmpMtrxA.countColumns());
 
         TestUtils.assertEquals(JAMA_QR.decompose(tmpMtrxA), PRIMITIVE_QR.decompose(tmpMtrxA));
@@ -153,7 +154,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
     public void testSimpleSingularValueCase() {
 
-        final MatrixStore<Double> tmpMtrxA = SimpleSingularValueCase.getOriginal().toPrimitiveStore();
+        final MatrixStore<Double> tmpMtrxA = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal());
 
         TestUtils.assertEquals(JAMA_SVD.decompose(tmpMtrxA), PRIMITIVE_SVD.decompose(tmpMtrxA));
 

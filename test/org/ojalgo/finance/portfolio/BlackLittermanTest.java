@@ -27,6 +27,8 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BigMatrix;
+import org.ojalgo.matrix.store.BigDenseStore;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -306,7 +308,10 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         final BasicMatrix tmpAct = tmpViews.multiply(tmpCovar).multiply(tmpViews.transpose());
 
         for (int i = 0; i < tmpExp.countRows(); i++) {
-            TestUtils.assertEquals(tmpExp.toBigDecimal(i, 0), tmpAct.toBigDecimal(i, i), EVAL_CNTXT);
+            final int row = i;
+            final int row1 = i;
+            final int col = i;
+            TestUtils.assertEquals(TypeUtils.toBigDecimal(tmpExp.get(row, 0)), TypeUtils.toBigDecimal(tmpAct.get(row1, col)), EVAL_CNTXT);
         }
     }
 
@@ -324,8 +329,9 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         final BasicMatrix tmpViewPortfolioReturns = BlackLittermanTest.getInvestorReturnsMatrix();
 
         for (int i = 0; i < tmpViewPortfolios.countRows(); i++) {
-            tmpBLM.addViewWithBalancedConfidence(tmpViewPortfolios.selectRows(new int[] { i }).toBigStore().asList(),
-                    tmpViewPortfolioReturns.toBigDecimal(i, 0));
+            final int row = i;
+            tmpBLM.addViewWithBalancedConfidence(BigDenseStore.FACTORY.copy(tmpViewPortfolios.selectRows(new int[] { i })).asList(),
+                    TypeUtils.toBigDecimal(tmpViewPortfolioReturns.get(row, 0)));
         }
 
         this.testBLM(tmpBLM);
@@ -346,8 +352,11 @@ public class BlackLittermanTest extends FinancePortfolioTests {
         final BasicMatrix tmpConfidenceMatrix = BlackLittermanTest.getInvestorConfidencesMatrix();
 
         for (int i = 0; i < tmpConfidenceMatrix.countRows(); i++) {
-            tmpBLM.addViewWithStandardDeviation(tmpViewPortfolios.selectRows(new int[] { i }).toBigStore().asList(), tmpViewPortfolioReturns.toBigDecimal(i, 0),
-                    BigFunction.SQRT.invoke(tmpConfidenceMatrix.toBigDecimal(i, i)));
+            final int row = i;
+            final int row1 = i;
+            final int col = i;
+            tmpBLM.addViewWithStandardDeviation(BigDenseStore.FACTORY.copy(tmpViewPortfolios.selectRows(new int[] { i })).asList(), TypeUtils.toBigDecimal(tmpViewPortfolioReturns.get(row, 0)),
+                    BigFunction.SQRT.invoke(TypeUtils.toBigDecimal(tmpConfidenceMatrix.get(row1, col))));
         }
 
         this.testBLM(tmpBLM);

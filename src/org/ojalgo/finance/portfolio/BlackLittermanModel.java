@@ -341,6 +341,6 @@ public final class BlackLittermanModel extends EquilibriumModel {
 
         tmpVal = tmpVal.multiply(weights);
 
-        return weights.transpose().multiply(tmpVal).toBigDecimal(0, 0);
+        return TypeUtils.toBigDecimal(weights.transpose().multiply(tmpVal).get(0, 0));
     }
 }

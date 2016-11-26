@@ -42,6 +42,7 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Factory;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -56,6 +57,7 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.StandardType;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 public class ConvexProblems extends OptimisationConvexTests {
@@ -294,7 +296,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Variable[] tmpVariables = new Variable[(int) tmpReturns.countRows()];
         for (int i = 0; i < tmpVariables.length; i++) {
             tmpVariables[i] = new Variable("VAR" + i);
-            tmpVariables[i].weight(tmpReturns.toBigDecimal(i, 0).negate());
+            final int row = i;
+            tmpVariables[i].weight(TypeUtils.toBigDecimal(tmpReturns.get(row, 0)).negate());
             // set the constraints on the asset weights
             // require at least a 2% allocation to each asset
             tmpVariables[i].lower(new BigDecimal("0.02"));
@@ -345,7 +348,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Variable[] tmpVariables = new Variable[(int) expectedReturnsMatrix.countRows()];
         for (int i = 0; i < tmpVariables.length; i++) {
             tmpVariables[i] = new Variable("VAR" + i);
-            tmpVariables[i].weight(expectedReturnsMatrix.toBigDecimal(i, 0).negate());
+            final int row = i;
+            tmpVariables[i].weight(TypeUtils.toBigDecimal(expectedReturnsMatrix.get(row, 0)).negate());
             // set the constraints on the asset weights
             // require at least a 2% allocation to each asset
             tmpVariables[i].lower(new BigDecimal("0.05"));
@@ -415,7 +419,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Variable[] tmpVariables = new Variable[(int) expectedReturnsMatrix.countRows()];
         for (int i = 0; i < tmpVariables.length; i++) {
             tmpVariables[i] = new Variable("VAR" + i);
-            tmpVariables[i].weight(expectedReturnsMatrix.toBigDecimal(i, 0).negate());
+            final int row = i;
+            tmpVariables[i].weight(TypeUtils.toBigDecimal(expectedReturnsMatrix.get(row, 0)).negate());
             // set the constraints on the asset weights
             // require at least a 2% allocation to each asset
             tmpVariables[i].lower(new BigDecimal("0.05"));
@@ -467,7 +472,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Variable[] tmpVariables = new Variable[(int) tmpExpectedReturns.countRows()];
         for (int i = 0; i < tmpVariables.length; i++) {
             tmpVariables[i] = new Variable("VAR" + i);
-            tmpVariables[i].weight(tmpExpectedReturns.toBigDecimal(i, 0).negate());
+            final int row = i;
+            tmpVariables[i].weight(TypeUtils.toBigDecimal(tmpExpectedReturns.get(row, 0)).negate());
             // set the constraints on the asset weights
             // require at least a 8% allocation to each asset
             tmpVariables[i].lower(new BigDecimal("0.08"));
@@ -519,7 +525,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Variable[] tmpVariables = new Variable[(int) tmpExpectedReturns.countRows()];
         for (int i = 0; i < tmpVariables.length; i++) {
             tmpVariables[i] = new Variable("VAR" + i);
-            tmpVariables[i].weight(tmpExpectedReturns.toBigDecimal(i, 0).negate());
+            final int row = i;
+            tmpVariables[i].weight(TypeUtils.toBigDecimal(tmpExpectedReturns.get(row, 0)).negate());
             // set the constraints on the asset weights
             // require at least a 8% allocation to each asset
             tmpVariables[i].lower(new BigDecimal("0.08"));
@@ -569,9 +576,9 @@ public class ConvexProblems extends OptimisationConvexTests {
         for (int i = 0; i < retVal.length; i++) {
             if (tmpMatrices[i] != null) {
                 if (i == 3) {
-                    retVal[i] = tmpMatrices[i].negate().toPrimitiveStore();
+                    retVal[i] = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[i].negate());
                 } else {
-                    retVal[i] = tmpMatrices[i].toPrimitiveStore();
+                    retVal[i] = PrimitiveDenseStore.FACTORY.copy(tmpMatrices[i]);
                 }
             }
         }
@@ -835,7 +842,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
-        final PhysicalStore<BigDecimal> tmpSolution = BigMatrix.FACTORY.columns(tmpResult).toBigStore();
+        final PhysicalStore<BigDecimal> tmpSolution = BigDenseStore.FACTORY.copy(BigMatrix.FACTORY.columns(tmpResult));
         tmpSolution.modifyAll(new NumberContext(7, 6).getBigFunction());
         for (final BigDecimal tmpBigDecimal : tmpSolution.asList()) {
             if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {

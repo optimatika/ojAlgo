@@ -492,7 +492,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        final AggregatorFunction<ComplexNumber> tmpMainAggr = aggregator.getComplexFunction();
+        final AggregatorFunction<ComplexNumber> tmpMainAggr = aggregator.getFunction(ComplexAggregator.getSet());
 
         if (tmpColDim > AggregateAll.THRESHOLD) {
 
@@ -501,7 +501,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
                 @Override
                 public void conquer(final int aFirst, final int aLimit) {
 
-                    final AggregatorFunction<ComplexNumber> tmpPartAggr = aggregator.getComplexFunction();
+                    final AggregatorFunction<ComplexNumber> tmpPartAggr = aggregator.getFunction(ComplexAggregator.getSet());
 
                     ComplexDenseStore.this.visit(tmpRowDim * aFirst, tmpRowDim * aLimit, 1, tmpPartAggr);
 

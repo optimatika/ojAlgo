@@ -26,6 +26,8 @@ import java.math.BigDecimal;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.store.BigDenseStore;
+import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -100,9 +102,9 @@ public class TridiagonalizeCase extends MatrixDecompositionTests {
         BasicMatrix tmpSymmetricRandoml = PrimitiveMatrix.FACTORY.makeFilled(9, 9, new Normal());
         tmpSymmetricRandoml = tmpSymmetricRandoml.add(tmpSymmetricRandoml.transpose());
 
-        final MatrixStore<BigDecimal> tmpBigA = tmpSymmetricRandoml.toBigStore();
-        final MatrixStore<ComplexNumber> tmpComplexA = tmpSymmetricRandoml.toComplexStore();
-        final MatrixStore<Double> tmpPrimitiveA = tmpSymmetricRandoml.toPrimitiveStore();
+        final MatrixStore<BigDecimal> tmpBigA = BigDenseStore.FACTORY.copy(tmpSymmetricRandoml);
+        final MatrixStore<ComplexNumber> tmpComplexA = ComplexDenseStore.FACTORY.copy(tmpSymmetricRandoml);
+        final MatrixStore<Double> tmpPrimitiveA = PrimitiveDenseStore.FACTORY.copy(tmpSymmetricRandoml);
 
         final Tridiagonal<BigDecimal> tmpBigDecomp = Tridiagonal.BIG.make();
         final Tridiagonal<ComplexNumber> tmpComplexDecomp = Tridiagonal.COMPLEX.make();

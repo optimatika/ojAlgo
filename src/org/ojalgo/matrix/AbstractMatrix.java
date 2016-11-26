@@ -22,7 +22,6 @@
 package org.ojalgo.matrix;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +29,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -40,12 +38,9 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -125,8 +120,20 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
-    public N aggregateAll(final Aggregator aggregator) {
-        return myStore.aggregateAll(aggregator);
+    public N aggregateColumn(final long row, final long col, final Aggregator aggregator) {
+        return myStore.aggregateColumn(row, col, aggregator);
+    }
+
+    public N aggregateDiagonal(final long row, final long col, final Aggregator aggregator) {
+        return myStore.aggregateDiagonal(row, col, aggregator);
+    }
+
+    public N aggregateRange(final long first, final long limit, final Aggregator aggregator) {
+        return myStore.aggregateRange(first, limit, aggregator);
+    }
+
+    public N aggregateRow(final long row, final long col, final Aggregator aggregator) {
+        return myStore.aggregateRow(row, col, aggregator);
     }
 
     public I conjugate() {
@@ -227,33 +234,38 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public Scalar<N> getDeterminant() {
-        return myStore.physical().scalar().convert(this.getComputedLU().getDeterminant());
+
+        N tmpDeterminant = null;
+
+        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Determinant)
+                && ((MatrixDecomposition.Determinant<N>) myDecomposition).isComputed()) {
+
+            tmpDeterminant = ((MatrixDecomposition.Determinant<N>) myDecomposition).getDeterminant();
+
+        } else {
+
+            final DeterminantTask<N> tmpTask = this.getDeterminantTask(myStore);
+
+            if (tmpTask instanceof MatrixDecomposition.Determinant) {
+                myDecomposition = (MatrixDecomposition.Determinant<N>) tmpTask;
+            }
+
+            tmpDeterminant = tmpTask.calculateDeterminant(myStore);
+        }
+
+        return myStore.physical().scalar().convert(tmpDeterminant);
     }
 
     public List<ComplexNumber> getEigenvalues() {
         return this.getComputedEigenvalue().getEigenvalues();
     }
 
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getFrobeniusNorm()
-     */
     public Scalar<N> getFrobeniusNorm() {
-        return myStore.physical().scalar().convert(myStore.norm());
+        return myStore.physical().scalar().convert(BasicMatrix.calculateFrobeniusNorm(this));
     }
 
     public Scalar<N> getInfinityNorm() {
-
-        double retVal = PrimitiveMath.ZERO;
-        final AggregatorFunction<N> tmpRowSumAggr = myStore.physical().aggregator().norm1();
-
-        final int tmpRowDim = (int) myStore.countRows();
-        for (int i = 0; i < tmpRowDim; i++) {
-            myStore.visitRow(i, 0, tmpRowSumAggr);
-            retVal = PrimitiveFunction.MAX.invoke(retVal, tmpRowSumAggr.doubleValue());
-            tmpRowSumAggr.reset();
-        }
-
-        return myStore.physical().scalar().convert(retVal);
+        return myStore.physical().scalar().convert(BasicMatrix.calculateInfinityNorm(this));
     }
 
     public Scalar<N> getKyFanNorm(final int k) {
@@ -261,20 +273,15 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public Scalar<N> getOneNorm() {
-
-        double retVal = PrimitiveMath.ZERO;
-        final AggregatorFunction<N> tmpColSumAggr = myStore.physical().aggregator().norm1();
-
-        final int tmpColDim = (int) this.countColumns();
-        for (int j = 0; j < tmpColDim; j++) {
-            myStore.visitColumn(0, j, tmpColSumAggr);
-            retVal = PrimitiveFunction.MAX.invoke(retVal, tmpColSumAggr.doubleValue());
-            tmpColSumAggr.reset();
-        }
-
-        return myStore.physical().scalar().convert(retVal);
+        return myStore.physical().scalar().convert(BasicMatrix.calculateOneNorm(this));
     }
 
+    /**
+     * 2-norm, max singular value
+     *
+     * @deprecated v40 Use {@link SingularValue}
+     */
+    @Deprecated
     public Scalar<N> getOperatorNorm() {
         return myStore.physical().scalar().convert(this.getComputedSingularValue().getOperatorNorm());
     }
@@ -304,9 +311,16 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return myStore.physical().scalar().convert(this.getComputedSingularValue().getTraceNorm());
     }
 
-    public Scalar<N> getVectorNorm(final int aDegree) {
+    /**
+     * Treats [this] as if it is one dimensional (a vector) and calculates the vector norm. The interface only
+     * requires that implementations can handle arguments 0, 1, 2 and {@linkplain Integer#MAX_VALUE}.
+     *
+     * @deprecated v40 Use {@link #aggregateAll(org.ojalgo.function.aggregator.Aggregator)}
+     */
+    @Deprecated
+    public Scalar<N> getVectorNorm(final int degree) {
 
-        switch (aDegree) {
+        switch (degree) {
 
         case 0:
 
@@ -455,6 +469,13 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
+    /**
+     * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
+     * the sum of the square of the singular values. This definition fits the requirements of
+     * {@linkplain NormedVectorSpace#norm()}.
+     *
+     * @return The matrix' Frobenius norm
+     */
     public double norm() {
         return myStore.norm();
     }
@@ -473,12 +494,12 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I solve(final Access2D<?> rhs) {
 
-        MatrixStore<N> tmpProduct = null;
+        MatrixStore<N> tmpSolution = null;
 
         if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
                 && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
 
-            tmpProduct = ((MatrixDecomposition.Solver<N>) myDecomposition).getSolution(this.cast(rhs));
+            tmpSolution = ((MatrixDecomposition.Solver<N>) myDecomposition).getSolution(this.cast(rhs));
 
         } else {
 
@@ -490,23 +511,23 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
                 myDecomposition = tmpSolver;
 
                 if (tmpSolver.compute(myStore)) {
-                    tmpProduct = tmpSolver.getSolution(this.cast(rhs));
+                    tmpSolution = tmpSolver.getSolution(this.cast(rhs));
                 } else {
-                    tmpProduct = null;
+                    tmpSolution = null;
                 }
 
             } else {
 
                 try {
-                    tmpProduct = tmpTask.solve(myStore, rhs);
+                    tmpSolution = tmpTask.solve(myStore, rhs);
                 } catch (final TaskException xcptn) {
                     xcptn.printStackTrace();
-                    tmpProduct = null;
+                    tmpSolution = null;
                 }
             }
         }
 
-        return this.getFactory().instantiate(tmpProduct);
+        return this.getFactory().instantiate(tmpSolution);
     }
 
     public I subtract(final BasicMatrix subtrahend) {
@@ -542,14 +563,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
-    public PhysicalStore<BigDecimal> toBigStore() {
-        return BigDenseStore.FACTORY.copy(this);
-    }
-
-    public PhysicalStore<ComplexNumber> toComplexStore() {
-        return ComplexDenseStore.FACTORY.copy(this);
-    }
-
     public List<BasicMatrix> toListOfColumns() {
 
         final int tmpColDim = (int) this.countColumns();
@@ -578,10 +591,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         }
 
         return retVal;
-    }
-
-    public PhysicalStore<Double> toPrimitiveStore() {
-        return PrimitiveDenseStore.FACTORY.copy(this);
     }
 
     public Scalar<N> toScalar(final long row, final long col) {

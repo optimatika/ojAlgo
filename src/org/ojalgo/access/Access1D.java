@@ -42,7 +42,11 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     public interface Aggregatable<N extends Number> extends Structure1D {
 
-        N aggregateAll(Aggregator aggregator);
+        default N aggregateAll(final Aggregator aggregator) {
+            return this.aggregateRange(0L, this.count(), aggregator);
+        }
+
+        N aggregateRange(long first, long limit, Aggregator aggregator);
 
     }
 

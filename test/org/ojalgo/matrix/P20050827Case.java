@@ -107,7 +107,7 @@ public class P20050827Case extends BasicMatrixTest {
         final ComplexMatrix tmpMtrx = tmpProblematic.multiply(tmpProblematic.conjugate());
         final ComplexNumber tmpVal = tmpMtrx.getTrace().getNumber();
         final ComplexNumber tmpExpected = ComplexFunction.ROOT.invoke(tmpVal, 2);
-        final ComplexNumber tmpActual = tmpProblematic.getFrobeniusNorm().getNumber();
+        final ComplexNumber tmpActual = ComplexNumber.valueOf(tmpProblematic.norm());
 
         TestUtils.assertEquals(tmpExpected.norm(), tmpActual.norm(), EVALUATION);
         TestUtils.assertEquals(tmpExpected, tmpActual, EVALUATION);

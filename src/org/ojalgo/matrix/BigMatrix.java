@@ -33,7 +33,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -56,21 +56,8 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
         return this.modify(context.getBigFunction());
     }
 
-    public BigDecimal toBigDecimal(final int row, final int column) {
-        return this.getStore().get(row, column);
-    }
-
-    @Override
-    public PhysicalStore<BigDecimal> toBigStore() {
-        return this.getStore().copy();
-    }
-
-    public ComplexNumber toComplexNumber(final int row, final int column) {
-        return ComplexNumber.valueOf(this.getStore().doubleValue(row, column));
-    }
-
     public String toString(final int row, final int col) {
-        return this.toBigDecimal(row, col).toPlainString();
+        return TypeUtils.toBigDecimal(this.get(row, col)).toPlainString();
     }
 
     @SuppressWarnings("unchecked")

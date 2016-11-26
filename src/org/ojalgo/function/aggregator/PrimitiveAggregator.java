@@ -23,13 +23,12 @@ package org.ojalgo.function.aggregator;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class PrimitiveAggregator {
+public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
     public static final ThreadLocal<AggregatorFunction<Double>> CARDINALITY = new ThreadLocal<AggregatorFunction<Double>>() {
 
@@ -574,74 +573,69 @@ public abstract class PrimitiveAggregator {
         }
     };
 
-    private static final AggregatorSet<Double> SET = new AggregatorSet<Double>() {
+    private static final PrimitiveAggregator SET = new PrimitiveAggregator();
 
-        @Override
-        public AggregatorFunction<Double> cardinality() {
-            return CARDINALITY.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Double> largest() {
-            return LARGEST.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Double> maximum() {
-            return MAX.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Double> minimum() {
-            return MIN.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Double> norm1() {
-            return NORM1.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Double> norm2() {
-            return NORM2.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Double> product() {
-            return PRODUCT.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Double> product2() {
-            return PRODUCT2.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Double> smallest() {
-            return SMALLEST.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Double> sum() {
-            return SUM.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<Double> sum2() {
-            return SUM2.get().reset();
-        }
-
-    };
-
-    public static AggregatorSet<Double> getSet() {
+    public static PrimitiveAggregator getSet() {
         return SET;
     }
 
     private PrimitiveAggregator() {
-
         super();
+    }
 
-        ProgrammingError.throwForIllegalInvocation();
+    @Override
+    public AggregatorFunction<Double> cardinality() {
+        return CARDINALITY.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Double> largest() {
+        return LARGEST.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Double> maximum() {
+        return MAX.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Double> minimum() {
+        return MIN.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Double> norm1() {
+        return NORM1.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Double> norm2() {
+        return NORM2.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Double> product() {
+        return PRODUCT.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Double> product2() {
+        return PRODUCT2.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Double> smallest() {
+        return SMALLEST.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Double> sum() {
+        return SUM.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<Double> sum2() {
+        return SUM2.get().reset();
     }
 
 }

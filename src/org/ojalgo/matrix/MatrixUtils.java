@@ -39,6 +39,7 @@ import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
 public abstract class MatrixUtils {
@@ -669,7 +670,7 @@ public abstract class MatrixUtils {
             }
 
             public BigDecimal get(final long row, final long col) {
-                return matrix.toBigDecimal((int) row, (int) col);
+                return TypeUtils.toBigDecimal(matrix.get((int) row, (int) col));
             }
 
             public int size() {
@@ -703,7 +704,7 @@ public abstract class MatrixUtils {
             }
 
             public ComplexNumber get(final long row, final long col) {
-                return matrix.toComplexNumber((int) row, (int) col);
+                return ComplexNumber.valueOf(matrix.get((int) row, (int) col));
             }
 
             public int size() {

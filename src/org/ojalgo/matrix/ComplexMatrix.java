@@ -21,8 +21,6 @@
  */
 package org.ojalgo.matrix;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.ComplexDenseStore;
@@ -88,21 +86,8 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
         return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexReal(this.getStore()));
     }
 
-    public BigDecimal toBigDecimal(final int row, final int column) {
-        return new BigDecimal(this.getStore().doubleValue(row, column));
-    }
-
-    public ComplexNumber toComplexNumber(final int row, final int column) {
-        return this.getStore().get(row, column);
-    }
-
-    @Override
-    public PhysicalStore<ComplexNumber> toComplexStore() {
-        return this.getStore().copy();
-    }
-
     public String toString(final int row, final int col) {
-        return this.toComplexNumber(row, col).toString();
+        return ComplexNumber.valueOf(this.get(row, col)).toString();
     }
 
     @SuppressWarnings("unchecked")

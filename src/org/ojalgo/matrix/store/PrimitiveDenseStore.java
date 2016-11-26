@@ -1023,7 +1023,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         final int tmpRowDim = myRowDim;
         final int tmpColDim = myColDim;
 
-        final AggregatorFunction<Double> tmpMainAggr = aggregator.getPrimitiveFunction();
+        final AggregatorFunction<Double> tmpMainAggr = aggregator.getFunction(PrimitiveAggregator.getSet());
 
         if (tmpColDim > AggregateAll.THRESHOLD) {
 
@@ -1032,7 +1032,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
                 @Override
                 public void conquer(final int first, final int limit) {
 
-                    final AggregatorFunction<Double> tmpPartAggr = aggregator.getPrimitiveFunction();
+                    final AggregatorFunction<Double> tmpPartAggr = aggregator.getFunction(PrimitiveAggregator.getSet());
 
                     PrimitiveDenseStore.this.visit(tmpRowDim * first, tmpRowDim * limit, 1, tmpPartAggr);
 

@@ -23,7 +23,6 @@ package org.ojalgo.function.aggregator;
 
 import static org.ojalgo.function.RationalFunction.*;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.RationalFunction;
@@ -31,7 +30,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class RationalAggregator {
+public final class RationalAggregator extends AggregatorSet<RationalNumber> {
 
     public static final ThreadLocal<AggregatorFunction<RationalNumber>> CARDINALITY = new ThreadLocal<AggregatorFunction<RationalNumber>>() {
 
@@ -574,74 +573,69 @@ public abstract class RationalAggregator {
         }
     };
 
-    private static final AggregatorSet<RationalNumber> SET = new AggregatorSet<RationalNumber>() {
+    private static final RationalAggregator SET = new RationalAggregator();
 
-        @Override
-        public AggregatorFunction<RationalNumber> cardinality() {
-            return CARDINALITY.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<RationalNumber> largest() {
-            return LARGEST.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<RationalNumber> maximum() {
-            return MAX.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<RationalNumber> minimum() {
-            return MIN.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<RationalNumber> norm1() {
-            return NORM1.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<RationalNumber> norm2() {
-            return NORM2.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<RationalNumber> product() {
-            return PRODUCT.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<RationalNumber> product2() {
-            return PRODUCT2.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<RationalNumber> smallest() {
-            return SMALLEST.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<RationalNumber> sum() {
-            return SUM.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<RationalNumber> sum2() {
-            return SUM2.get().reset();
-        }
-
-    };
-
-    public static AggregatorSet<RationalNumber> getSet() {
+    public static RationalAggregator getSet() {
         return SET;
     }
 
     private RationalAggregator() {
-
         super();
+    }
 
-        ProgrammingError.throwForIllegalInvocation();
+    @Override
+    public AggregatorFunction<RationalNumber> cardinality() {
+        return CARDINALITY.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> largest() {
+        return LARGEST.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> maximum() {
+        return MAX.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> minimum() {
+        return MIN.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> norm1() {
+        return NORM1.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> norm2() {
+        return NORM2.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> product() {
+        return PRODUCT.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> product2() {
+        return PRODUCT2.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> smallest() {
+        return SMALLEST.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> sum() {
+        return SUM.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<RationalNumber> sum2() {
+        return SUM2.get().reset();
     }
 
 }

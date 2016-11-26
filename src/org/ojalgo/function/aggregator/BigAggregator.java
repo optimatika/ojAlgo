@@ -26,12 +26,11 @@ import static org.ojalgo.function.BigFunction.*;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class BigAggregator {
+public final class BigAggregator extends AggregatorSet<BigDecimal> {
 
     public static final ThreadLocal<AggregatorFunction<BigDecimal>> CARDINALITY = new ThreadLocal<AggregatorFunction<BigDecimal>>() {
 
@@ -574,74 +573,69 @@ public abstract class BigAggregator {
         }
     };
 
-    private static final AggregatorSet<BigDecimal> SET = new AggregatorSet<BigDecimal>() {
+    private static final BigAggregator SET = new BigAggregator();
 
-        @Override
-        public AggregatorFunction<BigDecimal> cardinality() {
-            return CARDINALITY.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<BigDecimal> largest() {
-            return LARGEST.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<BigDecimal> maximum() {
-            return MAX.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<BigDecimal> minimum() {
-            return MIN.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<BigDecimal> norm1() {
-            return NORM1.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<BigDecimal> norm2() {
-            return NORM2.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<BigDecimal> product() {
-            return PRODUCT.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<BigDecimal> product2() {
-            return PRODUCT2.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<BigDecimal> smallest() {
-            return SMALLEST.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<BigDecimal> sum() {
-            return SUM.get().reset();
-        }
-
-        @Override
-        public AggregatorFunction<BigDecimal> sum2() {
-            return SUM2.get().reset();
-        }
-
-    };
-
-    public static AggregatorSet<BigDecimal> getSet() {
+    public static BigAggregator getSet() {
         return SET;
     }
 
     private BigAggregator() {
-
         super();
+    }
 
-        ProgrammingError.throwForIllegalInvocation();
+    @Override
+    public AggregatorFunction<BigDecimal> cardinality() {
+        return CARDINALITY.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<BigDecimal> largest() {
+        return LARGEST.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<BigDecimal> maximum() {
+        return MAX.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<BigDecimal> minimum() {
+        return MIN.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<BigDecimal> norm1() {
+        return NORM1.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<BigDecimal> norm2() {
+        return NORM2.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<BigDecimal> product() {
+        return PRODUCT.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<BigDecimal> product2() {
+        return PRODUCT2.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<BigDecimal> smallest() {
+        return SMALLEST.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<BigDecimal> sum() {
+        return SUM.get().reset();
+    }
+
+    @Override
+    public AggregatorFunction<BigDecimal> sum2() {
+        return SUM2.get().reset();
     }
 
 }
