@@ -421,7 +421,7 @@ public final class SampleSet implements Access1D<Double> {
     double[] getSortedCopy() {
 
         final Access1D<?> tmpSamples = this.getSamples();
-        final long tmpSamplesCount = tmpSamples.count();
+        final int tmpSamplesCount = (int) tmpSamples.count();
 
         if ((mySortedCopy == null) || (mySortedCopy.length < tmpSamplesCount)) {
             mySortedCopy = tmpSamples.toRawCopy1D();
@@ -430,7 +430,7 @@ public final class SampleSet implements Access1D<Double> {
             for (int i = 0; i < tmpSamplesCount; i++) {
                 mySortedCopy[i] = tmpSamples.doubleValue(i);
             }
-            Arrays.parallelSort(mySortedCopy, 0, (int) tmpSamplesCount);
+            Arrays.parallelSort(mySortedCopy, 0, tmpSamplesCount);
         }
 
         return mySortedCopy;
