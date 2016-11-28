@@ -133,6 +133,13 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         return true;
     }
 
+    public boolean addAll(final double[] elements) {
+        for (final double tmpElement : elements) {
+            this.add(tmpElement);
+        }
+        return true;
+    }
+
     public boolean addAll(final int index, final Collection<? extends N> c) {
         throw new UnsupportedOperationException();
     }

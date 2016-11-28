@@ -31,7 +31,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * PrimitiveMatrix
@@ -47,14 +46,6 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
      */
     PrimitiveMatrix(final MatrixStore<Double> aStore) {
         super(aStore);
-    }
-
-    public PrimitiveMatrix enforce(final NumberContext context) {
-        return this.modify(context.getPrimitiveFunction());
-    }
-
-    public String toString(final int row, final int col) {
-        return Double.toString(this.doubleValue(row, col));
     }
 
     @SuppressWarnings("unchecked")

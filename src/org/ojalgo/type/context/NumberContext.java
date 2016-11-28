@@ -32,7 +32,12 @@ import java.util.Locale;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.BigFunction;
+import org.ojalgo.function.ComplexFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.QuaternionFunction;
+import org.ojalgo.function.RationalFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -316,34 +321,26 @@ public final class NumberContext extends FormatContext<Number> {
 
     /**
      * "big" enforce(...)
+     *
+     * @deprecated v42 Use {@link #getFunction(FunctionSet)} instead.
      */
+    @Deprecated
     public UnaryFunction<BigDecimal> getBigFunction() {
-        return new UnaryFunction<BigDecimal>() {
-
-            public BigDecimal invoke(final BigDecimal arg) {
-                return NumberContext.this.enforce(arg);
-            }
-
-            public double invoke(final double arg) {
-                return NumberContext.this.enforce(arg);
-            }
-        };
+        return this.getFunction(BigFunction.getSet());
     }
 
     /**
      * "complex" enforce(...)
+     *
+     * @deprecated v42 Use {@link #getFunction(FunctionSet)} instead.
      */
+    @Deprecated
     public UnaryFunction<ComplexNumber> getComplexFunction() {
-        return new UnaryFunction<ComplexNumber>() {
+        return this.getFunction(ComplexFunction.getSet());
+    }
 
-            public ComplexNumber invoke(final ComplexNumber arg) {
-                return arg.enforce(NumberContext.this);
-            }
-
-            public double invoke(final double arg) {
-                return NumberContext.this.enforce(arg);
-            }
-        };
+    public <N extends Number> UnaryFunction<N> getFunction(final FunctionSet<N> functions) {
+        return functions.enforce(this);
     }
 
     public MathContext getMathContext() {
@@ -356,50 +353,32 @@ public final class NumberContext extends FormatContext<Number> {
 
     /**
      * "primitive" enforce(...)
+     *
+     * @deprecated v42 Use {@link #getFunction(FunctionSet)} instead.
      */
+    @Deprecated
     public UnaryFunction<Double> getPrimitiveFunction() {
-        return new UnaryFunction<Double>() {
-
-            public double invoke(final double arg) {
-                return NumberContext.this.enforce(arg);
-            }
-
-            public Double invoke(final Double arg) {
-                return NumberContext.this.enforce(arg.doubleValue());
-            }
-        };
+        return this.getFunction(PrimitiveFunction.getSet());
     }
 
     /**
      * "quaternion" enforce(...)
+     *
+     * @deprecated v42 Use {@link #getFunction(FunctionSet)} instead.
      */
+    @Deprecated
     public UnaryFunction<Quaternion> getQuaternionFunction() {
-        return new UnaryFunction<Quaternion>() {
-
-            public double invoke(final double arg) {
-                return NumberContext.this.enforce(arg);
-            }
-
-            public Quaternion invoke(final Quaternion arg) {
-                return arg.enforce(NumberContext.this);
-            }
-        };
+        return this.getFunction(QuaternionFunction.getSet());
     }
 
     /**
      * "rational" enforce(...)
+     *
+     * @deprecated v42 Use {@link #getFunction(FunctionSet)} instead.
      */
+    @Deprecated
     public UnaryFunction<RationalNumber> getRationalFunction() {
-        return new UnaryFunction<RationalNumber>() {
-
-            public double invoke(final double arg) {
-                return NumberContext.this.enforce(arg);
-            }
-
-            public RationalNumber invoke(final RationalNumber arg) {
-                return arg.enforce(NumberContext.this);
-            }
-        };
+        return this.getFunction(RationalFunction.getSet());
     }
 
     public RoundingMode getRoundingMode() {

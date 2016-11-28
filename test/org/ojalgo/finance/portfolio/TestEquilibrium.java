@@ -164,7 +164,7 @@ public class TestEquilibrium extends FinancePortfolioTests {
 
         final MarketEquilibrium tmpEquilibrium = new MarketEquilibrium(PrimitiveMatrix.FACTORY.copy(tmpCovariances), tmpRAF).clean();
 
-        final Number[] tmpRawWeights = PrimitiveMatrix.FACTORY.makeFilled(tmpDim, 1, tmpRndmWeight).toListOfElements().toArray(new Number[tmpDim]);
+        final double[] tmpRawWeights = PrimitiveMatrix.FACTORY.makeFilled(tmpDim, 1, tmpRndmWeight).toRawCopy1D();
         final List<BigDecimal> tmpNormalisedWeights = new SimplePortfolio(tmpRawWeights).normalise().getWeights();
 
         @SuppressWarnings("unchecked")

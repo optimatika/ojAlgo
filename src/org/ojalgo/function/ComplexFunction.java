@@ -24,6 +24,7 @@ package org.ojalgo.function;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.type.context.NumberContext;
 
 public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
@@ -602,6 +603,11 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     @Override
     public BinaryFunction<ComplexNumber> divide() {
         return DIVIDE;
+    }
+
+    @Override
+    public Unary enforce(final NumberContext context) {
+        return t -> ComplexNumber.valueOf(context.enforce(t));
     }
 
     @Override

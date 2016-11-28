@@ -22,7 +22,6 @@
 package org.ojalgo.matrix;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
@@ -34,9 +33,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
-import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
-import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -214,7 +211,14 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
         myHashCode = 0;
 
-        myDecomposition = null;
+        if (myDecomposition != null) {
+            myDecomposition.reset();
+            myDecomposition = null;
+        }
+
+        myHermitian = null;
+        mySymmetric = null;
+
     }
 
     public N get(final long index) {
@@ -350,19 +354,40 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I invert() {
 
-        MatrixStore<N> retVal = null;
+        MatrixStore<N> tmpInverse = null;
 
-        //        if (this.isSquare() && this.getComputedLU().isSolvable()) {
-        //            retVal = this.getComputedLU().getInverse();
-        //        } else if (this.isTall() && this.getComputedQR().isSolvable()) {
-        //            retVal = this.getComputedQR().getInverse();
-        //        } else {
-        //            retVal = this.getComputedSingularValue().getInverse();
-        //        }
+        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
+                && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
 
-        retVal = this.doInvert();
+            tmpInverse = ((MatrixDecomposition.Solver<N>) myDecomposition).getInverse();
 
-        return this.getFactory().instantiate(retVal);
+        } else {
+
+            final InverterTask<N> tmpTask = this.getInverterTask(myStore);
+
+            if (tmpTask instanceof MatrixDecomposition.Solver) {
+
+                final MatrixDecomposition.Solver<N> tmpSolver = (MatrixDecomposition.Solver<N>) tmpTask;
+                myDecomposition = tmpSolver;
+
+                if (tmpSolver.compute(myStore)) {
+                    tmpInverse = tmpSolver.getInverse();
+                } else {
+                    tmpInverse = null;
+                }
+
+            } else {
+
+                try {
+                    tmpInverse = tmpTask.invert(myStore);
+                } catch (final TaskException xcptn) {
+                    xcptn.printStackTrace();
+                    tmpInverse = null;
+                }
+            }
+        }
+
+        return this.getFactory().instantiate(tmpInverse);
     }
 
     public boolean isAbsolute(final long row, final long col) {
@@ -395,27 +420,29 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return mySymmetric.booleanValue();
     }
 
-    public I mergeColumns(final Access2D<?> aMtrx) {
+    public I mergeColumns(final Access2D<?> belowRows) {
 
-        MatrixError.throwIfNotEqualColumnDimensions(myStore, aMtrx);
+        MatrixError.throwIfNotEqualColumnDimensions(myStore, belowRows);
 
-        //return this.getFactory().instantiate(new AboveBelowStore<N>(myStore, this.getStoreFrom(aMtrx)));
-        return this.getFactory().instantiate(myStore.logical().below(this.cast(aMtrx).get()).get());
+        final MatrixStore<N> tmpBelow = this.cast(belowRows).get();
+
+        return this.getFactory().instantiate(myStore.logical().below(tmpBelow).get());
     }
 
-    public I mergeRows(final Access2D<?> aMtrx) {
+    public I mergeRows(final Access2D<?> rightColumns) {
 
-        MatrixError.throwIfNotEqualRowDimensions(myStore, aMtrx);
+        MatrixError.throwIfNotEqualRowDimensions(myStore, rightColumns);
 
-        //return this.getFactory().instantiate(new LeftRightStore<N>(myStore, this.getStoreFrom(aMtrx)));
-        return this.getFactory().instantiate(myStore.logical().right(this.cast(aMtrx).get()).get());
+        final MatrixStore<N> tmpRight = this.cast(rightColumns).get();
+
+        return this.getFactory().instantiate(myStore.logical().right(tmpRight).get());
     }
 
-    public I modify(final UnaryFunction<? extends Number> aFunc) {
+    public I modify(final UnaryFunction<? extends Number> modifier) {
 
         final PhysicalStore<N> retVal = myStore.copy();
 
-        retVal.modifyAll((UnaryFunction<N>) aFunc);
+        retVal.modifyAll((UnaryFunction<N>) modifier);
 
         return this.getFactory().instantiate(retVal);
     }
@@ -447,6 +474,15 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         retVal.modifyAll(myStore.physical().function().multiply().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
+    }
+
+    public I enforce(final NumberContext context) {
+
+        final PhysicalStore<N> tmpCopy = myStore.copy();
+
+        tmpCopy.modifyAll(myStore.physical().function().enforce(context));
+
+        return this.getFactory().instantiate(tmpCopy);
     }
 
     public I multiplyElements(final Access2D<?> multiplicand) {
@@ -563,36 +599,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return this.getFactory().instantiate(retVal);
     }
 
-    public List<BasicMatrix> toListOfColumns() {
-
-        final int tmpColDim = (int) this.countColumns();
-
-        final List<BasicMatrix> retVal = new ArrayList<>(tmpColDim);
-
-        for (int j = 0; j < tmpColDim; j++) {
-            retVal.add(j, this.selectColumns(j));
-        }
-
-        return retVal;
-    }
-
-    public List<N> toListOfElements() {
-        return myStore.copy().asList();
-    }
-
-    public List<BasicMatrix> toListOfRows() {
-
-        final int tmpRowDim = (int) this.countRows();
-
-        final List<BasicMatrix> retVal = new ArrayList<>(tmpRowDim);
-
-        for (int i = 0; i < tmpRowDim; i++) {
-            retVal.add(i, this.selectRows(i));
-        }
-
-        return retVal;
-    }
-
     public Scalar<N> toScalar(final long row, final long col) {
         return myStore.toScalar(row, col);
     }
@@ -616,26 +622,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return (Eigenvalue<N>) myDecomposition;
     }
 
-    private final LU<N> getComputedLU() {
-
-        if (!this.isComputedLU()) {
-            myDecomposition = LU.make(myStore);
-            myDecomposition.decompose(myStore);
-        }
-
-        return (LU<N>) myDecomposition;
-    }
-
-    private final QR<N> getComputedQR() {
-
-        if (!this.isComputedQR()) {
-            myDecomposition = QR.make(myStore);
-            myDecomposition.decompose(myStore);
-        }
-
-        return (QR<N>) myDecomposition;
-    }
-
     private final SingularValue<N> getComputedSingularValue() {
 
         if (!this.isComputedSingularValue()) {
@@ -650,50 +636,8 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return (myDecomposition != null) && (myDecomposition instanceof Eigenvalue) && myDecomposition.isComputed();
     }
 
-    private boolean isComputedLU() {
-        return (myDecomposition != null) && (myDecomposition instanceof LU) && myDecomposition.isComputed();
-    }
-
-    private boolean isComputedQR() {
-        return (myDecomposition != null) && (myDecomposition instanceof QR) && myDecomposition.isComputed();
-    }
-
     private boolean isComputedSingularValue() {
         return (myDecomposition != null) && (myDecomposition instanceof SingularValue) && myDecomposition.isComputed();
-    }
-
-    protected final MatrixStore<N> doInvert() {
-
-        if ((myDecomposition != null) && (myDecomposition instanceof MatrixDecomposition.Solver)
-                && ((MatrixDecomposition.Solver<?>) myDecomposition).isSolvable()) {
-
-            return ((MatrixDecomposition.Solver<N>) myDecomposition).getInverse();
-
-        } else {
-
-            final InverterTask<N> tmpTask = this.getInverterTask(myStore);
-
-            if (tmpTask instanceof MatrixDecomposition.Solver) {
-
-                final MatrixDecomposition.Solver<N> tmpSolver = (MatrixDecomposition.Solver<N>) tmpTask;
-                myDecomposition = tmpSolver;
-
-                if (tmpSolver.compute(myStore)) {
-                    return tmpSolver.getInverse();
-                } else {
-                    return null;
-                }
-
-            } else {
-
-                try {
-                    return tmpTask.invert(myStore);
-                } catch (final TaskException xcptn) {
-                    xcptn.printStackTrace();
-                    return null;
-                }
-            }
-        }
     }
 
     abstract ElementsSupplier<N> cast(Access1D<?> matrix);

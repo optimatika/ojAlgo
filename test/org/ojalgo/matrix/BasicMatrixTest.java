@@ -25,6 +25,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.access.ColumnView;
+import org.ojalgo.access.RowView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix.Builder;
@@ -914,74 +916,66 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#toListOfColumns()
+     * @see org.ojalgo.matrix.BasicMatrix#columns()
      */
     public void testToListOfColumns() {
 
-        final List<BasicMatrix> tmpExpStore = myBigAA.toListOfColumns();
-        List<BasicMatrix> tmpActStore;
+        final Iterable<ColumnView<Number>> tmpColumns = myBigAA.columns();
 
-        tmpActStore = myComplexAA.toListOfColumns();
-        for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
+        for (final ColumnView<Number> tmpColumnView : tmpColumns) {
+            final long j = tmpColumnView.column();
+            for (long i = 0L; i < tmpColumnView.count(); i++) {
+                TestUtils.assertEquals(tmpColumnView.get(i), myComplexAA.get(i, j), EVALUATION);
+                TestUtils.assertEquals(tmpColumnView.get(i), myPrimitiveAA.get(i, j), EVALUATION);
+            }
         }
-
-        tmpActStore = myPrimitiveAA.toListOfColumns();
-        for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-        }
-
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#toListOfElements()
+     * @see org.ojalgo.matrix.BasicMatrix#toRawCopy1D()
      */
-    public void testToListOfElements() {
+    public void testToRawCopy1D() {
 
-        final List<? extends Number> tmpExpStore = myBigAA.toListOfElements();
-        List<? extends Number> tmpActStore;
+        final double[] tmpExpStore = myBigAA.toRawCopy1D();
+        double[] tmpActStore;
 
         final int tmpFirstIndex = 0;
         final int tmpLastIndex = (int) (myBigAA.count() - 1);
 
-        tmpActStore = myComplexAA.toListOfElements();
-        TestUtils.assertEquals(tmpExpStore.get(tmpFirstIndex), tmpActStore.get(tmpFirstIndex), EVALUATION);
-        TestUtils.assertEquals(tmpExpStore.get(tmpLastIndex), tmpActStore.get(tmpLastIndex), EVALUATION);
+        tmpActStore = myComplexAA.toRawCopy1D();
+        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], EVALUATION);
+        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], EVALUATION);
         if (myBigAA.isVector()) {
-            for (int i = 0; i < tmpExpStore.size(); i++) {
-                TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
+            for (int i = 0; i < tmpExpStore.length; i++) {
+                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], EVALUATION);
             }
         }
 
-        tmpActStore = myPrimitiveAA.toListOfElements();
-        TestUtils.assertEquals(tmpExpStore.get(tmpFirstIndex), tmpActStore.get(tmpFirstIndex), EVALUATION);
-        TestUtils.assertEquals(tmpExpStore.get(tmpLastIndex), tmpActStore.get(tmpLastIndex), EVALUATION);
+        tmpActStore = myPrimitiveAA.toRawCopy1D();
+        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], EVALUATION);
+        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], EVALUATION);
         if (myBigAA.isVector()) {
-            for (int i = 0; i < tmpExpStore.size(); i++) {
-                TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
+            for (int i = 0; i < tmpExpStore.length; i++) {
+                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], EVALUATION);
             }
         }
 
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#toListOfRows()
+     * @see org.ojalgo.matrix.BasicMatrix#rows()
      */
     public void testToListOfRows() {
 
-        final List<BasicMatrix> tmpExpStore = myBigAA.toListOfRows();
-        List<BasicMatrix> tmpActStore;
+        final Iterable<RowView<Number>> tmpRows = myBigAA.rows();
 
-        tmpActStore = myComplexAA.toListOfRows();
-        for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
+        for (final RowView<Number> tmpRowView : tmpRows) {
+            final long i = tmpRowView.row();
+            for (long j = 0L; j < tmpRowView.count(); j++) {
+                TestUtils.assertEquals(tmpRowView.get(j), myComplexAA.get(i, j), EVALUATION);
+                TestUtils.assertEquals(tmpRowView.get(j), myPrimitiveAA.get(i, j), EVALUATION);
+            }
         }
-
-        tmpActStore = myPrimitiveAA.toListOfRows();
-        for (int i = 0; i < tmpExpStore.size(); i++) {
-            TestUtils.assertEquals(tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-        }
-
     }
 
     /**

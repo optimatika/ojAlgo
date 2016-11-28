@@ -32,7 +32,6 @@ import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * ComplexMatrix
@@ -48,10 +47,6 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
      */
     ComplexMatrix(final MatrixStore<ComplexNumber> aStore) {
         super(aStore);
-    }
-
-    public ComplexMatrix enforce(final NumberContext context) {
-        return this.modify(context.getComplexFunction());
     }
 
     /**
@@ -84,10 +79,6 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
     @SuppressWarnings("unchecked")
     public PrimitiveMatrix getReal() {
         return ((MatrixFactory<Double, PrimitiveMatrix>) PrimitiveMatrix.FACTORY).instantiate(MatrixUtils.getComplexReal(this.getStore()));
-    }
-
-    public String toString(final int row, final int col) {
-        return ComplexNumber.valueOf(this.get(row, col)).toString();
     }
 
     @SuppressWarnings("unchecked")

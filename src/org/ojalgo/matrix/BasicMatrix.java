@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.ojalgo.access.Access2D;
@@ -37,10 +36,6 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -136,10 +131,10 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     BasicMatrix divideElements(Access2D<?> aMtrx);
 
     /**
-     * Will enforce this context
+     * Will enforce this number context on the elements
      *
      * @param context The context
-     * @return A new matrix with the lements enforced
+     * @return A new matrix with the elements enforced
      */
     BasicMatrix enforce(NumberContext context);
 
@@ -251,21 +246,25 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     boolean isSymmetric();
 
     /**
-     * [aMtrx] is appended to the bottom of [this]. The two matrices must have the same number of columns.
+     * [belowRows] is appended below [this]. The two matrices must have the same number of columns.
      *
-     * @param aMtrx The matrix to merge.
+     * @param belowRows The matrix to merge.
      * @return A new matrix with more rows.
      */
-    BasicMatrix mergeColumns(Access2D<?> aMtrx);
+    BasicMatrix mergeColumns(Access2D<?> belowRows);
 
     /**
-     * [aMtrx] is appended to the right side of [this]. The two matrices must have the same number of rows.
+     * [rightColumns] is appended to the right of [this]. The two matrices must have the same number of rows.
      *
-     * @param aMtrx The matrix to merge.
+     * @param rightColumns The matrix to merge.
      * @return A new matrix with more columns.
      */
-    BasicMatrix mergeRows(Access2D<?> aMtrx);
+    BasicMatrix mergeRows(Access2D<?> rightColumns);
 
+    /**
+     * @deprecated v42
+     */
+    @Deprecated
     BasicMatrix modify(UnaryFunction<? extends Number> aFunc);
 
     /**
@@ -308,27 +307,6 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
     BasicMatrix solve(Access2D<?> aRHS);
 
     /**
-     * @deprecated v40 Use {@link #columns()}
-     */
-    @Deprecated
-    List<BasicMatrix> toListOfColumns();
-
-    /**
-     * It is also possible to call {@linkplain #toBigStore()}, {@linkplain #toComplexStore()} or
-     * {@linkplain #toPrimitiveStore()} and then {@linkplain PhysicalStore#asList()}.
-     *
-     * @deprecated v40 Use {@link #iterator()}
-     */
-    @Deprecated
-    List<? extends Number> toListOfElements();
-
-    /**
-     * @deprecated v40 Use {@link #rows()}
-     */
-    @Deprecated
-    List<BasicMatrix> toListOfRows();
-
-    /**
      * Extracts one element of this matrix as a Scalar.
      *
      * @param row A row index.
@@ -337,7 +315,13 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
      */
     Scalar<?> toScalar(long row, long col);
 
-    String toString(int row, int col);
+    /**
+     * @deprecated v42
+     */
+    @Deprecated
+    default String toString(final int row, final int col) {
+        return this.toScalar(row, col).toString();
+    }
 
     /**
      * Transposes this matrix. For complex matrices conjugate() and transpose() are NOT EQUAL.

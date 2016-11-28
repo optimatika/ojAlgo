@@ -24,6 +24,7 @@ package org.ojalgo.function;
 import java.math.BigDecimal;
 
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * RationalFunction
@@ -609,6 +610,11 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     @Override
     public BinaryFunction<RationalNumber> divide() {
         return DIVIDE;
+    }
+
+    @Override
+    public Unary enforce(final NumberContext context) {
+        return t -> RationalNumber.valueOf(context.enforce(t));
     }
 
     @Override

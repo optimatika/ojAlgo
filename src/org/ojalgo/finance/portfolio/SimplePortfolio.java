@@ -36,6 +36,17 @@ import org.ojalgo.random.process.GeometricBrownianMotion;
 
 public final class SimplePortfolio extends FinancePortfolio implements Context {
 
+    static List<SimpleAsset> toSimpleAssets(final double[] someWeights) {
+
+        final ArrayList<SimpleAsset> retVal = new ArrayList<>(someWeights.length);
+
+        for (int i = 0; i < someWeights.length; i++) {
+            retVal.add(new SimpleAsset(someWeights[i]));
+        }
+
+        return retVal;
+    }
+
     static List<SimpleAsset> toSimpleAssets(final Number[] someWeights) {
 
         final ArrayList<SimpleAsset> retVal = new ArrayList<>(someWeights.length);
@@ -92,6 +103,10 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
             final BigDecimal tmpWeight = tmpWeights.get(i);
             myComponents.add(new SimpleAsset(tmpMeanReturn, tmpVolatilty, tmpWeight));
         }
+    }
+
+    public SimplePortfolio(final double[] someWeights) {
+        this(SimplePortfolio.toSimpleAssets(someWeights));
     }
 
     public SimplePortfolio(final List<SimpleAsset> someAssets) {

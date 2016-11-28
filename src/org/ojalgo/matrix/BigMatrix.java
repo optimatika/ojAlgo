@@ -33,8 +33,6 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * BigMatrix
@@ -50,14 +48,6 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
      */
     BigMatrix(final MatrixStore<BigDecimal> aStore) {
         super(aStore);
-    }
-
-    public BigMatrix enforce(final NumberContext context) {
-        return this.modify(context.getBigFunction());
-    }
-
-    public String toString(final int row, final int col) {
-        return TypeUtils.toBigDecimal(this.get(row, col)).toPlainString();
     }
 
     @SuppressWarnings("unchecked")

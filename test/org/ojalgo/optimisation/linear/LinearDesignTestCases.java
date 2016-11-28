@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -188,7 +189,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         final PhysicalStore<Double> tmpExpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.74 }, { 0.45 }, { 1.0 } });
         final PhysicalStore<Double> tmpActX = PrimitiveDenseStore.FACTORY.copy(tmpSolution.selectRows(new int[] { 0, 1, 2 }));
-        tmpActX.modifyAll(new NumberContext(7, 2).getPrimitiveFunction());
+        tmpActX.modifyAll(new NumberContext(7, 2).getFunction(PrimitiveFunction.getSet()));
 
         TestUtils.assertEquals(tmpExpX, tmpActX);
     }

@@ -36,6 +36,7 @@ import org.ojalgo.array.PrimitiveArray;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.finance.portfolio.GitHubIssue24;
 import org.ojalgo.finance.portfolio.MarkowitzModel;
+import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
 import org.ojalgo.matrix.BasicMatrix;
@@ -843,7 +844,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertEquals(State.OPTIMAL, tmpResult.getState());
 
         final PhysicalStore<BigDecimal> tmpSolution = BigDenseStore.FACTORY.copy(BigMatrix.FACTORY.columns(tmpResult));
-        tmpSolution.modifyAll(new NumberContext(7, 6).getBigFunction());
+        tmpSolution.modifyAll(new NumberContext(7, 6).getFunction(BigFunction.getSet()));
         for (final BigDecimal tmpBigDecimal : tmpSolution.asList()) {
             if ((tmpBigDecimal.compareTo(BigMath.ZERO) == -1) || (tmpBigDecimal.compareTo(BigMath.ONE) == 1)) {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");

@@ -27,6 +27,8 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
+import org.ojalgo.type.context.NumberContext;
+
 /**
  * Only the reference type parameter (BigDecimal) methods are actually implemented. The methods with the
  * primitive parameters (double) should create a BigDecimal and then delegate to the primitive methods (and do
@@ -563,6 +565,11 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     @Override
     public BinaryFunction<BigDecimal> divide() {
         return DIVIDE;
+    }
+
+    @Override
+    public Unary enforce(final NumberContext context) {
+        return t -> context.enforce(t);
     }
 
     @Override

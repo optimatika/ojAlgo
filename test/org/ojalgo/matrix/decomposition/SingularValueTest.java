@@ -245,7 +245,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
         final Array1D<Double> tmpJamaSingularValues = IMPL_RAW.getSingularValues();
         final Array1D<Double> tmpDirectSingularValues = IMPL_PRIMITIVE.getSingularValues();
 
-        UnaryFunction<Double> tmpPrimitiveRoundFunction = CNTXT_REAL_VALUES.getPrimitiveFunction();
+        UnaryFunction<Double> tmpPrimitiveRoundFunction = CNTXT_REAL_VALUES.getFunction(PrimitiveFunction.getSet());
         //        tmpBigSingularValues.modifyAll(tmpPrimitiveRoundFunction);
         //        tmpComplexSingularValues.modifyAll(tmpPrimitiveRoundFunction);
         //        tmpJamaSingularValues.modifyAll(tmpPrimitiveRoundFunction);
@@ -312,7 +312,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         }
 
-        tmpPrimitiveRoundFunction = CNTXT_CPLX_VALUES.getPrimitiveFunction();
+        tmpPrimitiveRoundFunction = CNTXT_CPLX_VALUES.getFunction(PrimitiveFunction.getSet());
         tmpBigSingularValues.modifyAll(tmpPrimitiveRoundFunction);
         tmpComplexSingularValues.modifyAll(tmpPrimitiveRoundFunction);
         tmpJamaSingularValues.modifyAll(tmpPrimitiveRoundFunction);

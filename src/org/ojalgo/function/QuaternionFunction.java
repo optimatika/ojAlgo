@@ -24,6 +24,7 @@ package org.ojalgo.function;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.type.context.NumberContext;
 
 public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
@@ -610,6 +611,11 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     @Override
     public BinaryFunction<Quaternion> divide() {
         return DIVIDE;
+    }
+
+    @Override
+    public Unary enforce(final NumberContext context) {
+        return t -> Quaternion.valueOf(context.enforce(t));
     }
 
     @Override

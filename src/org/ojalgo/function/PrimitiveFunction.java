@@ -26,6 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Only the primitive parameter (double) methods are actually implemented. The methods with the reference type
@@ -542,6 +543,11 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     @Override
     public BinaryFunction<Double> divide() {
         return DIVIDE;
+    }
+
+    @Override
+    public Unary enforce(final NumberContext context) {
+        return t -> context.enforce(t);
     }
 
     @Override
