@@ -317,12 +317,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     protected abstract void fill(long first, long limit, long step, NullaryFunction<N> supplier);
 
-    @Override
-    protected void finalize() throws Throwable {
-        this.clear();
-        super.finalize();
-    }
-
     protected abstract long indexOfLargest(long first, long limit, long step);
 
     protected abstract boolean isSmall(long first, long limit, long step, double comparedTo);

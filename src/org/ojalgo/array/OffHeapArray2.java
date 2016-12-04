@@ -23,6 +23,8 @@ package org.ojalgo.array;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import java.lang.reflect.Field;
+
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.constant.PrimitiveMath;
@@ -32,14 +34,15 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.type.NativeMemory;
+
+import sun.misc.Unsafe;
 
 /**
  * Off heap memory array.
  *
  * @author apete
  */
-public final class OffHeapArray extends BasicArray<Double> {
+public final class OffHeapArray2 extends BasicArray<Double> {
 
     public static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
 
@@ -50,40 +53,60 @@ public final class OffHeapArray extends BasicArray<Double> {
 
         @Override
         BasicArray<Double> makeStructuredZero(final long... structure) {
-            return new OffHeapArray(AccessUtils.count(structure));
+            return new OffHeapArray2(AccessUtils.count(structure));
         }
 
         @Override
         BasicArray<Double> makeToBeFilled(final long... structure) {
-            return new OffHeapArray(AccessUtils.count(structure));
+            return new OffHeapArray2(AccessUtils.count(structure));
         }
 
     };
 
-    public static OffHeapArray make(final long count) {
-        return new OffHeapArray(count);
+    static Unsafe UNSAFE;
+
+    static {
+
+        Unsafe tmpUnsafe = null;
+
+        try {
+            final Field tmpField = Unsafe.class.getDeclaredField("theUnsafe");
+            tmpField.setAccessible(true);
+            tmpUnsafe = (Unsafe) tmpField.get(null);
+        } catch (final Exception e) {
+            tmpUnsafe = null;
+        } finally {
+            UNSAFE = tmpUnsafe;
+        }
+    }
+
+    public static OffHeapArray2 make(final long count) {
+        return new OffHeapArray2(count);
     }
 
     public static final SegmentedArray<Double> makeSegmented(final long count) {
         return SegmentedArray.make(FACTORY, count);
     }
 
-    private final long myCount;
-    private final long myPointer;
+    private final long data;
 
-    OffHeapArray(final long count) {
+    private final long myCount;
+
+    OffHeapArray2(final long count) {
 
         super();
 
         myCount = count;
 
-        myPointer = NativeMemory.allocateDoubleArray(this, count);
+        data = UNSAFE.allocateMemory(Unsafe.ARRAY_DOUBLE_INDEX_SCALE * count);
 
         this.fillAll(PrimitiveMath.ZERO);
     }
 
     public void add(final long index, final double addend) {
-        this.set(index, this.doubleValue(index) + addend);
+        final long tmpAddress = this.address(index);
+        final double tmpCurrentValue = UNSAFE.getDouble(tmpAddress);
+        UNSAFE.putDouble(tmpAddress, tmpCurrentValue + addend);
     }
 
     public void add(final long index, final Number addend) {
@@ -95,7 +118,7 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     public double doubleValue(final long index) {
-        return NativeMemory.getDouble(myPointer, index);
+        return UNSAFE.getDouble(this.address(index));
     }
 
     public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
@@ -123,11 +146,13 @@ public final class OffHeapArray extends BasicArray<Double> {
     }
 
     public void modifyOne(final long index, final UnaryFunction<Double> modifier) {
-        this.set(index, modifier.invoke(this.doubleValue(index)));
+        final long tmpAddress = this.address(index);
+        final double tmpCurrentValue = UNSAFE.getDouble(tmpAddress);
+        UNSAFE.putDouble(tmpAddress, modifier.invoke(tmpCurrentValue));
     }
 
     public void set(final long index, final double value) {
-        NativeMemory.setDouble(myPointer, index, value);
+        UNSAFE.putDouble(this.address(index), value);
     }
 
     public void set(final long index, final Number value) {
@@ -136,6 +161,14 @@ public final class OffHeapArray extends BasicArray<Double> {
 
     public void visitOne(final long index, final VoidFunction<Double> visitor) {
         visitor.accept(this.doubleValue(index));
+    }
+
+    private final long address(final long index) {
+        return data + (index * Unsafe.ARRAY_DOUBLE_INDEX_SCALE);
+    }
+
+    private final long increment(final long step) {
+        return step * Unsafe.ARRAY_DOUBLE_INDEX_SCALE;
     }
 
     @Override
@@ -159,16 +192,28 @@ public final class OffHeapArray extends BasicArray<Double> {
 
     @Override
     protected void fill(final long first, final long limit, final long step, final Double value) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, value);
+        final long tmpFirst = this.address(first);
+        final long tmpLimit = this.address(limit);
+        final long tmpStep = this.increment(step);
+        final double tmpValue = value.doubleValue();
+        for (long a = tmpFirst; a < tmpLimit; a += tmpStep) {
+            UNSAFE.putDouble(a, tmpValue);
         }
     }
 
     @Override
     protected void fill(final long first, final long limit, final long step, final NullaryFunction<Double> supplier) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, supplier.doubleValue());
+        final long tmpFirst = this.address(first);
+        final long tmpLimit = this.address(limit);
+        final long tmpStep = this.increment(step);
+        for (long a = tmpFirst; a < tmpLimit; a += tmpStep) {
+            UNSAFE.putDouble(a, supplier.doubleValue());
         }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        UNSAFE.freeMemory(data);
     }
 
     @Override
@@ -203,29 +248,39 @@ public final class OffHeapArray extends BasicArray<Double> {
 
     @Override
     protected void modify(final long first, final long limit, final long step, final Access1D<Double> left, final BinaryFunction<Double> function) {
+        long tmpAddress;
         for (long i = first; i < limit; i += step) {
-            this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
+            tmpAddress = this.address(i);
+            UNSAFE.putDouble(tmpAddress, function.invoke(left.doubleValue(i), UNSAFE.getDouble(tmpAddress)));
         }
     }
 
     @Override
     protected void modify(final long first, final long limit, final long step, final BinaryFunction<Double> function, final Access1D<Double> right) {
+        long tmpAddress;
         for (long i = first; i < limit; i += step) {
-            this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
+            tmpAddress = this.address(i);
+            UNSAFE.putDouble(tmpAddress, function.invoke(UNSAFE.getDouble(tmpAddress), right.doubleValue(i)));
         }
     }
 
     @Override
     protected void modify(final long first, final long limit, final long step, final UnaryFunction<Double> function) {
-        for (long i = first; i < limit; i += step) {
-            this.set(i, function.invoke(this.doubleValue(i)));
+        final long tmpFirst = this.address(first);
+        final long tmpLimit = this.address(limit);
+        final long tmpStep = this.increment(step);
+        for (long a = tmpFirst; a < tmpLimit; a += tmpStep) {
+            UNSAFE.putDouble(a, function.invoke(UNSAFE.getDouble(a)));
         }
     }
 
     @Override
     protected void visit(final long first, final long limit, final long step, final VoidFunction<Double> visitor) {
-        for (long i = first; i < limit; i += step) {
-            visitor.invoke(this.doubleValue(i));
+        final long tmpFirst = this.address(first);
+        final long tmpLimit = this.address(limit);
+        final long tmpStep = this.increment(step);
+        for (long a = tmpFirst; a < tmpLimit; a += tmpStep) {
+            visitor.invoke(UNSAFE.getDouble(a));
         }
     }
 

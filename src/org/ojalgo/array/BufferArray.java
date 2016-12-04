@@ -44,6 +44,8 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 
+import sun.misc.Cleaner;
+
 /**
  * A one- and/or arbitrary-dimensional array of double.
  *
@@ -211,6 +213,19 @@ public class BufferArray extends DenseArray<Double> {
 
         myBuffer = buffer;
         myFile = file;
+
+        if (file != null) {
+            Cleaner.create(this, new Runnable() {
+
+                public void run() {
+                    try {
+                        file.close();
+                    } catch (final IOException exception) {
+                        exception.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     public void close() {
@@ -295,16 +310,6 @@ public class BufferArray extends DenseArray<Double> {
     @Override
     protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
         myBuffer.put(index, supplier.doubleValue());
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-
-        super.finalize();
-
-        if (myFile != null) {
-            this.close();
-        }
     }
 
     @Override
