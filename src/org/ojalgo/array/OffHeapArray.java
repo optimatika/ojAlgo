@@ -98,6 +98,10 @@ public final class OffHeapArray extends BasicArray<Double> {
         return NativeMemory.getDouble(myPointer, index);
     }
 
+    public void fillAll(final Double value) {
+        this.fill(0L, this.count(), 1L, value);
+    }
+
     public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
         this.set(index, values.doubleValue(valueIndex));
     }
