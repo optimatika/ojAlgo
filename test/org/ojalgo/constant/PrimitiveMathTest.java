@@ -21,30 +21,34 @@
  */
 package org.ojalgo.constant;
 
-import org.ojalgo.FunctionalityTest;
+import org.ojalgo.TestUtils;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+public class PrimitiveMathTest extends ConstantTests {
 
-public abstract class ConstantTests extends FunctionalityTest {
+    private final double myTolerance = PrimitiveMath.MACHINE_EPSILON;
 
-    static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(ConstantTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(PrimitiveMathTest.class);
-        suite.addTestSuite(PrimitivePrefixTest.class);
-        //$JUnit-END$
-        return suite;
-    }
-
-    protected ConstantTests() {
+    public PrimitiveMathTest() {
         super();
     }
 
-    protected ConstantTests(final String name) {
-        super(name);
+    public PrimitiveMathTest(final String arg0) {
+        super(arg0);
+    }
+
+    public void testPowersOf2() {
+
+        long tmpPrev = PrimitiveMath.POWERS_OF_2[0];
+        TestUtils.assertEquals(1L, tmpPrev);
+
+        for (int i = 1; i < PrimitiveMath.POWERS_OF_2.length; i++) {
+            final long tmpVal = PrimitiveMath.POWERS_OF_2[i];
+
+            TestUtils.assertTrue(tmpPrev < tmpVal);
+            TestUtils.assertEquals(2, tmpVal / tmpPrev);
+
+            tmpPrev = tmpVal;
+        }
+
     }
 
 }

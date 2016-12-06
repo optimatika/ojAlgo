@@ -19,32 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.constant;
+package org.ojalgo.array;
 
-import org.ojalgo.FunctionalityTest;
+import org.ojalgo.TestUtils;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+/**
+ * NumberListTest
+ *
+ * @author apete
+ */
+public class NumberListTest extends ArrayTests {
 
-public abstract class ConstantTests extends FunctionalityTest {
-
-    static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(ConstantTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(PrimitiveMathTest.class);
-        suite.addTestSuite(PrimitivePrefixTest.class);
-        //$JUnit-END$
-        return suite;
-    }
-
-    protected ConstantTests() {
+    public NumberListTest() {
         super();
     }
 
-    protected ConstantTests(final String name) {
-        super(name);
+    public NumberListTest(final String aName) {
+        super(aName);
+    }
+
+    public void testGrowCapacity() {
+
+        final NumberList<Double> tmNumberList = NumberList.makeOffHeap();
+
+        TestUtils.assertEquals(0L, tmNumberList.count());
+        TestUtils.assertEquals(16L, tmNumberList.capacity());
+
+        for (long i = 0L; i <= 16; i++) {
+            tmNumberList.add(i);
+        }
+
+        TestUtils.assertEquals(17L, tmNumberList.count());
+        TestUtils.assertEquals(32L, tmNumberList.capacity());
+
+        for (long i = 17L; i <= 16_384L; i++) {
+            tmNumberList.add(i);
+        }
+
+        TestUtils.assertEquals(16_385L, tmNumberList.count());
+        TestUtils.assertEquals(16_384L * 2L, tmNumberList.capacity());
     }
 
 }

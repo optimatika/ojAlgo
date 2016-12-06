@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 import org.ojalgo.TestUtils;
 
 /**
- * BasicMapTest
+ * LongToNumberMap
  *
  * @author apete
  */
@@ -98,6 +98,13 @@ public class LongToNumberMapTest extends ArrayTests {
         }
         TestUtils.assertEquals(17.0, tmpValSum);
 
+    }
+
+    public void testAlignCapacity() {
+        TestUtils.assertEquals(1, BasicArray.alignCapacity(-1));
+        TestUtils.assertEquals(16, BasicArray.alignCapacity(16));
+        TestUtils.assertEquals(512, BasicArray.alignCapacity(365));
+        TestUtils.assertEquals(16_384, BasicArray.alignCapacity(16_384));
     }
 
 }

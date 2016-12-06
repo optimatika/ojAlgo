@@ -23,8 +23,6 @@ package org.ojalgo.constant;
 
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import org.ojalgo.function.PrimitiveFunction;
-
 public abstract class PrimitiveMath {
 
     public static final double ZERO = BigMath.ZERO.doubleValue();
@@ -83,10 +81,11 @@ public abstract class PrimitiveMath {
             107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263,
             269, 271 };
 
-    public static final int[] POWERS_OF_2 = new int[31];
+    public static final long[] POWERS_OF_2 = new long[63];
     static {
-        for (int p = 0; p < POWERS_OF_2.length; p++) {
-            POWERS_OF_2[p] = (int) Math.round(PrimitiveFunction.POWER.invoke(TWO, p));
+        POWERS_OF_2[0] = 1L;
+        for (int p = 1; p < POWERS_OF_2.length; p++) {
+            POWERS_OF_2[p] = POWERS_OF_2[p - 1] * 2L;
         }
     }
 

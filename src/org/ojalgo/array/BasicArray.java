@@ -36,7 +36,6 @@ import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.netio.ASCII;
@@ -227,35 +226,21 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
      * @param capacity The desired capacity.
      * @return The smallest power of 2 that is more than or equal to the desired capacity.
      */
-    static long alignCapacity(long capacity) {
+    static long alignCapacity(final long capacity) {
 
-        if (capacity > MAX_ARRAY_SIZE) {
+        if (capacity <= 0) {
 
-            return capacity;
+            return 1L;
 
         } else {
 
-            int index = Arrays.binarySearch(PrimitiveMath.POWERS_OF_2, (int) capacity);
-
-            if (index >= 0) {
-
-                return PrimitiveMath.POWERS_OF_2[index];
-
-            } else {
-
+            int index = Arrays.binarySearch(PrimitiveMath.POWERS_OF_2, capacity);
+            if (index < 0) {
                 index = -index - 1;
-
-                if (index < PrimitiveMath.POWERS_OF_2.length) {
-
-                    return PrimitiveMath.POWERS_OF_2[index];
-
-                } else {
-
-                    return Math.round(PrimitiveFunction.POWER.invoke(PrimitiveMath.TWO, index));
-                }
             }
-        }
 
+            return PrimitiveMath.POWERS_OF_2[index];
+        }
     }
 
     protected BasicArray() {

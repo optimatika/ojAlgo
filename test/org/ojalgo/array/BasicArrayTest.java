@@ -23,7 +23,6 @@ package org.ojalgo.array;
 
 import java.util.Arrays;
 
-import org.ojalgo.TestUtils;
 import org.ojalgo.random.Uniform;
 
 /**
@@ -69,10 +68,6 @@ public abstract class BasicArrayTest extends ArrayTests {
 
     public void testSparse() {
         this.doTest(SparseArray.makePrimitive(COUNT));
-    }
-
-    public void testAlignCapacity() {
-        TestUtils.assertEquals(512, BasicArray.alignCapacity(365));
     }
 
     abstract void doTest(final BasicArray<Double> array);

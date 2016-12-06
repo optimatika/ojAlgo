@@ -106,9 +106,9 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
         final BasicArray<N> tmpFirstSegment = segments[0];
         final long tmpSegmentSize = tmpFirstSegment.count();
 
-        final int tmpIndexBits = Arrays.binarySearch(POWERS_OF_2, (int) tmpSegmentSize);
+        final int tmpIndexBits = Arrays.binarySearch(POWERS_OF_2, tmpSegmentSize);
 
-        if ((tmpIndexBits >= 0) && (tmpSegmentSize != (1L << tmpIndexBits))) {
+        if ((tmpIndexBits < 0) || (tmpSegmentSize != (1L << tmpIndexBits))) {
             throw new IllegalArgumentException("The segment size must be a power of 2!");
         }
 

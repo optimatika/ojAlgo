@@ -337,8 +337,8 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     /**
      * Will either grow the last segment to be the same size as all the others, or add another segment (with
-     * the same size). The returned (could be the same) instance is guaranteed to have the last segement the
-     * same size as the others and at least one more "space" in the array.
+     * the same size). The returned (could be the same) instance is guaranteed to have a last segement of the
+     * same size as the others and at least one more "space" in that segment.
      */
     public SegmentedArray<N> grow() {
 

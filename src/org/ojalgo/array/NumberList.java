@@ -144,6 +144,10 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         throw new UnsupportedOperationException();
     }
 
+    public long capacity() {
+        return myStorage.count();
+    }
+
     public void clear() {
         myActualCount = 0L;
         myStorage.clear();
