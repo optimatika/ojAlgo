@@ -163,8 +163,9 @@ public final class OffHeapArray extends BasicArray<Double> {
 
     @Override
     protected void fill(final long first, final long limit, final long step, final Double value) {
+        final double tmpValue = value.doubleValue();
         for (long i = first; i < limit; i += step) {
-            this.set(i, value);
+            this.set(i, tmpValue);
         }
     }
 

@@ -18,7 +18,7 @@ import org.ojalgo.scalar.RationalNumber;
 
 public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N> {
 
-    private static int INITIAL_CAPACITY = 16;
+    private static int INITIAL_CAPACITY = 512;
 
     public static LongToNumberMap<BigDecimal> makeBig() {
         return new LongToNumberMap<>(BigArray.FACTORY);
