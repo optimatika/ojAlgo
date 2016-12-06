@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
@@ -32,8 +33,10 @@ import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.netio.ASCII;
@@ -219,6 +222,41 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         }
 
     };
+
+    /**
+     * @param capacity The desired capacity.
+     * @return The smallest power of 2 that is more than or equal to the desired capacity.
+     */
+    static long alignCapacity(long capacity) {
+
+        if (capacity > MAX_ARRAY_SIZE) {
+
+            return capacity;
+
+        } else {
+
+            int index = Arrays.binarySearch(PrimitiveMath.POWERS_OF_2, (int) capacity);
+
+            if (index >= 0) {
+
+                return PrimitiveMath.POWERS_OF_2[index];
+
+            } else {
+
+                index = -index - 1;
+
+                if (index < PrimitiveMath.POWERS_OF_2.length) {
+
+                    return PrimitiveMath.POWERS_OF_2[index];
+
+                } else {
+
+                    return Math.round(PrimitiveFunction.POWER.invoke(PrimitiveMath.TWO, index));
+                }
+            }
+        }
+
+    }
 
     protected BasicArray() {
         super();

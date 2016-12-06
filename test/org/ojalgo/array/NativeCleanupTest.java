@@ -21,29 +21,46 @@
  */
 package org.ojalgo.array;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 
 public class NativeCleanupTest {
 
-    public NativeCleanupTest() {
-        super();
-    }
+    static final AtomicInteger COUNTER = new AtomicInteger();
+    static final int SIZE = 134_217_728;
 
     public static void main(final String[] args) {
 
-        OffHeapArray tmpOrg = OffHeapArray.make(1_000_000_000);
+        OffHeapArray tmpOrg = OffHeapArray.make(SIZE);
         tmpOrg.fillAll(new Uniform());
 
         while (true) {
 
-            final OffHeapArray tmpCopy = OffHeapArray.make(1_000_000_000);
+            final OffHeapArray tmpCopy = OffHeapArray.make(SIZE);
 
+            long start = System.nanoTime();
             tmpCopy.fillMatching(tmpOrg);
+            long stop = System.nanoTime();
 
             tmpOrg = tmpCopy;
 
+            BasicLogger.debug("Copied {} times. Last copy took {}ms", COUNTER.incrementAndGet(), ((stop - start) / 1_000_000));
+
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                System.gc();
+            } catch (InterruptedException exception) {
+                exception.printStackTrace();
+            }
         }
 
+    }
+
+    public NativeCleanupTest() {
+        super();
     }
 
 }
