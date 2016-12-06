@@ -37,7 +37,7 @@ import org.ojalgo.scalar.RationalNumber;
 
 public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Mutate1D {
 
-    private static long INITIAL_CAPACITY = 512L;
+    private static long INITIAL_CAPACITY = 16L;
     private static long SEGMENT_CAPACITY = 16_384L;
 
     public static NumberList<BigDecimal> makeBig() {
