@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
@@ -494,16 +495,21 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<ZonedDateTime> from(final ZonedDateTime reference) {
             return new IndexMapper<ZonedDateTime>() {
 
+                private final IndexMapper<Instant> myReference = INSTANT.from(reference.toInstant());
+                private final ZoneId myZone = reference.getZone();
+
                 public long toIndex(final ZonedDateTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return myReference.toIndex(key.toInstant());
                 }
 
                 public ZonedDateTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    Instant tmpInstant = myReference.toKey(index);
+                    if (myZone != null) {
+                        return ZonedDateTime.ofInstant(tmpInstant, myZone);
+                    } else {
+                        return ZonedDateTime.ofInstant(tmpInstant, ZoneId.systemDefault());
+                    }
                 }
-
             };
         }
 
@@ -511,16 +517,21 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<ZonedDateTime> from(final ZonedDateTime reference, final CalendarDateDuration resolution) {
             return new IndexMapper<ZonedDateTime>() {
 
+                private final IndexMapper<Instant> myReference = INSTANT.from(reference.toInstant(), resolution);
+                private final ZoneId myZone = reference.getZone();
+
                 public long toIndex(final ZonedDateTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return myReference.toIndex(key.toInstant());
                 }
 
                 public ZonedDateTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    Instant tmpInstant = myReference.toKey(index);
+                    if (myZone != null) {
+                        return ZonedDateTime.ofInstant(tmpInstant, myZone);
+                    } else {
+                        return ZonedDateTime.ofInstant(tmpInstant, ZoneId.systemDefault());
+                    }
                 }
-
             };
         }
 
@@ -528,16 +539,21 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<ZonedDateTime> plain() {
             return new IndexMapper<ZonedDateTime>() {
 
+                private transient ZoneId myZone = null;
+
                 public long toIndex(final ZonedDateTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    myZone = key.getZone();
+                    return INSTANT.plain().toIndex(key.toInstant());
                 }
 
                 public ZonedDateTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    Instant tmpInstant = INSTANT.plain().toKey(index);
+                    if (myZone != null) {
+                        return ZonedDateTime.ofInstant(tmpInstant, myZone);
+                    } else {
+                        return ZonedDateTime.ofInstant(tmpInstant, ZoneId.systemDefault());
+                    }
                 }
-
             };
         }
 

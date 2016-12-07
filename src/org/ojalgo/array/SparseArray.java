@@ -119,6 +119,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
+    private static final int GROWTH_FACTOR = 2;
+
     static final SparseFactory<BigDecimal> BIG = new SparseFactory<BigDecimal>() {
 
         @Override
@@ -146,8 +148,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
 
     };
-
-    static final int GROWTH_FACTOR = 2;
 
     static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 

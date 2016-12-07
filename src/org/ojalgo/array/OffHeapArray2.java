@@ -41,7 +41,9 @@ import sun.misc.Unsafe;
  * Off heap memory array.
  *
  * @author apete
+ * @deprecated Use OffHeapArray instead
  */
+@Deprecated
 public final class OffHeapArray2 extends BasicArray<Double> {
 
     public static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {

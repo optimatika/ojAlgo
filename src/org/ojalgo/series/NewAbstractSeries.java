@@ -38,7 +38,7 @@ abstract class NewAbstractSeries<K extends Comparable<? super K>, V extends Numb
 
     private ColourData myColour = null;
     private String myName = null;
-    IndexMapper<K> indexMapper = null;
+    final IndexMapper<K> indexMapper;
 
     @SuppressWarnings("unused")
     private NewAbstractSeries() {
