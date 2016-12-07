@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
@@ -178,11 +179,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
             return new IndexMapper<Instant>() {
 
                 public long toIndex(final Instant key) {
-                    return reference.until(key, ChronoUnit.MILLIS);
+                    return reference.until(key, ChronoUnit.NANOS);
                 }
 
                 public Instant toKey(final long index) {
-                    return Instant.ofEpochMilli(index + reference.toEpochMilli());
+                    return reference.plus(index, ChronoUnit.NANOS);
                 }
 
             };
@@ -192,12 +193,14 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<Instant> from(final Instant reference, final CalendarDateDuration resolution) {
             return new IndexMapper<Instant>() {
 
+                private final long myResolution = resolution.toDurationInNanos();
+
                 public long toIndex(final Instant key) {
-                    return reference.until(key, ChronoUnit.MILLIS) / resolution.toDurationInMillis();
+                    return reference.until(key, ChronoUnit.NANOS) / myResolution;
                 }
 
                 public Instant toKey(final long index) {
-                    return Instant.ofEpochMilli((index * resolution.toDurationInMillis()) + reference.toEpochMilli());
+                    return reference.plus(index * myResolution, ChronoUnit.NANOS);
                 }
 
             };
@@ -226,14 +229,14 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<LocalDate> from(final LocalDate reference) {
             return new IndexMapper<LocalDate>() {
 
+                private final long myReference = reference.toEpochDay();
+
                 public long toIndex(final LocalDate key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return key.toEpochDay() - myReference;
                 }
 
                 public LocalDate toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    return LocalDate.ofEpochDay(myReference + index);
                 }
 
             };
@@ -243,14 +246,15 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<LocalDate> from(final LocalDate reference, final CalendarDateDuration resolution) {
             return new IndexMapper<LocalDate>() {
 
+                private final long myReference = reference.toEpochDay();
+                private final long myResolution = resolution.toDurationInMillis();
+
                 public long toIndex(final LocalDate key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return (key.toEpochDay() - myReference) / myResolution;
                 }
 
                 public LocalDate toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    return LocalDate.ofEpochDay(myReference + (index * myResolution));
                 }
 
             };
@@ -261,13 +265,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
             return new IndexMapper<LocalDate>() {
 
                 public long toIndex(final LocalDate key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return key.toEpochDay();
                 }
 
                 public LocalDate toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    return LocalDate.ofEpochDay(index);
                 }
 
             };
@@ -281,14 +283,14 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<LocalDateTime> from(final LocalDateTime reference) {
             return new IndexMapper<LocalDateTime>() {
 
+                private final long myReference = reference.toEpochSecond(ZoneOffset.UTC);
+
                 public long toIndex(final LocalDateTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return key.toEpochSecond(ZoneOffset.UTC) - myReference;
                 }
 
                 public LocalDateTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    return LocalDateTime.ofEpochSecond(myReference + index, 0, ZoneOffset.UTC);
                 }
 
             };
@@ -298,14 +300,15 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<LocalDateTime> from(final LocalDateTime reference, final CalendarDateDuration resolution) {
             return new IndexMapper<LocalDateTime>() {
 
+                private final long myReference = reference.toEpochSecond(ZoneOffset.UTC);
+                private final long myResolution = resolution.toDurationInMillis();
+
                 public long toIndex(final LocalDateTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return (key.toEpochSecond(ZoneOffset.UTC) - myReference) / myResolution;
                 }
 
                 public LocalDateTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    return LocalDateTime.ofEpochSecond(myReference + (index * myResolution), 0, ZoneOffset.UTC);
                 }
 
             };
@@ -316,13 +319,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
             return new IndexMapper<LocalDateTime>() {
 
                 public long toIndex(final LocalDateTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return key.toEpochSecond(ZoneOffset.UTC);
                 }
 
                 public LocalDateTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    return LocalDateTime.ofEpochSecond(index, 0, ZoneOffset.UTC);
                 }
 
             };
@@ -336,14 +337,14 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<LocalTime> from(final LocalTime reference) {
             return new IndexMapper<LocalTime>() {
 
+                final long myReference = reference.toNanoOfDay();
+
                 public long toIndex(final LocalTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return key.toNanoOfDay() - myReference;
                 }
 
                 public LocalTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    return LocalTime.ofNanoOfDay(myReference + index);
                 }
 
             };
@@ -353,14 +354,15 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<LocalTime> from(final LocalTime reference, final CalendarDateDuration resolution) {
             return new IndexMapper<LocalTime>() {
 
+                final long myReference = reference.toNanoOfDay();
+                final long myResolution = resolution.toDurationInNanos();
+
                 public long toIndex(final LocalTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return (key.toNanoOfDay() - myReference) / myResolution;
                 }
 
                 public LocalTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    return LocalTime.ofNanoOfDay(myReference + (index * myResolution));
                 }
 
             };
@@ -371,13 +373,11 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
             return new IndexMapper<LocalTime>() {
 
                 public long toIndex(final LocalTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return key.toNanoOfDay();
                 }
 
                 public LocalTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    return LocalTime.ofNanoOfDay(index);
                 }
 
             };
@@ -440,16 +440,21 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<OffsetDateTime> from(final OffsetDateTime reference) {
             return new IndexMapper<OffsetDateTime>() {
 
+                private final IndexMapper<Instant> myDelegate = INSTANT.from(reference.toInstant());
+                private final ZoneOffset myOffset = reference.getOffset();
+
                 public long toIndex(final OffsetDateTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return myDelegate.toIndex(key.toInstant());
                 }
 
                 public OffsetDateTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    final Instant tmpInstant = myDelegate.toKey(index);
+                    if (myOffset != null) {
+                        return OffsetDateTime.ofInstant(tmpInstant, myOffset);
+                    } else {
+                        return OffsetDateTime.ofInstant(tmpInstant, ZoneOffset.UTC);
+                    }
                 }
-
             };
         }
 
@@ -457,16 +462,21 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<OffsetDateTime> from(final OffsetDateTime reference, final CalendarDateDuration resolution) {
             return new IndexMapper<OffsetDateTime>() {
 
+                private final IndexMapper<Instant> myDelegate = INSTANT.from(reference.toInstant(), resolution);
+                private final ZoneOffset myOffset = reference.getOffset();
+
                 public long toIndex(final OffsetDateTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    return myDelegate.toIndex(key.toInstant());
                 }
 
                 public OffsetDateTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    final Instant tmpInstant = myDelegate.toKey(index);
+                    if (myOffset != null) {
+                        return OffsetDateTime.ofInstant(tmpInstant, myOffset);
+                    } else {
+                        return OffsetDateTime.ofInstant(tmpInstant, ZoneOffset.UTC);
+                    }
                 }
-
             };
         }
 
@@ -474,16 +484,22 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<OffsetDateTime> plain() {
             return new IndexMapper<OffsetDateTime>() {
 
+                private final IndexMapper<Instant> myDelegate = INSTANT.plain();
+                private transient ZoneOffset myOffset = null;
+
                 public long toIndex(final OffsetDateTime key) {
-                    // TODO Auto-generated method stub
-                    return 0;
+                    myOffset = key.getOffset();
+                    return myDelegate.toIndex(key.toInstant());
                 }
 
                 public OffsetDateTime toKey(final long index) {
-                    // TODO Auto-generated method stub
-                    return null;
+                    final Instant tmpInstant = myDelegate.toKey(index);
+                    if (myOffset != null) {
+                        return OffsetDateTime.ofInstant(tmpInstant, myOffset);
+                    } else {
+                        return OffsetDateTime.ofInstant(tmpInstant, ZoneOffset.UTC);
+                    }
                 }
-
             };
         }
 
@@ -495,19 +511,19 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<ZonedDateTime> from(final ZonedDateTime reference) {
             return new IndexMapper<ZonedDateTime>() {
 
-                private final IndexMapper<Instant> myReference = INSTANT.from(reference.toInstant());
+                private final IndexMapper<Instant> myDelegate = INSTANT.from(reference.toInstant());
                 private final ZoneId myZone = reference.getZone();
 
                 public long toIndex(final ZonedDateTime key) {
-                    return myReference.toIndex(key.toInstant());
+                    return myDelegate.toIndex(key.toInstant());
                 }
 
                 public ZonedDateTime toKey(final long index) {
-                    Instant tmpInstant = myReference.toKey(index);
+                    final Instant tmpInstant = myDelegate.toKey(index);
                     if (myZone != null) {
                         return ZonedDateTime.ofInstant(tmpInstant, myZone);
                     } else {
-                        return ZonedDateTime.ofInstant(tmpInstant, ZoneId.systemDefault());
+                        return ZonedDateTime.ofInstant(tmpInstant, ZoneOffset.UTC);
                     }
                 }
             };
@@ -517,19 +533,19 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<ZonedDateTime> from(final ZonedDateTime reference, final CalendarDateDuration resolution) {
             return new IndexMapper<ZonedDateTime>() {
 
-                private final IndexMapper<Instant> myReference = INSTANT.from(reference.toInstant(), resolution);
+                private final IndexMapper<Instant> myDelegate = INSTANT.from(reference.toInstant(), resolution);
                 private final ZoneId myZone = reference.getZone();
 
                 public long toIndex(final ZonedDateTime key) {
-                    return myReference.toIndex(key.toInstant());
+                    return myDelegate.toIndex(key.toInstant());
                 }
 
                 public ZonedDateTime toKey(final long index) {
-                    Instant tmpInstant = myReference.toKey(index);
+                    final Instant tmpInstant = myDelegate.toKey(index);
                     if (myZone != null) {
                         return ZonedDateTime.ofInstant(tmpInstant, myZone);
                     } else {
-                        return ZonedDateTime.ofInstant(tmpInstant, ZoneId.systemDefault());
+                        return ZonedDateTime.ofInstant(tmpInstant, ZoneOffset.UTC);
                     }
                 }
             };
@@ -539,19 +555,20 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<ZonedDateTime> plain() {
             return new IndexMapper<ZonedDateTime>() {
 
+                private final IndexMapper<Instant> myDelegate = INSTANT.plain();
                 private transient ZoneId myZone = null;
 
                 public long toIndex(final ZonedDateTime key) {
                     myZone = key.getZone();
-                    return INSTANT.plain().toIndex(key.toInstant());
+                    return myDelegate.toIndex(key.toInstant());
                 }
 
                 public ZonedDateTime toKey(final long index) {
-                    Instant tmpInstant = INSTANT.plain().toKey(index);
+                    final Instant tmpInstant = myDelegate.toKey(index);
                     if (myZone != null) {
                         return ZonedDateTime.ofInstant(tmpInstant, myZone);
                     } else {
-                        return ZonedDateTime.ofInstant(tmpInstant, ZoneId.systemDefault());
+                        return ZonedDateTime.ofInstant(tmpInstant, ZoneOffset.UTC);
                     }
                 }
             };

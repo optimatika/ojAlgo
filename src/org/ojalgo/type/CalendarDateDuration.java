@@ -152,4 +152,8 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
         return (long) (measure * unit.size());
     }
 
+    long toDurationInNanos() {
+        return (long) (measure * (1_000_000L * unit.size()));
+    }
+
 }
