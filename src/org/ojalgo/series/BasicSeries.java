@@ -78,13 +78,13 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             }
         }
 
-        public Builder<K> resolution(final CalendarDateDuration resolution) {
-            myResolution = resolution;
+        public Builder<K> reference(final K reference) {
+            myReference = reference;
             return this;
         }
 
-        public Builder<K> resolution(final K reference) {
-            myReference = reference;
+        public Builder<K> resolution(final CalendarDateDuration resolution) {
+            myResolution = resolution;
             return this;
         }
 
