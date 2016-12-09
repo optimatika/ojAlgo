@@ -30,7 +30,7 @@ import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.DenseArray.DenseFactory;
+import org.ojalgo.array.PlainArray.DenseFactory;
 import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
@@ -61,7 +61,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 
-        abstract DenseArray.DenseFactory<N> getDenseFactory();
+        abstract PlainArray.DenseFactory<N> getDenseFactory();
 
         abstract SegmentedArray.SegmentedFactory<N> getSegmentedFactory();
 
@@ -358,7 +358,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
      * Safe to cast as DenseArray.
      */
     final boolean isDense() {
-        return this instanceof DenseArray;
+        return this instanceof PlainArray;
     }
 
     /**

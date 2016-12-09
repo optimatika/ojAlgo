@@ -45,7 +45,7 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
         }
 
         @Override
-        DenseArray<RationalNumber> make(final int size) {
+        PlainArray<RationalNumber> make(final int size) {
             return RationalArray.make(size);
         }
 
@@ -148,7 +148,7 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
     }
 
     @Override
-    DenseArray<RationalNumber> newInstance(final int capacity) {
+    PlainArray<RationalNumber> newInstance(final int capacity) {
         return new RationalArray(capacity);
     }
 

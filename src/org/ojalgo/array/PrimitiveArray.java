@@ -50,7 +50,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public class PrimitiveArray extends DenseArray<Double> {
+public class PrimitiveArray extends PlainArray<Double> {
 
     public static final DenseFactory<Double> FACTORY = new DenseFactory<Double>() {
 
@@ -70,7 +70,7 @@ public class PrimitiveArray extends DenseArray<Double> {
         }
 
         @Override
-        DenseArray<Double> make(final int size) {
+        PlainArray<Double> make(final int size) {
             return PrimitiveArray.make(size);
         }
 
@@ -412,7 +412,7 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     public OfDouble spliterator() {
-        return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
+        return Spliterators.spliterator(data, 0, data.length, PlainArray.CHARACTERISTICS);
     }
 
     public DoubleStream stream(final boolean parallel) {
@@ -615,7 +615,7 @@ public class PrimitiveArray extends DenseArray<Double> {
     }
 
     @Override
-    DenseArray<Double> newInstance(final int capacity) {
+    PlainArray<Double> newInstance(final int capacity) {
         return new PrimitiveArray(capacity);
     }
 

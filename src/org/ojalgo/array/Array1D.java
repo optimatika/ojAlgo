@@ -619,9 +619,9 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public void sortAscending() {
 
-        if ((myDelegate instanceof DenseArray<?>) && (this.count() == myDelegate.count())) {
+        if ((myDelegate instanceof PlainArray<?>) && (this.count() == myDelegate.count())) {
 
-            ((DenseArray<N>) myDelegate).sortAscending();
+            ((PlainArray<N>) myDelegate).sortAscending();
 
         } else {
 
@@ -637,9 +637,9 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public void sortDescending() {
 
-        if ((myDelegate instanceof DenseArray<?>) && (this.count() == myDelegate.count())) {
+        if ((myDelegate instanceof PlainArray<?>) && (this.count() == myDelegate.count())) {
 
-            ((DenseArray<N>) myDelegate).sortDescending();
+            ((PlainArray<N>) myDelegate).sortDescending();
 
         } else {
 

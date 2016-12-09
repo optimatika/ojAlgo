@@ -49,7 +49,7 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         }
 
         @Override
-        DenseArray<BigDecimal> make(final int size) {
+        PlainArray<BigDecimal> make(final int size) {
             return BigArray.make(size);
         }
 
@@ -153,7 +153,7 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    DenseArray<BigDecimal> newInstance(final int capacity) {
+    PlainArray<BigDecimal> newInstance(final int capacity) {
         return new BigArray(capacity);
     }
 

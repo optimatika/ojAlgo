@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.array.DenseArray.DenseFactory;
+import org.ojalgo.array.PlainArray.DenseFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -47,7 +47,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     static abstract class SegmentedFactory<N extends Number> extends ArrayFactory<N> {
 
-        abstract DenseArray.DenseFactory<N> getDenseFactory();
+        abstract PlainArray.DenseFactory<N> getDenseFactory();
 
         @Override
         long getElementSize() {

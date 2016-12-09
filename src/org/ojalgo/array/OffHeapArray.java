@@ -39,7 +39,7 @@ import org.ojalgo.type.NativeMemory;
  *
  * @author apete
  */
-public final class OffHeapArray extends BasicArray<Double> {
+public final class OffHeapArray extends DenseArray<Double> {
 
     public static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
 

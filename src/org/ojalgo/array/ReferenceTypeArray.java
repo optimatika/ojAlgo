@@ -38,7 +38,7 @@ import org.ojalgo.function.VoidFunction;
  *
  * @author apete
  */
-abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
+abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> {
 
     protected static <N extends Number> void exchange(final N[] data, final int firstA, final int firstB, final int step, final int aCount) {
 
@@ -149,7 +149,7 @@ abstract class ReferenceTypeArray<N extends Number> extends DenseArray<N> {
     }
 
     public final Spliterator<N> spliterator() {
-        return Spliterators.spliterator(data, 0, data.length, DenseArray.CHARACTERISTICS);
+        return Spliterators.spliterator(data, 0, data.length, PlainArray.CHARACTERISTICS);
     }
 
     protected final N[] copyOfData() {

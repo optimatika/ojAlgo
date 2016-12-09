@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.array.DenseArray.DenseFactory;
+import org.ojalgo.array.PlainArray.DenseFactory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;

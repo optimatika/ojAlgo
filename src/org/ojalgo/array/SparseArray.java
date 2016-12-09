@@ -30,7 +30,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.DenseArray.DenseFactory;
+import org.ojalgo.array.PlainArray.DenseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -56,9 +56,9 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         private int myCursor = -1;
         private final long[] myIndices;
         private final int myLastCursor;
-        private final DenseArray<N> myValues;
+        private final PlainArray<N> myValues;
 
-        NonzeroView(final long[] indices, final DenseArray<N> values, final int actualLength) {
+        NonzeroView(final long[] indices, final PlainArray<N> values, final int actualLength) {
 
             super();
 
@@ -271,7 +271,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     private int myActualLength = 0;
     private final long myCount;
     private long[] myIndices;
-    private DenseArray<N> myValues;
+    private PlainArray<N> myValues;
     private final N myZeroNumber;
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
@@ -713,9 +713,9 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    final DenseArray<N> densify() {
+    final PlainArray<N> densify() {
 
-        final DenseArray<N> retVal = myValues.newInstance((int) this.count());
+        final PlainArray<N> retVal = myValues.newInstance((int) this.count());
 
         if (this.isPrimitive()) {
             for (int i = 0; i < myActualLength; i++) {
@@ -779,7 +779,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
                 final int tmpCapacity = tmpOldIndeces.length * GROWTH_FACTOR;
                 final long[] tmpIndices = new long[tmpCapacity];
-                final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
+                final PlainArray<N> tmpValues = myValues.newInstance(tmpCapacity);
 
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = tmpOldIndeces[i];
@@ -834,7 +834,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
                 final int tmpCapacity = tmpOldIndeces.length * GROWTH_FACTOR;
                 final long[] tmpIndices = new long[tmpCapacity];
-                final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
+                final PlainArray<N> tmpValues = myValues.newInstance(tmpCapacity);
 
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = tmpOldIndeces[i];
@@ -869,7 +869,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myActualLength;
     }
 
-    DenseArray<N> getValues() {
+    PlainArray<N> getValues() {
         return myValues;
     }
 

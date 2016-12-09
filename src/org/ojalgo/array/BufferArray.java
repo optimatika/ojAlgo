@@ -51,7 +51,7 @@ import sun.misc.Cleaner;
  *
  * @author apete
  */
-public class BufferArray extends DenseArray<Double> {
+public class BufferArray extends PlainArray<Double> {
 
     static long ELEMENT_SIZE = JavaType.DOUBLE.memory();
 
@@ -103,7 +103,7 @@ public class BufferArray extends DenseArray<Double> {
                     }
 
                     @Override
-                    DenseArray<Double> make(final int size) {
+                    PlainArray<Double> make(final int size) {
 
                         final long tmpSize2 = size * ELEMENT_SIZE;
                         try {
@@ -442,7 +442,7 @@ public class BufferArray extends DenseArray<Double> {
     }
 
     @Override
-    DenseArray<Double> newInstance(final int capacity) {
+    PlainArray<Double> newInstance(final int capacity) {
         return null;
         // return new MyTestArray(capacity);
     }
