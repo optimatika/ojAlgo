@@ -93,7 +93,7 @@ public class BufferArray extends PlainArray<Double> {
 
             if (tmpCount > MAX) {
 
-                final DenseFactory<Double> tmpFactory = new DenseFactory<Double>() {
+                final DenseArray.DenseFactory<Double> tmpFactory = new DenseArray.DenseFactory<Double>() {
 
                     long offset = 0L;
 

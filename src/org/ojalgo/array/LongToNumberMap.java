@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.array.PlainArray.DenseFactory;
+import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
@@ -40,18 +40,18 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         return new LongToNumberMap<>(RationalArray.FACTORY);
     }
 
-    private final DenseFactory<N> myArrayFactory;
+    private final DenseArray.DenseFactory<N> myArrayFactory;
     private final SparseArray<N> myStorage;
 
     public LongToNumberMap(final ArrayFactory<N> arrayFactory) {
 
         super();
 
-        if (!(arrayFactory instanceof DenseFactory<?>)) {
+        if (!(arrayFactory instanceof DenseArray.DenseFactory<?>)) {
             throw new IllegalArgumentException();
         }
 
-        myArrayFactory = (DenseFactory<N>) arrayFactory;
+        myArrayFactory = (DenseArray.DenseFactory<N>) arrayFactory;
 
         myStorage = new SparseArray<>(Long.MAX_VALUE, myArrayFactory, INITIAL_CAPACITY);
     }

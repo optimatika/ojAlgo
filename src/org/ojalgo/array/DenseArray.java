@@ -22,10 +22,30 @@
 package org.ojalgo.array;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.scalar.Scalar;
 
 abstract class DenseArray<N extends Number> extends BasicArray<N> {
+
+    static abstract class DenseFactory<N extends Number> extends ArrayFactory<N> {
+
+        abstract DenseArray<N> make(int size);
+
+        @Override
+        final DenseArray<N> makeStructuredZero(final long... structure) {
+            return this.make((int) AccessUtils.count(structure));
+        }
+
+        @Override
+        final DenseArray<N> makeToBeFilled(final long... structure) {
+            return this.make((int) AccessUtils.count(structure));
+        }
+
+        abstract Scalar<N> zero();
+
+    }
 
     protected DenseArray() {
         super();

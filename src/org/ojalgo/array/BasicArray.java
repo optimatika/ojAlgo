@@ -30,7 +30,7 @@ import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.PlainArray.DenseFactory;
+import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
@@ -61,7 +61,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 
-        abstract PlainArray.DenseFactory<N> getDenseFactory();
+        abstract DenseArray.DenseFactory<N> getDenseFactory();
 
         abstract SegmentedArray.SegmentedFactory<N> getSegmentedFactory();
 
@@ -105,7 +105,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     static final BasicFactory<BigDecimal> BIG = new BasicFactory<BigDecimal>() {
 
         @Override
-        DenseFactory<BigDecimal> getDenseFactory() {
+        DenseArray.DenseFactory<BigDecimal> getDenseFactory() {
             return BigArray.FACTORY;
         }
 
@@ -129,7 +129,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     static final BasicFactory<ComplexNumber> COMPLEX = new BasicFactory<ComplexNumber>() {
 
         @Override
-        DenseFactory<ComplexNumber> getDenseFactory() {
+        DenseArray.DenseFactory<ComplexNumber> getDenseFactory() {
             return ComplexArray.FACTORY;
         }
 
@@ -153,7 +153,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     static final BasicFactory<Double> PRIMITIVE = new BasicFactory<Double>() {
 
         @Override
-        DenseFactory<Double> getDenseFactory() {
+        DenseArray.DenseFactory<Double> getDenseFactory() {
             return PrimitiveArray.FACTORY;
         }
 
@@ -177,7 +177,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     static final BasicFactory<Quaternion> QUATERNION = new BasicFactory<Quaternion>() {
 
         @Override
-        DenseFactory<Quaternion> getDenseFactory() {
+        DenseArray.DenseFactory<Quaternion> getDenseFactory() {
             return QuaternionArray.FACTORY;
         }
 
@@ -201,7 +201,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     static final BasicFactory<RationalNumber> RATIONAL = new BasicFactory<RationalNumber>() {
 
         @Override
-        DenseFactory<RationalNumber> getDenseFactory() {
+        DenseArray.DenseFactory<RationalNumber> getDenseFactory() {
             return RationalArray.FACTORY;
         }
 

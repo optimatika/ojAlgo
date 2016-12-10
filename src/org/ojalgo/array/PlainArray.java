@@ -25,7 +25,6 @@ import java.util.RandomAccess;
 import java.util.Spliterator;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
@@ -39,24 +38,6 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 abstract class PlainArray<N extends Number> extends DenseArray<N> implements RandomAccess {
-
-    static abstract class DenseFactory<N extends Number> extends ArrayFactory<N> {
-
-        abstract PlainArray<N> make(int size);
-
-        @Override
-        final PlainArray<N> makeStructuredZero(final long... structure) {
-            return this.make((int) AccessUtils.count(structure));
-        }
-
-        @Override
-        final PlainArray<N> makeToBeFilled(final long... structure) {
-            return this.make((int) AccessUtils.count(structure));
-        }
-
-        abstract Scalar<N> zero();
-
-    }
 
     static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
 

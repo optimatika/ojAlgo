@@ -39,7 +39,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
 
-    public static final DenseFactory<ComplexNumber> FACTORY = new DenseFactory<ComplexNumber>() {
+    public static final DenseArray.DenseFactory<ComplexNumber> FACTORY = new DenseArray.DenseFactory<ComplexNumber>() {
 
         @Override
         long getElementSize() {

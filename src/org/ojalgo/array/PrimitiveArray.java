@@ -52,7 +52,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class PrimitiveArray extends PlainArray<Double> {
 
-    public static final DenseFactory<Double> FACTORY = new DenseFactory<Double>() {
+    public static final DenseArray.DenseFactory<Double> FACTORY = new DenseArray.DenseFactory<Double>() {
 
         @Override
         public final BasicArray<Double> makeFilled(final long count, final NullaryFunction<?> supplier) {

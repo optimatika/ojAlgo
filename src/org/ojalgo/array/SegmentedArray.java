@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.array.PlainArray.DenseFactory;
+import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -47,7 +47,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     static abstract class SegmentedFactory<N extends Number> extends ArrayFactory<N> {
 
-        abstract PlainArray.DenseFactory<N> getDenseFactory();
+        abstract DenseArray.DenseFactory<N> getDenseFactory();
 
         @Override
         long getElementSize() {
@@ -71,7 +71,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     static final SegmentedFactory<BigDecimal> BIG = new SegmentedFactory<BigDecimal>() {
 
         @Override
-        DenseFactory<BigDecimal> getDenseFactory() {
+        DenseArray.DenseFactory<BigDecimal> getDenseFactory() {
             return BigArray.FACTORY;
         }
 
@@ -85,7 +85,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     static final SegmentedFactory<ComplexNumber> COMPLEX = new SegmentedFactory<ComplexNumber>() {
 
         @Override
-        DenseFactory<ComplexNumber> getDenseFactory() {
+        DenseArray.DenseFactory<ComplexNumber> getDenseFactory() {
             return ComplexArray.FACTORY;
         }
 
@@ -99,7 +99,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     static final SegmentedFactory<Double> PRIMITIVE = new SegmentedFactory<Double>() {
 
         @Override
-        DenseFactory<Double> getDenseFactory() {
+        DenseArray.DenseFactory<Double> getDenseFactory() {
             return PrimitiveArray.FACTORY;
         }
 
@@ -113,7 +113,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     static final SegmentedFactory<Quaternion> QUATERNION = new SegmentedFactory<Quaternion>() {
 
         @Override
-        DenseFactory<Quaternion> getDenseFactory() {
+        DenseArray.DenseFactory<Quaternion> getDenseFactory() {
             return QuaternionArray.FACTORY;
         }
 
@@ -127,7 +127,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     static final SegmentedFactory<RationalNumber> RATIONAL = new SegmentedFactory<RationalNumber>() {
 
         @Override
-        DenseFactory<RationalNumber> getDenseFactory() {
+        DenseArray.DenseFactory<RationalNumber> getDenseFactory() {
             return RationalArray.FACTORY;
         }
 

@@ -30,7 +30,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.PlainArray.DenseFactory;
+import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -276,7 +276,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
 
-    SparseArray(final long count, final DenseFactory<N> factory, final int initialCapacity) {
+    SparseArray(final long count, final DenseArray.DenseFactory<N> factory, final int initialCapacity) {
 
         super();
 
