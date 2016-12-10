@@ -21,10 +21,22 @@
  */
 package org.ojalgo.array;
 
+import org.ojalgo.access.Access1D;
+import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.UnaryFunction;
+
 abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
     protected DenseArray() {
         super();
     }
+
+    protected abstract void modify(int index, Access1D<N> left, BinaryFunction<N> function);
+
+    protected abstract void modify(int index, BinaryFunction<N> function, Access1D<N> right);
+
+    protected abstract void modify(int index, UnaryFunction<N> function);
+
+    protected abstract DenseArray<N> newInstance(int capacity);
 
 }

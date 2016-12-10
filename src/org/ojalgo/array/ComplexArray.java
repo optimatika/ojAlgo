@@ -151,6 +151,7 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
     }
 
     @Override
+    protected
     PlainArray<ComplexNumber> newInstance(final int capacity) {
         return new ComplexArray(capacity);
     }

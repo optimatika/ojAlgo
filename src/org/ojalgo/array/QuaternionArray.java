@@ -151,6 +151,7 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
     }
 
     @Override
+    protected
     PlainArray<Quaternion> newInstance(final int capacity) {
         return new QuaternionArray(capacity);
     }

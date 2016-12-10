@@ -442,6 +442,7 @@ public class BufferArray extends PlainArray<Double> {
     }
 
     @Override
+    protected
     PlainArray<Double> newInstance(final int capacity) {
         return null;
         // return new MyTestArray(capacity);

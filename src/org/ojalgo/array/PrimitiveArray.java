@@ -615,6 +615,7 @@ public class PrimitiveArray extends PlainArray<Double> {
     }
 
     @Override
+    protected
     PlainArray<Double> newInstance(final int capacity) {
         return new PrimitiveArray(capacity);
     }

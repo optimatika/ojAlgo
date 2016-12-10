@@ -216,10 +216,6 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
         return this.isSmall((int) first, (int) limit, (int) step, comparedTo);
     }
 
-    protected abstract void modify(int index, Access1D<N> left, BinaryFunction<N> function);
-
-    protected abstract void modify(int index, BinaryFunction<N> function, Access1D<N> right);
-
     protected abstract void modify(int first, int limit, int step, Access1D<N> left, BinaryFunction<N> function);
 
     protected abstract void modify(int first, int limit, int step, BinaryFunction<N> function, Access1D<N> right);
@@ -231,8 +227,6 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
     protected abstract void modify(int first, int limit, int step, ParameterFunction<N> function, int parameter);
 
     protected abstract void modify(int first, int limit, int step, UnaryFunction<N> function);
-
-    protected abstract void modify(int index, UnaryFunction<N> function);
 
     @Override
     protected final void modify(final long first, final long limit, final long step, final Access1D<N> left, final BinaryFunction<N> function) {
@@ -269,7 +263,5 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
     }
 
     protected abstract void visitOne(final int index, final VoidFunction<N> visitor);
-
-    abstract PlainArray<N> newInstance(int capacity);
 
 }

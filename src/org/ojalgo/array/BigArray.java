@@ -153,6 +153,7 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
+    protected
     PlainArray<BigDecimal> newInstance(final int capacity) {
         return new BigArray(capacity);
     }

@@ -207,6 +207,21 @@ public final class OffHeapArray extends DenseArray<Double> {
     }
 
     @Override
+    protected void modify(final int index, final Access1D<Double> left, final BinaryFunction<Double> function) {
+        this.set(index, function.invoke(left.doubleValue(index), this.doubleValue(index)));
+    }
+
+    @Override
+    protected void modify(final int index, final BinaryFunction<Double> function, final Access1D<Double> right) {
+        this.set(index, function.invoke(this.doubleValue(index), right.doubleValue(index)));
+    }
+
+    @Override
+    protected void modify(final int index, final UnaryFunction<Double> function) {
+        this.set(index, function.invoke(this.doubleValue(index)));
+    }
+
+    @Override
     protected void modify(final long first, final long limit, final long step, final Access1D<Double> left, final BinaryFunction<Double> function) {
         for (long i = first; i < limit; i += step) {
             this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
@@ -225,6 +240,11 @@ public final class OffHeapArray extends DenseArray<Double> {
         for (long i = first; i < limit; i += step) {
             this.set(i, function.invoke(this.doubleValue(i)));
         }
+    }
+
+    @Override
+    protected DenseArray<Double> newInstance(final int capacity) {
+        return new OffHeapArray(capacity);
     }
 
     @Override

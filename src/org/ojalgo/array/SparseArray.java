@@ -56,9 +56,9 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         private int myCursor = -1;
         private final long[] myIndices;
         private final int myLastCursor;
-        private final PlainArray<N> myValues;
+        private final DenseArray<N> myValues;
 
-        NonzeroView(final long[] indices, final PlainArray<N> values, final int actualLength) {
+        NonzeroView(final long[] indices, final DenseArray<N> values, final int actualLength) {
 
             super();
 
@@ -271,7 +271,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     private int myActualLength = 0;
     private final long myCount;
     private long[] myIndices;
-    private PlainArray<N> myValues;
+    private DenseArray<N> myValues;
     private final N myZeroNumber;
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
@@ -713,9 +713,9 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    final PlainArray<N> densify() {
+    final DenseArray<N> densify() {
 
-        final PlainArray<N> retVal = myValues.newInstance((int) this.count());
+        final DenseArray<N> retVal = myValues.newInstance((int) this.count());
 
         if (this.isPrimitive()) {
             for (int i = 0; i < myActualLength; i++) {
@@ -779,7 +779,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
                 final int tmpCapacity = tmpOldIndeces.length * GROWTH_FACTOR;
                 final long[] tmpIndices = new long[tmpCapacity];
-                final PlainArray<N> tmpValues = myValues.newInstance(tmpCapacity);
+                final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
 
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = tmpOldIndeces[i];
@@ -834,7 +834,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
                 final int tmpCapacity = tmpOldIndeces.length * GROWTH_FACTOR;
                 final long[] tmpIndices = new long[tmpCapacity];
-                final PlainArray<N> tmpValues = myValues.newInstance(tmpCapacity);
+                final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
 
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = tmpOldIndeces[i];
@@ -869,7 +869,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myActualLength;
     }
 
-    PlainArray<N> getValues() {
+    DenseArray<N> getValues() {
         return myValues;
     }
 

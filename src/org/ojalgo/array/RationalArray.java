@@ -148,6 +148,7 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
     }
 
     @Override
+    protected
     PlainArray<RationalNumber> newInstance(final int capacity) {
         return new RationalArray(capacity);
     }
