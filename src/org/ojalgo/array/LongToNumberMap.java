@@ -32,6 +32,10 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         return new LongToNumberMap<>(PrimitiveArray.FACTORY);
     }
 
+    public static LongToNumberMap<Double> makeOffHeap() {
+        return new LongToNumberMap<>(OffHeapArray.FACTORY);
+    }
+
     public static LongToNumberMap<Quaternion> makeQuaternion() {
         return new LongToNumberMap<>(QuaternionArray.FACTORY);
     }

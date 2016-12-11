@@ -30,7 +30,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Factory1D;
 import org.ojalgo.function.NullaryFunction;
 
-public abstract class ArrayFactory<N extends Number> extends Object implements Factory1D<BasicArray<N>> {
+abstract class ArrayFactory<N extends Number> extends Object implements Factory1D<BasicArray<N>> {
 
     public final BasicArray<N> copy(final Access1D<?> source) {
         final long tmpCount = source.count();
@@ -94,7 +94,7 @@ public abstract class ArrayFactory<N extends Number> extends Object implements F
      * There are several requirements on the segments:
      * <ol>
      * <li>All segements, except possibly the last, must have the same length/size/count.</li>
-     * <li>The size must be a power of 2.</li>
+     * <li>That size must be a power of 2.</li>
      * <li>The size of the last segment must be <= "the segment size".</li>
      * </ol>
      *

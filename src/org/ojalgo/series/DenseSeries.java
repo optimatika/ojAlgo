@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.IndexMapper;
-import org.ojalgo.array.ArrayFactory;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.NumberList;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 
@@ -36,7 +36,7 @@ final class DenseSeries<K extends Comparable<? super K>, N extends Number> exten
 
     private final NumberList<N> myDelegate;
 
-    DenseSeries(final ArrayFactory<N> arrayFactory, final IndexMapper<K> indexMapper) {
+    DenseSeries(final BasicArray.Factory<N> arrayFactory, final IndexMapper<K> indexMapper) {
         super(indexMapper);
         myDelegate = new NumberList<>(arrayFactory);
     }

@@ -30,9 +30,7 @@ import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SegmentedArray.SegmentedFactory;
-import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -59,13 +57,11 @@ import org.ojalgo.scalar.RationalNumber;
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
         Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
 
-    static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
+    public static abstract class Factory<N extends Number> extends ArrayFactory<N> {
 
         abstract DenseArray.DenseFactory<N> getDenseFactory();
 
         abstract SegmentedArray.SegmentedFactory<N> getSegmentedFactory();
-
-        abstract SparseArray.SparseFactory<N> getSparseFactory();
 
         @Override
         BasicArray<N> makeStructuredZero(final long... structure) {
@@ -102,7 +98,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
      */
     public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
-    static final BasicFactory<BigDecimal> BIG = new BasicFactory<BigDecimal>() {
+    static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
         DenseArray.DenseFactory<BigDecimal> getDenseFactory() {
@@ -119,14 +115,9 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return SegmentedArray.BIG;
         }
 
-        @Override
-        SparseFactory<BigDecimal> getSparseFactory() {
-            return SparseArray.BIG;
-        }
-
     };
 
-    static final BasicFactory<ComplexNumber> COMPLEX = new BasicFactory<ComplexNumber>() {
+    static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
         DenseArray.DenseFactory<ComplexNumber> getDenseFactory() {
@@ -143,14 +134,9 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return SegmentedArray.COMPLEX;
         }
 
-        @Override
-        SparseFactory<ComplexNumber> getSparseFactory() {
-            return SparseArray.COMPLEX;
-        }
-
     };
 
-    static final BasicFactory<Double> PRIMITIVE = new BasicFactory<Double>() {
+    static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
         DenseArray.DenseFactory<Double> getDenseFactory() {
@@ -167,14 +153,9 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return SegmentedArray.PRIMITIVE;
         }
 
-        @Override
-        SparseFactory<Double> getSparseFactory() {
-            return SparseArray.PRIMITIVE;
-        }
-
     };
 
-    static final BasicFactory<Quaternion> QUATERNION = new BasicFactory<Quaternion>() {
+    static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
         DenseArray.DenseFactory<Quaternion> getDenseFactory() {
@@ -191,14 +172,9 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return SegmentedArray.QUATERNION;
         }
 
-        @Override
-        SparseFactory<Quaternion> getSparseFactory() {
-            return SparseArray.QUATERNION;
-        }
-
     };
 
-    static final BasicFactory<RationalNumber> RATIONAL = new BasicFactory<RationalNumber>() {
+    static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
         DenseArray.DenseFactory<RationalNumber> getDenseFactory() {
@@ -213,11 +189,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         @Override
         SegmentedFactory<RationalNumber> getSegmentedFactory() {
             return SegmentedArray.RATIONAL;
-        }
-
-        @Override
-        SparseFactory<RationalNumber> getSparseFactory() {
-            return SparseArray.RATIONAL;
         }
 
     };

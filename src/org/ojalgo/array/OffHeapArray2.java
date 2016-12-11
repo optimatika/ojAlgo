@@ -44,7 +44,7 @@ import sun.misc.Unsafe;
  * @deprecated Use OffHeapArray instead
  */
 @Deprecated
-public final class OffHeapArray2 extends BasicArray<Double> {
+final class OffHeapArray2 extends BasicArray<Double> {
 
     public static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
 

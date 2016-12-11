@@ -31,7 +31,6 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.FactoryAnyD;
 import org.ojalgo.access.MutateAnyD;
 import org.ojalgo.access.StructureAnyD;
-import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -81,14 +80,14 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
             return this.delegate().makeStructuredZero(structure).asArrayAnyD(structure);
         }
 
-        abstract BasicArray.BasicFactory<N> delegate();
+        abstract BasicArray.Factory<N> delegate();
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        BasicFactory<BigDecimal> delegate() {
+        BasicArray.Factory<BigDecimal> delegate() {
             return BasicArray.BIG;
         }
 
@@ -97,7 +96,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        BasicFactory<ComplexNumber> delegate() {
+        BasicArray.Factory<ComplexNumber> delegate() {
             return BasicArray.COMPLEX;
         }
 
@@ -121,7 +120,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         }
 
         @Override
-        BasicFactory<Double> delegate() {
+        BasicArray.Factory<Double> delegate() {
             return BasicArray.PRIMITIVE;
         }
 
@@ -130,7 +129,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
-        BasicFactory<Quaternion> delegate() {
+        BasicArray.Factory<Quaternion> delegate() {
             return BasicArray.QUATERNION;
         }
 
@@ -139,7 +138,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
-        BasicFactory<RationalNumber> delegate() {
+        BasicArray.Factory<RationalNumber> delegate() {
             return BasicArray.RATIONAL;
         }
 

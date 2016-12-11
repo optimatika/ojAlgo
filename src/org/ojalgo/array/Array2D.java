@@ -30,7 +30,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.access.Structure2D;
-import org.ojalgo.array.BasicArray.BasicFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -241,14 +240,14 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.asArray2D(tmpRows);
         }
 
-        abstract BasicArray.BasicFactory<N> delegate();
+        abstract BasicArray.Factory<N> delegate();
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        BasicFactory<BigDecimal> delegate() {
+        BasicArray.Factory<BigDecimal> delegate() {
             return BasicArray.BIG;
         }
 
@@ -257,7 +256,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        BasicFactory<ComplexNumber> delegate() {
+        BasicArray.Factory<ComplexNumber> delegate() {
             return BasicArray.COMPLEX;
         }
 
@@ -266,7 +265,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        BasicFactory<Double> delegate() {
+        BasicArray.Factory<Double> delegate() {
             return BasicArray.PRIMITIVE;
         }
 
@@ -275,7 +274,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
-        BasicFactory<Quaternion> delegate() {
+        BasicArray.Factory<Quaternion> delegate() {
             return BasicArray.QUATERNION;
         }
 
@@ -284,7 +283,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
-        BasicFactory<RationalNumber> delegate() {
+        BasicArray.Factory<RationalNumber> delegate() {
             return BasicArray.RATIONAL;
         }
 
