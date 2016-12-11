@@ -76,10 +76,6 @@ abstract class ArrayFactory<N extends Number> extends Object implements Factory1
         return retVal;
     }
 
-    public final SegmentedArray<N> makeSegmented(final long count) {
-        return SegmentedArray.make(this, count);
-    }
-
     public final BasicArray<N> makeZero(final long count) {
         return this.makeStructuredZero(count);
     }
