@@ -24,13 +24,13 @@ package org.ojalgo.array;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.NativeMemory;
 
 /**
@@ -40,16 +40,21 @@ import org.ojalgo.type.NativeMemory;
  */
 public final class OffHeapArray extends DenseArray<Double> {
 
-    public static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
+    public static final ArrayFactory<Double> FACTORY = new DenseFactory<Double>() {
 
         @Override
-        BasicArray<Double> makeStructuredZero(final long... structure) {
-            return new OffHeapArray(AccessUtils.count(structure));
+        DenseArray<Double> make(int size) {
+            return new OffHeapArray(size);
         }
 
         @Override
-        BasicArray<Double> makeToBeFilled(final long... structure) {
-            return new OffHeapArray(AccessUtils.count(structure));
+        long getElementSize() {
+            return 8L;
+        }
+
+        @Override
+        Scalar<Double> zero() {
+            return PrimitiveScalar.ZERO;
         }
 
     };
@@ -249,8 +254,8 @@ public final class OffHeapArray extends DenseArray<Double> {
     }
 
     @Override
-    void clear() {
-        ;
+    final void clear() {
+        this.fillAll(PrimitiveMath.ZERO);
     }
 
     @Override

@@ -31,6 +31,7 @@ import java.util.stream.StreamSupport;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate1D;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
@@ -606,7 +607,7 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     @Override
     final void clear() {
-        ;
+        this.fillAll(PrimitiveMath.ZERO);
     }
 
     @Override
@@ -615,8 +616,7 @@ public class PrimitiveArray extends PlainArray<Double> {
     }
 
     @Override
-    protected
-    PlainArray<Double> newInstance(final int capacity) {
+    protected PlainArray<Double> newInstance(final int capacity) {
         return new PrimitiveArray(capacity);
     }
 

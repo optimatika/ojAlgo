@@ -36,6 +36,7 @@ import java.nio.channels.FileChannel.MapMode;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
@@ -215,14 +216,11 @@ public class BufferArray extends PlainArray<Double> {
         myFile = file;
 
         if (file != null) {
-            Cleaner.create(this, new Runnable() {
-
-                public void run() {
-                    try {
-                        file.close();
-                    } catch (final IOException exception) {
-                        exception.printStackTrace();
-                    }
+            Cleaner.create(this, () -> {
+                try {
+                    file.close();
+                } catch (final IOException exception) {
+                    exception.printStackTrace();
                 }
             });
         }
@@ -433,6 +431,7 @@ public class BufferArray extends PlainArray<Double> {
 
     @Override
     void clear() {
+        this.fillAll(PrimitiveMath.ZERO);
         myBuffer.clear();
     }
 
@@ -442,8 +441,7 @@ public class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    protected
-    PlainArray<Double> newInstance(final int capacity) {
+    protected PlainArray<Double> newInstance(final int capacity) {
         return null;
         // return new MyTestArray(capacity);
     }

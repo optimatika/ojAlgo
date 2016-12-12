@@ -26,6 +26,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
@@ -289,7 +290,7 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> {
 
     @Override
     final void clear() {
-        Arrays.fill(data, this.valueOf(0.0));
+        Arrays.fill(data, this.valueOf(PrimitiveMath.ZERO));
     }
 
     @Override
