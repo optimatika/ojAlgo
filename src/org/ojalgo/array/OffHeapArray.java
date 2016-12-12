@@ -30,7 +30,6 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.NativeMemory;
 
@@ -42,11 +41,6 @@ import org.ojalgo.type.NativeMemory;
 public final class OffHeapArray extends DenseArray<Double> {
 
     public static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
-
-        @Override
-        long getElementSize() {
-            return JavaType.DOUBLE.memory();
-        }
 
         @Override
         BasicArray<Double> makeStructuredZero(final long... structure) {

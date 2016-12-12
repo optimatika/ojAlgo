@@ -30,7 +30,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -124,11 +123,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final SparseFactory<BigDecimal> BIG = new SparseFactory<BigDecimal>() {
 
         @Override
-        long getElementSize() {
-            return BigArray.ELEMENT_SIZE;
-        }
-
-        @Override
         SparseArray<BigDecimal> make(final long count, final int initialCapacity) {
             return SparseArray.makeBig(count, initialCapacity);
         }
@@ -136,11 +130,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     };
 
     static final SparseFactory<ComplexNumber> COMPLEX = new SparseFactory<ComplexNumber>() {
-
-        @Override
-        long getElementSize() {
-            return ComplexArray.ELEMENT_SIZE;
-        }
 
         @Override
         SparseArray<ComplexNumber> make(final long count, final int initialCapacity) {
@@ -154,11 +143,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final SparseFactory<Double> PRIMITIVE = new SparseFactory<Double>() {
 
         @Override
-        long getElementSize() {
-            return PrimitiveArray.ELEMENT_SIZE;
-        }
-
-        @Override
         SparseArray<Double> make(final long count, final int initialCapacity) {
             return SparseArray.makePrimitive(count, initialCapacity);
         }
@@ -168,11 +152,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final SparseFactory<Quaternion> QUATERNION = new SparseFactory<Quaternion>() {
 
         @Override
-        long getElementSize() {
-            return QuaternionArray.ELEMENT_SIZE;
-        }
-
-        @Override
         SparseArray<Quaternion> make(final long count, final int initialCapacity) {
             return SparseArray.makeQuaternion(count, initialCapacity);
         }
@@ -180,11 +159,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     };
 
     static final SparseFactory<RationalNumber> RATIONAL = new SparseFactory<RationalNumber>() {
-
-        @Override
-        long getElementSize() {
-            return RationalArray.ELEMENT_SIZE;
-        }
 
         @Override
         SparseArray<RationalNumber> make(final long count, final int initialCapacity) {

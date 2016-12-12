@@ -106,11 +106,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         }
 
         @Override
-        long getElementSize() {
-            return BigArray.ELEMENT_SIZE;
-        }
-
-        @Override
         SegmentedFactory<BigDecimal> getSegmentedFactory() {
             return SegmentedArray.BIG;
         }
@@ -122,11 +117,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         @Override
         DenseArray.DenseFactory<ComplexNumber> getDenseFactory() {
             return ComplexArray.FACTORY;
-        }
-
-        @Override
-        long getElementSize() {
-            return ComplexArray.ELEMENT_SIZE;
         }
 
         @Override
@@ -144,11 +134,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         }
 
         @Override
-        long getElementSize() {
-            return PrimitiveArray.ELEMENT_SIZE;
-        }
-
-        @Override
         SegmentedFactory<Double> getSegmentedFactory() {
             return SegmentedArray.PRIMITIVE;
         }
@@ -163,11 +148,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         }
 
         @Override
-        long getElementSize() {
-            return QuaternionArray.ELEMENT_SIZE;
-        }
-
-        @Override
         SegmentedFactory<Quaternion> getSegmentedFactory() {
             return SegmentedArray.QUATERNION;
         }
@@ -179,11 +159,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         @Override
         DenseArray.DenseFactory<RationalNumber> getDenseFactory() {
             return RationalArray.FACTORY;
-        }
-
-        @Override
-        long getElementSize() {
-            return RationalArray.ELEMENT_SIZE;
         }
 
         @Override

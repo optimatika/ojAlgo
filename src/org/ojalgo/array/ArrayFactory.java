@@ -32,16 +32,14 @@ import org.ojalgo.function.NullaryFunction;
 
 abstract class ArrayFactory<N extends Number> extends Object implements Factory1D<BasicArray<N>> {
 
-    public final BasicArray<N> copy(final Access1D<?> source) {
+    public BasicArray<N> copy(final Access1D<?> source) {
         final long tmpCount = source.count();
         final BasicArray<N> retVal = this.makeToBeFilled(tmpCount);
-        for (long i = 0L; i < tmpCount; i++) {
-            retVal.set(i, source.doubleValue(i));
-        }
+        retVal.fillMatching(source);
         return retVal;
     }
 
-    public final BasicArray<N> copy(final double... source) {
+    public BasicArray<N> copy(final double... source) {
         final int tmpLength = source.length;
         final BasicArray<N> retVal = this.makeToBeFilled(tmpLength);
         for (int i = 0; i < tmpLength; i++) {
@@ -50,7 +48,7 @@ abstract class ArrayFactory<N extends Number> extends Object implements Factory1
         return retVal;
     }
 
-    public final BasicArray<N> copy(final List<? extends Number> source) {
+    public BasicArray<N> copy(final List<? extends Number> source) {
         final int tmpSize = source.size();
         final BasicArray<N> retVal = this.makeToBeFilled(tmpSize);
         for (int i = 0; i < tmpSize; i++) {
@@ -59,7 +57,7 @@ abstract class ArrayFactory<N extends Number> extends Object implements Factory1
         return retVal;
     }
 
-    public final BasicArray<N> copy(final Number... source) {
+    public BasicArray<N> copy(final Number... source) {
         final int tmpLength = source.length;
         final BasicArray<N> retVal = this.makeToBeFilled(tmpLength);
         for (int i = 0; i < tmpLength; i++) {
@@ -76,11 +74,9 @@ abstract class ArrayFactory<N extends Number> extends Object implements Factory1
         return retVal;
     }
 
-    public final BasicArray<N> makeZero(final long count) {
+    public BasicArray<N> makeZero(final long count) {
         return this.makeStructuredZero(count);
     }
-
-    abstract long getElementSize();
 
     abstract BasicArray<N> makeStructuredZero(final long... structure);
 

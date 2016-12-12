@@ -43,6 +43,8 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> {
             return this.make((int) AccessUtils.count(structure));
         }
 
+        abstract long getElementSize();
+
         abstract Scalar<N> zero();
 
     }

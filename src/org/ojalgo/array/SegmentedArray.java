@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -48,11 +47,6 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     static abstract class SegmentedFactory<N extends Number> extends ArrayFactory<N> {
 
         abstract DenseArray.DenseFactory<N> getDenseFactory();
-
-        @Override
-        long getElementSize() {
-            return this.getDenseFactory().getElementSize();
-        }
 
         abstract SparseArray.SparseFactory<N> getSparseFactory();
 
@@ -196,7 +190,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
             }
         }
 
-        final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(segmentFactory.getElementSize());
+        final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(8L); // TODO Make dynamic
         final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
         while ((tmpUnits != 1L) && (tmpUniformSegmentSize >= tmpCacheDim) && ((tmpNumberOfUniformSegments * tmpUnits) <= tmpMaxNumberOfSegments)) {
             tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpUnits);
