@@ -61,7 +61,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     }
 
     public void clear() {
-        myStorage.clear();
+        myStorage.reset();
     }
 
     public Comparator<? super Long> comparator() {

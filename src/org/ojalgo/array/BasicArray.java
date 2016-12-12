@@ -25,7 +25,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
@@ -300,12 +299,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     protected abstract void visit(long first, long limit, long step, VoidFunction<N> visitor);
 
     /**
-     * As in {@link Collection}{@link#clear()} but the {@link #count()} must not change. The array sould
-     * simply be reset to some standard (all zeros) initial state.
-     */
-    abstract void clear();
-
-    /**
      * Safe to cast as DenseArray.
      */
     final boolean isDense() {
@@ -330,5 +323,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     final boolean isSparse() {
         return this instanceof SparseArray;
     }
+
+    /**
+     * Reset the array to some standard (all zeros) initial state. The array must still be usuable after this
+     * call, and the structure/shape of the array must not change.
+     */
+    abstract void reset();
 
 }

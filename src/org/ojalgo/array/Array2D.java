@@ -336,7 +336,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     public void clear() {
-        myDelegate.clear();
+        myDelegate.reset();
     }
 
     public long count() {

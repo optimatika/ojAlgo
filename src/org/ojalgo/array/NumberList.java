@@ -150,7 +150,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
     public void clear() {
         myActualCount = 0L;
-        myStorage.clear();
+        myStorage.reset();
     }
 
     public boolean contains(final Object object) {

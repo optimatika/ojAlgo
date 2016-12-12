@@ -617,9 +617,9 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    void clear() {
+    void reset() {
         for (final BasicArray<N> tmpSegment : mySegments) {
-            tmpSegment.clear();
+            tmpSegment.reset();
         }
     }
 

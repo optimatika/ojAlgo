@@ -119,7 +119,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public void clear() {
-        myElements.clear();
+        myElements.reset();
         Arrays.fill(myFirsts, (int) this.countColumns());
         Arrays.fill(myLimits, 0);
     }

@@ -188,7 +188,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public void clear() {
-        myDelegate.clear();
+        myDelegate.reset();
     }
 
     public long count() {

@@ -254,7 +254,7 @@ public final class OffHeapArray extends DenseArray<Double> {
     }
 
     @Override
-    final void clear() {
+    final void reset() {
         this.fillAll(PrimitiveMath.ZERO);
     }
 

@@ -289,7 +289,7 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> {
     }
 
     @Override
-    final void clear() {
+    final void reset() {
         Arrays.fill(data, this.valueOf(PrimitiveMath.ZERO));
     }
 

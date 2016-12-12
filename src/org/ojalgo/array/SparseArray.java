@@ -283,9 +283,9 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
-    public void clear() {
+    public void reset() {
         myActualLength = 0;
-        myValues.clear();
+        myValues.reset();
     }
 
     public final long count() {

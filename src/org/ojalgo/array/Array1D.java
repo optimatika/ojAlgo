@@ -355,7 +355,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     @Override
     public void clear() {
-        myDelegate.clear();
+        myDelegate.reset();
     }
 
     @Override

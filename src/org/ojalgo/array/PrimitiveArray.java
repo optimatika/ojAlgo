@@ -606,7 +606,7 @@ public class PrimitiveArray extends PlainArray<Double> {
     }
 
     @Override
-    final void clear() {
+    final void reset() {
         this.fillAll(PrimitiveMath.ZERO);
     }
 
