@@ -30,7 +30,6 @@ import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.SegmentedArray.SegmentedFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -61,15 +60,13 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
         abstract DenseArray.DenseFactory<N> getDenseFactory();
 
-        abstract SegmentedArray.SegmentedFactory<N> getSegmentedFactory();
-
         @Override
         BasicArray<N> makeStructuredZero(final long... structure) {
 
             final long tmpTotal = AccessUtils.count(structure);
 
             if (tmpTotal > MAX_ARRAY_SIZE) {
-                return this.getSegmentedFactory().makeStructuredZero(structure);
+                return SegmentedArray.make(this, structure);
             } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getDenseFactory().getElementSize())) {
                 return new SparseArray<>(tmpTotal, this.getDenseFactory(), SparseArray.capacity(tmpTotal));
             } else {
@@ -83,7 +80,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             final long tmpTotal = AccessUtils.count(structure);
 
             if (tmpTotal > MAX_ARRAY_SIZE) {
-                return this.getSegmentedFactory().makeToBeFilled(structure);
+                return SegmentedArray.make(this.getDenseFactory(), structure);
             } else {
                 return this.getDenseFactory().makeToBeFilled(structure);
             }
@@ -105,11 +102,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return BigArray.FACTORY;
         }
 
-        @Override
-        SegmentedFactory<BigDecimal> getSegmentedFactory() {
-            return SegmentedArray.BIG;
-        }
-
     };
 
     static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
@@ -117,11 +109,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         @Override
         DenseArray.DenseFactory<ComplexNumber> getDenseFactory() {
             return ComplexArray.FACTORY;
-        }
-
-        @Override
-        SegmentedFactory<ComplexNumber> getSegmentedFactory() {
-            return SegmentedArray.COMPLEX;
         }
 
     };
@@ -133,11 +120,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return PrimitiveArray.FACTORY;
         }
 
-        @Override
-        SegmentedFactory<Double> getSegmentedFactory() {
-            return SegmentedArray.PRIMITIVE;
-        }
-
     };
 
     static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
@@ -147,11 +129,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             return QuaternionArray.FACTORY;
         }
 
-        @Override
-        SegmentedFactory<Quaternion> getSegmentedFactory() {
-            return SegmentedArray.QUATERNION;
-        }
-
     };
 
     static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
@@ -159,11 +136,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         @Override
         DenseArray.DenseFactory<RationalNumber> getDenseFactory() {
             return RationalArray.FACTORY;
-        }
-
-        @Override
-        SegmentedFactory<RationalNumber> getSegmentedFactory() {
-            return SegmentedArray.RATIONAL;
         }
 
     };
