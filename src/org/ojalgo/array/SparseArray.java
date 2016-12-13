@@ -282,12 +282,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    @Override
-    public void reset() {
-        myActualLength = 0;
-        myValues.reset();
-    }
-
     public final long count() {
         return myCount;
     }
@@ -452,6 +446,12 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public NonzeroView<N> nonzeros() {
         return new NonzeroView<>(myIndices, myValues, myActualLength);
+    }
+
+    @Override
+    public void reset() {
+        myActualLength = 0;
+        myValues.reset();
     }
 
     @Override
@@ -685,6 +685,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
                 tmpOnlyOnce = false;
             }
         }
+    }
+
+    long capacity() {
+        return myValues.count();
     }
 
     final DenseArray<N> densify() {

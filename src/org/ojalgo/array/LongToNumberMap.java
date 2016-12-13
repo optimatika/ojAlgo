@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
@@ -28,12 +27,12 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         return new LongToNumberMap<>(ComplexArray.FACTORY);
     }
 
-    public static LongToNumberMap<Double> makePrimitive() {
-        return new LongToNumberMap<>(PrimitiveArray.FACTORY);
-    }
-
     public static LongToNumberMap<Double> makeOffHeap() {
         return new LongToNumberMap<>(OffHeapArray.FACTORY);
+    }
+
+    public static LongToNumberMap<Double> makePrimitive() {
+        return new LongToNumberMap<>(PrimitiveArray.FACTORY);
     }
 
     public static LongToNumberMap<Quaternion> makeQuaternion() {
@@ -58,6 +57,10 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         myArrayFactory = (DenseArray.DenseFactory<N>) arrayFactory;
 
         myStorage = new SparseArray<>(Long.MAX_VALUE, myArrayFactory, INITIAL_CAPACITY);
+    }
+
+    public long capacity() {
+        return myStorage.capacity();
     }
 
     public void clear() {
