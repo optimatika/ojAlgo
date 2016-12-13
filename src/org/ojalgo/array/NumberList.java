@@ -144,6 +144,10 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * The current capacity of the underlying data structure. The capacity is always greater than or equal to
+     * the current number of items in the list. When you add items to the list the capacity may have to grow.
+     */
     public long capacity() {
         return myStorage.count();
     }

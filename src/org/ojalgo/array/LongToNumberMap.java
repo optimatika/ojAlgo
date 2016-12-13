@@ -59,6 +59,11 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         myStorage = new SparseArray<>(Long.MAX_VALUE, myArrayFactory, INITIAL_CAPACITY);
     }
 
+    /**
+     * The current capacity of the underlying data structure. The capacity is always greater than or equal to
+     * the current number of entries in the map. When you add entries to the map the capacity may have to
+     * grow.
+     */
     public long capacity() {
         return myStorage.capacity();
     }
