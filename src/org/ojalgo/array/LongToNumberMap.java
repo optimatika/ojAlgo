@@ -298,6 +298,15 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         return new NumberList<>(myStorage.getValues(), myArrayFactory, myStorage.getActualLength());
     }
 
+    /**
+     * Should return the same elements/values as first calling {@link #subMap(Long, Long)} and then
+     * {@link #values()} but this method does not create any copies. Any change in the underlying data
+     * structure (this map) will corrupt this method's output.
+     */
+    public Access1D<N> values(final long fromKey, final long toKey) {
+        return myStorage.getValues(fromKey, toKey);
+    }
+
     SparseArray<N> getStorage() {
         return myStorage;
     }
