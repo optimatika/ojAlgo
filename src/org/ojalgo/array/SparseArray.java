@@ -731,7 +731,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
             myValues.set(intIndex, value);
 
-        } else if (value != PrimitiveMath.ZERO) {
+        } else {
             // Not existing value, insert new
 
             final long[] tmpOldIndeces = myIndices;
@@ -786,7 +786,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
             myValues.set(intIndex, value);
 
-        } else if (!value.equals(myZeroNumber)) {
+        } else {
             // Not existing value, insert new
 
             final long[] tmpOldIndeces = this.myIndices;
