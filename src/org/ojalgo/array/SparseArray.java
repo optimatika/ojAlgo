@@ -861,7 +861,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         int tmpToExcl = this.index(toExcl);
         if (tmpToExcl < 0) {
-            tmpToExcl = -tmpToExcl;
+            tmpToExcl = -(tmpToExcl + 1);
         }
         final int tmpLimit = tmpToExcl;
 
