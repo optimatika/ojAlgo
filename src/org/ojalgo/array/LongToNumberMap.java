@@ -113,7 +113,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     public double doubleValue(final long key) {
         final int tmpIndex = myStorage.index(key);
         if (tmpIndex >= 0) {
-            return myStorage.doDoubleValue(tmpIndex);
+            return myStorage.doubleValueInternally(tmpIndex);
         } else {
             return PrimitiveMath.NaN;
         }
@@ -170,7 +170,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     public N get(final long key) {
         final int tmpIndex = myStorage.index(key);
         if (tmpIndex >= 0) {
-            return myStorage.doGet(tmpIndex);
+            return myStorage.getInternally(tmpIndex);
         } else {
             return null;
         }
@@ -214,15 +214,15 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
     public double put(final long key, final double value) {
         final int tmpIndex = myStorage.index(key);
-        final double tmpOldValue = myStorage.doDoubleValue(tmpIndex);
-        myStorage.doSet(key, tmpIndex, value);
+        final double tmpOldValue = tmpIndex >= 0 ? myStorage.doubleValueInternally(tmpIndex) : PrimitiveMath.NaN;
+        myStorage.doSet(key, tmpIndex, value, true);
         return tmpOldValue;
     }
 
     public N put(final long key, final N value) {
         final int tmpIndex = myStorage.index(key);
-        final N tmpOldValue = myStorage.doGet(tmpIndex);
-        myStorage.doSet(key, tmpIndex, value);
+        final N tmpOldValue = tmpIndex >= 0 ? myStorage.getInternally(tmpIndex) : null;
+        myStorage.doSet(key, tmpIndex, value, true);
         return tmpOldValue;
     }
 
