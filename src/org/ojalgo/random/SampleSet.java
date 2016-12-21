@@ -21,6 +21,7 @@
  */
 package org.ojalgo.random;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
@@ -29,7 +30,6 @@ import java.util.Objects;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.PrimitiveArray;
-import org.ojalgo.constant.PrimitiveMath;
 
 public final class SampleSet implements Access1D<Double> {
 
@@ -49,15 +49,15 @@ public final class SampleSet implements Access1D<Double> {
         return new SampleSet(someSamples);
     }
 
-    private transient double myMin = Double.NaN;
-    private transient double myMean = Double.NaN;
-    private transient double myMax = Double.NaN;
-    private transient double myQuartile1 = Double.NaN;
-    private transient double myQuartile2 = Double.NaN;
-    private transient double myQuartile3 = Double.NaN;
+    private transient double myMin = NaN;
+    private transient double myMean = NaN;
+    private transient double myMax = NaN;
+    private transient double myQuartile1 = NaN;
+    private transient double myQuartile2 = NaN;
+    private transient double myQuartile3 = NaN;
     private Access1D<?> mySamples;
     private transient double[] mySortedCopy = null;
-    private transient double myVariance = Double.NaN;
+    private transient double myVariance = NaN;
 
     @SuppressWarnings("unused")
     private SampleSet() {
@@ -90,11 +90,11 @@ public final class SampleSet implements Access1D<Double> {
 
     public double getCorrelation(final SampleSet anotherSampleSet) {
 
-        double retVal = PrimitiveMath.ZERO;
+        double retVal = ZERO;
 
         final double tmpCovar = this.getCovariance(anotherSampleSet);
 
-        if (tmpCovar != PrimitiveMath.ZERO) {
+        if (tmpCovar != ZERO) {
 
             final double tmpThisStdDev = this.getStandardDeviation();
             final double tmpThatStdDev = anotherSampleSet.getStandardDeviation();
@@ -107,7 +107,7 @@ public final class SampleSet implements Access1D<Double> {
 
     public double getCovariance(final SampleSet anotherSampleSet) {
 
-        double retVal = PrimitiveMath.ZERO;
+        double retVal = ZERO;
 
         final double tmpThisMean = this.getMean();
         final double tmpThatMean = anotherSampleSet.getMean();
@@ -126,7 +126,11 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     public double getFirst() {
-        return mySamples.doubleValue(0);
+        if (mySamples.count() > 0L) {
+            return mySamples.doubleValue(0);
+        } else {
+            return ZERO;
+        }
     }
 
     public double getInterquartileRange() {
@@ -138,7 +142,7 @@ public final class SampleSet implements Access1D<Double> {
      */
     public double getLargest() {
 
-        double retVal = PrimitiveMath.ZERO;
+        double retVal = ZERO;
 
         final long tmpLimit = mySamples.count();
         for (long i = 0L; i < tmpLimit; i++) {
@@ -149,7 +153,11 @@ public final class SampleSet implements Access1D<Double> {
     }
 
     public double getLast() {
-        return mySamples.doubleValue(mySamples.count() - 1L);
+        if (mySamples.count() > 0L) {
+            return mySamples.doubleValue(mySamples.count() - 1L);
+        } else {
+            return ZERO;
+        }
     }
 
     /**
@@ -159,7 +167,7 @@ public final class SampleSet implements Access1D<Double> {
 
         if (Double.isNaN(myMax)) {
 
-            myMax = PrimitiveMath.NEGATIVE_INFINITY;
+            myMax = NEGATIVE_INFINITY;
 
             final long tmpLimit = mySamples.count();
             for (long i = 0L; i < tmpLimit; i++) {
@@ -174,7 +182,7 @@ public final class SampleSet implements Access1D<Double> {
 
         if (Double.isNaN(myMean)) {
 
-            myMean = PrimitiveMath.ZERO;
+            myMean = ZERO;
 
             final long tmpLimit = mySamples.count();
             for (long i = 0L; i < tmpLimit; i++) {
@@ -201,7 +209,7 @@ public final class SampleSet implements Access1D<Double> {
 
         if (Double.isNaN(myMin)) {
 
-            myMin = PrimitiveMath.POSITIVE_INFINITY;
+            myMin = POSITIVE_INFINITY;
 
             final long tmpLimit = mySamples.count();
             for (long i = 0L; i < tmpLimit; i++) {
@@ -253,7 +261,7 @@ public final class SampleSet implements Access1D<Double> {
      */
     public double getSmallest() {
 
-        double retVal = PrimitiveMath.POSITIVE_INFINITY;
+        double retVal = POSITIVE_INFINITY;
 
         final long tmpLimit = mySamples.count();
         for (long i = 0L; i < tmpLimit; i++) {
@@ -290,7 +298,7 @@ public final class SampleSet implements Access1D<Double> {
      */
     public double getSumOfSquares() {
 
-        double retVal = PrimitiveMath.ZERO;
+        double retVal = ZERO;
 
         final double tmpMean = this.getMean();
         double tmpVal;
@@ -324,15 +332,15 @@ public final class SampleSet implements Access1D<Double> {
      */
     public void reset() {
 
-        myMin = Double.NaN;
-        myMax = Double.NaN;
+        myMin = NaN;
+        myMax = NaN;
 
-        myMean = Double.NaN;
-        myVariance = Double.NaN;
+        myMean = NaN;
+        myVariance = NaN;
 
-        myQuartile1 = Double.NaN;
-        myQuartile2 = Double.NaN;
-        myQuartile3 = Double.NaN;
+        myQuartile1 = NaN;
+        myQuartile2 = NaN;
+        myQuartile3 = NaN;
 
         if (mySortedCopy != null) {
             Arrays.fill(mySortedCopy, Double.POSITIVE_INFINITY);
@@ -367,12 +375,12 @@ public final class SampleSet implements Access1D<Double> {
 
         case 0:
 
-            myMin = 0.0;
-            myMax = 0.0;
+            myMin = ZERO;
+            myMax = ZERO;
 
-            myQuartile1 = 0.0;
-            myQuartile2 = 0.0;
-            myQuartile3 = 0.0;
+            myQuartile1 = ZERO;
+            myQuartile2 = ZERO;
+            myQuartile3 = ZERO;
 
             break;
 

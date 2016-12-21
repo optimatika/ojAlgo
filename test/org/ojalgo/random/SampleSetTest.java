@@ -39,6 +39,37 @@ public class SampleSetTest extends RandomTests {
         super(someName);
     }
 
+    public void testEmptySet() {
+
+        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { });
+        final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
+
+        try {
+
+            // The key thing is that all methods return something
+            // 0.0, NaN, Inf... doesn't really matter...
+            TestUtils.assertEquals(0.0, tmpSampleSet.getFirst());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getInterquartileRange());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getLargest());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getLast());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getMaximum());
+            TestUtils.assertEquals(Double.NaN, tmpSampleSet.getMean());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getMedian());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getMinimum());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile1());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile2());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile3());
+            TestUtils.assertTrue(Double.isInfinite(tmpSampleSet.getSmallest()));
+            TestUtils.assertEquals(0.0, tmpSampleSet.getStandardDeviation());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getSumOfSquares());
+            TestUtils.assertEquals(0.0, tmpSampleSet.getVariance());
+
+        } catch (final Exception exception) {
+            // Important NOT to throw an exception!
+            TestUtils.fail(exception.getMessage());
+        }
+    }
+
     public void testQuartileEx1() {
 
         final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 6, 7, 15, 36, 39, 40, 41, 42, 43, 47, 49 });
