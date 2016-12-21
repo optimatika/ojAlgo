@@ -49,7 +49,9 @@ public final class SampleSet implements Access1D<Double> {
         return new SampleSet(someSamples);
     }
 
+    private transient double myMin = Double.NaN;
     private transient double myMean = Double.NaN;
+    private transient double myMax = Double.NaN;
     private transient double myQuartile1 = Double.NaN;
     private transient double myQuartile2 = Double.NaN;
     private transient double myQuartile3 = Double.NaN;
@@ -155,14 +157,17 @@ public final class SampleSet implements Access1D<Double> {
      */
     public double getMaximum() {
 
-        double retVal = PrimitiveMath.NEGATIVE_INFINITY;
+        if (Double.isNaN(myMax)) {
 
-        final long tmpLimit = mySamples.count();
-        for (long i = 0L; i < tmpLimit; i++) {
-            retVal = MAX.invoke(retVal, mySamples.doubleValue(i));
+            myMax = PrimitiveMath.NEGATIVE_INFINITY;
+
+            final long tmpLimit = mySamples.count();
+            for (long i = 0L; i < tmpLimit; i++) {
+                myMax = MAX.invoke(myMax, mySamples.doubleValue(i));
+            }
         }
 
-        return retVal;
+        return myMax;
     }
 
     public double getMean() {
@@ -194,14 +199,17 @@ public final class SampleSet implements Access1D<Double> {
      */
     public double getMinimum() {
 
-        double retVal = PrimitiveMath.POSITIVE_INFINITY;
+        if (Double.isNaN(myMin)) {
 
-        final long tmpLimit = mySamples.count();
-        for (long i = 0L; i < tmpLimit; i++) {
-            retVal = MIN.invoke(retVal, mySamples.doubleValue(i));
+            myMin = PrimitiveMath.POSITIVE_INFINITY;
+
+            final long tmpLimit = mySamples.count();
+            for (long i = 0L; i < tmpLimit; i++) {
+                myMin = MIN.invoke(myMin, mySamples.doubleValue(i));
+            }
         }
 
-        return retVal;
+        return myMin;
     }
 
     /**
@@ -316,6 +324,9 @@ public final class SampleSet implements Access1D<Double> {
      */
     public void reset() {
 
+        myMin = Double.NaN;
+        myMax = Double.NaN;
+
         myMean = Double.NaN;
         myVariance = Double.NaN;
 
@@ -356,6 +367,9 @@ public final class SampleSet implements Access1D<Double> {
 
         case 0:
 
+            myMin = 0.0;
+            myMax = 0.0;
+
             myQuartile1 = 0.0;
             myQuartile2 = 0.0;
             myQuartile3 = 0.0;
@@ -364,6 +378,9 @@ public final class SampleSet implements Access1D<Double> {
 
         case 1:
 
+            myMin = tmpSortedCopy[0];
+            myMax = tmpSortedCopy[0];
+
             myQuartile1 = tmpSortedCopy[0];
             myQuartile2 = tmpSortedCopy[0];
             myQuartile3 = tmpSortedCopy[0];
@@ -371,6 +388,9 @@ public final class SampleSet implements Access1D<Double> {
             break;
 
         default:
+
+            myMin = tmpSortedCopy[0];
+            myMax = tmpSortedCopy[tmpSize - 1];
 
             final int n = tmpSize / 4;
             final int r = tmpSize % 4;
