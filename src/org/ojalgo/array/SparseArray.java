@@ -175,20 +175,12 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return new SparseArray<>(count, BigArray.FACTORY, initialCapacity);
     }
 
-    public static final SegmentedArray<BigDecimal> makeBigSegmented(final long count) {
-        return SegmentedArray.make(BIG, count);
-    }
-
     public static SparseArray<ComplexNumber> makeComplex(final long count) {
         return new SparseArray<>(count, ComplexArray.FACTORY, SparseArray.capacity(count));
     }
 
     public static SparseArray<ComplexNumber> makeComplex(final long count, final int initialCapacity) {
         return new SparseArray<>(count, ComplexArray.FACTORY, initialCapacity);
-    }
-
-    public static final SegmentedArray<ComplexNumber> makeComplexSegmented(final long count) {
-        return SegmentedArray.make(COMPLEX, count);
     }
 
     public static SparseArray<Double> makePrimitive(final long count) {
@@ -199,10 +191,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return new SparseArray<>(count, PrimitiveArray.FACTORY, initialCapacity);
     }
 
-    public static final SegmentedArray<Double> makePrimitiveSegmented(final long count) {
-        return SegmentedArray.make(PRIMITIVE, count);
-    }
-
     public static SparseArray<Quaternion> makeQuaternion(final long count) {
         return new SparseArray<>(count, QuaternionArray.FACTORY, SparseArray.capacity(count));
     }
@@ -211,20 +199,12 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return new SparseArray<>(count, QuaternionArray.FACTORY, initialCapacity);
     }
 
-    public static final SegmentedArray<Quaternion> makeQuaternionSegmented(final long count) {
-        return SegmentedArray.make(QUATERNION, count);
-    }
-
     public static SparseArray<RationalNumber> makeRational(final long count) {
         return new SparseArray<>(count, RationalArray.FACTORY, SparseArray.capacity(count));
     }
 
     public static SparseArray<RationalNumber> makeRational(final long count, final int initialCapacity) {
         return new SparseArray<>(count, RationalArray.FACTORY, initialCapacity);
-    }
-
-    public static final SegmentedArray<RationalNumber> makeRationalSegmented(final long count) {
-        return SegmentedArray.make(RATIONAL, count);
     }
 
     static int capacity(final long count) {

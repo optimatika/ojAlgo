@@ -27,9 +27,11 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.scalar.Scalar;
 
-abstract class DenseArray<N extends Number> extends BasicArray<N> {
+public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
     static abstract class DenseFactory<N extends Number> extends ArrayFactory<N> {
+
+        abstract long getElementSize();
 
         abstract DenseArray<N> make(int size);
 
@@ -42,8 +44,6 @@ abstract class DenseArray<N extends Number> extends BasicArray<N> {
         final DenseArray<N> makeToBeFilled(final long... structure) {
             return this.make((int) AccessUtils.count(structure));
         }
-
-        abstract long getElementSize();
 
         abstract Scalar<N> zero();
 
