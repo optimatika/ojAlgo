@@ -81,7 +81,8 @@ final class OffHeapArray2 extends BasicArray<Double> {
     }
 
     public static final SegmentedArray<Double> makeSegmented(final long count) {
-        return SegmentedArray.make(FACTORY, count);
+        //return SegmentedArray.make(FACTORY, count);
+        return FACTORY.makeSegmented(count);
     }
 
     private final long data;
@@ -281,13 +282,13 @@ final class OffHeapArray2 extends BasicArray<Double> {
     }
 
     @Override
-    final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
+    boolean isPrimitive() {
+        return true;
     }
 
     @Override
-    boolean isPrimitive() {
-        return true;
+    final void reset() {
+        this.fillAll(PrimitiveMath.ZERO);
     }
 
 }

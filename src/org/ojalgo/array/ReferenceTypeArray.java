@@ -114,9 +114,9 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> {
 
     public final N[] data;
 
-    protected ReferenceTypeArray(final N[] data) {
+    ReferenceTypeArray(final N[] data) {
 
-        super();
+        super(data.length);
 
         this.data = data;
     }

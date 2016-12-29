@@ -56,13 +56,12 @@ public class PrimitiveArray extends PlainArray<Double> {
     public static final DenseArray.DenseFactory<Double> FACTORY = new DenseArray.DenseFactory<Double>() {
 
         @Override
-        public final BasicArray<Double> makeFilled(final long count, final NullaryFunction<?> supplier) {
-            final int tmpSize = (int) count;
-            final double[] tmpData = new double[tmpSize];
-            for (int i = 0; i < tmpSize; i++) {
-                tmpData[i] = supplier.doubleValue();
+        public BasicArray<Double> makeFilled(long count, NullaryFunction<?> supplier) {
+            final BasicArray<Double> retVal = this.makeToBeFilled(count);
+            for (long i = 0L; i < count; i++) {
+                retVal.set(i, supplier.doubleValue());
             }
-            return new PrimitiveArray(tmpData);
+            return retVal;
         }
 
         @Override
@@ -352,14 +351,14 @@ public class PrimitiveArray extends PlainArray<Double> {
      */
     protected PrimitiveArray(final double[] data) {
 
-        super();
+        super(data.length);
 
         this.data = data;
     }
 
     protected PrimitiveArray(final int size) {
 
-        super();
+        super(size);
 
         data = new double[size];
     }
@@ -564,6 +563,11 @@ public class PrimitiveArray extends PlainArray<Double> {
     }
 
     @Override
+    protected PlainArray<Double> newInstance(final int capacity) {
+        return new PrimitiveArray(capacity);
+    }
+
+    @Override
     protected final int searchAscending(final Double number) {
         return Arrays.binarySearch(data, number.doubleValue());
     }
@@ -606,18 +610,13 @@ public class PrimitiveArray extends PlainArray<Double> {
     }
 
     @Override
-    final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
-    }
-
-    @Override
     boolean isPrimitive() {
         return true;
     }
 
     @Override
-    protected PlainArray<Double> newInstance(final int capacity) {
-        return new PrimitiveArray(capacity);
+    final void reset() {
+        this.fillAll(PrimitiveMath.ZERO);
     }
 
     OfDouble split() {

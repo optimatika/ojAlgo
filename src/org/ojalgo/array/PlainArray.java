@@ -41,8 +41,18 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
 
     static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
 
-    PlainArray() {
+    @SuppressWarnings("unused")
+    private PlainArray() {
+        this(Integer.MAX_VALUE);
+    }
+
+    PlainArray(int size) {
+
         super();
+
+        if (size > MAX_ARRAY_SIZE) {
+            throw new IllegalArgumentException("Array too large!");
+        }
     }
 
     public void add(final long index, final double addend) {

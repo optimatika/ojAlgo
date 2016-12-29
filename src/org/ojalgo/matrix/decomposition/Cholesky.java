@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -58,7 +58,7 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
     public static final Factory<ComplexNumber> COMPLEX = typical -> new CholeskyDecomposition.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> {
-        if ((32L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+        if ((32L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new CholeskyDecomposition.Primitive();
         } else {
             return new RawCholesky();

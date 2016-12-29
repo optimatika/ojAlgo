@@ -43,13 +43,22 @@ public final class OffHeapArray extends DenseArray<Double> {
     public static final ArrayFactory<Double> FACTORY = new DenseFactory<Double>() {
 
         @Override
-        DenseArray<Double> make(int size) {
-            return new OffHeapArray(size);
+        public BasicArray<Double> makeFilled(long count, NullaryFunction<?> supplier) {
+            final BasicArray<Double> retVal = this.makeToBeFilled(count);
+            for (long i = 0L; i < count; i++) {
+                retVal.set(i, supplier.doubleValue());
+            }
+            return retVal;
         }
 
         @Override
         long getElementSize() {
             return 8L;
+        }
+
+        @Override
+        DenseArray<Double> make(int size) {
+            return new OffHeapArray(size);
         }
 
         @Override
@@ -64,7 +73,8 @@ public final class OffHeapArray extends DenseArray<Double> {
     }
 
     public static final SegmentedArray<Double> makeSegmented(final long count) {
-        return SegmentedArray.make(FACTORY, count);
+        //return SegmentedArray.make(FACTORY, count);
+        return FACTORY.makeSegmented(count);
     }
 
     private final long myCount;
@@ -254,13 +264,13 @@ public final class OffHeapArray extends DenseArray<Double> {
     }
 
     @Override
-    final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
+    boolean isPrimitive() {
+        return true;
     }
 
     @Override
-    boolean isPrimitive() {
-        return true;
+    final void reset() {
+        this.fillAll(PrimitiveMath.ZERO);
     }
 
 }

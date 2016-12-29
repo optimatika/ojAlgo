@@ -141,6 +141,12 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
     }
 
     @Override
+    protected
+    PlainArray<ComplexNumber> newInstance(final int capacity) {
+        return new ComplexArray(capacity);
+    }
+
+    @Override
     protected final void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -148,12 +154,6 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
     @Override
     protected void sortDescending() {
         Arrays.parallelSort(data, Comparator.reverseOrder());
-    }
-
-    @Override
-    protected
-    PlainArray<ComplexNumber> newInstance(final int capacity) {
-        return new ComplexArray(capacity);
     }
 
     @Override

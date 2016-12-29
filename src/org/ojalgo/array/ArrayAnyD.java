@@ -80,14 +80,14 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
             return this.delegate().makeStructuredZero(structure).asArrayAnyD(structure);
         }
 
-        abstract BasicArray.Factory<N> delegate();
+        abstract BasicArray.BasicFactory<N> delegate();
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        BasicArray.Factory<BigDecimal> delegate() {
+        BasicArray.BasicFactory<BigDecimal> delegate() {
             return BasicArray.BIG;
         }
 
@@ -96,7 +96,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        BasicArray.Factory<ComplexNumber> delegate() {
+        BasicArray.BasicFactory<ComplexNumber> delegate() {
             return BasicArray.COMPLEX;
         }
 
@@ -120,7 +120,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         }
 
         @Override
-        BasicArray.Factory<Double> delegate() {
+        BasicArray.BasicFactory<Double> delegate() {
             return BasicArray.PRIMITIVE;
         }
 
@@ -129,7 +129,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
-        BasicArray.Factory<Quaternion> delegate() {
+        BasicArray.BasicFactory<Quaternion> delegate() {
             return BasicArray.QUATERNION;
         }
 
@@ -138,7 +138,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
-        BasicArray.Factory<RationalNumber> delegate() {
+        BasicArray.BasicFactory<RationalNumber> delegate() {
             return BasicArray.RATIONAL;
         }
 

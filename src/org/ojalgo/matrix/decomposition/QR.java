@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -56,7 +56,7 @@ public interface QR<N extends Number>
     public static final Factory<ComplexNumber> COMPLEX = typical -> new QRDecomposition.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> {
-        if (typical.isFat() || ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE))) {
+        if (typical.isFat() || ((256L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE))) {
             return new QRDecomposition.Primitive();
         } else {
             return new RawQR();

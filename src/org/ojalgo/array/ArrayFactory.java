@@ -26,9 +26,12 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.Arrays;
 import java.util.List;
 
+import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Factory1D;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 
 abstract class ArrayFactory<N extends Number> extends Object implements Factory1D<BasicArray<N>> {
 
@@ -104,19 +107,49 @@ abstract class ArrayFactory<N extends Number> extends Object implements Factory1
             throw new IllegalArgumentException("The segment size must be a power of 2!");
         }
 
-        final int tmpLastIndex = segments.length - 1;
-        for (int s = 1; s < tmpLastIndex; s++) {
+        final int tmpIndexOfLastSegment = segments.length - 1;
+        for (int s = 1; s < tmpIndexOfLastSegment; s++) {
             if (segments[s].count() != tmpSegmentSize) {
                 throw new IllegalArgumentException("All segments (except possibly the last) must have the same size!");
             }
         }
-        if (segments[tmpLastIndex].count() > tmpSegmentSize) {
+        if (segments[tmpIndexOfLastSegment].count() > tmpSegmentSize) {
             throw new IllegalArgumentException("The last segment cannot be larger than the others!");
         }
 
         final long tmpIndexMask = tmpSegmentSize - 1L;
 
         return new SegmentedArray<>(segments, tmpSegmentSize, tmpIndexBits, tmpIndexMask, this);
+    }
+
+    final SegmentedArray<N> makeSegmented(final long... structure) {
+
+        final long tmpCount = AccessUtils.count(structure);
+
+        int tmpNumberOfUniformSegments = 1; // NumberOfUniformSegments
+        long tmpUniformSegmentSize = tmpCount;
+
+        final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, PrimitiveFunction.SQRT.invoke(tmpCount));
+
+        for (int i = 0; i < structure.length; i++) {
+            final long tmpNoS = (tmpNumberOfUniformSegments * structure[i]);
+            final long tmpSS = tmpUniformSegmentSize / structure[i];
+            if (tmpNoS <= tmpMaxNumberOfSegments) {
+                tmpNumberOfUniformSegments = (int) tmpNoS;
+                tmpUniformSegmentSize = tmpSS;
+            }
+        }
+
+        final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(8L); // TODO Make dynamic
+        final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
+        while ((tmpUnits != 1L) && (tmpUniformSegmentSize >= tmpCacheDim) && ((tmpNumberOfUniformSegments * tmpUnits) <= tmpMaxNumberOfSegments)) {
+            tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpUnits);
+            tmpUniformSegmentSize = tmpUniformSegmentSize / tmpUnits;
+        }
+
+        final int tmpShift = (int) (PrimitiveFunction.LOG.invoke(tmpUniformSegmentSize) / PrimitiveFunction.LOG.invoke(2));
+
+        return new SegmentedArray<>(tmpCount, tmpShift, this);
     }
 
 }

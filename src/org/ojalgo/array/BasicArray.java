@@ -23,10 +23,8 @@ package org.ojalgo.array;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
@@ -56,85 +54,94 @@ import org.ojalgo.scalar.RationalNumber;
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
         Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
 
-    public static abstract class Factory<N extends Number> extends ArrayFactory<N> {
+    public static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
 
-        abstract DenseArray.DenseFactory<N> getDenseFactory();
+        abstract DenseArray.DenseFactory<N> dense();
 
         @Override
-        BasicArray<N> makeStructuredZero(final long... structure) {
+        final BasicArray<N> makeStructuredZero(final long... structure) {
+            // Typically sparse
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            if (tmpTotal > MAX_ARRAY_SIZE) {
-                return SegmentedArray.make(this, structure);
-            } else if (tmpTotal > OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getDenseFactory().getElementSize())) {
-                return new SparseArray<>(tmpTotal, this.getDenseFactory(), SparseArray.capacity(tmpTotal));
+            if (tmpTotal > DenseArray.MAX_ARRAY_SIZE) {
+
+                return this.makeSegmented(structure);
+
+            } else if (tmpTotal <= 16L) {
+
+                return this.dense().makeStructuredZero(structure);
+
             } else {
-                return this.getDenseFactory().makeStructuredZero(structure);
+
+                return new SparseArray<>(tmpTotal, this.dense(), SparseArray.capacity(tmpTotal));
             }
         }
 
         @Override
-        BasicArray<N> makeToBeFilled(final long... structure) {
+        final BasicArray<N> makeToBeFilled(final long... structure) {
+            // Always dense, but maybe segmented
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            if (tmpTotal > MAX_ARRAY_SIZE) {
-                return SegmentedArray.make(this.getDenseFactory(), structure);
+            if (tmpTotal > DenseArray.MAX_ARRAY_SIZE) {
+                return this.dense().makeSegmented(structure);
             } else {
-                return this.getDenseFactory().makeToBeFilled(structure);
+                return this.dense().makeToBeFilled(structure);
             }
-
         }
 
     }
 
-    /**
-     * Exists as a private constant in {@link ArrayList}. The Oracle JVM seems to actually be limited at
-     * Integer.MAX_VALUE - 2 but other JVM:s may have different limits.
-     */
-    public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
-
-    static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
+    static final BasicFactory<BigDecimal> BIG = new BasicFactory<BigDecimal>() {
 
         @Override
-        DenseArray.DenseFactory<BigDecimal> getDenseFactory() {
+        DenseArray.DenseFactory<BigDecimal> dense() {
             return BigArray.FACTORY;
         }
 
     };
 
-    static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
+    static final BasicFactory<ComplexNumber> COMPLEX = new BasicFactory<ComplexNumber>() {
 
         @Override
-        DenseArray.DenseFactory<ComplexNumber> getDenseFactory() {
+        DenseArray.DenseFactory<ComplexNumber> dense() {
             return ComplexArray.FACTORY;
         }
 
     };
 
-    static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+    static final BasicFactory<Double> PRIMITIVE = new BasicFactory<Double>() {
 
         @Override
-        DenseArray.DenseFactory<Double> getDenseFactory() {
+        public BasicArray<Double> makeFilled(long count, NullaryFunction<?> supplier) {
+            final BasicArray<Double> retVal = this.makeToBeFilled(count);
+            for (long i = 0L; i < count; i++) {
+                retVal.set(i, supplier.doubleValue());
+            }
+            return retVal;
+        }
+
+        @Override
+        DenseArray.DenseFactory<Double> dense() {
             return PrimitiveArray.FACTORY;
         }
 
     };
 
-    static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
+    static final BasicFactory<Quaternion> QUATERNION = new BasicFactory<Quaternion>() {
 
         @Override
-        DenseArray.DenseFactory<Quaternion> getDenseFactory() {
+        DenseArray.DenseFactory<Quaternion> dense() {
             return QuaternionArray.FACTORY;
         }
 
     };
 
-    static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
+    static final BasicFactory<RationalNumber> RATIONAL = new BasicFactory<RationalNumber>() {
 
         @Override
-        DenseArray.DenseFactory<RationalNumber> getDenseFactory() {
+        DenseArray.DenseFactory<RationalNumber> dense() {
             return RationalArray.FACTORY;
         }
 
@@ -154,7 +161,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
             int index = Arrays.binarySearch(PrimitiveMath.POWERS_OF_2, capacity);
             if (index < 0) {
-                index = -index - 1;
+                index = Math.min(-index - 1, 62);
             }
 
             return PrimitiveMath.POWERS_OF_2[index];

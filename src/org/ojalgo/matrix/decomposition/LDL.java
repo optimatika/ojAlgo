@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -61,7 +61,7 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
     public static final Factory<ComplexNumber> COMPLEX = typical -> new LDLDecomposition.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> {
-        if ((256L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+        if ((256L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new LDLDecomposition.Primitive();
         } else {
             return new RawLDL();

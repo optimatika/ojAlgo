@@ -124,7 +124,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
             return array.asArray1D();
         }
 
-        abstract BasicArray.Factory<N> delegate();
+        abstract BasicArray.BasicFactory<N> delegate();
 
     }
 
@@ -253,7 +253,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        BasicArray.Factory<BigDecimal> delegate() {
+        BasicArray.BasicFactory<BigDecimal> delegate() {
             return BasicArray.BIG;
         }
 
@@ -262,7 +262,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        BasicArray.Factory<ComplexNumber> delegate() {
+        BasicArray.BasicFactory<ComplexNumber> delegate() {
             return BasicArray.COMPLEX;
         }
 
@@ -290,7 +290,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         }
 
         @Override
-        BasicArray.Factory<Double> delegate() {
+        BasicArray.BasicFactory<Double> delegate() {
             return BasicArray.PRIMITIVE;
         }
 
@@ -299,7 +299,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
-        BasicArray.Factory<Quaternion> delegate() {
+        BasicArray.BasicFactory<Quaternion> delegate() {
             return BasicArray.QUATERNION;
         }
 
@@ -308,7 +308,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
-        BasicArray.Factory<RationalNumber> delegate() {
+        BasicArray.BasicFactory<RationalNumber> delegate() {
             return BasicArray.RATIONAL;
         }
 

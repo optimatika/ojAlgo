@@ -138,6 +138,12 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
     }
 
     @Override
+    protected
+    PlainArray<RationalNumber> newInstance(final int capacity) {
+        return new RationalArray(capacity);
+    }
+
+    @Override
     protected final void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -145,12 +151,6 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
     @Override
     protected void sortDescending() {
         Arrays.parallelSort(data, Comparator.reverseOrder());
-    }
-
-    @Override
-    protected
-    PlainArray<RationalNumber> newInstance(final int capacity) {
-        return new RationalArray(capacity);
     }
 
     @Override

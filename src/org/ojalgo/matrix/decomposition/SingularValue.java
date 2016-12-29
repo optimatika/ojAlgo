@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -60,7 +60,7 @@ public interface SingularValue<N extends Number>
     public static final Factory<ComplexNumber> COMPLEX = typical -> new SVDnew32.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> {
-        if ((2048L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+        if ((2048L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new SVDnew32.Primitive();
         } else {
             return new RawSingularValue();

@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -82,7 +82,7 @@ public interface Eigenvalue<N extends Number>
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         public Eigenvalue<Double> make(final Structure2D typical) {
-            if ((8192L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
                 return new DynamicEvD.Primitive();
             } else {
                 return new RawEigenvalue.Dynamic();
@@ -90,7 +90,7 @@ public interface Eigenvalue<N extends Number>
         }
 
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
-            if ((8192L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+            if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
                 return hermitian ? new HermitianEvD.Primitive() : new GeneralEvD.Primitive();
             } else {
                 return hermitian ? new RawEigenvalue.Symmetric() : new RawEigenvalue.General();

@@ -23,9 +23,7 @@ package org.ojalgo.array;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -44,73 +42,43 @@ import org.ojalgo.scalar.RationalNumber;
 public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     public static SegmentedArray<BigDecimal> makeBigDense(final long count) {
-        return SegmentedArray.make(BigArray.FACTORY, count);
+        return BigArray.FACTORY.makeSegmented(count);
     }
 
     public static SegmentedArray<BigDecimal> makeBigSparse(final long count) {
-        return SegmentedArray.make(BasicArray.BIG, count);
+        return BasicArray.BIG.makeSegmented(count);
     }
 
     public static SegmentedArray<ComplexNumber> makeComplexDense(final long count) {
-        return SegmentedArray.make(ComplexArray.FACTORY, count);
+        return ComplexArray.FACTORY.makeSegmented(count);
     }
 
     public static SegmentedArray<ComplexNumber> makeComplexSparse(final long count) {
-        return SegmentedArray.make(BasicArray.COMPLEX, count);
+        return BasicArray.COMPLEX.makeSegmented(count);
     }
 
     public static SegmentedArray<Double> makePrimitiveDense(final long count) {
-        return SegmentedArray.make(PrimitiveArray.FACTORY, count);
+        return PrimitiveArray.FACTORY.makeSegmented(count);
     }
 
     public static SegmentedArray<Double> makePrimitiveSparse(final long count) {
-        return SegmentedArray.make(BasicArray.PRIMITIVE, count);
+        return BasicArray.PRIMITIVE.makeSegmented(count);
     }
 
     public static SegmentedArray<Quaternion> makeQuaternionDense(final long count) {
-        return SegmentedArray.make(QuaternionArray.FACTORY, count);
+        return QuaternionArray.FACTORY.makeSegmented(count);
     }
 
     public static SegmentedArray<Quaternion> makeQuaternionSparse(final long count) {
-        return SegmentedArray.make(BasicArray.QUATERNION, count);
+        return BasicArray.QUATERNION.makeSegmented(count);
     }
 
     public static SegmentedArray<RationalNumber> makeRationalDense(final long count) {
-        return SegmentedArray.make(RationalArray.FACTORY, count);
+        return RationalArray.FACTORY.makeSegmented(count);
     }
 
     public static SegmentedArray<RationalNumber> makeRationalSparse(final long count) {
-        return SegmentedArray.make(BasicArray.RATIONAL, count);
-    }
-
-    static <N extends Number> SegmentedArray<N> make(final ArrayFactory<N> segmentFactory, final long... structure) {
-
-        final long tmpCount = AccessUtils.count(structure);
-
-        int tmpNumberOfUniformSegments = 1; // NumberOfUniformSegments
-        long tmpUniformSegmentSize = tmpCount;
-
-        final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, PrimitiveFunction.SQRT.invoke(tmpCount));
-
-        for (int i = 0; i < structure.length; i++) {
-            final long tmpNoS = (tmpNumberOfUniformSegments * structure[i]);
-            final long tmpSS = tmpUniformSegmentSize / structure[i];
-            if (tmpNoS <= tmpMaxNumberOfSegments) {
-                tmpNumberOfUniformSegments = (int) tmpNoS;
-                tmpUniformSegmentSize = tmpSS;
-            }
-        }
-
-        final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(8L); // TODO Make dynamic
-        final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
-        while ((tmpUnits != 1L) && (tmpUniformSegmentSize >= tmpCacheDim) && ((tmpNumberOfUniformSegments * tmpUnits) <= tmpMaxNumberOfSegments)) {
-            tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpUnits);
-            tmpUniformSegmentSize = tmpUniformSegmentSize / tmpUnits;
-        }
-
-        final int tmpShift = (int) (PrimitiveFunction.LOG.invoke(tmpUniformSegmentSize) / PrimitiveFunction.LOG.invoke(2));
-
-        return new SegmentedArray<>(tmpCount, tmpShift, segmentFactory);
+        return BasicArray.RATIONAL.makeSegmented(count);
     }
 
     private final int myIndexBits;
@@ -528,15 +496,15 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     }
 
     @Override
+    boolean isPrimitive() {
+        return mySegments[0].isPrimitive();
+    }
+
+    @Override
     void reset() {
         for (final BasicArray<N> tmpSegment : mySegments) {
             tmpSegment.reset();
         }
-    }
-
-    @Override
-    boolean isPrimitive() {
-        return mySegments[0].isPrimitive();
     }
 
 }

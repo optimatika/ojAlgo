@@ -98,74 +98,9 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    static abstract class SparseFactory<N extends Number> extends ArrayFactory<N> {
-
-        final SparseArray<N> make(final long count) {
-            return this.make(count, SparseArray.capacity(count));
-        }
-
-        abstract SparseArray<N> make(long count, int initialCapacity);
-
-        @Override
-        final SparseArray<N> makeStructuredZero(final long... structure) {
-            return this.make(AccessUtils.count(structure));
-        }
-
-        @Override
-        final SparseArray<N> makeToBeFilled(final long... structure) {
-            return this.make(AccessUtils.count(structure));
-        }
-
-    }
-
     private static final int GROWTH_FACTOR = 2;
 
-    static final SparseFactory<BigDecimal> BIG = new SparseFactory<BigDecimal>() {
-
-        @Override
-        SparseArray<BigDecimal> make(final long count, final int initialCapacity) {
-            return SparseArray.makeBig(count, initialCapacity);
-        }
-
-    };
-
-    static final SparseFactory<ComplexNumber> COMPLEX = new SparseFactory<ComplexNumber>() {
-
-        @Override
-        SparseArray<ComplexNumber> make(final long count, final int initialCapacity) {
-            return SparseArray.makeComplex(count, initialCapacity);
-        }
-
-    };
-
     static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
-
-    static final SparseFactory<Double> PRIMITIVE = new SparseFactory<Double>() {
-
-        @Override
-        SparseArray<Double> make(final long count, final int initialCapacity) {
-            return SparseArray.makePrimitive(count, initialCapacity);
-        }
-
-    };
-
-    static final SparseFactory<Quaternion> QUATERNION = new SparseFactory<Quaternion>() {
-
-        @Override
-        SparseArray<Quaternion> make(final long count, final int initialCapacity) {
-            return SparseArray.makeQuaternion(count, initialCapacity);
-        }
-
-    };
-
-    static final SparseFactory<RationalNumber> RATIONAL = new SparseFactory<RationalNumber>() {
-
-        @Override
-        SparseArray<RationalNumber> make(final long count, final int initialCapacity) {
-            return SparseArray.makeRational(count, initialCapacity);
-        }
-
-    };
 
     public static SparseArray<BigDecimal> makeBig(final long count) {
         return new SparseArray<>(count, BigArray.FACTORY, SparseArray.capacity(count));
@@ -211,7 +146,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         double tmpInitialCapacity = count;
 
-        while (tmpInitialCapacity > BasicArray.MAX_ARRAY_SIZE) {
+        while (tmpInitialCapacity > DenseArray.MAX_ARRAY_SIZE) {
             tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
         }
 

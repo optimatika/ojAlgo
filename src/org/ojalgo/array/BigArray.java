@@ -143,6 +143,12 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
+    protected
+    PlainArray<BigDecimal> newInstance(final int capacity) {
+        return new BigArray(capacity);
+    }
+
+    @Override
     protected final void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -150,12 +156,6 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     @Override
     protected void sortDescending() {
         Arrays.parallelSort(data, Comparator.reverseOrder());
-    }
-
-    @Override
-    protected
-    PlainArray<BigDecimal> newInstance(final int capacity) {
-        return new BigArray(capacity);
     }
 
     @Override

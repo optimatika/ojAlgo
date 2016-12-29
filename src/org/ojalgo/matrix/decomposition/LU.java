@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -63,7 +63,7 @@ public interface LU<N extends Number> extends LDU<N> {
     public static final Factory<ComplexNumber> COMPLEX = typical -> new LUDecomposition.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> {
-        if ((16L < typical.countColumns()) && (typical.count() <= BasicArray.MAX_ARRAY_SIZE)) {
+        if ((16L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new LUDecomposition.Primitive();
         } else {
             return new RawLU();

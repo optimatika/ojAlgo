@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array;
 
+import java.util.ArrayList;
+
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.BinaryFunction;
@@ -48,6 +50,12 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
         abstract Scalar<N> zero();
 
     }
+
+    /**
+     * Exists as a private constant in {@link ArrayList}. The Oracle JVM seems to actually be limited at
+     * Integer.MAX_VALUE - 2 but other JVM:s may have different limits.
+     */
+    public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
     protected DenseArray() {
         super();

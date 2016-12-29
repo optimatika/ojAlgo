@@ -141,6 +141,12 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
     }
 
     @Override
+    protected
+    PlainArray<Quaternion> newInstance(final int capacity) {
+        return new QuaternionArray(capacity);
+    }
+
+    @Override
     protected final void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -148,12 +154,6 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
     @Override
     protected void sortDescending() {
         Arrays.parallelSort(data, Comparator.reverseOrder());
-    }
-
-    @Override
-    protected
-    PlainArray<Quaternion> newInstance(final int capacity) {
-        return new QuaternionArray(capacity);
     }
 
     @Override

@@ -126,7 +126,8 @@ public class BufferArray extends PlainArray<Double> {
 
                 };
 
-                return SegmentedArray.make(tmpFactory, structure);
+                //return SegmentedArray.make(tmpFactory, structure);
+                return tmpFactory.makeSegmented(structure);
 
             } else {
 
@@ -210,7 +211,7 @@ public class BufferArray extends PlainArray<Double> {
 
     private BufferArray(final DoubleBuffer buffer, final RandomAccessFile file) {
 
-        super();
+        super(buffer.capacity());
 
         myBuffer = buffer;
         myFile = file;
@@ -389,6 +390,12 @@ public class BufferArray extends PlainArray<Double> {
     }
 
     @Override
+    protected PlainArray<Double> newInstance(final int capacity) {
+        return null;
+        // return new MyTestArray(capacity);
+    }
+
+    @Override
     protected int searchAscending(final Double number) {
         // TODO Auto-generated method stub
         return -1;
@@ -430,20 +437,14 @@ public class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
-        myBuffer.clear();
-    }
-
-    @Override
     boolean isPrimitive() {
         return true;
     }
 
     @Override
-    protected PlainArray<Double> newInstance(final int capacity) {
-        return null;
-        // return new MyTestArray(capacity);
+    void reset() {
+        this.fillAll(PrimitiveMath.ZERO);
+        myBuffer.clear();
     }
 
 }
