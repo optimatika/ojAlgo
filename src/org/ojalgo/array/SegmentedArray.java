@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -45,43 +44,43 @@ import org.ojalgo.scalar.RationalNumber;
 public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     public static SegmentedArray<BigDecimal> makeBigDense(final long count) {
-        return SegmentedArray.make(BasicArray.BIG, count);
+        return SegmentedArray.make(BigArray.FACTORY, count);
     }
 
     public static SegmentedArray<BigDecimal> makeBigSparse(final long count) {
-        return SegmentedArray.make(SparseArray.BIG, count);
+        return SegmentedArray.make(BasicArray.BIG, count);
     }
 
     public static SegmentedArray<ComplexNumber> makeComplexDense(final long count) {
-        return SegmentedArray.make(BasicArray.COMPLEX, count);
+        return SegmentedArray.make(ComplexArray.FACTORY, count);
     }
 
     public static SegmentedArray<ComplexNumber> makeComplexSparse(final long count) {
-        return SegmentedArray.make(SparseArray.COMPLEX, count);
+        return SegmentedArray.make(BasicArray.COMPLEX, count);
     }
 
     public static SegmentedArray<Double> makePrimitiveDense(final long count) {
-        return SegmentedArray.make(BasicArray.PRIMITIVE, count);
+        return SegmentedArray.make(PrimitiveArray.FACTORY, count);
     }
 
     public static SegmentedArray<Double> makePrimitiveSparse(final long count) {
-        return SegmentedArray.make(SparseArray.PRIMITIVE, count);
+        return SegmentedArray.make(BasicArray.PRIMITIVE, count);
     }
 
     public static SegmentedArray<Quaternion> makeQuaternionDense(final long count) {
-        return SegmentedArray.make(BasicArray.QUATERNION, count);
+        return SegmentedArray.make(QuaternionArray.FACTORY, count);
     }
 
     public static SegmentedArray<Quaternion> makeQuaternionSparse(final long count) {
-        return SegmentedArray.make(SparseArray.QUATERNION, count);
+        return SegmentedArray.make(BasicArray.QUATERNION, count);
     }
 
     public static SegmentedArray<RationalNumber> makeRationalDense(final long count) {
-        return SegmentedArray.make(BasicArray.RATIONAL, count);
+        return SegmentedArray.make(RationalArray.FACTORY, count);
     }
 
     public static SegmentedArray<RationalNumber> makeRationalSparse(final long count) {
-        return SegmentedArray.make(SparseArray.RATIONAL, count);
+        return SegmentedArray.make(BasicArray.RATIONAL, count);
     }
 
     static <N extends Number> SegmentedArray<N> make(final ArrayFactory<N> segmentFactory, final long... structure) {
