@@ -45,15 +45,15 @@ import sun.misc.Unsafe;
 @Deprecated
 final class OffHeapArray2 extends BasicArray<Double> {
 
-    public static final ArrayFactory<Double> FACTORY = new ArrayFactory<Double>() {
+    public static final ArrayFactory<Double, OffHeapArray2> FACTORY = new ArrayFactory<Double, OffHeapArray2>() {
 
         @Override
-        BasicArray<Double> makeStructuredZero(final long... structure) {
+        OffHeapArray2 makeStructuredZero(final long... structure) {
             return new OffHeapArray2(AccessUtils.count(structure));
         }
 
         @Override
-        BasicArray<Double> makeToBeFilled(final long... structure) {
+        OffHeapArray2 makeToBeFilled(final long... structure) {
             return new OffHeapArray2(AccessUtils.count(structure));
         }
 

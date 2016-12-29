@@ -126,7 +126,6 @@ public class BufferArray extends PlainArray<Double> {
 
                 };
 
-                //return SegmentedArray.make(tmpFactory, structure);
                 return tmpFactory.makeSegmented(structure);
 
             } else {

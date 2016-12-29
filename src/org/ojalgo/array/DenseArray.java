@@ -31,7 +31,7 @@ import org.ojalgo.scalar.Scalar;
 
 public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
-    static abstract class DenseFactory<N extends Number> extends ArrayFactory<N> {
+    public static abstract class DenseFactory<N extends Number> extends ArrayFactory<N, DenseArray<N>> {
 
         abstract long getElementSize();
 

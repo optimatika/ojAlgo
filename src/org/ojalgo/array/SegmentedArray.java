@@ -83,7 +83,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     private final int myIndexBits;
     private final long myIndexMask;
-    private final ArrayFactory<N> mySegmentFactory;
+    private final ArrayFactory<N, ?> mySegmentFactory;
     private final BasicArray<N>[] mySegments;
 
     /**
@@ -92,7 +92,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
      */
     private final long mySegmentSize;
 
-    SegmentedArray(final BasicArray<N>[] segments, final long segmentSize, final int indexBits, final long indexMask, final ArrayFactory<N> segmentFactory) {
+    SegmentedArray(final BasicArray<N>[] segments, final long segmentSize, final int indexBits, final long indexMask, final ArrayFactory<N, ?> segmentFactory) {
 
         super();
 
@@ -105,7 +105,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
     }
 
     @SuppressWarnings("unchecked")
-    SegmentedArray(final long count, final int indexBits, final ArrayFactory<N> segmentFactory) {
+    SegmentedArray(final long count, final int indexBits, final ArrayFactory<N, ?> segmentFactory) {
 
         super();
 

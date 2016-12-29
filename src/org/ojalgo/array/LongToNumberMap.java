@@ -23,7 +23,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         return new LongToNumberMap<>(BigArray.FACTORY);
     }
 
-    public static LongToNumberMap<ComplexNumber> makeComplexe() {
+    public static LongToNumberMap<ComplexNumber> makeComplex() {
         return new LongToNumberMap<>(ComplexArray.FACTORY);
     }
 
@@ -46,15 +46,11 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     private final DenseArray.DenseFactory<N> myArrayFactory;
     private final SparseArray<N> myStorage;
 
-    public LongToNumberMap(final ArrayFactory<N> arrayFactory) {
+    public LongToNumberMap(final DenseArray.DenseFactory<N> arrayFactory) {
 
         super();
 
-        if (!(arrayFactory instanceof DenseArray.DenseFactory<?>)) {
-            throw new IllegalArgumentException();
-        }
-
-        myArrayFactory = (DenseArray.DenseFactory<N>) arrayFactory;
+        myArrayFactory = arrayFactory;
 
         myStorage = new SparseArray<>(Long.MAX_VALUE, myArrayFactory, INITIAL_CAPACITY);
     }

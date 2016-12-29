@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.ojalgo.access.IndexMapper;
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 
@@ -35,7 +35,7 @@ final class SparseSeries<K extends Comparable<? super K>, N extends Number> exte
 
     private final LongToNumberMap<N> myDelegate;
 
-    SparseSeries(final BasicArray.BasicFactory<N> arrayFactory, final IndexMapper<K> indexMapper) {
+    SparseSeries(final DenseArray.DenseFactory<N> arrayFactory, final IndexMapper<K> indexMapper) {
         super(indexMapper);
         myDelegate = new LongToNumberMap<>(arrayFactory);
     }

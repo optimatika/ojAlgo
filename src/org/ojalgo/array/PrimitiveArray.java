@@ -56,8 +56,8 @@ public class PrimitiveArray extends PlainArray<Double> {
     public static final DenseArray.DenseFactory<Double> FACTORY = new DenseArray.DenseFactory<Double>() {
 
         @Override
-        public BasicArray<Double> makeFilled(long count, NullaryFunction<?> supplier) {
-            final BasicArray<Double> retVal = this.makeToBeFilled(count);
+        public DenseArray<Double> makeFilled(long count, NullaryFunction<?> supplier) {
+            final DenseArray<Double> retVal = this.makeToBeFilled(count);
             for (long i = 0L; i < count; i++) {
                 retVal.set(i, supplier.doubleValue());
             }

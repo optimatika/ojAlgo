@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.SortedMap;
 
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.primitive.DataSeries;
 import org.ojalgo.series.primitive.PrimitiveSeries;
@@ -66,7 +66,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             myTimeIndex = timeIndex;
         }
 
-        public <N extends Number> BasicSeries<K, N> build(final BasicArray.BasicFactory<N> arrayFactory) {
+        public <N extends Number> BasicSeries<K, N> build(final DenseArray.DenseFactory<N> arrayFactory) {
             if (myReference != null) {
                 if (myResolution != null) {
                     return new DenseSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution));

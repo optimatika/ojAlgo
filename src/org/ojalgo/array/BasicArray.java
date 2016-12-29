@@ -54,7 +54,7 @@ import org.ojalgo.scalar.RationalNumber;
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
         Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
 
-    public static abstract class BasicFactory<N extends Number> extends ArrayFactory<N> {
+    public static abstract class BasicFactory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 
         abstract DenseArray.DenseFactory<N> dense();
 
