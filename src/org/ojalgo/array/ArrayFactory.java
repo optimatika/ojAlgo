@@ -21,28 +21,25 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-
-import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Factory1D;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 
 abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends Object implements Factory1D<BasicArray<N>> {
 
-    public I copy(final Access1D<?> source) {
+    public final I copy(final Access1D<?> source) {
         final long tmpCount = source.count();
         final I retVal = this.makeToBeFilled(tmpCount);
         retVal.fillMatching(source);
         return retVal;
     }
 
-    public I copy(final double... source) {
+    public final I copy(final double... source) {
         final int tmpLength = source.length;
         final I retVal = this.makeToBeFilled(tmpLength);
         for (int i = 0; i < tmpLength; i++) {
@@ -51,7 +48,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
         return retVal;
     }
 
-    public I copy(final List<? extends Number> source) {
+    public final I copy(final List<? extends Number> source) {
         final int tmpSize = source.size();
         final I retVal = this.makeToBeFilled(tmpSize);
         for (int i = 0; i < tmpSize; i++) {
@@ -60,7 +57,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
         return retVal;
     }
 
-    public I copy(final Number... source) {
+    public final I copy(final Number... source) {
         final int tmpLength = source.length;
         final I retVal = this.makeToBeFilled(tmpLength);
         for (int i = 0; i < tmpLength; i++) {
@@ -69,16 +66,52 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
         return retVal;
     }
 
-    public I makeFilled(final long count, final NullaryFunction<?> supplier) {
+    public final I makeFilled(final long count, final NullaryFunction<?> supplier) {
         final I retVal = this.makeToBeFilled(count);
-        for (long i = 0L; i < count; i++) {
-            retVal.set(i, supplier.get());
+        if (retVal.isPrimitive()) {
+            for (long i = 0L; i < count; i++) {
+                retVal.set(i, supplier.doubleValue());
+            }
+        } else {
+            for (long i = 0L; i < count; i++) {
+                retVal.set(i, supplier.get());
+            }
         }
         return retVal;
     }
 
-    public I makeZero(final long count) {
+    public final I makeZero(final long count) {
         return this.makeStructuredZero(count);
+    }
+
+    abstract long getElementSize();
+
+    final SegmentedArray<N> makeSegmented(final long... structure) {
+
+        final long tmpCount = AccessUtils.count(structure);
+
+        int tmpNumberOfUniformSegments = 1;
+        int tmpSegmentSizeExponent = PrimitiveMath.powerOf2Smaller(tmpCount);
+
+        long tmpSubCount = 1L;
+        for (int i = 0; i < structure.length; i++) {
+            tmpSubCount *= structure[i];
+            if (PrimitiveMath.isPowerOf2(tmpSubCount) && ((tmpCount / tmpSubCount) < DenseArray.MAX_ARRAY_SIZE)) {
+                tmpSegmentSizeExponent = PrimitiveMath.powerOf2Smaller(tmpSubCount);
+                tmpNumberOfUniformSegments = (int) (tmpCount / tmpSubCount);
+            }
+        }
+
+        int tmpMinShift = Math.max(1, PrimitiveMath.powerOf2Smaller(OjAlgoUtils.ENVIRONMENT.units));
+        int tmpTargetExponent = Math.min(30, PrimitiveMath.powerOf2Smaller(OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize())));
+
+        if (tmpSegmentSizeExponent > tmpTargetExponent) {
+            int tmpShift = Math.max(tmpMinShift, (tmpSegmentSizeExponent - tmpTargetExponent) / 2);
+            tmpNumberOfUniformSegments = tmpNumberOfUniformSegments << tmpShift;
+            tmpSegmentSizeExponent -= tmpShift;
+        }
+
+        return new SegmentedArray<>(tmpCount, tmpSegmentSizeExponent, this);
     }
 
     abstract I makeStructuredZero(final long... structure);
@@ -97,59 +130,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
      */
     @SafeVarargs
     final SegmentedArray<N> wrapAsSegments(final BasicArray<N>... segments) {
-
-        final BasicArray<N> tmpFirstSegment = segments[0];
-        final long tmpSegmentSize = tmpFirstSegment.count();
-
-        final int tmpIndexBits = Arrays.binarySearch(POWERS_OF_2, tmpSegmentSize);
-
-        if ((tmpIndexBits < 0) || (tmpSegmentSize != (1L << tmpIndexBits))) {
-            throw new IllegalArgumentException("The segment size must be a power of 2!");
-        }
-
-        final int tmpIndexOfLastSegment = segments.length - 1;
-        for (int s = 1; s < tmpIndexOfLastSegment; s++) {
-            if (segments[s].count() != tmpSegmentSize) {
-                throw new IllegalArgumentException("All segments (except possibly the last) must have the same size!");
-            }
-        }
-        if (segments[tmpIndexOfLastSegment].count() > tmpSegmentSize) {
-            throw new IllegalArgumentException("The last segment cannot be larger than the others!");
-        }
-
-        final long tmpIndexMask = tmpSegmentSize - 1L;
-
-        return new SegmentedArray<>(segments, tmpSegmentSize, tmpIndexBits, tmpIndexMask, this);
-    }
-
-    final SegmentedArray<N> makeSegmented(final long... structure) {
-
-        final long tmpCount = AccessUtils.count(structure);
-
-        int tmpNumberOfUniformSegments = 1; // NumberOfUniformSegments
-        long tmpUniformSegmentSize = tmpCount;
-
-        final long tmpMaxNumberOfSegments = (long) Math.min(Integer.MAX_VALUE - 1, PrimitiveFunction.SQRT.invoke(tmpCount));
-
-        for (int i = 0; i < structure.length; i++) {
-            final long tmpNoS = (tmpNumberOfUniformSegments * structure[i]);
-            final long tmpSS = tmpUniformSegmentSize / structure[i];
-            if (tmpNoS <= tmpMaxNumberOfSegments) {
-                tmpNumberOfUniformSegments = (int) tmpNoS;
-                tmpUniformSegmentSize = tmpSS;
-            }
-        }
-
-        final long tmpCacheDim = OjAlgoUtils.ENVIRONMENT.getCacheDim1D(8L); // TODO Make dynamic
-        final long tmpUnits = OjAlgoUtils.ENVIRONMENT.units;
-        while ((tmpUnits != 1L) && (tmpUniformSegmentSize >= tmpCacheDim) && ((tmpNumberOfUniformSegments * tmpUnits) <= tmpMaxNumberOfSegments)) {
-            tmpNumberOfUniformSegments = (int) (tmpNumberOfUniformSegments * tmpUnits);
-            tmpUniformSegmentSize = tmpUniformSegmentSize / tmpUnits;
-        }
-
-        final int tmpShift = (int) (PrimitiveFunction.LOG.invoke(tmpUniformSegmentSize) / PrimitiveFunction.LOG.invoke(2));
-
-        return new SegmentedArray<>(tmpCount, tmpShift, this);
+        return new SegmentedArray<>(segments, this);
     }
 
 }

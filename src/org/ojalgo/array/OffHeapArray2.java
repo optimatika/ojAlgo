@@ -57,6 +57,11 @@ final class OffHeapArray2 extends BasicArray<Double> {
             return new OffHeapArray2(AccessUtils.count(structure));
         }
 
+        @Override
+        long getElementSize() {
+            return 8L;
+        }
+
     };
 
     static Unsafe UNSAFE;

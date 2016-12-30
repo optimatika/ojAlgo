@@ -50,30 +50,12 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public static abstract class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
 
-        public ArrayAnyD<N> copy(final AccessAnyD<?> source) {
-
-            final long[] tmpStructure = source.shape();
-
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpStructure);
-
-            final long tmpCount = source.count();
-            for (long index = 0L; index < tmpCount; index++) {
-                tmpDelegate.set(index, source.get(index));
-            }
-
-            return tmpDelegate.asArrayAnyD(tmpStructure);
+        public final ArrayAnyD<N> copy(final AccessAnyD<?> source) {
+            return this.delegate().copy(source).asArrayAnyD(source.shape());
         }
 
         public final ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
-
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(structure);
-
-            final long tmpCount = AccessUtils.count(structure);
-            for (long index = 0L; index < tmpCount; index++) {
-                tmpDelegate.set(index, supplier.get());
-            }
-
-            return tmpDelegate.asArrayAnyD(structure);
+            return this.delegate().makeFilled(AccessUtils.count(structure), supplier).asArrayAnyD(structure);
         }
 
         public final ArrayAnyD<N> makeZero(final long... structure) {
@@ -103,21 +85,6 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     };
 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
-
-        @Override
-        public ArrayAnyD<Double> copy(final AccessAnyD<?> source) {
-
-            final long[] tmpStructure = source.shape();
-
-            final BasicArray<Double> tmpDelegate = this.delegate().makeToBeFilled(tmpStructure);
-
-            final long tmpCount = source.count();
-            for (long index = 0L; index < tmpCount; index++) {
-                tmpDelegate.set(index, source.doubleValue(index));
-            }
-
-            return tmpDelegate.asArrayAnyD(tmpStructure);
-        }
 
         @Override
         BasicArray.BasicFactory<Double> delegate() {

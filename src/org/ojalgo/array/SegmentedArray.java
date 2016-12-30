@@ -21,7 +21,10 @@
  */
 package org.ojalgo.array;
 
+import static org.ojalgo.constant.PrimitiveMath.POWERS_OF_2;
+
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -92,15 +95,29 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
      */
     private final long mySegmentSize;
 
-    SegmentedArray(final BasicArray<N>[] segments, final long segmentSize, final int indexBits, final long indexMask, final ArrayFactory<N, ?> segmentFactory) {
+    SegmentedArray(final BasicArray<N>[] segments, final ArrayFactory<N, ?> segmentFactory) {
 
         super();
 
-        mySegments = segments;
-        mySegmentSize = segmentSize;
-        myIndexBits = indexBits;
-        myIndexMask = indexMask;
+        mySegmentSize = segments[0].count();
+        final int tmpIndexOfLastSegment = segments.length - 1;
+        for (int s = 1; s < tmpIndexOfLastSegment; s++) {
+            if (segments[s].count() != mySegmentSize) {
+                throw new IllegalArgumentException("All segments (except possibly the last) must have the same size!");
+            }
+        }
+        if (segments[tmpIndexOfLastSegment].count() > mySegmentSize) {
+            throw new IllegalArgumentException("The last segment cannot be larger than the others!");
+        }
 
+        myIndexBits = Arrays.binarySearch(POWERS_OF_2, mySegmentSize);
+        if ((myIndexBits < 0) || (mySegmentSize != (1L << myIndexBits))) {
+            throw new IllegalArgumentException("The segment size must be a power of 2!");
+        }
+
+        myIndexMask = mySegmentSize - 1L;
+
+        mySegments = segments;
         mySegmentFactory = segmentFactory;
     }
 
@@ -238,7 +255,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
             }
             tmpSegments[mySegments.length] = tmpNewSegment;
 
-            return new SegmentedArray<>(tmpSegments, mySegmentSize, myIndexBits, myIndexMask, mySegmentFactory);
+            return new SegmentedArray<>(tmpSegments, mySegmentFactory);
 
         } else {
 

@@ -56,11 +56,21 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
             final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
 
-            long tmpIndex = 0L;
-            for (int j = 0; j < tmpColumns; j++) {
-                final Access1D<?> tmpColumn = source[j];
-                for (long i = 0L; i < tmpRows; i++) {
-                    tmpDelegate.set(tmpIndex++, tmpColumn.get(i));
+            if (tmpDelegate.isPrimitive()) {
+                long tmpIndex = 0L;
+                for (int j = 0; j < tmpColumns; j++) {
+                    final Access1D<?> tmpColumn = source[j];
+                    for (long i = 0L; i < tmpRows; i++) {
+                        tmpDelegate.set(tmpIndex++, tmpColumn.doubleValue(i));
+                    }
+                }
+            } else {
+                long tmpIndex = 0L;
+                for (int j = 0; j < tmpColumns; j++) {
+                    final Access1D<?> tmpColumn = source[j];
+                    for (long i = 0L; i < tmpRows; i++) {
+                        tmpDelegate.set(tmpIndex++, tmpColumn.get(i));
+                    }
                 }
             }
 
@@ -123,20 +133,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         }
 
         public final Array2D<N> copy(final Access2D<?> source) {
-
-            final long tmpColumns = source.countColumns();
-            final long tmpRows = source.countRows();
-
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
-
-            long tmpIndex = 0L;
-            for (long j = 0L; j < tmpColumns; j++) {
-                for (long i = 0L; i < tmpRows; i++) {
-                    tmpDelegate.set(tmpIndex++, source.get(i, j));
-                }
-            }
-
-            return tmpDelegate.asArray2D(tmpRows);
+            return this.delegate().copy(source).asArray2D(source.countRows());
         }
 
         public final Array2D<N> makeEye(final long rows, final long columns) {
@@ -178,10 +175,19 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
             final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
 
-            for (int i = 0; i < tmpRows; i++) {
-                final Access1D<?> tmpRow = source[i];
-                for (long j = 0L; j < tmpColumns; j++) {
-                    tmpDelegate.set(i + (j * tmpRows), tmpRow.get(j));
+            if (tmpDelegate.isPrimitive()) {
+                for (int i = 0; i < tmpRows; i++) {
+                    final Access1D<?> tmpRow = source[i];
+                    for (long j = 0L; j < tmpColumns; j++) {
+                        tmpDelegate.set(i + (j * tmpRows), tmpRow.doubleValue(j));
+                    }
+                }
+            } else {
+                for (int i = 0; i < tmpRows; i++) {
+                    final Access1D<?> tmpRow = source[i];
+                    for (long j = 0L; j < tmpColumns; j++) {
+                        tmpDelegate.set(i + (j * tmpRows), tmpRow.get(j));
+                    }
                 }
             }
 

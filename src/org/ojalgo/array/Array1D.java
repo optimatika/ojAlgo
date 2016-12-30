@@ -53,67 +53,24 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public static abstract class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
-        public Array1D<N> copy(final Access1D<?> source) {
-
-            final long tmpCount = source.count();
-
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpCount);
-
-            for (long i = 0L; i < tmpCount; i++) {
-                tmpDelegate.set(i, source.get(i));
-            }
-
-            return tmpDelegate.asArray1D();
+        public final Array1D<N> copy(final Access1D<?> source) {
+            return this.delegate().copy(source).asArray1D();
         }
 
-        public Array1D<N> copy(final double... source) {
-
-            final int tmpLength = source.length;
-
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpLength);
-
-            for (int i = 0; i < tmpLength; i++) {
-                tmpDelegate.set(i, source[i]);
-            }
-
-            return tmpDelegate.asArray1D();
+        public final Array1D<N> copy(final double... source) {
+            return this.delegate().copy(source).asArray1D();
         }
 
         public final Array1D<N> copy(final List<? extends Number> source) {
-
-            final int tmpSize = source.size();
-
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpSize);
-
-            for (int i = 0; i < tmpSize; i++) {
-                tmpDelegate.set(i, source.get(i));
-            }
-
-            return tmpDelegate.asArray1D();
+            return this.delegate().copy(source).asArray1D();
         }
 
         public final Array1D<N> copy(final Number... source) {
-
-            final int tmpLength = source.length;
-
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpLength);
-
-            for (int i = 0; i < tmpLength; i++) {
-                tmpDelegate.set(i, source[i]);
-            }
-
-            return tmpDelegate.asArray1D();
+            return this.delegate().copy(source).asArray1D();
         }
 
         public final Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
-
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(count);
-
-            for (int i = 0; i < count; i++) {
-                tmpDelegate.set(i, supplier.get());
-            }
-
-            return tmpDelegate.asArray1D();
+            return this.delegate().makeFilled(count, supplier).asArray1D();
         }
 
         public final Array1D<N> makeZero(final long count) {
@@ -269,25 +226,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     };
 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
-
-        @Override
-        public Array1D<Double> copy(final Access1D<?> source) {
-
-            final long tmpCount = source.count();
-
-            final BasicArray<Double> tmpDelegate = this.delegate().makeToBeFilled(tmpCount);
-
-            for (long i = 0L; i < tmpCount; i++) {
-                tmpDelegate.set(i, source.doubleValue(i));
-            }
-
-            return tmpDelegate.asArray1D();
-        }
-
-        @Override
-        public Array1D<Double> copy(final double... source) {
-            return new PrimitiveArray(source).asArray1D();
-        }
 
         @Override
         BasicArray.BasicFactory<Double> delegate() {

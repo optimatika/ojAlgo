@@ -43,15 +43,6 @@ public final class OffHeapArray extends DenseArray<Double> {
     public static final DenseFactory<Double> FACTORY = new DenseFactory<Double>() {
 
         @Override
-        public DenseArray<Double> makeFilled(long count, NullaryFunction<?> supplier) {
-            final DenseArray<Double> retVal = this.makeToBeFilled(count);
-            for (long i = 0L; i < count; i++) {
-                retVal.set(i, supplier.doubleValue());
-            }
-            return retVal;
-        }
-
-        @Override
         long getElementSize() {
             return 8L;
         }

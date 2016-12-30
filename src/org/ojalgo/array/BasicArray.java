@@ -59,6 +59,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         abstract DenseArray.DenseFactory<N> dense();
 
         @Override
+        final long getElementSize() {
+            return this.dense().getElementSize();
+        }
+
+        @Override
         final BasicArray<N> makeStructuredZero(final long... structure) {
             // Typically sparse
 
@@ -112,15 +117,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     };
 
     static final BasicFactory<Double> PRIMITIVE = new BasicFactory<Double>() {
-
-        @Override
-        public BasicArray<Double> makeFilled(long count, NullaryFunction<?> supplier) {
-            final BasicArray<Double> retVal = this.makeToBeFilled(count);
-            for (long i = 0L; i < count; i++) {
-                retVal.set(i, supplier.doubleValue());
-            }
-            return retVal;
-        }
 
         @Override
         DenseArray.DenseFactory<Double> dense() {

@@ -23,6 +23,8 @@ package org.ojalgo.constant;
 
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.util.Arrays;
+
 public abstract class PrimitiveMath {
 
     public static final double ZERO = BigMath.ZERO.doubleValue();
@@ -91,6 +93,26 @@ public abstract class PrimitiveMath {
 
     public static final int getPrimeNumber(final int index) {
         return PRIME[index];
+    }
+
+    public static final boolean isPowerOf2(long value) {
+        return Arrays.binarySearch(POWERS_OF_2, value) >= 0;
+    }
+
+    /**
+     * @return The smallest integer exponent so that 2^exp >= value.
+     */
+    public static final int powerOf2Larger(long value) {
+        int index = Arrays.binarySearch(POWERS_OF_2, value);
+        return index >= 0 ? index : Math.min(-(index + 1), 62);
+    }
+
+    /**
+     * @return The largest integer exponent so that 2^exp <= value.
+     */
+    public static final int powerOf2Smaller(long value) {
+        int index = Arrays.binarySearch(POWERS_OF_2, value);
+        return index >= 0 ? index : Math.max(-(index + 2), 0);
     }
 
     private PrimitiveMath() {

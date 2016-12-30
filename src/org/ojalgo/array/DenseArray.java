@@ -33,8 +33,6 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
     public static abstract class DenseFactory<N extends Number> extends ArrayFactory<N, DenseArray<N>> {
 
-        abstract long getElementSize();
-
         abstract DenseArray<N> make(int size);
 
         @Override
