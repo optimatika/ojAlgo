@@ -45,7 +45,8 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            if (tmpTotal > segmentationLimit) {
+            final long tmpLimit = Math.min(segmentationLimit, this.getMaxCount());
+            if (tmpTotal > tmpLimit) {
 
                 throw new IllegalArgumentException();
 
@@ -60,7 +61,8 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            if (tmpTotal > segmentationLimit) {
+            final long tmpLimit = Math.min(segmentationLimit, this.getMaxCount());
+            if (tmpTotal > tmpLimit) {
 
                 throw new IllegalArgumentException();
 
