@@ -45,8 +45,8 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
         }
 
         @Override
-        PlainArray<RationalNumber> make(final int size) {
-            return RationalArray.make(size);
+        PlainArray<RationalNumber> make(final long size) {
+            return RationalArray.make((int) size);
         }
 
         @Override
@@ -138,8 +138,7 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
     }
 
     @Override
-    protected
-    PlainArray<RationalNumber> newInstance(final int capacity) {
+    protected PlainArray<RationalNumber> newInstance(final int capacity) {
         return new RationalArray(capacity);
     }
 

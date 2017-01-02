@@ -48,7 +48,12 @@ public final class OffHeapArray extends DenseArray<Double> {
         }
 
         @Override
-        DenseArray<Double> make(int size) {
+        long getMaxCount() {
+            return Long.MAX_VALUE;
+        }
+
+        @Override
+        DenseArray<Double> make(final long size) {
             return new OffHeapArray(size);
         }
 

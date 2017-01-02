@@ -21,7 +21,7 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.constant.PrimitiveMath.POWERS_OF_2;
+import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -135,10 +135,10 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
         mySegments = (BasicArray<N>[]) new BasicArray<?>[tmpTotalNumberOfSegments];
         for (int s = 0; s < tmpNumberOfUniformSegments; s++) {
-            mySegments[s] = segmentFactory.makeZero(tmpSegmentSize);
+            mySegments[s] = segmentFactory.makeStructuredZero(segmentFactory.getMaxCount(), tmpSegmentSize);
         }
         if (tmpRemainder != 0L) {
-            mySegments[tmpNumberOfUniformSegments] = segmentFactory.makeZero(tmpRemainder);
+            mySegments[tmpNumberOfUniformSegments] = segmentFactory.makeStructuredZero(segmentFactory.getMaxCount(), tmpRemainder);
         }
 
         mySegmentSize = tmpSegmentSize;

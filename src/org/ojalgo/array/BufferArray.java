@@ -104,7 +104,7 @@ public class BufferArray extends PlainArray<Double> {
                     }
 
                     @Override
-                    PlainArray<Double> make(final int size) {
+                    PlainArray<Double> make(final long size) {
 
                         final long tmpSize2 = size * ELEMENT_SIZE;
                         try {

@@ -34,14 +34,14 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
 
     public final I copy(final Access1D<?> source) {
         final long tmpCount = source.count();
-        final I retVal = this.makeToBeFilled(tmpCount);
+        final I retVal = this.makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpCount);
         retVal.fillMatching(source);
         return retVal;
     }
 
     public final I copy(final double... source) {
         final int tmpLength = source.length;
-        final I retVal = this.makeToBeFilled(tmpLength);
+        final I retVal = this.makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpLength);
         for (int i = 0; i < tmpLength; i++) {
             retVal.set(i, source[i]);
         }
@@ -50,7 +50,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
 
     public final I copy(final List<? extends Number> source) {
         final int tmpSize = source.size();
-        final I retVal = this.makeToBeFilled(tmpSize);
+        final I retVal = this.makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpSize);
         for (int i = 0; i < tmpSize; i++) {
             retVal.set(i, source.get(i));
         }
@@ -59,7 +59,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
 
     public final I copy(final Number... source) {
         final int tmpLength = source.length;
-        final I retVal = this.makeToBeFilled(tmpLength);
+        final I retVal = this.makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpLength);
         for (int i = 0; i < tmpLength; i++) {
             retVal.set(i, source[i]);
         }
@@ -67,7 +67,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
     }
 
     public final I makeFilled(final long count, final NullaryFunction<?> supplier) {
-        final I retVal = this.makeToBeFilled(count);
+        final I retVal = this.makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, count);
         if (retVal.isPrimitive()) {
             for (long i = 0L; i < count; i++) {
                 retVal.set(i, supplier.doubleValue());
@@ -81,42 +81,32 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
     }
 
     public final I makeZero(final long count) {
-        return this.makeStructuredZero(count);
+        return this.makeStructuredZero(DenseArray.MAX_ARRAY_SIZE, count);
     }
 
     abstract long getElementSize();
 
+    abstract long getMaxCount();
+
     final SegmentedArray<N> makeSegmented(final long... structure) {
 
-        final long tmpCount = AccessUtils.count(structure);
+        final long tmpTotalCount = AccessUtils.count(structure);
 
-        int tmpNumberOfUniformSegments = 1;
-        int tmpSegmentSizeExponent = PrimitiveMath.powerOf2Smaller(tmpCount);
+        final int tmpMax = PrimitiveMath.powerOf2Smaller(Math.min(tmpTotalCount, this.getMaxCount()));
+        final int tmpMin = PrimitiveMath.powerOf2Larger(tmpTotalCount / DenseArray.MAX_ARRAY_SIZE);
 
-        long tmpSubCount = 1L;
-        for (int i = 0; i < structure.length; i++) {
-            tmpSubCount *= structure[i];
-            if (PrimitiveMath.isPowerOf2(tmpSubCount) && ((tmpCount / tmpSubCount) < DenseArray.MAX_ARRAY_SIZE)) {
-                tmpSegmentSizeExponent = PrimitiveMath.powerOf2Smaller(tmpSubCount);
-                tmpNumberOfUniformSegments = (int) (tmpCount / tmpSubCount);
-            }
+        if (tmpMin > tmpMax) {
+            throw new IllegalArgumentException();
         }
 
-        int tmpMinShift = Math.max(1, PrimitiveMath.powerOf2Smaller(OjAlgoUtils.ENVIRONMENT.units));
-        int tmpTargetExponent = Math.min(30, PrimitiveMath.powerOf2Smaller(OjAlgoUtils.ENVIRONMENT.getCacheDim1D(this.getElementSize())));
+        final int tmpUse = Math.max(tmpMin, tmpMax - Math.min(OjAlgoUtils.ENVIRONMENT.units, 10));
 
-        if (tmpSegmentSizeExponent > tmpTargetExponent) {
-            int tmpShift = Math.max(tmpMinShift, (tmpSegmentSizeExponent - tmpTargetExponent) / 2);
-            tmpNumberOfUniformSegments = tmpNumberOfUniformSegments << tmpShift;
-            tmpSegmentSizeExponent -= tmpShift;
-        }
-
-        return new SegmentedArray<>(tmpCount, tmpSegmentSizeExponent, this);
+        return new SegmentedArray<>(tmpTotalCount, tmpUse, this);
     }
 
-    abstract I makeStructuredZero(final long... structure);
+    abstract I makeStructuredZero(long segmentationLimit, final long... structure);
 
-    abstract I makeToBeFilled(final long... structure);
+    abstract I makeToBeFilled(long segmentationLimit, final long... structure);
 
     /**
      * There are several requirements on the segments:

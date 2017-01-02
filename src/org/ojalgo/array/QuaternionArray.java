@@ -47,8 +47,8 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
         }
 
         @Override
-        PlainArray<Quaternion> make(final int size) {
-            return QuaternionArray.make(size);
+        PlainArray<Quaternion> make(final long size) {
+            return QuaternionArray.make((int) size);
         }
 
         @Override
@@ -141,8 +141,7 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
     }
 
     @Override
-    protected
-    PlainArray<Quaternion> newInstance(final int capacity) {
+    protected PlainArray<Quaternion> newInstance(final int capacity) {
         return new QuaternionArray(capacity);
     }
 

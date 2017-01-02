@@ -48,18 +48,23 @@ final class OffHeapArray2 extends BasicArray<Double> {
     public static final ArrayFactory<Double, OffHeapArray2> FACTORY = new ArrayFactory<Double, OffHeapArray2>() {
 
         @Override
-        OffHeapArray2 makeStructuredZero(final long... structure) {
-            return new OffHeapArray2(AccessUtils.count(structure));
-        }
-
-        @Override
-        OffHeapArray2 makeToBeFilled(final long... structure) {
-            return new OffHeapArray2(AccessUtils.count(structure));
-        }
-
-        @Override
         long getElementSize() {
             return 8L;
+        }
+
+        @Override
+        long getMaxCount() {
+            return Long.MAX_VALUE;
+        }
+
+        @Override
+        OffHeapArray2 makeStructuredZero(final long segmentationLimit, final long... structure) {
+            return new OffHeapArray2(AccessUtils.count(structure));
+        }
+
+        @Override
+        OffHeapArray2 makeToBeFilled(final long segmentationLimit, final long... structure) {
+            return new OffHeapArray2(AccessUtils.count(structure));
         }
 
     };

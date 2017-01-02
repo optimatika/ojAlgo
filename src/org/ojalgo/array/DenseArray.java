@@ -33,16 +33,41 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
     public static abstract class DenseFactory<N extends Number> extends ArrayFactory<N, DenseArray<N>> {
 
-        abstract DenseArray<N> make(int size);
+        @Override
+        long getMaxCount() {
+            return MAX_ARRAY_SIZE;
+        }
+
+        abstract DenseArray<N> make(long size);
 
         @Override
-        final DenseArray<N> makeStructuredZero(final long... structure) {
-            return this.make((int) AccessUtils.count(structure));
+        final DenseArray<N> makeStructuredZero(final long segmentationLimit, final long... structure) {
+
+            final long tmpTotal = AccessUtils.count(structure);
+
+            if (tmpTotal > segmentationLimit) {
+
+                throw new IllegalArgumentException();
+
+            } else {
+
+                return this.make(tmpTotal);
+            }
         }
 
         @Override
-        final DenseArray<N> makeToBeFilled(final long... structure) {
-            return this.make((int) AccessUtils.count(structure));
+        final DenseArray<N> makeToBeFilled(final long segmentationLimit, final long... structure) {
+
+            final long tmpTotal = AccessUtils.count(structure);
+
+            if (tmpTotal > segmentationLimit) {
+
+                throw new IllegalArgumentException();
+
+            } else {
+
+                return this.make(tmpTotal);
+            }
         }
 
         abstract Scalar<N> zero();

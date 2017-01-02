@@ -72,6 +72,10 @@ public abstract class BasicArrayTest extends ArrayTests {
         this.doTest(SparseArray.makePrimitive(COUNT));
     }
 
+    public void testHugeSparse() {
+        this.doTest(SparseArray.makePrimitive(Long.MAX_VALUE, COUNT));
+    }
+
     abstract void doTest(final BasicArray<Double> array);
 
 }

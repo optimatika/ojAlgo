@@ -59,7 +59,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         }
 
         public final ArrayAnyD<N> makeZero(final long... structure) {
-            return this.delegate().makeStructuredZero(structure).asArrayAnyD(structure);
+            return this.delegate().makeStructuredZero(DenseArray.MAX_ARRAY_SIZE, structure).asArrayAnyD(structure);
         }
 
         abstract BasicArray.BasicFactory<N> delegate();

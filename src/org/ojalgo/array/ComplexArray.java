@@ -47,8 +47,8 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
         }
 
         @Override
-        PlainArray<ComplexNumber> make(final int size) {
-            return ComplexArray.make(size);
+        PlainArray<ComplexNumber> make(final long size) {
+            return ComplexArray.make((int) size);
         }
 
         @Override
@@ -141,8 +141,7 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
     }
 
     @Override
-    protected
-    PlainArray<ComplexNumber> newInstance(final int capacity) {
+    protected PlainArray<ComplexNumber> newInstance(final int capacity) {
         return new ComplexArray(capacity);
     }
 

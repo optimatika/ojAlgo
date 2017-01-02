@@ -28,6 +28,7 @@ import java.util.Arrays;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
@@ -56,6 +57,9 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     public static abstract class BasicFactory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 
+        private static final long DENSE_LIMIT = 1024L;
+        private static final int INITIAL_CAPACITY = SparseArray.capacity(DENSE_LIMIT);
+
         abstract DenseArray.DenseFactory<N> dense();
 
         @Override
@@ -64,35 +68,42 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         }
 
         @Override
-        final BasicArray<N> makeStructuredZero(final long... structure) {
+        long getMaxCount() {
+            return Long.MAX_VALUE;
+        }
+
+        @Override
+        final BasicArray<N> makeStructuredZero(final long segmentationLimit, final long... structure) {
             // Typically sparse
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            if (tmpTotal > DenseArray.MAX_ARRAY_SIZE) {
+            if (tmpTotal > segmentationLimit) {
 
                 return this.makeSegmented(structure);
 
-            } else if (tmpTotal <= 16L) {
+            } else if (tmpTotal <= DENSE_LIMIT) {
 
-                return this.dense().makeStructuredZero(structure);
+                return this.dense().makeStructuredZero(DenseArray.MAX_ARRAY_SIZE, structure);
 
             } else {
 
-                return new SparseArray<>(tmpTotal, this.dense(), SparseArray.capacity(tmpTotal));
+                return new SparseArray<>(tmpTotal, this.dense(), INITIAL_CAPACITY);
             }
         }
 
         @Override
-        final BasicArray<N> makeToBeFilled(final long... structure) {
+        final BasicArray<N> makeToBeFilled(final long segmentationLimit, final long... structure) {
             // Always dense, but maybe segmented
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            if (tmpTotal > DenseArray.MAX_ARRAY_SIZE) {
-                return this.dense().makeSegmented(structure);
+            final DenseFactory<N> tmpDense = this.dense();
+            final long tmpLimit = Math.min(segmentationLimit, tmpDense.getMaxCount());
+            if (tmpTotal > tmpLimit) {
+                return tmpDense.makeSegmented(structure);
             } else {
-                return this.dense().makeToBeFilled(structure);
+                return tmpDense.make(tmpTotal);
             }
         }
 

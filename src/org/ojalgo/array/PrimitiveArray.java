@@ -61,8 +61,8 @@ public class PrimitiveArray extends PlainArray<Double> {
         }
 
         @Override
-        PlainArray<Double> make(final int size) {
-            return PrimitiveArray.make(size);
+        PlainArray<Double> make(final long size) {
+            return PrimitiveArray.make((int) size);
         }
 
         @Override

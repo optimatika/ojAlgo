@@ -39,13 +39,31 @@ public class SegmentedArrayTest extends ArrayTests {
         super(aName);
     }
 
-    public void testRandomGetSet() {
+    public void testRandomGetSePrimitiveDenset() {
 
         final long tmpCount = 5000L;
 
         final SegmentedArray<Double> tmpArray = SegmentedArray.makePrimitiveDense(tmpCount);
 
-        TestUtils.assertEquals(tmpCount, tmpArray.count());
+        this.doTestGetSet(tmpArray);
+
+    }
+
+    public void testRandomGetSetLargeBasicArray() {
+
+        final long tmpCount = Long.MAX_VALUE;
+
+        final BasicArray<Double> tmpArray = BasicArray.PRIMITIVE.makeZero(tmpCount);
+
+        this.doTestGetSet(tmpArray);
+
+    }
+
+    private void doTestGetSet(final BasicArray<Double> array) {
+
+        final long tmpCount = array.count();
+
+        TestUtils.assertEquals(tmpCount, array.count());
 
         final Uniform tmpUniform = new Uniform();
 
@@ -55,13 +73,12 @@ public class SegmentedArrayTest extends ArrayTests {
 
             final double tmpExpected = tmpUniform.doubleValue();
 
-            tmpArray.set(tmpIndex, tmpExpected);
+            array.set(tmpIndex, tmpExpected);
 
-            final double tmpActual = tmpArray.doubleValue(tmpIndex);
+            final double tmpActual = array.doubleValue(tmpIndex);
 
             TestUtils.assertEquals(tmpExpected, tmpActual);
         }
-
     }
 
 }
