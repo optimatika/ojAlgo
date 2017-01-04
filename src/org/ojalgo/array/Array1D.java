@@ -34,6 +34,8 @@ import java.util.concurrent.RecursiveAction;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Factory1D;
 import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.BasicArray.BasicFactory;
+import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -252,6 +254,20 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     };
 
+    public static <N extends Number> Array1D.Factory<N> factory(final DenseFactory<N> delegate) {
+
+        final BasicFactory<N> tmpDelegate = BasicArray.factory(delegate);
+
+        return new Array1D.Factory<N>() {
+
+            @Override
+            BasicFactory<N> delegate() {
+                return tmpDelegate;
+            }
+
+        };
+    }
+
     public final long length;
 
     private final BasicArray<N> myDelegate;
@@ -306,9 +322,9 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
         BasicArray<N> retVal = null;
 
-        if (myDelegate instanceof PrimitiveArray) {
+        if (myDelegate instanceof Primitive64Array) {
 
-            retVal = (BasicArray<N>) new PrimitiveArray((int) length);
+            retVal = (BasicArray<N>) new Primitive64Array((int) length);
 
             for (long i = 0L; i < length; i++) {
                 retVal.set(i, this.doubleValue(i));
@@ -352,9 +368,9 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
         final int tmpLength = indices.length;
 
-        if (myDelegate instanceof PrimitiveArray) {
+        if (myDelegate instanceof Primitive64Array) {
 
-            retVal = (BasicArray<N>) new PrimitiveArray(tmpLength);
+            retVal = (BasicArray<N>) new Primitive64Array(tmpLength);
 
             for (int i = 0; i < tmpLength; i++) {
                 retVal.set(i, this.doubleValue(indices[i]));
@@ -495,7 +511,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         final long tmpLength = Math.min(length, left.count());
-        if (myDelegate instanceof PrimitiveArray) {
+        if (myDelegate instanceof Primitive64Array) {
             for (long i = 0L; i < tmpLength; i++) {
                 this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
             }
@@ -508,7 +524,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
         final long tmpLength = Math.min(length, right.count());
-        if (myDelegate instanceof PrimitiveArray) {
+        if (myDelegate instanceof Primitive64Array) {
             for (long i = 0L; i < tmpLength; i++) {
                 this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
             }

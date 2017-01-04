@@ -31,6 +31,8 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.FactoryAnyD;
 import org.ojalgo.access.MutateAnyD;
 import org.ojalgo.access.StructureAnyD;
+import org.ojalgo.array.BasicArray.BasicFactory;
+import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -110,6 +112,20 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         }
 
     };
+
+    public static <N extends Number> ArrayAnyD.Factory<N> factory(final DenseFactory<N> delegate) {
+
+        final BasicFactory<N> tmpDelegate = BasicArray.factory(delegate);
+
+        return new ArrayAnyD.Factory<N>() {
+
+            @Override
+            BasicFactory<N> delegate() {
+                return tmpDelegate;
+            }
+
+        };
+    }
 
     private final BasicArray<N> myDelegate;
     private final long[] myStructure;

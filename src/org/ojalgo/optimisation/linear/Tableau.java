@@ -26,7 +26,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Mutate2D;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -37,10 +37,10 @@ final class Tableau implements Access2D<Double>, Mutate2D {
     private final long myNumberOfConstraints;
     private final long myNumberOfVariables;
     private double myObjective;
-    private final PrimitiveArray myPhase1Weights;
-    private final PrimitiveArray myRHS;
+    private final Primitive64Array myPhase1Weights;
+    private final Primitive64Array myRHS;
     private final SparseArray<Double>[] myRows;
-    private final PrimitiveArray myWeights;
+    private final Primitive64Array myWeights;
 
     @SuppressWarnings("unchecked")
     Tableau(final int numberOfConstraints, final int numberOfVariables) {
@@ -54,9 +54,9 @@ final class Tableau implements Access2D<Double>, Mutate2D {
         for (int r = 0; r < numberOfConstraints; r++) {
             myRows[r] = SparseArray.makePrimitive(myNumberOfVariables, 4);
         }
-        myRHS = PrimitiveArray.make((int) myNumberOfConstraints);
-        myWeights = PrimitiveArray.make((int) myNumberOfVariables);
-        myPhase1Weights = PrimitiveArray.make((int) myNumberOfVariables);
+        myRHS = Primitive64Array.make((int) myNumberOfConstraints);
+        myWeights = Primitive64Array.make((int) myNumberOfVariables);
+        myPhase1Weights = Primitive64Array.make((int) myNumberOfVariables);
     }
 
     public void add(final long row, final long col, final double addend) {
@@ -160,7 +160,7 @@ final class Tableau implements Access2D<Double>, Mutate2D {
         return myInfeasibility;
     }
 
-    PrimitiveArray getRHS() {
+    Primitive64Array getRHS() {
         return myRHS;
     }
 

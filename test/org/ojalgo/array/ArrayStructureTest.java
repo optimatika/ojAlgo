@@ -32,10 +32,10 @@ import org.ojalgo.access.StructureAnyD;
  */
 public class ArrayStructureTest extends ArrayTests {
 
-    private static PrimitiveArray ARRAY_1D;
-    private static PrimitiveArray ARRAY_2D;
-    private static PrimitiveArray ARRAY_3D;
-    private static PrimitiveArray ARRAY_4D;
+    private static Primitive64Array ARRAY_1D;
+    private static Primitive64Array ARRAY_2D;
+    private static Primitive64Array ARRAY_3D;
+    private static Primitive64Array ARRAY_4D;
 
     private static int[] STRUCTURE_1D;
     private static int[] STRUCTURE_2D;
@@ -53,7 +53,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_1D[i] = 2 - i;
         }
 
-        ARRAY_1D = new PrimitiveArray(AccessUtils.count(STRUCTURE_1D));
+        ARRAY_1D = new Primitive64Array(AccessUtils.count(STRUCTURE_1D));
 
         for (int i = 0; i < ARRAY_1D.size(); i++) {
             ARRAY_1D.set(i, new Double(i));
@@ -68,7 +68,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_2D[i] = 3 - i;
         }
 
-        ARRAY_2D = new PrimitiveArray(AccessUtils.count(STRUCTURE_2D));
+        ARRAY_2D = new Primitive64Array(AccessUtils.count(STRUCTURE_2D));
 
         for (int i = 0; i < ARRAY_2D.size(); i++) {
             ARRAY_2D.set(i, new Double(i));
@@ -83,7 +83,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_3D[i] = 4 - i;
         }
 
-        ARRAY_3D = new PrimitiveArray(AccessUtils.count(STRUCTURE_3D));
+        ARRAY_3D = new Primitive64Array(AccessUtils.count(STRUCTURE_3D));
 
         for (int i = 0; i < ARRAY_3D.size(); i++) {
             ARRAY_3D.set(i, new Double(i));
@@ -98,7 +98,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_4D[i] = 5 - i;
         }
 
-        ARRAY_4D = new PrimitiveArray(AccessUtils.count(STRUCTURE_4D));
+        ARRAY_4D = new Primitive64Array(AccessUtils.count(STRUCTURE_4D));
 
         for (int i = 0; i < ARRAY_4D.size(); i++) {
             ARRAY_4D.set(i, new Double(i));

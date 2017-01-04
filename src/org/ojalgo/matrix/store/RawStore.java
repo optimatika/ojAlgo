@@ -37,7 +37,7 @@ import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -167,7 +167,7 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         }
 
         public BasicArray<Double> makeArray(final int length) {
-            return PrimitiveArray.make(length);
+            return Primitive64Array.make(length);
         }
 
         public RawStore makeEye(final long rows, final long columns) {

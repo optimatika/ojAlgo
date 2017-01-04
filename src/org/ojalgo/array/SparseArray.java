@@ -102,6 +102,14 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
+    public static <N extends Number> SparseArray<N> make(final DenseArray.DenseFactory<N> denseFactory, final long count) {
+        return new SparseArray<N>(count, denseFactory, SparseArray.capacity(count));
+    }
+
+    public static <N extends Number> SparseArray<N> make(final DenseArray.DenseFactory<N> denseFactory, final long count, final int initialCapacity) {
+        return new SparseArray<N>(count, denseFactory, initialCapacity);
+    }
+
     public static SparseArray<BigDecimal> makeBig(final long count) {
         return new SparseArray<>(count, BigArray.FACTORY, SparseArray.capacity(count));
     }
@@ -119,11 +127,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static SparseArray<Double> makePrimitive(final long count) {
-        return new SparseArray<>(count, PrimitiveArray.FACTORY, SparseArray.capacity(count));
+        return new SparseArray<>(count, Primitive64Array.FACTORY, SparseArray.capacity(count));
     }
 
     public static SparseArray<Double> makePrimitive(final long count, final int initialCapacity) {
-        return new SparseArray<>(count, PrimitiveArray.FACTORY, initialCapacity);
+        return new SparseArray<>(count, Primitive64Array.FACTORY, initialCapacity);
     }
 
     public static SparseArray<Quaternion> makeQuaternion(final long count) {

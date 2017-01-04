@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -45,8 +45,8 @@ class TridiagonalAltDecomp extends InPlaceDecomposition<Double> implements Tridi
 
         this.setInPlace(matrix);
 
-        myMain = PrimitiveArray.make(this.getMinDim());
-        myOff = PrimitiveArray.make(this.getMinDim());
+        myMain = Primitive64Array.make(this.getMinDim());
+        myOff = Primitive64Array.make(this.getMinDim());
 
         this.getInPlace().tred2(myMain, myOff, true);
 

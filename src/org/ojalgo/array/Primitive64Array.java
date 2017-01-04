@@ -51,7 +51,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public class PrimitiveArray extends PlainArray<Double> {
+public class Primitive64Array extends PlainArray<Double> {
 
     public static final DenseArray.DenseFactory<Double> FACTORY = new DenseArray.DenseFactory<Double>() {
 
@@ -62,7 +62,7 @@ public class PrimitiveArray extends PlainArray<Double> {
 
         @Override
         PlainArray<Double> make(final long size) {
-            return PrimitiveArray.make((int) size);
+            return Primitive64Array.make((int) size);
         }
 
         @Override
@@ -74,12 +74,12 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();
 
-    public static final PrimitiveArray make(final int size) {
-        return new PrimitiveArray(size);
+    public static final Primitive64Array make(final int size) {
+        return new Primitive64Array(size);
     }
 
-    public static final PrimitiveArray wrap(final double[] data) {
-        return new PrimitiveArray(data);
+    public static final Primitive64Array wrap(final double[] data) {
+        return new Primitive64Array(data);
     }
 
     private static void add(final double[] data, final int first, final int limit, final int step, final double left, final double[] right) {
@@ -199,8 +199,8 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     protected static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> left,
             final BinaryFunction<Double> function, final Access1D<Double> right) {
-        if ((left instanceof PrimitiveArray) && (right instanceof PrimitiveArray)) {
-            PrimitiveArray.invoke(data, first, limit, step, ((PrimitiveArray) left).data, function, ((PrimitiveArray) right).data);
+        if ((left instanceof Primitive64Array) && (right instanceof Primitive64Array)) {
+            Primitive64Array.invoke(data, first, limit, step, ((Primitive64Array) left).data, function, ((Primitive64Array) right).data);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(left.doubleValue(i), right.doubleValue(i));
@@ -210,8 +210,8 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     protected static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> left,
             final BinaryFunction<Double> function, final double right) {
-        if (left instanceof PrimitiveArray) {
-            PrimitiveArray.invoke(data, first, limit, step, ((PrimitiveArray) left).data, function, right);
+        if (left instanceof Primitive64Array) {
+            Primitive64Array.invoke(data, first, limit, step, ((Primitive64Array) left).data, function, right);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(left.doubleValue(i), right);
@@ -221,8 +221,8 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     protected static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> values,
             final ParameterFunction<Double> function, final int aParam) {
-        if (values instanceof PrimitiveArray) {
-            PrimitiveArray.invoke(data, first, limit, step, ((PrimitiveArray) values).data, function, aParam);
+        if (values instanceof Primitive64Array) {
+            Primitive64Array.invoke(data, first, limit, step, ((Primitive64Array) values).data, function, aParam);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values.doubleValue(i), aParam);
@@ -232,8 +232,8 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     protected static void invoke(final double[] data, final int first, final int limit, final int step, final Access1D<Double> values,
             final UnaryFunction<Double> function) {
-        if (values instanceof PrimitiveArray) {
-            PrimitiveArray.invoke(data, first, limit, step, ((PrimitiveArray) values).data, function);
+        if (values instanceof Primitive64Array) {
+            Primitive64Array.invoke(data, first, limit, step, ((Primitive64Array) values).data, function);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values.doubleValue(i));
@@ -243,8 +243,8 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     protected static void invoke(final double[] data, final int first, final int limit, final int step, final double left,
             final BinaryFunction<Double> function, final Access1D<Double> right) {
-        if (right instanceof PrimitiveArray) {
-            PrimitiveArray.invoke(data, first, limit, step, left, function, ((PrimitiveArray) right).data);
+        if (right instanceof Primitive64Array) {
+            Primitive64Array.invoke(data, first, limit, step, left, function, ((Primitive64Array) right).data);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(left, right.doubleValue(i));
@@ -261,13 +261,13 @@ public class PrimitiveArray extends PlainArray<Double> {
     static void invoke(final double[] data, final int first, final int limit, final int step, final double left, final BinaryFunction<Double> function,
             final double[] right) {
         if (function == PrimitiveFunction.ADD) {
-            PrimitiveArray.add(data, first, limit, step, left, right);
+            Primitive64Array.add(data, first, limit, step, left, right);
         } else if (function == PrimitiveFunction.DIVIDE) {
-            PrimitiveArray.divide(data, first, limit, step, left, right);
+            Primitive64Array.divide(data, first, limit, step, left, right);
         } else if (function == PrimitiveFunction.MULTIPLY) {
-            PrimitiveArray.multiply(data, first, limit, step, left, right);
+            Primitive64Array.multiply(data, first, limit, step, left, right);
         } else if (function == PrimitiveFunction.SUBTRACT) {
-            PrimitiveArray.subtract(data, first, limit, step, left, right);
+            Primitive64Array.subtract(data, first, limit, step, left, right);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(left, right[i]);
@@ -278,13 +278,13 @@ public class PrimitiveArray extends PlainArray<Double> {
     static void invoke(final double[] data, final int first, final int limit, final int step, final double[] left, final BinaryFunction<Double> function,
             final double right) {
         if (function == PrimitiveFunction.ADD) {
-            PrimitiveArray.add(data, first, limit, step, left, right);
+            Primitive64Array.add(data, first, limit, step, left, right);
         } else if (function == PrimitiveFunction.DIVIDE) {
-            PrimitiveArray.divide(data, first, limit, step, left, right);
+            Primitive64Array.divide(data, first, limit, step, left, right);
         } else if (function == PrimitiveFunction.MULTIPLY) {
-            PrimitiveArray.multiply(data, first, limit, step, left, right);
+            Primitive64Array.multiply(data, first, limit, step, left, right);
         } else if (function == PrimitiveFunction.SUBTRACT) {
-            PrimitiveArray.subtract(data, first, limit, step, left, right);
+            Primitive64Array.subtract(data, first, limit, step, left, right);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(left[i], right);
@@ -295,13 +295,13 @@ public class PrimitiveArray extends PlainArray<Double> {
     static void invoke(final double[] data, final int first, final int limit, final int step, final double[] left, final BinaryFunction<Double> function,
             final double[] right) {
         if (function == PrimitiveFunction.ADD) {
-            PrimitiveArray.add(data, first, limit, step, left, right);
+            Primitive64Array.add(data, first, limit, step, left, right);
         } else if (function == PrimitiveFunction.DIVIDE) {
-            PrimitiveArray.divide(data, first, limit, step, left, right);
+            Primitive64Array.divide(data, first, limit, step, left, right);
         } else if (function == PrimitiveFunction.MULTIPLY) {
-            PrimitiveArray.multiply(data, first, limit, step, left, right);
+            Primitive64Array.multiply(data, first, limit, step, left, right);
         } else if (function == PrimitiveFunction.SUBTRACT) {
-            PrimitiveArray.subtract(data, first, limit, step, left, right);
+            Primitive64Array.subtract(data, first, limit, step, left, right);
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(left[i], right[i]);
@@ -318,16 +318,16 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     static void invoke(final double[] data, final int first, final int limit, final int step, final double[] values, final UnaryFunction<Double> function) {
         if (function == PrimitiveFunction.NEGATE) {
-            PrimitiveArray.negate(data, first, limit, step, values);
+            Primitive64Array.negate(data, first, limit, step, values);
         } else if (function instanceof FixedFirst<?>) {
             final FixedFirst<Double> tmpFunc = (FixedFirst<Double>) function;
-            PrimitiveArray.invoke(data, first, limit, step, tmpFunc.doubleValue(), tmpFunc.getFunction(), values);
+            Primitive64Array.invoke(data, first, limit, step, tmpFunc.doubleValue(), tmpFunc.getFunction(), values);
         } else if (function instanceof FixedSecond<?>) {
             final FixedSecond<Double> tmpFunc = (FixedSecond<Double>) function;
-            PrimitiveArray.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.doubleValue());
+            Primitive64Array.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.doubleValue());
         } else if (function instanceof FixedParameter<?>) {
             final FixedParameter<Double> tmpFunc = (FixedParameter<Double>) function;
-            PrimitiveArray.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
+            Primitive64Array.invoke(data, first, limit, step, values, tmpFunc.getFunction(), tmpFunc.getParameter());
         } else {
             for (int i = first; i < limit; i += step) {
                 data[i] = function.invoke(values[i]);
@@ -340,14 +340,14 @@ public class PrimitiveArray extends PlainArray<Double> {
     /**
      * Array not copied! No checking!
      */
-    protected PrimitiveArray(final double[] data) {
+    protected Primitive64Array(final double[] data) {
 
         super(data.length);
 
         this.data = data;
     }
 
-    protected PrimitiveArray(final int size) {
+    protected Primitive64Array(final int size) {
 
         super(size);
 
@@ -376,25 +376,25 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     @Override
     public boolean equals(final Object anObj) {
-        if (anObj instanceof PrimitiveArray) {
-            return Arrays.equals(data, ((PrimitiveArray) anObj).data);
+        if (anObj instanceof Primitive64Array) {
+            return Arrays.equals(data, ((Primitive64Array) anObj).data);
         } else {
             return super.equals(anObj);
         }
     }
 
     public final void fillMatching(final Access1D<?> values) {
-        PrimitiveArray.fill(data, values);
+        Primitive64Array.fill(data, values);
     }
 
     public final void fillMatching(final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
         final int tmpLimit = (int) FunctionUtils.min(this.count(), left.count(), right.count());
-        PrimitiveArray.invoke(data, 0, tmpLimit, 1, left, function, right);
+        Primitive64Array.invoke(data, 0, tmpLimit, 1, left, function, right);
     }
 
     public final void fillMatching(final UnaryFunction<Double> function, final Access1D<Double> arguments) {
         final int tmpLimit = (int) FunctionUtils.min(this.count(), arguments.count());
-        PrimitiveArray.invoke(data, 0, tmpLimit, 1, arguments, function);
+        Primitive64Array.invoke(data, 0, tmpLimit, 1, arguments, function);
     }
 
     @Override
@@ -431,33 +431,33 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     @Override
     protected final void exchange(final int firstA, final int firstB, final int step, final int count) {
-        PrimitiveArray.exchange(data, firstA, firstB, step, count);
+        Primitive64Array.exchange(data, firstA, firstB, step, count);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function,
             final Access1D<Double> right) {
-        PrimitiveArray.invoke(data, first, limit, 1, left, function, right);
+        Primitive64Array.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
-        PrimitiveArray.invoke(data, first, limit, 1, left, function, right);
+        Primitive64Array.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        PrimitiveArray.invoke(data, first, limit, 1, left, function, right);
+        Primitive64Array.invoke(data, first, limit, 1, left, function, right);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final int step, final Double value) {
-        PrimitiveArray.fill(data, first, limit, step, value);
+        Primitive64Array.fill(data, first, limit, step, value);
     }
 
     @Override
     protected final void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
-        PrimitiveArray.fill(data, first, limit, step, supplier);
+        Primitive64Array.fill(data, first, limit, step, supplier);
     }
 
     @Override
@@ -520,32 +520,32 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        PrimitiveArray.invoke(data, first, limit, step, left, function, this);
+        Primitive64Array.invoke(data, first, limit, step, left, function, this);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        PrimitiveArray.invoke(data, first, limit, step, this, function, right);
+        Primitive64Array.invoke(data, first, limit, step, this, function, right);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        PrimitiveArray.invoke(data, first, limit, step, data, function, right);
+        Primitive64Array.invoke(data, first, limit, step, data, function, right);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        PrimitiveArray.invoke(data, first, limit, step, left, function, data);
+        Primitive64Array.invoke(data, first, limit, step, left, function, data);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final ParameterFunction<Double> function, final int parameter) {
-        PrimitiveArray.invoke(data, first, limit, step, data, function, parameter);
+        Primitive64Array.invoke(data, first, limit, step, data, function, parameter);
     }
 
     @Override
     protected final void modify(final int first, final int limit, final int step, final UnaryFunction<Double> function) {
-        PrimitiveArray.invoke(data, first, limit, step, this, function);
+        Primitive64Array.invoke(data, first, limit, step, this, function);
     }
 
     @Override
@@ -555,7 +555,7 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     @Override
     protected PlainArray<Double> newInstance(final int capacity) {
-        return new PrimitiveArray(capacity);
+        return new Primitive64Array(capacity);
     }
 
     @Override
@@ -585,14 +585,14 @@ public class PrimitiveArray extends PlainArray<Double> {
 
     @Override
     protected void sortDescending() {
-        PrimitiveArray.negate(data, 0, data.length, 1, data);
+        Primitive64Array.negate(data, 0, data.length, 1, data);
         Arrays.parallelSort(data);
-        PrimitiveArray.negate(data, 0, data.length, 1, data);
+        Primitive64Array.negate(data, 0, data.length, 1, data);
     }
 
     @Override
     protected final void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        PrimitiveArray.invoke(data, first, limit, step, visitor);
+        Primitive64Array.invoke(data, first, limit, step, visitor);
     }
 
     @Override

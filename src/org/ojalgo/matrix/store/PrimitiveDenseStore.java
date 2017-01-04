@@ -34,7 +34,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ComplexArray;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -66,7 +66,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public final class PrimitiveDenseStore extends PrimitiveArray implements PhysicalStore<Double>, DecompositionStore<Double> {
+public final class PrimitiveDenseStore extends Primitive64Array implements PhysicalStore<Double>, DecompositionStore<Double> {
 
     public static interface PrimitiveMultiplyBoth extends FillByMultiplying<Double> {
 
@@ -208,8 +208,8 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
             return PrimitiveFunction.getSet();
         }
 
-        public PrimitiveArray makeArray(final int length) {
-            return PrimitiveArray.make(length);
+        public Primitive64Array makeArray(final int length) {
+            return Primitive64Array.make(length);
         }
 
         public PrimitiveDenseStore makeEye(final long rows, final long columns) {
@@ -1055,7 +1055,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     public void applyCholesky(final int iterationPoint, final BasicArray<Double> multipliers) {
 
         final double[] tmpData = data;
-        final double[] tmpColumn = ((PrimitiveArray) multipliers).data;
+        final double[] tmpColumn = ((Primitive64Array) multipliers).data;
 
         if ((myColDim - iterationPoint - 1) > ApplyCholesky.THRESHOLD) {
 
@@ -1078,7 +1078,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     public void applyLDL(final int iterationPoint, final BasicArray<Double> multipliers) {
 
         final double[] tmpData = data;
-        final double[] tmpColumn = ((PrimitiveArray) multipliers).data;
+        final double[] tmpColumn = ((Primitive64Array) multipliers).data;
 
         if ((myColDim - iterationPoint - 1) > ApplyLDL.THRESHOLD) {
 
@@ -1101,7 +1101,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     public void applyLU(final int iterationPoint, final BasicArray<Double> multipliers) {
 
         final double[] tmpData = data;
-        final double[] tmpColumn = ((PrimitiveArray) multipliers).data;
+        final double[] tmpColumn = ((Primitive64Array) multipliers).data;
 
         if ((myColDim - iterationPoint - 1) > ApplyLU.THRESHOLD) {
 
@@ -1188,7 +1188,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
         final double[] tmpData = data;
         final int tmpRowDim = myRowDim;
 
-        final double[] tmpDestination = ((PrimitiveArray) destination).data;
+        final double[] tmpDestination = ((Primitive64Array) destination).data;
 
         int tmpIndex = row + (column * tmpRowDim);
         final double tmpDenominator = tmpData[tmpIndex];
@@ -1765,7 +1765,7 @@ public final class PrimitiveDenseStore extends PrimitiveArray implements Physica
     }
 
     public void tred2(final BasicArray<Double> mainDiagonal, final BasicArray<Double> offDiagonal, final boolean yesvecs) {
-        HouseholderHermitian.tred2j(data, ((PrimitiveArray) mainDiagonal).data, ((PrimitiveArray) offDiagonal).data, yesvecs);
+        HouseholderHermitian.tred2j(data, ((Primitive64Array) mainDiagonal).data, ((Primitive64Array) offDiagonal).data, yesvecs);
     }
 
     public void visitColumn(final long row, final long col, final VoidFunction<Double> visitor) {

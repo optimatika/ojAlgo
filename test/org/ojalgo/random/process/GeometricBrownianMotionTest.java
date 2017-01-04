@@ -26,7 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.util.List;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.finance.data.DatePrice;
 import org.ojalgo.finance.data.YahooSymbol;
@@ -152,14 +152,14 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
 
-        final PrimitiveArray tmpRawValues = PrimitiveArray.make(tmpPeriods + 1);
+        final Primitive64Array tmpRawValues = Primitive64Array.make(tmpPeriods + 1);
         tmpRawValues.data[0] = ONE;
         for (int t = 1; t < tmpRawValues.count(); t++) {
             tmpRawValues.data[t] = tmpRawValues.data[t - 1] * tmpFactoryDistr.doubleValue();
         }
 
-        final PrimitiveArray tmpQuotient = PrimitiveArray.make(tmpPeriods);
-        final PrimitiveArray tmpLogDiffs = PrimitiveArray.make(tmpPeriods);
+        final Primitive64Array tmpQuotient = Primitive64Array.make(tmpPeriods);
+        final Primitive64Array tmpLogDiffs = Primitive64Array.make(tmpPeriods);
         for (int t = 0; t < tmpPeriods; t++) {
             tmpQuotient.data[t] = tmpRawValues.data[t + 1] / tmpRawValues.data[t];
             tmpLogDiffs.data[t] = PrimitiveFunction.LOG.invoke(tmpRawValues.data[t + 1]) - PrimitiveFunction.LOG.invoke(tmpRawValues.data[t]);

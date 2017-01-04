@@ -41,6 +41,13 @@ public abstract class ArrayUtils {
         return retVal;
     }
 
+    public static float[] copyOf(final float[] original) {
+        final int tmpLength = original.length;
+        final float[] retVal = new float[tmpLength];
+        System.arraycopy(original, 0, retVal, 0, tmpLength);
+        return retVal;
+    }
+
     public static int[] copyOf(final int[] original) {
         final int tmpLength = original.length;
         final int[] retVal = new int[tmpLength];

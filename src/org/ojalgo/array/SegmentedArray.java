@@ -60,8 +60,12 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return BasicArray.COMPLEX.makeSegmented(count);
     }
 
+    public static <N extends Number> SegmentedArray<N> makeDense(final DenseArray.DenseFactory<N> denseFactory, final long count) {
+        return denseFactory.makeSegmented(count);
+    }
+
     public static SegmentedArray<Double> makePrimitiveDense(final long count) {
-        return PrimitiveArray.FACTORY.makeSegmented(count);
+        return Primitive64Array.FACTORY.makeSegmented(count);
     }
 
     public static SegmentedArray<Double> makePrimitiveSparse(final long count) {
@@ -82,6 +86,10 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     public static SegmentedArray<RationalNumber> makeRationalSparse(final long count) {
         return BasicArray.RATIONAL.makeSegmented(count);
+    }
+
+    public static <N extends Number> SegmentedArray<N> makeSparse(final BasicArray.BasicFactory<N> basicFactory, final long count) {
+        return basicFactory.makeSegmented(count);
     }
 
     private final int myIndexBits;

@@ -31,16 +31,39 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.NativeMemory;
 
 /**
  * Off heap memory array.
  *
  * @author apete
  */
-public final class OffHeapArray extends DenseArray<Double> {
+public abstract class OffHeapArray extends DenseArray<Double> {
 
-    public static final DenseFactory<Double> FACTORY = new DenseFactory<Double>() {
+    public static final DenseFactory<Double> PRIMITIVE32 = new DenseFactory<Double>() {
+
+        @Override
+        long getElementSize() {
+            return 4L;
+        }
+
+        @Override
+        long getMaxCount() {
+            return Long.MAX_VALUE;
+        }
+
+        @Override
+        DenseArray<Double> make(final long size) {
+            return new Native32Array(size);
+        }
+
+        @Override
+        Scalar<Double> zero() {
+            return PrimitiveScalar.ZERO;
+        }
+
+    };
+
+    public static final DenseFactory<Double> PRIMITIVE64 = new DenseFactory<Double>() {
 
         @Override
         long getElementSize() {
@@ -54,7 +77,7 @@ public final class OffHeapArray extends DenseArray<Double> {
 
         @Override
         DenseArray<Double> make(final long size) {
-            return new OffHeapArray(size);
+            return new Native64Array(size);
         }
 
         @Override
@@ -64,27 +87,44 @@ public final class OffHeapArray extends DenseArray<Double> {
 
     };
 
+    /**
+     * @deprecated v42 Use {@link #PRIMITIVE64} instead
+     */
+    @Deprecated
+    public static final DenseFactory<Double> FACTORY = PRIMITIVE64;
+
+    /**
+     * @deprecated v42 Use {@link #makePrimitive64(long)} instead
+     */
+    @Deprecated
     public static OffHeapArray make(final long count) {
-        return new OffHeapArray(count);
+        return OffHeapArray.makePrimitive64(count);
     }
 
+    public static OffHeapArray makePrimitive32(final long count) {
+        return new Native32Array(count);
+    }
+
+    public static OffHeapArray makePrimitive64(final long count) {
+        return new Native64Array(count);
+    }
+
+    /**
+     * @deprecated v42 Use {@link SegmentedArray#makeDense(DenseArray.DenseFactory, long)} or
+     *             {@link SegmentedArray#makeSparse(BasicArray.BasicFactory, long)} instead
+     */
+    @Deprecated
     public static final SegmentedArray<Double> makeSegmented(final long count) {
-        //return SegmentedArray.make(FACTORY, count);
-        return FACTORY.makeSegmented(count);
+        return SegmentedArray.makeDense(PRIMITIVE64, count);
     }
 
     private final long myCount;
-    private final long myPointer;
 
     OffHeapArray(final long count) {
 
         super();
 
         myCount = count;
-
-        myPointer = NativeMemory.allocateDoubleArray(this, count);
-
-        this.fillAll(PrimitiveMath.ZERO);
     }
 
     public void add(final long index, final double addend) {
@@ -97,10 +137,6 @@ public final class OffHeapArray extends DenseArray<Double> {
 
     public long count() {
         return myCount;
-    }
-
-    public double doubleValue(final long index) {
-        return NativeMemory.getDouble(myPointer, index);
     }
 
     public void fillAll(final Double value) {
@@ -133,10 +169,6 @@ public final class OffHeapArray extends DenseArray<Double> {
 
     public void modifyOne(final long index, final UnaryFunction<Double> modifier) {
         this.set(index, modifier.invoke(this.doubleValue(index)));
-    }
-
-    public void set(final long index, final double value) {
-        NativeMemory.setDouble(myPointer, index, value);
     }
 
     public void set(final long index, final Number value) {
@@ -245,11 +277,6 @@ public final class OffHeapArray extends DenseArray<Double> {
         for (long i = first; i < limit; i += step) {
             this.set(i, function.invoke(this.doubleValue(i)));
         }
-    }
-
-    @Override
-    protected DenseArray<Double> newInstance(final int capacity) {
-        return new OffHeapArray(capacity);
     }
 
     @Override

@@ -23,13 +23,11 @@ package org.ojalgo.array;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.DenseFactory;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -131,7 +129,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
         @Override
         DenseArray.DenseFactory<Double> dense() {
-            return PrimitiveArray.FACTORY;
+            return Primitive64Array.FACTORY;
         }
 
     };
@@ -154,25 +152,15 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     };
 
-    /**
-     * @param capacity The desired capacity.
-     * @return The smallest power of 2 that is more than or equal to the desired capacity.
-     */
-    static long alignCapacity(final long capacity) {
+    public static <N extends Number> BasicFactory<N> factory(final DenseFactory<N> denseFactory) {
+        return new BasicFactory<N>() {
 
-        if (capacity <= 0) {
-
-            return 1L;
-
-        } else {
-
-            int index = Arrays.binarySearch(PrimitiveMath.POWERS_OF_2, capacity);
-            if (index < 0) {
-                index = Math.min(-index - 1, 62);
+            @Override
+            DenseArray.DenseFactory<N> dense() {
+                return denseFactory;
             }
 
-            return PrimitiveMath.POWERS_OF_2[index];
-        }
+        };
     }
 
     protected BasicArray() {

@@ -50,11 +50,11 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public static NumberList<Double> makeOffHeap() {
-        return new NumberList<>(OffHeapArray.FACTORY);
+        return new NumberList<>(OffHeapArray.PRIMITIVE64);
     }
 
     public static NumberList<Double> makePrimitive() {
-        return new NumberList<>(PrimitiveArray.FACTORY);
+        return new NumberList<>(Primitive64Array.FACTORY);
     }
 
     public static NumberList<Quaternion> makeQuaternion() {
@@ -297,7 +297,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
     public NumberList<N> subList(final int fromIndex, final int toIndex) {
         final NumberList<N> retVal = new NumberList<>(myArrayFactory);
-        if (myStorage instanceof PrimitiveArray) {
+        if (myStorage instanceof Primitive64Array) {
             for (int i = 0; i < toIndex; i++) {
                 retVal.add(this.doubleValue(i));
             }

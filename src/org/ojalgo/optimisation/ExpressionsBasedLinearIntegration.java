@@ -24,7 +24,7 @@ package org.ojalgo.optimisation;
 import java.util.List;
 
 import org.ojalgo.access.IntIndex;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.optimisation.linear.LinearSolver;
 
@@ -46,7 +46,7 @@ final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Inte
     @Override
     public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
-        final PrimitiveArray tmpModelSolution = PrimitiveArray.make(model.countVariables());
+        final Primitive64Array tmpModelSolution = Primitive64Array.make(model.countVariables());
 
         for (final IntIndex tmpFixed : model.getFixedVariables()) {
             tmpModelSolution.set(tmpFixed.index, model.getVariable(tmpFixed.index).getValue().doubleValue());
@@ -78,7 +78,7 @@ final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Inte
         final int tmpCountPositives = tmpPositives.size();
         final int tmpCountNegatives = tmpNegatives.size();
 
-        final PrimitiveArray tmpSolverSolution = PrimitiveArray.make(tmpCountPositives + tmpCountNegatives);
+        final Primitive64Array tmpSolverSolution = Primitive64Array.make(tmpCountPositives + tmpCountNegatives);
 
         for (int p = 0; p < tmpCountPositives; p++) {
             final Variable tmpVariable = tmpPositives.get(p);

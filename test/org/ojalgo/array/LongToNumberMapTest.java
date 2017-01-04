@@ -24,6 +24,7 @@ package org.ojalgo.array;
 import java.util.Map.Entry;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.constant.PrimitiveMath;
 
 /**
  * LongToNumberMap
@@ -101,10 +102,10 @@ public class LongToNumberMapTest extends ArrayTests {
     }
 
     public void testAlignCapacity() {
-        TestUtils.assertEquals(1, BasicArray.alignCapacity(-1));
-        TestUtils.assertEquals(16, BasicArray.alignCapacity(16));
-        TestUtils.assertEquals(512, BasicArray.alignCapacity(365));
-        TestUtils.assertEquals(16_384, BasicArray.alignCapacity(16_384));
+        TestUtils.assertEquals(1, 1L << PrimitiveMath.powerOf2Larger(-1L));
+        TestUtils.assertEquals(16, 1L << PrimitiveMath.powerOf2Larger(16L));
+        TestUtils.assertEquals(512, 1L << PrimitiveMath.powerOf2Larger(365L));
+        TestUtils.assertEquals(16_384, 1L << PrimitiveMath.powerOf2Larger(16_384L));
     }
 
 }

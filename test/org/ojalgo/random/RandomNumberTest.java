@@ -25,7 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.ArrayUtils;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -276,8 +276,8 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals("Factory Expected", tmpFactoryExpected, tmpFactoryDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals("Factory Std Dev", tmpFactoryStdDev, tmpFactoryDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
 
-        final PrimitiveArray tmpRawValues = PrimitiveArray.make(tmpSize);
-        final PrimitiveArray tmpLogValues = PrimitiveArray.make(tmpSize);
+        final Primitive64Array tmpRawValues = Primitive64Array.make(tmpSize);
+        final Primitive64Array tmpLogValues = Primitive64Array.make(tmpSize);
         for (int i = 0; i < tmpSize; i++) {
             tmpRawValues.data[i] = tmpFactoryDistr.doubleValue();
             tmpLogValues.data[i] = PrimitiveFunction.LOG.invoke(tmpRawValues.data[i]);

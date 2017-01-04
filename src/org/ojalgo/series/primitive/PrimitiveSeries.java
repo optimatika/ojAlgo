@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 
 public abstract class PrimitiveSeries implements Access1D<Double> {
 
@@ -164,7 +164,7 @@ public abstract class PrimitiveSeries implements Access1D<Double> {
             final int tmpSampleSize = this.size() / interval;
             final int tmpLastIndex = this.size() - 1;
 
-            final PrimitiveArray tmpValues = PrimitiveArray.make(tmpSampleSize);
+            final Primitive64Array tmpValues = Primitive64Array.make(tmpSampleSize);
 
             for (int i = 0; i < tmpSampleSize; i++) {
                 tmpValues.set(i, tmpLastIndex - (i * interval));

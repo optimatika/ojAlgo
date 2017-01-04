@@ -22,7 +22,7 @@
 package org.ojalgo.random;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 
 /**
  * SampleSetTest
@@ -41,7 +41,7 @@ public class SampleSetTest extends RandomTests {
 
     public void testEmptySet() {
 
-        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { });
+        final Primitive64Array tmpSamples = Primitive64Array.wrap(new double[] { });
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
 
         try {
@@ -72,7 +72,7 @@ public class SampleSetTest extends RandomTests {
 
     public void testQuartileEx1() {
 
-        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 6, 7, 15, 36, 39, 40, 41, 42, 43, 47, 49 });
+        final Primitive64Array tmpSamples = Primitive64Array.wrap(new double[] { 6, 7, 15, 36, 39, 40, 41, 42, 43, 47, 49 });
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
 
         TestUtils.assertEquals(20.25, tmpSampleSet.getQuartile1());
@@ -83,7 +83,7 @@ public class SampleSetTest extends RandomTests {
 
     public void testQuartileEx2() {
 
-        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 7, 15, 36, 39, 40, 41 });
+        final Primitive64Array tmpSamples = Primitive64Array.wrap(new double[] { 7, 15, 36, 39, 40, 41 });
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
 
         TestUtils.assertEquals(15.0, tmpSampleSet.getQuartile1());
@@ -94,7 +94,7 @@ public class SampleSetTest extends RandomTests {
 
     public void testQuartileSize0() {
 
-        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { });
+        final Primitive64Array tmpSamples = Primitive64Array.wrap(new double[] { });
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
 
         TestUtils.assertEquals(0.0, tmpSampleSet.getQuartile1());
@@ -105,7 +105,7 @@ public class SampleSetTest extends RandomTests {
 
     public void testQuartileSize1() {
 
-        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0 });
+        final Primitive64Array tmpSamples = Primitive64Array.wrap(new double[] { 100.0 });
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
 
         TestUtils.assertEquals(100.0, tmpSampleSet.getQuartile1());
@@ -116,7 +116,7 @@ public class SampleSetTest extends RandomTests {
 
     public void testQuartileSize2() {
 
-        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0, 200.0 });
+        final Primitive64Array tmpSamples = Primitive64Array.wrap(new double[] { 100.0, 200.0 });
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
 
         TestUtils.assertEquals(100.0, tmpSampleSet.getQuartile1());
@@ -127,7 +127,7 @@ public class SampleSetTest extends RandomTests {
 
     public void testQuartileSize3() {
 
-        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0, 200.0, 300.0 });
+        final Primitive64Array tmpSamples = Primitive64Array.wrap(new double[] { 100.0, 200.0, 300.0 });
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
 
         TestUtils.assertEquals(125.0, tmpSampleSet.getQuartile1());
@@ -138,7 +138,7 @@ public class SampleSetTest extends RandomTests {
 
     public void testQuartileSize4() {
 
-        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0, 200.0, 300.0, 400.0 });
+        final Primitive64Array tmpSamples = Primitive64Array.wrap(new double[] { 100.0, 200.0, 300.0, 400.0 });
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
 
         TestUtils.assertEquals(150.0, tmpSampleSet.getQuartile1());
@@ -149,7 +149,7 @@ public class SampleSetTest extends RandomTests {
 
     public void testQuartileSize6() {
 
-        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0, 200.0, 300.0, 400.0, 500.0, 600.0 });
+        final Primitive64Array tmpSamples = Primitive64Array.wrap(new double[] { 100.0, 200.0, 300.0, 400.0, 500.0, 600.0 });
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
 
         TestUtils.assertEquals(200.0, tmpSampleSet.getQuartile1());
@@ -160,7 +160,7 @@ public class SampleSetTest extends RandomTests {
 
     public void testQuartileSize8() {
 
-        final PrimitiveArray tmpSamples = PrimitiveArray.wrap(new double[] { 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0 });
+        final Primitive64Array tmpSamples = Primitive64Array.wrap(new double[] { 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0 });
         final SampleSet tmpSampleSet = SampleSet.wrap(tmpSamples);
 
         TestUtils.assertEquals(250.0, tmpSampleSet.getQuartile1());

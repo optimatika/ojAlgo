@@ -29,13 +29,13 @@ import java.util.Objects;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 
 public final class SampleSet implements Access1D<Double> {
 
     public static SampleSet make(final RandomNumber randomNumber, final int size) {
 
-        final PrimitiveArray retVal = PrimitiveArray.make(size);
+        final Primitive64Array retVal = Primitive64Array.make(size);
         final double[] tmpData = retVal.data;
 
         for (int i = 0; i < size; i++) {

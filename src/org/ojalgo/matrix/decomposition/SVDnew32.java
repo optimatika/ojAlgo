@@ -26,7 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import java.math.BigDecimal;
 
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -335,7 +335,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
         } // while
 
         //return new PrimitiveArray(s).asArray1D();
-        return Array1D.PRIMITIVE.wrap(PrimitiveArray.wrap(s));
+        return Array1D.PRIMITIVE.wrap(Primitive64Array.wrap(s));
     }
 
     protected SVDnew32(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final BidiagonalDecomposition<N> bidiagonal) {

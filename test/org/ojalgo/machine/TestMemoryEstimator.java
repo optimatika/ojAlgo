@@ -1,6 +1,6 @@
 package org.ojalgo.machine;
 
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.matrix.BigMatrix;
 
 public class TestMemoryEstimator extends MachineTests {
@@ -27,7 +27,7 @@ public class TestMemoryEstimator extends MachineTests {
 
     public void testPrimitiveArray() {
 
-        final long tmpEstimate = MemoryEstimator.estimateObject(PrimitiveArray.class);
+        final long tmpEstimate = MemoryEstimator.estimateObject(Primitive64Array.class);
 
         final long tmpManually = 0L;
 

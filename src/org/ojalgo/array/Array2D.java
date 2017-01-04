@@ -30,6 +30,8 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.array.BasicArray.BasicFactory;
+import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -294,6 +296,20 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         }
 
     };
+
+    public static <N extends Number> Array2D.Factory<N> factory(final DenseFactory<N> delegate) {
+
+        final BasicFactory<N> tmpDelegate = BasicArray.factory(delegate);
+
+        return new Array2D.Factory<N>() {
+
+            @Override
+            BasicFactory<N> delegate() {
+                return tmpDelegate;
+            }
+
+        };
+    }
 
     private final long myColumnsCount;
     private final BasicArray<N> myDelegate;

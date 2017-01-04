@@ -26,7 +26,7 @@ import java.util.List;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.random.ContinuousDistribution;
 import org.ojalgo.random.Random1D;
 import org.ojalgo.random.process.RandomProcess.SimulationResults;
@@ -64,10 +64,10 @@ abstract class Process1D<D extends ContinuousDistribution, P extends AbstractPro
         return myProcesses[index].getValue();
     }
 
-    public PrimitiveArray getValues() {
+    public Primitive64Array getValues() {
 
         final int tmpLength = myProcesses.length;
-        final PrimitiveArray retVal = PrimitiveArray.make(tmpLength);
+        final Primitive64Array retVal = Primitive64Array.make(tmpLength);
 
         for (int p = 0; p < tmpLength; p++) {
             retVal.set(p, myProcesses[p].getValue());

@@ -27,7 +27,7 @@ import java.util.List;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.finance.portfolio.SimplePortfolio;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -74,7 +74,7 @@ public class PortfolioSimulator {
 
         final int tmpProcDim = myProcess.size();
 
-        final PrimitiveArray tmpInitialValues = myProcess.getValues();
+        final Primitive64Array tmpInitialValues = myProcess.getValues();
         final Number[] tmpValues = new Number[tmpProcDim];
         for (int p = 0; p < tmpProcDim; p++) {
             tmpValues[p] = tmpInitialValues.get(p);

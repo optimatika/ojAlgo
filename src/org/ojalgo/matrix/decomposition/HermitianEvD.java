@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
@@ -227,7 +227,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         //        }
 
         //return new PrimitiveArray(tmpMainDiagonal).asArray1D();
-        return Array1D.PRIMITIVE.wrap(PrimitiveArray.wrap(tmpMainDiagData));
+        return Array1D.PRIMITIVE.wrap(Primitive64Array.wrap(tmpMainDiagData));
     }
 
     private Array1D<Double> myDiagonalValues;

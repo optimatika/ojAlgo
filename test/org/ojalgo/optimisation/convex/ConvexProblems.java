@@ -32,7 +32,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.ArrayUtils;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.finance.portfolio.GitHubIssue24;
 import org.ojalgo.finance.portfolio.MarkowitzModel;
@@ -1122,7 +1122,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Optimisation.Result tmpResult = tmpCorrectSolver.solve();
 
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
-        TestUtils.assertEquals(PrimitiveArray.wrap(new double[] { 0.5, 0.5 }), tmpResult);
+        TestUtils.assertEquals(Primitive64Array.wrap(new double[] { 0.5, 0.5 }), tmpResult);
 
     }
 
@@ -1270,8 +1270,8 @@ public class ConvexProblems extends OptimisationConvexTests {
      */
     public void testP20150809() {
 
-        final PrimitiveArray tmpExpectedSolution = PrimitiveArray.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
-        final PrimitiveArray tmpBoundedSolution = PrimitiveArray.wrap(new double[] { 99999, -99999, 99999, 99999 });
+        final Primitive64Array tmpExpectedSolution = Primitive64Array.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
+        final Primitive64Array tmpBoundedSolution = Primitive64Array.wrap(new double[] { 99999, -99999, 99999, 99999 });
 
         ConvexSolver tmpSolver = P20150809.buildModel(true, false);
         Result tmpResult = tmpSolver.solve();

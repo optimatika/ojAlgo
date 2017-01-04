@@ -32,7 +32,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.PrimitiveArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.netio.BasicLogger.Printer;
 import org.ojalgo.type.context.NumberContext;
 
@@ -103,7 +103,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
 
-            final PrimitiveArray tmpModelSolution = PrimitiveArray.make(model.countVariables());
+            final Primitive64Array tmpModelSolution = Primitive64Array.make(model.countVariables());
 
             for (final IntIndex tmpFixed : model.getFixedVariables()) {
                 tmpModelSolution.set(tmpFixed.index, model.getVariable(tmpFixed.index).getValue().doubleValue());
@@ -123,7 +123,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
             final List<Variable> tmpFreeVariables = model.getFreeVariables();
 
-            final PrimitiveArray tmpSolverSolution = PrimitiveArray.make(tmpFreeVariables.size());
+            final Primitive64Array tmpSolverSolution = Primitive64Array.make(tmpFreeVariables.size());
             final double[] tmpData = tmpSolverSolution.data;
 
             for (int i = 0; i < tmpData.length; i++) {
