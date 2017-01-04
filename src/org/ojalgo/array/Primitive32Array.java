@@ -49,7 +49,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class Primitive32Array extends PlainArray<Double> {
 
-    public static final DenseArray.DenseFactory<Double> FACTORY = new DenseArray.DenseFactory<Double>() {
+    public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<Double>() {
 
         @Override
         long getElementSize() {
@@ -497,16 +497,6 @@ public class Primitive32Array extends PlainArray<Double> {
     }
 
     @Override
-    protected void modify(final int index, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        data[index] = (float) function.invoke(left.doubleValue(index), data[index]);
-    }
-
-    @Override
-    protected void modify(final int index, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        data[index] = (float) function.invoke(data[index], right.doubleValue(index));
-    }
-
-    @Override
     protected final void modify(final int first, final int limit, final int step, final Access1D<Double> left, final BinaryFunction<Double> function) {
         Primitive32Array.invoke(data, first, limit, step, left, function, this);
     }
@@ -537,13 +527,8 @@ public class Primitive32Array extends PlainArray<Double> {
     }
 
     @Override
-    protected void modify(final int index, final UnaryFunction<Double> function) {
-        data[index] = (float) function.invoke(data[index]);
-    }
-
-    @Override
-    protected PlainArray<Double> newInstance(final int capacity) {
-        return new Primitive32Array(capacity);
+    protected final void modifyOne(final int index, final UnaryFunction<Double> modifier) {
+        data[index] = (float) modifier.invoke(data[index]);
     }
 
     @Override
@@ -591,6 +576,26 @@ public class Primitive32Array extends PlainArray<Double> {
     @Override
     boolean isPrimitive() {
         return true;
+    }
+
+    @Override
+    void modify(final long extIndex, final int intIndex, final Access1D<Double> left, final BinaryFunction<Double> function) {
+        data[intIndex] = (float) function.invoke(left.doubleValue(extIndex), data[intIndex]);
+    }
+
+    @Override
+    void modify(final long extIndex, final int intIndex, final BinaryFunction<Double> function, final Access1D<Double> right) {
+        data[intIndex] = (float) function.invoke(data[intIndex], right.doubleValue(extIndex));
+    }
+
+    @Override
+    void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
+        data[intIndex] = (float) function.invoke(data[intIndex]);
+    }
+
+    @Override
+    PlainArray<Double> newInstance(final int capacity) {
+        return new Primitive32Array(capacity);
     }
 
     @Override

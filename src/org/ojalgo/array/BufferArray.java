@@ -94,7 +94,7 @@ public class BufferArray extends PlainArray<Double> {
 
             if (tmpCount > MAX) {
 
-                final DenseArray.DenseFactory<Double> tmpFactory = new DenseArray.DenseFactory<Double>() {
+                final DenseArray.Factory<Double> tmpFactory = new DenseArray.Factory<Double>() {
 
                     long offset = 0L;
 
@@ -344,16 +344,6 @@ public class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    protected void modify(final int index, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    protected void modify(final int index, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     protected void modify(final int first, final int limit, final int step, final Access1D<Double> left, final BinaryFunction<Double> function) {
         BufferArray.invoke(myBuffer, first, limit, step, left, function, this);
     }
@@ -384,14 +374,8 @@ public class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    protected void modify(final int index, final UnaryFunction<Double> function) {
-        myBuffer.put(index, function.invoke(myBuffer.get(index)));
-    }
-
-    @Override
-    protected PlainArray<Double> newInstance(final int capacity) {
-        return null;
-        // return new MyTestArray(capacity);
+    protected void modifyOne(final int index, final UnaryFunction<Double> modifier) {
+        myBuffer.put(index, modifier.invoke(myBuffer.get(index)));
     }
 
     @Override
@@ -438,6 +422,27 @@ public class BufferArray extends PlainArray<Double> {
     @Override
     boolean isPrimitive() {
         return true;
+    }
+
+    @Override
+    void modify(final long extIndex, final int intIndex, final Access1D<Double> left, final BinaryFunction<Double> function) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    void modify(final long extIndex, final int intIndex, final BinaryFunction<Double> function, final Access1D<Double> right) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
+        myBuffer.put(intIndex, function.invoke(myBuffer.get(intIndex)));
+    }
+
+    @Override
+    PlainArray<Double> newInstance(final int capacity) {
+        return null;
+        // return new MyTestArray(capacity);
     }
 
     @Override

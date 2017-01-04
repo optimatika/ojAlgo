@@ -46,7 +46,7 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
         this(Integer.MAX_VALUE);
     }
 
-    PlainArray(int size) {
+    PlainArray(final int size) {
 
         super();
 
@@ -118,7 +118,7 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
     }
 
     public final void modifyOne(final long index, final UnaryFunction<N> modifier) {
-        this.modify((int) index, modifier);
+        this.modifyOne((int) index, modifier);
     }
 
     public final void set(final long index, final double value) {
@@ -233,6 +233,8 @@ abstract class PlainArray<N extends Number> extends DenseArray<N> implements Ran
     protected final void modify(final long first, final long limit, final long step, final UnaryFunction<N> function) {
         this.modify((int) first, (int) limit, (int) step, function);
     }
+
+    protected abstract void modifyOne(final int index, final UnaryFunction<N> modifier);
 
     protected abstract int searchAscending(final N number);
 

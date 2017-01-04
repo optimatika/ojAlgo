@@ -45,8 +45,7 @@ final class Native64Array extends OffHeapArray {
         NativeMemory.setDouble(myPointer, index, value);
     }
 
-    @Override
-    protected Native64Array newInstance(final int capacity) {
+    @Override Native64Array newInstance(final int capacity) {
         return new Native64Array(capacity);
     }
 

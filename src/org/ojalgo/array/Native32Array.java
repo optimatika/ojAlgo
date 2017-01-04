@@ -45,8 +45,7 @@ final class Native32Array extends OffHeapArray {
         NativeMemory.setFloat(myPointer, index, (float) value);
     }
 
-    @Override
-    protected Native32Array newInstance(final int capacity) {
+    @Override Native32Array newInstance(final int capacity) {
         return new Native32Array(capacity);
     }
 

@@ -31,7 +31,7 @@ import java.util.RandomAccess;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.DenseArray.DenseFactory;
+import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -66,10 +66,10 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     private long myActualCount;
-    private final DenseFactory<N> myArrayFactory;
+    private final Factory<N> myArrayFactory;
     private BasicArray<N> myStorage;
 
-    public NumberList(final DenseFactory<N> arrayFactory) {
+    public NumberList(final Factory<N> arrayFactory) {
 
         super();
 
@@ -79,7 +79,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         myActualCount = 0L;
     }
 
-    NumberList(final BasicArray<N> storage, final DenseFactory<N> arrayFactory, final long actualCount) {
+    NumberList(final BasicArray<N> storage, final Factory<N> arrayFactory, final long actualCount) {
 
         super();
 

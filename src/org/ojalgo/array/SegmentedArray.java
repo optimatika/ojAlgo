@@ -38,7 +38,12 @@ import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
 /**
- * Huge array - only deals with long indices. Delegates to its segments, localises indices for them.
+ * <p>
+ * An array implemented as a sequence of segments that together make up the data structure. Any
+ * {@link BasicArray} subclass can be used for segements. A {@link BasicArray.Factory} is used to create
+ * sparse segments (they're not guaranteed to actually be sparse) and a {@link DenseArray.Factory} is used to
+ * create dense segments (guaranteed to be dense).
+ * </p>
  *
  * @author apete
  */
@@ -60,7 +65,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return BasicArray.COMPLEX.makeSegmented(count);
     }
 
-    public static <N extends Number> SegmentedArray<N> makeDense(final DenseArray.DenseFactory<N> denseFactory, final long count) {
+    public static <N extends Number> SegmentedArray<N> makeDense(final DenseArray.Factory<N> denseFactory, final long count) {
         return denseFactory.makeSegmented(count);
     }
 
@@ -88,8 +93,8 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
         return BasicArray.RATIONAL.makeSegmented(count);
     }
 
-    public static <N extends Number> SegmentedArray<N> makeSparse(final BasicArray.BasicFactory<N> basicFactory, final long count) {
-        return basicFactory.makeSegmented(count);
+    public static <N extends Number> SegmentedArray<N> makeSparse(final BasicArray.Factory<N> sparseFactory, final long count) {
+        return sparseFactory.makeSegmented(count);
     }
 
     private final int myIndexBits;
@@ -167,8 +172,7 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     @Override
     public long count() {
-        final int tmpVal = mySegments.length - 1;
-        return (mySegments[0].count() * tmpVal) + mySegments[tmpVal].count();
+        return (mySegments[0].count() * (mySegments.length - 1)) + mySegments[mySegments.length - 1].count();
     }
 
     public double doubleValue(final long index) {

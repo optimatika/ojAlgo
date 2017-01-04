@@ -34,8 +34,6 @@ import java.util.concurrent.RecursiveAction;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Factory1D;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.BasicArray.BasicFactory;
-import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -83,7 +81,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
             return array.asArray1D();
         }
 
-        abstract BasicArray.BasicFactory<N> delegate();
+        abstract BasicArray.Factory<N> delegate();
 
     }
 
@@ -212,7 +210,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        BasicArray.BasicFactory<BigDecimal> delegate() {
+        BasicArray.Factory<BigDecimal> delegate() {
             return BasicArray.BIG;
         }
 
@@ -221,7 +219,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        BasicArray.BasicFactory<ComplexNumber> delegate() {
+        BasicArray.Factory<ComplexNumber> delegate() {
             return BasicArray.COMPLEX;
         }
 
@@ -230,7 +228,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        BasicArray.BasicFactory<Double> delegate() {
+        BasicArray.Factory<Double> delegate() {
             return BasicArray.PRIMITIVE;
         }
 
@@ -239,7 +237,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
-        BasicArray.BasicFactory<Quaternion> delegate() {
+        BasicArray.Factory<Quaternion> delegate() {
             return BasicArray.QUATERNION;
         }
 
@@ -248,20 +246,20 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
-        BasicArray.BasicFactory<RationalNumber> delegate() {
+        BasicArray.Factory<RationalNumber> delegate() {
             return BasicArray.RATIONAL;
         }
 
     };
 
-    public static <N extends Number> Array1D.Factory<N> factory(final DenseFactory<N> delegate) {
+    public static <N extends Number> Array1D.Factory<N> factory(final DenseArray.Factory<N> delegate) {
 
-        final BasicFactory<N> tmpDelegate = BasicArray.factory(delegate);
+        final BasicArray.Factory<N> tmpDelegate = BasicArray.factory(delegate);
 
         return new Array1D.Factory<N>() {
 
             @Override
-            BasicFactory<N> delegate() {
+            BasicArray.Factory<N> delegate() {
                 return tmpDelegate;
             }
 

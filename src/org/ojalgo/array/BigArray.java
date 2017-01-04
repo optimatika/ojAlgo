@@ -41,7 +41,7 @@ import org.ojalgo.type.TypeUtils;
  */
 public class BigArray extends ReferenceTypeArray<BigDecimal> {
 
-    public static final DenseArray.DenseFactory<BigDecimal> FACTORY = new DenseArray.DenseFactory<BigDecimal>() {
+    public static final DenseArray.Factory<BigDecimal> FACTORY = new DenseArray.Factory<BigDecimal>() {
 
         @Override
         long getElementSize() {
@@ -142,8 +142,7 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         return BigScalar.isSmall(comparedTo, data[index]);
     }
 
-    @Override
-    protected PlainArray<BigDecimal> newInstance(final int capacity) {
+    @Override PlainArray<BigDecimal> newInstance(final int capacity) {
         return new BigArray(capacity);
     }
 

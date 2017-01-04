@@ -43,10 +43,10 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         return new LongToNumberMap<>(RationalArray.FACTORY);
     }
 
-    private final DenseArray.DenseFactory<N> myArrayFactory;
+    private final DenseArray.Factory<N> myArrayFactory;
     private final SparseArray<N> myStorage;
 
-    public LongToNumberMap(final DenseArray.DenseFactory<N> arrayFactory) {
+    public LongToNumberMap(final DenseArray.Factory<N> arrayFactory) {
 
         super();
 

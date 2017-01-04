@@ -27,7 +27,6 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.DenseArray.DenseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -39,7 +38,7 @@ import org.ojalgo.scalar.RationalNumber;
 
 /**
  * <p>
- * A BasicArray is one-dimensional, but designed to easily be extended or encapsulated, and then treated as
+ * A BasicArray is 1-dimensional, but designed to easily be extended or encapsulated, and then treated as
  * arbitrary-dimensional. It stores/handles (any subclass of) {@linkplain java.lang.Number} elements depending
  * on the subclass/implementation.
  * </p>
@@ -53,12 +52,12 @@ import org.ojalgo.scalar.RationalNumber;
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
         Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
 
-    public static abstract class BasicFactory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
+    public static abstract class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 
         private static final long DENSE_LIMIT = 1024L;
         private static final int INITIAL_CAPACITY = SparseArray.capacity(DENSE_LIMIT);
 
-        abstract DenseArray.DenseFactory<N> dense();
+        abstract DenseArray.Factory<N> dense();
 
         @Override
         final long getElementSize() {
@@ -96,7 +95,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            final DenseFactory<N> tmpDense = this.dense();
+            final DenseArray.Factory<N> tmpDense = this.dense();
             final long tmpLimit = Math.min(segmentationLimit, tmpDense.getMaxCount());
             if (tmpTotal > tmpLimit) {
                 return tmpDense.makeSegmented(structure);
@@ -107,56 +106,56 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     }
 
-    static final BasicFactory<BigDecimal> BIG = new BasicFactory<BigDecimal>() {
+    static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        DenseArray.DenseFactory<BigDecimal> dense() {
+        DenseArray.Factory<BigDecimal> dense() {
             return BigArray.FACTORY;
         }
 
     };
 
-    static final BasicFactory<ComplexNumber> COMPLEX = new BasicFactory<ComplexNumber>() {
+    static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        DenseArray.DenseFactory<ComplexNumber> dense() {
+        DenseArray.Factory<ComplexNumber> dense() {
             return ComplexArray.FACTORY;
         }
 
     };
 
-    static final BasicFactory<Double> PRIMITIVE = new BasicFactory<Double>() {
+    static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        DenseArray.DenseFactory<Double> dense() {
+        DenseArray.Factory<Double> dense() {
             return Primitive64Array.FACTORY;
         }
 
     };
 
-    static final BasicFactory<Quaternion> QUATERNION = new BasicFactory<Quaternion>() {
+    static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
-        DenseArray.DenseFactory<Quaternion> dense() {
+        DenseArray.Factory<Quaternion> dense() {
             return QuaternionArray.FACTORY;
         }
 
     };
 
-    static final BasicFactory<RationalNumber> RATIONAL = new BasicFactory<RationalNumber>() {
+    static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
-        DenseArray.DenseFactory<RationalNumber> dense() {
+        DenseArray.Factory<RationalNumber> dense() {
             return RationalArray.FACTORY;
         }
 
     };
 
-    public static <N extends Number> BasicFactory<N> factory(final DenseFactory<N> denseFactory) {
-        return new BasicFactory<N>() {
+    public static <N extends Number> BasicArray.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
+        return new BasicArray.Factory<N>() {
 
             @Override
-            DenseArray.DenseFactory<N> dense() {
+            DenseArray.Factory<N> dense() {
                 return denseFactory;
             }
 

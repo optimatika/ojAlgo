@@ -39,7 +39,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
 
-    public static final DenseArray.DenseFactory<ComplexNumber> FACTORY = new DenseArray.DenseFactory<ComplexNumber>() {
+    public static final DenseArray.Factory<ComplexNumber> FACTORY = new DenseArray.Factory<ComplexNumber>() {
 
         @Override
         long getElementSize() {
@@ -140,8 +140,7 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
         return ComplexNumber.isSmall(comparedTo, data[index]);
     }
 
-    @Override
-    protected PlainArray<ComplexNumber> newInstance(final int capacity) {
+    @Override PlainArray<ComplexNumber> newInstance(final int capacity) {
         return new ComplexArray(capacity);
     }
 

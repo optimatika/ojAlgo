@@ -39,7 +39,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
 
-    public static final DenseArray.DenseFactory<Quaternion> FACTORY = new DenseArray.DenseFactory<Quaternion>() {
+    public static final DenseArray.Factory<Quaternion> FACTORY = new DenseArray.Factory<Quaternion>() {
 
         @Override
         long getElementSize() {
@@ -140,8 +140,7 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
         return Quaternion.isSmall(comparedTo, data[index]);
     }
 
-    @Override
-    protected PlainArray<Quaternion> newInstance(final int capacity) {
+    @Override PlainArray<Quaternion> newInstance(final int capacity) {
         return new QuaternionArray(capacity);
     }
 

@@ -44,7 +44,10 @@ import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
 /**
- * Sparse array - maps long indices to a localiced int.
+ * <p>
+ * Only actually stores nonzero elements and/or elements specifically set by the user. The nonzero elements
+ * are stored internally in a {@link DenseArray}.
+ * </p>
  *
  * @author apete
  */
@@ -102,11 +105,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
-    public static <N extends Number> SparseArray<N> make(final DenseArray.DenseFactory<N> denseFactory, final long count) {
+    public static <N extends Number> SparseArray<N> make(final DenseArray.Factory<N> denseFactory, final long count) {
         return new SparseArray<N>(count, denseFactory, SparseArray.capacity(count));
     }
 
-    public static <N extends Number> SparseArray<N> make(final DenseArray.DenseFactory<N> denseFactory, final long count, final int initialCapacity) {
+    public static <N extends Number> SparseArray<N> make(final DenseArray.Factory<N> denseFactory, final long count, final int initialCapacity) {
         return new SparseArray<N>(count, denseFactory, initialCapacity);
     }
 
@@ -173,7 +176,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
 
-    SparseArray(final long count, final DenseArray.DenseFactory<N> factory, final int initialCapacity) {
+    SparseArray(final long count, final DenseArray.Factory<N> factory, final int initialCapacity) {
 
         super();
 
@@ -361,9 +364,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         if (!MATH_CONTEXT.isDifferent(myZeroValue, tmpZeroValue)) {
 
-            for (int i = 0; i < myActualLength; i++) {
-                myValues.modify(i, modifier);
-            }
+            myValues.modifyAll(modifier);
 
         } else {
 
@@ -553,7 +554,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
                 final long tmpIndex = myIndices[i];
                 if ((tmpIndex >= first) && (tmpIndex < limit)) {
                     if (((tmpIndex - first) % step) == 0L) {
-                        myValues.modify(i, left, function);
+                        myValues.modify(tmpIndex, i, left, function);
                     }
                 }
             }
@@ -574,7 +575,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             for (int i = 0; i < myIndices.length; i++) {
                 final long tmpIndex = myIndices[i];
                 if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
-                    myValues.modify(i, function, right);
+                    myValues.modify(tmpIndex, i, function, right);
                 }
             }
 
@@ -594,7 +595,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             for (int i = 0; i < myIndices.length; i++) {
                 final long tmpIndex = myIndices[i];
                 if ((tmpIndex >= first) && (tmpIndex < limit) && (((tmpIndex - first) % step) == 0L)) {
-                    myValues.modify(i, function);
+                    myValues.modify(tmpIndex, i, function);
                 }
             }
 

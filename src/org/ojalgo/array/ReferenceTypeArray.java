@@ -214,16 +214,6 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> {
     }
 
     @Override
-    protected final void modify(final int index, final Access1D<N> left, final BinaryFunction<N> function) {
-        data[index] = function.invoke(left.get(index), data[index]);
-    }
-
-    @Override
-    protected final void modify(final int index, final BinaryFunction<N> function, final Access1D<N> right) {
-        data[index] = function.invoke(data[index], right.get(index));
-    }
-
-    @Override
     protected final void modify(final int first, final int limit, final int step, final Access1D<N> left, final BinaryFunction<N> function) {
         ReferenceTypeArray.invoke(data, first, limit, step, left, function, this);
     }
@@ -254,8 +244,8 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> {
     }
 
     @Override
-    protected final void modify(final int index, final UnaryFunction<N> function) {
-        data[index] = function.invoke(data[index]);
+    protected final void modifyOne(final int index, final UnaryFunction<N> modifier) {
+        data[index] = modifier.invoke(data[index]);
     }
 
     @Override
@@ -289,13 +279,28 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> {
     }
 
     @Override
-    final void reset() {
-        Arrays.fill(data, this.valueOf(PrimitiveMath.ZERO));
+    final boolean isPrimitive() {
+        return false;
     }
 
     @Override
-    final boolean isPrimitive() {
-        return false;
+    final void modify(final long extIndex, final int intIndex, final Access1D<N> left, final BinaryFunction<N> function) {
+        data[intIndex] = function.invoke(left.get(extIndex), data[intIndex]);
+    }
+
+    @Override
+    final void modify(final long extIndex, final int intIndex, final BinaryFunction<N> function, final Access1D<N> right) {
+        data[intIndex] = function.invoke(data[intIndex], right.get(extIndex));
+    }
+
+    @Override
+    final void modify(final long extIndex, final int intIndex, final UnaryFunction<N> function) {
+        data[intIndex] = function.invoke(data[intIndex]);
+    }
+
+    @Override
+    final void reset() {
+        Arrays.fill(data, this.valueOf(PrimitiveMath.ZERO));
     }
 
     abstract N valueOf(double value);

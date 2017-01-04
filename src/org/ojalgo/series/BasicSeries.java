@@ -66,7 +66,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             myTimeIndex = timeIndex;
         }
 
-        public <N extends Number> BasicSeries<K, N> build(final DenseArray.DenseFactory<N> arrayFactory) {
+        public <N extends Number> BasicSeries<K, N> build(final DenseArray.Factory<N> arrayFactory) {
             if (myReference != null) {
                 if (myResolution != null) {
                     return new DenseSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution));

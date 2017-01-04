@@ -37,7 +37,7 @@ import org.ojalgo.scalar.Scalar;
  */
 public class RationalArray extends ReferenceTypeArray<RationalNumber> {
 
-    public static final DenseArray.DenseFactory<RationalNumber> FACTORY = new DenseArray.DenseFactory<RationalNumber>() {
+    public static final DenseArray.Factory<RationalNumber> FACTORY = new DenseArray.Factory<RationalNumber>() {
 
         @Override
         long getElementSize() {
@@ -137,8 +137,7 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
         return RationalNumber.isSmall(comparedTo, data[index]);
     }
 
-    @Override
-    protected PlainArray<RationalNumber> newInstance(final int capacity) {
+    @Override PlainArray<RationalNumber> newInstance(final int capacity) {
         return new RationalArray(capacity);
     }
 

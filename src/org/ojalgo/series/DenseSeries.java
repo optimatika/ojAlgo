@@ -37,7 +37,7 @@ final class DenseSeries<K extends Comparable<? super K>, N extends Number> exten
 
     private final NumberList<N> myDelegate;
 
-    DenseSeries(final DenseArray.DenseFactory<N> arrayFactory, final IndexMapper<K> indexMapper) {
+    DenseSeries(final DenseArray.Factory<N> arrayFactory, final IndexMapper<K> indexMapper) {
         super(indexMapper);
         myDelegate = new NumberList<>(arrayFactory);
     }

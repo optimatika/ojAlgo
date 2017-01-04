@@ -29,9 +29,16 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.scalar.Scalar;
 
+/**
+ * <p>
+ * Each and every element occupies memory and holds a value.
+ * </p>
+ *
+ * @author apete
+ */
 public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
-    public static abstract class DenseFactory<N extends Number> extends ArrayFactory<N, DenseArray<N>> {
+    public static abstract class Factory<N extends Number> extends ArrayFactory<N, DenseArray<N>> {
 
         @Override
         long getMaxCount() {
@@ -86,12 +93,12 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
         super();
     }
 
-    protected abstract void modify(int index, Access1D<N> left, BinaryFunction<N> function);
+    abstract void modify(long extIndex, int intIndex, Access1D<N> left, BinaryFunction<N> function);
 
-    protected abstract void modify(int index, BinaryFunction<N> function, Access1D<N> right);
+    abstract void modify(long extIndex, int intIndex, BinaryFunction<N> function, Access1D<N> right);
 
-    protected abstract void modify(int index, UnaryFunction<N> function);
+    abstract void modify(long extIndex, int intIndex, UnaryFunction<N> function);
 
-    protected abstract DenseArray<N> newInstance(int capacity);
+    abstract DenseArray<N> newInstance(int capacity);
 
 }
