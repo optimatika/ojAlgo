@@ -45,8 +45,8 @@ import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
- * Only actually stores nonzero elements and/or elements specifically set by the user. The nonzero elements
- * are stored internally in a {@link DenseArray}.
+ * Only stores nonzero elements and/or elements specifically set by the user. The nonzero elements are stored
+ * internally in a {@link DenseArray}.
  * </p>
  *
  * @author apete
