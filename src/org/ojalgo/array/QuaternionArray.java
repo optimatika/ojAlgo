@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -37,7 +35,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
+public class QuaternionArray extends ScalarArray<Quaternion> {
 
     public static final DenseArray.Factory<Quaternion> FACTORY = new DenseArray.Factory<Quaternion>() {
 
@@ -113,24 +111,6 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
     }
 
     @Override
-    protected int indexOfLargest(final int first, final int limit, final int step) {
-
-        int retVal = first;
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int i = first; i < limit; i += step) {
-            tmpValue = data[i].norm();
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-        }
-
-        return retVal;
-    }
-
-    @Override
     protected boolean isAbsolute(final int index) {
         return Quaternion.isAbsolute(data[index]);
     }
@@ -140,7 +120,8 @@ public class QuaternionArray extends ReferenceTypeArray<Quaternion> {
         return Quaternion.isSmall(comparedTo, data[index]);
     }
 
-    @Override PlainArray<Quaternion> newInstance(final int capacity) {
+    @Override
+    PlainArray<Quaternion> newInstance(final int capacity) {
         return new QuaternionArray(capacity);
     }
 

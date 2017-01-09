@@ -33,7 +33,9 @@ import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * Represents a single dense array - casts long indices to int.
+ * <p>
+ * Typically a plain java array - like double[]. limitied to int indices (simply casts long to int).
+ * </p>
  *
  * @author apete
  */

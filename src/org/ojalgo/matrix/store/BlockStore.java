@@ -9,48 +9,53 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 
-public class BlockStore<N extends Number> extends FactoryStore<N> implements PhysicalStore<N> {
+/**
+ * @deprecated Experimental code. Doesn't work and may never do so.
+ * @author apete
+ */
+@Deprecated
+final class BlockStore<N extends Number> extends FactoryStore<N> implements PhysicalStore<N> {
 
-    private PhysicalStore<N> myBlock00 = null;
-    private PhysicalStore<N> myBlock01 = null;
-    private PhysicalStore<N> myBlock10 = null;
-    private PhysicalStore<N> myBlock11 = null;
+    private final PhysicalStore<N> myBlock00 = null;
+    private final PhysicalStore<N> myBlock01 = null;
+    private final PhysicalStore<N> myBlock10 = null;
+    private final PhysicalStore<N> myBlock11 = null;
 
-    BlockStore(PhysicalStore.Factory<N, ?> factory, int rowsCount, int columnsCount) {
+    BlockStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
         super(factory, rowsCount, columnsCount);
     }
 
-    public double doubleValue(long row, long col) {
+    public double doubleValue(final long row, final long col) {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    public N get(long row, long col) {
+    public N get(final long row, final long col) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public void fillByMultiplying(Access1D<N> left, Access1D<N> right) {
+    public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
         // TODO Auto-generated method stub
 
     }
 
-    public ElementsConsumer<N> regionByColumns(int... columns) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public ElementsConsumer<N> regionByLimits(int rowLimit, int columnLimit) {
+    public ElementsConsumer<N> regionByColumns(final int... columns) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public ElementsConsumer<N> regionByOffsets(int rowOffset, int columnOffset) {
+    public ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public ElementsConsumer<N> regionByRows(int... rows) {
+    public ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public ElementsConsumer<N> regionByRows(final int... rows) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -60,82 +65,82 @@ public class BlockStore<N extends Number> extends FactoryStore<N> implements Phy
         return null;
     }
 
-    public void add(long row, long col, double addend) {
+    public void add(final long row, final long col, final double addend) {
         // TODO Auto-generated method stub
 
     }
 
-    public void add(long row, long col, Number addend) {
+    public void add(final long row, final long col, final Number addend) {
         // TODO Auto-generated method stub
 
     }
 
-    public void set(long row, long col, double value) {
+    public void set(final long row, final long col, final double value) {
         // TODO Auto-generated method stub
 
     }
 
-    public void set(long row, long col, Number value) {
+    public void set(final long row, final long col, final Number value) {
         // TODO Auto-generated method stub
 
     }
 
-    public void fillOne(long row, long col, Access1D<?> values, long valueIndex) {
+    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
         // TODO Auto-generated method stub
 
     }
 
-    public void fillOne(long row, long col, N value) {
+    public void fillOne(final long row, final long col, final N value) {
         // TODO Auto-generated method stub
 
     }
 
-    public void fillOne(long row, long col, NullaryFunction<N> supplier) {
+    public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
         // TODO Auto-generated method stub
 
     }
 
-    public void modifyOne(long row, long col, UnaryFunction<N> modifier) {
+    public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
         // TODO Auto-generated method stub
 
     }
 
-    public void modifyMatching(Access1D<N> left, BinaryFunction<N> function) {
+    public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         // TODO Auto-generated method stub
 
     }
 
-    public void modifyMatching(BinaryFunction<N> function, Access1D<N> right) {
+    public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
         // TODO Auto-generated method stub
 
     }
 
-    public long indexOfLargestInColumn(long row, long col) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public long indexOfLargestInDiagonal(long row, long col) {
+    public long indexOfLargestInColumn(final long row, final long col) {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    public long indexOfLargestInRow(long row, long col) {
+    public long indexOfLargestInDiagonal(final long row, final long col) {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    public long indexOfLargestInRange(long first, long limit) {
+    public long indexOfLargestInRow(final long row, final long col) {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    public void exchangeColumns(long colA, long colB) {
+    public long indexOfLargestInRange(final long first, final long limit) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public void exchangeColumns(final long colA, final long colB) {
         // TODO Auto-generated method stub
 
     }
 
-    public void exchangeRows(long rowA, long rowB) {
+    public void exchangeRows(final long rowA, final long rowB) {
         // TODO Auto-generated method stub
 
     }
@@ -145,43 +150,43 @@ public class BlockStore<N extends Number> extends FactoryStore<N> implements Phy
         return null;
     }
 
-    public void caxpy(N scalarA, int columnX, int columnY, int firstRow) {
+    public void caxpy(final N scalarA, final int columnX, final int columnY, final int firstRow) {
         // TODO Auto-generated method stub
 
     }
 
-    public void maxpy(N scalarA, MatrixStore<N> matrixX) {
+    public void maxpy(final N scalarA, final MatrixStore<N> matrixX) {
         // TODO Auto-generated method stub
 
     }
 
-    public void raxpy(N scalarA, int rowX, int rowY, int firstColumn) {
+    public void raxpy(final N scalarA, final int rowX, final int rowY, final int firstColumn) {
         // TODO Auto-generated method stub
 
     }
 
-    public void transformLeft(Householder<N> transformation, int firstColumn) {
+    public void transformLeft(final Householder<N> transformation, final int firstColumn) {
         // TODO Auto-generated method stub
 
     }
 
-    public void transformLeft(Rotation<N> transformation) {
+    public void transformLeft(final Rotation<N> transformation) {
         // TODO Auto-generated method stub
 
     }
 
-    public void transformRight(Householder<N> transformation, int firstRow) {
+    public void transformRight(final Householder<N> transformation, final int firstRow) {
         // TODO Auto-generated method stub
 
     }
 
-    public void transformRight(Rotation<N> transformation) {
+    public void transformRight(final Rotation<N> transformation) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    protected void addNonZerosTo(ElementsConsumer<N> consumer) {
+    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
         // TODO Auto-generated method stub
 
     }

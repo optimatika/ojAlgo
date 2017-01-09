@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 
 public abstract class DotProduct extends MatrixOperation {
 
@@ -56,13 +56,13 @@ public abstract class DotProduct extends MatrixOperation {
         return retVal;
     }
 
-    public static RationalNumber invoke(final RationalNumber[] array1, final int offset1, final RationalNumber[] array2, final int offset2, final int limit,
-            final int first) {
-        RationalNumber retVal = RationalNumber.ZERO;
+    public static <N extends Number & Scalar<N>> N invoke(final N[] array1, final int offset1, final N[] array2, final int offset2, final int first,
+            final int limit, final Scalar.Factory<N> factory) {
+        Scalar<N> retVal = factory.zero();
         for (int i = first; i < limit; i++) {
             retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
         }
-        return retVal;
+        return retVal.getNumber();
     }
 
     private DotProduct() {

@@ -33,13 +33,15 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * Off heap memory array.
+ * <p>
+ * Off heap memory array. Currently supports float and double elements
+ * </p>
  *
  * @author apete
  */
 public abstract class OffHeapArray extends DenseArray<Double> {
 
-    public static final Factory<Double> PRIMITIVE32 = new Factory<Double>() {
+    public static final Factory<Double> NATIVE32 = new Factory<Double>() {
 
         @Override
         long getElementSize() {
@@ -63,7 +65,7 @@ public abstract class OffHeapArray extends DenseArray<Double> {
 
     };
 
-    public static final Factory<Double> PRIMITIVE64 = new Factory<Double>() {
+    public static final Factory<Double> NATIVE64 = new Factory<Double>() {
 
         @Override
         long getElementSize() {
@@ -88,24 +90,24 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     };
 
     /**
-     * @deprecated v42 Use {@link #PRIMITIVE64} instead
+     * @deprecated v42 Use {@link #NATIVE64} instead
      */
     @Deprecated
-    public static final Factory<Double> FACTORY = PRIMITIVE64;
+    public static final Factory<Double> FACTORY = NATIVE64;
 
     /**
-     * @deprecated v42 Use {@link #makePrimitive64(long)} instead
+     * @deprecated v42 Use {@link #makeNative64(long)} instead
      */
     @Deprecated
     public static OffHeapArray make(final long count) {
-        return OffHeapArray.makePrimitive64(count);
+        return OffHeapArray.makeNative64(count);
     }
 
-    public static OffHeapArray makePrimitive32(final long count) {
+    public static OffHeapArray makeNative32(final long count) {
         return new Native32Array(count);
     }
 
-    public static OffHeapArray makePrimitive64(final long count) {
+    public static OffHeapArray makeNative64(final long count) {
         return new Native64Array(count);
     }
 
@@ -115,7 +117,7 @@ public abstract class OffHeapArray extends DenseArray<Double> {
      */
     @Deprecated
     public static final SegmentedArray<Double> makeSegmented(final long count) {
-        return SegmentedArray.makeDense(PRIMITIVE64, count);
+        return SegmentedArray.makeDense(NATIVE64, count);
     }
 
     private final long myCount;
@@ -254,7 +256,7 @@ public abstract class OffHeapArray extends DenseArray<Double> {
     }
 
     @Override
-    void modify(long extIndex, final int intIndex, final UnaryFunction<Double> function) {
+    void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
         this.set(intIndex, function.invoke(this.doubleValue(intIndex)));
     }
 

@@ -50,7 +50,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public static NumberList<Double> makeOffHeap() {
-        return new NumberList<>(OffHeapArray.PRIMITIVE64);
+        return new NumberList<>(OffHeapArray.NATIVE64);
     }
 
     public static NumberList<Double> makePrimitive() {

@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -37,7 +35,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
+public class ComplexArray extends ScalarArray<ComplexNumber> {
 
     public static final DenseArray.Factory<ComplexNumber> FACTORY = new DenseArray.Factory<ComplexNumber>() {
 
@@ -113,24 +111,6 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
     }
 
     @Override
-    protected int indexOfLargest(final int first, final int limit, final int step) {
-
-        int retVal = first;
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int i = first; i < limit; i += step) {
-            tmpValue = data[i].norm();
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-        }
-
-        return retVal;
-    }
-
-    @Override
     protected boolean isAbsolute(final int index) {
         return ComplexNumber.isAbsolute(data[index]);
     }
@@ -140,7 +120,8 @@ public class ComplexArray extends ReferenceTypeArray<ComplexNumber> {
         return ComplexNumber.isSmall(comparedTo, data[index]);
     }
 
-    @Override PlainArray<ComplexNumber> newInstance(final int capacity) {
+    @Override
+    PlainArray<ComplexNumber> newInstance(final int capacity) {
         return new ComplexArray(capacity);
     }
 

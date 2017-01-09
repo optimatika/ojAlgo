@@ -34,12 +34,12 @@ public class NativeCleanupTest {
 
     public static void main(final String[] args) {
 
-        OffHeapArray tmpOrg = OffHeapArray.makePrimitive64(SIZE);
+        OffHeapArray tmpOrg = OffHeapArray.makeNative64(SIZE);
         tmpOrg.fillAll(new Uniform());
 
         while (true) {
 
-            final OffHeapArray tmpCopy = OffHeapArray.makePrimitive64(SIZE);
+            final OffHeapArray tmpCopy = OffHeapArray.makeNative64(SIZE);
 
             long start = System.nanoTime();
             tmpCopy.fillMatching(tmpOrg);

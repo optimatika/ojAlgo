@@ -28,7 +28,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     }
 
     public static LongToNumberMap<Double> makeOffHeap() {
-        return new LongToNumberMap<>(OffHeapArray.PRIMITIVE64);
+        return new LongToNumberMap<>(OffHeapArray.NATIVE64);
     }
 
     public static LongToNumberMap<Double> makePrimitive() {

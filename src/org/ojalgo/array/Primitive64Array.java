@@ -31,7 +31,6 @@ import java.util.stream.StreamSupport;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
@@ -51,7 +50,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public class Primitive64Array extends PlainArray<Double> {
+public class Primitive64Array extends PrimitiveArray {
 
     public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<Double>() {
 
@@ -586,11 +585,6 @@ public class Primitive64Array extends PlainArray<Double> {
     }
 
     @Override
-    boolean isPrimitive() {
-        return true;
-    }
-
-    @Override
     void modify(final long extIndex, final int intIndex, final Access1D<Double> left, final BinaryFunction<Double> function) {
         data[intIndex] = function.invoke(left.doubleValue(extIndex), data[intIndex]);
     }
@@ -608,11 +602,6 @@ public class Primitive64Array extends PlainArray<Double> {
     @Override
     PlainArray<Double> newInstance(final int capacity) {
         return new Primitive64Array(capacity);
-    }
-
-    @Override
-    final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
     }
 
     OfDouble split() {

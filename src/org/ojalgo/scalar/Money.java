@@ -58,8 +58,8 @@ public final class Money extends Number implements Scalar<Money>, Enforceable<Mo
 
     };
 
-    private static final double DOUBLE_DENOMINATOR = 1000_000D;
-    private static final long LONG_DENOMINATOR = 1000_000L;
+    private static final double DOUBLE_DENOMINATOR = 1_000_000D;
+    private static final long LONG_DENOMINATOR = 1_000_000L;
 
     public static final Money NEG = new Money(-LONG_DENOMINATOR);
     public static final Money ONE = new Money(LONG_DENOMINATOR);

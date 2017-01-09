@@ -51,7 +51,7 @@ public abstract class BasicArrayTest extends ArrayTests {
     }
 
     public void testOffHeap() {
-        this.doTest(OffHeapArray.makePrimitive64(COUNT));
+        this.doTest(OffHeapArray.makeNative64(COUNT));
     }
 
     public void testPrimitive() {

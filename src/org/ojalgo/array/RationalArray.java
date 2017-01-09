@@ -35,7 +35,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public class RationalArray extends ReferenceTypeArray<RationalNumber> {
+public class RationalArray extends ScalarArray<RationalNumber> {
 
     public static final DenseArray.Factory<RationalNumber> FACTORY = new DenseArray.Factory<RationalNumber>() {
 
@@ -110,24 +110,6 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
     }
 
     @Override
-    protected int indexOfLargest(final int first, final int limit, final int step) {
-
-        int retVal = first;
-        RationalNumber tmpLargest = RationalNumber.ZERO;
-        RationalNumber tmpValue;
-
-        for (int i = first; i < limit; i += step) {
-            tmpValue = data[i];
-            if (tmpValue.compareTo(tmpLargest) == 1) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-        }
-
-        return retVal;
-    }
-
-    @Override
     protected boolean isAbsolute(final int index) {
         return RationalNumber.isAbsolute(data[index]);
     }
@@ -137,7 +119,8 @@ public class RationalArray extends ReferenceTypeArray<RationalNumber> {
         return RationalNumber.isSmall(comparedTo, data[index]);
     }
 
-    @Override PlainArray<RationalNumber> newInstance(final int capacity) {
+    @Override
+    PlainArray<RationalNumber> newInstance(final int capacity) {
         return new RationalArray(capacity);
     }
 

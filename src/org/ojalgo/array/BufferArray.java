@@ -48,7 +48,10 @@ import org.ojalgo.scalar.PrimitiveScalar;
 import sun.misc.Cleaner;
 
 /**
- * A one- and/or arbitrary-dimensional array of double.
+ * <p>
+ * The odd member among the array implementations. It allows to create arrays based on memory mapped files or
+ * direct buffers.
+ * </p>
  *
  * @author apete
  */
