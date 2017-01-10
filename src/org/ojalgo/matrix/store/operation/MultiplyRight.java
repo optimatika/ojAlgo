@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
@@ -679,7 +680,7 @@ public final class MultiplyRight extends MatrixOperation {
 
         for (int j = firstColumn; j < columnLimit; j++) {
             for (int c = 0; c < complexity; c++) {
-                AXPY.invoke(product, j * tmpRowDim, 1, right.get(c + (j * complexity)), left, c * tmpRowDim, 1, tmpRowDim);
+                AXPY.invoke(product, j * tmpRowDim, 1, right.get(c + (j * complexity)), left, c * tmpRowDim, 1, 0, tmpRowDim);
             }
         }
     }
@@ -696,7 +697,7 @@ public final class MultiplyRight extends MatrixOperation {
 
         for (int j = firstColumn; j < columnLimit; j++) {
             for (int c = 0; c < complexity; c++) {
-                AXPY.invoke(product, j * tmpRowDim, 1, right.get(c + (j * complexity)), left, c * tmpRowDim, 1, tmpRowDim);
+                AXPY.invoke(product, j * tmpRowDim, 1, right.get(c + (j * complexity)), left, c * tmpRowDim, 1, 0, tmpRowDim);
             }
         }
     }
@@ -717,7 +718,7 @@ public final class MultiplyRight extends MatrixOperation {
             final int tmpLimitOfColumn = MatrixUtils.limitOfColumn(right, j, complexity);
 
             for (int c = tmpFirstInColumn; c < tmpLimitOfColumn; c++) {
-                AXPY.invoke(product, j * tmpRowDim, 1, right.doubleValue(c + (j * complexity)), left, c * tmpRowDim, 1, tmpRowDim);
+                AXPY.invoke(product, j * tmpRowDim, 1, right.doubleValue(c + (j * complexity)), left, c * tmpRowDim, 1, 0, tmpRowDim);
             }
         }
     }

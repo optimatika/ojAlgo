@@ -19,19 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.store.operation;
+package org.ojalgo.array.blas;
 
 /**
- * Basic Linear Algebra Subprograms (BLAS) Level 3 contains matrix-matrix operations.
+ * Basic Linear Algebra Subprograms (BLAS) Level 1 contains vector operations.
  * <ul>
- * <li><a href="http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_3">BLAS Level 3 @
+ * <li><a href="http://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_1">BLAS Level 1 @
  * WikipediA</a></li>
- * <li><a href="http://www.netlib.org/blas/#_level_3">BLAS Level 3 @ Netlib</a></li>
- * <li><a href="https://software.intel.com/en-us/node/520774">BLAS Level 3 @ Intel</a></li>
+ * <li><a href="http://www.netlib.org/blas/#_level_1">BLAS Level 1 @ Netlib</a></li>
+ * <li><a href="https://software.intel.com/en-us/node/520730">BLAS Level 1 @ Intel</a></li>
  * </ul>
  *
  * @author apete
  */
-public interface BLAS3 {
+public interface BLAS1 {
 
 }

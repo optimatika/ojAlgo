@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.store.operation;
+package org.ojalgo.array.blas;
 
 /**
  * Basic Linear Algebra Subprograms (BLAS) Level 2 contains matrix-vector operations.

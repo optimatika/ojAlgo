@@ -34,6 +34,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.BigArray;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
@@ -576,7 +577,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     }
 
     public void caxpy(final BigDecimal scalarA, final int columnX, final int columnY, final int firstRow) {
-        AXPY.invoke(data, (columnY * myRowDim) + firstRow, 1, scalarA, data, (columnX * myRowDim) + firstRow, 1, myRowDim - firstRow);
+        AXPY.invoke(data, (columnY * myRowDim) + firstRow, 1, scalarA, data, (columnX * myRowDim) + firstRow, 1, 0, myRowDim - firstRow);
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<BigDecimal> transformationCollector, final boolean eigenvalue) {
@@ -940,7 +941,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void raxpy(final BigDecimal scalarA, final int rowX, final int rowY, final int firstColumn) {
         AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data,
-                rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
+                rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, 0, myColDim - firstColumn);
     }
 
     public final ElementsConsumer<BigDecimal> regionByColumns(final int... columns) {

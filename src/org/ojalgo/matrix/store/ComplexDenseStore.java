@@ -32,6 +32,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ComplexArray;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ComplexFunction;
@@ -595,7 +596,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public void caxpy(final ComplexNumber scalarA, final int columnX, final int columnY, final int firstRow) {
-        AXPY.invoke(data, (columnY * myRowDim) + firstRow, 1, scalarA, data, (columnX * myRowDim) + firstRow, 1, myRowDim - firstRow);
+        AXPY.invoke(data, (columnY * myRowDim) + firstRow, 1, scalarA, data, (columnX * myRowDim) + firstRow, 1, 0, myRowDim - firstRow);
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<ComplexNumber> transformationCollector, final boolean eigenvalue) {
@@ -962,7 +963,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public void raxpy(final ComplexNumber scalarA, final int rowX, final int rowY, final int firstColumn) {
         AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data,
-                rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, myColDim - firstColumn);
+                rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, 0, myColDim - firstColumn);
     }
 
     public final ElementsConsumer<ComplexNumber> regionByColumns(final int... columns) {

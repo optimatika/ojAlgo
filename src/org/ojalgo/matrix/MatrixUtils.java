@@ -27,6 +27,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.decomposition.*;

@@ -19,36 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.store.operation;
+package org.ojalgo.array.blas;
 
 import java.math.BigDecimal;
 
 import org.ojalgo.function.BigFunction;
-import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
 
 public abstract class AXPY implements BLAS1 {
 
     public static int THRESHOLD = 128;
 
     public static void invoke(final BigDecimal[] vectorY, final int offsetY, final int stepY, final BigDecimal scalar, final BigDecimal[] vectorX,
-            final int offsetX, final int stepX, final int count) {
-        for (int i = 0; i < count; i++) {
+            final int offsetX, final int stepX, final int first, final int limit) {
+        for (int i = 0; i < limit; i++) {
             vectorY[offsetY + (i * stepY)] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(scalar, vectorX[offsetX + (i * stepX)]),
                     vectorY[offsetY + (i * stepY)]); // y += ax
         }
     }
 
-    public static void invoke(final ComplexNumber[] vectorY, final int offsetY, final int stepY, final ComplexNumber scalar, final ComplexNumber[] vectorX,
-            final int offsetX, final int stepX, final int count) {
-        for (int i = 0; i < count; i++) {
-            vectorY[offsetY + (i * stepY)] = scalar.multiply(vectorX[offsetX + (i * stepX)]).add(vectorY[offsetY + (i * stepY)]); // y += ax
+    public static void invoke(final double[] vectorY, final int offsetY, final int stepY, final double scalar, final double[] vectorX, final int offsetX,
+            final int stepX, final int first, final int limit) {
+        for (int i = first; i < limit; i++) {
+            vectorY[offsetY + (i * stepY)] += scalar * vectorX[offsetX + (i * stepX)]; // y += ax
         }
     }
 
-    public static void invoke(final double[] vectorY, final int offsetY, final int stepY, final double scalar, final double[] vectorX, final int offsetX,
-            final int stepX, final int count) {
-        for (int i = 0; i < count; i++) {
-            vectorY[offsetY + (i * stepY)] += scalar * vectorX[offsetX + (i * stepX)]; // y += ax
+    public static <N extends Number & Scalar<N>> void invoke(final N[] vectorY, final int offsetY, final int stepY, final N scalar, final N[] vectorX,
+            final int offsetX, final int stepX, final int first, final int limit) {
+        for (int i = first; i < limit; i++) {
+            vectorY[offsetY + (i * stepY)] = scalar.multiply(vectorX[offsetX + (i * stepX)]).add(vectorY[offsetY + (i * stepY)]).getNumber(); // y += ax
         }
     }
 
