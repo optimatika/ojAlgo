@@ -162,18 +162,20 @@ final class RationalNumber2 extends Number implements Scalar<RationalNumber2>, E
 
     public static RationalNumber2 valueOf(final double value) {
 
-        if (Double.isInfinite(value) || Double.isNaN(value)) {
-            throw new NumberFormatException("Infinite or NaN");
+        if (Double.isNaN(value)) {
+            return NaN;
+        } else if (value == Double.POSITIVE_INFINITY) {
+            return POSITIVE_INFINITY;
+        } else if (value == Double.NEGATIVE_INFINITY) {
+            return NEGATIVE_INFINITY;
         }
 
-        // Translate the double into sign, exponent and significand, according
-        // to the formulae in JLS, Section 20.10.22.
         final long valBits = Double.doubleToLongBits(value);
+
         final int sign = ((valBits >> 63) == 0 ? 1 : -1);
         int exponent = (int) ((valBits >> 52) & 0x7ffL);
         final long significand = (exponent == 0 ? (valBits & ((1L << 52) - 1)) << 1 : (valBits & ((1L << 52) - 1)) | (1L << 52));
         exponent -= 1075;
-        // At this point, value == sign * significand * 2**exponent.
 
         if (exponent < 0) {
             return RationalNumber2.of(sign * significand, 1L << exponent);

@@ -34,7 +34,8 @@ import org.ojalgo.scalar.Scalar;
 
 /**
  * <p>
- * Typically a plain java array - like double[]. limitied to int indices (simply casts long to int).
+ * Array class limited by integer (int, not long) indices. Typically this will be a plain java array as in
+ * <code>double[]</code>. The long indices from the various method arguments are cast to int.
  * </p>
  *
  * @author apete
