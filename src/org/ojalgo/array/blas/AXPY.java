@@ -51,23 +51,26 @@ public abstract class AXPY implements BLAS1 {
     }
 
     public static void invoke(final Mutate1D y, final double a, final BigDecimal[] x) {
-        BigDecimal tmpA = new BigDecimal(a);
-        int tmpLimit = (int) Math.min(y.count(), x.length);
-        for (int i = 0; i < tmpLimit; i++) {
+        final BigDecimal tmpA = new BigDecimal(a);
+        for (int i = 0; i < x.length; i++) {
             y.add(i, x[i].multiply(tmpA));
         }
     }
 
     public static void invoke(final Mutate1D y, final double a, final double[] x) {
-        int tmpLimit = (int) Math.min(y.count(), x.length);
-        for (int i = 0; i < tmpLimit; i++) {
+        for (int i = 0; i < x.length; i++) {
+            y.add(i, a * x[i]);
+        }
+    }
+
+    public static void invoke(final Mutate1D y, final double a, final float[] x) {
+        for (int i = 0; i < x.length; i++) {
             y.add(i, a * x[i]);
         }
     }
 
     public static <N extends Number & Scalar<N>> void invoke(final Mutate1D y, final double a, final N[] x) {
-        int tmpLimit = (int) Math.min(y.count(), x.length);
-        for (int i = 0; i < tmpLimit; i++) {
+        for (int i = 0; i < x.length; i++) {
             y.add(i, x[i].multiply(a).getNumber());
         }
     }

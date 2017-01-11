@@ -354,14 +354,7 @@ public class Primitive64Array extends PrimitiveArray {
         data = new double[size];
     }
 
-    //    public void daxpy(final double a, final Mutate1D y) {
-    //        final int tmpLength = Math.min(data.length, (int) y.count());
-    //        for (int i = 0; i < tmpLength; i++) {
-    //            y.add(i, a * data[i]);
-    //        }
-    //    }
-
-    public void daxpy(double a, Mutate1D y) {
+    public final void daxpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
 

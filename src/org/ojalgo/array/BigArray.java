@@ -85,7 +85,7 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         this.fill(0, size, 1, ZERO);
     }
 
-    public void daxpy(double a, Mutate1D y) {
+    public final void daxpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
 

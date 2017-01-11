@@ -38,7 +38,7 @@ abstract class ScalarArray<N extends Number & Scalar<N>> extends ReferenceTypeAr
         super(data);
     }
 
-    public void daxpy(double a, Mutate1D y) {
+    public final void daxpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
 
