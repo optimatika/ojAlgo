@@ -31,6 +31,7 @@ import java.util.stream.StreamSupport;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
@@ -353,11 +354,15 @@ public class Primitive64Array extends PrimitiveArray {
         data = new double[size];
     }
 
-    public void daxpy(final double a, final Mutate1D y) {
-        final int tmpLength = Math.min(data.length, (int) y.count());
-        for (int i = 0; i < tmpLength; i++) {
-            y.add(i, a * data[i]);
-        }
+    //    public void daxpy(final double a, final Mutate1D y) {
+    //        final int tmpLength = Math.min(data.length, (int) y.count());
+    //        for (int i = 0; i < tmpLength; i++) {
+    //            y.add(i, a * data[i]);
+    //        }
+    //    }
+
+    public void daxpy(double a, Mutate1D y) {
+        AXPY.invoke(y, a, data);
     }
 
     @Override

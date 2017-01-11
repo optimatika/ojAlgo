@@ -23,6 +23,8 @@ package org.ojalgo.array;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -34,6 +36,10 @@ abstract class ScalarArray<N extends Number & Scalar<N>> extends ReferenceTypeAr
 
     protected ScalarArray(final N[] data) {
         super(data);
+    }
+
+    public void daxpy(double a, Mutate1D y) {
+        AXPY.invoke(y, a, data);
     }
 
     @Override

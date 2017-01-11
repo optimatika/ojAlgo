@@ -23,9 +23,15 @@ package org.ojalgo.array.blas;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.access.Mutate1D;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.Scalar;
 
+/**
+ * <code>y += a*x</code>
+ *
+ * @author apete
+ */
 public abstract class AXPY implements BLAS1 {
 
     public static int THRESHOLD = 128;
@@ -40,14 +46,36 @@ public abstract class AXPY implements BLAS1 {
     public static void invoke(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            y[basey + (incy * i)] += a * x[basex + (incx * i)]; // y += a*x
+            y[basey + (incy * i)] += a * x[basex + (incx * i)];
+        }
+    }
+
+    public static void invoke(final Mutate1D y, final double a, final BigDecimal[] x) {
+        BigDecimal tmpA = new BigDecimal(a);
+        int tmpLimit = (int) Math.min(y.count(), x.length);
+        for (int i = 0; i < tmpLimit; i++) {
+            y.add(i, x[i].multiply(tmpA));
+        }
+    }
+
+    public static void invoke(final Mutate1D y, final double a, final double[] x) {
+        int tmpLimit = (int) Math.min(y.count(), x.length);
+        for (int i = 0; i < tmpLimit; i++) {
+            y.add(i, a * x[i]);
+        }
+    }
+
+    public static <N extends Number & Scalar<N>> void invoke(final Mutate1D y, final double a, final N[] x) {
+        int tmpLimit = (int) Math.min(y.count(), x.length);
+        for (int i = 0; i < tmpLimit; i++) {
+            y.add(i, x[i].multiply(a).getNumber());
         }
     }
 
     public static <N extends Number & Scalar<N>> void invoke(final N[] y, final int basey, final int incy, final N a, final N[] x, final int basex,
             final int incx, final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            y[basey + (incy * i)] = y[basey + (incy * i)].add(a.multiply(x[basex + (incx * i)])).getNumber(); // y += a*x
+            y[basey + (incy * i)] = y[basey + (incy * i)].add(a.multiply(x[basex + (incx * i)])).getNumber();
         }
     }
 

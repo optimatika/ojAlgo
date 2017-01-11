@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.BigScalar;
@@ -81,6 +83,10 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         super(new BigDecimal[size]);
 
         this.fill(0, size, 1, ZERO);
+    }
+
+    public void daxpy(double a, Mutate1D y) {
+        AXPY.invoke(y, a, data);
     }
 
     @Override
@@ -142,10 +148,6 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         return BigScalar.isSmall(comparedTo, data[index]);
     }
 
-    @Override PlainArray<BigDecimal> newInstance(final int capacity) {
-        return new BigArray(capacity);
-    }
-
     @Override
     protected final void sortAscending() {
         Arrays.parallelSort(data);
@@ -154,6 +156,11 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     @Override
     protected void sortDescending() {
         Arrays.parallelSort(data, Comparator.reverseOrder());
+    }
+
+    @Override
+    PlainArray<BigDecimal> newInstance(final int capacity) {
+        return new BigArray(capacity);
     }
 
     @Override
