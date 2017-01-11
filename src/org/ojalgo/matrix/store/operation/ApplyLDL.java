@@ -23,6 +23,7 @@ package org.ojalgo.matrix.store.operation;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.scalar.ComplexNumber;
 
 public final class ApplyLDL extends MatrixOperation {
@@ -35,7 +36,7 @@ public final class ApplyLDL extends MatrixOperation {
             final int iterationPoint) {
         final BigDecimal tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, tmpDiagVal.multiply(multipliers[j]), j, structure);
+            AXPY.invoke(data, j * structure, 1, tmpDiagVal.multiply(multipliers[j]).negate(), multipliers, 0, 1, j, structure);
         }
     }
 
@@ -43,7 +44,7 @@ public final class ApplyLDL extends MatrixOperation {
             final int iterationPoint) {
         final ComplexNumber tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, tmpDiagVal.multiply(multipliers[j].conjugate()), j, structure);
+            AXPY.invoke(data, j * structure, 1, tmpDiagVal.multiply(multipliers[j].conjugate()).negate(), multipliers, 0, 1, j, structure);
         }
     }
 
@@ -51,7 +52,7 @@ public final class ApplyLDL extends MatrixOperation {
             final int iterationPoint) {
         final double tmpDiagVal = data[iterationPoint + (iterationPoint * structure)];
         for (int j = firstColumn; j < columnLimit; j++) {
-            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, tmpDiagVal * multipliers[j], j, structure);
+            AXPY.invoke(data, j * structure, 1, -(tmpDiagVal * multipliers[j]), multipliers, 0, 1, j, structure);
         }
     }
 

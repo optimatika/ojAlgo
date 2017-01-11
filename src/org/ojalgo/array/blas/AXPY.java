@@ -30,25 +30,24 @@ public abstract class AXPY implements BLAS1 {
 
     public static int THRESHOLD = 128;
 
-    public static void invoke(final BigDecimal[] vectorY, final int offsetY, final int stepY, final BigDecimal scalar, final BigDecimal[] vectorX,
-            final int offsetX, final int stepX, final int first, final int limit) {
-        for (int i = 0; i < limit; i++) {
-            vectorY[offsetY + (i * stepY)] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(scalar, vectorX[offsetX + (i * stepX)]),
-                    vectorY[offsetY + (i * stepY)]); // y += ax
+    public static void invoke(final BigDecimal[] y, final int basey, final int incy, final BigDecimal a, final BigDecimal[] x, final int basex, final int incx,
+            final int first, final int limit) {
+        for (int i = first; i < limit; i++) {
+            y[basey + (incy * i)] = BigFunction.ADD.invoke(y[basey + (incy * i)], BigFunction.MULTIPLY.invoke(a, x[basex + (incx * i)])); // y += a*x
         }
     }
 
-    public static void invoke(final double[] vectorY, final int offsetY, final int stepY, final double scalar, final double[] vectorX, final int offsetX,
-            final int stepX, final int first, final int limit) {
+    public static void invoke(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
+            final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            vectorY[offsetY + (i * stepY)] += scalar * vectorX[offsetX + (i * stepX)]; // y += ax
+            y[basey + (incy * i)] += a * x[basex + (incx * i)]; // y += a*x
         }
     }
 
-    public static <N extends Number & Scalar<N>> void invoke(final N[] vectorY, final int offsetY, final int stepY, final N scalar, final N[] vectorX,
-            final int offsetX, final int stepX, final int first, final int limit) {
+    public static <N extends Number & Scalar<N>> void invoke(final N[] y, final int basey, final int incy, final N a, final N[] x, final int basex,
+            final int incx, final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            vectorY[offsetY + (i * stepY)] = scalar.multiply(vectorX[offsetX + (i * stepX)]).add(vectorY[offsetY + (i * stepY)]).getNumber(); // y += ax
+            y[basey + (incy * i)] = y[basey + (incy * i)].add(a.multiply(x[basex + (incx * i)])).getNumber(); // y += a*x
         }
     }
 

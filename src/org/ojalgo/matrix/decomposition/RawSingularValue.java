@@ -26,6 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -33,7 +34,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.DotProduct;
-import org.ojalgo.matrix.store.operation.SubtractScaledVector;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
@@ -347,7 +347,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     for (int j = k + 1; j < n; j++) {
                         double t = DotProduct.invoke(tmpAt_k, 0, data[j], 0, k, m);
                         t = t / tmpAt_k[k];
-                        SubtractScaledVector.invoke(data[j], 0, tmpAt_k, 0, t, k, m);
+                        AXPY.invoke(data[j], 0, 1, -t, tmpAt_k, 0, 1, k, m);
                     }
                 }
                 myS[k] = -nrm;
@@ -391,10 +391,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     }
                     // ... remining columns
                     for (int j = k + 1; j < n; j++) {
-                        SubtractScaledVector.invoke(tmpWork, 0, data[j], 0, -tmpE[j], k + 1, m);
+                        AXPY.invoke(tmpWork, 0, 1, -(-tmpE[j]), data[j], 0, 1, k + 1, m);
                     }
                     for (int j = k + 1; j < n; j++) {
-                        SubtractScaledVector.invoke(data[j], 0, tmpWork, 0, tmpE[j] / tmpE[k + 1], k + 1, m);
+                        AXPY.invoke(data[j], 0, 1, -(tmpE[j] / tmpE[k + 1]), tmpWork, 0, 1, k + 1, m);
                     }
                 }
                 tmpE[k] = -nrm;
@@ -435,7 +435,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     for (int j = k + 1; j < n; j++) {
                         double t = DotProduct.invoke(tmpUt_k, 0, myUt[j], 0, k, m);
                         t = t / tmpUt_k[k];
-                        SubtractScaledVector.invoke(myUt[j], 0, tmpUt_k, 0, t, k, m);
+                        AXPY.invoke(myUt[j], 0, 1, -t, tmpUt_k, 0, 1, k, m);
                     }
                     for (int i = k; i < m; i++) {
                         tmpUt_k[i] = -tmpUt_k[i];
@@ -461,7 +461,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     for (int j = k + 1; j < n; j++) {
                         double t = DotProduct.invoke(tmpVt_k, 0, myVt[j], 0, k + 1, n);
                         t = t / tmpVt_k[k + 1];
-                        SubtractScaledVector.invoke(myVt[j], 0, tmpVt_k, 0, t, k + 1, n);
+                        AXPY.invoke(myVt[j], 0, 1, -t, tmpVt_k, 0, 1, k + 1, n);
                     }
                 }
                 for (int i = 0; i < n; i++) {

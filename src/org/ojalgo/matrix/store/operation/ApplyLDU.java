@@ -23,6 +23,7 @@ package org.ojalgo.matrix.store.operation;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.scalar.ComplexNumber;
 
 public final class ApplyLDU extends MatrixOperation {
@@ -36,7 +37,7 @@ public final class ApplyLDU extends MatrixOperation {
         for (int j = firstColumn; j < columnLimit; j++) {
             final BigDecimal tmpScalar = hermitian ? multipliers[j] : data[iterationPoint + (j * structure)];
             final int tmpFirstRow = hermitian ? j : iterationPoint + 1;
-            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, tmpScalar, tmpFirstRow, structure);
+            AXPY.invoke(data, j * structure, 1, tmpScalar.negate(), multipliers, 0, 1, tmpFirstRow, structure);
         }
     }
 
@@ -45,7 +46,7 @@ public final class ApplyLDU extends MatrixOperation {
         for (int j = firstColumn; j < columnLimit; j++) {
             final ComplexNumber tmpScalar = hermitian ? multipliers[j].conjugate() : data[iterationPoint + (j * structure)];
             final int tmpFirstRow = hermitian ? j : iterationPoint + 1;
-            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, tmpScalar, tmpFirstRow, structure);
+            AXPY.invoke(data, j * structure, 1, tmpScalar.negate(), multipliers, 0, 1, tmpFirstRow, structure);
         }
     }
 
@@ -54,7 +55,7 @@ public final class ApplyLDU extends MatrixOperation {
         for (int j = firstColumn; j < columnLimit; j++) {
             final double tmpScalar = hermitian ? multipliers[j] : data[iterationPoint + (j * structure)];
             final int tmpFirstRow = hermitian ? j : iterationPoint + 1;
-            SubtractScaledVector.invoke(data, j * structure, multipliers, 0, tmpScalar, tmpFirstRow, structure);
+            AXPY.invoke(data, j * structure, 1, -tmpScalar, multipliers, 0, 1, tmpFirstRow, structure);
         }
     }
 

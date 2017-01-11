@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
@@ -289,7 +290,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                     f += e[j] * d[j];
                 }
                 tmpVal = f / (h + h);
-                SubtractScaledVector.invoke(e, 0, d, 0, tmpVal, 0, i);
+                AXPY.invoke(e, 0, 1, -tmpVal, d, 0, 1, 0, i);
                 for (int j = 0; j < i; j++) {
                     f = d[j];
                     g = e[j];
@@ -422,7 +423,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                     f += e[j] * d[j];
                 }
                 tmpVal = f / (h + h);
-                SubtractScaledVector.invoke(e, 0, d, 0, tmpVal, 0, i);
+                AXPY.invoke(e, 0, 1, -tmpVal, d, 0, 1, 0, i);
                 for (int j = 0; j < i; j++) {
                     f = d[j];
                     g = e[j];
@@ -459,7 +460,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                     //                        //g += V[k][i + 1] * V[k][j];
                     //                        g += tmpVt_i1[k] * tmpVt_j[k];
                     //                    }
-                    SubtractScaledVector.invoke(data[j], 0, d, 0, tmpDotProd, 0, i + 1);
+                    AXPY.invoke(data[j], 0, 1, -tmpDotProd, d, 0, 1, 0, i + 1);
                     //                    for (int k = 0; k <= i; k++) {
                     //                        //V[k][j] -= g * d[k];
                     //                        tmpVt_j[k] -= g * d[k];

@@ -23,6 +23,7 @@ package org.ojalgo.matrix.store.operation;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
@@ -95,10 +96,10 @@ public final class HouseholderRight extends MatrixOperation {
         final double tmpBeta = householder.beta;
 
         for (int j = tmpFirstNonZero; j < numberOfColumns; j++) {
-            SubtractScaledVector.invoke(work, 0, data, j * structure, -tmpBeta * tmpHouseholderVector[j], first, limit);
+            AXPY.invoke(work, 0, 1, -(-tmpBeta * tmpHouseholderVector[j]), data, j * structure, 1, first, limit);
         }
         for (int j = tmpFirstNonZero; j < numberOfColumns; j++) {
-            SubtractScaledVector.invoke(data, j * structure, work, 0, tmpHouseholderVector[j], first, limit);
+            AXPY.invoke(data, j * structure, 1, -tmpHouseholderVector[j], work, 0, 1, first, limit);
         }
     }
 

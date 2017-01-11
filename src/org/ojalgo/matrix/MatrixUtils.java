@@ -572,7 +572,6 @@ public abstract class MatrixUtils {
         RotateRight.THRESHOLD = Math.min(maxValue, RotateRight.THRESHOLD);
         SubstituteBackwards.THRESHOLD = Math.min(maxValue, SubstituteBackwards.THRESHOLD);
         SubstituteForwards.THRESHOLD = Math.min(maxValue, SubstituteForwards.THRESHOLD);
-        SubtractScaledVector.THRESHOLD = Math.min(maxValue, SubtractScaledVector.THRESHOLD);
     }
 
     /**
@@ -605,7 +604,6 @@ public abstract class MatrixUtils {
         RotateRight.THRESHOLD = Math.max(minValue, RotateRight.THRESHOLD);
         SubstituteBackwards.THRESHOLD = Math.max(minValue, SubstituteBackwards.THRESHOLD);
         SubstituteForwards.THRESHOLD = Math.max(minValue, SubstituteForwards.THRESHOLD);
-        SubtractScaledVector.THRESHOLD = Math.max(minValue, SubtractScaledVector.THRESHOLD);
     }
 
     public static String toString(final Access2D<?> matrix) {
