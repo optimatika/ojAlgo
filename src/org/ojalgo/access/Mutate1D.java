@@ -178,7 +178,10 @@ public interface Mutate1D extends Structure1D {
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.
+     * 
+     * @deprecated v42 Use {@link Structure1D.Callback} instead.
      */
+    @Deprecated
     default <N extends Number> void passMatching(final Access1D<N> from, final Callback1D<N> through) {
         Callback1D.onMatching(from, through, this);
     }

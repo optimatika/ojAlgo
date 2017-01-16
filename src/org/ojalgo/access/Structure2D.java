@@ -23,6 +23,17 @@ package org.ojalgo.access;
 
 public interface Structure2D extends Structure1D {
 
+    @FunctionalInterface
+    public interface Callback {
+
+        /**
+         * @param row Row
+         * @param col Column
+         */
+        void call(final long row, final long col);
+
+    }
+
     static int column(final int index, final int structure) {
         return index / structure;
     }
@@ -153,6 +164,45 @@ public interface Structure2D extends Structure1D {
      */
     default boolean isVector() {
         return ((this.countColumns() == 1L) || (this.countRows() == 1L));
+    }
+
+    default void loopAll(final Callback callback) {
+        final long tmpCountRows = this.countRows();
+        final long tmpCountColumns = this.countColumns();
+        for (long j = 0L; j < tmpCountColumns; j++) {
+            for (long i = 0L; i < tmpCountRows; i++) {
+                callback.call(i, j);
+            }
+        }
+    }
+
+    default void loopColumn(final long col, final Callback callback) {
+        this.loopColumn(0L, col, callback);
+    }
+
+    default void loopColumn(final long row, final long col, final Callback callback) {
+        final long tmpCountRows = this.countRows();
+        for (long i = row; i < tmpCountRows; i++) {
+            callback.call(i, col);
+        }
+    }
+
+    default void loopDiagonal(final long row, final long col, final Callback callback) {
+        final long tmpLimit = Math.min(this.countRows() - row, this.countColumns() - col);
+        for (long ij = 0L; ij < tmpLimit; ij++) {
+            callback.call(row + ij, col + ij);
+        }
+    }
+
+    default void loopRow(final long row, final Callback callback) {
+        this.loopRow(row, 0L, callback);
+    }
+
+    default void loopRow(final long row, final long col, final Callback callback) {
+        final long tmpCountColumns = this.countColumns();
+        for (long j = col; j < tmpCountColumns; j++) {
+            callback.call(row, j);
+        }
     }
 
 }

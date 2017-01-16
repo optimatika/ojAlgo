@@ -23,9 +23,17 @@ package org.ojalgo.access;
 
 import org.ojalgo.function.FunctionUtils;
 
+/**
+ * @deprecated v42 Use {@link Structure1D.Callback} instead.
+ */
+@Deprecated
 @FunctionalInterface
 public interface Callback1D<N extends Number> {
 
+    /**
+     * @deprecated v42 Use {@link Structure1D.Callback} instead.
+     */
+    @Deprecated
     static <N extends Number> void onMatching(final Access1D<N> from, final Callback1D<N> through, final Mutate1D to) {
         final long tmpLimit = FunctionUtils.min(from.count(), to.count());
         for (long i = 0L; i < tmpLimit; i++) {
@@ -37,7 +45,9 @@ public interface Callback1D<N extends Number> {
      * @param r Reader/Accessor/Getter
      * @param i Index
      * @param w Writer/Mutator/Setter
+     * @deprecated v42 Use {@link Structure1D.Callback} instead.
      */
+    @Deprecated
     void call(Access1D<N> r, long i, Mutate1D w);
 
 }

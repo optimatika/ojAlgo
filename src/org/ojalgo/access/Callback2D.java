@@ -23,9 +23,17 @@ package org.ojalgo.access;
 
 import org.ojalgo.function.FunctionUtils;
 
+/**
+ * @deprecated v42 Use {@link Structure2D.Callback} instead.
+ */
+@Deprecated
 @FunctionalInterface
 public interface Callback2D<N extends Number> {
 
+    /**
+     * @deprecated v42 Use {@link Structure2D.Callback} instead.
+     */
+    @Deprecated
     static <N extends Number> void onMatching(final Access2D<N> from, final Callback2D<N> through, final Mutate2D to) {
         final long tmpRows = FunctionUtils.min(from.countRows(), to.countRows());
         final long tmpCols = FunctionUtils.min(from.countColumns(), to.countColumns());
@@ -41,7 +49,9 @@ public interface Callback2D<N extends Number> {
      * @param row Row
      * @param col Column
      * @param w Writer/Mutator/Setter
+     * @deprecated v42 Use {@link Structure2D.Callback} instead.
      */
+    @Deprecated
     void call(Access2D<N> r, long row, long col, Mutate2D w);
 
 }

@@ -200,7 +200,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.
+     * 
+     * @deprecated v42 Use {@link Structure1D.Callback} instead.
      */
+    @Deprecated
     default void passMatching(final Callback1D<N> through, final Mutate1D to) {
         Callback1D.onMatching(this, through, to);
     }

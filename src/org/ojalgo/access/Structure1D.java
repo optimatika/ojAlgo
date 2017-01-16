@@ -28,9 +28,29 @@ package org.ojalgo.access;
  */
 public interface Structure1D {
 
+    @FunctionalInterface
+    public interface Callback {
+
+        /**
+         * @param index Index
+         */
+        void call(final long index);
+
+    }
+
     /**
      * @return The total number of elements in this structure.
      */
     long count();
+
+    default void loopAll(final Callback callback) {
+        this.loopRange(0L, this.count(), callback);
+    }
+
+    default void loopRange(final long first, final long limit, final Callback callback) {
+        for (long i = first; i < limit; i++) {
+            callback.call(i);
+        }
+    }
 
 }

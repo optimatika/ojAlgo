@@ -23,6 +23,16 @@ package org.ojalgo.access;
 
 public interface StructureAnyD extends Structure1D {
 
+    @FunctionalInterface
+    public interface Callback {
+
+        /**
+         * @param ref Element reference (indices)
+         */
+        void call(long[] ref);
+
+    }
+
     /**
      * @param structure An access structure
      * @param reference An access element reference
@@ -178,6 +188,13 @@ public interface StructureAnyD extends Structure1D {
     }
 
     long count(int dimension);
+
+    default void loopAll(final Callback callback) {
+        final long[] tmpShape = this.shape();
+        for (long i = 0L; i < this.count(); i++) {
+            callback.call(StructureAnyD.reference(i, tmpShape));
+        }
+    }
 
     long[] shape();
 

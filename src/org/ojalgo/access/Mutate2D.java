@@ -192,7 +192,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     }
 
     interface Receiver<N extends Number> extends Mutate2D, Fillable<N>, Modifiable<N>, BiModifiable<N>, Consumer<Access2D<?>> {
-    
+
         default void accept(final Access2D<?> supplied) {
             if (this.isAcceptable(supplied)) {
                 final long tmpCountRows = supplied.countRows();
@@ -206,11 +206,11 @@ public interface Mutate2D extends Structure2D, Mutate1D {
                 throw new ProgrammingError("Not acceptable!");
             }
         }
-    
+
         default boolean isAcceptable(final Structure2D supplier) {
             return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
         }
-    
+
     }
 
     /**
@@ -243,7 +243,10 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.
+     * 
+     * @deprecated v42 Use {@link Structure2D.Callback} instead.
      */
+    @Deprecated
     default <N extends Number> void passMatching(final Access2D<N> from, final Callback2D<N> through) {
         Callback2D.onMatching(from, through, this);
     }
