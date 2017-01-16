@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.IndexMapper;
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.NumberList;
 import org.ojalgo.series.primitive.PrimitiveSeries;

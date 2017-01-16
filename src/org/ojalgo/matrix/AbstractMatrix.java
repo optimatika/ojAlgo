@@ -194,6 +194,15 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         return myStore.doubleValue(i, j);
     }
 
+    public I enforce(final NumberContext context) {
+
+        final PhysicalStore<N> tmpCopy = myStore.copy();
+
+        tmpCopy.modifyAll(myStore.physical().function().enforce(context));
+
+        return this.getFactory().instantiate(tmpCopy);
+    }
+
     public boolean equals(final Access2D<?> aMtrx, final NumberContext aCntxt) {
         return AccessUtils.equals(myStore, aMtrx, aCntxt);
     }
@@ -226,7 +235,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public N get(final long aRow, final long aColumn) {
-        return this.getStore().get(aRow, aColumn);
+        return myStore.get(aRow, aColumn);
     }
 
     public I getColumnsRange(final int first, final int limit) {
@@ -474,15 +483,6 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
         retVal.modifyAll(myStore.physical().function().multiply().second(tmpRight));
 
         return this.getFactory().instantiate(retVal);
-    }
-
-    public I enforce(final NumberContext context) {
-
-        final PhysicalStore<N> tmpCopy = myStore.copy();
-
-        tmpCopy.modifyAll(myStore.physical().function().enforce(context));
-
-        return this.getFactory().instantiate(tmpCopy);
     }
 
     public I multiplyElements(final Access2D<?> multiplicand) {

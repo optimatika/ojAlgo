@@ -32,11 +32,12 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.Factory;
+import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
-public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Mutate1D {
+public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D {
 
     private static long INITIAL_CAPACITY = 16L;
     private static long SEGMENT_CAPACITY = 16_384L;
@@ -319,6 +320,14 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
             array[i] = (T) myStorage.get(i);
         }
         return array;
+    }
+
+    public void visitOne(long index, VoidFunction<N> visitor) {
+        if (index >= myActualCount) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            myStorage.visitOne(index, visitor);
+        }
     }
 
     private void ensureCapacity() {

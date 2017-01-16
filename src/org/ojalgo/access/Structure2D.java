@@ -94,7 +94,7 @@ public interface Structure2D extends Structure1D {
      * m &lt;= 0 or n &lt;= 0
      * </p>
      * Historically some ojAlgo data structures did allow to create "empty" instances. Currently this is not
-     * encouraged, or even disallowed.
+     * encouraged, but still possible in some instances.
      *
      * @return true if matrix is empty
      */

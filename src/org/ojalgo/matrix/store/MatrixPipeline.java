@@ -19,25 +19,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.access;
+package org.ojalgo.matrix.store;
 
-import java.util.function.Supplier;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 
-/**
- * You can query the size/count before getting.
- *
- * @author apete
- */
-public interface Supplier1D<I extends Structure1D> extends Structure1D, Supplier<I> {
+abstract class MatrixPipeline<N extends Number> implements MatrixSupplier<N> {
 
-    interface Elements<N extends Number, C extends Consumer1D.Elements<N, ?>, I extends Structure1D> extends Pipeline<N, C>, Supplier1D<I> {
+    private final MatrixSupplier<N> myContext;
 
+    protected MatrixPipeline(final MatrixSupplier<N> context) {
+        super();
+        myContext = context;
     }
 
-    interface Pipeline<N extends Number, C extends Consumer1D.Elements<N, ?>> extends Structure1D {
+    public final Factory<N, ?> physical() {
+        return myContext.physical();
+    }
 
-        void supplyTo(C consumer);
-
+    @Override
+    public String toString() {
+        return myContext.toString();
     }
 
 }

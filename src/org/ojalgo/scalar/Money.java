@@ -28,7 +28,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class Money extends Number implements Scalar<Money>, Enforceable<Money> {
+final class Money extends Number implements Scalar<Money>, Enforceable<Money> {
 
     public static final Scalar.Factory<Money> FACTORY = new Scalar.Factory<Money>() {
 

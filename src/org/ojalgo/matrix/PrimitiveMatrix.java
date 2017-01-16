@@ -23,10 +23,8 @@ package org.ojalgo.matrix;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
@@ -60,60 +58,18 @@ public final class PrimitiveMatrix extends AbstractMatrix<Double, PrimitiveMatri
 
             return (PrimitiveDenseStore) matrix;
 
-        } else if ((matrix instanceof ElementsSupplier) && !this.isEmpty() && (matrix.get(0) instanceof Double)) {
+        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof Double)) {
 
             return (ElementsSupplier<Double>) matrix;
 
         } else if (matrix instanceof Access2D) {
+
             final Access2D<?> tmpAccess2D = (Access2D<?>) matrix;
-
-            return new ElementsSupplier<Double>() {
-
-                public long countColumns() {
-                    return tmpAccess2D.countColumns();
-                }
-
-                public long countRows() {
-                    return tmpAccess2D.countRows();
-                }
-
-                public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
-                    return PrimitiveDenseStore.FACTORY;
-                }
-
-                public void supplyTo(final ElementsConsumer<Double> consumer) {
-                    final long tmpLimit = tmpAccess2D.count();
-                    for (long i = 0L; i < tmpLimit; i++) {
-                        consumer.set(i, tmpAccess2D.doubleValue(i));
-                    }
-                }
-
-            };
+            return this.getStore().physical().builder().makeWrapper(tmpAccess2D);
 
         } else {
 
-            return new ElementsSupplier<Double>() {
-
-                public long countColumns() {
-                    return 1L;
-                }
-
-                public long countRows() {
-                    return matrix.count();
-                }
-
-                public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
-                    return PrimitiveDenseStore.FACTORY;
-                }
-
-                public void supplyTo(final ElementsConsumer<Double> consumer) {
-                    final long tmpLimit = matrix.count();
-                    for (long i = 0L; i < tmpLimit; i++) {
-                        consumer.set(i, matrix.doubleValue(i));
-                    }
-                }
-
-            };
+            return this.getStore().physical().columns(matrix);
         }
     }
 

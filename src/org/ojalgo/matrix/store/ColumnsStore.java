@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.scalar.Scalar;
 
 /**

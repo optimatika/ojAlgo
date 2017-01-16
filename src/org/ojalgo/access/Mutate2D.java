@@ -21,6 +21,9 @@
  */
 package org.ojalgo.access;
 
+import java.util.function.Consumer;
+
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -186,6 +189,28 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.modifyRow(row, 0L, modifier);
         }
 
+    }
+
+    interface Receiver<N extends Number> extends Mutate2D, Fillable<N>, Modifiable<N>, BiModifiable<N>, Consumer<Access2D<?>> {
+    
+        default void accept(final Access2D<?> supplied) {
+            if (this.isAcceptable(supplied)) {
+                final long tmpCountRows = supplied.countRows();
+                final long tmpCountColumns = supplied.countColumns();
+                for (long j = 0L; j < tmpCountColumns; j++) {
+                    for (long i = 0L; i < tmpCountRows; i++) {
+                        this.set(i, j, supplied.get(i, j));
+                    }
+                }
+            } else {
+                throw new ProgrammingError("Not acceptable!");
+            }
+        }
+    
+        default boolean isAcceptable(final Structure2D supplier) {
+            return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
+        }
+    
     }
 
     /**

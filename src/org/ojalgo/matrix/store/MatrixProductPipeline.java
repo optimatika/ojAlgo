@@ -19,37 +19,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.access;
+package org.ojalgo.matrix.store;
 
-import java.util.function.Consumer;
+import org.ojalgo.access.Access1D;
 
-import org.ojalgo.ProgrammingError;
+final class MatrixProductPipeline<N extends Number> extends MatrixPipeline<N> {
 
-/**
- * You can query the size/count before accepting.
- *
- * @author apete
- */
-public interface Consumer1D<I extends Structure1D> extends Structure1D, Consumer<I> {
+    private final Access1D<N> myLeft;
+    private final MatrixStore<N> myRight;
 
-    interface Elements<N extends Number, I extends Access1D<N>>
-            extends Consumer1D<I>, Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N> {
+    private MatrixProductPipeline(final MatrixSupplier<N> base) {
 
-        default void accept(final I supplied) {
-            if (this.isAcceptable(supplied)) {
-                final long tmpLimit = supplied.count();
-                for (long i = 0L; i < tmpLimit; i++) {
-                    this.set(i, supplied.get(i));
-                }
-            } else {
-                throw new ProgrammingError("Not acceptable!");
-            }
-        }
+        super(base);
 
+        myLeft = null;
+        myRight = null;
     }
 
-    default boolean isAcceptable(final Structure1D supplier) {
-        return this.count() >= supplier.count();
+    MatrixProductPipeline(final Access1D<N> left, final MatrixStore<N> right) {
+
+        super(right);
+
+        myLeft = left;
+        myRight = right;
+    }
+
+    public long countColumns() {
+        return myRight.countColumns();
+    }
+
+    public long countRows() {
+        return myLeft.count() / myRight.countRows();
+    }
+
+    @Override
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        consumer.fillByMultiplying(myLeft, myRight);
     }
 
 }

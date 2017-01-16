@@ -24,10 +24,8 @@ package org.ojalgo.matrix;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -93,60 +91,18 @@ public final class ComplexMatrix extends AbstractMatrix<ComplexNumber, ComplexMa
 
             return (ComplexDenseStore) matrix;
 
-        } else if ((matrix instanceof ElementsSupplier) && !this.isEmpty() && (matrix.get(0) instanceof ComplexNumber)) {
+        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof ComplexNumber)) {
 
             return (ElementsSupplier<ComplexNumber>) matrix;
 
         } else if (matrix instanceof Access2D) {
+
             final Access2D<?> tmpAccess2D = (Access2D<?>) matrix;
-
-            return new ElementsSupplier<ComplexNumber>() {
-
-                public long countColumns() {
-                    return tmpAccess2D.countColumns();
-                }
-
-                public long countRows() {
-                    return tmpAccess2D.countRows();
-                }
-
-                public PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> physical() {
-                    return ComplexDenseStore.FACTORY;
-                }
-
-                public void supplyTo(final ElementsConsumer<ComplexNumber> consumer) {
-                    final long tmpLimit = tmpAccess2D.count();
-                    for (long i = 0L; i < tmpLimit; i++) {
-                        consumer.set(i, tmpAccess2D.get(i));
-                    }
-                }
-
-            };
+            return this.getStore().physical().builder().makeWrapper(tmpAccess2D);
 
         } else {
 
-            return new ElementsSupplier<ComplexNumber>() {
-
-                public long countColumns() {
-                    return 1L;
-                }
-
-                public long countRows() {
-                    return matrix.count();
-                }
-
-                public PhysicalStore.Factory<ComplexNumber, ComplexDenseStore> physical() {
-                    return ComplexDenseStore.FACTORY;
-                }
-
-                public void supplyTo(final ElementsConsumer<ComplexNumber> consumer) {
-                    final long tmpLimit = matrix.count();
-                    for (long i = 0L; i < tmpLimit; i++) {
-                        consumer.set(i, matrix.get(i));
-                    }
-                }
-
-            };
+            return this.getStore().physical().columns(matrix);
         }
     }
 

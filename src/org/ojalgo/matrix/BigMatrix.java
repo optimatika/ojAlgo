@@ -26,10 +26,8 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.BigDenseStore;
-import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -62,60 +60,18 @@ public final class BigMatrix extends AbstractMatrix<BigDecimal, BigMatrix> {
 
             return (BigDenseStore) matrix;
 
-        } else if ((matrix instanceof ElementsSupplier) && !this.isEmpty() && (matrix.get(0) instanceof BigDecimal)) {
+        } else if ((matrix instanceof ElementsSupplier) && (matrix.count() > 0L) && (matrix.get(0) instanceof BigDecimal)) {
 
             return (ElementsSupplier<BigDecimal>) matrix;
 
         } else if (matrix instanceof Access2D) {
+
             final Access2D<?> tmpAccess2D = (Access2D<?>) matrix;
-
-            return new ElementsSupplier<BigDecimal>() {
-
-                public long countColumns() {
-                    return tmpAccess2D.countColumns();
-                }
-
-                public long countRows() {
-                    return tmpAccess2D.countRows();
-                }
-
-                public PhysicalStore.Factory<BigDecimal, BigDenseStore> physical() {
-                    return BigDenseStore.FACTORY;
-                }
-
-                public void supplyTo(final ElementsConsumer<BigDecimal> consumer) {
-                    final long tmpLimit = tmpAccess2D.count();
-                    for (long i = 0L; i < tmpLimit; i++) {
-                        consumer.set(i, tmpAccess2D.get(i));
-                    }
-                }
-
-            };
+            return this.getStore().physical().builder().makeWrapper(tmpAccess2D);
 
         } else {
 
-            return new ElementsSupplier<BigDecimal>() {
-
-                public long countColumns() {
-                    return 1L;
-                }
-
-                public long countRows() {
-                    return matrix.count();
-                }
-
-                public PhysicalStore.Factory<BigDecimal, BigDenseStore> physical() {
-                    return BigDenseStore.FACTORY;
-                }
-
-                public void supplyTo(final ElementsConsumer<BigDecimal> consumer) {
-                    final long tmpLimit = matrix.count();
-                    for (long i = 0L; i < tmpLimit; i++) {
-                        consumer.set(i, matrix.get(i));
-                    }
-                }
-
-            };
+            return this.getStore().physical().columns(matrix);
         }
     }
 

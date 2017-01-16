@@ -21,6 +21,10 @@
  */
 package org.ojalgo.access;
 
+import java.util.function.Consumer;
+
+import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 
@@ -63,6 +67,34 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
             for (long i = first; i < limit; i++) {
                 this.modifyOne(i, modifier);
             }
+        }
+
+    }
+
+    interface Receiver<N extends Number> extends MutateAnyD, Fillable<N>, Modifiable<N>, BiModifiable<N>, Consumer<AccessAnyD<?>> {
+
+        default void accept(final AccessAnyD<?> supplied) {
+            if (this.isAcceptable(supplied)) {
+                final long tmpLimit = supplied.count();
+                for (long i = 0L; i < tmpLimit; i++) {
+                    this.set(i, supplied.get(i));
+                }
+            } else {
+                throw new ProgrammingError("Not acceptable!");
+            }
+        }
+
+        default boolean isAcceptable(final StructureAnyD supplier) {
+
+            boolean retVal = true;
+
+            final int tmpRank = FunctionUtils.max(this.shape().length, this.shape().length);
+
+            for (int i = 0; i < tmpRank; i++) {
+                retVal &= this.count(i) >= supplier.count(i);
+            }
+
+            return retVal;
         }
 
     }

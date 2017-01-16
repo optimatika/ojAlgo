@@ -21,9 +21,9 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.access.Supplier2D;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.UnaryFunction;
+import java.util.function.Supplier;
+
+import org.ojalgo.access.Stream2D;
 
 /**
  * An elements supplier is not (yet) a matrix. There are 4 things you can do with them:
@@ -38,145 +38,8 @@ import org.ojalgo.function.UnaryFunction;
  *
  * @author apete
  */
-public interface ElementsSupplier<N extends Number> extends Supplier2D.Pipeline<N, ElementsConsumer<N>> {
+public interface ElementsSupplier<N extends Number> extends Stream2D<N, MatrixStore<N>, ElementsConsumer<N>, ElementsSupplier<N>>, Supplier<MatrixStore<N>> {
 
-    default MatrixStore<N> get() {
-
-        final PhysicalStore<N> retVal = this.physical().makeZero(this.countRows(), this.countColumns());
-
-        this.supplyTo(retVal);
-
-        return retVal;
-    }
-
-    default ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {
-
-        return new ContextSupplier<N>(this) {
-
-            public long count() {
-                return ElementsSupplier.this.count();
-            }
-
-            public long countColumns() {
-                return ElementsSupplier.this.countColumns();
-            }
-
-            public long countRows() {
-                return ElementsSupplier.this.countRows();
-            }
-
-            @Override
-            public void supplyTo(final ElementsConsumer<N> consumer) {
-                ElementsSupplier.this.supplyTo(consumer);
-                consumer.modifyAll(operator);
-            }
-
-        };
-
-    }
-
-    default ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
-
-        return new ContextSupplier<N>(this) {
-
-            public long count() {
-                return ElementsSupplier.this.count();
-            }
-
-            public long countColumns() {
-                return ElementsSupplier.this.countColumns();
-            }
-
-            public long countRows() {
-                return ElementsSupplier.this.countRows();
-            }
-
-            @Override
-            public void supplyTo(final ElementsConsumer<N> consumer) {
-                ElementsSupplier.this.supplyTo(consumer);
-                consumer.modifyMatching(operator, right);
-            }
-
-        };
-
-    }
-
-    default ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
-
-        return new ContextSupplier<N>(this) {
-
-            public long count() {
-                return ElementsSupplier.this.count();
-            }
-
-            public long countColumns() {
-                return ElementsSupplier.this.countColumns();
-            }
-
-            public long countRows() {
-                return ElementsSupplier.this.countRows();
-            }
-
-            @Override
-            public void supplyTo(final ElementsConsumer<N> consumer) {
-                ElementsSupplier.this.supplyTo(consumer);
-                consumer.modifyMatching(left, operator);
-            }
-
-        };
-
-    }
-
-    PhysicalStore.Factory<N, ?> physical();
-
-    default ElementsSupplier<N> transpose() {
-
-        return new ContextSupplier<N>(this) {
-
-            public long count() {
-                return ElementsSupplier.this.count();
-            }
-
-            public long countColumns() {
-                return ElementsSupplier.this.countRows();
-            }
-
-            public long countRows() {
-                return ElementsSupplier.this.countColumns();
-            }
-
-            public MatrixStore<N> get() {
-
-                final PhysicalStore<N> retVal = this.physical().makeZero(ElementsSupplier.this.countRows(), ElementsSupplier.this.countColumns());
-
-                this.supplyTo(retVal);
-
-                return retVal;
-            }
-
-            public ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {
-                return ElementsSupplier.this.operateOnAll(operator);
-            }
-
-            public ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
-                return ElementsSupplier.this.operateOnMatching(operator, right.transpose());
-            }
-
-            public ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
-                return ElementsSupplier.this.operateOnMatching(left.transpose(), operator);
-            }
-
-            @Override
-            public void supplyTo(final ElementsConsumer<N> consumer) {
-                ElementsSupplier.this.supplyTo(consumer.regionByTransposing());
-            }
-
-            public ElementsSupplier<N> transpose() {
-                return ElementsSupplier.this;
-            }
-
-        };
-
-    }
+    ElementsSupplier<N> transpose();
 
 }

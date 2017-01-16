@@ -22,11 +22,11 @@
 package org.ojalgo.matrix;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
-import org.ojalgo.access.Supplier2D;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.algebra.Operation;
 import org.ojalgo.algebra.ScalarOperation;
@@ -93,7 +93,7 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
         return retVal;
     }
 
-    public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier2D<I> {
+    public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier<I> {
 
         default I build() {
             return this.get();

@@ -21,8 +21,6 @@
  */
 package org.ojalgo;
 
-import java.util.Objects;
-
 /**
  * Incorrect use of the API. The code needs to be changed. Typically execution can't continue. Is never
  * declared to be thrown, and should not be caught.
