@@ -24,7 +24,6 @@ package org.ojalgo.access;
 import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 
@@ -46,24 +45,15 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void fillColumn(final long row, final long col, final Access1D<N> values) {
-            final long tmpLimit = Math.min(this.countRows() - row, values.count());
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.fillOne(row + i, col, values.get(i));
-            }
+            this.loopColumn(row, col, (r, c) -> this.fillOne(r, c, values.get(r - row)));
         }
 
         default void fillColumn(final long row, final long col, final N value) {
-            final long tmpLimit = this.countRows();
-            for (long i = row; i < tmpLimit; i++) {
-                this.fillOne(i, col, value);
-            }
+            this.loopColumn(row, col, (r, c) -> this.fillOne(r, c, value));
         }
 
         default void fillColumn(final long row, final long col, final NullaryFunction<N> supplier) {
-            final long tmpLimit = this.countRows();
-            for (long i = row; i < tmpLimit; i++) {
-                this.fillOne(i, col, supplier);
-            }
+            this.loopColumn(row, col, (r, c) -> this.fillOne(r, c, supplier));
         }
 
         default void fillColumn(final long col, final N value) {
@@ -75,24 +65,15 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void fillDiagonal(final long row, final long col, final Access1D<N> values) {
-            final long tmpLimit = FunctionUtils.min(this.countRows() - row, this.countColumns() - col, values.count());
-            for (long ij = 0L; ij < tmpLimit; ij++) {
-                this.fillOne(row + ij, col + ij, values.get(ij));
-            }
+            this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, values.get(r - row)));
         }
 
         default void fillDiagonal(final long row, final long col, final N value) {
-            final long tmpLimit = Math.min(this.countRows() - row, this.countColumns() - col);
-            for (long ij = 0L; ij < tmpLimit; ij++) {
-                this.fillOne(row + ij, col + ij, value);
-            }
+            this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, value));
         }
 
         default void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
-            final long tmpLimit = Math.min(this.countRows() - row, this.countColumns() - col);
-            for (long ij = 0L; ij < tmpLimit; ij++) {
-                this.fillOne(row + ij, col + ij, supplier);
-            }
+            this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, supplier));
         }
 
         default void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
@@ -121,24 +102,15 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void fillRow(final long row, final long col, final Access1D<N> values) {
-            final long tmpLimit = Math.min(this.countColumns() - col, values.count());
-            for (long j = 0L; j < tmpLimit; j++) {
-                this.fillOne(row, col + j, values.get(j));
-            }
+            this.loopRow(row, col, (r, c) -> this.fillOne(r, c, values.get(c - col)));
         }
 
         default void fillRow(final long row, final long col, final N value) {
-            final long tmpLimit = this.countColumns();
-            for (long j = col; j < tmpLimit; j++) {
-                this.fillOne(row, j, value);
-            }
+            this.loopRow(row, col, (r, c) -> this.fillOne(r, c, value));
         }
 
         default void fillRow(final long row, final long col, final NullaryFunction<N> supplier) {
-            final long tmpLimit = this.countColumns();
-            for (long j = col; j < tmpLimit; j++) {
-                this.fillOne(row, j, supplier);
-            }
+            this.loopRow(row, col, (r, c) -> this.fillOne(r, c, supplier));
         }
 
         default void fillRow(final long row, final N value) {
@@ -154,10 +126,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     interface Modifiable<N extends Number> extends Structure2D, Mutate1D.Modifiable<N> {
 
         default void modifyColumn(final long row, final long col, final UnaryFunction<N> modifier) {
-            final long tmpLimit = this.countRows();
-            for (long i = row; i < tmpLimit; i++) {
-                this.modifyOne(i, col, modifier);
-            }
+            this.loopColumn(row, col, (r, c) -> this.modifyOne(r, c, modifier));
         }
 
         default void modifyColumn(final long col, final UnaryFunction<N> modifier) {
@@ -165,10 +134,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void modifyDiagonal(final long row, final long col, final UnaryFunction<N> modifier) {
-            final long tmpLimit = Math.min(this.countRows() - row, this.countColumns() - col);
-            for (long ij = 0L; ij < tmpLimit; ij++) {
-                this.modifyOne(row + ij, col + ij, modifier);
-            }
+            this.loopDiagonal(row, col, (r, c) -> this.modifyOne(r, c, modifier));
         }
 
         void modifyOne(long row, long col, UnaryFunction<N> modifier);
@@ -179,10 +145,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         }
 
         default void modifyRow(final long row, final long col, final UnaryFunction<N> modifier) {
-            final long tmpCountColumns = this.countColumns();
-            for (long j = col; j < tmpCountColumns; j++) {
-                this.modifyOne(row, j, modifier);
-            }
+            this.loopRow(row, col, (r, c) -> this.modifyOne(r, c, modifier));
         }
 
         default void modifyRow(final long row, final UnaryFunction<N> modifier) {
@@ -195,13 +158,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         default void accept(final Access2D<?> supplied) {
             if (this.isAcceptable(supplied)) {
-                final long tmpCountRows = supplied.countRows();
-                final long tmpCountColumns = supplied.countColumns();
-                for (long j = 0L; j < tmpCountColumns; j++) {
-                    for (long i = 0L; i < tmpCountRows; i++) {
-                        this.set(i, j, supplied.get(i, j));
-                    }
-                }
+                supplied.loopAll((r, c) -> this.set(r, c, supplied.get(r, c)));
             } else {
                 throw new ProgrammingError("Not acceptable!");
             }
@@ -243,8 +200,8 @@ public interface Mutate2D extends Structure2D, Mutate1D {
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.
-     * 
-     * @deprecated v42 Use {@link Structure2D.Callback} instead.
+     *
+     * @deprecated v42 Use {@link Structure2D.RowColumnCallback} instead.
      */
     @Deprecated
     default <N extends Number> void passMatching(final Access2D<N> from, final Callback2D<N> through) {

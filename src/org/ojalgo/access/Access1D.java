@@ -147,9 +147,7 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         void visitOne(long index, VoidFunction<N> visitor);
 
         default void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
-            for (long i = first; i < limit; i++) {
-                this.visitOne(i, visitor);
-            }
+            Structure1D.loopRange(first, limit, i -> this.visitOne(i, visitor));
         }
     }
 
@@ -160,10 +158,7 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
      * @param y The "vector" to update
      */
     default void daxpy(final double a, final Mutate1D y) {
-        final long tmpLimit = Math.min(this.count(), y.count());
-        for (long i = 0L; i < tmpLimit; i++) {
-            y.add(i, a * this.doubleValue(i));
-        }
+        Structure1D.loopMatching(this, y, i -> y.add(i, a * this.doubleValue(i)));
     }
 
     /**
@@ -200,8 +195,8 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.
-     * 
-     * @deprecated v42 Use {@link Structure1D.Callback} instead.
+     *
+     * @deprecated v42 Use {@link Structure1D.IndexCallback} instead.
      */
     @Deprecated
     default void passMatching(final Callback1D<N> through, final Mutate1D to) {

@@ -52,17 +52,11 @@ public interface Mutate1D extends Structure1D {
     interface Fillable<N extends Number> extends Structure1D {
 
         default void fillAll(final N value) {
-            final long tmpLimit = this.count();
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.fillOne(i, value);
-            }
+            this.fillRange(0L, this.count(), value);
         }
 
         default void fillAll(final NullaryFunction<N> supplier) {
-            final long tmpLimit = this.count();
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.fillOne(i, supplier);
-            }
+            this.fillRange(0L, this.count(), supplier);
         }
 
         /**
@@ -73,10 +67,7 @@ public interface Mutate1D extends Structure1D {
          * <code>this(i) = values(i)</code>
          */
         default void fillMatching(final Access1D<?> values) {
-            final long tmpLimit = FunctionUtils.min(this.count(), values.count());
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.fillOne(i, values, i);
-            }
+            Structure1D.loopMatching(this, values, i -> this.fillOne(i, values, i));
         }
 
         /**
@@ -121,33 +112,24 @@ public interface Mutate1D extends Structure1D {
         void fillOne(long index, NullaryFunction<N> supplier);
 
         default void fillRange(final long first, final long limit, final N value) {
-            for (long i = first; i < limit; i++) {
-                this.fillOne(i, value);
-            }
+            Structure1D.loopRange(first, limit, i -> this.fillOne(i, value));
         }
 
         default void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
-            for (long i = first; i < limit; i++) {
-                this.fillOne(i, supplier);
-            }
+            Structure1D.loopRange(first, limit, i -> this.fillOne(i, supplier));
         }
     }
 
     interface Modifiable<N extends Number> extends Structure1D {
 
         default void modifyAll(final UnaryFunction<N> modifier) {
-            final long tmpLimit = this.count();
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.modifyOne(i, modifier);
-            }
+            this.modifyRange(0L, this.count(), modifier);
         }
 
         void modifyOne(long index, UnaryFunction<N> modifier);
 
         default void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
-            for (long i = first; i < limit; i++) {
-                this.modifyOne(i, modifier);
-            }
+            Structure1D.loopRange(first, limit, i -> this.modifyOne(i, modifier));
         }
 
     }
@@ -156,10 +138,7 @@ public interface Mutate1D extends Structure1D {
 
         default void accept(final Access1D<?> supplied) {
             if (this.isAcceptable(supplied)) {
-                final long tmpLimit = supplied.count();
-                for (long i = 0L; i < tmpLimit; i++) {
-                    this.set(i, supplied.get(i));
-                }
+                supplied.loopAll(i -> this.set(i, supplied.get(i)));
             } else {
                 throw new ProgrammingError("Not acceptable!");
             }
@@ -178,8 +157,8 @@ public interface Mutate1D extends Structure1D {
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.
-     * 
-     * @deprecated v42 Use {@link Structure1D.Callback} instead.
+     *
+     * @deprecated v42 Use {@link Structure1D.IndexCallback} instead.
      */
     @Deprecated
     default <N extends Number> void passMatching(final Access1D<N> from, final Callback1D<N> through) {

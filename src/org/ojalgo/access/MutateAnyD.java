@@ -45,29 +45,11 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
         void fillOne(long[] reference, NullaryFunction<N> supplier);
 
-        default void fillRange(final long first, final long limit, final N value) {
-            for (long i = first; i < limit; i++) {
-                this.fillOne(i, value);
-            }
-        }
-
-        default void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
-            for (long i = first; i < limit; i++) {
-                this.fillOne(i, supplier);
-            }
-        }
-
     }
 
     interface Modifiable<N extends Number> extends StructureAnyD, Mutate1D.Modifiable<N> {
 
         void modifyOne(long[] reference, UnaryFunction<N> modifier);
-
-        default void modifyRange(final long first, final long limit, final UnaryFunction<N> modifier) {
-            for (long i = first; i < limit; i++) {
-                this.modifyOne(i, modifier);
-            }
-        }
 
     }
 
@@ -75,10 +57,7 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
 
         default void accept(final AccessAnyD<?> supplied) {
             if (this.isAcceptable(supplied)) {
-                final long tmpLimit = supplied.count();
-                for (long i = 0L; i < tmpLimit; i++) {
-                    this.set(i, supplied.get(i));
-                }
+                supplied.loopAll((final long[] ref) -> this.set(ref, supplied.get(ref)));
             } else {
                 throw new ProgrammingError("Not acceptable!");
             }
@@ -114,8 +93,8 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.
-     * 
-     * @deprecated v42 Use {@link StructureAnyD.Callback} instead.
+     *
+     * @deprecated v42 Use {@link StructureAnyD.ReferenceCallback} instead.
      */
     @Deprecated
     default <N extends Number> void passMatching(final AccessAnyD<N> from, final CallbackAnyD<N> through) {

@@ -37,19 +37,19 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     public interface Aggregatable<N extends Number> extends Structure2D, Access1D.Aggregatable<N> {
 
-        N aggregateColumn(long row, long col, Aggregator aggregator);
-
         default N aggregateColumn(final long col, final Aggregator aggregator) {
             return this.aggregateColumn(0L, col, aggregator);
         }
 
-        N aggregateDiagonal(long row, long col, Aggregator aggregator);
+        N aggregateColumn(long row, long col, Aggregator aggregator);
 
-        N aggregateRow(long row, long col, Aggregator aggregator);
+        N aggregateDiagonal(long row, long col, Aggregator aggregator);
 
         default N aggregateRow(final long row, final Aggregator aggregator) {
             return this.aggregateRow(row, 0L, aggregator);
         }
+
+        N aggregateRow(long row, long col, Aggregator aggregator);
 
     }
 
@@ -227,10 +227,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     public interface Visitable<N extends Number> extends Structure2D, Access1D.Visitable<N> {
 
         default void visitColumn(final long row, final long col, final VoidFunction<N> visitor) {
-            final long tmpLimit = this.countRows();
-            for (long i = row; i < tmpLimit; i++) {
-                this.visitOne(i, col, visitor);
-            }
+            this.loopColumn(row, col, (r, c) -> this.visitOne(r, c, visitor));
         }
 
         default void visitColumn(final long col, final VoidFunction<N> visitor) {
@@ -238,10 +235,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         }
 
         default void visitDiagonal(final long row, final long col, final VoidFunction<N> visitor) {
-            final long tmpLimit = Math.min(this.countRows() - row, this.countColumns() - col);
-            for (long ij = 0L; ij < tmpLimit; ij++) {
-                this.visitOne(row + ij, col + ij, visitor);
-            }
+            this.loopDiagonal(row, col, (r, c) -> this.visitOne(r, c, visitor));
         }
 
         void visitOne(long row, long col, VoidFunction<N> visitor);
@@ -252,10 +246,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         }
 
         default void visitRow(final long row, final long col, final VoidFunction<N> visitor) {
-            final long tmpLimit = this.countColumns();
-            for (long j = col; j < tmpLimit; j++) {
-                this.visitOne(row, j, visitor);
-            }
+            this.loopRow(row, col, (r, c) -> this.visitOne(r, c, visitor));
         }
 
         default void visitRow(final long row, final VoidFunction<N> visitor) {
@@ -296,8 +287,8 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.
-     * 
-     * @deprecated v42 Use {@link Structure2D.Callback} instead.
+     *
+     * @deprecated v42 Use {@link Structure2D.RowColumnCallback} instead.
      */
     @Deprecated
     default void passMatching(final Callback2D<N> through, final Mutate2D to) {

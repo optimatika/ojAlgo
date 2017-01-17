@@ -21,10 +21,14 @@
  */
 package org.ojalgo.access;
 
+import java.util.Arrays;
+
+import org.ojalgo.ProgrammingError;
+
 public interface StructureAnyD extends Structure1D {
 
     @FunctionalInterface
-    public interface Callback {
+    public interface ReferenceCallback {
 
         /**
          * @param ref Element reference (indices)
@@ -79,6 +83,16 @@ public interface StructureAnyD extends Structure1D {
             tmpFactor *= structure[i];
         }
         return retVal;
+    }
+
+    static void loopMatching(StructureAnyD structureA, StructureAnyD structureB, final ReferenceCallback callback) {
+        final long[] tmpShape = structureA.shape();
+        if (!Arrays.equals(tmpShape, structureB.shape())) {
+            throw new ProgrammingError("The 2 structures must have the same shape!");
+        }
+        for (long i = 0L; i < structureA.count(); i++) {
+            callback.call(StructureAnyD.reference(i, tmpShape));
+        }
     }
 
     static long[] reference(final long index, final long[] structure) {
@@ -189,7 +203,7 @@ public interface StructureAnyD extends Structure1D {
 
     long count(int dimension);
 
-    default void loopAll(final Callback callback) {
+    default void loopAll(final ReferenceCallback callback) {
         final long[] tmpShape = this.shape();
         for (long i = 0L; i < this.count(); i++) {
             callback.call(StructureAnyD.reference(i, tmpShape));

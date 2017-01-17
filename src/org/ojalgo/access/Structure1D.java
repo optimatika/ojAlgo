@@ -29,7 +29,7 @@ package org.ojalgo.access;
 public interface Structure1D {
 
     @FunctionalInterface
-    public interface Callback {
+    public interface IndexCallback {
 
         /**
          * @param index Index
@@ -38,19 +38,24 @@ public interface Structure1D {
 
     }
 
+    static void loopMatching(Structure1D structureA, Structure1D structureB, final IndexCallback callback) {
+        long tmpLimit = Math.min(structureA.count(), structureB.count());
+        Structure1D.loopRange(0L, tmpLimit, callback);
+    }
+
+    static void loopRange(final long first, final long limit, final IndexCallback callback) {
+        for (long i = first; i < limit; i++) {
+            callback.call(i);
+        }
+    }
+
     /**
      * @return The total number of elements in this structure.
      */
     long count();
 
-    default void loopAll(final Callback callback) {
-        this.loopRange(0L, this.count(), callback);
-    }
-
-    default void loopRange(final long first, final long limit, final Callback callback) {
-        for (long i = first; i < limit; i++) {
-            callback.call(i);
-        }
+    default void loopAll(final IndexCallback callback) {
+        Structure1D.loopRange(0L, this.count(), callback);
     }
 
 }

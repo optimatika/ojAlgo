@@ -83,7 +83,7 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
     N get(long[] ref);
 
     /**
-     * @deprecated v42 Use {@link StructureAnyD.Callback} instead.
+     * @deprecated v42 Use {@link StructureAnyD.ReferenceCallback} instead.
      */
     @Deprecated
     default void passMatching(final CallbackAnyD<N> through, final MutateAnyD to) {

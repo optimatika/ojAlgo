@@ -24,14 +24,14 @@ package org.ojalgo.access;
 import java.util.Arrays;
 
 /**
- * @deprecated v42 Use {@link StructureAnyD.Callback} instead.
+ * @deprecated v42 Use {@link StructureAnyD.ReferenceCallback} instead.
  */
 @Deprecated
 @FunctionalInterface
 public interface CallbackAnyD<N extends Number> {
 
     /**
-     * @deprecated v42 Use {@link StructureAnyD.Callback} instead.
+     * @deprecated v42 Use {@link StructureAnyD.ReferenceCallback} instead.
      */
     @Deprecated
     static <N extends Number> void onMatching(final AccessAnyD<N> from, final CallbackAnyD<N> through, final MutateAnyD to) {
@@ -59,7 +59,7 @@ public interface CallbackAnyD<N extends Number> {
      * @param r Reader/Accessor/Getter
      * @param ref Element reference (indices)
      * @param w Writer/Mutator/Setter
-     * @deprecated v42 Use {@link StructureAnyD.Callback} instead.
+     * @deprecated v42 Use {@link StructureAnyD.ReferenceCallback} instead.
      */
     @Deprecated
     void call(AccessAnyD<N> r, long[] ref, MutateAnyD w);

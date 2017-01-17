@@ -163,11 +163,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
         return false;
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        return myUtility.equals(obj);
-    }
-
     public void exchangeColumns(final long colA, final long colB) {
         myUtility.exchangeColumns(colA, colB);
     }

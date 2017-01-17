@@ -246,15 +246,15 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<LocalDate> from(final LocalDate reference, final CalendarDateDuration resolution) {
             return new IndexMapper<LocalDate>() {
 
-                private final long myReference = reference.toEpochDay();
+                private final long myReference = reference.toEpochDay() * DAY_SIZE;
                 private final long myResolution = resolution.toDurationInMillis();
 
                 public long toIndex(final LocalDate key) {
-                    return (key.toEpochDay() - myReference) / myResolution;
+                    return ((DAY_SIZE * key.toEpochDay()) - myReference) / myResolution;
                 }
 
                 public LocalDate toKey(final long index) {
-                    return LocalDate.ofEpochDay(myReference + (index * myResolution));
+                    return LocalDate.ofEpochDay((myReference + (index * myResolution)) / DAY_SIZE);
                 }
 
             };
@@ -575,6 +575,8 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         }
 
     };
+
+    static final long DAY_SIZE = CalendarDateUnit.DAY.size();
 
     public abstract IndexMapper<T> from(final T reference);
 
