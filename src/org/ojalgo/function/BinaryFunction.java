@@ -21,6 +21,7 @@
  */
 package org.ojalgo.function;
 
+import java.util.Objects;
 import java.util.function.BinaryOperator;
 import java.util.function.DoubleBinaryOperator;
 
@@ -147,6 +148,21 @@ public interface BinaryFunction<N extends Number> extends BasicFunction<N>, Bina
     public abstract double invoke(double arg1, double arg2);
 
     public abstract N invoke(N arg1, N arg2);
+
+    default BinaryFunction<N> andThen(final UnaryFunction<N> after) {
+        Objects.requireNonNull(after);
+        return new BinaryFunction<N>() {
+
+            public double invoke(final double arg1, final double arg2) {
+                return after.invoke(BinaryFunction.this.invoke(arg1, arg2));
+            }
+
+            public N invoke(final N arg1, final N arg2) {
+                return after.invoke(BinaryFunction.this.invoke(arg1, arg2));
+            }
+
+        };
+    }
 
     /**
      * @see java.util.function.BiFunction#apply(java.lang.Object, java.lang.Object)

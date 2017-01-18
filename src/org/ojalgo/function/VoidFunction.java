@@ -21,6 +21,7 @@
  */
 package org.ojalgo.function;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
@@ -32,6 +33,21 @@ public interface VoidFunction<N extends Number> extends BasicFunction<N>, Consum
 
     default void accept(final N arg) {
         this.invoke(arg);
+    }
+
+    default VoidFunction<N> compose(final UnaryFunction<N> before) {
+        Objects.requireNonNull(before);
+        return new VoidFunction<N>() {
+
+            public void invoke(final double arg) {
+                VoidFunction.this.invoke(before.invoke(arg));
+            }
+
+            public void invoke(final N arg) {
+                VoidFunction.this.invoke(before.invoke(arg));
+            }
+
+        };
     }
 
     void invoke(double arg);

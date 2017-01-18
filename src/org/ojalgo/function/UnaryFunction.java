@@ -21,10 +21,26 @@
  */
 package org.ojalgo.function;
 
+import java.util.Objects;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.UnaryOperator;
 
 public interface UnaryFunction<N extends Number> extends BasicFunction<N>, UnaryOperator<N>, DoubleUnaryOperator {
+
+    default UnaryFunction<N> andThen(final UnaryFunction<N> after) {
+        Objects.requireNonNull(after);
+        return new UnaryFunction<N>() {
+
+            public double invoke(final double arg) {
+                return after.invoke(UnaryFunction.this.invoke(arg));
+            }
+
+            public N invoke(final N arg) {
+                return after.invoke(UnaryFunction.this.invoke(arg));
+            }
+
+        };
+    }
 
     default N apply(final N arg) {
         return this.invoke(arg);
@@ -32,6 +48,21 @@ public interface UnaryFunction<N extends Number> extends BasicFunction<N>, Unary
 
     default double applyAsDouble(final double arg) {
         return this.invoke(arg);
+    }
+
+    default UnaryFunction<N> compose(final UnaryFunction<N> before) {
+        Objects.requireNonNull(before);
+        return new UnaryFunction<N>() {
+
+            public double invoke(final double arg) {
+                return UnaryFunction.this.invoke(before.invoke(arg));
+            }
+
+            public N invoke(final N arg) {
+                return UnaryFunction.this.invoke(before.invoke(arg));
+            }
+
+        };
     }
 
     double invoke(double arg);

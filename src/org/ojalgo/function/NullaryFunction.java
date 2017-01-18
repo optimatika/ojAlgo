@@ -21,10 +21,26 @@
  */
 package org.ojalgo.function;
 
+import java.util.Objects;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public interface NullaryFunction<N extends Number> extends BasicFunction<N>, Supplier<N>, DoubleSupplier {
+
+    default NullaryFunction<N> andThen(final UnaryFunction<N> after) {
+        Objects.requireNonNull(after);
+        return new NullaryFunction<N>() {
+
+            public double doubleValue() {
+                return after.invoke(NullaryFunction.this.doubleValue());
+            }
+
+            public N invoke() {
+                return after.invoke(NullaryFunction.this.invoke());
+            }
+
+        };
+    }
 
     double doubleValue();
 

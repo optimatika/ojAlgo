@@ -25,6 +25,11 @@ import java.util.Arrays;
 
 import org.ojalgo.ProgrammingError;
 
+/**
+ * A (fixed size) any-dimensional data structure.
+ *
+ * @author apete
+ */
 public interface StructureAnyD extends Structure1D {
 
     @FunctionalInterface
