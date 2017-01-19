@@ -25,7 +25,6 @@ import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 
@@ -68,41 +67,6 @@ public interface Mutate1D extends Structure1D {
          */
         default void fillMatching(final Access1D<?> values) {
             Structure1D.loopMatching(this, values, i -> this.fillOne(i, values, i));
-        }
-
-        /**
-         * <p>
-         * Will fill the elements of [this] with the results of element wise invocation of the input binary
-         * funtion:
-         * </p>
-         * <code>this(i) = function.invoke(left(i),right(i))</code>
-         *
-         * @deprecated v41 Use {@link BiModifiable#modifyMatching(Access1D, BinaryFunction)} or
-         *             {@link BiModifiable#modifyMatching(BinaryFunction, Access1D)} instaed
-         */
-        @Deprecated
-        default void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-            final long tmpLimit = FunctionUtils.min(left.count(), right.count(), this.count());
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.fillOne(i, function.invoke(left.get(i), right.get(i)));
-            }
-        }
-
-        /**
-         * <p>
-         * Will fill the elements of [this] with the results of element wise invocation of the input unary
-         * funtion:
-         * </p>
-         * <code>this(i) = function.invoke(arguments(i))</code>
-         *
-         * @deprecated v41 Use {@link Modifiable#modifyAll(UnaryFunction)} instaed
-         */
-        @Deprecated
-        default void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
-            final long tmpLimit = FunctionUtils.min(this.count(), arguments.count());
-            for (long i = 0L; i < tmpLimit; i++) {
-                this.fillOne(i, function.invoke(arguments.get(i)));
-            }
         }
 
         void fillOne(long index, final Access1D<?> values, long valueIndex);

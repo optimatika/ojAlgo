@@ -21,6 +21,11 @@
  */
 package org.ojalgo.access;
 
+/**
+ * A (fixed size) 2-dimensional data structure.
+ *
+ * @author apete
+ */
 public interface Structure2D extends Structure1D {
 
     @FunctionalInterface

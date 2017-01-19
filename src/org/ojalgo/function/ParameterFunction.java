@@ -21,6 +21,7 @@
  */
 package org.ojalgo.function;
 
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 public interface ParameterFunction<N extends Number> extends BasicFunction<N>, BiFunction<N, Integer, N> {
@@ -70,8 +71,38 @@ public interface ParameterFunction<N extends Number> extends BasicFunction<N>, B
 
     public abstract N invoke(N arg, int param);
 
+    default ParameterFunction<N> andThen(final UnaryFunction<N> after) {
+        Objects.requireNonNull(after);
+        return new ParameterFunction<N>() {
+
+            public double invoke(final double arg, final int param) {
+                return after.invoke(ParameterFunction.this.invoke(arg, param));
+            }
+
+            public N invoke(final N arg, final int param) {
+                return after.invoke(ParameterFunction.this.invoke(arg, param));
+            }
+
+        };
+    }
+
     default N apply(final N arg, final Integer param) {
         return this.invoke(arg, param);
+    }
+
+    default ParameterFunction<N> compose(final UnaryFunction<N> before) {
+        Objects.requireNonNull(before);
+        return new ParameterFunction<N>() {
+
+            public double invoke(final double arg, final int param) {
+                return ParameterFunction.this.invoke(before.invoke(arg), param);
+            }
+
+            public N invoke(final N arg, final int param) {
+                return ParameterFunction.this.invoke(before.invoke(arg), param);
+            }
+
+        };
     }
 
     /**

@@ -229,14 +229,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
         myUtility.fillMatching(values);
     }
 
-    public void fillMatching(final Access1D<N> left, final BinaryFunction<N> function, final Access1D<N> right) {
-        myUtility.fillMatching(left, function, right);
-    }
-
-    public void fillMatching(final UnaryFunction<N> function, final Access1D<N> arguments) {
-        myUtility.fillMatching(function, arguments);
-    }
-
     public void fillOne(final long index, final Access1D<?> values, final long valueIndex) {
         myUtility.fillOne(index, values, valueIndex);
     }
