@@ -95,8 +95,8 @@ class P20130225 {
             final double[] costs = (double[]) preCalculateCosts.get(i);
             // Cost function = Min(sum(C_i_j*X_i_j + alpha*(sum(Ui + Vi))
             final int availableDocks = costs.length;
-            final Variable u = new Variable("U_" + i).lower(new BigDecimal(0)).weight(new BigDecimal(alpha));
-            final Variable v = new Variable("V_" + i).lower(new BigDecimal(0)).weight(new BigDecimal(alpha));
+            final Variable u = new Variable("U_" + i).lower(BigDecimal.valueOf(0)).weight(BigDecimal.valueOf(alpha));
+            final Variable v = new Variable("V_" + i).lower(BigDecimal.valueOf(0)).weight(BigDecimal.valueOf(alpha));
 
             allVariables.add(u);
             allVariables.add(v);
@@ -109,7 +109,7 @@ class P20130225 {
 
                 final double cost = costs[j];
 
-                final Variable variable = new Variable("X_" + i + "_" + j).binary().weight(new BigDecimal(cost));
+                final Variable variable = new Variable("X_" + i + "_" + j).binary().weight(BigDecimal.valueOf(cost));
 
                 if (variablesStation.containsKey(i)) {
                     final ArrayList vars = (ArrayList) variablesStation.get(i);
@@ -131,10 +131,10 @@ class P20130225 {
             final String name = v.getName();
             if (name.startsWith("X_")) {
                 final String state = name.substring(name.lastIndexOf("_") + 1, name.length());
-                expresion1.set(v, new BigDecimal((Integer.valueOf(state))));
+                expresion1.set(v, BigDecimal.valueOf((Integer.valueOf(state))));
             }
         }
-        expresion1.upper(new BigDecimal(91));
+        expresion1.upper(BigDecimal.valueOf(91));
 
         for (int i = 0; i < preCalculateCosts.size(); i++) {
             // Exp_i = sum(X_i_j) = 1
@@ -142,7 +142,7 @@ class P20130225 {
 
             final Expression expresion2 = tmpIntegerModel.addExpression("Exp_" + i);
             expresion2.setLinearFactorsSimple(varsStation);
-            expresion2.level(new BigDecimal(1));
+            expresion2.level(BigDecimal.valueOf(1));
         }
 
         for (int i = 0; i < preCalculateCosts.size(); i++) {
@@ -159,8 +159,8 @@ class P20130225 {
             final Variable u = (Variable) uvStation.get(0);
             final Variable v = (Variable) uvStation.get(1);
             expresion3.set(u, BigDecimal.ONE);
-            expresion3.set(v, new BigDecimal(-1));
-            expresion3.level(new BigDecimal(5));
+            expresion3.set(v, BigDecimal.valueOf(-1));
+            expresion3.level(BigDecimal.valueOf(5));
         }
         return tmpIntegerModel;
     }
@@ -178,8 +178,8 @@ class P20130225 {
                 final double[] costs = (double[]) preCalculateCosts.get(i);
                 // Cost function = Min(sum(C_i_j*X_i_j + alpha*(sum(Ui + Vi))
                 final int availableDocks = costs.length;
-                final Variable u = new Variable("U_" + i).lower(new BigDecimal(0)).weight(new BigDecimal(alpha));
-                final Variable v = new Variable("V_" + i).lower(new BigDecimal(0)).weight(new BigDecimal(alpha));
+                final Variable u = new Variable("U_" + i).lower(BigDecimal.valueOf(0)).weight(BigDecimal.valueOf(alpha));
+                final Variable v = new Variable("V_" + i).lower(BigDecimal.valueOf(0)).weight(BigDecimal.valueOf(alpha));
 
                 allVariables.add(u);
                 allVariables.add(v);
@@ -192,7 +192,7 @@ class P20130225 {
 
                     final double cost = costs[j];
 
-                    final Variable variable = new Variable("X_" + i + "_" + j).binary().weight(new BigDecimal(cost));
+                    final Variable variable = new Variable("X_" + i + "_" + j).binary().weight(BigDecimal.valueOf(cost));
 
                     if (variablesStation.containsKey(i)) {
                         final ArrayList vars = (ArrayList) variablesStation.get(i);
@@ -214,10 +214,10 @@ class P20130225 {
                 final String name = v.getName();
                 if (name.startsWith("X_")) {
                     final String state = name.substring(name.lastIndexOf("_") + 1, name.length());
-                    expresion1.set(v, new BigDecimal((Integer.valueOf(state))));
+                    expresion1.set(v, BigDecimal.valueOf((Integer.valueOf(state))));
                 }
             }
-            expresion1.upper(new BigDecimal(91));
+            expresion1.upper(BigDecimal.valueOf(91));
 
             for (int i = 0; i < preCalculateCosts.size(); i++) {
                 // Exp_i = sum(X_i_j) = 1
@@ -225,7 +225,7 @@ class P20130225 {
 
                 final Expression expresion2 = model.addExpression("Exp_" + i);
                 expresion2.setLinearFactorsSimple(varsStation);
-                expresion2.level(new BigDecimal(1));
+                expresion2.level(BigDecimal.valueOf(1));
             }
 
             for (int i = 0; i < preCalculateCosts.size(); i++) {
@@ -242,8 +242,8 @@ class P20130225 {
                 final Variable u = (Variable) uvStation.get(0);
                 final Variable v = (Variable) uvStation.get(1);
                 expresion3.set(u, BigDecimal.ONE);
-                expresion3.set(v, new BigDecimal(-1));
-                expresion3.level(new BigDecimal(5));
+                expresion3.set(v, BigDecimal.valueOf(-1));
+                expresion3.level(BigDecimal.valueOf(5));
             }
 
             final Optimisation.Result result = model.minimise();

@@ -27,7 +27,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.decomposition.*;
@@ -549,7 +548,6 @@ public abstract class MatrixUtils {
         AggregateAll.THRESHOLD = Math.min(maxValue, AggregateAll.THRESHOLD);
         ApplyCholesky.THRESHOLD = Math.min(maxValue, ApplyCholesky.THRESHOLD);
         ApplyLU.THRESHOLD = Math.min(maxValue, ApplyLU.THRESHOLD);
-        AXPY.THRESHOLD = Math.min(maxValue, AXPY.THRESHOLD);
         FillMatchingBoth.THRESHOLD = Math.min(maxValue, FillMatchingBoth.THRESHOLD);
         FillConjugated.THRESHOLD = Math.min(maxValue, FillConjugated.THRESHOLD);
         FillMatchingLeft.THRESHOLD = Math.min(maxValue, FillMatchingLeft.THRESHOLD);
@@ -581,7 +579,6 @@ public abstract class MatrixUtils {
         AggregateAll.THRESHOLD = Math.max(minValue, AggregateAll.THRESHOLD);
         ApplyCholesky.THRESHOLD = Math.max(minValue, ApplyCholesky.THRESHOLD);
         ApplyLU.THRESHOLD = Math.max(minValue, ApplyLU.THRESHOLD);
-        AXPY.THRESHOLD = Math.max(minValue, AXPY.THRESHOLD);
         FillMatchingBoth.THRESHOLD = Math.max(minValue, FillMatchingBoth.THRESHOLD);
         FillConjugated.THRESHOLD = Math.max(minValue, FillConjugated.THRESHOLD);
         FillMatchingLeft.THRESHOLD = Math.max(minValue, FillMatchingLeft.THRESHOLD);

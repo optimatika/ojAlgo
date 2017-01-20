@@ -22,10 +22,10 @@
 package org.ojalgo.access;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.DoubleAdder;
 import java.util.stream.BaseStream;
 import java.util.stream.StreamSupport;
 
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.scalar.Scalar;
@@ -168,12 +168,9 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
      * @return The dot product
      */
     default double dot(final Access1D<?> vector) {
-        double retVal = PrimitiveMath.ZERO;
-        final long tmpLimit = Math.min(this.count(), vector.count());
-        for (long i = 0L; i < tmpLimit; i++) {
-            retVal += this.doubleValue(i) * vector.doubleValue(i);
-        }
-        return retVal;
+        final DoubleAdder retVal = new DoubleAdder();
+        Structure1D.loopMatching(this, vector, i -> retVal.add(this.doubleValue(i) * vector.doubleValue(i)));
+        return retVal.doubleValue();
     }
 
     double doubleValue(long index);

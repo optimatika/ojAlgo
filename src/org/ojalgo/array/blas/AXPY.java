@@ -28,13 +28,12 @@ import org.ojalgo.function.BigFunction;
 import org.ojalgo.scalar.Scalar;
 
 /**
- * <code>y += a*x</code>
+ * The ?axpy routines perform a vector-vector operation defined as y := a*x + y where: a is a scalar x and y
+ * are vectors each with a number of elements that equals n. <code>y = y + a * x</code>
  *
  * @author apete
  */
 public abstract class AXPY implements BLAS1 {
-
-    public static int THRESHOLD = 128;
 
     public static void invoke(final BigDecimal[] y, final int basey, final int incy, final BigDecimal a, final BigDecimal[] x, final int basex, final int incx,
             final int first, final int limit) {

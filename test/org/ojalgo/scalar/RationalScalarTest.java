@@ -21,16 +21,9 @@
  */
 package org.ojalgo.scalar;
 
-import java.math.BigDecimal;
-
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 
-/**
- * ScientificNumberTest
- *
- * @author apete
- */
 public class RationalScalarTest extends ScalarTests {
 
     private double myAct;
@@ -47,19 +40,6 @@ public class RationalScalarTest extends ScalarTests {
         myAct = tmpVal1.add(tmpVal2).doubleValue();
 
         TestUtils.assertEquals(myExp, myAct, myDiff);
-    }
-
-    public void testBigDecimal() {
-
-        final BigDecimal tmpBig1 = new BigDecimal(5.0);
-        final BigDecimal tmpBig2 = new BigDecimal(2.0);
-
-        for (int i = 0; i < 100; i++) {
-            tmpBig1.add(tmpBig2);
-            tmpBig1.multiply(tmpBig2);
-            tmpBig1.subtract(tmpBig2);
-            tmpBig1.divide(tmpBig2, BigDecimal.ROUND_HALF_EVEN);
-        }
     }
 
     public void testDivide() {

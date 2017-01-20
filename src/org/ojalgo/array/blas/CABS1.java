@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,50 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation;
+package org.ojalgo.array.blas;
 
-abstract class AbstractModel<S extends Optimisation.Solver> implements Optimisation.Model {
-
-    public final Optimisation.Options options;
-
-    private boolean myMinimisation = true;
-
-    protected AbstractModel() {
-
-        super();
-
-        options = new Optimisation.Options();
-    }
-
-    protected AbstractModel(final Optimisation.Options someOptions) {
-
-        super();
-
-        options = someOptions;
-    }
-
-    public final boolean isMaximisation() {
-        return !this.isMinimisation();
-    }
-
-    public final boolean isMinimisation() {
-        return myMinimisation;
-    }
-
-    public final void setMaximisation() {
-        this.setMaximisation(true);
-    }
-
-    public final void setMinimisation() {
-        this.setMinimisation(true);
-    }
-
-    protected final void setMaximisation(final boolean maximisation) {
-        this.setMinimisation(!maximisation);
-    }
-
-    protected final void setMinimisation(final boolean minimisation) {
-        myMinimisation = minimisation;
-    }
+/**
+ * The ?cabs1 is an auxiliary routine for a few BLAS Level 1 routines. This routine performs an operation
+ * defined as res=|Re(z)|+|Im(z)|, where z is a scalar, and res is a value containing the absolute value of a
+ * complex number z.
+ * 
+ * @author apete
+ */
+public abstract class CABS1 implements BLAS1 {
 
 }

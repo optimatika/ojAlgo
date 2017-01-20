@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,50 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation;
+package org.ojalgo.array.blas;
 
-abstract class AbstractModel<S extends Optimisation.Solver> implements Optimisation.Model {
-
-    public final Optimisation.Options options;
-
-    private boolean myMinimisation = true;
-
-    protected AbstractModel() {
-
-        super();
-
-        options = new Optimisation.Options();
-    }
-
-    protected AbstractModel(final Optimisation.Options someOptions) {
-
-        super();
-
-        options = someOptions;
-    }
-
-    public final boolean isMaximisation() {
-        return !this.isMinimisation();
-    }
-
-    public final boolean isMinimisation() {
-        return myMinimisation;
-    }
-
-    public final void setMaximisation() {
-        this.setMaximisation(true);
-    }
-
-    public final void setMinimisation() {
-        this.setMinimisation(true);
-    }
-
-    protected final void setMaximisation(final boolean maximisation) {
-        this.setMinimisation(!maximisation);
-    }
-
-    protected final void setMinimisation(final boolean minimisation) {
-        myMinimisation = minimisation;
-    }
+/**
+ * The ?asum routine computes the sum of the magnitudes of elements of a real vector, or the sum of magnitudes
+ * of the real and imaginary parts of elements of a complex vector: res = |Re x1| + |Im x1| + |Re x2| + |Im
+ * x2|+ ... + |Re xn| + |Im xn|, where x is a vector with n elements.
+ *
+ * @author apete
+ */
+public abstract class ASUM implements BLAS1 {
 
 }
