@@ -21,8 +21,6 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-
 import java.lang.reflect.Field;
 
 import org.ojalgo.access.Access1D;
@@ -221,24 +219,6 @@ final class OffHeapArray2 extends BasicArray<Double> {
     @Override
     protected void finalize() throws Throwable {
         UNSAFE.freeMemory(data);
-    }
-
-    @Override
-    protected long indexOfLargest(final long first, final long limit, final long step) {
-
-        long retVal = first;
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (long i = first; i < limit; i += step) {
-            tmpValue = Math.abs(this.doubleValue(i));
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-        }
-
-        return retVal;
     }
 
     @Override

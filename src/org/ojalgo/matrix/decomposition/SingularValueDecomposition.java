@@ -188,7 +188,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         int retVal = tmpSingularValues.size();
 
         // Tolerance based on min-dim but should be max-dim
-        final double tmpTolerance = retVal * tmpSingularValues.doubleValue(0) * PrimitiveMath.MACHINE_EPSILON;
+        final double tmpTolerance = retVal * (tmpSingularValues.doubleValue(0) * PrimitiveMath.MACHINE_EPSILON);
 
         for (int i = retVal - 1; i >= 0; i--) {
             if (tmpSingularValues.doubleValue(i) <= tmpTolerance) {

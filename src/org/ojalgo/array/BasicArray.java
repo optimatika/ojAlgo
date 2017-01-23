@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -259,7 +260,9 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     protected abstract void fill(long first, long limit, long step, NullaryFunction<N> supplier);
 
-    protected abstract long indexOfLargest(long first, long limit, long step);
+    protected long indexOfLargest(final long first, final long limit, final long step) {
+        return AMAX.invoke(this, first, limit, step);
+    }
 
     protected abstract boolean isSmall(long first, long limit, long step, double comparedTo);
 

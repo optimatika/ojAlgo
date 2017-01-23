@@ -95,10 +95,11 @@ public class DesignCase extends MatrixDecompositionTests {
         final List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getAllPrimitive();
         for (final MatrixDecomposition<Double> tmpDecomp : tmpAllDecomps) {
             if (tmpDecomp instanceof SolverTask) {
+                final SolverTask<Double> tmpSolverTask = (SolverTask<Double>) tmpDecomp;
                 try {
-                    TestUtils.assertEquals(tmpDecomp.getClass().toString(), tmpRandom, ((SolverTask) tmpDecomp).solve(tmpIdentity, tmpRandom));
+                    TestUtils.assertEquals(tmpDecomp.getClass().toString(), tmpRandom, tmpSolverTask.solve(tmpIdentity, tmpRandom));
                 } catch (final TaskException xcptn) {
-                    TestUtils.fail(xcptn.getMessage());
+                    TestUtils.fail(tmpDecomp.getClass().toString() + " " + xcptn.getMessage());
                 }
             }
         }

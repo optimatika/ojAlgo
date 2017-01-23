@@ -478,8 +478,8 @@ public abstract class MatrixUtils {
             tmpRandom[i] = Math.random();
 
             for (int j = 0; j < i; j++) {
-                retVal.set(i, j, tmpRandom[i] + tmpRandom[j]);
-                retVal.set(j, i, tmpRandom[j] + tmpRandom[i]);
+                retVal.set(i, j, tmpRandom[i] * tmpRandom[j]);
+                retVal.set(j, i, tmpRandom[j] * tmpRandom[i]);
             }
             retVal.set(i, i, tmpRandom[i] + 1.0);
         }

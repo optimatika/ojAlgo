@@ -21,7 +21,13 @@
  */
 package org.ojalgo.array.blas;
 
+import java.math.BigDecimal;
+
+import org.ojalgo.array.BasicArray;
+import org.ojalgo.constant.BigMath;
+import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.scalar.Scalar;
 
 /**
  * Given a vector x, the i?amax functions return the position of the vector element x[i] that has the largest
@@ -32,6 +38,38 @@ import org.ojalgo.function.PrimitiveFunction;
  * @author apete
  */
 public abstract class AMAX implements BLAS1 {
+
+    public static <N extends Number> long invoke(final BasicArray<N> data, final long first, final long limit, final long step) {
+
+        long retVal = first;
+        double tmpLargest = 0D;
+        double tmpValue;
+
+        for (long i = first; i < limit; i += step) {
+            tmpValue = PrimitiveFunction.ABS.invoke(data.doubleValue(i));
+            if (tmpValue > tmpLargest) {
+                tmpLargest = tmpValue;
+                retVal = i;
+            }
+        }
+        return retVal;
+    }
+
+    public static int invoke(final BigDecimal[] data, final int first, final int limit, final int step) {
+
+        int retVal = first;
+        BigDecimal tmpLargest = BigMath.ZERO;
+        BigDecimal tmpValue;
+
+        for (int i = first; i < limit; i += step) {
+            tmpValue = BigFunction.ABS.invoke(data[i]);
+            if (tmpValue.compareTo(tmpLargest) > 0) {
+                tmpLargest = tmpValue;
+                retVal = i;
+            }
+        }
+        return retVal;
+    }
 
     public static int invoke(final double[] data, final int first, final int limit, final int step) {
 
@@ -57,6 +95,22 @@ public abstract class AMAX implements BLAS1 {
 
         for (int i = first; i < limit; i += step) {
             tmpValue = Math.abs(data[i]);
+            if (tmpValue > tmpLargest) {
+                tmpLargest = tmpValue;
+                retVal = i;
+            }
+        }
+        return retVal;
+    }
+
+    public static <N extends Number & Scalar<N>> int invoke(final N[] data, final int first, final int limit, final int step) {
+
+        int retVal = first;
+        double tmpLargest = 0D;
+        double tmpValue;
+
+        for (int i = first; i < limit; i += step) {
+            tmpValue = data[i].norm();
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i;

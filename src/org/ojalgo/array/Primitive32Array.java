@@ -27,6 +27,7 @@ import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
@@ -467,20 +468,7 @@ public class Primitive32Array extends PrimitiveArray {
 
     @Override
     protected final int indexOfLargest(final int first, final int limit, final int step) {
-
-        int retVal = first;
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int i = first; i < limit; i += step) {
-            tmpValue = PrimitiveFunction.ABS.invoke(data[i]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-        }
-
-        return retVal;
+        return AMAX.invoke(data, first, limit, step);
     }
 
     @Override

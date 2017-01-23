@@ -27,10 +27,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.ComplexNumber;
@@ -407,22 +405,6 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
                 this.set(i, supplier.invoke());
             }
         }
-    }
-
-    @Override
-    protected long indexOfLargest(final long first, final long limit, final long step) {
-
-        double tmpVal = PrimitiveMath.ZERO;
-        long retVal = Long.MIN_VALUE;
-
-        for (long tmpIndex = first; tmpIndex < limit; tmpIndex += step) {
-            if (this.doubleValue(tmpIndex) > tmpVal) {
-                tmpVal = PrimitiveFunction.ABS.invoke(this.doubleValue(tmpIndex));
-                retVal = tmpIndex;
-            }
-        }
-
-        return retVal;
     }
 
     @Override

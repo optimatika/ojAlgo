@@ -516,6 +516,17 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
                 / myRowsCount;
     }
 
+    public long indexOfLargestOnDiagonal(final long first) {
+
+        final long tmpMinCount = Math.min(myRowsCount, myColumnsCount);
+
+        final long tmpFirst = Structure2D.index(myRowsCount, first, first);
+        final long tmpLimit = Structure2D.index(myRowsCount, tmpMinCount, tmpMinCount);
+        final long tmpStep = 1L + myRowsCount;
+
+        return myDelegate.indexOfLargest(tmpFirst, tmpLimit, tmpStep);
+    }
+
     public boolean isAbsolute(final long index) {
         return myDelegate.isAbsolute(index);
     }

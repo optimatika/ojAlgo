@@ -33,7 +33,6 @@ import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.HouseholderHermitian;
 import org.ojalgo.matrix.task.TaskException;
@@ -122,8 +121,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         public DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
-            final long numberOfEquations = templateBody.countRows();
-            return this.allocate(numberOfEquations, numberOfEquations);
+            return this.allocate(templateBody.countRows(), templateRHS.countColumns());
         }
 
         @Override
@@ -253,7 +251,11 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return retVal;
     }
 
-    public RawStore getInverse() {
+    public MatrixStore<Double> getInverse() {
+        return this.getInverse(this.allocate(n, n));
+    }
+
+    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
 
         if (myInverse == null) {
 
@@ -274,14 +276,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 }
             }
 
-            myInverse = new RawStore(this.getV().multiply(tmpMtrx));
+            myInverse = this.getV().multiply(tmpMtrx);
         }
 
         return myInverse;
-    }
-
-    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
-        return this.doGetInverse((PrimitiveDenseStore) preallocated);
     }
 
     public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
@@ -1008,7 +1006,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         // Accumulate transformation.
                         this.rot1(Vt[i], Vt[i + 1], c, s);
                     }
-                    p = (-s * s2 * c3 * el1 * e[l]) / dl1;
+                    // p = (-s * s2 * c3 * el1 * e[l]) / dl1;
+                    p = (-s * s2 * c3) * ((el1 / dl1) * e[l]);
                     e[l] = s * p;
                     d[l] = c * p;
 
@@ -1050,11 +1049,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 //                }
             }
         }
-    }
-
-    protected MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     abstract boolean doDecompose(double[][] data);

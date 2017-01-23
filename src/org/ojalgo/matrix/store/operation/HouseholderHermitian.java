@@ -208,6 +208,9 @@ public final class HouseholderHermitian extends MatrixOperation {
         }
     }
 
+    /**
+     * Ursprung JAMA men refactored till ojAlgos egna strukturer
+     */
     public static void tred2j(final double[] data, final double[] d, final double[] e, final boolean yesvecs) {
 
         /*
@@ -242,7 +245,8 @@ public final class HouseholderHermitian extends MatrixOperation {
 
             // Calc the norm of the row/col to zero out - to avoid under/overflow.
             for (int k = 0; k < i; k++) {
-                scale += PrimitiveFunction.ABS.invoke(d[k]);
+                // scale += PrimitiveFunction.ABS.invoke(d[k]);
+                scale = PrimitiveFunction.MAX.invoke(scale, PrimitiveFunction.ABS.invoke(d[k]));
             }
 
             if (scale == PrimitiveMath.ZERO) {
@@ -343,6 +347,9 @@ public final class HouseholderHermitian extends MatrixOperation {
 
     }
 
+    /**
+     * Ursprung JAMA och används i JAMA's dekomposition
+     */
     public static void tred2jj(final double[][] data, final double[] d, final double[] e, final boolean yesvecs) {
 
         /*
@@ -375,7 +382,8 @@ public final class HouseholderHermitian extends MatrixOperation {
 
             // Calc the norm of the row/col to zero out - to avoid under/overflow.
             for (int k = 0; k < i; k++) {
-                scale += PrimitiveFunction.ABS.invoke(d[k]);
+                // scale += PrimitiveFunction.ABS.invoke(d[k]);
+                scale = PrimitiveFunction.MAX.invoke(scale, PrimitiveFunction.ABS.invoke(d[k]));
             }
             if (scale == PrimitiveMath.ZERO) {
                 // Skip generation, already zero
@@ -485,6 +493,9 @@ public final class HouseholderHermitian extends MatrixOperation {
         e[0] = PrimitiveMath.ZERO;
     }
 
+    /**
+     * Ursprung Numerical Recipies
+     */
     public static void tred2nr(final double[] data, final double[] d, final double[] e, final boolean yesvecs) {
 
         final int n = d.length;

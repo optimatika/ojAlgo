@@ -179,18 +179,16 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         }
 
         /**
-         * @param row
-         * @param col
+         * @param row First row to investigate
+         * @param col The column
          * @return The row-index of the largest absolute value in a column, starting at the specified row.
          */
         long indexOfLargestInColumn(final long row, final long col);
 
         /**
-         * @param row
-         * @param col
-         * @return The matrix-index of the largest absolute value on a diagonal, starting at the specified
-         *         row-column pair.
+         * @deprecated v42 Use {@link #indexOfLargestOnDiagonal(long)} instead
          */
+        @Deprecated
         long indexOfLargestInDiagonal(final long row, final long col);
 
         default long indexOfLargestInRow(final long row) {
@@ -198,11 +196,22 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         }
 
         /**
-         * @param row
-         * @param col
+         * @param row The row
+         * @param col The first column to investigate
          * @return The column-index of the largest absolute value in a row, starting at the specified column.
          */
         long indexOfLargestInRow(final long row, final long col);
+
+        default long indexOfLargestOnDiagonal() {
+            return this.indexOfLargestOnDiagonal(0L);
+        }
+
+        /**
+         * @param first The first row/column to investigate
+         * @return The row/column-index of the largest absolute value on the main diagonal, starting at the
+         *         specified row/column.
+         */
+        long indexOfLargestOnDiagonal(final long first);
 
     }
 

@@ -29,6 +29,7 @@ import java.util.Comparator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.machine.MemoryEstimator;
@@ -121,21 +122,8 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    protected int indexOfLargest(final int first, final int limit, final int step) {
-
-        int retVal = first;
-        BigDecimal tmpLargest = ZERO;
-        BigDecimal tmpValue;
-
-        for (int i = first; i < limit; i += step) {
-            tmpValue = data[i].abs();
-            if (tmpValue.compareTo(tmpLargest) == 1) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-        }
-
-        return retVal;
+    protected final int indexOfLargest(final int first, final int limit, final int step) {
+        return AMAX.invoke(data, first, limit, step);
     }
 
     @Override

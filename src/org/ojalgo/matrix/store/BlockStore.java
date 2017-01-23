@@ -191,4 +191,9 @@ final class BlockStore<N extends Number> extends FactoryStore<N> implements Phys
 
     }
 
+    public long indexOfLargestOnDiagonal(final long first) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
 }

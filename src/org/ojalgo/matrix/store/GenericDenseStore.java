@@ -340,6 +340,10 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
         return myUtility.indexOfLargestInRow(row, col);
     }
 
+    public long indexOfLargestOnDiagonal(final long first) {
+        return myUtility.indexOfLargestOnDiagonal(first);
+    }
+
     public boolean isAbsolute(final long index) {
         return myUtility.isAbsolute(index);
     }

@@ -26,7 +26,10 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Structure2D;
+import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
 import org.ojalgo.matrix.decomposition.Cholesky;
@@ -118,7 +121,11 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final long expected, final long actual) {
-        Assert.assertEquals(expected, actual);
+        TestUtils.assertEquals("long != long", expected, actual);
+    }
+
+    public static void assertEquals(final String message, final long expected, final long actual) {
+        Assert.assertEquals(message, expected, actual);
     }
 
     public static void assertEquals(final long[] expected, final long[] actual) {
@@ -198,9 +205,23 @@ public abstract class TestUtils {
     }
 
     public static void assertEquals(final String message, final Access1D<?> expected, final Access1D<?> actual, final NumberContext context) {
-        for (long i = 0L; i < expected.count(); i++) {
-            TestUtils.assertEquals(message + " @ " + i, expected.get(i), actual.get(i), context);
+
+        TestUtils.assertEquals(message + ", different count()", expected.count(), actual.count());
+        if ((expected instanceof Structure2D) && (actual instanceof Structure2D)) {
+            TestUtils.assertEquals(message + ", different countRows()", ((Structure2D) expected).countRows(), ((Structure2D) actual).countRows());
+            TestUtils.assertEquals(message + ", different countColumns()", ((Structure2D) expected).countColumns(), ((Structure2D) actual).countColumns());
+        } else if ((expected instanceof StructureAnyD) && (actual instanceof StructureAnyD)) {
+            TestUtils.assertEquals(message + ", different shape()", ((StructureAnyD) expected).shape(), ((StructureAnyD) actual).shape());
         }
+
+        double tmpFrobNormDiff = 0.0;
+        double tmpFrobNormExpt = 0.0;
+        for (long i = 0L; i < expected.count(); i++) {
+            tmpFrobNormDiff = PrimitiveFunction.HYPOT.invoke(tmpFrobNormDiff, actual.doubleValue(i) - expected.doubleValue(i));
+            tmpFrobNormExpt = PrimitiveFunction.HYPOT.invoke(tmpFrobNormExpt, expected.doubleValue(i));
+        }
+        TestUtils.assertTrue(message + ", large norm differences " + tmpFrobNormDiff + " !<< " + tmpFrobNormExpt,
+                context.isSmall(tmpFrobNormExpt, tmpFrobNormDiff));
     }
 
     public static void assertEquals(final String message, final ComplexNumber expected, final ComplexNumber actual) {

@@ -508,16 +508,18 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     @Override
     protected long indexOfLargest(final long first, final long limit, final long step) {
 
-        double tmpVal = PrimitiveMath.ZERO;
-        long retVal = Long.MIN_VALUE;
+        long retVal = first;
+        double tmpLargest = PrimitiveMath.ZERO;
+        double tmpValue;
 
         for (int i = 0; i < myIndices.length; i++) {
             final long tmpIndex = myIndices[i];
             if ((tmpIndex >= first) && (tmpIndex < limit)) {
                 if (((tmpIndex - first) % step) == 0L) {
-                    if (myValues.doubleValue(i) > tmpVal) {
-                        tmpVal = PrimitiveFunction.ABS.invoke(myValues.doubleValue(i));
-                        retVal = tmpIndex;
+                    tmpValue = PrimitiveFunction.ABS.invoke(myValues.doubleValue(i));
+                    if (tmpValue > tmpLargest) {
+                        tmpLargest = tmpValue;
+                        retVal = i;
                     }
                 }
             }

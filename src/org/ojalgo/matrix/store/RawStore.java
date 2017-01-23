@@ -1074,6 +1074,25 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
+    public long indexOfLargestOnDiagonal(final long first) {
+
+        final int tmpRowDim = data.length;
+
+        int retVal = (int) (first);
+        double tmpLargest = ZERO;
+        double tmpValue;
+
+        for (int i = (int) first, j = (int) first; (i < tmpRowDim) && (j < myNumberOfColumns); i++, j++) {
+            tmpValue = PrimitiveFunction.ABS.invoke(data[i][j]);
+            if (tmpValue > tmpLargest) {
+                tmpLargest = tmpValue;
+                retVal = i;
+            }
+        }
+
+        return retVal;
+    }
+
     public boolean isAbsolute(final long index) {
         final int tmpRowDim = data.length;
         return PrimitiveScalar.isAbsolute(this.get(Structure2D.row(index, tmpRowDim), Structure2D.column(index, tmpRowDim)));

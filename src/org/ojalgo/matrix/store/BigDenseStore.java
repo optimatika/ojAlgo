@@ -807,6 +807,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return myUtility.indexOfLargestInRow(row, col);
     }
 
+    public long indexOfLargestOnDiagonal(final long first) {
+        return myUtility.indexOfLargestOnDiagonal(first);
+    }
+
     public boolean isAbsolute(final long row, final long col) {
         return myUtility.isAbsolute(row, col);
     }

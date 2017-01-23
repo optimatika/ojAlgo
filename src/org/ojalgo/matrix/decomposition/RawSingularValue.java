@@ -186,7 +186,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     public int getRank() {
         final double eps = PrimitiveFunction.POW.invoke(TWO, -52.0);
-        final double tol = PrimitiveFunction.MAX.invoke(m, n) * myS[0] * eps;
+        final double tol = PrimitiveFunction.MAX.invoke(m, n) * (myS[0] * eps);
         int r = 0;
         for (int i = 0; i < myS.length; i++) {
             if (myS[i] > tol) {
@@ -722,7 +722,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
             final double[][] tmpMtrxData = tmpMtrx.data;
 
-            final double tmpEps = tmpSingular[0] * tmpSingular.length;
+            final double tmpEps = (tmpSingular[0] * MACHINE_EPSILON) * tmpSingular.length;
 
             for (int i = 0; i < tmpSingular.length; i++) {
                 final double tmpVal = tmpSingular[i];

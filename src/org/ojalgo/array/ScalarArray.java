@@ -21,9 +21,8 @@
  */
 package org.ojalgo.array;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
-
 import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.scalar.Scalar;
 
@@ -44,20 +43,7 @@ abstract class ScalarArray<N extends Number & Scalar<N>> extends ReferenceTypeAr
 
     @Override
     protected final int indexOfLargest(final int first, final int limit, final int step) {
-
-        int retVal = first;
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int i = first; i < limit; i += step) {
-            tmpValue = data[i].norm();
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i;
-            }
-        }
-
-        return retVal;
+        return AMAX.invoke(data, first, limit, step);
     }
 
     @Override

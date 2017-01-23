@@ -204,7 +204,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
 
                     }
 
-                    p = (-tmpRotSin * tmpRotSin2 * tmpRotCos3 * tmp2Sl1 * tmpOffDiagData[l]) / tmp2Ml1; // Final p
+                    p = (-tmpRotSin * tmpRotSin2 * tmpRotCos3) * ((tmp2Sl1 / tmp2Ml1) * tmpOffDiagData[l]); // Final p
 
                     tmpMainDiagData[l] = tmpRotCos * p;
                     tmpOffDiagData[l] = tmpRotSin * p;
