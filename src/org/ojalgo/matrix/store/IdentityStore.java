@@ -82,13 +82,7 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
-        if (this.getColDim() == right.count()) {
-            return this.physical().columns(right);
-        } else if (right instanceof MatrixStore<?>) {
-            return right.copy();
-        } else {
-            return super.multiply(right);
-        }
+        return right.copy();
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
