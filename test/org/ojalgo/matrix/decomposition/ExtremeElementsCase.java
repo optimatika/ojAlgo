@@ -28,9 +28,9 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.decomposition.MatrixDecomposition.Solver;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
@@ -44,28 +44,21 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     static final NumberContext PRECISION = new NumberContext().newPrecision(12);
 
-    private static void performInvertTest(final PrimitiveDenseStore original, final MatrixDecomposition<Double> algorithm, final NumberContext context) {
+    private static void performInvertTest(final PrimitiveDenseStore original, final InverterTask<Double> inverterTask, final NumberContext context) {
 
-        if (algorithm instanceof MatrixDecomposition.Solver) {
-            final MatrixDecomposition.Solver<Double> tmpSolver = (Solver<Double>) algorithm;
+        try {
 
-            try {
+            final MatrixStore<Double> tmpInverse = inverterTask.invert(original);
 
-                final MatrixStore<Double> tmpInverse = tmpSolver.invert(original);
+            final MatrixStore<Double> tmpExpected = MatrixStore.PRIMITIVE.makeIdentity((int) original.countRows()).get();
+            final MatrixStore<Double> tmpActual = original.multiply(tmpInverse);
 
-                final MatrixStore<Double> tmpExpected = MatrixStore.PRIMITIVE.makeIdentity((int) original.countRows()).get();
-                final MatrixStore<Double> tmpActual = original.multiply(tmpInverse);
+            TestUtils.assertEquals(inverterTask.getClass().toString(), tmpExpected, tmpActual, context);
 
-                TestUtils.assertEquals(algorithm.getClass().toString(), tmpExpected, tmpActual, context);
-
-            } catch (final TaskException exception) {
-                TestUtils.fail(algorithm.getClass() + " " + exception.toString());
-            }
-
-        } else {
-
-            TestUtils.fail("Does not implement MatrixDecomposition.Solver");
+        } catch (final TaskException exception) {
+            TestUtils.fail(inverterTask.getClass() + " " + exception.toString());
         }
+
     }
 
     static void doTestInvert(final boolean large) {
@@ -87,6 +80,8 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                     }
                     tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(tmpScale));
 
+                    ExtremeElementsCase.performInvertTest(tmpOriginal, InverterTask.PRIMITIVE.make(tmpOriginal), tmpContext);
+
                     final List<MatrixDecomposition<Double>> tmpAllDecomps = MatrixDecompositionTests.getAllPrimitive();
                     for (final MatrixDecomposition<Double> tmpDecomp : tmpAllDecomps) {
 
@@ -94,7 +89,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                             BasicLogger.debug("{} at dim={} for scale={}", tmpDecomp.getClass(), dim, tmpScale);
                         }
                         if (tmpDecomp instanceof MatrixDecomposition.Solver) {
-                            ExtremeElementsCase.performInvertTest(tmpOriginal, tmpDecomp, tmpContext);
+                            ExtremeElementsCase.performInvertTest(tmpOriginal, (InverterTask<Double>) tmpDecomp, tmpContext);
                         }
                     }
                 }
@@ -169,19 +164,6 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     }
 
-    public void testInvertEvD_3_155_1() {
-
-        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.509726074514643, 0.6439543946598099, 1.2096354379603502 },
-                { 0.6439543946598099, 1.134228320145167, 0.8341376835908743 }, { 1.2096354379603502, 0.8341376835908743, 1.6999093634457072 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 155)));
-
-        final HermitianEvD.Primitive tmpAlgorithm = new HermitianEvD.Primitive();
-
-        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
-    }
-
     public void testInvertEvD_10_307_1() {
 
         final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] {
@@ -214,6 +196,41 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
     }
 
+    public void testInvertEvD_3_155_1() {
+
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.509726074514643, 0.6439543946598099, 1.2096354379603502 },
+                { 0.6439543946598099, 1.134228320145167, 0.8341376835908743 }, { 1.2096354379603502, 0.8341376835908743, 1.6999093634457072 } });
+        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 155)));
+
+        final HermitianEvD.Primitive tmpAlgorithm = new HermitianEvD.Primitive();
+
+        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
+
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+    }
+
+    public void testInvertOverflow() {
+        ExtremeElementsCase.doTestInvert(true);
+    }
+
+    public void testInvertSVD_6_307_2() {
+
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(
+                new double[][] { { 1.7951923814808213, 0.659451350679988, 0.7107146253894259, 0.5763579411022435, 0.7199441830503458, 0.6356947473097578 },
+                        { 0.659451350679988, 1.829297873115869, 0.7411968989569697, 0.6010777087922337, 0.7508223087524556, 0.6629594475153139 },
+                        { 0.7107146253894259, 0.7411968989569697, 1.8937643794649044, 0.6478032355134435, 0.8091884190528792, 0.7144954285155056 },
+                        { 0.5763579411022435, 0.6010777087922337, 0.6478032355134435, 1.7248031476721892, 0.6562158066095086, 0.5794240042274624 },
+                        { 0.7199441830503458, 0.7508223087524556, 0.8091884190528792, 0.6562158066095086, 1.905371077260138, 0.7237740848430495 },
+                        { 0.6356947473097578, 0.6629594475153139, 0.7144954285155056, 0.5794240042274624, 0.7237740848430495, 1.7994225826534653 } });
+        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
+
+        final RawSingularValue tmpAlgorithm = new RawSingularValue();
+
+        final NumberContext tmpContext = NumberContext.getGeneral(2, Integer.MIN_VALUE);
+
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+    }
+
     public void testInvertSVD_7_307_1() {
 
         final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] {
@@ -237,26 +254,17 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
     }
 
-    public void testInvertSVD_6_307_2() {
+    public void testInvertTask_2_155_1() {
 
-        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(
-                new double[][] { { 1.7951923814808213, 0.659451350679988, 0.7107146253894259, 0.5763579411022435, 0.7199441830503458, 0.6356947473097578 },
-                        { 0.659451350679988, 1.829297873115869, 0.7411968989569697, 0.6010777087922337, 0.7508223087524556, 0.6629594475153139 },
-                        { 0.7107146253894259, 0.7411968989569697, 1.8937643794649044, 0.6478032355134435, 0.8091884190528792, 0.7144954285155056 },
-                        { 0.5763579411022435, 0.6010777087922337, 0.6478032355134435, 1.7248031476721892, 0.6562158066095086, 0.5794240042274624 },
-                        { 0.7199441830503458, 0.7508223087524556, 0.8091884190528792, 0.6562158066095086, 1.905371077260138, 0.7237740848430495 },
-                        { 0.6356947473097578, 0.6629594475153139, 0.7144954285155056, 0.5794240042274624, 0.7237740848430495, 1.7994225826534653 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 1.7755876870972727, 0.5243083105843722 }, { 0.5243083105843722, 1.6760142267686806 } });
+        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 155)));
 
-        final RawSingularValue tmpAlgorithm = new RawSingularValue();
+        final InverterTask<Double> tmpAlgorithm = InverterTask.PRIMITIVE.make(tmpOriginal);
 
-        final NumberContext tmpContext = NumberContext.getGeneral(2, Integer.MIN_VALUE);
+        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
 
         ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
-    }
-
-    public void testInvertOverflow() {
-        ExtremeElementsCase.doTestInvert(true);
     }
 
     public void testInvertUnderflow() {

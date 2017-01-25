@@ -150,6 +150,26 @@ public abstract class FunctionUtils {
         return Math.min(Math.min(a, b), Math.min(c, d));
     }
 
+    public static double norm(final double... values) {
+        double retVal = Math.abs(values[0]);
+        for (int i = values.length; i-- != 1;) {
+            retVal = values[i] > retVal ? Math.abs(values[i]) : retVal;
+        }
+        return retVal;
+    }
+
+    public static double norm(final double a, final double b) {
+        return Math.max(Math.abs(a), Math.abs(b));
+    }
+
+    public static double norm(final double a, final double b, final double c) {
+        return Math.max(Math.max(Math.abs(a), Math.abs(b)), Math.abs(c));
+    }
+
+    public static double norm(final double a, final double b, final double c, final double d) {
+        return Math.max(Math.max(Math.abs(a), Math.abs(b)), Math.max(Math.abs(c), Math.abs(d)));
+    }
+
     private FunctionUtils() {
         super();
     }

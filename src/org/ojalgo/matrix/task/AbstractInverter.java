@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -163,13 +164,21 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static void full2X2(final Access2D<?> source, final DecompositionStore<?> destination) {
 
-        final double tmp00 = source.doubleValue(0L);
-        final double tmp10 = source.doubleValue(1L);
+        double tmp00 = source.doubleValue(0L);
+        double tmp10 = source.doubleValue(1L);
 
-        final double tmp01 = source.doubleValue(2L);
-        final double tmp11 = source.doubleValue(3L);
+        double tmp01 = source.doubleValue(2L);
+        double tmp11 = source.doubleValue(3L);
 
-        final double tmpDet = AbstractDeterminator.calculate(tmp00, tmp10, tmp01, tmp11);
+        final double tmpScale = FunctionUtils.norm(tmp00, tmp01, tmp10, tmp11);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+
+        tmp01 /= tmpScale;
+        tmp11 /= tmpScale;
+
+        final double tmpDet = tmpScale * AbstractDeterminator.calculate(tmp00, tmp10, tmp01, tmp11);
 
         destination.set(0L, tmp11 / tmpDet);
         destination.set(1L, -tmp10 / tmpDet);
@@ -180,17 +189,31 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static void full3X3(final Access2D<?> source, final DecompositionStore<?> destination) {
 
-        final double tmp00 = source.doubleValue(0L);
-        final double tmp10 = source.doubleValue(1L);
-        final double tmp20 = source.doubleValue(2L);
+        double tmp00 = source.doubleValue(0L);
+        double tmp10 = source.doubleValue(1L);
+        double tmp20 = source.doubleValue(2L);
 
-        final double tmp01 = source.doubleValue(3L);
-        final double tmp11 = source.doubleValue(4L);
-        final double tmp21 = source.doubleValue(5L);
+        double tmp01 = source.doubleValue(3L);
+        double tmp11 = source.doubleValue(4L);
+        double tmp21 = source.doubleValue(5L);
 
-        final double tmp02 = source.doubleValue(6L);
-        final double tmp12 = source.doubleValue(7L);
-        final double tmp22 = source.doubleValue(8L);
+        double tmp02 = source.doubleValue(6L);
+        double tmp12 = source.doubleValue(7L);
+        double tmp22 = source.doubleValue(8L);
+
+        final double tmpScale = FunctionUtils.norm(tmp00, tmp01, tmp02, tmp10, tmp11, tmp12, tmp20, tmp21, tmp22);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+
+        tmp01 /= tmpScale;
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+
+        tmp02 /= tmpScale;
+        tmp12 /= tmpScale;
+        tmp22 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp12, tmp22);
         final double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp02, tmp22);
@@ -204,7 +227,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         final double tmpMin12 = AbstractDeterminator.calculate(tmp00, tmp20, tmp01, tmp21);
         final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp01, tmp11);
 
-        final double tmpDet = ((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20);
+        final double tmpDet = tmpScale * (((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20));
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin01 / tmpDet);
@@ -221,25 +244,48 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static void full4X4(final Access2D<?> source, final DecompositionStore<?> destination) {
 
-        final double tmp00 = source.doubleValue(0L);
-        final double tmp10 = source.doubleValue(1L);
-        final double tmp20 = source.doubleValue(2L);
-        final double tmp30 = source.doubleValue(3L);
+        double tmp00 = source.doubleValue(0L);
+        double tmp10 = source.doubleValue(1L);
+        double tmp20 = source.doubleValue(2L);
+        double tmp30 = source.doubleValue(3L);
 
-        final double tmp01 = source.doubleValue(4L);
-        final double tmp11 = source.doubleValue(5L);
-        final double tmp21 = source.doubleValue(6L);
-        final double tmp31 = source.doubleValue(7L);
+        double tmp01 = source.doubleValue(4L);
+        double tmp11 = source.doubleValue(5L);
+        double tmp21 = source.doubleValue(6L);
+        double tmp31 = source.doubleValue(7L);
 
-        final double tmp02 = source.doubleValue(8L);
-        final double tmp12 = source.doubleValue(9L);
-        final double tmp22 = source.doubleValue(10L);
-        final double tmp32 = source.doubleValue(11L);
+        double tmp02 = source.doubleValue(8L);
+        double tmp12 = source.doubleValue(9L);
+        double tmp22 = source.doubleValue(10L);
+        double tmp32 = source.doubleValue(11L);
 
-        final double tmp03 = source.doubleValue(12L);
-        final double tmp13 = source.doubleValue(13L);
-        final double tmp23 = source.doubleValue(14L);
-        final double tmp33 = source.doubleValue(15L);
+        double tmp03 = source.doubleValue(12L);
+        double tmp13 = source.doubleValue(13L);
+        double tmp23 = source.doubleValue(14L);
+        double tmp33 = source.doubleValue(15L);
+
+        final double tmpScale = FunctionUtils.norm(tmp00, tmp01, tmp02, tmp03, tmp10, tmp11, tmp12, tmp13, tmp20, tmp21, tmp22, tmp23, tmp30, tmp31, tmp32,
+                tmp33);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+        tmp30 /= tmpScale;
+
+        tmp01 /= tmpScale;
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+        tmp31 /= tmpScale;
+
+        tmp02 /= tmpScale;
+        tmp12 /= tmpScale;
+        tmp22 /= tmpScale;
+        tmp32 /= tmpScale;
+
+        tmp03 /= tmpScale;
+        tmp13 /= tmpScale;
+        tmp23 /= tmpScale;
+        tmp33 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp12, tmp22, tmp32, tmp13, tmp23, tmp33);
         final double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp31, tmp02, tmp22, tmp32, tmp03, tmp23, tmp33);
@@ -261,7 +307,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         final double tmpMin23 = AbstractDeterminator.calculate(tmp00, tmp10, tmp30, tmp01, tmp11, tmp31, tmp02, tmp12, tmp32);
         final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp01, tmp11, tmp21, tmp02, tmp12, tmp22);
 
-        final double tmpDet = (((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30);
+        final double tmpDet = tmpScale * ((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30));
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin01 / tmpDet);
@@ -286,35 +332,68 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static void full5X5(final Access2D<?> source, final DecompositionStore<?> destination) {
 
-        final double tmp00 = source.doubleValue(0L);
-        final double tmp10 = source.doubleValue(1L);
-        final double tmp20 = source.doubleValue(2L);
-        final double tmp30 = source.doubleValue(3L);
-        final double tmp40 = source.doubleValue(4L);
+        double tmp00 = source.doubleValue(0L);
+        double tmp10 = source.doubleValue(1L);
+        double tmp20 = source.doubleValue(2L);
+        double tmp30 = source.doubleValue(3L);
+        double tmp40 = source.doubleValue(4L);
 
-        final double tmp01 = source.doubleValue(5L);
-        final double tmp11 = source.doubleValue(6L);
-        final double tmp21 = source.doubleValue(7L);
-        final double tmp31 = source.doubleValue(8L);
-        final double tmp41 = source.doubleValue(9L);
+        double tmp01 = source.doubleValue(5L);
+        double tmp11 = source.doubleValue(6L);
+        double tmp21 = source.doubleValue(7L);
+        double tmp31 = source.doubleValue(8L);
+        double tmp41 = source.doubleValue(9L);
 
-        final double tmp02 = source.doubleValue(10L);
-        final double tmp12 = source.doubleValue(11L);
-        final double tmp22 = source.doubleValue(12L);
-        final double tmp32 = source.doubleValue(13L);
-        final double tmp42 = source.doubleValue(14L);
+        double tmp02 = source.doubleValue(10L);
+        double tmp12 = source.doubleValue(11L);
+        double tmp22 = source.doubleValue(12L);
+        double tmp32 = source.doubleValue(13L);
+        double tmp42 = source.doubleValue(14L);
 
-        final double tmp03 = source.doubleValue(15L);
-        final double tmp13 = source.doubleValue(16L);
-        final double tmp23 = source.doubleValue(17L);
-        final double tmp33 = source.doubleValue(18L);
-        final double tmp43 = source.doubleValue(19L);
+        double tmp03 = source.doubleValue(15L);
+        double tmp13 = source.doubleValue(16L);
+        double tmp23 = source.doubleValue(17L);
+        double tmp33 = source.doubleValue(18L);
+        double tmp43 = source.doubleValue(19L);
 
-        final double tmp04 = source.doubleValue(20L);
-        final double tmp14 = source.doubleValue(21L);
-        final double tmp24 = source.doubleValue(22L);
-        final double tmp34 = source.doubleValue(23L);
-        final double tmp44 = source.doubleValue(24L);
+        double tmp04 = source.doubleValue(20L);
+        double tmp14 = source.doubleValue(21L);
+        double tmp24 = source.doubleValue(22L);
+        double tmp34 = source.doubleValue(23L);
+        double tmp44 = source.doubleValue(24L);
+
+        final double tmpScale = FunctionUtils.norm(tmp00, tmp01, tmp02, tmp03, tmp04, tmp10, tmp11, tmp12, tmp13, tmp14, tmp20, tmp21, tmp22, tmp23, tmp24,
+                tmp30, tmp31, tmp32, tmp33, tmp34, tmp40, tmp41, tmp42, tmp43, tmp44);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+        tmp30 /= tmpScale;
+        tmp40 /= tmpScale;
+
+        tmp01 /= tmpScale;
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+        tmp31 /= tmpScale;
+        tmp41 /= tmpScale;
+
+        tmp02 /= tmpScale;
+        tmp12 /= tmpScale;
+        tmp22 /= tmpScale;
+        tmp32 /= tmpScale;
+        tmp42 /= tmpScale;
+
+        tmp03 /= tmpScale;
+        tmp13 /= tmpScale;
+        tmp23 /= tmpScale;
+        tmp33 /= tmpScale;
+        tmp43 /= tmpScale;
+
+        tmp04 /= tmpScale;
+        tmp14 /= tmpScale;
+        tmp24 /= tmpScale;
+        tmp34 /= tmpScale;
+        tmp44 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
                 tmp34, tmp44);
@@ -371,7 +450,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp01, tmp11, tmp21, tmp31, tmp02, tmp12, tmp22, tmp32, tmp03, tmp13,
                 tmp23, tmp33);
 
-        final double tmpDet = ((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30)) + (tmp40 * tmpMin40);
+        final double tmpDet = tmpScale * (((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30)) + (tmp40 * tmpMin40));
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin01 / tmpDet);
@@ -406,12 +485,19 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static void symmetric2X2(final Access2D<?> source, final DecompositionStore<?> destination) {
 
-        final double tmp00 = source.doubleValue(0L);
-        final double tmp10 = source.doubleValue(1L);
+        double tmp00 = source.doubleValue(0L);
+        double tmp10 = source.doubleValue(1L);
 
-        final double tmp11 = source.doubleValue(3L);
+        double tmp11 = source.doubleValue(3L);
 
-        final double tmpDet = AbstractDeterminator.calculate(tmp00, tmp10, tmp10, tmp11);
+        final double tmpScale = FunctionUtils.norm(tmp00, tmp10, tmp11);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+
+        tmp11 /= tmpScale;
+
+        final double tmpDet = tmpScale * AbstractDeterminator.calculate(tmp00, tmp10, tmp10, tmp11);
 
         destination.set(0L, tmp11 / tmpDet);
         destination.set(1L, -tmp10 / tmpDet);
@@ -422,14 +508,25 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static void symmetric3X3(final Access2D<?> source, final DecompositionStore<?> destination) {
 
-        final double tmp00 = source.doubleValue(0L);
-        final double tmp10 = source.doubleValue(1L);
-        final double tmp20 = source.doubleValue(2L);
+        double tmp00 = source.doubleValue(0L);
+        double tmp10 = source.doubleValue(1L);
+        double tmp20 = source.doubleValue(2L);
 
-        final double tmp11 = source.doubleValue(4L);
-        final double tmp21 = source.doubleValue(5L);
+        double tmp11 = source.doubleValue(4L);
+        double tmp21 = source.doubleValue(5L);
 
-        final double tmp22 = source.doubleValue(8L);
+        double tmp22 = source.doubleValue(8L);
+
+        final double tmpScale = FunctionUtils.norm(tmp00, tmp10, tmp11, tmp20, tmp21, tmp22);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+
+        tmp22 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp21, tmp22);
         final double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp20, tmp22);
@@ -440,7 +537,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
         final double tmpMin22 = AbstractDeterminator.calculate(tmp00, tmp10, tmp10, tmp11);
 
-        final double tmpDet = ((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20);
+        final double tmpDet = tmpScale * (((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20));
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin10 / tmpDet);
@@ -457,19 +554,35 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static void symmetric4X4(final Access2D<?> source, final DecompositionStore<?> destination) {
 
-        final double tmp00 = source.doubleValue(0L);
-        final double tmp10 = source.doubleValue(1L);
-        final double tmp20 = source.doubleValue(2L);
-        final double tmp30 = source.doubleValue(3L);
+        double tmp00 = source.doubleValue(0L);
+        double tmp10 = source.doubleValue(1L);
+        double tmp20 = source.doubleValue(2L);
+        double tmp30 = source.doubleValue(3L);
 
-        final double tmp11 = source.doubleValue(5L);
-        final double tmp21 = source.doubleValue(6L);
-        final double tmp31 = source.doubleValue(7L);
+        double tmp11 = source.doubleValue(5L);
+        double tmp21 = source.doubleValue(6L);
+        double tmp31 = source.doubleValue(7L);
 
-        final double tmp22 = source.doubleValue(10L);
-        final double tmp32 = source.doubleValue(11L);
+        double tmp22 = source.doubleValue(10L);
+        double tmp32 = source.doubleValue(11L);
 
-        final double tmp33 = source.doubleValue(15L);
+        double tmp33 = source.doubleValue(15L);
+
+        final double tmpScale = FunctionUtils.norm(tmp00, tmp10, tmp11, tmp20, tmp21, tmp22, tmp30, tmp31, tmp32, tmp33);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+        tmp30 /= tmpScale;
+
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+        tmp31 /= tmpScale;
+
+        tmp22 /= tmpScale;
+        tmp32 /= tmpScale;
+
+        tmp33 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp21, tmp22, tmp32, tmp31, tmp32, tmp33);
         final double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp31, tmp20, tmp22, tmp32, tmp30, tmp32, tmp33);
@@ -485,7 +598,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
         final double tmpMin33 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp10, tmp11, tmp21, tmp20, tmp21, tmp22);
 
-        final double tmpDet = (((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30);
+        final double tmpDet = tmpScale * ((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30));
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin10 / tmpDet);
@@ -510,25 +623,47 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static void symmetric5X5(final Access2D<?> source, final DecompositionStore<?> destination) {
 
-        final double tmp00 = source.doubleValue(0L);
-        final double tmp10 = source.doubleValue(1L);
-        final double tmp20 = source.doubleValue(2L);
-        final double tmp30 = source.doubleValue(3L);
-        final double tmp40 = source.doubleValue(4L);
+        double tmp00 = source.doubleValue(0L);
+        double tmp10 = source.doubleValue(1L);
+        double tmp20 = source.doubleValue(2L);
+        double tmp30 = source.doubleValue(3L);
+        double tmp40 = source.doubleValue(4L);
 
-        final double tmp11 = source.doubleValue(6L);
-        final double tmp21 = source.doubleValue(7L);
-        final double tmp31 = source.doubleValue(8L);
-        final double tmp41 = source.doubleValue(9L);
+        double tmp11 = source.doubleValue(6L);
+        double tmp21 = source.doubleValue(7L);
+        double tmp31 = source.doubleValue(8L);
+        double tmp41 = source.doubleValue(9L);
 
-        final double tmp22 = source.doubleValue(12L);
-        final double tmp32 = source.doubleValue(13L);
-        final double tmp42 = source.doubleValue(14L);
+        double tmp22 = source.doubleValue(12L);
+        double tmp32 = source.doubleValue(13L);
+        double tmp42 = source.doubleValue(14L);
 
-        final double tmp33 = source.doubleValue(18L);
-        final double tmp43 = source.doubleValue(19L);
+        double tmp33 = source.doubleValue(18L);
+        double tmp43 = source.doubleValue(19L);
 
-        final double tmp44 = source.doubleValue(24L);
+        double tmp44 = source.doubleValue(24L);
+
+        final double tmpScale = FunctionUtils.norm(tmp00, tmp10, tmp11, tmp20, tmp21, tmp22, tmp30, tmp31, tmp32, tmp33, tmp40, tmp41, tmp42, tmp43, tmp44);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+        tmp30 /= tmpScale;
+        tmp40 /= tmpScale;
+
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+        tmp31 /= tmpScale;
+        tmp41 /= tmpScale;
+
+        tmp22 /= tmpScale;
+        tmp32 /= tmpScale;
+        tmp42 /= tmpScale;
+
+        tmp33 /= tmpScale;
+        tmp43 /= tmpScale;
+
+        tmp44 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp21, tmp22, tmp32, tmp42, tmp31, tmp32, tmp33, tmp43, tmp41, tmp42,
                 tmp43, tmp44);
@@ -565,7 +700,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         final double tmpMin44 = AbstractDeterminator.calculate(tmp00, tmp10, tmp20, tmp30, tmp10, tmp11, tmp21, tmp31, tmp20, tmp21, tmp22, tmp32, tmp30, tmp31,
                 tmp32, tmp33);
 
-        final double tmpDet = ((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30)) + (tmp40 * tmpMin40);
+        final double tmpDet = tmpScale * (((((tmp00 * tmpMin00) - (tmp10 * tmpMin10)) + (tmp20 * tmpMin20)) - (tmp30 * tmpMin30)) + (tmp40 * tmpMin40));
 
         destination.set(0L, tmpMin00 / tmpDet);
         destination.set(1L, -tmpMin10 / tmpDet);
