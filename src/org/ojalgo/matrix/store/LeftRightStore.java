@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.Scalar;
 
@@ -39,14 +38,6 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
 
     private final MatrixStore<N> myRight;
     private final int mySplit;
-
-    @SuppressWarnings("unused")
-    private LeftRightStore(final MatrixStore<N> base) {
-
-        this(base, null);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     LeftRightStore(final MatrixStore<N> base, final MatrixStore<N> right) {
 

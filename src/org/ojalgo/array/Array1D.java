@@ -273,11 +273,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     private final long myLimit;
     private final long myStep;
 
-    @SuppressWarnings("unused")
-    private Array1D() {
-        this(null);
-    }
-
     Array1D(final BasicArray<N> delegate) {
         this(delegate, 0L, delegate.count(), 1L);
     }

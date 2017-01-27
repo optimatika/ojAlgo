@@ -38,11 +38,6 @@ public interface BinaryFunction<N extends Number> extends BasicFunction<N>, Bina
         private final N myNumber;
         private final double myValue;
 
-        @SuppressWarnings("unused")
-        private FixedFirst() {
-            this(null, null);
-        }
-
         @SuppressWarnings("unchecked")
         FixedFirst(final double arg1, final BinaryFunction<N> function) {
 
@@ -96,11 +91,6 @@ public interface BinaryFunction<N extends Number> extends BasicFunction<N>, Bina
         private final BinaryFunction<N> myFunction;
         private final N myNumber;
         private final double myValue;
-
-        @SuppressWarnings("unused")
-        private FixedSecond() {
-            this(null, null);
-        }
 
         @SuppressWarnings("unchecked")
         FixedSecond(final BinaryFunction<N> function, final double arg2) {

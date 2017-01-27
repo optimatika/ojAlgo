@@ -154,7 +154,8 @@ public class IntegerProblems extends OptimisationIntegerTests {
         tmpExpr3.set(2, 5000);
         tmpExpr3.level(new BigDecimal(19105000));
 
-        final BigArray tmpExpSol = BigArray.wrap(new BigDecimal[] { new BigDecimal(4200.000000000075), new BigDecimal(1892), new BigDecimal(1929) });
+        final BigArray tmpExpSol = BigArray
+                .wrap(new BigDecimal[] { BigDecimal.valueOf(4200.000000000075), BigDecimal.valueOf(1892), BigDecimal.valueOf(1929) });
 
         TestUtils.assertTrue("Expected Solution Not Valid", tmpModel.validate(tmpExpSol));
 
@@ -230,7 +231,7 @@ public class IntegerProblems extends OptimisationIntegerTests {
         c6.level(BigDecimal.valueOf(19105000));
 
         final BigArray tmpExpSol = BigArray
-                .wrap(new BigDecimal[] { new BigDecimal(4849.999999997941), new BigDecimal(1245), new BigDecimal(1269), new BigDecimal(1307) });
+                .wrap(new BigDecimal[] { BigDecimal.valueOf(4849.999999997941), BigDecimal.valueOf(1245), BigDecimal.valueOf(1269), BigDecimal.valueOf(1307) });
 
         TestUtils.assertTrue("Expected Solution Not Valid", tmpModel.validate(tmpExpSol));
 

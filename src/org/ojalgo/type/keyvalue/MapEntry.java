@@ -64,11 +64,6 @@ public final class MapEntry<K extends Comparable<? super K>, V extends Object> i
         myValue = null;
     }
 
-    @SuppressWarnings("unused")
-    private MapEntry() {
-        this(null);
-    }
-
     public int compareTo(final KeyValue<K, ?> aReference) {
         return myKey.compareTo(aReference.getKey());
     }

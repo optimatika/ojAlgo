@@ -27,7 +27,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.PrimitiveMatrix;
@@ -86,12 +85,6 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
     private transient State myOptimisationState = State.UNEXPLORED;
     private boolean myShortingAllowed = false;
     private final Variable[] myVariables;
-
-    @SuppressWarnings("unused")
-    private OptimisedPortfolio(final MarketEquilibrium marketEquilibrium) {
-        this(marketEquilibrium, null);
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     OptimisedPortfolio(final BasicMatrix covarianceMatrix, final BasicMatrix expectedExcessReturns) {
         this(new MarketEquilibrium(covarianceMatrix), expectedExcessReturns);

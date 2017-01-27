@@ -40,12 +40,7 @@ abstract class FormatContext<T> implements TypeContext<T>, Serializable {
      */
     public static final boolean NBSP = true;
     private boolean myConfigured = false;
-    private Format myFormat;
-
-    @SuppressWarnings("unused")
-    private FormatContext() {
-        this((Format) null);
-    }
+    private final Format myFormat;
 
     FormatContext(final Format format) {
 

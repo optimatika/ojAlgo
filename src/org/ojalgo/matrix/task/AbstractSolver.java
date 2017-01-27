@@ -24,6 +24,7 @@ package org.ojalgo.matrix.task;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -126,14 +127,25 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static void full2X2(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
 
-        final double tmp00 = body.doubleValue(0L);
-        final double tmp10 = body.doubleValue(1L);
+        double tmp00 = body.doubleValue(0L);
+        double tmp10 = body.doubleValue(1L);
 
-        final double tmp01 = body.doubleValue(2L);
-        final double tmp11 = body.doubleValue(3L);
+        double tmp01 = body.doubleValue(2L);
+        double tmp11 = body.doubleValue(3L);
 
-        final double tmp0 = rhs.doubleValue(0L);
-        final double tmp1 = rhs.doubleValue(1L);
+        double tmp0 = rhs.doubleValue(0L);
+        double tmp1 = rhs.doubleValue(1L);
+
+        final double tmpScale = FunctionUtils.norm(tmp0, tmp1);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+
+        tmp01 /= tmpScale;
+        tmp11 /= tmpScale;
+
+        tmp0 /= tmpScale;
+        tmp1 /= tmpScale;
 
         final double tmpDet = AbstractDeterminator.calculate(tmp00, tmp10, tmp01, tmp11);
 
@@ -143,21 +155,39 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static void full3X3(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
 
-        final double tmp00 = body.doubleValue(0L);
-        final double tmp10 = body.doubleValue(1L);
-        final double tmp20 = body.doubleValue(2L);
+        double tmp00 = body.doubleValue(0L);
+        double tmp10 = body.doubleValue(1L);
+        double tmp20 = body.doubleValue(2L);
 
-        final double tmp01 = body.doubleValue(3L);
-        final double tmp11 = body.doubleValue(4L);
-        final double tmp21 = body.doubleValue(5L);
+        double tmp01 = body.doubleValue(3L);
+        double tmp11 = body.doubleValue(4L);
+        double tmp21 = body.doubleValue(5L);
 
-        final double tmp02 = body.doubleValue(6L);
-        final double tmp12 = body.doubleValue(7L);
-        final double tmp22 = body.doubleValue(8L);
+        double tmp02 = body.doubleValue(6L);
+        double tmp12 = body.doubleValue(7L);
+        double tmp22 = body.doubleValue(8L);
 
-        final double tmp0 = rhs.doubleValue(0L);
-        final double tmp1 = rhs.doubleValue(1L);
-        final double tmp2 = rhs.doubleValue(2L);
+        double tmp0 = rhs.doubleValue(0L);
+        double tmp1 = rhs.doubleValue(1L);
+        double tmp2 = rhs.doubleValue(2L);
+
+        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+
+        tmp01 /= tmpScale;
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+
+        tmp02 /= tmpScale;
+        tmp12 /= tmpScale;
+        tmp22 /= tmpScale;
+
+        tmp0 /= tmpScale;
+        tmp1 /= tmpScale;
+        tmp2 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp12, tmp22);
         final double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp02, tmp22);
@@ -180,30 +210,57 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static void full4X4(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
 
-        final double tmp00 = body.doubleValue(0L);
-        final double tmp10 = body.doubleValue(1L);
-        final double tmp20 = body.doubleValue(2L);
-        final double tmp30 = body.doubleValue(3L);
+        double tmp00 = body.doubleValue(0L);
+        double tmp10 = body.doubleValue(1L);
+        double tmp20 = body.doubleValue(2L);
+        double tmp30 = body.doubleValue(3L);
 
-        final double tmp01 = body.doubleValue(4L);
-        final double tmp11 = body.doubleValue(5L);
-        final double tmp21 = body.doubleValue(6L);
-        final double tmp31 = body.doubleValue(7L);
+        double tmp01 = body.doubleValue(4L);
+        double tmp11 = body.doubleValue(5L);
+        double tmp21 = body.doubleValue(6L);
+        double tmp31 = body.doubleValue(7L);
 
-        final double tmp02 = body.doubleValue(8L);
-        final double tmp12 = body.doubleValue(9L);
-        final double tmp22 = body.doubleValue(10L);
-        final double tmp32 = body.doubleValue(11L);
+        double tmp02 = body.doubleValue(8L);
+        double tmp12 = body.doubleValue(9L);
+        double tmp22 = body.doubleValue(10L);
+        double tmp32 = body.doubleValue(11L);
 
-        final double tmp03 = body.doubleValue(12L);
-        final double tmp13 = body.doubleValue(13L);
-        final double tmp23 = body.doubleValue(14L);
-        final double tmp33 = body.doubleValue(15L);
+        double tmp03 = body.doubleValue(12L);
+        double tmp13 = body.doubleValue(13L);
+        double tmp23 = body.doubleValue(14L);
+        double tmp33 = body.doubleValue(15L);
 
-        final double tmp0 = rhs.doubleValue(0L);
-        final double tmp1 = rhs.doubleValue(1L);
-        final double tmp2 = rhs.doubleValue(2L);
-        final double tmp3 = rhs.doubleValue(3L);
+        double tmp0 = rhs.doubleValue(0L);
+        double tmp1 = rhs.doubleValue(1L);
+        double tmp2 = rhs.doubleValue(2L);
+        double tmp3 = rhs.doubleValue(3L);
+
+        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2, tmp3);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+        tmp30 /= tmpScale;
+
+        tmp01 /= tmpScale;
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+        tmp31 /= tmpScale;
+
+        tmp02 /= tmpScale;
+        tmp12 /= tmpScale;
+        tmp22 /= tmpScale;
+        tmp32 /= tmpScale;
+
+        tmp03 /= tmpScale;
+        tmp13 /= tmpScale;
+        tmp23 /= tmpScale;
+        tmp33 /= tmpScale;
+
+        tmp0 /= tmpScale;
+        tmp1 /= tmpScale;
+        tmp2 /= tmpScale;
+        tmp3 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp12, tmp22, tmp32, tmp13, tmp23, tmp33);
         final double tmpMin10 = AbstractDeterminator.calculate(tmp01, tmp21, tmp31, tmp02, tmp22, tmp32, tmp03, tmp23, tmp33);
@@ -235,41 +292,79 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static void full5X5(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
 
-        final double tmp00 = body.doubleValue(0L);
-        final double tmp10 = body.doubleValue(1L);
-        final double tmp20 = body.doubleValue(2L);
-        final double tmp30 = body.doubleValue(3L);
-        final double tmp40 = body.doubleValue(4L);
+        double tmp00 = body.doubleValue(0L);
+        double tmp10 = body.doubleValue(1L);
+        double tmp20 = body.doubleValue(2L);
+        double tmp30 = body.doubleValue(3L);
+        double tmp40 = body.doubleValue(4L);
 
-        final double tmp01 = body.doubleValue(5L);
-        final double tmp11 = body.doubleValue(6L);
-        final double tmp21 = body.doubleValue(7L);
-        final double tmp31 = body.doubleValue(8L);
-        final double tmp41 = body.doubleValue(9L);
+        double tmp01 = body.doubleValue(5L);
+        double tmp11 = body.doubleValue(6L);
+        double tmp21 = body.doubleValue(7L);
+        double tmp31 = body.doubleValue(8L);
+        double tmp41 = body.doubleValue(9L);
 
-        final double tmp02 = body.doubleValue(10L);
-        final double tmp12 = body.doubleValue(11L);
-        final double tmp22 = body.doubleValue(12L);
-        final double tmp32 = body.doubleValue(13L);
-        final double tmp42 = body.doubleValue(14L);
+        double tmp02 = body.doubleValue(10L);
+        double tmp12 = body.doubleValue(11L);
+        double tmp22 = body.doubleValue(12L);
+        double tmp32 = body.doubleValue(13L);
+        double tmp42 = body.doubleValue(14L);
 
-        final double tmp03 = body.doubleValue(15L);
-        final double tmp13 = body.doubleValue(16L);
-        final double tmp23 = body.doubleValue(17L);
-        final double tmp33 = body.doubleValue(18L);
-        final double tmp43 = body.doubleValue(19L);
+        double tmp03 = body.doubleValue(15L);
+        double tmp13 = body.doubleValue(16L);
+        double tmp23 = body.doubleValue(17L);
+        double tmp33 = body.doubleValue(18L);
+        double tmp43 = body.doubleValue(19L);
 
-        final double tmp04 = body.doubleValue(20L);
-        final double tmp14 = body.doubleValue(21L);
-        final double tmp24 = body.doubleValue(22L);
-        final double tmp34 = body.doubleValue(23L);
-        final double tmp44 = body.doubleValue(24L);
+        double tmp04 = body.doubleValue(20L);
+        double tmp14 = body.doubleValue(21L);
+        double tmp24 = body.doubleValue(22L);
+        double tmp34 = body.doubleValue(23L);
+        double tmp44 = body.doubleValue(24L);
 
-        final double tmp0 = rhs.doubleValue(0L);
-        final double tmp1 = rhs.doubleValue(1L);
-        final double tmp2 = rhs.doubleValue(2L);
-        final double tmp3 = rhs.doubleValue(3L);
-        final double tmp4 = rhs.doubleValue(4L);
+        double tmp0 = rhs.doubleValue(0L);
+        double tmp1 = rhs.doubleValue(1L);
+        double tmp2 = rhs.doubleValue(2L);
+        double tmp3 = rhs.doubleValue(3L);
+        double tmp4 = rhs.doubleValue(4L);
+
+        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2, tmp3, tmp4);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+        tmp30 /= tmpScale;
+        tmp40 /= tmpScale;
+
+        tmp01 /= tmpScale;
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+        tmp31 /= tmpScale;
+        tmp41 /= tmpScale;
+
+        tmp02 /= tmpScale;
+        tmp12 /= tmpScale;
+        tmp22 /= tmpScale;
+        tmp32 /= tmpScale;
+        tmp42 /= tmpScale;
+
+        tmp03 /= tmpScale;
+        tmp13 /= tmpScale;
+        tmp23 /= tmpScale;
+        tmp33 /= tmpScale;
+        tmp43 /= tmpScale;
+
+        tmp04 /= tmpScale;
+        tmp14 /= tmpScale;
+        tmp24 /= tmpScale;
+        tmp34 /= tmpScale;
+        tmp44 /= tmpScale;
+
+        tmp0 /= tmpScale;
+        tmp1 /= tmpScale;
+        tmp2 /= tmpScale;
+        tmp3 /= tmpScale;
+        tmp4 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp12, tmp22, tmp32, tmp42, tmp13, tmp23, tmp33, tmp43, tmp14, tmp24,
                 tmp34, tmp44);
@@ -337,29 +432,29 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static void leastSquares(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
 
-        final PrimitiveDenseStore tmpTransposed = PrimitiveDenseStore.FACTORY.transpose(body);
+        final PrimitiveDenseStore tmpTranspBody = PrimitiveDenseStore.FACTORY.transpose(body);
 
-        final int tmpCountRows = (int) tmpTransposed.countRows();
+        final int tmpCountRows = (int) tmpTranspBody.countRows();
         final PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.makeZero(tmpCountRows, tmpCountRows);
-        tmpBody.fillByMultiplying(tmpTransposed, (Access1D<Double>) body);
 
-        final MatrixStore<Double> tmpRhs = tmpTransposed.multiply((MatrixStore<Double>) rhs);
+        tmpBody.fillByMultiplying(tmpTranspBody, (Access1D<Double>) body);
+        final MatrixStore<Double> tmpRHS = tmpTranspBody.multiply((MatrixStore<Double>) rhs);
 
         switch (tmpCountRows) {
         case 1:
-            AbstractSolver.full1X1(tmpBody, tmpRhs, solution);
+            AbstractSolver.full1X1(tmpBody, tmpRHS, solution);
             break;
         case 2:
-            AbstractSolver.symmetric2X2(tmpBody, tmpRhs, solution);
+            AbstractSolver.symmetric2X2(tmpBody, tmpRHS, solution);
             break;
         case 3:
-            AbstractSolver.symmetric3X3(tmpBody, tmpRhs, solution);
+            AbstractSolver.symmetric3X3(tmpBody, tmpRHS, solution);
             break;
         case 4:
-            AbstractSolver.symmetric4X4(tmpBody, tmpRhs, solution);
+            AbstractSolver.symmetric4X4(tmpBody, tmpRHS, solution);
             break;
         case 5:
-            AbstractSolver.symmetric5X5(tmpBody, tmpRhs, solution);
+            AbstractSolver.symmetric5X5(tmpBody, tmpRHS, solution);
             break;
         default:
             throw new IllegalArgumentException();
@@ -369,13 +464,23 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static void symmetric2X2(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
 
-        final double tmp00 = body.doubleValue(0L);
-        final double tmp10 = body.doubleValue(1L);
+        double tmp00 = body.doubleValue(0L);
+        double tmp10 = body.doubleValue(1L);
 
-        final double tmp11 = body.doubleValue(3L);
+        double tmp11 = body.doubleValue(3L);
 
-        final double tmp0 = rhs.doubleValue(0L);
-        final double tmp1 = rhs.doubleValue(1L);
+        double tmp0 = rhs.doubleValue(0L);
+        double tmp1 = rhs.doubleValue(1L);
+
+        final double tmpScale = FunctionUtils.norm(tmp0, tmp1);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+
+        tmp11 /= tmpScale;
+
+        tmp0 /= tmpScale;
+        tmp1 /= tmpScale;
 
         final double tmpDet = AbstractDeterminator.calculate(tmp00, tmp10, tmp10, tmp11);
 
@@ -385,18 +490,33 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static void symmetric3X3(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
 
-        final double tmp00 = body.doubleValue(0L);
-        final double tmp10 = body.doubleValue(1L);
-        final double tmp20 = body.doubleValue(2L);
+        double tmp00 = body.doubleValue(0L);
+        double tmp10 = body.doubleValue(1L);
+        double tmp20 = body.doubleValue(2L);
 
-        final double tmp11 = body.doubleValue(4L);
-        final double tmp21 = body.doubleValue(5L);
+        double tmp11 = body.doubleValue(4L);
+        double tmp21 = body.doubleValue(5L);
 
-        final double tmp22 = body.doubleValue(8L);
+        double tmp22 = body.doubleValue(8L);
 
-        final double tmp0 = rhs.doubleValue(0L);
-        final double tmp1 = rhs.doubleValue(1L);
-        final double tmp2 = rhs.doubleValue(2L);
+        double tmp0 = rhs.doubleValue(0L);
+        double tmp1 = rhs.doubleValue(1L);
+        double tmp2 = rhs.doubleValue(2L);
+
+        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+
+        tmp22 /= tmpScale;
+
+        tmp0 /= tmpScale;
+        tmp1 /= tmpScale;
+        tmp2 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp21, tmp22);
         final double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp20, tmp22);
@@ -416,24 +536,45 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static void symmetric4X4(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
 
-        final double tmp00 = body.doubleValue(0L);
-        final double tmp10 = body.doubleValue(1L);
-        final double tmp20 = body.doubleValue(2L);
-        final double tmp30 = body.doubleValue(3L);
+        double tmp00 = body.doubleValue(0L);
+        double tmp10 = body.doubleValue(1L);
+        double tmp20 = body.doubleValue(2L);
+        double tmp30 = body.doubleValue(3L);
 
-        final double tmp11 = body.doubleValue(5L);
-        final double tmp21 = body.doubleValue(6L);
-        final double tmp31 = body.doubleValue(7L);
+        double tmp11 = body.doubleValue(5L);
+        double tmp21 = body.doubleValue(6L);
+        double tmp31 = body.doubleValue(7L);
 
-        final double tmp22 = body.doubleValue(10L);
-        final double tmp32 = body.doubleValue(11L);
+        double tmp22 = body.doubleValue(10L);
+        double tmp32 = body.doubleValue(11L);
 
-        final double tmp33 = body.doubleValue(15L);
+        double tmp33 = body.doubleValue(15L);
 
-        final double tmp0 = rhs.doubleValue(0L);
-        final double tmp1 = rhs.doubleValue(1L);
-        final double tmp2 = rhs.doubleValue(2L);
-        final double tmp3 = rhs.doubleValue(3L);
+        double tmp0 = rhs.doubleValue(0L);
+        double tmp1 = rhs.doubleValue(1L);
+        double tmp2 = rhs.doubleValue(2L);
+        double tmp3 = rhs.doubleValue(3L);
+
+        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2, tmp3);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+        tmp30 /= tmpScale;
+
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+        tmp31 /= tmpScale;
+
+        tmp22 /= tmpScale;
+        tmp32 /= tmpScale;
+
+        tmp33 /= tmpScale;
+
+        tmp0 /= tmpScale;
+        tmp1 /= tmpScale;
+        tmp2 /= tmpScale;
+        tmp3 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp21, tmp22, tmp32, tmp31, tmp32, tmp33);
         final double tmpMin10 = AbstractDeterminator.calculate(tmp10, tmp21, tmp31, tmp20, tmp22, tmp32, tmp30, tmp32, tmp33);
@@ -459,31 +600,59 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static void symmetric5X5(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
 
-        final double tmp00 = body.doubleValue(0L);
-        final double tmp10 = body.doubleValue(1L);
-        final double tmp20 = body.doubleValue(2L);
-        final double tmp30 = body.doubleValue(3L);
-        final double tmp40 = body.doubleValue(4L);
+        double tmp00 = body.doubleValue(0L);
+        double tmp10 = body.doubleValue(1L);
+        double tmp20 = body.doubleValue(2L);
+        double tmp30 = body.doubleValue(3L);
+        double tmp40 = body.doubleValue(4L);
 
-        final double tmp11 = body.doubleValue(6L);
-        final double tmp21 = body.doubleValue(7L);
-        final double tmp31 = body.doubleValue(8L);
-        final double tmp41 = body.doubleValue(9L);
+        double tmp11 = body.doubleValue(6L);
+        double tmp21 = body.doubleValue(7L);
+        double tmp31 = body.doubleValue(8L);
+        double tmp41 = body.doubleValue(9L);
 
-        final double tmp22 = body.doubleValue(12L);
-        final double tmp32 = body.doubleValue(13L);
-        final double tmp42 = body.doubleValue(14L);
+        double tmp22 = body.doubleValue(12L);
+        double tmp32 = body.doubleValue(13L);
+        double tmp42 = body.doubleValue(14L);
 
-        final double tmp33 = body.doubleValue(18L);
-        final double tmp43 = body.doubleValue(19L);
+        double tmp33 = body.doubleValue(18L);
+        double tmp43 = body.doubleValue(19L);
 
-        final double tmp44 = body.doubleValue(24L);
+        double tmp44 = body.doubleValue(24L);
 
-        final double tmp0 = rhs.doubleValue(0L);
-        final double tmp1 = rhs.doubleValue(1L);
-        final double tmp2 = rhs.doubleValue(2L);
-        final double tmp3 = rhs.doubleValue(3L);
-        final double tmp4 = rhs.doubleValue(4L);
+        double tmp0 = rhs.doubleValue(0L);
+        double tmp1 = rhs.doubleValue(1L);
+        double tmp2 = rhs.doubleValue(2L);
+        double tmp3 = rhs.doubleValue(3L);
+        double tmp4 = rhs.doubleValue(4L);
+
+        final double tmpScale = FunctionUtils.norm(tmp0, tmp1, tmp2, tmp3, tmp4);
+
+        tmp00 /= tmpScale;
+        tmp10 /= tmpScale;
+        tmp20 /= tmpScale;
+        tmp30 /= tmpScale;
+        tmp40 /= tmpScale;
+
+        tmp11 /= tmpScale;
+        tmp21 /= tmpScale;
+        tmp31 /= tmpScale;
+        tmp41 /= tmpScale;
+
+        tmp22 /= tmpScale;
+        tmp32 /= tmpScale;
+        tmp42 /= tmpScale;
+
+        tmp33 /= tmpScale;
+        tmp43 /= tmpScale;
+
+        tmp44 /= tmpScale;
+
+        tmp0 /= tmpScale;
+        tmp1 /= tmpScale;
+        tmp2 /= tmpScale;
+        tmp3 /= tmpScale;
+        tmp4 /= tmpScale;
 
         final double tmpMin00 = AbstractDeterminator.calculate(tmp11, tmp21, tmp31, tmp41, tmp21, tmp22, tmp32, tmp42, tmp31, tmp32, tmp33, tmp43, tmp41, tmp42,
                 tmp43, tmp44);

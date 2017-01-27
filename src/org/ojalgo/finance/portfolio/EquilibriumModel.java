@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.store.BigDenseStore;
@@ -40,14 +39,6 @@ abstract class EquilibriumModel extends FinancePortfolio implements FinancePortf
     private final MarketEquilibrium myMarketEquilibrium;
     private transient Scalar<?> myMeanReturn;
     private transient Scalar<?> myReturnVariance;
-
-    @SuppressWarnings("unused")
-    private EquilibriumModel() {
-
-        this((MarketEquilibrium) null);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     protected EquilibriumModel(final FinancePortfolio.Context portfolioContext) {
 

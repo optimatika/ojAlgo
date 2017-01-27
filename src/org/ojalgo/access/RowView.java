@@ -35,11 +35,6 @@ public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<
 
     final Iterable<RowView<N>> iterable = () -> RowView.this;
 
-    @SuppressWarnings("unused")
-    private RowView() {
-        this(null);
-    }
-
     protected RowView(final Access2D<N> access) {
         this(access, -1L);
     }

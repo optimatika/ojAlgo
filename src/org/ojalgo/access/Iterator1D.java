@@ -42,11 +42,6 @@ public final class Iterator1D<N extends Number> implements ListIterator<N> {
         myNextIndex = cursor;
     }
 
-    @SuppressWarnings("unused")
-    private Iterator1D() {
-        this(null);
-    }
-
     public void add(final N e) {
         throw new UnsupportedOperationException();
     }

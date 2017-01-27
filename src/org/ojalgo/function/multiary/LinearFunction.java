@@ -66,11 +66,6 @@ public final class LinearFunction<N extends Number> extends AbstractMultiary<N, 
 
     private final MatrixStore<N> myFactors;
 
-    @SuppressWarnings("unused")
-    private LinearFunction() {
-        this(null);
-    }
-
     LinearFunction(final MatrixStore<N> factors) {
 
         super();

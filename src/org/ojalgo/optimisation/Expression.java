@@ -90,14 +90,6 @@ public final class Expression extends ModelEntity<Expression> {
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    @SuppressWarnings("unused")
-    private Expression(final String aName) {
-
-        this(aName, null);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
-
     protected Expression(final Expression expressionToCopy, final ExpressionsBasedModel destinationModel, final boolean deep) {
 
         super(expressionToCopy);

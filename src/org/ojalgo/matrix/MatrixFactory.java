@@ -46,11 +46,6 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         private final PhysicalStore<N> myStore;
         private boolean mySafe = true;
 
-        @SuppressWarnings("unused")
-        private MatrixBuilder() {
-            this(null, 0, 0);
-        }
-
         protected MatrixBuilder(final PhysicalStore.Factory<N, ?> factory, final int rowDim, final int colDim) {
 
             super();
@@ -183,14 +178,6 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
     private final Constructor<I> myConstructor;
     private final PhysicalStore.Factory<N, ?> myPhysicalFactory;
-
-    @SuppressWarnings("unused")
-    private MatrixFactory() {
-
-        this(null, null);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     @SuppressWarnings("unchecked")
     MatrixFactory(final Class<I> template, final PhysicalStore.Factory<N, ?> factory) {

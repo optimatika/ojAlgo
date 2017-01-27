@@ -23,7 +23,6 @@ package org.ojalgo.finance.portfolio;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
@@ -114,14 +113,6 @@ public class MarketEquilibrium {
         myAssetKeys = ArrayUtils.copyOf(assetNamesOrKeys);
         myCovariances = covarianceMatrix;
         myRiskAversion = TypeUtils.toBigDecimal(riskAversionFactor);
-    }
-
-    @SuppressWarnings("unused")
-    private MarketEquilibrium() {
-
-        this(null, null, null);
-
-        ProgrammingError.throwForIllegalInvocation();
     }
 
     MarketEquilibrium(final MarketEquilibrium marketEquilibrium) {

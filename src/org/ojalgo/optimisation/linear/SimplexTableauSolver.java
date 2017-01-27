@@ -26,7 +26,6 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
@@ -53,12 +52,6 @@ final class SimplexTableauSolver extends LinearSolver {
         private final SimplexTableauSolver mySolver;
         int col = -1;
         int row = -1;
-
-        @SuppressWarnings("unused")
-        private PivotPoint() {
-            this(null);
-            ProgrammingError.throwForIllegalInvocation();
-        }
 
         PivotPoint(final SimplexTableauSolver solver) {
 

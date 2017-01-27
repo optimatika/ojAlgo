@@ -91,6 +91,7 @@ public abstract class MatrixTaskTests extends FunctionalityTest {
         suite.addTestSuite(DeterminantTest.class);
         suite.addTestSuite(InverterTest.class);
         suite.addTestSuite(JacobiSolverTest.class);
+        suite.addTestSuite(SolverTest.class);
         //$JUnit-END$
         return suite;
     }

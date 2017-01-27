@@ -36,11 +36,6 @@ abstract class Process1D<D extends ContinuousDistribution, P extends AbstractPro
     private final Random1D myGenerator;
     private final AbstractProcess<? extends D>[] myProcesses;
 
-    @SuppressWarnings("unused")
-    private Process1D() {
-        this(null, null);
-    }
-
     @SuppressWarnings("unchecked")
     protected Process1D(final Access2D<?> correlations, final List<? extends P> processes) {
 

@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -72,14 +71,6 @@ public final class PortfolioMixer {
                 myComponents.add(tmpCompPortf);
             }
         }
-    }
-
-    @SuppressWarnings("unused")
-    private PortfolioMixer() {
-
-        this(null, new ArrayList<FinancePortfolio>());
-
-        ProgrammingError.throwForIllegalInvocation();
     }
 
     public LowerUpper addAssetConstraint(final Number lowerLimit, final Number upperLimit, final int... assetIndeces) {

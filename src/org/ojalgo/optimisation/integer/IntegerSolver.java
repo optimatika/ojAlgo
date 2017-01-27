@@ -139,11 +139,6 @@ public abstract class IntegerSolver extends GenericSolver {
 
     private final ExpressionsBasedModel myModel;
 
-    @SuppressWarnings("unused")
-    private IntegerSolver(final Options solverOptions) {
-        this(null, solverOptions);
-    }
-
     protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
 
         super(solverOptions);

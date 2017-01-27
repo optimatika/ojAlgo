@@ -35,11 +35,6 @@ public class ColumnView<N extends Number> implements Access1D<N>, Iterator<Colum
 
     final Iterable<ColumnView<N>> iterable = () -> ColumnView.this;
 
-    @SuppressWarnings("unused")
-    private ColumnView() {
-        this(null);
-    }
-
     protected ColumnView(final Access2D<N> access) {
         this(access, -1L);
     }

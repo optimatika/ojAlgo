@@ -131,7 +131,7 @@ class P20130225 {
             final String name = v.getName();
             if (name.startsWith("X_")) {
                 final String state = name.substring(name.lastIndexOf("_") + 1, name.length());
-                expresion1.set(v, BigDecimal.valueOf((Integer.valueOf(state))));
+                expresion1.set(v, BigDecimal.valueOf((Integer.parseInt(state))));
             }
         }
         expresion1.upper(BigDecimal.valueOf(91));
@@ -152,7 +152,7 @@ class P20130225 {
             for (int j = 0; j < varsStation.size(); j++) {
                 final Variable v = (Variable) varsStation.get(j);
                 final String name = v.getName();
-                final int state = Integer.valueOf(name.substring(name.lastIndexOf("_") + 1, name.length()));
+                final int state = Integer.parseInt(name.substring(name.lastIndexOf("_") + 1, name.length()));
                 expresion3.set(v, state);
             }
             final ArrayList uvStation = (ArrayList) variablesUVStation.get(i);
@@ -214,7 +214,7 @@ class P20130225 {
                 final String name = v.getName();
                 if (name.startsWith("X_")) {
                     final String state = name.substring(name.lastIndexOf("_") + 1, name.length());
-                    expresion1.set(v, BigDecimal.valueOf((Integer.valueOf(state))));
+                    expresion1.set(v, new BigDecimal(state));
                 }
             }
             expresion1.upper(BigDecimal.valueOf(91));
@@ -235,7 +235,7 @@ class P20130225 {
                 for (int j = 0; j < varsStation.size(); j++) {
                     final Variable v = (Variable) varsStation.get(j);
                     final String name = v.getName();
-                    final int state = Integer.valueOf(name.substring(name.lastIndexOf("_") + 1, name.length()));
+                    final int state = Integer.parseInt(name.substring(name.lastIndexOf("_") + 1, name.length()));
                     expresion3.set(v, state);
                 }
                 final ArrayList uvStation = (ArrayList) variablesUVStation.get(i);

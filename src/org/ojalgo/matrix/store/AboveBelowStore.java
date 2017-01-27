@@ -24,7 +24,6 @@ package org.ojalgo.matrix.store;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -38,14 +37,6 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
 
     private final MatrixStore<N> myBelow;
     private final int mySplit;
-
-    @SuppressWarnings("unused")
-    private AboveBelowStore(final MatrixStore<N> base) {
-
-        this(base, null);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     AboveBelowStore(final MatrixStore<N> base, final MatrixStore<N> below) {
 

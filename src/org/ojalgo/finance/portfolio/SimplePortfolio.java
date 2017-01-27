@@ -117,11 +117,6 @@ public final class SimplePortfolio extends FinancePortfolio implements Context {
         this(SimplePortfolio.toSimpleAssets(someWeights));
     }
 
-    @SuppressWarnings("unused")
-    private SimplePortfolio() {
-        this((BasicMatrix) null, null);
-    }
-
     public double calculatePortfolioReturn(final FinancePortfolio weightsPortfolio) {
         final List<BigDecimal> tmpWeights = weightsPortfolio.getWeights();
         final BasicMatrix tmpAssetWeights = MATRIX_FACTORY.columns(tmpWeights);

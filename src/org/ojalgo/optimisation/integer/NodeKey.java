@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
@@ -62,12 +61,6 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
      * Node sequennce number to keep track of in which order the nodes were created.
      */
     final long sequence = GENERATOR.getAndIncrement();
-
-    @SuppressWarnings("unused")
-    private NodeKey() {
-        this(null);
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     private NodeKey(final int[] lowerBounds, final int[] upperBounds, final long parentSequenceNumber, final int indexBranchedOn,
             final double branchVariableDisplacement, final double parentObjectiveFunctionValue) {

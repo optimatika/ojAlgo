@@ -79,11 +79,6 @@ public final class CompoundFunction<N extends Number> extends AbstractMultiary<N
     private final LinearFunction<N> myLinear;
     private final QuadraticFunction<N> myQuadratic;
 
-    @SuppressWarnings("unused")
-    private CompoundFunction() {
-        this((QuadraticFunction<N>) null, (LinearFunction<N>) null);
-    }
-
     CompoundFunction(final QuadraticFunction<N> quadratic, final LinearFunction<N> linear) {
 
         super();

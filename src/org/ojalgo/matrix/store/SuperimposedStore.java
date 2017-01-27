@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.store;
 
-import org.ojalgo.ProgrammingError;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -36,14 +35,6 @@ final class SuperimposedStore<N extends Number> extends DelegatingStore<N> {
     private final MatrixStore<N> myDiff;
     private final int myRowFirst;
     private final int myRowLimit;
-
-    @SuppressWarnings("unused")
-    private SuperimposedStore(final int rowsCount, final int columnsCount, final MatrixStore<N> base) {
-
-        this(base, 0, 0, (MatrixStore<N>) null);
-
-        ProgrammingError.throwForIllegalInvocation();
-    }
 
     SuperimposedStore(final MatrixStore<N> base, final int row, final int column, final MatrixStore<N> diff) {
 

@@ -308,16 +308,7 @@ public interface Optimisation {
         }
 
         public int compareTo(final Result reference) {
-
-            final double tmpRefValue = reference.getValue();
-
-            if (myValue > tmpRefValue) {
-                return 1;
-            } else if (myValue < tmpRefValue) {
-                return -1;
-            } else {
-                return 0;
-            }
+            return Double.compare(myValue, reference.getValue());
         }
 
         public long count() {

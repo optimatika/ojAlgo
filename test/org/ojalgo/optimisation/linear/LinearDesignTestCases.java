@@ -427,7 +427,7 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
         c6.level(BigDecimal.valueOf(19105000));
 
         final BigArray tmpExpSol = BigArray
-                .wrap(new BigDecimal[] { new BigDecimal(4849.999999997941), new BigDecimal(1245), new BigDecimal(1269), new BigDecimal(1307) });
+                .wrap(new BigDecimal[] { BigDecimal.valueOf(4849.999999997941), BigDecimal.valueOf(1245), BigDecimal.valueOf(1269), BigDecimal.valueOf(1307) });
 
         TestUtils.assertTrue("Expected Solution Not Valid", tmpModel.validate(tmpExpSol));
 
