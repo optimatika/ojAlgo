@@ -827,30 +827,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return myUtility.isSmall(row, col, comparedTo);
     }
 
-    public void maxpy(final BigDecimal aSclrA, final MatrixStore<BigDecimal> aMtrxX) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > MAXPY.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    MAXPY.invoke(BigDenseStore.this.data, tmpRowDim, aFirst, aLimit, aSclrA, aMtrxX);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, MAXPY.THRESHOLD);
-
-        } else {
-
-            MAXPY.invoke(data, tmpRowDim, 0, tmpColDim, aSclrA, aMtrxX);
-        }
-    }
-
     @Override
     public void modifyAll(final UnaryFunction<BigDecimal> aFunc) {
 

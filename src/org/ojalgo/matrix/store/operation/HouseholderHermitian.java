@@ -25,6 +25,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.blas.COPY;
+import org.ojalgo.array.blas.DOT;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
@@ -235,7 +237,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
         // Copy the last column (same as the last row) of z to d
         // The last row/column is the first to be worked on in the main loop
-        Copy.invoke(data, tmpRowDim * tmpLast, d, 0, 0, n);
+        COPY.invoke(data, tmpRowDim * tmpLast, d, 0, 0, n);
 
         // Householder reduction to tridiagonal form.
         for (int i = tmpLast; i > 0; i--) { // row index of target householder point
@@ -372,7 +374,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
         // Copy the last column (same as the last row) of z to d
         // The last row/column is the first to be worked on in the main loop
-        Copy.invoke(data[tmpLast], 0, d, 0, 0, n);
+        COPY.invoke(data[tmpLast], 0, d, 0, 0, n);
 
         // Householder reduction to tridiagonal form.
         for (int i = tmpLast; i > 0; i--) { // row index of target householder point
@@ -463,7 +465,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                 }
 
                 for (int j = 0; j <= i; j++) {
-                    final double tmpDotProd = DotProduct.invoke(tmpVt_i1, 0, data[j], 0, 0, i + 1);
+                    final double tmpDotProd = DOT.invoke(tmpVt_i1, 0, data[j], 0, 0, i + 1);
                     //                    for (int k = 0; k <= i; k++) {
                     //                        //g += V[k][i + 1] * V[k][j];
                     //                        g += tmpVt_i1[k] * tmpVt_j[k];

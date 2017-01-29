@@ -212,7 +212,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myCount;
     }
 
-    public void daxpy(final double a, final Mutate1D y) {
+    public void axpy(final double a, final Mutate1D y) {
         for (int n = 0; n < myActualLength; n++) {
             y.add(myIndices[n], a * myValues.doubleValue(n));
         }

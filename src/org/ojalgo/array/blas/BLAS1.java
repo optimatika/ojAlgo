@@ -21,6 +21,8 @@
  */
 package org.ojalgo.array.blas;
 
+import org.ojalgo.array.DenseArray;
+
 /**
  * Basic Linear Algebra Subprograms (BLAS) Level 1 contains vector operations.
  * <ul>
@@ -29,6 +31,11 @@ package org.ojalgo.array.blas;
  * <li><a href="http://www.netlib.org/blas/#_level_1">BLAS Level 1 @ Netlib</a></li>
  * <li><a href="https://software.intel.com/en-us/node/520730">BLAS Level 1 @ Intel</a></li>
  * </ul>
+ * For each operation there should be 2 sets of implementations:
+ * <ol>
+ * <li>Optimised to be the implementations for the {@linkplain DenseArray} instances.</li>
+ * <li>Optimised to be building blocks for higher level algorithms</li>
+ * </ol>
  *
  * @author apete
  */

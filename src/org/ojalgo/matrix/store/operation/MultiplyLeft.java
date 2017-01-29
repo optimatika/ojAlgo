@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.array.blas.DOT;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.MatrixUtils;
@@ -637,7 +638,7 @@ public final class MultiplyLeft extends MatrixOperation {
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
+                product[i + (j * tmpRowDim)] = DOT.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
             }
         }
     }
@@ -657,7 +658,7 @@ public final class MultiplyLeft extends MatrixOperation {
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
+                product[i + (j * tmpRowDim)] = DOT.invoke(tmpLeftRow, 0, right, j * complexity, 0, complexity);
             }
         }
     }
@@ -679,7 +680,7 @@ public final class MultiplyLeft extends MatrixOperation {
             }
 
             for (int j = 0; j < tmpColDim; j++) {
-                product[i + (j * tmpRowDim)] = DotProduct.invoke(tmpLeftRow, 0, right, j * complexity, tmpFirstInRow, tmpLimitOfRow);
+                product[i + (j * tmpRowDim)] = DOT.invoke(tmpLeftRow, 0, right, j * complexity, tmpFirstInRow, tmpLimitOfRow);
             }
         }
     }

@@ -155,11 +155,6 @@ final class BlockStore<N extends Number> extends FactoryStore<N> implements Phys
 
     }
 
-    public void maxpy(final N scalarA, final MatrixStore<N> matrixX) {
-        // TODO Auto-generated method stub
-
-    }
-
     public void raxpy(final N scalarA, final int rowX, final int rowY, final int firstColumn) {
         // TODO Auto-generated method stub
 

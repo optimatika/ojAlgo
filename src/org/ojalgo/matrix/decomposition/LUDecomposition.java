@@ -227,7 +227,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         final int tmpMinDim = (int) Math.min(tmpStore.countRows(), tmpStore.countColumns());
 
         for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
-            retVal &= !tmpStore.isSmall(ij, ij, PrimitiveMath.ONE);
+            retVal &= tmpStore.doubleValue(ij, ij) != PrimitiveMath.ZERO;
         }
 
         return retVal;

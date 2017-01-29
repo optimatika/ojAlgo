@@ -27,6 +27,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.decomposition.*;
@@ -560,7 +561,7 @@ public abstract class MatrixUtils {
         HouseholderHermitian.THRESHOLD = Math.min(maxValue, HouseholderHermitian.THRESHOLD);
         HouseholderLeft.THRESHOLD = Math.min(maxValue, HouseholderLeft.THRESHOLD);
         HouseholderRight.THRESHOLD = Math.min(maxValue, HouseholderRight.THRESHOLD);
-        MAXPY.THRESHOLD = Math.min(maxValue, MAXPY.THRESHOLD);
+        AXPY.THRESHOLD = Math.min(maxValue, AXPY.THRESHOLD);
         ModifyAll.THRESHOLD = Math.min(maxValue, ModifyAll.THRESHOLD);
         MultiplyBoth.THRESHOLD = Math.min(maxValue, MultiplyBoth.THRESHOLD);
         MultiplyHermitianAndVector.THRESHOLD = Math.min(maxValue, MultiplyHermitianAndVector.THRESHOLD);
@@ -591,7 +592,7 @@ public abstract class MatrixUtils {
         HouseholderHermitian.THRESHOLD = Math.max(minValue, HouseholderHermitian.THRESHOLD);
         HouseholderLeft.THRESHOLD = Math.max(minValue, HouseholderLeft.THRESHOLD);
         HouseholderRight.THRESHOLD = Math.max(minValue, HouseholderRight.THRESHOLD);
-        MAXPY.THRESHOLD = Math.max(minValue, MAXPY.THRESHOLD);
+        AXPY.THRESHOLD = Math.max(minValue, AXPY.THRESHOLD);
         ModifyAll.THRESHOLD = Math.max(minValue, ModifyAll.THRESHOLD);
         MultiplyBoth.THRESHOLD = Math.max(minValue, MultiplyBoth.THRESHOLD);
         MultiplyHermitianAndVector.THRESHOLD = Math.max(minValue, MultiplyHermitianAndVector.THRESHOLD);

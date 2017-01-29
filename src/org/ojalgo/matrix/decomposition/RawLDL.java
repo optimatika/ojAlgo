@@ -25,13 +25,13 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.matrix.task.TaskException;
 
 final class RawLDL extends RawDecomposition implements LDL<Double> {
@@ -177,13 +177,13 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
             for (int j = 0; j < ij; j++) {
                 tmpRowIJ[j] = tmpRowI[j] * data[j][j];
             }
-            final double tmpD = tmpRowI[ij] = input.doubleValue(ij, ij) - DotProduct.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij);
+            final double tmpD = tmpRowI[ij] = input.doubleValue(ij, ij) - DOT.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij);
             mySPD &= (tmpD > ZERO);
 
             for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
                 tmpRowI = data[i];
 
-                tmpRowI[ij] = (input.doubleValue(i, ij) - DotProduct.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij)) / tmpD;
+                tmpRowI[ij] = (input.doubleValue(i, ij) - DOT.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij)) / tmpD;
             }
         }
 

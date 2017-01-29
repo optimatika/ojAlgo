@@ -420,7 +420,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
 
                 if (tmpStepLength > ZERO) { // It is possible that it becomes == 0.0
-                    this.getX().maxpy(tmpStepLength, iterationSolution);
+                    // this.getX().maxpy(tmpStepLength, iterationSolution);
+                    iterationSolution.axpy(tmpStepLength, this.getX());
                 } else if (((myConstraintToInclude >= 0) && (myActivator.getLastExcluded() == myConstraintToInclude))
                         && (myActivator.getLastIncluded() == myConstraintToInclude)) {
                     myConstraintToInclude = -1;

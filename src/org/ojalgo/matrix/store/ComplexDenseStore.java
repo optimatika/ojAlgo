@@ -846,30 +846,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return myUtility.isSmall(row, col, comparedTo);
     }
 
-    public void maxpy(final ComplexNumber aSclrA, final MatrixStore<ComplexNumber> aMtrxX) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > MAXPY.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int aFirst, final int aLimit) {
-                    MAXPY.invoke(ComplexDenseStore.this.data, tmpRowDim, aFirst, aLimit, aSclrA, aMtrxX);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, MAXPY.THRESHOLD);
-
-        } else {
-
-            MAXPY.invoke(data, tmpRowDim, 0, tmpColDim, aSclrA, aMtrxX);
-        }
-    }
-
     @Override
     public void modifyAll(final UnaryFunction<ComplexNumber> aFunc) {
 

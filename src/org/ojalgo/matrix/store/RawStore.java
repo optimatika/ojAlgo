@@ -1111,21 +1111,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return PrimitiveScalar.isSmall(comparedTo, this.doubleValue(row, col));
     }
 
-    public void maxpy(final Double aSclrA, final MatrixStore<Double> aMtrxX) {
-
-        final double tmpValA = aSclrA;
-        final double[][] tmpArray = data;
-
-        final int tmpRowDim = data.length;
-        final int tmpColDim = myNumberOfColumns;
-
-        for (int i = 0; i < tmpRowDim; i++) {
-            for (int j = 0; j < tmpColDim; j++) {
-                tmpArray[i][j] += tmpValA * aMtrxX.doubleValue(i, j);
-            }
-        }
-    }
-
     public void modifyAll(final UnaryFunction<Double> modifier) {
         ArrayUtils.modifyAll(data, modifier);
     }

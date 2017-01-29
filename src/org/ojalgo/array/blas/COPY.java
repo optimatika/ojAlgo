@@ -28,4 +28,12 @@ package org.ojalgo.array.blas;
  */
 public abstract class COPY implements BLAS1 {
 
+    public static void invoke(final double[] source, final int sourceOffset, final double[] destination, final int destinationOffset, final int first,
+            final int limit) {
+        for (int i = first; i < limit; i++) {
+            destination[destinationOffset + i] = source[sourceOffset + i];
+        }
+    
+    }
+
 }

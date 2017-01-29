@@ -26,6 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
@@ -34,7 +35,6 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
@@ -326,7 +326,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
                 // Apply transformation to remaining columns.
                 for (int j = k + 1; j < n; j++) {
-                    AXPY.invoke(data[j], 0, 1, -(DotProduct.invoke(tmpColK, 0, data[j], 0, k, m) / tmpColK[k]), tmpColK, 0, 1, k, m);
+                    AXPY.invoke(data[j], 0, 1, -(DOT.invoke(tmpColK, 0, data[j], 0, k, m) / tmpColK[k]), tmpColK, 0, 1, k, m);
                 }
             }
             myDiagonalR[k] = -nrm;
@@ -372,7 +372,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             tmpColK = tmpData[k];
 
             for (int j = 0; j < s; j++) {
-                final double tmpVal = -(DotProduct.invoke(tmpColK, 0, tmpRHSdata, m * j, k, m) / tmpColK[k]);
+                final double tmpVal = -(DOT.invoke(tmpColK, 0, tmpRHSdata, m * j, k, m) / tmpColK[k]);
                 AXPY.invoke(tmpRHSdata, m * j, 1, tmpVal, tmpColK, 0, 1, k, m);
             }
         }

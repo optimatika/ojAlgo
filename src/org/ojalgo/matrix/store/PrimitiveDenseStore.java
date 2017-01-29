@@ -1347,6 +1347,38 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
+    /**
+     * @deprecated v42 Temporary method until redesign of transpose() and conjugate() related functionality
+     */
+    @Deprecated
+    public void fillMatching(final MatrixStore<Double> source) {
+
+        if (source instanceof TransjugatedStore) {
+
+            if (myColDim > FillTransposed.THRESHOLD) {
+
+                final DivideAndConquer tmpConquerer = new DivideAndConquer() {
+
+                    @Override
+                    public void conquer(final int first, final int limit) {
+                        FillTransposed.invoke(data, myRowDim, first, limit, source);
+                    }
+
+                };
+
+                tmpConquerer.invoke(0, myColDim, FillTransposed.THRESHOLD);
+
+            } else {
+
+                FillTransposed.invoke(data, myRowDim, 0, myColDim, source);
+            }
+
+        } else {
+
+            super.fillMatching(source);
+        }
+    }
+
     public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
         this.set(row, col, values.doubleValue(valueIndex));
     }
@@ -1418,30 +1450,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public boolean isSmall(final long row, final long col, final double comparedTo) {
         return myUtility.isSmall(row, col, comparedTo);
-    }
-
-    public void maxpy(final Double aSclrA, final MatrixStore<Double> aMtrxX) {
-
-        final int tmpRowDim = myRowDim;
-        final int tmpColDim = myColDim;
-
-        if (tmpColDim > MAXPY.THRESHOLD) {
-
-            final DivideAndConquer tmpConquerer = new DivideAndConquer() {
-
-                @Override
-                public void conquer(final int first, final int limit) {
-                    MAXPY.invoke(PrimitiveDenseStore.this.data, tmpRowDim, first, limit, aSclrA, aMtrxX);
-                }
-
-            };
-
-            tmpConquerer.invoke(0, tmpColDim, MAXPY.THRESHOLD);
-
-        } else {
-
-            MAXPY.invoke(data, tmpRowDim, 0, tmpColDim, aSclrA, aMtrxX);
-        }
     }
 
     @Override

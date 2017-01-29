@@ -26,6 +26,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.ArrayUtils;
+import org.ojalgo.array.blas.DOT;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -35,7 +36,6 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
@@ -237,7 +237,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
             // Apply previous transformations.
             for (int i = 0; i < tmpRowDim; i++) {
                 // Most of the time is spent in the following dot product.
-                data[i][j] = tmpColJ[i] -= DotProduct.invoke(data[i], 0, tmpColJ, 0, 0, Math.min(i, j));
+                data[i][j] = tmpColJ[i] -= DOT.invoke(data[i], 0, tmpColJ, 0, 0, Math.min(i, j));
             }
 
             // Find pivot and exchange if necessary.
@@ -305,10 +305,11 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
         final double[][] LU = this.getRawInPlaceData();
         for (int j = 0; j < n; j++) {
-            if (LU[j][j] == 0) {
+            if (LU[j][j] == 0.0) {
                 return false;
             }
         }
+
         return true;
     }
 }

@@ -187,7 +187,8 @@ public class SingularValueTest extends MatrixDecompositionTests {
             BasicLogger.debug("Q2", tmpDecomposition.getQ2());
             BasicLogger.debug("Reconstructed", tmpReconstructed);
             final PhysicalStore<ComplexNumber> tmpCopy = tmpOriginal.copy();
-            tmpCopy.maxpy(ComplexNumber.NEG, tmpReconstructed);
+            // tmpCopy.maxpy(ComplexNumber.NEG, tmpReconstructed);
+            tmpReconstructed.axpy(-1, tmpCopy);
             BasicLogger.debug("Diff", tmpCopy);
         }
 
@@ -235,10 +236,10 @@ public class SingularValueTest extends MatrixDecompositionTests {
         final PhysicalStore<ComplexNumber> tmpComplexStore = ComplexDenseStore.FACTORY.copy(original);
         final PhysicalStore<Double> tmpPrimitiveStore = PrimitiveDenseStore.FACTORY.copy(original);
 
-        IMPL_BIG.decompose((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(original));
-        IMPL_COMPLEX.decompose((PhysicalStore<ComplexNumber>) ComplexDenseStore.FACTORY.copy(original));
-        IMPL_RAW.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(original));
-        IMPL_PRIMITIVE.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(original));
+        IMPL_BIG.decompose(BigDenseStore.FACTORY.copy(original));
+        IMPL_COMPLEX.decompose(ComplexDenseStore.FACTORY.copy(original));
+        IMPL_RAW.decompose(PrimitiveDenseStore.FACTORY.copy(original));
+        IMPL_PRIMITIVE.decompose(PrimitiveDenseStore.FACTORY.copy(original));
 
         final Array1D<Double> tmpBigSingularValues = IMPL_BIG.getSingularValues();
         final Array1D<Double> tmpComplexSingularValues = IMPL_COMPLEX.getSingularValues();
@@ -362,7 +363,8 @@ public class SingularValueTest extends MatrixDecompositionTests {
                 BasicLogger.debug("Q2", tmpImpls[i].getQ2());
                 BasicLogger.debug("Reconstructed", tmpReconstructed);
                 final PhysicalStore<Double> tmpCopy = aMtrx.copy();
-                tmpCopy.maxpy(-1.0, tmpReconstructed);
+                // tmpCopy.maxpy(-1.0, tmpReconstructed);
+                tmpReconstructed.axpy(-1, tmpCopy);
                 BasicLogger.debug("Diff", tmpCopy);
             }
 

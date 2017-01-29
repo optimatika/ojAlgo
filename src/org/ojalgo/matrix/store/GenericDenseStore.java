@@ -133,8 +133,8 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
         return myUtility.countRows();
     }
 
-    public void daxpy(final double a, final Mutate1D y) {
-        myUtility.daxpy(a, y);
+    public void axpy(final double a, final Mutate1D y) {
+        myUtility.axpy(a, y);
     }
 
     public void divideAndCopyColumn(final int row, final int column, final BasicArray<N> destination) {

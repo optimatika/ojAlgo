@@ -27,13 +27,13 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.store.operation.DotProduct;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
@@ -345,7 +345,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
                     // Apply the transformation to the remaining columns
                     for (int j = k + 1; j < n; j++) {
-                        double t = DotProduct.invoke(tmpAt_k, 0, data[j], 0, k, m);
+                        double t = DOT.invoke(tmpAt_k, 0, data[j], 0, k, m);
                         t = t / tmpAt_k[k];
                         AXPY.invoke(data[j], 0, 1, -t, tmpAt_k, 0, 1, k, m);
                     }
@@ -433,7 +433,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 final double[] tmpUt_k = myUt[k];
                 if (myS[k] != ZERO) {
                     for (int j = k + 1; j < n; j++) {
-                        double t = DotProduct.invoke(tmpUt_k, 0, myUt[j], 0, k, m);
+                        double t = DOT.invoke(tmpUt_k, 0, myUt[j], 0, k, m);
                         t = t / tmpUt_k[k];
                         AXPY.invoke(myUt[j], 0, 1, -t, tmpUt_k, 0, 1, k, m);
                     }
@@ -459,7 +459,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 final double[] tmpVt_k = myVt[k];
                 if ((k < nrt) && (tmpE[k] != ZERO)) {
                     for (int j = k + 1; j < n; j++) {
-                        double t = DotProduct.invoke(tmpVt_k, 0, myVt[j], 0, k + 1, n);
+                        double t = DOT.invoke(tmpVt_k, 0, myVt[j], 0, k + 1, n);
                         t = t / tmpVt_k[k + 1];
                         AXPY.invoke(myVt[j], 0, 1, -t, tmpVt_k, 0, 1, k + 1, n);
                     }

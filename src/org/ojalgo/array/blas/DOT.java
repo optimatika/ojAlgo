@@ -21,12 +21,54 @@
  */
 package org.ojalgo.array.blas;
 
+import java.math.BigDecimal;
+
+import org.ojalgo.constant.BigMath;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Scalar;
+
 /**
  * The ?dot routines perform a vector-vector reduction operation defined as Equation where xi and yi are
  * elements of vectors x and y.
- * 
+ *
  * @author apete
  */
 public abstract class DOT implements BLAS1 {
+
+    public static BigDecimal invoke(final BigDecimal[] array1, final int offset1, final BigDecimal[] array2, final int offset2, final int first,
+            final int limit) {
+        BigDecimal retVal = BigMath.ZERO;
+        for (int i = first; i < limit; i++) {
+            retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
+        }
+        return retVal;
+    }
+
+    public static ComplexNumber invoke(final ComplexNumber[] array1, final int offset1, final ComplexNumber[] array2, final int offset2, final int first,
+            final int limit) {
+        ComplexNumber retVal = ComplexNumber.ZERO;
+        for (int i = first; i < limit; i++) {
+            retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
+        }
+        return retVal;
+    }
+
+    public static double invoke(final double[] array1, final int offset1, final double[] array2, final int offset2, final int first, final int limit) {
+        double retVal = PrimitiveMath.ZERO;
+        for (int i = first; i < limit; i++) {
+            retVal += array1[offset1 + i] * array2[offset2 + i];
+        }
+        return retVal;
+    }
+
+    public static <N extends Number & Scalar<N>> N invoke(final N[] array1, final int offset1, final N[] array2, final int offset2, final int first,
+            final int limit, final Scalar.Factory<N> factory) {
+        Scalar<N> retVal = factory.zero();
+        for (int i = first; i < limit; i++) {
+            retVal = retVal.add(array1[offset1 + i].multiply(array2[offset2 + i]));
+        }
+        return retVal.getNumber();
+    }
 
 }

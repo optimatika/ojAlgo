@@ -591,17 +591,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
 
     /**
      * <p>
-     * <b>m</b>atrix <b>a</b> * <b>x</b> <b>p</b>lus <b>y</b>
-     * </p>
-     * [this] = aSclrA [aMtrxX] + [this]
-     *
-     * @deprecated v32 Let me know if you need this
-     */
-    @Deprecated
-    void maxpy(final N scalarA, final MatrixStore<N> matrixX);
-
-    /**
-     * <p>
      * <b>r</b>ow <b>a</b> * <b>x</b> <b>p</b>lus <b>y</b>
      * </p>
      * [this(aRowY,*)] = aSclrA [this(aRowX,*)] + [this(aRowY,*)]

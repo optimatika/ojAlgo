@@ -186,22 +186,22 @@ final class Tableau implements Access2D<Double>, Mutate2D {
         for (int i = 0; i < row; i++) {
             final SparseArray<Double> tmpY = myRows[i];
             tmpVal = -tmpY.doubleValue(col);
-            tmpPivotRow.daxpy(tmpVal, tmpY);
+            tmpPivotRow.axpy(tmpVal, tmpY);
             myRHS.add(i, (tmpVal * tmpPivotRHS));
         }
         for (int i = row + 1; i < myRows.length; i++) {
             final SparseArray<Double> tmpY = myRows[i];
             tmpVal = -tmpY.doubleValue(col);
-            tmpPivotRow.daxpy(tmpVal, tmpY);
+            tmpPivotRow.axpy(tmpVal, tmpY);
             myRHS.add(i, tmpVal * tmpPivotRHS);
         }
 
         tmpVal = -myWeights.doubleValue(col);
-        tmpPivotRow.daxpy(tmpVal, myWeights);
+        tmpPivotRow.axpy(tmpVal, myWeights);
         myObjective += tmpVal * tmpPivotRHS;
 
         tmpVal = -myPhase1Weights.doubleValue(col);
-        tmpPivotRow.daxpy(tmpVal, myPhase1Weights);
+        tmpPivotRow.axpy(tmpVal, myPhase1Weights);
         myInfeasibility += tmpVal * tmpPivotRHS;
     }
 

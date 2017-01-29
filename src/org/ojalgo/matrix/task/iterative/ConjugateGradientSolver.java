@@ -104,8 +104,12 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
             tmpStepLength = zr0 / pAp0;
 
             if (!Double.isNaN(tmpStepLength)) {
-                solution.maxpy(tmpStepLength, tmpDirection);
-                tmpResidual.maxpy(-tmpStepLength, tmpVector);
+
+                // solution.maxpy(tmpStepLength, tmpDirection);
+                tmpDirection.axpy(tmpStepLength, solution);
+
+                // tmpResidual.maxpy(-tmpStepLength, tmpVector);
+                tmpVector.axpy(-tmpStepLength, tmpResidual);
             }
 
             tmpNormErr = ZERO;

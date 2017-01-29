@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store.operation;
 import java.math.BigDecimal;
 
 import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.blas.DOT;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.transformation.Householder;
@@ -89,7 +90,7 @@ public final class HouseholderLeft extends MatrixOperation {
 
         double tmpScale;
         for (int j = first; j < limit; j++) {
-            tmpScale = DotProduct.invoke(data, j * structure, tmpHouseholderVector, 0, tmpFirstNonZero, structure);
+            tmpScale = DOT.invoke(data, j * structure, tmpHouseholderVector, 0, tmpFirstNonZero, structure);
             tmpScale *= tmpBeta;
             AXPY.invoke(data, j * structure, 1, -tmpScale, tmpHouseholderVector, 0, 1, tmpFirstNonZero, structure);
         }

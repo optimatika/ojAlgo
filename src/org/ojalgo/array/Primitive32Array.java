@@ -351,7 +351,7 @@ public class Primitive32Array extends PrimitiveArray {
         data = new float[size];
     }
 
-    public final void daxpy(final double a, final Mutate1D y) {
+    public final void axpy(final double a, final Mutate1D y) {
         AXPY.invoke(y, a, data);
     }
 
