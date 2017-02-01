@@ -40,7 +40,7 @@ public class NumberListTest extends ArrayTests {
 
     public void testGrowCapacity() {
 
-        final NumberList<Double> tmNumberList = NumberList.makeOffHeap();
+        final NumberList<Double> tmNumberList = NumberList.makePrimitive();
 
         TestUtils.assertEquals(0L, tmNumberList.count());
         TestUtils.assertEquals(16L, tmNumberList.capacity());

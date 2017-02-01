@@ -50,11 +50,15 @@ public abstract class BasicArrayTest extends ArrayTests {
         super(aName);
     }
 
-    public void testOffHeap() {
-        this.doTest(OffHeapArray.makeNative64(COUNT));
+    public void testHugeSparse() {
+        this.doTest(SparseArray.makePrimitive(Long.MAX_VALUE, COUNT));
     }
 
-    public void testPrimitive() {
+    public void testPrimitive32() {
+        this.doTest(Primitive32Array.make(COUNT));
+    }
+
+    public void testPrimitive64() {
         this.doTest(Primitive64Array.make(COUNT));
     }
 
@@ -70,10 +74,6 @@ public abstract class BasicArrayTest extends ArrayTests {
 
     public void testSparse() {
         this.doTest(SparseArray.makePrimitive(COUNT));
-    }
-
-    public void testHugeSparse() {
-        this.doTest(SparseArray.makePrimitive(Long.MAX_VALUE, COUNT));
     }
 
     abstract void doTest(final BasicArray<Double> array);
