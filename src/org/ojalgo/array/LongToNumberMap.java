@@ -19,16 +19,16 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
     private static int INITIAL_CAPACITY = 16;
 
+    public static <N extends Number> LongToNumberMap<N> make(final DenseArray.Factory<N> arrayFactory) {
+        return new LongToNumberMap<>(arrayFactory);
+    }
+
     public static LongToNumberMap<BigDecimal> makeBig() {
         return new LongToNumberMap<>(BigArray.FACTORY);
     }
 
     public static LongToNumberMap<ComplexNumber> makeComplex() {
         return new LongToNumberMap<>(ComplexArray.FACTORY);
-    }
-
-    public static LongToNumberMap<Double> makeOffHeap() {
-        return new LongToNumberMap<>(OffHeapArray.NATIVE64);
     }
 
     public static LongToNumberMap<Double> makePrimitive() {

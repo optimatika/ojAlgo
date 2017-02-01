@@ -42,16 +42,16 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     private static long INITIAL_CAPACITY = 16L;
     private static long SEGMENT_CAPACITY = 16_384L;
 
+    public static <N extends Number> NumberList<N> make(final DenseArray.Factory<N> arrayFactory) {
+        return new NumberList<>(arrayFactory);
+    }
+
     public static NumberList<BigDecimal> makeBig() {
         return new NumberList<>(BigArray.FACTORY);
     }
 
     public static NumberList<ComplexNumber> makeComplex() {
         return new NumberList<>(ComplexArray.FACTORY);
-    }
-
-    public static NumberList<Double> makeOffHeap() {
-        return new NumberList<>(OffHeapArray.NATIVE64);
     }
 
     public static NumberList<Double> makePrimitive() {
@@ -322,7 +322,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         return array;
     }
 
-    public void visitOne(long index, VoidFunction<N> visitor) {
+    public void visitOne(final long index, final VoidFunction<N> visitor) {
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
