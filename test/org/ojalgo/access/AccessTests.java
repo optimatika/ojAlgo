@@ -23,23 +23,12 @@ package org.ojalgo.access;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * @author apete
  */
 public abstract class AccessTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(AccessTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(AccessUtilsTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected AccessTests() {
         super();

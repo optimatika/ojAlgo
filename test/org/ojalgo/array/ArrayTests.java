@@ -23,9 +23,6 @@ package org.ojalgo.array;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * ArrayPackageTests
  *
@@ -34,23 +31,6 @@ import junit.framework.TestSuite;
 public abstract class ArrayTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(ArrayTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(AggregatorCardinality.class);
-        suite.addTestSuite(AggregatorProduct.class);
-        suite.addTestSuite(AggregatorSum.class);
-        suite.addTestSuite(ArrayStructureTest.class);
-        suite.addTestSuite(Array1DTest.class);
-        suite.addTestSuite(NumberListTest.class);
-        suite.addTestSuite(LongToNumberMapTest.class);
-        suite.addTestSuite(BufferArrayTest.class);
-        suite.addTestSuite(SegmentedArrayTest.class);
-        suite.addTestSuite(SetGetTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected ArrayTests() {
         super();

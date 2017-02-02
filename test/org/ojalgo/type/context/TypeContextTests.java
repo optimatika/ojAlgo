@@ -23,9 +23,6 @@ package org.ojalgo.type.context;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * TypeContextPackageTests
  *
@@ -34,14 +31,6 @@ import junit.framework.TestSuite;
 public abstract class TypeContextTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(TypeContextTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(NumberContextTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected TypeContextTests() {
         super();

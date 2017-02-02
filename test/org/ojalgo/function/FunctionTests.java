@@ -23,22 +23,9 @@ package org.ojalgo.function;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 public abstract class FunctionTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(FunctionTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(ComplexCase.class);
-        suite.addTestSuite(CompareImplementations.class);
-        suite.addTestSuite(PrimitiveCase.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected FunctionTests() {
         super();

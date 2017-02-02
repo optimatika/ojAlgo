@@ -46,7 +46,7 @@ public class SVDbyEvD extends MatrixDecompositionTests {
     /**
      * Data from example 3.15 in Scientific Computing by Michael T. Heath
      */
-    public void testHeath() {
+    public void _testHeath() {
 
         final PhysicalStore<Double> tmpMtrx = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 10, 11, 12 } });
 

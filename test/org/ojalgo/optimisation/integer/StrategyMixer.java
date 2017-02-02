@@ -66,7 +66,7 @@ public class StrategyMixer extends OptimisationIntegerTests {
         TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE);
     }
 
-    public void testStratCombPortfolioMixerRandom() {
+    public void _testStratCombPortfolioMixerRandom() {
 
         final FinancePortfolio tmpTarget = new SimplePortfolio(QUARTER, QUARTER, QUARTER, QUARTER).normalise();
 

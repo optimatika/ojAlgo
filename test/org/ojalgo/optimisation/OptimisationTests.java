@@ -14,9 +14,6 @@ package org.ojalgo.optimisation;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * OptimisationQuadraticPackageTests
  *
@@ -25,14 +22,6 @@ import junit.framework.TestSuite;
 public abstract class OptimisationTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(OptimisationTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(ExpressionsBasedModelTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected OptimisationTests() {
         super();

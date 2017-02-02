@@ -313,7 +313,7 @@ public class RandomNumberTest extends RandomTests {
         // Check that the geometric standard deviation is within ±0.005% of what it should be.
     }
 
-    public void testLogNormal() {
+    public void _testLogNormal() {
 
         final double tmpAccuracy = TENTH / THREE;
 

@@ -23,21 +23,9 @@ package org.ojalgo.constant;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 public abstract class ConstantTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(ConstantTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(PrimitiveMathTest.class);
-        suite.addTestSuite(PrimitivePrefixTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected ConstantTests() {
         super();

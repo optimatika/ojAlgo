@@ -23,21 +23,9 @@ package org.ojalgo.machine;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 public abstract class MachineTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(MachineTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(TestHardware.class);
-        suite.addTestSuite(TestMemoryEstimator.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected MachineTests() {
         super();

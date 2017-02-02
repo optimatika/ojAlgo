@@ -14,9 +14,6 @@ package org.ojalgo.optimisation.linear;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * OptimisationLinearPackageTests
  *
@@ -25,19 +22,6 @@ import junit.framework.TestSuite;
 public abstract class OptimisationLinearTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(OptimisationLinearTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(BurkardtDatasetsMps.class);
-        suite.addTestSuite(CommonsMathSimplexSolverTest.class);
-        suite.addTestSuite(ComPictetPamBamTest.class);
-        suite.addTestSuite(LinearDesignTestCases.class);
-        suite.addTestSuite(NetlibCase.class);
-        suite.addTestSuite(LinearProblems.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected OptimisationLinearTests() {
         super();

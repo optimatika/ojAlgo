@@ -23,20 +23,9 @@ package org.ojalgo.function.polynomial;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 public abstract class FunctionPolynomialTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(FunctionPolynomialTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(PolynomialImplTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected FunctionPolynomialTests() {
         super();

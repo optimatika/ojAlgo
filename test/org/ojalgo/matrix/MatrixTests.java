@@ -23,35 +23,9 @@ package org.ojalgo.matrix;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 public abstract class MatrixTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(MatrixTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(LargerCholeskyCase.class);
-        suite.addTestSuite(MatrixUtilsTest.class);
-        suite.addTestSuite(P20030422Case.class);
-        suite.addTestSuite(P20030512Case.class);
-        suite.addTestSuite(P20030528Case.class);
-        suite.addTestSuite(P20050125Case.class);
-        suite.addTestSuite(P20050827Case.class);
-        suite.addTestSuite(P20061119Case.class);
-        suite.addTestSuite(P20071019Case.class);
-        suite.addTestSuite(SimpleCholeskyCase.class);
-        suite.addTestSuite(SimpleEigenvalueCase.class);
-        suite.addTestSuite(SimpleEquationCase.class);
-        suite.addTestSuite(SimpleLeastSquaresCase.class);
-        suite.addTestSuite(SimpleLUCase.class);
-        suite.addTestSuite(SimpleQRCase.class);
-        suite.addTestSuite(SimpleSingularValueCase.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected MatrixTests() {
         super();

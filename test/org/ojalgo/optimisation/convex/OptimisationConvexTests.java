@@ -14,30 +14,12 @@ package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * @author apete
  */
 public abstract class OptimisationConvexTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(OptimisationConvexTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(ComPictetPamBamTest.class);
-        suite.addTestSuite(MostBasicCase.class);
-        suite.addTestSuite(Qsd20030327P1Case.class);
-        suite.addTestSuite(Qsd20030409P1Case.class);
-        suite.addTestSuite(QsdOldFundOfFundsCase.class);
-        suite.addTestSuite(QsdOldNormalCase.class);
-        suite.addTestSuite(QsdOldOptimalCase.class);
-        suite.addTestSuite(ConvexProblems.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected OptimisationConvexTests() {
         super();

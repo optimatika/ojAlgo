@@ -14,9 +14,6 @@ package org.ojalgo.optimisation.integer;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * OptimisationIntegerPackageTests
  *
@@ -25,23 +22,6 @@ import junit.framework.TestSuite;
 public abstract class OptimisationIntegerTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(OptimisationIntegerTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(DesignCase.class);
-        suite.addTestSuite(KnapsackTest.class);
-        //suite.addTestSuite(LpsolveSemiContCase.class);
-        suite.addTestSuite(MarketShareCase.class);
-        //suite.addTestSuite(MipCase.class);
-        suite.addTestSuite(RelaxedLpCase.class);
-        suite.addTestSuite(IntegerProblems.class);
-        suite.addTestSuite(SpecificBranchCase.class);
-        suite.addTestSuite(StrategyMixer.class);
-        suite.addTestSuite(UCLAee236aCase.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected OptimisationIntegerTests() {
         super();
