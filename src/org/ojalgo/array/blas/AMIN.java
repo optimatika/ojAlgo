@@ -26,7 +26,7 @@ package org.ojalgo.array.blas;
  * absolute value for real flavors, or the smallest sum |Re(x[i])|+|Im(x[i])| for complex flavors. If n is not
  * positive, 0 is returned. If more than one vector element is found with the same smallest absolute value,
  * the index of the first one encountered is returned.
- * 
+ *
  * @author apete
  */
 public abstract class AMIN implements BLAS1 {

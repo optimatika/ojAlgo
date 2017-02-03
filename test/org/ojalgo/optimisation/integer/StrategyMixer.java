@@ -39,33 +39,6 @@ public class StrategyMixer extends OptimisationIntegerTests {
         super(someName);
     }
 
-    public void testStratCombPortfolioMixer() {
-
-        final FinancePortfolio tmpTarget = new SimplePortfolio(THIRD, THIRD, THIRD).normalise();
-
-        final FinancePortfolio tmpStrat1 = new SimplePortfolio(HALF, HALF, ZERO);
-        final FinancePortfolio tmpStrat2 = new SimplePortfolio(HALF, ZERO, HALF);
-        final FinancePortfolio tmpStrat3 = new SimplePortfolio(ZERO, HALF, HALF);
-
-        final PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
-
-        final int tmpExpectedNumberOfStrategies = 2;
-        final List<BigDecimal> tmpStrategyWeights = tmpMixer.mix(tmpExpectedNumberOfStrategies);
-
-        int tmpUseCount = 0;
-        double tmpTotalWeight = 0D;
-
-        for (final BigDecimal tmpWeight : tmpStrategyWeights) {
-            if (tmpWeight.signum() != 0) {
-                tmpUseCount++;
-                tmpTotalWeight += tmpWeight.doubleValue();
-            }
-        }
-
-        TestUtils.assertEquals(tmpExpectedNumberOfStrategies, tmpUseCount);
-        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE);
-    }
-
     public void _testStratCombPortfolioMixerRandom() {
 
         final FinancePortfolio tmpTarget = new SimplePortfolio(QUARTER, QUARTER, QUARTER, QUARTER).normalise();
@@ -96,6 +69,33 @@ public class StrategyMixer extends OptimisationIntegerTests {
 
         TestUtils.assertEquals(tmpExpectedNumberOfStrategies, tmpUseCount);
         TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE / PrimitiveMath.HUNDRED);
+    }
+
+    public void testStratCombPortfolioMixer() {
+
+        final FinancePortfolio tmpTarget = new SimplePortfolio(THIRD, THIRD, THIRD).normalise();
+
+        final FinancePortfolio tmpStrat1 = new SimplePortfolio(HALF, HALF, ZERO);
+        final FinancePortfolio tmpStrat2 = new SimplePortfolio(HALF, ZERO, HALF);
+        final FinancePortfolio tmpStrat3 = new SimplePortfolio(ZERO, HALF, HALF);
+
+        final PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
+
+        final int tmpExpectedNumberOfStrategies = 2;
+        final List<BigDecimal> tmpStrategyWeights = tmpMixer.mix(tmpExpectedNumberOfStrategies);
+
+        int tmpUseCount = 0;
+        double tmpTotalWeight = 0D;
+
+        for (final BigDecimal tmpWeight : tmpStrategyWeights) {
+            if (tmpWeight.signum() != 0) {
+                tmpUseCount++;
+                tmpTotalWeight += tmpWeight.doubleValue();
+            }
+        }
+
+        TestUtils.assertEquals(tmpExpectedNumberOfStrategies, tmpUseCount);
+        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE);
     }
 
     /**

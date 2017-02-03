@@ -67,10 +67,10 @@ public class SimpleSingularValueCase extends BasicMatrixTest {
     public void testData() {
 
         final PhysicalStore<Double> tmpExp = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getOriginal())
-                .multiply((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixQ2())).copy();
+                .multiply(PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixQ2())).copy();
 
         final PhysicalStore<Double> tmpAct = PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixQ1())
-                .multiply((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixD())).copy();
+                .multiply(PrimitiveDenseStore.FACTORY.copy(SimpleSingularValueCase.getMatrixD())).copy();
 
         TestUtils.assertEquals(tmpExp, tmpAct, EVALUATION);
     }

@@ -24,7 +24,7 @@ package org.ojalgo.array.blas;
 /**
  * Given two complex vectors x and y, each vector element of these vectors is replaced as follows: xi = c*xi +
  * s*yi yi = c*yi - s*xi
- * 
+ *
  * @author apete
  */
 public abstract class ROT implements BLAS1 {

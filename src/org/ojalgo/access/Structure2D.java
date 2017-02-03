@@ -67,7 +67,7 @@ public interface Structure2D extends Structure1D {
         return row + (column * structure);
     }
 
-    static void loopMatching(Structure2D structureA, Structure2D structureB, final RowColumnCallback callback) {
+    static void loopMatching(final Structure2D structureA, final Structure2D structureB, final RowColumnCallback callback) {
         final long tmpCountRows = Math.min(structureA.countRows(), structureB.countRows());
         final long tmpCountColumns = Math.min(structureA.countColumns(), structureB.countColumns());
         for (long j = 0L; j < tmpCountColumns; j++) {

@@ -23,7 +23,7 @@ package org.ojalgo.array.blas;
 
 /**
  * The ?dotc routines perform a vector-vector operation defined as: Equation
- * 
+ *
  * @author apete
  */
 public abstract class DOTC implements BLAS1 {

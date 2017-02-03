@@ -92,6 +92,49 @@ public class RandomNumberTest extends RandomTests {
         super(someName);
     }
 
+    public void _testLogNormal() {
+
+        final double tmpAccuracy = TENTH / THREE;
+
+        final RandomNumber tmpRandomNumber = new Normal(ONE, TENTH);
+        double tmpValue = HUNDRED;
+        final CalendarDateSeries<Double> tmpSeries = new CalendarDateSeries<>();
+        for (int i = 0; i < 1000; i++) {
+            tmpSeries.put(i, tmpValue);
+            tmpValue *= tmpRandomNumber.doubleValue();
+        }
+        final double[] someValues1 = tmpSeries.getPrimitiveValues();
+        final int tmpSize1 = someValues1.length - 1;
+
+        final double[] retVal1 = new double[tmpSize1];
+
+        for (int i1 = 0; i1 < tmpSize1; i1++) {
+            retVal1[i1] = someValues1[i1 + 1] / someValues1[i1];
+        }
+
+        final SampleSet tmpQuotients = SampleSet.wrap(ArrayUtils.wrapAccess1D(retVal1));
+        final double[] someValues = tmpSeries.getPrimitiveValues();
+        final int tmpSize = someValues.length - 1;
+
+        final double[] retVal = new double[tmpSize];
+
+        for (int i = 0; i < tmpSize; i++) {
+            retVal[i] = PrimitiveFunction.LOG.invoke(someValues[i + 1] / someValues[i]);
+        }
+        final SampleSet tmpLogChanges = SampleSet.wrap(ArrayUtils.wrapAccess1D(retVal));
+
+        // Quotient distribution parameters within 3% of the generating distribution
+        TestUtils.assertEquals(ONE, tmpQuotients.getMean() / tmpRandomNumber.getExpected(), tmpAccuracy);
+        TestUtils.assertEquals(ONE, tmpQuotients.getStandardDeviation() / tmpRandomNumber.getStandardDeviation(), tmpAccuracy);
+
+        final Normal tmpNormal = new Normal(tmpQuotients.getMean(), tmpQuotients.getStandardDeviation());
+        final LogNormal tmpLogNormal = new LogNormal(tmpLogChanges.getMean(), tmpLogChanges.getStandardDeviation());
+
+        // LogNormal (logarithmic changes) parameters within 3% of the Normal (quotients) parameters
+        TestUtils.assertEquals(ONE, tmpLogNormal.getExpected() / tmpNormal.getExpected(), tmpAccuracy);
+        TestUtils.assertEquals(ONE, tmpLogNormal.getStandardDeviation() / tmpNormal.getStandardDeviation(), tmpAccuracy);
+    }
+
     /**
      * Tests that the error function implementation returns correct confidence intervals for +/- 6 standard
      * deviations. They are all correct to at least 10 decimal places.
@@ -311,49 +354,6 @@ public class RandomNumberTest extends RandomTests {
         TestUtils.assertEquals(tmpGeometricStandardDeviation / tmpGeometricStandardDeviation,
                 PrimitiveFunction.EXP.invoke(PrimitiveFunction.SQRT.invoke(tmpSumSqrDiff / tmpSize)) / tmpGeometricStandardDeviation, 0.00005);
         // Check that the geometric standard deviation is within ±0.005% of what it should be.
-    }
-
-    public void _testLogNormal() {
-
-        final double tmpAccuracy = TENTH / THREE;
-
-        final RandomNumber tmpRandomNumber = new Normal(ONE, TENTH);
-        double tmpValue = HUNDRED;
-        final CalendarDateSeries<Double> tmpSeries = new CalendarDateSeries<>();
-        for (int i = 0; i < 1000; i++) {
-            tmpSeries.put(i, tmpValue);
-            tmpValue *= tmpRandomNumber.doubleValue();
-        }
-        final double[] someValues1 = tmpSeries.getPrimitiveValues();
-        final int tmpSize1 = someValues1.length - 1;
-
-        final double[] retVal1 = new double[tmpSize1];
-
-        for (int i1 = 0; i1 < tmpSize1; i1++) {
-            retVal1[i1] = someValues1[i1 + 1] / someValues1[i1];
-        }
-
-        final SampleSet tmpQuotients = SampleSet.wrap(ArrayUtils.wrapAccess1D(retVal1));
-        final double[] someValues = tmpSeries.getPrimitiveValues();
-        final int tmpSize = someValues.length - 1;
-
-        final double[] retVal = new double[tmpSize];
-
-        for (int i = 0; i < tmpSize; i++) {
-            retVal[i] = PrimitiveFunction.LOG.invoke(someValues[i + 1] / someValues[i]);
-        }
-        final SampleSet tmpLogChanges = SampleSet.wrap(ArrayUtils.wrapAccess1D(retVal));
-
-        // Quotient distribution parameters within 3% of the generating distribution
-        TestUtils.assertEquals(ONE, tmpQuotients.getMean() / tmpRandomNumber.getExpected(), tmpAccuracy);
-        TestUtils.assertEquals(ONE, tmpQuotients.getStandardDeviation() / tmpRandomNumber.getStandardDeviation(), tmpAccuracy);
-
-        final Normal tmpNormal = new Normal(tmpQuotients.getMean(), tmpQuotients.getStandardDeviation());
-        final LogNormal tmpLogNormal = new LogNormal(tmpLogChanges.getMean(), tmpLogChanges.getStandardDeviation());
-
-        // LogNormal (logarithmic changes) parameters within 3% of the Normal (quotients) parameters
-        TestUtils.assertEquals(ONE, tmpLogNormal.getExpected() / tmpNormal.getExpected(), tmpAccuracy);
-        TestUtils.assertEquals(ONE, tmpLogNormal.getStandardDeviation() / tmpNormal.getStandardDeviation(), tmpAccuracy);
     }
 
     // Sample means differ from expectation by an amount greater than anticipated given the large samples. May be due to

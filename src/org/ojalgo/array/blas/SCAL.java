@@ -24,7 +24,7 @@ package org.ojalgo.array.blas;
 /**
  * The ?scal routines perform a vector operation defined as x = a*x where: a is a scalar, x is an n-element
  * vector.
- * 
+ *
  * @author apete
  */
 public abstract class SCAL implements BLAS1 {

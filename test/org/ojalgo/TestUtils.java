@@ -124,10 +124,6 @@ public abstract class TestUtils {
         TestUtils.assertEquals("long != long", expected, actual);
     }
 
-    public static void assertEquals(final String message, final long expected, final long actual) {
-        Assert.assertEquals(message, expected, actual);
-    }
-
     public static void assertEquals(final long[] expected, final long[] actual) {
         TestUtils.assertEquals(Arrays.toString(expected) + " != " + Arrays.toString(actual), expected, actual);
     }
@@ -256,6 +252,10 @@ public abstract class TestUtils {
 
     public static void assertEquals(final String message, final int[] expected, final int[] actual) {
         TestUtils.assertTrue(message, Arrays.equals(expected, actual));
+    }
+
+    public static void assertEquals(final String message, final long expected, final long actual) {
+        Assert.assertEquals(message, expected, actual);
     }
 
     public static void assertEquals(final String message, final long[] expected, final long[] actual) {

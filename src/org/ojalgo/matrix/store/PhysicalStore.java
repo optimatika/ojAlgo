@@ -210,7 +210,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
         BasicArray<N> makeArray(int length);
 
         default ColumnsSupplier<N> makeColumnsSupplier(final int numberOfRows) {
-            return new ColumnsSupplier<N>(this, numberOfRows);
+            return new ColumnsSupplier<>(this, numberOfRows);
         }
 
         Householder<N> makeHouseholder(int length);
@@ -220,7 +220,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
         Rotation<N> makeRotation(int low, int high, N cos, N sin);
 
         default RowsSupplier<N> makeRowsSupplier(final int numberOfColumns) {
-            return new RowsSupplier<N>(this, numberOfColumns);
+            return new RowsSupplier<>(this, numberOfColumns);
         }
 
         Scalar.Factory<N> scalar();

@@ -25,9 +25,59 @@ final class BlockStore<N extends Number> extends FactoryStore<N> implements Phys
         super(factory, rowsCount, columnsCount);
     }
 
+    public void add(final long row, final long col, final double addend) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void add(final long row, final long col, final Number addend) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public List<N> asList() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void caxpy(final N scalarA, final int columnX, final int columnY, final int firstRow) {
+        // TODO Auto-generated method stub
+
+    }
+
     public double doubleValue(final long row, final long col) {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    public void exchangeColumns(final long colA, final long colB) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void exchangeRows(final long rowA, final long rowB) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void fillOne(final long row, final long col, final N value) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
+        // TODO Auto-generated method stub
+
     }
 
     public N get(final long row, final long col) {
@@ -35,7 +85,47 @@ final class BlockStore<N extends Number> extends FactoryStore<N> implements Phys
         return null;
     }
 
-    public void fillByMultiplying(final Access1D<N> left, final Access1D<N> right) {
+    public long indexOfLargestInColumn(final long row, final long col) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public long indexOfLargestInDiagonal(final long row, final long col) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public long indexOfLargestInRange(final long first, final long limit) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public long indexOfLargestInRow(final long row, final long col) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public long indexOfLargestOnDiagonal(final long first) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void raxpy(final N scalarA, final int rowX, final int rowY, final int firstColumn) {
         // TODO Auto-generated method stub
 
     }
@@ -65,97 +155,12 @@ final class BlockStore<N extends Number> extends FactoryStore<N> implements Phys
         return null;
     }
 
-    public void add(final long row, final long col, final double addend) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void add(final long row, final long col, final Number addend) {
-        // TODO Auto-generated method stub
-
-    }
-
     public void set(final long row, final long col, final double value) {
         // TODO Auto-generated method stub
 
     }
 
     public void set(final long row, final long col, final Number value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillOne(final long row, final long col, final Access1D<?> values, final long valueIndex) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillOne(final long row, final long col, final N value) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void fillOne(final long row, final long col, final NullaryFunction<N> supplier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void modifyOne(final long row, final long col, final UnaryFunction<N> modifier) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public long indexOfLargestInColumn(final long row, final long col) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public long indexOfLargestInDiagonal(final long row, final long col) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public long indexOfLargestInRow(final long row, final long col) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public long indexOfLargestInRange(final long first, final long limit) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public void exchangeColumns(final long colA, final long colB) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void exchangeRows(final long rowA, final long rowB) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public List<N> asList() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void caxpy(final N scalarA, final int columnX, final int columnY, final int firstRow) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void raxpy(final N scalarA, final int rowX, final int rowY, final int firstColumn) {
         // TODO Auto-generated method stub
 
     }
@@ -184,11 +189,6 @@ final class BlockStore<N extends Number> extends FactoryStore<N> implements Phys
     protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
         // TODO Auto-generated method stub
 
-    }
-
-    public long indexOfLargestOnDiagonal(final long first) {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
 }

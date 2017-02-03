@@ -59,13 +59,13 @@ public abstract class PrimitiveArray extends PlainArray<Double> {
     }
 
     @Override
-    final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
+    final boolean isPrimitive() {
+        return true;
     }
 
     @Override
-    final boolean isPrimitive() {
-        return true;
+    final void reset() {
+        this.fillAll(PrimitiveMath.ZERO);
     }
 
 }

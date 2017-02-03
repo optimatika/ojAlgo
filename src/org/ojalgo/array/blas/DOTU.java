@@ -24,7 +24,7 @@ package org.ojalgo.array.blas;
 /**
  * The ?dotu routines perform a vector-vector reduction operation defined as Equation where xi and yi are
  * elements of complex vectors x and y.
- * 
+ *
  * @author apete
  */
 public abstract class DOTU implements BLAS1 {

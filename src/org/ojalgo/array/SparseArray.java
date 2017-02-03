@@ -106,11 +106,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
     public static <N extends Number> SparseArray<N> make(final DenseArray.Factory<N> denseFactory, final long count) {
-        return new SparseArray<N>(count, denseFactory, SparseArray.capacity(count));
+        return new SparseArray<>(count, denseFactory, SparseArray.capacity(count));
     }
 
     public static <N extends Number> SparseArray<N> make(final DenseArray.Factory<N> denseFactory, final long count, final int initialCapacity) {
-        return new SparseArray<N>(count, denseFactory, initialCapacity);
+        return new SparseArray<>(count, denseFactory, initialCapacity);
     }
 
     public static SparseArray<BigDecimal> makeBig(final long count) {
@@ -208,14 +208,14 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         }
     }
 
-    public final long count() {
-        return myCount;
-    }
-
     public void axpy(final double a, final Mutate1D y) {
         for (int n = 0; n < myActualLength; n++) {
             y.add(myIndices[n], a * myValues.doubleValue(n));
         }
+    }
+
+    public final long count() {
+        return myCount;
     }
 
     @Override

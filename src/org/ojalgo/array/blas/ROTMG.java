@@ -24,7 +24,7 @@ package org.ojalgo.array.blas;
 /**
  * Given Cartesian coordinates (x1, y1) of an input vector, these routines compute the components of a
  * modified Givens transformation matrix H that zeros the y-component of the resulting vector:
- * 
+ *
  * @author apete
  */
 public abstract class ROTMG implements BLAS1 {

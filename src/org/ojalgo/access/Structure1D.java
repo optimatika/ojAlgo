@@ -38,8 +38,8 @@ public interface Structure1D {
 
     }
 
-    static void loopMatching(Structure1D structureA, Structure1D structureB, final IndexCallback callback) {
-        long tmpLimit = Math.min(structureA.count(), structureB.count());
+    static void loopMatching(final Structure1D structureA, final Structure1D structureB, final IndexCallback callback) {
+        final long tmpLimit = Math.min(structureA.count(), structureB.count());
         Structure1D.loopRange(0L, tmpLimit, callback);
     }
 

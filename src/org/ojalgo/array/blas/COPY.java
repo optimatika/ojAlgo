@@ -23,7 +23,7 @@ package org.ojalgo.array.blas;
 
 /**
  * The ?copy routines perform a vector-vector operation defined as y = x, where x and y are vectors.
- * 
+ *
  * @author apete
  */
 public abstract class COPY implements BLAS1 {
@@ -33,7 +33,7 @@ public abstract class COPY implements BLAS1 {
         for (int i = first; i < limit; i++) {
             destination[destinationOffset + i] = source[sourceOffset + i];
         }
-    
+
     }
 
 }

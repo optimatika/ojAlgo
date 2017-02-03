@@ -95,23 +95,23 @@ public abstract class PrimitiveMath {
         return PRIME[index];
     }
 
-    public static final boolean isPowerOf2(long value) {
+    public static final boolean isPowerOf2(final long value) {
         return Arrays.binarySearch(POWERS_OF_2, value) >= 0;
     }
 
     /**
-     * @return The smallest integer exponent so that 2^exp >= value.
+     * @return The smallest integer exponent so that 2^exp &gt;= value.
      */
-    public static final int powerOf2Larger(long value) {
-        int index = Arrays.binarySearch(POWERS_OF_2, value);
+    public static final int powerOf2Larger(final long value) {
+        final int index = Arrays.binarySearch(POWERS_OF_2, value);
         return index >= 0 ? index : Math.min(-(index + 1), 62);
     }
 
     /**
-     * @return The largest integer exponent so that 2^exp <= value.
+     * @return The largest integer exponent so that 2^exp &lt;= value.
      */
-    public static final int powerOf2Smaller(long value) {
-        int index = Arrays.binarySearch(POWERS_OF_2, value);
+    public static final int powerOf2Smaller(final long value) {
+        final int index = Arrays.binarySearch(POWERS_OF_2, value);
         return index >= 0 ? index : Math.max(-(index + 2), 0);
     }
 

@@ -179,167 +179,8 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
         super(arg0);
     }
 
-    public void testEvD() {
-
-        final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
-
-        final Eigenvalue<BigDecimal> tmpBig = Eigenvalue.BIG.make(true);
-        final Eigenvalue<ComplexNumber> tmpComplex = Eigenvalue.COMPLEX.make(true);
-        final Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
-        final Eigenvalue<Double> tmpJama = new RawEigenvalue.Dynamic();
-
-        TestUtils.assertTrue("Big.compute()", tmpBig.decompose(MatrixStore.BIG.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(MatrixStore.COMPLEX.makeWrapper(tmpProblematic)));
-        TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
-        TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
-
-        if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Big: {}", tmpBig.getEigenvalues());
-            BasicLogger.debug("Complex: {}", tmpComplex.getEigenvalues());
-            BasicLogger.debug("Primitive: {}", tmpPrimitive.getEigenvalues());
-            BasicLogger.debug("Jama: {}", tmpJama.getEigenvalues());
-        }
-
-        // TestUtils.assertEquals("QR.Q Big vs Complex", tmpBig.getQ(), tmpComplex.getQ());
-        // TestUtils.assertEquals("QR.Q Complex vs Primitive", tmpComplex.getQ(), tmpPrimitive.getQ());
-        // TestUtils.assertEquals("QR.Q Primitive vs Jama", tmpPrimitive.getQ(), tmpJama.getQ());
-
-        TestUtils.assertEquals("EvD Big vs Complex", tmpBig.getEigenvalues().get(0), tmpComplex.getEigenvalues().get(0), PRECISION);
-        TestUtils.assertEquals("EvD Complex vs Primitive", tmpComplex.getEigenvalues().get(0), tmpPrimitive.getEigenvalues().get(0), PRECISION);
-        TestUtils.assertEquals("EvD Primitive vs Jama", tmpPrimitive.getEigenvalues().get(0), tmpJama.getEigenvalues().get(0), PRECISION);
-
-        TestUtils.assertEquals("Big.reconstruct()", tmpProblematic, tmpBig.reconstruct(), PRECISION);
-        TestUtils.assertEquals("Complex.reconstruct()", tmpProblematic, tmpComplex.reconstruct(), PRECISION);
-        TestUtils.assertEquals("Primitive.reconstruct()", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
-        TestUtils.assertEquals("Jama.reconstruct()", tmpProblematic, tmpJama.reconstruct(), PRECISION);
-
-        TestUtils.assertEquals("trace() Big vs Complex", tmpBig.getTrace(), tmpComplex.getTrace(), PRECISION);
-        TestUtils.assertEquals("trace() Complex vs Primitive", tmpComplex.getTrace(), tmpPrimitive.getTrace(), PRECISION);
-        TestUtils.assertEquals("trace() Primitive vs Jama", tmpPrimitive.getTrace(), tmpJama.getTrace(), PRECISION);
-
-        TestUtils.assertEquals("det() Big vs Complex", tmpBig.getDeterminant(), tmpComplex.getDeterminant(), PRECISION);
-        TestUtils.assertEquals("det() Complex vs Primitive", tmpComplex.getDeterminant(), tmpPrimitive.getDeterminant(), PRECISION);
-        TestUtils.assertEquals("det() Primitive vs Jama", tmpPrimitive.getDeterminant(), tmpJama.getDeterminant(), PRECISION);
-
-    }
-
-    public void testInvertEvD_10_307_1() {
-
-        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] {
-                { 1.488828119167862, 0.42210916029401624, 0.3090339419657017, 0.31968488522727556, 0.32307269871880584, 0.46899580731023627,
-                        0.12091920407255509, 0.03795763520492966, 0.17470282114825963, 0.3946701200769135 },
-                { 0.42210916029401624, 1.8635124366670595, 0.545906918558408, 0.5647217567560566, 0.570706312407284, 0.8284787565954789, 0.21360317145069477,
-                        0.06705197344564522, 0.3086116630097931, 0.6971828004646068 },
-                { 0.3090339419657017, 0.545906918558408, 1.632193464017115, 0.41344326780911667, 0.417824671952357, 0.6065446573280001, 0.1563828419260192,
-                        0.04908999287306165, 0.22594032001124298, 0.5104204536764679 },
-                { 0.31968488522727556, 0.5647217567560566, 0.41344326780911667, 1.6539821927009415, 0.43222511886101456, 0.6274493925480824,
-                        0.16177262133291218, 0.05078189352797441, 0.23372741780909156, 0.528012240705021 },
-                { 0.32307269871880584, 0.570706312407284, 0.417824671952357, 0.43222511886101456, 1.660912672676802, 0.6340986950817811, 0.1634869828633994,
-                        0.051320047166039655, 0.23620430969852588, 0.5336077726660703 },
-                { 0.46899580731023627, 0.8284787565954789, 0.6065446573280001, 0.6274493925480824, 0.6340986950817811, 1.959428864502749, 0.23732958500300408,
-                        0.07449990991899043, 0.34289134104035285, 0.7746238203382216 },
-                { 0.12091920407255509, 0.21360317145069477, 0.1563828419260192, 0.16177262133291218, 0.1634869828633994, 0.23732958500300408, 1.2473654835536,
-                        0.019207996469193075, 0.08840622324485663, 0.19971798116519177 },
-                { 0.03795763520492966, 0.06705197344564522, 0.04908999287306165, 0.05078189352797441, 0.051320047166039655, 0.07449990991899043,
-                        0.019207996469193075, 1.0776502695252994, 0.027751515547194034, 0.06269328624082444 },
-                { 0.17470282114825963, 0.3086116630097931, 0.22594032001124298, 0.23372741780909156, 0.23620430969852588, 0.34289134104035285,
-                        0.08840622324485663, 0.027751515547194034, 1.3573911039439759, 0.2885504830370714 },
-                { 0.3946701200769135, 0.6971828004646068, 0.5104204536764679, 0.528012240705021, 0.5336077726660703, 0.7746238203382216, 0.19971798116519177,
-                        0.06269328624082444, 0.2885504830370714, 1.8073801497932753 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
-
-        final RawEigenvalue.Symmetric tmpAlgorithm = new RawEigenvalue.Symmetric();
-
-        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
-    }
-
-    public void testInvertEvD_3_155_1() {
-
-        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.509726074514643, 0.6439543946598099, 1.2096354379603502 },
-                { 0.6439543946598099, 1.134228320145167, 0.8341376835908743 }, { 1.2096354379603502, 0.8341376835908743, 1.6999093634457072 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 155)));
-
-        final HermitianEvD.Primitive tmpAlgorithm = new HermitianEvD.Primitive();
-
-        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
-    }
-
     public void _testInvertOverflow() {
         ExtremeElementsCase.doTestInvert(true);
-    }
-
-    public void testInvertSVD_6_307_2() {
-
-        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(
-                new double[][] { { 1.7951923814808213, 0.659451350679988, 0.7107146253894259, 0.5763579411022435, 0.7199441830503458, 0.6356947473097578 },
-                        { 0.659451350679988, 1.829297873115869, 0.7411968989569697, 0.6010777087922337, 0.7508223087524556, 0.6629594475153139 },
-                        { 0.7107146253894259, 0.7411968989569697, 1.8937643794649044, 0.6478032355134435, 0.8091884190528792, 0.7144954285155056 },
-                        { 0.5763579411022435, 0.6010777087922337, 0.6478032355134435, 1.7248031476721892, 0.6562158066095086, 0.5794240042274624 },
-                        { 0.7199441830503458, 0.7508223087524556, 0.8091884190528792, 0.6562158066095086, 1.905371077260138, 0.7237740848430495 },
-                        { 0.6356947473097578, 0.6629594475153139, 0.7144954285155056, 0.5794240042274624, 0.7237740848430495, 1.7994225826534653 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
-
-        final RawSingularValue tmpAlgorithm = new RawSingularValue();
-
-        final NumberContext tmpContext = NumberContext.getGeneral(2, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
-    }
-
-    public void testSolveLU_1_16_1() {
-
-        final PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.7259687987824925 } });
-        final PrimitiveDenseStore tmpRHS = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.6533251061005759 } });
-
-        final UnaryFunction<Double> tmpSecond = PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, -16));
-        tmpBody.modifyAll(tmpSecond);
-        tmpRHS.modifyAll(tmpSecond);
-
-        final SolverTask<Double> tmpAlgorithm = new LUDecomposition.Primitive();
-
-        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, tmpAlgorithm, tmpContext);
-    }
-
-    public void testInvertSVD_7_307_1() {
-
-        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] {
-                { 1.6630365629391541, 0.5725332799439422, 0.6293312306387542, 0.3255116741968718, 0.16197060952553563, 0.38338065513999414,
-                        0.45947212690705896 },
-                { 0.5725332799439422, 1.8635018216883505, 0.8196058776803916, 0.42392824070490653, 0.2109414837777316, 0.4992935723573937, 0.5983908592318098 },
-                { 0.6293312306387542, 0.8196058776803916, 1.949165198143842, 0.46598388385643336, 0.23186785507316293, 0.5488258051522601, 0.6577540014446122 },
-                { 0.3255116741968718, 0.42392824070490653, 0.46598388385643336, 1.4909407601202584, 0.11992999873960987, 0.283871509914158,
-                        0.3402129050589385 },
-                { 0.16197060952553563, 0.2109414837777316, 0.23186785507316293, 0.11992999873960987, 1.2442860900574488, 0.14125097541024584,
-                        0.16928576136879764 },
-                { 0.38338065513999414, 0.4992935723573937, 0.5488258051522601, 0.283871509914158, 0.14125097541024584, 1.5782194777321448, 0.4006954489432253 },
-                { 0.45947212690705896, 0.5983908592318098, 0.6577540014446122, 0.3402129050589385, 0.16928576136879764, 0.4006954489432253,
-                        1.6929815829013701 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
-
-        final SVDnew32.Primitive tmpAlgorithm = new SVDnew32.Primitive();
-
-        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
-    }
-
-    public void testInvertTask_2_155_1() {
-
-        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY
-                .rows(new double[][] { { 1.7755876870972727, 0.5243083105843722 }, { 0.5243083105843722, 1.6760142267686806 } });
-        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 155)));
-
-        final InverterTask<Double> tmpAlgorithm = InverterTask.PRIMITIVE.make(tmpOriginal);
-
-        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
-
-        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
     }
 
     public void _testInvertUnderflow() {
@@ -432,6 +273,165 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
     public void _testSolveUnderflow() {
         ExtremeElementsCase.doTestSolve(false);
+    }
+
+    public void testEvD() {
+
+        final MatrixStore<Double> tmpProblematic = ExtremeElementsCase.getVerySmall();
+
+        final Eigenvalue<BigDecimal> tmpBig = Eigenvalue.BIG.make(true);
+        final Eigenvalue<ComplexNumber> tmpComplex = Eigenvalue.COMPLEX.make(true);
+        final Eigenvalue<Double> tmpPrimitive = Eigenvalue.PRIMITIVE.make();
+        final Eigenvalue<Double> tmpJama = new RawEigenvalue.Dynamic();
+
+        TestUtils.assertTrue("Big.compute()", tmpBig.decompose(MatrixStore.BIG.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Complex.compute()", tmpComplex.decompose(MatrixStore.COMPLEX.makeWrapper(tmpProblematic)));
+        TestUtils.assertTrue("Primitive.compute()", tmpPrimitive.decompose(tmpProblematic));
+        TestUtils.assertTrue("Jama.compute()", tmpJama.decompose(tmpProblematic));
+
+        if (MatrixDecompositionTests.DEBUG) {
+            BasicLogger.debug("Big: {}", tmpBig.getEigenvalues());
+            BasicLogger.debug("Complex: {}", tmpComplex.getEigenvalues());
+            BasicLogger.debug("Primitive: {}", tmpPrimitive.getEigenvalues());
+            BasicLogger.debug("Jama: {}", tmpJama.getEigenvalues());
+        }
+
+        // TestUtils.assertEquals("QR.Q Big vs Complex", tmpBig.getQ(), tmpComplex.getQ());
+        // TestUtils.assertEquals("QR.Q Complex vs Primitive", tmpComplex.getQ(), tmpPrimitive.getQ());
+        // TestUtils.assertEquals("QR.Q Primitive vs Jama", tmpPrimitive.getQ(), tmpJama.getQ());
+
+        TestUtils.assertEquals("EvD Big vs Complex", tmpBig.getEigenvalues().get(0), tmpComplex.getEigenvalues().get(0), PRECISION);
+        TestUtils.assertEquals("EvD Complex vs Primitive", tmpComplex.getEigenvalues().get(0), tmpPrimitive.getEigenvalues().get(0), PRECISION);
+        TestUtils.assertEquals("EvD Primitive vs Jama", tmpPrimitive.getEigenvalues().get(0), tmpJama.getEigenvalues().get(0), PRECISION);
+
+        TestUtils.assertEquals("Big.reconstruct()", tmpProblematic, tmpBig.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Complex.reconstruct()", tmpProblematic, tmpComplex.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Primitive.reconstruct()", tmpProblematic, tmpPrimitive.reconstruct(), PRECISION);
+        TestUtils.assertEquals("Jama.reconstruct()", tmpProblematic, tmpJama.reconstruct(), PRECISION);
+
+        TestUtils.assertEquals("trace() Big vs Complex", tmpBig.getTrace(), tmpComplex.getTrace(), PRECISION);
+        TestUtils.assertEquals("trace() Complex vs Primitive", tmpComplex.getTrace(), tmpPrimitive.getTrace(), PRECISION);
+        TestUtils.assertEquals("trace() Primitive vs Jama", tmpPrimitive.getTrace(), tmpJama.getTrace(), PRECISION);
+
+        TestUtils.assertEquals("det() Big vs Complex", tmpBig.getDeterminant(), tmpComplex.getDeterminant(), PRECISION);
+        TestUtils.assertEquals("det() Complex vs Primitive", tmpComplex.getDeterminant(), tmpPrimitive.getDeterminant(), PRECISION);
+        TestUtils.assertEquals("det() Primitive vs Jama", tmpPrimitive.getDeterminant(), tmpJama.getDeterminant(), PRECISION);
+
+    }
+
+    public void testInvertEvD_10_307_1() {
+
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] {
+                { 1.488828119167862, 0.42210916029401624, 0.3090339419657017, 0.31968488522727556, 0.32307269871880584, 0.46899580731023627,
+                        0.12091920407255509, 0.03795763520492966, 0.17470282114825963, 0.3946701200769135 },
+                { 0.42210916029401624, 1.8635124366670595, 0.545906918558408, 0.5647217567560566, 0.570706312407284, 0.8284787565954789, 0.21360317145069477,
+                        0.06705197344564522, 0.3086116630097931, 0.6971828004646068 },
+                { 0.3090339419657017, 0.545906918558408, 1.632193464017115, 0.41344326780911667, 0.417824671952357, 0.6065446573280001, 0.1563828419260192,
+                        0.04908999287306165, 0.22594032001124298, 0.5104204536764679 },
+                { 0.31968488522727556, 0.5647217567560566, 0.41344326780911667, 1.6539821927009415, 0.43222511886101456, 0.6274493925480824,
+                        0.16177262133291218, 0.05078189352797441, 0.23372741780909156, 0.528012240705021 },
+                { 0.32307269871880584, 0.570706312407284, 0.417824671952357, 0.43222511886101456, 1.660912672676802, 0.6340986950817811, 0.1634869828633994,
+                        0.051320047166039655, 0.23620430969852588, 0.5336077726660703 },
+                { 0.46899580731023627, 0.8284787565954789, 0.6065446573280001, 0.6274493925480824, 0.6340986950817811, 1.959428864502749, 0.23732958500300408,
+                        0.07449990991899043, 0.34289134104035285, 0.7746238203382216 },
+                { 0.12091920407255509, 0.21360317145069477, 0.1563828419260192, 0.16177262133291218, 0.1634869828633994, 0.23732958500300408, 1.2473654835536,
+                        0.019207996469193075, 0.08840622324485663, 0.19971798116519177 },
+                { 0.03795763520492966, 0.06705197344564522, 0.04908999287306165, 0.05078189352797441, 0.051320047166039655, 0.07449990991899043,
+                        0.019207996469193075, 1.0776502695252994, 0.027751515547194034, 0.06269328624082444 },
+                { 0.17470282114825963, 0.3086116630097931, 0.22594032001124298, 0.23372741780909156, 0.23620430969852588, 0.34289134104035285,
+                        0.08840622324485663, 0.027751515547194034, 1.3573911039439759, 0.2885504830370714 },
+                { 0.3946701200769135, 0.6971828004646068, 0.5104204536764679, 0.528012240705021, 0.5336077726660703, 0.7746238203382216, 0.19971798116519177,
+                        0.06269328624082444, 0.2885504830370714, 1.8073801497932753 } });
+        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
+
+        final RawEigenvalue.Symmetric tmpAlgorithm = new RawEigenvalue.Symmetric();
+
+        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
+
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+    }
+
+    public void testInvertEvD_3_155_1() {
+
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.509726074514643, 0.6439543946598099, 1.2096354379603502 },
+                { 0.6439543946598099, 1.134228320145167, 0.8341376835908743 }, { 1.2096354379603502, 0.8341376835908743, 1.6999093634457072 } });
+        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 155)));
+
+        final HermitianEvD.Primitive tmpAlgorithm = new HermitianEvD.Primitive();
+
+        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
+
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+    }
+
+    public void testInvertSVD_6_307_2() {
+
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(
+                new double[][] { { 1.7951923814808213, 0.659451350679988, 0.7107146253894259, 0.5763579411022435, 0.7199441830503458, 0.6356947473097578 },
+                        { 0.659451350679988, 1.829297873115869, 0.7411968989569697, 0.6010777087922337, 0.7508223087524556, 0.6629594475153139 },
+                        { 0.7107146253894259, 0.7411968989569697, 1.8937643794649044, 0.6478032355134435, 0.8091884190528792, 0.7144954285155056 },
+                        { 0.5763579411022435, 0.6010777087922337, 0.6478032355134435, 1.7248031476721892, 0.6562158066095086, 0.5794240042274624 },
+                        { 0.7199441830503458, 0.7508223087524556, 0.8091884190528792, 0.6562158066095086, 1.905371077260138, 0.7237740848430495 },
+                        { 0.6356947473097578, 0.6629594475153139, 0.7144954285155056, 0.5794240042274624, 0.7237740848430495, 1.7994225826534653 } });
+        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
+
+        final RawSingularValue tmpAlgorithm = new RawSingularValue();
+
+        final NumberContext tmpContext = NumberContext.getGeneral(2, Integer.MIN_VALUE);
+
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+    }
+
+    public void testInvertSVD_7_307_1() {
+
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY.rows(new double[][] {
+                { 1.6630365629391541, 0.5725332799439422, 0.6293312306387542, 0.3255116741968718, 0.16197060952553563, 0.38338065513999414,
+                        0.45947212690705896 },
+                { 0.5725332799439422, 1.8635018216883505, 0.8196058776803916, 0.42392824070490653, 0.2109414837777316, 0.4992935723573937, 0.5983908592318098 },
+                { 0.6293312306387542, 0.8196058776803916, 1.949165198143842, 0.46598388385643336, 0.23186785507316293, 0.5488258051522601, 0.6577540014446122 },
+                { 0.3255116741968718, 0.42392824070490653, 0.46598388385643336, 1.4909407601202584, 0.11992999873960987, 0.283871509914158,
+                        0.3402129050589385 },
+                { 0.16197060952553563, 0.2109414837777316, 0.23186785507316293, 0.11992999873960987, 1.2442860900574488, 0.14125097541024584,
+                        0.16928576136879764 },
+                { 0.38338065513999414, 0.4992935723573937, 0.5488258051522601, 0.283871509914158, 0.14125097541024584, 1.5782194777321448, 0.4006954489432253 },
+                { 0.45947212690705896, 0.5983908592318098, 0.6577540014446122, 0.3402129050589385, 0.16928576136879764, 0.4006954489432253,
+                        1.6929815829013701 } });
+        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
+
+        final SVDnew32.Primitive tmpAlgorithm = new SVDnew32.Primitive();
+
+        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
+
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+    }
+
+    public void testInvertTask_2_155_1() {
+
+        final PrimitiveDenseStore tmpOriginal = PrimitiveDenseStore.FACTORY
+                .rows(new double[][] { { 1.7755876870972727, 0.5243083105843722 }, { 0.5243083105843722, 1.6760142267686806 } });
+        tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 155)));
+
+        final InverterTask<Double> tmpAlgorithm = InverterTask.PRIMITIVE.make(tmpOriginal);
+
+        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
+
+        ExtremeElementsCase.performInvertTest(tmpOriginal, tmpAlgorithm, tmpContext);
+    }
+
+    public void testSolveLU_1_16_1() {
+
+        final PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.7259687987824925 } });
+        final PrimitiveDenseStore tmpRHS = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.6533251061005759 } });
+
+        final UnaryFunction<Double> tmpSecond = PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, -16));
+        tmpBody.modifyAll(tmpSecond);
+        tmpRHS.modifyAll(tmpSecond);
+
+        final SolverTask<Double> tmpAlgorithm = new LUDecomposition.Primitive();
+
+        final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
+
+        ExtremeElementsCase.performSolveTest(tmpBody, tmpRHS, tmpAlgorithm, tmpContext);
     }
 
 }

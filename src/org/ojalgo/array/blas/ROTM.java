@@ -25,7 +25,7 @@ package org.ojalgo.array.blas;
  * Given two vectors x and y, each vector element of these vectors is replaced as follows: for i=1 to n, where
  * H is a modified Givens transformation matrix whose values are stored in the param[1] through param[4]
  * array. See discussion on the param argument.
- * 
+ *
  * @author apete
  */
 public abstract class ROTM implements BLAS1 {

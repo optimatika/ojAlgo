@@ -112,9 +112,6 @@ public final class MipCase extends OptimisationIntegerTests {
         MipLibCase.assertMinMaxVal("noswot.mps", new BigDecimal("-4.10000000e+01"), null, false, null);
     }
 
-    public void testDummy() {
-    }
-
     /**
      * <ul>
      * <li>2013-11-13: Never attempted</li>
@@ -189,6 +186,9 @@ public final class MipCase extends OptimisationIntegerTests {
      */
     public void _testVpm2() {
         MipLibCase.assertMinMaxVal("vpm2.mps", new BigDecimal("1.37500000e+01"), null, false, null);
+    }
+
+    public void testDummy() {
     }
 
 }

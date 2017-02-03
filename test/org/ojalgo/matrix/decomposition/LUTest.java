@@ -28,7 +28,6 @@ import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
@@ -52,16 +51,16 @@ public class LUTest extends MatrixDecompositionTests {
         final BigMatrix tmpProblematic = P20061119Case.getProblematic();
 
         final LU<BigDecimal> tmpBig = LU.BIG.make();
-        tmpBig.decompose((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(tmpProblematic));
+        tmpBig.decompose(BigDenseStore.FACTORY.copy(tmpProblematic));
 
         final LU<ComplexNumber> tmpComplex = LU.COMPLEX.make();
-        tmpComplex.decompose((PhysicalStore<ComplexNumber>) ComplexDenseStore.FACTORY.copy(tmpProblematic));
+        tmpComplex.decompose(ComplexDenseStore.FACTORY.copy(tmpProblematic));
 
         final LU<Double> tmpPrimitive = LU.PRIMITIVE.make();
-        tmpPrimitive.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
+        tmpPrimitive.decompose(PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
 
         final LU<Double> tmpJama = new RawLU();
-        tmpJama.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
+        tmpJama.decompose(PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
 
         final NumberContext tmpPrintContext = NumberContext.getGeneral(20);
 
@@ -80,7 +79,7 @@ public class LUTest extends MatrixDecompositionTests {
         }
 
         final SingularValue<Double> tmpSVD = new RawSingularValue();
-        tmpSVD.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
+        tmpSVD.decompose(PrimitiveDenseStore.FACTORY.copy(tmpProblematic));
 
         TestUtils.assertEquals("LU.rank SVD vs Big", tmpSVD.getRank(), tmpBig.getRank());
         TestUtils.assertEquals("LU.rank SVD vs Complex", tmpSVD.getRank(), tmpComplex.getRank());

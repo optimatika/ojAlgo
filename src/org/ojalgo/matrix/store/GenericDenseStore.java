@@ -98,6 +98,10 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
         return null;
     }
 
+    public void axpy(final double a, final Mutate1D y) {
+        myUtility.axpy(a, y);
+    }
+
     public void caxpy(final N scalarA, final int columnX, final int columnY, final int firstRow) {
         // TODO Auto-generated method stub
 
@@ -131,10 +135,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
 
     public long countRows() {
         return myUtility.countRows();
-    }
-
-    public void axpy(final double a, final Mutate1D y) {
-        myUtility.axpy(a, y);
     }
 
     public void divideAndCopyColumn(final int row, final int column, final BasicArray<N> destination) {

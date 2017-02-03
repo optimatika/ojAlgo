@@ -355,7 +355,8 @@ public class BlackLittermanTest extends FinancePortfolioTests {
             final int row = i;
             final int row1 = i;
             final int col = i;
-            tmpBLM.addViewWithStandardDeviation(BigDenseStore.FACTORY.copy(tmpViewPortfolios.selectRows(new int[] { i })).asList(), TypeUtils.toBigDecimal(tmpViewPortfolioReturns.get(row, 0)),
+            tmpBLM.addViewWithStandardDeviation(BigDenseStore.FACTORY.copy(tmpViewPortfolios.selectRows(new int[] { i })).asList(),
+                    TypeUtils.toBigDecimal(tmpViewPortfolioReturns.get(row, 0)),
                     BigFunction.SQRT.invoke(TypeUtils.toBigDecimal(tmpConfidenceMatrix.get(row1, col))));
         }
 

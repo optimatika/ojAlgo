@@ -90,7 +90,7 @@ public interface StructureAnyD extends Structure1D {
         return retVal;
     }
 
-    static void loopMatching(StructureAnyD structureA, StructureAnyD structureB, final ReferenceCallback callback) {
+    static void loopMatching(final StructureAnyD structureA, final StructureAnyD structureB, final ReferenceCallback callback) {
         final long[] tmpShape = structureA.shape();
         if (!Arrays.equals(tmpShape, structureB.shape())) {
             throw new ProgrammingError("The 2 structures must have the same shape!");

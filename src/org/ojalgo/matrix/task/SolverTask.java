@@ -69,8 +69,8 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        public SolverTask<ComplexNumber> make(final Structure2D templateBody, final Structure2D templateRHS,
-                final boolean symmetric, final boolean positiveDefinite) {
+        public SolverTask<ComplexNumber> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
+                final boolean positiveDefinite) {
             if (templateBody.isSquare()) {
                 if (symmetric && positiveDefinite) {
                     return Cholesky.COMPLEX.make(templateBody);
@@ -89,8 +89,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        public SolverTask<Double> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric,
-                final boolean positiveDefinite) {
+        public SolverTask<Double> make(final Structure2D templateBody, final Structure2D templateRHS, final boolean symmetric, final boolean positiveDefinite) {
 
             final boolean tmpVectorRHS = templateRHS.countColumns() == 1L;
 

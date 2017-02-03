@@ -97,6 +97,32 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
+     * @see org.ojalgo.matrix.BasicMatrix#getEigenvalues()
+     */
+    public void _testGetEigenvalues() {
+
+        if (myBigAA.isSquare()) {
+
+            final List<ComplexNumber> tmpExpStore = myPrimitiveAA.getEigenvalues();
+            List<ComplexNumber> tmpActStore;
+
+            if (MatrixUtils.isHermitian(PrimitiveDenseStore.FACTORY.copy(myBigAA))) {
+
+                tmpActStore = myBigAA.getEigenvalues();
+                for (int i = 0; i < tmpExpStore.size(); i++) {
+                    TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
+                }
+
+                tmpActStore = myComplexAA.getEigenvalues();
+                for (int i = 0; i < tmpExpStore.size(); i++) {
+                    TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
+                }
+            }
+
+        }
+    }
+
+    /**
      * @see org.ojalgo.matrix.BasicMatrix#add(org.ojalgo.matrix.BasicMatrix)
      */
     public void testAddBasicMatrix() {
@@ -297,32 +323,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
             myActNmbr = myPrimitiveAA.getDeterminant().getNumber();
             TestUtils.assertEquals(myExpNmbr, myActNmbr, EVALUATION);
-
-        }
-    }
-
-    /**
-     * @see org.ojalgo.matrix.BasicMatrix#getEigenvalues()
-     */
-    public void _testGetEigenvalues() {
-
-        if (myBigAA.isSquare()) {
-
-            final List<ComplexNumber> tmpExpStore = myPrimitiveAA.getEigenvalues();
-            List<ComplexNumber> tmpActStore;
-
-            if (MatrixUtils.isHermitian(PrimitiveDenseStore.FACTORY.copy(myBigAA))) {
-
-                tmpActStore = myBigAA.getEigenvalues();
-                for (int i = 0; i < tmpExpStore.size(); i++) {
-                    TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-                }
-
-                tmpActStore = myComplexAA.getEigenvalues();
-                for (int i = 0; i < tmpExpStore.size(); i++) {
-                    TestUtils.assertEquals("Scalar<?> != Scalar<?>", tmpExpStore.get(i), tmpActStore.get(i), EVALUATION);
-                }
-            }
 
         }
     }
@@ -932,37 +932,6 @@ public abstract class BasicMatrixTest extends MatrixTests {
     }
 
     /**
-     * @see org.ojalgo.matrix.BasicMatrix#toRawCopy1D()
-     */
-    public void testToRawCopy1D() {
-
-        final double[] tmpExpStore = myBigAA.toRawCopy1D();
-        double[] tmpActStore;
-
-        final int tmpFirstIndex = 0;
-        final int tmpLastIndex = (int) (myBigAA.count() - 1);
-
-        tmpActStore = myComplexAA.toRawCopy1D();
-        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], EVALUATION);
-        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], EVALUATION);
-        if (myBigAA.isVector()) {
-            for (int i = 0; i < tmpExpStore.length; i++) {
-                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], EVALUATION);
-            }
-        }
-
-        tmpActStore = myPrimitiveAA.toRawCopy1D();
-        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], EVALUATION);
-        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], EVALUATION);
-        if (myBigAA.isVector()) {
-            for (int i = 0; i < tmpExpStore.length; i++) {
-                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], EVALUATION);
-            }
-        }
-
-    }
-
-    /**
      * @see org.ojalgo.matrix.BasicMatrix#rows()
      */
     public void testToListOfRows() {
@@ -991,6 +960,37 @@ public abstract class BasicMatrixTest extends MatrixTests {
 
         tmpActStore = PrimitiveDenseStore.FACTORY.copy(myPrimitiveAA);
         TestUtils.assertEquals(tmpExpStore, tmpActStore, EVALUATION);
+
+    }
+
+    /**
+     * @see org.ojalgo.matrix.BasicMatrix#toRawCopy1D()
+     */
+    public void testToRawCopy1D() {
+
+        final double[] tmpExpStore = myBigAA.toRawCopy1D();
+        double[] tmpActStore;
+
+        final int tmpFirstIndex = 0;
+        final int tmpLastIndex = (int) (myBigAA.count() - 1);
+
+        tmpActStore = myComplexAA.toRawCopy1D();
+        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], EVALUATION);
+        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], EVALUATION);
+        if (myBigAA.isVector()) {
+            for (int i = 0; i < tmpExpStore.length; i++) {
+                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], EVALUATION);
+            }
+        }
+
+        tmpActStore = myPrimitiveAA.toRawCopy1D();
+        TestUtils.assertEquals(tmpExpStore[tmpFirstIndex], tmpActStore[tmpFirstIndex], EVALUATION);
+        TestUtils.assertEquals(tmpExpStore[tmpLastIndex], tmpActStore[tmpLastIndex], EVALUATION);
+        if (myBigAA.isVector()) {
+            for (int i = 0; i < tmpExpStore.length; i++) {
+                TestUtils.assertEquals(tmpExpStore[i], tmpActStore[i], EVALUATION);
+            }
+        }
 
     }
 

@@ -53,6 +53,22 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
         Operation.Subtraction<BasicMatrix>, Operation.Multiplication<BasicMatrix>, ScalarOperation.Addition<BasicMatrix, Number>,
         ScalarOperation.Division<BasicMatrix, Number>, ScalarOperation.Subtraction<BasicMatrix, Number> {
 
+    public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier<I> {
+
+        default I build() {
+            return this.get();
+        }
+
+    }
+
+    public static interface Factory<I extends BasicMatrix> extends Factory2D<I> {
+
+        Builder<I> getBuilder(int count);
+
+        Builder<I> getBuilder(int rows, int columns);
+
+    }
+
     /**
      * The Frobenius norm is the square root of the sum of the squares of each element, or the square root of
      * the sum of the square of the singular values.
@@ -91,22 +107,6 @@ public interface BasicMatrix extends Access2D<Number>, Access2D.Elements, Access
         }
 
         return retVal;
-    }
-
-    public static interface Builder<I extends BasicMatrix> extends Mutate2D, Supplier<I> {
-
-        default I build() {
-            return this.get();
-        }
-
-    }
-
-    public static interface Factory<I extends BasicMatrix> extends Factory2D<I> {
-
-        Builder<I> getBuilder(int count);
-
-        Builder<I> getBuilder(int rows, int columns);
-
     }
 
     /**

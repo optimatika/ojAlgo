@@ -25,7 +25,7 @@ package org.ojalgo.array.blas;
  * The ?cabs1 is an auxiliary routine for a few BLAS Level 1 routines. This routine performs an operation
  * defined as res=|Re(z)|+|Im(z)|, where z is a scalar, and res is a value containing the absolute value of a
  * complex number z.
- * 
+ *
  * @author apete
  */
 public abstract class CABS1 implements BLAS1 {

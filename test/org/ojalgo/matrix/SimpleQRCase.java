@@ -28,7 +28,6 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 
 /**
  * Gilbert Strang, Linear Algebra and its Applications III, Problem 3.4.16
@@ -78,7 +77,7 @@ public class SimpleQRCase extends BasicMatrixTest {
         // QR
 
         final QR<BigDecimal> tmpQR = QR.BIG.make();
-        tmpQR.decompose((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(SimpleQRCase.getOriginal()));
+        tmpQR.decompose(BigDenseStore.FACTORY.copy(SimpleQRCase.getOriginal()));
 
         final MatrixStore<BigDecimal> tmpQ = tmpQR.getQ();
         final MatrixStore<BigDecimal> tmpR = tmpQR.getR();

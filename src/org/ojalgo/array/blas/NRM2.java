@@ -24,7 +24,7 @@ package org.ojalgo.array.blas;
 /**
  * The ?nrm2 routines perform a vector reduction operation defined as res = ||x||, where: x is a vector, res
  * is a value containing the Euclidean norm of the elements of x.
- * 
+ *
  * @author apete
  */
 public abstract class NRM2 implements BLAS1 {

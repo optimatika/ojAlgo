@@ -101,12 +101,12 @@ public final class SolverTest extends AbstractMatrixDecompositionTaskTest {
         }
     }
 
-    MatrixStore<Double> makeSPD(final int dim) {
-        return MatrixUtils.makeSPD(dim);
-    }
-
     MatrixStore<Double> makeRHS(final int dim) {
         return PrimitiveDenseStore.FACTORY.makeFilled(dim, 1L, new Uniform());
+    }
+
+    MatrixStore<Double> makeSPD(final int dim) {
+        return MatrixUtils.makeSPD(dim);
     }
 
 }

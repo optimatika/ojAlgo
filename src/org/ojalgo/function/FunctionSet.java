@@ -99,6 +99,8 @@ public abstract class FunctionSet<N extends Number> {
      */
     public abstract BinaryFunction<N> divide();
 
+    public abstract UnaryFunction<N> enforce(NumberContext context);
+
     /**
      * @see Math#exp(double)
      */
@@ -140,8 +142,6 @@ public abstract class FunctionSet<N extends Number> {
      * @see Math#max(double, double)
      */
     public abstract BinaryFunction<N> max();
-
-    public abstract UnaryFunction<N> enforce(NumberContext context);
 
     /**
      * @see Math#min(double, double)

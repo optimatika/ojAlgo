@@ -41,10 +41,6 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
         super(someName);
     }
 
-    public void testDummy() {
-
-    }
-
     public void _testSemiContNot() {
 
         final File tmpFile = new File(PATH + "lpsolve_sc_not.mps");
@@ -83,5 +79,9 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
         }
 
         TestUtils.assertEquals(tmpExpVal.doubleValue(), tmpActVal, PRECISION);
+    }
+
+    public void testDummy() {
+
     }
 }

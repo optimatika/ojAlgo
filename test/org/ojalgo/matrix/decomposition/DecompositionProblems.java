@@ -47,6 +47,47 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     }
 
     /**
+     * A user reported problems solving complex valued (overdetermined) equation systemes.
+     */
+    public void _testP20111213square() {
+
+        final int tmpDim = Uniform.randomInteger(2, 6);
+
+        final PhysicalStore<ComplexNumber> tmpSquare = MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim);
+        final MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
+        final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
+        MatrixStore<ComplexNumber> tmpActual;
+
+        @SuppressWarnings("unchecked")
+        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
+                Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
+                        true)/*
+                              * , HessenbergDecomposition. makeComplex()
+                              */,
+                LU.COMPLEX.make(), QR.COMPLEX.make(),
+                SingularValue.COMPLEX.make() /*
+                                              * , TridiagonalDecomposition . makeComplex ( )
+                                              */ };
+
+        for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
+            tmpDecomposition.decompose(tmpHermitian);
+            if (MatrixDecompositionTests.DEBUG) {
+                BasicLogger.debug(tmpDecomposition.toString());
+                BasicLogger.debug("Original", tmpHermitian);
+                BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
+            }
+            TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), new NumberContext(8, 5));
+            if ((tmpDecomposition instanceof MatrixDecomposition.Solver<?>) && ((Solver) tmpDecomposition).isSolvable()) {
+                tmpActual = ((Solver) tmpDecomposition).getSolution(tmpHermitian);
+                if (MatrixDecompositionTests.DEBUG) {
+                    BasicLogger.debug("Actual", tmpActual);
+                }
+                TestUtils.assertEquals("Solving: " + tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
+            }
+        }
+    }
+
+    /**
      * A user reported problems related to calculating the pseudoinverse for large (2000x2000) matrices.
      */
     public void _testP20160419() {
@@ -219,47 +260,6 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         final MatrixStore<Double> left1 = tmpActual;
         TestUtils.assertEquals(tmpIdentity, left1.multiply(tmpRandom), tmpEqualsNumberContext);
         TestUtils.assertEquals(tmpIdentity, tmpRandom.multiply(tmpActual), tmpEqualsNumberContext);
-    }
-
-    /**
-     * A user reported problems solving complex valued (overdetermined) equation systemes.
-     */
-    public void _testP20111213square() {
-
-        final int tmpDim = Uniform.randomInteger(2, 6);
-
-        final PhysicalStore<ComplexNumber> tmpSquare = MatrixUtils.makeRandomComplexStore(tmpDim, tmpDim);
-        final MatrixStore<ComplexNumber> tmpHermitian = tmpSquare.conjugate().multiply(tmpSquare);
-        final PhysicalStore<ComplexNumber> tmpExpected = ComplexDenseStore.FACTORY.makeEye(tmpDim, tmpDim);
-        MatrixStore<ComplexNumber> tmpActual;
-
-        @SuppressWarnings("unchecked")
-        final MatrixDecomposition<ComplexNumber>[] tmpCmplxDecomps = new MatrixDecomposition[] { Bidiagonal.COMPLEX.make(), Cholesky.COMPLEX.make(),
-                Eigenvalue.COMPLEX.make(MatrixDecomposition.TYPICAL,
-                        true)/*
-                              * , HessenbergDecomposition. makeComplex()
-                              */,
-                LU.COMPLEX.make(), QR.COMPLEX.make(),
-                SingularValue.COMPLEX.make() /*
-                                              * , TridiagonalDecomposition . makeComplex ( )
-                                              */ };
-
-        for (final MatrixDecomposition<ComplexNumber> tmpDecomposition : tmpCmplxDecomps) {
-            tmpDecomposition.decompose(tmpHermitian);
-            if (MatrixDecompositionTests.DEBUG) {
-                BasicLogger.debug(tmpDecomposition.toString());
-                BasicLogger.debug("Original", tmpHermitian);
-                BasicLogger.debug("Recretaed", tmpDecomposition.reconstruct());
-            }
-            TestUtils.assertEquals("Recreation: " + tmpDecomposition.toString(), tmpHermitian, tmpDecomposition.reconstruct(), new NumberContext(8, 5));
-            if ((tmpDecomposition instanceof MatrixDecomposition.Solver<?>) && ((Solver) tmpDecomposition).isSolvable()) {
-                tmpActual = ((Solver) tmpDecomposition).getSolution(tmpHermitian);
-                if (MatrixDecompositionTests.DEBUG) {
-                    BasicLogger.debug("Actual", tmpActual);
-                }
-                TestUtils.assertEquals("Solving: " + tmpDecomposition.toString(), tmpExpected, tmpActual, new NumberContext(7, 6));
-            }
-        }
     }
 
     /**

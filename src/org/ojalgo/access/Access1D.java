@@ -156,10 +156,9 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
      *
      * @param a The scale
      * @param y The "vector" to update
-     * @deprecated v42 Use {@link #axpy(double,Mutate1D)} instead
      */
-    default void daxpy(final double a, final Mutate1D y) {
-        axpy(a, y);
+    default void axpy(final double a, final Mutate1D y) {
+        Structure1D.loopMatching(this, y, i -> y.add(i, a * this.doubleValue(i)));
     }
 
     /**
@@ -167,9 +166,11 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
      *
      * @param a The scale
      * @param y The "vector" to update
+     * @deprecated v42 Use {@link #axpy(double,Mutate1D)} instead
      */
-    default void axpy(final double a, final Mutate1D y) {
-        Structure1D.loopMatching(this, y, i -> y.add(i, a * this.doubleValue(i)));
+    @Deprecated
+    default void daxpy(final double a, final Mutate1D y) {
+        this.axpy(a, y);
     }
 
     /**

@@ -120,11 +120,6 @@ public class RationalArray extends ScalarArray<RationalNumber> {
     }
 
     @Override
-    PlainArray<RationalNumber> newInstance(final int capacity) {
-        return new RationalArray(capacity);
-    }
-
-    @Override
     protected final void sortAscending() {
         Arrays.parallelSort(data);
     }
@@ -132,6 +127,11 @@ public class RationalArray extends ScalarArray<RationalNumber> {
     @Override
     protected void sortDescending() {
         Arrays.parallelSort(data, Comparator.reverseOrder());
+    }
+
+    @Override
+    PlainArray<RationalNumber> newInstance(final int capacity) {
+        return new RationalArray(capacity);
     }
 
     @Override
