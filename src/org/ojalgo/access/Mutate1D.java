@@ -98,7 +98,7 @@ public interface Mutate1D extends Structure1D {
 
     }
 
-    interface Receiver<N extends Number> extends Mutate1D, Fillable<N>, Modifiable<N>, BiModifiable<N>, Consumer<Access1D<?>> {
+    interface Receiver<N extends Number> extends Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>, Consumer<Access1D<?>> {
 
         default void accept(final Access1D<?> supplied) {
             if (this.isAcceptable(supplied)) {

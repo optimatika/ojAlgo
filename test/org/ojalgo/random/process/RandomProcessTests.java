@@ -23,9 +23,6 @@ package org.ojalgo.random.process;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * RandomProcessPackageTests
  *
@@ -34,16 +31,6 @@ import junit.framework.TestSuite;
 public abstract class RandomProcessTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(RandomProcessTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(GaussianProcessTest.class);
-        suite.addTestSuite(GeometricBrownianMotionTest.class);
-        suite.addTestSuite(MultidimensionalSimulatorTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected RandomProcessTests() {
         super();

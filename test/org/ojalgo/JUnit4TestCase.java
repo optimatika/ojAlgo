@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,24 +19,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.scalar;
+package org.ojalgo;
 
-import org.ojalgo.FunctionalityTest;
+import org.junit.After;
+import org.junit.Before;
 
-/**
- * ScalarPackageTests
- *
- * @author apete
- */
-public abstract class ScalarTests extends FunctionalityTest {
+public class JUnit4TestCase {
 
-    static final boolean DEBUG = false;
-
-    protected ScalarTests() {
+    public JUnit4TestCase() {
         super();
     }
 
-    protected ScalarTests(final String name) {
-        super(name);
+    /**
+     * Sets up the fixture, for example, open a network connection. This method is called before a test is
+     * executed.
+     */
+    @Before
+    protected void setUp() throws Exception {
     }
+
+    /**
+     * Tears down the fixture, for example, close a network connection. This method is called after a test is
+     * executed.
+     */
+    @After
+    protected void tearDown() throws Exception {
+    }
+
 }

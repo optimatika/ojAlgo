@@ -23,9 +23,6 @@ package org.ojalgo.finance;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * FinanceDataPackageTests
  *
@@ -34,14 +31,6 @@ import junit.framework.TestSuite;
 public abstract class FinanceTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(FinanceTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(FinanceUtilsTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected FinanceTests() {
         super();

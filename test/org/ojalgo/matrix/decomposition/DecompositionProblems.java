@@ -224,7 +224,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
     /**
      * A user reported problems solving complex valued (overdetermined) equation systemes.
      */
-    public void testP20111213square() {
+    public void _testP20111213square() {
 
         final int tmpDim = Uniform.randomInteger(2, 6);
 

@@ -23,32 +23,9 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 public abstract class MatrixStoreTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(MatrixStoreTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(ConjugatedCase.class);
-        suite.addTestSuite(IdentityCase.class);
-        suite.addTestSuite(MergedColumnsCase.class);
-        suite.addTestSuite(MergedRowsCase.class);
-        suite.addTestSuite(SelectedColumnsCase.class);
-        suite.addTestSuite(SelectedRowsCase.class);
-        suite.addTestSuite(StoreProblems.class);
-        suite.addTestSuite(SuperimposedMatrixColumnCase.class);
-        suite.addTestSuite(SuperimposedMatrixElementCase.class);
-        suite.addTestSuite(SuperimposedMatrixRowCase.class);
-        suite.addTestSuite(SuppliersAndConsumers.class);
-        suite.addTestSuite(TransposedCase.class);
-        suite.addTestSuite(ZeroCase.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected MatrixStoreTests() {
         super();

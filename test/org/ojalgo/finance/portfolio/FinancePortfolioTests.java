@@ -23,22 +23,9 @@ package org.ojalgo.finance.portfolio;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 public abstract class FinancePortfolioTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(FinancePortfolioTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(BlackLittermanTest.class);
-        suite.addTestSuite(PortfolioProblems.class);
-        suite.addTestSuite(TestEquilibrium.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected FinancePortfolioTests() {
         super();

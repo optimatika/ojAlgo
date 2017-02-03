@@ -23,20 +23,9 @@ package org.ojalgo.function.multiary;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 public abstract class FunctionMultiaryTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(FunctionMultiaryTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(ApproximationCase.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected FunctionMultiaryTests() {
         super();

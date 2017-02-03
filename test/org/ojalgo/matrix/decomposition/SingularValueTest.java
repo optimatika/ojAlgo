@@ -63,11 +63,11 @@ public class SingularValueTest extends MatrixDecompositionTests {
         super(arg0);
     }
 
-    public void testBasicMatrixP20030422Case() {
+    public void _testBasicMatrixP20030422Case() {
         this.doTestTypes(P20030422Case.getProblematic());
     }
 
-    public void testBasicMatrixP20030512Case() {
+    public void _testBasicMatrixP20030512Case() {
         this.doTestTypes(P20030512Case.getProblematic());
     }
 
@@ -79,11 +79,11 @@ public class SingularValueTest extends MatrixDecompositionTests {
         this.doTestTypes(P20050125Case.getProblematic());
     }
 
-    public void testBasicMatrixP20050827Case() {
+    public void _testBasicMatrixP20050827Case() {
         this.doTestTypes(PrimitiveMatrix.FACTORY.copy(PrimitiveDenseStore.FACTORY.copy(P20050827Case.getProblematic())));
     }
 
-    public void testBasicMatrixP20061119Case() {
+    public void _testBasicMatrixP20061119Case() {
         this.doTestTypes(P20061119Case.getProblematic());
     }
 

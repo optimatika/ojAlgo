@@ -41,6 +41,10 @@ public class LpsolveSemiContCase extends OptimisationIntegerTests {
         super(someName);
     }
 
+    public void testDummy() {
+
+    }
+
     public void _testSemiContNot() {
 
         final File tmpFile = new File(PATH + "lpsolve_sc_not.mps");

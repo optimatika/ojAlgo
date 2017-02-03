@@ -29,9 +29,6 @@ import java.util.List;
 import org.ojalgo.FunctionalityTest;
 import org.ojalgo.TestUtils;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * MatrixDecompositionPackageTests
  *
@@ -154,30 +151,6 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     @SuppressWarnings("unchecked")
     public static final Tridiagonal<Double>[] getTridiagonalPrimitive() {
         return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new TridiagonalDecomposition.Primitive(), new TridiagonalAltDecomp() };
-    }
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(MatrixDecompositionTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(BidiagonalTest.class);
-        suite.addTestSuite(CompareJamaAndPrimitive.class);
-        suite.addTestSuite(DecompositionProblems.class);
-        suite.addTestSuite(DegenerateLUCase.class);
-        suite.addTestSuite(DesignCase.class);
-        suite.addTestSuite(EigenvalueTest.class);
-        suite.addTestSuite(HessenbergTest.class);
-        suite.addTestSuite(LDLTest.class);
-        suite.addTestSuite(LUTest.class);
-        suite.addTestSuite(QRTest.class);
-        suite.addTestSuite(SchurTest.class);
-        suite.addTestSuite(SingularValueTest.class);
-        suite.addTestSuite(SVDbyEvD.class);
-        suite.addTestSuite(TestJama.class);
-        suite.addTestSuite(TestSolveAndInvert.class);
-        suite.addTestSuite(TridiagonalizeCase.class);
-        suite.addTestSuite(ExtremeElementsCase.class);
-        //$JUnit-END$
-        return suite;
     }
 
     protected MatrixDecompositionTests() {

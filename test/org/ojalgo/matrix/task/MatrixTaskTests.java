@@ -27,9 +27,6 @@ import java.util.List;
 import org.ojalgo.FunctionalityTest;
 import org.ojalgo.matrix.decomposition.MatrixDecompositionTests;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * MatrixDecompositionPackageTests
  *
@@ -83,17 +80,6 @@ public abstract class MatrixTaskTests extends FunctionalityTest {
         //        }
 
         return retVal;
-    }
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(MatrixTaskTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(DeterminantTest.class);
-        suite.addTestSuite(InverterTest.class);
-        suite.addTestSuite(JacobiSolverTest.class);
-        suite.addTestSuite(SolverTest.class);
-        //$JUnit-END$
-        return suite;
     }
 
     protected MatrixTaskTests() {

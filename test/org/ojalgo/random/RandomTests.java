@@ -23,9 +23,6 @@ package org.ojalgo.random;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * RandomPackageTests
  *
@@ -34,16 +31,6 @@ import junit.framework.TestSuite;
 public abstract class RandomTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(RandomTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(QuantileTest.class);
-        suite.addTestSuite(RandomNumberTest.class);
-        suite.addTestSuite(SampleSetTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected RandomTests() {
         super();

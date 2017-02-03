@@ -23,9 +23,6 @@ package org.ojalgo.series;
 
 import org.ojalgo.FunctionalityTest;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * SeriesPackageTests
  *
@@ -34,14 +31,6 @@ import junit.framework.TestSuite;
 public abstract class SeriesTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
-
-    public static Test suite() {
-        final TestSuite suite = new TestSuite(SeriesTests.class.getPackage().getName());
-        //$JUnit-BEGIN$
-        suite.addTestSuite(CalendarDateSeriesTest.class);
-        //$JUnit-END$
-        return suite;
-    }
 
     protected SeriesTests() {
         super();
