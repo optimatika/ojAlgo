@@ -1424,10 +1424,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return myUtility.indexOfLargestInColumn(row, col);
     }
 
-    public long indexOfLargestInDiagonal(final long row, final long col) {
-        return myUtility.indexOfLargestInDiagonal(row, col);
-    }
-
     public long indexOfLargestInRow(final long row, final long col) {
         return myUtility.indexOfLargestInRow(row, col);
     }

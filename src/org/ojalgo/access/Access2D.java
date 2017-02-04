@@ -185,12 +185,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
          */
         long indexOfLargestInColumn(final long row, final long col);
 
-        /**
-         * @deprecated v42 Use {@link #indexOfLargestOnDiagonal(long)} instead
-         */
-        @Deprecated
-        long indexOfLargestInDiagonal(final long row, final long col);
-
         default long indexOfLargestInRow(final long row) {
             return this.indexOfLargestInRow(row, 0L);
         }
@@ -292,17 +286,6 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
     }
 
     N get(long row, long col);
-
-    /**
-     * Will pass through each matching element position calling the {@code through} function. What happens is
-     * entirely dictated by how you implement the callback.
-     *
-     * @deprecated v42 Use {@link Structure2D.RowColumnCallback} instead.
-     */
-    @Deprecated
-    default void passMatching(final Callback2D<N> through, final Mutate2D to) {
-        Callback2D.onMatching(this, through, to);
-    }
 
     default Iterable<RowView<N>> rows() {
         return RowView.makeIterable(this);

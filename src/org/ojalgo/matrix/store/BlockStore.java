@@ -90,11 +90,6 @@ final class BlockStore<N extends Number> extends FactoryStore<N> implements Phys
         return 0;
     }
 
-    public long indexOfLargestInDiagonal(final long row, final long col) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
     public long indexOfLargestInRange(final long first, final long limit) {
         // TODO Auto-generated method stub
         return 0;

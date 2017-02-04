@@ -27,7 +27,12 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.BaseStream;
 
-import org.ojalgo.access.*;
+import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
+import org.ojalgo.access.ColumnView;
+import org.ojalgo.access.ElementView2D;
+import org.ojalgo.access.Mutate1D;
+import org.ojalgo.access.RowView;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
@@ -324,10 +329,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
         return myUtility.indexOfLargestInColumn(row, col);
     }
 
-    public long indexOfLargestInDiagonal(final long row, final long col) {
-        return myUtility.indexOfLargestInDiagonal(row, col);
-    }
-
     public long indexOfLargestInRange(final long first, final long limit) {
         return myUtility.indexOfLargestInRange(first, limit);
     }
@@ -465,14 +466,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
     public void negateColumn(final int column) {
         // TODO Auto-generated method stub
 
-    }
-
-    public void passMatching(final Callback1D<N> through, final Mutate1D to) {
-        myUtility.passMatching(through, to);
-    }
-
-    public void passMatching(final Callback2D<N> through, final Mutate2D to) {
-        myUtility.passMatching(through, to);
     }
 
     public org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> physical() {

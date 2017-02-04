@@ -799,10 +799,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return myUtility.indexOfLargestInColumn(row, col);
     }
 
-    public long indexOfLargestInDiagonal(final long row, final long col) {
-        return myUtility.indexOfLargestInDiagonal(row, col);
-    }
-
     public long indexOfLargestInRow(final long row, final long col) {
         return myUtility.indexOfLargestInRow(row, col);
     }

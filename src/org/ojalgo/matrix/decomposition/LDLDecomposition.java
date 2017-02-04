@@ -97,7 +97,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         for (int ij = 0; ij < tmpMinDim; ij++) {
 
             // Find next pivot row
-            final int tmpPivotRow = (int) (tmpInPlace.indexOfLargestInDiagonal(ij, ij) / tmpRowDim);
+            final int tmpPivotRow = (int) tmpInPlace.indexOfLargestOnDiagonal(ij);
 
             // Pivot?
             if (tmpPivotRow != ij) {

@@ -162,18 +162,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
     }
 
     /**
-     * Will calculate y = y + a x, will add "a" times "this" to "y"
-     *
-     * @param a The scale
-     * @param y The "vector" to update
-     * @deprecated v42 Use {@link #axpy(double,Mutate1D)} instead
-     */
-    @Deprecated
-    default void daxpy(final double a, final Mutate1D y) {
-        this.axpy(a, y);
-    }
-
-    /**
      * Will calculate and return the dot product of this 1D-structure and another input 1D-vector.
      *
      * @param vector Another 1D-structure
@@ -199,17 +187,6 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     default Iterator<N> iterator() {
         return new Iterator1D<>(this);
-    }
-
-    /**
-     * Will pass through each matching element position calling the {@code through} function. What happens is
-     * entirely dictated by how you implement the callback.
-     *
-     * @deprecated v42 Use {@link Structure1D.IndexCallback} instead.
-     */
-    @Deprecated
-    default void passMatching(final Callback1D<N> through, final Mutate1D to) {
-        Callback1D.onMatching(this, through, to);
     }
 
     default BaseStream<N, ? extends BaseStream<N, ?>> stream(final boolean parallel) {

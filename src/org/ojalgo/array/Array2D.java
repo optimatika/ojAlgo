@@ -490,18 +490,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         return myDelegate.indexOfLargest(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L) % myRowsCount;
     }
 
-    /**
-     * @param row
-     * @param col
-     * @return The matrix-index of the largest absolute value on a diagonal, starting at the specified
-     *         row-column pair.
-     */
-    public long indexOfLargestInDiagonal(final long row, final long col) {
-        final long tmpCount = Math.min(myRowsCount - row, myColumnsCount - col);
-        return myDelegate.indexOfLargest(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, row + tmpCount, col + tmpCount),
-                1L + myRowsCount);
-    }
-
     public long indexOfLargestInRange(final long first, final long limit) {
         return myDelegate.indexOfLargestInRange(first, limit);
     }
@@ -524,7 +512,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         final long tmpLimit = Structure2D.index(myRowsCount, tmpMinCount, tmpMinCount);
         final long tmpStep = 1L + myRowsCount;
 
-        return myDelegate.indexOfLargest(tmpFirst, tmpLimit, tmpStep);
+        return myDelegate.indexOfLargest(tmpFirst, tmpLimit, tmpStep) / myRowsCount;
     }
 
     public boolean isAbsolute(final long index) {

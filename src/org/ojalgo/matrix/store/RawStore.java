@@ -1016,25 +1016,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return retVal;
     }
 
-    public long indexOfLargestInDiagonal(final long row, final long col) {
-
-        final int tmpRowDim = data.length;
-
-        int retVal = (int) (row + (col * tmpRowDim));
-        double tmpLargest = ZERO;
-        double tmpValue;
-
-        for (int i = (int) row, j = (int) col; (i < tmpRowDim) && (j < myNumberOfColumns); i++, j++) {
-            tmpValue = PrimitiveFunction.ABS.invoke(data[i][j]);
-            if (tmpValue > tmpLargest) {
-                tmpLargest = tmpValue;
-                retVal = i + (j * tmpRowDim);
-            }
-        }
-
-        return retVal;
-    }
-
     public long indexOfLargestInRange(final long first, final long limit) {
 
         final int tmpRowDim = data.length;
