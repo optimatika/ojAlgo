@@ -75,8 +75,8 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public void supplyTo(final ElementsConsumer<N> consumer) {
-        this.addNonZerosTo(consumer);
+    public void supplyTo(final ElementsConsumer<N> receiver) {
+        this.addNonZerosTo(receiver);
     }
 
     public Scalar<N> toScalar(final long row, final long column) {

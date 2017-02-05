@@ -53,6 +53,21 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    public interface Collectable<N extends Number, R extends Mutate2D.Receiver<N>> extends Structure2D {
+
+        default <I extends R> I collect(final Factory2D<I> factory) {
+
+            final I retVal = factory.makeZero(this.countRows(), this.countColumns());
+
+            this.supplyTo(retVal);
+
+            return retVal;
+        }
+
+        void supplyTo(R receiver);
+
+    }
+
     public interface Elements extends Structure2D, Access1D.Elements {
 
         default boolean isAbsolute(final long index) {

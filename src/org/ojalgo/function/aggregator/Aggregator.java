@@ -21,79 +21,12 @@
  */
 package org.ojalgo.function.aggregator;
 
-import java.math.BigDecimal;
-
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
-
 public enum Aggregator {
 
     CARDINALITY, LARGEST, MAXIMUM, MINIMUM, NORM1, NORM2, PRODUCT, PRODUCT2, SMALLEST, SUM, SUM2;
 
-    /**
-     * @deprecated v42 Use {@link #getFunction(AggregatorSet)} instead.
-     */
-    @Deprecated
-    public final AggregatorFunction<BigDecimal> getBigFunction() {
-        return this.getFunction(BigAggregator.getSet());
-    }
-
-    /**
-     * @deprecated v42 Use {@link #getFunction(AggregatorSet)} instead.
-     */
-    @Deprecated
-    public final AggregatorFunction<ComplexNumber> getComplexFunction() {
-        return this.getFunction(ComplexAggregator.getSet());
-    }
-
     public final <N extends Number> AggregatorFunction<N> getFunction(final AggregatorSet<N> collection) {
         return collection.get(this);
-    }
-
-    /**
-     * @deprecated v42 Use {@link #getFunction(AggregatorSet)} instead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public final <N extends Number> AggregatorFunction<N> getFunction(final Class<?> scalarType) {
-        if (double.class.isAssignableFrom(scalarType) || Double.class.isAssignableFrom(scalarType)) {
-            return (AggregatorFunction<N>) this.getFunction(PrimitiveAggregator.getSet());
-        } else if (ComplexNumber.class.isAssignableFrom(scalarType)) {
-            return (AggregatorFunction<N>) this.getFunction(ComplexAggregator.getSet());
-        } else if (BigDecimal.class.isAssignableFrom(scalarType)) {
-            return (AggregatorFunction<N>) this.getFunction(BigAggregator.getSet());
-        } else if (RationalNumber.class.isAssignableFrom(scalarType)) {
-            return (AggregatorFunction<N>) this.getFunction(RationalAggregator.getSet());
-        } else if (Quaternion.class.isAssignableFrom(scalarType)) {
-            return (AggregatorFunction<N>) this.getFunction(QuaternionAggregator.getSet());
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @deprecated v42 Use {@link #getFunction(AggregatorSet)} instead.
-     */
-    @Deprecated
-    public final AggregatorFunction<Double> getPrimitiveFunction() {
-        return this.getFunction(PrimitiveAggregator.getSet());
-    }
-
-    /**
-     * @deprecated v42 Use {@link #getFunction(AggregatorSet)} instead.
-     */
-    @Deprecated
-    public final AggregatorFunction<Quaternion> getQuaternionFunction() {
-        return this.getFunction(QuaternionAggregator.getSet());
-    }
-
-    /**
-     * @deprecated v42 Use {@link #getFunction(AggregatorSet)} instead.
-     */
-    @Deprecated
-    public final AggregatorFunction<RationalNumber> getRationalFunction() {
-        return this.getFunction(RationalAggregator.getSet());
     }
 
 }

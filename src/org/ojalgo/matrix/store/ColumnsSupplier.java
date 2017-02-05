@@ -67,10 +67,10 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Mat
         return myColumns.remove(index);
     }
 
-    public void supplyTo(final ElementsConsumer<N> consumer) {
+    public void supplyTo(final ElementsConsumer<N> receiver) {
         final int tmpLimit = myColumns.size();
         for (int j = 0; j < tmpLimit; j++) {
-            consumer.fillColumn(j, myColumns.get(j));
+            receiver.fillColumn(j, myColumns.get(j));
         }
     }
 

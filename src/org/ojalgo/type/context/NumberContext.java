@@ -319,26 +319,6 @@ public final class NumberContext extends FormatContext<Number> {
         return true;
     }
 
-    /**
-     * "big" enforce(...)
-     *
-     * @deprecated v42 Use {@link #getFunction(FunctionSet)} instead.
-     */
-    @Deprecated
-    public UnaryFunction<BigDecimal> getBigFunction() {
-        return this.getFunction(BigFunction.getSet());
-    }
-
-    /**
-     * "complex" enforce(...)
-     *
-     * @deprecated v42 Use {@link #getFunction(FunctionSet)} instead.
-     */
-    @Deprecated
-    public UnaryFunction<ComplexNumber> getComplexFunction() {
-        return this.getFunction(ComplexFunction.getSet());
-    }
-
     public <N extends Number> UnaryFunction<N> getFunction(final FunctionSet<N> functions) {
         return functions.enforce(this);
     }
@@ -349,36 +329,6 @@ public final class NumberContext extends FormatContext<Number> {
 
     public int getPrecision() {
         return myMathContext.getPrecision();
-    }
-
-    /**
-     * "primitive" enforce(...)
-     *
-     * @deprecated v42 Use {@link #getFunction(FunctionSet)} instead.
-     */
-    @Deprecated
-    public UnaryFunction<Double> getPrimitiveFunction() {
-        return this.getFunction(PrimitiveFunction.getSet());
-    }
-
-    /**
-     * "quaternion" enforce(...)
-     *
-     * @deprecated v42 Use {@link #getFunction(FunctionSet)} instead.
-     */
-    @Deprecated
-    public UnaryFunction<Quaternion> getQuaternionFunction() {
-        return this.getFunction(QuaternionFunction.getSet());
-    }
-
-    /**
-     * "rational" enforce(...)
-     *
-     * @deprecated v42 Use {@link #getFunction(FunctionSet)} instead.
-     */
-    @Deprecated
-    public UnaryFunction<RationalNumber> getRationalFunction() {
-        return this.getFunction(RationalFunction.getSet());
     }
 
     public RoundingMode getRoundingMode() {

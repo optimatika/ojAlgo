@@ -1043,8 +1043,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
-    public void supplyTo(final ElementsConsumer<ComplexNumber> consumer) {
-        consumer.fillMatching(this);
+    public void supplyTo(final ElementsConsumer<ComplexNumber> receiver) {
+        receiver.fillMatching(this);
     }
 
     public Scalar<ComplexNumber> toScalar(final long row, final long column) {

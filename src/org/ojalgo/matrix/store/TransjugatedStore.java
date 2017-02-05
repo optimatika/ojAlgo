@@ -63,8 +63,8 @@ abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
     }
 
     @Override
-    public void supplyTo(final ElementsConsumer<N> consumer) {
-        this.addNonZerosTo(consumer);
+    public void supplyTo(final ElementsConsumer<N> receiver) {
+        this.addNonZerosTo(receiver);
     }
 
     @Override

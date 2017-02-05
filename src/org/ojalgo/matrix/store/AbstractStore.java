@@ -132,9 +132,9 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return tmpStep2.get(0L);
     }
 
-    public void supplyTo(final ElementsConsumer<N> consumer) {
-        consumer.fillAll(this.physical().scalar().zero().getNumber());
-        this.addNonZerosTo(consumer);
+    public void supplyTo(final ElementsConsumer<N> receiver) {
+        receiver.fillAll(this.physical().scalar().zero().getNumber());
+        this.addNonZerosTo(receiver);
     }
 
     @Override

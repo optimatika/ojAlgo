@@ -1234,8 +1234,8 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         data[(int) row][(int) col] = value.doubleValue();
     }
 
-    public void supplyTo(final ElementsConsumer<Double> consumer) {
-        consumer.fillMatching(this);
+    public void supplyTo(final ElementsConsumer<Double> receiver) {
+        receiver.fillMatching(this);
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {

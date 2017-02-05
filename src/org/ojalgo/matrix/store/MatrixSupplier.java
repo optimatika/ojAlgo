@@ -58,9 +58,9 @@ interface MatrixSupplier<N extends Number> extends ElementsSupplier<N> {
             }
 
             @Override
-            public void supplyTo(final ElementsConsumer<N> consumer) {
-                MatrixSupplier.this.supplyTo(consumer);
-                consumer.modifyAll(operator);
+            public void supplyTo(final ElementsConsumer<N> receiver) {
+                MatrixSupplier.this.supplyTo(receiver);
+                receiver.modifyAll(operator);
             }
 
         };
@@ -84,9 +84,9 @@ interface MatrixSupplier<N extends Number> extends ElementsSupplier<N> {
             }
 
             @Override
-            public void supplyTo(final ElementsConsumer<N> consumer) {
-                MatrixSupplier.this.supplyTo(consumer);
-                consumer.modifyMatching(operator, right);
+            public void supplyTo(final ElementsConsumer<N> receiver) {
+                MatrixSupplier.this.supplyTo(receiver);
+                receiver.modifyMatching(operator, right);
             }
 
         };
@@ -110,9 +110,9 @@ interface MatrixSupplier<N extends Number> extends ElementsSupplier<N> {
             }
 
             @Override
-            public void supplyTo(final ElementsConsumer<N> consumer) {
-                MatrixSupplier.this.supplyTo(consumer);
-                consumer.modifyMatching(left, operator);
+            public void supplyTo(final ElementsConsumer<N> receiver) {
+                MatrixSupplier.this.supplyTo(receiver);
+                receiver.modifyMatching(left, operator);
             }
 
         };
@@ -159,8 +159,8 @@ interface MatrixSupplier<N extends Number> extends ElementsSupplier<N> {
             }
 
             @Override
-            public void supplyTo(final ElementsConsumer<N> consumer) {
-                MatrixSupplier.this.supplyTo(consumer.regionByTransposing());
+            public void supplyTo(final ElementsConsumer<N> receiver) {
+                MatrixSupplier.this.supplyTo(receiver.regionByTransposing());
             }
 
             public ElementsSupplier<N> transpose() {

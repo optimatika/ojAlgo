@@ -67,10 +67,10 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Matrix
         return myRows.remove(index);
     }
 
-    public void supplyTo(final ElementsConsumer<N> consumer) {
+    public void supplyTo(final ElementsConsumer<N> receiver) {
         final int tmpLimit = myRows.size();
         for (int i = 0; i < tmpLimit; i++) {
-            consumer.fillRow(i, myRows.get(i));
+            receiver.fillRow(i, myRows.get(i));
         }
     }
 

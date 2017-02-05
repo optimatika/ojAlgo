@@ -356,9 +356,9 @@ public interface MatrixStore<N extends Number> extends MatrixSupplier<N>, Access
             return this;
         }
 
-        public final void supplyTo(final ElementsConsumer<N> consumer) {
-            if (consumer.isAcceptable(this)) {
-                consumer.accept(this.get());
+        public final void supplyTo(final ElementsConsumer<N> receiver) {
+            if (receiver.isAcceptable(this)) {
+                receiver.accept(this.get());
             } else {
                 throw new ProgrammingError("Not acceptable!");
             }

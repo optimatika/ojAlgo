@@ -50,6 +50,21 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
+    public interface Collectable<N extends Number, R extends Mutate1D.Receiver<N>> extends Structure1D {
+
+        default <I extends R> I collect(final Factory1D<I> factory) {
+
+            final I retVal = factory.makeZero(this.count());
+
+            this.supplyTo(retVal);
+
+            return retVal;
+        }
+
+        void supplyTo(R receiver);
+
+    }
+
     public interface Elements extends Structure1D {
 
         /**

@@ -575,7 +575,7 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
 
     }
 
-    public void supplyTo(final ElementsConsumer<N> consumer) {
+    public void supplyTo(final ElementsConsumer<N> receiver) {
         // TODO Auto-generated method stub
 
     }

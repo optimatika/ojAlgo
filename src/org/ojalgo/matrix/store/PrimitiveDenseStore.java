@@ -1646,8 +1646,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
-    public void supplyTo(final ElementsConsumer<Double> consumer) {
-        consumer.fillMatching(this);
+    public void supplyTo(final ElementsConsumer<Double> receiver) {
+        receiver.fillMatching(this);
     }
 
     public PrimitiveScalar toScalar(final long row, final long column) {

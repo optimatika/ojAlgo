@@ -53,8 +53,8 @@ final class MatrixProductPipeline<N extends Number> extends MatrixPipeline<N> {
     }
 
     @Override
-    public void supplyTo(final ElementsConsumer<N> consumer) {
-        consumer.fillByMultiplying(myLeft, myRight);
+    public void supplyTo(final ElementsConsumer<N> receiver) {
+        receiver.fillByMultiplying(myLeft, myRight);
     }
 
 }

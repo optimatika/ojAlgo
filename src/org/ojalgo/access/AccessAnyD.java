@@ -36,6 +36,21 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
+    public interface Collectable<N extends Number, R extends MutateAnyD.Receiver<N>> extends StructureAnyD {
+
+        default <I extends R> I collect(final FactoryAnyD<I> factory) {
+
+            final I retVal = factory.makeZero(this.shape());
+
+            this.supplyTo(retVal);
+
+            return retVal;
+        }
+
+        void supplyTo(R receiver);
+
+    }
+
     public interface Elements extends StructureAnyD, Access1D.Elements {
 
         /**

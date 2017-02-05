@@ -53,8 +53,8 @@ final class WrapperStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    public void supplyTo(final ElementsConsumer<N> consumer) {
-        this.addNonZerosTo(consumer);
+    public void supplyTo(final ElementsConsumer<N> receiver) {
+        this.addNonZerosTo(receiver);
     }
 
     @Override
