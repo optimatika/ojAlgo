@@ -27,6 +27,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.RandomAccess;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Iterator1D;
@@ -41,6 +46,17 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
     private static long INITIAL_CAPACITY = 16L;
     private static long SEGMENT_CAPACITY = 16_384L;
+
+    public static <N extends Number> Collector<N, NumberList<N>, NumberList<N>> collector(final DenseArray.Factory<N> arrayFactory) {
+        final Supplier<NumberList<N>> tmpSupplier = () -> new NumberList<>(arrayFactory);
+        final BiConsumer<NumberList<N>, N> tmpAccumulator = (list, element) -> list.add(element);
+        final BinaryOperator<NumberList<N>> tmpCombiner = (part1, part2) -> {
+            part1.addAll(part2);
+            return part1;
+        };
+        final Function<NumberList<N>, NumberList<N>> tmpIdentity = Function.identity();
+        return Collector.of(tmpSupplier, tmpAccumulator, tmpCombiner, tmpIdentity, Collector.Characteristics.IDENTITY_FINISH);
+    }
 
     public static <N extends Number> NumberList<N> make(final DenseArray.Factory<N> arrayFactory) {
         return new NumberList<>(arrayFactory);
