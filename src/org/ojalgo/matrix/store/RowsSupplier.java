@@ -7,7 +7,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 
-public final class RowsSupplier<N extends Number> implements Access2D<N>, MatrixSupplier<N> {
+public final class RowsSupplier<N extends Number> implements Access2D<N>, ElementsSupplier<N> {
 
     private final int myColumnsCount;
     private final PhysicalStore.Factory<N, ?> myFactory;

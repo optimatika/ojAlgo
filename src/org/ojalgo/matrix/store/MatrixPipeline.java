@@ -23,11 +23,11 @@ package org.ojalgo.matrix.store;
 
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 
-abstract class MatrixPipeline<N extends Number> implements MatrixSupplier<N> {
+abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 
-    private final MatrixSupplier<N> myContext;
+    private final ElementsSupplier<N> myContext;
 
-    protected MatrixPipeline(final MatrixSupplier<N> context) {
+    protected MatrixPipeline(final ElementsSupplier<N> context) {
         super();
         myContext = context;
     }

@@ -28,7 +28,7 @@ final class MatrixProductPipeline<N extends Number> extends MatrixPipeline<N> {
     private final Access1D<N> myLeft;
     private final MatrixStore<N> myRight;
 
-    private MatrixProductPipeline(final MatrixSupplier<N> base) {
+    private MatrixProductPipeline(final ElementsSupplier<N> base) {
 
         super(base);
 

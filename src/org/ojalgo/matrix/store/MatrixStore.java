@@ -58,7 +58,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface MatrixStore<N extends Number> extends MatrixSupplier<N>, Access2D<N>, Access2D.Elements, Access2D.Visitable<N>, Access2D.Aggregatable<N>,
+public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Access2D<N>, Access2D.Elements, Access2D.Visitable<N>, Access2D.Aggregatable<N>,
         Access2D.Sliceable<N>, NormedVectorSpace<MatrixStore<N>, N>, Operation.Multiplication<MatrixStore<N>> {
 
     public static interface Factory<N extends Number> {
@@ -78,7 +78,7 @@ public interface MatrixStore<N extends Number> extends MatrixSupplier<N>, Access
      *
      * @author apete
      */
-    public static final class LogicalBuilder<N extends Number> implements MatrixSupplier<N> {
+    public static final class LogicalBuilder<N extends Number> implements ElementsSupplier<N> {
 
         @SafeVarargs
         static <N extends Number> MatrixStore<N> buildColumn(final int aMinRowDim, final MatrixStore<N>... aColStore) {
