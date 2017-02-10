@@ -17,6 +17,10 @@ import org.ojalgo.scalar.RationalNumber;
 
 public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N> {
 
+    static final class MapStrategy extends CapacityStrategy<MapStrategy> {
+
+    }
+
     private static int INITIAL_CAPACITY = 16;
 
     public static <N extends Number> LongToNumberMap<N> make(final DenseArray.Factory<N> arrayFactory) {

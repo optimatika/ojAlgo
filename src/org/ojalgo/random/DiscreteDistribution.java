@@ -26,5 +26,5 @@ public interface DiscreteDistribution extends Distribution {
     /**
      * Probability density function
      */
-    double getProbability(int aVal);
+    double getProbability(int value);
 }

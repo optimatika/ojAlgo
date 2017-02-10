@@ -52,8 +52,8 @@ public class Geometric extends AbstractDiscrete {
         return ONE / myProbability;
     }
 
-    public double getProbability(final int aVal) {
-        return myProbability * PrimitiveFunction.POW.invoke(ONE - myProbability, aVal - ONE);
+    public double getProbability(final int value) {
+        return myProbability * PrimitiveFunction.POW.invoke(ONE - myProbability, value - ONE);
     }
 
     @Override

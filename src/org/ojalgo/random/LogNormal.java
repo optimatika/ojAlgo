@@ -81,8 +81,8 @@ public class LogNormal extends AbstractContinuous {
         myNormal = new Normal(aMean, aStdDev);
     }
 
-    public double getDistribution(final double aValue) {
-        return myNormal.getDistribution(PrimitiveFunction.LOG.invoke(aValue));
+    public double getDistribution(final double value) {
+        return myNormal.getDistribution(PrimitiveFunction.LOG.invoke(value));
     }
 
     public double getExpected() {
@@ -100,15 +100,15 @@ public class LogNormal extends AbstractContinuous {
         return PrimitiveFunction.EXP.invoke(myNormal.getStandardDeviation());
     }
 
-    public double getProbability(final double aValue) {
-        return myNormal.getProbability(PrimitiveFunction.LOG.invoke(aValue)) / aValue;
+    public double getProbability(final double value) {
+        return myNormal.getProbability(PrimitiveFunction.LOG.invoke(value)) / value;
     }
 
-    public double getQuantile(final double aProbality) {
+    public double getQuantile(final double probality) {
 
-        this.checkProbabilty(aProbality);
+        this.checkProbabilty(probality);
 
-        return PrimitiveFunction.EXP.invoke(myNormal.getQuantile(aProbality));
+        return PrimitiveFunction.EXP.invoke(myNormal.getQuantile(probality));
     }
 
     @Override

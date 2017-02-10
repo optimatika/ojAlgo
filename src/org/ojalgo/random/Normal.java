@@ -50,26 +50,26 @@ public class Normal extends AbstractContinuous {
         myScale = aScale;
     }
 
-    public double getDistribution(final double aValue) {
-        return (ONE + RandomUtils.erf((aValue - myLocation) / (myScale * SQRT_TWO))) / TWO;
+    public double getDistribution(final double value) {
+        return (ONE + RandomUtils.erf((value - myLocation) / (myScale * SQRT_TWO))) / TWO;
     }
 
     public double getExpected() {
         return myLocation;
     }
 
-    public double getProbability(final double aValue) {
+    public double getProbability(final double value) {
 
-        final double tmpVal = (aValue - myLocation) / myScale;
+        final double tmpVal = (value - myLocation) / myScale;
 
         return PrimitiveFunction.EXP.invoke((tmpVal * tmpVal) / -TWO) / (myScale * SQRT_TWO_PI);
     }
 
-    public double getQuantile(final double aProbality) {
+    public double getQuantile(final double probality) {
 
-        this.checkProbabilty(aProbality);
+        this.checkProbabilty(probality);
 
-        return (myScale * SQRT_TWO * RandomUtils.erfi((TWO * aProbality) - ONE)) + myLocation;
+        return (myScale * SQRT_TWO * RandomUtils.erfi((TWO * probality) - ONE)) + myLocation;
     }
 
     @Override

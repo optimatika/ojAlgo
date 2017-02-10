@@ -55,7 +55,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<BigDecimal> tmpBigDecomp = LU.BIG.make();
-        tmpBigDecomp.decompose((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(tmpMtrxA));
+        tmpBigDecomp.decompose(BigDenseStore.FACTORY.copy(tmpMtrxA));
         //        System.out.println("A: " + tmpMtrxA.enforce(tmpEvalContext));
         //        System.out.println("P: " + new BigMatrix(tmpBigDecomp.getP()).enforce(tmpEvalContext));
         //        System.out.println("L: " + new BigMatrix(tmpBigDecomp.getL()).enforce(tmpEvalContext));
@@ -74,7 +74,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<ComplexNumber> tmpComplexDecomp = LU.COMPLEX.make();
-        tmpComplexDecomp.decompose((PhysicalStore<ComplexNumber>) ComplexDenseStore.FACTORY.copy(tmpMtrxA));
+        tmpComplexDecomp.decompose(ComplexDenseStore.FACTORY.copy(tmpMtrxA));
         //        System.out.println("A: " + tmpMtrxA.enforce(tmpEvalContext));
         //        System.out.println("P: " + new ComplexMatrix(tmpComplexDecomp.getP()).enforce(tmpEvalContext));
         //        System.out.println("L: " + new ComplexMatrix(tmpComplexDecomp.getL()).enforce(tmpEvalContext));
@@ -93,7 +93,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<Double> tmpDoubleDecomp = LU.PRIMITIVE.make();
-        tmpDoubleDecomp.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpMtrxA));
+        tmpDoubleDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpMtrxA));
         //        System.out.println("A: " + tmpMtrxA.enforce(tmpEvalContext));
         //        System.out.println("P: " + new PrimitiveMatrix(tmpDoubleDecomp.getP()).enforce(tmpEvalContext));
         //        System.out.println("L: " + new PrimitiveMatrix(tmpDoubleDecomp.getL()).enforce(tmpEvalContext));
@@ -112,7 +112,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<Double> tmpDoubleDecomp = new RawLU();
-        tmpDoubleDecomp.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpMtrxA));
+        tmpDoubleDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpMtrxA));
         //        System.out.println("A: " + tmpMtrxA.enforce(tmpEvalContext));
         //        System.out.println("P: " + new PrimitiveMatrix(tmpDoubleDecomp.getP()).enforce(tmpEvalContext));
         //        System.out.println("L: " + new PrimitiveMatrix(tmpDoubleDecomp.getL()).enforce(tmpEvalContext));
@@ -131,7 +131,7 @@ public class DegenerateLUCase extends MatrixDecompositionTests {
                 .mergeColumns(SimpleEquationCase.getBody()).mergeColumns(SimpleEquationCase.getBody());
 
         final LU<Double> tmpDoubleDecomp = LU.PRIMITIVE.make();
-        tmpDoubleDecomp.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpMtrxA));
+        tmpDoubleDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpMtrxA));
         //        System.out.println("A: " + tmpMtrxA.enforce(tmpEvalContext));
         //        System.out.println("P: " + new PrimitiveMatrix(tmpDoubleDecomp.getP()).enforce(tmpEvalContext));
         //        System.out.println("L: " + new PrimitiveMatrix(tmpDoubleDecomp.getL()).enforce(tmpEvalContext));
