@@ -451,7 +451,7 @@ public final class SampleSet implements Access1D<Double> {
         final Access1D<?> tmpSamples = this.getSamples();
         final int tmpSamplesCount = (int) tmpSamples.count();
 
-        if ((mySortedCopy == null) || (mySortedCopy.length < tmpSamplesCount)) {
+        if ((mySortedCopy == null) || (mySortedCopy.length < tmpSamplesCount) || (mySortedCopy.length == 0)) {
             mySortedCopy = tmpSamples.toRawCopy1D();
             Arrays.parallelSort(mySortedCopy);
         } else if (mySortedCopy[0] == Double.POSITIVE_INFINITY) {
