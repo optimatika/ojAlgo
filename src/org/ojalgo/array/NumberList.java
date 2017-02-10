@@ -39,6 +39,10 @@ import org.ojalgo.scalar.RationalNumber;
 
 public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D {
 
+    static final class ListStrategy extends CapacityStrategy<ListStrategy> {
+
+    }
+
     private static long INITIAL_CAPACITY = 16L;
     private static long SEGMENT_CAPACITY = 16_384L;
 

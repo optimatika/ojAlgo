@@ -49,11 +49,11 @@ public class Exponential extends AbstractContinuous {
         myRate = aRate;
     }
 
-    public double getDistribution(final double aValue) {
-        if (aValue < ZERO) {
+    public double getDistribution(final double value) {
+        if (value < ZERO) {
             return ZERO;
         } else {
-            return ONE - PrimitiveFunction.EXP.invoke(-myRate * aValue);
+            return ONE - PrimitiveFunction.EXP.invoke(-myRate * value);
         }
     }
 
@@ -61,19 +61,19 @@ public class Exponential extends AbstractContinuous {
         return ONE / myRate;
     }
 
-    public double getProbability(final double aValue) {
-        if (aValue < ZERO) {
+    public double getProbability(final double value) {
+        if (value < ZERO) {
             return ZERO;
         } else {
-            return myRate * PrimitiveFunction.EXP.invoke(-myRate * aValue);
+            return myRate * PrimitiveFunction.EXP.invoke(-myRate * value);
         }
     }
 
-    public double getQuantile(final double aProbality) {
+    public double getQuantile(final double probality) {
 
-        this.checkProbabilty(aProbality);
+        this.checkProbabilty(probality);
 
-        return PrimitiveFunction.LOG.invoke(ONE - aProbality) / -myRate;
+        return PrimitiveFunction.LOG.invoke(ONE - probality) / -myRate;
     }
 
     @Override

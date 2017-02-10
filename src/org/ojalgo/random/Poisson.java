@@ -56,8 +56,8 @@ public class Poisson extends AbstractDiscrete {
         return myLambda;
     }
 
-    public double getProbability(final int aVal) {
-        return (PrimitiveFunction.EXP.invoke(-myLambda) * PrimitiveFunction.POW.invoke(myLambda, aVal)) / RandomUtils.factorial(aVal);
+    public double getProbability(final int value) {
+        return (PrimitiveFunction.EXP.invoke(-myLambda) * PrimitiveFunction.POW.invoke(myLambda, value)) / RandomUtils.factorial(value);
     }
 
     @Override

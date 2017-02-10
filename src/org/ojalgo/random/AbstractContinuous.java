@@ -29,12 +29,12 @@ abstract class AbstractContinuous extends RandomNumber implements ContinuousDist
         super();
     }
 
-    public final double getLowerConfidenceQuantile(final double aConfidence) {
-        return this.getQuantile((ONE - aConfidence) / TWO);
+    public final double getLowerConfidenceQuantile(final double confidence) {
+        return this.getQuantile((ONE - confidence) / TWO);
     }
 
-    public final double getUpperConfidenceQuantile(final double aConfidence) {
-        return this.getQuantile(ONE - ((ONE - aConfidence) / TWO));
+    public final double getUpperConfidenceQuantile(final double confidence) {
+        return this.getQuantile(ONE - ((ONE - confidence) / TWO));
     }
 
 }

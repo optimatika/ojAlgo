@@ -31,10 +31,10 @@ public interface ContinuousDistribution extends Distribution {
      * the distribution of multivariate random variables.
      * <a href="http://en.wikipedia.org/wiki/Cumulative_distribution_function">WikipediA</a>
      *
-     * @param aValue x
+     * @param value x
      * @return P(&lt;=x)
      */
-    double getDistribution(double aValue);
+    double getDistribution(double value);
 
     /**
      * In probability theory, a probability density function (pdf), or density of a continuous random variable
@@ -44,10 +44,10 @@ public interface ContinuousDistribution extends Distribution {
      * everywhere, and its integral over the entire space is equal to one.
      * <a href="http://en.wikipedia.org/wiki/Probability_density_function">WikipediA</a>
      *
-     * @param aValue x
+     * @param value x
      * @return P(x)
      */
-    double getProbability(double aValue);
+    double getProbability(double value);
 
     /**
      * The quantile function, for any distribution, is defined for real variables between zero and one and is
@@ -55,9 +55,9 @@ public interface ContinuousDistribution extends Distribution {
      * <a href="http://en.wikipedia.org/wiki/Quantile_function">WikipediA</a> The input probability absolutely
      * has to be [0.0, 1.0], but values close to 0.0 and 1.0 may be problematic
      *
-     * @param aProbality P(&lt;=x)
+     * @param probality P(&lt;=x)
      * @return x
      */
-    double getQuantile(double aProbality);
+    double getQuantile(double probality);
 
 }
