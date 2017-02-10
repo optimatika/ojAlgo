@@ -12,4 +12,6 @@ public interface Stream2D<N extends Number, A extends Access2D<N>, R extends Mut
 
     P operateOnMatching(final BinaryFunction<N> operator, final A right);
 
+    P transpose();
+
 }

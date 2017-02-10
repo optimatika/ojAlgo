@@ -40,6 +40,4 @@ import org.ojalgo.access.Stream2D;
  */
 public interface ElementsSupplier<N extends Number> extends Stream2D<N, MatrixStore<N>, ElementsConsumer<N>, ElementsSupplier<N>>, Supplier<MatrixStore<N>> {
 
-    ElementsSupplier<N> transpose();
-
 }

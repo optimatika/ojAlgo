@@ -22,10 +22,12 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -53,7 +55,7 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         return this.compute(matrix, this.isHermitian(), true);
     }
 
-    public final boolean decompose(final ElementsSupplier<N> matrix) {
+    public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, this.isHermitian(), false);
     }
 
@@ -96,9 +98,9 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         myEigenvaluesOnly = false;
     }
 
-    protected abstract boolean doNonsymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly);
+    protected abstract boolean doNonsymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
 
-    protected abstract boolean doSymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly);
+    protected abstract boolean doSymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
 
     protected abstract MatrixStore<N> makeD();
 
@@ -106,7 +108,7 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
 
     protected abstract MatrixStore<N> makeV();
 
-    final boolean compute(final ElementsSupplier<N> matrix, final boolean symmetric, final boolean eigenvaluesOnly) {
+    final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean symmetric, final boolean eigenvaluesOnly) {
 
         this.reset();
 

@@ -79,7 +79,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return this.getDeterminant();
     }
 
-    public boolean decompose(final ElementsSupplier<N> matrix) {
+    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
 
         this.reset();
 

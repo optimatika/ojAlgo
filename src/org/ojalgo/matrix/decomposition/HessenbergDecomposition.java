@@ -27,8 +27,8 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -69,7 +69,7 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
         super(aFactory);
     }
 
-    public final boolean compute(final ElementsSupplier<N> matrix, final boolean upper) {
+    public final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean upper) {
 
         this.reset();
 
@@ -110,7 +110,7 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
         return this.computed(true);
     }
 
-    public final boolean decompose(final ElementsSupplier<N> matrix) {
+    public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, true);
     }
 

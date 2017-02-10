@@ -34,6 +34,7 @@ import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
@@ -80,7 +81,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.compute(matrix, true);
     }
 
-    public final boolean decompose(final ElementsSupplier<N> aStore) {
+    public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore) {
         return this.compute(aStore, false);
     }
 
@@ -221,7 +222,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         }
     }
 
-    final boolean compute(final ElementsSupplier<N> matrix, final boolean checkHermitian) {
+    final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {
 
         this.reset();
 

@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Stream2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
@@ -33,6 +34,7 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.task.TaskException;
@@ -83,11 +85,13 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      *
      * @param matrix Rectangular matrix
      */
-    public boolean decompose(final ElementsSupplier<Double> matrix) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         final double[][] retVal = this.reset(matrix, true);
 
-        matrix.transpose().supplyTo(this.getRawInPlaceStore());
+        // TODO Handle case with non Stream2D
+        ((Stream2D) matrix).transpose().supplyTo(this.getRawInPlaceStore());
 
         return this.doDecompose(retVal);
     }

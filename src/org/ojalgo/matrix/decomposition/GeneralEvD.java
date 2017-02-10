@@ -21,13 +21,13 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -104,11 +104,13 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     @Override
-    protected boolean doNonsymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly) {
+    protected boolean doNonsymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
 
-        final int tmpDiagDim = (int) aMtrx.countRows();
+        final int tmpDiagDim = (int) matrix.countRows();
 
-        final DecompositionStore<N> tmpMtrxA = this.copy(aMtrx.get());
+        // final DecompositionStore<N> tmpMtrxA = this.copy(matrix.get());
+        final DecompositionStore<N> tmpMtrxA = this.makeZero(tmpDiagDim, tmpDiagDim);
+        matrix.supplyTo(tmpMtrxA);
 
         final DecompositionStore<N> tmpV = this.makeEye(tmpDiagDim, tmpDiagDim);
 
@@ -145,8 +147,8 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     @Override
-    protected boolean doSymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly) {
-        return this.doNonsymmetric(aMtrx, eigenvaluesOnly);
+    protected boolean doSymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
+        return this.doNonsymmetric(matrix, eigenvaluesOnly);
     }
 
     @Override

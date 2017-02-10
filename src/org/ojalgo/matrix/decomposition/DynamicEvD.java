@@ -22,9 +22,10 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -110,7 +111,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     @Override
-    protected boolean doNonsymmetric(final ElementsSupplier<N> matrix, final boolean eigenvaluesOnly) {
+    protected boolean doNonsymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
 
         myHermitian = false;
 
@@ -118,7 +119,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
     }
 
     @Override
-    protected boolean doSymmetric(final ElementsSupplier<N> matrix, final boolean eigenvaluesOnly) {
+    protected boolean doSymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
 
         myHermitian = true;
 

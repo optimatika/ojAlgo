@@ -25,14 +25,15 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -355,7 +356,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     @Override
-    protected boolean doCompute(final ElementsSupplier<N> matrix, final boolean singularValuesOnly, final boolean fullSize) {
+    protected boolean doCompute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean singularValuesOnly, final boolean fullSize) {
 
         this.computeBidiagonal(matrix, fullSize);
 

@@ -31,6 +31,7 @@ import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.matrix.transformation.Householder;
@@ -75,7 +76,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.getDeterminant();
     }
 
-    public boolean decompose(final ElementsSupplier<N> matrix) {
+    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
 
         this.reset();
 

@@ -116,4 +116,8 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         return myFactory.builder().makeWrapper(source);
     }
 
+    protected final DecompositionStore<N> collect(final Access2D.Collectable<N, ? super DecompositionStore<N>> source) {
+        return source.collect(myFactory);
+    }
+
 }

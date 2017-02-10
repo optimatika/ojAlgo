@@ -21,11 +21,13 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
@@ -232,13 +234,13 @@ public interface MatrixDecomposition<N extends Number> {
      * @param matrix A matrix to decompose
      * @return true if the computation suceeded; false if not
      */
-    boolean decompose(ElementsSupplier<N> matrix);
+    boolean decompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
 
     boolean equals(MatrixStore<N> other, NumberContext context);
 
     /**
      * @return true if computation has been attemped; false if not.
-     * @see #decompose(ElementsSupplier)
+     * @see #decompose(Access2D.Collectable<N, ? super PhysicalStore<N>>)
      */
     boolean isComputed();
 

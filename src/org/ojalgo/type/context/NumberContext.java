@@ -32,16 +32,9 @@ import java.util.Locale;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.BigFunction;
-import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.QuaternionFunction;
-import org.ojalgo.function.RationalFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.type.format.NumberStyle;
 
 /**

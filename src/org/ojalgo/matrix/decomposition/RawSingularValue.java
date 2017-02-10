@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Stream2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.blas.AXPY;
@@ -32,6 +33,7 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.task.TaskException;
@@ -106,16 +108,18 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.doDecompose(tmpData, false);
     }
 
-    public boolean decompose(final ElementsSupplier<Double> matrix) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         myTransposed = matrix.countRows() < matrix.countColumns();
 
-        final double[][] tmpData = this.reset(matrix.get(), !myTransposed);
+        final double[][] tmpData = this.reset(matrix, !myTransposed);
 
         if (myTransposed) {
             matrix.supplyTo(this.getRawInPlaceStore());
         } else {
-            matrix.transpose().supplyTo(this.getRawInPlaceStore());
+            // TODO Handle case with non Stream2D
+            ((Stream2D) matrix).transpose().supplyTo(this.getRawInPlaceStore());
         }
 
         return this.doDecompose(tmpData, true);

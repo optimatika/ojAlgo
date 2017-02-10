@@ -87,7 +87,7 @@ public interface LU<N extends Number> extends LDU<N> {
     }
 
     /**
-     * The normal {@link #decompose(ElementsSupplier)} method must handle cases where pivoting is required. If
+     * The normal {@link #decompose(Access2D.Collectable<N, ? super PhysicalStore<N>>)} method must handle cases where pivoting is required. If
      * you know that pivoting is not needed you may call this method instead - it may be faster. Note that the
      * algorithm implementation may still pivot. Pivoting is optional not forbidden (or required).
      */

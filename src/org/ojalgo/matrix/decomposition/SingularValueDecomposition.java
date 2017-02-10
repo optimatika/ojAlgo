@@ -63,7 +63,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return this.compute(matrix, true, false);
     }
 
-    public boolean decompose(final ElementsSupplier<N> matrix) {
+    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, false, this.isFullSize());
     }
 
@@ -328,7 +328,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return myInverse;
     }
 
-    protected boolean compute(final ElementsSupplier<N> matrix, final boolean singularValuesOnly, final boolean fullSize) {
+    protected boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean singularValuesOnly, final boolean fullSize) {
 
         this.reset();
 
@@ -344,7 +344,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         try {
 
-            retVal = this.doCompute(myTransposed ? matrix.get().conjugate() : matrix, singularValuesOnly, fullSize);
+            // TODO Handle case with non Stream2D (transposed case)
+            retVal = this.doCompute(myTransposed ? this.collect(matrix).conjugate() : matrix, singularValuesOnly, fullSize);
 
         } catch (final Exception anException) {
 
@@ -358,12 +359,12 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return this.computed(retVal);
     }
 
-    protected boolean computeBidiagonal(final ElementsSupplier<N> matrix, final boolean fullSize) {
+    protected boolean computeBidiagonal(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean fullSize) {
         myBidiagonal.setFullSize(fullSize);
         return myBidiagonal.decompose(matrix);
     }
 
-    protected abstract boolean doCompute(ElementsSupplier<N> matrix, boolean singularValuesOnly, boolean fullSize);
+    protected abstract boolean doCompute(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, boolean singularValuesOnly, boolean fullSize);
 
     protected DiagonalAccess<N> getBidiagonalAccessD() {
         return myBidiagonal.getDiagonalAccessD();

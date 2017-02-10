@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
@@ -408,16 +409,16 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
     }
 
     @Override
-    protected final boolean doNonsymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly) {
+    protected final boolean doNonsymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    protected final boolean doSymmetric(final ElementsSupplier<N> aMtrx, final boolean eigenvaluesOnly) {
+    protected final boolean doSymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
 
-        final int tmpDim = (int) aMtrx.countRows();
+        final int tmpDim = (int) matrix.countRows();
 
-        myTridiagonal.decompose(aMtrx);
+        myTridiagonal.decompose(matrix);
 
         final DiagonalAccess<N> tmpTridiagonal = myTridiagonal.getDiagonalAccessD();
 

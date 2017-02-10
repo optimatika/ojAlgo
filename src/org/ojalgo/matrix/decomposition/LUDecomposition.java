@@ -35,6 +35,7 @@ import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
@@ -81,7 +82,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.compute(matrix, true);
     }
 
-    public boolean decompose(final ElementsSupplier<N> aStore) {
+    public boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore) {
         return this.compute(aStore, false);
     }
 
@@ -272,7 +273,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    private final boolean compute(final ElementsSupplier<N> aStore, final boolean assumeNoPivotingRequired) {
+    private final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore, final boolean assumeNoPivotingRequired) {
 
         this.reset();
 

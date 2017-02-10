@@ -29,9 +29,9 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
@@ -110,7 +110,7 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
         super(aFactory);
     }
 
-    public final boolean decompose(final ElementsSupplier<N> matrix) {
+    public final boolean decompose(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
 
         this.reset();
 
@@ -120,8 +120,8 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
 
             final int tmpRowDim = (int) matrix.countRows(); // Which is also the col-dim.
 
-            final LogicalBuilder<N> aTriangularMtrx = matrix.get().logical().triangular(false, false);
-
+            final LogicalBuilder<N> aTriangularMtrx = this.collect(matrix).logical().triangular(false, false);
+            //TODO Not optimal code here!
             final DecompositionStore<N> tmpInPlace = this.setInPlace(aTriangularMtrx);
 
             final Householder<N> tmpHouseholder = this.makeHouseholder(tmpRowDim);

@@ -33,6 +33,7 @@ import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.store.operation.HouseholderHermitian;
 import org.ojalgo.matrix.task.TaskException;
@@ -191,7 +192,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return this.doDecompose(tmpData);
     }
 
-    public boolean decompose(final ElementsSupplier<Double> matrix) {
+    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         final double[][] tmpData = this.reset(matrix, false);
 

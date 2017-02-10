@@ -34,6 +34,7 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.task.TaskException;
@@ -71,7 +72,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.doDecompose(tmpData);
     }
 
-    public boolean decompose(final ElementsSupplier<Double> matrix) {
+    public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         final double[][] tmpData = this.reset(matrix, false);
 
@@ -215,7 +216,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     /**
      * Use a "left-looking", dot-product, Crout/Doolittle algorithm, essentially copied from JAMA.
      *
-     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#decompose(ElementsSupplier)
+     * @see org.ojalgo.matrix.decomposition.MatrixDecomposition#decompose(Access2D.Collectable<N, ? super
+     *      PhysicalStore<N>>)
      */
     private boolean doDecompose(final double[][] data) {
 

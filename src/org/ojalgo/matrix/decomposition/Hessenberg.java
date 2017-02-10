@@ -25,8 +25,8 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -67,7 +67,7 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
         }
     }
 
-    boolean compute(ElementsSupplier<N> matrix, boolean upper);
+    boolean compute(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, boolean upper);
 
     MatrixStore<N> getH();
 

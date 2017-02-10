@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.concurrent.DaemonPoolExecutor;
 import org.ojalgo.constant.BigMath;
@@ -38,7 +39,6 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -267,7 +267,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
 
     @Override
     @SuppressWarnings("unchecked")
-    protected boolean doCompute(final ElementsSupplier<N> aStore, final boolean singularValuesOnly, final boolean fullSize) {
+    protected boolean doCompute(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore, final boolean singularValuesOnly, final boolean fullSize) {
 
         final int tmpMinDim = (int) Math.min(aStore.countRows(), aStore.countColumns());
 
