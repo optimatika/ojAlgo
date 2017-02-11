@@ -16,7 +16,7 @@ ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/
 <dependency>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>41.0.0</version>
+    <version>42.0.0</version>
 </dependency>
 ```
 
