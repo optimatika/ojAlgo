@@ -36,7 +36,6 @@ import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -319,12 +318,12 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         return myInverse;
     }
 
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
-        return this.getInverse().multiply(rhs.get());
+    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
+        return this.getInverse().multiply(this.collect(rhs));
     }
 
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
-        preallocated.fillByMultiplying(this.getInverse(), rhs.get());
+    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final DecompositionStore<N> preallocated) {
+        preallocated.fillByMultiplying(this.getInverse(), this.collect(rhs));
         return preallocated;
     }
 

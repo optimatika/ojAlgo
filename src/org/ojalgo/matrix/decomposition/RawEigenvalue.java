@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -106,7 +107,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             super();
         }
 
-        public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
+        public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
             final long numberOfEquations = rhs.countRows();
             final DecompositionStore<Double> tmpPreallocated = this.allocate(numberOfEquations, numberOfEquations);
             return this.getSolution(rhs, tmpPreallocated);
@@ -283,7 +284,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return myInverse;
     }
 
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final DecompositionStore<Double> preallocated) {
         return null;
     }
 

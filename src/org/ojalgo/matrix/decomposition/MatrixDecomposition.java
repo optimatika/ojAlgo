@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
@@ -133,7 +134,7 @@ public interface MatrixDecomposition<N extends Number> {
          * @param matrix A matrix to decompose
          * @return true if the decomposition suceeded AND {@link #isSolvable()}; false if not
          */
-        default boolean compute(final ElementsSupplier<N> matrix) {
+        default boolean compute(final Collectable<N, ? super PhysicalStore<N>> matrix) {
             return this.decompose(matrix) && this.isSolvable();
         }
 
@@ -167,7 +168,7 @@ public interface MatrixDecomposition<N extends Number> {
         /**
          * [A][X]=[B] or [this][return]=[rhs]
          */
-        MatrixStore<N> getSolution(ElementsSupplier<N> rhs);
+        MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs);
 
         /**
          * <p>
@@ -178,7 +179,7 @@ public interface MatrixDecomposition<N extends Number> {
          * this interface. It must be documented for each implementation.
          * </p>
          * <p>
-         * Should produce the same results as calling {@link #getSolution(ElementsSupplier)}.
+         * Should produce the same results as calling {@link #getSolution(Collectable)}.
          * </p>
          *
          * @param rhs The Right Hand Side, wont be modfied
@@ -188,12 +189,12 @@ public interface MatrixDecomposition<N extends Number> {
          * @return The solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
-        MatrixStore<N> getSolution(ElementsSupplier<N> rhs, DecompositionStore<N> preallocated);
+        MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs, DecompositionStore<N> preallocated);
 
         /**
-         * @return true if it is ok to call {@linkplain #getSolution(ElementsSupplier)} (computation was
+         * @return true if it is ok to call {@linkplain #getSolution(Collectable)} (computation was
          *         successful); false if not
-         * @see #getSolution(ElementsSupplier)
+         * @see #getSolution(Collectable)
          * @see #isComputed()
          */
         boolean isSolvable();

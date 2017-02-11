@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.constant.PrimitiveMath;
@@ -32,7 +33,6 @@ import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -114,7 +114,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.getInPlace().logical().triangular(false, false).get();
     }
 
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs) {
+    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
 
@@ -137,7 +137,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
      * @return [X] The solution will be written to "preallocated" and then returned.
      */
     @Override
-    public final MatrixStore<N> getSolution(final ElementsSupplier<N> rhs, final DecompositionStore<N> preallocated) {
+    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final DecompositionStore<N> preallocated) {
 
         rhs.supplyTo(preallocated);
 

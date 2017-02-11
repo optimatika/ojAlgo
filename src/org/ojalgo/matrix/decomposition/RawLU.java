@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.blas.DOT;
@@ -136,15 +137,15 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return retVal;
     }
 
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
+    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
         final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
         return this.getSolution(rhs, tmpPreallocated);
     }
 
     @Override
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final DecompositionStore<Double> preallocated) {
 
-        rhs.get().logical().row(myPivot.getOrder()).supplyTo(preallocated);
+        this.collect(rhs).logical().row(myPivot.getOrder()).supplyTo(preallocated);
 
         return this.doSolve(preallocated);
     }

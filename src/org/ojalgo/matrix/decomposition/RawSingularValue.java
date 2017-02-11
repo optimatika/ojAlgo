@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Stream2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
@@ -204,14 +205,14 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return Array1D.PRIMITIVE.copy(myS);
     }
 
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
+    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
         final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countRows());
         return this.getSolution(rhs, tmpPreallocated);
     }
 
     @Override
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
-        return this.doGetInverse((PrimitiveDenseStore) preallocated).multiply(rhs.get());
+    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final DecompositionStore<Double> preallocated) {
+        return this.doGetInverse((PrimitiveDenseStore) preallocated).multiply(this.collect(rhs));
     }
 
     public double getTraceNorm() {

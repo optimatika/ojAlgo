@@ -24,10 +24,10 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -99,13 +99,13 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return 0;
     }
 
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs) {
+    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
         final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
         return this.getSolution(rhs, tmpPreallocated);
     }
 
     @Override
-    public MatrixStore<Double> getSolution(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final DecompositionStore<Double> preallocated) {
         return this.doSolve(rhs, preallocated);
     }
 
@@ -209,7 +209,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return preallocated;
     }
 
-    private MatrixStore<Double> doSolve(final ElementsSupplier<Double> rhs, final DecompositionStore<Double> preallocated) {
+    private MatrixStore<Double> doSolve(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final DecompositionStore<Double> preallocated) {
 
         rhs.supplyTo(preallocated);
 
