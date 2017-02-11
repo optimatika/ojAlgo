@@ -143,7 +143,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     @Override
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
 
         this.collect(rhs).logical().row(myPivot.getOrder()).supplyTo(preallocated);
 
@@ -195,7 +195,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     @Override
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
 
         final double[][] tmpData = this.reset(body, false);
 
@@ -287,7 +287,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return preallocated;
     }
 
-    private MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
+    private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
         final MatrixStore<Double> tmpBody = this.getRawInPlaceStore();
 

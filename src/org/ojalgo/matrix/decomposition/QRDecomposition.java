@@ -181,7 +181,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
      *         MatrixStore.
      */
     @Override
-    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
         rhs.supplyTo(preallocated);
 
@@ -273,7 +273,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) throws TaskException {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws TaskException {
 
         this.decompose(this.wrap(body));
 

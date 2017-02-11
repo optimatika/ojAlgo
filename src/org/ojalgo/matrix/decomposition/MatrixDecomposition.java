@@ -189,7 +189,7 @@ public interface MatrixDecomposition<N extends Number> {
          * @return The solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
-        MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs, DecompositionStore<N> preallocated);
+        MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs, PhysicalStore<N> preallocated);
 
         /**
          * @return true if it is ok to call {@linkplain #getSolution(Collectable)} (computation was

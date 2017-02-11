@@ -21,7 +21,6 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -72,37 +71,6 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
     void rotateRight(int aLow, int aHigh, double aCos, double aSin);
 
     void setToIdentity(int aCol);
-
-    /**
-     * Will solve the equation system [A][X]=[B] where:
-     * <ul>
-     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
-     * the solution).</li>
-     * <li>[A] is upper/right triangular</li>
-     * </ul>
-     *
-     * @param body The equation system body parameters [A]
-     * @param unitDiagonal TODO
-     * @param conjugated true if the upper/right part of body is actually stored in the lower/left part of the
-     *        matrix, and the elements conjugated.
-     * @param hermitian TODO
-     */
-    void substituteBackwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean hermitian);
-
-    /**
-     * Will solve the equation system [A][X]=[B] where:
-     * <ul>
-     * <li>[body][this]=[this] is [A][X]=[B] ("this" is the right hand side, and it will be overwritten with
-     * the solution).</li>
-     * <li>[A] is lower/left triangular</li>
-     * </ul>
-     *
-     * @param body The equation system body parameters [A]
-     * @param unitDiagonal true if body as ones on the diagonal
-     * @param conjugated TODO
-     * @param identity
-     */
-    void substituteForwards(Access2D<N> body, boolean unitDiagonal, boolean conjugated, boolean identity);
 
     void transformSymmetric(Householder<N> transformation);
 

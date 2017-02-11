@@ -123,7 +123,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     @Override
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
 
         rhs.supplyTo(preallocated);
 
@@ -166,7 +166,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     @Override
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
 
         final double[][] retVal = this.reset(body, false);
 
@@ -219,7 +219,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return preallocated.logical().hermitian(false).get();
     }
 
-    private MatrixStore<Double> doSolve(final DecompositionStore<Double> preallocated) {
+    private MatrixStore<Double> doSolve(final PhysicalStore<Double> preallocated) {
 
         final RawStore tmpBody = this.getRawInPlaceStore();
 

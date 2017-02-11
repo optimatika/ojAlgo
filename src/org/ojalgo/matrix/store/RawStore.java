@@ -1234,6 +1234,16 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         data[(int) row][(int) col] = value.doubleValue();
     }
 
+    public void substituteBackwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean hermitian) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void substituteForwards(final Access2D<Double> body, final boolean unitDiagonal, final boolean conjugated, final boolean identity) {
+        // TODO Auto-generated method stub
+
+    }
+
     public void supplyTo(final ElementsConsumer<Double> receiver) {
         receiver.fillMatching(this);
     }

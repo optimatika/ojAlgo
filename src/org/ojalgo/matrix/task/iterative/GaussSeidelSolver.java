@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.TaskException;
@@ -73,7 +72,7 @@ public final class GaussSeidelSolver extends StationaryIterativeSolver implement
         return tmpNormErr / tmpNormRHS;
     }
 
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> current) throws TaskException {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws TaskException {
 
         final List<Equation> tmpRows = IterativeSolverTask.toListOfRows(body, rhs);
 

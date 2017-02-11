@@ -32,6 +32,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 public interface SolverTask<N extends Number> extends MatrixTask<N> {
@@ -153,7 +154,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     /**
      * <p>
      * Will create a {@linkplain DecompositionStore} instance suitable for use with
-     * {@link #solve(Access2D, Access2D, DecompositionStore)}. The dimensions of the returned instance is not
+     * {@link #solve(Access2D, Access2D, PhysicalStore)}. The dimensions of the returned instance is not
      * specified by this interface - it is specified by the behaviour/requirements of each implementation.
      * </p>
      * <p>
@@ -190,6 +191,6 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
      * @return The solution
      */
-    MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, DecompositionStore<N> preallocated) throws TaskException;
+    MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, PhysicalStore<N> preallocated) throws TaskException;
 
 }

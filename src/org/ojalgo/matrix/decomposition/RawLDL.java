@@ -105,7 +105,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     }
 
     @Override
-    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
         return this.doSolve(rhs, preallocated);
     }
 
@@ -149,7 +149,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     }
 
     @Override
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
 
         final double[][] retVal = this.reset(body, false);
 
@@ -209,7 +209,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return preallocated;
     }
 
-    private MatrixStore<Double> doSolve(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final DecompositionStore<Double> preallocated) {
+    private MatrixStore<Double> doSolve(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
 
         rhs.supplyTo(preallocated);
 

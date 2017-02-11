@@ -27,13 +27,14 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> FULL_1X1 = new AbstractSolver() {
 
-        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
             AbstractSolver.full1X1(body, rhs, preallocated);
             return preallocated;
         }
@@ -42,7 +43,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> FULL_2X2 = new AbstractSolver() {
 
-        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
             AbstractSolver.full2X2(body, rhs, preallocated);
             return preallocated;
         }
@@ -51,7 +52,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> FULL_3X3 = new AbstractSolver() {
 
-        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
             AbstractSolver.full3X3(body, rhs, preallocated);
             return preallocated;
         }
@@ -60,7 +61,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> FULL_4X4 = new AbstractSolver() {
 
-        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
             AbstractSolver.full4X4(body, rhs, preallocated);
             return preallocated;
         }
@@ -69,7 +70,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> FULL_5X5 = new AbstractSolver() {
 
-        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
             AbstractSolver.full5X5(body, rhs, preallocated);
             return preallocated;
         }
@@ -78,7 +79,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> LEAST_SQUARES = new AbstractSolver() {
 
-        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
             AbstractSolver.leastSquares(body, rhs, preallocated);
             return preallocated;
         }
@@ -87,7 +88,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> SYMMETRIC_2X2 = new AbstractSolver() {
 
-        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
             AbstractSolver.symmetric2X2(body, rhs, preallocated);
             return preallocated;
         }
@@ -96,7 +97,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> SYMMETRIC_3X3 = new AbstractSolver() {
 
-        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
             AbstractSolver.symmetric3X3(body, rhs, preallocated);
             return preallocated;
         }
@@ -105,7 +106,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> SYMMETRIC_4X4 = new AbstractSolver() {
 
-        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
             AbstractSolver.symmetric4X4(body, rhs, preallocated);
             return preallocated;
         }
@@ -114,18 +115,18 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     static final SolverTask<Double> SYMMETRIC_5X5 = new AbstractSolver() {
 
-        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> preallocated) throws TaskException {
+        public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
             AbstractSolver.symmetric5X5(body, rhs, preallocated);
             return preallocated;
         }
 
     };
 
-    static void full1X1(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
+    static void full1X1(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
         solution.set(0L, rhs.doubleValue(0L) / body.doubleValue(0L));
     }
 
-    static void full2X2(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
+    static void full2X2(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -153,7 +154,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         solution.set(1L, AbstractDeterminator.calculate(tmp00, tmp10, tmp0, tmp1) / tmpDet);
     }
 
-    static void full3X3(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
+    static void full3X3(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -208,7 +209,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         solution.set(2L, (((tmp0 * tmpMin02) - (tmp1 * tmpMin12)) + (tmp2 * tmpMin22)) / tmpDet);
     }
 
-    static void full4X4(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
+    static void full4X4(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -290,7 +291,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         solution.set(3L, -((((tmp0 * tmpMin03) - (tmp1 * tmpMin13)) + (tmp2 * tmpMin23)) - (tmp3 * tmpMin33)) / tmpDet);
     }
 
-    static void full5X5(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
+    static void full5X5(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -430,7 +431,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         solution.set(4L, (((((tmp0 * tmpMin04) - (tmp1 * tmpMin14)) + (tmp2 * tmpMin24)) - (tmp3 * tmpMin34)) + (tmp4 * tmpMin44)) / tmpDet);
     }
 
-    static void leastSquares(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
+    static void leastSquares(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
 
         final PrimitiveDenseStore tmpTranspBody = PrimitiveDenseStore.FACTORY.transpose(body);
 
@@ -462,7 +463,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
 
     }
 
-    static void symmetric2X2(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
+    static void symmetric2X2(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -488,7 +489,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         solution.set(1L, AbstractDeterminator.calculate(tmp00, tmp10, tmp0, tmp1) / tmpDet);
     }
 
-    static void symmetric3X3(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
+    static void symmetric3X3(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -534,7 +535,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         solution.set(2L, (((tmp0 * tmpMin20) - (tmp1 * tmpMin21)) + (tmp2 * tmpMin22)) / tmpDet);
     }
 
-    static void symmetric4X4(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
+    static void symmetric4X4(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);
@@ -598,7 +599,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         solution.set(3L, -((((tmp0 * tmpMin30) - (tmp1 * tmpMin31)) + (tmp2 * tmpMin32)) - (tmp3 * tmpMin33)) / tmpDet);
     }
 
-    static void symmetric5X5(final Access2D<?> body, final Access1D<?> rhs, final DecompositionStore<?> solution) {
+    static void symmetric5X5(final Access2D<?> body, final Access1D<?> rhs, final PhysicalStore<?> solution) {
 
         double tmp00 = body.doubleValue(0L);
         double tmp10 = body.doubleValue(1L);

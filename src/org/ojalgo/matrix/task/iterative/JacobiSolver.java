@@ -26,7 +26,6 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -40,7 +39,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
     }
 
     @SuppressWarnings("unchecked")
-    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<Double> current) throws TaskException {
+    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws TaskException {
 
         MatrixStore<Double> tmpBody = null;
         if ((body instanceof MatrixStore<?>) && (body.get(0L) instanceof Double)) {

@@ -137,7 +137,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
      * @return [X] The solution will be written to "preallocated" and then returned.
      */
     @Override
-    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final DecompositionStore<N> preallocated) {
+    public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs, final PhysicalStore<N> preallocated) {
 
         rhs.supplyTo(preallocated);
 
@@ -211,7 +211,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         }
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final DecompositionStore<N> preallocated) throws TaskException {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws TaskException {
 
         this.decompose(this.wrap(body));
 
