@@ -253,7 +253,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.isComputed();
     }
 
-    public DecompositionStore<Double> preallocate(final Structure2D template) {
+    public PhysicalStore<Double> preallocate(final Structure2D template) {
         return this.allocate(template.countColumns(), template.countRows());
     }
 

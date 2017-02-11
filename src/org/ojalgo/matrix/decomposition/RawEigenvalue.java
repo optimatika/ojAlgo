@@ -117,7 +117,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             return true;
         }
 
-        public DecompositionStore<Double> preallocate(final Structure2D template) {
+        public PhysicalStore<Double> preallocate(final Structure2D template) {
             final long numberOfEquations = template.countRows();
             return this.allocate(numberOfEquations, numberOfEquations);
         }

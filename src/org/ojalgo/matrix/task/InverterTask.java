@@ -163,6 +163,6 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
      * of the time A is square).
      * </p>
      */
-    DecompositionStore<N> preallocate(Structure2D template);
+    PhysicalStore<N> preallocate(Structure2D template);
 
 }

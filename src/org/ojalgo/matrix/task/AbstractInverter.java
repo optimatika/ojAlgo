@@ -26,7 +26,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.FunctionUtils;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -742,7 +741,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         return this.invert(original, PrimitiveDenseStore.FACTORY.makeZero(this.dim(), this.dim()));
     }
 
-    public final DecompositionStore<Double> preallocate(final Structure2D template) {
+    public final PhysicalStore<Double> preallocate(final Structure2D template) {
         return PrimitiveDenseStore.FACTORY.makeZero(this.dim(), this.dim());
     }
 

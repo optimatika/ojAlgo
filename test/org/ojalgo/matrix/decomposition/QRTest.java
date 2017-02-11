@@ -167,8 +167,8 @@ public class QRTest extends MatrixDecompositionTests {
         final QR<Double> tmpDenseQR = new QRDecomposition.Primitive();
         final QR<Double> tmpRawQR = new RawQR();
 
-        final DecompositionStore<Double> tmpDenseAlloc = tmpDenseQR.preallocate(tmpA);
-        final DecompositionStore<Double> tmpRawAlloc = tmpRawQR.preallocate(tmpA);
+        final PhysicalStore<Double> tmpDenseAlloc = tmpDenseQR.preallocate(tmpA);
+        final PhysicalStore<Double> tmpRawAlloc = tmpRawQR.preallocate(tmpA);
 
         MatrixStore<Double> tmpDenseInv;
         try {
@@ -196,9 +196,9 @@ public class QRTest extends MatrixDecompositionTests {
         final QR<ComplexNumber> tmpComplexDecomp = QR.COMPLEX.make();
         final QR<Double> tmpPrimitiveDecomp = QR.PRIMITIVE.make();
 
-        tmpBigDecomp.decompose((PhysicalStore<BigDecimal>) BigDenseStore.FACTORY.copy(tmpOriginal));
-        tmpComplexDecomp.decompose((PhysicalStore<ComplexNumber>) ComplexDenseStore.FACTORY.copy(tmpOriginal));
-        tmpPrimitiveDecomp.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpOriginal));
+        tmpBigDecomp.decompose(BigDenseStore.FACTORY.copy(tmpOriginal));
+        tmpComplexDecomp.decompose(ComplexDenseStore.FACTORY.copy(tmpOriginal));
+        tmpPrimitiveDecomp.decompose(PrimitiveDenseStore.FACTORY.copy(tmpOriginal));
 
         final MatrixStore<BigDecimal> tmpBigQ = tmpBigDecomp.getQ();
         final MatrixStore<ComplexNumber> tmpComplexQ = tmpComplexDecomp.getQ();

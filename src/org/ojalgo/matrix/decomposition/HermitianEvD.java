@@ -366,7 +366,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         return this.isComputed() && this.isHermitian();
     }
 
-    public DecompositionStore<N> preallocate(final Structure2D template) {
+    public PhysicalStore<N> preallocate(final Structure2D template) {
         final long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);
     }

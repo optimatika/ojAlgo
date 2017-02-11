@@ -250,7 +250,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return myFullSize;
     }
 
-    public DecompositionStore<N> preallocate(final Structure2D template) {
+    public PhysicalStore<N> preallocate(final Structure2D template) {
         return this.allocate(template.countColumns(), template.countRows());
     }
 

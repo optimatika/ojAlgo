@@ -152,7 +152,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return mySPD;
     }
 
-    public DecompositionStore<Double> preallocate(final Structure2D template) {
+    public PhysicalStore<Double> preallocate(final Structure2D template) {
         return this.allocate(template.countRows(), template.countRows());
     }
 

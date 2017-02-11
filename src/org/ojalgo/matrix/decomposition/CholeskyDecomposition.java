@@ -183,7 +183,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return mySPD;
     }
 
-    public DecompositionStore<N> preallocate(final Structure2D template) {
+    public PhysicalStore<N> preallocate(final Structure2D template) {
         final long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);
     }

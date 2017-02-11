@@ -136,7 +136,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return false;
     }
 
-    public DecompositionStore<Double> preallocate(final Structure2D template) {
+    public PhysicalStore<Double> preallocate(final Structure2D template) {
         return this.allocate(template.countRows(), template.countRows());
     }
 

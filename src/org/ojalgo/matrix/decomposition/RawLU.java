@@ -178,7 +178,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return (this.getRowDim() == this.getColDim()) && this.isNonsingular();
     }
 
-    public DecompositionStore<Double> preallocate(final Structure2D template) {
+    public PhysicalStore<Double> preallocate(final Structure2D template) {
         return this.allocate(template.countRows(), template.countRows());
     }
 
