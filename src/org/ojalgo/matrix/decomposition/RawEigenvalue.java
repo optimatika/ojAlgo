@@ -39,7 +39,6 @@ import org.ojalgo.matrix.store.operation.HouseholderHermitian;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.

@@ -38,7 +38,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>

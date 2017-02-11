@@ -35,7 +35,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Orginalet, sedan ett tag Based on SVDnew2, but with transposing so that calculations are always made on a

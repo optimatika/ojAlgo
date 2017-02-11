@@ -38,7 +38,6 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.matrix.task.TaskException;
-import org.ojalgo.type.context.NumberContext;
 
 final class RawLU extends RawDecomposition implements LU<Double> {
 

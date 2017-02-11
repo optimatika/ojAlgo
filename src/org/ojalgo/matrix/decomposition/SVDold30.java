@@ -45,7 +45,6 @@ import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Samma som orginalet, but without QR. Instead Householder directly. Wasn't faster. Try going directly to

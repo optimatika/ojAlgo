@@ -36,7 +36,6 @@ import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.HouseholderReference;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.type.context.NumberContext;
 
 abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N> implements QR<N> {
 
