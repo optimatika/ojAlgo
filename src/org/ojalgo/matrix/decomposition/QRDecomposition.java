@@ -112,7 +112,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     }
 
     @Override
-    public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
         return this.getSolution(this.makeIdentity(this.getRowDim()), preallocated);
     }
 
@@ -223,7 +223,7 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) throws TaskException {
+    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws TaskException {
 
         this.decompose(this.wrap(original));
 

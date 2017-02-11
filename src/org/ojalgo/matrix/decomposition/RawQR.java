@@ -114,7 +114,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return this.doGetInverse(this.allocate(tmpRowDim, tmpRowDim));
     }
 
-    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
         return this.doGetInverse((PrimitiveDenseStore) preallocated);
     }
 
@@ -214,7 +214,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     @Override
-    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws TaskException {
 
         final double[][] tmpData = this.reset(MatrixStore.PRIMITIVE.makeWrapper(original), true);
 

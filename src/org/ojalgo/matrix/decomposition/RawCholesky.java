@@ -109,7 +109,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.doGetInverse(this.allocate(tmpRowDim, tmpRowDim));
     }
 
-    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
         return this.doGetInverse((PrimitiveDenseStore) preallocated);
     }
 
@@ -131,7 +131,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     @Override
-    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws TaskException {
 
         final double[][] retVal = this.reset(original, false);
 

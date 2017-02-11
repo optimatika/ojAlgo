@@ -163,7 +163,7 @@ public interface MatrixDecomposition<N extends Number> {
          * @return The inverse, this is where you get the solution
          * @throws UnsupportedOperationException When/if this feature is not implemented
          */
-        MatrixStore<N> getInverse(DecompositionStore<N> preallocated);
+        MatrixStore<N> getInverse(PhysicalStore<N> preallocated);
 
         /**
          * [A][X]=[B] or [this][return]=[rhs]

@@ -28,13 +28,14 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_1X1 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) {
             AbstractInverter.full1X1(original, preallocated);
             return preallocated;
         }
@@ -48,7 +49,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_2X2 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) {
             AbstractInverter.full2X2(original, preallocated);
             return preallocated;
         }
@@ -62,7 +63,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_3X3 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) {
             AbstractInverter.full3X3(original, preallocated);
             return preallocated;
         }
@@ -76,7 +77,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_4X4 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) {
             AbstractInverter.full4X4(original, preallocated);
             return preallocated;
         }
@@ -90,7 +91,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> FULL_5X5 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) {
             AbstractInverter.full5X5(original, preallocated);
             return preallocated;
         }
@@ -104,7 +105,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_2X2 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) {
             AbstractInverter.symmetric2X2(original, preallocated);
             return preallocated;
         }
@@ -118,7 +119,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_3X3 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) {
             AbstractInverter.symmetric3X3(original, preallocated);
             return preallocated;
         }
@@ -132,7 +133,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_4X4 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) {
             AbstractInverter.symmetric4X4(original, preallocated);
             return preallocated;
         }
@@ -146,7 +147,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     static final InverterTask<Double> SYMMETRIC_5X5 = new AbstractInverter() {
 
-        public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) {
+        public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) {
             AbstractInverter.symmetric5X5(original, preallocated);
             return preallocated;
         }
@@ -158,11 +159,11 @@ public abstract class AbstractInverter implements InverterTask<Double> {
 
     };
 
-    static void full1X1(final Access2D<?> source, final DecompositionStore<?> destination) {
+    static void full1X1(final Access2D<?> source, final PhysicalStore<?> destination) {
         destination.set(0L, ONE / source.doubleValue(0L));
     }
 
-    static void full2X2(final Access2D<?> source, final DecompositionStore<?> destination) {
+    static void full2X2(final Access2D<?> source, final PhysicalStore<?> destination) {
 
         double tmp00 = source.doubleValue(0L);
         double tmp10 = source.doubleValue(1L);
@@ -187,7 +188,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         destination.set(3L, tmp00 / tmpDet);
     }
 
-    static void full3X3(final Access2D<?> source, final DecompositionStore<?> destination) {
+    static void full3X3(final Access2D<?> source, final PhysicalStore<?> destination) {
 
         double tmp00 = source.doubleValue(0L);
         double tmp10 = source.doubleValue(1L);
@@ -242,7 +243,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         destination.set(8L, tmpMin22 / tmpDet);
     }
 
-    static void full4X4(final Access2D<?> source, final DecompositionStore<?> destination) {
+    static void full4X4(final Access2D<?> source, final PhysicalStore<?> destination) {
 
         double tmp00 = source.doubleValue(0L);
         double tmp10 = source.doubleValue(1L);
@@ -330,7 +331,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         destination.set(15L, tmpMin33 / tmpDet);
     }
 
-    static void full5X5(final Access2D<?> source, final DecompositionStore<?> destination) {
+    static void full5X5(final Access2D<?> source, final PhysicalStore<?> destination) {
 
         double tmp00 = source.doubleValue(0L);
         double tmp10 = source.doubleValue(1L);
@@ -483,7 +484,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         destination.set(24L, tmpMin44 / tmpDet);
     }
 
-    static void symmetric2X2(final Access2D<?> source, final DecompositionStore<?> destination) {
+    static void symmetric2X2(final Access2D<?> source, final PhysicalStore<?> destination) {
 
         double tmp00 = source.doubleValue(0L);
         double tmp10 = source.doubleValue(1L);
@@ -506,7 +507,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         destination.set(3L, tmp00 / tmpDet);
     }
 
-    static void symmetric3X3(final Access2D<?> source, final DecompositionStore<?> destination) {
+    static void symmetric3X3(final Access2D<?> source, final PhysicalStore<?> destination) {
 
         double tmp00 = source.doubleValue(0L);
         double tmp10 = source.doubleValue(1L);
@@ -552,7 +553,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         destination.set(8L, tmpMin22 / tmpDet);
     }
 
-    static void symmetric4X4(final Access2D<?> source, final DecompositionStore<?> destination) {
+    static void symmetric4X4(final Access2D<?> source, final PhysicalStore<?> destination) {
 
         double tmp00 = source.doubleValue(0L);
         double tmp10 = source.doubleValue(1L);
@@ -621,7 +622,7 @@ public abstract class AbstractInverter implements InverterTask<Double> {
         destination.set(15L, tmpMin33 / tmpDet);
     }
 
-    static void symmetric5X5(final Access2D<?> source, final DecompositionStore<?> destination) {
+    static void symmetric5X5(final Access2D<?> source, final PhysicalStore<?> destination) {
 
         double tmp00 = source.doubleValue(0L);
         double tmp10 = source.doubleValue(1L);

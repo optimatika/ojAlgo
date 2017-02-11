@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 
 abstract class InPlaceDecomposition<N extends Number> extends GenericDecomposition<N> {
 
@@ -38,7 +39,7 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
         return this.getInverse(this.allocate(this.getRowDim(), this.getRowDim()));
     }
 
-    public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
         throw new UnsupportedOperationException();
     }
 

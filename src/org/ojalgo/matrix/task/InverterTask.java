@@ -33,6 +33,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
 
 public interface InverterTask<N extends Number> extends MatrixTask<N> {
@@ -150,12 +151,12 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
      *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
      * @return The inverse
      */
-    MatrixStore<N> invert(Access2D<?> original, DecompositionStore<N> preallocated) throws TaskException;
+    MatrixStore<N> invert(Access2D<?> original, PhysicalStore<N> preallocated) throws TaskException;
 
     /**
      * <p>
      * Will create a {@linkplain DecompositionStore} instance suitable for use with
-     * {@link #invert(Access2D, DecompositionStore)}.
+     * {@link #invert(Access2D, PhysicalStore)}.
      * </p>
      * <p>
      * When inverting a matrix (mxn) the preallocated memory/matrix will typically be nxm (and of course most

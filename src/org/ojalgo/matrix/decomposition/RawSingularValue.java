@@ -157,7 +157,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.doGetInverse(this.allocate(this.getColDim(), this.getRowDim()));
     }
 
-    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
         return this.doGetInverse((PrimitiveDenseStore) preallocated);
     }
 
@@ -220,7 +220,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     @Override
-    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws TaskException {
 
         myTransposed = original.countRows() < original.countColumns();
 

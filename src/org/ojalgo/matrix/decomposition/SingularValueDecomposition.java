@@ -113,7 +113,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         }));
     }
 
-    public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
         if (myInverse == null) {
 
@@ -235,7 +235,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         }
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) throws TaskException {
+    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws TaskException {
 
         this.decompose(this.wrap(original));
 

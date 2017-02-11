@@ -99,7 +99,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
     }
 
     @Override
-    public final MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
+    public final MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
         final DecompositionStore<N> tmpBody = this.getInPlace();
 
@@ -160,7 +160,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         }
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) throws TaskException {
+    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws TaskException {
 
         this.decompose(this.wrap(original));
 

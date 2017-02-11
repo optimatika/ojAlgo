@@ -105,7 +105,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
     }
 
     @Override
-    public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
         if (myPivot.isModified()) {
             preallocated.fillAll(this.scalar().zero().getNumber());
@@ -206,7 +206,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) throws TaskException {
+    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws TaskException {
 
         this.decompose(this.wrap(original));
 

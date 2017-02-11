@@ -257,7 +257,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return this.getInverse(this.allocate(n, n));
     }
 
-    public MatrixStore<Double> getInverse(final DecompositionStore<Double> preallocated) {
+    public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
 
         if (myInverse == null) {
 
@@ -306,7 +306,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return new RawStore(Vt, n, n).transpose();
     }
 
-    public MatrixStore<Double> invert(final Access2D<?> original, final DecompositionStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws TaskException {
 
         final double[][] tmpData = this.reset(original, false);
 

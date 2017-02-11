@@ -146,7 +146,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
     }
 
     @Override
-    public MatrixStore<N> getInverse(final DecompositionStore<N> preallocated) {
+    public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
 
         final int tmpRowDim = this.getRowDim();
         final int[] tmpOrder = myPivot.getOrder();
@@ -239,7 +239,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         }
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original, final DecompositionStore<N> preallocated) throws TaskException {
+    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws TaskException {
 
         this.decompose(this.wrap(original));
 
