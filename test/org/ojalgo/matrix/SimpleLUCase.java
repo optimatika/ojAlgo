@@ -75,7 +75,7 @@ public class SimpleLUCase extends BasicMatrixTest {
         final LU<BigDecimal> tmpLU = LU.BIG.make();
         tmpLU.decompose(BigDenseStore.FACTORY.copy(SimpleLUCase.getOrginal()));
 
-        tmpLU.equals(BigDenseStore.FACTORY.copy(SimpleLUCase.getOrginal()), EVALUATION);
+        TestUtils.assertEquals(BigDenseStore.FACTORY.copy(SimpleLUCase.getOrginal()), tmpLU, EVALUATION);
     }
 
     @Override

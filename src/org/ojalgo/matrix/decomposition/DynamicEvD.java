@@ -28,7 +28,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.type.context.NumberContext;
 
 abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
@@ -60,14 +59,6 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
         mySymmetricDelegate = aSymmetric;
         myNonsymmetricDelegate = aNonsymmetric;
-    }
-
-    public boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        if (myHermitian) {
-            return mySymmetricDelegate.equals(other, context);
-        } else {
-            return myNonsymmetricDelegate.equals(other, context);
-        }
     }
 
     @Override

@@ -30,7 +30,6 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * AbstractDecomposition
@@ -40,6 +39,7 @@ import org.ojalgo.type.context.NumberContext;
 abstract class GenericDecomposition<N extends Number> extends AbstractDecomposition<N> {
 
     private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
+    MatrixStore.Factory<N> myBuilder;
 
     @SuppressWarnings("unused")
     private GenericDecomposition() {
@@ -51,16 +51,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
         super();
 
         myFactory = factory;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public boolean equals(final Object someObj) {
-        if (someObj instanceof MatrixStore) {
-            return this.equals((MatrixStore<N>) someObj, NumberContext.getGeneral(6));
-        } else {
-            return super.equals(someObj);
-        }
+        myBuilder = myFactory.builder();
     }
 
     protected final AggregatorSet<N> aggregator() {
@@ -70,6 +61,17 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
     @Override
     protected final DecompositionStore<N> allocate(final long numberOfRows, final long numberOfColumns) {
         return myFactory.makeZero(numberOfRows, numberOfColumns);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected final MatrixStore<N> collect(final Access2D.Collectable<N, ? super DecompositionStore<N>> source) {
+        if (source instanceof MatrixStore) {
+            return (MatrixStore<N>) source;
+        } else if (source instanceof Access2D) {
+            return myBuilder.makeWrapper((Access2D<?>) source).get();
+        } else {
+            return source.collect(myFactory);
+        }
     }
 
     protected final DecompositionStore<N> copy(final Access2D<?> source) {
@@ -93,7 +95,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
     }
 
     protected final MatrixStore.LogicalBuilder<N> makeIdentity(final int dimension) {
-        return myFactory.builder().makeIdentity(dimension);
+        return myBuilder.makeIdentity(dimension);
     }
 
     protected final Rotation<N> makeRotation(final int low, final int high, final double cos, final double sin) {
@@ -113,11 +115,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
     }
 
     protected final MatrixStore.LogicalBuilder<N> wrap(final Access2D<?> source) {
-        return myFactory.builder().makeWrapper(source);
-    }
-
-    protected final DecompositionStore<N> collect(final Access2D.Collectable<N, ? super DecompositionStore<N>> source) {
-        return source.collect(myFactory);
+        return myBuilder.makeWrapper(source);
     }
 
 }

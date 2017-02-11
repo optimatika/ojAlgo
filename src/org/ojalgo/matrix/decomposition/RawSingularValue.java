@@ -125,10 +125,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.doDecompose(tmpData, true);
     }
 
-    public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
-        return SingularValue.equals(aStore, this, context);
-    }
-
     public double getCondition() {
         return myS[0] / myS[n - 1];
     }

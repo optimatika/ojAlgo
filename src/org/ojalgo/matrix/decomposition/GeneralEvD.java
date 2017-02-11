@@ -60,10 +60,6 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
         super(aFactory);
     }
 
-    public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
-        return Eigenvalue.equals(aStore, this, context);
-    }
-
     public final N getDeterminant() {
 
         final AggregatorFunction<ComplexNumber> tmpVisitor = ComplexAggregator.getSet().product();

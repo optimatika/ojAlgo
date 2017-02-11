@@ -342,10 +342,6 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
         super(factory, bidiagonal);
     }
 
-    public boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        return SingularValue.equals(other, this, NumberContext.getGeneral(6));
-    }
-
     public boolean isOrdered() {
         return true;
     }

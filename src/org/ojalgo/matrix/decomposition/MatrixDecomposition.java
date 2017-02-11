@@ -32,7 +32,6 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * Notation used to describe the various matrix decompositions:
@@ -236,8 +235,6 @@ public interface MatrixDecomposition<N extends Number> {
      * @return true if the computation suceeded; false if not
      */
     boolean decompose(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
-
-    boolean equals(MatrixStore<N> other, NumberContext context);
 
     /**
      * @return true if computation has been attemped; false if not.

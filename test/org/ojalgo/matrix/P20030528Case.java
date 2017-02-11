@@ -67,7 +67,8 @@ public class P20030528Case extends BasicMatrixTest {
         final SingularValue<Double> tmpSVD = SingularValue.make(tmpA);
         tmpSVD.decompose(tmpA);
 
-        tmpSVD.equals(tmpA, EVALUATION);
+        // tmpSVD.equals(tmpA, EVALUATION);
+        TestUtils.assertEquals(tmpA, tmpSVD, EVALUATION);
     }
 
     @Override

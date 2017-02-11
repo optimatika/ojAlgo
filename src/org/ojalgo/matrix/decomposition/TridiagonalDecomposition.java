@@ -154,10 +154,6 @@ abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecompo
         return this.computed(retVal);
     }
 
-    public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
-        return AccessUtils.equals(this.reconstruct(), aStore, context);
-    }
-
     public final MatrixStore<N> getD() {
 
         if (myD == null) {

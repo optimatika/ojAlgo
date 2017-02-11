@@ -113,10 +113,6 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
         return this.compute(matrix, true);
     }
 
-    public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
-        return Hessenberg.equals(aStore, this, context);
-    }
-
     public final MatrixStore<N> getH() {
         return this.getInPlace().logical().hessenberg(myUpper).get();
     }

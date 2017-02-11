@@ -84,10 +84,6 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.doDecompose(retVal, tmpRawInPlaceStore);
     }
 
-    public boolean equals(final MatrixStore<Double> matrix, final NumberContext context) {
-        return Cholesky.equals(matrix, this, context);
-    }
-
     public Double getDeterminant() {
 
         final double[][] tmpData = this.getRawInPlaceData();

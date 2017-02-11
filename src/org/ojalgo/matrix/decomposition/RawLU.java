@@ -81,10 +81,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.doDecompose(tmpData);
     }
 
-    public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
-        return LU.equals(aStore, this, context);
-    }
-
     public Double getDeterminant() {
         final int m = this.getRowDim();
         final int n = this.getColDim();

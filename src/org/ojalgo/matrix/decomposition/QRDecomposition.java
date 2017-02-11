@@ -97,10 +97,6 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.computed(true);
     }
 
-    public boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
-        return QR.equals(aStore, this, context);
-    }
-
     public N getDeterminant() {
 
         final AggregatorFunction<N> tmpAggrFunc = this.aggregator().product();

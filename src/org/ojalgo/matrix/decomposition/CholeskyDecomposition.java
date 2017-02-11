@@ -85,10 +85,6 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.compute(aStore, false);
     }
 
-    public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
-        return Cholesky.equals(aStore, this, context);
-    }
-
     public N getDeterminant() {
 
         final AggregatorFunction<N> tmpAggrFunc = this.aggregator().product2();

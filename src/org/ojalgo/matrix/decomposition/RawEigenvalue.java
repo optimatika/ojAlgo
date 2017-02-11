@@ -201,10 +201,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return this.doDecompose(tmpData);
     }
 
-    public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
-        return Eigenvalue.equals(aStore, this, context);
-    }
-
     /**
      * Return the block diagonal eigenvalue matrix
      *

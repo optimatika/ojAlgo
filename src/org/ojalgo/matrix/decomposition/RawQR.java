@@ -95,10 +95,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return this.doDecompose(retVal);
     }
 
-    public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
-        return QR.equals(aStore, this, context);
-    }
-
     public Double getDeterminant() {
 
         final AggregatorFunction<Double> tmpAggrFunc = PrimitiveAggregator.getSet().product();

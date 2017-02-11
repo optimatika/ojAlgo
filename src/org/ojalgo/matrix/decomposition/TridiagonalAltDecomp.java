@@ -52,10 +52,6 @@ class TridiagonalAltDecomp extends InPlaceDecomposition<Double> implements Tridi
         return true;
     }
 
-    public boolean equals(final MatrixStore<Double> other, final NumberContext context) {
-        return Tridiagonal.equals(other, this, context);
-    }
-
     public MatrixStore<Double> getD() {
 
         final Array1D<Double> tmpMain = Array1D.PRIMITIVE.wrap(myMain);

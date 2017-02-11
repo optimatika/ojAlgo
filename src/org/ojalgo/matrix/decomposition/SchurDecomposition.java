@@ -92,10 +92,6 @@ abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition
         return this.computed(true);
     }
 
-    public boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        return Schur.equals(other, this, context);
-    }
-
     public Array1D<ComplexNumber> getDiagonal() {
         return myDiagonal;
     }

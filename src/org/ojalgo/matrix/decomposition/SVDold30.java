@@ -240,10 +240,6 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
         super(aFactory, aBidiagonal);
     }
 
-    public boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
-        return SingularValue.equals(aStore, this, context);
-    }
-
     public boolean isOrdered() {
         return false;
     }

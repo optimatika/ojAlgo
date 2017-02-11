@@ -220,10 +220,6 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         return this.computed(true);
     }
 
-    public boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
-        return Bidiagonal.equals(aStore, this, context);
-    }
-
     public MatrixStore<N> getD() {
         return this.getInPlace().logical().bidiagonal(this.isAspectRatioNormal(), false).get();
     }
