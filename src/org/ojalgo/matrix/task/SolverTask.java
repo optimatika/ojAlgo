@@ -165,7 +165,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      * @param templateBody
      * @param templateRHS
      */
-    DecompositionStore<N> preallocate(Structure2D templateBody, Structure2D templateRHS);
+    PhysicalStore<N> preallocate(Structure2D templateBody, Structure2D templateRHS);
 
     /**
      * [A][X]=[B] or [body][return]=[rhs]

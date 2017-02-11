@@ -25,7 +25,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.FunctionUtils;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -703,7 +702,7 @@ abstract class AbstractSolver implements SolverTask<Double> {
         super();
     }
 
-    public final DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+    public final PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return PrimitiveDenseStore.FACTORY.makeZero(templateBody.countColumns(), 1L);
     }
 

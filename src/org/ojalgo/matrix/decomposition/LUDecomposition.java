@@ -240,7 +240,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.allocate(tmpCountRows, tmpCountRows);
     }
 
-    public DecompositionStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+    public PhysicalStore<N> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         return this.allocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 

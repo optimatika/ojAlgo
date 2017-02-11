@@ -32,7 +32,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -129,7 +128,7 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
         return new Configurator(this);
     }
 
-    public final DecompositionStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
+    public final PhysicalStore<Double> preallocate(final Structure2D templateBody, final Structure2D templateRHS) {
         if (templateRHS.countColumns() != 1L) {
             throw new IllegalArgumentException("The RHS must have precisely 1 column!");
         }
