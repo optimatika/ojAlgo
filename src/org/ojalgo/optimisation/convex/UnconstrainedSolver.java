@@ -21,8 +21,8 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -66,7 +66,7 @@ final class UnconstrainedSolver extends ConvexSolver {
 
         final MatrixStore<Double> tmpQ = this.getQ();
         final MatrixStore<Double> tmpC = this.getC();
-        final DecompositionStore<Double> tmpX = this.getX();
+        final PhysicalStore<Double> tmpX = this.getX();
 
         boolean tmpSolvable = true;
 

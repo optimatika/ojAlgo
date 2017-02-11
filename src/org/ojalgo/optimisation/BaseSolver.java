@@ -31,7 +31,6 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.PrimitiveMatrix;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
@@ -198,7 +197,7 @@ public abstract class BaseSolver extends GenericSolver {
         public MatrixStore<Double> getAEX() {
 
             final MatrixStore<Double> tmpAE = this.getAE();
-            final DecompositionStore<Double> tmpX = this.getX();
+            final PhysicalStore<Double> tmpX = this.getX();
 
             if ((tmpAE != null) && (tmpX != null)) {
                 return tmpAE.multiply(tmpX);
@@ -224,7 +223,7 @@ public abstract class BaseSolver extends GenericSolver {
         public MatrixStore<Double> getAIX() {
 
             final MatrixStore<Double> tmpAI = this.getAI();
-            final DecompositionStore<Double> tmpX = this.getX();
+            final PhysicalStore<Double> tmpX = this.getX();
 
             if ((tmpAI != null) && (tmpX != null)) {
                 return tmpAI.multiply(tmpX);
@@ -236,7 +235,7 @@ public abstract class BaseSolver extends GenericSolver {
         public MatrixStore<Double> getAIX(final int[] selector) {
 
             final MatrixStore<Double> tmpAI = this.getAI();
-            final DecompositionStore<Double> tmpX = this.getX();
+            final PhysicalStore<Double> tmpX = this.getX();
 
             if ((tmpAI != null) && (tmpX != null)) {
                 return tmpAI.logical().row(selector).get().multiply(tmpX);
@@ -354,7 +353,7 @@ public abstract class BaseSolver extends GenericSolver {
         /**
          * Solution / Variables: [X]
          */
-        public DecompositionStore<Double> getX() {
+        public PhysicalStore<Double> getX() {
             if (myX == null) {
                 myX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1);
             }
@@ -809,7 +808,7 @@ public abstract class BaseSolver extends GenericSolver {
         return myMatrices.getSI(rowSelector);
     }
 
-    protected DecompositionStore<Double> getX() {
+    protected PhysicalStore<Double> getX() {
         return myMatrices.getX();
     }
 

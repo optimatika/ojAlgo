@@ -27,7 +27,6 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -168,7 +167,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int tmpNumVars = (int) tmpC.countRows();
         final int tmpNumEqus = tmpAE != null ? (int) tmpAE.countRows() : 0;
 
-        final DecompositionStore<Double> tmpX = this.getX();
+        final PhysicalStore<Double> tmpX = this.getX();
 
         myActivator.excludeAll();
 

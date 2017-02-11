@@ -27,7 +27,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
@@ -153,7 +152,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
 
     /**
      * <p>
-     * Will create a {@linkplain DecompositionStore} instance suitable for use with
+     * Will create a {@linkplain PhysicalStore} instance suitable for use with
      * {@link #solve(Access2D, Access2D, PhysicalStore)}. The dimensions of the returned instance is not
      * specified by this interface - it is specified by the behaviour/requirements of each implementation.
      * </p>

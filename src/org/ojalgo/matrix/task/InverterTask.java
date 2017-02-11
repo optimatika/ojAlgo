@@ -28,7 +28,6 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Cholesky;
-import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
@@ -155,7 +154,7 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     /**
      * <p>
-     * Will create a {@linkplain DecompositionStore} instance suitable for use with
+     * Will create a {@linkplain PhysicalStore} instance suitable for use with
      * {@link #invert(Access2D, PhysicalStore)}.
      * </p>
      * <p>
