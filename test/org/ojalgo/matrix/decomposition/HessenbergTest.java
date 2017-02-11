@@ -64,7 +64,7 @@ public class HessenbergTest extends MatrixDecompositionTests {
         BasicLogger.debug("Q get: ", aDecomposition.getQ());
         BasicLogger.debug("Q do: ", aDecomposition.doQ(this.makeEye((int) aMatrix.countRows(), (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))));
         BasicLogger.debug("H: ", aDecomposition.getH());
-        BasicLogger.debug("Reconstructed: ", MatrixUtils.reconstruct(aDecomposition));
+        BasicLogger.debug("Reconstructed: ", Hessenberg.reconstruct(aDecomposition));
     }
 
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {
@@ -72,12 +72,12 @@ public class HessenbergTest extends MatrixDecompositionTests {
         final HessenbergDecomposition<Double> tmpDecomposition = (HessenbergDecomposition<Double>) Hessenberg.PRIMITIVE.make();
         tmpDecomposition.decompose(aMatrix);
 
-        if (!MatrixUtils.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
+        if (!Hessenberg.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Not equals!");
         }
 
-        final MatrixStore<Double> tmpReconstructed = MatrixUtils.reconstruct(tmpDecomposition);
+        final MatrixStore<Double> tmpReconstructed = Hessenberg.reconstruct(tmpDecomposition);
         if (!AccessUtils.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Failed to reconstruct!");

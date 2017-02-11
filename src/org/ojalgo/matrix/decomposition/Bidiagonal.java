@@ -24,9 +24,9 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * A general matrix [A] can be factorized by similarity transformations into the form [A]=[Q1][D][Q2]
@@ -69,6 +69,57 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
         }
     }
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Bidiagonal<N> decomposition, final NumberContext context) {
+    
+        final int tmpRowDim = (int) matrix.countRows();
+        final int tmpColDim = (int) matrix.countColumns();
+    
+        final MatrixStore<N> tmpQ1 = decomposition.getQ1();
+        decomposition.getD();
+        final MatrixStore<N> tmpQ2 = decomposition.getQ2();
+    
+        final MatrixStore<N> tmpConjugatedQ1 = tmpQ1.logical().conjugate().get();
+        final MatrixStore<N> tmpConjugatedQ2 = tmpQ2.logical().conjugate().get();
+    
+        MatrixStore<N> tmpThis;
+        MatrixStore<N> tmpThat;
+    
+        boolean retVal = (tmpRowDim == tmpQ1.countRows()) && (tmpQ2.countRows() == tmpColDim);
+    
+        // Check that it's possible to reconstruct the original matrix.
+        if (retVal) {
+    
+            tmpThis = matrix;
+            tmpThat = decomposition.reconstruct();
+    
+            retVal &= tmpThis.equals(tmpThat, context);
+        }
+    
+        // If Q1 is square, then check if it is orthogonal/unitary.
+        if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
+    
+            tmpThis = tmpQ1;
+            tmpThat = tmpQ1.multiply(tmpConjugatedQ1).multiply(tmpQ1);
+    
+            retVal &= tmpThis.equals(tmpThat, context);
+        }
+    
+        // If Q2 is square, then check if it is orthogonal/unitary.
+        if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
+    
+            tmpThis = tmpQ2;
+            tmpThat = tmpQ2.multiply(tmpConjugatedQ2).multiply(tmpQ2);
+    
+            retVal &= tmpThis.equals(tmpThat, context);
+        }
+    
+        return retVal;
+    }
+
+    static <N extends Number> MatrixStore<N> reconstruct(final Bidiagonal<N> decomposition) {
+        return decomposition.getQ1().multiply(decomposition.getD()).multiply(decomposition.getQ2().conjugate());
+    }
+
     MatrixStore<N> getD();
 
     MatrixStore<N> getQ1();
@@ -78,7 +129,7 @@ public interface Bidiagonal<N extends Number> extends MatrixDecomposition<N>, Ma
     boolean isUpper();
 
     default MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return Bidiagonal.reconstruct(this);
     }
 
 }

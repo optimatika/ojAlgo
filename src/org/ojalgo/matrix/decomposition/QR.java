@@ -24,10 +24,11 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * QR: [A] = [Q][R] Decomposes [this] into [Q] and [R] where:
@@ -79,6 +80,20 @@ public interface QR<N extends Number>
         }
     }
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
+    
+        final MatrixStore<N> tmpQ = decomposition.getQ();
+        final MatrixStore<N> tmpR = decomposition.getR();
+    
+        final MatrixStore<N> tmpStore = tmpQ.multiply(tmpR);
+    
+        return AccessUtils.equals(tmpStore, matrix, context);
+    }
+
+    static <N extends Number> MatrixStore<N> reconstruct(final QR<N> decomposition) {
+        return decomposition.getQ().multiply(decomposition.getR());
+    }
+
     MatrixStore<N> getQ();
 
     MatrixStore<N> getR();
@@ -94,7 +109,7 @@ public interface QR<N extends Number>
     boolean isFullColumnRank();
 
     default MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return QR.reconstruct(this);
     }
 
 }

@@ -175,7 +175,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
         if (!AccessUtils.equals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6))) {
             BasicLogger.error("Recreation failed for: {}", tmpDecomposition.getClass().getName());
         }
-        if (!MatrixUtils.equals(tmpOriginal, tmpDecomposition, new NumberContext(7, 6))) {
+        if (!SingularValue.equals(tmpOriginal, tmpDecomposition, new NumberContext(7, 6))) {
             BasicLogger.error("Decomposition not correct for: {}", tmpDecomposition.getClass().getName());
         }
         if (MatrixDecompositionTests.DEBUG) {
@@ -347,11 +347,11 @@ public class SingularValueTest extends MatrixDecompositionTests {
         for (int i = 0; i < tmpImpls.length; i++) {
 
             tmpImpls[i].decompose(aMtrx);
-            final MatrixStore<Double> tmpReconstructed = MatrixUtils.reconstruct(tmpImpls[i]);
+            final MatrixStore<Double> tmpReconstructed = SingularValue.reconstruct(tmpImpls[i]);
             if (!AccessUtils.equals(aMtrx, tmpReconstructed, new NumberContext(7, 6))) {
                 BasicLogger.error("Recreation failed for: {}", tmpImpls[i].getClass().getName());
             }
-            if (!MatrixUtils.equals(aMtrx, tmpImpls[i], new NumberContext(7, 6))) {
+            if (!SingularValue.equals(aMtrx, tmpImpls[i], new NumberContext(7, 6))) {
                 BasicLogger.error("Decomposition not correct for: {}", tmpImpls[i].getClass().getName());
             }
             if (MatrixDecompositionTests.DEBUG) {

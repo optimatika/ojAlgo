@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
@@ -31,6 +32,7 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * [A] = [V][D][V]<sup>-1</sup> ([A][V] = [V][D])
@@ -117,6 +119,23 @@ public interface Eigenvalue<N extends Number>
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
+    
+        final MatrixStore<N> tmpD = decomposition.getD();
+        final MatrixStore<N> tmpV = decomposition.getV();
+    
+        // Check that [A][V] == [V][D] ([A] == [V][D][V]<sup>T</sup> is not always true)
+        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpV);
+        final MatrixStore<N> tmpStore2 = tmpV.multiply(tmpD);
+    
+        return AccessUtils.equals(tmpStore1, tmpStore2, context);
+    }
+
+    static <N extends Number> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {
+        final MatrixStore<N> tmpV = decomposition.getV();
+        return tmpV.multiply(decomposition.getD()).multiply(tmpV.conjugate());
     }
 
     /**
@@ -238,7 +257,7 @@ public interface Eigenvalue<N extends Number>
     boolean isOrdered();
 
     default MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return Eigenvalue.reconstruct(this);
     }
 
 }

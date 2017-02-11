@@ -25,7 +25,6 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.P20061119Case;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -56,7 +55,7 @@ public class SchurTest extends MatrixDecompositionTests {
             BasicLogger.debug("Q = {}", tmpQ);
         }
 
-        tmpRecreatedMatrix = MatrixUtils.reconstruct(tmpSchurDecomp);
+        tmpRecreatedMatrix = Schur.reconstruct(tmpSchurDecomp);
         if (MatrixDecompositionTests.DEBUG) {
             BasicLogger.debug("Original = {}", originalMatrix);
             BasicLogger.debug("Recreated = {}", tmpRecreatedMatrix);

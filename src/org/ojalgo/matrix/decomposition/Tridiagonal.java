@@ -24,9 +24,10 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Tridiagonal: [A] = [Q][D][Q]<sup>H</sup> Any square symmetric (hermitian) matrix [A] can be factorized by
@@ -65,12 +66,25 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
         }
     }
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
+    
+        // Check that [A] == [Q][D][Q]<sup>T</sup>
+        return AccessUtils.equals(matrix, Tridiagonal.reconstruct(decomposition), context);
+    
+        // Check that Q is orthogonal/unitary...
+    }
+
+    static <N extends Number> MatrixStore<N> reconstruct(final Tridiagonal<N> decomposition) {
+        final MatrixStore<N> tmpQ = decomposition.getQ();
+        return tmpQ.multiply(decomposition.getD()).multiply(tmpQ.conjugate());
+    }
+
     MatrixStore<N> getD();
 
     MatrixStore<N> getQ();
 
     default MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return Tridiagonal.reconstruct(this);
     }
 
 }

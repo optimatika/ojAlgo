@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.array.Array1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionUtils;
@@ -122,190 +121,84 @@ public abstract class MatrixUtils {
         }
     }
 
+    /**
+     * @deprecated v43 Use {@link Bidiagonal#equals(MatrixStore,Bidiagonal,NumberContext)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Bidiagonal<N> decomposition, final NumberContext context) {
-
-        final int tmpRowDim = (int) matrix.countRows();
-        final int tmpColDim = (int) matrix.countColumns();
-
-        final MatrixStore<N> tmpQ1 = decomposition.getQ1();
-        decomposition.getD();
-        final MatrixStore<N> tmpQ2 = decomposition.getQ2();
-
-        final MatrixStore<N> tmpConjugatedQ1 = tmpQ1.logical().conjugate().get();
-        final MatrixStore<N> tmpConjugatedQ2 = tmpQ2.logical().conjugate().get();
-
-        MatrixStore<N> tmpThis;
-        MatrixStore<N> tmpThat;
-
-        boolean retVal = (tmpRowDim == tmpQ1.countRows()) && (tmpQ2.countRows() == tmpColDim);
-
-        // Check that it's possible to reconstruct the original matrix.
-        if (retVal) {
-
-            tmpThis = matrix;
-            tmpThat = decomposition.reconstruct();
-
-            retVal &= tmpThis.equals(tmpThat, context);
-        }
-
-        // If Q1 is square, then check if it is orthogonal/unitary.
-        if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
-
-            tmpThis = tmpQ1;
-            tmpThat = tmpQ1.multiply(tmpConjugatedQ1).multiply(tmpQ1);
-
-            retVal &= tmpThis.equals(tmpThat, context);
-        }
-
-        // If Q2 is square, then check if it is orthogonal/unitary.
-        if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
-
-            tmpThis = tmpQ2;
-            tmpThat = tmpQ2.multiply(tmpConjugatedQ2).multiply(tmpQ2);
-
-            retVal &= tmpThis.equals(tmpThat, context);
-        }
-
-        return retVal;
+        return Bidiagonal.equals(matrix, decomposition, context);
     }
 
+    /**
+     * @deprecated v43 Use {@link Cholesky#equals(MatrixStore,Cholesky,NumberContext)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
-
-        boolean retVal = false;
-
-        final MatrixStore<N> tmpL = decomposition.getL();
-
-        retVal = AccessUtils.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
-
-        return retVal;
+        return Cholesky.equals(matrix, decomposition, context);
     }
 
+    /**
+     * @deprecated v43 Use {@link Eigenvalue#equals(MatrixStore,Eigenvalue,NumberContext)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpD = decomposition.getD();
-        final MatrixStore<N> tmpV = decomposition.getV();
-
-        // Check that [A][V] == [V][D] ([A] == [V][D][V]<sup>T</sup> is not always true)
-        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpV);
-        final MatrixStore<N> tmpStore2 = tmpV.multiply(tmpD);
-
-        return AccessUtils.equals(tmpStore1, tmpStore2, context);
+        return Eigenvalue.equals(matrix, decomposition, context);
     }
 
+    /**
+     * @deprecated v43 Use {@link Hessenberg#equals(MatrixStore,Hessenberg,NumberContext)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Hessenberg<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpH = decomposition.getH();
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-
-        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
-        final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpH);
-
-        return AccessUtils.equals(tmpStore1, tmpStore2, context);
+        return Hessenberg.equals(matrix, decomposition, context);
     }
 
+    /**
+     * @deprecated v43 Use {@link LDL#equals(MatrixStore,LDL,NumberContext)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
-        return AccessUtils.equals(matrix, decomposition.reconstruct(), context);
+        return LDL.equals(matrix, decomposition, context);
     }
 
+    /**
+     * @deprecated v43 Use {@link LU#equals(MatrixStore,LU,NumberContext)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpL = decomposition.getL();
-        final MatrixStore<N> tmpU = decomposition.getU();
-        final int[] tmpPivotOrder = decomposition.getPivotOrder();
-
-        return AccessUtils.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
+        return LU.equals(matrix, decomposition, context);
     }
 
+    /**
+     * @deprecated v43 Use {@link QR#equals(MatrixStore,QR,NumberContext)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-        final MatrixStore<N> tmpR = decomposition.getR();
-
-        final MatrixStore<N> tmpStore = tmpQ.multiply(tmpR);
-
-        return AccessUtils.equals(tmpStore, matrix, context);
+        return QR.equals(matrix, decomposition, context);
     }
 
+    /**
+     * @deprecated v43 Use {@link Schur#equals(MatrixStore,Schur,NumberContext)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Schur<N> decomposition, final NumberContext context) {
-
-        final MatrixStore<N> tmpU = decomposition.getU();
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-
-        // Check that [A][Q] == [Q][U] ([A] == [Q][U][Q]<sup>T</sup> is not always true)
-        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
-        final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpU);
-
-        return AccessUtils.equals(tmpStore1, tmpStore2, context);
+        return Schur.equals(matrix, decomposition, context);
     }
 
+    /**
+     * @deprecated v43 Use {@link SingularValue#equals(MatrixStore,SingularValue,NumberContext)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
-
-        final int tmpRowDim = (int) matrix.countRows();
-        final int tmpColDim = (int) matrix.countColumns();
-
-        final MatrixStore<N> tmpQ1 = decomposition.getQ1();
-        final MatrixStore<N> tmpD = decomposition.getD();
-        final MatrixStore<N> tmpQ2 = decomposition.getQ2();
-
-        MatrixStore<N> tmpThis;
-        MatrixStore<N> tmpThat;
-
-        boolean retVal = (tmpRowDim == tmpQ1.countRows()) && (tmpQ2.countRows() == tmpColDim);
-
-        // Check that [A][Q2] == [Q1][D]
-        if (retVal) {
-
-            tmpThis = matrix.multiply(tmpQ2);
-            tmpThat = tmpQ1.multiply(tmpD);
-
-            retVal &= tmpThis.equals(tmpThat, context);
-        }
-
-        // If Q1 is square, then check if it is orthogonal/unitary.
-        if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
-
-            tmpThis = tmpQ1.physical().makeEye(tmpRowDim, tmpRowDim);
-            tmpThat = tmpQ1.logical().conjugate().get().multiply(tmpQ1);
-
-            retVal &= tmpThis.equals(tmpThat, context);
-        }
-
-        // If Q2 is square, then check if it is orthogonal/unitary.
-        if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
-
-            tmpThis = tmpQ2.physical().makeEye(tmpColDim, tmpColDim);
-            tmpThat = tmpQ2.multiply(tmpQ2.logical().conjugate().get());
-
-            retVal &= tmpThis.equals(tmpThat, context);
-        }
-
-        // Check the pseudoinverse.
-        if (retVal) {
-            retVal &= matrix.equals(matrix.multiply(decomposition.getInverse().multiply(matrix)), context);
-        }
-
-        // Check that the singular values are sorted in descending order
-        if (retVal) {
-            final Array1D<Double> tmpSV = decomposition.getSingularValues();
-            for (int i = 1; retVal && (i < tmpSV.size()); i++) {
-                retVal &= tmpSV.doubleValue(i - 1) >= tmpSV.doubleValue(i);
-            }
-            if (retVal && decomposition.isOrdered()) {
-                for (int ij = 1; retVal && (ij < tmpD.countRows()); ij++) {
-                    retVal &= tmpD.doubleValue(ij - 1, ij - 1) >= tmpD.doubleValue(ij, ij);
-                }
-            }
-        }
-
-        return retVal;
+        return SingularValue.equals(matrix, decomposition, context);
     }
 
+    /**
+     * @deprecated v43 Use {@link Tridiagonal#equals(MatrixStore,Tridiagonal,NumberContext)} instead
+     */
+    @Deprecated
     public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
-
-        // Check that [A] == [Q][D][Q]<sup>T</sup>
-        return AccessUtils.equals(matrix, MatrixUtils.reconstruct(decomposition), context);
-
-        // Check that Q is orthogonal/unitary...
+        return Tridiagonal.equals(matrix, decomposition, context);
     }
 
     public static final int firstInColumn(final Access1D<?> matrix, final int col, final int defaultAndMinimum) {
@@ -488,53 +381,84 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
+    /**
+     * @deprecated v43 Use {@link Bidiagonal#reconstruct(Bidiagonal)} instead
+     */
+    @Deprecated
     public static <N extends Number> MatrixStore<N> reconstruct(final Bidiagonal<N> decomposition) {
-        return decomposition.getQ1().multiply(decomposition.getD()).multiply(decomposition.getQ2().conjugate());
+        return Bidiagonal.reconstruct(decomposition);
     }
 
+    /**
+     * @deprecated v43 Use {@link Cholesky#reconstruct(Cholesky)} instead
+     */
+    @Deprecated
     public static <N extends Number> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
-        final MatrixStore<N> tmpL = decomposition.getL();
-        return tmpL.multiply(tmpL.conjugate());
+        return Cholesky.reconstruct(decomposition);
     }
 
+    /**
+     * @deprecated v43 Use {@link Eigenvalue#reconstruct(Eigenvalue)} instead
+     */
+    @Deprecated
     public static <N extends Number> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {
-        final MatrixStore<N> tmpV = decomposition.getV();
-        return tmpV.multiply(decomposition.getD()).multiply(tmpV.conjugate());
+        return Eigenvalue.reconstruct(decomposition);
     }
 
+    /**
+     * @deprecated v43 Use {@link Hessenberg#reconstruct(Hessenberg)} instead
+     */
+    @Deprecated
     public static <N extends Number> MatrixStore<N> reconstruct(final Hessenberg<N> decomposition) {
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-        final MatrixStore<N> tmpH = decomposition.getH();
-        return tmpQ.multiply(tmpH).multiply(tmpQ.transpose());
+        return Hessenberg.reconstruct(decomposition);
     }
 
+    /**
+     * @deprecated v43 Use {@link LDL#reconstruct(LDL)} instead
+     */
+    @Deprecated
     public static <N extends Number> MatrixStore<N> reconstruct(final LDL<N> decomposition) {
-        final MatrixStore<N> tmpL = decomposition.getL();
-        final MatrixStore<N> tmpD = decomposition.getD();
-        final MatrixStore<N> tmpR = decomposition.getR();
-        return tmpL.multiply(tmpD).multiply(tmpR);
+        return LDL.reconstruct(decomposition);
     }
 
+    /**
+     * @deprecated v43 Use {@link LU#reconstruct(LU)} instead
+     */
+    @Deprecated
     public static <N extends Number> MatrixStore<N> reconstruct(final LU<N> decomposition) {
-        return decomposition.getL().multiply(decomposition.getU()).logical().row(decomposition.getPivotOrder()).get();
+        return LU.reconstruct(decomposition);
     }
 
+    /**
+     * @deprecated v43 Use {@link QR#reconstruct(QR)} instead
+     */
+    @Deprecated
     public static <N extends Number> MatrixStore<N> reconstruct(final QR<N> decomposition) {
-        return decomposition.getQ().multiply(decomposition.getR());
+        return QR.reconstruct(decomposition);
     }
 
+    /**
+     * @deprecated v43 Use {@link Schur#reconstruct(Schur)} instead
+     */
+    @Deprecated
     public static <N extends Number> MatrixStore<N> reconstruct(final Schur<N> decomposition) {
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-        return tmpQ.multiply(decomposition.getU()).multiply(tmpQ.logical().transpose().get());
+        return Schur.reconstruct(decomposition);
     }
 
+    /**
+     * @deprecated v43 Use {@link SingularValue#reconstruct(SingularValue)} instead
+     */
+    @Deprecated
     public static <N extends Number> MatrixStore<N> reconstruct(final SingularValue<N> decomposition) {
-        return decomposition.getQ1().multiply(decomposition.getD()).multiply(decomposition.getQ2().conjugate());
+        return SingularValue.reconstruct(decomposition);
     }
 
+    /**
+     * @deprecated v43 Use {@link Tridiagonal#reconstruct(Tridiagonal)} instead
+     */
+    @Deprecated
     public static <N extends Number> MatrixStore<N> reconstruct(final Tridiagonal<N> decomposition) {
-        final MatrixStore<N> tmpQ = decomposition.getQ();
-        return tmpQ.multiply(decomposition.getD()).multiply(tmpQ.conjugate());
+        return Tridiagonal.reconstruct(decomposition);
     }
 
     public static void setAllOperationThresholds(final int value) {

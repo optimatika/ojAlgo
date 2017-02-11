@@ -32,7 +32,6 @@ import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -97,7 +96,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
-        return MatrixUtils.equals(aStore, this, context);
+        return QR.equals(aStore, this, context);
     }
 
     public Double getDeterminant() {
@@ -263,7 +262,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
     }
 
     public MatrixStore<Double> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return QR.reconstruct(this);
     }
 
     public void setFullSize(final boolean fullSize) {

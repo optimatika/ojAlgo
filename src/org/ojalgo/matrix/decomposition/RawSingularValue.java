@@ -31,7 +31,6 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -127,7 +126,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public boolean equals(final MatrixStore<Double> aStore, final NumberContext context) {
-        return MatrixUtils.equals(aStore, this, context);
+        return SingularValue.equals(aStore, this, context);
     }
 
     public double getCondition() {
@@ -262,7 +261,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return SingularValue.reconstruct(this);
     }
 
     @Override

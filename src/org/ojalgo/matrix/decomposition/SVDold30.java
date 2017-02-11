@@ -36,7 +36,6 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -242,7 +241,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     public boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
-        return MatrixUtils.equals(aStore, this, context);
+        return SingularValue.equals(aStore, this, context);
     }
 
     public boolean isOrdered() {

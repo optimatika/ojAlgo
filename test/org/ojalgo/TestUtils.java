@@ -129,49 +129,49 @@ public abstract class TestUtils {
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Bidiagonal<N> actual, final NumberContext context) {
-        if (!MatrixUtils.equals(expected, actual, context)) {
+        if (!Bidiagonal.equals(expected, actual, context)) {
             Assert.failNotEquals("Bidiagonal<N>", expected, actual);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Cholesky<N> actual, final NumberContext context) {
-        if (!MatrixUtils.equals(expected, actual, context)) {
+        if (!Cholesky.equals(expected, actual, context)) {
             Assert.failNotEquals("Cholesky<N>", expected, actual);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Eigenvalue<N> actual, final NumberContext context) {
-        if (!MatrixUtils.equals(expected, actual, context)) {
+        if (!Eigenvalue.equals(expected, actual, context)) {
             Assert.failNotEquals("Eigenvalue<N>", expected, actual);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Hessenberg<N> actual, final NumberContext context) {
-        if (!MatrixUtils.equals(expected, actual, context)) {
+        if (!Hessenberg.equals(expected, actual, context)) {
             Assert.failNotEquals("Hessenberg<N>", expected, actual);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final LU<N> actual, final NumberContext context) {
-        if (!MatrixUtils.equals(expected, actual, context)) {
+        if (!LU.equals(expected, actual, context)) {
             Assert.failNotEquals("LU<N>", expected, actual);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final QR<N> actual, final NumberContext context) {
-        if (!MatrixUtils.equals(expected, actual, context)) {
+        if (!QR.equals(expected, actual, context)) {
             Assert.failNotEquals("QR<N>", expected, actual);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final SingularValue<N> actual, final NumberContext context) {
-        if (!MatrixUtils.equals(expected, actual, context)) {
+        if (!SingularValue.equals(expected, actual, context)) {
             Assert.failNotEquals("SingularValue<N>", expected, actual);
         }
     }
 
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Tridiagonal<N> actual, final NumberContext context) {
-        if (!MatrixUtils.equals(expected, actual, context)) {
+        if (!Tridiagonal.equals(expected, actual, context)) {
             Assert.failNotEquals("Tridiagonal<N>", expected, actual);
         }
     }

@@ -115,7 +115,7 @@ public class DesignCase extends MatrixDecompositionTests {
 
         tmpDecomposition.decompose(tmpOriginalMatrix);
 
-        TestUtils.assertTrue(MatrixUtils.equals(tmpOriginalMatrix, tmpDecomposition, new NumberContext(7, 6)));
+        TestUtils.assertTrue(Tridiagonal.equals(tmpOriginalMatrix, tmpDecomposition, new NumberContext(7, 6)));
     }
 
     /**

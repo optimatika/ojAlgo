@@ -23,7 +23,6 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -94,7 +93,7 @@ abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition
     }
 
     public boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        return MatrixUtils.equals(other, this, context);
+        return Schur.equals(other, this, context);
     }
 
     public Array1D<ComplexNumber> getDiagonal() {

@@ -139,7 +139,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         BasicLogger.debug("Q1 get: ", aDecomposition.getQ1());
         BasicLogger.debug("D: ", aDecomposition.getD());
         BasicLogger.debug("Q2 get: ", aDecomposition.getQ2());
-        BasicLogger.debug("Reconstructed: ", MatrixUtils.reconstruct(aDecomposition));
+        BasicLogger.debug("Reconstructed: ", Bidiagonal.reconstruct(aDecomposition));
     }
 
     private void doTestCorrect(final PhysicalStore<Double> aMatrix) {
@@ -147,17 +147,17 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         final BidiagonalDecomposition<Double> tmpDecomposition = (BidiagonalDecomposition<Double>) Bidiagonal.PRIMITIVE.make();
         tmpDecomposition.decompose(aMatrix);
 
-        if (!MatrixUtils.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
+        if (!Bidiagonal.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Not equals, easy!");
         }
 
-        if (!MatrixUtils.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
+        if (!Bidiagonal.equals(aMatrix, tmpDecomposition, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Not equals, hard!");
         }
 
-        final MatrixStore<Double> tmpReconstructed = MatrixUtils.reconstruct(tmpDecomposition);
+        final MatrixStore<Double> tmpReconstructed = Bidiagonal.reconstruct(tmpDecomposition);
         if (!AccessUtils.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Failed to reconstruct!");

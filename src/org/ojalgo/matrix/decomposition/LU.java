@@ -24,11 +24,12 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * LU: [A] = [L][U]
@@ -86,10 +87,24 @@ public interface LU<N extends Number> extends LDU<N> {
         }
     }
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
+    
+        final MatrixStore<N> tmpL = decomposition.getL();
+        final MatrixStore<N> tmpU = decomposition.getU();
+        final int[] tmpPivotOrder = decomposition.getPivotOrder();
+    
+        return AccessUtils.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
+    }
+
+    static <N extends Number> MatrixStore<N> reconstruct(final LU<N> decomposition) {
+        return decomposition.getL().multiply(decomposition.getU()).logical().row(decomposition.getPivotOrder()).get();
+    }
+
     /**
-     * The normal {@link #decompose(Access2D.Collectable<N, ? super PhysicalStore<N>>)} method must handle cases where pivoting is required. If
-     * you know that pivoting is not needed you may call this method instead - it may be faster. Note that the
-     * algorithm implementation may still pivot. Pivoting is optional not forbidden (or required).
+     * The normal {@link #decompose(Access2D.Collectable)} method must handle cases where pivoting is
+     * required. If you know that pivoting is not needed you may call this method instead - it may be faster.
+     * Note that the algorithm implementation may still pivot. Pivoting is optional not forbidden (or
+     * required).
      */
     boolean computeWithoutPivoting(ElementsSupplier<N> matrix);
 
@@ -116,7 +131,7 @@ public interface LU<N extends Number> extends LDU<N> {
     boolean isSquareAndNotSingular();
 
     default MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return LU.reconstruct(this);
     }
 
 }

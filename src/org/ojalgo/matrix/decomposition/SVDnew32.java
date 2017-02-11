@@ -29,7 +29,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -344,7 +343,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
     }
 
     public boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        return MatrixUtils.equals(other, this, NumberContext.getGeneral(6));
+        return SingularValue.equals(other, this, NumberContext.getGeneral(6));
     }
 
     public boolean isOrdered() {

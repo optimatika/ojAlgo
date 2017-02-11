@@ -33,7 +33,6 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -248,7 +247,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
     }
 
     public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
-        return MatrixUtils.equals(aStore, this, context);
+        return Eigenvalue.equals(aStore, this, context);
     }
 
     public final N getDeterminant() {

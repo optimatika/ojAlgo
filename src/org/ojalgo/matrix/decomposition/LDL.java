@@ -24,8 +24,8 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -84,8 +84,19 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
         }
     }
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
+        return AccessUtils.equals(matrix, decomposition.reconstruct(), context);
+    }
+
+    static <N extends Number> MatrixStore<N> reconstruct(final LDL<N> decomposition) {
+        final MatrixStore<N> tmpL = decomposition.getL();
+        final MatrixStore<N> tmpD = decomposition.getD();
+        final MatrixStore<N> tmpR = decomposition.getR();
+        return tmpL.multiply(tmpD).multiply(tmpR);
+    }
+
     default boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        return MatrixUtils.equals(other, this, context);
+        return LDL.equals(other, this, context);
     }
 
     MatrixStore<N> getD();
@@ -113,6 +124,6 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
     boolean isSquareAndNotSingular();
 
     default MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return LDL.reconstruct(this);
     }
 }

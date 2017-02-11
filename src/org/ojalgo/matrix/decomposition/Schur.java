@@ -22,10 +22,11 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Schur: [A] = [Q][U][Q]<sup>-1</sup> [A] = [Q][U][Q]<sup>-1</sup> where:
@@ -57,6 +58,23 @@ public interface Schur<N extends Number> extends MatrixDecomposition<N> {
         return new SchurDecomposition.Primitive();
     }
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Schur<N> decomposition, final NumberContext context) {
+    
+        final MatrixStore<N> tmpU = decomposition.getU();
+        final MatrixStore<N> tmpQ = decomposition.getQ();
+    
+        // Check that [A][Q] == [Q][U] ([A] == [Q][U][Q]<sup>T</sup> is not always true)
+        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
+        final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpU);
+    
+        return AccessUtils.equals(tmpStore1, tmpStore2, context);
+    }
+
+    static <N extends Number> MatrixStore<N> reconstruct(final Schur<N> decomposition) {
+        final MatrixStore<N> tmpQ = decomposition.getQ();
+        return tmpQ.multiply(decomposition.getU()).multiply(tmpQ.logical().transpose().get());
+    }
+
     Array1D<ComplexNumber> getDiagonal();
 
     MatrixStore<N> getQ();
@@ -66,7 +84,7 @@ public interface Schur<N extends Number> extends MatrixDecomposition<N> {
     boolean isOrdered();
 
     default MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return Schur.reconstruct(this);
     }
 
 }

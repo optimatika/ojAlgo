@@ -24,10 +24,11 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * <p>
@@ -81,6 +82,22 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
         }
     }
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
+    
+        boolean retVal = false;
+    
+        final MatrixStore<N> tmpL = decomposition.getL();
+    
+        retVal = AccessUtils.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
+    
+        return retVal;
+    }
+
+    static <N extends Number> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
+        final MatrixStore<N> tmpL = decomposition.getL();
+        return tmpL.multiply(tmpL.conjugate());
+    }
+
     /**
      * To use the Cholesky decomposition rather than the LU decomposition the matrix must be symmetric and
      * positive definite. It is recommended that the decomposition algorithm checks for this during
@@ -106,7 +123,7 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
     }
 
     default MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return Cholesky.reconstruct(this);
     }
 
 }

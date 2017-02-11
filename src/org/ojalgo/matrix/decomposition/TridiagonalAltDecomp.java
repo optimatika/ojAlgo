@@ -26,7 +26,6 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -54,7 +53,7 @@ class TridiagonalAltDecomp extends InPlaceDecomposition<Double> implements Tridi
     }
 
     public boolean equals(final MatrixStore<Double> other, final NumberContext context) {
-        return MatrixUtils.equals(other, this, context);
+        return Tridiagonal.equals(other, this, context);
     }
 
     public MatrixStore<Double> getD() {

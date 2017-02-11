@@ -24,10 +24,11 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.access.AccessUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Hessenberg: [A] = [Q][H][Q]<sup>T</sup> A general square matrix [A] can be decomposed by orthogonal
@@ -67,6 +68,23 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
         }
     }
 
+    static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Hessenberg<N> decomposition, final NumberContext context) {
+    
+        final MatrixStore<N> tmpH = decomposition.getH();
+        final MatrixStore<N> tmpQ = decomposition.getQ();
+    
+        final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
+        final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpH);
+    
+        return AccessUtils.equals(tmpStore1, tmpStore2, context);
+    }
+
+    static <N extends Number> MatrixStore<N> reconstruct(final Hessenberg<N> decomposition) {
+        final MatrixStore<N> tmpQ = decomposition.getQ();
+        final MatrixStore<N> tmpH = decomposition.getH();
+        return tmpQ.multiply(tmpH).multiply(tmpQ.transpose());
+    }
+
     boolean compute(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, boolean upper);
 
     MatrixStore<N> getH();
@@ -76,6 +94,6 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
     boolean isUpper();
 
     default MatrixStore<N> reconstruct() {
-        return MatrixUtils.reconstruct(this);
+        return Hessenberg.reconstruct(this);
     }
 }

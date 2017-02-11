@@ -86,7 +86,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
     }
 
     public final boolean equals(final MatrixStore<N> aStore, final NumberContext context) {
-        return MatrixUtils.equals(aStore, this, context);
+        return Cholesky.equals(aStore, this, context);
     }
 
     public N getDeterminant() {
