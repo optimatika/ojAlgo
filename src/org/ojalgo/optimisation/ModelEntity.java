@@ -24,8 +24,12 @@ package org.ojalgo.optimisation;
 import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Objects;
 
+import org.ojalgo.constant.BigMath;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -41,6 +45,9 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
+
+    private static final BigDecimal LARGEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_LARGEST), new MathContext(8, RoundingMode.DOWN));
+    private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
 
     private transient int myAdjustmentExponent = Integer.MIN_VALUE;
     private BigDecimal myContributionWeight = null;
@@ -186,15 +193,27 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     /**
-     * @see #getLowerLimit()
+     * Extremely large (absolute value) values are treated as "no limit" (null) and extremely small values are
+     * treated as exactly 0.0, unless the input number type is {@link BigDecimal}. {@link BigDecimal} values
+     * are always used as they are.
      */
     @SuppressWarnings("unchecked")
     public final ME lower(final Number lower) {
         myAdjustmentExponent = Integer.MIN_VALUE;
+        myLowerLimit = null;
         if (lower != null) {
-            myLowerLimit = TypeUtils.toBigDecimal(lower);
-        } else {
-            myLowerLimit = null;
+            if (lower instanceof BigDecimal) {
+                myLowerLimit = (BigDecimal) lower;
+            } else if (Double.isFinite(lower.doubleValue())) {
+                BigDecimal tmpLimit = TypeUtils.toBigDecimal(lower);
+                final BigDecimal tmpMagnitude = tmpLimit.abs();
+                if (tmpMagnitude.compareTo(LARGEST) >= 0) {
+                    tmpLimit = null;
+                } else if (tmpMagnitude.compareTo(SMALLEST) <= 0) {
+                    tmpLimit = BigMath.ZERO;
+                }
+                myLowerLimit = tmpLimit;
+            }
         }
         return (ME) this;
     }
@@ -210,15 +229,27 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     }
 
     /**
-     * @see #getUpperLimit()
+     * Extremely large (absolute value) values are treated as "no limit" (null) and extremely small values are
+     * treated as exactly 0.0, unless the input number type is {@link BigDecimal}. {@link BigDecimal} values
+     * are always used as they are.
      */
     @SuppressWarnings("unchecked")
     public final ME upper(final Number upper) {
         myAdjustmentExponent = Integer.MIN_VALUE;
+        myUpperLimit = null;
         if (upper != null) {
-            myUpperLimit = TypeUtils.toBigDecimal(upper);
-        } else {
-            myUpperLimit = null;
+            if (upper instanceof BigDecimal) {
+                myUpperLimit = (BigDecimal) upper;
+            } else if (Double.isFinite(upper.doubleValue())) {
+                BigDecimal tmpLimit = TypeUtils.toBigDecimal(upper);
+                final BigDecimal tmpMagnitude = tmpLimit.abs();
+                if (tmpMagnitude.compareTo(LARGEST) >= 0) {
+                    tmpLimit = null;
+                } else if (tmpMagnitude.compareTo(SMALLEST) <= 0) {
+                    tmpLimit = BigMath.ZERO;
+                }
+                myUpperLimit = tmpLimit;
+            }
         }
         return (ME) this;
     }
@@ -228,11 +259,17 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
      */
     @SuppressWarnings("unchecked")
     public final ME weight(final Number weight) {
-        final BigDecimal tmpWeight = weight != null ? TypeUtils.toBigDecimal(weight) : null;
-        if ((tmpWeight != null) && (tmpWeight.signum() != 0)) {
-            myContributionWeight = tmpWeight;
-        } else {
-            myContributionWeight = null;
+        myContributionWeight = null;
+        if (weight != null) {
+            BigDecimal tmpWeight = null;
+            if (weight instanceof BigDecimal) {
+                tmpWeight = (BigDecimal) weight;
+            } else if (Double.isFinite(weight.doubleValue())) {
+                tmpWeight = TypeUtils.toBigDecimal(weight);
+            }
+            if ((tmpWeight != null) && (tmpWeight.signum() != 0)) {
+                myContributionWeight = tmpWeight;
+            }
         }
         return (ME) this;
     }

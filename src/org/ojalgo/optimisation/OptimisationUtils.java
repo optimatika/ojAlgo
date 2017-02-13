@@ -28,7 +28,7 @@ import org.ojalgo.type.context.NumberContext;
 
 abstract class OptimisationUtils {
 
-    private static final double _16_0 = EIGHT + EIGHT;
+    private static final double _32_0 = EIGHT + EIGHT + EIGHT + EIGHT;
 
     static final NumberContext DISPLAY = NumberContext.getGeneral(6);
 
@@ -37,7 +37,7 @@ abstract class OptimisationUtils {
         final double tmpLargestExp = largest > ZERO ? PrimitiveFunction.LOG10.invoke(largest) : ZERO;
         final double tmpSmallestExp = smallest > ZERO ? PrimitiveFunction.LOG10.invoke(smallest) : -EIGHT;
 
-        if ((tmpLargestExp > _16_0) || (tmpSmallestExp < -_16_0)) {
+        if ((tmpLargestExp - tmpSmallestExp) > _32_0) {
 
             return 0;
 
