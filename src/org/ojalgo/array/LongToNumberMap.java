@@ -20,57 +20,79 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
     public static class MapFactory<N extends Number> extends BuilderFactory<N, LongToNumberMap<N>> {
 
-        MapFactory(Factory<N> denseFactory) {
+        MapFactory(final Factory<N> denseFactory) {
             super(denseFactory);
         }
 
         @Override
         public LongToNumberMap<N> make() {
-            return new LongToNumberMap<>(null);
+            return new LongToNumberMap<>(this.getStrategy());
         }
 
     }
-
-    private static int INITIAL_CAPACITY = 16;
 
     public static <N extends Number> MapFactory<N> factory(final DenseArray.Factory<N> arrayFactory) {
         return new MapFactory<>(arrayFactory);
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static <N extends Number> LongToNumberMap<N> make(final DenseArray.Factory<N> arrayFactory) {
-        return new LongToNumberMap<>(arrayFactory);
+        return LongToNumberMap.factory(arrayFactory).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static LongToNumberMap<BigDecimal> makeBig() {
-        return new LongToNumberMap<>(BigArray.FACTORY);
+        return LongToNumberMap.factory(BigArray.FACTORY).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static LongToNumberMap<ComplexNumber> makeComplex() {
-        return new LongToNumberMap<>(ComplexArray.FACTORY);
+        return LongToNumberMap.factory(ComplexArray.FACTORY).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static LongToNumberMap<Double> makePrimitive() {
-        return new LongToNumberMap<>(Primitive64Array.FACTORY);
+        return LongToNumberMap.factory(Primitive64Array.FACTORY).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static LongToNumberMap<Quaternion> makeQuaternion() {
-        return new LongToNumberMap<>(QuaternionArray.FACTORY);
+        return LongToNumberMap.factory(QuaternionArray.FACTORY).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static LongToNumberMap<RationalNumber> makeRational() {
-        return new LongToNumberMap<>(RationalArray.FACTORY);
+        return LongToNumberMap.factory(RationalArray.FACTORY).make();
     }
 
-    private final DenseArray.Factory<N> myArrayFactory;
+    private final DenseStrategy<N> myStrategy;
     private final SparseArray<N> myStorage;
 
-    public LongToNumberMap(final DenseArray.Factory<N> arrayFactory) {
+    LongToNumberMap(final DenseStrategy<N> strategy) {
 
         super();
 
-        myArrayFactory = arrayFactory;
+        myStrategy = strategy;
 
-        myStorage = new SparseArray<>(Long.MAX_VALUE, new DenseStrategy<>(myArrayFactory).initial(INITIAL_CAPACITY));
+        myStorage = new SparseArray<>(Long.MAX_VALUE, strategy);
     }
 
     /**
@@ -282,7 +304,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
     public LongToNumberMap<N> subMap(final long fromKey, final long toKey) {
 
-        final LongToNumberMap<N> retVal = new LongToNumberMap<>(myArrayFactory);
+        final LongToNumberMap<N> retVal = new LongToNumberMap<>(myStrategy);
 
         long tmpKey;
         for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {
@@ -309,7 +331,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     }
 
     public NumberList<N> values() {
-        return new NumberList<>(myStorage.getValues(), myArrayFactory, myStorage.getActualLength());
+        return new NumberList<>(myStorage.getValues(), myStrategy, myStorage.getActualLength());
     }
 
     /**

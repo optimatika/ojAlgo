@@ -6,7 +6,7 @@ abstract class BuilderFactory<N extends Number, I extends Access1D<N>> {
 
     private final DenseStrategy<N> myStrategy;
 
-    public BuilderFactory(DenseArray.Factory<N> denseFactory) {
+    public BuilderFactory(final DenseArray.Factory<N> denseFactory) {
 
         super();
 
@@ -14,5 +14,9 @@ abstract class BuilderFactory<N extends Number, I extends Access1D<N>> {
     }
 
     public abstract I make();
+
+    DenseStrategy<N> getStrategy() {
+        return myStrategy;
+    }
 
 }

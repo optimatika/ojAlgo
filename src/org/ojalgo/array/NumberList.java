@@ -46,22 +46,19 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
     public static class ListFactory<N extends Number> extends BuilderFactory<N, NumberList<N>> {
 
-        ListFactory(Factory<N> denseFactory) {
+        ListFactory(final Factory<N> denseFactory) {
             super(denseFactory);
         }
 
         @Override
         public NumberList<N> make() {
-            return new NumberList<>(null);
+            return new NumberList<>(this.getStrategy());
         }
 
     }
 
-    private static long INITIAL_CAPACITY = 16L;
-    private static long SEGMENT_CAPACITY = 16_384L;
-
     public static <N extends Number> Collector<N, NumberList<N>, NumberList<N>> collector(final DenseArray.Factory<N> arrayFactory) {
-        final Supplier<NumberList<N>> tmpSupplier = () -> new NumberList<>(arrayFactory);
+        final Supplier<NumberList<N>> tmpSupplier = () -> NumberList.factory(arrayFactory).make();
         final BiConsumer<NumberList<N>, N> tmpAccumulator = (list, element) -> list.add(element);
         final BinaryOperator<NumberList<N>> tmpCombiner = (part1, part2) -> {
             part1.addAll(part2);
@@ -75,49 +72,73 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         return new ListFactory<>(arrayFactory);
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static <N extends Number> NumberList<N> make(final DenseArray.Factory<N> arrayFactory) {
-        return new NumberList<>(arrayFactory);
+        return NumberList.factory(arrayFactory).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static NumberList<BigDecimal> makeBig() {
-        return new NumberList<>(BigArray.FACTORY);
+        return NumberList.factory(BigArray.FACTORY).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static NumberList<ComplexNumber> makeComplex() {
-        return new NumberList<>(ComplexArray.FACTORY);
+        return NumberList.factory(ComplexArray.FACTORY).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static NumberList<Double> makePrimitive() {
-        return new NumberList<>(Primitive64Array.FACTORY);
+        return NumberList.factory(Primitive64Array.FACTORY).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static NumberList<Quaternion> makeQuaternion() {
-        return new NumberList<>(QuaternionArray.FACTORY);
+        return NumberList.factory(QuaternionArray.FACTORY).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(Factory)} instead.
+     */
+    @Deprecated
     public static NumberList<RationalNumber> makeRational() {
-        return new NumberList<>(RationalArray.FACTORY);
+        return NumberList.factory(RationalArray.FACTORY).make();
     }
 
     private long myActualCount;
-    private final Factory<N> myArrayFactory;
+    private final DenseStrategy<N> myStrategy;
     private BasicArray<N> myStorage;
 
-    public NumberList(final Factory<N> arrayFactory) {
+    NumberList(final DenseStrategy<N> strategy) {
 
         super();
 
-        myArrayFactory = arrayFactory;
+        myStrategy = strategy;
 
-        myStorage = arrayFactory.makeZero(INITIAL_CAPACITY);
+        myStorage = strategy.makeInitial();
         myActualCount = 0L;
     }
 
-    NumberList(final BasicArray<N> storage, final Factory<N> arrayFactory, final long actualCount) {
+    NumberList(final BasicArray<N> storage, final DenseStrategy<N> strategy, final long actualCount) {
 
         super();
 
-        myArrayFactory = arrayFactory;
+        myStrategy = strategy;
 
         myStorage = storage;
         myActualCount = actualCount;
@@ -330,7 +351,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public NumberList<N> subList(final int fromIndex, final int toIndex) {
-        final NumberList<N> retVal = new NumberList<>(myArrayFactory);
+        final NumberList<N> retVal = new NumberList<>(myStrategy);
         if (myStorage instanceof Primitive64Array) {
             for (int i = 0; i < toIndex; i++) {
                 retVal.add(this.doubleValue(i));
@@ -368,21 +389,20 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         if (myStorage.count() > myActualCount) {
             // It fits, just add to the end
 
-        } else if ((myStorage.count() % SEGMENT_CAPACITY) == 0L) {
+        } else if (myStrategy.isChunked(myActualCount)) {
             // Doesn't fit, grow by 1 segment, then add
 
             if (myStorage instanceof SegmentedArray) {
                 myStorage = ((SegmentedArray<N>) myStorage).grow();
-            } else if (myStorage.count() == SEGMENT_CAPACITY) {
-                myStorage = myArrayFactory.wrapAsSegments(myStorage, myArrayFactory.makeZero(SEGMENT_CAPACITY));
             } else {
-                throw new IllegalStateException();
+                myStorage = myStrategy.makeSegmented(myStorage);
             }
-
         } else {
-            // Doesn't fit, grow by doubling the capacity, then add
+            // Doesn't fit, grow, then add
 
-            final BasicArray<N> tmpStorage = myArrayFactory.makeZero(myStorage.count() * 2L);
+            final long tmoNewTotalCount = myStrategy.grow(myActualCount);
+
+            final BasicArray<N> tmpStorage = myStrategy.make(tmoNewTotalCount);
             tmpStorage.fillMatching(myStorage);
             myStorage = tmpStorage;
         }

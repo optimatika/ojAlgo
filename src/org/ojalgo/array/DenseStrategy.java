@@ -18,26 +18,26 @@ final class DenseStrategy<N extends Number> {
     private final DenseArray.Factory<N> myDenseFactory;
     private long myInitial = MINIMAL;
 
-    DenseStrategy(DenseArray.Factory<N> denseFactory) {
+    DenseStrategy(final DenseArray.Factory<N> denseFactory) {
 
         super();
 
         myDenseFactory = denseFactory;
     }
 
-    DenseStrategy<N> capacity(Distribution expected) {
+    DenseStrategy<N> capacity(final Distribution expected) {
         final long stdDev = (long) expected.getStandardDeviation();
         final long exp = (long) expected.getExpected();
         return this.chunk(stdDev).initial(exp + stdDev);
     }
 
-    DenseStrategy<N> chunk(long chunk) {
-        int power = PrimitiveMath.powerOf2Smaller(chunk);
+    DenseStrategy<N> chunk(final long chunk) {
+        final int power = PrimitiveMath.powerOf2Smaller(chunk);
         myChunk = Math.max(MINIMAL, 1L << power);
         return this;
     }
 
-    long grow(long current) {
+    long grow(final long current) {
 
         long required = current + 1L;
 
@@ -58,12 +58,24 @@ final class DenseStrategy<N extends Number> {
         return retVal;
     }
 
-    DenseStrategy<N> initial(long initial) {
+    boolean isChunked(final long count) {
+        return count >= myChunk;
+    }
+
+    DenseStrategy<N> initial(final long initial) {
         myInitial = Math.max(MINIMAL, initial);
         return this;
     }
 
-    DenseArray<N> make(long size) {
+    SegmentedArray<N> makeSegmented(final BasicArray<N> segment) {
+        if (segment.count() == myChunk) {
+            return myDenseFactory.wrapAsSegments(segment, this.makeChunk());
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+    DenseArray<N> make(final long size) {
         return myDenseFactory.make(size);
     }
 
