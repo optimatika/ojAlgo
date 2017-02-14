@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.ComplexNumber;
@@ -17,11 +18,24 @@ import org.ojalgo.scalar.RationalNumber;
 
 public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N> {
 
-    static final class MapStrategy extends CapacityStrategy<MapStrategy> {
+    public static class MapFactory<N extends Number> extends BuilderFactory<N, LongToNumberMap<N>> {
+
+        MapFactory(Factory<N> denseFactory) {
+            super(denseFactory);
+        }
+
+        @Override
+        public LongToNumberMap<N> make() {
+            return new LongToNumberMap<>(null);
+        }
 
     }
 
     private static int INITIAL_CAPACITY = 16;
+
+    public static <N extends Number> MapFactory<N> factory(final DenseArray.Factory<N> arrayFactory) {
+        return new MapFactory<>(arrayFactory);
+    }
 
     public static <N extends Number> LongToNumberMap<N> make(final DenseArray.Factory<N> arrayFactory) {
         return new LongToNumberMap<>(arrayFactory);

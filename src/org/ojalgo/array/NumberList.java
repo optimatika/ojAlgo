@@ -44,7 +44,16 @@ import org.ojalgo.scalar.RationalNumber;
 
 public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D {
 
-    static final class ListStrategy extends CapacityStrategy<ListStrategy> {
+    public static class ListFactory<N extends Number> extends BuilderFactory<N, NumberList<N>> {
+
+        ListFactory(Factory<N> denseFactory) {
+            super(denseFactory);
+        }
+
+        @Override
+        public NumberList<N> make() {
+            return new NumberList<>(null);
+        }
 
     }
 
@@ -60,6 +69,10 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         };
         final Function<NumberList<N>, NumberList<N>> tmpIdentity = Function.identity();
         return Collector.of(tmpSupplier, tmpAccumulator, tmpCombiner, tmpIdentity, Collector.Characteristics.IDENTITY_FINISH);
+    }
+
+    public static <N extends Number> ListFactory<N> factory(final DenseArray.Factory<N> arrayFactory) {
+        return new ListFactory<>(arrayFactory);
     }
 
     public static <N extends Number> NumberList<N> make(final DenseArray.Factory<N> arrayFactory) {
