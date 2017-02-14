@@ -70,7 +70,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
         myArrayFactory = arrayFactory;
 
-        myStorage = new SparseArray<>(Long.MAX_VALUE, myArrayFactory, INITIAL_CAPACITY);
+        myStorage = new SparseArray<>(Long.MAX_VALUE, new DenseStrategy<>(myArrayFactory).initial(INITIAL_CAPACITY));
     }
 
     /**

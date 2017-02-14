@@ -86,7 +86,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
             } else {
 
-                return new SparseArray<>(tmpTotal, this.dense(), INITIAL_CAPACITY);
+                return new SparseArray<>(tmpTotal, new DenseStrategy<>(this.dense()).initial(INITIAL_CAPACITY));
             }
         }
 

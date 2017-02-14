@@ -2,6 +2,7 @@ package org.ojalgo.array;
 
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.random.Distribution;
+import org.ojalgo.scalar.Scalar;
 
 /**
  * To be used by implementations that delegate to a DenseArray
@@ -72,6 +73,14 @@ final class DenseStrategy<N extends Number> {
 
     DenseArray<N> makeInitial() {
         return this.make(myInitial);
+    }
+
+    long[] makeInitialIndices() {
+        return new long[(int) myInitial];
+    }
+
+    Scalar<N> zero() {
+        return myDenseFactory.zero();
     }
 
 }
