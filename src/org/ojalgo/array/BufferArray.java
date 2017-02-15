@@ -28,9 +28,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
@@ -55,15 +57,66 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public class BufferArray extends PlainArray<Double> {
+public abstract class BufferArray extends PlainArray<Double> {
 
-    public static DenseArray.Factory<Double> DIRECT64 = new DenseArray.Factory<Double>() {
+    static final class DoubleBufferArray extends BufferArray {
+
+        private final DoubleBuffer myDoubleBuffer;
+
+        DoubleBufferArray(final DoubleBuffer buffer, final RandomAccessFile file) {
+
+            super(buffer, file);
+
+            myDoubleBuffer = buffer;
+        }
+
+        @Override
+        protected double doubleValue(final int index) {
+            return myDoubleBuffer.get(index);
+        }
+
+        @Override
+        protected void set(final int index, final double value) {
+            myDoubleBuffer.put(index, value);
+        }
+
+    }
+
+    static final class FloatBufferArray extends BufferArray {
+
+        private final FloatBuffer myFloatBuffer;
+
+        FloatBufferArray(final FloatBuffer buffer, final RandomAccessFile file) {
+
+            super(buffer, file);
+
+            myFloatBuffer = buffer;
+        }
+
+        @Override
+        protected double doubleValue(final int index) {
+            return myFloatBuffer.get(index);
+        }
+
+        @Override
+        protected void set(final int index, final double value) {
+            myFloatBuffer.put(index, (float) value);
+        }
+
+    }
+
+    public static final DenseArray.Factory<Double> DIRECT32 = new DenseArray.Factory<Double>() {
+
+        @Override
+        long getElementSize() {
+            return JavaType.FLOAT.memory();
+        }
 
         @Override
         DenseArray<Double> make(final long size) {
-            // TODO Auto-generated method stub
-            final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect((int) size * 8);
-            return new BufferArray(tmpAllocateDirect.asDoubleBuffer(), null);
+            final int tmpSize = (int) size;
+            final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect(tmpSize * 4);
+            return new FloatBufferArray(tmpAllocateDirect.asFloatBuffer(), null);
         }
 
         @Override
@@ -71,16 +124,28 @@ public class BufferArray extends PlainArray<Double> {
             return PrimitiveScalar.ZERO;
         }
 
+    };
+
+    public static final DenseArray.Factory<Double> DIRECT64 = new DenseArray.Factory<Double>() {
+
         @Override
         long getElementSize() {
-            return 8L;
+            return JavaType.DOUBLE.memory();
+        }
+
+        @Override
+        DenseArray<Double> make(final long size) {
+            final int tmpSize = (int) size;
+            final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect(tmpSize * 8);
+            return new DoubleBufferArray(tmpAllocateDirect.asDoubleBuffer(), null);
+        }
+
+        @Override
+        Scalar<Double> zero() {
+            return PrimitiveScalar.ZERO;
         }
 
     };
-
-    static long ELEMENT_SIZE = JavaType.DOUBLE.memory();
-
-    static long MAX = 1L << 8;
 
     public static Array1D<Double> make(final File file, final long count) {
         return BufferArray.create(file, count).asArray1D();
@@ -94,12 +159,16 @@ public class BufferArray extends PlainArray<Double> {
         return BufferArray.create(file, rows, columns).asArray2D(rows);
     }
 
-    public static BasicArray<Double> make(final int capacity) {
-        return new BufferArray(DoubleBuffer.allocate(capacity), null);
+    public static BufferArray make(final int capacity) {
+        return new DoubleBufferArray(DoubleBuffer.allocate(capacity), null);
     }
 
     public static BufferArray wrap(final DoubleBuffer data) {
-        return new BufferArray(data, null);
+        return new DoubleBufferArray(data, null);
+    }
+
+    public static BufferArray wrap(final FloatBuffer data) {
+        return new FloatBufferArray(data, null);
     }
 
     private static BasicArray<Double> create(final File file, final long... structure) {
@@ -114,9 +183,9 @@ public class BufferArray extends PlainArray<Double> {
 
             final FileChannel tmpFileChannel = tmpRandomAccessFile.getChannel();
 
-            final long tmpSize = ELEMENT_SIZE * tmpCount;
+            final long tmpSize = JavaType.DOUBLE.memory() * tmpCount;
 
-            if (tmpCount > MAX) {
+            if (tmpCount > (1L << 8)) {
 
                 final DenseArray.Factory<Double> tmpFactory = new DenseArray.Factory<Double>() {
 
@@ -124,18 +193,18 @@ public class BufferArray extends PlainArray<Double> {
 
                     @Override
                     long getElementSize() {
-                        return ELEMENT_SIZE;
+                        return JavaType.DOUBLE.memory();
                     }
 
                     @Override
                     PlainArray<Double> make(final long size) {
 
-                        final long tmpSize2 = size * ELEMENT_SIZE;
+                        final long tmpSize2 = size * JavaType.DOUBLE.memory();
                         try {
 
                             final MappedByteBuffer tmpMap = tmpFileChannel.map(MapMode.READ_WRITE, offset, tmpSize2);
                             tmpMap.order(ByteOrder.nativeOrder());
-                            return new BufferArray(tmpMap.asDoubleBuffer(), tmpRandomAccessFile);
+                            return new DoubleBufferArray(tmpMap.asDoubleBuffer(), tmpRandomAccessFile);
                         } catch (final IOException exception) {
                             throw new RuntimeException(exception);
                         } finally {
@@ -159,7 +228,7 @@ public class BufferArray extends PlainArray<Double> {
 
                 tmpDoubleBuffer = tmpMappedByteBuffer.asDoubleBuffer();
 
-                return new BufferArray(tmpDoubleBuffer, tmpRandomAccessFile);
+                return new DoubleBufferArray(tmpDoubleBuffer, tmpRandomAccessFile);
             }
 
         } catch (final FileNotFoundException exception) {
@@ -169,70 +238,70 @@ public class BufferArray extends PlainArray<Double> {
         }
     }
 
-    protected static void fill(final DoubleBuffer data, final Access1D<?> value) {
-        final int tmpLimit = (int) Math.min(data.capacity(), value.count());
+    protected static void fill(final BufferArray data, final Access1D<?> value) {
+        final int tmpLimit = (int) Math.min(data.count(), value.count());
         for (int i = 0; i < tmpLimit; i++) {
-            data.put(i, value.doubleValue(i));
+            data.set(i, value.doubleValue(i));
         }
     }
 
-    protected static void fill(final DoubleBuffer data, final int first, final int limit, final int step, final double value) {
+    protected static void fill(final BufferArray data, final int first, final int limit, final int step, final double value) {
         for (int i = first; i < limit; i += step) {
-            data.put(i, value);
+            data.set(i, value);
         }
     }
 
-    protected static void fill(final DoubleBuffer data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
+    protected static void fill(final BufferArray data, final int first, final int limit, final int step, final NullaryFunction<?> supplier) {
         for (int i = first; i < limit; i += step) {
-            data.put(i, supplier.doubleValue());
+            data.set(i, supplier.doubleValue());
         }
     }
 
-    protected static void invoke(final DoubleBuffer data, final int first, final int limit, final int step, final Access1D<Double> left,
+    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final Access1D<Double> left,
             final BinaryFunction<Double> function, final Access1D<Double> right) {
         for (int i = first; i < limit; i += step) {
-            data.put(i, function.invoke(left.get(i), right.get(i)));
+            data.set(i, function.invoke(left.get(i), right.get(i)));
         }
     }
 
-    protected static void invoke(final DoubleBuffer data, final int first, final int limit, final int step, final Access1D<Double> left,
+    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final Access1D<Double> left,
             final BinaryFunction<Double> function, final double right) {
         for (int i = first; i < limit; i += step) {
-            data.put(i, function.invoke(left.doubleValue(i), right));
+            data.set(i, function.invoke(left.doubleValue(i), right));
         }
     }
 
-    protected static void invoke(final DoubleBuffer data, final int first, final int limit, final int step, final Access1D<Double> value,
+    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final Access1D<Double> value,
             final ParameterFunction<Double> function, final int aParam) {
         for (int i = first; i < limit; i += step) {
-            data.put(i, function.invoke(value.doubleValue(i), aParam));
+            data.set(i, function.invoke(value.doubleValue(i), aParam));
         }
     }
 
-    protected static void invoke(final DoubleBuffer data, final int first, final int limit, final int step, final Access1D<Double> value,
+    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final Access1D<Double> value,
             final UnaryFunction<Double> function) {
         for (int i = first; i < limit; i += step) {
-            data.put(i, function.invoke(value.doubleValue(i)));
+            data.set(i, function.invoke(value.doubleValue(i)));
         }
     }
 
-    protected static void invoke(final DoubleBuffer data, final int first, final int limit, final int step, final double left,
+    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final double left,
             final BinaryFunction<Double> function, final Access1D<Double> right) {
         for (int i = first; i < limit; i += step) {
-            data.put(i, function.invoke(left, right.doubleValue(i)));
+            data.set(i, function.invoke(left, right.doubleValue(i)));
         }
     }
 
-    protected static void invoke(final DoubleBuffer data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
+    protected static void invoke(final BufferArray data, final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
         for (int i = first; i < limit; i += step) {
             visitor.invoke(data.get(i));
         }
     }
 
-    private final DoubleBuffer myBuffer;
+    private final Buffer myBuffer;
     private final RandomAccessFile myFile;
 
-    private BufferArray(final DoubleBuffer buffer, final RandomAccessFile file) {
+    BufferArray(final Buffer buffer, final RandomAccessFile file) {
 
         super(buffer.capacity());
 
@@ -253,17 +322,12 @@ public class BufferArray extends PlainArray<Double> {
 
     @Override
     protected void add(final int index, final double addend) {
-        myBuffer.put(index, myBuffer.get(index) + addend);
+        this.set(index, this.doubleValue(index) + addend);
     }
 
     @Override
     protected void add(final int index, final Number addend) {
-        myBuffer.put(index, myBuffer.get(index) + addend.doubleValue());
-    }
-
-    @Override
-    protected double doubleValue(final int index) {
-        return myBuffer.get(index);
+        this.set(index, this.doubleValue(index) + addend.doubleValue());
     }
 
     @Override
@@ -276,9 +340,9 @@ public class BufferArray extends PlainArray<Double> {
 
         for (int i = 0; i < count; i++) {
 
-            tmpVal = myBuffer.get(tmpIndexA);
-            myBuffer.put(tmpIndexA, myBuffer.get(tmpIndexB));
-            myBuffer.put(tmpIndexB, tmpVal);
+            tmpVal = this.doubleValue(tmpIndexA);
+            this.set(tmpIndexA, this.doubleValue(tmpIndexB));
+            this.set(tmpIndexB, tmpVal);
 
             tmpIndexA += step;
             tmpIndexB += step;
@@ -287,47 +351,47 @@ public class BufferArray extends PlainArray<Double> {
 
     @Override
     protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        BufferArray.invoke(myBuffer, first, limit, 1, left, function, right);
+        BufferArray.invoke(this, first, limit, 1, left, function, right);
     }
 
     @Override
     protected void fill(final int first, final int limit, final Access1D<Double> left, final BinaryFunction<Double> function, final Double right) {
-        BufferArray.invoke(myBuffer, first, limit, 1, left, function, right);
+        BufferArray.invoke(this, first, limit, 1, left, function, right);
     }
 
     @Override
     protected void fill(final int first, final int limit, final Double left, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        BufferArray.invoke(myBuffer, first, limit, 1, left, function, right);
+        BufferArray.invoke(this, first, limit, 1, left, function, right);
     }
 
     @Override
     protected void fill(final int first, final int limit, final int step, final Double value) {
-        BufferArray.fill(myBuffer, first, limit, step, value);
+        BufferArray.fill(this, first, limit, step, value);
     }
 
     @Override
     protected void fill(final int first, final int limit, final int step, final NullaryFunction<Double> supplier) {
-        BufferArray.fill(myBuffer, first, limit, step, supplier);
+        BufferArray.fill(this, first, limit, step, supplier);
     }
 
     @Override
     protected void fillOne(final int index, final Access1D<?> values, final long valueIndex) {
-        myBuffer.put(index, values.doubleValue(valueIndex));
+        this.set(index, values.doubleValue(valueIndex));
     }
 
     @Override
     protected void fillOne(final int index, final Double value) {
-        myBuffer.put(index, value);
+        this.set(index, value);
     }
 
     @Override
     protected void fillOne(final int index, final NullaryFunction<Double> supplier) {
-        myBuffer.put(index, supplier.doubleValue());
+        this.set(index, supplier.doubleValue());
     }
 
     @Override
     protected Double get(final int index) {
-        return myBuffer.get(index);
+        return this.doubleValue(index);
     }
 
     @Override
@@ -338,7 +402,7 @@ public class BufferArray extends PlainArray<Double> {
         double tmpValue;
 
         for (int i = first; i < limit; i += step) {
-            tmpValue = ABS.invoke(myBuffer.get(i));
+            tmpValue = ABS.invoke(this.doubleValue(i));
             if (tmpValue > tmpLargest) {
                 tmpLargest = tmpValue;
                 retVal = i;
@@ -350,47 +414,47 @@ public class BufferArray extends PlainArray<Double> {
 
     @Override
     protected boolean isAbsolute(final int index) {
-        return PrimitiveScalar.isAbsolute(myBuffer.get(index));
+        return PrimitiveScalar.isAbsolute(this.doubleValue(index));
     }
 
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
-        return PrimitiveScalar.isSmall(comparedTo, myBuffer.get(index));
+        return PrimitiveScalar.isSmall(comparedTo, this.doubleValue(index));
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        BufferArray.invoke(myBuffer, first, limit, step, left, function, this);
+        BufferArray.invoke(this, first, limit, step, left, function, this);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        BufferArray.invoke(myBuffer, first, limit, step, this, function, right);
+        BufferArray.invoke(this, first, limit, step, this, function, right);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final BinaryFunction<Double> function, final Double right) {
-        BufferArray.invoke(myBuffer, first, limit, step, this, function, right);
+        BufferArray.invoke(this, first, limit, step, this, function, right);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final Double left, final BinaryFunction<Double> function) {
-        BufferArray.invoke(myBuffer, first, limit, step, left, function, this);
+        BufferArray.invoke(this, first, limit, step, left, function, this);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final ParameterFunction<Double> function, final int parameter) {
-        BufferArray.invoke(myBuffer, first, limit, step, this, function, parameter);
+        BufferArray.invoke(this, first, limit, step, this, function, parameter);
     }
 
     @Override
     protected void modify(final int first, final int limit, final int step, final UnaryFunction<Double> function) {
-        BufferArray.invoke(myBuffer, first, limit, step, this, function);
+        BufferArray.invoke(this, first, limit, step, this, function);
     }
 
     @Override
     protected void modifyOne(final int index, final UnaryFunction<Double> modifier) {
-        myBuffer.put(index, modifier.invoke(myBuffer.get(index)));
+        this.set(index, modifier.invoke(this.doubleValue(index)));
     }
 
     @Override
@@ -400,13 +464,8 @@ public class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    protected void set(final int index, final double value) {
-        myBuffer.put(index, value);
-    }
-
-    @Override
     protected void set(final int index, final Number value) {
-        myBuffer.put(index, value.doubleValue());
+        this.set(index, value.doubleValue());
     }
 
     @Override
@@ -426,12 +485,12 @@ public class BufferArray extends PlainArray<Double> {
 
     @Override
     protected void visit(final int first, final int limit, final int step, final VoidFunction<Double> visitor) {
-        BufferArray.invoke(myBuffer, first, limit, step, visitor);
+        BufferArray.invoke(this, first, limit, step, visitor);
     }
 
     @Override
     protected void visitOne(final int index, final VoidFunction<Double> visitor) {
-        visitor.invoke(myBuffer.get(index));
+        visitor.invoke(this.doubleValue(index));
     }
 
     @Override
@@ -441,17 +500,17 @@ public class BufferArray extends PlainArray<Double> {
 
     @Override
     void modify(final long extIndex, final int intIndex, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        myBuffer.put(intIndex, function.invoke(left.doubleValue(extIndex), myBuffer.get(intIndex)));
+        this.set(intIndex, function.invoke(left.doubleValue(extIndex), this.doubleValue(intIndex)));
     }
 
     @Override
     void modify(final long extIndex, final int intIndex, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        myBuffer.put(intIndex, function.invoke(myBuffer.get(intIndex), right.doubleValue(extIndex)));
+        this.set(intIndex, function.invoke(this.doubleValue(intIndex), right.doubleValue(extIndex)));
     }
 
     @Override
     void modify(final long extIndex, final int intIndex, final UnaryFunction<Double> function) {
-        myBuffer.put(intIndex, function.invoke(myBuffer.get(intIndex)));
+        this.set(intIndex, function.invoke(this.doubleValue(intIndex)));
     }
 
     @Override
