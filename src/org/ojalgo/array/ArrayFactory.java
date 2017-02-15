@@ -33,7 +33,7 @@ import org.ojalgo.function.NullaryFunction;
 abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends Object implements Factory1D<BasicArray<N>> {
 
     private static final long DENSE_SEGMENTATION_LIMIT = DenseArray.MAX_ARRAY_SIZE;
-    private static final long SPARSE_SEGMENTATION_LIMIT = SparseArray.capacity(DenseArray.MAX_ARRAY_SIZE);
+    private static final long SPARSE_SEGMENTATION_LIMIT = DenseStrategy.capacity(DenseArray.MAX_ARRAY_SIZE);
 
     public final I copy(final Access1D<?> source) {
         final long tmpCount = source.count();

@@ -443,12 +443,6 @@ public class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    PlainArray<Double> newInstance(final int capacity) {
-        return null;
-        // return new MyTestArray(capacity);
-    }
-
-    @Override
     void reset() {
         this.fillAll(PrimitiveMath.ZERO);
         myBuffer.clear();

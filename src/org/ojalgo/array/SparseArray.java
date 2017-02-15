@@ -101,12 +101,10 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    private static final int GROWTH_FACTOR = 2;
-
     static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
 
     public static <N extends Number> SparseArray<N> make(final DenseArray.Factory<N> denseFactory, final long count) {
-        return new SparseArray<>(count, new DenseStrategy<>(denseFactory).initial(SparseArray.capacity(count)));
+        return new SparseArray<>(count, new DenseStrategy<>(denseFactory).initial(DenseStrategy.capacity(count)));
     }
 
     public static <N extends Number> SparseArray<N> make(final DenseArray.Factory<N> denseFactory, final long count, final int initialCapacity) {
@@ -114,7 +112,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static SparseArray<BigDecimal> makeBig(final long count) {
-        return new SparseArray<>(count, new DenseStrategy<>(BigArray.FACTORY).initial(SparseArray.capacity(count)));
+        return new SparseArray<>(count, new DenseStrategy<>(BigArray.FACTORY).initial(DenseStrategy.capacity(count)));
     }
 
     public static SparseArray<BigDecimal> makeBig(final long count, final int initialCapacity) {
@@ -122,7 +120,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static SparseArray<ComplexNumber> makeComplex(final long count) {
-        return new SparseArray<>(count, new DenseStrategy<>(ComplexArray.FACTORY).initial(SparseArray.capacity(count)));
+        return new SparseArray<>(count, new DenseStrategy<>(ComplexArray.FACTORY).initial(DenseStrategy.capacity(count)));
     }
 
     public static SparseArray<ComplexNumber> makeComplex(final long count, final int initialCapacity) {
@@ -130,7 +128,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static SparseArray<Double> makePrimitive(final long count) {
-        return new SparseArray<>(count, new DenseStrategy<>(Primitive64Array.FACTORY).initial(SparseArray.capacity(count)));
+        return new SparseArray<>(count, new DenseStrategy<>(Primitive64Array.FACTORY).initial(DenseStrategy.capacity(count)));
     }
 
     public static SparseArray<Double> makePrimitive(final long count, final int initialCapacity) {
@@ -138,7 +136,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static SparseArray<Quaternion> makeQuaternion(final long count) {
-        return new SparseArray<>(count, new DenseStrategy<>(QuaternionArray.FACTORY).initial(SparseArray.capacity(count)));
+        return new SparseArray<>(count, new DenseStrategy<>(QuaternionArray.FACTORY).initial(DenseStrategy.capacity(count)));
     }
 
     public static SparseArray<Quaternion> makeQuaternion(final long count, final int initialCapacity) {
@@ -146,23 +144,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     }
 
     public static SparseArray<RationalNumber> makeRational(final long count) {
-        return new SparseArray<>(count, new DenseStrategy<>(RationalArray.FACTORY).initial(SparseArray.capacity(count)));
+        return new SparseArray<>(count, new DenseStrategy<>(RationalArray.FACTORY).initial(DenseStrategy.capacity(count)));
     }
 
     public static SparseArray<RationalNumber> makeRational(final long count, final int initialCapacity) {
         return new SparseArray<>(count, new DenseStrategy<>(RationalArray.FACTORY).initial(initialCapacity));
-    }
-
-    static int capacity(final long count) {
-
-        double tmpInitialCapacity = count;
-
-        while (tmpInitialCapacity > DenseArray.MAX_ARRAY_SIZE) {
-            tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
-        }
-
-        tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
-        return GROWTH_FACTOR * (int) tmpInitialCapacity;
     }
 
     /**
@@ -171,6 +157,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     private int myActualLength = 0;
     private final long myCount;
     private long[] myIndices;
+    private final DenseStrategy<N> myStrategy;
     private DenseArray<N> myValues;
     private final N myZeroNumber;
     private final Scalar<N> myZeroScalar;
@@ -182,7 +169,9 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         myCount = count;
 
-        myIndices = strategy.makeInitialIndices();
+        myStrategy = strategy;
+
+        myIndices = new long[strategy.initial()];
         myValues = strategy.makeInitial();
 
         myZeroScalar = strategy.zero();
@@ -255,7 +244,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
             if (tmpSize != myIndices.length) {
                 myIndices = AccessUtils.makeIncreasingRange(0L, tmpSize);
-                myValues = myValues.newInstance(tmpSize);
+                myValues = myStrategy.make(tmpSize);
                 myActualLength = tmpSize;
             }
 
@@ -272,7 +261,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         if (tmpSize != myIndices.length) {
             myIndices = AccessUtils.makeIncreasingRange(0L, tmpSize);
-            myValues = myValues.newInstance(tmpSize);
+            myValues = myStrategy.make(tmpSize);
             myActualLength = tmpSize;
         }
 
@@ -627,7 +616,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     final DenseArray<N> densify() {
 
-        final DenseArray<N> retVal = myValues.newInstance((int) this.count());
+        final DenseArray<N> retVal = myStrategy.make((int) this.count());
 
         if (this.isPrimitive()) {
             for (int i = 0; i < myActualLength; i++) {
@@ -668,9 +657,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             } else {
                 // Needs to grow the backing arrays
 
-                final int tmpCapacity = myIndices.length * GROWTH_FACTOR;
+                final int tmpCapacity = myStrategy.grow(myIndices.length);
                 final long[] tmpIndices = new long[tmpCapacity];
-                final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
+                final DenseArray<N> tmpValues = myStrategy.make(tmpCapacity);
+
+                System.err.println("SparseArray grew to " + tmpCapacity);
 
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = myIndices[i];
@@ -719,9 +710,11 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             } else {
                 // Needs to grow the backing arrays
 
-                final int tmpCapacity = myIndices.length * GROWTH_FACTOR;
+                final int tmpCapacity = myStrategy.grow(myIndices.length);
                 final long[] tmpIndices = new long[tmpCapacity];
-                final DenseArray<N> tmpValues = myValues.newInstance(tmpCapacity);
+                final DenseArray<N> tmpValues = myStrategy.make(tmpCapacity);
+
+                System.err.println("SparseArray grew to " + tmpCapacity);
 
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = myIndices[i];

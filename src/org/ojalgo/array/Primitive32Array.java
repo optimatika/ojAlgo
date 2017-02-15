@@ -573,9 +573,4 @@ public class Primitive32Array extends PrimitiveArray {
         data[intIndex] = (float) function.invoke(data[intIndex]);
     }
 
-    @Override
-    PlainArray<Double> newInstance(final int capacity) {
-        return new Primitive32Array(capacity);
-    }
-
 }

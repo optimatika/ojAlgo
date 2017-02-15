@@ -18,7 +18,7 @@ import org.ojalgo.scalar.RationalNumber;
 
 public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N> {
 
-    public static class MapFactory<N extends Number> extends BuilderFactory<N, LongToNumberMap<N>> {
+    public static class MapFactory<N extends Number> extends BuilderFactory<N, LongToNumberMap<N>, MapFactory<N>> {
 
         MapFactory(final Factory<N> denseFactory) {
             super(denseFactory);

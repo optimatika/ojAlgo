@@ -131,11 +131,6 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
     }
 
     @Override
-    PlainArray<ComplexNumber> newInstance(final int capacity) {
-        return new ComplexArray(capacity);
-    }
-
-    @Override
     ComplexNumber valueOf(final double value) {
         return ComplexNumber.valueOf(value);
     }

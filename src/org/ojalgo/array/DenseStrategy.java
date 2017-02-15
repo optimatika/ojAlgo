@@ -1,6 +1,7 @@
 package org.ojalgo.array;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.random.Distribution;
 import org.ojalgo.scalar.Scalar;
 
@@ -37,6 +38,10 @@ final class DenseStrategy<N extends Number> {
         return this;
     }
 
+    int grow(final int current) {
+        return (int) grow((long) current);
+    }
+
     long grow(final long current) {
 
         long required = current + 1L;
@@ -58,8 +63,8 @@ final class DenseStrategy<N extends Number> {
         return retVal;
     }
 
-    boolean isChunked(final long count) {
-        return count >= myChunk;
+    int initial() {
+        return (int) myInitial;
     }
 
     DenseStrategy<N> initial(final long initial) {
@@ -67,12 +72,8 @@ final class DenseStrategy<N extends Number> {
         return this;
     }
 
-    SegmentedArray<N> makeSegmented(final BasicArray<N> segment) {
-        if (segment.count() == myChunk) {
-            return myDenseFactory.wrapAsSegments(segment, this.makeChunk());
-        } else {
-            throw new IllegalStateException();
-        }
+    boolean isChunked(final long count) {
+        return count >= myChunk;
     }
 
     DenseArray<N> make(final long size) {
@@ -87,12 +88,28 @@ final class DenseStrategy<N extends Number> {
         return this.make(myInitial);
     }
 
-    long[] makeInitialIndices() {
-        return new long[(int) myInitial];
+    SegmentedArray<N> makeSegmented(final BasicArray<N> segment) {
+        if (segment.count() == myChunk) {
+            return myDenseFactory.wrapAsSegments(segment, this.makeChunk());
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
     Scalar<N> zero() {
         return myDenseFactory.zero();
+    }
+
+    static int capacity(final long count) {
+
+        double tmpInitialCapacity = count;
+
+        while (tmpInitialCapacity > DenseArray.MAX_ARRAY_SIZE) {
+            tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
+        }
+
+        tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
+        return 2 * (int) tmpInitialCapacity;
     }
 
 }

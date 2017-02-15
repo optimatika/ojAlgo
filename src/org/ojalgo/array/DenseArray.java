@@ -99,6 +99,4 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
     abstract void modify(long extIndex, int intIndex, UnaryFunction<N> function);
 
-    abstract DenseArray<N> newInstance(int capacity);
-
 }

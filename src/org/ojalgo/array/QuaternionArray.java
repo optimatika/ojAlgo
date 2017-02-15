@@ -131,11 +131,6 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
     }
 
     @Override
-    PlainArray<Quaternion> newInstance(final int capacity) {
-        return new QuaternionArray(capacity);
-    }
-
-    @Override
     final Quaternion valueOf(final double value) {
         return Quaternion.valueOf(value);
     }

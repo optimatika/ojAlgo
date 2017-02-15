@@ -130,11 +130,6 @@ public class RationalArray extends ScalarArray<RationalNumber> {
     }
 
     @Override
-    PlainArray<RationalNumber> newInstance(final int capacity) {
-        return new RationalArray(capacity);
-    }
-
-    @Override
     final RationalNumber valueOf(final double value) {
         return RationalNumber.valueOf(value);
     }

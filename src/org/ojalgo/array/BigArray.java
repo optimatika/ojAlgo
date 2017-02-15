@@ -147,11 +147,6 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
-    PlainArray<BigDecimal> newInstance(final int capacity) {
-        return new BigArray(capacity);
-    }
-
-    @Override
     BigDecimal valueOf(final double value) {
         return BigDecimal.valueOf(value);
     }

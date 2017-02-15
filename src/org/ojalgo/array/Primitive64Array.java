@@ -585,11 +585,6 @@ public class Primitive64Array extends PrimitiveArray {
         data[intIndex] = function.invoke(data[intIndex]);
     }
 
-    @Override
-    PlainArray<Double> newInstance(final int capacity) {
-        return new Primitive64Array(capacity);
-    }
-
     OfDouble split() {
         return Spliterators.spliterator(data, 0);
     }

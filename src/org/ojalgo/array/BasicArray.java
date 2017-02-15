@@ -56,7 +56,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     public static abstract class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 
         private static final long DENSE_LIMIT = 1024L;
-        private static final int INITIAL_CAPACITY = SparseArray.capacity(DENSE_LIMIT);
+        private static final int INITIAL_CAPACITY = DenseStrategy.capacity(DENSE_LIMIT);
 
         abstract DenseArray.Factory<N> dense();
 
