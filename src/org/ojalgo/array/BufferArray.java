@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 import java.nio.MappedByteBuffer;
@@ -44,8 +45,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
-
-import sun.misc.Cleaner;
+import org.ojalgo.scalar.Scalar;
 
 /**
  * <p>
@@ -56,6 +56,27 @@ import sun.misc.Cleaner;
  * @author apete
  */
 public class BufferArray extends PlainArray<Double> {
+
+    public static DenseArray.Factory<Double> DIRECT64 = new DenseArray.Factory<Double>() {
+
+        @Override
+        DenseArray<Double> make(final long size) {
+            // TODO Auto-generated method stub
+            final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect((int) size * 8);
+            return new BufferArray(tmpAllocateDirect.asDoubleBuffer(), null);
+        }
+
+        @Override
+        Scalar<Double> zero() {
+            return PrimitiveScalar.ZERO;
+        }
+
+        @Override
+        long getElementSize() {
+            return 8L;
+        }
+
+    };
 
     static long ELEMENT_SIZE = JavaType.DOUBLE.memory();
 
@@ -218,15 +239,6 @@ public class BufferArray extends PlainArray<Double> {
         myBuffer = buffer;
         myFile = file;
 
-        if (file != null) {
-            Cleaner.create(this, () -> {
-                try {
-                    file.close();
-                } catch (final IOException exception) {
-                    exception.printStackTrace();
-                }
-            });
-        }
     }
 
     public void close() {
@@ -429,12 +441,12 @@ public class BufferArray extends PlainArray<Double> {
 
     @Override
     void modify(final long extIndex, final int intIndex, final Access1D<Double> left, final BinaryFunction<Double> function) {
-        // TODO Auto-generated method stub
+        myBuffer.put(intIndex, function.invoke(left.doubleValue(extIndex), myBuffer.get(intIndex)));
     }
 
     @Override
     void modify(final long extIndex, final int intIndex, final BinaryFunction<Double> function, final Access1D<Double> right) {
-        // TODO Auto-generated method stub
+        myBuffer.put(intIndex, function.invoke(myBuffer.get(intIndex), right.doubleValue(extIndex)));
     }
 
     @Override
