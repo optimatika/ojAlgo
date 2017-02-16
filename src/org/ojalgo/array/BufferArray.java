@@ -108,8 +108,13 @@ public abstract class BufferArray extends PlainArray<Double> {
     public static final DenseArray.Factory<Double> DIRECT32 = new DenseArray.Factory<Double>() {
 
         @Override
+        long getCapacityLimit() {
+            return MAX_ARRAY_SIZE / FLOAT_ELEMENT_SIZE;
+        }
+
+        @Override
         long getElementSize() {
-            return JavaType.FLOAT.memory();
+            return FLOAT_ELEMENT_SIZE;
         }
 
         @Override
@@ -129,8 +134,13 @@ public abstract class BufferArray extends PlainArray<Double> {
     public static final DenseArray.Factory<Double> DIRECT64 = new DenseArray.Factory<Double>() {
 
         @Override
+        long getCapacityLimit() {
+            return MAX_ARRAY_SIZE / DOUBLE_ELEMENT_SIZE;
+        }
+
+        @Override
         long getElementSize() {
-            return JavaType.DOUBLE.memory();
+            return DOUBLE_ELEMENT_SIZE;
         }
 
         @Override
@@ -146,6 +156,9 @@ public abstract class BufferArray extends PlainArray<Double> {
         }
 
     };
+
+    static final long DOUBLE_ELEMENT_SIZE = JavaType.DOUBLE.memory();
+    static final long FLOAT_ELEMENT_SIZE = JavaType.FLOAT.memory();
 
     public static Array1D<Double> make(final File file, final long count) {
         return BufferArray.create(file, count).asArray1D();
@@ -183,7 +196,7 @@ public abstract class BufferArray extends PlainArray<Double> {
 
             final FileChannel tmpFileChannel = tmpRandomAccessFile.getChannel();
 
-            final long tmpSize = JavaType.DOUBLE.memory() * tmpCount;
+            final long tmpSize = DOUBLE_ELEMENT_SIZE * tmpCount;
 
             if (tmpCount > (1L << 8)) {
 
@@ -193,13 +206,13 @@ public abstract class BufferArray extends PlainArray<Double> {
 
                     @Override
                     long getElementSize() {
-                        return JavaType.DOUBLE.memory();
+                        return DOUBLE_ELEMENT_SIZE;
                     }
 
                     @Override
                     PlainArray<Double> make(final long size) {
 
-                        final long tmpSize2 = size * JavaType.DOUBLE.memory();
+                        final long tmpSize2 = size * DOUBLE_ELEMENT_SIZE;
                         try {
 
                             final MappedByteBuffer tmpMap = tmpFileChannel.map(MapMode.READ_WRITE, offset, tmpSize2);

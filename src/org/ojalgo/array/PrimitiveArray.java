@@ -22,7 +22,6 @@
 package org.ojalgo.array;
 
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
 public abstract class PrimitiveArray extends PlainArray<Double> {
@@ -35,13 +34,13 @@ public abstract class PrimitiveArray extends PlainArray<Double> {
         }
 
         @Override
-        PlainArray<Double> make(final long size) {
-            return (PlainArray<Double>) Primitive64Array.FACTORY.make(size);
+        DenseArray<Double> make(final long size) {
+            return Primitive64Array.FACTORY.make(size);
         }
 
         @Override
         Scalar<Double> zero() {
-            return PrimitiveScalar.ZERO;
+            return Primitive64Array.FACTORY.zero();
         }
 
     };

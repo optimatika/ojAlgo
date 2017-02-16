@@ -54,6 +54,15 @@ import org.ojalgo.netio.ASCII;
 public final class Hardware extends AbstractMachine implements Comparable<Hardware> {
 
     /**
+     * Cache-line size is (typically) 64 bytes
+     */
+    public static final long CPU_CACHE_LINE_SIZE = 64L;
+    /**
+     * Practically all architectures/Os:s have a page size of 4k (one notable exception is Solaris/SPARC that
+     * have 8k)
+     */
+    public static final long OS_MEMORY_PAGE_SIZE = 4L * K;
+    /**
      * Should contain all available hardware in ascending "power" order.
      */
     public static final TreeSet<Hardware> PREDEFINED = new TreeSet<>();

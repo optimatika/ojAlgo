@@ -21,43 +21,46 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.TestUtils;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * NumberListTest
- *
- * @author apete
- */
-public class NumberListTest extends ArrayTests {
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.random.Uniform;
 
-    public NumberListTest() {
+public class DirectCleanupTest {
+
+    static final AtomicInteger COUNTER = new AtomicInteger();
+    static final int SIZE = 134_217_728;
+
+    public static void main(final String[] args) {
+
+        DenseArray<Double> tmpOrg = BufferArray.DIRECT64.makeZero(SIZE);
+        tmpOrg.fillAll(new Uniform());
+
+        while (true) {
+
+            final DenseArray<Double> tmpCopy = BufferArray.DIRECT64.makeZero(SIZE);
+
+            long start = System.nanoTime();
+            tmpCopy.fillMatching(tmpOrg);
+            long stop = System.nanoTime();
+
+            tmpOrg = tmpCopy;
+
+            BasicLogger.debug("Copied {} times. Last copy took {}ms", COUNTER.incrementAndGet(), ((stop - start) / 1_000_000));
+
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                System.gc();
+            } catch (InterruptedException exception) {
+                exception.printStackTrace();
+            }
+        }
+
+    }
+
+    public DirectCleanupTest() {
         super();
-    }
-
-    public NumberListTest(final String aName) {
-        super(aName);
-    }
-
-    public void testGrowCapacity() {
-
-        final NumberList<Double> tmNumberList = NumberList.factory(Primitive64Array.FACTORY).make();
-
-        TestUtils.assertEquals(0L, tmNumberList.count());
-        TestUtils.assertEquals(16L, tmNumberList.capacity());
-
-        for (long i = 0L; i <= 16; i++) {
-            tmNumberList.add(i);
-        }
-
-        TestUtils.assertEquals(17L, tmNumberList.count());
-        TestUtils.assertEquals(32L, tmNumberList.capacity());
-
-        for (long i = 17L; i <= 16_384L; i++) {
-            tmNumberList.add(i);
-        }
-
-        TestUtils.assertEquals(16_385L, tmNumberList.count());
-        TestUtils.assertEquals(16_384L * 2L, tmNumberList.capacity());
     }
 
 }

@@ -87,15 +87,13 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
         return this.makeStructuredZero(SPARSE_SEGMENTATION_LIMIT, count);
     }
 
-    abstract long getElementSize();
-
-    abstract long getMaxCount();
+    abstract long getCapacityLimit();
 
     final SegmentedArray<N> makeSegmented(final long... structure) {
 
         final long tmpTotalCount = AccessUtils.count(structure);
 
-        final int tmpMax = PrimitiveMath.powerOf2Smaller(Math.min(tmpTotalCount, this.getMaxCount()));
+        final int tmpMax = PrimitiveMath.powerOf2Smaller(Math.min(tmpTotalCount, this.getCapacityLimit()));
         final int tmpMin = PrimitiveMath.powerOf2Larger(tmpTotalCount / DenseArray.MAX_ARRAY_SIZE);
 
         if (tmpMin > tmpMax) {

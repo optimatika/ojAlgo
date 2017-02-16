@@ -12,12 +12,26 @@ import org.ojalgo.scalar.Scalar;
  */
 final class DenseStrategy<N extends Number> {
 
-    static long DEFAULT = 16_384L;
-    static long MINIMAL = 16L;
+    static long CHUNK = 512L;
+    static long INITIAL = 16L;
+    static long SEGMENT = 16_384L;
 
-    private long myChunk = DEFAULT;
+    static int capacity(final long count) {
+
+        double tmpInitialCapacity = count;
+
+        while (tmpInitialCapacity > DenseArray.MAX_ARRAY_SIZE) {
+            tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
+        }
+
+        tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
+        return 2 * (int) tmpInitialCapacity;
+    }
+
+    private long myChunk = CHUNK;
     private final DenseArray.Factory<N> myDenseFactory;
-    private long myInitial = MINIMAL;
+    private long myInitial = INITIAL;
+    private long mySegment = SEGMENT;
 
     DenseStrategy(final DenseArray.Factory<N> denseFactory) {
 
@@ -33,8 +47,8 @@ final class DenseStrategy<N extends Number> {
     }
 
     DenseStrategy<N> chunk(final long chunk) {
-        final int power = PrimitiveMath.powerOf2Smaller(chunk);
-        myChunk = Math.max(MINIMAL, 1L << power);
+        final int power = PrimitiveMath.powerOf2Smaller(Math.min(chunk, mySegment));
+        myChunk = Math.max(INITIAL, 1L << power);
         return this;
     }
 
@@ -50,7 +64,7 @@ final class DenseStrategy<N extends Number> {
 
         if (required >= myChunk) {
             while (retVal < required) {
-                required += myChunk;
+                retVal += myChunk;
             }
         } else {
             long maybe = retVal / 2L;
@@ -67,13 +81,20 @@ final class DenseStrategy<N extends Number> {
         return (int) myInitial;
     }
 
+    /**
+     * Enforced to be 1 &lt;= initial
+     */
     DenseStrategy<N> initial(final long initial) {
-        myInitial = Math.max(MINIMAL, initial);
+        myInitial = Math.max(1, initial);
         return this;
     }
 
     boolean isChunked(final long count) {
         return count >= myChunk;
+    }
+
+    boolean isSegmented(final long count) {
+        return count >= mySegment;
     }
 
     DenseArray<N> make(final long size) {
@@ -88,6 +109,10 @@ final class DenseStrategy<N extends Number> {
         return this.make(myInitial);
     }
 
+    DenseArray<N> makeSegment() {
+        return this.make(mySegment);
+    }
+
     SegmentedArray<N> makeSegmented(final BasicArray<N> segment) {
         if (segment.count() == myChunk) {
             return myDenseFactory.wrapAsSegments(segment, this.makeChunk());
@@ -96,20 +121,14 @@ final class DenseStrategy<N extends Number> {
         }
     }
 
-    Scalar<N> zero() {
-        return myDenseFactory.zero();
+    DenseStrategy<N> segment(final long segment) {
+        final int power = PrimitiveMath.powerOf2Smaller(Math.max(myChunk, segment));
+        mySegment = Math.max(INITIAL, 1L << power);
+        return this;
     }
 
-    static int capacity(final long count) {
-
-        double tmpInitialCapacity = count;
-
-        while (tmpInitialCapacity > DenseArray.MAX_ARRAY_SIZE) {
-            tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
-        }
-
-        tmpInitialCapacity = PrimitiveFunction.SQRT.invoke(tmpInitialCapacity);
-        return 2 * (int) tmpInitialCapacity;
+    Scalar<N> zero() {
+        return myDenseFactory.zero();
     }
 
 }

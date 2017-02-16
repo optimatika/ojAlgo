@@ -661,8 +661,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
                 final long[] tmpIndices = new long[tmpCapacity];
                 final DenseArray<N> tmpValues = myStrategy.make(tmpCapacity);
 
-                System.err.println("SparseArray grew to " + tmpCapacity);
-
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = myIndices[i];
                     tmpValues.set(i, myValues.doubleValue(i));
@@ -713,8 +711,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
                 final int tmpCapacity = myStrategy.grow(myIndices.length);
                 final long[] tmpIndices = new long[tmpCapacity];
                 final DenseArray<N> tmpValues = myStrategy.make(tmpCapacity);
-
-                System.err.println("SparseArray grew to " + tmpCapacity);
 
                 for (int i = 0; i < tmpInsInd; i++) {
                     tmpIndices[i] = myIndices[i];

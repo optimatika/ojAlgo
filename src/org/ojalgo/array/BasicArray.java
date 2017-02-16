@@ -61,12 +61,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         abstract DenseArray.Factory<N> dense();
 
         @Override
-        final long getElementSize() {
-            return this.dense().getElementSize();
-        }
-
-        @Override
-        long getMaxCount() {
+        final long getCapacityLimit() {
             return Long.MAX_VALUE;
         }
 
@@ -97,7 +92,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             final long tmpTotal = AccessUtils.count(structure);
 
             final DenseArray.Factory<N> tmpDense = this.dense();
-            final long tmpLimit = Math.min(segmentationLimit, tmpDense.getMaxCount());
+            final long tmpLimit = Math.min(segmentationLimit, tmpDense.getCapacityLimit());
             if (tmpTotal > tmpLimit) {
                 return tmpDense.makeSegmented(structure);
             } else {

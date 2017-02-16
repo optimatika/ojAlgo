@@ -146,10 +146,10 @@ public final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
         mySegments = (BasicArray<N>[]) new BasicArray<?>[tmpTotalNumberOfSegments];
         for (int s = 0; s < tmpNumberOfUniformSegments; s++) {
-            mySegments[s] = segmentFactory.makeStructuredZero(segmentFactory.getMaxCount(), tmpSegmentSize);
+            mySegments[s] = segmentFactory.makeStructuredZero(segmentFactory.getCapacityLimit(), tmpSegmentSize);
         }
         if (tmpRemainder != 0L) {
-            mySegments[tmpNumberOfUniformSegments] = segmentFactory.makeStructuredZero(segmentFactory.getMaxCount(), tmpRemainder);
+            mySegments[tmpNumberOfUniformSegments] = segmentFactory.makeStructuredZero(segmentFactory.getCapacityLimit(), tmpRemainder);
         }
 
         mySegmentSize = tmpSegmentSize;

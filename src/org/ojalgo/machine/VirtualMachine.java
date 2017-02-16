@@ -29,11 +29,8 @@ import org.ojalgo.netio.BasicLogger;
 public final class VirtualMachine extends AbstractMachine {
 
     private static final String AMD64 = "amd64";
-
     private static final String I386 = "i386";
-
     private static final String X86 = "x86";
-
     private static final String X86_64 = "x86_64";
 
     public static String getArchitecture() {

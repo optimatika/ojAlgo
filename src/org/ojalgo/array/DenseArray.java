@@ -41,9 +41,11 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
     public static abstract class Factory<N extends Number> extends ArrayFactory<N, DenseArray<N>> {
 
         @Override
-        long getMaxCount() {
+        long getCapacityLimit() {
             return MAX_ARRAY_SIZE;
         }
+
+        abstract long getElementSize();
 
         abstract DenseArray<N> make(long size);
 
@@ -52,8 +54,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            final long tmpLimit = Math.min(segmentationLimit, this.getMaxCount());
-            if (tmpTotal > tmpLimit) {
+            if (tmpTotal > this.getCapacityLimit()) {
 
                 throw new IllegalArgumentException();
 
@@ -68,8 +69,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            final long tmpLimit = Math.min(segmentationLimit, this.getMaxCount());
-            if (tmpTotal > tmpLimit) {
+            if (tmpTotal > this.getCapacityLimit()) {
 
                 throw new IllegalArgumentException();
 
@@ -85,7 +85,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
 
     /**
      * Exists as a private constant in {@link ArrayList}. The Oracle JVM seems to actually be limited at
-     * Integer.MAX_VALUE - 2 but other JVM:s may have different limits.
+     * Integer.MAX_VALUE - 2, but other JVM:s may have different limits.
      */
     public static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
