@@ -58,7 +58,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         private static final long DENSE_LIMIT = 1024L;
         private static final int INITIAL_CAPACITY = DenseStrategy.capacity(DENSE_LIMIT);
 
-        abstract DenseArray.Factory<N> dense();
+        abstract DenseStrategy<N> strategy();
 
         @Override
         final long getCapacityLimit() {
@@ -77,11 +77,11 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
             } else if (tmpTotal <= DENSE_LIMIT) {
 
-                return this.dense().makeStructuredZero(DenseArray.MAX_ARRAY_SIZE, structure);
+                return this.strategy().make(tmpTotal);
 
             } else {
 
-                return new SparseArray<>(tmpTotal, new DenseStrategy<>(this.dense()).initial(INITIAL_CAPACITY));
+                return new SparseArray<>(tmpTotal, this.strategy().initial(INITIAL_CAPACITY));
             }
         }
 
@@ -91,10 +91,10 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            final DenseArray.Factory<N> tmpDense = this.dense();
-            final long tmpLimit = Math.min(segmentationLimit, tmpDense.getCapacityLimit());
-            if (tmpTotal > tmpLimit) {
-                return tmpDense.makeSegmented(structure);
+            final DenseStrategy<N> tmpDense = this.strategy();
+
+            if (tmpDense.isSegmented(tmpTotal)) {
+                return tmpDense.makeSegmented(tmpTotal);
             } else {
                 return tmpDense.make(tmpTotal);
             }
@@ -105,8 +105,8 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        DenseArray.Factory<BigDecimal> dense() {
-            return BigArray.FACTORY;
+        DenseStrategy<BigDecimal> strategy() {
+            return new DenseStrategy<>(BigArray.FACTORY);
         }
 
     };
@@ -114,8 +114,8 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        DenseArray.Factory<ComplexNumber> dense() {
-            return ComplexArray.FACTORY;
+        DenseStrategy<ComplexNumber> strategy() {
+            return new DenseStrategy<>(ComplexArray.FACTORY);
         }
 
     };
@@ -123,8 +123,8 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     static final Factory<Double> PRIMITIVE = new Factory<Double>() {
 
         @Override
-        DenseArray.Factory<Double> dense() {
-            return Primitive64Array.FACTORY;
+        DenseStrategy<Double> strategy() {
+            return new DenseStrategy<>(Primitive64Array.FACTORY);
         }
 
     };
@@ -132,8 +132,8 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
-        DenseArray.Factory<Quaternion> dense() {
-            return QuaternionArray.FACTORY;
+        DenseStrategy<Quaternion> strategy() {
+            return new DenseStrategy<>(QuaternionArray.FACTORY);
         }
 
     };
@@ -141,8 +141,8 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
-        DenseArray.Factory<RationalNumber> dense() {
-            return RationalArray.FACTORY;
+        DenseStrategy<RationalNumber> strategy() {
+            return new DenseStrategy<>(RationalArray.FACTORY);
         }
 
     };
@@ -151,8 +151,8 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         return new BasicArray.Factory<N>() {
 
             @Override
-            DenseArray.Factory<N> dense() {
-                return denseFactory;
+            DenseStrategy<N> strategy() {
+                return new DenseStrategy<N>(denseFactory);
             }
 
         };

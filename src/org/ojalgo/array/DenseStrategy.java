@@ -17,6 +17,9 @@ final class DenseStrategy<N extends Number> {
     static long INITIAL = 16L;
     static long SEGMENT = 16_384L;
 
+    /**
+     * Will suggest an initial capacity (for a SparseArray) given the total count.
+     */
     static int capacity(final long count) {
 
         double tmpInitialCapacity = count;
@@ -40,13 +43,11 @@ final class DenseStrategy<N extends Number> {
 
         myDenseFactory = denseFactory;
 
-        mySegment = this.alignToMemoryPages((OjAlgoUtils.ENVIRONMENT.cache / 2L) / denseFactory.getElementSize());
-    }
+        final long tmpHalfTopLevelCacheElements = (OjAlgoUtils.ENVIRONMENT.cache / 2L) / denseFactory.getElementSize();
+        this.segment(tmpHalfTopLevelCacheElements);
 
-    private long alignToMemoryPages(long numberOfElements) {
-        long tmpElementsPerPage = Hardware.OS_MEMORY_PAGE_SIZE / myDenseFactory.getElementSize();
-        final long tmpNumberOfPages = Math.max(1L, numberOfElements / tmpElementsPerPage);
-        return tmpElementsPerPage * tmpNumberOfPages;
+        final long tmpMemoryPageElements = Hardware.OS_MEMORY_PAGE_SIZE / denseFactory.getElementSize();
+        this.chunk(tmpMemoryPageElements);
     }
 
     DenseStrategy<N> chunk(final long chunk) {
@@ -56,12 +57,12 @@ final class DenseStrategy<N extends Number> {
     }
 
     int grow(final int current) {
-        return (int) grow((long) current);
+        return (int) this.grow((long) current);
     }
 
     long grow(final long current) {
 
-        long required = current + 1L;
+        final long required = current + 1L;
 
         long retVal = myChunk;
 
@@ -93,11 +94,11 @@ final class DenseStrategy<N extends Number> {
     }
 
     boolean isChunked(final long count) {
-        return count >= myChunk;
+        return count > myChunk;
     }
 
     boolean isSegmented(final long count) {
-        return count >= mySegment;
+        return count > mySegment;
     }
 
     DenseArray<N> make(final long size) {
@@ -124,11 +125,17 @@ final class DenseStrategy<N extends Number> {
         }
     }
 
+    SegmentedArray<N> makeSegmented(final long count) {
+        return myDenseFactory.makeSegmented(count);
+    }
+
     /**
      * Will be set to a multiple of {@link Hardware#OS_MEMORY_PAGE_SIZE} amd not {@code 0L}.
      */
     DenseStrategy<N> segment(final long segment) {
-        mySegment = this.alignToMemoryPages(Math.max(myChunk, segment));
+        final long tmpElementsPerPage = Hardware.OS_MEMORY_PAGE_SIZE / myDenseFactory.getElementSize();
+        final long tmpNumberOfPages = Math.max(1L, Math.max(myChunk, segment) / tmpElementsPerPage);
+        mySegment = tmpElementsPerPage * tmpNumberOfPages;
         return this;
     }
 
