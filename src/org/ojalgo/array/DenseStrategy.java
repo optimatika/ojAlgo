@@ -1,8 +1,9 @@
 package org.ojalgo.array;
 
+import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.random.Distribution;
+import org.ojalgo.machine.Hardware;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -38,12 +39,14 @@ final class DenseStrategy<N extends Number> {
         super();
 
         myDenseFactory = denseFactory;
+
+        mySegment = this.alignToMemoryPages((OjAlgoUtils.ENVIRONMENT.cache / 2L) / denseFactory.getElementSize());
     }
 
-    DenseStrategy<N> capacity(final Distribution expected) {
-        final long stdDev = (long) expected.getStandardDeviation();
-        final long exp = (long) expected.getExpected();
-        return this.chunk(stdDev).initial(exp + stdDev);
+    private long alignToMemoryPages(long numberOfElements) {
+        long tmpElementsPerPage = Hardware.OS_MEMORY_PAGE_SIZE / myDenseFactory.getElementSize();
+        final long tmpNumberOfPages = Math.max(1L, numberOfElements / tmpElementsPerPage);
+        return tmpElementsPerPage * tmpNumberOfPages;
     }
 
     DenseStrategy<N> chunk(final long chunk) {
@@ -82,7 +85,7 @@ final class DenseStrategy<N extends Number> {
     }
 
     /**
-     * Enforced to be 1 &lt;= initial
+     * Enforced to be &gt;= 1
      */
     DenseStrategy<N> initial(final long initial) {
         myInitial = Math.max(1, initial);
@@ -121,9 +124,11 @@ final class DenseStrategy<N extends Number> {
         }
     }
 
+    /**
+     * Will be set to a multiple of {@link Hardware#OS_MEMORY_PAGE_SIZE} amd not {@code 0L}.
+     */
     DenseStrategy<N> segment(final long segment) {
-        final int power = PrimitiveMath.powerOf2Smaller(Math.max(myChunk, segment));
-        mySegment = Math.max(INITIAL, 1L << power);
+        mySegment = this.alignToMemoryPages(Math.max(myChunk, segment));
         return this;
     }
 
