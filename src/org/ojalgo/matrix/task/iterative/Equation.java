@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.PhysicalStore;
 
@@ -44,14 +45,14 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     public Equation(final int row, final long numberOfColumns, final double rhs) {
         super();
         index = row;
-        myElements = SparseArray.makePrimitive(numberOfColumns);
+        myElements = SparseArray.make(Primitive64Array.FACTORY, numberOfColumns);
         myRHS = rhs;
     }
 
     public Equation(final int row, final long numberOfColumns, final double rhs, final int numberOfNonzeros) {
         super();
         index = row;
-        myElements = SparseArray.makePrimitive(numberOfColumns, numberOfNonzeros);
+        myElements = SparseArray.make(Primitive64Array.FACTORY, numberOfColumns, numberOfNonzeros);
         myRHS = rhs;
     }
 

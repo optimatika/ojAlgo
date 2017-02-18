@@ -52,7 +52,7 @@ final class Tableau implements Access2D<Double>, Mutate2D {
 
         myRows = new SparseArray[numberOfConstraints];
         for (int r = 0; r < numberOfConstraints; r++) {
-            myRows[r] = SparseArray.makePrimitive(myNumberOfVariables, 4);
+            myRows[r] = SparseArray.make(Primitive64Array.FACTORY, myNumberOfVariables, 4);
         }
         myRHS = Primitive64Array.make((int) myNumberOfConstraints);
         myWeights = Primitive64Array.make((int) myNumberOfVariables);

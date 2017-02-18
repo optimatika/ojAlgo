@@ -29,6 +29,9 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.ElementView2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.array.BigArray;
+import org.ojalgo.array.ComplexArray;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -59,15 +62,15 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     public static final SparseStore.Factory<Double> PRIMITIVE = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
 
     public static SparseStore<BigDecimal> makeBig(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.makeBig(rowsCount * columnsCount));
+        return new SparseStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.make(BigArray.FACTORY, (long) (rowsCount * columnsCount)));
     }
 
     public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.makeComplex(rowsCount * columnsCount));
+        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.make(ComplexArray.FACTORY, (long) (rowsCount * columnsCount)));
     }
 
     public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.makePrimitive(rowsCount * columnsCount));
+        return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.make(Primitive64Array.FACTORY, (long) (rowsCount * columnsCount)));
     }
 
     private final SparseArray<N> myElements;
