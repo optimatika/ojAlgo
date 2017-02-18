@@ -40,24 +40,37 @@ public class NumberListTest extends ArrayTests {
 
     public void testGrowCapacity() {
 
+        final DenseStrategy<Double> tmpStrategy = new DenseStrategy<>(Primitive64Array.FACTORY);
+
+        final long initial = tmpStrategy.initial();
+        final long chunk = tmpStrategy.chunk();
+
         final NumberList<Double> tmNumberList = NumberList.factory(Primitive64Array.FACTORY).make();
 
         TestUtils.assertEquals(0L, tmNumberList.count());
-        TestUtils.assertEquals(16L, tmNumberList.capacity());
 
-        for (long i = 0L; i <= 16; i++) {
+        for (long i = 0L; i <= initial; i++) {
+            TestUtils.assertEquals(initial, tmNumberList.capacity());
             tmNumberList.add(i);
         }
+        TestUtils.assertEquals(initial * 2L, tmNumberList.capacity());
 
-        TestUtils.assertEquals(17L, tmNumberList.count());
-        TestUtils.assertEquals(32L, tmNumberList.capacity());
+        TestUtils.assertEquals(initial + 1L, tmNumberList.count());
 
-        for (long i = 17L; i <= 16_384L; i++) {
+        for (long i = initial + 1L; i <= chunk; i++) {
             tmNumberList.add(i);
         }
+        TestUtils.assertEquals(chunk * 2L, tmNumberList.capacity());
 
-        TestUtils.assertEquals(16_385L, tmNumberList.count());
-        TestUtils.assertEquals(16_384L * 2L, tmNumberList.capacity());
+        TestUtils.assertEquals(chunk + 1L, tmNumberList.count());
+
+        for (long i = 0L; i < chunk; i++) {
+            tmNumberList.add(i);
+        }
+        TestUtils.assertEquals(chunk * 3L, tmNumberList.capacity());
+
+        TestUtils.assertEquals((2L * chunk) + 1L, tmNumberList.count());
+
     }
 
 }

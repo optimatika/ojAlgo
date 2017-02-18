@@ -28,6 +28,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.blas.AMAX;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -55,8 +56,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     public static abstract class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 
-        private static final long DENSE_LIMIT = 1024L;
-        private static final int INITIAL_CAPACITY = DenseStrategy.capacity(DENSE_LIMIT);
+        private static final long SPARSE_SEGMENTATION_LIMIT = PrimitiveMath.POWERS_OF_2[46];
 
         abstract DenseStrategy<N> strategy();
 
@@ -66,37 +66,43 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         }
 
         @Override
-        final BasicArray<N> makeStructuredZero(final long segmentationLimit, final long... structure) {
-            // Typically sparse
+        final BasicArray<N> makeStructuredZero(final long... structure) {
+            // Typically sparse, very large are also segmented, and very small are dense
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            if (tmpTotal > segmentationLimit) {
+            final DenseStrategy<N> tmpStrategy = this.strategy();
+
+            if (tmpTotal > SPARSE_SEGMENTATION_LIMIT) {
 
                 return this.makeSegmented(structure);
 
-            } else if (tmpTotal <= DENSE_LIMIT) {
+            } else if (tmpStrategy.isChunked(tmpTotal)) {
 
-                return this.strategy().make(tmpTotal);
+                return new SparseArray<>(tmpTotal, tmpStrategy);
 
             } else {
 
-                return new SparseArray<>(tmpTotal, this.strategy().initial(INITIAL_CAPACITY));
+                return tmpStrategy.make(tmpTotal);
             }
+
         }
 
         @Override
-        final BasicArray<N> makeToBeFilled(final long segmentationLimit, final long... structure) {
+        final BasicArray<N> makeToBeFilled(final long... structure) {
             // Always dense, but maybe segmented
 
             final long tmpTotal = AccessUtils.count(structure);
 
-            final DenseStrategy<N> tmpDense = this.strategy();
+            final DenseStrategy<N> tmpStrategy = this.strategy();
 
-            if (tmpDense.isSegmented(tmpTotal)) {
-                return tmpDense.makeSegmented(tmpTotal);
+            if (tmpStrategy.isSegmented(tmpTotal)) {
+
+                return tmpStrategy.makeSegmented(tmpTotal);
+
             } else {
-                return tmpDense.make(tmpTotal);
+
+                return tmpStrategy.make(tmpTotal);
             }
         }
 

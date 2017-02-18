@@ -50,7 +50,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
         abstract DenseArray<N> make(long size);
 
         @Override
-        final DenseArray<N> makeStructuredZero(final long segmentationLimit, final long... structure) {
+        final DenseArray<N> makeStructuredZero(final long... structure) {
 
             final long tmpTotal = AccessUtils.count(structure);
 
@@ -65,7 +65,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
         }
 
         @Override
-        final DenseArray<N> makeToBeFilled(final long segmentationLimit, final long... structure) {
+        final DenseArray<N> makeToBeFilled(final long... structure) {
 
             final long tmpTotal = AccessUtils.count(structure);
 

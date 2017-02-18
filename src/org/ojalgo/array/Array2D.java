@@ -54,7 +54,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpColumns = source.length;
             final long tmpRows = source[0].count();
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
 
             if (tmpDelegate.isPrimitive()) {
                 long tmpIndex = 0L;
@@ -82,7 +82,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpColumns = source.length;
             final int tmpRows = source[0].length;
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
@@ -101,7 +101,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpColumns = source.length;
             final int tmpRows = source[0].size();
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
@@ -119,7 +119,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpColumns = source.length;
             final int tmpRows = source[0].length;
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
@@ -138,7 +138,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         public final Array2D<N> makeEye(final long rows, final long columns) {
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeStructuredZero(DenseArray.MAX_ARRAY_SIZE, rows, columns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeStructuredZero(rows, columns);
 
             final long tmpLimit = Math.min(rows, columns);
 
@@ -152,7 +152,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         public final Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, rows, columns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(rows, columns);
 
             long tmpIndex = 0L;
             for (long j = 0L; j < columns; j++) {
@@ -165,7 +165,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         }
 
         public final Array2D<N> makeZero(final long rows, final long columns) {
-            return this.delegate().makeStructuredZero(DenseArray.MAX_ARRAY_SIZE, rows, columns).asArray2D(rows);
+            return this.delegate().makeStructuredZero(rows, columns).asArray2D(rows);
         }
 
         public final Array2D<N> rows(final Access1D<?>... source) {
@@ -173,7 +173,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpRows = source.length;
             final long tmpColumns = source[0].count();
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
 
             if (tmpDelegate.isPrimitive()) {
                 for (int i = 0; i < tmpRows; i++) {
@@ -199,7 +199,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpRows = source.length;
             final int tmpColumns = source[0].length;
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
                 final double[] tmpRow = source[i];
@@ -217,7 +217,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpRows = source.length;
             final int tmpColumns = source[0].size();
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
                 final List<? extends Number> tmpRow = source[i];
@@ -234,7 +234,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpRows = source.length;
             final int tmpColumns = source[0].length;
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(DenseArray.MAX_ARRAY_SIZE, tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
                 final Number[] tmpRow = source[i];

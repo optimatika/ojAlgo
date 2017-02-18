@@ -32,19 +32,16 @@ import org.ojalgo.function.NullaryFunction;
 
 abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends Object implements Factory1D<BasicArray<N>> {
 
-    private static final long DENSE_SEGMENTATION_LIMIT = DenseArray.MAX_ARRAY_SIZE;
-    private static final long SPARSE_SEGMENTATION_LIMIT = DenseStrategy.capacity(DenseArray.MAX_ARRAY_SIZE);
-
     public final I copy(final Access1D<?> source) {
         final long tmpCount = source.count();
-        final I retVal = this.makeToBeFilled(DENSE_SEGMENTATION_LIMIT, tmpCount);
+        final I retVal = this.makeToBeFilled(tmpCount);
         retVal.fillMatching(source);
         return retVal;
     }
 
     public final I copy(final double... source) {
         final int tmpLength = source.length;
-        final I retVal = this.makeToBeFilled(DENSE_SEGMENTATION_LIMIT, tmpLength);
+        final I retVal = this.makeToBeFilled(tmpLength);
         for (int i = 0; i < tmpLength; i++) {
             retVal.set(i, source[i]);
         }
@@ -53,7 +50,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
 
     public final I copy(final List<? extends Number> source) {
         final int tmpSize = source.size();
-        final I retVal = this.makeToBeFilled(DENSE_SEGMENTATION_LIMIT, tmpSize);
+        final I retVal = this.makeToBeFilled(tmpSize);
         for (int i = 0; i < tmpSize; i++) {
             retVal.set(i, source.get(i));
         }
@@ -62,7 +59,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
 
     public final I copy(final Number... source) {
         final int tmpLength = source.length;
-        final I retVal = this.makeToBeFilled(DENSE_SEGMENTATION_LIMIT, tmpLength);
+        final I retVal = this.makeToBeFilled(tmpLength);
         for (int i = 0; i < tmpLength; i++) {
             retVal.set(i, source[i]);
         }
@@ -70,7 +67,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
     }
 
     public final I makeFilled(final long count, final NullaryFunction<?> supplier) {
-        final I retVal = this.makeToBeFilled(DENSE_SEGMENTATION_LIMIT, count);
+        final I retVal = this.makeToBeFilled(count);
         if (retVal.isPrimitive()) {
             for (long i = 0L; i < count; i++) {
                 retVal.set(i, supplier.doubleValue());
@@ -84,7 +81,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
     }
 
     public final I makeZero(final long count) {
-        return this.makeStructuredZero(SPARSE_SEGMENTATION_LIMIT, count);
+        return this.makeStructuredZero(count);
     }
 
     abstract long getCapacityLimit();
@@ -100,14 +97,14 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
             throw new IllegalArgumentException();
         }
 
-        final int tmpUse = Math.max(tmpMin, tmpMax - Math.min(OjAlgoUtils.ENVIRONMENT.cores, 10));
+        final int tmpUse = Math.max(tmpMin, tmpMax - OjAlgoUtils.ENVIRONMENT.cores);
 
         return new SegmentedArray<>(tmpTotalCount, tmpUse, this);
     }
 
-    abstract I makeStructuredZero(long segmentationLimit, final long... structure);
+    abstract I makeStructuredZero(final long... structure);
 
-    abstract I makeToBeFilled(long segmentationLimit, final long... structure);
+    abstract I makeToBeFilled(final long... structure);
 
     /**
      * There are several requirements on the segments:

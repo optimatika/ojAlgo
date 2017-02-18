@@ -50,6 +50,10 @@ final class DenseStrategy<N extends Number> {
         this.chunk(tmpMemoryPageElements);
     }
 
+    long chunk() {
+        return myChunk;
+    }
+
     DenseStrategy<N> chunk(final long chunk) {
         final int power = PrimitiveMath.powerOf2Smaller(Math.min(chunk, mySegment));
         myChunk = Math.max(INITIAL, 1L << power);
@@ -118,7 +122,7 @@ final class DenseStrategy<N extends Number> {
     }
 
     SegmentedArray<N> makeSegmented(final BasicArray<N> segment) {
-        if (segment.count() == myChunk) {
+        if (segment.count() == mySegment) {
             return myDenseFactory.wrapAsSegments(segment, this.makeChunk());
         } else {
             throw new IllegalStateException();
@@ -127,6 +131,10 @@ final class DenseStrategy<N extends Number> {
 
     SegmentedArray<N> makeSegmented(final long count) {
         return myDenseFactory.makeSegmented(count);
+    }
+
+    long segment() {
+        return mySegment;
     }
 
     /**
