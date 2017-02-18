@@ -13,22 +13,31 @@ abstract class BuilderFactory<N extends Number, I extends Access1D<N>, BF extend
         myStrategy = new DenseStrategy<N>(denseFactory);
     }
 
-    public abstract I make();
-
-    DenseStrategy<N> getStrategy() {
-        return myStrategy;
+    /**
+     * @param chunk Defines the capacity break point. Below this point the capacity is doubled when needed.
+     *        Above it, it is grown by adding one "chunk" at the time.
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public BF chunk(final long chunk) {
+        myStrategy.chunk(chunk);
+        return (BF) this;
     }
 
+    /**
+     * @param initial Sets the initial capacity.
+     * @return this
+     */
     @SuppressWarnings("unchecked")
-    public BF initial(long initial) {
+    public BF initial(final long initial) {
         myStrategy.initial(initial);
         return (BF) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public BF chunk(long chunk) {
-        myStrategy.chunk(chunk);
-        return (BF) this;
+    public abstract I make();
+
+    DenseStrategy<N> getStrategy() {
+        return myStrategy;
     }
 
 }
