@@ -34,11 +34,11 @@ abstract class SelectingStore<N extends Number> extends LogicalStore<N> {
 
     @Override
     public void supplyTo(final ElementsConsumer<N> receiver) {
-        this.addNonZerosTo(receiver);
+        this.addNonzerosTo(receiver);
     }
 
     @Override
-    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillMatching(this);
     }
 

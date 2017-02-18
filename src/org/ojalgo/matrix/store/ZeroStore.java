@@ -98,7 +98,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
     }
 
 }

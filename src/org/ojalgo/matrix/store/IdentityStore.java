@@ -99,7 +99,7 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillDiagonal(0L, 0L, this.physical().scalar().one().getNumber());
     }
 

@@ -76,7 +76,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
 
     @Override
     public void supplyTo(final ElementsConsumer<N> receiver) {
-        this.addNonZerosTo(receiver);
+        this.addNonzerosTo(receiver);
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
@@ -89,7 +89,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
     }
 
     @Override
-    protected void addNonZerosTo(final ElementsConsumer<N> consumer) {
+    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillOne(0L, 0L, myNumber);
     }
 

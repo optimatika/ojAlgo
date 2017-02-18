@@ -83,7 +83,7 @@ abstract class DelegatingStore<N extends Number> extends LogicalStore<N> {
 
     @Override
     public void supplyTo(final ElementsConsumer<N> receiver) {
-        this.addNonZerosTo(receiver);
+        this.addNonzerosTo(receiver);
     }
 
     protected final Future<MatrixStore<N>> executeMultiplyLeftOnBase(final Access1D<N> left) {
