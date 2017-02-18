@@ -84,11 +84,38 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     };
 
-    public static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+    public static final Factory<Double> DIRECT32 = new Factory<Double>() {
 
         @Override
         BasicArray.Factory<Double> delegate() {
-            return BasicArray.PRIMITIVE;
+            return BasicArray.DIRECT32;
+        }
+
+    };
+
+    public static final Factory<Double> DIRECT64 = new Factory<Double>() {
+
+        @Override
+        BasicArray.Factory<Double> delegate() {
+            return BasicArray.DIRECT64;
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE32 = new Factory<Double>() {
+
+        @Override
+        BasicArray.Factory<Double> delegate() {
+            return BasicArray.PRIMITIVE32;
+        }
+
+    };
+
+    public static final Factory<Double> PRIMITIVE64 = new Factory<Double>() {
+
+        @Override
+        BasicArray.Factory<Double> delegate() {
+            return BasicArray.PRIMITIVE64;
         }
 
     };
@@ -110,6 +137,12 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         }
 
     };
+
+    /**
+     * @deprecated v43 Use {@link #PRIMITIVE64} instead
+     */
+    @Deprecated
+    public static final Factory<Double> PRIMITIVE = PRIMITIVE64;
 
     public static <N extends Number> ArrayAnyD.Factory<N> factory(final DenseArray.Factory<N> delegate) {
 

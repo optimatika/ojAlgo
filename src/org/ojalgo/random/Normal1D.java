@@ -36,7 +36,7 @@ public final class Normal1D extends RandomNumber1D {
         final int tmpDim = (int) covariances.countRows();
 
         final Array2D<Double> retVal = Array2D.PRIMITIVE.makeZero(tmpDim, tmpDim);
-        final Array1D<Double> tmpStdDev = Array1D.PRIMITIVE.makeZero(tmpDim);
+        final Array1D<Double> tmpStdDev = Array1D.PRIMITIVE64.makeZero(tmpDim);
 
         for (int ij = 0; ij < tmpDim; ij++) {
             tmpStdDev.set(ij, PrimitiveFunction.SQRT.invoke(covariances.doubleValue(ij, ij)));
@@ -68,8 +68,8 @@ public final class Normal1D extends RandomNumber1D {
 
         final int tmpDim = (int) covariances.countRows();
 
-        myLocations = Array1D.PRIMITIVE.copy(locations);
-        myScales = Array1D.PRIMITIVE.makeZero(tmpDim);
+        myLocations = Array1D.PRIMITIVE64.copy(locations);
+        myScales = Array1D.PRIMITIVE64.makeZero(tmpDim);
         for (int ij = 0; ij < tmpDim; ij++) {
             myScales.set(ij, PrimitiveFunction.SQRT.invoke(covariances.doubleValue(ij, ij)));
         }

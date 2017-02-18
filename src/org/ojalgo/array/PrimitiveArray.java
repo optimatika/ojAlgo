@@ -26,6 +26,10 @@ import org.ojalgo.scalar.Scalar;
 
 public abstract class PrimitiveArray extends PlainArray<Double> {
 
+    /**
+     * @deprecated v43 Use {@link Primitive64Array#FACTORY}
+     */
+    @Deprecated
     public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<Double>() {
 
         @Override

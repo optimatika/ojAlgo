@@ -334,7 +334,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
         } // while
 
         //return new PrimitiveArray(s).asArray1D();
-        return Array1D.PRIMITIVE.wrap(Primitive64Array.wrap(s));
+        return Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(s));
     }
 
     protected SVDnew32(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final BidiagonalDecomposition<N> bidiagonal) {

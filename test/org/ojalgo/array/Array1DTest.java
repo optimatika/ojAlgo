@@ -70,7 +70,7 @@ public class Array1DTest extends ArrayTests {
 
     private void doSortTest(final double[][] rows) {
 
-        final Array1D<Double> tmpExpexted = Array1D.PRIMITIVE.copy(rows[0]);
+        final Array1D<Double> tmpExpexted = Array1D.PRIMITIVE64.copy(rows[0]);
 
         final boolean tmpAscending = tmpExpexted.doubleValue(tmpExpexted.count() - 1L) > tmpExpexted.doubleValue(0L);
 

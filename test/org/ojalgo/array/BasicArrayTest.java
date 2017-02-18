@@ -69,7 +69,7 @@ public abstract class BasicArrayTest extends ArrayTests {
 
     public void testSegmentedSparse() {
         //this.doTest(SparseArray.makePrimitiveSegmented(COUNT));
-        this.doTest(BasicArray.PRIMITIVE.makeSegmented((long) COUNT));
+        this.doTest(BasicArray.PRIMITIVE64.makeSegmented((long) COUNT));
     }
 
     public void testSparse() {

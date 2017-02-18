@@ -196,7 +196,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public Array1D<Double> getSingularValues() {
-        return Array1D.PRIMITIVE.copy(myS);
+        return Array1D.PRIMITIVE64.copy(myS);
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {

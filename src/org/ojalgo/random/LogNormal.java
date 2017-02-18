@@ -43,7 +43,7 @@ public class LogNormal extends AbstractContinuous {
 
         final int tmpSize = (int) rawSamples.count();
 
-        final Array1D<Double> tmpLogSamples = Array1D.PRIMITIVE.makeZero(tmpSize);
+        final Array1D<Double> tmpLogSamples = Array1D.PRIMITIVE64.makeZero(tmpSize);
 
         for (int i = 0; i < tmpSize; i++) {
             tmpLogSamples.set(i, PrimitiveFunction.LOG.invoke(rawSamples.doubleValue(i)));

@@ -1,6 +1,7 @@
 package org.ojalgo.array;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.random.Distribution;
 
 abstract class BuilderFactory<N extends Number, I extends Access1D<N>, BF extends BuilderFactory<N, I, BF>> {
 
@@ -11,6 +12,19 @@ abstract class BuilderFactory<N extends Number, I extends Access1D<N>, BF extend
         super();
 
         myStrategy = new DenseStrategy<N>(denseFactory);
+    }
+
+    /**
+     * Updates both the initial capacity and the capacity chunk.
+     *
+     * @param countDistribution A probability distribution that estimates the count/size of the "arrays" to be
+     *        created using this factory.
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public BF capacity(final Distribution countDistribution) {
+        myStrategy.capacity(countDistribution);
+        return (BF) this;
     }
 
     /**
@@ -25,7 +39,7 @@ abstract class BuilderFactory<N extends Number, I extends Access1D<N>, BF extend
     }
 
     /**
-     * @param initial Sets the initial capacity.
+     * @param initial Sets the initial capacity of the "arrays" to be created using this factory.
      * @return this
      */
     @SuppressWarnings("unchecked")

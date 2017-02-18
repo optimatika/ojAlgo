@@ -225,7 +225,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
         //        }
 
         //return new PrimitiveArray(tmpMainDiagonal).asArray1D();
-        return Array1D.PRIMITIVE.wrap(Primitive64Array.wrap(tmpMainDiagData));
+        return Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(tmpMainDiagData));
     }
 
     private Array1D<Double> myDiagonalValues;

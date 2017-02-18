@@ -44,7 +44,7 @@ import org.ojalgo.scalar.RationalNumber;
 
 public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D {
 
-    public static class ListFactory<N extends Number> extends BuilderFactory<N, NumberList<N>, ListFactory<N>> {
+    public static final class ListFactory<N extends Number> extends BuilderFactory<N, NumberList<N>, ListFactory<N>> {
 
         ListFactory(final Factory<N> denseFactory) {
             super(denseFactory);

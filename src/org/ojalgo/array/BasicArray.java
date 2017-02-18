@@ -58,8 +58,6 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
         private static final long SPARSE_SEGMENTATION_LIMIT = PrimitiveMath.POWERS_OF_2[46];
 
-        abstract DenseStrategy<N> strategy();
-
         @Override
         final long getCapacityLimit() {
             return Long.MAX_VALUE;
@@ -106,6 +104,8 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             }
         }
 
+        abstract DenseStrategy<N> strategy();
+
     }
 
     static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
@@ -126,7 +126,34 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     };
 
-    static final Factory<Double> PRIMITIVE = new Factory<Double>() {
+    static final Factory<Double> DIRECT32 = new Factory<Double>() {
+
+        @Override
+        DenseStrategy<Double> strategy() {
+            return new DenseStrategy<>(BufferArray.DIRECT32);
+        }
+
+    };
+
+    static final Factory<Double> DIRECT64 = new Factory<Double>() {
+
+        @Override
+        DenseStrategy<Double> strategy() {
+            return new DenseStrategy<>(BufferArray.DIRECT32);
+        }
+
+    };
+
+    static final Factory<Double> PRIMITIVE32 = new Factory<Double>() {
+
+        @Override
+        DenseStrategy<Double> strategy() {
+            return new DenseStrategy<>(Primitive32Array.FACTORY);
+        }
+
+    };
+
+    static final Factory<Double> PRIMITIVE64 = new Factory<Double>() {
 
         @Override
         DenseStrategy<Double> strategy() {

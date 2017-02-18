@@ -4,6 +4,7 @@ import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.machine.Hardware;
+import org.ojalgo.random.Distribution;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -14,8 +15,8 @@ import org.ojalgo.scalar.Scalar;
 final class DenseStrategy<N extends Number> {
 
     static long CHUNK = 512L;
-    static long INITIAL = 16L;
-    static long SEGMENT = 16_384L;
+    static long INITIAL = 8L;
+    static long SEGMENT = 32_768L;
 
     /**
      * Will suggest an initial capacity (for a SparseArray) given the total count.
@@ -48,6 +49,18 @@ final class DenseStrategy<N extends Number> {
 
         final long tmpMemoryPageElements = Hardware.OS_MEMORY_PAGE_SIZE / denseFactory.getElementSize();
         this.chunk(tmpMemoryPageElements);
+    }
+
+    DenseStrategy<N> capacity(final Distribution countDistribution) {
+
+        final double expected = countDistribution.getExpected();
+        final double stdDev = countDistribution.getStandardDeviation();
+
+        this.chunk((long) stdDev);
+
+        this.initial((long) (expected - (stdDev + stdDev)));
+
+        return this;
     }
 
     long chunk() {

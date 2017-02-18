@@ -31,7 +31,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 public class PrimitivePolynomial extends AbstractPolynomial<Double> {
 
     public PrimitivePolynomial(final int aDegree) {
-        super(Array1D.PRIMITIVE.makeZero(aDegree + 1));
+        super(Array1D.PRIMITIVE64.makeZero(aDegree + 1));
     }
 
     PrimitivePolynomial(final Array1D<Double> someCoefficients) {
@@ -102,7 +102,7 @@ public class PrimitivePolynomial extends AbstractPolynomial<Double> {
 
     @Override
     protected AbstractPolynomial<Double> makeInstance(final int aSize) {
-        return new PrimitivePolynomial(Array1D.PRIMITIVE.makeZero(aSize));
+        return new PrimitivePolynomial(Array1D.PRIMITIVE64.makeZero(aSize));
     }
 
 }

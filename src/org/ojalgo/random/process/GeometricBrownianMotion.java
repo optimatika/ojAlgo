@@ -48,7 +48,7 @@ public final class GeometricBrownianMotion extends AbstractProcess<LogNormal> {
     public static GeometricBrownianMotion estimate(final Access1D<?> seriesOfSamples, final double samplePeriod) {
 
         final int tmpSizeMinusOne = (int) (seriesOfSamples.count() - 1);
-        final Array1D<Double> tmpLogDiffSeries = Array1D.PRIMITIVE.makeZero(tmpSizeMinusOne);
+        final Array1D<Double> tmpLogDiffSeries = Array1D.PRIMITIVE64.makeZero(tmpSizeMinusOne);
         for (int i = 0; i < tmpSizeMinusOne; i++) {
             tmpLogDiffSeries.set(i, PrimitiveFunction.LOG.invoke(seriesOfSamples.doubleValue(i + 1) / seriesOfSamples.doubleValue(i)));
         }

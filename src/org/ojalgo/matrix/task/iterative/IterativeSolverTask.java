@@ -145,7 +145,7 @@ abstract class IterativeSolverTask implements SolverTask<Double> {
 
     protected final void debug(final int iteration, final Access1D<?> current) {
         if (myDebugPrinter != null) {
-            myDebugPrinter.println("{}: {}", iteration, Array1D.PRIMITIVE.copy(current));
+            myDebugPrinter.println("{}: {}", iteration, Array1D.PRIMITIVE64.copy(current));
         }
     }
 

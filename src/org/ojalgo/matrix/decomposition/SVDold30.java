@@ -270,7 +270,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
         final DecompositionStore<N> tmpSimilar = this.copy(this.getBidiagonalAccessD());
         this.setD(tmpSimilar);
 
-        this.setSingularValues(Array1D.PRIMITIVE.makeZero(tmpMinDim));
+        this.setSingularValues(Array1D.PRIMITIVE64.makeZero(tmpMinDim));
 
         Rotation<N>[] tmpRotations = new Rotation[2]; // [Givens - Jacobi, Jacobi]
 

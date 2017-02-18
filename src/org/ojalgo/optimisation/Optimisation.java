@@ -372,7 +372,7 @@ public interface Optimisation {
 
         @Override
         public String toString() {
-            return myState + " " + myValue + " @ " + Array1D.PRIMITIVE.copy(mySolution);
+            return myState + " " + myValue + " @ " + Array1D.PRIMITIVE64.copy(mySolution);
         }
     }
 

@@ -247,7 +247,7 @@ public abstract class FinanceUtils {
         final double[] tmpPrices = priceSeries.getPrimitiveValues();
         final double[] tmpRiskFreeInterestRates = riskFreeInterestRateSeries.getPrimitiveValues();
 
-        final Array1D<Double> retVal = Array1D.PRIMITIVE.makeZero(tmpPrices.length - 1);
+        final Array1D<Double> retVal = Array1D.PRIMITIVE64.makeZero(tmpPrices.length - 1);
 
         final CalendarDateUnit tmpUnit = priceSeries.getResolution();
         double tmpThisRiskFree, tmpNextRiskFree, tmpAvgRiskFree, tmpRiskFreeGrowthRate, tmpThisPrice, tmpNextPrice, tmpPriceGrowthFactor, tmpPriceGrowthRate,
