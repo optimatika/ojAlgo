@@ -390,7 +390,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
             // It fits, just add to the end
 
         } else if (myStrategy.isSegmented(myActualCount)) {
-            // Doesn't fit, grow by 1 segment, then add
+            // Doesn't fit, create or grow segment, then add
 
             if (myStorage instanceof SegmentedArray) {
                 myStorage = ((SegmentedArray<N>) myStorage).grow();

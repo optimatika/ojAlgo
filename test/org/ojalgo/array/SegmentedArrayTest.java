@@ -43,7 +43,7 @@ public class SegmentedArrayTest extends ArrayTests {
 
         final long tmpCount = 5000L;
 
-        final SegmentedArray<Double> tmpArray = SegmentedArray.makePrimitiveDense(tmpCount);
+        final SegmentedArray<Double> tmpArray = Primitive64Array.FACTORY.makeSegmented(tmpCount);
 
         this.doTestGetSet(tmpArray);
 

@@ -23,7 +23,6 @@ package org.ojalgo.array;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
@@ -31,9 +30,6 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 
 /**
  * <p>
@@ -45,55 +41,7 @@ import org.ojalgo.scalar.RationalNumber;
  *
  * @author apete
  */
-public final class SegmentedArray<N extends Number> extends BasicArray<N> {
-
-    public static SegmentedArray<BigDecimal> makeBigDense(final long count) {
-        return BigArray.FACTORY.makeSegmented(count);
-    }
-
-    public static SegmentedArray<BigDecimal> makeBigSparse(final long count) {
-        return BasicArray.BIG.makeSegmented(count);
-    }
-
-    public static SegmentedArray<ComplexNumber> makeComplexDense(final long count) {
-        return ComplexArray.FACTORY.makeSegmented(count);
-    }
-
-    public static SegmentedArray<ComplexNumber> makeComplexSparse(final long count) {
-        return BasicArray.COMPLEX.makeSegmented(count);
-    }
-
-    public static <N extends Number> SegmentedArray<N> makeDense(final DenseArray.Factory<N> denseFactory, final long count) {
-        return denseFactory.makeSegmented(count);
-    }
-
-    public static SegmentedArray<Double> makePrimitiveDense(final long count) {
-        return Primitive64Array.FACTORY.makeSegmented(count);
-    }
-
-    public static SegmentedArray<Double> makePrimitiveSparse(final long count) {
-        return BasicArray.PRIMITIVE.makeSegmented(count);
-    }
-
-    public static SegmentedArray<Quaternion> makeQuaternionDense(final long count) {
-        return QuaternionArray.FACTORY.makeSegmented(count);
-    }
-
-    public static SegmentedArray<Quaternion> makeQuaternionSparse(final long count) {
-        return BasicArray.QUATERNION.makeSegmented(count);
-    }
-
-    public static SegmentedArray<RationalNumber> makeRationalDense(final long count) {
-        return RationalArray.FACTORY.makeSegmented(count);
-    }
-
-    public static SegmentedArray<RationalNumber> makeRationalSparse(final long count) {
-        return BasicArray.RATIONAL.makeSegmented(count);
-    }
-
-    public static <N extends Number> SegmentedArray<N> makeSparse(final BasicArray.Factory<N> sparseFactory, final long count) {
-        return sparseFactory.makeSegmented(count);
-    }
+final class SegmentedArray<N extends Number> extends BasicArray<N> {
 
     private final int myIndexBits;
     private final long myIndexMask;
