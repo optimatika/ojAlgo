@@ -45,7 +45,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, MutateAnyD.Fillable<N>,
+public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, MutateAnyD, MutateAnyD.Fillable<N>,
         MutateAnyD.Modifiable<N>, MutateAnyD.BiModifiable<N>, AccessAnyD.Visitable<N>, AccessAnyD.Sliceable<N>, Serializable {
 
     public static abstract class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
