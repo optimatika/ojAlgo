@@ -51,7 +51,7 @@ public abstract class BasicArrayTest extends ArrayTests {
     }
 
     public void testHugeSparse() {
-        this.doTest(SparseArray.make(Primitive64Array.FACTORY, Long.MAX_VALUE, COUNT));
+        this.doTest(SparseArray.factory(Primitive64Array.FACTORY, Long.MAX_VALUE).initial(COUNT).make());
     }
 
     public void testPrimitive32() {
@@ -73,7 +73,8 @@ public abstract class BasicArrayTest extends ArrayTests {
     }
 
     public void testSparse() {
-        this.doTest(SparseArray.make(Primitive64Array.FACTORY, (long) COUNT));
+        final long count = (long) COUNT;
+        this.doTest(SparseArray.factory(Primitive64Array.FACTORY, count).initial(DenseStrategy.capacity(count)).make());
     }
 
     abstract void doTest(final BasicArray<Double> array);

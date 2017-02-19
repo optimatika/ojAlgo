@@ -1,8 +1,9 @@
 package org.ojalgo.array;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.random.Distribution;
 
-abstract class StrategyBuilder<N extends Number, SB extends StrategyBuilder<N, SB>> {
+abstract class StrategyBuilder<N extends Number, I extends Access1D<N>, SB extends StrategyBuilder<N, I, SB>> {
 
     private final DenseStrategy<N> myStrategy;
 
@@ -50,5 +51,7 @@ abstract class StrategyBuilder<N extends Number, SB extends StrategyBuilder<N, S
     DenseStrategy<N> getStrategy() {
         return myStrategy;
     }
+
+    public abstract I make();
 
 }

@@ -62,15 +62,18 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     public static final SparseStore.Factory<Double> PRIMITIVE = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
 
     public static SparseStore<BigDecimal> makeBig(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.make(BigArray.FACTORY, (long) (rowsCount * columnsCount)));
+        return new SparseStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount,
+                SparseArray.factory(BigArray.FACTORY, rowsCount * columnsCount).initial(rowsCount + columnsCount).make());
     }
 
     public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.make(ComplexArray.FACTORY, (long) (rowsCount * columnsCount)));
+        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount,
+                SparseArray.factory(ComplexArray.FACTORY, rowsCount * columnsCount).initial(rowsCount + columnsCount).make());
     }
 
     public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.make(Primitive64Array.FACTORY, (long) (rowsCount * columnsCount)));
+        return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount,
+                SparseArray.factory(Primitive64Array.FACTORY, rowsCount * columnsCount).initial(rowsCount + columnsCount).make());
     }
 
     private final SparseArray<N> myElements;

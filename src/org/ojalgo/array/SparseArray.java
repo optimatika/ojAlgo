@@ -53,18 +53,6 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
 
-    public static final class SparseFactory<N extends Number> extends StrategyBuilder<N, SparseFactory<N>> {
-
-        SparseFactory(final DenseArray.Factory<N> denseFactory) {
-            super(denseFactory);
-        }
-
-        public SparseArray<N> make(final long count) {
-            return new SparseArray<>(count, this.getStrategy());
-        }
-
-    }
-
     public static final class NonzeroView<N extends Number> implements ElementView1D<N, NonzeroView<N>> {
 
         private int myCursor = -1;
@@ -113,54 +101,66 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     }
 
-    static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
+    public static final class SparseFactory<N extends Number> extends StrategyBuilder<N, SparseArray<N>, SparseFactory<N>> {
 
-    public static <N extends Number> SparseArray<N> make(final DenseArray.Factory<N> denseFactory, final long count) {
-        return new SparseArray<>(count, new DenseStrategy<>(denseFactory).initial(DenseStrategy.capacity(count)));
+        private final long myCount;
+
+        SparseFactory(final DenseArray.Factory<N> denseFactory, final long count) {
+            super(denseFactory);
+            myCount = count;
+        }
+
+        @Override
+        public SparseArray<N> make() {
+            return new SparseArray<>(myCount, this.getStrategy());
+        }
+
     }
 
-    public static <N extends Number> SparseArray<N> make(final DenseArray.Factory<N> denseFactory, final long count, final int initialCapacity) {
-        return new SparseArray<>(count, new DenseStrategy<>(denseFactory).initial(initialCapacity));
+    static final NumberContext MATH_CONTEXT = NumberContext.getMath(MathContext.DECIMAL64);
+
+    public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
+        return new SparseFactory<>(denseFactory, count);
     }
 
     public static SparseArray<BigDecimal> makeBig(final long count) {
-        return SparseArray.make(BigArray.FACTORY, count);
+        return SparseArray.factory(BigArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
     }
 
     public static SparseArray<BigDecimal> makeBig(final long count, final int initialCapacity) {
-        return SparseArray.make(BigArray.FACTORY, count, initialCapacity);
+        return SparseArray.factory(BigArray.FACTORY, count).initial(initialCapacity).make();
     }
 
     public static SparseArray<ComplexNumber> makeComplex(final long count) {
-        return SparseArray.make(ComplexArray.FACTORY, count);
+        return SparseArray.factory(ComplexArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
     }
 
     public static SparseArray<ComplexNumber> makeComplex(final long count, final int initialCapacity) {
-        return SparseArray.make(ComplexArray.FACTORY, count, initialCapacity);
+        return SparseArray.factory(ComplexArray.FACTORY, count).initial(initialCapacity).make();
     }
 
     public static SparseArray<Double> makePrimitive(final long count) {
-        return SparseArray.make(Primitive64Array.FACTORY, count);
+        return SparseArray.factory(Primitive64Array.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
     }
 
     public static SparseArray<Double> makePrimitive(final long count, final int initialCapacity) {
-        return SparseArray.make(Primitive64Array.FACTORY, count, initialCapacity);
+        return SparseArray.factory(Primitive64Array.FACTORY, count).initial(initialCapacity).make();
     }
 
     public static SparseArray<Quaternion> makeQuaternion(final long count) {
-        return SparseArray.make(QuaternionArray.FACTORY, count);
+        return SparseArray.factory(QuaternionArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
     }
 
     public static SparseArray<Quaternion> makeQuaternion(final long count, final int initialCapacity) {
-        return SparseArray.make(QuaternionArray.FACTORY, count, initialCapacity);
+        return SparseArray.factory(QuaternionArray.FACTORY, count).initial(initialCapacity).make();
     }
 
     public static SparseArray<RationalNumber> makeRational(final long count) {
-        return SparseArray.make(RationalArray.FACTORY, count);
+        return SparseArray.factory(RationalArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
     }
 
     public static SparseArray<RationalNumber> makeRational(final long count, final int initialCapacity) {
-        return SparseArray.make(RationalArray.FACTORY, count, initialCapacity);
+        return SparseArray.factory(RationalArray.FACTORY, count).initial(initialCapacity).make();
     }
 
     /**

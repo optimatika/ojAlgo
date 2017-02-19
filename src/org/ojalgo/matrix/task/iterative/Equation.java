@@ -45,14 +45,14 @@ public final class Equation implements Comparable<Equation>, Access1D<Double>, M
     public Equation(final int row, final long numberOfColumns, final double rhs) {
         super();
         index = row;
-        myElements = SparseArray.make(Primitive64Array.FACTORY, numberOfColumns);
+        myElements = SparseArray.factory(Primitive64Array.FACTORY, numberOfColumns).make();
         myRHS = rhs;
     }
 
     public Equation(final int row, final long numberOfColumns, final double rhs, final int numberOfNonzeros) {
         super();
         index = row;
-        myElements = SparseArray.make(Primitive64Array.FACTORY, numberOfColumns, numberOfNonzeros);
+        myElements = SparseArray.factory(Primitive64Array.FACTORY, numberOfColumns).initial(numberOfNonzeros).make();
         myRHS = rhs;
     }
 
