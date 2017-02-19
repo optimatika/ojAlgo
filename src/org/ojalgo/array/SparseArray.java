@@ -53,6 +53,18 @@ import org.ojalgo.type.context.NumberContext;
  */
 public final class SparseArray<N extends Number> extends BasicArray<N> {
 
+    public static final class SparseFactory<N extends Number> extends StrategyBuilder<N, SparseFactory<N>> {
+
+        SparseFactory(final DenseArray.Factory<N> denseFactory) {
+            super(denseFactory);
+        }
+
+        public SparseArray<N> make(final long count) {
+            return new SparseArray<>(count, this.getStrategy());
+        }
+
+    }
+
     public static final class NonzeroView<N extends Number> implements ElementView1D<N, NonzeroView<N>> {
 
         private int myCursor = -1;

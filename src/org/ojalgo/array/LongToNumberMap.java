@@ -18,13 +18,12 @@ import org.ojalgo.scalar.RationalNumber;
 
 public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N> {
 
-    public static final class MapFactory<N extends Number> extends BuilderFactory<N, LongToNumberMap<N>, MapFactory<N>> {
+    public static final class MapFactory<N extends Number> extends StrategyBuilder<N, MapFactory<N>> {
 
         MapFactory(final Factory<N> denseFactory) {
             super(denseFactory);
         }
 
-        @Override
         public LongToNumberMap<N> make() {
             return new LongToNumberMap<>(this.getStrategy());
         }

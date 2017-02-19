@@ -44,13 +44,12 @@ import org.ojalgo.scalar.RationalNumber;
 
 public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D {
 
-    public static final class ListFactory<N extends Number> extends BuilderFactory<N, NumberList<N>, ListFactory<N>> {
+    public static final class ListFactory<N extends Number> extends StrategyBuilder<N, ListFactory<N>> {
 
-        ListFactory(final Factory<N> denseFactory) {
+        ListFactory(final DenseArray.Factory<N> denseFactory) {
             super(denseFactory);
         }
 
-        @Override
         public NumberList<N> make() {
             return new NumberList<>(this.getStrategy());
         }

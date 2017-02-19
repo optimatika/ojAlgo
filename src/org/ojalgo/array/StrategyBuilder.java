@@ -1,13 +1,12 @@
 package org.ojalgo.array;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.random.Distribution;
 
-abstract class BuilderFactory<N extends Number, I extends Access1D<N>, BF extends BuilderFactory<N, I, BF>> {
+abstract class StrategyBuilder<N extends Number, SB extends StrategyBuilder<N, SB>> {
 
     private final DenseStrategy<N> myStrategy;
 
-    public BuilderFactory(final DenseArray.Factory<N> denseFactory) {
+    public StrategyBuilder(final DenseArray.Factory<N> denseFactory) {
 
         super();
 
@@ -22,9 +21,9 @@ abstract class BuilderFactory<N extends Number, I extends Access1D<N>, BF extend
      * @return this
      */
     @SuppressWarnings("unchecked")
-    public BF capacity(final Distribution countDistribution) {
+    public SB capacity(final Distribution countDistribution) {
         myStrategy.capacity(countDistribution);
-        return (BF) this;
+        return (SB) this;
     }
 
     /**
@@ -33,9 +32,9 @@ abstract class BuilderFactory<N extends Number, I extends Access1D<N>, BF extend
      * @return this
      */
     @SuppressWarnings("unchecked")
-    public BF chunk(final long chunk) {
+    public SB chunk(final long chunk) {
         myStrategy.chunk(chunk);
-        return (BF) this;
+        return (SB) this;
     }
 
     /**
@@ -43,12 +42,10 @@ abstract class BuilderFactory<N extends Number, I extends Access1D<N>, BF extend
      * @return this
      */
     @SuppressWarnings("unchecked")
-    public BF initial(final long initial) {
+    public SB initial(final long initial) {
         myStrategy.initial(initial);
-        return (BF) this;
+        return (SB) this;
     }
-
-    public abstract I make();
 
     DenseStrategy<N> getStrategy() {
         return myStrategy;
