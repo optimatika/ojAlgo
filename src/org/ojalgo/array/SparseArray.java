@@ -123,42 +123,82 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return new SparseFactory<>(denseFactory, count);
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
+     */
+    @Deprecated
     public static SparseArray<BigDecimal> makeBig(final long count) {
         return SparseArray.factory(BigArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
+     */
+    @Deprecated
     public static SparseArray<BigDecimal> makeBig(final long count, final int initialCapacity) {
         return SparseArray.factory(BigArray.FACTORY, count).initial(initialCapacity).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
+     */
+    @Deprecated
     public static SparseArray<ComplexNumber> makeComplex(final long count) {
         return SparseArray.factory(ComplexArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
+     */
+    @Deprecated
     public static SparseArray<ComplexNumber> makeComplex(final long count, final int initialCapacity) {
         return SparseArray.factory(ComplexArray.FACTORY, count).initial(initialCapacity).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
+     */
+    @Deprecated
     public static SparseArray<Double> makePrimitive(final long count) {
         return SparseArray.factory(Primitive64Array.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
+     */
+    @Deprecated
     public static SparseArray<Double> makePrimitive(final long count, final int initialCapacity) {
         return SparseArray.factory(Primitive64Array.FACTORY, count).initial(initialCapacity).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
+     */
+    @Deprecated
     public static SparseArray<Quaternion> makeQuaternion(final long count) {
         return SparseArray.factory(QuaternionArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
+     */
+    @Deprecated
     public static SparseArray<Quaternion> makeQuaternion(final long count, final int initialCapacity) {
         return SparseArray.factory(QuaternionArray.FACTORY, count).initial(initialCapacity).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
+     */
+    @Deprecated
     public static SparseArray<RationalNumber> makeRational(final long count) {
         return SparseArray.factory(RationalArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
     }
 
+    /**
+     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
+     */
+    @Deprecated
     public static SparseArray<RationalNumber> makeRational(final long count, final int initialCapacity) {
         return SparseArray.factory(RationalArray.FACTORY, count).initial(initialCapacity).make();
     }
