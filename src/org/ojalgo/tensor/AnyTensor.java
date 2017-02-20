@@ -21,21 +21,48 @@
  */
 package org.ojalgo.tensor;
 
-import org.ojalgo.access.AccessAnyD;
+import java.util.Arrays;
+
+import org.ojalgo.array.ArrayAnyD;
 import org.ojalgo.array.DenseArray;
 
-public interface Tensor<N extends Number> extends AccessAnyD<N> {
+final class AnyTensor<N extends Number> implements Tensor<N> {
 
-    static <N extends Number> Tensor<N> make(final DenseArray.Factory<N> factory, final int rank, final long dimension) {
-        return new AnyTensor<>(rank, dimension, factory);
+    private final ArrayAnyD<N> myArray;
+    private final long myDimension;
+    private final int myRank;
+    private final long[] myShape;
+
+    AnyTensor(final int rank, final long dimension, final DenseArray.Factory<N> factory) {
+
+        super();
+
+        myRank = rank;
+        myDimension = dimension;
+        myShape = new long[rank];
+        Arrays.fill(myShape, dimension);
+
+        myArray = ArrayAnyD.factory(factory).makeZero(myShape);
     }
 
-    int rank();
+    public long dimension() {
+        return myDimension;
+    }
 
-    long dimension();
+    public double doubleValue(final long[] ref) {
+        return myArray.doubleValue(ref);
+    }
 
-    default long count(final int dimension) {
-        return this.dimension();
+    public N get(final long[] ref) {
+        return myArray.get(ref);
+    }
+
+    public int rank() {
+        return myRank;
+    }
+
+    public long[] shape() {
+        return myShape;
     }
 
 }
