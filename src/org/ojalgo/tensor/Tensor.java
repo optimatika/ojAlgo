@@ -26,16 +26,16 @@ import org.ojalgo.array.DenseArray;
 
 public interface Tensor<N extends Number> extends AccessAnyD<N> {
 
-    static <N extends Number> Tensor<N> make(final DenseArray.Factory<N> factory, final int rank, final long dimension) {
-        return new AnyTensor<>(rank, dimension, factory);
+    static <N extends Number> Tensor<N> make(final DenseArray.Factory<N> factory, final int rank, final int dimensions) {
+        return new AnyTensor<>(rank, dimensions, factory);
     }
-
-    int rank();
-
-    long dimension();
 
     default long count(final int dimension) {
-        return this.dimension();
+        return this.dimensions();
     }
+
+    int dimensions();
+
+    int rank();
 
 }

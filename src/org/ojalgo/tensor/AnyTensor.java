@@ -29,24 +29,24 @@ import org.ojalgo.array.DenseArray;
 final class AnyTensor<N extends Number> implements Tensor<N> {
 
     private final ArrayAnyD<N> myArray;
-    private final long myDimension;
+    private final int myDimensions;
     private final int myRank;
     private final long[] myShape;
 
-    AnyTensor(final int rank, final long dimension, final DenseArray.Factory<N> factory) {
+    AnyTensor(final int rank, final int dimensions, final DenseArray.Factory<N> factory) {
 
         super();
 
         myRank = rank;
-        myDimension = dimension;
+        myDimensions = dimensions;
         myShape = new long[rank];
-        Arrays.fill(myShape, dimension);
+        Arrays.fill(myShape, dimensions);
 
         myArray = ArrayAnyD.factory(factory).makeZero(myShape);
     }
 
-    public long dimension() {
-        return myDimension;
+    public int dimensions() {
+        return myDimensions;
     }
 
     public double doubleValue(final long[] ref) {
