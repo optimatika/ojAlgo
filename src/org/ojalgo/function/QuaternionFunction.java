@@ -675,6 +675,16 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
     }
 
     @Override
+    public UnaryFunction<Quaternion> logistic() {
+        return LOGISTIC;
+    }
+
+    @Override
+    public UnaryFunction<Quaternion> logit() {
+        return LOGIT;
+    }
+
+    @Override
     public BinaryFunction<Quaternion> max() {
         return MAX;
     }

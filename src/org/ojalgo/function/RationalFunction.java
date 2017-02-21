@@ -674,6 +674,16 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
     }
 
     @Override
+    public UnaryFunction<RationalNumber> logistic() {
+        return LOGISTIC;
+    }
+
+    @Override
+    public UnaryFunction<RationalNumber> logit() {
+        return LOGIT;
+    }
+
+    @Override
     public BinaryFunction<RationalNumber> max() {
         return MAX;
     }

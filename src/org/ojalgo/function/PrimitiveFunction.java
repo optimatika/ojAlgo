@@ -607,6 +607,16 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
     }
 
     @Override
+    public UnaryFunction<Double> logistic() {
+        return LOGISTIC;
+    }
+
+    @Override
+    public UnaryFunction<Double> logit() {
+        return LOGIT;
+    }
+
+    @Override
     public BinaryFunction<Double> max() {
         return MAX;
     }

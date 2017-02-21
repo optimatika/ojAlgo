@@ -629,6 +629,16 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
     }
 
     @Override
+    public UnaryFunction<BigDecimal> logistic() {
+        return LOGISTIC;
+    }
+
+    @Override
+    public UnaryFunction<BigDecimal> logit() {
+        return LOGIT;
+    }
+
+    @Override
     public BinaryFunction<BigDecimal> max() {
         return MAX;
     }

@@ -22,6 +22,7 @@
 package org.ojalgo.function;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
@@ -666,6 +667,16 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     @Override
     public UnaryFunction<ComplexNumber> log1p() {
         return LOG1P;
+    }
+
+    @Override
+    public UnaryFunction<ComplexNumber> logistic() {
+        return LOGISTIC;
+    }
+
+    @Override
+    public UnaryFunction<ComplexNumber> logit() {
+        return LOGIT;
     }
 
     @Override
