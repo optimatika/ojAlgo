@@ -270,6 +270,22 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
     };
 
+    public static final Unary LOGISTIC = new Unary() {
+
+        public final double invoke(final double arg) {
+            return ONE / (ONE + Math.exp(-arg));
+        }
+
+    };
+
+    public static final Unary LOGIT = new Unary() {
+
+        public final double invoke(final double arg) {
+            return Math.log(ONE / (ONE - arg));
+        }
+
+    };
+
     public static final Binary MAX = new Binary() {
 
         @Override

@@ -314,6 +314,22 @@ public final class QuaternionFunction extends FunctionSet<Quaternion> {
 
     };
 
+    public static final Unary LOGISTIC = new Unary() {
+
+        public final Quaternion invoke(final Quaternion arg) {
+            return Quaternion.ONE.divide(Quaternion.ONE.add(EXP.invoke(arg.negate())));
+        }
+
+    };
+
+    public static final Unary LOGIT = new Unary() {
+
+        public final Quaternion invoke(final Quaternion arg) {
+            return LOG.invoke(Quaternion.ONE.divide(Quaternion.ONE.subtract(arg)));
+        }
+
+    };
+
     public static final Binary MAX = new Binary() {
 
         @Override

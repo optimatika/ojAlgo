@@ -26,7 +26,6 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Primitive64Array;

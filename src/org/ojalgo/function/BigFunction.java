@@ -262,6 +262,22 @@ public final class BigFunction extends FunctionSet<BigDecimal> {
 
     };
 
+    public static final Unary LOGISTIC = new Unary() {
+
+        public final BigDecimal invoke(final BigDecimal arg) {
+            return BigDecimal.valueOf(PrimitiveFunction.LOGISTIC.invoke(arg.doubleValue()));
+        }
+
+    };
+
+    public static final Unary LOGIT = new Unary() {
+
+        public final BigDecimal invoke(final BigDecimal arg) {
+            return BigDecimal.valueOf(PrimitiveFunction.LOGIT.invoke(arg.doubleValue()));
+        }
+
+    };
+
     public static final Binary MAX = new Binary() {
 
         @Override

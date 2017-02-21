@@ -31,7 +31,6 @@ final class AnyTensor<N extends Number> implements Tensor<N> {
     private final ArrayAnyD<N> myArray;
     private final int myDimensions;
     private final int myRank;
-    private final long[] myShape;
 
     AnyTensor(final int rank, final int dimensions, final DenseArray.Factory<N> factory) {
 
@@ -39,10 +38,10 @@ final class AnyTensor<N extends Number> implements Tensor<N> {
 
         myRank = rank;
         myDimensions = dimensions;
-        myShape = new long[rank];
-        Arrays.fill(myShape, dimensions);
+        long[] shape = new long[rank];
+        Arrays.fill(shape, dimensions);
 
-        myArray = ArrayAnyD.factory(factory).makeZero(myShape);
+        myArray = ArrayAnyD.factory(factory).makeZero(shape);
     }
 
     public int dimensions() {
@@ -62,7 +61,7 @@ final class AnyTensor<N extends Number> implements Tensor<N> {
     }
 
     public long[] shape() {
-        return myShape;
+        return myArray.shape();
     }
 
 }

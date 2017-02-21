@@ -318,6 +318,22 @@ public final class RationalFunction extends FunctionSet<RationalNumber> {
         }
     };
 
+    public static final Unary LOGISTIC = new Unary() {
+
+        public final RationalNumber invoke(final RationalNumber arg) {
+            return RationalNumber.valueOf(BigFunction.LOGISTIC.invoke(arg.toBigDecimal()));
+        }
+
+    };
+
+    public static final Unary LOGIT = new Unary() {
+
+        public final RationalNumber invoke(final RationalNumber arg) {
+            return RationalNumber.valueOf(BigFunction.LOGIT.invoke(arg.toBigDecimal()));
+        }
+
+    };
+
     public static final Binary MAX = new Binary() {
 
         @Override

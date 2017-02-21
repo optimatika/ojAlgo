@@ -21,7 +21,7 @@
  */
 package org.ojalgo.function;
 
-import org.ojalgo.constant.PrimitiveMath;
+import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.context.NumberContext;
@@ -81,7 +81,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final Unary ACOSH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return LOG.invoke(arg.add(SQRT.invoke(arg.multiply(arg).subtract(PrimitiveMath.ONE))));
+            return LOG.invoke(arg.add(SQRT.invoke(arg.multiply(arg).subtract(ONE))));
         }
 
     };
@@ -113,7 +113,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final ComplexNumber tmpNmbr = arg.multiply(arg).add(PrimitiveMath.ONE);
+            final ComplexNumber tmpNmbr = arg.multiply(arg).add(ONE);
 
             return LOG.invoke(arg.add(SQRT.invoke(tmpNmbr)));
         }
@@ -126,7 +126,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
             final ComplexNumber tmpNmbr = ComplexNumber.I.add(arg).divide(ComplexNumber.I.subtract(arg));
 
-            return LOG.invoke(tmpNmbr).multiply(ComplexNumber.I).divide(PrimitiveMath.TWO);
+            return LOG.invoke(tmpNmbr).multiply(ComplexNumber.I).divide(TWO);
         }
 
     };
@@ -143,9 +143,9 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
-            final ComplexNumber tmpNmbr = arg.add(PrimitiveMath.ONE).divide(ComplexNumber.ONE.subtract(arg));
+            final ComplexNumber tmpNmbr = arg.add(ONE).divide(ComplexNumber.ONE.subtract(arg));
 
-            return LOG.invoke(tmpNmbr).divide(PrimitiveMath.TWO);
+            return LOG.invoke(tmpNmbr).divide(TWO);
         }
 
     };
@@ -153,7 +153,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final Unary CARDINALITY = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return PrimitiveScalar.isSmall(PrimitiveMath.ONE, arg.norm()) ? ComplexNumber.ZERO : ComplexNumber.ONE;
+            return PrimitiveScalar.isSmall(ONE, arg.norm()) ? ComplexNumber.ZERO : ComplexNumber.ONE;
         }
 
     };
@@ -163,7 +163,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
             final double retMod = PrimitiveFunction.CBRT.invoke(arg.norm());
-            final double retArg = arg.phase() * PrimitiveMath.THIRD;
+            final double retArg = arg.phase() * THIRD;
 
             return ComplexNumber.makePolar(retMod, retArg);
         }
@@ -200,7 +200,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final Unary COSH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return (EXP.invoke(arg).add(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
+            return (EXP.invoke(arg).add(EXP.invoke(arg.negate()))).divide(TWO);
         }
 
     };
@@ -302,6 +302,24 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
     };
 
+    public static final Unary LOGISTIC = new Unary() {
+
+        public final ComplexNumber invoke(final ComplexNumber arg) {
+            // return ONE / (ONE + Math.exp(-arg));
+            return ComplexNumber.ONE.divide(ComplexNumber.ONE.add(EXP.invoke(arg.negate())));
+        }
+
+    };
+
+    public static final Unary LOGIT = new Unary() {
+
+        public final ComplexNumber invoke(final ComplexNumber arg) {
+            // return Math.log(ONE / (ONE - arg));
+            return LOG.invoke(ComplexNumber.ONE.divide(ComplexNumber.ONE.subtract(arg)));
+        }
+
+    };
+
     public static final Binary MAX = new Binary() {
 
         @Override
@@ -395,7 +413,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
 
             if (param != 0) {
 
-                final double tmpExp = PrimitiveMath.ONE / param;
+                final double tmpExp = ONE / param;
 
                 final double retMod = PrimitiveFunction.POW.invoke(arg.norm(), tmpExp);
                 final double retArg = arg.phase() * tmpExp;
@@ -440,7 +458,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
     public static final Unary SINH = new Unary() {
 
         public final ComplexNumber invoke(final ComplexNumber arg) {
-            return (EXP.invoke(arg).subtract(EXP.invoke(arg.negate()))).divide(PrimitiveMath.TWO);
+            return (EXP.invoke(arg).subtract(EXP.invoke(arg.negate()))).divide(TWO);
         }
 
     };
@@ -450,7 +468,7 @@ public final class ComplexFunction extends FunctionSet<ComplexNumber> {
         public final ComplexNumber invoke(final ComplexNumber arg) {
 
             final double retMod = PrimitiveFunction.SQRT.invoke(arg.norm());
-            final double retArg = arg.phase() * PrimitiveMath.HALF;
+            final double retArg = arg.phase() * HALF;
 
             return ComplexNumber.makePolar(retMod, retArg);
         }
