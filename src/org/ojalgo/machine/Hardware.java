@@ -252,9 +252,23 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
+     * <li>Core i7-2600 3.4 GHz - 4 cores - 8 threads (Vostro-460 @ Scila)
+     * <ul>
+     * <li></li>
+     * <li>1 processor</li>
+     * <li>4 cores per processor</li>
+     * <li>2 threads per core</li>
+     * <li>==>> Total 8 threads</li>
+     * <li></li>
+     * <li>32GB system RAM</li>
+     * <li>8MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
      * </ul>
      */
-    static final Hardware X86_64__08 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(11L * K * K * K, 8), new BasicMachine(8L * K * K, 8),
+    static final Hardware X86_64__08 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(32L * K * K * K, 8), new BasicMachine(8L * K * K, 8),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**

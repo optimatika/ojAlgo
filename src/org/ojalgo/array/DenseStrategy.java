@@ -69,7 +69,7 @@ final class DenseStrategy<N extends Number> {
 
     DenseStrategy<N> chunk(final long chunk) {
         final int power = PrimitiveMath.powerOf2Smaller(Math.min(chunk, mySegment));
-        myChunk = Math.max(INITIAL, 1L << power);
+        myChunk = 1L << power;
         return this;
     }
 
@@ -150,13 +150,9 @@ final class DenseStrategy<N extends Number> {
         return mySegment;
     }
 
-    /**
-     * Will be set to a multiple of {@link Hardware#OS_MEMORY_PAGE_SIZE} amd not {@code 0L}.
-     */
     DenseStrategy<N> segment(final long segment) {
-        final long tmpElementsPerPage = Hardware.OS_MEMORY_PAGE_SIZE / myDenseFactory.getElementSize();
-        final long tmpNumberOfPages = Math.max(1L, Math.max(myChunk, segment) / tmpElementsPerPage);
-        mySegment = tmpElementsPerPage * tmpNumberOfPages;
+        final int power = PrimitiveMath.powerOf2Smaller(Math.max(myChunk, segment));
+        mySegment = 1L << power;
         return this;
     }
 
