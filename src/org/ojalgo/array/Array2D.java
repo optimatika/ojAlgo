@@ -271,7 +271,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         @Override
         BasicArray.Factory<BigDecimal> delegate() {
-            return BasicArray.BIG;
+            return BasicArray.factory(BigArray.FACTORY);
         }
 
     };
@@ -280,7 +280,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         @Override
         BasicArray.Factory<ComplexNumber> delegate() {
-            return BasicArray.COMPLEX;
+            return BasicArray.factory(ComplexArray.FACTORY);
         }
 
     };
@@ -289,7 +289,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         @Override
         BasicArray.Factory<Double> delegate() {
-            return BasicArray.DIRECT32;
+            return BasicArray.factory(BufferArray.DIRECT32);
         }
 
     };
@@ -298,7 +298,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         @Override
         BasicArray.Factory<Double> delegate() {
-            return BasicArray.DIRECT64;
+            return BasicArray.factory(BufferArray.DIRECT64);
         }
 
     };
@@ -307,7 +307,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         @Override
         BasicArray.Factory<Double> delegate() {
-            return BasicArray.PRIMITIVE32;
+            return BasicArray.factory(Primitive32Array.FACTORY);
         }
 
     };
@@ -316,7 +316,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         @Override
         BasicArray.Factory<Double> delegate() {
-            return BasicArray.PRIMITIVE64;
+            return BasicArray.factory(Primitive64Array.FACTORY);
         }
 
     };
@@ -325,7 +325,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         @Override
         BasicArray.Factory<Quaternion> delegate() {
-            return BasicArray.QUATERNION;
+            return BasicArray.factory(QuaternionArray.FACTORY);
         }
 
     };
@@ -334,7 +334,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         @Override
         BasicArray.Factory<RationalNumber> delegate() {
-            return BasicArray.RATIONAL;
+            return BasicArray.factory(RationalArray.FACTORY);
         }
 
     };

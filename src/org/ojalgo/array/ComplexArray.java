@@ -54,11 +54,6 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
         }
 
         @Override
-        Scalar<ComplexNumber> zero() {
-            return ComplexNumber.ZERO;
-        }
-
-        @Override
         public FunctionSet<ComplexNumber> function() {
             return ComplexFunction.getSet();
         }

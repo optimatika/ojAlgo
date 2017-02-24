@@ -226,7 +226,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         myIndices = new long[strategy.initial()];
         myValues = strategy.makeInitial();
 
-        myZeroScalar = strategy.zero();
+        myZeroScalar = strategy.scalar().zero();
         myZeroNumber = myZeroScalar.getNumber();
         myZeroValue = myZeroNumber.doubleValue();
     }

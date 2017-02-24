@@ -35,6 +35,8 @@ import org.ojalgo.scalar.Scalar;
 
 abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends Object implements Factory1D<BasicArray<N>> {
 
+    public abstract AggregatorSet<N> aggregator();
+
     public final I copy(final Access1D<?> source) {
         final long tmpCount = source.count();
         final I retVal = this.makeToBeFilled(tmpCount);
@@ -69,6 +71,8 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
         return retVal;
     }
 
+    public abstract FunctionSet<N> function();
+
     public final I makeFilled(final long count, final NullaryFunction<?> supplier) {
         final I retVal = this.makeToBeFilled(count);
         if (retVal.isPrimitive()) {
@@ -86,6 +90,8 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
     public final I makeZero(final long count) {
         return this.makeStructuredZero(count);
     }
+
+    public abstract Scalar.Factory<N> scalar();
 
     abstract long getCapacityLimit();
 
@@ -123,11 +129,5 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
     final SegmentedArray<N> wrapAsSegments(final BasicArray<N>... segments) {
         return new SegmentedArray<>(segments, this);
     }
-
-    public abstract FunctionSet<N> function();
-
-    public abstract AggregatorSet<N> aggregator();
-
-    public abstract Scalar.Factory<N> scalar();
 
 }

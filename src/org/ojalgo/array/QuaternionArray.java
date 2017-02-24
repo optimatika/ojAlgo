@@ -54,11 +54,6 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
         }
 
         @Override
-        Scalar<Quaternion> zero() {
-            return Quaternion.ZERO;
-        }
-
-        @Override
         public FunctionSet<Quaternion> function() {
             return QuaternionFunction.getSet();
         }

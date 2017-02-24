@@ -22,8 +22,6 @@
 package org.ojalgo.array;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
@@ -36,9 +34,6 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.netio.ASCII;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -57,9 +52,31 @@ import org.ojalgo.scalar.Scalar;
 public abstract class BasicArray<N extends Number> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Mutate1D,
         Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Serializable {
 
-    public static abstract class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
+    public static final class Factory<N extends Number> extends ArrayFactory<N, BasicArray<N>> {
 
         private static final long SPARSE_SEGMENTATION_LIMIT = PrimitiveMath.POWERS_OF_2[46];
+
+        private final DenseArray.Factory<N> myDenseFactory;
+
+        Factory(org.ojalgo.array.DenseArray.Factory<N> denseFactory) {
+            super();
+            myDenseFactory = denseFactory;
+        }
+
+        @Override
+        public final AggregatorSet<N> aggregator() {
+            return myDenseFactory.aggregator();
+        }
+
+        @Override
+        public final FunctionSet<N> function() {
+            return myDenseFactory.function();
+        }
+
+        @Override
+        public final Scalar.Factory<N> scalar() {
+            return myDenseFactory.scalar();
+        }
 
         @Override
         final long getCapacityLimit() {
@@ -107,106 +124,14 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             }
         }
 
-        abstract DenseStrategy<N> strategy();
-
-        @Override
-        public final FunctionSet<N> function() {
-            return this.strategy().function();
-        }
-
-        @Override
-        public final AggregatorSet<N> aggregator() {
-            return this.strategy().aggregator();
-        }
-
-        @Override
-        public final Scalar.Factory<N> scalar() {
-            return this.strategy().scalar();
+        DenseStrategy<N> strategy() {
+            return new DenseStrategy<>(myDenseFactory);
         }
 
     }
 
-    static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
-
-        @Override
-        DenseStrategy<BigDecimal> strategy() {
-            return new DenseStrategy<>(BigArray.FACTORY);
-        }
-
-    };
-
-    static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        @Override
-        DenseStrategy<ComplexNumber> strategy() {
-            return new DenseStrategy<>(ComplexArray.FACTORY);
-        }
-
-    };
-
-    static final Factory<Double> DIRECT32 = new Factory<Double>() {
-
-        @Override
-        DenseStrategy<Double> strategy() {
-            return new DenseStrategy<>(BufferArray.DIRECT32);
-        }
-
-    };
-
-    static final Factory<Double> DIRECT64 = new Factory<Double>() {
-
-        @Override
-        DenseStrategy<Double> strategy() {
-            return new DenseStrategy<>(BufferArray.DIRECT32);
-        }
-
-    };
-
-    static final Factory<Double> PRIMITIVE32 = new Factory<Double>() {
-
-        @Override
-        DenseStrategy<Double> strategy() {
-            return new DenseStrategy<>(Primitive32Array.FACTORY);
-        }
-
-    };
-
-    static final Factory<Double> PRIMITIVE64 = new Factory<Double>() {
-
-        @Override
-        DenseStrategy<Double> strategy() {
-            return new DenseStrategy<>(Primitive64Array.FACTORY);
-        }
-
-    };
-
-    static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
-
-        @Override
-        DenseStrategy<Quaternion> strategy() {
-            return new DenseStrategy<>(QuaternionArray.FACTORY);
-        }
-
-    };
-
-    static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
-
-        @Override
-        DenseStrategy<RationalNumber> strategy() {
-            return new DenseStrategy<>(RationalArray.FACTORY);
-        }
-
-    };
-
     public static <N extends Number> BasicArray.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
-        return new BasicArray.Factory<N>() {
-
-            @Override
-            DenseStrategy<N> strategy() {
-                return new DenseStrategy<N>(denseFactory);
-            }
-
-        };
+        return new BasicArray.Factory<N>(denseFactory);
     }
 
     protected BasicArray() {

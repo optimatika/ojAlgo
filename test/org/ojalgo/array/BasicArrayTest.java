@@ -69,11 +69,11 @@ public abstract class BasicArrayTest extends ArrayTests {
 
     public void testSegmentedSparse() {
         //this.doTest(SparseArray.makePrimitiveSegmented(COUNT));
-        this.doTest(BasicArray.PRIMITIVE64.makeSegmented((long) COUNT));
+        this.doTest(BasicArray.factory(Primitive64Array.FACTORY).makeSegmented(COUNT));
     }
 
     public void testSparse() {
-        final long count = (long) COUNT;
+        final long count = COUNT;
         this.doTest(SparseArray.factory(Primitive64Array.FACTORY, count).initial(DenseStrategy.capacity(count)).make());
     }
 

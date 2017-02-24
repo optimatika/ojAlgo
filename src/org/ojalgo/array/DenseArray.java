@@ -27,7 +27,6 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.scalar.Scalar;
 
 /**
  * <p>
@@ -78,8 +77,6 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
                 return this.make(tmpTotal);
             }
         }
-
-        abstract Scalar<N> zero();
 
     }
 

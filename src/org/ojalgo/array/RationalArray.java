@@ -54,11 +54,6 @@ public class RationalArray extends ScalarArray<RationalNumber> {
         }
 
         @Override
-        Scalar<RationalNumber> zero() {
-            return RationalNumber.ZERO;
-        }
-
-        @Override
         public FunctionSet<RationalNumber> function() {
             return RationalFunction.getSet();
         }

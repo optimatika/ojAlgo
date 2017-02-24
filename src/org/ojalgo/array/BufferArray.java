@@ -129,11 +129,6 @@ public abstract class BufferArray extends PlainArray<Double> {
         }
 
         @Override
-        Scalar<Double> zero() {
-            return PrimitiveScalar.ZERO;
-        }
-
-        @Override
         public FunctionSet<Double> function() {
             return PrimitiveFunction.getSet();
         }
@@ -167,11 +162,6 @@ public abstract class BufferArray extends PlainArray<Double> {
             final int tmpSize = (int) size;
             final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect(tmpSize * 8);
             return new DoubleBufferArray(tmpAllocateDirect.asDoubleBuffer(), null);
-        }
-
-        @Override
-        Scalar<Double> zero() {
-            return PrimitiveScalar.ZERO;
         }
 
         @Override
@@ -257,11 +247,6 @@ public abstract class BufferArray extends PlainArray<Double> {
                         } finally {
                             offset += tmpSize2;
                         }
-                    }
-
-                    @Override
-                    PrimitiveScalar zero() {
-                        return PrimitiveScalar.ZERO;
                     }
 
                     @Override

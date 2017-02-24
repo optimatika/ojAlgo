@@ -7,7 +7,6 @@ import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.machine.Hardware;
 import org.ojalgo.random.Distribution;
-import org.ojalgo.scalar.Scalar;
 import org.ojalgo.scalar.Scalar.Factory;
 
 /**
@@ -169,10 +168,6 @@ final class DenseStrategy<N extends Number> {
         final int power = PrimitiveMath.powerOf2Smaller(Math.max(myChunk, segment));
         mySegment = 1L << power;
         return this;
-    }
-
-    Scalar<N> zero() {
-        return myDenseFactory.zero();
     }
 
 }

@@ -61,11 +61,6 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         }
 
         @Override
-        Scalar<BigDecimal> zero() {
-            return BigScalar.ZERO;
-        }
-
-        @Override
         public FunctionSet<BigDecimal> function() {
             return BigFunction.getSet();
         }

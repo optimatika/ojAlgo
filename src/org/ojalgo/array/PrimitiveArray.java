@@ -48,11 +48,6 @@ public abstract class PrimitiveArray extends PlainArray<Double> {
         }
 
         @Override
-        Scalar<Double> zero() {
-            return Primitive64Array.FACTORY.zero();
-        }
-
-        @Override
         public FunctionSet<Double> function() {
             return PrimitiveFunction.getSet();
         }

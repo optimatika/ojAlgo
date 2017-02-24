@@ -70,11 +70,6 @@ public class Primitive64Array extends PrimitiveArray {
         }
 
         @Override
-        Scalar<Double> zero() {
-            return PrimitiveScalar.ZERO;
-        }
-
-        @Override
         public FunctionSet<Double> function() {
             return PrimitiveFunction.getSet();
         }
