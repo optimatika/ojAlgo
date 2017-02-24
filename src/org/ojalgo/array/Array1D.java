@@ -53,61 +53,57 @@ import org.ojalgo.scalar.Scalar;
 public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D,
         Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
 
-    public static abstract class Factory<N extends Number> implements Factory1D<Array1D<N>> {
+    public static final class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
-        private transient BasicArray.Factory<N> myDelegate = null;
+        private final BasicArray.Factory<N> myDelegate;
+
+        Factory(final DenseArray.Factory<N> denseArray) {
+            super();
+            myDelegate = BasicArray.factory(denseArray);
+        }
 
         @Override
         public final AggregatorSet<N> aggregator() {
-            return this.delegate().aggregator();
+            return myDelegate.aggregator();
         }
 
         public final Array1D<N> copy(final Access1D<?> source) {
-            return this.delegate().copy(source).asArray1D();
+            return myDelegate.copy(source).asArray1D();
         }
 
         public final Array1D<N> copy(final double... source) {
-            return this.delegate().copy(source).asArray1D();
+            return myDelegate.copy(source).asArray1D();
         }
 
         public final Array1D<N> copy(final List<? extends Number> source) {
-            return this.delegate().copy(source).asArray1D();
+            return myDelegate.copy(source).asArray1D();
         }
 
         public final Array1D<N> copy(final Number... source) {
-            return this.delegate().copy(source).asArray1D();
+            return myDelegate.copy(source).asArray1D();
         }
 
         @Override
         public final FunctionSet<N> function() {
-            return this.delegate().function();
+            return myDelegate.function();
         }
 
         public final Array1D<N> makeFilled(final long count, final NullaryFunction<?> supplier) {
-            return this.delegate().makeFilled(count, supplier).asArray1D();
+            return myDelegate.makeFilled(count, supplier).asArray1D();
         }
 
         public final Array1D<N> makeZero(final long count) {
-            return this.delegate().makeZero(count).asArray1D();
+            return myDelegate.makeZero(count).asArray1D();
         }
 
         @Override
         public final Scalar.Factory<N> scalar() {
-            return this.delegate().scalar();
+            return myDelegate.scalar();
         }
 
         public final Array1D<N> wrap(final BasicArray<N> array) {
             return array.asArray1D();
         }
-
-        private final BasicArray.Factory<N> delegate() {
-            if (myDelegate == null) {
-                myDelegate = this.makeDelegate();
-            }
-            return myDelegate;
-        }
-
-        abstract BasicArray.Factory<N> makeDelegate();
 
     }
 
@@ -233,77 +229,14 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
-
-        @Override
-        BasicArray.Factory<BigDecimal> makeDelegate() {
-            return BasicArray.factory(BigArray.FACTORY);
-        }
-
-    };
-
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        @Override
-        BasicArray.Factory<ComplexNumber> makeDelegate() {
-            return BasicArray.factory(ComplexArray.FACTORY);
-        }
-
-    };
-
-    public static final Factory<Double> DIRECT32 = new Factory<Double>() {
-
-        @Override
-        BasicArray.Factory<Double> makeDelegate() {
-            return BasicArray.factory(BufferArray.DIRECT32);
-        }
-
-    };
-
-    public static final Factory<Double> DIRECT64 = new Factory<Double>() {
-
-        @Override
-        BasicArray.Factory<Double> makeDelegate() {
-            return BasicArray.factory(BufferArray.DIRECT64);
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE32 = new Factory<Double>() {
-
-        @Override
-        BasicArray.Factory<Double> makeDelegate() {
-            return BasicArray.factory(Primitive32Array.FACTORY);
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE64 = new Factory<Double>() {
-
-        @Override
-        BasicArray.Factory<Double> makeDelegate() {
-            return BasicArray.factory(Primitive64Array.FACTORY);
-        }
-
-    };
-
-    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
-
-        @Override
-        BasicArray.Factory<Quaternion> makeDelegate() {
-            return BasicArray.factory(QuaternionArray.FACTORY);
-        }
-
-    };
-
-    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
-
-        @Override
-        BasicArray.Factory<RationalNumber> makeDelegate() {
-            return BasicArray.factory(RationalArray.FACTORY);
-        }
-
-    };
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>(BigArray.FACTORY);
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>(ComplexArray.FACTORY);
+    public static final Factory<Double> DIRECT32 = new Factory<Double>(BufferArray.DIRECT32);
+    public static final Factory<Double> DIRECT64 = new Factory<Double>(BufferArray.DIRECT64);
+    public static final Factory<Double> PRIMITIVE32 = new Factory<Double>(Primitive32Array.FACTORY);
+    public static final Factory<Double> PRIMITIVE64 = new Factory<Double>(Primitive64Array.FACTORY);
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>(QuaternionArray.FACTORY);
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>(RationalArray.FACTORY);
 
     /**
      * @deprecated v43 Use {@link #PRIMITIVE64} instead
@@ -311,16 +244,8 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     @Deprecated
     public static final Factory<Double> PRIMITIVE = PRIMITIVE64;
 
-    public static <N extends Number> Array1D.Factory<N> factory(final DenseArray.Factory<N> delegate) {
-
-        return new Array1D.Factory<N>() {
-
-            @Override
-            BasicArray.Factory<N> makeDelegate() {
-                return BasicArray.factory(delegate);
-            }
-
-        };
+    public static <N extends Number> Array1D.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
+        return new Array1D.Factory<N>(denseFactory);
     }
 
     public final long length;

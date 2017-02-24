@@ -49,13 +49,18 @@ import org.ojalgo.scalar.Scalar;
 public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N>,
         Mutate2D.BiModifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Mutate2D.Special<N>, Serializable {
 
-    public static abstract class Factory<N extends Number> implements Factory2D<Array2D<N>> {
+    public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
-        private transient BasicArray.Factory<N> myDelegate = null;
+        private final BasicArray.Factory<N> myDelegate;
+
+        Factory(final DenseArray.Factory<N> denseArray) {
+            super();
+            myDelegate = BasicArray.factory(denseArray);
+        }
 
         @Override
         public final AggregatorSet<N> aggregator() {
-            return this.delegate().aggregator();
+            return myDelegate.aggregator();
         }
 
         public final Array2D<N> columns(final Access1D<?>... source) {
@@ -63,7 +68,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpColumns = source.length;
             final long tmpRows = source[0].count();
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             if (tmpDelegate.isPrimitive()) {
                 long tmpIndex = 0L;
@@ -91,7 +96,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpColumns = source.length;
             final int tmpRows = source[0].length;
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
@@ -110,7 +115,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpColumns = source.length;
             final int tmpRows = source[0].size();
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
@@ -128,7 +133,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpColumns = source.length;
             final int tmpRows = source[0].length;
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             long tmpIndex = 0L;
             for (int j = 0; j < tmpColumns; j++) {
@@ -142,17 +147,17 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         }
 
         public final Array2D<N> copy(final Access2D<?> source) {
-            return this.delegate().copy(source).asArray2D(source.countRows());
+            return myDelegate.copy(source).asArray2D(source.countRows());
         }
 
         @Override
         public final FunctionSet<N> function() {
-            return this.delegate().function();
+            return myDelegate.function();
         }
 
         public final Array2D<N> makeEye(final long rows, final long columns) {
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeStructuredZero(rows, columns);
+            final BasicArray<N> tmpDelegate = myDelegate.makeStructuredZero(rows, columns);
 
             final long tmpLimit = Math.min(rows, columns);
 
@@ -166,7 +171,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         public final Array2D<N> makeFilled(final long rows, final long columns, final NullaryFunction<?> supplier) {
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(rows, columns);
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(rows, columns);
 
             long tmpIndex = 0L;
             for (long j = 0L; j < columns; j++) {
@@ -179,7 +184,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         }
 
         public final Array2D<N> makeZero(final long rows, final long columns) {
-            return this.delegate().makeStructuredZero(rows, columns).asArray2D(rows);
+            return myDelegate.makeStructuredZero(rows, columns).asArray2D(rows);
         }
 
         public final Array2D<N> rows(final Access1D<?>... source) {
@@ -187,7 +192,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpRows = source.length;
             final long tmpColumns = source[0].count();
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             if (tmpDelegate.isPrimitive()) {
                 for (int i = 0; i < tmpRows; i++) {
@@ -213,7 +218,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpRows = source.length;
             final int tmpColumns = source[0].length;
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
                 final double[] tmpRow = source[i];
@@ -231,7 +236,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpRows = source.length;
             final int tmpColumns = source[0].size();
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
                 final List<? extends Number> tmpRow = source[i];
@@ -248,7 +253,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final int tmpRows = source.length;
             final int tmpColumns = source[0].length;
 
-            final BasicArray<N> tmpDelegate = this.delegate().makeToBeFilled(tmpRows, tmpColumns);
+            final BasicArray<N> tmpDelegate = myDelegate.makeToBeFilled(tmpRows, tmpColumns);
 
             for (int i = 0; i < tmpRows; i++) {
                 final Number[] tmpRow = source[i];
@@ -262,91 +267,19 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         @Override
         public final Scalar.Factory<N> scalar() {
-            return this.delegate().scalar();
+            return myDelegate.scalar();
         }
-
-        private final BasicArray.Factory<N> delegate() {
-            if (myDelegate == null) {
-                myDelegate = this.makeDelegate();
-            }
-            return myDelegate;
-        }
-
-        abstract BasicArray.Factory<N> makeDelegate();
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
-
-        @Override
-        BasicArray.Factory<BigDecimal> makeDelegate() {
-            return BasicArray.factory(BigArray.FACTORY);
-        }
-
-    };
-
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
-
-        @Override
-        BasicArray.Factory<ComplexNumber> makeDelegate() {
-            return BasicArray.factory(ComplexArray.FACTORY);
-        }
-
-    };
-
-    public static final Factory<Double> DIRECT32 = new Factory<Double>() {
-
-        @Override
-        BasicArray.Factory<Double> makeDelegate() {
-            return BasicArray.factory(BufferArray.DIRECT32);
-        }
-
-    };
-
-    public static final Factory<Double> DIRECT64 = new Factory<Double>() {
-
-        @Override
-        BasicArray.Factory<Double> makeDelegate() {
-            return BasicArray.factory(BufferArray.DIRECT64);
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE32 = new Factory<Double>() {
-
-        @Override
-        BasicArray.Factory<Double> makeDelegate() {
-            return BasicArray.factory(Primitive32Array.FACTORY);
-        }
-
-    };
-
-    public static final Factory<Double> PRIMITIVE64 = new Factory<Double>() {
-
-        @Override
-        BasicArray.Factory<Double> makeDelegate() {
-            return BasicArray.factory(Primitive64Array.FACTORY);
-        }
-
-    };
-
-    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
-
-        @Override
-        BasicArray.Factory<Quaternion> makeDelegate() {
-            return BasicArray.factory(QuaternionArray.FACTORY);
-        }
-
-    };
-
-    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
-
-        @Override
-        BasicArray.Factory<RationalNumber> makeDelegate() {
-            return BasicArray.factory(RationalArray.FACTORY);
-        }
-
-    };
+    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>(BigArray.FACTORY);
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>(ComplexArray.FACTORY);
+    public static final Factory<Double> DIRECT32 = new Factory<Double>(BufferArray.DIRECT32);
+    public static final Factory<Double> DIRECT64 = new Factory<Double>(BufferArray.DIRECT64);
+    public static final Factory<Double> PRIMITIVE32 = new Factory<Double>(Primitive32Array.FACTORY);
+    public static final Factory<Double> PRIMITIVE64 = new Factory<Double>(Primitive64Array.FACTORY);
+    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>(QuaternionArray.FACTORY);
+    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>(RationalArray.FACTORY);
 
     /**
      * @deprecated v43 Use {@link #PRIMITIVE64} instead
@@ -354,16 +287,8 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     @Deprecated
     public static final Factory<Double> PRIMITIVE = PRIMITIVE64;
 
-    public static <N extends Number> Array2D.Factory<N> factory(final DenseArray.Factory<N> delegate) {
-
-        return new Array2D.Factory<N>() {
-
-            @Override
-            BasicArray.Factory<N> makeDelegate() {
-                return BasicArray.factory(delegate);
-            }
-
-        };
+    public static <N extends Number> Array2D.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
+        return new Array2D.Factory<N>(denseArray);
     }
 
     private final long myColumnsCount;
