@@ -51,6 +51,13 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public static abstract class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
+        private transient BasicArray.Factory<N> myDelegate = null;
+
+        @Override
+        public final AggregatorSet<N> aggregator() {
+            return this.delegate().aggregator();
+        }
+
         public final Array2D<N> columns(final Access1D<?>... source) {
 
             final int tmpColumns = source.length;
@@ -136,6 +143,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
         public final Array2D<N> copy(final Access2D<?> source) {
             return this.delegate().copy(source).asArray2D(source.countRows());
+        }
+
+        @Override
+        public final FunctionSet<N> function() {
+            return this.delegate().function();
         }
 
         public final Array2D<N> makeEye(final long rows, final long columns) {
@@ -248,29 +260,26 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             return tmpDelegate.asArray2D(tmpRows);
         }
 
-        abstract BasicArray.Factory<N> delegate();
-
-        @Override
-        public final FunctionSet<N> function() {
-            return this.delegate().function();
-        }
-
-        @Override
-        public final AggregatorSet<N> aggregator() {
-            return this.delegate().aggregator();
-        }
-
         @Override
         public final Scalar.Factory<N> scalar() {
             return this.delegate().scalar();
         }
+
+        private final BasicArray.Factory<N> delegate() {
+            if (myDelegate == null) {
+                myDelegate = this.makeDelegate();
+            }
+            return myDelegate;
+        }
+
+        abstract BasicArray.Factory<N> makeDelegate();
 
     }
 
     public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>() {
 
         @Override
-        BasicArray.Factory<BigDecimal> delegate() {
+        BasicArray.Factory<BigDecimal> makeDelegate() {
             return BasicArray.factory(BigArray.FACTORY);
         }
 
@@ -279,7 +288,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>() {
 
         @Override
-        BasicArray.Factory<ComplexNumber> delegate() {
+        BasicArray.Factory<ComplexNumber> makeDelegate() {
             return BasicArray.factory(ComplexArray.FACTORY);
         }
 
@@ -288,7 +297,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<Double> DIRECT32 = new Factory<Double>() {
 
         @Override
-        BasicArray.Factory<Double> delegate() {
+        BasicArray.Factory<Double> makeDelegate() {
             return BasicArray.factory(BufferArray.DIRECT32);
         }
 
@@ -297,7 +306,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<Double> DIRECT64 = new Factory<Double>() {
 
         @Override
-        BasicArray.Factory<Double> delegate() {
+        BasicArray.Factory<Double> makeDelegate() {
             return BasicArray.factory(BufferArray.DIRECT64);
         }
 
@@ -306,7 +315,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<Double> PRIMITIVE32 = new Factory<Double>() {
 
         @Override
-        BasicArray.Factory<Double> delegate() {
+        BasicArray.Factory<Double> makeDelegate() {
             return BasicArray.factory(Primitive32Array.FACTORY);
         }
 
@@ -315,7 +324,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<Double> PRIMITIVE64 = new Factory<Double>() {
 
         @Override
-        BasicArray.Factory<Double> delegate() {
+        BasicArray.Factory<Double> makeDelegate() {
             return BasicArray.factory(Primitive64Array.FACTORY);
         }
 
@@ -324,7 +333,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>() {
 
         @Override
-        BasicArray.Factory<Quaternion> delegate() {
+        BasicArray.Factory<Quaternion> makeDelegate() {
             return BasicArray.factory(QuaternionArray.FACTORY);
         }
 
@@ -333,7 +342,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>() {
 
         @Override
-        BasicArray.Factory<RationalNumber> delegate() {
+        BasicArray.Factory<RationalNumber> makeDelegate() {
             return BasicArray.factory(RationalArray.FACTORY);
         }
 
@@ -347,13 +356,11 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public static <N extends Number> Array2D.Factory<N> factory(final DenseArray.Factory<N> delegate) {
 
-        final BasicArray.Factory<N> tmpDelegate = BasicArray.factory(delegate);
-
         return new Array2D.Factory<N>() {
 
             @Override
-            BasicArray.Factory<N> delegate() {
-                return tmpDelegate;
+            BasicArray.Factory<N> makeDelegate() {
+                return BasicArray.factory(delegate);
             }
 
         };
