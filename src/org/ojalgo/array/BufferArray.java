@@ -41,10 +41,14 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -129,6 +133,21 @@ public abstract class BufferArray extends PlainArray<Double> {
             return PrimitiveScalar.ZERO;
         }
 
+        @Override
+        public FunctionSet<Double> function() {
+            return PrimitiveFunction.getSet();
+        }
+
+        @Override
+        public AggregatorSet<Double> aggregator() {
+            return PrimitiveAggregator.getSet();
+        }
+
+        @Override
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
+        }
+
     };
 
     public static final DenseArray.Factory<Double> DIRECT64 = new DenseArray.Factory<Double>() {
@@ -153,6 +172,21 @@ public abstract class BufferArray extends PlainArray<Double> {
         @Override
         Scalar<Double> zero() {
             return PrimitiveScalar.ZERO;
+        }
+
+        @Override
+        public FunctionSet<Double> function() {
+            return PrimitiveFunction.getSet();
+        }
+
+        @Override
+        public AggregatorSet<Double> aggregator() {
+            return PrimitiveAggregator.getSet();
+        }
+
+        @Override
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
         }
 
     };
@@ -228,6 +262,21 @@ public abstract class BufferArray extends PlainArray<Double> {
                     @Override
                     PrimitiveScalar zero() {
                         return PrimitiveScalar.ZERO;
+                    }
+
+                    @Override
+                    public FunctionSet<Double> function() {
+                        return PrimitiveFunction.getSet();
+                    }
+
+                    @Override
+                    public AggregatorSet<Double> aggregator() {
+                        return PrimitiveAggregator.getSet();
+                    }
+
+                    @Override
+                    public Scalar.Factory<Double> scalar() {
+                        return PrimitiveScalar.FACTORY;
                     }
 
                 };

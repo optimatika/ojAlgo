@@ -31,9 +31,11 @@ import org.ojalgo.access.Factory2D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -247,6 +249,21 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         }
 
         abstract BasicArray.Factory<N> delegate();
+
+        @Override
+        public final FunctionSet<N> function() {
+            return this.delegate().function();
+        }
+
+        @Override
+        public final AggregatorSet<N> aggregator() {
+            return this.delegate().aggregator();
+        }
+
+        @Override
+        public final Scalar.Factory<N> scalar() {
+            return this.delegate().scalar();
+        }
 
     }
 

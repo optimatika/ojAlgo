@@ -22,12 +22,15 @@
 package org.ojalgo.tensor;
 
 import org.ojalgo.access.AccessAnyD;
-import org.ojalgo.array.DenseArray;
+import org.ojalgo.algebra.NormedVectorSpace;
+import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 
-public interface Tensor<N extends Number> extends AccessAnyD<N> {
+public interface Tensor<N extends Number> extends AccessAnyD<N>, NormedVectorSpace<Tensor<N>, N> {
 
-    static <N extends Number> Tensor<N> make(final DenseArray.Factory<N> factory, final int rank, final int dimensions) {
-        return new AnyTensor<>(rank, dimensions, factory);
+    static Tensor<Double> makePrimitive(final int rank, final int dimensions) {
+        return new AnyTensor<Double>(rank, dimensions, Primitive64Array.FACTORY, PrimitiveFunction.getSet(), PrimitiveAggregator.getSet());
     }
 
     default long count(final int dimension) {

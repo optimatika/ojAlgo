@@ -25,7 +25,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.FunctionUtils;
+import org.ojalgo.function.RationalFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.RationalAggregator;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
@@ -53,6 +57,22 @@ public class RationalArray extends ScalarArray<RationalNumber> {
         Scalar<RationalNumber> zero() {
             return RationalNumber.ZERO;
         }
+
+        @Override
+        public FunctionSet<RationalNumber> function() {
+            return RationalFunction.getSet();
+        }
+
+        @Override
+        public AggregatorSet<RationalNumber> aggregator() {
+            return RationalAggregator.getSet();
+        }
+
+        @Override
+        public Scalar.Factory<RationalNumber> scalar() {
+            return RationalNumber.FACTORY;
+        }
+
     };
 
     static final long ELEMENT_SIZE = MemoryEstimator.estimateObject(RationalNumber.class);

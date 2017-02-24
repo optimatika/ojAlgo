@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,14 +21,16 @@
  */
 package org.ojalgo.access;
 
-import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.scalar.Scalar;
 
-public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement {
+interface FactorySupplement {
 
-    I copy(AccessAnyD<?> source);
+    FunctionSet<?> function();
 
-    I makeFilled(long[] structure, NullaryFunction<?> supplier);
+    AggregatorSet<?> aggregator();
 
-    I makeZero(long... structure);
+    Scalar.Factory<?> scalar();
 
 }

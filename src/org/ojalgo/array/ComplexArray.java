@@ -25,7 +25,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.function.ComplexFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.FunctionUtils;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
@@ -52,6 +56,21 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
         @Override
         Scalar<ComplexNumber> zero() {
             return ComplexNumber.ZERO;
+        }
+
+        @Override
+        public FunctionSet<ComplexNumber> function() {
+            return ComplexFunction.getSet();
+        }
+
+        @Override
+        public AggregatorSet<ComplexNumber> aggregator() {
+            return ComplexAggregator.getSet();
+        }
+
+        @Override
+        public Scalar.Factory<ComplexNumber> scalar() {
+            return ComplexNumber.FACTORY;
         }
 
     };

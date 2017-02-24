@@ -32,9 +32,11 @@ import org.ojalgo.access.FactoryAnyD;
 import org.ojalgo.access.MutateAnyD;
 import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -63,6 +65,21 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         }
 
         abstract BasicArray.Factory<N> delegate();
+
+        @Override
+        public final FunctionSet<N> function() {
+            return this.delegate().function();
+        }
+
+        @Override
+        public final AggregatorSet<N> aggregator() {
+            return this.delegate().aggregator();
+        }
+
+        @Override
+        public final Scalar.Factory<N> scalar() {
+            return this.delegate().scalar();
+        }
 
     }
 

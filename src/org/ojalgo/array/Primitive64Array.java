@@ -36,6 +36,7 @@ import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.BinaryFunction.FixedFirst;
 import org.ojalgo.function.BinaryFunction.FixedSecond;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.ParameterFunction;
@@ -43,6 +44,8 @@ import org.ojalgo.function.ParameterFunction.FixedParameter;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
@@ -69,6 +72,21 @@ public class Primitive64Array extends PrimitiveArray {
         @Override
         Scalar<Double> zero() {
             return PrimitiveScalar.ZERO;
+        }
+
+        @Override
+        public FunctionSet<Double> function() {
+            return PrimitiveFunction.getSet();
+        }
+
+        @Override
+        public AggregatorSet<Double> aggregator() {
+            return PrimitiveAggregator.getSet();
+        }
+
+        @Override
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
         }
 
     };

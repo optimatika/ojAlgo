@@ -31,7 +31,11 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.function.BigFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.FunctionUtils;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.BigAggregator;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.BigScalar;
 import org.ojalgo.scalar.Scalar;
@@ -59,6 +63,21 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         @Override
         Scalar<BigDecimal> zero() {
             return BigScalar.ZERO;
+        }
+
+        @Override
+        public FunctionSet<BigDecimal> function() {
+            return BigFunction.getSet();
+        }
+
+        @Override
+        public AggregatorSet<BigDecimal> aggregator() {
+            return BigAggregator.getSet();
+        }
+
+        @Override
+        public Scalar.Factory<BigDecimal> scalar() {
+            return BigScalar.FACTORY;
         }
 
     };

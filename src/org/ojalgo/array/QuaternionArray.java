@@ -25,7 +25,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.FunctionUtils;
+import org.ojalgo.function.QuaternionFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.QuaternionAggregator;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.Scalar;
@@ -52,6 +56,21 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
         @Override
         Scalar<Quaternion> zero() {
             return Quaternion.ZERO;
+        }
+
+        @Override
+        public FunctionSet<Quaternion> function() {
+            return QuaternionFunction.getSet();
+        }
+
+        @Override
+        public AggregatorSet<Quaternion> aggregator() {
+            return QuaternionAggregator.getSet();
+        }
+
+        @Override
+        public Scalar.Factory<Quaternion> scalar() {
+            return Quaternion.FACTORY;
         }
 
     };

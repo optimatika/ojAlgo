@@ -2,10 +2,13 @@ package org.ojalgo.array;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.machine.Hardware;
 import org.ojalgo.random.Distribution;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.scalar.Scalar.Factory;
 
 /**
  * To be used by implementations that delegate to a DenseArray
@@ -49,6 +52,18 @@ final class DenseStrategy<N extends Number> {
 
         final long tmpMemoryPageElements = Hardware.OS_MEMORY_PAGE_SIZE / denseFactory.getElementSize();
         this.chunk(tmpMemoryPageElements);
+    }
+
+    public AggregatorSet<N> aggregator() {
+        return myDenseFactory.aggregator();
+    }
+
+    public FunctionSet<N> function() {
+        return myDenseFactory.function();
+    }
+
+    public Factory<N> scalar() {
+        return myDenseFactory.scalar();
     }
 
     DenseStrategy<N> capacity(final Distribution countDistribution) {

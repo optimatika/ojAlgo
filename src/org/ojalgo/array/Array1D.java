@@ -35,9 +35,11 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Factory1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
@@ -82,6 +84,21 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
         }
 
         abstract BasicArray.Factory<N> delegate();
+
+        @Override
+        public final FunctionSet<N> function() {
+            return this.delegate().function();
+        }
+
+        @Override
+        public final AggregatorSet<N> aggregator() {
+            return this.delegate().aggregator();
+        }
+
+        @Override
+        public final Scalar.Factory<N> scalar() {
+            return this.delegate().scalar();
+        }
 
     }
 

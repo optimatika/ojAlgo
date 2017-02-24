@@ -22,6 +22,11 @@
 package org.ojalgo.array;
 
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.FunctionSet;
+import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
 public abstract class PrimitiveArray extends PlainArray<Double> {
@@ -45,6 +50,21 @@ public abstract class PrimitiveArray extends PlainArray<Double> {
         @Override
         Scalar<Double> zero() {
             return Primitive64Array.FACTORY.zero();
+        }
+
+        @Override
+        public FunctionSet<Double> function() {
+            return PrimitiveFunction.getSet();
+        }
+
+        @Override
+        public AggregatorSet<Double> aggregator() {
+            return PrimitiveAggregator.getSet();
+        }
+
+        @Override
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
         }
 
     };

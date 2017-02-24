@@ -28,7 +28,10 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Factory1D;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
+import org.ojalgo.scalar.Scalar;
 
 abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends Object implements Factory1D<BasicArray<N>> {
 
@@ -120,5 +123,11 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
     final SegmentedArray<N> wrapAsSegments(final BasicArray<N>... segments) {
         return new SegmentedArray<>(segments, this);
     }
+
+    public abstract FunctionSet<N> function();
+
+    public abstract AggregatorSet<N> aggregator();
+
+    public abstract Scalar.Factory<N> scalar();
 
 }

@@ -28,10 +28,13 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.scalar.Scalar;
 
 /**
  * MatrixFactory creates instances of classes that implement the {@linkplain org.ojalgo.matrix.BasicMatrix}
@@ -276,6 +279,21 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
     final MatrixBuilder wrap(final PhysicalStore<N> store) {
         return new MatrixBuilder(store);
+    }
+
+    @Override
+    public final FunctionSet<N> function() {
+        return myPhysicalFactory.function();
+    }
+
+    @Override
+    public final AggregatorSet<N> aggregator() {
+        return myPhysicalFactory.aggregator();
+    }
+
+    @Override
+    public final Scalar.Factory<N> scalar() {
+        return myPhysicalFactory.scalar();
     }
 
 }

@@ -30,13 +30,16 @@ import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
+import org.ojalgo.scalar.Scalar;
 
 /**
  * <p>
@@ -105,6 +108,21 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         }
 
         abstract DenseStrategy<N> strategy();
+
+        @Override
+        public final FunctionSet<N> function() {
+            return this.strategy().function();
+        }
+
+        @Override
+        public final AggregatorSet<N> aggregator() {
+            return this.strategy().aggregator();
+        }
+
+        @Override
+        public final Scalar.Factory<N> scalar() {
+            return this.strategy().scalar();
+        }
 
     }
 
