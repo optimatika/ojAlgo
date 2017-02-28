@@ -34,7 +34,7 @@ import org.ojalgo.optimisation.Optimisation;
 
 public abstract class IntegerSolver extends GenericSolver {
 
-    final class NodeStatistics {
+    static final class NodeStatistics {
 
         private final AtomicInteger myAbandoned = new AtomicInteger();
         /**

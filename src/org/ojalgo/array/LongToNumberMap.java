@@ -126,7 +126,8 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
     public boolean containsValue(final double value) {
         for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {
-            if (tmpView.doubleValue() == value) {
+            // if (tmpView.doubleValue() == value) {
+            if (Double.compare(tmpView.doubleValue(), value) == 0) {
                 return true;
             }
         }

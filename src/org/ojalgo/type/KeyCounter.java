@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class KeyCounter<K> {
 
-    protected static final int INT_ZERO = 0;
+    private static final int INT_ZERO = 0;
 
     private final HashMap<K, AtomicInteger> myDelegate = new HashMap<>();
 

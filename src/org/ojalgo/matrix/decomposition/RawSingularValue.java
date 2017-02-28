@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
@@ -30,7 +31,7 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
-import org.ojalgo.function.PrimitiveFunction;
+
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -143,7 +144,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             retVal += tmpVal * tmpVal;
         }
 
-        return PrimitiveFunction.SQRT.invoke(retVal);
+        return SQRT.invoke(retVal);
     }
 
     @Override
@@ -184,8 +185,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public int getRank() {
-        final double eps = PrimitiveFunction.POW.invoke(TWO, -52.0);
-        final double tol = PrimitiveFunction.MAX.invoke(m, n) * (myS[0] * eps);
+        final double eps = POW.invoke(TWO, -52.0);
+        final double tol = MAX.invoke(m, n) * (myS[0] * eps);
         int r = 0;
         for (int i = 0; i < myS.length; i++) {
             if (myS[i] > tol) {
@@ -329,7 +330,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 nrm = ZERO;
                 for (int i = k; i < m; i++) {
                     final double a = nrm;
-                    nrm = PrimitiveFunction.HYPOT.invoke(a, tmpAt_k[i]);
+                    nrm = HYPOT.invoke(a, tmpAt_k[i]);
                 }
 
                 // Form k-th Householder column-vector.
@@ -373,7 +374,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 nrm = ZERO;
                 for (int i = k + 1; i < n; i++) {
                     final double a = nrm;
-                    nrm = PrimitiveFunction.HYPOT.invoke(a, tmpE[i]);
+                    nrm = HYPOT.invoke(a, tmpE[i]);
                 }
                 if (nrm != ZERO) {
                     if (tmpE[k + 1] < ZERO) {
@@ -472,8 +473,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         // Main iteration loop for the singular values.
         final int pp = p - 1;
-        final double eps = PrimitiveFunction.POW.invoke(TWO, -52.0);
-        final double tiny = PrimitiveFunction.POW.invoke(TWO, -966.0);
+        final double eps = POW.invoke(TWO, -52.0);
+        final double tiny = POW.invoke(TWO, -966.0);
         while (p > 0) {
             int k, kase;
 
@@ -493,8 +494,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 if (k == -1) {
                     break;
                 }
-                if (PrimitiveFunction.ABS
-                        .invoke(tmpE[k]) <= (tiny + (eps * (PrimitiveFunction.ABS.invoke(myS[k]) + PrimitiveFunction.ABS.invoke(myS[k + 1]))))) {
+                if (ABS.invoke(tmpE[k]) <= (tiny + (eps * (ABS.invoke(myS[k]) + ABS.invoke(myS[k + 1]))))) {
                     tmpE[k] = ZERO;
                     break;
                 }
@@ -507,9 +507,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     if (ks == k) {
                         break;
                     }
-                    final double t = (ks != p ? PrimitiveFunction.ABS.invoke(tmpE[ks]) : 0.)
-                            + (ks != (k + 1) ? PrimitiveFunction.ABS.invoke(tmpE[ks - 1]) : 0.);
-                    if (PrimitiveFunction.ABS.invoke(myS[ks]) <= (tiny + (eps * t))) {
+                    final double t = (ks != p ? ABS.invoke(tmpE[ks]) : 0.) + (ks != (k + 1) ? ABS.invoke(tmpE[ks - 1]) : 0.);
+                    if (ABS.invoke(myS[ks]) <= (tiny + (eps * t))) {
                         myS[ks] = ZERO;
                         break;
                     }
@@ -534,7 +533,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 tmpE[p - 2] = ZERO;
                 for (int j = p - 2; j >= k; j--) {
                     final double b = f;
-                    double t = PrimitiveFunction.HYPOT.invoke(myS[j], b);
+                    double t = HYPOT.invoke(myS[j], b);
                     final double cs = myS[j] / t;
                     final double sn = f / t;
                     myS[j] = t;
@@ -562,7 +561,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 tmpE[k - 1] = ZERO;
                 for (int j = k; j < p; j++) {
                     final double b = f;
-                    double t = PrimitiveFunction.HYPOT.invoke(myS[j], b);
+                    double t = HYPOT.invoke(myS[j], b);
                     final double cs = myS[j] / t;
                     final double sn = f / t;
                     myS[j] = t;
@@ -586,11 +585,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             case 3: {
 
                 // Calculate the shift.
-                final double scale = PrimitiveFunction.MAX.invoke(
-                        PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(
-                                PrimitiveFunction.MAX.invoke(PrimitiveFunction.ABS.invoke(myS[p - 1]), PrimitiveFunction.ABS.invoke(myS[p - 2])),
-                                PrimitiveFunction.ABS.invoke(tmpE[p - 2])), PrimitiveFunction.ABS.invoke(myS[k])),
-                        PrimitiveFunction.ABS.invoke(tmpE[k]));
+                final double scale = MAX.invoke(
+                        MAX.invoke(MAX.invoke(MAX.invoke(ABS.invoke(myS[p - 1]), ABS.invoke(myS[p - 2])), ABS.invoke(tmpE[p - 2])), ABS.invoke(myS[k])),
+                        ABS.invoke(tmpE[k]));
                 final double sp = myS[p - 1] / scale;
                 final double spm1 = myS[p - 2] / scale;
                 final double epm1 = tmpE[p - 2] / scale;
@@ -599,8 +596,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 final double b = (((spm1 + sp) * (spm1 - sp)) + (epm1 * epm1)) / TWO;
                 final double c = (sp * epm1) * (sp * epm1);
                 double shift = ZERO;
-                if ((b != ZERO) | (c != ZERO)) {
-                    shift = PrimitiveFunction.SQRT.invoke((b * b) + c);
+                // if ((b != ZERO) | (c != ZERO)) {
+                if ((Double.compare(b, ZERO) != 0) || (Double.compare(c, ZERO) != 0)) {
+                    shift = SQRT.invoke((b * b) + c);
                     if (b < ZERO) {
                         shift = -shift;
                     }
@@ -613,7 +611,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 for (int j = k; j < (p - 1); j++) {
                     final double a = f;
                     final double b1 = g;
-                    double t = PrimitiveFunction.HYPOT.invoke(a, b1);
+                    double t = HYPOT.invoke(a, b1);
                     double cs = f / t;
                     double sn = g / t;
                     if (j != k) {
@@ -635,7 +633,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     }
                     final double a1 = f;
                     final double b2 = g;
-                    t = PrimitiveFunction.HYPOT.invoke(a1, b2);
+                    t = HYPOT.invoke(a1, b2);
                     cs = f / t;
                     sn = g / t;
                     myS[j] = t;

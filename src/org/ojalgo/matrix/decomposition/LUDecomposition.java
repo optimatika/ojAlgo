@@ -223,7 +223,8 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         final int tmpMinDim = (int) Math.min(tmpStore.countRows(), tmpStore.countColumns());
 
         for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
-            retVal &= tmpStore.doubleValue(ij, ij) != PrimitiveMath.ZERO;
+            // retVal &= tmpStore.doubleValue(ij, ij) != PrimitiveMath.ZERO;
+            retVal &= Double.compare(tmpStore.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0;
         }
 
         return retVal;
@@ -298,7 +299,8 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
             // Do the calculations...
             // if (!tmpInPlace.isZero(ij, ij)) {
-            if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
+            // if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
+            if (Double.compare(tmpInPlace.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0) {
 
                 // Calculate multipliers and copy to local column
                 // Current column, below the diagonal

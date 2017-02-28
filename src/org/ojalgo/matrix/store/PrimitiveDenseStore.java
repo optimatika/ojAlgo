@@ -427,7 +427,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                     } else {
                         l = i;
                         if (tmpOffDiagonal[i] == PrimitiveMath.ZERO) {
-                            if (w != PrimitiveMath.ZERO) {
+                            // if (w != PrimitiveMath.ZERO) {
+                            if (Double.compare(w, ZERO) != 0) {
                                 aMtrxH[i + (tmpDiagDim * ij)] = -r / w;
                             } else {
                                 aMtrxH[i + (tmpDiagDim * ij)] = -r / (PrimitiveMath.MACHINE_EPSILON * aNorm1);
@@ -511,7 +512,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                             y = aMtrxH[(i + 1) + (tmpDiagDim * i)];
                             vr = (((tmpMainDiagonal[i] - p) * (tmpMainDiagonal[i] - p)) + (tmpOffDiagonal[i] * tmpOffDiagonal[i])) - (q * q);
                             vi = (tmpMainDiagonal[i] - p) * 2.0 * q;
-                            if ((vr == PrimitiveMath.ZERO) & (vi == PrimitiveMath.ZERO)) {
+                            // if ((vr == PrimitiveMath.ZERO) & (vi == PrimitiveMath.ZERO)) {
+                            if ((Double.compare(vr, ZERO) == 0) && (Double.compare(vi, ZERO) == 0)) {
                                 vr = PrimitiveMath.MACHINE_EPSILON * aNorm1 * (PrimitiveFunction.ABS.invoke(w) + PrimitiveFunction.ABS.invoke(q)
                                         + PrimitiveFunction.ABS.invoke(x) + PrimitiveFunction.ABS.invoke(y) + PrimitiveFunction.ABS.invoke(z));
                             }
@@ -587,7 +589,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 tmpColNorm1 += PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * ij)]);
             }
 
-            if (tmpColNorm1 != PrimitiveMath.ZERO) {
+            // if (tmpColNorm1 != PrimitiveMath.ZERO) {
+            if (Double.compare(tmpColNorm1, ZERO) != 0) {
 
                 // Compute Householder transformation.
                 double tmpInvBeta = PrimitiveMath.ZERO;
@@ -697,7 +700,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             int l = tmpMainIterIndex;
             while (l > 0) {
                 s = PrimitiveFunction.ABS.invoke(aMtrxH[(l - 1) + (tmpDiagDim * (l - 1))]) + PrimitiveFunction.ABS.invoke(aMtrxH[l + (tmpDiagDim * l)]);
-                if (s == PrimitiveMath.ZERO) {
+                // if (s == PrimitiveMath.ZERO) {
+                if (Double.compare(s, ZERO) == 0) {
                     s = tmpNorm1;
                 }
                 if (PrimitiveFunction.ABS.invoke(aMtrxH[l + (tmpDiagDim * (l - 1))]) < (PrimitiveMath.MACHINE_EPSILON * s)) {
@@ -735,7 +739,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                     }
                     tmpMainDiagonal[tmpMainIterIndex - 1] = x + z;
                     tmpMainDiagonal[tmpMainIterIndex] = tmpMainDiagonal[tmpMainIterIndex - 1];
-                    if (z != PrimitiveMath.ZERO) {
+                    // if (z != PrimitiveMath.ZERO) {
+                    if (Double.compare(z, ZERO) != 0) {
                         tmpMainDiagonal[tmpMainIterIndex] = x - (w / z);
                     }
                     tmpOffDiagonal[tmpMainIterIndex - 1] = PrimitiveMath.ZERO;
@@ -863,7 +868,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                         q = aMtrxH[(k + 1) + (tmpDiagDim * (k - 1))];
                         r = (notlast ? aMtrxH[(k + 2) + (tmpDiagDim * (k - 1))] : PrimitiveMath.ZERO);
                         x = PrimitiveFunction.ABS.invoke(p) + PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(r);
-                        if (x == PrimitiveMath.ZERO) {
+                        // if (x == PrimitiveMath.ZERO) {
+                        if (Double.compare(x, ZERO) == 0) {
                             continue;
                         }
                         p = p / x;
@@ -926,7 +932,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         } // while (n >= low)
 
         // Backsubstitute to find vectors of upper triangular form
-        if (allTheWay && (tmpNorm1 != PrimitiveMath.ZERO)) {
+        // if (allTheWay && (tmpNorm1 != PrimitiveMath.ZERO)) {
+        if (allTheWay && (Double.compare(tmpNorm1, ZERO) != 0)) {
             PrimitiveDenseStore.doAfter(aMtrxH, aMtrxV, tmpMainDiagonal, tmpOffDiagonal, r, s, z, tmpNorm1);
         }
 

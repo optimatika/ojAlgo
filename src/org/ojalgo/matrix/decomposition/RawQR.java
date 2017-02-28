@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
@@ -29,7 +30,7 @@ import org.ojalgo.access.Stream2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
-import org.ojalgo.function.PrimitiveFunction;
+
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -308,7 +309,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             nrm = ZERO;
             for (int i = k; i < m; i++) {
                 final double a = nrm;
-                nrm = PrimitiveFunction.HYPOT.invoke(a, tmpColK[i]);
+                nrm = HYPOT.invoke(a, tmpColK[i]);
             }
 
             if (nrm != ZERO) {

@@ -408,7 +408,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                             if (this.isDebug()) {
                                 this.debug("Best so far: {} @ {} ({}).", tmpStepLength, i, myConstraintToInclude);
                             }
-                        } else if ((tmpVal == ZERO) && this.isDebug()) {
+                            // } else if ((tmpVal == ZERO) && this.isDebug()) {
+                        } else if ((Double.compare(tmpVal, ZERO) == 0) && this.isDebug()) {
                             this.debug("Zero, but still not good...");
                             this.debug("Numer/slack: {}", tmpN);
                             this.debug("Denom/chang: {}", tmpD);

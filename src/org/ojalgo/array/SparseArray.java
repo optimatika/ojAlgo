@@ -690,7 +690,8 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
             myValues.set(internalIndex, value);
 
-        } else if (shouldStoreZero || (value != PrimitiveMath.ZERO)) {
+            // } else if (shouldStoreZero || (value != PrimitiveMath.ZERO)) {
+        } else if (shouldStoreZero || (Double.compare(value, PrimitiveMath.ZERO) != 0)) {
             // Not existing value, insert new
             final int tmpInsInd = -(internalIndex + 1);
 

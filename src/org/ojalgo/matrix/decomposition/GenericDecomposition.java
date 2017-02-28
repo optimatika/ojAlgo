@@ -41,11 +41,6 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
     private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
     MatrixStore.Factory<N> myBuilder;
 
-    @SuppressWarnings("unused")
-    private GenericDecomposition() {
-        this(null);
-    }
-
     protected GenericDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
 
         super();

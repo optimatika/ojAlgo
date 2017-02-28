@@ -93,7 +93,8 @@ public final class SampleSet implements Access1D<Double> {
 
         final double tmpCovar = this.getCovariance(anotherSampleSet);
 
-        if (tmpCovar != ZERO) {
+        // if (tmpCovar != ZERO) {
+        if (Double.compare(tmpCovar, ZERO) != 0) {
 
             final double tmpThisStdDev = this.getStandardDeviation();
             final double tmpThatStdDev = anotherSampleSet.getStandardDeviation();

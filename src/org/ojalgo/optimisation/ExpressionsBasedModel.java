@@ -577,11 +577,8 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         boolean retVal = false;
 
-        String tmpExpressionKey;
-        for (final Iterator<String> tmpIterator = myExpressions.keySet().iterator(); !retVal && tmpIterator.hasNext();) {
-            tmpExpressionKey = tmpIterator.next();
-            final Expression tmpExpression = myExpressions.get(tmpExpressionKey);
-            retVal |= tmpExpression.isAnyQuadraticFactorNonZero() && (tmpExpression.isConstraint() || tmpExpression.isObjective());
+        for (Expression value : myExpressions.values()) {
+            retVal |= value.isAnyQuadraticFactorNonZero() && (value.isConstraint() || value.isObjective());
         }
 
         return retVal;

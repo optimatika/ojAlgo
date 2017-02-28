@@ -22,13 +22,13 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -261,9 +261,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             final RawStore tmpMtrx = new RawStore(tmpEigen.length, tmpQ1.length);
 
             for (int i = 0; i < tmpEigen.length; i++) {
-                if (PrimitiveScalar.isSmall(PrimitiveMath.ONE, tmpEigen[i])) {
+                if (PrimitiveScalar.isSmall(ONE, tmpEigen[i])) {
                     for (int j = 0; j < tmpQ1.length; j++) {
-                        tmpMtrx.set(i, j, PrimitiveMath.ZERO);
+                        tmpMtrx.set(i, j, ZERO);
                     }
                 } else {
                     for (int j = 0; j < tmpQ1.length; j++) {
@@ -360,7 +360,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     private void cdiv(final double xr, final double xi, final double yr, final double yi) {
         double r, d;
-        if (PrimitiveFunction.ABS.invoke(yr) > PrimitiveFunction.ABS.invoke(yi)) {
+        if (ABS.invoke(yr) > ABS.invoke(yi)) {
             r = yi / yr;
             d = yr + (r * yi);
             cdivr = (xr + (r * xi)) / d;
@@ -399,7 +399,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 e[i] = ZERO;
             }
             for (int j = Math.max(i - 1, 0); j < nn; j++) {
-                norm = norm + PrimitiveFunction.ABS.invoke(H[i][j]);
+                norm = norm + ABS.invoke(H[i][j]);
             }
         }
 
@@ -412,11 +412,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             int l = n;
             while (l > low) {
-                s = PrimitiveFunction.ABS.invoke(H[l - 1][l - 1]) + PrimitiveFunction.ABS.invoke(H[l][l]);
-                if (s == ZERO) {
+                s = ABS.invoke(H[l - 1][l - 1]) + ABS.invoke(H[l][l]);
+                // if (s == ZERO) {
+                if (Double.compare(s, ZERO) == 0) {
                     s = norm;
                 }
-                if (PrimitiveFunction.ABS.invoke(H[l][l - 1]) < (eps * s)) {
+                if (ABS.invoke(H[l][l - 1]) < (eps * s)) {
                     break;
                 }
                 l--;
@@ -438,7 +439,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 w = H[n][n - 1] * H[n - 1][n];
                 p = (H[n - 1][n - 1] - H[n][n]) / TWO;
                 q = (p * p) + w;
-                z = PrimitiveFunction.SQRT.invoke(PrimitiveFunction.ABS.invoke(q));
+                z = SQRT.invoke(ABS.invoke(q));
                 H[n][n] = H[n][n] + exshift;
                 H[n - 1][n - 1] = H[n - 1][n - 1] + exshift;
                 x = H[n][n];
@@ -453,16 +454,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     }
                     d[n - 1] = x + z;
                     d[n] = d[n - 1];
-                    if (z != ZERO) {
+                    // if (z != ZERO) {
+                    if (Double.compare(z, ZERO) != 0) {
                         d[n] = x - (w / z);
                     }
                     e[n - 1] = ZERO;
                     e[n] = ZERO;
                     x = H[n][n - 1];
-                    s = PrimitiveFunction.ABS.invoke(x) + PrimitiveFunction.ABS.invoke(z);
+                    s = ABS.invoke(x) + ABS.invoke(z);
                     p = x / s;
                     q = z / s;
-                    r = PrimitiveFunction.SQRT.invoke((p * p) + (q * q));
+                    r = SQRT.invoke((p * p) + (q * q));
                     p = p / r;
                     q = q / r;
 
@@ -525,7 +527,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     for (int i = low; i <= n; i++) {
                         H[i][i] -= x;
                     }
-                    s = PrimitiveFunction.ABS.invoke(H[n][n - 1]) + PrimitiveFunction.ABS.invoke(H[n - 1][n - 2]);
+                    s = ABS.invoke(H[n][n - 1]) + ABS.invoke(H[n - 1][n - 2]);
                     x = y = 0.75 * s;
                     w = -0.4375 * s * s;
                 }
@@ -536,7 +538,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     s = (y - x) / TWO;
                     s = (s * s) + w;
                     if (s > 0) {
-                        s = PrimitiveFunction.SQRT.invoke(s);
+                        s = SQRT.invoke(s);
                         if (y < x) {
                             s = -s;
                         }
@@ -561,16 +563,15 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     p = (((r * s) - w) / H[m + 1][m]) + H[m][m + 1];
                     q = H[m + 1][m + 1] - z - r - s;
                     r = H[m + 2][m + 1];
-                    s = PrimitiveFunction.ABS.invoke(p) + PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(r);
+                    s = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
                     p = p / s;
                     q = q / s;
                     r = r / s;
                     if (m == l) {
                         break;
                     }
-                    if ((PrimitiveFunction.ABS.invoke(H[m][m - 1]) * (PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(r))) < (eps
-                            * (PrimitiveFunction.ABS.invoke(p) * (PrimitiveFunction.ABS.invoke(H[m - 1][m - 1]) + PrimitiveFunction.ABS.invoke(z)
-                                    + PrimitiveFunction.ABS.invoke(H[m + 1][m + 1]))))) {
+                    if ((ABS.invoke(H[m][m - 1]) * (ABS.invoke(q) + ABS.invoke(r))) < (eps
+                            * (ABS.invoke(p) * (ABS.invoke(H[m - 1][m - 1]) + ABS.invoke(z) + ABS.invoke(H[m + 1][m + 1]))))) {
                         break;
                     }
                     m--;
@@ -591,8 +592,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         p = H[k][k - 1];
                         q = H[k + 1][k - 1];
                         r = (notlast ? H[k + 2][k - 1] : ZERO);
-                        x = PrimitiveFunction.ABS.invoke(p) + PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(r);
-                        if (x == ZERO) {
+                        x = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
+                        // if (x == ZERO) {
+                        if (Double.compare(x, ZERO) == 0) {
                             continue;
                         }
                         p = p / x;
@@ -600,7 +602,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         r = r / x;
                     }
 
-                    s = PrimitiveFunction.SQRT.invoke((p * p) + (q * q) + (r * r));
+                    s = SQRT.invoke((p * p) + (q * q) + (r * r));
                     if (p < 0) {
                         s = -s;
                     }
@@ -661,7 +663,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         // Backsubstitute to find vectors of upper triangular form
 
-        if (norm == ZERO) {
+        // if (norm == ZERO) {
+        if (Double.compare(norm, ZERO) == 0) {
             return;
         }
 
@@ -686,7 +689,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     } else {
                         l = i;
                         if (e[i] == ZERO) {
-                            if (w != ZERO) {
+                            // if (w != ZERO) {
+                            if (Double.compare(w, ZERO) != 0) {
                                 H[i][n] = -r / w;
                             } else {
                                 H[i][n] = -r / (eps * norm);
@@ -700,7 +704,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                             q = ((d[i] - p) * (d[i] - p)) + (e[i] * e[i]);
                             t = ((x * s) - (z * r)) / q;
                             H[i][n] = t;
-                            if (PrimitiveFunction.ABS.invoke(x) > PrimitiveFunction.ABS.invoke(z)) {
+                            if (ABS.invoke(x) > ABS.invoke(z)) {
                                 H[i + 1][n] = (-r - (w * t)) / x;
                             } else {
                                 H[i + 1][n] = (-s - (y * t)) / z;
@@ -709,7 +713,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
                         // Overflow control
 
-                        t = PrimitiveFunction.ABS.invoke(H[i][n]);
+                        t = ABS.invoke(H[i][n]);
                         if (((eps * t) * t) > 1) {
                             for (int j = i; j <= n; j++) {
                                 H[j][n] = H[j][n] / t;
@@ -725,7 +729,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
                 // Last vector component imaginary so matrix is triangular
 
-                if (PrimitiveFunction.ABS.invoke(H[n][n - 1]) > PrimitiveFunction.ABS.invoke(H[n - 1][n])) {
+                if (ABS.invoke(H[n][n - 1]) > ABS.invoke(H[n - 1][n])) {
                     H[n - 1][n - 1] = q / H[n][n - 1];
                     H[n - 1][n] = -(H[n][n] - p) / H[n][n - 1];
                 } else {
@@ -763,14 +767,14 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                             y = H[i + 1][i];
                             vr = (((d[i] - p) * (d[i] - p)) + (e[i] * e[i])) - (q * q);
                             vi = (d[i] - p) * TWO * q;
-                            if ((vr == ZERO) & (vi == ZERO)) {
-                                vr = eps * norm * (PrimitiveFunction.ABS.invoke(w) + PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(x)
-                                        + PrimitiveFunction.ABS.invoke(y) + PrimitiveFunction.ABS.invoke(z));
+                            // if ((vr == ZERO) & (vi == ZERO)) {
+                            if ((Double.compare(vr, ZERO) == 0) && (Double.compare(vi, ZERO) == 0)) {
+                                vr = eps * norm * (ABS.invoke(w) + ABS.invoke(q) + ABS.invoke(x) + ABS.invoke(y) + ABS.invoke(z));
                             }
                             this.cdiv(((x * r) - (z * ra)) + (q * sa), (x * s) - (z * sa) - (q * ra), vr, vi);
                             H[i][n - 1] = cdivr;
                             H[i][n] = cdivi;
-                            if (PrimitiveFunction.ABS.invoke(x) > (PrimitiveFunction.ABS.invoke(z) + PrimitiveFunction.ABS.invoke(q))) {
+                            if (ABS.invoke(x) > (ABS.invoke(z) + ABS.invoke(q))) {
                                 H[i + 1][n - 1] = ((-ra - (w * H[i][n - 1])) + (q * H[i][n])) / x;
                                 H[i + 1][n] = (-sa - (w * H[i][n]) - (q * H[i][n - 1])) / x;
                             } else {
@@ -781,7 +785,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         }
 
                         // Overflow control
-                        t = PrimitiveFunction.MAX.invoke(PrimitiveFunction.ABS.invoke(H[i][n - 1]), PrimitiveFunction.ABS.invoke(H[i][n]));
+                        t = MAX.invoke(ABS.invoke(H[i][n - 1]), ABS.invoke(H[i][n]));
                         if (((eps * t) * t) > 1) {
                             for (int j = i; j <= n; j++) {
                                 H[j][n - 1] = H[j][n - 1] / t;
@@ -840,9 +844,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             double scale = ZERO;
             for (int i = m; i <= high; i++) {
-                scale = scale + PrimitiveFunction.ABS.invoke(H[i][m - 1]);
+                scale = scale + ABS.invoke(H[i][m - 1]);
             }
-            if (scale != ZERO) {
+            // if (scale != ZERO) {
+            if (Double.compare(scale, ZERO) != 0) {
 
                 // Compute Householder transformation.
 
@@ -851,7 +856,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     ort[i] = H[i][m - 1] / scale;
                     h += ort[i] * ort[i];
                 }
-                double g = PrimitiveFunction.SQRT.invoke(h);
+                double g = SQRT.invoke(h);
                 if (ort[m] > 0) {
                     g = -g;
                 }
@@ -945,10 +950,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         for (int l = 0; l < n; l++) {
 
             // Find small subdiagonal element
-            tst1 = PrimitiveFunction.MAX.invoke(tst1, PrimitiveFunction.ABS.invoke(d[l]) + PrimitiveFunction.ABS.invoke(e[l]));
+            tst1 = MAX.invoke(tst1, ABS.invoke(d[l]) + ABS.invoke(e[l]));
             int m = l;
             while (m < n) {
-                if (PrimitiveFunction.ABS.invoke(e[m]) <= (MACHINE_EPSILON * tst1)) {
+                if (ABS.invoke(e[m]) <= (MACHINE_EPSILON * tst1)) {
                     break;
                 }
                 m++;
@@ -964,7 +969,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     double g = d[l];
                     double p = (d[l + 1] - g) / (TWO * e[l]);
                     final double a = p;
-                    double r = PrimitiveFunction.HYPOT.invoke(a, ONE);
+                    double r = HYPOT.invoke(a, ONE);
                     if (p < 0) {
                         r = -r;
                     }
@@ -992,7 +997,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         g = c * e[i];
                         h = c * p;
                         final double a1 = p;
-                        r = PrimitiveFunction.HYPOT.invoke(a1, e[i]);
+                        r = HYPOT.invoke(a1, e[i]);
                         e[i + 1] = s * r;
                         s = e[i] / r;
                         c = p / r;
@@ -1008,7 +1013,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     d[l] = c * p;
 
                     // Check for convergence.
-                } while (PrimitiveFunction.ABS.invoke(e[l]) > (MACHINE_EPSILON * tst1));
+                } while (ABS.invoke(e[l]) > (MACHINE_EPSILON * tst1));
             }
             d[l] = d[l] + f;
             e[l] = ZERO;

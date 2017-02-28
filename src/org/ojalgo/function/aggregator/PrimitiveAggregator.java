@@ -448,7 +448,8 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
                 public void invoke(final double anArg) {
                     final double tmpArg = PrimitiveFunction.ABS.invoke(anArg);
-                    if (tmpArg != ZERO) {
+                    // if (tmpArg != ZERO) {
+                    if (Double.compare(tmpArg, ZERO) != 0) {
                         myValue = PrimitiveFunction.MIN.invoke(myValue, tmpArg);
                     }
                 }

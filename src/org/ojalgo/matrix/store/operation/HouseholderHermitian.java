@@ -523,7 +523,8 @@ public final class HouseholderHermitian extends MatrixOperation {
                     scale += PrimitiveFunction.ABS.invoke(data[i + (k * tmpRowDim)]);
                 }
 
-                if (scale == PrimitiveMath.ZERO) {
+                // if (scale == PrimitiveMath.ZERO) {
+                if (Double.compare(scale, PrimitiveMath.ZERO) == 0) {
                     e[i] = data[i + (l * tmpRowDim)];
                 } else {
                     for (int k = 0; k < i; k++) {

@@ -106,7 +106,8 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
             }
 
             // Do the calculations...
-            if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
+            // if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
+            if (Double.compare(tmpInPlace.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0) {
 
                 // Calculate multipliers and copy to local column
                 // Current column, below the diagonal

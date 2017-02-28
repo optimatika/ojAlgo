@@ -22,12 +22,13 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.blas.DOT;
-import org.ojalgo.function.PrimitiveFunction;
+
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -84,7 +85,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     }
 
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-        return this.doGetInverse((PrimitiveDenseStore) preallocated);
+        return this.doGetInverse(preallocated);
     }
 
     public MatrixStore<Double> getL() {
@@ -191,7 +192,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return this.computed(true);
     }
 
-    private MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
+    private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
         preallocated.fillAll(ZERO);
         preallocated.fillDiagonal(0L, 0L, ONE);
@@ -201,7 +202,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         preallocated.substituteForwards(tmpBody, true, false, true);
 
         for (int i = 0; i < preallocated.countRows(); i++) {
-            preallocated.modifyRow(i, 0, PrimitiveFunction.DIVIDE.second(tmpBody.doubleValue(i, i)));
+            preallocated.modifyRow(i, 0, DIVIDE.second(tmpBody.doubleValue(i, i)));
         }
 
         preallocated.substituteBackwards(tmpBody, true, true, true);
@@ -218,7 +219,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         preallocated.substituteForwards(tmpBody, true, false, false);
 
         for (int i = 0; i < preallocated.countRows(); i++) {
-            preallocated.modifyRow(i, 0, PrimitiveFunction.DIVIDE.second(tmpBody.doubleValue(i, i)));
+            preallocated.modifyRow(i, 0, DIVIDE.second(tmpBody.doubleValue(i, i)));
         }
 
         preallocated.substituteBackwards(tmpBody, true, true, false);

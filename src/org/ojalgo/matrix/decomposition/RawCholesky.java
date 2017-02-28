@@ -22,12 +22,13 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.blas.DOT;
-import org.ojalgo.function.PrimitiveFunction;
+
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -105,7 +106,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-        return this.doGetInverse((PrimitiveDenseStore) preallocated);
+        return this.doGetInverse(preallocated);
     }
 
     public MatrixStore<Double> getL() {
@@ -190,8 +191,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         for (int ij = 0; ij < tmpDiagDim; ij++) { // For each row/column, along the diagonal
             tmpRowIJ = data[ij];
 
-            final double tmpD = tmpRowIJ[ij] = PrimitiveFunction.SQRT
-                    .invoke(PrimitiveFunction.MAX.invoke(input.doubleValue(ij, ij) - DOT.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO));
+            final double tmpD = tmpRowIJ[ij] = SQRT.invoke(MAX.invoke(input.doubleValue(ij, ij) - DOT.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO));
             mySPD &= (tmpD > ZERO);
 
             for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
@@ -204,7 +204,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.computed(true);
     }
 
-    private MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
+    private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
         final RawStore tmpBody = this.getRawInPlaceStore();
 

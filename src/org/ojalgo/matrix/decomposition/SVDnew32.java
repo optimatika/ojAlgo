@@ -146,7 +146,8 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
         final double b = (((sPm2 + sPm1) * (sPm2 - sPm1)) + (ePm2 * ePm2)) / TWO;
         final double c = (sPm1 * ePm2) * (sPm1 * ePm2);
         double shift = ZERO;
-        if ((c != ZERO) || (b != ZERO)) {
+        // if ((c != ZERO) || (b != ZERO)) {
+        if ((Double.compare(c, ZERO) != 0) || (Double.compare(b, ZERO) != 0)) {
             shift = PrimitiveFunction.SQRT.invoke((b * b) + c);
             if (b < ZERO) {
                 shift = -shift;

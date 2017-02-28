@@ -22,14 +22,14 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.blas.DOT;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -100,7 +100,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
     }
 
     public MatrixStore<Double> getInverse(final PhysicalStore<Double> preallocated) {
-        return this.doGetInverse((PrimitiveDenseStore) preallocated);
+        return this.doGetInverse(preallocated);
     }
 
     public MatrixStore<Double> getL() {
@@ -240,7 +240,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
             // Find pivot and exchange if necessary.
             int p = j;
             for (int i = j + 1; i < tmpRowDim; i++) {
-                if (PrimitiveFunction.ABS.invoke(tmpColJ[i]) > PrimitiveFunction.ABS.invoke(tmpColJ[p])) {
+                if (ABS.invoke(tmpColJ[i]) > ABS.invoke(tmpColJ[p])) {
                     p = i;
                 }
             }
@@ -264,12 +264,12 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return this.computed(true);
     }
 
-    private MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
+    private MatrixStore<Double> doGetInverse(final PhysicalStore<Double> preallocated) {
 
         final int[] tmpPivotOrder = myPivot.getOrder();
         final int tmpRowDim = this.getRowDim();
         for (int i = 0; i < tmpRowDim; i++) {
-            preallocated.set(i, tmpPivotOrder[i], PrimitiveMath.ONE);
+            preallocated.set(i, tmpPivotOrder[i], ONE);
         }
 
         final RawStore tmpBody = this.getRawInPlaceStore();
