@@ -123,7 +123,7 @@ public class CalendarDateSeries<V extends Number> extends OldAbstractSeries<Cale
     }
 
     public ExplicitTimeSeries getPrimitiveTimeSeries() {
-        return new ExplicitTimeSeries(this.getPrimitiveKeys(), this.getDataSeries());
+        return new ExplicitTimeSeries(this.getPrimitiveKeys(), this.getPrimitiveSeries());
     }
 
     public CalendarDateUnit getResolution() {

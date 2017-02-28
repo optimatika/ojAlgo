@@ -93,7 +93,7 @@ public abstract class FinanceUtils {
         retVal.name(series.getName()).colour(series.getColour());
 
         final double tmpSamplePeriod = (double) series.getAverageStepSize() / (double) timeUnit.size();
-        final GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.estimate(series.getDataSeries(), tmpSamplePeriod);
+        final GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.estimate(series.getPrimitiveSeries(), tmpSamplePeriod);
 
         if (includeOriginalSeries) {
             for (final Entry<CalendarDate, ? extends Number> tmpEntry : series.entrySet()) {
@@ -196,7 +196,7 @@ public abstract class FinanceUtils {
 
         for (int j = 0; j < tmpSize; j++) {
 
-            final PrimitiveSeries tmpPrimitiveSeries = tmpCoordinated.get(listOfTimeSeries.get(j).getName()).getDataSeries();
+            final PrimitiveSeries tmpPrimitiveSeries = tmpCoordinated.get(listOfTimeSeries.get(j).getName()).getPrimitiveSeries();
 
             tmpSampleSet = SampleSet.wrap(tmpPrimitiveSeries.quotients().log().toDataSeries());
 

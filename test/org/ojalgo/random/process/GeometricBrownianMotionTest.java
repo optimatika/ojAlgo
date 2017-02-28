@@ -38,7 +38,7 @@ import org.ojalgo.random.Normal;
 import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.series.CalendarDateSeries;
-import org.ojalgo.series.primitive.DataSeries;
+import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
@@ -269,8 +269,8 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         final CalendarDateSeries<Double> tmpYearSeries = tmpDaySeries.resample(CalendarDateUnit.YEAR);
         final CalendarDateSeries<Double> tmpMonthSeries = tmpDaySeries.resample(CalendarDateUnit.MONTH);
 
-        final DataSeries tmpDataY = tmpYearSeries.getDataSeries();
-        final DataSeries tmpDataM = tmpMonthSeries.getDataSeries();
+        final PrimitiveSeries tmpDataY = tmpYearSeries.getPrimitiveSeries();
+        final PrimitiveSeries tmpDataM = tmpMonthSeries.getPrimitiveSeries();
 
         final SampleSet tmpSetY = SampleSet.wrap(tmpDataY.log().differences());
         final SampleSet tmpSetM = SampleSet.wrap(tmpDataM.log().differences());
