@@ -223,19 +223,18 @@ public final class PrimitiveFunction extends FunctionSet<Double> {
 
         @Override
         public final double invoke(final double arg1, final double arg2) {
-            double retVal;
+
             final double abs1 = ABS.invoke(arg1);
             final double abs2 = ABS.invoke(arg2);
+
+            double retVal = ZERO;
+
             if (abs1 > abs2) {
-                retVal = arg2 / arg1;
-                retVal = abs1 * SQRT.invoke(ONE + (retVal * retVal));
-                // } else if (arg2 != ZERO) {
-            } else if (Double.compare(abs2, ZERO) != 0) {
-                retVal = arg1 / arg2;
-                retVal = abs2 * SQRT.invoke(ONE + (retVal * retVal));
-            } else {
-                retVal = ZERO;
+                retVal = abs1 * SQRT1PX2.invoke(abs2 / abs1);
+            } else if (abs2 > ZERO) {
+                retVal = abs2 * SQRT1PX2.invoke(abs1 / abs2);
             }
+
             return retVal;
         }
 
