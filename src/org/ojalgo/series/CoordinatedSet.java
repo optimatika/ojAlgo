@@ -24,6 +24,7 @@ package org.ojalgo.series;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.CalendarDateDuration;
@@ -39,10 +40,27 @@ class CoordinatedSet<K extends Comparable<? super K>> {
         return new CoordinatedSet<>(series, resolution);
     }
 
+    static <K extends Comparable<? super K>> CoordinatedSet<K> coordinate(final List<? extends BasicSeries<K, ?>> series,
+            final CalendarDateDuration resolution) {
+
+        K first = BasicSeries.findLatestFirstKey(series);
+        K last = BasicSeries.findEarliestLastKey(series);
+
+        TreeSet<K> tmpAllKeys = new TreeSet<K>();
+
+        for (BasicSeries<K, ?> individual : series) {
+            tmpAllKeys.addAll(individual.subMap(first, last).keySet());
+        }
+        tmpAllKeys.add(last);
+
+        return null;
+    }
+
     private final K myFirst = null;
     private final K myLast = null;
     private final int myLength = 0;
     private final CalendarDateDuration myResolution = null;
+
     private final Map<String, PrimitiveSeries> mySet = new HashMap<>();
 
     private CoordinatedSet(final List<? extends BasicSeries<K, ?>> series, final CalendarDateDuration resolution) {

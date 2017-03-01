@@ -56,7 +56,7 @@ public class ArrayStructureTest extends ArrayTests {
         ARRAY_1D = new Primitive64Array(AccessUtils.count(STRUCTURE_1D));
 
         for (int i = 0; i < ARRAY_1D.size(); i++) {
-            ARRAY_1D.set(i, new Double(i));
+            ARRAY_1D.set(i, Double.valueOf(i));
         }
 
         // 2
@@ -71,7 +71,7 @@ public class ArrayStructureTest extends ArrayTests {
         ARRAY_2D = new Primitive64Array(AccessUtils.count(STRUCTURE_2D));
 
         for (int i = 0; i < ARRAY_2D.size(); i++) {
-            ARRAY_2D.set(i, new Double(i));
+            ARRAY_2D.set(i, Double.valueOf(i));
         }
 
         // 3
@@ -86,7 +86,7 @@ public class ArrayStructureTest extends ArrayTests {
         ARRAY_3D = new Primitive64Array(AccessUtils.count(STRUCTURE_3D));
 
         for (int i = 0; i < ARRAY_3D.size(); i++) {
-            ARRAY_3D.set(i, new Double(i));
+            ARRAY_3D.set(i, Double.valueOf(i));
         }
 
         // 4
@@ -101,7 +101,7 @@ public class ArrayStructureTest extends ArrayTests {
         ARRAY_4D = new Primitive64Array(AccessUtils.count(STRUCTURE_4D));
 
         for (int i = 0; i < ARRAY_4D.size(); i++) {
-            ARRAY_4D.set(i, new Double(i));
+            ARRAY_4D.set(i, Double.valueOf(i));
         }
     }
 

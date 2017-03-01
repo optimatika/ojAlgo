@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.SortedMap;
 
+import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.primitive.DataSeries;
@@ -100,6 +101,74 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     public static final BasicSeries.Builder<Long> LONG = new BasicSeries.Builder<>(TimeIndex.LONG);
     public static final BasicSeries.Builder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.Builder<>(TimeIndex.OFFSET_DATE_TIME);
     public static final BasicSeries.Builder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.Builder<>(TimeIndex.ZONED_DATE_TIME);
+
+    public static <N extends Number & Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, IndexMapper<N> indexMapper) {
+        return new SparseSeries<>(arrayFactory, indexMapper);
+    }
+
+    static <K extends Comparable<? super K>> K findEarliestFirstKey(Collection<? extends BasicSeries<K, ?>> collection) {
+
+        K retVal = null, tmpVal = null;
+
+        for (final BasicSeries<K, ?> individual : collection) {
+
+            tmpVal = individual.firstKey();
+
+            if ((retVal == null) || (tmpVal.compareTo(retVal) < 0)) {
+                retVal = tmpVal;
+            }
+        }
+
+        return retVal;
+    }
+
+    static <K extends Comparable<? super K>> K findEarliestLastKey(Collection<? extends BasicSeries<K, ?>> collection) {
+
+        K retVal = null, tmpVal = null;
+
+        for (final BasicSeries<K, ?> individual : collection) {
+
+            tmpVal = individual.lastKey();
+
+            if ((retVal == null) || (tmpVal.compareTo(retVal) < 0)) {
+                retVal = tmpVal;
+            }
+        }
+
+        return retVal;
+    }
+
+    static <K extends Comparable<? super K>> K findLatestFirstKey(Collection<? extends BasicSeries<K, ?>> collection) {
+
+        K retVal = null, tmpVal = null;
+
+        for (final BasicSeries<K, ?> individual : collection) {
+
+            tmpVal = individual.firstKey();
+
+            if ((retVal == null) || (tmpVal.compareTo(retVal) > 0)) {
+                retVal = tmpVal;
+            }
+        }
+
+        return retVal;
+    }
+
+    static <K extends Comparable<? super K>> K findLatestLastKey(Collection<? extends BasicSeries<K, ?>> collection) {
+
+        K retVal = null, tmpVal = null;
+
+        for (final BasicSeries<K, ?> individual : collection) {
+
+            tmpVal = individual.lastKey();
+
+            if ((retVal == null) || (tmpVal.compareTo(retVal) > 0)) {
+                retVal = tmpVal;
+            }
+        }
+
+        return retVal;
+    }
 
     BasicSeries<K, V> colour(ColourData colour);
 

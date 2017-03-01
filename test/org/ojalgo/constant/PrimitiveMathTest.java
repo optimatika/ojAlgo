@@ -25,8 +25,6 @@ import org.ojalgo.TestUtils;
 
 public class PrimitiveMathTest extends ConstantTests {
 
-    private final double myTolerance = PrimitiveMath.MACHINE_EPSILON;
-
     public PrimitiveMathTest() {
         super();
     }

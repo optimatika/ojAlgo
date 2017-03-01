@@ -130,67 +130,19 @@ public class CoordinationSet<N extends Number> extends HashMap<String, CalendarD
     }
 
     public CalendarDate getEarliestFirstKey() {
-
-        CalendarDate retVal = null, tmpVal = null;
-
-        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-
-            tmpVal = tmpSeries.firstKey();
-
-            if ((retVal == null) || (tmpVal.compareTo(retVal) < 0)) {
-                retVal = tmpVal;
-            }
-        }
-
-        return retVal;
+        return BasicSeries.findEarliestFirstKey(this.values());
     }
 
     public CalendarDate getEarliestLastKey() {
-
-        CalendarDate retVal = null, tmpVal = null;
-
-        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-
-            tmpVal = tmpSeries.lastKey();
-
-            if ((retVal == null) || (tmpVal.compareTo(retVal) < 0)) {
-                retVal = tmpVal;
-            }
-        }
-
-        return retVal;
+        return BasicSeries.findEarliestLastKey(this.values());
     }
 
     public CalendarDate getLatestFirstKey() {
-
-        CalendarDate retVal = null, tmpVal = null;
-
-        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-
-            tmpVal = tmpSeries.firstKey();
-
-            if ((retVal == null) || (tmpVal.compareTo(retVal) > 0)) {
-                retVal = tmpVal;
-            }
-        }
-
-        return retVal;
+        return BasicSeries.findLatestFirstKey(this.values());
     }
 
     public CalendarDate getLatestLastKey() {
-
-        CalendarDate retVal = null, tmpVal = null;
-
-        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-
-            tmpVal = tmpSeries.lastKey();
-
-            if ((retVal == null) || (tmpVal.compareTo(retVal) > 0)) {
-                retVal = tmpVal;
-            }
-        }
-
-        return retVal;
+        return BasicSeries.findLatestLastKey(this.values());
     };
 
     public CalendarDateUnit getResolution() {
