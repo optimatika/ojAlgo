@@ -320,6 +320,48 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
     static final Hardware X86_64__16 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(12L * K * K * K, 16), new BasicMachine(8L * K * K, 8),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
+    /**
+     * <ul>
+     * <li>CBF
+     * <ul>
+     * <li></li>
+     * <li>? processors</li>
+     * <li>? cores per processor (32 cores in total)</li>
+     * <li>2 threads per core</li>
+     * <li>==>> Total 64 threads</li>
+     * <li></li>
+     * <li>256GB system RAM</li>
+     * <li>8MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
+     * </ul>
+     */
+    static final Hardware X86_64__64 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(256L * K * K * K, 64), new BasicMachine(8L * K * K, 8),
+            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
+
+    /**
+     * <ul>
+     * <li>CBL
+     * <ul>
+     * <li></li>
+     * <li>? processors</li>
+     * <li>? cores per processor (32 cores in total)</li>
+     * <li>2 threads per core</li>
+     * <li>==>> Total 64 threads</li>
+     * <li></li>
+     * <li>256GB system RAM</li>
+     * <li>8MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
+     * </ul>
+     */
+    static final Hardware X86_64__96 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(256L * K * K * K, 64), new BasicMachine(8L * K * K, 8),
+            new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
+
     static {
         PREDEFINED.add(PPC__01);
         PREDEFINED.add(X86__01);
@@ -329,6 +371,8 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
         PREDEFINED.add(X86_64__08);
         PREDEFINED.add(X86_64__12);
         PREDEFINED.add(X86_64__16);
+        PREDEFINED.add(X86_64__64);
+        PREDEFINED.add(X86_64__96);
     }
 
     public static Hardware makeSimple() {
