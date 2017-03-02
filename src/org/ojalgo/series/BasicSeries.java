@@ -30,11 +30,13 @@ import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.SortedMap;
 
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.series.primitive.CoordinatedSet;
 import org.ojalgo.series.primitive.DataSeries;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.CalendarDate;
@@ -102,11 +104,15 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     public static final BasicSeries.Builder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.Builder<>(TimeIndex.OFFSET_DATE_TIME);
     public static final BasicSeries.Builder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.Builder<>(TimeIndex.ZONED_DATE_TIME);
 
-    public static <N extends Number & Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, IndexMapper<N> indexMapper) {
+    public static <N extends Number & Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, final IndexMapper<N> indexMapper) {
         return new SparseSeries<>(arrayFactory, indexMapper);
     }
 
-    static <K extends Comparable<? super K>> K findEarliestFirstKey(Collection<? extends BasicSeries<K, ?>> collection) {
+    static <K extends Comparable<? super K>> CoordinatedSet<K> coordinate(final List<? extends BasicSeries<K, ?>> uncoordinated) {
+        return CoordinatedSet.from(uncoordinated);
+    }
+
+    static <K extends Comparable<? super K>> K findEarliestFirstKey(final Collection<? extends BasicSeries<K, ?>> collection) {
 
         K retVal = null, tmpVal = null;
 
@@ -122,7 +128,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         return retVal;
     }
 
-    static <K extends Comparable<? super K>> K findEarliestLastKey(Collection<? extends BasicSeries<K, ?>> collection) {
+    static <K extends Comparable<? super K>> K findEarliestLastKey(final Collection<? extends BasicSeries<K, ?>> collection) {
 
         K retVal = null, tmpVal = null;
 
@@ -138,7 +144,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         return retVal;
     }
 
-    static <K extends Comparable<? super K>> K findLatestFirstKey(Collection<? extends BasicSeries<K, ?>> collection) {
+    static <K extends Comparable<? super K>> K findLatestFirstKey(final Collection<? extends BasicSeries<K, ?>> collection) {
 
         K retVal = null, tmpVal = null;
 
@@ -154,7 +160,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         return retVal;
     }
 
-    static <K extends Comparable<? super K>> K findLatestLastKey(Collection<? extends BasicSeries<K, ?>> collection) {
+    static <K extends Comparable<? super K>> K findLatestLastKey(final Collection<? extends BasicSeries<K, ?>> collection) {
 
         K retVal = null, tmpVal = null;
 
