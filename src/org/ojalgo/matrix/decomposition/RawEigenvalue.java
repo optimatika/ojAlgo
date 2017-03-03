@@ -24,11 +24,12 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.util.Optional;
+
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
-
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
 import org.ojalgo.matrix.store.ElementsSupplier;
@@ -1113,6 +1114,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     double[] getRealEigenvalues() {
         return d;
+    }
+
+    public void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
+
+        final int length = realParts.length;
+
+        System.arraycopy(this.getRealEigenvalues(), 0, realParts, 0, length);
+
+        if (imaginaryParts.isPresent()) {
+            System.arraycopy(this.getImagEigenvalues(), 0, imaginaryParts.get(), 0, length);
+        }
     }
 
 }

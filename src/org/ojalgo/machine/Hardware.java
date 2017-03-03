@@ -322,7 +322,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
 
     /**
      * <ul>
-     * <li>CBF
+     * <li>CBF (test)
      * <ul>
      * <li></li>
      * <li>? processors</li>
@@ -330,7 +330,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>2 threads per core</li>
      * <li>==>> Total 64 threads</li>
      * <li></li>
-     * <li>256GB system RAM</li>
+     * <li>512GB system RAM</li>
      * <li>8MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
      * <li>32kB L1 cache per core</li>
@@ -338,20 +338,20 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * </ul>
      */
-    static final Hardware X86_64__64 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(256L * K * K * K, 64), new BasicMachine(8L * K * K, 8),
+    static final Hardware X86_64__64 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 64), new BasicMachine(8L * K * K, 8),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**
      * <ul>
-     * <li>CBL
+     * <li>CBF (prod)
      * <ul>
      * <li></li>
      * <li>? processors</li>
-     * <li>? cores per processor (32 cores in total)</li>
+     * <li>? cores per processor (48 cores in total)</li>
      * <li>2 threads per core</li>
-     * <li>==>> Total 64 threads</li>
+     * <li>==>> Total 96 threads</li>
      * <li></li>
-     * <li>256GB system RAM</li>
+     * <li>512GB system RAM</li>
      * <li>8MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
      * <li>32kB L1 cache per core</li>
@@ -359,7 +359,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * </ul>
      */
-    static final Hardware X86_64__96 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(256L * K * K * K, 64), new BasicMachine(8L * K * K, 8),
+    static final Hardware X86_64__96 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 64), new BasicMachine(8L * K * K, 12),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     static {

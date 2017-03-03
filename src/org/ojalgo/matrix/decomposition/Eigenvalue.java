@@ -22,6 +22,8 @@
 package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
@@ -122,14 +124,14 @@ public interface Eigenvalue<N extends Number>
     }
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
-    
+
         final MatrixStore<N> tmpD = decomposition.getD();
         final MatrixStore<N> tmpV = decomposition.getV();
-    
+
         // Check that [A][V] == [V][D] ([A] == [V][D][V]<sup>T</sup> is not always true)
         final MatrixStore<N> tmpStore1 = matrix.multiply(tmpV);
         final MatrixStore<N> tmpStore2 = tmpV.multiply(tmpD);
-    
+
         return AccessUtils.equals(tmpStore1, tmpStore2, context);
     }
 
@@ -195,6 +197,34 @@ public interface Eigenvalue<N extends Number>
      * @return The eigenvalues.
      */
     Array1D<ComplexNumber> getEigenvalues();
+
+    /**
+     * @param realParts An array that will receive the real parts of the eigenvalues
+     * @param imaginaryParts An optional array that, if present, will receive the imaginary parts of the
+     *        eigenvalues
+     */
+    default void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
+
+        Objects.requireNonNull(realParts);
+        Objects.requireNonNull(imaginaryParts);
+
+        final Array1D<ComplexNumber> values = this.getEigenvalues();
+
+        final int length = realParts.length;
+
+        if (imaginaryParts.isPresent()) {
+            final double[] imagParts = imaginaryParts.get();
+            for (int i = 0; i < length; i++) {
+                final ComplexNumber value = values.get(i);
+                realParts[i] = value.getReal();
+                imagParts[i] = value.getImaginary();
+            }
+        } else {
+            for (int i = 0; i < length; i++) {
+                realParts[i] = values.doubleValue(i);
+            }
+        }
+    }
 
     /**
      * @param index Index corresponding to an entry in {@link #getEigenvalues()} and/or a column in
