@@ -248,6 +248,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return retVal;
     }
 
+    public void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
+
+        final int length = realParts.length;
+
+        System.arraycopy(this.getRealEigenvalues(), 0, realParts, 0, length);
+
+        if (imaginaryParts.isPresent()) {
+            System.arraycopy(this.getImagEigenvalues(), 0, imaginaryParts.get(), 0, length);
+        }
+    }
+
     public MatrixStore<Double> getInverse() {
         return this.getInverse(this.allocate(n, n));
     }
@@ -1114,17 +1125,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     double[] getRealEigenvalues() {
         return d;
-    }
-
-    public void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
-
-        final int length = realParts.length;
-
-        System.arraycopy(this.getRealEigenvalues(), 0, realParts, 0, length);
-
-        if (imaginaryParts.isPresent()) {
-            System.arraycopy(this.getImagEigenvalues(), 0, imaginaryParts.get(), 0, length);
-        }
     }
 
 }
