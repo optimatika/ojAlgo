@@ -123,14 +123,6 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
         return myQ;
     }
 
-    public final boolean isFullSize() {
-        return true;
-    }
-
-    public final boolean isSolvable() {
-        return false;
-    }
-
     public boolean isUpper() {
         return myUpper;
     }
@@ -142,10 +134,6 @@ abstract class HessenbergDecomposition<N extends Number> extends InPlaceDecompos
 
         myQ = null;
         myUpper = true;
-    }
-
-    public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
-        throw new UnsupportedOperationException();
     }
 
     private final DecompositionStore<N> makeQ(final DecompositionStore<N> storeToTransform, final boolean upper, final boolean eye) {

@@ -228,6 +228,7 @@ public interface MatrixDecomposition<N extends Number> {
         public long countRows() {
             return 50L;
         }
+
     };
 
     /**

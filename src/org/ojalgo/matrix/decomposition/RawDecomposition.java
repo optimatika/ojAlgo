@@ -57,7 +57,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         boolean retVal = myRowDim == myColDim;
         for (int i = 0; retVal && (i < myRowDim); i++) {
             for (int j = 0; retVal && (j < i); j++) {
-                retVal &= (myRawInPlaceData[i][j] == myRawInPlaceData[j][i]);
+                retVal &= (Double.compare(myRawInPlaceData[i][j], myRawInPlaceData[j][i]) == 0);
             }
         }
         return retVal;

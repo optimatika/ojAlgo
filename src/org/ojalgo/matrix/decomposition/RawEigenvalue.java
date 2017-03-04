@@ -142,17 +142,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      *
      * @serial internal storage of eigenvalues.
      */
-    private double[] d;
+    private double[] d = null;
 
-    private double[] e;
+    private double[] e = null;
     /**
      * Array for internal storage of nonsymmetric Hessenberg form.
      *
      * @serial internal storage of nonsymmetric Hessenberg form.
      */
-    private double[][] H;
+    private double[][] H = null;
 
-    private RawStore myInverse;
+    private RawStore myInverse = null;
 
     /**
      * Row and column dimension (square matrix).
@@ -166,7 +166,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      *
      * @serial internal storage of eigenvectors.
      */
-    private double[][] Vt;
+    private double[][] Vt = null;
 
     protected RawEigenvalue() {
         super();
@@ -848,7 +848,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
          *
          * @serial working storage for nonsymmetric algorithm.
          */
-        final double[] ort = new double[n];
+        // final double[] ort = new double[n];
+        final double[] ort = d; // reuse
 
         for (int m = low + 1; m <= (high - 1); m++) {
 
@@ -1069,9 +1070,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     void doDecomposeGeneral(final double[][] data) {
 
         n = data.length;
-        Vt = new double[n][n];
-        d = new double[n];
-        e = new double[n];
+
+        if ((d == null) || (n != d.length)) {
+            Vt = new double[n][n];
+            d = new double[n];
+            e = new double[n];
+        }
 
         H = data;
 
@@ -1092,9 +1096,13 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     void doDecomposeSymmetric(final double[][] data) {
 
         n = data.length;
+
+        if ((d == null) || (n != d.length)) {
+            d = new double[n];
+            e = new double[n];
+        }
+
         Vt = data;
-        d = new double[n];
-        e = new double[n];
 
         //        for (int i = 0; i < n; i++) {
         //            for (int j = 0; j < n; j++) {

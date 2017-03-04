@@ -37,7 +37,6 @@ import org.ojalgo.array.ComplexArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.FunctionUtils;
@@ -217,7 +216,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
             final PrimitiveDenseStore retVal = this.makeZero(rows, columns);
 
-            retVal.myUtility.fillDiagonal(0, 0, PrimitiveMath.ONE);
+            retVal.myUtility.fillDiagonal(0, 0, ONE);
 
             return retVal;
         }
@@ -391,10 +390,10 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
-    static void doAfter(final double[] aMtrxH, final double[] aMtrxV, final double[] tmpMainDiagonal, final double[] tmpOffDiagonal, double r, double s,
+    static void doAfter(final double[] mtrxH, final double[] mtrxV, final double[] d, final double[] e, double r, double s,
             double z, final double aNorm1) {
 
-        final int tmpDiagDim = (int) PrimitiveFunction.SQRT.invoke(aMtrxH.length);
+        final int tmpDiagDim = (int) SQRT.invoke(mtrxH.length);
         final int tmpDiagDimMinusOne = tmpDiagDim - 1;
 
         // BasicLogger.logDebug("r={}, s={}, z={}", r, s, z);
@@ -408,51 +407,51 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         for (int ij = tmpDiagDimMinusOne; ij >= 0; ij--) {
 
-            p = tmpMainDiagonal[ij];
-            q = tmpOffDiagonal[ij];
+            p = d[ij];
+            q = e[ij];
 
             // Real vector
             if (q == 0) {
                 int l = ij;
-                aMtrxH[ij + (tmpDiagDim * ij)] = 1.0;
+                mtrxH[ij + (tmpDiagDim * ij)] = 1.0;
                 for (int i = ij - 1; i >= 0; i--) {
-                    w = aMtrxH[i + (tmpDiagDim * i)] - p;
-                    r = PrimitiveMath.ZERO;
+                    w = mtrxH[i + (tmpDiagDim * i)] - p;
+                    r = ZERO;
                     for (int j = l; j <= ij; j++) {
-                        r = r + (aMtrxH[i + (tmpDiagDim * j)] * aMtrxH[j + (tmpDiagDim * ij)]);
+                        r = r + (mtrxH[i + (tmpDiagDim * j)] * mtrxH[j + (tmpDiagDim * ij)]);
                     }
-                    if (tmpOffDiagonal[i] < PrimitiveMath.ZERO) {
+                    if (e[i] < ZERO) {
                         z = w;
                         s = r;
                     } else {
                         l = i;
-                        if (tmpOffDiagonal[i] == PrimitiveMath.ZERO) {
-                            // if (w != PrimitiveMath.ZERO) {
+                        if (e[i] == ZERO) {
+                            // if (w !=  ZERO) {
                             if (Double.compare(w, ZERO) != 0) {
-                                aMtrxH[i + (tmpDiagDim * ij)] = -r / w;
+                                mtrxH[i + (tmpDiagDim * ij)] = -r / w;
                             } else {
-                                aMtrxH[i + (tmpDiagDim * ij)] = -r / (PrimitiveMath.MACHINE_EPSILON * aNorm1);
+                                mtrxH[i + (tmpDiagDim * ij)] = -r / (MACHINE_EPSILON * aNorm1);
                             }
 
                             // Solve real equations
                         } else {
-                            x = aMtrxH[i + (tmpDiagDim * (i + 1))];
-                            y = aMtrxH[(i + 1) + (tmpDiagDim * i)];
-                            q = ((tmpMainDiagonal[i] - p) * (tmpMainDiagonal[i] - p)) + (tmpOffDiagonal[i] * tmpOffDiagonal[i]);
+                            x = mtrxH[i + (tmpDiagDim * (i + 1))];
+                            y = mtrxH[(i + 1) + (tmpDiagDim * i)];
+                            q = ((d[i] - p) * (d[i] - p)) + (e[i] * e[i]);
                             t = ((x * s) - (z * r)) / q;
-                            aMtrxH[i + (tmpDiagDim * ij)] = t;
-                            if (PrimitiveFunction.ABS.invoke(x) > PrimitiveFunction.ABS.invoke(z)) {
-                                aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-r - (w * t)) / x;
+                            mtrxH[i + (tmpDiagDim * ij)] = t;
+                            if (ABS.invoke(x) > ABS.invoke(z)) {
+                                mtrxH[(i + 1) + (tmpDiagDim * ij)] = (-r - (w * t)) / x;
                             } else {
-                                aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-s - (y * t)) / z;
+                                mtrxH[(i + 1) + (tmpDiagDim * ij)] = (-s - (y * t)) / z;
                             }
                         }
 
                         // Overflow control
-                        t = PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * ij)]);
-                        if (((PrimitiveMath.MACHINE_EPSILON * t) * t) > 1) {
+                        t = ABS.invoke(mtrxH[i + (tmpDiagDim * ij)]);
+                        if (((MACHINE_EPSILON * t) * t) > 1) {
                             for (int j = i; j <= ij; j++) {
-                                aMtrxH[j + (tmpDiagDim * ij)] = aMtrxH[j + (tmpDiagDim * ij)] / t;
+                                mtrxH[j + (tmpDiagDim * ij)] = mtrxH[j + (tmpDiagDim * ij)] / t;
                             }
                         }
                     }
@@ -463,39 +462,39 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 int l = ij - 1;
 
                 // Last vector component imaginary so matrix is triangular
-                if (PrimitiveFunction.ABS.invoke(aMtrxH[ij + (tmpDiagDim * (ij - 1))]) > PrimitiveFunction.ABS.invoke(aMtrxH[(ij - 1) + (tmpDiagDim * ij)])) {
-                    aMtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] = q / aMtrxH[ij + (tmpDiagDim * (ij - 1))];
-                    aMtrxH[(ij - 1) + (tmpDiagDim * ij)] = -(aMtrxH[ij + (tmpDiagDim * ij)] - p) / aMtrxH[ij + (tmpDiagDim * (ij - 1))];
+                if (ABS.invoke(mtrxH[ij + (tmpDiagDim * (ij - 1))]) > ABS.invoke(mtrxH[(ij - 1) + (tmpDiagDim * ij)])) {
+                    mtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] = q / mtrxH[ij + (tmpDiagDim * (ij - 1))];
+                    mtrxH[(ij - 1) + (tmpDiagDim * ij)] = -(mtrxH[ij + (tmpDiagDim * ij)] - p) / mtrxH[ij + (tmpDiagDim * (ij - 1))];
                 } else {
 
-                    final ComplexNumber tmpX = ComplexNumber.of(PrimitiveMath.ZERO, (-aMtrxH[(ij - 1) + (tmpDiagDim * ij)]));
+                    final ComplexNumber tmpX = ComplexNumber.of(ZERO, (-mtrxH[(ij - 1) + (tmpDiagDim * ij)]));
                     final double imaginary = q;
-                    final ComplexNumber tmpY = ComplexNumber.of((aMtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] - p), imaginary);
+                    final ComplexNumber tmpY = ComplexNumber.of((mtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] - p), imaginary);
 
                     final ComplexNumber tmpZ = tmpX.divide(tmpY);
 
-                    aMtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] = tmpZ.doubleValue();
-                    aMtrxH[(ij - 1) + (tmpDiagDim * ij)] = tmpZ.i;
+                    mtrxH[(ij - 1) + (tmpDiagDim * (ij - 1))] = tmpZ.doubleValue();
+                    mtrxH[(ij - 1) + (tmpDiagDim * ij)] = tmpZ.i;
                 }
-                aMtrxH[ij + (tmpDiagDim * (ij - 1))] = PrimitiveMath.ZERO;
-                aMtrxH[ij + (tmpDiagDim * ij)] = 1.0;
+                mtrxH[ij + (tmpDiagDim * (ij - 1))] = ZERO;
+                mtrxH[ij + (tmpDiagDim * ij)] = 1.0;
                 for (int i = ij - 2; i >= 0; i--) {
                     double ra, sa, vr, vi;
-                    ra = PrimitiveMath.ZERO;
-                    sa = PrimitiveMath.ZERO;
+                    ra = ZERO;
+                    sa = ZERO;
                     for (int j = l; j <= ij; j++) {
-                        ra = ra + (aMtrxH[i + (tmpDiagDim * j)] * aMtrxH[j + (tmpDiagDim * (ij - 1))]);
-                        sa = sa + (aMtrxH[i + (tmpDiagDim * j)] * aMtrxH[j + (tmpDiagDim * ij)]);
+                        ra = ra + (mtrxH[i + (tmpDiagDim * j)] * mtrxH[j + (tmpDiagDim * (ij - 1))]);
+                        sa = sa + (mtrxH[i + (tmpDiagDim * j)] * mtrxH[j + (tmpDiagDim * ij)]);
                     }
-                    w = aMtrxH[i + (tmpDiagDim * i)] - p;
+                    w = mtrxH[i + (tmpDiagDim * i)] - p;
 
-                    if (tmpOffDiagonal[i] < PrimitiveMath.ZERO) {
+                    if (e[i] < ZERO) {
                         z = w;
                         r = ra;
                         s = sa;
                     } else {
                         l = i;
-                        if (tmpOffDiagonal[i] == 0) {
+                        if (e[i] == 0) {
                             final ComplexNumber tmpX = ComplexNumber.of((-ra), (-sa));
                             final double real = w;
                             final double imaginary = q;
@@ -503,19 +502,18 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                             final ComplexNumber tmpZ = tmpX.divide(tmpY);
 
-                            aMtrxH[i + (tmpDiagDim * (ij - 1))] = tmpZ.doubleValue();
-                            aMtrxH[i + (tmpDiagDim * ij)] = tmpZ.i;
+                            mtrxH[i + (tmpDiagDim * (ij - 1))] = tmpZ.doubleValue();
+                            mtrxH[i + (tmpDiagDim * ij)] = tmpZ.i;
                         } else {
 
                             // Solve complex equations
-                            x = aMtrxH[i + (tmpDiagDim * (i + 1))];
-                            y = aMtrxH[(i + 1) + (tmpDiagDim * i)];
-                            vr = (((tmpMainDiagonal[i] - p) * (tmpMainDiagonal[i] - p)) + (tmpOffDiagonal[i] * tmpOffDiagonal[i])) - (q * q);
-                            vi = (tmpMainDiagonal[i] - p) * 2.0 * q;
-                            // if ((vr == PrimitiveMath.ZERO) & (vi == PrimitiveMath.ZERO)) {
+                            x = mtrxH[i + (tmpDiagDim * (i + 1))];
+                            y = mtrxH[(i + 1) + (tmpDiagDim * i)];
+                            vr = (((d[i] - p) * (d[i] - p)) + (e[i] * e[i])) - (q * q);
+                            vi = (d[i] - p) * 2.0 * q;
+                            // if ((vr ==  ZERO) & (vi ==  ZERO)) {
                             if ((Double.compare(vr, ZERO) == 0) && (Double.compare(vi, ZERO) == 0)) {
-                                vr = PrimitiveMath.MACHINE_EPSILON * aNorm1 * (PrimitiveFunction.ABS.invoke(w) + PrimitiveFunction.ABS.invoke(q)
-                                        + PrimitiveFunction.ABS.invoke(x) + PrimitiveFunction.ABS.invoke(y) + PrimitiveFunction.ABS.invoke(z));
+                                vr = MACHINE_EPSILON * aNorm1 * (ABS.invoke(w) + ABS.invoke(q) + ABS.invoke(x) + ABS.invoke(y) + ABS.invoke(z));
                             }
 
                             final ComplexNumber tmpX = ComplexNumber.of((((x * r) - (z * ra)) + (q * sa)), ((x * s) - (z * sa) - (q * ra)));
@@ -525,36 +523,34 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                             final ComplexNumber tmpZ = tmpX.divide(tmpY);
 
-                            aMtrxH[i + (tmpDiagDim * (ij - 1))] = tmpZ.doubleValue();
-                            aMtrxH[i + (tmpDiagDim * ij)] = tmpZ.i;
+                            mtrxH[i + (tmpDiagDim * (ij - 1))] = tmpZ.doubleValue();
+                            mtrxH[i + (tmpDiagDim * ij)] = tmpZ.i;
 
-                            if (PrimitiveFunction.ABS.invoke(x) > (PrimitiveFunction.ABS.invoke(z) + PrimitiveFunction.ABS.invoke(q))) {
-                                aMtrxH[(i + 1)
-                                        + (tmpDiagDim * (ij - 1))] = ((-ra - (w * aMtrxH[i + (tmpDiagDim * (ij - 1))])) + (q * aMtrxH[i + (tmpDiagDim * ij)]))
+                            if (ABS.invoke(x) > (ABS.invoke(z) + ABS.invoke(q))) {
+                                mtrxH[(i + 1)
+                                        + (tmpDiagDim * (ij - 1))] = ((-ra - (w * mtrxH[i + (tmpDiagDim * (ij - 1))])) + (q * mtrxH[i + (tmpDiagDim * ij)]))
                                                 / x;
-                                aMtrxH[(i + 1) + (tmpDiagDim * ij)] = (-sa - (w * aMtrxH[i + (tmpDiagDim * ij)]) - (q * aMtrxH[i + (tmpDiagDim * (ij - 1))]))
-                                        / x;
+                                mtrxH[(i + 1) + (tmpDiagDim * ij)] = (-sa - (w * mtrxH[i + (tmpDiagDim * ij)]) - (q * mtrxH[i + (tmpDiagDim * (ij - 1))])) / x;
                             } else {
-                                final ComplexNumber tmpX1 = ComplexNumber.of((-r - (y * aMtrxH[i + (tmpDiagDim * (ij - 1))])),
-                                        (-s - (y * aMtrxH[i + (tmpDiagDim * ij)])));
+                                final ComplexNumber tmpX1 = ComplexNumber.of((-r - (y * mtrxH[i + (tmpDiagDim * (ij - 1))])),
+                                        (-s - (y * mtrxH[i + (tmpDiagDim * ij)])));
                                 final double real1 = z;
                                 final double imaginary1 = q;
                                 final ComplexNumber tmpY1 = ComplexNumber.of(real1, imaginary1);
 
                                 final ComplexNumber tmpZ1 = tmpX1.divide(tmpY1);
 
-                                aMtrxH[(i + 1) + (tmpDiagDim * (ij - 1))] = tmpZ1.doubleValue();
-                                aMtrxH[(i + 1) + (tmpDiagDim * ij)] = tmpZ1.i;
+                                mtrxH[(i + 1) + (tmpDiagDim * (ij - 1))] = tmpZ1.doubleValue();
+                                mtrxH[(i + 1) + (tmpDiagDim * ij)] = tmpZ1.i;
                             }
                         }
 
                         // Overflow control
-                        t = PrimitiveFunction.MAX.invoke(PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * (ij - 1))]),
-                                PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * ij)]));
-                        if (((PrimitiveMath.MACHINE_EPSILON * t) * t) > 1) {
+                        t = MAX.invoke(ABS.invoke(mtrxH[i + (tmpDiagDim * (ij - 1))]), ABS.invoke(mtrxH[i + (tmpDiagDim * ij)]));
+                        if (((MACHINE_EPSILON * t) * t) > 1) {
                             for (int j = i; j <= ij; j++) {
-                                aMtrxH[j + (tmpDiagDim * (ij - 1))] = aMtrxH[j + (tmpDiagDim * (ij - 1))] / t;
-                                aMtrxH[j + (tmpDiagDim * ij)] = aMtrxH[j + (tmpDiagDim * ij)] / t;
+                                mtrxH[j + (tmpDiagDim * (ij - 1))] = mtrxH[j + (tmpDiagDim * (ij - 1))] / t;
+                                mtrxH[j + (tmpDiagDim * ij)] = mtrxH[j + (tmpDiagDim * ij)] / t;
                             }
                         }
                     }
@@ -565,18 +561,21 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         // Back transformation to get eigenvectors of original matrix
         for (int j = tmpDiagDimMinusOne; j >= 0; j--) {
             for (int i = 0; i <= tmpDiagDimMinusOne; i++) {
-                z = PrimitiveMath.ZERO;
+                z = ZERO;
                 for (int k = 0; k <= j; k++) {
-                    z += aMtrxV[i + (tmpDiagDim * k)] * aMtrxH[k + (tmpDiagDim * j)];
+                    z += mtrxV[i + (tmpDiagDim * k)] * mtrxH[k + (tmpDiagDim * j)];
                 }
-                aMtrxV[i + (tmpDiagDim * j)] = z;
+                mtrxV[i + (tmpDiagDim * j)] = z;
             }
         }
     }
 
-    static int doHessenberg(final double[] aMtrxH, final double[] aMtrxV) {
+    /**
+     * orthes
+     */
+    static int doHessenberg(final double[] mtrxH, final double[] mtrxV) {
 
-        final int tmpDiagDim = (int) PrimitiveFunction.SQRT.invoke(aMtrxH.length);
+        final int tmpDiagDim = (int) SQRT.invoke(mtrxH.length);
         final int tmpDiagDimMinusTwo = tmpDiagDim - 2;
 
         final double[] tmpWorkCopy = new double[tmpDiagDim];
@@ -584,21 +583,21 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         for (int ij = 0; ij < tmpDiagDimMinusTwo; ij++) {
 
             // Scale column.
-            double tmpColNorm1 = PrimitiveMath.ZERO;
+            double tmpColNorm1 = ZERO;
             for (int i = ij + 1; i < tmpDiagDim; i++) {
-                tmpColNorm1 += PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * ij)]);
+                tmpColNorm1 += ABS.invoke(mtrxH[i + (tmpDiagDim * ij)]);
             }
 
-            // if (tmpColNorm1 != PrimitiveMath.ZERO) {
+            // if (tmpColNorm1 !=  ZERO) {
             if (Double.compare(tmpColNorm1, ZERO) != 0) {
 
                 // Compute Householder transformation.
-                double tmpInvBeta = PrimitiveMath.ZERO;
+                double tmpInvBeta = ZERO;
                 for (int i = tmpDiagDim - 1; i >= (ij + 1); i--) {
-                    tmpWorkCopy[i] = aMtrxH[i + (tmpDiagDim * ij)] / tmpColNorm1;
+                    tmpWorkCopy[i] = mtrxH[i + (tmpDiagDim * ij)] / tmpColNorm1;
                     tmpInvBeta += tmpWorkCopy[i] * tmpWorkCopy[i];
                 }
-                double g = PrimitiveFunction.SQRT.invoke(tmpInvBeta);
+                double g = SQRT.invoke(tmpInvBeta);
                 if (tmpWorkCopy[ij + 1] > 0) {
                     g = -g;
                 }
@@ -608,29 +607,29 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 // Apply Householder similarity transformation
                 // H = (I-u*u'/h)*H*(I-u*u')/h)
                 for (int j = ij + 1; j < tmpDiagDim; j++) {
-                    double f = PrimitiveMath.ZERO;
+                    double f = ZERO;
                     for (int i = tmpDiagDim - 1; i >= (ij + 1); i--) {
-                        f += tmpWorkCopy[i] * aMtrxH[i + (tmpDiagDim * j)];
+                        f += tmpWorkCopy[i] * mtrxH[i + (tmpDiagDim * j)];
                     }
                     f = f / tmpInvBeta;
                     for (int i = ij + 1; i <= (tmpDiagDim - 1); i++) {
-                        aMtrxH[i + (tmpDiagDim * j)] -= f * tmpWorkCopy[i];
+                        mtrxH[i + (tmpDiagDim * j)] -= f * tmpWorkCopy[i];
                     }
                 }
 
                 for (int i = 0; i < tmpDiagDim; i++) {
-                    double f = PrimitiveMath.ZERO;
+                    double f = ZERO;
                     for (int j = tmpDiagDim - 1; j >= (ij + 1); j--) {
-                        f += tmpWorkCopy[j] * aMtrxH[i + (tmpDiagDim * j)];
+                        f += tmpWorkCopy[j] * mtrxH[i + (tmpDiagDim * j)];
                     }
                     f = f / tmpInvBeta;
                     for (int j = ij + 1; j < tmpDiagDim; j++) {
-                        aMtrxH[i + (tmpDiagDim * j)] -= f * tmpWorkCopy[j];
+                        mtrxH[i + (tmpDiagDim * j)] -= f * tmpWorkCopy[j];
                     }
                 }
 
                 tmpWorkCopy[ij + 1] = tmpColNorm1 * tmpWorkCopy[ij + 1];
-                aMtrxH[(ij + 1) + (tmpDiagDim * ij)] = tmpColNorm1 * g;
+                mtrxH[(ij + 1) + (tmpDiagDim * ij)] = tmpColNorm1 * g;
             }
         }
 
@@ -643,19 +642,19 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         // Accumulate transformations (Algol's ortran).
         for (int ij = tmpDiagDimMinusTwo; ij >= 1; ij--) {
             final int tmpIndex = ij + (tmpDiagDim * (ij - 1));
-            if (aMtrxH[tmpIndex] != PrimitiveMath.ZERO) {
+            if (mtrxH[tmpIndex] != ZERO) {
                 for (int i = ij + 1; i <= (tmpDiagDim - 1); i++) {
-                    tmpWorkCopy[i] = aMtrxH[i + (tmpDiagDim * (ij - 1))];
+                    tmpWorkCopy[i] = mtrxH[i + (tmpDiagDim * (ij - 1))];
                 }
                 for (int j = ij; j <= (tmpDiagDim - 1); j++) {
-                    double g = PrimitiveMath.ZERO;
+                    double g = ZERO;
                     for (int i = ij; i <= (tmpDiagDim - 1); i++) {
-                        g += tmpWorkCopy[i] * aMtrxV[i + (tmpDiagDim * j)];
+                        g += tmpWorkCopy[i] * mtrxV[i + (tmpDiagDim * j)];
                     }
                     // Double division avoids possible underflow
-                    g = (g / tmpWorkCopy[ij]) / aMtrxH[tmpIndex];
+                    g = (g / tmpWorkCopy[ij]) / mtrxH[tmpIndex];
                     for (int i = ij; i <= (tmpDiagDim - 1); i++) {
-                        aMtrxV[i + (tmpDiagDim * j)] += g * tmpWorkCopy[i];
+                        mtrxV[i + (tmpDiagDim * j)] += g * tmpWorkCopy[i];
                     }
                 }
             } else {
@@ -670,24 +669,27 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return tmpDiagDim;
     }
 
-    static double[][] doSchur(final double[] aMtrxH, final double[] aMtrxV, final boolean allTheWay) {
+    /**
+     * hqr2
+     */
+    static double[][] doSchur(final double[] mtrxH, final double[] mtrxV, final boolean allTheWay) {
 
-        final int tmpDiagDim = (int) PrimitiveFunction.SQRT.invoke(aMtrxH.length);
+        final int tmpDiagDim = (int) SQRT.invoke(mtrxH.length);
         final int tmpDiagDimMinusOne = tmpDiagDim - 1;
 
         // Store roots isolated by balanc and compute matrix norm
-        double tmpVal = PrimitiveMath.ZERO;
+        double tmpVal = ZERO;
         for (int j = 0; j < tmpDiagDim; j++) {
             for (int i = Math.min(j + 1, tmpDiagDim - 1); i >= 0; i--) {
-                tmpVal += PrimitiveFunction.ABS.invoke(aMtrxH[i + (tmpDiagDim * j)]);
+                tmpVal += ABS.invoke(mtrxH[i + (tmpDiagDim * j)]);
             }
         }
         final double tmpNorm1 = tmpVal;
 
-        final double[] tmpMainDiagonal = new double[tmpDiagDim];
-        final double[] tmpOffDiagonal = new double[tmpDiagDim];
+        final double[] d = new double[tmpDiagDim];
+        final double[] e = new double[tmpDiagDim];
 
-        double exshift = PrimitiveMath.ZERO;
+        double exshift = ZERO;
         double p = 0, q = 0, r = 0, s = 0, z = 0;
 
         double w, x, y;
@@ -699,12 +701,12 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             // Look for single small sub-diagonal element
             int l = tmpMainIterIndex;
             while (l > 0) {
-                s = PrimitiveFunction.ABS.invoke(aMtrxH[(l - 1) + (tmpDiagDim * (l - 1))]) + PrimitiveFunction.ABS.invoke(aMtrxH[l + (tmpDiagDim * l)]);
-                // if (s == PrimitiveMath.ZERO) {
+                s = ABS.invoke(mtrxH[(l - 1) + (tmpDiagDim * (l - 1))]) + ABS.invoke(mtrxH[l + (tmpDiagDim * l)]);
+                // if (s ==  ZERO) {
                 if (Double.compare(s, ZERO) == 0) {
                     s = tmpNorm1;
                 }
-                if (PrimitiveFunction.ABS.invoke(aMtrxH[l + (tmpDiagDim * (l - 1))]) < (PrimitiveMath.MACHINE_EPSILON * s)) {
+                if (ABS.invoke(mtrxH[l + (tmpDiagDim * (l - 1))]) < (MACHINE_EPSILON * s)) {
                     break;
                 }
                 l--;
@@ -713,22 +715,22 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             // Check for convergence
             // One root found
             if (l == tmpMainIterIndex) {
-                aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] = aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] + exshift;
-                tmpMainDiagonal[tmpMainIterIndex] = aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)];
-                tmpOffDiagonal[tmpMainIterIndex] = PrimitiveMath.ZERO;
+                mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] = mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] + exshift;
+                d[tmpMainIterIndex] = mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)];
+                e[tmpMainIterIndex] = ZERO;
                 tmpMainIterIndex--;
                 tmpIterCount = 0;
 
                 // Two roots found
             } else if (l == (tmpMainIterIndex - 1)) {
-                w = aMtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))] * aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * tmpMainIterIndex)];
-                p = (aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))] - aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)]) / 2.0;
+                w = mtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))] * mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * tmpMainIterIndex)];
+                p = (mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))] - mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)]) / 2.0;
                 q = (p * p) + w;
-                z = PrimitiveFunction.SQRT.invoke(PrimitiveFunction.ABS.invoke(q));
-                aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] = aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] + exshift;
-                aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))] = aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))]
+                z = SQRT.invoke(ABS.invoke(q));
+                mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] = mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)] + exshift;
+                mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))] = mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))]
                         + exshift;
-                x = aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)];
+                x = mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)];
 
                 // Real pair
                 if (q >= 0) {
@@ -737,49 +739,49 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                     } else {
                         z = p - z;
                     }
-                    tmpMainDiagonal[tmpMainIterIndex - 1] = x + z;
-                    tmpMainDiagonal[tmpMainIterIndex] = tmpMainDiagonal[tmpMainIterIndex - 1];
-                    // if (z != PrimitiveMath.ZERO) {
+                    d[tmpMainIterIndex - 1] = x + z;
+                    d[tmpMainIterIndex] = d[tmpMainIterIndex - 1];
+                    // if (z !=  ZERO) {
                     if (Double.compare(z, ZERO) != 0) {
-                        tmpMainDiagonal[tmpMainIterIndex] = x - (w / z);
+                        d[tmpMainIterIndex] = x - (w / z);
                     }
-                    tmpOffDiagonal[tmpMainIterIndex - 1] = PrimitiveMath.ZERO;
-                    tmpOffDiagonal[tmpMainIterIndex] = PrimitiveMath.ZERO;
-                    x = aMtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))];
-                    s = PrimitiveFunction.ABS.invoke(x) + PrimitiveFunction.ABS.invoke(z);
+                    e[tmpMainIterIndex - 1] = ZERO;
+                    e[tmpMainIterIndex] = ZERO;
+                    x = mtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))];
+                    s = ABS.invoke(x) + ABS.invoke(z);
                     p = x / s;
                     q = z / s;
-                    r = PrimitiveFunction.SQRT.invoke((p * p) + (q * q));
+                    r = SQRT.invoke((p * p) + (q * q));
                     p = p / r;
                     q = q / r;
 
                     // Row modification
                     for (int j = tmpMainIterIndex - 1; j < tmpDiagDim; j++) {
-                        z = aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * j)];
-                        aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * j)] = (q * z) + (p * aMtrxH[tmpMainIterIndex + (tmpDiagDim * j)]);
-                        aMtrxH[tmpMainIterIndex + (tmpDiagDim * j)] = (q * aMtrxH[tmpMainIterIndex + (tmpDiagDim * j)]) - (p * z);
+                        z = mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * j)];
+                        mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * j)] = (q * z) + (p * mtrxH[tmpMainIterIndex + (tmpDiagDim * j)]);
+                        mtrxH[tmpMainIterIndex + (tmpDiagDim * j)] = (q * mtrxH[tmpMainIterIndex + (tmpDiagDim * j)]) - (p * z);
                     }
 
                     // Column modification
                     for (int i = 0; i <= tmpMainIterIndex; i++) {
-                        z = aMtrxH[i + (tmpDiagDim * (tmpMainIterIndex - 1))];
-                        aMtrxH[i + (tmpDiagDim * (tmpMainIterIndex - 1))] = (q * z) + (p * aMtrxH[i + (tmpDiagDim * tmpMainIterIndex)]);
-                        aMtrxH[i + (tmpDiagDim * tmpMainIterIndex)] = (q * aMtrxH[i + (tmpDiagDim * tmpMainIterIndex)]) - (p * z);
+                        z = mtrxH[i + (tmpDiagDim * (tmpMainIterIndex - 1))];
+                        mtrxH[i + (tmpDiagDim * (tmpMainIterIndex - 1))] = (q * z) + (p * mtrxH[i + (tmpDiagDim * tmpMainIterIndex)]);
+                        mtrxH[i + (tmpDiagDim * tmpMainIterIndex)] = (q * mtrxH[i + (tmpDiagDim * tmpMainIterIndex)]) - (p * z);
                     }
 
                     // Accumulate transformations
                     for (int i = 0; i <= tmpDiagDimMinusOne; i++) {
-                        z = aMtrxV[i + (tmpDiagDim * (tmpMainIterIndex - 1))];
-                        aMtrxV[i + (tmpDiagDim * (tmpMainIterIndex - 1))] = (q * z) + (p * aMtrxV[i + (tmpDiagDim * tmpMainIterIndex)]);
-                        aMtrxV[i + (tmpDiagDim * tmpMainIterIndex)] = (q * aMtrxV[i + (tmpDiagDim * tmpMainIterIndex)]) - (p * z);
+                        z = mtrxV[i + (tmpDiagDim * (tmpMainIterIndex - 1))];
+                        mtrxV[i + (tmpDiagDim * (tmpMainIterIndex - 1))] = (q * z) + (p * mtrxV[i + (tmpDiagDim * tmpMainIterIndex)]);
+                        mtrxV[i + (tmpDiagDim * tmpMainIterIndex)] = (q * mtrxV[i + (tmpDiagDim * tmpMainIterIndex)]) - (p * z);
                     }
 
                     // Complex pair
                 } else {
-                    tmpMainDiagonal[tmpMainIterIndex - 1] = x + p;
-                    tmpMainDiagonal[tmpMainIterIndex] = x + p;
-                    tmpOffDiagonal[tmpMainIterIndex - 1] = z;
-                    tmpOffDiagonal[tmpMainIterIndex] = -z;
+                    d[tmpMainIterIndex - 1] = x + p;
+                    d[tmpMainIterIndex] = x + p;
+                    e[tmpMainIterIndex - 1] = z;
+                    e[tmpMainIterIndex] = -z;
                 }
                 tmpMainIterIndex = tmpMainIterIndex - 2;
                 tmpIterCount = 0;
@@ -788,22 +790,22 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
             } else {
 
                 // Form shift
-                x = aMtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)];
-                y = PrimitiveMath.ZERO;
-                w = PrimitiveMath.ZERO;
+                x = mtrxH[tmpMainIterIndex + (tmpDiagDim * tmpMainIterIndex)];
+                y = ZERO;
+                w = ZERO;
                 if (l < tmpMainIterIndex) {
-                    y = aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))];
-                    w = aMtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))] * aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * tmpMainIterIndex)];
+                    y = mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 1))];
+                    w = mtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))] * mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * tmpMainIterIndex)];
                 }
 
                 // Wilkinson's original ad hoc shift
                 if (tmpIterCount == 10) {
                     exshift += x;
                     for (int i = 0; i <= tmpMainIterIndex; i++) {
-                        aMtrxH[i + (tmpDiagDim * i)] -= x;
+                        mtrxH[i + (tmpDiagDim * i)] -= x;
                     }
-                    s = PrimitiveFunction.ABS.invoke(aMtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))])
-                            + PrimitiveFunction.ABS.invoke(aMtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 2))]);
+                    s = ABS.invoke(mtrxH[tmpMainIterIndex + (tmpDiagDim * (tmpMainIterIndex - 1))])
+                            + ABS.invoke(mtrxH[(tmpMainIterIndex - 1) + (tmpDiagDim * (tmpMainIterIndex - 2))]);
                     x = y = 0.75 * s;
                     w = -0.4375 * s * s;
                 }
@@ -813,13 +815,13 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                     s = (y - x) / 2.0;
                     s = (s * s) + w;
                     if (s > 0) {
-                        s = PrimitiveFunction.SQRT.invoke(s);
+                        s = SQRT.invoke(s);
                         if (y < x) {
                             s = -s;
                         }
                         s = x - (w / (((y - x) / 2.0) + s));
                         for (int i = 0; i <= tmpMainIterIndex; i++) {
-                            aMtrxH[i + (tmpDiagDim * i)] -= s;
+                            mtrxH[i + (tmpDiagDim * i)] -= s;
                         }
                         exshift += s;
                         x = y = w = 0.964;
@@ -831,32 +833,30 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 // Look for two consecutive small sub-diagonal elements
                 int m = tmpMainIterIndex - 2;
                 while (m >= l) {
-                    z = aMtrxH[m + (tmpDiagDim * m)];
+                    z = mtrxH[m + (tmpDiagDim * m)];
                     r = x - z;
                     s = y - z;
-                    p = (((r * s) - w) / aMtrxH[(m + 1) + (tmpDiagDim * m)]) + aMtrxH[m + (tmpDiagDim * (m + 1))];
-                    q = aMtrxH[(m + 1) + (tmpDiagDim * (m + 1))] - z - r - s;
-                    r = aMtrxH[(m + 2) + (tmpDiagDim * (m + 1))];
-                    s = PrimitiveFunction.ABS.invoke(p) + PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(r);
+                    p = (((r * s) - w) / mtrxH[(m + 1) + (tmpDiagDim * m)]) + mtrxH[m + (tmpDiagDim * (m + 1))];
+                    q = mtrxH[(m + 1) + (tmpDiagDim * (m + 1))] - z - r - s;
+                    r = mtrxH[(m + 2) + (tmpDiagDim * (m + 1))];
+                    s = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
                     p = p / s;
                     q = q / s;
                     r = r / s;
                     if (m == l) {
                         break;
                     }
-                    if ((PrimitiveFunction.ABS.invoke(aMtrxH[m + (tmpDiagDim * (m - 1))])
-                            * (PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(r))) < (PrimitiveMath.MACHINE_EPSILON
-                                    * (PrimitiveFunction.ABS.invoke(p) * (PrimitiveFunction.ABS.invoke(aMtrxH[(m - 1) + (tmpDiagDim * (m - 1))])
-                                            + PrimitiveFunction.ABS.invoke(z) + PrimitiveFunction.ABS.invoke(aMtrxH[(m + 1) + (tmpDiagDim * (m + 1))]))))) {
+                    if ((ABS.invoke(mtrxH[m + (tmpDiagDim * (m - 1))]) * (ABS.invoke(q) + ABS.invoke(r))) < (MACHINE_EPSILON * (ABS.invoke(p)
+                            * (ABS.invoke(mtrxH[(m - 1) + (tmpDiagDim * (m - 1))]) + ABS.invoke(z) + ABS.invoke(mtrxH[(m + 1) + (tmpDiagDim * (m + 1))]))))) {
                         break;
                     }
                     m--;
                 }
 
                 for (int i = m + 2; i <= tmpMainIterIndex; i++) {
-                    aMtrxH[i + (tmpDiagDim * (i - 2))] = PrimitiveMath.ZERO;
+                    mtrxH[i + (tmpDiagDim * (i - 2))] = ZERO;
                     if (i > (m + 2)) {
-                        aMtrxH[i + (tmpDiagDim * (i - 3))] = PrimitiveMath.ZERO;
+                        mtrxH[i + (tmpDiagDim * (i - 3))] = ZERO;
                     }
                 }
 
@@ -864,11 +864,11 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 for (int k = m; k <= (tmpMainIterIndex - 1); k++) {
                     final boolean notlast = (k != (tmpMainIterIndex - 1));
                     if (k != m) {
-                        p = aMtrxH[k + (tmpDiagDim * (k - 1))];
-                        q = aMtrxH[(k + 1) + (tmpDiagDim * (k - 1))];
-                        r = (notlast ? aMtrxH[(k + 2) + (tmpDiagDim * (k - 1))] : PrimitiveMath.ZERO);
-                        x = PrimitiveFunction.ABS.invoke(p) + PrimitiveFunction.ABS.invoke(q) + PrimitiveFunction.ABS.invoke(r);
-                        // if (x == PrimitiveMath.ZERO) {
+                        p = mtrxH[k + (tmpDiagDim * (k - 1))];
+                        q = mtrxH[(k + 1) + (tmpDiagDim * (k - 1))];
+                        r = (notlast ? mtrxH[(k + 2) + (tmpDiagDim * (k - 1))] : ZERO);
+                        x = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
+                        // if (x ==  ZERO) {
                         if (Double.compare(x, ZERO) == 0) {
                             continue;
                         }
@@ -877,15 +877,15 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                         r = r / x;
                     }
 
-                    s = PrimitiveFunction.SQRT.invoke((p * p) + (q * q) + (r * r));
+                    s = SQRT.invoke((p * p) + (q * q) + (r * r));
                     if (p < 0) {
                         s = -s;
                     }
                     if (s != 0) {
                         if (k != m) {
-                            aMtrxH[k + (tmpDiagDim * (k - 1))] = -s * x;
+                            mtrxH[k + (tmpDiagDim * (k - 1))] = -s * x;
                         } else if (l != m) {
-                            aMtrxH[k + (tmpDiagDim * (k - 1))] = -aMtrxH[k + (tmpDiagDim * (k - 1))];
+                            mtrxH[k + (tmpDiagDim * (k - 1))] = -mtrxH[k + (tmpDiagDim * (k - 1))];
                         }
                         p = p + s;
                         x = p / s;
@@ -896,35 +896,35 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
                         // Row modification
                         for (int j = k; j < tmpDiagDim; j++) {
-                            p = aMtrxH[k + (tmpDiagDim * j)] + (q * aMtrxH[(k + 1) + (tmpDiagDim * j)]);
+                            p = mtrxH[k + (tmpDiagDim * j)] + (q * mtrxH[(k + 1) + (tmpDiagDim * j)]);
                             if (notlast) {
-                                p = p + (r * aMtrxH[(k + 2) + (tmpDiagDim * j)]);
-                                aMtrxH[(k + 2) + (tmpDiagDim * j)] = aMtrxH[(k + 2) + (tmpDiagDim * j)] - (p * z);
+                                p = p + (r * mtrxH[(k + 2) + (tmpDiagDim * j)]);
+                                mtrxH[(k + 2) + (tmpDiagDim * j)] = mtrxH[(k + 2) + (tmpDiagDim * j)] - (p * z);
                             }
-                            aMtrxH[k + (tmpDiagDim * j)] = aMtrxH[k + (tmpDiagDim * j)] - (p * x);
-                            aMtrxH[(k + 1) + (tmpDiagDim * j)] = aMtrxH[(k + 1) + (tmpDiagDim * j)] - (p * y);
+                            mtrxH[k + (tmpDiagDim * j)] = mtrxH[k + (tmpDiagDim * j)] - (p * x);
+                            mtrxH[(k + 1) + (tmpDiagDim * j)] = mtrxH[(k + 1) + (tmpDiagDim * j)] - (p * y);
                         }
 
                         // Column modification
                         for (int i = 0; i <= Math.min(tmpMainIterIndex, k + 3); i++) {
-                            p = (x * aMtrxH[i + (tmpDiagDim * k)]) + (y * aMtrxH[i + (tmpDiagDim * (k + 1))]);
+                            p = (x * mtrxH[i + (tmpDiagDim * k)]) + (y * mtrxH[i + (tmpDiagDim * (k + 1))]);
                             if (notlast) {
-                                p = p + (z * aMtrxH[i + (tmpDiagDim * (k + 2))]);
-                                aMtrxH[i + (tmpDiagDim * (k + 2))] = aMtrxH[i + (tmpDiagDim * (k + 2))] - (p * r);
+                                p = p + (z * mtrxH[i + (tmpDiagDim * (k + 2))]);
+                                mtrxH[i + (tmpDiagDim * (k + 2))] = mtrxH[i + (tmpDiagDim * (k + 2))] - (p * r);
                             }
-                            aMtrxH[i + (tmpDiagDim * k)] = aMtrxH[i + (tmpDiagDim * k)] - p;
-                            aMtrxH[i + (tmpDiagDim * (k + 1))] = aMtrxH[i + (tmpDiagDim * (k + 1))] - (p * q);
+                            mtrxH[i + (tmpDiagDim * k)] = mtrxH[i + (tmpDiagDim * k)] - p;
+                            mtrxH[i + (tmpDiagDim * (k + 1))] = mtrxH[i + (tmpDiagDim * (k + 1))] - (p * q);
                         }
 
                         // Accumulate transformations
                         for (int i = 0; i <= tmpDiagDimMinusOne; i++) {
-                            p = (x * aMtrxV[i + (tmpDiagDim * k)]) + (y * aMtrxV[i + (tmpDiagDim * (k + 1))]);
+                            p = (x * mtrxV[i + (tmpDiagDim * k)]) + (y * mtrxV[i + (tmpDiagDim * (k + 1))]);
                             if (notlast) {
-                                p = p + (z * aMtrxV[i + (tmpDiagDim * (k + 2))]);
-                                aMtrxV[i + (tmpDiagDim * (k + 2))] = aMtrxV[i + (tmpDiagDim * (k + 2))] - (p * r);
+                                p = p + (z * mtrxV[i + (tmpDiagDim * (k + 2))]);
+                                mtrxV[i + (tmpDiagDim * (k + 2))] = mtrxV[i + (tmpDiagDim * (k + 2))] - (p * r);
                             }
-                            aMtrxV[i + (tmpDiagDim * k)] = aMtrxV[i + (tmpDiagDim * k)] - p;
-                            aMtrxV[i + (tmpDiagDim * (k + 1))] = aMtrxV[i + (tmpDiagDim * (k + 1))] - (p * q);
+                            mtrxV[i + (tmpDiagDim * k)] = mtrxV[i + (tmpDiagDim * k)] - p;
+                            mtrxV[i + (tmpDiagDim * (k + 1))] = mtrxV[i + (tmpDiagDim * (k + 1))] - (p * q);
                         }
                     } // (s != 0)
                 } // k loop
@@ -932,12 +932,12 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         } // while (n >= low)
 
         // Backsubstitute to find vectors of upper triangular form
-        // if (allTheWay && (tmpNorm1 != PrimitiveMath.ZERO)) {
+        // if (allTheWay && (tmpNorm1 !=  ZERO)) {
         if (allTheWay && (Double.compare(tmpNorm1, ZERO) != 0)) {
-            PrimitiveDenseStore.doAfter(aMtrxH, aMtrxV, tmpMainDiagonal, tmpOffDiagonal, r, s, z, tmpNorm1);
+            PrimitiveDenseStore.doAfter(mtrxH, mtrxV, d, e, r, s, z, tmpNorm1);
         }
 
-        return new double[][] { tmpMainDiagonal, tmpOffDiagonal };
+        return new double[][] { d, e };
     }
 
     private final PrimitiveMultiplyBoth multiplyBoth;
@@ -1540,7 +1540,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public void negateColumn(final int column) {
-        myUtility.modifyColumn(0, column, PrimitiveFunction.NEGATE);
+        myUtility.modifyColumn(0, column, NEGATE);
     }
 
     public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
