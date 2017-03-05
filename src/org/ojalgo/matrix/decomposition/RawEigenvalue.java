@@ -142,15 +142,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      *
      * @serial internal storage of eigenvalues.
      */
-    private double[] d = null;
-
-    private double[] e = null;
-    /**
-     * Array for internal storage of nonsymmetric Hessenberg form.
-     *
-     * @serial internal storage of nonsymmetric Hessenberg form.
-     */
-    private double[][] H = null;
+    private double[] d = null, e = null;
 
     private RawStore myInverse = null;
 
@@ -385,7 +377,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    private void hqr2() {
+    /**
+     * @param H Array for internal storage of nonsymmetric Hessenberg form.
+     */
+    private void hqr2(final double[][] H) {
 
         //  This is derived from the Algol procedure hqr2,
         //  by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -833,7 +828,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    private void orthes() {
+    /**
+     * @param H Array for internal storage of nonsymmetric Hessenberg form.
+     */
+    private void orthes(final double[][] H) {
 
         //  This is derived from the Algol procedures orthes and ortran,
         //  by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -1077,7 +1075,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             e = new double[n];
         }
 
-        H = data;
+        // H = data;
 
         //        for (int j = 0; j < n; j++) {
         //            for (int i = 0; i < n; i++) {
@@ -1086,10 +1084,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         //        }
 
         // Reduce to Hessenberg form.
-        this.orthes();
+        this.orthes(data);
 
         // Reduce Hessenberg to real Schur form.
-        this.hqr2();
+        this.hqr2(data);
 
     }
 
