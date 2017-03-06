@@ -144,7 +144,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     private double[] d = null, e = null;
 
-    private RawStore myInverse = null;
+    private transient MatrixStore<Double> myInverse = null;
 
     /**
      * Row and column dimension (square matrix).
@@ -158,7 +158,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      *
      * @serial internal storage of eigenvectors.
      */
-    private double[][] Vt = null;
+    private double[][] myTransposedV = null;
 
     protected RawEigenvalue() {
         super();
@@ -259,19 +259,23 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         if (myInverse == null) {
 
-            final double[][] tmpQ1 = this.getV().data;
-            final double[] tmpEigen = this.getRealEigenvalues();
+            final int dim = d.length;
 
-            final RawStore tmpMtrx = new RawStore(tmpEigen.length, tmpQ1.length);
+            final RawStore tmpMtrx = new RawStore(dim, dim);
 
-            for (int i = 0; i < tmpEigen.length; i++) {
-                if (PrimitiveScalar.isSmall(ONE, tmpEigen[i])) {
-                    for (int j = 0; j < tmpQ1.length; j++) {
+            double max = ONE;
+
+            for (int i = 0; i < dim; i++) {
+                final double val = d[i];
+                max = MAX.invoke(max, ABS.invoke(val));
+                if (PrimitiveScalar.isSmall(max, val)) {
+                    for (int j = 0; j < dim; j++) {
                         tmpMtrx.set(i, j, ZERO);
                     }
                 } else {
-                    for (int j = 0; j < tmpQ1.length; j++) {
-                        tmpMtrx.set(i, j, tmpQ1[j][i] / tmpEigen[i]);
+                    final double[] colVi = myTransposedV[i];
+                    for (int j = 0; j < dim; j++) {
+                        tmpMtrx.set(i, j, colVi[j] / val);
                     }
                 }
             }
@@ -300,8 +304,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      *
      * @return V
      */
-    public RawStore getV() {
-        return new RawStore(Vt, n, n).transpose();
+    public MatrixStore<Double> getV() {
+        return new RawStore(myTransposedV, n, n).logical().transpose().get();
     }
 
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws TaskException {
@@ -495,11 +499,11 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
                     for (int i = low; i <= high; i++) {
                         //z = V[i][n - 1];
-                        z = Vt[n - 1][i];
+                        z = myTransposedV[n - 1][i];
                         //V[i][n - 1] = (q * z) + (p * V[i][n]);
-                        Vt[n - 1][i] = (q * z) + (p * Vt[n][i]);
+                        myTransposedV[n - 1][i] = (q * z) + (p * myTransposedV[n][i]);
                         //V[i][n] = (q * V[i][n]) - (p * z);
-                        Vt[n][i] = (q * Vt[n][i]) - (p * z);
+                        myTransposedV[n][i] = (q * myTransposedV[n][i]) - (p * z);
                     }
 
                     // Complex pair
@@ -651,17 +655,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         // Accumulate transformations
                         for (int i = low; i <= high; i++) {
                             //p = (x * V[i][k]) + (y * V[i][k + 1]);
-                            p = (x * Vt[k][i]) + (y * Vt[k + 1][i]);
+                            p = (x * myTransposedV[k][i]) + (y * myTransposedV[k + 1][i]);
                             if (notlast) {
                                 //p = p + (z * V[i][k + 2]);
-                                p = p + (z * Vt[k + 2][i]);
+                                p = p + (z * myTransposedV[k + 2][i]);
                                 //V[i][k + 2] = V[i][k + 2] - (p * r);
-                                Vt[k + 2][i] = Vt[k + 2][i] - (p * r);
+                                myTransposedV[k + 2][i] = myTransposedV[k + 2][i] - (p * r);
                             }
                             //V[i][k] = V[i][k] - p;
-                            Vt[k][i] = Vt[k][i] - p;
+                            myTransposedV[k][i] = myTransposedV[k][i] - p;
                             //V[i][k + 1] = V[i][k + 1] - (p * q);
-                            Vt[k + 1][i] = Vt[k + 1][i] - (p * q);
+                            myTransposedV[k + 1][i] = myTransposedV[k + 1][i] - (p * q);
                         }
                     } // (s != 0)
                 } // k loop
@@ -809,7 +813,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             if ((i < low) | (i > high)) {
                 for (int j = i; j < nn; j++) {
                     //V[i][j] = H[i][j];
-                    Vt[j][i] = H[i][j];
+                    myTransposedV[j][i] = H[i][j];
                 }
             }
         }
@@ -820,10 +824,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 z = ZERO;
                 for (int k = low; k <= Math.min(j, high); k++) {
                     //z = z + (V[i][k] * H[k][j]);
-                    z = z + (Vt[k][i] * H[k][j]);
+                    z = z + (myTransposedV[k][i] * H[k][j]);
                 }
                 //V[i][j] = z;
-                Vt[j][i] = z;
+                myTransposedV[j][i] = z;
             }
         }
     }
@@ -907,7 +911,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 //V[i][j] = (i == j ? ONE : ZERO);
-                Vt[j][i] = (i == j ? ONE : ZERO);
+                myTransposedV[j][i] = (i == j ? ONE : ZERO);
             }
         }
 
@@ -920,13 +924,13 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     double g = ZERO;
                     for (int i = m; i <= high; i++) {
                         //g += ort[i] * V[i][j];
-                        g += ort[i] * Vt[j][i];
+                        g += ort[i] * myTransposedV[j][i];
                     }
                     // Double division avoids possible underflow
                     g = (g / ort[m]) / H[m][m - 1];
                     for (int i = m; i <= high; i++) {
                         //V[i][j] += g * ort[i];
-                        Vt[j][i] += g * ort[i];
+                        myTransposedV[j][i] += g * ort[i];
                     }
                 }
             }
@@ -1016,7 +1020,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         d[i + 1] = h + (s * ((c * g) + (s * d[i])));
 
                         // Accumulate transformation.
-                        this.rot1(Vt[i], Vt[i + 1], c, s);
+                        this.rot1(myTransposedV[i], myTransposedV[i + 1], c, s);
                     }
                     // p = (-s * s2 * c3 * el1 * e[l]) / dl1;
                     p = (-s * s2 * c3) * ((el1 / dl1) * e[l]);
@@ -1047,9 +1051,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 d[k] = d[i];
                 d[i] = p;
 
-                tmpCol = Vt[i];
-                Vt[i] = Vt[k];
-                Vt[k] = tmpCol;
+                tmpCol = myTransposedV[i];
+                myTransposedV[i] = myTransposedV[k];
+                myTransposedV[k] = tmpCol;
 
                 //                for (int j = 0; j < n; j++) {
                 //                    //p = V[j][i];
@@ -1070,7 +1074,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         n = data.length;
 
         if ((d == null) || (n != d.length)) {
-            Vt = new double[n][n];
+            myTransposedV = new double[n][n];
             d = new double[n];
             e = new double[n];
         }
@@ -1100,7 +1104,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             e = new double[n];
         }
 
-        Vt = data;
+        myTransposedV = data;
 
         //        for (int i = 0; i < n; i++) {
         //            for (int j = 0; j < n; j++) {
@@ -1109,7 +1113,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         //        }
 
         // Tridiagonalize.
-        HouseholderHermitian.tred2jj(Vt, d, e, true);
+        HouseholderHermitian.tred2jj(myTransposedV, d, e, true);
 
         // Diagonalize.
         this.tql2();
