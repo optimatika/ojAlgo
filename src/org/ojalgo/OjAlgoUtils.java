@@ -49,12 +49,13 @@ public abstract class OjAlgoUtils {
         }
 
         if (ENVIRONMENT == null) {
-            if (System.getProperty("shut.up.ojAlgo") != null) {
+            if (System.getProperty("shut.up.ojAlgo") == null) {
                 BasicLogger.debug("ojAlgo includes a small set of predefined hardware profiles,");
                 BasicLogger.debug("none of which were deemed suitable for the hardware you're currently using.");
                 BasicLogger.debug("You should set org.ojalgo.OjAlgoUtils.ENVIRONMENT to something that matches the hardware/OS/JVM you're running on.");
                 BasicLogger.debug("Additionally it would be appreciated if you contribute your hardware profile to ojAlgo.");
                 BasicLogger.debug("https://lists.sourceforge.net/lists/listinfo/ojalgo-user");
+                BasicLogger.debug("https://github.com/optimatika/ojAlgo/issues");
                 BasicLogger.debug("Architecture={} Threads={} Memory={}", tmpArchitecture, tmpThreads, tmpMemory);
             }
             ENVIRONMENT = Hardware.makeSimple(tmpArchitecture, tmpMemory, tmpThreads).virtualise();
