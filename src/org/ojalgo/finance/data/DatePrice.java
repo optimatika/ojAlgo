@@ -63,6 +63,28 @@ public abstract class DatePrice implements KeyValue<CalendarDate, Double> {
         return key.compareTo(ref.getKey());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof DatePrice)) {
+            return false;
+        }
+        DatePrice other = (DatePrice) obj;
+        if (key == null) {
+            if (other.key != null) {
+                return false;
+            }
+        } else if (!key.equals(other.key)) {
+            return false;
+        }
+        return true;
+    }
+
     public final CalendarDate getKey() {
         return key;
     }
@@ -71,6 +93,14 @@ public abstract class DatePrice implements KeyValue<CalendarDate, Double> {
 
     public final Double getValue() {
         return this.getPrice();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((key == null) ? 0 : key.hashCode());
+        return result;
     }
 
     @Override

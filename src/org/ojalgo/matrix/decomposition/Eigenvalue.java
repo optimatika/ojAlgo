@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Structure2D;
@@ -60,6 +61,61 @@ import org.ojalgo.type.context.NumberContext;
  */
 public interface Eigenvalue<N extends Number>
         extends MatrixDecomposition<N>, MatrixDecomposition.Hermitian<N>, MatrixDecomposition.Determinant<N>, MatrixDecomposition.Values<N> {
+
+    public static class Eigenpair implements Comparable<Eigenpair> {
+
+        public final ComplexNumber value;
+        public final Access1D<ComplexNumber> vector;
+
+        Eigenpair(ComplexNumber aValue, Access1D<ComplexNumber> aVector) {
+            super();
+            value = aValue;
+            vector = aVector;
+        }
+
+        public int compareTo(Eigenpair other) {
+            return value.compareTo(other.value);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof Eigenpair)) {
+                return false;
+            }
+            Eigenpair other = (Eigenpair) obj;
+            if (value == null) {
+                if (other.value != null) {
+                    return false;
+                }
+            } else if (!value.equals(other.value)) {
+                return false;
+            }
+            if (vector == null) {
+                if (other.vector != null) {
+                    return false;
+                }
+            } else if (!vector.equals(other.vector)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + ((value == null) ? 0 : value.hashCode());
+            result = (prime * result) + ((vector == null) ? 0 : vector.hashCode());
+            return result;
+        }
+
+    }
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<Eigenvalue<N>> {
 
@@ -182,6 +238,17 @@ public interface Eigenvalue<N extends Number>
      * @return The (block) diagonal eigenvalue matrix.
      */
     MatrixStore<N> getD();
+
+    default Eigenpair getEigenpair(final int index) {
+
+        final long tmpDimension = this.getV().countColumns();
+
+        final ComplexDenseStore retVal = ComplexDenseStore.FACTORY.makeZero(tmpDimension, 1L);
+
+        this.copyEigenvector(index, retVal.sliceColumn(0, index));
+
+        return new Eigenpair(getEigenvalues().get(index), retVal);
+    }
 
     /**
      * <p>
