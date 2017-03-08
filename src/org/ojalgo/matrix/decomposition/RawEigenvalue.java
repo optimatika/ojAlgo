@@ -67,12 +67,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
-        boolean doDecompose(final double[][] data) {
+        boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
             if (this.checkSymmetry()) {
-                this.doDecomposeSymmetric(data);
+                this.doDecomposeSymmetric(data, valuesOnly);
             } else {
-                this.doDecomposeGeneral(data);
+                this.doDecomposeGeneral(data, valuesOnly);
             }
 
             return this.computed(true);
@@ -91,9 +91,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
-        boolean doDecompose(final double[][] data) {
+        boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
-            this.doDecomposeGeneral(data);
+            this.doDecomposeGeneral(data, valuesOnly);
 
             return this.computed(true);
         }
@@ -126,9 +126,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
-        boolean doDecompose(final double[][] data) {
+        boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
-            this.doDecomposeSymmetric(data);
+            this.doDecomposeSymmetric(data, valuesOnly);
 
             return this.computed(true);
         }
@@ -147,18 +147,18 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     private transient MatrixStore<Double> myInverse = null;
 
     /**
-     * Row and column dimension (square matrix).
-     *
-     * @serial matrix dimension.
-     */
-    private int n;
-
-    /**
      * Array for internal storage of eigenvectors.
      *
      * @serial internal storage of eigenvectors.
      */
     private double[][] myTransposedV = null;
+
+    /**
+     * Row and column dimension (square matrix).
+     *
+     * @serial matrix dimension.
+     */
+    private int n;
 
     protected RawEigenvalue() {
         super();
@@ -170,7 +170,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         this.getRawInPlaceStore().fillMatching(matrix);
 
-        this.doDecompose(tmpData);
+        this.doDecompose(tmpData, true);
 
         return this.getDeterminant();
     }
@@ -181,7 +181,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         matrix.supplyTo(this.getRawInPlaceStore());
 
-        return this.doDecompose(tmpData);
+        return this.doDecompose(tmpData, true);
     }
 
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
@@ -190,7 +190,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         matrix.supplyTo(this.getRawInPlaceStore());
 
-        return this.doDecompose(tmpData);
+        return this.doDecompose(tmpData, false);
     }
 
     /**
@@ -226,8 +226,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     public Array1D<ComplexNumber> getEigenvalues() {
 
-        final double[] tmpRe = this.getRealEigenvalues();
-        final double[] tmpIm = this.getImagEigenvalues();
+        final double[] tmpRe = this.getRealParts();
+        final double[] tmpIm = this.getImaginaryParts();
 
         final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.makeZero(tmpRe.length);
 
@@ -244,10 +244,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         final int length = realParts.length;
 
-        System.arraycopy(this.getRealEigenvalues(), 0, realParts, 0, length);
+        System.arraycopy(this.getRealParts(), 0, realParts, 0, length);
 
         if (imaginaryParts.isPresent()) {
-            System.arraycopy(this.getImagEigenvalues(), 0, imaginaryParts.get(), 0, length);
+            System.arraycopy(this.getImaginaryParts(), 0, imaginaryParts.get(), 0, length);
         }
     }
 
@@ -314,7 +314,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         this.getRawInPlaceStore().fillMatching(original);
 
-        this.doDecompose(tmpData);
+        this.doDecompose(tmpData, false);
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
@@ -346,7 +346,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         this.getRawInPlaceStore().fillMatching(body);
 
-        this.doDecompose(tmpData);
+        this.doDecompose(tmpData, false);
 
         if (this.isSolvable()) {
 
@@ -382,9 +382,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     /**
-     * @param H Array for internal storage of nonsymmetric Hessenberg form.
+     * @param mtrxH Array for internal storage of nonsymmetric Hessenberg form.
      */
-    private void hqr2(final double[][] H) {
+    private void hqr2(final double[][] mtrxH) {
 
         //  This is derived from the Algol procedure hqr2,
         //  by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -406,11 +406,11 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         double norm = ZERO;
         for (int i = 0; i < nn; i++) {
             if ((i < low) | (i > high)) {
-                d[i] = H[i][i];
+                d[i] = mtrxH[i][i];
                 e[i] = ZERO;
             }
             for (int j = Math.max(i - 1, 0); j < nn; j++) {
-                norm = norm + ABS.invoke(H[i][j]);
+                norm = norm + ABS.invoke(mtrxH[i][j]);
             }
         }
 
@@ -423,12 +423,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             int l = n;
             while (l > low) {
-                s = ABS.invoke(H[l - 1][l - 1]) + ABS.invoke(H[l][l]);
+                s = ABS.invoke(mtrxH[l - 1][l - 1]) + ABS.invoke(mtrxH[l][l]);
                 // if (s == ZERO) {
                 if (Double.compare(s, ZERO) == 0) {
                     s = norm;
                 }
-                if (ABS.invoke(H[l][l - 1]) < (eps * s)) {
+                if (ABS.invoke(mtrxH[l][l - 1]) < (eps * s)) {
                     break;
                 }
                 l--;
@@ -438,8 +438,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             // One root found
 
             if (l == n) {
-                H[n][n] = H[n][n] + exshift;
-                d[n] = H[n][n];
+                mtrxH[n][n] = mtrxH[n][n] + exshift;
+                d[n] = mtrxH[n][n];
                 e[n] = ZERO;
                 n--;
                 iter = 0;
@@ -447,13 +447,13 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 // Two roots found
 
             } else if (l == (n - 1)) {
-                w = H[n][n - 1] * H[n - 1][n];
-                p = (H[n - 1][n - 1] - H[n][n]) / TWO;
+                w = mtrxH[n][n - 1] * mtrxH[n - 1][n];
+                p = (mtrxH[n - 1][n - 1] - mtrxH[n][n]) / TWO;
                 q = (p * p) + w;
                 z = SQRT.invoke(ABS.invoke(q));
-                H[n][n] = H[n][n] + exshift;
-                H[n - 1][n - 1] = H[n - 1][n - 1] + exshift;
-                x = H[n][n];
+                mtrxH[n][n] = mtrxH[n][n] + exshift;
+                mtrxH[n - 1][n - 1] = mtrxH[n - 1][n - 1] + exshift;
+                x = mtrxH[n][n];
 
                 // Real pair
 
@@ -471,7 +471,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     }
                     e[n - 1] = ZERO;
                     e[n] = ZERO;
-                    x = H[n][n - 1];
+                    x = mtrxH[n][n - 1];
                     s = ABS.invoke(x) + ABS.invoke(z);
                     p = x / s;
                     q = z / s;
@@ -482,28 +482,29 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     // Row modification
 
                     for (int j = n - 1; j < nn; j++) {
-                        z = H[n - 1][j];
-                        H[n - 1][j] = (q * z) + (p * H[n][j]);
-                        H[n][j] = (q * H[n][j]) - (p * z);
+                        z = mtrxH[n - 1][j];
+                        mtrxH[n - 1][j] = (q * z) + (p * mtrxH[n][j]);
+                        mtrxH[n][j] = (q * mtrxH[n][j]) - (p * z);
                     }
 
                     // Column modification
 
                     for (int i = 0; i <= n; i++) {
-                        z = H[i][n - 1];
-                        H[i][n - 1] = (q * z) + (p * H[i][n]);
-                        H[i][n] = (q * H[i][n]) - (p * z);
+                        z = mtrxH[i][n - 1];
+                        mtrxH[i][n - 1] = (q * z) + (p * mtrxH[i][n]);
+                        mtrxH[i][n] = (q * mtrxH[i][n]) - (p * z);
                     }
 
                     // Accumulate transformations
-
-                    for (int i = low; i <= high; i++) {
-                        //z = V[i][n - 1];
-                        z = myTransposedV[n - 1][i];
-                        //V[i][n - 1] = (q * z) + (p * V[i][n]);
-                        myTransposedV[n - 1][i] = (q * z) + (p * myTransposedV[n][i]);
-                        //V[i][n] = (q * V[i][n]) - (p * z);
-                        myTransposedV[n][i] = (q * myTransposedV[n][i]) - (p * z);
+                    if (myTransposedV != null) {
+                        for (int i = low; i <= high; i++) {
+                            //z = V[i][n - 1];
+                            z = myTransposedV[n - 1][i];
+                            //V[i][n - 1] = (q * z) + (p * V[i][n]);
+                            myTransposedV[n - 1][i] = (q * z) + (p * myTransposedV[n][i]);
+                            //V[i][n] = (q * V[i][n]) - (p * z);
+                            myTransposedV[n][i] = (q * myTransposedV[n][i]) - (p * z);
+                        }
                     }
 
                     // Complex pair
@@ -523,12 +524,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
                 // Form shift
 
-                x = H[n][n];
+                x = mtrxH[n][n];
                 y = ZERO;
                 w = ZERO;
                 if (l < n) {
-                    y = H[n - 1][n - 1];
-                    w = H[n][n - 1] * H[n - 1][n];
+                    y = mtrxH[n - 1][n - 1];
+                    w = mtrxH[n][n - 1] * mtrxH[n - 1][n];
                 }
 
                 // Wilkinson's original ad hoc shift
@@ -536,9 +537,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 if (iter == 10) {
                     exshift += x;
                     for (int i = low; i <= n; i++) {
-                        H[i][i] -= x;
+                        mtrxH[i][i] -= x;
                     }
-                    s = ABS.invoke(H[n][n - 1]) + ABS.invoke(H[n - 1][n - 2]);
+                    s = ABS.invoke(mtrxH[n][n - 1]) + ABS.invoke(mtrxH[n - 1][n - 2]);
                     x = y = 0.75 * s;
                     w = -0.4375 * s * s;
                 }
@@ -555,7 +556,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         }
                         s = x - (w / (((y - x) / TWO) + s));
                         for (int i = low; i <= n; i++) {
-                            H[i][i] -= s;
+                            mtrxH[i][i] -= s;
                         }
                         exshift += s;
                         x = y = w = 0.964;
@@ -568,12 +569,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
                 int m = n - 2;
                 while (m >= l) {
-                    z = H[m][m];
+                    z = mtrxH[m][m];
                     r = x - z;
                     s = y - z;
-                    p = (((r * s) - w) / H[m + 1][m]) + H[m][m + 1];
-                    q = H[m + 1][m + 1] - z - r - s;
-                    r = H[m + 2][m + 1];
+                    p = (((r * s) - w) / mtrxH[m + 1][m]) + mtrxH[m][m + 1];
+                    q = mtrxH[m + 1][m + 1] - z - r - s;
+                    r = mtrxH[m + 2][m + 1];
                     s = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
                     p = p / s;
                     q = q / s;
@@ -581,17 +582,17 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     if (m == l) {
                         break;
                     }
-                    if ((ABS.invoke(H[m][m - 1]) * (ABS.invoke(q) + ABS.invoke(r))) < (eps
-                            * (ABS.invoke(p) * (ABS.invoke(H[m - 1][m - 1]) + ABS.invoke(z) + ABS.invoke(H[m + 1][m + 1]))))) {
+                    if ((ABS.invoke(mtrxH[m][m - 1]) * (ABS.invoke(q) + ABS.invoke(r))) < (eps
+                            * (ABS.invoke(p) * (ABS.invoke(mtrxH[m - 1][m - 1]) + ABS.invoke(z) + ABS.invoke(mtrxH[m + 1][m + 1]))))) {
                         break;
                     }
                     m--;
                 }
 
                 for (int i = m + 2; i <= n; i++) {
-                    H[i][i - 2] = ZERO;
+                    mtrxH[i][i - 2] = ZERO;
                     if (i > (m + 2)) {
-                        H[i][i - 3] = ZERO;
+                        mtrxH[i][i - 3] = ZERO;
                     }
                 }
 
@@ -600,9 +601,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 for (int k = m; k <= (n - 1); k++) {
                     final boolean notlast = (k != (n - 1));
                     if (k != m) {
-                        p = H[k][k - 1];
-                        q = H[k + 1][k - 1];
-                        r = (notlast ? H[k + 2][k - 1] : ZERO);
+                        p = mtrxH[k][k - 1];
+                        q = mtrxH[k + 1][k - 1];
+                        r = (notlast ? mtrxH[k + 2][k - 1] : ZERO);
                         x = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
                         // if (x == ZERO) {
                         if (Double.compare(x, ZERO) == 0) {
@@ -619,9 +620,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     }
                     if (s != 0) {
                         if (k != m) {
-                            H[k][k - 1] = -s * x;
+                            mtrxH[k][k - 1] = -s * x;
                         } else if (l != m) {
-                            H[k][k - 1] = -H[k][k - 1];
+                            mtrxH[k][k - 1] = -mtrxH[k][k - 1];
                         }
                         p = p + s;
                         x = p / s;
@@ -632,41 +633,44 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
                         // Row modification
                         for (int j = k; j < nn; j++) {
-                            p = H[k][j] + (q * H[k + 1][j]);
+                            p = mtrxH[k][j] + (q * mtrxH[k + 1][j]);
                             if (notlast) {
-                                p = p + (r * H[k + 2][j]);
-                                H[k + 2][j] = H[k + 2][j] - (p * z);
+                                p = p + (r * mtrxH[k + 2][j]);
+                                mtrxH[k + 2][j] = mtrxH[k + 2][j] - (p * z);
                             }
-                            H[k][j] = H[k][j] - (p * x);
-                            H[k + 1][j] = H[k + 1][j] - (p * y);
+                            mtrxH[k][j] = mtrxH[k][j] - (p * x);
+                            mtrxH[k + 1][j] = mtrxH[k + 1][j] - (p * y);
                         }
 
                         // Column modification
                         for (int i = 0; i <= Math.min(n, k + 3); i++) {
-                            p = (x * H[i][k]) + (y * H[i][k + 1]);
+                            p = (x * mtrxH[i][k]) + (y * mtrxH[i][k + 1]);
                             if (notlast) {
-                                p = p + (z * H[i][k + 2]);
-                                H[i][k + 2] = H[i][k + 2] - (p * r);
+                                p = p + (z * mtrxH[i][k + 2]);
+                                mtrxH[i][k + 2] = mtrxH[i][k + 2] - (p * r);
                             }
-                            H[i][k] = H[i][k] - p;
-                            H[i][k + 1] = H[i][k + 1] - (p * q);
+                            mtrxH[i][k] = mtrxH[i][k] - p;
+                            mtrxH[i][k + 1] = mtrxH[i][k + 1] - (p * q);
                         }
 
                         // Accumulate transformations
-                        for (int i = low; i <= high; i++) {
-                            //p = (x * V[i][k]) + (y * V[i][k + 1]);
-                            p = (x * myTransposedV[k][i]) + (y * myTransposedV[k + 1][i]);
-                            if (notlast) {
-                                //p = p + (z * V[i][k + 2]);
-                                p = p + (z * myTransposedV[k + 2][i]);
-                                //V[i][k + 2] = V[i][k + 2] - (p * r);
-                                myTransposedV[k + 2][i] = myTransposedV[k + 2][i] - (p * r);
+                        if (myTransposedV != null) {
+                            for (int i = low; i <= high; i++) {
+                                //p = (x * V[i][k]) + (y * V[i][k + 1]);
+                                p = (x * myTransposedV[k][i]) + (y * myTransposedV[k + 1][i]);
+                                if (notlast) {
+                                    //p = p + (z * V[i][k + 2]);
+                                    p = p + (z * myTransposedV[k + 2][i]);
+                                    //V[i][k + 2] = V[i][k + 2] - (p * r);
+                                    myTransposedV[k + 2][i] = myTransposedV[k + 2][i] - (p * r);
+                                }
+                                //V[i][k] = V[i][k] - p;
+                                myTransposedV[k][i] = myTransposedV[k][i] - p;
+                                //V[i][k + 1] = V[i][k + 1] - (p * q);
+                                myTransposedV[k + 1][i] = myTransposedV[k + 1][i] - (p * q);
                             }
-                            //V[i][k] = V[i][k] - p;
-                            myTransposedV[k][i] = myTransposedV[k][i] - p;
-                            //V[i][k + 1] = V[i][k + 1] - (p * q);
-                            myTransposedV[k + 1][i] = myTransposedV[k + 1][i] - (p * q);
                         }
+
                     } // (s != 0)
                 } // k loop
             } // check convergence
@@ -687,12 +691,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             if (q == 0) {
                 int l = n;
-                H[n][n] = ONE;
+                mtrxH[n][n] = ONE;
                 for (int i = n - 1; i >= 0; i--) {
-                    w = H[i][i] - p;
+                    w = mtrxH[i][i] - p;
                     r = ZERO;
                     for (int j = l; j <= n; j++) {
-                        r = r + (H[i][j] * H[j][n]);
+                        r = r + (mtrxH[i][j] * mtrxH[j][n]);
                     }
                     if (e[i] < ZERO) {
                         z = w;
@@ -702,32 +706,32 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         if (e[i] == ZERO) {
                             // if (w != ZERO) {
                             if (Double.compare(w, ZERO) != 0) {
-                                H[i][n] = -r / w;
+                                mtrxH[i][n] = -r / w;
                             } else {
-                                H[i][n] = -r / (eps * norm);
+                                mtrxH[i][n] = -r / (eps * norm);
                             }
 
                             // Solve real equations
 
                         } else {
-                            x = H[i][i + 1];
-                            y = H[i + 1][i];
+                            x = mtrxH[i][i + 1];
+                            y = mtrxH[i + 1][i];
                             q = ((d[i] - p) * (d[i] - p)) + (e[i] * e[i]);
                             t = ((x * s) - (z * r)) / q;
-                            H[i][n] = t;
+                            mtrxH[i][n] = t;
                             if (ABS.invoke(x) > ABS.invoke(z)) {
-                                H[i + 1][n] = (-r - (w * t)) / x;
+                                mtrxH[i + 1][n] = (-r - (w * t)) / x;
                             } else {
-                                H[i + 1][n] = (-s - (y * t)) / z;
+                                mtrxH[i + 1][n] = (-s - (y * t)) / z;
                             }
                         }
 
                         // Overflow control
 
-                        t = ABS.invoke(H[i][n]);
+                        t = ABS.invoke(mtrxH[i][n]);
                         if (((eps * t) * t) > 1) {
                             for (int j = i; j <= n; j++) {
-                                H[j][n] = H[j][n] / t;
+                                mtrxH[j][n] = mtrxH[j][n] / t;
                             }
                         }
                     }
@@ -740,25 +744,25 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
                 // Last vector component imaginary so matrix is triangular
 
-                if (ABS.invoke(H[n][n - 1]) > ABS.invoke(H[n - 1][n])) {
-                    H[n - 1][n - 1] = q / H[n][n - 1];
-                    H[n - 1][n] = -(H[n][n] - p) / H[n][n - 1];
+                if (ABS.invoke(mtrxH[n][n - 1]) > ABS.invoke(mtrxH[n - 1][n])) {
+                    mtrxH[n - 1][n - 1] = q / mtrxH[n][n - 1];
+                    mtrxH[n - 1][n] = -(mtrxH[n][n] - p) / mtrxH[n][n - 1];
                 } else {
-                    this.cdiv(ZERO, -H[n - 1][n], H[n - 1][n - 1] - p, q);
-                    H[n - 1][n - 1] = cdivr;
-                    H[n - 1][n] = cdivi;
+                    this.cdiv(ZERO, -mtrxH[n - 1][n], mtrxH[n - 1][n - 1] - p, q);
+                    mtrxH[n - 1][n - 1] = cdivr;
+                    mtrxH[n - 1][n] = cdivi;
                 }
-                H[n][n - 1] = ZERO;
-                H[n][n] = ONE;
+                mtrxH[n][n - 1] = ZERO;
+                mtrxH[n][n] = ONE;
                 for (int i = n - 2; i >= 0; i--) {
                     double ra, sa, vr, vi;
                     ra = ZERO;
                     sa = ZERO;
                     for (int j = l; j <= n; j++) {
-                        ra = ra + (H[i][j] * H[j][n - 1]);
-                        sa = sa + (H[i][j] * H[j][n]);
+                        ra = ra + (mtrxH[i][j] * mtrxH[j][n - 1]);
+                        sa = sa + (mtrxH[i][j] * mtrxH[j][n]);
                     }
-                    w = H[i][i] - p;
+                    w = mtrxH[i][i] - p;
 
                     if (e[i] < ZERO) {
                         z = w;
@@ -768,14 +772,14 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         l = i;
                         if (e[i] == 0) {
                             this.cdiv(-ra, -sa, w, q);
-                            H[i][n - 1] = cdivr;
-                            H[i][n] = cdivi;
+                            mtrxH[i][n - 1] = cdivr;
+                            mtrxH[i][n] = cdivi;
                         } else {
 
                             // Solve complex equations
 
-                            x = H[i][i + 1];
-                            y = H[i + 1][i];
+                            x = mtrxH[i][i + 1];
+                            y = mtrxH[i + 1][i];
                             vr = (((d[i] - p) * (d[i] - p)) + (e[i] * e[i])) - (q * q);
                             vi = (d[i] - p) * TWO * q;
                             // if ((vr == ZERO) & (vi == ZERO)) {
@@ -783,24 +787,24 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                                 vr = eps * norm * (ABS.invoke(w) + ABS.invoke(q) + ABS.invoke(x) + ABS.invoke(y) + ABS.invoke(z));
                             }
                             this.cdiv(((x * r) - (z * ra)) + (q * sa), (x * s) - (z * sa) - (q * ra), vr, vi);
-                            H[i][n - 1] = cdivr;
-                            H[i][n] = cdivi;
+                            mtrxH[i][n - 1] = cdivr;
+                            mtrxH[i][n] = cdivi;
                             if (ABS.invoke(x) > (ABS.invoke(z) + ABS.invoke(q))) {
-                                H[i + 1][n - 1] = ((-ra - (w * H[i][n - 1])) + (q * H[i][n])) / x;
-                                H[i + 1][n] = (-sa - (w * H[i][n]) - (q * H[i][n - 1])) / x;
+                                mtrxH[i + 1][n - 1] = ((-ra - (w * mtrxH[i][n - 1])) + (q * mtrxH[i][n])) / x;
+                                mtrxH[i + 1][n] = (-sa - (w * mtrxH[i][n]) - (q * mtrxH[i][n - 1])) / x;
                             } else {
-                                this.cdiv(-r - (y * H[i][n - 1]), -s - (y * H[i][n]), z, q);
-                                H[i + 1][n - 1] = cdivr;
-                                H[i + 1][n] = cdivi;
+                                this.cdiv(-r - (y * mtrxH[i][n - 1]), -s - (y * mtrxH[i][n]), z, q);
+                                mtrxH[i + 1][n - 1] = cdivr;
+                                mtrxH[i + 1][n] = cdivi;
                             }
                         }
 
                         // Overflow control
-                        t = MAX.invoke(ABS.invoke(H[i][n - 1]), ABS.invoke(H[i][n]));
+                        t = MAX.invoke(ABS.invoke(mtrxH[i][n - 1]), ABS.invoke(mtrxH[i][n]));
                         if (((eps * t) * t) > 1) {
                             for (int j = i; j <= n; j++) {
-                                H[j][n - 1] = H[j][n - 1] / t;
-                                H[j][n] = H[j][n] / t;
+                                mtrxH[j][n - 1] = mtrxH[j][n - 1] / t;
+                                mtrxH[j][n] = mtrxH[j][n] / t;
                             }
                         }
                     }
@@ -808,34 +812,37 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             }
         }
 
-        // Vectors of isolated roots
-        for (int i = 0; i < nn; i++) {
-            if ((i < low) | (i > high)) {
-                for (int j = i; j < nn; j++) {
-                    //V[i][j] = H[i][j];
-                    myTransposedV[j][i] = H[i][j];
+        if (myTransposedV != null) {
+
+            // Vectors of isolated roots
+            for (int i = 0; i < nn; i++) {
+                if ((i < low) | (i > high)) {
+                    for (int j = i; j < nn; j++) {
+                        //V[i][j] = H[i][j];
+                        myTransposedV[j][i] = mtrxH[i][j];
+                    }
                 }
             }
-        }
 
-        // Back transformation to get eigenvectors of original matrix
-        for (int j = nn - 1; j >= low; j--) {
-            for (int i = low; i <= high; i++) {
-                z = ZERO;
-                for (int k = low; k <= Math.min(j, high); k++) {
-                    //z = z + (V[i][k] * H[k][j]);
-                    z = z + (myTransposedV[k][i] * H[k][j]);
+            // Back transformation to get eigenvectors of original matrix
+            for (int j = nn - 1; j >= low; j--) {
+                for (int i = low; i <= high; i++) {
+                    z = ZERO;
+                    for (int k = low; k <= Math.min(j, high); k++) {
+                        //z = z + (V[i][k] * H[k][j]);
+                        z = z + (myTransposedV[k][i] * mtrxH[k][j]);
+                    }
+                    //V[i][j] = z;
+                    myTransposedV[j][i] = z;
                 }
-                //V[i][j] = z;
-                myTransposedV[j][i] = z;
             }
         }
     }
 
     /**
-     * @param H Array for internal storage of nonsymmetric Hessenberg form.
+     * @param mtrxH Array for internal storage of nonsymmetric Hessenberg form.
      */
-    private void orthes(final double[][] H) {
+    private void orthes(final double[][] mtrxH) {
 
         //  This is derived from the Algol procedures orthes and ortran,
         //  by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -859,7 +866,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             double scale = ZERO;
             for (int i = m; i <= high; i++) {
-                scale = scale + ABS.invoke(H[i][m - 1]);
+                scale = scale + ABS.invoke(mtrxH[i][m - 1]);
             }
             // if (scale != ZERO) {
             if (Double.compare(scale, ZERO) != 0) {
@@ -868,7 +875,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
                 double h = ZERO;
                 for (int i = high; i >= m; i--) {
-                    ort[i] = H[i][m - 1] / scale;
+                    ort[i] = mtrxH[i][m - 1] / scale;
                     h += ort[i] * ort[i];
                 }
                 double g = SQRT.invoke(h);
@@ -884,53 +891,56 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 for (int j = m; j < n; j++) {
                     double f = ZERO;
                     for (int i = high; i >= m; i--) {
-                        f += ort[i] * H[i][j];
+                        f += ort[i] * mtrxH[i][j];
                     }
                     f = f / h;
                     for (int i = m; i <= high; i++) {
-                        H[i][j] -= f * ort[i];
+                        mtrxH[i][j] -= f * ort[i];
                     }
                 }
 
                 for (int i = 0; i <= high; i++) {
                     double f = ZERO;
                     for (int j = high; j >= m; j--) {
-                        f += ort[j] * H[i][j];
+                        f += ort[j] * mtrxH[i][j];
                     }
                     f = f / h;
                     for (int j = m; j <= high; j++) {
-                        H[i][j] -= f * ort[j];
+                        mtrxH[i][j] -= f * ort[j];
                     }
                 }
                 ort[m] = scale * ort[m];
-                H[m][m - 1] = scale * g;
+                mtrxH[m][m - 1] = scale * g;
             }
         }
 
         // Accumulate transformations (Algol's ortran).
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                //V[i][j] = (i == j ? ONE : ZERO);
-                myTransposedV[j][i] = (i == j ? ONE : ZERO);
-            }
-        }
+        if (myTransposedV != null) {
 
-        for (int m = high - 1; m >= (low + 1); m--) {
-            if (H[m][m - 1] != ZERO) {
-                for (int i = m + 1; i <= high; i++) {
-                    ort[i] = H[i][m - 1];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    //V[i][j] = (i == j ? ONE : ZERO);
+                    myTransposedV[j][i] = (i == j ? ONE : ZERO);
                 }
-                for (int j = m; j <= high; j++) {
-                    double g = ZERO;
-                    for (int i = m; i <= high; i++) {
-                        //g += ort[i] * V[i][j];
-                        g += ort[i] * myTransposedV[j][i];
+            }
+
+            for (int m = high - 1; m >= (low + 1); m--) {
+                if (mtrxH[m][m - 1] != ZERO) {
+                    for (int i = m + 1; i <= high; i++) {
+                        ort[i] = mtrxH[i][m - 1];
                     }
-                    // Double division avoids possible underflow
-                    g = (g / ort[m]) / H[m][m - 1];
-                    for (int i = m; i <= high; i++) {
-                        //V[i][j] += g * ort[i];
-                        myTransposedV[j][i] += g * ort[i];
+                    for (int j = m; j <= high; j++) {
+                        double g = ZERO;
+                        for (int i = m; i <= high; i++) {
+                            //g += ort[i] * V[i][j];
+                            g += ort[i] * myTransposedV[j][i];
+                        }
+                        // Double division avoids possible underflow
+                        g = (g / ort[m]) / mtrxH[m][m - 1];
+                        for (int i = m; i <= high; i++) {
+                            //V[i][j] += g * ort[i];
+                            myTransposedV[j][i] += g * ort[i];
+                        }
                     }
                 }
             }
@@ -1067,25 +1077,21 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    abstract boolean doDecompose(double[][] data);
+    abstract boolean doDecompose(double[][] data, boolean valuesOnly);
 
-    void doDecomposeGeneral(final double[][] data) {
+    final void doDecomposeGeneral(final double[][] data, final boolean valuesOnly) {
 
         n = data.length;
 
         if ((d == null) || (n != d.length)) {
-            myTransposedV = new double[n][n];
+            if (valuesOnly) {
+                myTransposedV = null;
+            } else {
+                myTransposedV = new double[n][n];
+            }
             d = new double[n];
             e = new double[n];
         }
-
-        // H = data;
-
-        //        for (int j = 0; j < n; j++) {
-        //            for (int i = 0; i < n; i++) {
-        //                H[i][j] = A[i][j];
-        //            }
-        //        }
 
         // Reduce to Hessenberg form.
         this.orthes(data);
@@ -1095,7 +1101,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     }
 
-    void doDecomposeSymmetric(final double[][] data) {
+    final void doDecomposeSymmetric(final double[][] data, final boolean valuesOnly) {
 
         n = data.length;
 
@@ -1106,14 +1112,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         myTransposedV = data;
 
-        //        for (int i = 0; i < n; i++) {
-        //            for (int j = 0; j < n; j++) {
-        //                V[i][j] = A[i][j];
-        //            }
-        //        }
-
         // Tridiagonalize.
-        HouseholderHermitian.tred2jj(myTransposedV, d, e, true);
+        HouseholderHermitian.tred2jj(myTransposedV, d, e, !valuesOnly);
 
         // Diagonalize.
         this.tql2();
@@ -1124,7 +1124,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      *
      * @return imag(diag(D))
      */
-    double[] getImagEigenvalues() {
+    double[] getImaginaryParts() {
         return e;
     }
 
@@ -1133,7 +1133,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      *
      * @return real(diag(D))
      */
-    double[] getRealEigenvalues() {
+    double[] getRealParts() {
         return d;
     }
 

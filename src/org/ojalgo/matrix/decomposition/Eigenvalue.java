@@ -67,18 +67,18 @@ public interface Eigenvalue<N extends Number>
         public final ComplexNumber value;
         public final Access1D<ComplexNumber> vector;
 
-        Eigenpair(ComplexNumber aValue, Access1D<ComplexNumber> aVector) {
+        Eigenpair(final ComplexNumber aValue, final Access1D<ComplexNumber> aVector) {
             super();
             value = aValue;
             vector = aVector;
         }
 
-        public int compareTo(Eigenpair other) {
+        public int compareTo(final Eigenpair other) {
             return value.compareTo(other.value);
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -88,7 +88,7 @@ public interface Eigenvalue<N extends Number>
             if (!(obj instanceof Eigenpair)) {
                 return false;
             }
-            Eigenpair other = (Eigenpair) obj;
+            final Eigenpair other = (Eigenpair) obj;
             if (value == null) {
                 if (other.value != null) {
                     return false;
@@ -247,7 +247,7 @@ public interface Eigenvalue<N extends Number>
 
         this.copyEigenvector(index, retVal.sliceColumn(0, index));
 
-        return new Eigenpair(getEigenvalues().get(index), retVal);
+        return new Eigenpair(this.getEigenvalues().get(index), retVal);
     }
 
     /**
