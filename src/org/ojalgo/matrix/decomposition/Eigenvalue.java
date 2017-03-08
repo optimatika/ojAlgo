@@ -297,7 +297,9 @@ public interface Eigenvalue<N extends Number>
      * @param index Index corresponding to an entry in {@link #getEigenvalues()} and/or a column in
      *        {@link #getEigenvectors()}.
      * @return One eigenvector
+     * @deprecated v43 Use {@link #getEigenpair(int)} instead.
      */
+    @Deprecated
     default MatrixStore<ComplexNumber> getEigenvector(final int index) {
 
         final long tmpDimension = this.getV().countColumns();

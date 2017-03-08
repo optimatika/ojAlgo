@@ -23,14 +23,18 @@ package org.ojalgo.tensor;
 
 import org.ojalgo.access.AccessAnyD;
 import org.ojalgo.algebra.NormedVectorSpace;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.scalar.Scalar;
 
 public interface Tensor<N extends Number> extends AccessAnyD<N>, NormedVectorSpace<Tensor<N>, N> {
 
+    static <N extends Number & Scalar<N>> Tensor<N> make(DenseArray.Factory<N> arrayFactory, final int rank, final int dimensions) {
+        return new AnyTensor<N>(rank, dimensions, arrayFactory);
+    }
+
     static Tensor<Double> makePrimitive(final int rank, final int dimensions) {
-        return new AnyTensor<Double>(rank, dimensions, Primitive64Array.FACTORY, PrimitiveFunction.getSet(), PrimitiveAggregator.getSet());
+        return new AnyTensor<Double>(rank, dimensions, Primitive64Array.FACTORY);
     }
 
     default long count(final int dimension) {

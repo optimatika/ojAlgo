@@ -25,22 +25,17 @@ import java.util.Arrays;
 
 import org.ojalgo.array.ArrayAnyD;
 import org.ojalgo.array.DenseArray;
-import org.ojalgo.function.FunctionSet;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
 
 final class AnyTensor<N extends Number> implements Tensor<N> {
 
     private final ArrayAnyD<N> myArray;
+    private final DenseArray.Factory<N> myArrayFactory;
     private final int myDimensions;
     private final int myRank;
 
-    private final DenseArray.Factory<N> myArrayFactory;
-    private final FunctionSet<N> myFunctionSet;
-    private final AggregatorSet<N> myAggregatorSet;
-
-    AnyTensor(final int rank, final int dimensions, final DenseArray.Factory<N> arrayFactory, final FunctionSet<N> functionSet,
-            final AggregatorSet<N> aggregatorSet) {
+    AnyTensor(final int rank, final int dimensions, final DenseArray.Factory<N> arrayFactory) {
 
         super();
 
@@ -52,47 +47,21 @@ final class AnyTensor<N extends Number> implements Tensor<N> {
         myArray = ArrayAnyD.factory(arrayFactory).makeZero(shape);
 
         myArrayFactory = arrayFactory;
-        myFunctionSet = functionSet;
-        myAggregatorSet = aggregatorSet;
     }
 
-    public int dimensions() {
-        return myDimensions;
-    }
+    public Tensor<N> add(final Tensor<N> addend) {
 
-    public double doubleValue(final long[] ref) {
-        return myArray.doubleValue(ref);
-    }
+        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory);
+        final ArrayAnyD<N> retArray = retVal.getArray();
 
-    public N get(final long[] ref) {
-        return myArray.get(ref);
-    }
+        retArray.loopAll((final long i) -> retArray.set(i, this.doubleValue(i) + addend.doubleValue(i)));
 
-    public int rank() {
-        return myRank;
-    }
-
-    public long[] shape() {
-        return myArray.shape();
-    }
-
-    public boolean isSmall(final double comparedTo) {
-        return myArray.isAllSmall(comparedTo);
-    }
-
-    public double norm() {
-        final AggregatorFunction<N> tmpNorm2 = myAggregatorSet.norm2();
-        myArray.visitAll(tmpNorm2);
-        return tmpNorm2.doubleValue();
-    }
-
-    public Tensor<N> signum() {
-        return this.multiply(1.0 / this.norm());
+        return retVal;
     }
 
     public Tensor<N> conjugate() {
 
-        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory, myFunctionSet, myAggregatorSet);
+        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory);
         final ArrayAnyD<N> retArray = retVal.getArray();
 
         final long[] traspRef = retVal.shape().clone();
@@ -108,44 +77,72 @@ final class AnyTensor<N extends Number> implements Tensor<N> {
         return retVal;
     }
 
-    public Tensor<N> negate() {
-
-        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory, myFunctionSet, myAggregatorSet);
-        final ArrayAnyD<N> retArray = retVal.getArray();
-
-        retArray.modifyAll(myFunctionSet.negate());
-
-        return retVal;
+    public long count() {
+        return (long) Math.pow(myDimensions, myRank);
     }
 
-    public Tensor<N> add(final Tensor<N> addend) {
+    public int dimensions() {
+        return myDimensions;
+    }
 
-        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory, myFunctionSet, myAggregatorSet);
-        final ArrayAnyD<N> retArray = retVal.getArray();
+    public double doubleValue(final long[] ref) {
+        return myArray.doubleValue(ref);
+    }
 
-        retArray.loopAll((final long i) -> retArray.set(i, this.doubleValue(i) + addend.doubleValue(i)));
+    public N get(final long[] ref) {
+        return myArray.get(ref);
+    }
 
-        return retVal;
+    public boolean isSmall(final double comparedTo) {
+        return myArray.isAllSmall(comparedTo);
     }
 
     public Tensor<N> multiply(final double scalarMultiplicand) {
 
-        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory, myFunctionSet, myAggregatorSet);
+        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory);
         final ArrayAnyD<N> retArray = retVal.getArray();
 
-        retArray.modifyAll(myFunctionSet.multiply().second(scalarMultiplicand));
+        retArray.modifyAll(myArrayFactory.function().multiply().second(scalarMultiplicand));
 
         return retVal;
     }
 
     public Tensor<N> multiply(final N scalarMultiplicand) {
 
-        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory, myFunctionSet, myAggregatorSet);
+        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory);
         final ArrayAnyD<N> retArray = retVal.getArray();
 
-        retArray.modifyAll(myFunctionSet.multiply().second(scalarMultiplicand));
+        retArray.modifyAll(myArrayFactory.function().multiply().second(scalarMultiplicand));
 
         return retVal;
+    }
+
+    public Tensor<N> negate() {
+
+        final AnyTensor<N> retVal = new AnyTensor<>(myRank, myDimensions, myArrayFactory);
+        final ArrayAnyD<N> retArray = retVal.getArray();
+
+        retArray.modifyAll(myArrayFactory.function().negate());
+
+        return retVal;
+    }
+
+    public double norm() {
+        final AggregatorFunction<N> tmpNorm2 = myArrayFactory.aggregator().norm2();
+        myArray.visitAll(tmpNorm2);
+        return tmpNorm2.doubleValue();
+    }
+
+    public int rank() {
+        return myRank;
+    }
+
+    public long[] shape() {
+        return myArray.shape();
+    }
+
+    public Tensor<N> signum() {
+        return this.multiply(PrimitiveMath.ONE / this.norm());
     }
 
     ArrayAnyD<N> getArray() {
