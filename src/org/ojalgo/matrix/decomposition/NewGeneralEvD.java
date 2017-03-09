@@ -98,7 +98,7 @@ abstract class NewGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
     }
 
     @Override
-    protected boolean doNonsymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
+    protected boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
 
         final int tmpDiagDim = (int) matrix.countRows();
 
@@ -141,8 +141,8 @@ abstract class NewGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
     }
 
     @Override
-    protected boolean doSymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
-        return this.doNonsymmetric(matrix, eigenvaluesOnly);
+    protected boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
+        return this.doGeneral(matrix, eigenvaluesOnly);
     }
 
     @Override

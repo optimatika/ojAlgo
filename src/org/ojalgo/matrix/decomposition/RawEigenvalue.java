@@ -397,7 +397,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         int n = nn - 1;
         final int low = 0;
         final int high = nn - 1;
-        final double eps = MACHINE_EPSILON;
         double exshift = ZERO;
         double p = 0, q = 0, r = 0, s = 0, z = 0, t, w, x, y;
 
@@ -428,7 +427,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 if (Double.compare(s, ZERO) == 0) {
                     s = norm;
                 }
-                if (ABS.invoke(mtrxH[l][l - 1]) < (eps * s)) {
+                if (ABS.invoke(mtrxH[l][l - 1]) < (MACHINE_EPSILON * s)) {
                     break;
                 }
                 l--;
@@ -582,7 +581,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     if (m == l) {
                         break;
                     }
-                    if ((ABS.invoke(mtrxH[m][m - 1]) * (ABS.invoke(q) + ABS.invoke(r))) < (eps
+                    if ((ABS.invoke(mtrxH[m][m - 1]) * (ABS.invoke(q) + ABS.invoke(r))) < (MACHINE_EPSILON
                             * (ABS.invoke(p) * (ABS.invoke(mtrxH[m - 1][m - 1]) + ABS.invoke(z) + ABS.invoke(mtrxH[m + 1][m + 1]))))) {
                         break;
                     }
@@ -708,7 +707,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                             if (Double.compare(w, ZERO) != 0) {
                                 mtrxH[i][n] = -r / w;
                             } else {
-                                mtrxH[i][n] = -r / (eps * norm);
+                                mtrxH[i][n] = -r / (MACHINE_EPSILON * norm);
                             }
 
                             // Solve real equations
@@ -729,7 +728,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                         // Overflow control
 
                         t = ABS.invoke(mtrxH[i][n]);
-                        if (((eps * t) * t) > 1) {
+                        if (((MACHINE_EPSILON * t) * t) > 1) {
                             for (int j = i; j <= n; j++) {
                                 mtrxH[j][n] = mtrxH[j][n] / t;
                             }
@@ -784,7 +783,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                             vi = (d[i] - p) * TWO * q;
                             // if ((vr == ZERO) & (vi == ZERO)) {
                             if ((Double.compare(vr, ZERO) == 0) && (Double.compare(vi, ZERO) == 0)) {
-                                vr = eps * norm * (ABS.invoke(w) + ABS.invoke(q) + ABS.invoke(x) + ABS.invoke(y) + ABS.invoke(z));
+                                vr = MACHINE_EPSILON * norm * (ABS.invoke(w) + ABS.invoke(q) + ABS.invoke(x) + ABS.invoke(y) + ABS.invoke(z));
                             }
                             this.cdiv(((x * r) - (z * ra)) + (q * sa), (x * s) - (z * sa) - (q * ra), vr, vi);
                             mtrxH[i][n - 1] = cdivr;
@@ -801,7 +800,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
                         // Overflow control
                         t = MAX.invoke(ABS.invoke(mtrxH[i][n - 1]), ABS.invoke(mtrxH[i][n]));
-                        if (((eps * t) * t) > 1) {
+                        if (((MACHINE_EPSILON * t) * t) > 1) {
                             for (int j = i; j <= n; j++) {
                                 mtrxH[j][n - 1] = mtrxH[j][n - 1] / t;
                                 mtrxH[j][n] = mtrxH[j][n] / t;

@@ -253,12 +253,12 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     }
 
     @Override
-    protected final boolean doNonsymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
+    protected final boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    protected final boolean doSymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
+    protected final boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
 
         final int tmpDim = (int) matrix.countRows();
 

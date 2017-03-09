@@ -98,9 +98,9 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         myEigenvaluesOnly = false;
     }
 
-    protected abstract boolean doNonsymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
+    protected abstract boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
 
-    protected abstract boolean doSymmetric(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
+    protected abstract boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
 
     protected abstract MatrixStore<N> makeD();
 
@@ -120,11 +120,11 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
 
             if (symmetric) {
 
-                retVal = this.doSymmetric(matrix, eigenvaluesOnly);
+                retVal = this.doHermitian(matrix, eigenvaluesOnly);
 
             } else {
 
-                retVal = this.doNonsymmetric(matrix, eigenvaluesOnly);
+                retVal = this.doGeneral(matrix, eigenvaluesOnly);
             }
 
         } catch (final Exception exc) {
