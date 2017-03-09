@@ -54,36 +54,6 @@ public class EigenvalueTest extends MatrixDecompositionTests {
 
     }
 
-    private static void doTest(final PhysicalStore<Double> originalMatrix, final Array1D<ComplexNumber> expectedEigenvalues,
-            final NumberContext accuracyContext) {
-
-        MatrixStore<Double> tmpRecreatedMatrix;
-
-        final Eigenvalue<Double> tmpDecomposition = Eigenvalue.PRIMITIVE.make();
-        tmpDecomposition.decompose(originalMatrix);
-
-        final Array1D<ComplexNumber> tmpEigenvalues = tmpDecomposition.getEigenvalues();
-        final MatrixStore<Double> tmpD = tmpDecomposition.getD();
-        final MatrixStore<Double> tmpV = tmpDecomposition.getV();
-
-        if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Eigenvalues = {}", tmpEigenvalues);
-            BasicLogger.debug("D = {}", tmpD);
-            BasicLogger.debug("V = {}", tmpV);
-        }
-
-        tmpRecreatedMatrix = tmpV.multiply(tmpDecomposition.getD()).multiply(tmpV.transpose());
-        if (MatrixDecompositionTests.DEBUG) {
-            BasicLogger.debug("Original = {}", originalMatrix);
-            BasicLogger.debug("Recreated = {}", tmpRecreatedMatrix);
-        }
-        TestUtils.assertEquals(originalMatrix.multiply(tmpV), tmpV.multiply(tmpDecomposition.getD()), accuracyContext);
-
-        expectedEigenvalues.sortDescending();
-        tmpEigenvalues.sortDescending();
-        TestUtils.assertEquals(expectedEigenvalues, tmpEigenvalues, accuracyContext);
-    }
-
     public EigenvalueTest() {
         super();
     }
@@ -137,8 +107,37 @@ public class EigenvalueTest extends MatrixDecompositionTests {
         final ComplexNumber tmp44 = tmp33;
 
         final Array1D<ComplexNumber> tmpExpectedDiagonal = Array1D.COMPLEX.copy(new ComplexNumber[] { tmp00, tmp11, tmp22, tmp33, tmp44 });
+        final NumberContext accuracyContext = new NumberContext(7, 6);
 
-        EigenvalueTest.doTest(tmpOriginalMatrix, tmpExpectedDiagonal, new NumberContext(7, 6));
+        MatrixStore<Double> tmpRecreatedMatrix;
+
+        final Eigenvalue<Double> tmpDecomposition = Eigenvalue.PRIMITIVE.make(tmpOriginalMatrix);
+        tmpDecomposition.decompose(tmpOriginalMatrix);
+
+        final Array1D<ComplexNumber> tmpEigenvalues = tmpDecomposition.getEigenvalues();
+        final MatrixStore<Double> tmpD = tmpDecomposition.getD();
+        final MatrixStore<Double> tmpV = tmpDecomposition.getV();
+
+        if (MatrixDecompositionTests.DEBUG) {
+            BasicLogger.debug("Eigenvalues = {}", tmpEigenvalues);
+            BasicLogger.debug("D = {}", tmpD);
+            BasicLogger.debug("V = {}", tmpV);
+        }
+
+        tmpRecreatedMatrix = tmpV.multiply(tmpDecomposition.getD()).multiply(tmpV.transpose());
+        if (MatrixDecompositionTests.DEBUG) {
+            BasicLogger.debug("Original = {}", tmpOriginalMatrix);
+            BasicLogger.debug("Recreated = {}", tmpRecreatedMatrix);
+        }
+        TestUtils.assertEquals(tmpOriginalMatrix.multiply(tmpV), tmpV.multiply(tmpDecomposition.getD()), accuracyContext);
+
+        tmpExpectedDiagonal.sortDescending();
+        tmpEigenvalues.sortDescending();
+        TestUtils.assertEquals(tmpExpectedDiagonal, tmpEigenvalues, accuracyContext);
+
+        tmpDecomposition.computeValuesOnly(tmpOriginalMatrix);
+        final Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpDecomposition.getEigenvalues();
+        TestUtils.assertEquals(tmpExpectedDiagonal, tmpEigenvaluesOnly, accuracyContext);
     }
 
     public void testPaulsMathNote() {
@@ -192,6 +191,11 @@ public class EigenvalueTest extends MatrixDecompositionTests {
         final MatrixStore<ComplexNumber> tmpExp2 = tmpCmplA.multiply(tmpVectors);
         final MatrixStore<ComplexNumber> tmpAct2 = tmpVectors.multiply(tmpComplexD);
         TestUtils.assertEquals(tmpExp2, tmpAct2);
+
+        tmpEvD.computeValuesOnly(tmpA);
+        final Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEvD.getEigenvalues();
+        TestUtils.assertEquals(tmpValues, tmpEigenvaluesOnly);
+
     }
 
     public void testPrimitiveAsComplex() {
@@ -229,6 +233,10 @@ public class EigenvalueTest extends MatrixDecompositionTests {
         final MatrixStore<ComplexNumber> tmpExp2 = tmpCmplA.multiply(tmpAltV);
         final MatrixStore<ComplexNumber> tmpAct2 = tmpAltV.multiply(tmpAltD);
         TestUtils.assertEquals(tmpExp2, tmpAct2);
+
+        tmpEvD.computeValuesOnly(tmpA);
+        final Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEvD.getEigenvalues();
+        TestUtils.assertEquals(tmpValues, tmpEigenvaluesOnly);
     }
 
     /**
@@ -243,6 +251,13 @@ public class EigenvalueTest extends MatrixDecompositionTests {
             tmpEigenvalue.decompose(matrix);
 
             TestUtils.assertEquals(matrix, tmpEigenvalue, NumberContext.getGeneral(MathContext.DECIMAL64));
+
+            final Array1D<ComplexNumber> tmpValues = tmpEigenvalue.getEigenvalues();
+
+            tmpEigenvalue.computeValuesOnly(matrix);
+            final Array1D<ComplexNumber> tmpEigenvaluesOnly = tmpEigenvalue.getEigenvalues();
+            TestUtils.assertEquals(tmpValues, tmpEigenvaluesOnly);
+
         }
     }
 
