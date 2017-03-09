@@ -27,8 +27,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.constant.PrimitiveMath;
+import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -41,7 +40,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
 
-abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
+public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
 
     static final class Big extends HermitianEvD<BigDecimal> {
 
@@ -78,154 +77,6 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
             super(PrimitiveDenseStore.FACTORY, new TridiagonalDecomposition.Primitive());
         }
 
-    }
-
-    private static final double EPSILON = PrimitiveFunction.POW.invoke(2.0, -52.0);
-
-    static Array1D<Double> toDiagonal(final DiagonalAccess<?> aTridiagonal, final DecompositionStore<?> transformationAccumulator) {
-
-        //   BasicLogger.logDebug("Tridiagonal={}", aTridiagonal.toString());
-
-        final Array1D<?> tmpMainDiagonal = aTridiagonal.mainDiagonal;
-        final Array1D<?> tmpSubdiagonal = aTridiagonal.subdiagonal;
-
-        final int tmpDim = tmpMainDiagonal.size();
-
-        final double[] tmpMainDiagData = tmpMainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
-        final double[] tmpOffDiagData = new double[tmpDim]; // The algorith needs the array to be the same length as the main diagonal
-        final int tmpLength = tmpSubdiagonal.size();
-        for (int i = 0; i < tmpLength; i++) {
-            tmpOffDiagData[i] = tmpSubdiagonal.doubleValue(i);
-        }
-
-        //        BasicLogger.logDebug("BEGIN diagonalize");
-        //        BasicLogger.logDebug("Main D: {}", Arrays.toString(tmpMainDiagonal));
-        //        BasicLogger.logDebug("Seco D: {}", Arrays.toString(tmpOffDiagonal));
-        //        BasicLogger.logDebug("V", aV);
-        //        BasicLogger.logDebug();
-
-        double tmpShift = PrimitiveMath.ZERO;
-        double tmpShiftIncr;
-
-        double tmpMagnitude = PrimitiveMath.ZERO;
-        double tmpLocalEpsilon;
-
-        int m;
-        // Main loop
-        for (int l = 0; l < tmpDim; l++) {
-
-            //BasicLogger.logDebug("Loop l=" + l, tmpMainDiagonal, tmpOffDiagonal);
-
-            // Find small subdiagonal element
-            tmpMagnitude = PrimitiveFunction.MAX.invoke(tmpMagnitude,
-                    PrimitiveFunction.ABS.invoke(tmpMainDiagData[l]) + PrimitiveFunction.ABS.invoke(tmpOffDiagData[l]));
-            tmpLocalEpsilon = EPSILON * tmpMagnitude;
-
-            m = l;
-            while (m < tmpDim) {
-                if (PrimitiveFunction.ABS.invoke(tmpOffDiagData[m]) <= tmpLocalEpsilon) {
-                    break;
-                }
-                m++;
-            }
-
-            // If m == l, aMainDiagonal[l] is an eigenvalue, otherwise, iterate.
-            if (m > l) {
-
-                do {
-
-                    final double tmp1Ml0 = tmpMainDiagData[l]; // (l,l)
-                    final double tmp1Ml1 = tmpMainDiagData[l + 1]; // (l+1,l+1)
-                    final double tmp1Sl0 = tmpOffDiagData[l]; // (l+1,l) and (l,l+1)
-
-                    // Compute implicit shift
-
-                    double p = (tmp1Ml1 - tmp1Ml0) / (tmp1Sl0 + tmp1Sl0);
-                    double r = PrimitiveFunction.HYPOT.invoke(p, PrimitiveMath.ONE);
-                    if (p < 0) {
-                        r = -r;
-                    }
-
-                    final double tmp2Ml0 = tmpMainDiagData[l] = tmp1Sl0 / (p + r); // (l,l)
-                    final double tmp2Ml1 = tmpMainDiagData[l + 1] = tmp1Sl0 * (p + r); // (l+1,l+1)
-                    final double tmp2Sl1 = tmpOffDiagData[l + 1]; // (l+1,l) and (l,l+1)
-
-                    tmpShiftIncr = tmp1Ml0 - tmp2Ml0;
-                    for (int i = l + 2; i < tmpDim; i++) {
-                        tmpMainDiagData[i] -= tmpShiftIncr;
-                    }
-                    tmpShift += tmpShiftIncr;
-
-                    //BasicLogger.logDebug("New shift =" + tmpShift, tmpMainDiagonal, tmpOffDiagonal);
-
-                    // Implicit QL transformation
-
-                    double tmpRotCos = PrimitiveMath.ONE;
-                    double tmpRotSin = PrimitiveMath.ZERO;
-
-                    double tmpRotCos2 = tmpRotCos;
-                    double tmpRotSin2 = PrimitiveMath.ZERO;
-
-                    double tmpRotCos3 = tmpRotCos;
-
-                    p = tmpMainDiagData[m]; // Initiate p
-                    //      BasicLogger.logDebug("m={} l={}", m, l);
-                    for (int i = m - 1; i >= l; i--) {
-
-                        final double tmp1Mi0 = tmpMainDiagData[i];
-                        final double tmp1Si0 = tmpOffDiagData[i];
-
-                        r = PrimitiveFunction.HYPOT.invoke(p, tmp1Si0);
-
-                        tmpRotCos3 = tmpRotCos2;
-
-                        tmpRotCos2 = tmpRotCos;
-                        tmpRotSin2 = tmpRotSin;
-
-                        tmpRotCos = p / r;
-                        tmpRotSin = tmp1Si0 / r;
-
-                        tmpMainDiagData[i + 1] = (tmpRotCos2 * p) + (tmpRotSin * ((tmpRotCos * tmpRotCos2 * tmp1Si0) + (tmpRotSin * tmp1Mi0)));
-                        tmpOffDiagData[i + 1] = tmpRotSin2 * r;
-
-                        p = (tmpRotCos * tmp1Mi0) - (tmpRotSin * tmpRotCos2 * tmp1Si0); // Next p
-
-                        // Accumulate transformation - rotate the eigenvector matrix
-                        //aV.transformRight(new Rotation.Primitive(i, i + 1, tmpRotCos, tmpRotSin));
-
-                        //BasicLogger.logDebug("low={} high={} cos={} sin={}", i, i + 1, tmpRotCos, tmpRotSin);
-                        if (transformationAccumulator != null) {
-                            transformationAccumulator.rotateRight(i, i + 1, tmpRotCos, tmpRotSin);
-                        }
-
-                        //          EigenvalueDecomposition.log("QL step done i=" + i, tmpMainDiagonal, tmpOffDiagonal);
-
-                    }
-
-                    p = (-tmpRotSin * tmpRotSin2 * tmpRotCos3) * ((tmp2Sl1 / tmp2Ml1) * tmpOffDiagData[l]); // Final p
-
-                    tmpMainDiagData[l] = tmpRotCos * p;
-                    tmpOffDiagData[l] = tmpRotSin * p;
-
-                } while (PrimitiveFunction.ABS.invoke(tmpOffDiagData[l]) > tmpLocalEpsilon); // Check for convergence
-            } // End if (m > l)
-
-            tmpMainDiagData[l] = tmpMainDiagData[l] + tmpShift;
-            tmpOffDiagData[l] = PrimitiveMath.ZERO;
-        } // End main loop - l
-
-        //        BasicLogger.logDebug("END diagonalize");
-        //        BasicLogger.logDebug("Main D: {}", Arrays.toString(tmpMainDiagonal));
-        //        BasicLogger.logDebug("Seco D: {}", Arrays.toString(tmpOffDiagonal));
-        //        BasicLogger.logDebug("V", aV);
-        //        BasicLogger.logDebug();
-
-        //        for (int i = 0; i < tmpMainDiagData.length; i++) {
-        //            tmpMainDiagonal.set(i, tmpMainDiagData[i]);
-        //        }
-
-        //return new PrimitiveArray(tmpMainDiagonal).asArray1D();
-        return Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(tmpMainDiagData));
     }
 
     private Array1D<Double> myDiagonalValues;
@@ -269,7 +120,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
             final BinaryFunction<N> tmpDivide = this.function().divide();
 
             for (int i = 0; i < tmpDim; i++) {
-                if (tmpD.isSmall(i, i, PrimitiveMath.ONE)) {
+                if (tmpD.isSmall(i, i, ONE)) {
                     tmpMtrx.fillRow(i, 0, tmpZero);
                 } else {
                     tmpMtrx.modifyRow(i, 0, tmpDivide.second(tmpD.get(i, i)));
@@ -299,7 +150,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
             final BinaryFunction<N> tmpDivide = this.function().divide();
 
             for (int i = 0; i < tmpDim; i++) {
-                if (tmpD.isSmall(i, i, PrimitiveMath.ONE)) {
+                if (tmpD.isSmall(i, i, ONE)) {
                     tmpMtrx.fillRow(i, 0, tmpZero);
                 } else {
                     tmpMtrx.modifyRow(i, 0, tmpDivide.second(tmpD.get(i, i)));
@@ -421,7 +272,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
 
         //        BasicLogger.logDebug("Tridiagonal2={}", tmpTridiagonal);
 
-        final Array1D<Double> tmpDiagonal = myDiagonalValues = HermitianEvD.toDiagonal(tmpTridiagonal, tmpV);
+        final Array1D<Double> tmpDiagonal = myDiagonalValues = EvD1D.tql2(tmpTridiagonal, tmpV);
 
         for (int ij1 = 0; ij1 < (tmpDim - 1); ij1++) {
             final double tmpValue1 = tmpDiagonal.doubleValue(ij1);
@@ -457,7 +308,7 @@ abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N>
 
     @Override
     protected MatrixStore<N> makeD() {
-        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<>(myDiagonalValues, null, null, PrimitiveMath.ZERO);
+        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<>(myDiagonalValues, null, null, ZERO);
         return this.wrap(tmpDiagonal).diagonal(false).get();
     }
 

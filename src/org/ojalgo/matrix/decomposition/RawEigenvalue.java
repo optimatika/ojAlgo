@@ -32,7 +32,6 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.matrix.EvD2D;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -840,136 +839,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    private void rot1(final double[] tmpVt_i, final double[] tmpVt_i1, final double c, final double s) {
-        double h;
-        for (int k = 0; k < n; k++) {
-            //h = V[k][i + 1];
-            h = tmpVt_i1[k];
-            //V[k][i + 1] = (s * V[k][i]) + (c * h);
-            tmpVt_i1[k] = (s * tmpVt_i[k]) + (c * h);
-            //V[k][i] = (c * V[k][i]) - (s * h);
-            tmpVt_i[k] = (c * tmpVt_i[k]) - (s * h);
-        }
-    }
-
-    private void tql2() {
-        //  This is derived from the Algol procedures tql2, by
-        //  Bowdler, Martin, Reinsch, and Wilkinson, Handbook for
-        //  Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
-        //  Fortran subroutine in EISPACK.
-
-        for (int i = 1; i < n; i++) {
-            e[i - 1] = e[i];
-        }
-        e[n - 1] = ZERO;
-
-        double f = ZERO;
-        double tst1 = ZERO;
-        for (int l = 0; l < n; l++) {
-
-            // Find small subdiagonal element
-            tst1 = MAX.invoke(tst1, ABS.invoke(d[l]) + ABS.invoke(e[l]));
-            int m = l;
-            while (m < n) {
-                if (ABS.invoke(e[m]) <= (MACHINE_EPSILON * tst1)) {
-                    break;
-                }
-                m++;
-            }
-
-            // If m == l, d[l] is an eigenvalue, otherwise, iterate.
-            if (m > l) {
-                int iter = 0;
-                do {
-                    iter = iter + 1; // (Could check iteration count here.)
-
-                    // Compute implicit shift
-                    double g = d[l];
-                    double p = (d[l + 1] - g) / (TWO * e[l]);
-                    final double a = p;
-                    double r = HYPOT.invoke(a, ONE);
-                    if (p < 0) {
-                        r = -r;
-                    }
-                    d[l] = e[l] / (p + r);
-                    d[l + 1] = e[l] * (p + r);
-                    final double dl1 = d[l + 1];
-                    double h = g - d[l];
-                    for (int i = l + 2; i < n; i++) {
-                        d[i] -= h;
-                    }
-                    f = f + h;
-
-                    // Implicit QL transformation.
-                    p = d[m];
-                    double c = ONE;
-                    double c2 = c;
-                    double c3 = c;
-                    final double el1 = e[l + 1];
-                    double s = ZERO;
-                    double s2 = ZERO;
-                    for (int i = m - 1; i >= l; i--) {
-                        c3 = c2;
-                        c2 = c;
-                        s2 = s;
-                        g = c * e[i];
-                        h = c * p;
-                        final double a1 = p;
-                        r = HYPOT.invoke(a1, e[i]);
-                        e[i + 1] = s * r;
-                        s = e[i] / r;
-                        c = p / r;
-                        p = (c * d[i]) - (s * g);
-                        d[i + 1] = h + (s * ((c * g) + (s * d[i])));
-
-                        // Accumulate transformation.
-                        this.rot1(myTransposedV[i], myTransposedV[i + 1], c, s);
-                    }
-                    // p = (-s * s2 * c3 * el1 * e[l]) / dl1;
-                    p = (-s * s2 * c3) * ((el1 / dl1) * e[l]);
-                    e[l] = s * p;
-                    d[l] = c * p;
-
-                    // Check for convergence.
-                } while (ABS.invoke(e[l]) > (MACHINE_EPSILON * tst1));
-            }
-            d[l] = d[l] + f;
-            e[l] = ZERO;
-        }
-
-        // Sort eigenvalues and corresponding vectors.
-        for (int i = 0; i < (n - 1); i++) {
-
-            double[] tmpCol;
-
-            int k = i;
-            double p = d[i];
-            for (int j = i + 1; j < n; j++) {
-                if (d[j] > p) {
-                    k = j;
-                    p = d[j];
-                }
-            }
-            if (k != i) {
-                d[k] = d[i];
-                d[i] = p;
-
-                tmpCol = myTransposedV[i];
-                myTransposedV[i] = myTransposedV[k];
-                myTransposedV[k] = tmpCol;
-
-                //                for (int j = 0; j < n; j++) {
-                //                    //p = V[j][i];
-                //                    p = Vt[i][j];
-                //                    //V[j][i] = V[j][k];
-                //                    Vt[i][j] = Vt[k][j];
-                //                    //V[j][k] = p;
-                //                    Vt[k][j] = p;
-                //                }
-            }
-        }
-    }
-
     abstract boolean doDecompose(double[][] data, boolean valuesOnly);
 
     final void doDecomposeGeneral(final double[][] data, final boolean valuesOnly) {
@@ -1002,14 +871,13 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             d = new double[n];
             e = new double[n];
         }
-
-        myTransposedV = data;
+        myTransposedV = valuesOnly ? null : data;
 
         // Tridiagonalize.
-        HouseholderHermitian.tred2jj(myTransposedV, d, e, !valuesOnly);
+        HouseholderHermitian.tred2jj(data, d, e, !valuesOnly);
 
         // Diagonalize.
-        this.tql2();
+        EvD2D.tql2(d, e, myTransposedV);
     }
 
     /**
