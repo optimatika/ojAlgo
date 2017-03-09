@@ -69,26 +69,26 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
         return (Cholesky<Double>[]) new Cholesky<?>[] { new CholeskyDecomposition.Primitive(), new RawCholesky() };
     }
 
+    public static final Eigenvalue<?>[] getEigenvalueAllDynamic() {
+        return new Eigenvalue<?>[] { new DynamicEvD.Primitive(), new RawEigenvalue.Dynamic() };
+    }
+
     public static final Eigenvalue<?>[] getEigenvalueAllGeneral() {
-        return new Eigenvalue<?>[] { Eigenvalue.PRIMITIVE.make(), new RawEigenvalue.Dynamic() };
+        return new Eigenvalue<?>[] { new NewGeneralEvD.Primitive(), new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive() };
     }
 
-    public static final Eigenvalue<?>[] getEigenvalueAllNonsymmetric() {
-        return new Eigenvalue<?>[] { Eigenvalue.PRIMITIVE.make(false) };
-    }
-
-    public static final Eigenvalue<?>[] getEigenvalueAllSymmetric() {
-        return new Eigenvalue<?>[] { Eigenvalue.PRIMITIVE.make(true) };
+    public static final Eigenvalue<?>[] getEigenvalueAllHermitian() {
+        return new Eigenvalue<?>[] { new HermitianEvD.Primitive(), new RawEigenvalue.Symmetric(), new HermitianEvD.Big(), new HermitianEvD.Complex() };
     }
 
     @SuppressWarnings("unchecked")
-    public static final Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
+    public static final Eigenvalue<Double>[] getEigenvaluePrimitiveDynamic() {
         return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new DynamicEvD.Primitive(), new RawEigenvalue.Dynamic() };
     }
 
     @SuppressWarnings("unchecked")
-    public static final Eigenvalue<Double>[] getEigenvaluePrimitiveNonsymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new GeneralEvD.Primitive(), new RawEigenvalue.General() };
+    public static final Eigenvalue<Double>[] getEigenvaluePrimitiveGeneral() {
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new NewGeneralEvD.Primitive(), new RawEigenvalue.Dynamic(), new OldGeneralEvD.Primitive() };
     }
 
     @SuppressWarnings("unchecked")

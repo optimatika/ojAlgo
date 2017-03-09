@@ -151,7 +151,7 @@ public interface Eigenvalue<N extends Number>
 
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
             if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
-                return hermitian ? new HermitianEvD.Primitive() : new GeneralEvD.Primitive();
+                return hermitian ? new HermitianEvD.Primitive() : new OldGeneralEvD.Primitive();
             } else {
                 return hermitian ? new RawEigenvalue.Symmetric() : new RawEigenvalue.General();
             }

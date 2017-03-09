@@ -246,7 +246,7 @@ public class EigenvalueTest extends MatrixDecompositionTests {
 
         final PrimitiveDenseStore matrix = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1, 0, 0 }, { 0.01, 0, -1 }, { 0.01, 1, 0 } });
 
-        for (final Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getEigenvaluePrimitiveNonsymmetric()) {
+        for (final Eigenvalue<Double> tmpEigenvalue : MatrixDecompositionTests.getEigenvaluePrimitiveGeneral()) {
 
             tmpEigenvalue.decompose(matrix);
 

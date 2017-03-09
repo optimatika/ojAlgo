@@ -34,7 +34,7 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
     static final class Primitive extends DynamicEvD<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY, new HermitianEvD.Primitive(), new GeneralEvD.Primitive());
+            super(PrimitiveDenseStore.FACTORY, new HermitianEvD.Primitive(), new OldGeneralEvD.Primitive());
         }
 
     }

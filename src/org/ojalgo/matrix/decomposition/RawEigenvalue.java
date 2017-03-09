@@ -32,6 +32,7 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
+import org.ojalgo.matrix.EvD2D;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -839,114 +840,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    /**
-     * @param mtrxH Array for internal storage of nonsymmetric Hessenberg form.
-     */
-    private void orthes(final double[][] mtrxH) {
-
-        //  This is derived from the Algol procedures orthes and ortran,
-        //  by Martin and Wilkinson, Handbook for Auto. Comp.,
-        //  Vol.ii-Linear Algebra, and the corresponding
-        //  Fortran subroutines in EISPACK.
-
-        final int low = 0;
-        final int high = n - 1;
-
-        /**
-         * Working storage for nonsymmetric algorithm.
-         *
-         * @serial working storage for nonsymmetric algorithm.
-         */
-        // final double[] ort = new double[n];
-        final double[] ort = d; // reuse
-
-        for (int m = low + 1; m <= (high - 1); m++) {
-
-            // Scale column.
-
-            double scale = ZERO;
-            for (int i = m; i <= high; i++) {
-                scale = scale + ABS.invoke(mtrxH[i][m - 1]);
-            }
-            // if (scale != ZERO) {
-            if (Double.compare(scale, ZERO) != 0) {
-
-                // Compute Householder transformation.
-
-                double h = ZERO;
-                for (int i = high; i >= m; i--) {
-                    ort[i] = mtrxH[i][m - 1] / scale;
-                    h += ort[i] * ort[i];
-                }
-                double g = SQRT.invoke(h);
-                if (ort[m] > 0) {
-                    g = -g;
-                }
-                h = h - (ort[m] * g);
-                ort[m] = ort[m] - g;
-
-                // Apply Householder similarity transformation
-                // H = (I-u*u'/h)*H*(I-u*u')/h)
-
-                for (int j = m; j < n; j++) {
-                    double f = ZERO;
-                    for (int i = high; i >= m; i--) {
-                        f += ort[i] * mtrxH[i][j];
-                    }
-                    f = f / h;
-                    for (int i = m; i <= high; i++) {
-                        mtrxH[i][j] -= f * ort[i];
-                    }
-                }
-
-                for (int i = 0; i <= high; i++) {
-                    double f = ZERO;
-                    for (int j = high; j >= m; j--) {
-                        f += ort[j] * mtrxH[i][j];
-                    }
-                    f = f / h;
-                    for (int j = m; j <= high; j++) {
-                        mtrxH[i][j] -= f * ort[j];
-                    }
-                }
-                ort[m] = scale * ort[m];
-                mtrxH[m][m - 1] = scale * g;
-            }
-        }
-
-        // Accumulate transformations (Algol's ortran).
-        if (myTransposedV != null) {
-
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    //V[i][j] = (i == j ? ONE : ZERO);
-                    myTransposedV[j][i] = (i == j ? ONE : ZERO);
-                }
-            }
-
-            for (int m = high - 1; m >= (low + 1); m--) {
-                if (mtrxH[m][m - 1] != ZERO) {
-                    for (int i = m + 1; i <= high; i++) {
-                        ort[i] = mtrxH[i][m - 1];
-                    }
-                    for (int j = m; j <= high; j++) {
-                        double g = ZERO;
-                        for (int i = m; i <= high; i++) {
-                            //g += ort[i] * V[i][j];
-                            g += ort[i] * myTransposedV[j][i];
-                        }
-                        // Double division avoids possible underflow
-                        g = (g / ort[m]) / mtrxH[m][m - 1];
-                        for (int i = m; i <= high; i++) {
-                            //V[i][j] += g * ort[i];
-                            myTransposedV[j][i] += g * ort[i];
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private void rot1(final double[] tmpVt_i, final double[] tmpVt_i1, final double c, final double s) {
         double h;
         for (int k = 0; k < n; k++) {
@@ -1094,7 +987,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         // Reduce to Hessenberg form.
-        this.orthes(data);
+        EvD2D.orthes(data, myTransposedV, d);
 
         // Reduce Hessenberg to real Schur form.
         this.hqr2(data);

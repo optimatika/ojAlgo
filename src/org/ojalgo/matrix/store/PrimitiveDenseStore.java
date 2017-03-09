@@ -51,6 +51,7 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.machine.JavaType;
 import org.ojalgo.machine.MemoryEstimator;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.EvD1D;
 import org.ojalgo.matrix.decomposition.DecompositionStore;
 import org.ojalgo.matrix.store.operation.*;
 import org.ojalgo.matrix.transformation.Householder;
@@ -390,8 +391,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         }
     }
 
-    static void doAfter(final double[] mtrxH, final double[] mtrxV, final double[] d, final double[] e, double r, double s,
-            double z, final double aNorm1) {
+    static void doAfter(final double[] mtrxH, final double[] mtrxV, final double[] d, final double[] e, double r, double s, double z, final double aNorm1) {
 
         final int tmpDiagDim = (int) SQRT.invoke(mtrxH.length);
         final int tmpDiagDimMinusOne = tmpDiagDim - 1;
@@ -568,105 +568,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
                 mtrxV[i + (tmpDiagDim * j)] = z;
             }
         }
-    }
-
-    /**
-     * orthes
-     */
-    static int doHessenberg(final double[] mtrxH, final double[] mtrxV) {
-
-        final int tmpDiagDim = (int) SQRT.invoke(mtrxH.length);
-        final int tmpDiagDimMinusTwo = tmpDiagDim - 2;
-
-        final double[] tmpWorkCopy = new double[tmpDiagDim];
-
-        for (int ij = 0; ij < tmpDiagDimMinusTwo; ij++) {
-
-            // Scale column.
-            double tmpColNorm1 = ZERO;
-            for (int i = ij + 1; i < tmpDiagDim; i++) {
-                tmpColNorm1 += ABS.invoke(mtrxH[i + (tmpDiagDim * ij)]);
-            }
-
-            // if (tmpColNorm1 !=  ZERO) {
-            if (Double.compare(tmpColNorm1, ZERO) != 0) {
-
-                // Compute Householder transformation.
-                double tmpInvBeta = ZERO;
-                for (int i = tmpDiagDim - 1; i >= (ij + 1); i--) {
-                    tmpWorkCopy[i] = mtrxH[i + (tmpDiagDim * ij)] / tmpColNorm1;
-                    tmpInvBeta += tmpWorkCopy[i] * tmpWorkCopy[i];
-                }
-                double g = SQRT.invoke(tmpInvBeta);
-                if (tmpWorkCopy[ij + 1] > 0) {
-                    g = -g;
-                }
-                tmpInvBeta = tmpInvBeta - (tmpWorkCopy[ij + 1] * g);
-                tmpWorkCopy[ij + 1] = tmpWorkCopy[ij + 1] - g;
-
-                // Apply Householder similarity transformation
-                // H = (I-u*u'/h)*H*(I-u*u')/h)
-                for (int j = ij + 1; j < tmpDiagDim; j++) {
-                    double f = ZERO;
-                    for (int i = tmpDiagDim - 1; i >= (ij + 1); i--) {
-                        f += tmpWorkCopy[i] * mtrxH[i + (tmpDiagDim * j)];
-                    }
-                    f = f / tmpInvBeta;
-                    for (int i = ij + 1; i <= (tmpDiagDim - 1); i++) {
-                        mtrxH[i + (tmpDiagDim * j)] -= f * tmpWorkCopy[i];
-                    }
-                }
-
-                for (int i = 0; i < tmpDiagDim; i++) {
-                    double f = ZERO;
-                    for (int j = tmpDiagDim - 1; j >= (ij + 1); j--) {
-                        f += tmpWorkCopy[j] * mtrxH[i + (tmpDiagDim * j)];
-                    }
-                    f = f / tmpInvBeta;
-                    for (int j = ij + 1; j < tmpDiagDim; j++) {
-                        mtrxH[i + (tmpDiagDim * j)] -= f * tmpWorkCopy[j];
-                    }
-                }
-
-                tmpWorkCopy[ij + 1] = tmpColNorm1 * tmpWorkCopy[ij + 1];
-                mtrxH[(ij + 1) + (tmpDiagDim * ij)] = tmpColNorm1 * g;
-            }
-        }
-
-        // BasicLogger.logDebug("Jama H", new PrimitiveDenseStore(tmpDiagDim,
-        // tmpDiagDim, aMtrxH));
-
-        // Här borde Hessenberg vara klar
-        // Nedan börjar uträkningen av Q
-
-        // Accumulate transformations (Algol's ortran).
-        for (int ij = tmpDiagDimMinusTwo; ij >= 1; ij--) {
-            final int tmpIndex = ij + (tmpDiagDim * (ij - 1));
-            if (mtrxH[tmpIndex] != ZERO) {
-                for (int i = ij + 1; i <= (tmpDiagDim - 1); i++) {
-                    tmpWorkCopy[i] = mtrxH[i + (tmpDiagDim * (ij - 1))];
-                }
-                for (int j = ij; j <= (tmpDiagDim - 1); j++) {
-                    double g = ZERO;
-                    for (int i = ij; i <= (tmpDiagDim - 1); i++) {
-                        g += tmpWorkCopy[i] * mtrxV[i + (tmpDiagDim * j)];
-                    }
-                    // Double division avoids possible underflow
-                    g = (g / tmpWorkCopy[ij]) / mtrxH[tmpIndex];
-                    for (int i = ij; i <= (tmpDiagDim - 1); i++) {
-                        mtrxV[i + (tmpDiagDim * j)] += g * tmpWorkCopy[i];
-                    }
-                }
-            } else {
-                // BasicLogger.logDebug("Iter V", new
-                // PrimitiveDenseStore(tmpDiagDim, tmpDiagDim, aMtrxV));
-            }
-        }
-
-        // BasicLogger.logDebug("Jama V", new PrimitiveDenseStore(tmpDiagDim,
-        // tmpDiagDim, aMtrxV));
-
-        return tmpDiagDim;
     }
 
     /**
@@ -1155,7 +1056,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         final double[] tmpCollectorData = ((PrimitiveDenseStore) transformationCollector).data;
 
-        PrimitiveDenseStore.doHessenberg(tmpData, tmpCollectorData);
+        final double[] tmpVctrWork = new double[this.getMinDim()];
+        EvD1D.orthes(tmpData, tmpCollectorData, tmpVctrWork);
 
         // BasicLogger.logDebug("Schur Step", this);
         // BasicLogger.logDebug("Hessenberg", tmpThisCopy);

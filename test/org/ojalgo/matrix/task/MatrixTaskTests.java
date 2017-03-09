@@ -44,7 +44,7 @@ public abstract class MatrixTaskTests extends FunctionalityTest {
             retVal.add(tmpDeterminantTask);
         }
 
-        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getEigenvaluePrimitiveNonsymmetric()) {
+        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getEigenvaluePrimitiveGeneral()) {
             retVal.add(tmpDeterminantTask);
         }
 
@@ -71,7 +71,7 @@ public abstract class MatrixTaskTests extends FunctionalityTest {
             retVal.add(tmpDeterminantTask);
         }
 
-        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getEigenvaluePrimitiveNonsymmetric()) {
+        for (final DeterminantTask<Double> tmpDeterminantTask : MatrixDecompositionTests.getEigenvaluePrimitiveGeneral()) {
             retVal.add(tmpDeterminantTask);
         }
 

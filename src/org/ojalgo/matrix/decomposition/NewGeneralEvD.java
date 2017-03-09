@@ -32,7 +32,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 
-abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
+abstract class NewGeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     /**
      * Eigenvalues and eigenvectors of a real matrix.
@@ -47,7 +47,7 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
      * V.times(D). The matrix V may be badly conditioned, or even singular, so the validity of the equation A
      * = V*D*inverse(V) depends upon V.cond().
      **/
-    static final class Primitive extends GeneralEvD<Double> {
+    static final class Primitive extends NewGeneralEvD<Double> {
 
         Primitive() {
             super(PrimitiveDenseStore.FACTORY);
@@ -55,7 +55,7 @@ abstract class GeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     }
 
-    protected GeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
+    protected NewGeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
     }
 
