@@ -67,7 +67,7 @@ public interface Eigenvalue<N extends Number>
         public final ComplexNumber value;
         public final Access1D<ComplexNumber> vector;
 
-        Eigenpair(final ComplexNumber aValue, final Access1D<ComplexNumber> aVector) {
+        public Eigenpair(final ComplexNumber aValue, final Access1D<ComplexNumber> aVector) {
             super();
             value = aValue;
             vector = aVector;
