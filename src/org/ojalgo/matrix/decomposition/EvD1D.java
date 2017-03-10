@@ -566,12 +566,19 @@ public abstract class EvD1D {
 
         final int size = tmpMainDiagonal.size();
 
-        final double[] tmpMainDiagData = tmpMainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
-        final double[] tmpOffDiagData = new double[size]; // The algorith needs the array to be the same length as the main diagonal
+        final double[] d = tmpMainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
+        final double[] e = new double[size]; // The algorith needs the array to be the same length as the main diagonal
         final int tmpLength = tmpSubdiagonal.size();
         for (int i = 0; i < tmpLength; i++) {
-            tmpOffDiagData[i] = tmpSubdiagonal.doubleValue(i);
+            e[i] = tmpSubdiagonal.doubleValue(i);
         }
+
+        return EvD1D.tql2a(d, e, mtrxV);
+    }
+
+    public static Array1D<Double> tql2a(final double[] d, final double[] e, final DecompositionStore<?> mtrxV) {
+
+        final int size = d.length;
 
         //        BasicLogger.logDebug("BEGIN diagonalize");
         //        BasicLogger.logDebug("Main D: {}", Arrays.toString(tmpMainDiagonal));
@@ -592,13 +599,12 @@ public abstract class EvD1D {
             //BasicLogger.logDebug("Loop l=" + l, tmpMainDiagonal, tmpOffDiagonal);
 
             // Find small subdiagonal element
-            tmpMagnitude = PrimitiveFunction.MAX.invoke(tmpMagnitude,
-                    PrimitiveFunction.ABS.invoke(tmpMainDiagData[l]) + PrimitiveFunction.ABS.invoke(tmpOffDiagData[l]));
+            tmpMagnitude = PrimitiveFunction.MAX.invoke(tmpMagnitude, PrimitiveFunction.ABS.invoke(d[l]) + PrimitiveFunction.ABS.invoke(e[l]));
             tmpLocalEpsilon = MACHINE_EPSILON * tmpMagnitude;
 
             m = l;
             while (m < size) {
-                if (PrimitiveFunction.ABS.invoke(tmpOffDiagData[m]) <= tmpLocalEpsilon) {
+                if (PrimitiveFunction.ABS.invoke(e[m]) <= tmpLocalEpsilon) {
                     break;
                 }
                 m++;
@@ -609,9 +615,9 @@ public abstract class EvD1D {
 
                 do {
 
-                    final double tmp1Ml0 = tmpMainDiagData[l]; // (l,l)
-                    final double tmp1Ml1 = tmpMainDiagData[l + 1]; // (l+1,l+1)
-                    final double tmp1Sl0 = tmpOffDiagData[l]; // (l+1,l) and (l,l+1)
+                    final double tmp1Ml0 = d[l]; // (l,l)
+                    final double tmp1Ml1 = d[l + 1]; // (l+1,l+1)
+                    final double tmp1Sl0 = e[l]; // (l+1,l) and (l,l+1)
 
                     // Compute implicit shift
 
@@ -621,13 +627,13 @@ public abstract class EvD1D {
                         r = -r;
                     }
 
-                    final double tmp2Ml0 = tmpMainDiagData[l] = tmp1Sl0 / (p + r); // (l,l)
-                    final double tmp2Ml1 = tmpMainDiagData[l + 1] = tmp1Sl0 * (p + r); // (l+1,l+1)
-                    final double tmp2Sl1 = tmpOffDiagData[l + 1]; // (l+1,l) and (l,l+1)
+                    final double tmp2Ml0 = d[l] = tmp1Sl0 / (p + r); // (l,l)
+                    final double tmp2Ml1 = d[l + 1] = tmp1Sl0 * (p + r); // (l+1,l+1)
+                    final double tmp2Sl1 = e[l + 1]; // (l+1,l) and (l,l+1)
 
                     tmpShiftIncr = tmp1Ml0 - tmp2Ml0;
                     for (int i = l + 2; i < size; i++) {
-                        tmpMainDiagData[i] -= tmpShiftIncr;
+                        d[i] -= tmpShiftIncr;
                     }
                     tmpShift += tmpShiftIncr;
 
@@ -643,12 +649,12 @@ public abstract class EvD1D {
 
                     double tmpRotCos3 = tmpRotCos;
 
-                    p = tmpMainDiagData[m]; // Initiate p
+                    p = d[m]; // Initiate p
                     //      BasicLogger.logDebug("m={} l={}", m, l);
                     for (int i = m - 1; i >= l; i--) {
 
-                        final double tmp1Mi0 = tmpMainDiagData[i];
-                        final double tmp1Si0 = tmpOffDiagData[i];
+                        final double tmp1Mi0 = d[i];
+                        final double tmp1Si0 = e[i];
 
                         r = PrimitiveFunction.HYPOT.invoke(p, tmp1Si0);
 
@@ -660,8 +666,8 @@ public abstract class EvD1D {
                         tmpRotCos = p / r;
                         tmpRotSin = tmp1Si0 / r;
 
-                        tmpMainDiagData[i + 1] = (tmpRotCos2 * p) + (tmpRotSin * ((tmpRotCos * tmpRotCos2 * tmp1Si0) + (tmpRotSin * tmp1Mi0)));
-                        tmpOffDiagData[i + 1] = tmpRotSin2 * r;
+                        d[i + 1] = (tmpRotCos2 * p) + (tmpRotSin * ((tmpRotCos * tmpRotCos2 * tmp1Si0) + (tmpRotSin * tmp1Mi0)));
+                        e[i + 1] = tmpRotSin2 * r;
 
                         p = (tmpRotCos * tmp1Mi0) - (tmpRotSin * tmpRotCos2 * tmp1Si0); // Next p
 
@@ -677,16 +683,16 @@ public abstract class EvD1D {
 
                     }
 
-                    p = (-tmpRotSin * tmpRotSin2 * tmpRotCos3) * ((tmp2Sl1 / tmp2Ml1) * tmpOffDiagData[l]); // Final p
+                    p = (-tmpRotSin * tmpRotSin2 * tmpRotCos3) * ((tmp2Sl1 / tmp2Ml1) * e[l]); // Final p
 
-                    tmpMainDiagData[l] = tmpRotCos * p;
-                    tmpOffDiagData[l] = tmpRotSin * p;
+                    d[l] = tmpRotCos * p;
+                    e[l] = tmpRotSin * p;
 
-                } while (PrimitiveFunction.ABS.invoke(tmpOffDiagData[l]) > tmpLocalEpsilon); // Check for convergence
+                } while (PrimitiveFunction.ABS.invoke(e[l]) > tmpLocalEpsilon); // Check for convergence
             } // End if (m > l)
 
-            tmpMainDiagData[l] = tmpMainDiagData[l] + tmpShift;
-            tmpOffDiagData[l] = PrimitiveMath.ZERO;
+            d[l] = d[l] + tmpShift;
+            e[l] = PrimitiveMath.ZERO;
         } // End main loop - l
 
         //        BasicLogger.logDebug("END diagonalize");
@@ -700,7 +706,7 @@ public abstract class EvD1D {
         //        }
 
         //return new PrimitiveArray(tmpMainDiagonal).asArray1D();
-        return Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(tmpMainDiagData));
+        return Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(d));
     }
 
     private EvD1D() {

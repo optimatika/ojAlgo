@@ -151,13 +151,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     private double[][] myTransposedV = null;
 
-    /**
-     * Row and column dimension (square matrix).
-     *
-     * @serial matrix dimension.
-     */
-    private int n;
-
     protected RawEigenvalue() {
         super();
     }
@@ -197,6 +190,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      * @return D
      */
     public RawStore getD() {
+        int n = this.getRowDim();
         final RawStore X = new RawStore(n, n);
         final double[][] D = X.data;
         for (int i = 0; i < n; i++) {
@@ -250,6 +244,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     public MatrixStore<Double> getInverse() {
+        int n = this.getRowDim();
         return this.getInverse(this.allocate(n, n));
     }
 
@@ -303,6 +298,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      * @return V
      */
     public MatrixStore<Double> getV() {
+        int n = this.getRowDim();
         return new RawStore(myTransposedV, n, n).logical().transpose().get();
     }
 
@@ -365,7 +361,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     final void doDecomposeGeneral(final double[][] data, final boolean valuesOnly) {
 
-        n = data.length;
+        int n = data.length;
 
         if ((d == null) || (n != d.length)) {
             if (valuesOnly) {
@@ -387,7 +383,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     final void doDecomposeSymmetric(final double[][] data, final boolean valuesOnly) {
 
-        n = data.length;
+        int n = data.length;
 
         if ((d == null) || (n != d.length)) {
             d = new double[n];

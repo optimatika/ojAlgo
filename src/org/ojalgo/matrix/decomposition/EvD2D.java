@@ -575,6 +575,13 @@ public abstract class EvD2D {
         }
         e[size - 1] = ZERO;
 
+        EvD2D.tql2a(d, e, trnspV);
+    }
+
+    public static void tql2a(final double[] d, final double[] e, final double[][] trnspV) {
+
+        final int size = d.length;
+
         double f = ZERO;
         double tst1 = ZERO;
         for (int l = 0; l < size; l++) {
