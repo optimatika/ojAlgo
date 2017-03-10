@@ -38,6 +38,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.TaskException;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 
 public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
@@ -269,10 +270,23 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
         //        BasicLogger.logDebug("Tridiagonal1={}", tmpTridiagonal);
 
         final DecompositionStore<N> tmpV = eigenvaluesOnly ? null : myTridiagonal.doQ();
+        BasicLogger.debug("Tridiagonal={}", tmpTridiagonal.toString());
+        
+        final Array1D<?> tmpMainDiagonal = tmpTridiagonal.mainDiagonal;
+        final Array1D<?> tmpSubdiagonal = tmpTridiagonal.subdiagonal;
+        
+        final int size = tmpMainDiagonal.size();
+        
+        final double[] d = tmpMainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
+        final double[] e = new double[size]; // The algorith needs the array to be the same length as the main diagonal
+        final int tmpLength = tmpSubdiagonal.size();
+        for (int i = 0; i < tmpLength; i++) {
+            e[i] = tmpSubdiagonal.doubleValue(i);
+        }
 
         //        BasicLogger.logDebug("Tridiagonal2={}", tmpTridiagonal);
 
-        final Array1D<Double> tmpDiagonal = myDiagonalValues = EvD1D.tql2(tmpTridiagonal, tmpV);
+        final Array1D<Double> tmpDiagonal = myDiagonalValues = EvD1D.tql2a(d, e, tmpV);
 
         for (int ij1 = 0; ij1 < (tmpDim - 1); ij1++) {
             final double tmpValue1 = tmpDiagonal.doubleValue(ij1);

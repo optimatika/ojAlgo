@@ -393,9 +393,19 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         // Tridiagonalize.
         HouseholderHermitian.tred2jj(data, d, e, !valuesOnly);
+        final double[] d1 = d;
+        final double[] e1 = e;
+        final double[][] trnspV = myTransposedV;
 
         // Diagonalize.
-        EvD2D.tql2(d, e, myTransposedV);
+        final int size = d1.length;
+        
+        for (int i = 1; i < size; i++) {
+            e1[i - 1] = e1[i];
+        }
+        e1[size - 1] = ZERO;
+        
+        EvD2D.tql2a(d1, e1, trnspV);
     }
 
     /**

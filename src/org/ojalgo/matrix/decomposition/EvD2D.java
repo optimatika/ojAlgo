@@ -3,6 +3,10 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.util.Arrays;
+
+import org.ojalgo.netio.BasicLogger;
+
 public abstract class EvD2D {
 
     /**
@@ -566,31 +570,33 @@ public abstract class EvD2D {
         }
     }
 
-    public static void tql2(final double[] d, final double[] e, final double[][] trnspV) {
-
-        final int size = d.length;
-
-        for (int i = 1; i < size; i++) {
-            e[i - 1] = e[i];
-        }
-        e[size - 1] = ZERO;
-
-        EvD2D.tql2a(d, e, trnspV);
-    }
-
     public static void tql2a(final double[] d, final double[] e, final double[][] trnspV) {
 
         final int size = d.length;
 
+        BasicLogger.debug("BEGIN diagonalize");
+        BasicLogger.debug("Main diag d: {}", Arrays.toString(d));
+        BasicLogger.debug("Seco diag e: {}", Arrays.toString(e));
+        BasicLogger.debug();
+
         double f = ZERO;
-        double tst1 = ZERO;
+
+        double tmpMagnitude = ZERO;
+        double tmpLocalEpsilon;
+
+        int m;
+        // Main loop
         for (int l = 0; l < size; l++) {
 
+            BasicLogger.debug("Loop l=" + l, d, e);
+
             // Find small subdiagonal element
-            tst1 = MAX.invoke(tst1, ABS.invoke(d[l]) + ABS.invoke(e[l]));
-            int m = l;
+            tmpMagnitude = MAX.invoke(tmpMagnitude, ABS.invoke(d[l]) + ABS.invoke(e[l]));
+            tmpLocalEpsilon = MACHINE_EPSILON * tmpMagnitude;
+
+            m = l;
             while (m < size) {
-                if (ABS.invoke(e[m]) <= (MACHINE_EPSILON * tst1)) {
+                if (ABS.invoke(e[m]) <= tmpLocalEpsilon) {
                     break;
                 }
                 m++;
@@ -598,9 +604,8 @@ public abstract class EvD2D {
 
             // If m == l, d[l] is an eigenvalue, otherwise, iterate.
             if (m > l) {
-                int iter = 0;
+
                 do {
-                    iter = iter + 1; // (Could check iteration count here.)
 
                     // Compute implicit shift
                     double g = d[l];
@@ -661,7 +666,7 @@ public abstract class EvD2D {
                     d[l] = c * p;
 
                     // Check for convergence.
-                } while (ABS.invoke(e[l]) > (MACHINE_EPSILON * tst1));
+                } while (ABS.invoke(e[l]) > tmpLocalEpsilon);
             }
             d[l] = d[l] + f;
             e[l] = ZERO;

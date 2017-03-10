@@ -3,10 +3,12 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.util.Arrays;
+
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 
 public abstract class EvD1D {
@@ -279,7 +281,7 @@ public abstract class EvD1D {
             final int tmpDiagDim1 = (int) SQRT.invoke(mtrxH.length);
             final int tmpDiagDimMinusOne1 = tmpDiagDim1 - 1;
 
-            // BasicLogger.logDebug("r={}, s={}, z={}", r, s, z);
+            // BasicLogger.debug("r={}, s={}, z={}", r, s, z);
 
             double p1;
             double q1;
@@ -522,7 +524,7 @@ public abstract class EvD1D {
             }
         }
 
-        // BasicLogger.logDebug("Jama H", new PrimitiveDenseStore(tmpDiagDim,
+        // BasicLogger.debug("Jama H", new PrimitiveDenseStore(tmpDiagDim,
         // tmpDiagDim, aMtrxH));
 
         // Här borde Hessenberg vara klar
@@ -547,44 +549,24 @@ public abstract class EvD1D {
                     }
                 }
             } else {
-                // BasicLogger.logDebug("Iter V", new
+                // BasicLogger.debug("Iter V", new
                 // PrimitiveDenseStore(tmpDiagDim, tmpDiagDim, aMtrxV));
             }
         }
 
-        // BasicLogger.logDebug("Jama V", new PrimitiveDenseStore(tmpDiagDim,
+        // BasicLogger.debug("Jama V", new PrimitiveDenseStore(tmpDiagDim,
         // tmpDiagDim, aMtrxV));
 
-    }
-
-    public static Array1D<Double> tql2(final DiagonalAccess<?> tridiagonal, final DecompositionStore<?> mtrxV) {
-
-        //   BasicLogger.logDebug("Tridiagonal={}", aTridiagonal.toString());
-
-        final Array1D<?> tmpMainDiagonal = tridiagonal.mainDiagonal;
-        final Array1D<?> tmpSubdiagonal = tridiagonal.subdiagonal;
-
-        final int size = tmpMainDiagonal.size();
-
-        final double[] d = tmpMainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
-        final double[] e = new double[size]; // The algorith needs the array to be the same length as the main diagonal
-        final int tmpLength = tmpSubdiagonal.size();
-        for (int i = 0; i < tmpLength; i++) {
-            e[i] = tmpSubdiagonal.doubleValue(i);
-        }
-
-        return EvD1D.tql2a(d, e, mtrxV);
     }
 
     public static Array1D<Double> tql2a(final double[] d, final double[] e, final DecompositionStore<?> mtrxV) {
 
         final int size = d.length;
 
-        //        BasicLogger.logDebug("BEGIN diagonalize");
-        //        BasicLogger.logDebug("Main D: {}", Arrays.toString(tmpMainDiagonal));
-        //        BasicLogger.logDebug("Seco D: {}", Arrays.toString(tmpOffDiagonal));
-        //        BasicLogger.logDebug("V", aV);
-        //        BasicLogger.logDebug();
+        BasicLogger.debug("BEGIN diagonalize");
+        BasicLogger.debug("Main diag d: {}", Arrays.toString(d));
+        BasicLogger.debug("Seco diag e: {}", Arrays.toString(e));
+        BasicLogger.debug();
 
         double tmpShift = PrimitiveMath.ZERO;
         double tmpShiftIncr;
@@ -596,48 +578,48 @@ public abstract class EvD1D {
         // Main loop
         for (int l = 0; l < size; l++) {
 
-            //BasicLogger.logDebug("Loop l=" + l, tmpMainDiagonal, tmpOffDiagonal);
+            BasicLogger.debug("Loop l=" + l, d, e);
 
             // Find small subdiagonal element
-            tmpMagnitude = PrimitiveFunction.MAX.invoke(tmpMagnitude, PrimitiveFunction.ABS.invoke(d[l]) + PrimitiveFunction.ABS.invoke(e[l]));
+            tmpMagnitude = MAX.invoke(tmpMagnitude, ABS.invoke(d[l]) + ABS.invoke(e[l]));
             tmpLocalEpsilon = MACHINE_EPSILON * tmpMagnitude;
 
             m = l;
             while (m < size) {
-                if (PrimitiveFunction.ABS.invoke(e[m]) <= tmpLocalEpsilon) {
+                if (ABS.invoke(e[m]) <= tmpLocalEpsilon) {
                     break;
                 }
                 m++;
             }
 
-            // If m == l, aMainDiagonal[l] is an eigenvalue, otherwise, iterate.
+            // If m == l, d[l] is an eigenvalue, otherwise, iterate.
             if (m > l) {
 
                 do {
 
-                    final double tmp1Ml0 = d[l]; // (l,l)
-                    final double tmp1Ml1 = d[l + 1]; // (l+1,l+1)
-                    final double tmp1Sl0 = e[l]; // (l+1,l) and (l,l+1)
+                    final double tmp1Dl0 = d[l]; // (l,l)
+                    final double tmp1Dl1 = d[l + 1]; // (l+1,l+1)
+                    final double tmp1El0 = e[l]; // (l+1,l) and (l,l+1)
 
                     // Compute implicit shift
 
-                    double p = (tmp1Ml1 - tmp1Ml0) / (tmp1Sl0 + tmp1Sl0);
-                    double r = PrimitiveFunction.HYPOT.invoke(p, PrimitiveMath.ONE);
+                    double p = (tmp1Dl1 - tmp1Dl0) / (tmp1El0 + tmp1El0);
+                    double r = HYPOT.invoke(p, PrimitiveMath.ONE);
                     if (p < 0) {
                         r = -r;
                     }
 
-                    final double tmp2Ml0 = d[l] = tmp1Sl0 / (p + r); // (l,l)
-                    final double tmp2Ml1 = d[l + 1] = tmp1Sl0 * (p + r); // (l+1,l+1)
+                    final double tmp2Ml0 = d[l] = tmp1El0 / (p + r); // (l,l)
+                    final double tmp2Ml1 = d[l + 1] = tmp1El0 * (p + r); // (l+1,l+1)
                     final double tmp2Sl1 = e[l + 1]; // (l+1,l) and (l,l+1)
 
-                    tmpShiftIncr = tmp1Ml0 - tmp2Ml0;
+                    tmpShiftIncr = tmp1Dl0 - tmp2Ml0;
                     for (int i = l + 2; i < size; i++) {
                         d[i] -= tmpShiftIncr;
                     }
                     tmpShift += tmpShiftIncr;
 
-                    //BasicLogger.logDebug("New shift =" + tmpShift, tmpMainDiagonal, tmpOffDiagonal);
+                    BasicLogger.debug("New shift =" + tmpShift, d, e);
 
                     // Implicit QL transformation
 
@@ -650,13 +632,13 @@ public abstract class EvD1D {
                     double tmpRotCos3 = tmpRotCos;
 
                     p = d[m]; // Initiate p
-                    //      BasicLogger.logDebug("m={} l={}", m, l);
+                    BasicLogger.debug("m={} l={}", m, l);
                     for (int i = m - 1; i >= l; i--) {
 
                         final double tmp1Mi0 = d[i];
                         final double tmp1Si0 = e[i];
 
-                        r = PrimitiveFunction.HYPOT.invoke(p, tmp1Si0);
+                        r = HYPOT.invoke(p, tmp1Si0);
 
                         tmpRotCos3 = tmpRotCos2;
 
@@ -674,7 +656,7 @@ public abstract class EvD1D {
                         // Accumulate transformation - rotate the eigenvector matrix
                         //aV.transformRight(new Rotation.Primitive(i, i + 1, tmpRotCos, tmpRotSin));
 
-                        //BasicLogger.logDebug("low={} high={} cos={} sin={}", i, i + 1, tmpRotCos, tmpRotSin);
+                        BasicLogger.debug("low={} high={} cos={} sin={}", i, i + 1, tmpRotCos, tmpRotSin);
                         if (mtrxV != null) {
                             mtrxV.rotateRight(i, i + 1, tmpRotCos, tmpRotSin);
                         }
@@ -688,18 +670,18 @@ public abstract class EvD1D {
                     d[l] = tmpRotCos * p;
                     e[l] = tmpRotSin * p;
 
-                } while (PrimitiveFunction.ABS.invoke(e[l]) > tmpLocalEpsilon); // Check for convergence
+                } while (ABS.invoke(e[l]) > tmpLocalEpsilon); // Check for convergence
             } // End if (m > l)
 
             d[l] = d[l] + tmpShift;
             e[l] = PrimitiveMath.ZERO;
         } // End main loop - l
 
-        //        BasicLogger.logDebug("END diagonalize");
-        //        BasicLogger.logDebug("Main D: {}", Arrays.toString(tmpMainDiagonal));
-        //        BasicLogger.logDebug("Seco D: {}", Arrays.toString(tmpOffDiagonal));
-        //        BasicLogger.logDebug("V", aV);
-        //        BasicLogger.logDebug();
+        BasicLogger.debug("END diagonalize");
+        BasicLogger.debug("Main D: {}", Arrays.toString(d));
+        BasicLogger.debug("Seco D: {}", Arrays.toString(e));
+        BasicLogger.debug("V", mtrxV);
+        BasicLogger.debug();
 
         //        for (int i = 0; i < tmpMainDiagData.length; i++) {
         //            tmpMainDiagonal.set(i, tmpMainDiagData[i]);
