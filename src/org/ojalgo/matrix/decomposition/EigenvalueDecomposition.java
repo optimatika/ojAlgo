@@ -98,17 +98,7 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         myEigenvaluesOnly = false;
     }
 
-    protected abstract boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
-
-    protected abstract boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
-
-    protected abstract MatrixStore<N> makeD();
-
-    protected abstract Array1D<ComplexNumber> makeEigenvalues();
-
-    protected abstract MatrixStore<N> makeV();
-
-    final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean symmetric, final boolean eigenvaluesOnly) {
+    private final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean symmetric, final boolean eigenvaluesOnly) {
 
         this.reset();
 
@@ -138,6 +128,16 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
 
         return this.computed(retVal);
     }
+
+    protected abstract boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
+
+    protected abstract boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly);
+
+    protected abstract MatrixStore<N> makeD();
+
+    protected abstract Array1D<ComplexNumber> makeEigenvalues();
+
+    protected abstract MatrixStore<N> makeV();
 
     final void setD(final MatrixStore<N> newD) {
         myD = newD;

@@ -115,6 +115,7 @@ public interface MatrixDecomposition<N extends Number> {
          * @param matrix A matrix to check and then (maybe) decompose
          * @return true if the hermitian check passed and computation suceeded; false if not
          */
+        @SuppressWarnings("unchecked")
         default boolean checkAndCompute(final MatrixStore<N> matrix) {
 
             this.reset();

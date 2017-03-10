@@ -39,8 +39,8 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     }
 
-    private boolean myHermitian = false;
     private final EigenvalueDecomposition<N> myGeneralDelegate;
+    private boolean myHermitian = false;
     private final EigenvalueDecomposition<N> myHermitianDelegate;
 
     @SuppressWarnings("unused")
@@ -102,12 +102,12 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     @Override
     protected boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
-        return myGeneralDelegate.compute(matrix, myHermitian = false, eigenvaluesOnly);
+        return myGeneralDelegate.doGeneral(matrix, eigenvaluesOnly);
     }
 
     @Override
     protected boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
-        return myHermitianDelegate.compute(matrix, myHermitian = true, eigenvaluesOnly);
+        return myHermitianDelegate.doHermitian(matrix, eigenvaluesOnly);
     }
 
     @Override
