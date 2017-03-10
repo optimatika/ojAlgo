@@ -21,15 +21,155 @@
  */
 package org.ojalgo.matrix.store;
 
+import org.ojalgo.access.Access1D;
+import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 
 abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
+
+    static final class BinaryOperatorLeft<N extends Number> extends MatrixPipeline<N> {
+
+        private final MatrixStore<N> myLeft;
+        private final BinaryFunction<N> myOperator;
+
+        BinaryOperatorLeft(MatrixStore<N> left, BinaryFunction<N> operator, ElementsSupplier<N> right) {
+            super(right);
+            myLeft = left;
+            myOperator = operator;
+        }
+
+        @Override
+        public void supplyTo(final ElementsConsumer<N> receiver) {
+            this.getContext().supplyTo(receiver);
+            receiver.modifyMatching(myLeft, myOperator);
+        }
+    }
+
+    static final class BinaryOperatorRight<N extends Number> extends MatrixPipeline<N> {
+
+        private final BinaryFunction<N> myOperator;
+        private final MatrixStore<N> myRight;
+
+        BinaryOperatorRight(ElementsSupplier<N> left, BinaryFunction<N> operator, MatrixStore<N> right) {
+            super(left);
+            myRight = right;
+            myOperator = operator;
+        }
+
+        @Override
+        public void supplyTo(final ElementsConsumer<N> receiver) {
+            this.getContext().supplyTo(receiver);
+            receiver.modifyMatching(myOperator, myRight);
+        }
+    }
+
+    static final class MatrixMultiplication<N extends Number> extends MatrixPipeline<N> {
+
+        private final Access1D<N> myLeft;
+        private final MatrixStore<N> myRight;
+
+        MatrixMultiplication(final Access1D<N> left, final MatrixStore<N> right) {
+
+            super(right);
+
+            myLeft = left;
+            myRight = right;
+        }
+
+        @Override
+        public long countColumns() {
+            return myRight.countColumns();
+        }
+
+        @Override
+        public long countRows() {
+            return myLeft.count() / myRight.countRows();
+        }
+
+        @Override
+        public void supplyTo(final ElementsConsumer<N> receiver) {
+            receiver.fillByMultiplying(myLeft, myRight);
+        }
+
+    }
+
+    static final class Transpose<N extends Number> extends MatrixPipeline<N> {
+
+        Transpose(ElementsSupplier<N> context) {
+            super(context);
+        }
+
+        @Override
+        public long countColumns() {
+            return this.getContext().countRows();
+        }
+
+        @Override
+        public long countRows() {
+            return this.getContext().countColumns();
+        }
+
+        public MatrixStore<N> get() {
+
+            final PhysicalStore<N> retVal = this.physical().makeZero(this.getContext().countRows(), this.getContext().countColumns());
+
+            this.supplyTo(retVal);
+
+            return retVal;
+        }
+
+        public ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {
+            return this.getContext().operateOnAll(operator);
+        }
+
+        public ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
+            return this.getContext().operateOnMatching(operator, right.transpose());
+        }
+
+        public ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
+            return this.getContext().operateOnMatching(left.transpose(), operator);
+        }
+
+        @Override
+        public void supplyTo(final ElementsConsumer<N> receiver) {
+            this.getContext().supplyTo(receiver.regionByTransposing());
+        }
+
+        public ElementsSupplier<N> transpose() {
+            return this.getContext();
+        }
+    }
+
+    static final class UnaryOperator<N extends Number> extends MatrixPipeline<N> {
+
+        private final UnaryFunction<N> myOperator;
+
+        UnaryOperator(ElementsSupplier<N> context, UnaryFunction<N> operator) {
+            super(context);
+            myOperator = operator;
+        }
+
+        @Override
+        public void supplyTo(final ElementsConsumer<N> receiver) {
+            this.getContext().supplyTo(receiver);
+            receiver.modifyAll(myOperator);
+        }
+    }
 
     private final ElementsSupplier<N> myContext;
 
     protected MatrixPipeline(final ElementsSupplier<N> context) {
         super();
         myContext = context;
+    }
+
+    public long countColumns() {
+        return myContext.countColumns();
+    }
+
+    public long countRows() {
+        return myContext.countRows();
     }
 
     public final Factory<N, ?> physical() {
@@ -39,6 +179,10 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
     @Override
     public String toString() {
         return myContext.toString();
+    }
+
+    ElementsSupplier<N> getContext() {
+        return myContext;
     }
 
 }

@@ -74,7 +74,7 @@ public interface Eigenvalue<N extends Number>
         }
 
         public int compareTo(final Eigenpair other) {
-            return value.compareTo(other.value);
+            return other.value.compareTo(value);
         }
 
         @Override
