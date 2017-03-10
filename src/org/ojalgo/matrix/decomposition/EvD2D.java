@@ -579,7 +579,8 @@ public abstract class EvD2D {
         BasicLogger.debug("Seco diag e: {}", Arrays.toString(e));
         BasicLogger.debug();
 
-        double f = ZERO;
+        double tmpShift = ZERO;
+        double tmpShiftIncr;
 
         double tmpMagnitude = ZERO;
         double tmpLocalEpsilon;
@@ -607,68 +608,82 @@ public abstract class EvD2D {
 
                 do {
 
+                    final double tmp1Dl0 = d[l]; // (l,l)
+                    final double tmp1Dl1 = d[l + 1]; // (l+1,l+1)
+                    final double tmp1El0 = e[l]; // (l+1,l) and (l,l+1)
+
                     // Compute implicit shift
-                    double g = d[l];
-                    double p = (d[l + 1] - g) / (TWO * e[l]);
-                    final double a = p;
-                    double r = HYPOT.invoke(a, ONE);
-                    if (p < 0) {
+
+                    double p = (tmp1Dl1 - tmp1Dl0) / (tmp1El0 + tmp1El0);
+                    double r = HYPOT.invoke(p, ONE);
+                    if (p < ZERO) {
                         r = -r;
                     }
-                    d[l] = e[l] / (p + r);
-                    d[l + 1] = e[l] * (p + r);
-                    final double dl1 = d[l + 1];
-                    double h = g - d[l];
+
+                    final double tmp2Dl0 = d[l] = tmp1El0 / (p + r); // (l,l)
+                    final double tmp2Dl1 = d[l + 1] = tmp1El0 * (p + r); // (l+1,l+1)
+                    final double tmp2El1 = e[l + 1]; // (l+2,l+1) and (l+1,l+2)
+
+                    tmpShiftIncr = tmp1Dl0 - tmp2Dl0;
                     for (int i = l + 2; i < size; i++) {
-                        d[i] -= h;
+                        d[i] -= tmpShiftIncr;
                     }
-                    f = f + h;
+                    tmpShift += tmpShiftIncr;
+
+                    BasicLogger.debug("New shift =" + tmpShift, d, e);
 
                     // Implicit QL transformation.
-                    p = d[m];
-                    double c = ONE;
-                    double c2 = c;
-                    double c3 = c;
-                    final double el1 = e[l + 1];
-                    double s = ZERO;
-                    double s2 = ZERO;
+
+                    double cos1 = ONE;
+                    double sin1 = ZERO;
+
+                    double cos2 = cos1;
+                    double sin2 = sin1;
+
+                    double cos3 = cos2;
+
+                    double g = tmp1Dl0;
+
+                    p = d[m]; // Initiate p
+                    BasicLogger.debug("m={} l={}", m, l);
                     for (int i = m - 1; i >= l; i--) {
-                        c3 = c2;
-                        c2 = c;
-                        s2 = s;
-                        g = c * e[i];
-                        h = c * p;
+                        cos3 = cos2;
+                        cos2 = cos1;
+                        sin2 = sin1;
+                        g = cos1 * e[i];
+                        tmpShiftIncr = cos1 * p;
                         final double a1 = p;
                         r = HYPOT.invoke(a1, e[i]);
-                        e[i + 1] = s * r;
-                        s = e[i] / r;
-                        c = p / r;
-                        p = (c * d[i]) - (s * g);
-                        d[i + 1] = h + (s * ((c * g) + (s * d[i])));
+                        e[i + 1] = sin1 * r;
+                        sin1 = e[i] / r;
+                        cos1 = p / r;
+                        p = (cos1 * d[i]) - (sin1 * g);
+                        d[i + 1] = tmpShiftIncr + (sin1 * ((cos1 * g) + (sin1 * d[i])));
 
-                        // Accumulate transformation.
+                        // Accumulate transformation - rotate the eigenvector matrix
+                        BasicLogger.debug("low={} high={} cos={} sin={}", i, i + 1, cos1, sin1);
                         if (trnspV != null) {
                             double h1;
                             for (int k = 0; k < trnspV[i].length; k++) {
                                 //h = V[k][i + 1];
                                 h1 = trnspV[i + 1][k];
                                 //V[k][i + 1] = (s * V[k][i]) + (c * h);
-                                trnspV[i + 1][k] = (s * trnspV[i][k]) + (c * h1);
+                                trnspV[i + 1][k] = (sin1 * trnspV[i][k]) + (cos1 * h1);
                                 //V[k][i] = (c * V[k][i]) - (s * h);
-                                trnspV[i][k] = (c * trnspV[i][k]) - (s * h1);
+                                trnspV[i][k] = (cos1 * trnspV[i][k]) - (sin1 * h1);
                             }
                         }
 
                     }
                     // p = (-s * s2 * c3 * el1 * e[l]) / dl1;
-                    p = (-s * s2 * c3) * ((el1 / dl1) * e[l]);
-                    e[l] = s * p;
-                    d[l] = c * p;
+                    p = (-sin1 * sin2 * cos3) * ((tmp2El1 / tmp2Dl1) * e[l]);
+                    e[l] = sin1 * p;
+                    d[l] = cos1 * p;
 
                     // Check for convergence.
                 } while (ABS.invoke(e[l]) > tmpLocalEpsilon);
             }
-            d[l] = d[l] + f;
+            d[l] = d[l] + tmpShift;
             e[l] = ZERO;
         }
 

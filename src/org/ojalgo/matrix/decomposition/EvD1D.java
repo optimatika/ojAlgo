@@ -7,7 +7,6 @@ import java.util.Arrays;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 
@@ -568,10 +567,10 @@ public abstract class EvD1D {
         BasicLogger.debug("Seco diag e: {}", Arrays.toString(e));
         BasicLogger.debug();
 
-        double tmpShift = PrimitiveMath.ZERO;
+        double tmpShift = ZERO;
         double tmpShiftIncr;
 
-        double tmpMagnitude = PrimitiveMath.ZERO;
+        double tmpMagnitude = ZERO;
         double tmpLocalEpsilon;
 
         int m;
@@ -604,16 +603,16 @@ public abstract class EvD1D {
                     // Compute implicit shift
 
                     double p = (tmp1Dl1 - tmp1Dl0) / (tmp1El0 + tmp1El0);
-                    double r = HYPOT.invoke(p, PrimitiveMath.ONE);
-                    if (p < 0) {
+                    double r = HYPOT.invoke(p, ONE);
+                    if (p < ZERO) {
                         r = -r;
                     }
 
-                    final double tmp2Ml0 = d[l] = tmp1El0 / (p + r); // (l,l)
-                    final double tmp2Ml1 = d[l + 1] = tmp1El0 * (p + r); // (l+1,l+1)
-                    final double tmp2Sl1 = e[l + 1]; // (l+1,l) and (l,l+1)
+                    final double tmp2Dl0 = d[l] = tmp1El0 / (p + r); // (l,l)
+                    final double tmp2Dl1 = d[l + 1] = tmp1El0 * (p + r); // (l+1,l+1)
+                    final double tmp2El1 = e[l + 1]; // (l+2,l+1) and (l+1,l+2)
 
-                    tmpShiftIncr = tmp1Dl0 - tmp2Ml0;
+                    tmpShiftIncr = tmp1Dl0 - tmp2Dl0;
                     for (int i = l + 2; i < size; i++) {
                         d[i] -= tmpShiftIncr;
                     }
@@ -623,58 +622,53 @@ public abstract class EvD1D {
 
                     // Implicit QL transformation
 
-                    double tmpRotCos = PrimitiveMath.ONE;
-                    double tmpRotSin = PrimitiveMath.ZERO;
+                    double cos1 = ONE;
+                    double sin1 = ZERO;
 
-                    double tmpRotCos2 = tmpRotCos;
-                    double tmpRotSin2 = PrimitiveMath.ZERO;
+                    double cos2 = cos1;
+                    double sin2 = sin1;
 
-                    double tmpRotCos3 = tmpRotCos;
+                    double cos3 = cos2;
 
                     p = d[m]; // Initiate p
                     BasicLogger.debug("m={} l={}", m, l);
                     for (int i = m - 1; i >= l; i--) {
 
-                        final double tmp1Mi0 = d[i];
-                        final double tmp1Si0 = e[i];
+                        final double tmp1Di0 = d[i];
+                        final double tmp1Ei0 = e[i];
 
-                        r = HYPOT.invoke(p, tmp1Si0);
+                        r = HYPOT.invoke(p, tmp1Ei0);
 
-                        tmpRotCos3 = tmpRotCos2;
+                        cos3 = cos2;
 
-                        tmpRotCos2 = tmpRotCos;
-                        tmpRotSin2 = tmpRotSin;
+                        cos2 = cos1;
+                        sin2 = sin1;
 
-                        tmpRotCos = p / r;
-                        tmpRotSin = tmp1Si0 / r;
+                        cos1 = p / r;
+                        sin1 = tmp1Ei0 / r;
 
-                        d[i + 1] = (tmpRotCos2 * p) + (tmpRotSin * ((tmpRotCos * tmpRotCos2 * tmp1Si0) + (tmpRotSin * tmp1Mi0)));
-                        e[i + 1] = tmpRotSin2 * r;
+                        d[i + 1] = (cos2 * p) + (sin1 * ((cos1 * cos2 * tmp1Ei0) + (sin1 * tmp1Di0)));
+                        e[i + 1] = sin2 * r;
 
-                        p = (tmpRotCos * tmp1Mi0) - (tmpRotSin * tmpRotCos2 * tmp1Si0); // Next p
+                        p = (cos1 * tmp1Di0) - (sin1 * cos2 * tmp1Ei0); // Next p
 
                         // Accumulate transformation - rotate the eigenvector matrix
-                        //aV.transformRight(new Rotation.Primitive(i, i + 1, tmpRotCos, tmpRotSin));
-
-                        BasicLogger.debug("low={} high={} cos={} sin={}", i, i + 1, tmpRotCos, tmpRotSin);
+                        BasicLogger.debug("low={} high={} cos={} sin={}", i, i + 1, cos1, sin1);
                         if (mtrxV != null) {
-                            mtrxV.rotateRight(i, i + 1, tmpRotCos, tmpRotSin);
+                            mtrxV.rotateRight(i, i + 1, cos1, sin1);
                         }
-
-                        //          EigenvalueDecomposition.log("QL step done i=" + i, tmpMainDiagonal, tmpOffDiagonal);
-
                     }
 
-                    p = (-tmpRotSin * tmpRotSin2 * tmpRotCos3) * ((tmp2Sl1 / tmp2Ml1) * e[l]); // Final p
+                    p = (-sin1 * sin2 * cos3) * ((tmp2El1 / tmp2Dl1) * e[l]); // Final p
 
-                    d[l] = tmpRotCos * p;
-                    e[l] = tmpRotSin * p;
+                    d[l] = cos1 * p;
+                    e[l] = sin1 * p;
 
                 } while (ABS.invoke(e[l]) > tmpLocalEpsilon); // Check for convergence
             } // End if (m > l)
 
             d[l] = d[l] + tmpShift;
-            e[l] = PrimitiveMath.ZERO;
+            e[l] = ZERO;
         } // End main loop - l
 
         BasicLogger.debug("END diagonalize");
