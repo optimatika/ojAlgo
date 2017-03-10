@@ -64,12 +64,12 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         }
     }
 
-    static final class MatrixMultiplication<N extends Number> extends MatrixPipeline<N> {
+    static final class Multiplication<N extends Number> extends MatrixPipeline<N> {
 
         private final Access1D<N> myLeft;
         private final MatrixStore<N> myRight;
 
-        MatrixMultiplication(final Access1D<N> left, final MatrixStore<N> right) {
+        Multiplication(final Access1D<N> left, final MatrixStore<N> right) {
 
             super(right);
 

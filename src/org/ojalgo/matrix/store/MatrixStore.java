@@ -626,7 +626,7 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
      * @return The matrix product
      */
     default ElementsSupplier<N> premultiply(final Access1D<N> left) {
-        return new MatrixPipeline.MatrixMultiplication<>(left, this);
+        return new MatrixPipeline.Multiplication<>(left, this);
     }
 
     default MatrixStore<N> signum() {
