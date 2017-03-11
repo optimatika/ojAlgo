@@ -3,10 +3,6 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.util.Arrays;
-
-import org.ojalgo.netio.BasicLogger;
-
 public abstract class EvD2D {
 
     /**
@@ -574,10 +570,10 @@ public abstract class EvD2D {
 
         final int size = d.length;
 
-        BasicLogger.debug("BEGIN diagonalize");
-        BasicLogger.debug("Main diag d: {}", Arrays.toString(d));
-        BasicLogger.debug("Seco diag e: {}", Arrays.toString(e));
-        BasicLogger.debug();
+        //        BasicLogger.debug("BEGIN diagonalize");
+        //        BasicLogger.debug("Main diag d: {}", Arrays.toString(d));
+        //        BasicLogger.debug("Seco diag e: {}", Arrays.toString(e));
+        //        BasicLogger.debug();
 
         double tmpShift = ZERO;
         double tmpShiftIncr;
@@ -589,7 +585,7 @@ public abstract class EvD2D {
         // Main loop
         for (int l = 0; l < size; l++) {
 
-            BasicLogger.debug("Loop l=" + l, d, e);
+            //            BasicLogger.debug("Loop l=" + l, d, e);
 
             // Find small subdiagonal element
             tmpMagnitude = MAX.invoke(tmpMagnitude, ABS.invoke(d[l]) + ABS.invoke(e[l]));
@@ -630,7 +626,7 @@ public abstract class EvD2D {
                     }
                     tmpShift += tmpShiftIncr;
 
-                    BasicLogger.debug("New shift =" + tmpShift, d, e);
+                    //                    BasicLogger.debug("New shift =" + tmpShift, d, e);
 
                     // Implicit QL transformation.
 
@@ -643,7 +639,7 @@ public abstract class EvD2D {
                     double cos3 = cos2;
 
                     p = d[m]; // Initiate p
-                    BasicLogger.debug("m={} l={}", m, l);
+                    //                    BasicLogger.debug("m={} l={}", m, l);
                     for (int i = m - 1; i >= l; i--) {
 
                         cos3 = cos2;
@@ -663,7 +659,7 @@ public abstract class EvD2D {
                         d[i + 1] = tmpShiftIncr + (sin1 * ((cos1 * g) + (sin1 * d[i])));
 
                         // Accumulate transformation - rotate the eigenvector matrix
-                        BasicLogger.debug("low={} high={} cos={} sin={}", i, i + 1, cos1, sin1);
+                        //                        BasicLogger.debug("low={} high={} cos={} sin={}", i, i + 1, cos1, sin1);
                         if (trnspV != null) {
 
                             final double[] tmpVi0 = trnspV[i];
@@ -715,6 +711,7 @@ public abstract class EvD2D {
                 }
             }
         }
+
     }
 
     /**

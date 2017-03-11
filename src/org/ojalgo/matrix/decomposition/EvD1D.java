@@ -3,11 +3,6 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.util.Arrays;
-
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 
 public abstract class EvD1D {
@@ -558,14 +553,14 @@ public abstract class EvD1D {
 
     }
 
-    public static Array1D<Double> tql2a(final double[] d, final double[] e, final DecompositionStore<?> mtrxV) {
+    public static void tql2a(final double[] d, final double[] e, final DecompositionStore<?> mtrxV) {
 
         final int size = d.length;
 
-        BasicLogger.debug("BEGIN diagonalize");
-        BasicLogger.debug("Main diag d: {}", Arrays.toString(d));
-        BasicLogger.debug("Seco diag e: {}", Arrays.toString(e));
-        BasicLogger.debug();
+        //        BasicLogger.debug("BEGIN diagonalize");
+        //        BasicLogger.debug("Main diag d: {}", Arrays.toString(d));
+        //        BasicLogger.debug("Seco diag e: {}", Arrays.toString(e));
+        //        BasicLogger.debug();
 
         double tmpShift = ZERO;
         double tmpShiftIncr;
@@ -577,7 +572,7 @@ public abstract class EvD1D {
         // Main loop
         for (int l = 0; l < size; l++) {
 
-            BasicLogger.debug("Loop l=" + l, d, e);
+            //            BasicLogger.debug("Loop l=" + l, d, e);
 
             // Find small subdiagonal element
             tmpMagnitude = MAX.invoke(tmpMagnitude, ABS.invoke(d[l]) + ABS.invoke(e[l]));
@@ -618,7 +613,7 @@ public abstract class EvD1D {
                     }
                     tmpShift += tmpShiftIncr;
 
-                    BasicLogger.debug("New shift =" + tmpShift, d, e);
+                    //                    BasicLogger.debug("New shift =" + tmpShift, d, e);
 
                     // Implicit QL transformation
 
@@ -631,7 +626,7 @@ public abstract class EvD1D {
                     double cos3 = cos2;
 
                     p = d[m]; // Initiate p
-                    BasicLogger.debug("m={} l={}", m, l);
+                    //                    BasicLogger.debug("m={} l={}", m, l);
                     for (int i = m - 1; i >= l; i--) {
 
                         final double tmp1Di0 = d[i];
@@ -653,7 +648,7 @@ public abstract class EvD1D {
                         p = (cos1 * tmp1Di0) - (sin1 * cos2 * tmp1Ei0); // Next p
 
                         // Accumulate transformation - rotate the eigenvector matrix
-                        BasicLogger.debug("low={} high={} cos={} sin={}", i, i + 1, cos1, sin1);
+                        //                        BasicLogger.debug("low={} high={} cos={} sin={}", i, i + 1, cos1, sin1);
                         if (mtrxV != null) {
                             mtrxV.rotateRight(i, i + 1, cos1, sin1);
                         }
@@ -671,18 +666,18 @@ public abstract class EvD1D {
             e[l] = ZERO;
         } // End main loop - l
 
-        BasicLogger.debug("END diagonalize");
-        BasicLogger.debug("Main D: {}", Arrays.toString(d));
-        BasicLogger.debug("Seco D: {}", Arrays.toString(e));
-        BasicLogger.debug("V", mtrxV);
-        BasicLogger.debug();
+        //        BasicLogger.debug("END diagonalize");
+        //        BasicLogger.debug("Main D: {}", Arrays.toString(d));
+        //        BasicLogger.debug("Seco D: {}", Arrays.toString(e));
+        //        BasicLogger.debug("V", mtrxV);
+        //        BasicLogger.debug();
 
         //        for (int i = 0; i < tmpMainDiagData.length; i++) {
         //            tmpMainDiagonal.set(i, tmpMainDiagData[i]);
         //        }
 
         //return new PrimitiveArray(tmpMainDiagonal).asArray1D();
-        return Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(d));
+
     }
 
     private EvD1D() {

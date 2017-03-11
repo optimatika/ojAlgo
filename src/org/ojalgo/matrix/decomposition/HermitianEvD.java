@@ -21,13 +21,15 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
-import static org.ojalgo.constant.PrimitiveMath.*;
+import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -271,12 +273,12 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
         final DecompositionStore<N> tmpV = eigenvaluesOnly ? null : myTridiagonal.doQ();
         BasicLogger.debug("Tridiagonal={}", tmpTridiagonal.toString());
-        
+
         final Array1D<?> tmpMainDiagonal = tmpTridiagonal.mainDiagonal;
         final Array1D<?> tmpSubdiagonal = tmpTridiagonal.subdiagonal;
-        
+
         final int size = tmpMainDiagonal.size();
-        
+
         final double[] d = tmpMainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
         final double[] e = new double[size]; // The algorith needs the array to be the same length as the main diagonal
         final int tmpLength = tmpSubdiagonal.size();
@@ -286,7 +288,9 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
         //        BasicLogger.logDebug("Tridiagonal2={}", tmpTridiagonal);
 
-        final Array1D<Double> tmpDiagonal = myDiagonalValues = EvD1D.tql2a(d, e, tmpV);
+        EvD1D.tql2a(d, e, tmpV);
+
+        final Array1D<Double> tmpDiagonal = myDiagonalValues = Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(d));
 
         for (int ij1 = 0; ij1 < (tmpDim - 1); ij1++) {
             final double tmpValue1 = tmpDiagonal.doubleValue(ij1);
