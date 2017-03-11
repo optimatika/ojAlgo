@@ -642,38 +642,44 @@ public abstract class EvD2D {
 
                     double cos3 = cos2;
 
-                    double g = tmp1Dl0;
-
                     p = d[m]; // Initiate p
                     BasicLogger.debug("m={} l={}", m, l);
                     for (int i = m - 1; i >= l; i--) {
+
                         cos3 = cos2;
+
                         cos2 = cos1;
                         sin2 = sin1;
-                        g = cos1 * e[i];
+
+                        final double g = cos1 * e[i];
                         tmpShiftIncr = cos1 * p;
-                        final double a1 = p;
-                        r = HYPOT.invoke(a1, e[i]);
+                        r = HYPOT.invoke(p, e[i]);
                         e[i + 1] = sin1 * r;
+
                         sin1 = e[i] / r;
                         cos1 = p / r;
+
                         p = (cos1 * d[i]) - (sin1 * g);
                         d[i + 1] = tmpShiftIncr + (sin1 * ((cos1 * g) + (sin1 * d[i])));
 
                         // Accumulate transformation - rotate the eigenvector matrix
                         BasicLogger.debug("low={} high={} cos={} sin={}", i, i + 1, cos1, sin1);
                         if (trnspV != null) {
-                            double h1;
-                            for (int k = 0; k < trnspV[i].length; k++) {
-                                //h = V[k][i + 1];
-                                h1 = trnspV[i + 1][k];
-                                //V[k][i + 1] = (s * V[k][i]) + (c * h);
-                                trnspV[i + 1][k] = (sin1 * trnspV[i][k]) + (cos1 * h1);
-                                //V[k][i] = (c * V[k][i]) - (s * h);
-                                trnspV[i][k] = (cos1 * trnspV[i][k]) - (sin1 * h1);
+
+                            final double[] tmpVi0 = trnspV[i];
+                            double tmpVi0k;
+                            final double[] tmpVi1 = trnspV[i + 1];
+                            double tmpVi1k;
+
+                            for (int k = 0; k < size; k++) {
+
+                                tmpVi0k = tmpVi0[k];
+                                tmpVi1k = tmpVi1[k];
+
+                                tmpVi0[k] = (cos1 * tmpVi0k) - (sin1 * tmpVi1k);
+                                tmpVi1[k] = (sin1 * tmpVi0k) + (cos1 * tmpVi1k);
                             }
                         }
-
                     }
                     // p = (-s * s2 * c3 * el1 * e[l]) / dl1;
                     p = (-sin1 * sin2 * cos3) * ((tmp2El1 / tmp2Dl1) * e[l]);
