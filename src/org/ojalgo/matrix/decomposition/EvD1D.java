@@ -557,126 +557,88 @@ public abstract class EvD1D {
 
         final int size = d.length;
 
-        //        BasicLogger.debug("BEGIN diagonalize");
-        //        BasicLogger.debug("Main diag d: {}", Arrays.toString(d));
-        //        BasicLogger.debug("Seco diag e: {}", Arrays.toString(e));
-        //        BasicLogger.debug();
+        double shift = ZERO;
+        double increment;
 
-        double tmpShift = ZERO;
-        double tmpShiftIncr;
+        double magnitude = ZERO;
+        double epsilon;
 
-        double tmpMagnitude = ZERO;
-        double tmpLocalEpsilon;
+        double d_l, e_l;
 
         int m;
         // Main loop
         for (int l = 0; l < size; l++) {
 
-            //            BasicLogger.debug("Loop l=" + l, d, e);
+            d_l = d[l];
+            e_l = e[l];
 
             // Find small subdiagonal element
-            tmpMagnitude = MAX.invoke(tmpMagnitude, ABS.invoke(d[l]) + ABS.invoke(e[l]));
-            tmpLocalEpsilon = MACHINE_EPSILON * tmpMagnitude;
+            magnitude = MAX.invoke(magnitude, ABS.invoke(d_l) + ABS.invoke(e_l));
+            epsilon = MACHINE_EPSILON * magnitude;
 
             m = l;
-            while (m < size) {
-                if (ABS.invoke(e[m]) <= tmpLocalEpsilon) {
-                    break;
-                }
+            while ((m < size) && (ABS.invoke(e[m]) > epsilon)) {
                 m++;
             }
 
             // If m == l, d[l] is an eigenvalue, otherwise, iterate.
             if (m > l) {
-
                 do {
-
-                    final double tmp1Dl0 = d[l]; // (l,l)
-                    final double tmp1Dl1 = d[l + 1]; // (l+1,l+1)
-                    final double tmp1El0 = e[l]; // (l+1,l) and (l,l+1)
 
                     // Compute implicit shift
 
-                    double p = (tmp1Dl1 - tmp1Dl0) / (tmp1El0 + tmp1El0);
+                    double p = (d[l + 1] - d_l) / (e_l + e_l);
                     double r = HYPOT.invoke(p, ONE);
                     if (p < ZERO) {
                         r = -r;
                     }
 
-                    final double tmp2Dl0 = d[l] = tmp1El0 / (p + r); // (l,l)
-                    final double tmp2Dl1 = d[l + 1] = tmp1El0 * (p + r); // (l+1,l+1)
-                    final double tmp2El1 = e[l + 1]; // (l+2,l+1) and (l+1,l+2)
-
-                    tmpShiftIncr = tmp1Dl0 - tmp2Dl0;
+                    d[l + 1] = e_l * (p + r);
+                    increment = d_l - (d[l] = e_l / (p + r));
                     for (int i = l + 2; i < size; i++) {
-                        d[i] -= tmpShiftIncr;
+                        d[i] -= increment;
                     }
-                    tmpShift += tmpShiftIncr;
-
-                    //                    BasicLogger.debug("New shift =" + tmpShift, d, e);
+                    shift += increment;
 
                     // Implicit QL transformation
 
-                    double cos1 = ONE;
-                    double sin1 = ZERO;
+                    double cos1 = ONE, sin1 = ZERO, cos2 = cos1;
+                    double d_i, e_i;
 
-                    double cos2 = cos1;
-                    double sin2 = sin1;
-
-                    double cos3 = cos2;
-
-                    p = d[m]; // Initiate p
-                    //                    BasicLogger.debug("m={} l={}", m, l);
+                    p = d[m];
                     for (int i = m - 1; i >= l; i--) {
+                        d_i = d[i];
+                        e_i = e[i];
 
-                        final double tmp1Di0 = d[i];
-                        final double tmp1Ei0 = e[i];
+                        r = HYPOT.invoke(p, e_i);
 
-                        r = HYPOT.invoke(p, tmp1Ei0);
-
-                        cos3 = cos2;
+                        e[i + 1] = sin1 * r;
 
                         cos2 = cos1;
-                        sin2 = sin1;
 
                         cos1 = p / r;
-                        sin1 = tmp1Ei0 / r;
+                        sin1 = e_i / r;
 
-                        d[i + 1] = (cos2 * p) + (sin1 * ((cos1 * cos2 * tmp1Ei0) + (sin1 * tmp1Di0)));
-                        e[i + 1] = sin2 * r;
+                        d[i + 1] = (cos2 * p) + (sin1 * ((cos1 * cos2 * e_i) + (sin1 * d_i)));
 
-                        p = (cos1 * tmp1Di0) - (sin1 * cos2 * tmp1Ei0); // Next p
+                        p = (cos1 * d_i) - (sin1 * cos2 * e_i);
 
                         // Accumulate transformation - rotate the eigenvector matrix
-                        //                        BasicLogger.debug("low={} high={} cos={} sin={}", i, i + 1, cos1, sin1);
                         if (mtrxV != null) {
                             mtrxV.rotateRight(i, i + 1, cos1, sin1);
                         }
                     }
 
-                    p = (-sin1 * sin2 * cos3) * ((tmp2El1 / tmp2Dl1) * e[l]); // Final p
+                    d_l = d[l] = cos1 * p;
+                    e_l = e[l] = sin1 * p;
 
-                    d[l] = cos1 * p;
-                    e[l] = sin1 * p;
-
-                } while (ABS.invoke(e[l]) > tmpLocalEpsilon); // Check for convergence
+                } while (ABS.invoke(e[l]) > epsilon); // Check for convergence
             } // End if (m > l)
 
-            d[l] = d[l] + tmpShift;
+            d[l] = d[l] + shift;
             e[l] = ZERO;
+
         } // End main loop - l
-
-        //        BasicLogger.debug("END diagonalize");
-        //        BasicLogger.debug("Main D: {}", Arrays.toString(d));
-        //        BasicLogger.debug("Seco D: {}", Arrays.toString(e));
-        //        BasicLogger.debug("V", mtrxV);
-        //        BasicLogger.debug();
-
-        //        for (int i = 0; i < tmpMainDiagData.length; i++) {
-        //            tmpMainDiagonal.set(i, tmpMainDiagData[i]);
-        //        }
-
-        //return new PrimitiveArray(tmpMainDiagonal).asArray1D();
 
     }
 
