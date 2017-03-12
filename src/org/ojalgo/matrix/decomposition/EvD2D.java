@@ -690,27 +690,27 @@ public abstract class EvD2D {
         }
 
         // Sort eigenvalues and corresponding vectors.
-        for (int i = 0; i < (size - 1); i++) {
-
-            int k = i;
-            double p = d[i];
-            for (int j = i + 1; j < size; j++) {
-                if (d[j] > p) {
-                    k = j;
-                    p = d[j];
-                }
-            }
-            if (k != i) {
-                d[k] = d[i];
-                d[i] = p;
-
-                if (trnspV != null) {
-                    final double[] tmpCol = trnspV[i];
-                    trnspV[i] = trnspV[k];
-                    trnspV[k] = tmpCol;
-                }
-            }
-        }
+        //        for (int i = 0; i < (size - 1); i++) {
+        //
+        //            int k = i;
+        //            double p = d[i];
+        //            for (int j = i + 1; j < size; j++) {
+        //                if (d[j] > p) {
+        //                    k = j;
+        //                    p = d[j];
+        //                }
+        //            }
+        //            if (k != i) {
+        //                d[k] = d[i];
+        //                d[i] = p;
+        //
+        //                if (trnspV != null) {
+        //                    final double[] tmpCol = trnspV[i];
+        //                    trnspV[i] = trnspV[k];
+        //                    trnspV[k] = tmpCol;
+        //                }
+        //            }
+        //        }
 
     }
 

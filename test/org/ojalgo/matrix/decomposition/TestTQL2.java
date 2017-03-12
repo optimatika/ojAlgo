@@ -21,10 +21,11 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import java.util.Arrays;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.junit.Test;
 import org.ojalgo.TestUtils;
+import org.ojalgo.scalar.PrimitiveScalar;
 
 /**
  * @author apete
@@ -54,7 +55,14 @@ public class TestTQL2 {
         EvD1D.tql2a(d1, e1, null);
         EvD2D.tql2a(d2, e2, null);
 
-        TestUtils.assertTrue(Arrays.equals(d1, d2));
+        double normArr = 0.0;
+        double normDif = 0.0;
+        for (int i = 0; i < d1.length; i++) {
+            normArr = HYPOT.invoke(normArr, d1[i]);
+            normDif = HYPOT.invoke(normDif, d1[i] - d2[i]);
+        }
+
+        TestUtils.assertTrue(PrimitiveScalar.isSmall(normArr * 10, normDif));
     }
 
 }
