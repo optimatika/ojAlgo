@@ -271,13 +271,12 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
         final DecompositionStore<N> tmpV = eigenvaluesOnly ? null : myTridiagonal.doQ();
 
-        final Array1D<?> tmpSubdiagonal = tridiagonal.subdiagonal;
-
         final double[] d = tridiagonal.mainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
         final double[] e = new double[size]; // The algorith needs the array to be the same length as the main diagonal
-        final int tmpLength = tmpSubdiagonal.size();
+        final Array1D<N> tridiagonalSubdiagonal = tridiagonal.subdiagonal;
+        final int tmpLength = tridiagonalSubdiagonal.size();
         for (int i = 0; i < tmpLength; i++) {
-            e[i] = tmpSubdiagonal.doubleValue(i);
+            e[i] = tridiagonalSubdiagonal.doubleValue(i);
         }
 
         //        BasicLogger.logDebug("Tridiagonal2={}", tmpTridiagonal);
