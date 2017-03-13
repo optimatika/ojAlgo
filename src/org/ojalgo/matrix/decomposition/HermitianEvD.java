@@ -34,13 +34,13 @@ import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
+import org.ojalgo.matrix.decomposition.function.AccumulatorEvD;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.TaskException;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 
 public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
@@ -263,23 +263,17 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     @Override
     protected final boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
 
-        final int tmpDim = (int) matrix.countRows();
+        final int size = (int) matrix.countRows();
 
         myTridiagonal.decompose(matrix);
 
-        final DiagonalAccess<N> tmpTridiagonal = myTridiagonal.getDiagonalAccessD();
-
-        //        BasicLogger.logDebug("Tridiagonal1={}", tmpTridiagonal);
+        final DiagonalAccess<N> tridiagonal = myTridiagonal.getDiagonalAccessD();
 
         final DecompositionStore<N> tmpV = eigenvaluesOnly ? null : myTridiagonal.doQ();
-        BasicLogger.debug("Tridiagonal={}", tmpTridiagonal.toString());
 
-        final Array1D<?> tmpMainDiagonal = tmpTridiagonal.mainDiagonal;
-        final Array1D<?> tmpSubdiagonal = tmpTridiagonal.subdiagonal;
+        final Array1D<?> tmpSubdiagonal = tridiagonal.subdiagonal;
 
-        final int size = tmpMainDiagonal.size();
-
-        final double[] d = tmpMainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
+        final double[] d = tridiagonal.mainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
         final double[] e = new double[size]; // The algorith needs the array to be the same length as the main diagonal
         final int tmpLength = tmpSubdiagonal.size();
         for (int i = 0; i < tmpLength; i++) {
@@ -288,17 +282,22 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
         //        BasicLogger.logDebug("Tridiagonal2={}", tmpTridiagonal);
 
-        EvD1D.tql2a(d, e, tmpV);
+        EigenvalueDecomposition.tql2(d, e, tmpV != null ? new AccumulatorEvD() {
+
+            public void rotateRight(final int low, final int high, final double cos, final double sin) {
+                tmpV.rotateRight(low, high, cos, sin);
+            }
+        } : AccumulatorEvD.NULL);
 
         final Array1D<Double> tmpDiagonal = myDiagonalValues = Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(d));
 
-        for (int ij1 = 0; ij1 < (tmpDim - 1); ij1++) {
+        for (int ij1 = 0; ij1 < (size - 1); ij1++) {
             final double tmpValue1 = tmpDiagonal.doubleValue(ij1);
 
             int ij2 = ij1;
             double tmpValue2 = tmpValue1;
 
-            for (int ij2exp = ij1 + 1; ij2exp < tmpDim; ij2exp++) {
+            for (int ij2exp = ij1 + 1; ij2exp < size; ij2exp++) {
                 final double tmpValue2exp = tmpDiagonal.doubleValue(ij2exp);
 
                 if ((PrimitiveFunction.ABS.invoke(tmpValue2exp) > PrimitiveFunction.ABS.invoke(tmpValue1))

@@ -21,10 +21,14 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
+
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.decomposition.function.AccumulatorEvD;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -32,6 +36,93 @@ import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 
 abstract class EigenvalueDecomposition<N extends Number> extends GenericDecomposition<N> implements Eigenvalue<N> {
+
+    static void tql2(final double[] d, final double[] e, final AccumulatorEvD mtrxV) {
+
+        final int size = d.length;
+
+        double shift = ZERO;
+        double increment;
+
+        double magnitude = ZERO;
+        double epsilon;
+
+        double d_l, e_l;
+
+        int m;
+        // Main loop
+        for (int l = 0; l < size; l++) {
+
+            d_l = d[l];
+            e_l = e[l];
+
+            // Find small subdiagonal element
+            magnitude = MAX.invoke(magnitude, ABS.invoke(d_l) + ABS.invoke(e_l));
+            epsilon = MACHINE_EPSILON * magnitude;
+
+            m = l;
+            while ((m < size) && (ABS.invoke(e[m]) > epsilon)) {
+                m++;
+            }
+
+            // If m == l, d[l] is an eigenvalue, otherwise, iterate.
+            if (m > l) {
+                do {
+
+                    // Compute implicit shift
+
+                    double p = (d[l + 1] - d_l) / (e_l + e_l);
+                    double r = HYPOT.invoke(p, ONE);
+                    if (p < ZERO) {
+                        r = -r;
+                    }
+
+                    d[l + 1] = e_l * (p + r);
+                    increment = d_l - (d[l] = e_l / (p + r));
+                    for (int i = l + 2; i < size; i++) {
+                        d[i] -= increment;
+                    }
+                    shift += increment;
+
+                    // Implicit QL transformation
+
+                    double cos1 = ONE, sin1 = ZERO, cos2 = cos1;
+                    double d_i, e_i;
+
+                    p = d[m];
+                    for (int i = m - 1; i >= l; i--) {
+                        d_i = d[i];
+                        e_i = e[i];
+
+                        r = HYPOT.invoke(p, e_i);
+
+                        e[i + 1] = sin1 * r;
+
+                        cos2 = cos1;
+
+                        cos1 = p / r;
+                        sin1 = e_i / r;
+
+                        d[i + 1] = (cos2 * p) + (sin1 * ((cos1 * cos2 * e_i) + (sin1 * d_i)));
+
+                        p = (cos1 * d_i) - (sin1 * cos2 * e_i);
+
+                        // Accumulate transformation - rotate the eigenvector matrix
+                        mtrxV.rotateRight(i, i + 1, cos1, sin1);
+                    }
+
+                    d_l = d[l] = cos1 * p;
+                    e_l = e[l] = sin1 * p;
+
+                } while (ABS.invoke(e[l]) > epsilon); // Check for convergence
+            } // End if (m > l)
+
+            d[l] += shift;
+            e[l] = ZERO;
+
+        } // End main loop - l
+
+    }
 
     private MatrixStore<N> myD = null;
     private Array1D<ComplexNumber> myEigenvalues = null;

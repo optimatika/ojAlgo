@@ -3,6 +3,9 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.ojalgo.matrix.decomposition.function.AccumulatorEvD;
+import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
+
 public abstract class EvD2D {
 
     /**
@@ -566,137 +569,6 @@ public abstract class EvD2D {
         }
     }
 
-    public static void tql2a(final double[] d, final double[] e, final double[][] trnspV) {
-
-        final int size = d.length;
-
-        double shift = ZERO;
-        double shiftIncr;
-
-        double magnitude = ZERO;
-        double effectiveEpsilon;
-
-        int m;
-        // Main loop
-        for (int l = 0; l < size; l++) {
-
-            // Find small subdiagonal element
-            magnitude = MAX.invoke(magnitude, ABS.invoke(d[l]) + ABS.invoke(e[l]));
-            effectiveEpsilon = MACHINE_EPSILON * magnitude;
-
-            m = l;
-            while ((m < size) && (ABS.invoke(e[m]) > effectiveEpsilon)) {
-                m++;
-            }
-
-            // If m == l, d[l] is an eigenvalue, otherwise, iterate.
-            if (m > l) {
-                do {
-
-                    final double tmp1Dl0 = d[l]; // (l,l)
-                    final double tmp1Dl1 = d[l + 1]; // (l+1,l+1)
-                    final double tmp1El0 = e[l]; // (l+1,l) and (l,l+1)
-
-                    // Compute implicit shift
-
-                    double p = (tmp1Dl1 - tmp1Dl0) / (tmp1El0 + tmp1El0);
-                    double r = HYPOT.invoke(p, ONE);
-                    if (p < ZERO) {
-                        r = -r;
-                    }
-
-                    final double tmp2Dl0 = d[l] = tmp1El0 / (p + r); // (l,l)
-                    final double tmp2Dl1 = d[l + 1] = tmp1El0 * (p + r); // (l+1,l+1)
-                    final double tmp2El1 = e[l + 1]; // (l+2,l+1) and (l+1,l+2)
-
-                    shiftIncr = tmp1Dl0 - tmp2Dl0;
-                    for (int i = l + 2; i < size; i++) {
-                        d[i] -= shiftIncr;
-                    }
-                    shift += shiftIncr;
-
-                    // Implicit QL transformation.
-
-                    double cos1 = ONE, sin1 = ZERO, cos2 = cos1, sin2 = sin1, cos3 = cos2;
-                    double d_i, e_i;
-
-                    p = d[m];
-                    for (int i = m - 1; i >= l; i--) {
-                        d_i = d[i];
-                        e_i = e[i];
-
-                        r = HYPOT.invoke(p, e_i);
-
-                        cos3 = cos2;
-
-                        cos2 = cos1;
-                        sin2 = sin1;
-
-                        sin1 = e_i / r;
-                        cos1 = p / r;
-
-                        d[i + 1] = (cos2 * p) + (sin1 * ((cos1 * cos2 * e_i) + (sin1 * d_i)));
-                        e[i + 1] = sin2 * r;
-
-                        p = (cos1 * d_i) - (sin1 * cos2 * e_i);
-
-                        // Accumulate transformation - rotate the eigenvector matrix
-                        if (trnspV != null) {
-
-                            final double[] tmpVi0 = trnspV[i];
-                            double tmpVi0k;
-                            final double[] tmpVi1 = trnspV[i + 1];
-                            double tmpVi1k;
-
-                            for (int k = 0; k < size; k++) {
-
-                                tmpVi0k = tmpVi0[k];
-                                tmpVi1k = tmpVi1[k];
-
-                                tmpVi0[k] = (cos1 * tmpVi0k) - (sin1 * tmpVi1k);
-                                tmpVi1[k] = (sin1 * tmpVi0k) + (cos1 * tmpVi1k);
-                            }
-                        }
-                    }
-
-                    p = (-sin1 * sin2 * cos3) * (tmp2El1 / tmp2Dl1) * e[l];
-
-                    e[l] = sin1 * p;
-                    d[l] = cos1 * p;
-
-                } while (ABS.invoke(e[l]) > effectiveEpsilon); // Check for convergence
-            } // End if (m > l)
-
-            d[l] = d[l] + shift;
-            e[l] = ZERO;
-
-        } // End main loop - l
-
-        // Sort eigenvalues and corresponding vectors.
-        for (int i = 0; i < (size - 1); i++) {
-
-            int k = i;
-            double p = d[i];
-            for (int j = i + 1; j < size; j++) {
-                if (d[j] > p) {
-                    k = j;
-                    p = d[j];
-                }
-            }
-            if (k != i) {
-                d[k] = d[i];
-                d[i] = p;
-
-                if (trnspV != null) {
-                    final double[] tmpCol = trnspV[i];
-                    trnspV[i] = trnspV[k];
-                    trnspV[k] = tmpCol;
-                }
-            }
-        }
-
-    }
-
     /**
      * Complex scalar division.
      */
@@ -717,6 +589,33 @@ public abstract class EvD2D {
 
     private EvD2D() {
         super();
+    }
+
+    public static void sort(final double[] d, final ExchangeColumns trnspV) {
+
+        final int size = d.length;
+
+        // Sort eigenvalues and corresponding vectors.
+        for (int i = 0; i < (size - 1); i++) {
+
+            int k = i;
+            double p = d[i];
+            for (int j = i + 1; j < size; j++) {
+                if (d[j] > p) {
+                    k = j;
+                    p = d[j];
+                }
+            }
+            if (k != i) {
+                d[k] = d[i];
+                d[i] = p;
+
+                if (trnspV != null) {
+                    trnspV.exchangeColumns(i, k);
+                }
+            }
+        }
+
     }
 
 }

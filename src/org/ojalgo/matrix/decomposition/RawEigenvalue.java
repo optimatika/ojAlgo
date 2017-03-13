@@ -32,6 +32,8 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
+import org.ojalgo.matrix.decomposition.function.AccumulatorEvD;
+import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -190,7 +192,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      * @return D
      */
     public RawStore getD() {
-        int n = this.getRowDim();
+        final int n = this.getRowDim();
         final RawStore X = new RawStore(n, n);
         final double[][] D = X.data;
         for (int i = 0; i < n; i++) {
@@ -244,7 +246,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     }
 
     public MatrixStore<Double> getInverse() {
-        int n = this.getRowDim();
+        final int n = this.getRowDim();
         return this.getInverse(this.allocate(n, n));
     }
 
@@ -298,7 +300,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      * @return V
      */
     public MatrixStore<Double> getV() {
-        int n = this.getRowDim();
+        final int n = this.getRowDim();
         return new RawStore(myTransposedV, n, n).logical().transpose().get();
     }
 
@@ -361,7 +363,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     final void doDecomposeGeneral(final double[][] data, final boolean valuesOnly) {
 
-        int n = data.length;
+        final int n = data.length;
 
         if ((d == null) || (n != d.length)) {
             if (valuesOnly) {
@@ -383,7 +385,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     final void doDecomposeSymmetric(final double[][] data, final boolean valuesOnly) {
 
-        int n = data.length;
+        final int n = data.length;
 
         if ((d == null) || (n != d.length)) {
             d = new double[n];
@@ -399,13 +401,41 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         // Diagonalize.
         final int size = d1.length;
-        
+
         for (int i = 1; i < size; i++) {
             e1[i - 1] = e1[i];
         }
         e1[size - 1] = ZERO;
-        
-        EvD2D.tql2a(d1, e1, trnspV);
+
+        EigenvalueDecomposition.tql2(d1, e1, trnspV != null ? new AccumulatorEvD() {
+
+            public void rotateRight(final int low, final int high, final double cos, final double sin) {
+                final double[] tmpVi0 = trnspV[low];
+                double tmpVi0k;
+                final double[] tmpVi1 = trnspV[high];
+                double tmpVi1k;
+
+                for (int k = 0; k < size; k++) {
+
+                    tmpVi0k = tmpVi0[k];
+                    tmpVi1k = tmpVi1[k];
+
+                    tmpVi0[k] = (cos * tmpVi0k) - (sin * tmpVi1k);
+                    tmpVi1[k] = (sin * tmpVi0k) + (cos * tmpVi1k);
+                }
+
+            }
+        } : AccumulatorEvD.NULL);
+
+        EvD2D.sort(d1, trnspV != null ? new ExchangeColumns() {
+
+            public void exchangeColumns(final int colA, final int colB) {
+                final double[] tmp = trnspV[colA];
+                trnspV[colA] = trnspV[colB];
+                trnspV[colB] = tmp;
+
+            }
+        } : ExchangeColumns.NULL);
     }
 
     /**

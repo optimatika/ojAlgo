@@ -19,9 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.decomposition;
+package org.ojalgo.matrix.decomposition.function;
 
+public interface ExchangeColumns {
 
-interface AccumulatorEvD {
+    ExchangeColumns NULL = new ExchangeColumns() {
+
+        public void exchangeColumns(final int colA, final int colB) {
+
+        }
+
+    };
+
+    void exchangeColumns(int colA, int colB);
 
 }
