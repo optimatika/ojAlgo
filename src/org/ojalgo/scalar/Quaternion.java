@@ -28,10 +28,12 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.type.context.NumberContext;
 import org.ojalgo.type.context.NumberContext.Enforceable;
 
-public final class Quaternion extends Number implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double> {
+public final class Quaternion extends Number
+        implements Scalar<Quaternion>, Enforceable<Quaternion>, Access2D<Double>, Access2D.Collectable<Double, PhysicalStore<Double>> {
 
     public static final Scalar.Factory<Quaternion> FACTORY = new Scalar.Factory<Quaternion>() {
 
@@ -650,6 +652,25 @@ public final class Quaternion extends Number implements Scalar<Quaternion>, Enfo
         final double tmpK = k - arg.k;
 
         return new Quaternion(tmpScalar, tmpI, tmpJ, tmpK);
+    }
+
+    public void supplyTo(final PhysicalStore<Double> receiver) {
+        receiver.set(0L, myScalar);
+        receiver.set(1L, -i);
+        receiver.set(2L, -j);
+        receiver.set(3L, -k);
+        receiver.set(4L, i);
+        receiver.set(5L, myScalar);
+        receiver.set(6L, k);
+        receiver.set(7L, -j);
+        receiver.set(8L, j);
+        receiver.set(9L, -k);
+        receiver.set(10L, myScalar);
+        receiver.set(11L, i);
+        receiver.set(12L, k);
+        receiver.set(13L, j);
+        receiver.set(14L, -i);
+        receiver.set(15L, myScalar);
     }
 
     public BigDecimal toBigDecimal() {

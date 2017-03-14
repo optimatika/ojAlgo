@@ -89,10 +89,6 @@ abstract class NewGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
         return false;
     }
 
-    public final boolean isOrdered() {
-        return true;
-    }
-
     public final boolean isSolvable() {
         return this.isComputed() && this.isHermitian();
     }

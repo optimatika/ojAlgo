@@ -3,9 +3,6 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import org.ojalgo.matrix.decomposition.function.AccumulatorEvD;
-import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
-
 public abstract class EvD2D {
 
     /**
@@ -589,33 +586,6 @@ public abstract class EvD2D {
 
     private EvD2D() {
         super();
-    }
-
-    public static void sort(final double[] d, final ExchangeColumns trnspV) {
-
-        final int size = d.length;
-
-        // Sort eigenvalues and corresponding vectors.
-        for (int i = 0; i < (size - 1); i++) {
-
-            int k = i;
-            double p = d[i];
-            for (int j = i + 1; j < size; j++) {
-                if (d[j] > p) {
-                    k = j;
-                    p = d[j];
-                }
-            }
-            if (k != i) {
-                d[k] = d[i];
-                d[i] = p;
-
-                if (trnspV != null) {
-                    trnspV.exchangeColumns(i, k);
-                }
-            }
-        }
-
     }
 
 }

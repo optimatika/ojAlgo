@@ -23,6 +23,8 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
+import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
+import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
@@ -39,7 +41,7 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
+public interface DecompositionStore<N extends Number> extends PhysicalStore<N>, RotateRight, ExchangeColumns {
 
     /**
      * Cholesky transformations
@@ -75,5 +77,9 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N> {
     void transformSymmetric(Householder<N> transformation);
 
     void tred2(BasicArray<N> mainDiagonal, BasicArray<N> offDiagonal, boolean yesvecs);
+
+    default void exchangeColumns(final int colA, final int colB) {
+        this.exchangeColumns((long) colA, (long) colB);
+    }
 
 }

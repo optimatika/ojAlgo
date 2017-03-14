@@ -21,9 +21,9 @@
  */
 package org.ojalgo.matrix.decomposition.function;
 
-public interface AccumulatorEvD {
+public interface RotateRight {
 
-    static final AccumulatorEvD NULL = new AccumulatorEvD() {
+    static final RotateRight NULL = new RotateRight() {
 
         public void rotateRight(final int low, final int high, final double cos, final double sin) {
 

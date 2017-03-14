@@ -32,8 +32,8 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.matrix.decomposition.function.AccumulatorEvD;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
+import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -72,9 +72,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
             if (this.checkSymmetry()) {
-                this.doDecomposeSymmetric(data, valuesOnly);
+                this.doSymmetric(data, valuesOnly);
             } else {
-                this.doDecomposeGeneral(data, valuesOnly);
+                this.doGeneral(data, valuesOnly);
             }
 
             return this.computed(true);
@@ -95,7 +95,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         @Override
         boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
-            this.doDecomposeGeneral(data, valuesOnly);
+            this.doGeneral(data, valuesOnly);
 
             return this.computed(true);
         }
@@ -130,7 +130,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         @Override
         boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
-            this.doDecomposeSymmetric(data, valuesOnly);
+            this.doSymmetric(data, valuesOnly);
 
             return this.computed(true);
         }
@@ -145,6 +145,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     private double[] d = null, e = null;
 
     private transient MatrixStore<Double> myInverse = null;
+    private boolean myOrdered = true;
 
     /**
      * Array for internal storage of eigenvectors.
@@ -319,8 +320,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    public boolean isOrdered() {
-        return !this.isHermitian();
+    public final boolean isOrdered() {
+        return myOrdered;
     }
 
     public boolean isSolvable() {
@@ -334,6 +335,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     @Override
     public void reset() {
         myInverse = null;
+    }
+
+    public void setOrdered(final boolean ordered) {
+        myOrdered = ordered;
     }
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
@@ -361,7 +366,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     abstract boolean doDecompose(double[][] data, boolean valuesOnly);
 
-    final void doDecomposeGeneral(final double[][] data, final boolean valuesOnly) {
+    final void doGeneral(final double[][] data, final boolean valuesOnly) {
 
         final int n = data.length;
 
@@ -383,36 +388,31 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     }
 
-    final void doDecomposeSymmetric(final double[][] data, final boolean valuesOnly) {
+    final void doSymmetric(final double[][] data, final boolean valuesOnly) {
 
-        final int n = data.length;
+        final int size = data.length;
 
-        if ((d == null) || (n != d.length)) {
-            d = new double[n];
-            e = new double[n];
+        if ((d == null) || (size != d.length)) {
+            d = new double[size];
+            e = new double[size];
         }
         myTransposedV = valuesOnly ? null : data;
 
         // Tridiagonalize.
         HouseholderHermitian.tred2jj(data, d, e, !valuesOnly);
-        final double[] d1 = d;
-        final double[] e1 = e;
-        final double[][] trnspV = myTransposedV;
-
-        // Diagonalize.
-        final int size = d1.length;
 
         for (int i = 1; i < size; i++) {
-            e1[i - 1] = e1[i];
+            e[i - 1] = e[i];
         }
-        e1[size - 1] = ZERO;
+        e[size - 1] = ZERO;
 
-        EigenvalueDecomposition.tql2(d1, e1, trnspV != null ? new AccumulatorEvD() {
+        // Diagonalize.
+        final RotateRight tmpRotateRight = valuesOnly ? RotateRight.NULL : new RotateRight() {
 
             public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                final double[] tmpVi0 = trnspV[low];
+                final double[] tmpVi0 = myTransposedV[low];
                 double tmpVi0k;
-                final double[] tmpVi1 = trnspV[high];
+                final double[] tmpVi1 = myTransposedV[high];
                 double tmpVi1k;
 
                 for (int k = 0; k < size; k++) {
@@ -425,17 +425,21 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 }
 
             }
-        } : AccumulatorEvD.NULL);
+        };
+        HermitianEvD.tql2(d, e, tmpRotateRight);
 
-        EvD2D.sort(d1, trnspV != null ? new ExchangeColumns() {
+        if (this.isOrdered()) {
+            final ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : new ExchangeColumns() {
 
-            public void exchangeColumns(final int colA, final int colB) {
-                final double[] tmp = trnspV[colA];
-                trnspV[colA] = trnspV[colB];
-                trnspV[colB] = tmp;
+                public void exchangeColumns(final int colA, final int colB) {
+                    final double[] tmp = myTransposedV[colA];
+                    myTransposedV[colA] = myTransposedV[colB];
+                    myTransposedV[colB] = tmp;
 
-            }
-        } : ExchangeColumns.NULL);
+                }
+            };
+            EigenvalueDecomposition.sort(d, tmpExchangeColumns);
+        }
     }
 
     /**

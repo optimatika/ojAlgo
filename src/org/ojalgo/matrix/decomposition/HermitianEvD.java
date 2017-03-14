@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.BigDecimal;
 
@@ -31,10 +32,10 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
-import org.ojalgo.matrix.decomposition.function.AccumulatorEvD;
+import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
+import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -82,7 +83,95 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     }
 
+    static void tql2(final double[] d, final double[] e, final RotateRight mtrxV) {
+
+        final int size = d.length;
+
+        double shift = ZERO;
+        double increment;
+
+        double magnitude = ZERO;
+        double epsilon;
+
+        double d_l, e_l;
+
+        int m;
+        // Main loop
+        for (int l = 0; l < size; l++) {
+
+            d_l = d[l];
+            e_l = e[l];
+
+            // Find small subdiagonal element
+            magnitude = MAX.invoke(magnitude, ABS.invoke(d_l) + ABS.invoke(e_l));
+            epsilon = MACHINE_EPSILON * magnitude;
+
+            m = l;
+            while ((m < size) && (ABS.invoke(e[m]) > epsilon)) {
+                m++;
+            }
+
+            // If m == l, d[l] is an eigenvalue, otherwise, iterate.
+            if (m > l) {
+                do {
+
+                    // Compute implicit shift
+
+                    double p = (d[l + 1] - d_l) / (e_l + e_l);
+                    double r = HYPOT.invoke(p, ONE);
+                    if (p < ZERO) {
+                        r = -r;
+                    }
+
+                    d[l + 1] = e_l * (p + r);
+                    increment = d_l - (d[l] = e_l / (p + r));
+                    for (int i = l + 2; i < size; i++) {
+                        d[i] -= increment;
+                    }
+                    shift += increment;
+
+                    // Implicit QL transformation
+
+                    double cos1 = ONE, sin1 = ZERO, cos2 = cos1;
+                    double d_i, e_i;
+
+                    p = d[m];
+                    for (int i = m - 1; i >= l; i--) {
+                        d_i = d[i];
+                        e_i = e[i];
+
+                        r = HYPOT.invoke(p, e_i);
+
+                        e[i + 1] = sin1 * r;
+
+                        cos2 = cos1;
+
+                        cos1 = p / r;
+                        sin1 = e_i / r;
+
+                        d[i + 1] = (cos2 * p) + (sin1 * ((cos1 * cos2 * e_i) + (sin1 * d_i)));
+
+                        p = (cos1 * d_i) - (sin1 * cos2 * e_i);
+
+                        // Accumulate transformation - rotate the eigenvector matrix
+                        mtrxV.rotateRight(i, i + 1, cos1, sin1);
+                    }
+
+                    d_l = d[l] = cos1 * p;
+                    e_l = e[l] = sin1 * p;
+
+                } while (ABS.invoke(e[l]) > epsilon); // Check for convergence
+            } // End if (m > l)
+
+            d[l] += shift;
+            e[l] = ZERO;
+
+        } // End main loop - l
+
+    }
+
     private Array1D<Double> myDiagonalValues;
+
     private transient MatrixStore<N> myInverse;
 
     private final TridiagonalDecomposition<N> myTridiagonal;
@@ -206,10 +295,6 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
         return true;
     }
 
-    public final boolean isOrdered() {
-        return true;
-    }
-
     public final boolean isSolvable() {
         return this.isComputed() && this.isHermitian();
     }
@@ -261,15 +346,13 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     }
 
     @Override
-    protected final boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
+    protected final boolean doHermitian(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly) {
 
         final int size = (int) matrix.countRows();
 
         myTridiagonal.decompose(matrix);
 
         final DiagonalAccess<N> tridiagonal = myTridiagonal.getDiagonalAccessD();
-
-        final DecompositionStore<N> tmpV = eigenvaluesOnly ? null : myTridiagonal.doQ();
 
         final double[] d = tridiagonal.mainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
         final double[] e = new double[size]; // The algorith needs the array to be the same length as the main diagonal
@@ -279,44 +362,18 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
             e[i] = tridiagonalSubdiagonal.doubleValue(i);
         }
 
-        //        BasicLogger.logDebug("Tridiagonal2={}", tmpTridiagonal);
+        final RotateRight tmpRotateRight = valuesOnly ? RotateRight.NULL : myTridiagonal.doQ();
+        HermitianEvD.tql2(d, e, tmpRotateRight);
 
-        EigenvalueDecomposition.tql2(d, e, tmpV != null ? new AccumulatorEvD() {
-
-            public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                tmpV.rotateRight(low, high, cos, sin);
-            }
-        } : AccumulatorEvD.NULL);
-
-        final Array1D<Double> tmpDiagonal = myDiagonalValues = Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(d));
-
-        for (int ij1 = 0; ij1 < (size - 1); ij1++) {
-            final double tmpValue1 = tmpDiagonal.doubleValue(ij1);
-
-            int ij2 = ij1;
-            double tmpValue2 = tmpValue1;
-
-            for (int ij2exp = ij1 + 1; ij2exp < size; ij2exp++) {
-                final double tmpValue2exp = tmpDiagonal.doubleValue(ij2exp);
-
-                if ((PrimitiveFunction.ABS.invoke(tmpValue2exp) > PrimitiveFunction.ABS.invoke(tmpValue1))
-                        || ((PrimitiveFunction.ABS.invoke(tmpValue2exp) == PrimitiveFunction.ABS.invoke(tmpValue1)) && (tmpValue2exp > tmpValue1))) {
-                    ij2 = ij2exp;
-                    tmpValue2 = tmpValue2exp;
-                }
-            }
-
-            if (ij2 != ij1) {
-                tmpDiagonal.set(ij1, tmpValue2);
-                tmpDiagonal.set(ij2, tmpValue1);
-                if (tmpV != null) {
-                    tmpV.exchangeColumns(ij1, ij2);
-                }
-            }
+        if (this.isOrdered()) {
+            final ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : myTridiagonal.doQ();
+            EigenvalueDecomposition.sort(d, tmpExchangeColumns);
         }
 
-        if (!eigenvaluesOnly) {
-            this.setV(tmpV);
+        myDiagonalValues = Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(d));
+
+        if (!valuesOnly) {
+            this.setV(myTridiagonal.doQ());
         }
 
         return this.computed(true);

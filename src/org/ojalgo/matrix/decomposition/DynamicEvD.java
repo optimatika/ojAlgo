@@ -81,14 +81,6 @@ abstract class DynamicEvD<N extends Number> extends EigenvalueDecomposition<N> {
         return myHermitian;
     }
 
-    public boolean isOrdered() {
-        if (myHermitian) {
-            return myHermitianDelegate.isOrdered();
-        } else {
-            return myGeneralDelegate.isOrdered();
-        }
-    }
-
     @Override
     public void reset() {
 
