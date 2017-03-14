@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
@@ -170,10 +171,9 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     }
 
-    private Array1D<Double> myDiagonalValues;
-
+    private double[] d;
+    private double[] e;
     private transient MatrixStore<N> myInverse;
-
     private final TridiagonalDecomposition<N> myTridiagonal;
 
     @SuppressWarnings("unused")
@@ -195,6 +195,17 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
         this.getEigenvalues().visitAll(tmpVisitor);
 
         return this.scalar().cast(tmpVisitor.getNumber());
+    }
+
+    public void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
+
+        final int length = realParts.length;
+
+        System.arraycopy(d, 0, realParts, 0, length);
+
+        if (imaginaryParts.isPresent()) {
+            System.arraycopy(e, 0, imaginaryParts.get(), 0, length);
+        }
     }
 
     public final MatrixStore<N> getInverse() {
@@ -352,15 +363,14 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
         myTridiagonal.decompose(matrix);
 
-        final DiagonalAccess<N> tridiagonal = myTridiagonal.getDiagonalAccessD();
-
-        final double[] d = tridiagonal.mainDiagonal.toRawCopy1D(); // Actually unnecessary to copy
-        final double[] e = new double[size]; // The algorith needs the array to be the same length as the main diagonal
-        final Array1D<N> tridiagonalSubdiagonal = tridiagonal.subdiagonal;
-        final int tmpLength = tridiagonalSubdiagonal.size();
-        for (int i = 0; i < tmpLength; i++) {
-            e[i] = tridiagonalSubdiagonal.doubleValue(i);
+        if ((d == null) || (d.length != size)) {
+            d = new double[size];
+            e = new double[size];
         }
+
+        final DiagonalAccess<N> tridiagonal = myTridiagonal.getDiagonalAccessD();
+        tridiagonal.mainDiagonal.supplyTo(d);
+        tridiagonal.subdiagonal.supplyTo(e);
 
         final RotateRight tmpRotateRight = valuesOnly ? RotateRight.NULL : myTridiagonal.doQ();
         HermitianEvD.tql2(d, e, tmpRotateRight);
@@ -369,8 +379,6 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
             final ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : myTridiagonal.doQ();
             EigenvalueDecomposition.sort(d, tmpExchangeColumns);
         }
-
-        myDiagonalValues = Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(d));
 
         if (!valuesOnly) {
             this.setV(myTridiagonal.doQ());
@@ -381,19 +389,19 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     @Override
     protected MatrixStore<N> makeD() {
-        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<>(myDiagonalValues, null, null, ZERO);
+        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<>(Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(d)), null, null, ZERO);
         return this.wrap(tmpDiagonal).diagonal(false).get();
     }
 
     @Override
     protected Array1D<ComplexNumber> makeEigenvalues() {
 
-        final int tmpDim = myDiagonalValues.size();
+        final int length = d.length;
 
-        final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.makeZero(tmpDim);
+        final Array1D<ComplexNumber> retVal = Array1D.COMPLEX.makeZero(length);
 
-        for (int ij = 0; ij < tmpDim; ij++) {
-            retVal.set(ij, ComplexNumber.valueOf(myDiagonalValues.doubleValue(ij)));
+        for (int ij = 0; ij < length; ij++) {
+            retVal.set(ij, ComplexNumber.valueOf(d[ij]));
         }
 
         return retVal;

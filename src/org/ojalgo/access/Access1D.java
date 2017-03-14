@@ -208,15 +208,20 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         return StreamSupport.stream(this.spliterator(), parallel);
     }
 
+    default void supplyTo(final double[] receiver) {
+        final int limit = Math.min(receiver.length, (int) this.count());
+        for (int i = 0; i < limit; i++) {
+            receiver[i] = this.doubleValue(i);
+        }
+    }
+
     default double[] toRawCopy1D() {
 
         final int tmpLength = (int) this.count();
 
         final double[] retVal = new double[tmpLength];
 
-        for (int i = 0; i < tmpLength; i++) {
-            retVal[i] = this.doubleValue(i);
-        }
+        this.supplyTo(retVal);
 
         return retVal;
     }

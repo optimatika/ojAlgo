@@ -69,7 +69,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
-        boolean doDecompose(final double[][] data, final boolean valuesOnly) {
+        protected boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
             if (this.checkSymmetry()) {
                 this.doSymmetric(data, valuesOnly);
@@ -93,7 +93,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
-        boolean doDecompose(final double[][] data, final boolean valuesOnly) {
+        protected boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
             this.doGeneral(data, valuesOnly);
 
@@ -128,7 +128,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         @Override
-        boolean doDecompose(final double[][] data, final boolean valuesOnly) {
+        protected boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
             this.doSymmetric(data, valuesOnly);
 
@@ -143,10 +143,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      * @serial internal storage of eigenvalues.
      */
     private double[] d = null, e = null;
-
     private transient MatrixStore<Double> myInverse = null;
     private boolean myOrdered = true;
-
     /**
      * Array for internal storage of eigenvectors.
      *
@@ -364,7 +362,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return null;
     }
 
-    abstract boolean doDecompose(double[][] data, boolean valuesOnly);
+    protected abstract boolean doDecompose(double[][] data, boolean valuesOnly);
 
     final void doGeneral(final double[][] data, final boolean valuesOnly) {
 
