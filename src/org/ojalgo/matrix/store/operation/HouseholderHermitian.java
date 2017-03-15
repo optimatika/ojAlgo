@@ -46,7 +46,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
     public static final HouseholderHermitian SETUP = new HouseholderHermitian();
 
-    public static int THRESHOLD = 64;
+    public static int THRESHOLD = 256;
 
     public static void invoke(final BigDecimal[] data, final Householder.Big householder, final BigDecimal[] worker) {
 
