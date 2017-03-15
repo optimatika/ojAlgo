@@ -33,7 +33,6 @@ public abstract class COPY implements BLAS1 {
         for (int i = first; i < limit; i++) {
             destination[destinationOffset + i] = source[sourceOffset + i];
         }
-
     }
 
 }

@@ -81,22 +81,22 @@ public final class HermitianRank2Update extends MatrixOperation {
         }
     }
 
-    public static void invoke(final double[] aData, final int aFirstCol, final int aColLimit, final double[] aVector1, final double[] aVector2) {
+    public static void invoke(final double[] data, final int first, final int limit, final double[] vector1, final double[] vector2) {
 
-        final int tmpLength = aVector1.length; // Should be the same as aVector1.length and the "row-dim" of aData.
+        final int tmpLength = vector1.length; // Should be the same as aVector1.length and the "row-dim" of aData.
 
         double tmpVal1j;
         double tmpVal2j;
 
         int tmpIndex;
-        for (int j = aFirstCol; j < aColLimit; j++) {
+        for (int j = first; j < limit; j++) {
 
-            tmpVal1j = aVector1[j];
-            tmpVal2j = aVector2[j];
+            tmpVal1j = vector1[j];
+            tmpVal2j = vector2[j];
 
             tmpIndex = j + (j * tmpLength);
             for (int i = j; i < tmpLength; i++) {
-                aData[tmpIndex++] -= ((aVector2[i] * tmpVal1j) + (aVector1[i] * tmpVal2j));
+                data[tmpIndex++] -= ((vector2[i] * tmpVal1j) + (vector1[i] * tmpVal2j));
             }
         }
     }
