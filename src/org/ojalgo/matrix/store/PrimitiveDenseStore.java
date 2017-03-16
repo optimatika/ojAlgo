@@ -1233,7 +1233,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public void tred2(final BasicArray<Double> mainDiagonal, final BasicArray<Double> offDiagonal, final boolean yesvecs) {
-        HouseholderHermitian.tred2j(data, ((Primitive64Array) mainDiagonal).data, ((Primitive64Array) offDiagonal).data, yesvecs);
+        EvD1D.tred2j(data, ((Primitive64Array) mainDiagonal).data, ((Primitive64Array) offDiagonal).data, yesvecs);
     }
 
     public void visitColumn(final long row, final long col, final VoidFunction<Double> visitor) {

@@ -3,6 +3,12 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.util.Arrays;
+
+import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.blas.COPY;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.scalar.ComplexNumber;
 
 public abstract class EvD1D {
@@ -555,6 +561,244 @@ public abstract class EvD1D {
 
     private EvD1D() {
         super();
+    }
+
+    /**
+     * Ursprung JAMA men refactored till ojAlgos egna strukturer
+     */
+    public static void tred2j(final double[] data, final double[] d, final double[] e, final boolean yesvecs) {
+    
+        /*
+         * Symmetric Householder reduction to tridiagonal form. The original version of this code was taken
+         * from JAMA. That code is in turn derived from the Algol procedures tred2 by Bowdler, Martin,
+         * Reinsch, and Wilkinson, Handbook for Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
+         * Fortran subroutine in EISPACK. tred2 is also described in Numerical Recipes. The array d will hold
+         * the main diagonal of the tridiagonal result, and e will hold the off (super and sub) diagonals of
+         * the tridiagonal result
+         */
+    
+        final int n = d.length; // rows, columns, structure
+        final int tmpLast = n - 1;
+    
+        double scale;
+        double h;
+        double f;
+        double g;
+        double tmpVal; // Nothing special, just some transient value
+    
+        final int tmpRowDim = n;
+    
+        // Copy the last column (same as the last row) of z to d
+        // The last row/column is the first to be worked on in the main loop
+        COPY.invoke(data, tmpRowDim * tmpLast, d, 0, 0, n);
+    
+        // Householder reduction to tridiagonal form.
+        for (int i = tmpLast; i > 0; i--) { // row index of target householder point
+            final int l = i - 1; // col index of target householder point
+    
+            h = scale = PrimitiveMath.ZERO;
+    
+            // Calc the norm of the row/col to zero out - to avoid under/overflow.
+            for (int k = 0; k < i; k++) {
+                // scale += PrimitiveFunction.ABS.invoke(d[k]);
+                scale = PrimitiveFunction.MAX.invoke(scale, PrimitiveFunction.ABS.invoke(d[k]));
+            }
+    
+            if (scale == PrimitiveMath.ZERO) {
+                // Skip generation, already zero
+                e[i] = d[l];
+                for (int j = 0; j < i; j++) {
+                    d[j] = data[l + (tmpRowDim * j)];
+                    data[i + (tmpRowDim * j)] = PrimitiveMath.ZERO; // Are both needed?
+                    data[j + (tmpRowDim * i)] = PrimitiveMath.ZERO; // Could cause cache-misses
+                }
+    
+            } else {
+                // Generate Householder vector.
+    
+                for (int k = 0; k < i; k++) {
+                    tmpVal = d[k] /= scale;
+                    h += tmpVal * tmpVal; // d[k] * d[k]
+                }
+                f = d[l];
+                g = PrimitiveFunction.SQRT.invoke(h);
+                if (f > 0) {
+                    g = -g;
+                }
+                e[i] = scale * g;
+                h -= f * g;
+                d[l] = f - g;
+                Arrays.fill(e, 0, i, PrimitiveMath.ZERO);
+    
+                // Apply similarity transformation to remaining columns.
+                // Remaing refers to all columns "before" the target col
+                for (int j = 0; j < i; j++) {
+                    f = d[j];
+                    data[j + (tmpRowDim * i)] = f;
+                    g = e[j] + (data[j + (tmpRowDim * j)] * f);
+                    for (int k = j + 1; k <= l; k++) {
+                        tmpVal = data[k + (tmpRowDim * j)];
+                        g += tmpVal * d[k]; // access the same element in z twice
+                        e[k] += tmpVal * f;
+                    }
+                    e[j] = g;
+                }
+                f = PrimitiveMath.ZERO;
+                for (int j = 0; j < i; j++) {
+                    e[j] /= h;
+                    f += e[j] * d[j];
+                }
+                tmpVal = f / (h + h);
+                AXPY.invoke(e, 0, 1, -tmpVal, d, 0, 1, 0, i);
+                for (int j = 0; j < i; j++) {
+                    f = d[j];
+                    g = e[j];
+                    for (int k = j; k <= l; k++) {
+                        data[k + (tmpRowDim * j)] -= ((f * e[k]) + (g * d[k]));
+                    }
+                    d[j] = data[l + (tmpRowDim * j)];
+                    data[i + (tmpRowDim * j)] = PrimitiveMath.ZERO;
+                }
+            }
+            d[i] = h;
+        }
+    
+        // Accumulate transformations.
+        if (yesvecs) {
+    
+            for (int i = 0; i < tmpLast; i++) {
+    
+                final int l = i + 1;
+    
+                data[tmpLast + (tmpRowDim * i)] = data[i + (tmpRowDim * i)];
+                data[i + (tmpRowDim * i)] = PrimitiveMath.ONE;
+                h = d[l];
+                if (h != PrimitiveMath.ZERO) {
+                    for (int k = 0; k <= i; k++) {
+                        d[k] = data[k + (tmpRowDim * l)] / h;
+                    }
+                    for (int j = 0; j <= i; j++) {
+                        g = PrimitiveMath.ZERO;
+                        for (int k = 0; k <= i; k++) {
+                            g += data[k + (tmpRowDim * l)] * data[k + (tmpRowDim * j)];
+                        }
+                        for (int k = 0; k <= i; k++) {
+                            data[k + (tmpRowDim * j)] -= g * d[k];
+                        }
+                    }
+                }
+                for (int k = 0; k <= i; k++) {
+                    data[k + (tmpRowDim * l)] = PrimitiveMath.ZERO;
+                }
+            }
+            for (int j = 0; j < n; j++) {
+                d[j] = data[tmpLast + (tmpRowDim * j)];
+                data[tmpLast + (tmpRowDim * j)] = PrimitiveMath.ZERO;
+            }
+            data[tmpLast + (tmpRowDim * tmpLast)] = PrimitiveMath.ONE;
+    
+            e[0] = PrimitiveMath.ZERO;
+        }
+    
+    }
+
+    /**
+     * Ursprung Numerical Recipies
+     */
+    public static void tred2nr(final double[] data, final double[] d, final double[] e, final boolean yesvecs) {
+    
+        final int n = d.length;
+        int l;
+        final int tmpRowDim = n;
+    
+        double scale;
+        double h;
+        double hh;
+        double g;
+        double f;
+    
+        for (int i = n - 1; i > 0; i--) {
+    
+            l = i - 1;
+    
+            scale = PrimitiveMath.ZERO;
+            h = PrimitiveMath.ZERO;
+    
+            if (l > 0) {
+    
+                for (int k = 0; k < i; k++) {
+                    scale += PrimitiveFunction.ABS.invoke(data[i + (k * tmpRowDim)]);
+                }
+    
+                // if (scale == PrimitiveMath.ZERO) {
+                if (Double.compare(scale, PrimitiveMath.ZERO) == 0) {
+                    e[i] = data[i + (l * tmpRowDim)];
+                } else {
+                    for (int k = 0; k < i; k++) {
+                        data[i + (k * tmpRowDim)] /= scale;
+                        h += data[i + (k * tmpRowDim)] * data[i + (k * tmpRowDim)];
+                    }
+                    f = data[i + (l * tmpRowDim)];
+                    g = (f >= PrimitiveMath.ZERO) ? -PrimitiveFunction.SQRT.invoke(h) : PrimitiveFunction.SQRT.invoke(h);
+                    e[i] = scale * g;
+                    h -= f * g;
+                    data[i + (l * tmpRowDim)] = f - g;
+                    f = PrimitiveMath.ZERO;
+                    for (int j = 0; j < i; j++) {
+                        if (yesvecs) {
+                            data[j + (i * tmpRowDim)] = data[i + (j * tmpRowDim)] / h;
+                        }
+                        g = PrimitiveMath.ZERO;
+                        for (int k = 0; k < (j + 1); k++) {
+                            g += data[j + (k * tmpRowDim)] * data[i + (k * tmpRowDim)];
+                        }
+                        for (int k = j + 1; k < i; k++) {
+                            g += data[k + (j * tmpRowDim)] * data[i + (k * tmpRowDim)];
+                        }
+                        e[j] = g / h;
+                        f += e[j] * data[i + (j * tmpRowDim)];
+                    }
+                    hh = f / (h + h);
+                    for (int j = 0; j < i; j++) {
+                        f = data[i + (j * tmpRowDim)];
+                        e[j] = g = e[j] - (hh * f);
+                        for (int k = 0; k < (j + 1); k++) {
+                            data[j + (k * tmpRowDim)] -= ((f * e[k]) + (g * data[i + (k * tmpRowDim)]));
+                        }
+                    }
+                }
+            } else {
+                e[i] = data[i + (l * tmpRowDim)];
+            }
+            d[i] = h;
+        }
+        if (yesvecs) {
+            d[0] = PrimitiveMath.ZERO;
+        }
+        e[0] = PrimitiveMath.ZERO;
+        for (int i = 0; i < n; i++) {
+            if (yesvecs) {
+                if (d[i] != PrimitiveMath.ZERO) {
+                    for (int j = 0; j < i; j++) {
+                        g = PrimitiveMath.ZERO;
+                        for (int k = 0; k < i; k++) {
+                            g += data[i + (k * tmpRowDim)] * data[k + (j * tmpRowDim)];
+                        }
+                        for (int k = 0; k < i; k++) {
+                            data[k + (j * tmpRowDim)] -= g * data[k + (i * tmpRowDim)];
+                        }
+                    }
+                }
+                d[i] = data[i + (i * tmpRowDim)];
+                data[i + (i * tmpRowDim)] = PrimitiveMath.ONE;
+                for (int j = 0; j < i; j++) {
+                    data[i + (j * tmpRowDim)] = PrimitiveMath.ZERO;
+                    data[j + (i * tmpRowDim)] = PrimitiveMath.ZERO;
+                }
+            } else {
+                d[i] = data[i + (i * tmpRowDim)];
+            }
+        }
     }
 
 }

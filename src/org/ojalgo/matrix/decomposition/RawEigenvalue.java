@@ -38,7 +38,6 @@ import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.store.operation.HouseholderHermitian;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
@@ -397,7 +396,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         myTransposedV = valuesOnly ? null : data;
 
         // Tridiagonalize.
-        HouseholderHermitian.tred2jj(data, d, e, !valuesOnly);
+        EvD2D.tred2jj(data, d, e, !valuesOnly);
 
         for (int i = 1; i < size; i++) {
             e[i - 1] = e[i];

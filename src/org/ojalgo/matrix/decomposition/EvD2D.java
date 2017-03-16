@@ -3,6 +3,14 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.util.Arrays;
+
+import org.ojalgo.array.blas.AXPY;
+import org.ojalgo.array.blas.COPY;
+import org.ojalgo.array.blas.DOT;
+import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
+
 public abstract class EvD2D {
 
     /**
@@ -586,6 +594,152 @@ public abstract class EvD2D {
 
     private EvD2D() {
         super();
+    }
+
+    /**
+     * Ursprung JAMA och används i JAMA's dekomposition
+     */
+    public static void tred2jj(final double[][] data, final double[] d, final double[] e, final boolean yesvecs) {
+    
+        /*
+         * Symmetric Householder reduction to tridiagonal form. The original version of this code was taken
+         * from JAMA. That code is in turn derived from the Algol procedures tred2 by Bowdler, Martin,
+         * Reinsch, and Wilkinson, Handbook for Auto. Comp., Vol.ii-Linear Algebra, and the corresponding
+         * Fortran subroutine in EISPACK. tred2 is also described in Numerical Recipes. The array d will hold
+         * the main diagonal of the tridiagonal result, and e will hold the off (super and sub) diagonals of
+         * the tridiagonal result
+         */
+    
+        final int n = d.length; // rows, columns, structure
+        final int tmpLast = n - 1;
+    
+        double scale;
+        double h;
+        double f;
+        double g;
+        double tmpVal; // Nothing special, just some transient value
+    
+        // Copy the last column (same as the last row) of z to d
+        // The last row/column is the first to be worked on in the main loop
+        COPY.invoke(data[tmpLast], 0, d, 0, 0, n);
+    
+        // Householder reduction to tridiagonal form.
+        for (int i = tmpLast; i > 0; i--) { // row index of target householder point
+            final int l = i - 1; // col index of target householder point
+    
+            h = scale = PrimitiveMath.ZERO;
+    
+            // Calc the norm of the row/col to zero out - to avoid under/overflow.
+            for (int k = 0; k < i; k++) {
+                // scale += PrimitiveFunction.ABS.invoke(d[k]);
+                scale = PrimitiveFunction.MAX.invoke(scale, PrimitiveFunction.ABS.invoke(d[k]));
+            }
+            if (scale == PrimitiveMath.ZERO) {
+                // Skip generation, already zero
+                e[i] = d[l];
+                for (int j = 0; j < i; j++) {
+                    d[j] = data[j][l];
+                    data[j][i] = PrimitiveMath.ZERO; // Are both needed?
+                    data[i][j] = PrimitiveMath.ZERO; // Could cause cache-misses
+                }
+    
+            } else {
+                // Generate Householder vector.
+    
+                for (int k = 0; k < i; k++) {
+                    tmpVal = d[k] /= scale;
+                    h += tmpVal * tmpVal; // d[k] * d[k]
+                }
+                f = d[l];
+                g = PrimitiveFunction.SQRT.invoke(h);
+                if (f > 0) {
+                    g = -g;
+                }
+                e[i] = scale * g;
+                h = h - (f * g);
+                d[l] = f - g;
+                Arrays.fill(e, 0, i, PrimitiveMath.ZERO);
+    
+                // Apply similarity transformation to remaining columns.
+                // Remaing refers to all columns "before" the target col
+                for (int j = 0; j < i; j++) {
+                    f = d[j];
+                    data[i][j] = f;
+                    final double[] tmpVt_j = data[j];
+                    g = e[j] + (tmpVt_j[j] * f);
+                    for (int k = j + 1; k <= l; k++) {
+                        tmpVal = tmpVt_j[k];
+                        g += tmpVal * d[k];
+                        e[k] += tmpVal * f;
+                    }
+                    e[j] = g;
+                }
+                f = PrimitiveMath.ZERO;
+                for (int j = 0; j < i; j++) {
+                    e[j] /= h;
+                    f += e[j] * d[j];
+                }
+                tmpVal = f / (h + h);
+                AXPY.invoke(e, 0, 1, -tmpVal, d, 0, 1, 0, i);
+                for (int j = 0; j < i; j++) {
+                    f = d[j];
+                    g = e[j];
+                    for (int k = j; k <= l; k++) {
+                        data[j][k] -= ((f * e[k]) + (g * d[k]));
+                    }
+                    d[j] = data[j][l];
+                    data[j][i] = PrimitiveMath.ZERO;
+                }
+            }
+            d[i] = h;
+        }
+    
+        // Accumulate transformations.
+        for (int i = 0; i < tmpLast; i++) {
+    
+            final double[] tmpVt_i = data[i];
+            final double[] tmpVt_i1 = data[i + 1];
+    
+            //V[n - 1][i] = V[i][i];
+            tmpVt_i[tmpLast] = tmpVt_i[i];
+            //V[i][i] = ONE;
+            tmpVt_i[i] = PrimitiveMath.ONE;
+            h = d[i + 1];
+            if (h != PrimitiveMath.ZERO) {
+                for (int k = 0; k <= i; k++) {
+                    //d[k] = V[k][i + 1] / h;
+                    d[k] = tmpVt_i1[k] / h;
+                }
+    
+                for (int j = 0; j <= i; j++) {
+                    final double tmpDotProd = DOT.invoke(tmpVt_i1, 0, data[j], 0, 0, i + 1);
+                    //                    for (int k = 0; k <= i; k++) {
+                    //                        //g += V[k][i + 1] * V[k][j];
+                    //                        g += tmpVt_i1[k] * tmpVt_j[k];
+                    //                    }
+                    AXPY.invoke(data[j], 0, 1, -tmpDotProd, d, 0, 1, 0, i + 1);
+                    //                    for (int k = 0; k <= i; k++) {
+                    //                        //V[k][j] -= g * d[k];
+                    //                        tmpVt_j[k] -= g * d[k];
+                    //                    }
+                }
+            }
+            Arrays.fill(tmpVt_i1, 0, i + 1, PrimitiveMath.ZERO);
+            //            for (int k = 0; k <= i; k++) {
+            //                //V[k][i + 1] = ZERO;
+            //                tmpVt_i1[k] = ZERO;
+            //            }
+        }
+    
+        for (int j = 0; j < n; j++) {
+            //d[j] = V[n - 1][j];
+            d[j] = data[j][tmpLast];
+            //V[n - 1][j] = ZERO;
+            data[j][tmpLast] = PrimitiveMath.ZERO;
+        }
+        //V[n - 1][n - 1] = ONE;
+        data[tmpLast][tmpLast] = PrimitiveMath.ONE;
+        e[0] = PrimitiveMath.ZERO;
     }
 
 }
