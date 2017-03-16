@@ -261,16 +261,16 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
 
     @Override
     @SuppressWarnings("unchecked")
-    protected boolean doCompute(final Access2D.Collectable<N, ? super PhysicalStore<N>> aStore, final boolean singularValuesOnly, final boolean fullSize) {
+    protected boolean doCompute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
 
-        final int tmpMinDim = (int) Math.min(aStore.countRows(), aStore.countColumns());
+        this.computeBidiagonal(matrix, fullSize);
 
-        this.computeBidiagonal(aStore, fullSize);
+        final int tmpDiagDim = this.getBidiagonalDim();
 
         final DecompositionStore<N> tmpSimilar = this.copy(this.getBidiagonalAccessD());
         this.setD(tmpSimilar);
 
-        this.setSingularValues(Array1D.PRIMITIVE64.makeZero(tmpMinDim));
+        this.setSingularValues(Array1D.PRIMITIVE64.makeZero(tmpDiagDim));
 
         Rotation<N>[] tmpRotations = new Rotation[2]; // [Givens - Jacobi, Jacobi]
 
@@ -280,14 +280,14 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
 
         final N tmpZero = this.scalar().zero().getNumber();
         boolean tmpNotAllZeros = true;
-        for (int l = 0; tmpNotAllZeros && (l < tmpMinDim); l++) {
+        for (int l = 0; tmpNotAllZeros && (l < tmpDiagDim); l++) {
 
             tmpNotAllZeros = false;
 
             int i;
             //for (int i0 = tmpMinDim - 1; i0 > 0; i0--) { // Performs much slower
-            for (int i0 = 1; i0 < tmpMinDim; i0++) {
-                for (int j = 0; j < (tmpMinDim - i0); j++) {
+            for (int i0 = 1; i0 < tmpDiagDim; i0++) {
+                for (int j = 0; j < (tmpDiagDim - i0); j++) {
                     i = i0 + j;
 
                     if (!tmpSimilar.isSmall(i, j, PrimitiveMath.ONE) || !tmpSimilar.isSmall(j, i, PrimitiveMath.ONE)) {
@@ -313,7 +313,7 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
         }
 
         double tmpSingularValue;
-        for (int ij = 0; ij < tmpMinDim; ij++) {
+        for (int ij = 0; ij < tmpDiagDim; ij++) {
 
             if (tmpSimilar.isSmall(ij, ij, PrimitiveMath.ONE)) {
 
@@ -367,26 +367,6 @@ abstract class SVDold30<N extends Number & Comparable<N>> extends SingularValueD
         });
 
         return this.computed(true);
-    }
-
-    protected DiagonalAccess<N> extractSimilar(final PhysicalStore<N> aStore, final boolean aNormalAspectRatio) {
-
-        final DecompositionStore<N> tmpArray2D = ((DecompositionStore<N>) aStore);
-
-        final Array1D<N> tmpMain = (Array1D<N>) tmpArray2D.sliceDiagonal(0, 0);
-
-        if (aNormalAspectRatio) {
-
-            final Array1D<N> tmpSuper = (Array1D<N>) tmpArray2D.sliceDiagonal(0, 1);
-
-            return new DiagonalAccess<>(tmpMain, tmpSuper, null, this.scalar().zero().getNumber());
-
-        } else {
-
-            final Array1D<N> tmpSub = (Array1D<N>) tmpArray2D.sliceDiagonal(1, 0);
-
-            return new DiagonalAccess<>(tmpMain, null, tmpSub, this.scalar().zero().getNumber());
-        }
     }
 
     @Override

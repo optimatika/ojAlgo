@@ -44,8 +44,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     private transient MatrixStore<N> myQ1;
     private transient MatrixStore<N> myQ2;
     private transient Array1D<Double> mySingularValues;
-    private boolean mySingularValuesOnly = false;
     private boolean myTransposed = false;
+    private boolean myValuesOnly = false;
 
     @SuppressWarnings("unused")
     private SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
@@ -158,7 +158,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     public MatrixStore<N> getQ1() {
 
-        if (!mySingularValuesOnly && this.isComputed() && (myQ1 == null)) {
+        if (!myValuesOnly && this.isComputed() && (myQ1 == null)) {
 
             if (myTransposed) {
                 myQ1 = this.makeQ2();
@@ -172,7 +172,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     public MatrixStore<N> getQ2() {
 
-        if (!mySingularValuesOnly && this.isComputed() && (myQ2 == null)) {
+        if (!myValuesOnly && this.isComputed() && (myQ2 == null)) {
             if (myTransposed) {
                 myQ2 = this.makeQ1();
             } else {
@@ -271,7 +271,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
         myInverse = null;
 
-        mySingularValuesOnly = false;
+        myValuesOnly = false;
         myTransposed = false;
     }
 
@@ -339,7 +339,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
             myTransposed = true;
         }
 
-        mySingularValuesOnly = singularValuesOnly;
+        myValuesOnly = singularValuesOnly;
 
         boolean retVal = false;
 
@@ -369,6 +369,10 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     protected DiagonalAccess<N> getBidiagonalAccessD() {
         return myBidiagonal.getDiagonalAccessD();
+    }
+
+    protected int getBidiagonalDim() {
+        return myBidiagonal.getMinDim();
     }
 
     protected DecompositionStore<N> getBidiagonalQ1() {
