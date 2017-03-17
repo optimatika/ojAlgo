@@ -44,11 +44,11 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
 
     }
 
-    public static final Factory<BigDecimal> BIG = typical -> new TridiagonalDecomposition.Big();
+    public static final Factory<BigDecimal> BIG = typical -> new SimultaneousTridiagonal.Big();
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new TridiagonalDecomposition.Complex();
+    public static final Factory<ComplexNumber> COMPLEX = typical -> new SimultaneousTridiagonal.Complex();
 
-    public static final Factory<Double> PRIMITIVE = typical -> new TridiagonalDecomposition.Primitive();
+    public static final Factory<Double> PRIMITIVE = typical -> new SimultaneousTridiagonal.Primitive();
 
     @SuppressWarnings("unchecked")
     public static <N extends Number> Tridiagonal<N> make(final Access2D<N> typical) {

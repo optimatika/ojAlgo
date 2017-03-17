@@ -31,8 +31,8 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
     private DecompositionStore<N> myInPlace;
     private int myRowDim;
 
-    protected InPlaceDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
-        super(aFactory);
+    protected InPlaceDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
+        super(factory);
     }
 
     public final MatrixStore<N> getInverse() {

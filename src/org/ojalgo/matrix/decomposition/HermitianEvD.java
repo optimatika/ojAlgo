@@ -50,7 +50,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     static final class Big extends HermitianEvD<BigDecimal> {
 
         Big() {
-            super(BigDenseStore.FACTORY, new TridiagonalDecomposition.Big());
+            super(BigDenseStore.FACTORY, new SimultaneousTridiagonal.Big());
         }
 
     }
@@ -58,7 +58,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     static final class Complex extends HermitianEvD<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY, new TridiagonalDecomposition.Complex());
+            super(ComplexDenseStore.FACTORY, new SimultaneousTridiagonal.Complex());
         }
 
     }
@@ -79,7 +79,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     static final class Primitive extends HermitianEvD<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY, new TridiagonalDecomposition.Primitive());
+            super(PrimitiveDenseStore.FACTORY, new SimultaneousTridiagonal.Primitive());
         }
 
     }
@@ -174,14 +174,14 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     private double[] d;
     private double[] e;
     private transient MatrixStore<N> myInverse;
-    private final TridiagonalDecomposition<N> myTridiagonal;
+    private final SimultaneousTridiagonal<N> myTridiagonal;
 
     @SuppressWarnings("unused")
     private HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         this(aFactory, null);
     }
 
-    protected HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final TridiagonalDecomposition<N> aTridiagonal) {
+    protected HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final SimultaneousTridiagonal<N> aTridiagonal) {
 
         super(aFactory);
 

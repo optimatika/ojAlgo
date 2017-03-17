@@ -150,7 +150,7 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     @SuppressWarnings("unchecked")
     public static final Tridiagonal<Double>[] getTridiagonalPrimitive() {
-        return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new TridiagonalDecomposition.Primitive(), new TridiagonalAltDecomp() };
+        return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new SimultaneousTridiagonal.Primitive(), new RawTridiagonal() };
     }
 
     protected MatrixDecompositionTests() {

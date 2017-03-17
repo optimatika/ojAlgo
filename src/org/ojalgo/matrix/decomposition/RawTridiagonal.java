@@ -30,12 +30,12 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-class TridiagonalAltDecomp extends InPlaceDecomposition<Double> implements Tridiagonal<Double> {
+class RawTridiagonal extends TridiagonalDecomposition<Double> {
 
     BasicArray<Double> myMain;
     BasicArray<Double> myOff;
 
-    TridiagonalAltDecomp() {
+    RawTridiagonal() {
         super(PrimitiveDenseStore.FACTORY);
     }
 
