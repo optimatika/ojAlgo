@@ -36,7 +36,7 @@ import org.openjdk.jmh.runner.RunnerException;
  *
  * <pre>
  * # Run complete. Total time: 03:49:11
- * 
+ *
  * Benchmark                              (dim)   Mode  Cnt        Score        Error    Units
  * PrimitiveOrRawSingularValue.primitive      5  thrpt    3  1245689,416 ±   6939,980  ops/min
  * PrimitiveOrRawSingularValue.primitive     10  thrpt    3   335548,634 ±   8511,615  ops/min
@@ -64,7 +64,7 @@ import org.openjdk.jmh.runner.RunnerException;
  *
  * <pre>
  * # Run complete. Total time: 02:28:37
- * 
+ *
  * Benchmark                              (dim)   Mode  Cnt  Score   Error    Units
  * PrimitiveOrRawSingularValue.primitive    512  thrpt    3  50,619 ± 27,497  ops/min
  * PrimitiveOrRawSingularValue.primitive   1024  thrpt    3   7,994 ±  0,833  ops/min
@@ -85,7 +85,7 @@ public class PrimitiveOrRawSingularValue extends AbstractPrimitiveOrRaw<Singular
         LinearAlgebraBenchmark.run(PrimitiveOrRawSingularValue.class);
     }
 
-    @Param({ "5", "10", "20", "50", "100", "200", "500", "1000", "2000", "5000" })
+    @Param({ "500", "1000", "2000", "5000" })
     public int dim;
 
     protected SingularValue<Double> alternative = new SVDold30.Primitive();
