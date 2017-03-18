@@ -88,18 +88,18 @@ public final class HouseholderRight extends MatrixOperation {
         }
     }
 
-    public static void invoke(final double[] data, final int structure, final int first, final int limit, final int numberOfColumns,
+    public static void invoke(final double[] data, final int structure, final int firstRow, final int rowLimit, final int numberOfColumns,
             final Householder.Primitive householder, final double[] work) {
 
-        final double[] tmpHouseholderVector = householder.vector;
-        final int tmpFirstNonZero = householder.first;
-        final double tmpBeta = householder.beta;
+        final double[] vector = householder.vector;
+        final int firstNonZero = householder.first;
+        final double beta = householder.beta;
 
-        for (int j = tmpFirstNonZero; j < numberOfColumns; j++) {
-            AXPY.invoke(work, 0, 1, -(-tmpBeta * tmpHouseholderVector[j]), data, j * structure, 1, first, limit);
+        for (int j = firstNonZero; j < numberOfColumns; j++) {
+            AXPY.invoke(work, 0, 1, beta * vector[j], data, j * structure, 1, firstRow, rowLimit);
         }
-        for (int j = tmpFirstNonZero; j < numberOfColumns; j++) {
-            AXPY.invoke(data, j * structure, 1, -tmpHouseholderVector[j], work, 0, 1, first, limit);
+        for (int j = firstNonZero; j < numberOfColumns; j++) {
+            AXPY.invoke(data, j * structure, 1, -vector[j], work, 0, 1, firstRow, rowLimit);
         }
     }
 
