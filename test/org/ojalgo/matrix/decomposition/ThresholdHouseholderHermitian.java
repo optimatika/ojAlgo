@@ -24,7 +24,8 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.LinearAlgebraBenchmark;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.operation.HouseholderHermitian;
+import org.ojalgo.matrix.store.operation.HermitianRank2Update;
+import org.ojalgo.matrix.store.operation.MultiplyHermitianAndVector;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -90,7 +91,8 @@ public class ThresholdHouseholderHermitian extends AbstractThresholdTuner {
     @Setup
     public void setup() {
 
-        HouseholderHermitian.THRESHOLD = dim / z;
+        MultiplyHermitianAndVector.THRESHOLD = dim / z;
+        HermitianRank2Update.THRESHOLD = dim / z;
 
         matrix = MatrixUtils.makeSPD(dim);
     }
@@ -98,8 +100,7 @@ public class ThresholdHouseholderHermitian extends AbstractThresholdTuner {
     @Override
     @Benchmark
     public Object tune() {
-        final boolean retVal = decomposition.decompose(matrix);
-        return retVal;
+        return decomposition.decompose(matrix);
     };
 
 }

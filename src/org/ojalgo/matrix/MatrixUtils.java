@@ -482,7 +482,6 @@ public abstract class MatrixUtils {
         GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
         GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
         HermitianRank2Update.THRESHOLD = Math.min(maxValue, HermitianRank2Update.THRESHOLD);
-        HouseholderHermitian.THRESHOLD = Math.min(maxValue, HouseholderHermitian.THRESHOLD);
         HouseholderLeft.THRESHOLD = Math.min(maxValue, HouseholderLeft.THRESHOLD);
         HouseholderRight.THRESHOLD = Math.min(maxValue, HouseholderRight.THRESHOLD);
         AXPY.THRESHOLD = Math.min(maxValue, AXPY.THRESHOLD);
@@ -513,7 +512,6 @@ public abstract class MatrixUtils {
         GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
         GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
         HermitianRank2Update.THRESHOLD = Math.max(minValue, HermitianRank2Update.THRESHOLD);
-        HouseholderHermitian.THRESHOLD = Math.max(minValue, HouseholderHermitian.THRESHOLD);
         HouseholderLeft.THRESHOLD = Math.max(minValue, HouseholderLeft.THRESHOLD);
         HouseholderRight.THRESHOLD = Math.max(minValue, HouseholderRight.THRESHOLD);
         AXPY.THRESHOLD = Math.max(minValue, AXPY.THRESHOLD);

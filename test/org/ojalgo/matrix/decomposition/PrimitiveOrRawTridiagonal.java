@@ -111,7 +111,7 @@ public class PrimitiveOrRawTridiagonal extends AbstractPrimitiveOrRaw<Tridiagona
         LinearAlgebraBenchmark.run(PrimitiveOrRawTridiagonal.class);
     }
 
-    @Param({ "500", "1000", "2000" })
+    @Param({ "100", "200", "500", "1000" })
     public int dim;
 
     MatrixStore<Double> matrix;
@@ -148,12 +148,12 @@ public class PrimitiveOrRawTridiagonal extends AbstractPrimitiveOrRaw<Tridiagona
 
     @Override
     protected Tridiagonal<Double> makePrimitive() {
-        return new DelegatingTridiagonal.Primitive();
+        return new SimultaneousTridiagonal.Primitive();
     }
 
     @Override
     protected Tridiagonal<Double> makeRaw() {
-        return new SimultaneousTridiagonal.Primitive();
+        return new RawTridiagonal();
     }
 
 }

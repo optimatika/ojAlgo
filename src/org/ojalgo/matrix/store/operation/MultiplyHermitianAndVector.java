@@ -38,63 +38,59 @@ public final class MultiplyHermitianAndVector extends MatrixOperation {
 
     public static final MultiplyHermitianAndVector SETUP = new MultiplyHermitianAndVector();
 
-    public static int THRESHOLD = 64;
+    public static int THRESHOLD = 256;
 
-    public static void invoke(final BigDecimal[] productMtrx, final int aFirst, final int aLimit, final BigDecimal[] aSymmetric, final BigDecimal[] aVector,
-            final int aFirstNonZero) {
+    public static void invoke(final BigDecimal[] productMatrix, final int firstRow, final int rowLimit, final BigDecimal[] hermitianMatrix,
+            final BigDecimal[] rightVector, final int firstColumn) {
 
-        final int tmpRowDim = aVector.length;
+        final int structure = rightVector.length;
 
         BigDecimal tmpVal;
-        for (int i = aFirst; i < aLimit; i++) {
+        for (int i = firstRow; i < rowLimit; i++) {
             tmpVal = BigMath.ZERO;
-            for (int c = aFirstNonZero; c < i; c++) {
-                //tmpVal += aSymmetric[i + c * tmpRowDim] * aVector[c];
-                tmpVal = tmpVal.add(aSymmetric[i + (c * tmpRowDim)].multiply(aVector[c]));
+            for (int c = firstColumn; c < i; c++) {
+                tmpVal = tmpVal.add(hermitianMatrix[i + (c * structure)].multiply(rightVector[c]));
             }
-            for (int c = i; c < tmpRowDim; c++) {
-                //tmpVal += aSymmetric[c + i * tmpRowDim] * aVector[c];
-                tmpVal = tmpVal.add(aSymmetric[c + (i * tmpRowDim)].multiply(aVector[c]));
+            for (int c = i; c < structure; c++) {
+                tmpVal = tmpVal.add(hermitianMatrix[c + (i * structure)].multiply(rightVector[c]));
             }
-            productMtrx[i] = tmpVal;
+            productMatrix[i] = tmpVal;
         }
     }
 
-    public static void invoke(final ComplexNumber[] productMtrx, final int aFirst, final int aLimit, final ComplexNumber[] aSymmetric,
-            final ComplexNumber[] aVector, final int aFirstNonZero) {
+    public static void invoke(final ComplexNumber[] productMatrix, final int firstRow, final int rowLimit, final ComplexNumber[] hermitianMatrix,
+            final ComplexNumber[] rightVector, final int firstColumn) {
 
-        final int tmpRowDim = aVector.length;
+        final int structure = rightVector.length;
 
         ComplexNumber tmpVal;
-        for (int i = aFirst; i < aLimit; i++) {
+        for (int i = firstRow; i < rowLimit; i++) {
             tmpVal = ComplexNumber.ZERO;
-            for (int c = aFirstNonZero; c < i; c++) {
-                //tmpVal += aSymmetric[i + c * tmpRowDim] * aVector[c];
-                tmpVal = tmpVal.add(aSymmetric[i + (c * tmpRowDim)].multiply(aVector[c]));
+            for (int c = firstColumn; c < i; c++) {
+                tmpVal = tmpVal.add(hermitianMatrix[i + (c * structure)].multiply(rightVector[c]));
             }
-            for (int c = i; c < tmpRowDim; c++) {
-                //tmpVal += aSymmetric[c + i * tmpRowDim] * aVector[c];
-                tmpVal = tmpVal.add(aSymmetric[c + (i * tmpRowDim)].conjugate().multiply(aVector[c]));
+            for (int c = i; c < structure; c++) {
+                tmpVal = tmpVal.add(hermitianMatrix[c + (i * structure)].conjugate().multiply(rightVector[c]));
             }
-            productMtrx[i] = tmpVal;
+            productMatrix[i] = tmpVal;
         }
     }
 
-    public static void invoke(final double[] productMtrx, final int aFirst, final int aLimit, final double[] aSymmetric, final double[] aVector,
-            final int aFirstNonZero) {
+    public static void invoke(final double[] productMatrix, final int firstRow, final int rowLimit, final double[] hermitianMatrix, final double[] rightVector,
+            final int firstColumn) {
 
-        final int tmpRowDim = aVector.length;
+        final int structure = rightVector.length;
 
         double tmpVal;
-        for (int i = aFirst; i < aLimit; i++) {
+        for (int i = firstRow; i < rowLimit; i++) {
             tmpVal = ZERO;
-            for (int c = aFirstNonZero; c < i; c++) {
-                tmpVal += aSymmetric[i + (c * tmpRowDim)] * aVector[c];
+            for (int c = firstColumn; c < i; c++) {
+                tmpVal += hermitianMatrix[i + (c * structure)] * rightVector[c];
             }
-            for (int c = i; c < tmpRowDim; c++) {
-                tmpVal += aSymmetric[c + (i * tmpRowDim)] * aVector[c];
+            for (int c = i; c < structure; c++) {
+                tmpVal += hermitianMatrix[c + (i * structure)] * rightVector[c];
             }
-            productMtrx[i] = tmpVal;
+            productMatrix[i] = tmpVal;
         }
     }
 

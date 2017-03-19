@@ -1225,7 +1225,8 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public void transformSymmetric(final Householder<Double> transformation) {
-        HouseholderHermitian.invoke(data, PrimitiveDenseStore.cast(transformation), new double[(int) transformation.count()]);
+
+        HouseholderHermitian.invoke(data, PrimitiveDenseStore.cast(transformation), this.getWorkerColumn());
     }
 
     public MatrixStore<Double> transpose() {

@@ -36,66 +36,66 @@ public final class HermitianRank2Update extends MatrixOperation {
 
     public static final HermitianRank2Update SETUP = new HermitianRank2Update();
 
-    public static int THRESHOLD = 64;
+    public static int THRESHOLD = 256;
 
-    public static void invoke(final BigDecimal[] aData, final int aFirstCol, final int aColLimit, final BigDecimal[] aVector1, final BigDecimal[] aVector2) {
+    public static void invoke(final BigDecimal[] data, final int firstColumn, final int columnLimit, final BigDecimal[] vector1, final BigDecimal[] vector2) {
 
-        final int tmpLength = aVector1.length; // Should be the same as aVector1.length and the "row-dim" of aData.
+        final int structure = vector1.length;
 
         BigDecimal tmpVal1j;
         BigDecimal tmpVal2j;
 
         int tmpIndex;
-        for (int j = aFirstCol; j < aColLimit; j++) {
+        for (int j = firstColumn; j < columnLimit; j++) {
 
-            tmpVal1j = aVector1[j];
-            tmpVal2j = aVector2[j];
+            tmpVal1j = vector1[j];
+            tmpVal2j = vector2[j];
 
-            tmpIndex = j + (j * tmpLength);
-            for (int i = j; i < tmpLength; i++) {
-                aData[tmpIndex] = aData[tmpIndex].subtract(aVector2[i].multiply(tmpVal1j).add(aVector1[i].multiply(tmpVal2j)));
+            tmpIndex = j + (j * structure);
+            for (int i = j; i < structure; i++) {
+                data[tmpIndex] = data[tmpIndex].subtract(vector2[i].multiply(tmpVal1j).add(vector1[i].multiply(tmpVal2j)));
                 tmpIndex++;
             }
         }
     }
 
-    public static void invoke(final ComplexNumber[] aData, final int aFirstCol, final int aColLimit, final ComplexNumber[] aVector1,
-            final ComplexNumber[] aVector2) {
+    public static void invoke(final ComplexNumber[] data, final int firstColumn, final int columnLimit, final ComplexNumber[] vector1,
+            final ComplexNumber[] vector2) {
 
-        final int tmpLength = aVector1.length; // Should be the same as aVector1.length and the "row-dim" of aData.
+        final int structure = vector1.length;
 
         ComplexNumber tmpVal1j;
         ComplexNumber tmpVal2j;
 
         int tmpIndex;
-        for (int j = aFirstCol; j < aColLimit; j++) {
+        for (int j = firstColumn; j < columnLimit; j++) {
 
-            tmpVal1j = aVector1[j].conjugate();
-            tmpVal2j = aVector2[j].conjugate();
+            tmpVal1j = vector1[j].conjugate();
+            tmpVal2j = vector2[j].conjugate();
 
-            tmpIndex = j + (j * tmpLength);
-            for (int i = j; i < tmpLength; i++) {
-                aData[tmpIndex] = aData[tmpIndex].subtract(aVector2[i].multiply(tmpVal1j).add(aVector1[i].multiply(tmpVal2j)));
+            tmpIndex = j + (j * structure);
+            for (int i = j; i < structure; i++) {
+                data[tmpIndex] = data[tmpIndex].subtract(vector2[i].multiply(tmpVal1j).add(vector1[i].multiply(tmpVal2j)));
                 tmpIndex++;
             }
         }
     }
 
-    public static void invoke(final double[] data, final int first, final int limit, final double[] vector1, final double[] vector2) {
+    public static void invoke(final double[] data, final int firstColumn, final int columnLimit, final double[] vector1, final double[] vector2) {
 
-        final int tmpLength = vector1.length; // Should be the same as aVector1.length and the "row-dim" of aData.
+        final int structure = vector1.length;
 
         double tmpVal1j;
         double tmpVal2j;
 
         int tmpIndex;
-        for (int j = first; j < limit; j++) {
+        for (int j = firstColumn; j < columnLimit; j++) {
 
             tmpVal1j = vector1[j];
             tmpVal2j = vector2[j];
 
-            tmpIndex = j + (j * tmpLength);
-            for (int i = j; i < tmpLength; i++) {
+            tmpIndex = j + (j * structure);
+            for (int i = j; i < structure; i++) {
                 data[tmpIndex++] -= ((vector2[i] * tmpVal1j) + (vector1[i] * tmpVal2j));
             }
         }

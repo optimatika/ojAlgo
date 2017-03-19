@@ -41,8 +41,6 @@ public final class HouseholderHermitian extends MatrixOperation {
 
     public static final HouseholderHermitian SETUP = new HouseholderHermitian();
 
-    public static int THRESHOLD = 256;
-
     public static void invoke(final BigDecimal[] data, final Householder.Big householder, final BigDecimal[] worker) {
 
         final BigDecimal[] tmpVector = householder.vector;
@@ -51,17 +49,17 @@ public final class HouseholderHermitian extends MatrixOperation {
         final BigDecimal tmpBeta = householder.beta;
         final int tmpCount = tmpLength - tmpFirst;
 
-        if (tmpCount > THRESHOLD) {
+        if (tmpCount > MultiplyHermitianAndVector.THRESHOLD) {
 
             final DivideAndConquer tmpConqurer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    MultiplyHermitianAndVector.invoke(worker, aFirst, aLimit, data, tmpVector, tmpFirst);
+                protected void conquer(final int first, final int limit) {
+                    MultiplyHermitianAndVector.invoke(worker, first, limit, data, tmpVector, tmpFirst);
                 }
             };
 
-            tmpConqurer.invoke(tmpFirst, tmpLength, THRESHOLD);
+            tmpConqurer.invoke(tmpFirst, tmpLength, MultiplyHermitianAndVector.THRESHOLD);
 
         } else {
 
@@ -80,17 +78,17 @@ public final class HouseholderHermitian extends MatrixOperation {
             worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c])));
         }
 
-        if (tmpCount > THRESHOLD) {
+        if (tmpCount > HermitianRank2Update.THRESHOLD) {
 
             final DivideAndConquer tmpConqurer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    HermitianRank2Update.invoke(data, aFirst, aLimit, tmpVector, worker);
+                protected void conquer(final int first, final int limit) {
+                    HermitianRank2Update.invoke(data, first, limit, tmpVector, worker);
                 }
             };
 
-            tmpConqurer.invoke(tmpFirst, tmpLength, THRESHOLD);
+            tmpConqurer.invoke(tmpFirst, tmpLength, HermitianRank2Update.THRESHOLD);
 
         } else {
 
@@ -106,17 +104,17 @@ public final class HouseholderHermitian extends MatrixOperation {
         final ComplexNumber tmpBeta = householder.beta;
         final int tmpCount = tmpLength - tmpFirst;
 
-        if (tmpCount > THRESHOLD) {
+        if (tmpCount > MultiplyHermitianAndVector.THRESHOLD) {
 
             final DivideAndConquer tmpConqurer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    MultiplyHermitianAndVector.invoke(worker, aFirst, aLimit, data, tmpVector, tmpFirst);
+                protected void conquer(final int first, final int limit) {
+                    MultiplyHermitianAndVector.invoke(worker, first, limit, data, tmpVector, tmpFirst);
                 }
             };
 
-            tmpConqurer.invoke(tmpFirst, tmpLength, THRESHOLD);
+            tmpConqurer.invoke(tmpFirst, tmpLength, MultiplyHermitianAndVector.THRESHOLD);
 
         } else {
 
@@ -135,17 +133,17 @@ public final class HouseholderHermitian extends MatrixOperation {
             worker[c] = tmpBeta.multiply(worker[c].subtract(tmpVal.multiply(tmpVector[c])));
         }
 
-        if (tmpCount > THRESHOLD) {
+        if (tmpCount > HermitianRank2Update.THRESHOLD) {
 
             final DivideAndConquer tmpConqurer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    HermitianRank2Update.invoke(data, aFirst, aLimit, tmpVector, worker);
+                protected void conquer(final int first, final int limit) {
+                    HermitianRank2Update.invoke(data, first, limit, tmpVector, worker);
                 }
             };
 
-            tmpConqurer.invoke(tmpFirst, tmpLength, THRESHOLD);
+            tmpConqurer.invoke(tmpFirst, tmpLength, HermitianRank2Update.THRESHOLD);
 
         } else {
 
@@ -161,17 +159,17 @@ public final class HouseholderHermitian extends MatrixOperation {
         final double tmpBeta = householder.beta;
         final int tmpCount = tmpLength - tmpFirst;
 
-        if (tmpCount > THRESHOLD) {
+        if (tmpCount > MultiplyHermitianAndVector.THRESHOLD) {
 
             final DivideAndConquer tmpConqurer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    MultiplyHermitianAndVector.invoke(worker, aFirst, aLimit, data, tmpVector, tmpFirst);
+                protected void conquer(final int first, final int limit) {
+                    MultiplyHermitianAndVector.invoke(worker, first, limit, data, tmpVector, tmpFirst);
                 }
             };
 
-            tmpConqurer.invoke(tmpFirst, tmpLength, THRESHOLD);
+            tmpConqurer.invoke(tmpFirst, tmpLength, MultiplyHermitianAndVector.THRESHOLD);
 
         } else {
 
@@ -187,17 +185,17 @@ public final class HouseholderHermitian extends MatrixOperation {
             worker[c] = tmpBeta * (worker[c] - (tmpVal * tmpVector[c]));
         }
 
-        if (tmpCount > THRESHOLD) {
+        if (tmpCount > HermitianRank2Update.THRESHOLD) {
 
             final DivideAndConquer tmpConqurer = new DivideAndConquer() {
 
                 @Override
-                protected void conquer(final int aFirst, final int aLimit) {
-                    HermitianRank2Update.invoke(data, aFirst, aLimit, tmpVector, worker);
+                protected void conquer(final int first, final int limit) {
+                    HermitianRank2Update.invoke(data, first, limit, tmpVector, worker);
                 }
             };
 
-            tmpConqurer.invoke(tmpFirst, tmpLength, THRESHOLD);
+            tmpConqurer.invoke(tmpFirst, tmpLength, HermitianRank2Update.THRESHOLD);
 
         } else {
 
@@ -211,7 +209,7 @@ public final class HouseholderHermitian extends MatrixOperation {
 
     @Override
     public int threshold() {
-        return THRESHOLD;
+        return Math.min(MultiplyHermitianAndVector.THRESHOLD, HermitianRank2Update.THRESHOLD);
     }
 
 }
