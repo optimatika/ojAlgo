@@ -31,7 +31,6 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
-
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -130,7 +129,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public MatrixStore<Double> getD() {
-        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<>(this.getSingularValues(), null, null, ZERO);
+        final DiagonalArray1D<Double> tmpDiagonal = new DiagonalArray1D<>(this.getSingularValues(), null, null, ZERO);
         return MatrixStore.PRIMITIVE.makeWrapper(tmpDiagonal).get();
     }
 

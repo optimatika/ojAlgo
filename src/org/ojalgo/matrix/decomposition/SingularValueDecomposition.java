@@ -367,7 +367,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     protected abstract boolean doCompute(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, boolean singularValuesOnly, boolean fullSize);
 
-    protected DiagonalAccess<N> getBidiagonalAccessD() {
+    protected DiagonalArray1D<N> getBidiagonalAccessD() {
         return myBidiagonal.getDiagonalAccessD();
     }
 

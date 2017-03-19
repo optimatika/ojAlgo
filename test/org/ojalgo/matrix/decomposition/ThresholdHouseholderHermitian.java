@@ -83,7 +83,7 @@ public class ThresholdHouseholderHermitian extends AbstractThresholdTuner {
     @Param({ "1", "2" })
     public int z;
 
-    Tridiagonal<Double> decomposition = new SimultaneousTridiagonal.Primitive();
+    Tridiagonal<Double> decomposition = new DeferredTridiagonal.Primitive();
 
     MatrixStore<Double> matrix;
 

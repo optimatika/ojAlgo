@@ -39,7 +39,7 @@ import org.ojalgo.scalar.Scalar;
 abstract class GenericDecomposition<N extends Number> extends AbstractDecomposition<N> {
 
     private final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> myFactory;
-    MatrixStore.Factory<N> myBuilder;
+    private final MatrixStore.Factory<N> myBuilder;
 
     protected GenericDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2016 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,12 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.array.Array1D;
 
-abstract class TridiagonalDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Tridiagonal<N> {
+final class DiagonalArray1D<N extends Number> extends DiagonalAccess<N, Array1D<N>> {
 
-    protected TridiagonalDecomposition(final PhysicalStore.Factory<N, ? extends DecompositionStore<N>> factory) {
-        super(factory);
+    DiagonalArray1D(final Array1D<N> mainDiag, final Array1D<N> superdiag, final Array1D<N> subdiag, final N zero) {
+        super(mainDiag, superdiag, subdiag, zero);
     }
-
-    protected abstract DecompositionStore<N> getDecompositionQ();
-
-    protected abstract void supplyDiagonalTo(double[] d, double[] e);
 
 }

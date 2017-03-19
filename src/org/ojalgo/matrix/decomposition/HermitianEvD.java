@@ -50,7 +50,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     static final class Big extends HermitianEvD<BigDecimal> {
 
         Big() {
-            super(BigDenseStore.FACTORY, new SimultaneousTridiagonal.Big());
+            super(BigDenseStore.FACTORY, new DeferredTridiagonal.Big());
         }
 
     }
@@ -58,7 +58,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     static final class Complex extends HermitianEvD<ComplexNumber> {
 
         Complex() {
-            super(ComplexDenseStore.FACTORY, new SimultaneousTridiagonal.Complex());
+            super(ComplexDenseStore.FACTORY, new DeferredTridiagonal.Complex());
         }
 
     }
@@ -79,7 +79,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     static final class Primitive extends HermitianEvD<Double> {
 
         Primitive() {
-            super(PrimitiveDenseStore.FACTORY, new SimultaneousTridiagonal.Primitive());
+            super(PrimitiveDenseStore.FACTORY, new DeferredTridiagonal.Primitive());
         }
 
     }
@@ -174,14 +174,14 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     private double[] d;
     private double[] e;
     private transient MatrixStore<N> myInverse;
-    private final SimultaneousTridiagonal<N> myTridiagonal;
+    private final TridiagonalDecomposition<N> myTridiagonal;
 
     @SuppressWarnings("unused")
     private HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         this(aFactory, null);
     }
 
-    protected HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final SimultaneousTridiagonal<N> aTridiagonal) {
+    protected HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final DeferredTridiagonal<N> aTridiagonal) {
 
         super(aFactory);
 
@@ -368,20 +368,18 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
             e = new double[size];
         }
 
-        final DiagonalAccess<N> tridiagonal = myTridiagonal.getDiagonalAccessD();
-        tridiagonal.mainDiagonal.supplyTo(d);
-        tridiagonal.subdiagonal.supplyTo(e);
+        myTridiagonal.supplyDiagonalTo(d, e);
 
-        final RotateRight tmpRotateRight = valuesOnly ? RotateRight.NULL : myTridiagonal.doQ();
+        final RotateRight tmpRotateRight = valuesOnly ? RotateRight.NULL : myTridiagonal.getDecompositionQ();
         HermitianEvD.tql2(d, e, tmpRotateRight);
 
         if (this.isOrdered()) {
-            final ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : myTridiagonal.doQ();
+            final ExchangeColumns tmpExchangeColumns = valuesOnly ? ExchangeColumns.NULL : myTridiagonal.getDecompositionQ();
             EigenvalueDecomposition.sort(d, tmpExchangeColumns);
         }
 
         if (!valuesOnly) {
-            this.setV(myTridiagonal.doQ());
+            this.setV(myTridiagonal.getDecompositionQ());
         }
 
         return this.computed(true);
@@ -389,7 +387,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     @Override
     protected MatrixStore<N> makeD() {
-        final DiagonalAccess<Double> tmpDiagonal = new DiagonalAccess<>(Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(d)), null, null, ZERO);
+        final DiagonalBasicArray<Double> tmpDiagonal = new DiagonalBasicArray<>(Primitive64Array.wrap(d), null, null, ZERO);
         return this.wrap(tmpDiagonal).diagonal(false).get();
     }
 

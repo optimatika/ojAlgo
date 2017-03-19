@@ -48,7 +48,7 @@ public class EigenvalueTest extends MatrixDecompositionTests {
 
     static final class EvD {
 
-        DiagonalAccess<?> D;
+        DiagonalBasicArray<?> D;
 
         PhysicalStore<Double> V;
 

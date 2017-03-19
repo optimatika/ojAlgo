@@ -239,7 +239,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
         }
     }
 
-    static Array1D<Double> toDiagonal(final DiagonalAccess<?> bidiagonal, final DecompositionStore<?> mtrxQ1, final DecompositionStore<?> mtrxQ2) {
+    static Array1D<Double> toDiagonal(final DiagonalArray1D<?> bidiagonal, final DecompositionStore<?> mtrxQ1, final DecompositionStore<?> mtrxQ2) {
 
         final int tmpDiagDim = bidiagonal.mainDiagonal.size();
 
@@ -355,7 +355,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
         this.computeBidiagonal(matrix, fullSize);
 
-        final DiagonalAccess<N> tmpBidiagonal = this.getBidiagonalAccessD();
+        final DiagonalArray1D<N> tmpBidiagonal = this.getBidiagonalAccessD();
 
         final DecompositionStore<N> tmpQ1 = singularValuesOnly ? null : this.getBidiagonalQ1();
         final DecompositionStore<N> tmpQ2 = singularValuesOnly ? null : this.getBidiagonalQ2();
@@ -369,7 +369,7 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
     @Override
     protected MatrixStore<N> makeD() {
-        return this.wrap(new DiagonalAccess<>(this.getSingularValues(), null, null, ZERO)).get();
+        return this.wrap(new DiagonalArray1D<>(this.getSingularValues(), null, null, ZERO)).get();
     }
 
     @Override

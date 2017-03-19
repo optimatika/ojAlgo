@@ -145,14 +145,12 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Tridiagonal<?>[] getTridiagonalAll() {
-        return new Tridiagonal<?>[] { Tridiagonal.BIG.make(), Tridiagonal.COMPLEX.make(), new DelegatingTridiagonal.Primitive(),
-                new SimultaneousTridiagonal.Primitive(), new RawTridiagonal() };
+        return new Tridiagonal<?>[] { Tridiagonal.BIG.make(), Tridiagonal.COMPLEX.make(), new DeferredTridiagonal.Primitive(), new SimultaneousTridiagonal() };
     }
 
     @SuppressWarnings("unchecked")
     public static final Tridiagonal<Double>[] getTridiagonalPrimitive() {
-        return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DelegatingTridiagonal.Primitive(), new SimultaneousTridiagonal.Primitive(),
-                new RawTridiagonal() };
+        return (Tridiagonal<Double>[]) new Tridiagonal<?>[] { new DeferredTridiagonal.Primitive(), new SimultaneousTridiagonal() };
     }
 
     protected MatrixDecompositionTests() {
