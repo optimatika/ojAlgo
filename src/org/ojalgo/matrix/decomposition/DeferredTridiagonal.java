@@ -104,11 +104,10 @@ abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecompos
 
     }
 
-    private transient BasicArray<N> d = null;
-    private transient BasicArray<N> e = null;
-    private transient MatrixStore<N> myD = null;
+    private transient BasicArray<N> myDiagD = null;
+    private transient BasicArray<N> myDiagE = null;
+
     private Array1D<N> myInitDiagQ = null;
-    private transient DecompositionStore<N> myQ = null;
 
     protected DeferredTridiagonal(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
         super(factory);
@@ -128,9 +127,9 @@ abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecompos
 
             final int size = this.getMinDim();
 
-            if ((d == null) || (d.count() != size)) {
-                d = this.makeArray(size);
-                e = this.makeArray(size);
+            if ((myDiagD == null) || (myDiagD.count() != size)) {
+                myDiagD = this.makeArray(size);
+                myDiagE = this.makeArray(size);
             }
 
             final Householder<N> tmpHouseholder = this.makeHouseholder(size);
@@ -142,16 +141,16 @@ abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecompos
                 }
             }
 
-            d.fillMatching(inPlace.sliceDiagonal(0, 0));
-            e.fillMatching(inPlace.sliceDiagonal(1, 0));
+            myDiagD.fillMatching(inPlace.sliceDiagonal(0, 0));
+            myDiagE.fillMatching(inPlace.sliceDiagonal(1, 0));
 
-            myInitDiagQ = this.makeReal(e);
+            myInitDiagQ = this.makeReal(myDiagE);
 
             retVal = true;
 
-        } catch (final Exception anException) {
+        } catch (final Exception xcptn) {
 
-            BasicLogger.error(anException.toString());
+            BasicLogger.error(xcptn.toString());
 
             this.reset();
 
@@ -161,48 +160,26 @@ abstract class DeferredTridiagonal<N extends Number> extends TridiagonalDecompos
         return this.computed(retVal);
     }
 
-    public final MatrixStore<N> getD() {
-
-        if (myD == null) {
-            myD = this.makeD();
-        }
-
-        return myD;
-    }
-
-    public final MatrixStore<N> getQ() {
-        return this.getDecompositionQ();
-    }
-
     @Override
     public void reset() {
 
         super.reset();
 
-        myD = null;
-        myQ = null;
-
         myInitDiagQ = null;
     }
 
     @Override
-    protected final DecompositionStore<N> getDecompositionQ() {
-        if (myQ == null) {
-            myQ = this.makeQ();
-        }
-        return myQ;
+    protected void supplyDiagonalTo(final double[] d, final double[] e) {
+        myDiagD.supplyTo(d);
+        myDiagE.supplyTo(e);
     }
 
     @Override
-    protected void supplyDiagonalTo(final double[] d, final double[] e) {
-        this.d.supplyTo(d);
-        this.e.supplyTo(e);
-    }
-
     final MatrixStore<N> makeD() {
-        return this.wrap(new DiagonalBasicArray<>(d, e, e, this.scalar().zero().getNumber())).get();
+        return this.wrap(new DiagonalBasicArray<>(myDiagD, myDiagE, myDiagE, this.scalar().zero().getNumber())).get();
     }
 
+    @Override
     final DecompositionStore<N> makeQ() {
 
         final DecompositionStore<N> retVal = this.getInPlace();

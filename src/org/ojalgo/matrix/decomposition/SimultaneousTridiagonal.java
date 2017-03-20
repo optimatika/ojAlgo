@@ -36,8 +36,8 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
  */
 class SimultaneousTridiagonal extends TridiagonalDecomposition<Double> {
 
-    BasicArray<Double> myMain;
-    BasicArray<Double> myOff;
+    private BasicArray<Double> myDiagD;
+    private BasicArray<Double> myDiagE;
 
     SimultaneousTridiagonal() {
         super(PrimitiveDenseStore.FACTORY);
@@ -49,34 +49,33 @@ class SimultaneousTridiagonal extends TridiagonalDecomposition<Double> {
 
         final int size = this.getMinDim();
 
-        myMain = Primitive64Array.make(size);
-        myOff = Primitive64Array.make(size);
+        if ((myDiagD == null) || (myDiagD.count() == size)) {
+            myDiagD = Primitive64Array.make(size);
+            myDiagE = Primitive64Array.make(size);
+        }
 
-        this.getInPlace().tred2(myMain, myOff, true);
+        this.getInPlace().tred2(myDiagD, myDiagE, true);
 
-        return true;
-    }
-
-    public MatrixStore<Double> getD() {
-
-        final DiagonalBasicArray<Double> tmpAccess = new DiagonalBasicArray<>(myMain, myOff, myOff, PrimitiveMath.ZERO);
-
-        return this.wrap(tmpAccess).get();
-    }
-
-    public MatrixStore<Double> getQ() {
-        return this.getInPlace();
-    }
-
-    @Override
-    protected DecompositionStore<Double> getDecompositionQ() {
-        return this.getInPlace();
+        return this.computed(true);
     }
 
     @Override
     protected void supplyDiagonalTo(final double[] d, final double[] e) {
-        myMain.supplyTo(d);
-        myOff.supplyTo(e);
+        myDiagD.supplyTo(d);
+        myDiagE.supplyTo(e);
+    }
+
+    @Override
+    MatrixStore<Double> makeD() {
+
+        final DiagonalBasicArray<Double> tmpAccess = new DiagonalBasicArray<>(myDiagD, myDiagE, myDiagE, PrimitiveMath.ZERO);
+
+        return this.wrap(tmpAccess).get();
+    }
+
+    @Override
+    DecompositionStore<Double> makeQ() {
+        return this.getInPlace();
     }
 
 }
