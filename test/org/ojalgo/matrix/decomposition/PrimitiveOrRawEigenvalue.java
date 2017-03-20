@@ -32,36 +32,30 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro: 2015-06-23 => 8192L < primitive
- *
+ * Mac Pro: 2017-03-20
+ * 
  * <pre>
- * # Run complete. Total time: 01:50:13
- *
- * Benchmark                           (dim)   Mode  Cnt         Score        Error    Units
- * PrimitiveOrRawEigenvalue.primitive      5  thrpt    3   1601950,602 ±  41898,899  ops/min
- * PrimitiveOrRawEigenvalue.primitive     10  thrpt    3    417818,262 ±  16765,578  ops/min
- * PrimitiveOrRawEigenvalue.primitive     20  thrpt    3    109291,846 ±  40996,968  ops/min
- * PrimitiveOrRawEigenvalue.primitive     50  thrpt    3     17944,622 ±   1045,067  ops/min
- * PrimitiveOrRawEigenvalue.primitive    100  thrpt    3      3532,074 ±    235,511  ops/min
- * PrimitiveOrRawEigenvalue.primitive    200  thrpt    3       574,723 ±     63,854  ops/min
- * PrimitiveOrRawEigenvalue.primitive    500  thrpt    3        75,237 ±     13,454  ops/min
- * PrimitiveOrRawEigenvalue.primitive   1000  thrpt    3        14,551 ±      0,344  ops/min
- * PrimitiveOrRawEigenvalue.primitive   2000  thrpt    3         2,168 ±      0,020  ops/min
- * PrimitiveOrRawEigenvalue.primitive   5000  thrpt    3         0,152 ±      0,002  ops/min
- * PrimitiveOrRawEigenvalue.raw            5  thrpt    3  20168235,047 ± 742079,618  ops/min
- * PrimitiveOrRawEigenvalue.raw           10  thrpt    3   5171421,262 ± 154827,904  ops/min
- * PrimitiveOrRawEigenvalue.raw           20  thrpt    3   1043347,383 ±  34181,534  ops/min
- * PrimitiveOrRawEigenvalue.raw           50  thrpt    3    120998,134 ±   5026,435  ops/min
- * PrimitiveOrRawEigenvalue.raw          100  thrpt    3     19887,301 ±    661,461  ops/min
- * PrimitiveOrRawEigenvalue.raw          200  thrpt    3      2946,835 ±     67,958  ops/min
- * PrimitiveOrRawEigenvalue.raw          500  thrpt    3       203,515 ±      4,626  ops/min
- * PrimitiveOrRawEigenvalue.raw         1000  thrpt    3        26,505 ±      1,474  ops/min
- * PrimitiveOrRawEigenvalue.raw         2000  thrpt    3         2,697 ±      0,327  ops/min
- * PrimitiveOrRawEigenvalue.raw         5000  thrpt    3         0,172 ±      0,012  ops/min
+# Run complete. Total time: 00:37:47
+
+Benchmark                           (dim)   Mode  Cnt      Score      Error  Units
+PrimitiveOrRawEigenvalue.primitive     20  thrpt   15  13107.915 ±  114.357  ops/s
+PrimitiveOrRawEigenvalue.primitive     50  thrpt   15   1277.783 ±   12.526  ops/s
+PrimitiveOrRawEigenvalue.primitive    100  thrpt   15    204.110 ±    3.790  ops/s
+PrimitiveOrRawEigenvalue.primitive    200  thrpt   15     28.279 ±    0.291  ops/s
+PrimitiveOrRawEigenvalue.primitive    500  thrpt   15      2.127 ±    0.034  ops/s
+PrimitiveOrRawEigenvalue.primitive   1000  thrpt   15      0.320 ±    0.003  ops/s
+PrimitiveOrRawEigenvalue.primitive   2000  thrpt   15      0.041 ±    0.001  ops/s
+PrimitiveOrRawEigenvalue.raw           20  thrpt   15  19428.335 ± 1105.222  ops/s
+PrimitiveOrRawEigenvalue.raw           50  thrpt   15   2281.822 ±   40.410  ops/s
+PrimitiveOrRawEigenvalue.raw          100  thrpt   15    345.549 ±   12.416  ops/s
+PrimitiveOrRawEigenvalue.raw          200  thrpt   15     53.138 ±    0.462  ops/s
+PrimitiveOrRawEigenvalue.raw          500  thrpt   15      3.683 ±    0.009  ops/s
+PrimitiveOrRawEigenvalue.raw         1000  thrpt   15      0.483 ±    0.003  ops/s
+PrimitiveOrRawEigenvalue.raw         2000  thrpt   15      0.047 ±    0.001  ops/s
  * </pre>
  *
  * MacBook Air: 2017-03-15
- * 
+ *
  * <pre>
 # Run complete. Total time: 00:10:17
 
@@ -89,7 +83,7 @@ public class PrimitiveOrRawEigenvalue extends AbstractPrimitiveOrRaw<Eigenvalue<
         LinearAlgebraBenchmark.run(PrimitiveOrRawEigenvalue.class);
     }
 
-    @Param({ "20", "50", "100", "200", "500", "1000" })
+    @Param({ "20", "50", "100", "200", "500", "1000", "2000" })
     public int dim;
 
     MatrixStore<Double> matrix;

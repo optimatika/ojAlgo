@@ -150,10 +150,18 @@ public interface Eigenvalue<N extends Number>
         }
 
         public Eigenvalue<Double> make(final Structure2D typical, final boolean hermitian) {
-            if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
-                return hermitian ? new HermitianEvD.Primitive() : new OldGeneralEvD.Primitive();
+            if (hermitian) {
+                if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
+                    return new HermitianEvD.Primitive();
+                } else {
+                    return new RawEigenvalue.Symmetric();
+                }
             } else {
-                return hermitian ? new RawEigenvalue.Symmetric() : new RawEigenvalue.General();
+                if ((8192L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
+                    return new OldGeneralEvD.Primitive();
+                } else {
+                    return new RawEigenvalue.General();
+                }
             }
         }
 
