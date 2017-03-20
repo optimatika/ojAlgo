@@ -62,6 +62,10 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N>, 
 
     void divideAndCopyColumn(int row, int column, BasicArray<N> destination);
 
+    default void exchangeColumns(final int colA, final int colB) {
+        this.exchangeColumns((long) colA, (long) colB);
+    }
+
     void exchangeHermitian(int indexA, int indexB);
 
     boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<N> destination);
@@ -74,12 +78,24 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N>, 
 
     void setToIdentity(int aCol);
 
+    default Array1D<N> sliceColumn(final long col) {
+        return this.sliceColumn(0L, col);
+    }
+
+    Array1D<N> sliceColumn(long row, long col);
+
+    Array1D<N> sliceDiagonal(long row, long col);
+
+    Array1D<N> sliceRange(long first, long limit);
+
+    default Array1D<N> sliceRow(final long row) {
+        return this.sliceRow(row, 0L);
+    }
+
+    Array1D<N> sliceRow(long row, long col);
+
     void transformSymmetric(Householder<N> transformation);
 
     void tred2(BasicArray<N> mainDiagonal, BasicArray<N> offDiagonal, boolean yesvecs);
-
-    default void exchangeColumns(final int colA, final int colB) {
-        this.exchangeColumns((long) colA, (long) colB);
-    }
 
 }

@@ -533,10 +533,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
 
     }
 
-    public Access1D<N> sliceColumn(final long col) {
-        return myUtility.sliceColumn(col);
-    }
-
     public Array1D<N> sliceColumn(final long row, final long col) {
         return myUtility.sliceColumn(row, col);
     }
@@ -547,10 +543,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
 
     public Array1D<N> sliceRange(final long first, final long limit) {
         return myUtility.sliceRange(first, limit);
-    }
-
-    public Access1D<N> sliceRow(final long row) {
-        return myUtility.sliceRow(row);
     }
 
     public Array1D<N> sliceRow(final long row, final long col) {

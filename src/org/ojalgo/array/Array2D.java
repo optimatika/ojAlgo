@@ -46,8 +46,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N>,
-        Mutate2D.BiModifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Mutate2D.Special<N>, Serializable {
+public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Mutate2D, Mutate2D.Fillable<N>,
+        Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Mutate2D.Special<N>, Serializable {
 
     public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
@@ -280,7 +280,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<Double> PRIMITIVE64 = new Factory<Double>(Primitive64Array.FACTORY);
     public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>(QuaternionArray.FACTORY);
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>(RationalArray.FACTORY);
-
     /**
      * @deprecated v43 Use {@link #PRIMITIVE64} instead
      */
@@ -581,6 +580,10 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.set(index, value);
     }
 
+    public Array1D<N> sliceColumn(final long col) {
+        return this.sliceColumn(0L, col);
+    }
+
     public Array1D<N> sliceColumn(final long row, final long col) {
         return new Array1D<>(myDelegate, Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L);
     }
@@ -593,6 +596,10 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public Array1D<N> sliceRange(final long first, final long limit) {
         return myDelegate.asArray1D().sliceRange(first, limit);
+    }
+
+    public Array1D<N> sliceRow(final long row) {
+        return this.sliceRow(row, 0L);
     }
 
     public Array1D<N> sliceRow(final long row, final long col) {
