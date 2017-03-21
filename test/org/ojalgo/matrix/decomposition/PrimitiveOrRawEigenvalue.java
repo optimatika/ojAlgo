@@ -33,7 +33,7 @@ import org.openjdk.jmh.runner.RunnerException;
 
 /**
  * Mac Pro: 2017-03-20
- * 
+ *
  * <pre>
 # Run complete. Total time: 00:37:47
 
@@ -83,12 +83,21 @@ public class PrimitiveOrRawEigenvalue extends AbstractPrimitiveOrRaw<Eigenvalue<
         LinearAlgebraBenchmark.run(PrimitiveOrRawEigenvalue.class);
     }
 
-    @Param({ "20", "50", "100", "200", "500", "1000", "2000" })
+    @Param({ "20", "50", "100", "200" })
     public int dim;
 
     MatrixStore<Double> matrix;
     DecompositionStore<Double> preallocated;
     MatrixStore<Double> rhs;
+
+    protected Eigenvalue<Double> simultaneous;
+
+    public PrimitiveOrRawEigenvalue() {
+
+        super();
+
+        simultaneous = this.makeSimultaneousPrimitive();
+    }
 
     @Override
     @Benchmark
@@ -109,14 +118,24 @@ public class PrimitiveOrRawEigenvalue extends AbstractPrimitiveOrRaw<Eigenvalue<
         matrix = MatrixUtils.makeSPD(dim);
     }
 
+    @Benchmark
+    public MatrixStore<Double> simultaneous() {
+        simultaneous.decompose(matrix);
+        return simultaneous.getV();
+    }
+
     @Override
     protected Eigenvalue<Double> makePrimitive() {
-        return new HermitianEvD.Primitive();
+        return new HermitianEvD.DeferredPrimitive();
     }
 
     @Override
     protected Eigenvalue<Double> makeRaw() {
         return new RawEigenvalue.Symmetric();
+    }
+
+    protected Eigenvalue<Double> makeSimultaneousPrimitive() {
+        return new HermitianEvD.SimultaneousPrimitive();
     }
 
 }

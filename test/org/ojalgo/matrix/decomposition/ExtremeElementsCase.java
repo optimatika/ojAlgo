@@ -29,6 +29,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.decomposition.HermitianEvD.SimultaneousPrimitive;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.InverterTask;
@@ -357,7 +358,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                 { 0.6439543946598099, 1.134228320145167, 0.8341376835908743 }, { 1.2096354379603502, 0.8341376835908743, 1.6999093634457072 } });
         tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 155)));
 
-        final HermitianEvD.Primitive tmpAlgorithm = new HermitianEvD.Primitive();
+        final SimultaneousPrimitive tmpAlgorithm = new HermitianEvD.SimultaneousPrimitive();
 
         final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
 

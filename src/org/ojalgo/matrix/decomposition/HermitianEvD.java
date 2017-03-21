@@ -45,6 +45,19 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
 
+/**
+ * Eigenvalues and eigenvectors of a real matrix.
+ * <P>
+ * If A is symmetric, then A = V*D*V' where the eigenvalue matrix D is diagonal and the eigenvector matrix V
+ * is orthogonal. I.e. A = V.times(D.times(V.transpose())) and V.times(V.transpose()) equals the identity
+ * matrix.
+ * <P>
+ * If A is not symmetric, then the eigenvalue matrix D is block diagonal with the real eigenvalues in 1-by-1
+ * blocks and any complex eigenvalues, lambda + i*mu, in 2-by-2 blocks, [lambda, mu; -mu, lambda]. The columns
+ * of V represent the eigenvectors in the sense that A*V = V*D, i.e. A.times(V) equals V.times(D). The matrix
+ * V may be badly conditioned, or even singular, so the validity of the equation A = V*D*inverse(V) depends
+ * upon V.cond().
+ **/
 public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposition<N> implements MatrixDecomposition.Solver<N> {
 
     static final class Big extends HermitianEvD<BigDecimal> {
@@ -63,23 +76,18 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     }
 
-    /**
-     * Eigenvalues and eigenvectors of a real matrix.
-     * <P>
-     * If A is symmetric, then A = V*D*V' where the eigenvalue matrix D is diagonal and the eigenvector matrix
-     * V is orthogonal. I.e. A = V.times(D.times(V.transpose())) and V.times(V.transpose()) equals the
-     * identity matrix.
-     * <P>
-     * If A is not symmetric, then the eigenvalue matrix D is block diagonal with the real eigenvalues in
-     * 1-by-1 blocks and any complex eigenvalues, lambda + i*mu, in 2-by-2 blocks, [lambda, mu; -mu, lambda].
-     * The columns of V represent the eigenvectors in the sense that A*V = V*D, i.e. A.times(V) equals
-     * V.times(D). The matrix V may be badly conditioned, or even singular, so the validity of the equation A
-     * = V*D*inverse(V) depends upon V.cond().
-     **/
-    static final class Primitive extends HermitianEvD<Double> {
+    static final class DeferredPrimitive extends HermitianEvD<Double> {
 
-        Primitive() {
+        DeferredPrimitive() {
             super(PrimitiveDenseStore.FACTORY, new DeferredTridiagonal.Primitive());
+        }
+
+    }
+
+    static final class SimultaneousPrimitive extends HermitianEvD<Double> {
+
+        SimultaneousPrimitive() {
+            super(PrimitiveDenseStore.FACTORY, new SimultaneousTridiagonal());
         }
 
     }
@@ -181,11 +189,11 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
         this(aFactory, null);
     }
 
-    protected HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final DeferredTridiagonal<N> aTridiagonal) {
+    protected HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory, final TridiagonalDecomposition<N> tridiagonal) {
 
         super(aFactory);
 
-        myTridiagonal = aTridiagonal;
+        myTridiagonal = tridiagonal;
     }
 
     public final N getDeterminant() {

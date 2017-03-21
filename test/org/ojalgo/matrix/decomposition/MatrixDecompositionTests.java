@@ -78,7 +78,8 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final Eigenvalue<?>[] getEigenvalueAllHermitian() {
-        return new Eigenvalue<?>[] { new HermitianEvD.Primitive(), new RawEigenvalue.Symmetric(), new HermitianEvD.Big(), new HermitianEvD.Complex() };
+        return new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(), new RawEigenvalue.Symmetric(),
+                new HermitianEvD.Big(), new HermitianEvD.Complex() };
     }
 
     @SuppressWarnings("unchecked")
@@ -93,7 +94,8 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
 
     @SuppressWarnings("unchecked")
     public static final Eigenvalue<Double>[] getEigenvaluePrimitiveSymmetric() {
-        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new HermitianEvD.Primitive(), new RawEigenvalue.Symmetric() };
+        return (Eigenvalue<Double>[]) new Eigenvalue<?>[] { new HermitianEvD.DeferredPrimitive(), new HermitianEvD.SimultaneousPrimitive(),
+                new RawEigenvalue.Symmetric() };
     }
 
     public static final Hessenberg<?>[] getHessenbergAll() {
