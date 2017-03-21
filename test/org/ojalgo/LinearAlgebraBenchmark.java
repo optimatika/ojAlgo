@@ -39,7 +39,7 @@ public abstract class LinearAlgebraBenchmark {
     }
 
     protected static ChainedOptionsBuilder options() {
-        return new OptionsBuilder().forks(3).measurementIterations(5).warmupIterations(7).mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS)
+        return new OptionsBuilder().forks(1).measurementIterations(3).warmupIterations(5).mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS)
                 .timeout(new TimeValue(1L, TimeUnit.HOURS)).jvmArgs("-server", "-Xmx2g");
     }
 
