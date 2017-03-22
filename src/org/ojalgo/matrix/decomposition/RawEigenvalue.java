@@ -398,6 +398,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             e = new double[size]; // work > off diagonal
         }
         myTransposedV = valuesOnly ? null : data;
+        // Stores the columns of V in the rows of 'data'
 
         // > Tridiagonalize
 
@@ -455,10 +456,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 for (int j = 0; j < ij; j++) {
                     f = d[j];
                     data[ij][j] = f;
-                    final double[] col_j = data[j];
-                    g = e[j] + (col_j[j] * f);
+                    g = e[j] + (data[j][j] * f);
                     for (int k = j + 1; k <= ij1; k++) {
-                        val = col_j[k];
+                        val = data[j][k];
                         g += val * d[k];
                         e[k] += val * f;
                     }
@@ -474,12 +474,11 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 for (int j = 0; j < ij; j++) {
                     f = d[j];
                     g = e[j];
-                    final double[] col_j = data[j];
                     for (int k = j; k <= ij1; k++) { // rank-2 update
-                        col_j[k] -= ((f * e[k]) + (g * d[k]));
+                        data[j][k] -= ((f * e[k]) + (g * d[k]));
                     }
-                    d[j] = col_j[ij1]; // Copy "next" row/column to work on
-                    col_j[ij] = ZERO;
+                    d[j] = data[j][ij1]; // Copy "next" row/column to work on
+                    data[j][ij] = ZERO;
                 }
             }
             d[ij] = h;
