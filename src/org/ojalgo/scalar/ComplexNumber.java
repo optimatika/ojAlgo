@@ -304,7 +304,7 @@ public final class ComplexNumber extends Number
      */
     public ComplexNumber enforce(final NumberContext context) {
 
-        final double tmpRe = context.enforce(this.doubleValue());
+        final double tmpRe = context.enforce(myRealValue);
         final double tmpIm = context.enforce(i);
 
         return new ComplexNumber(tmpRe, tmpIm);

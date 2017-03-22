@@ -21,7 +21,40 @@
  */
 package org.ojalgo.access;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface IndexMapper<T extends Comparable<? super T>> {
+
+    final class AnyIndex<T extends Comparable<? super T>> implements IndexMapper<T> {
+
+        private final List<T> myKeys = new ArrayList<>();
+
+        AnyIndex() {
+            super();
+        }
+
+        public synchronized long toIndex(T key) {
+            long retVal = myKeys.indexOf(key);
+            if (retVal < 0L) {
+                retVal = myKeys.size();
+                myKeys.add(key);
+            }
+            return retVal;
+        }
+
+        public T toKey(long index) {
+            return myKeys.get((int) index);
+        }
+
+    }
+
+    /**
+     * @return A very simple implementation - you better come up with something else.
+     */
+    public static <T extends Comparable<? super T>> IndexMapper<T> make() {
+        return new AnyIndex<>();
+    }
 
     long toIndex(T key);
 
