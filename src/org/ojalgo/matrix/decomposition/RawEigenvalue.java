@@ -394,8 +394,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         final int size = data.length;
 
         if ((d == null) || (size != d.length)) {
-            d = new double[size];
-            e = new double[size];
+            d = new double[size]; // householder > main diagonal
+            e = new double[size]; // work > off diagonal
         }
         myTransposedV = valuesOnly ? null : data;
 
@@ -412,121 +412,104 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         COPY.invoke(data[size - 1], 0, d, 0, 0, size);
 
         // Householder reduction to tridiagonal form.
-        for (int i1 = size - 1; i1 > 0; i1--) { // row index of target householder point
-            final int l = i1 - 1; // col index of target householder point
+        for (int ij = size - 1; ij > 0; ij--) { // row index of target householder point
+            final int ij1 = ij - 1; // col index of target householder point
 
             h = ZERO;
 
             // Calculate the norm of the row/col to zero out - to avoid under/overflow.
             scale = ZERO;
-            for (int k4 = 0; k4 < i1; k4++) {
-                scale = MAX.invoke(scale, ABS.invoke(d[k4]));
+            for (int k = 0; k < ij; k++) {
+                scale = MAX.invoke(scale, ABS.invoke(d[k]));
             }
 
-            if (scale == ZERO) {
+            if (Double.compare(scale, ZERO) == 0) {
                 // Skip generation, already zero
-                e[i1] = d[l];
-                for (int j = 0; j < i1; j++) {
-                    d[j] = data[j][l]; // Copy "next" row/column to work on
-                    data[j][i1] = ZERO; // Are both needed? - neither needed?
-                    data[i1][j] = ZERO; // Could cause cache-misses - it was already zero!
+                e[ij] = d[ij1];
+                for (int j = 0; j < ij; j++) {
+                    d[j] = data[j][ij1]; // Copy "next" row/column to work on
+                    data[j][ij] = ZERO; // Are both needed? - neither needed?
+                    data[ij][j] = ZERO; // Could cause cache-misses - it was already zero!
                 }
 
             } else {
                 // Generate Householder vector.
 
-                for (int k3 = 0; k3 < i1; k3++) {
+                for (int k3 = 0; k3 < ij; k3++) {
                     val = d[k3] /= scale;
                     h += val * val; // d[k] * d[k]
                 }
-                f = d[l];
+                f = d[ij1];
                 g = SQRT.invoke(h);
                 if (f > 0) {
                     g = -g;
                 }
-                e[i1] = scale * g;
+                e[ij] = scale * g;
                 h = h - (f * g);
-                d[l] = f - g;
-                Arrays.fill(e, 0, i1, ZERO);
+                d[ij1] = f - g;
+
+                Arrays.fill(e, 0, ij, ZERO);
 
                 // Apply similarity transformation to remaining columns.
                 // Remaing refers to all columns "before" the target col
-                for (int j = 0; j < i1; j++) {
+                for (int j = 0; j < ij; j++) {
                     f = d[j];
-                    data[i1][j] = f;
-                    final double[] tmpVt_j = data[j];
-                    g = e[j] + (tmpVt_j[j] * f);
-                    for (int k1 = j + 1; k1 <= l; k1++) {
-                        val = tmpVt_j[k1];
-                        g += val * d[k1];
-                        e[k1] += val * f;
+                    data[ij][j] = f;
+                    final double[] col_j = data[j];
+                    g = e[j] + (col_j[j] * f);
+                    for (int k = j + 1; k <= ij1; k++) {
+                        val = col_j[k];
+                        g += val * d[k];
+                        e[k] += val * f;
                     }
                     e[j] = g;
                 }
                 f = ZERO;
-                for (int j = 0; j < i1; j++) {
+                for (int j = 0; j < ij; j++) {
                     e[j] /= h;
                     f += e[j] * d[j];
                 }
                 val = f / (h + h);
-                AXPY.invoke(e, 0, 1, -val, d, 0, 1, 0, i1);
-                for (int j = 0; j < i1; j++) {
+                AXPY.invoke(e, 0, 1, -val, d, 0, 1, 0, ij);
+                for (int j = 0; j < ij; j++) {
                     f = d[j];
                     g = e[j];
-                    for (int k2 = j; k2 <= l; k2++) {
-                        data[j][k2] -= ((f * e[k2]) + (g * d[k2]));
+                    final double[] col_j = data[j];
+                    for (int k = j; k <= ij1; k++) { // rank-2 update
+                        col_j[k] -= ((f * e[k]) + (g * d[k]));
                     }
-                    d[j] = data[j][l];
-                    data[j][i1] = ZERO;
+                    d[j] = col_j[ij1]; // Copy "next" row/column to work on
+                    col_j[ij] = ZERO;
                 }
             }
-            d[i1] = h;
+            d[ij] = h;
         }
 
-        // Accumulate transformations.
-        for (int i2 = 0; i2 < (size - 1); i2++) {
+        // Accumulate transformations - turn data into V
+        for (int ij = 0; ij < (size - 1); ij++) {
 
-            final double[] tmpVt_i = data[i2];
-            final double[] tmpVt_i1 = data[i2 + 1];
+            data[ij][size - 1] = data[ij][ij];
+            data[ij][ij] = ONE;
 
-            //V[n - 1][i] = V[i][i];
-            tmpVt_i[size - 1] = tmpVt_i[i2];
-            //V[i][i] = ONE;
-            tmpVt_i[i2] = ONE;
-            h = d[i2 + 1];
-            if (h != ZERO) {
-                for (int k5 = 0; k5 <= i2; k5++) {
-                    //d[k] = V[k][i + 1] / h;
-                    d[k5] = tmpVt_i1[k5] / h;
+            h = d[ij + 1];
+            if (Double.compare(h, ZERO) != 0) {
+                for (int k5 = 0; k5 <= ij; k5++) {
+                    d[k5] = data[ij + 1][k5] / h;
                 }
 
-                for (int j = 0; j <= i2; j++) {
-                    final double tmpDotProd = DOT.invoke(tmpVt_i1, 0, data[j], 0, 0, i2 + 1);
-                    //                    for (int k = 0; k <= i; k++) {
-                    //                        //g += V[k][i + 1] * V[k][j];
-                    //                        g += tmpVt_i1[k] * tmpVt_j[k];
-                    //                    }
-                    AXPY.invoke(data[j], 0, 1, -tmpDotProd, d, 0, 1, 0, i2 + 1);
-                    //                    for (int k = 0; k <= i; k++) {
-                    //                        //V[k][j] -= g * d[k];
-                    //                        tmpVt_j[k] -= g * d[k];
-                    //                    }
+                for (int j = 0; j <= ij; j++) {
+                    final double dotp = DOT.invoke(data[ij + 1], 0, data[j], 0, 0, ij + 1);
+                    AXPY.invoke(data[j], 0, 1, -dotp, d, 0, 1, 0, ij + 1);
                 }
             }
-            Arrays.fill(tmpVt_i1, 0, i2 + 1, ZERO);
-            //            for (int k = 0; k <= i; k++) {
-            //                //V[k][i + 1] = ZERO;
-            //                tmpVt_i1[k] = ZERO;
-            //            }
+            Arrays.fill(data[ij + 1], 0, ij + 1, ZERO);
         }
 
         for (int j = 0; j < size; j++) {
-            //d[j] = V[n - 1][j];
             d[j] = data[j][size - 1];
-            //V[n - 1][j] = ZERO;
             data[j][size - 1] = ZERO;
         }
-        //V[n - 1][n - 1] = ONE;
+
         data[size - 1][size - 1] = ONE;
         e[0] = ZERO;
 
