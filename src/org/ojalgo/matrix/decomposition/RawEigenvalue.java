@@ -414,7 +414,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         // Householder reduction to tridiagonal form.
         for (int ij = size - 1; ij > 0; ij--) { // row index of target householder point
-            final int ij1 = ij - 1; // col index of target householder point
+            // col index of target householder point
 
             h = ZERO;
 
@@ -426,9 +426,9 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             if (Double.compare(scale, ZERO) == 0) {
                 // Skip generation, already zero
-                e[ij] = d[ij1];
+                e[ij] = d[ij - 1];
                 for (int j = 0; j < ij; j++) {
-                    d[j] = data[j][ij1]; // Copy "next" row/column to work on
+                    d[j] = data[j][ij - 1]; // Copy "next" row/column to work on
                     data[j][ij] = ZERO; // Are both needed? - neither needed?
                     data[ij][j] = ZERO; // Could cause cache-misses - it was already zero!
                 }
@@ -440,14 +440,14 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     val = d[k3] /= scale;
                     h += val * val; // d[k] * d[k]
                 }
-                f = d[ij1];
+                f = d[ij - 1];
                 g = SQRT.invoke(h);
                 if (f > 0) {
                     g = -g;
                 }
                 e[ij] = scale * g;
                 h = h - (f * g);
-                d[ij1] = f - g;
+                d[ij - 1] = f - g;
 
                 Arrays.fill(e, 0, ij, ZERO);
 
@@ -457,7 +457,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                     f = d[j];
                     data[ij][j] = f;
                     g = e[j] + (data[j][j] * f);
-                    for (int k = j + 1; k <= ij1; k++) {
+                    for (int k = j + 1; k < ij; k++) {
                         val = data[j][k];
                         g += val * d[k];
                         e[k] += val * f;
@@ -474,10 +474,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 for (int j = 0; j < ij; j++) {
                     f = d[j];
                     g = e[j];
-                    for (int k = j; k <= ij1; k++) { // rank-2 update
+                    for (int k = j; k < ij; k++) { // rank-2 update
                         data[j][k] -= ((f * e[k]) + (g * d[k]));
                     }
-                    d[j] = data[j][ij1]; // Copy "next" row/column to work on
+                    d[j] = data[j][ij - 1]; // Copy "next" row/column to work on
                     data[j][ij] = ZERO;
                 }
             }
