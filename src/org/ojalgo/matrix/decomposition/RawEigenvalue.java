@@ -438,8 +438,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             } else {
                 // Generate Householder vector.
 
-                for (int k3 = 0; k3 < m; k3++) {
-                    val = d[k3] /= scale;
+                for (int k = 0; k < m; k++) {
+                    val = d[k] /= scale;
                     h += val * val; // d[k] * d[k]
                 }
                 f = d[m - 1];
