@@ -392,6 +392,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     final void doSymmetric(final double[][] data, final boolean valuesOnly) {
 
         final int size = data.length;
+        final int last = size - 1;
 
         if ((d == null) || (size != d.length)) {
             d = new double[size]; // householder > main diagonal
@@ -400,7 +401,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         myTransposedV = valuesOnly ? null : data;
         // Stores the columns of V in the rows of 'data'
 
-        // > Tridiagonalize
+        // > Tridiagonalize (Householder reduction)
 
         double scale;
         double h;
@@ -410,112 +411,113 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         // Copy the last column (same as the last row) of z to d
         // The last row/column is the first to be worked on in the main loop
-        COPY.invoke(data[size - 1], 0, d, 0, 0, size);
 
-        // Householder reduction to tridiagonal form.
-        for (int ij = size - 1; ij > 0; ij--) { // row index of target householder point
+        COPY.invoke(data[last], 0, d, 0, 0, size);
+
+        for (int m = last; m > 0; m--) { // row index of target householder point
             // col index of target householder point
-
-            h = ZERO;
 
             // Calculate the norm of the row/col to zero out - to avoid under/overflow.
             scale = ZERO;
-            for (int k = 0; k < ij; k++) {
+            for (int k = 0; k < m; k++) {
                 scale = MAX.invoke(scale, ABS.invoke(d[k]));
             }
 
+            h = ZERO;
+
             if (Double.compare(scale, ZERO) == 0) {
                 // Skip generation, already zero
-                e[ij] = d[ij - 1];
-                for (int j = 0; j < ij; j++) {
-                    d[j] = data[j][ij - 1]; // Copy "next" row/column to work on
-                    data[j][ij] = ZERO; // Are both needed? - neither needed?
-                    data[ij][j] = ZERO; // Could cause cache-misses - it was already zero!
+
+                e[m] = d[m - 1];
+                for (int j = 0; j < m; j++) {
+                    d[j] = data[j][m - 1]; // Copy "next" row/column to work on
+                    data[j][m] = ZERO; // Are both needed? - neither needed?
+                    data[m][j] = ZERO; // Could cause cache-misses - it was already zero!
                 }
 
             } else {
                 // Generate Householder vector.
 
-                for (int k3 = 0; k3 < ij; k3++) {
+                for (int k3 = 0; k3 < m; k3++) {
                     val = d[k3] /= scale;
                     h += val * val; // d[k] * d[k]
                 }
-                f = d[ij - 1];
+                f = d[m - 1];
                 g = SQRT.invoke(h);
                 if (f > 0) {
                     g = -g;
                 }
-                e[ij] = scale * g;
+                e[m] = scale * g;
                 h = h - (f * g);
-                d[ij - 1] = f - g;
+                d[m - 1] = f - g;
 
-                Arrays.fill(e, 0, ij, ZERO);
+                Arrays.fill(e, 0, m, ZERO);
 
-                // Apply similarity transformation to remaining columns.
-                // Remaing refers to all columns "before" the target col
-                for (int j = 0; j < ij; j++) {
-                    f = d[j];
-                    data[ij][j] = f;
-                    g = e[j] + (data[j][j] * f);
-                    for (int k = j + 1; k < ij; k++) {
-                        val = data[j][k];
-                        g += val * d[k];
-                        e[k] += val * f;
+                // Apply similarity transformation to rows and columns to left and above 'm'
+                // Only update elements below the diagonal
+                for (int i = 0; i < m; i++) {
+                    f = d[i];
+                    data[m][i] = f;
+                    g = e[i] + (data[i][i] * f);
+                    for (int j = i + 1; j < m; j++) {
+                        val = data[i][j];
+                        g += val * d[j];
+                        e[j] += val * f;
                     }
-                    e[j] = g;
+                    e[i] = g;
                 }
                 f = ZERO;
-                for (int j = 0; j < ij; j++) {
+                for (int j = 0; j < m; j++) {
                     e[j] /= h;
                     f += e[j] * d[j];
                 }
                 val = f / (h + h);
-                AXPY.invoke(e, 0, 1, -val, d, 0, 1, 0, ij);
-                for (int j = 0; j < ij; j++) {
-                    f = d[j];
-                    g = e[j];
-                    for (int k = j; k < ij; k++) { // rank-2 update
-                        data[j][k] -= ((f * e[k]) + (g * d[k]));
+                AXPY.invoke(e, 0, 1, -val, d, 0, 1, 0, m);
+                for (int i = 0; i < m; i++) {
+                    f = d[i];
+                    g = e[i];
+                    for (int j = i; j < m; j++) { // rank-2 update
+                        data[i][j] -= ((f * e[j]) + (g * d[j]));
                     }
-                    d[j] = data[j][ij - 1]; // Copy "next" row/column to work on
-                    data[j][ij] = ZERO;
+                    d[i] = data[i][m - 1]; // Copy "next" row/column to work on
+                    data[i][m] = ZERO;
                 }
             }
-            d[ij] = h;
+            d[m] = h;
         }
 
         // Accumulate transformations - turn data into V
-        for (int ij = 0; ij < (size - 1); ij++) {
+        for (int m = 0; m < last; m++) {
 
-            data[ij][size - 1] = data[ij][ij];
-            data[ij][ij] = ONE;
+            data[m][last] = data[m][m];
+            data[m][m] = ONE;
 
-            h = d[ij + 1];
+            h = d[m + 1];
             if (Double.compare(h, ZERO) != 0) {
-                for (int k5 = 0; k5 <= ij; k5++) {
-                    d[k5] = data[ij + 1][k5] / h;
+                for (int j = 0; j <= m; j++) {
+                    d[j] = data[m + 1][j] / h;
                 }
 
-                for (int j = 0; j <= ij; j++) {
-                    final double dotp = DOT.invoke(data[ij + 1], 0, data[j], 0, 0, ij + 1);
-                    AXPY.invoke(data[j], 0, 1, -dotp, d, 0, 1, 0, ij + 1);
+                for (int i = 0; i <= m; i++) {
+                    final double dotp = DOT.invoke(data[m + 1], 0, data[i], 0, 0, m + 1);
+                    AXPY.invoke(data[i], 0, 1, -dotp, d, 0, 1, 0, m + 1);
                 }
             }
-            Arrays.fill(data[ij + 1], 0, ij + 1, ZERO);
+            Arrays.fill(data[m + 1], 0, m + 1, ZERO);
         }
 
-        for (int j = 0; j < size; j++) {
-            d[j] = data[j][size - 1];
-            data[j][size - 1] = ZERO;
+        for (int i = 0; i < size; i++) {
+            d[i] = data[i][last];
+            data[i][last] = ZERO;
         }
 
-        data[size - 1][size - 1] = ONE;
+        data[last][last] = ONE;
         e[0] = ZERO;
 
-        for (int i = 1; i < size; i++) {
-            e[i - 1] = e[i];
+        for (int k = 1; k < size; k++) {
+            e[k - 1] = e[k];
         }
-        e[size - 1] = ZERO;
+        e[last] = ZERO;
 
         // Tridiagonalize > Diagonalize
 
