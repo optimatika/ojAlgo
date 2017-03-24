@@ -24,6 +24,7 @@ package org.ojalgo.access;
 import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
 
@@ -121,6 +122,23 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillRow(row, 0L, supplier);
         }
 
+    }
+
+    interface Mixable<N extends Number> extends Structure2D, Mutate1D.Mixable<N> {
+
+        default double mix(long index, BinaryFunction<N> mixer, double addend) {
+            final long structure = this.countRows();
+            return this.mix(Structure2D.row(index, structure), Structure2D.column(index, structure), mixer, addend);
+        }
+
+        default N mix(long index, BinaryFunction<N> mixer, N addend) {
+            final long structure = this.countRows();
+            return this.mix(Structure2D.row(index, structure), Structure2D.column(index, structure), mixer, addend);
+        }
+
+        double mix(long row, long col, BinaryFunction<N> mixer, double addend);
+
+        N mix(long row, long col, BinaryFunction<N> mixer, N addend);
     }
 
     interface Modifiable<N extends Number> extends Structure2D, Mutate1D.Modifiable<N> {

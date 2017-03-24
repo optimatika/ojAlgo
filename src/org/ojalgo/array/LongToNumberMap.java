@@ -9,14 +9,16 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
-public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N> {
+public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N>, Mutate1D.Mixable<N> {
 
     public static final class MapFactory<N extends Number> extends StrategyBuilder<N, LongToNumberMap<N>, MapFactory<N>> {
 
@@ -83,8 +85,8 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         return LongToNumberMap.factory(RationalArray.FACTORY).make();
     }
 
-    private final DenseStrategy<N> myStrategy;
     private final SparseArray<N> myStorage;
+    private final DenseStrategy<N> myStrategy;
 
     LongToNumberMap(final DenseStrategy<N> strategy) {
 
@@ -247,6 +249,20 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
     public Long lastKey() {
         return myStorage.lastIndex();
+    }
+
+    public double mix(long key, BinaryFunction<N> mixer, double addend) {
+        final int tmpIndex = myStorage.index(key);
+        final double retVal = tmpIndex >= 0 ? mixer.invoke(myStorage.doubleValueInternally(tmpIndex), addend) : addend;
+        myStorage.doSet(key, tmpIndex, retVal, true);
+        return retVal;
+    }
+
+    public N mix(long key, BinaryFunction<N> mixer, N addend) {
+        final int tmpIndex = myStorage.index(key);
+        final N retVal = tmpIndex >= 0 ? mixer.invoke(myStorage.getInternally(tmpIndex), addend) : addend;
+        myStorage.doSet(key, tmpIndex, retVal, true);
+        return retVal;
     }
 
     public double put(final long key, final double value) {

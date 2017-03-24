@@ -53,7 +53,7 @@ import org.ojalgo.type.context.NumberContext;
  * @author apete
  */
 @Deprecated
-final class GenericDenseStore<N extends Number & Scalar<N>> implements DecompositionStore<N> {
+final class GenericDenseStore<N extends Number & Scalar<N>> implements PhysicalStore<N>, DecompositionStore<N> {
 
     private final DenseArray<N> myDenseArray = null;
     private final long myStructure = 0L;
@@ -94,10 +94,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
 
     }
 
-    public Array1D<N> asArray1D() {
-        return myUtility.asArray1D();
-    }
-
     public List<N> asList() {
         // TODO Auto-generated method stub
         return null;
@@ -110,10 +106,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
     public void caxpy(final N scalarA, final int columnX, final int columnY, final int firstRow) {
         // TODO Auto-generated method stub
 
-    }
-
-    public void clear() {
-        myUtility.clear();
     }
 
     public Iterable<ColumnView<N>> columns() {
@@ -407,11 +399,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements Decomposi
 
     public Iterator<N> iterator() {
         return myUtility.iterator();
-    }
-
-    public void maxpy(final N scalarA, final MatrixStore<N> matrixX) {
-        // TODO Auto-generated method stub
-
     }
 
     public void modifyAll(final UnaryFunction<N> modifier) {

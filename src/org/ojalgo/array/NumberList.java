@@ -37,12 +37,13 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.Factory;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
 
-public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D {
+public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D, Mutate1D.Mixable<N> {
 
     public static final class ListFactory<N extends Number> extends StrategyBuilder<N, NumberList<N>, ListFactory<N>> {
 
@@ -121,18 +122,8 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     private long myActualCount;
-    private final DenseStrategy<N> myStrategy;
     private BasicArray<N> myStorage;
-
-    NumberList(final DenseStrategy<N> strategy) {
-
-        super();
-
-        myStrategy = strategy;
-
-        myStorage = strategy.makeInitial();
-        myActualCount = 0L;
-    }
+    private final DenseStrategy<N> myStrategy;
 
     NumberList(final BasicArray<N> storage, final DenseStrategy<N> strategy, final long actualCount) {
 
@@ -142,6 +133,16 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
         myStorage = storage;
         myActualCount = actualCount;
+    }
+
+    NumberList(final DenseStrategy<N> strategy) {
+
+        super();
+
+        myStrategy = strategy;
+
+        myStorage = strategy.makeInitial();
+        myActualCount = 0L;
     }
 
     public boolean add(final double e) {
@@ -308,6 +309,26 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
     public ListIterator<N> listIterator(final int index) {
         return new Iterator1D<>(this, index);
+    }
+
+    public double mix(long index, BinaryFunction<N> mixer, double addend) {
+        if (index >= myActualCount) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            final double retVal = mixer.invoke(myStorage.doubleValue(index), addend);
+            myStorage.set(index, retVal);
+            return retVal;
+        }
+    }
+
+    public N mix(long index, BinaryFunction<N> mixer, N addend) {
+        if (index >= myActualCount) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            final N retVal = mixer.invoke(myStorage.get(index), addend);
+            myStorage.set(index, retVal);
+            return retVal;
+        }
     }
 
     public N remove(final int index) {

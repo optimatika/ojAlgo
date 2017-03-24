@@ -24,6 +24,7 @@ package org.ojalgo.access;
 import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionUtils;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -44,6 +45,22 @@ public interface MutateAnyD extends StructureAnyD, Mutate1D {
         void fillOne(long[] reference, N value);
 
         void fillOne(long[] reference, NullaryFunction<N> supplier);
+
+    }
+
+    interface Mixable<N extends Number> extends StructureAnyD, Mutate1D.Mixable<N> {
+
+        default double mix(long index, BinaryFunction<N> mixer, double addend) {
+            return this.mix(StructureAnyD.reference(index, this.shape()), mixer, addend);
+        }
+
+        default N mix(long index, BinaryFunction<N> mixer, N addend) {
+            return this.mix(StructureAnyD.reference(index, this.shape()), mixer, addend);
+        }
+
+        double mix(long[] reference, BinaryFunction<N> mixer, double addend);
+
+        N mix(long[] reference, BinaryFunction<N> mixer, N addend);
 
     }
 

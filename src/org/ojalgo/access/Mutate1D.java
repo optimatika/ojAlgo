@@ -84,6 +84,19 @@ public interface Mutate1D extends Structure1D {
         }
     }
 
+    /**
+     * Mix/combine the previously existing value, at index, with the supplied addend
+     *
+     * @author apete
+     */
+    interface Mixable<N extends Number> extends Structure1D {
+
+        double mix(long index, BinaryFunction<N> mixer, double addend);
+
+        N mix(long index, BinaryFunction<N> mixer, N addend);
+
+    }
+
     interface Modifiable<N extends Number> extends Structure1D {
 
         default void modifyAll(final UnaryFunction<N> modifier) {
