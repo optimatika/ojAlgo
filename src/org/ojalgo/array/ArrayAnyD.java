@@ -47,8 +47,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, MutateAnyD, MutateAnyD.Fillable<N>,
-        MutateAnyD.Modifiable<N>, MutateAnyD.BiModifiable<N>, AccessAnyD.Visitable<N>, AccessAnyD.Sliceable<N>, Serializable {
+public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessAnyD.Elements, AccessAnyD.IndexOf, AccessAnyD.Visitable<N>,
+        AccessAnyD.Sliceable<N>, MutateAnyD, MutateAnyD.Fillable<N>, MutateAnyD.Modifiable<N>, MutateAnyD.BiModifiable<N>, MutateAnyD.Mixable<N>, Serializable {
 
     public static final class Factory<N extends Number> implements FactoryAnyD<ArrayAnyD<N>> {
 
@@ -266,6 +266,18 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public boolean isSmall(final long[] reference, final double comparedTo) {
         return myDelegate.isSmall(StructureAnyD.index(myStructure, reference), comparedTo);
+    }
+
+    public double mix(final long[] reference, final BinaryFunction<N> mixer, final double addend) {
+        final double retVal = mixer.invoke(this.doubleValue(reference), addend);
+        this.set(reference, retVal);
+        return retVal;
+    }
+
+    public N mix(final long[] reference, final BinaryFunction<N> mixer, final N addend) {
+        final N retVal = mixer.invoke(this.get(reference), addend);
+        this.set(reference, retVal);
+        return retVal;
     }
 
     public void modifyAll(final UnaryFunction<N> modifier) {

@@ -46,8 +46,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Mutate2D, Mutate2D.Fillable<N>,
-        Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N>, Access2D.Visitable<N>, Access2D.Sliceable<N>, Mutate2D.Special<N>, Serializable {
+public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Access2D.Visitable<N>, Access2D.Sliceable<N>,
+        Mutate2D, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N>, Mutate2D.Mixable<N>, Mutate2D.Special<N>, Serializable {
 
     public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
@@ -525,6 +525,18 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public boolean isSmall(final long row, final long col, final double comparedTo) {
         return myDelegate.isSmall(Structure2D.index(myRowsCount, row, col), comparedTo);
+    }
+
+    public double mix(final long row, final long col, final BinaryFunction<N> mixer, final double addend) {
+        final double retVal = mixer.invoke(this.doubleValue(row, col), addend);
+        this.set(row, col, retVal);
+        return retVal;
+    }
+
+    public N mix(final long row, final long col, final BinaryFunction<N> mixer, final N addend) {
+        final N retVal = mixer.invoke(this.get(row, col), addend);
+        this.set(row, col, retVal);
+        return retVal;
     }
 
     public void modifyAll(final UnaryFunction<N> modifier) {

@@ -50,8 +50,9 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array1D<N extends Number> extends AbstractList<N> implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Mutate1D,
-        Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>, Access1D.Visitable<N>, Access1D.Sliceable<N>, RandomAccess, Serializable {
+public final class Array1D<N extends Number> extends AbstractList<N>
+        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Access1D.Sliceable<N>, Mutate1D, Mutate1D.Fillable<N>,
+        Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>, Mutate1D.Mixable<N>, RandomAccess, Serializable {
 
     public static final class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
@@ -237,7 +238,6 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
     public static final Factory<Double> PRIMITIVE64 = new Factory<Double>(Primitive64Array.FACTORY);
     public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>(QuaternionArray.FACTORY);
     public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>(RationalArray.FACTORY);
-
     /**
      * @deprecated v43 Use {@link #PRIMITIVE64} instead
      */
@@ -478,6 +478,18 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
      */
     public boolean isSmall(final long index, final double comparedTo) {
         return myDelegate.isSmall(myFirst + (myStep * index), comparedTo);
+    }
+
+    public double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
+        final double retVal = mixer.invoke(this.doubleValue(index), addend);
+        this.set(index, retVal);
+        return retVal;
+    }
+
+    public N mix(final long index, final BinaryFunction<N> mixer, final N addend) {
+        final N retVal = mixer.invoke(this.get(index), addend);
+        this.set(index, retVal);
+        return retVal;
     }
 
     public void modifyAll(final UnaryFunction<N> modifier) {
