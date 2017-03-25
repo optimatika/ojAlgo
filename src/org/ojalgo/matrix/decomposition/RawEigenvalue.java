@@ -408,6 +408,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         double f;
         double g;
         double val;
+        double[] row;
 
         // Copy the last column (same as the last row) of z to d
         // The last row/column is the first to be worked on in the main loop
@@ -456,11 +457,12 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 // Apply similarity transformation to rows and columns to left and above 'm'
                 // Only update elements below the diagonal
                 for (int i = 0; i < m; i++) {
+                    row = data[i];
                     f = d[i];
                     data[m][i] = f;
-                    g = e[i] + (data[i][i] * f);
+                    g = e[i] + (row[i] * f);
                     for (int j = i + 1; j < m; j++) {
-                        val = data[i][j];
+                        val = row[j];
                         g += val * d[j];
                         e[j] += val * f;
                     }
@@ -474,13 +476,14 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 val = f / (h + h);
                 AXPY.invoke(e, 0, 1, -val, d, 0, 1, 0, m);
                 for (int i = 0; i < m; i++) {
+                    row = data[i];
                     f = d[i];
                     g = e[i];
                     for (int j = i; j < m; j++) { // rank-2 update
-                        data[i][j] -= ((f * e[j]) + (g * d[j]));
+                        row[j] -= ((f * e[j]) + (g * d[j]));
                     }
-                    d[i] = data[i][m - 1]; // Copy "next" row/column to work on
-                    data[i][m] = ZERO;
+                    d[i] = row[m - 1]; // Copy "next" row/column to work on
+                    row[m] = ZERO;
                 }
             }
             d[m] = h;
@@ -493,19 +496,20 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             }
         } else {
             for (int m = 0; m < last; m++) {
+                row = data[m + 1];
                 data[m][last] = data[m][m];
                 data[m][m] = ONE;
                 h = d[m + 1];
                 if (Double.compare(h, ZERO) != 0) {
                     for (int j = 0; j <= m; j++) {
-                        d[j] = data[m + 1][j] / h;
+                        d[j] = row[j] / h;
                     }
                     for (int i = 0; i <= m; i++) {
-                        final double dotp = DOT.invoke(data[m + 1], 0, data[i], 0, 0, m + 1);
-                        AXPY.invoke(data[i], 0, 1, -dotp, d, 0, 1, 0, m + 1);
+                        val = DOT.invoke(row, 0, data[i], 0, 0, m + 1);
+                        AXPY.invoke(data[i], 0, 1, -val, d, 0, 1, 0, m + 1);
                     }
                 }
-                Arrays.fill(data[m + 1], 0, m + 1, ZERO);
+                Arrays.fill(row, 0, m + 1, ZERO);
             }
             for (int i = 0; i < last; i++) {
                 d[i] = data[i][last];
