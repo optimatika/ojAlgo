@@ -297,7 +297,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
         BasicArray<N> retVal = null;
 
-        if (myDelegate instanceof Primitive64Array) {
+        if (myDelegate.isPrimitive()) {
 
             retVal = (BasicArray<N>) new Primitive64Array((int) length);
 
@@ -343,7 +343,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
         final int tmpLength = indices.length;
 
-        if (myDelegate instanceof Primitive64Array) {
+        if (myDelegate.isPrimitive()) {
 
             retVal = (BasicArray<N>) new Primitive64Array(tmpLength);
 
@@ -486,7 +486,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public void modifyMatching(final Access1D<N> left, final BinaryFunction<N> function) {
         final long tmpLength = Math.min(length, left.count());
-        if (myDelegate instanceof Primitive64Array) {
+        if (myDelegate.isPrimitive()) {
             for (long i = 0L; i < tmpLength; i++) {
                 this.set(i, function.invoke(left.doubleValue(i), this.doubleValue(i)));
             }
@@ -499,7 +499,7 @@ public final class Array1D<N extends Number> extends AbstractList<N> implements 
 
     public void modifyMatching(final BinaryFunction<N> function, final Access1D<N> right) {
         final long tmpLength = Math.min(length, right.count());
-        if (myDelegate instanceof Primitive64Array) {
+        if (myDelegate.isPrimitive()) {
             for (long i = 0L; i < tmpLength; i++) {
                 this.set(i, function.invoke(this.doubleValue(i), right.doubleValue(i)));
             }

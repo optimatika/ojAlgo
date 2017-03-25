@@ -71,6 +71,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             return this.checkSymmetry();
         }
 
+        public boolean isOrdered() {
+            return false;
+        }
+
         @Override
         protected boolean doDecompose(final double[][] data, final boolean valuesOnly) {
 
@@ -92,6 +96,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         public boolean isHermitian() {
+            return false;
+        }
+
+        public boolean isOrdered() {
             return false;
         }
 
@@ -121,6 +129,10 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             return true;
         }
 
+        public boolean isOrdered() {
+            return true;
+        }
+
         public PhysicalStore<Double> preallocate(final Structure2D template) {
             final long numberOfEquations = template.countRows();
             return this.allocate(numberOfEquations, numberOfEquations);
@@ -147,7 +159,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
      */
     private double[] d = null, e = null;
     private transient MatrixStore<Double> myInverse = null;
-    private boolean myOrdered = true;
     /**
      * Array for internal storage of eigenvectors.
      *
@@ -321,10 +332,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    public final boolean isOrdered() {
-        return myOrdered;
-    }
-
     public boolean isSolvable() {
         return this.isComputed() && this.isHermitian();
     }
@@ -336,10 +343,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
     @Override
     public void reset() {
         myInverse = null;
-    }
-
-    public void setOrdered(final boolean ordered) {
-        myOrdered = ordered;
     }
 
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {

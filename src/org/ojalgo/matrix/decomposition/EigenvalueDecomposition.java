@@ -62,7 +62,6 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
 
     private MatrixStore<N> myD = null;
     private Array1D<ComplexNumber> myEigenvalues = null;
-    private boolean myOrdered = true;
     private MatrixStore<N> myV = null;
     private boolean myValuesOnly = false;
 
@@ -114,10 +113,6 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         return myV;
     }
 
-    public final boolean isOrdered() {
-        return myOrdered;
-    }
-
     @Override
     public void reset() {
 
@@ -128,10 +123,6 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         myV = null;
 
         myValuesOnly = false;
-    }
-
-    public void setOrdered(final boolean ordered) {
-        myOrdered = ordered;
     }
 
     private final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean hermitian, final boolean valuesOnly) {

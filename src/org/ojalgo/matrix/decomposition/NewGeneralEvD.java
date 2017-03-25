@@ -52,7 +52,6 @@ abstract class NewGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
         Primitive() {
             super(PrimitiveDenseStore.FACTORY);
         }
-
     }
 
     protected NewGeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
@@ -86,6 +85,10 @@ abstract class NewGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
     }
 
     public final boolean isHermitian() {
+        return false;
+    }
+
+    public boolean isOrdered() {
         return false;
     }
 

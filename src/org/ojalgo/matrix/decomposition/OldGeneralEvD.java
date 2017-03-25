@@ -89,6 +89,10 @@ abstract class OldGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
         return false;
     }
 
+    public boolean isOrdered() {
+        return false;
+    }
+
     public final boolean isSolvable() {
         return this.isComputed() && this.isHermitian();
     }
@@ -131,7 +135,7 @@ abstract class OldGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
         //            BasicLogger.logDebug("D", tmpD);
         //            BasicLogger.logDebug("THIS", tmpMtrxA);
 
-        tmpEigenvalues.sortDescending();
+        // tmpEigenvalues.sortDescending();
 
         return this.computed(true);
     }

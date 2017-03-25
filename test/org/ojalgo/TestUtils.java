@@ -28,6 +28,7 @@ import java.util.Arrays;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.access.StructureAnyD;
+import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.MatrixUtils;
@@ -143,6 +144,17 @@ public abstract class TestUtils {
     public static <N extends Number> void assertEquals(final MatrixStore<N> expected, final Eigenvalue<N> actual, final NumberContext context) {
         if (!Eigenvalue.equals(expected, actual, context)) {
             Assert.failNotEquals("Eigenvalue<N>", expected, actual);
+        }
+        if (actual.isOrdered()) {
+            final MatrixStore<N> mtrxD = actual.getD();
+            double bigger = Double.MAX_VALUE;
+            final Array1D<ComplexNumber> tmpEigenvalues = actual.getEigenvalues();
+            for (int i = 0; i < tmpEigenvalues.length; i++) {
+                final ComplexNumber value = tmpEigenvalues.get(i);
+                Assert.assertTrue(bigger >= value.getModulus());
+                Assert.assertEquals(value.doubleValue(), mtrxD.doubleValue(i, i), context.epsilon());
+                bigger = value.getModulus();
+            }
         }
     }
 

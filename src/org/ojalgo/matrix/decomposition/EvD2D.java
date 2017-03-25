@@ -3,14 +3,6 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.util.Arrays;
-
-import org.ojalgo.array.blas.AXPY;
-import org.ojalgo.array.blas.COPY;
-import org.ojalgo.array.blas.DOT;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
-
 public abstract class EvD2D {
 
     /**
