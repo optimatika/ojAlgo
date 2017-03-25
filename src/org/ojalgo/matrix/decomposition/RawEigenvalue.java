@@ -431,8 +431,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 e[m] = d[m - 1];
                 for (int j = 0; j < m; j++) {
                     d[j] = data[j][m - 1]; // Copy "next" row/column to work on
-                    data[j][m] = ZERO; // Are both needed? - neither needed?
-                    data[m][j] = ZERO; // Could cause cache-misses - it was already zero!
+                    //                    data[j][m] = ZERO; // Are both needed? - neither needed?
+                    //                    data[m][j] = ZERO; // Could cause cache-misses - it was already zero!
                 }
 
             } else {
@@ -487,23 +487,38 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         // Accumulate transformations - turn data into V
-        for (int m = 0; m < last; m++) {
-
-            data[m][last] = data[m][m];
-            data[m][m] = ONE;
-
-            h = d[m + 1];
-            if (Double.compare(h, ZERO) != 0) {
-                for (int j = 0; j <= m; j++) {
-                    d[j] = data[m + 1][j] / h;
-                }
-
-                for (int i = 0; i <= m; i++) {
-                    final double dotp = DOT.invoke(data[m + 1], 0, data[i], 0, 0, m + 1);
-                    AXPY.invoke(data[i], 0, 1, -dotp, d, 0, 1, 0, m + 1);
-                }
+        if (valuesOnly) {
+            for (int m = 0; m < last; m++) {
+                data[m][last] = data[m][m];
+                //                data[m][m] = ONE;
+                //                h = d[m + 1];
+                //                if (Double.compare(h, ZERO) != 0) {
+                //                    for (int j = 0; j <= m; j++) {
+                //                        d[j] = data[m + 1][j] / h;
+                //                    }
+                //                    for (int i = 0; i <= m; i++) {
+                //                        final double dotp = DOT.invoke(data[m + 1], 0, data[i], 0, 0, m + 1);
+                //                        AXPY.invoke(data[i], 0, 1, -dotp, d, 0, 1, 0, m + 1);
+                //                    }
+                //                }
+                //                Arrays.fill(data[m + 1], 0, m + 1, ZERO);
             }
-            Arrays.fill(data[m + 1], 0, m + 1, ZERO);
+        } else {
+            for (int m = 0; m < last; m++) {
+                data[m][last] = data[m][m];
+                data[m][m] = ONE;
+                h = d[m + 1];
+                if (Double.compare(h, ZERO) != 0) {
+                    for (int j = 0; j <= m; j++) {
+                        d[j] = data[m + 1][j] / h;
+                    }
+                    for (int i = 0; i <= m; i++) {
+                        final double dotp = DOT.invoke(data[m + 1], 0, data[i], 0, 0, m + 1);
+                        AXPY.invoke(data[i], 0, 1, -dotp, d, 0, 1, 0, m + 1);
+                    }
+                }
+                Arrays.fill(data[m + 1], 0, m + 1, ZERO);
+            }
         }
 
         for (int i = 0; i < size; i++) {
@@ -512,7 +527,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         data[last][last] = ONE;
-        e[0] = ZERO;
+        // e[0] = ZERO;
 
         for (int k = 1; k < size; k++) {
             e[k - 1] = e[k];

@@ -261,4 +261,25 @@ public class EigenvalueTest extends MatrixDecompositionTests {
         }
     }
 
+    public void testRandomSymmetricValuesOnly() {
+
+        final NumberContext evaluationContext = NumberContext.getGeneral(MathContext.DECIMAL32);
+
+        for (int dim = 1; dim < 10; dim++) {
+
+            final PrimitiveDenseStore matrix = MatrixUtils.makeSPD(dim);
+
+            for (final Eigenvalue<Double> decomp : MatrixDecompositionTests.getEigenvaluePrimitiveSymmetric()) {
+
+                decomp.decompose(matrix);
+                TestUtils.assertEquals(matrix, decomp, evaluationContext);
+
+                final Array1D<ComplexNumber> expected = decomp.getEigenvalues();
+                decomp.computeValuesOnly(matrix);
+                final Array1D<ComplexNumber> actual = decomp.getEigenvalues();
+                TestUtils.assertEquals(expected, actual, evaluationContext);
+            }
+        }
+    }
+
 }
