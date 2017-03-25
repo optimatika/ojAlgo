@@ -488,20 +488,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
         // Accumulate transformations - turn data into V
         if (valuesOnly) {
-            for (int m = 0; m < last; m++) {
-                data[m][last] = data[m][m];
-                //                data[m][m] = ONE;
-                //                h = d[m + 1];
-                //                if (Double.compare(h, ZERO) != 0) {
-                //                    for (int j = 0; j <= m; j++) {
-                //                        d[j] = data[m + 1][j] / h;
-                //                    }
-                //                    for (int i = 0; i <= m; i++) {
-                //                        final double dotp = DOT.invoke(data[m + 1], 0, data[i], 0, 0, m + 1);
-                //                        AXPY.invoke(data[i], 0, 1, -dotp, d, 0, 1, 0, m + 1);
-                //                    }
-                //                }
-                //                Arrays.fill(data[m + 1], 0, m + 1, ZERO);
+            for (int m = 0; m < size; m++) {
+                d[m] = data[m][m];
             }
         } else {
             for (int m = 0; m < last; m++) {
@@ -519,15 +507,13 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 }
                 Arrays.fill(data[m + 1], 0, m + 1, ZERO);
             }
+            for (int i = 0; i < last; i++) {
+                d[i] = data[i][last];
+                data[i][last] = ZERO;
+            }
+            d[last] = data[last][last];
+            data[last][last] = ONE;
         }
-
-        for (int i = 0; i < size; i++) {
-            d[i] = data[i][last];
-            data[i][last] = ZERO;
-        }
-
-        data[last][last] = ONE;
-        // e[0] = ZERO;
 
         for (int k = 1; k < size; k++) {
             e[k - 1] = e[k];
