@@ -28,6 +28,13 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 
+/**
+ * SchurDecomposition
+ *
+ * @author apete
+ * @deprecated v43 Use {@linkplain Eigenvalue} instead
+ */
+@Deprecated
 abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Schur<N> {
 
     public static final class SchurResult<N extends Number> extends Object {

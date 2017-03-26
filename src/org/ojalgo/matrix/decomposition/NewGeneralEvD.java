@@ -32,6 +32,12 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 
+/**
+ * Intended to be refactored to use ojAlgo's standrad householder transformations, and then probably/hopefully
+ * replace {@link OldGeneralEvD}.
+ *
+ * @author apete
+ */
 abstract class NewGeneralEvD<N extends Number> extends EigenvalueDecomposition<N> {
 
     /**
@@ -52,6 +58,7 @@ abstract class NewGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
         Primitive() {
             super(PrimitiveDenseStore.FACTORY);
         }
+
     }
 
     protected NewGeneralEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
