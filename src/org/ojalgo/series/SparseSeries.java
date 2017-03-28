@@ -29,11 +29,13 @@ import java.util.Set;
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.LongToNumberMap;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 
 final class SparseSeries<K extends Comparable<? super K>, N extends Number> extends NewAbstractSeries<K, N, SparseSeries<K, N>> {
 
     private final LongToNumberMap<N> myDelegate;
+    private final BinaryFunction<N> myMixer = null;
 
     SparseSeries(final DenseArray.Factory<N> arrayFactory, final IndexMapper<K> indexMapper) {
         super(indexMapper);
@@ -126,7 +128,11 @@ final class SparseSeries<K extends Comparable<? super K>, N extends Number> exte
 
         final long tmpIndex = indexMapper.toIndex(key);
 
-        return myDelegate.put(tmpIndex, value);
+        if (myMixer != null) {
+            return myDelegate.mix(tmpIndex, myMixer, value);
+        } else {
+            return myDelegate.put(tmpIndex, value);
+        }
     }
 
     @Override
@@ -134,7 +140,11 @@ final class SparseSeries<K extends Comparable<? super K>, N extends Number> exte
 
         final long tmpIndex = indexMapper.toIndex(key);
 
-        return myDelegate.put(tmpIndex, value);
+        if (myMixer != null) {
+            return myDelegate.mix(tmpIndex, myMixer, value);
+        } else {
+            return myDelegate.put(tmpIndex, value);
+        }
     }
 
     @Override

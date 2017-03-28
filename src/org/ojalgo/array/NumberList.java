@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
@@ -312,22 +313,30 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public double mix(long index, BinaryFunction<N> mixer, double addend) {
+        Objects.requireNonNull(mixer);
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
-            final double retVal = mixer.invoke(myStorage.doubleValue(index), addend);
-            myStorage.set(index, retVal);
-            return retVal;
+            synchronized (myStorage) {
+                final double oldValue = myStorage.doubleValue(index);
+                final double newValue = mixer.invoke(oldValue, addend);
+                myStorage.set(index, newValue);
+                return oldValue;
+            }
         }
     }
 
     public N mix(long index, BinaryFunction<N> mixer, N addend) {
+        Objects.requireNonNull(mixer);
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
-            final N retVal = mixer.invoke(myStorage.get(index), addend);
-            myStorage.set(index, retVal);
-            return retVal;
+            synchronized (myStorage) {
+                final N oldValue = myStorage.get(index);
+                final N newValue = mixer.invoke(oldValue, addend);
+                myStorage.set(index, newValue);
+                return oldValue;
+            }
         }
     }
 

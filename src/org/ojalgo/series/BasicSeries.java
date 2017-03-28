@@ -104,6 +104,19 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     public static final BasicSeries.Builder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.Builder<>(TimeIndex.OFFSET_DATE_TIME);
     public static final BasicSeries.Builder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.Builder<>(TimeIndex.ZONED_DATE_TIME);
 
+    public static BasicSeries<Double, Double> make(DenseArray.Factory<Double> arrayFactory) {
+        return new SparseSeries<>(arrayFactory, new IndexMapper<Double>() {
+
+            public long toIndex(Double key) {
+                return Double.doubleToLongBits(key);
+            }
+
+            public Double toKey(long index) {
+                return Double.longBitsToDouble(index);
+            }
+        });
+    }
+
     public static <N extends Number & Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, final IndexMapper<N> indexMapper) {
         return new SparseSeries<>(arrayFactory, indexMapper);
     }
@@ -216,6 +229,8 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     K nextKey();
 
     double put(final K key, final double value);
+
+    V put(final K key, final V value);
 
     default void putAll(final Collection<? extends KeyValue<? extends K, ? extends V>> data) {
         for (final KeyValue<? extends K, ? extends V> tmpKeyValue : data) {

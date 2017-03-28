@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.List;
+import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.Spliterator;
 import java.util.concurrent.ExecutionException;
@@ -481,15 +482,23 @@ public final class Array1D<N extends Number> extends AbstractList<N>
     }
 
     public double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
-        final double retVal = mixer.invoke(this.doubleValue(index), addend);
-        this.set(index, retVal);
-        return retVal;
+        Objects.requireNonNull(mixer);
+        synchronized (myDelegate) {
+            final double oldValue = this.doubleValue(index);
+            final double newValue = mixer.invoke(oldValue, addend);
+            this.set(index, newValue);
+            return oldValue;
+        }
     }
 
     public N mix(final long index, final BinaryFunction<N> mixer, final N addend) {
-        final N retVal = mixer.invoke(this.get(index), addend);
-        this.set(index, retVal);
-        return retVal;
+        Objects.requireNonNull(mixer);
+        synchronized (myDelegate) {
+            final N oldValue = this.get(index);
+            final N newValue = mixer.invoke(oldValue, addend);
+            this.set(index, newValue);
+            return oldValue;
+        }
     }
 
     public void modifyAll(final UnaryFunction<N> modifier) {

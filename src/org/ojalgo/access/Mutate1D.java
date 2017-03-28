@@ -85,12 +85,17 @@ public interface Mutate1D extends Structure1D {
     }
 
     /**
-     * Mix/combine the previously existing value, at index, with the supplied addend
+     * Mix/combine the previously existing value, at index, with the supplied addend. The intention is that
+     * implementations should make this method thread safe even if the class as a whole is not (which is
+     * usually the case).
      *
      * @author apete
      */
     interface Mixable<N extends Number> extends Structure1D {
 
+        /**
+         * @return The original/previous value
+         */
         double mix(long index, BinaryFunction<N> mixer, double addend);
 
         N mix(long index, BinaryFunction<N> mixer, N addend);

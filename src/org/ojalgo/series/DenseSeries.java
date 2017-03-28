@@ -30,11 +30,13 @@ import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.NumberList;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 
 final class DenseSeries<K extends Comparable<? super K>, N extends Number> extends NewAbstractSeries<K, N, DenseSeries<K, N>> {
 
     private final NumberList<N> myDelegate;
+    private final BinaryFunction<N> myMixer = null;
 
     DenseSeries(final DenseArray.Factory<N> arrayFactory, final IndexMapper<K> indexMapper) {
         super(indexMapper);
@@ -123,11 +125,18 @@ final class DenseSeries<K extends Comparable<? super K>, N extends Number> exten
 
         final long tmpIndex = indexMapper.toIndex(key);
 
-        final double tmpOldVal = myDelegate.doubleValue(tmpIndex);
+        if (myMixer != null) {
 
-        myDelegate.set(tmpIndex, value);
+            return myDelegate.mix(tmpIndex, myMixer, value);
 
-        return tmpOldVal;
+        } else {
+
+            final double oldValue = myDelegate.doubleValue(tmpIndex);
+
+            myDelegate.set(tmpIndex, value);
+
+            return oldValue;
+        }
     }
 
     @Override
@@ -135,11 +144,18 @@ final class DenseSeries<K extends Comparable<? super K>, N extends Number> exten
 
         final long tmpIndex = indexMapper.toIndex(key);
 
-        final N tmpOldVal = myDelegate.get(tmpIndex);
+        if (myMixer != null) {
 
-        myDelegate.set(tmpIndex, value);
+            return myDelegate.mix(tmpIndex, myMixer, value);
 
-        return tmpOldVal;
+        } else {
+
+            final N oldValue = myDelegate.get(tmpIndex);
+
+            myDelegate.set(tmpIndex, value);
+
+            return oldValue;
+        }
     }
 
     @Override

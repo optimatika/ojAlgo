@@ -5,6 +5,7 @@ import java.util.AbstractSet;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -252,17 +253,25 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     }
 
     public double mix(long key, BinaryFunction<N> mixer, double addend) {
-        final int tmpIndex = myStorage.index(key);
-        final double retVal = tmpIndex >= 0 ? mixer.invoke(myStorage.doubleValueInternally(tmpIndex), addend) : addend;
-        myStorage.doSet(key, tmpIndex, retVal, true);
-        return retVal;
+        Objects.requireNonNull(mixer);
+        synchronized (myStorage) {
+            final int tmpIndex = myStorage.index(key);
+            final double oldValue = myStorage.doubleValueInternally(tmpIndex);
+            final double newValue = tmpIndex >= 0 ? mixer.invoke(oldValue, addend) : addend;
+            myStorage.doSet(key, tmpIndex, newValue, true);
+            return oldValue;
+        }
     }
 
     public N mix(long key, BinaryFunction<N> mixer, N addend) {
-        final int tmpIndex = myStorage.index(key);
-        final N retVal = tmpIndex >= 0 ? mixer.invoke(myStorage.getInternally(tmpIndex), addend) : addend;
-        myStorage.doSet(key, tmpIndex, retVal, true);
-        return retVal;
+        Objects.requireNonNull(mixer);
+        synchronized (myStorage) {
+            final int tmpIndex = myStorage.index(key);
+            final N oldValue = myStorage.getInternally(tmpIndex);
+            final N newValue = tmpIndex >= 0 ? mixer.invoke(oldValue, addend) : addend;
+            myStorage.doSet(key, tmpIndex, newValue, true);
+            return oldValue;
+        }
     }
 
     public double put(final long key, final double value) {
