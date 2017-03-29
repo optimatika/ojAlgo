@@ -256,7 +256,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         Objects.requireNonNull(mixer);
         synchronized (myStorage) {
             final int tmpIndex = myStorage.index(key);
-            final double oldValue = myStorage.doubleValueInternally(tmpIndex);
+            final double oldValue = tmpIndex >= 0 ? myStorage.doubleValueInternally(tmpIndex) : PrimitiveMath.NaN;
             final double newValue = tmpIndex >= 0 ? mixer.invoke(oldValue, addend) : addend;
             myStorage.doSet(key, tmpIndex, newValue, true);
             return oldValue;
@@ -267,7 +267,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         Objects.requireNonNull(mixer);
         synchronized (myStorage) {
             final int tmpIndex = myStorage.index(key);
-            final N oldValue = myStorage.getInternally(tmpIndex);
+            final N oldValue = tmpIndex >= 0 ? myStorage.getInternally(tmpIndex) : null;
             final N newValue = tmpIndex >= 0 ? mixer.invoke(oldValue, addend) : addend;
             myStorage.doSet(key, tmpIndex, newValue, true);
             return oldValue;
