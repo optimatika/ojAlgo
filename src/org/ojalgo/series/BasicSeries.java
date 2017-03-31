@@ -35,6 +35,7 @@ import java.util.SortedMap;
 
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.DenseArray;
+import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.series.primitive.CoordinatedSet;
 import org.ojalgo.series.primitive.DataSeries;
@@ -58,54 +59,74 @@ import org.ojalgo.type.keyvalue.KeyValue;
  */
 public interface BasicSeries<K extends Comparable<? super K>, V extends Number> extends SortedMap<K, V> {
 
-    public class Builder<K extends Comparable<? super K>> {
+    public class NumberSeriesBuilder<N extends Number & Comparable<? super N>> {
 
-        private transient K myReference = null;
-        private transient CalendarDateDuration myResolution = null;
+        NumberSeriesBuilder() {
+            super();
+        }
+
+        public BasicSeries<N, N> build(final DenseArray.Factory<N> arrayFactory) {
+            return this.build(arrayFactory, null);
+        }
+
+        public BasicSeries<N, N> build(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
+            return null;
+        }
+
+    }
+
+    public class TimeSeriesBuilder<K extends Comparable<? super K>> {
+
+        private K myReference = null;
+        private CalendarDateDuration myResolution = null;
         private final TimeIndex<K> myTimeIndex;
 
-        private Builder(final TimeIndex<K> timeIndex) {
+        TimeSeriesBuilder(final TimeIndex<K> timeIndex) {
             super();
             myTimeIndex = timeIndex;
         }
 
         public <N extends Number> BasicSeries<K, N> build(final DenseArray.Factory<N> arrayFactory) {
+            return build(arrayFactory, null);
+        }
+
+        public <N extends Number> BasicSeries<K, N> build(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
             if (myReference != null) {
                 if (myResolution != null) {
-                    return new DenseSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution));
+                    return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution), accumularor);
                 } else {
-                    return new DenseSeries<>(arrayFactory, myTimeIndex.from(myReference));
+                    return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference), accumularor);
                 }
             } else {
-                return new SparseSeries<>(arrayFactory, myTimeIndex.plain());
+                return new MappedIndexSeries<>(arrayFactory, myTimeIndex.plain(), accumularor);
             }
         }
 
-        public Builder<K> reference(final K reference) {
+        public TimeSeriesBuilder<K> reference(final K reference) {
             myReference = reference;
             return this;
         }
 
-        public Builder<K> resolution(final CalendarDateDuration resolution) {
+        public TimeSeriesBuilder<K> resolution(final CalendarDateDuration resolution) {
             myResolution = resolution;
             return this;
         }
 
     }
 
-    public static final BasicSeries.Builder<Calendar> CALENDAR = new BasicSeries.Builder<>(TimeIndex.CALENDAR);
-    public static final BasicSeries.Builder<CalendarDate> CALENDAR_DATE = new BasicSeries.Builder<>(TimeIndex.CALENDAR_DATE);
-    public static final BasicSeries.Builder<Date> DATE = new BasicSeries.Builder<>(TimeIndex.DATE);
-    public static final BasicSeries.Builder<Instant> INSTANT = new BasicSeries.Builder<>(TimeIndex.INSTANT);
-    public static final BasicSeries.Builder<LocalDate> LOCAL_DATE = new BasicSeries.Builder<>(TimeIndex.LOCAL_DATE);
-    public static final BasicSeries.Builder<LocalDateTime> LOCAL_DATE_TIME = new BasicSeries.Builder<>(TimeIndex.LOCAL_DATE_TIME);
-    public static final BasicSeries.Builder<LocalTime> LOCAL_TIME = new BasicSeries.Builder<>(TimeIndex.LOCAL_TIME);
-    public static final BasicSeries.Builder<Long> LONG = new BasicSeries.Builder<>(TimeIndex.LONG);
-    public static final BasicSeries.Builder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.Builder<>(TimeIndex.OFFSET_DATE_TIME);
-    public static final BasicSeries.Builder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.Builder<>(TimeIndex.ZONED_DATE_TIME);
+    public static final BasicSeries.TimeSeriesBuilder<Calendar> CALENDAR = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.CALENDAR);
+    public static final BasicSeries.TimeSeriesBuilder<CalendarDate> CALENDAR_DATE = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.CALENDAR_DATE);
+    public static final BasicSeries.TimeSeriesBuilder<Date> DATE = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.DATE);
+    public static final BasicSeries.TimeSeriesBuilder<Instant> INSTANT = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.INSTANT);
+    public static final BasicSeries.TimeSeriesBuilder<LocalDate> LOCAL_DATE = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_DATE);
+    public static final BasicSeries.TimeSeriesBuilder<LocalDateTime> LOCAL_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_DATE_TIME);
+    public static final BasicSeries.TimeSeriesBuilder<LocalTime> LOCAL_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_TIME);
+    public static final BasicSeries.TimeSeriesBuilder<Long> LONG = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LONG);
+    public static final BasicSeries.TimeSeriesBuilder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.OFFSET_DATE_TIME);
+    public static final BasicSeries.TimeSeriesBuilder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.ZONED_DATE_TIME);
 
     public static BasicSeries<Double, Double> make(DenseArray.Factory<Double> arrayFactory) {
-        return new SparseSeries<>(arrayFactory, new IndexMapper<Double>() {
+        return new MappedIndexSeries<>(arrayFactory, new IndexMapper<Double>() {
 
             public long toIndex(Double key) {
                 return Double.doubleToLongBits(key);
@@ -114,11 +135,11 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             public Double toKey(long index) {
                 return Double.longBitsToDouble(index);
             }
-        });
+        }, null);
     }
 
     public static <N extends Number & Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, final IndexMapper<N> indexMapper) {
-        return new SparseSeries<>(arrayFactory, indexMapper);
+        return new MappedIndexSeries<>(arrayFactory, indexMapper, null);
     }
 
     static <K extends Comparable<? super K>> CoordinatedSet<K> coordinate(final List<? extends BasicSeries<K, ?>> uncoordinated) {
