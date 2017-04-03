@@ -34,25 +34,25 @@ import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 
-abstract class OldAbstractSeries<K extends Comparable<? super K>, V extends Number, I extends OldAbstractSeries<K, V, I>> extends TreeMap<K, V>
-        implements BasicSeries<K, V> {
+abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I extends TreeSeries<K, N, I>> extends TreeMap<K, N> implements BasicSeries<K, N> {
 
     private ColourData myColour = null;
     private String myName = null;
 
-    protected OldAbstractSeries() {
+    protected TreeSeries() {
         super();
     }
 
-    protected OldAbstractSeries(final Comparator<? super K> comparator) {
+    @SuppressWarnings("unused")
+    private TreeSeries(final Comparator<? super K> comparator) {
         super(comparator);
     }
 
-    protected OldAbstractSeries(final Map<? extends K, ? extends V> map) {
+    protected TreeSeries(final Map<? extends K, ? extends N> map) {
         super(map);
     }
 
-    protected OldAbstractSeries(final SortedMap<K, ? extends V> sortedMap) {
+    protected TreeSeries(final SortedMap<K, ? extends N> sortedMap) {
         super(sortedMap);
     }
 
@@ -65,7 +65,7 @@ abstract class OldAbstractSeries<K extends Comparable<? super K>, V extends Numb
         return this.get(key).doubleValue();
     }
 
-    public V firstValue() {
+    public N firstValue() {
         return this.get(this.firstKey());
     }
 
@@ -93,7 +93,7 @@ abstract class OldAbstractSeries<K extends Comparable<? super K>, V extends Numb
         final double[] retVal = new double[this.size()];
 
         int i = 0;
-        for (final V tmpValue : this.values()) {
+        for (final N tmpValue : this.values()) {
             retVal[i] = tmpValue.doubleValue();
             i++;
         }
@@ -101,12 +101,12 @@ abstract class OldAbstractSeries<K extends Comparable<? super K>, V extends Numb
         return retVal;
     }
 
-    public V lastValue() {
+    public N lastValue() {
         return this.get(this.lastKey());
     }
 
-    public void modifyAll(final UnaryFunction<V> function) {
-        for (final Map.Entry<K, V> tmpEntry : this.entrySet()) {
+    public void modifyAll(final UnaryFunction<N> function) {
+        for (final Map.Entry<K, N> tmpEntry : this.entrySet()) {
             this.put(tmpEntry.getKey(), function.invoke(tmpEntry.getValue()));
         }
     }

@@ -42,6 +42,25 @@ import org.ojalgo.type.TypeUtils;
 
 final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number> extends AbstractMap<K, N> implements BasicSeries<K, N> {
 
+    static final IndexMapper<Double> MAPPER = new IndexMapper<Double>() {
+
+        public long toIndex(Double key) {
+            return MappedIndexSeries.toIndex(key);
+        }
+
+        public Double toKey(long index) {
+            return MappedIndexSeries.toKey(index);
+        }
+    };
+
+    static long toIndex(double key) {
+        return Double.doubleToLongBits(key);
+    }
+
+    static double toKey(long index) {
+        return Double.longBitsToDouble(index);
+    }
+
     private final BinaryFunction<N> myAccumulator;
     private ColourData myColour = null;
     private final LongToNumberMap<N> myDelegate;
@@ -62,9 +81,8 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         myAccumulator = accumulator;
     }
 
-    @SuppressWarnings("unchecked")
     public MappedIndexSeries<K, N> colour(final ColourData colour) {
-        myColour = colour;
+        this.setColour(colour);
         return this;
     }
 
@@ -72,8 +90,16 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         return null;
     }
 
+    public double doubleValue(double key) {
+        return myDelegate.doubleValue(MappedIndexSeries.toIndex(key));
+    }
+
     public double doubleValue(final K key) {
         return myDelegate.doubleValue(myIndexMapper.toIndex(key));
+    }
+
+    public double doubleValue(long key) {
+        return myDelegate.doubleValue(key);
     }
 
     @Override
@@ -128,6 +154,14 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
 
     public N firstValue() {
         return this.get(this.firstKey());
+    }
+
+    public N get(double key) {
+        return myDelegate.get(MappedIndexSeries.toIndex(key));
+    }
+
+    public N get(long key) {
+        return myDelegate.get(key);
     }
 
     @SuppressWarnings("unchecked")
@@ -194,9 +228,8 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         }
     }
 
-    @SuppressWarnings("unchecked")
     public MappedIndexSeries<K, N> name(final String name) {
-        myName = name;
+        this.setName(name);
         return this;
     }
 
@@ -204,26 +237,36 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         return myIndexMapper.toKey(myDelegate.lastKey() + 1L);
     }
 
+    public double put(double key, double value) {
+        return this.put(MappedIndexSeries.toIndex(key), value);
+    }
+
+    public N put(double key, N value) {
+        return this.put(MappedIndexSeries.toIndex(key), value);
+    }
+
     public double put(final K key, final double value) {
-
-        final long tmpIndex = myIndexMapper.toIndex(key);
-
-        if (myAccumulator != null) {
-            return myDelegate.mix(tmpIndex, myAccumulator, value);
-        } else {
-            return myDelegate.put(tmpIndex, value);
-        }
+        return this.put(myIndexMapper.toIndex(key), value);
     }
 
     @Override
     public N put(final K key, final N value) {
+        return this.put(myIndexMapper.toIndex(key), value);
+    }
 
-        final long tmpIndex = myIndexMapper.toIndex(key);
-
+    public double put(long key, double value) {
         if (myAccumulator != null) {
-            return myDelegate.mix(tmpIndex, myAccumulator, value);
+            return myDelegate.mix(key, myAccumulator, value);
         } else {
-            return myDelegate.put(tmpIndex, value);
+            return myDelegate.put(key, value);
+        }
+    }
+
+    public N put(long key, N value) {
+        if (myAccumulator != null) {
+            return myDelegate.mix(key, myAccumulator, value);
+        } else {
+            return myDelegate.put(key, value);
         }
     }
 
@@ -275,11 +318,11 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
     }
 
     void setColour(final ColourData colour) {
-        this.colour(colour);
+        myColour = colour;
     }
 
     void setName(final String name) {
-        this.name(name);
+        myName = name;
     }
 
 }

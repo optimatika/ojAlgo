@@ -22,7 +22,6 @@
 package org.ojalgo.series;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -32,14 +31,10 @@ import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.UnaryFunction;
 
-public class NumberSeries<N extends Number & Comparable<N>> extends OldAbstractSeries<N, N, NumberSeries<N>> implements UnaryFunction<N> {
+public class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> implements UnaryFunction<N> {
 
     public NumberSeries() {
         super();
-    }
-
-    public NumberSeries(final Comparator<? super N> comparator) {
-        super(comparator);
     }
 
     public NumberSeries(final Map<? extends N, ? extends N> map) {
@@ -58,6 +53,26 @@ public class NumberSeries<N extends Number & Comparable<N>> extends OldAbstractS
         return ArrayUtils.wrapAccess1D(new ArrayList<>(this.values()));
     }
 
+    public double doubleValue(double key) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public double doubleValue(long key) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public N get(double key) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public N get(long key) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     public double invoke(final double arg) {
         ProgrammingError.throwForIllegalInvocation();
         return PrimitiveMath.NaN;
@@ -68,6 +83,26 @@ public class NumberSeries<N extends Number & Comparable<N>> extends OldAbstractS
     }
 
     public N nextKey() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public double put(double key, double value) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public N put(double key, N value) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public double put(long key, double value) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public N put(long key, N value) {
         // TODO Auto-generated method stub
         return null;
     }

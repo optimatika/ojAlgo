@@ -59,22 +59,6 @@ import org.ojalgo.type.keyvalue.KeyValue;
  */
 public interface BasicSeries<K extends Comparable<? super K>, V extends Number> extends SortedMap<K, V> {
 
-    public class NumberSeriesBuilder<N extends Number & Comparable<? super N>> {
-
-        NumberSeriesBuilder() {
-            super();
-        }
-
-        public BasicSeries<N, N> build(final DenseArray.Factory<N> arrayFactory) {
-            return this.build(arrayFactory, null);
-        }
-
-        public BasicSeries<N, N> build(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
-            return null;
-        }
-
-    }
-
     public class TimeSeriesBuilder<K extends Comparable<? super K>> {
 
         private K myReference = null;
@@ -126,20 +110,21 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     public static final BasicSeries.TimeSeriesBuilder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.ZONED_DATE_TIME);
 
     public static BasicSeries<Double, Double> make(DenseArray.Factory<Double> arrayFactory) {
-        return new MappedIndexSeries<>(arrayFactory, new IndexMapper<Double>() {
-
-            public long toIndex(Double key) {
-                return Double.doubleToLongBits(key);
-            }
-
-            public Double toKey(long index) {
-                return Double.longBitsToDouble(index);
-            }
-        }, null);
+        return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, null);
     }
 
-    public static <N extends Number & Comparable<N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, final IndexMapper<N> indexMapper) {
+    public static BasicSeries<Double, Double> make(DenseArray.Factory<Double> arrayFactory, final BinaryFunction<Double> accumulator) {
+        return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, accumulator);
+    }
+
+    public static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
+            final IndexMapper<N> indexMapper) {
         return new MappedIndexSeries<>(arrayFactory, indexMapper, null);
+    }
+
+    public static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, final IndexMapper<N> indexMapper,
+            final BinaryFunction<N> accumulator) {
+        return new MappedIndexSeries<>(arrayFactory, indexMapper, accumulator);
     }
 
     static <K extends Comparable<? super K>> CoordinatedSet<K> coordinate(final List<? extends BasicSeries<K, ?>> uncoordinated) {
@@ -210,9 +195,17 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         return retVal;
     }
 
+    public V get(double key);
+
+    public V get(long key);
+
     BasicSeries<K, V> colour(ColourData colour);
 
+    double doubleValue(final double key);
+
     double doubleValue(final K key);
+
+    double doubleValue(final long key);
 
     V firstValue();
 
@@ -249,9 +242,17 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
      */
     K nextKey();
 
+    double put(final double key, final double value);
+
+    V put(final double key, final V value);
+
     double put(final K key, final double value);
 
     V put(final K key, final V value);
+
+    double put(final long key, final double value);
+
+    V put(final long key, final V value);
 
     default void putAll(final Collection<? extends KeyValue<? extends K, ? extends V>> data) {
         for (final KeyValue<? extends K, ? extends V> tmpKeyValue : data) {

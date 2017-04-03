@@ -22,7 +22,6 @@
 package org.ojalgo.series;
 
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -33,7 +32,7 @@ import org.ojalgo.series.primitive.ExplicitTimeSeries;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 
-public class CalendarDateSeries<V extends Number> extends OldAbstractSeries<CalendarDate, V, CalendarDateSeries<V>> {
+public class CalendarDateSeries<V extends Number> extends TreeSeries<CalendarDate, V, CalendarDateSeries<V>> {
 
     private final CalendarDateUnit myResolution;
 
@@ -49,12 +48,6 @@ public class CalendarDateSeries<V extends Number> extends OldAbstractSeries<Cale
         super();
 
         myResolution = resolution;
-    }
-
-    @SuppressWarnings("unused")
-    private CalendarDateSeries(final Comparator<? super CalendarDate> comparator) {
-        super(comparator);
-        myResolution = null;
     }
 
     @SuppressWarnings("unused")
@@ -103,6 +96,26 @@ public class CalendarDateSeries<V extends Number> extends OldAbstractSeries<Cale
 
             tmpKey = this.step(tmpKey);
         }
+    }
+
+    public double doubleValue(double key) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public double doubleValue(long key) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public V get(double key) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public V get(long key) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public long getAverageStepSize() {
@@ -185,6 +198,21 @@ public class CalendarDateSeries<V extends Number> extends OldAbstractSeries<Cale
 
     public V put(final Date key, final V value) {
         return super.put(CalendarDate.make(key, myResolution), value);
+    }
+
+    public double put(double key, double value) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public V put(double key, V value) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public double put(long key, double value) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     public V put(final long key, final V value) {
