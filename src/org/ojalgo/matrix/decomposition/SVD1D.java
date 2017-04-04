@@ -1,10 +1,10 @@
 package org.ojalgo.matrix.decomposition;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
-import org.ojalgo.function.PrimitiveFunction;
 
 public abstract class SVD1D {
 
@@ -14,23 +14,23 @@ public abstract class SVD1D {
         e[p - 2] = ZERO;
 
         double t;
-        double cs;
-        double sn;
+        double cos;
+        double sin;
 
         for (int j = p - 2; j >= k; j--) {
 
-            t = PrimitiveFunction.HYPOT.invoke(s[j], f);
-            cs = s[j] / t;
-            sn = f / t;
+            t = HYPOT.invoke(s[j], f);
+            cos = s[j] / t;
+            sin = f / t;
 
             s[j] = t;
             if (j != k) {
-                f = -sn * e[j - 1];
-                e[j - 1] = cs * e[j - 1];
+                f = -sin * e[j - 1];
+                e[j - 1] = cos * e[j - 1];
             }
 
             if (mtrxQ2 != null) {
-                mtrxQ2.rotateRight(p - 1, j, cs, sn);
+                mtrxQ2.rotateRight(p - 1, j, cos, sin);
             }
         }
     }
@@ -46,7 +46,7 @@ public abstract class SVD1D {
 
         for (int j = k; j < p; j++) {
 
-            t = PrimitiveFunction.HYPOT.invoke(s[j], f);
+            t = HYPOT.invoke(s[j], f);
             cs = s[j] / t;
             sn = f / t;
 
@@ -66,10 +66,8 @@ public abstract class SVD1D {
         final int indPm2 = p - 2;
 
         // Calculate the shift.
-        final double scale = PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(
-                PrimitiveFunction.MAX.invoke(PrimitiveFunction.MAX.invoke(PrimitiveFunction.ABS.invoke(s[indPm1]), PrimitiveFunction.ABS.invoke(s[indPm2])),
-                        PrimitiveFunction.ABS.invoke(e[indPm2])),
-                PrimitiveFunction.ABS.invoke(s[k])), PrimitiveFunction.ABS.invoke(e[k]));
+        final double scale = MAX.invoke(
+                MAX.invoke(MAX.invoke(MAX.invoke(ABS.invoke(s[indPm1]), ABS.invoke(s[indPm2])), ABS.invoke(e[indPm2])), ABS.invoke(s[k])), ABS.invoke(e[k]));
 
         final double sPm1 = s[indPm1] / scale;
         final double sPm2 = s[indPm2] / scale;
@@ -82,7 +80,7 @@ public abstract class SVD1D {
         double shift = ZERO;
         // if ((c != ZERO) || (b != ZERO)) {
         if ((Double.compare(c, ZERO) != 0) || (Double.compare(b, ZERO) != 0)) {
-            shift = PrimitiveFunction.SQRT.invoke((b * b) + c);
+            shift = SQRT.invoke((b * b) + c);
             if (b < ZERO) {
                 shift = -shift;
             }
@@ -99,7 +97,7 @@ public abstract class SVD1D {
         // Chase zeros.
         for (int j = k; j < indPm1; j++) {
 
-            t = PrimitiveFunction.HYPOT.invoke(f, g);
+            t = HYPOT.invoke(f, g);
             cs = f / t;
             sn = g / t;
             if (j != k) {
@@ -115,7 +113,7 @@ public abstract class SVD1D {
 
             }
 
-            t = PrimitiveFunction.HYPOT.invoke(f, g);
+            t = HYPOT.invoke(f, g);
             cs = f / t;
             sn = g / t;
             s[j] = t;
@@ -143,7 +141,7 @@ public abstract class SVD1D {
             s[k] = -tmpSk;
 
             if (mtrxQ2 != null) {
-                //aQ2.modifyColumn(0, k, PrimitiveFunction.NEGATE);
+                //aQ2.modifyColumn(0, k,  NEGATE);
                 mtrxQ2.negateColumn(k);
 
             }
@@ -207,8 +205,7 @@ public abstract class SVD1D {
                 if (k == -1) {
                     break;
                 }
-                if (PrimitiveFunction.ABS
-                        .invoke(e[k]) <= (SVDnew32.TINY + (MACHINE_EPSILON * (PrimitiveFunction.ABS.invoke(s[k]) + PrimitiveFunction.ABS.invoke(s[k + 1]))))) {
+                if (ABS.invoke(e[k]) <= (SVDnew32.TINY + (MACHINE_EPSILON * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))))) {
                     e[k] = ZERO;
                     break;
                 }
@@ -221,8 +218,8 @@ public abstract class SVD1D {
                     if (ks == k) {
                         break;
                     }
-                    final double t = (ks != p ? PrimitiveFunction.ABS.invoke(e[ks]) : ZERO) + (ks != (k + 1) ? PrimitiveFunction.ABS.invoke(e[ks - 1]) : ZERO);
-                    if (PrimitiveFunction.ABS.invoke(s[ks]) <= (SVDnew32.TINY + (MACHINE_EPSILON * t))) {
+                    final double t = (ks != p ? ABS.invoke(e[ks]) : ZERO) + (ks != (k + 1) ? ABS.invoke(e[ks - 1]) : ZERO);
+                    if (ABS.invoke(s[ks]) <= (SVDnew32.TINY + (MACHINE_EPSILON * t))) {
                         s[ks] = ZERO;
                         break;
                     }
