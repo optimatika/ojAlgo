@@ -98,24 +98,12 @@ public class CalendarDateSeries<V extends Number> extends TreeSeries<CalendarDat
         }
     }
 
-    public double doubleValue(double key) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
     public double doubleValue(long key) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public V get(double key) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.doubleValue(CalendarDate.make(key, myResolution));
     }
 
     public V get(long key) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.get(CalendarDate.make(key, myResolution));
     }
 
     public long getAverageStepSize() {
@@ -200,19 +188,8 @@ public class CalendarDateSeries<V extends Number> extends TreeSeries<CalendarDat
         return super.put(CalendarDate.make(key, myResolution), value);
     }
 
-    public double put(double key, double value) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public V put(double key, V value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public double put(long key, double value) {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.put(CalendarDate.make(key, myResolution), value);
     }
 
     public V put(final long key, final V value) {

@@ -559,10 +559,6 @@ public abstract class EvD1D {
 
     }
 
-    private EvD1D() {
-        super();
-    }
-
     /**
      * Ursprung JAMA men refactored till ojAlgos egna strukturer
      */

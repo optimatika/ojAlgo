@@ -21,12 +21,14 @@
  */
 package org.ojalgo.series;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.finance.data.DatePrice;
 import org.ojalgo.finance.data.YahooSymbol;
+import org.ojalgo.random.Uniform;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
@@ -42,6 +44,28 @@ public class CalendarDateSeriesTest extends SeriesTests {
 
     public CalendarDateSeriesTest(final String arg0) {
         super(arg0);
+    }
+
+    public void testDoubleKeys() {
+
+        int dim = 1000;
+        final Uniform tmpUniform = new Uniform(0, Double.MAX_VALUE);
+
+        double[] keys = new double[dim];
+        long[] indices = new long[dim];
+
+        for (int i = 0; i < dim; i++) {
+            keys[i] = tmpUniform.doubleValue();
+            indices[i] = Double.doubleToLongBits(keys[i]);
+        }
+
+        Arrays.sort(keys);
+        Arrays.sort(indices);
+
+        for (int i = 0; i < dim; i++) {
+            TestUtils.assertEquals(keys[i], Double.longBitsToDouble(indices[i]));
+        }
+
     }
 
     public void testResample() {

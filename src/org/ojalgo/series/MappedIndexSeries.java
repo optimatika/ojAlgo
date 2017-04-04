@@ -32,6 +32,7 @@ import java.util.UUID;
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.LongToNumberMap;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.netio.ASCII;
@@ -51,10 +52,15 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         public Double toKey(long index) {
             return MappedIndexSeries.toKey(index);
         }
+
     };
 
     static long toIndex(double key) {
-        return Double.doubleToLongBits(key);
+        if (key >= PrimitiveMath.ZERO) {
+            return Double.doubleToLongBits(key);
+        } else {
+            throw new IllegalArgumentException("Negative keys not supported!");
+        }
     }
 
     static double toKey(long index) {
@@ -88,10 +94,6 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
 
     public Comparator<? super K> comparator() {
         return null;
-    }
-
-    public double doubleValue(double key) {
-        return myDelegate.doubleValue(MappedIndexSeries.toIndex(key));
     }
 
     public double doubleValue(final K key) {
@@ -154,10 +156,6 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
 
     public N firstValue() {
         return this.get(this.firstKey());
-    }
-
-    public N get(double key) {
-        return myDelegate.get(MappedIndexSeries.toIndex(key));
     }
 
     public N get(long key) {
@@ -235,14 +233,6 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
 
     public K nextKey() {
         return myIndexMapper.toKey(myDelegate.lastKey() + 1L);
-    }
-
-    public double put(double key, double value) {
-        return this.put(MappedIndexSeries.toIndex(key), value);
-    }
-
-    public N put(double key, N value) {
-        return this.put(MappedIndexSeries.toIndex(key), value);
     }
 
     public double put(final K key, final double value) {

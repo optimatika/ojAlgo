@@ -32,6 +32,10 @@ import org.ojalgo.array.Primitive64Array;
 
 public final class SampleSet implements Access1D<Double> {
 
+    public static SampleSet make() {
+        return new SampleSet(Primitive64Array.make(4));
+    }
+
     public static SampleSet make(final RandomNumber randomNumber, final int size) {
 
         final Primitive64Array retVal = Primitive64Array.make(size);
@@ -48,9 +52,9 @@ public final class SampleSet implements Access1D<Double> {
         return new SampleSet(someSamples);
     }
 
-    private transient double myMin = NaN;
-    private transient double myMean = NaN;
     private transient double myMax = NaN;
+    private transient double myMean = NaN;
+    private transient double myMin = NaN;
     private transient double myQuartile1 = NaN;
     private transient double myQuartile2 = NaN;
     private transient double myQuartile3 = NaN;

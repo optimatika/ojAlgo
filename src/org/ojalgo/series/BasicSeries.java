@@ -49,9 +49,12 @@ import org.ojalgo.type.keyvalue.KeyValue;
 /**
  * A BasicSeries is a {@linkplain SortedMap} with:
  * <ul>
- * <li>Keys restricted to Comparable</li>
- * <li>Values restricted to Number</li>
+ * <li>Keys restricted to {@linkplain Comparable} (the keys have a natural order)</li>
+ * <li>Values restricted to {@linkplain Number} (you can do maths on the values)</li>
  * <li>The option to associate a name and colour with the data</li>
+ * <li>The option to define an accumlator function to be used with multilple/subsequent put operations on the
+ * same key</li>
+ * <li>Some additional methods to work with primitive keys and values more efficiently</li>
  * <li>A few additional methods to help access and modify series entries</li>
  * </ul>
  *
@@ -105,7 +108,6 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     public static final BasicSeries.TimeSeriesBuilder<LocalDate> LOCAL_DATE = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_DATE);
     public static final BasicSeries.TimeSeriesBuilder<LocalDateTime> LOCAL_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_DATE_TIME);
     public static final BasicSeries.TimeSeriesBuilder<LocalTime> LOCAL_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LOCAL_TIME);
-    public static final BasicSeries.TimeSeriesBuilder<Long> LONG = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.LONG);
     public static final BasicSeries.TimeSeriesBuilder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.OFFSET_DATE_TIME);
     public static final BasicSeries.TimeSeriesBuilder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.ZONED_DATE_TIME);
 
@@ -195,19 +197,23 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         return retVal;
     }
 
-    public V get(double key);
-
     public V get(long key);
 
     BasicSeries<K, V> colour(ColourData colour);
 
-    double doubleValue(final double key);
+    default double doubleValue(double key) {
+        return this.doubleValue(MappedIndexSeries.toIndex(key));
+    }
 
     double doubleValue(final K key);
 
     double doubleValue(final long key);
 
     V firstValue();
+
+    default V get(double key) {
+        return this.get(MappedIndexSeries.toIndex(key));
+    }
 
     ColourData getColour();
 
@@ -242,9 +248,13 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
      */
     K nextKey();
 
-    double put(final double key, final double value);
+    default double put(double key, double value) {
+        return this.put(MappedIndexSeries.toIndex(key), value);
+    }
 
-    V put(final double key, final V value);
+    default V put(double key, V value) {
+        return this.put(MappedIndexSeries.toIndex(key), value);
+    }
 
     double put(final K key, final double value);
 

@@ -584,8 +584,4 @@ public abstract class EvD2D {
         }
     }
 
-    private EvD2D() {
-        super();
-    }
-
 }

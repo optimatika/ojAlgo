@@ -385,55 +385,6 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
 
     };
 
-    public static final TimeIndex<Long> LONG = new TimeIndex<Long>() {
-
-        @Override
-        public IndexMapper<Long> from(final Long reference) {
-            return new IndexMapper<Long>() {
-
-                public long toIndex(final Long key) {
-                    return key - reference;
-                }
-
-                public Long toKey(final long index) {
-                    return index + reference;
-                }
-
-            };
-        }
-
-        @Override
-        public IndexMapper<Long> from(final Long reference, final CalendarDateDuration resolution) {
-            return new IndexMapper<Long>() {
-
-                public long toIndex(final Long key) {
-                    return (key - reference) / resolution.toDurationInMillis();
-                }
-
-                public Long toKey(final long index) {
-                    return (index * resolution.toDurationInMillis()) + reference;
-                }
-
-            };
-        }
-
-        @Override
-        public IndexMapper<Long> plain() {
-            return new IndexMapper<Long>() {
-
-                public long toIndex(final Long key) {
-                    return key;
-                }
-
-                public Long toKey(final long index) {
-                    return index;
-                }
-
-            };
-        }
-
-    };
-
     public static final TimeIndex<OffsetDateTime> OFFSET_DATE_TIME = new TimeIndex<OffsetDateTime>() {
 
         @Override

@@ -29,9 +29,8 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.UnaryFunction;
 
-public class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> implements UnaryFunction<N> {
+public class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> {
 
     public NumberSeries() {
         super();
@@ -53,19 +52,9 @@ public class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N
         return ArrayUtils.wrapAccess1D(new ArrayList<>(this.values()));
     }
 
-    public double doubleValue(double key) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
     public double doubleValue(long key) {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    public N get(double key) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public N get(long key) {
@@ -83,16 +72,6 @@ public class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N
     }
 
     public N nextKey() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public double put(double key, double value) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public N put(double key, N value) {
         // TODO Auto-generated method stub
         return null;
     }
