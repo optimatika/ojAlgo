@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
+import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.transformation.Householder;
@@ -41,7 +42,7 @@ import org.ojalgo.scalar.ComplexNumber;
  *
  * @author apete
  */
-public interface DecompositionStore<N extends Number> extends PhysicalStore<N>, RotateRight, ExchangeColumns {
+public interface DecompositionStore<N extends Number> extends PhysicalStore<N>, RotateRight, ExchangeColumns, NegateColumn {
 
     /**
      * Cholesky transformations
@@ -71,8 +72,6 @@ public interface DecompositionStore<N extends Number> extends PhysicalStore<N>, 
     boolean generateApplyAndCopyHouseholderColumn(final int row, final int column, final Householder<N> destination);
 
     boolean generateApplyAndCopyHouseholderRow(final int row, final int column, final Householder<N> destination);
-
-    void negateColumn(int column);
 
     void rotateRight(int aLow, int aHigh, double aCos, double aSin);
 

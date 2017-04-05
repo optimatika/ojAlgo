@@ -5,58 +5,53 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.matrix.decomposition.function.RotateRight;
 
 public abstract class SVD1D {
 
-    static void doCase1(final double[] s, final double[] e, final int p, final int k, final DecompositionStore<?> mtrxQ2) {
+    static void doCase1(final double[] s, final double[] e, final int p, final int k, final RotateRight mtrxQ2) {
 
         double f = e[p - 2];
         e[p - 2] = ZERO;
 
-        double t;
-        double cos;
-        double sin;
+        double tmp, cos, sin;
 
         for (int j = p - 2; j >= k; j--) {
 
-            t = HYPOT.invoke(s[j], f);
-            cos = s[j] / t;
-            sin = f / t;
+            tmp = HYPOT.invoke(s[j], f);
+            cos = s[j] / tmp;
+            sin = f / tmp;
+            s[j] = tmp;
 
-            s[j] = t;
             if (j != k) {
-                f = -sin * e[j - 1];
-                e[j - 1] = cos * e[j - 1];
+                tmp = e[j - 1];
+                f = -sin * tmp;
+                e[j - 1] = cos * tmp;
             }
 
-            if (mtrxQ2 != null) {
-                mtrxQ2.rotateRight(p - 1, j, cos, sin);
-            }
+            mtrxQ2.rotateRight(p - 1, j, cos, sin);
         }
     }
 
-    static void doCase2(final double[] s, final double[] e, final int p, final int k, final DecompositionStore<?> mtrxQ1) {
+    static void doCase2(final double[] s, final double[] e, final int p, final int k, final RotateRight mtrxQ1) {
 
         double f = e[k - 1];
         e[k - 1] = ZERO;
 
-        double t;
-        double cs;
-        double sn;
+        double tmp, cos, sin;
 
         for (int j = k; j < p; j++) {
 
-            t = HYPOT.invoke(s[j], f);
-            cs = s[j] / t;
-            sn = f / t;
+            tmp = HYPOT.invoke(s[j], f);
+            cos = s[j] / tmp;
+            sin = f / tmp;
 
-            s[j] = t;
-            f = -sn * e[j];
-            e[j] = cs * e[j];
+            s[j] = tmp;
+            tmp = e[j];
+            f = -sin * tmp;
+            e[j] = cos * tmp;
 
-            if (mtrxQ1 != null) {
-                mtrxQ1.rotateRight(k - 1, j, cs, sn);
-            }
+            mtrxQ1.rotateRight(k - 1, j, cos, sin);
         }
     }
 
@@ -239,7 +234,8 @@ public abstract class SVD1D {
 
             case 1: // Deflate negligible s[p]
 
-                SVD1D.doCase1(s, e, p, k, mtrxQ2);
+                RotateRight q2RotR = mtrxQ2 != null ? mtrxQ2 : RotateRight.NULL;
+                SVD1D.doCase1(s, e, p, k, q2RotR);
                 break;
 
             case 2: // Split at negligible s[k]
