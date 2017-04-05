@@ -3,11 +3,13 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
+import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 
 public abstract class SVD2D {
 
-    static void doCase1(final double[] s, final double[] e, final int p, final int k, final RotateRight mtrxQ2) {
+    static void doCase1(final double[] s, final double[] e, final int p, final int k, final RotateRight q2RotR) {
 
         double f = e[p - 2];
         e[p - 2] = ZERO;
@@ -21,7 +23,7 @@ public abstract class SVD2D {
             sin = f / tmp;
             s[j] = tmp;
 
-            mtrxQ2.rotateRight(p - 1, j, cos, sin);
+            q2RotR.rotateRight(p - 1, j, cos, sin);
 
             tmp = e[j - 1];
             f = -sin * tmp;
@@ -33,7 +35,7 @@ public abstract class SVD2D {
         sin = f / tmp;
         s[k] = tmp;
 
-        mtrxQ2.rotateRight(p - 1, k, cos, sin);
+        q2RotR.rotateRight(p - 1, k, cos, sin);
     }
 
     static void doCase2(final double[] s, final double[] e, final int p, final int k, final RotateRight mtrxQ1) {
@@ -130,18 +132,13 @@ public abstract class SVD2D {
         e[p - 2] = f;
     }
 
-    static int doCase4(final double[] s, final boolean factors, final double[][] myUt, final double[][] myVt, final int n, final int m, final int pp, int k) {
+    static int doCase4(final double[] s, final boolean factors, final double[][] myUt, final double[][] myVt, final int n, final int m, final int pp, int k,
+            final ExchangeColumns q1XchgCols, final ExchangeColumns q2XchgCols, final NegateColumn q2NegCol) {
 
-        double[] tmpAt_k;
         // Make the singular values positive.
         if (s[k] <= ZERO) {
-            s[k] = (s[k] < ZERO ? -s[k] : ZERO);
-            if (factors) {
-                for (int i = 0; i <= pp; i++) {
-                    // myV[i][k] = -myV[i][k];
-                    myVt[k][i] = -myVt[k][i];
-                }
-            }
+            s[k] = s[k] < ZERO ? -s[k] : ZERO;
+            q2NegCol.negateColumn(k);
         }
 
         // Order the singular values.
@@ -153,12 +150,12 @@ public abstract class SVD2D {
             s[k] = s[k + 1];
             s[k + 1] = t;
             if (factors && (k < (n - 1))) {
-                tmpAt_k = myVt[k + 1]; // Re-use tmpAt_k for a completely different purpose
+                final double[] tmpAt_k = myVt[k + 1];
                 myVt[k + 1] = myVt[k];
                 myVt[k] = tmpAt_k;
             }
             if (factors && (k < (m - 1))) {
-                tmpAt_k = myUt[k + 1]; // Re-use tmpAt_k for a completely different purpose
+                final double[] tmpAt_k = myUt[k + 1];
                 myUt[k + 1] = myUt[k];
                 myUt[k] = tmpAt_k;
             }
@@ -231,9 +228,9 @@ public abstract class SVD2D {
             // Deflate negligible s(p).
             case 1:
 
-                RotateRight q2RotR = factors ? new RotateRight() {
+                final RotateRight q2RotR = factors ? new RotateRight() {
 
-                    public void rotateRight(int low, int high, double cos, double sin) {
+                    public void rotateRight(final int low, final int high, final double cos, final double sin) {
                         final double[] colLow = myVt[low];
                         final double[] colHigh = myVt[high];
                         double valLow;
@@ -247,17 +244,15 @@ public abstract class SVD2D {
                     }
 
                 } : RotateRight.NULL;
-
                 SVD2D.doCase1(s, e, p, k, q2RotR);
-
                 break;
 
             // Split at negligible s(k).
             case 2:
 
-                RotateRight q1RotR = factors ? new RotateRight() {
+                final RotateRight q1RotR = factors ? new RotateRight() {
 
-                    public void rotateRight(int low, int high, double cos, double sin) {
+                    public void rotateRight(final int low, final int high, final double cos, final double sin) {
                         final double[] colLow = myUt[low];
                         final double[] colHigh = myUt[high];
                         double valLow;
@@ -268,32 +263,55 @@ public abstract class SVD2D {
                             colLow[i] = (-sin * valHigh) + (cos * valLow);
                             colHigh[i] = (cos * valHigh) + (sin * valLow);
                         }
-
                     }
 
                 } : RotateRight.NULL;
-
                 SVD2D.doCase2(s, e, p, k, q1RotR);
-
                 break;
 
             // Perform one qr step.
             case 3:
 
                 SVD2D.doCase3(s, e, factors, p, myUt, myVt, n, m, k);
-
                 break;
 
             // Convergence.
             case 4:
 
-                k = SVD2D.doCase4(s, factors, myUt, myVt, n, m, pp, k);
-                p--;
+                final ExchangeColumns q1XchgCols = factors ? new ExchangeColumns() {
 
+                    public void exchangeColumns(final int colA, final int colB) {
+                        // TODO Auto-generated method stub
+
+                    }
+                } : ExchangeColumns.NULL;
+
+                final ExchangeColumns q2XchgCols = factors ? new ExchangeColumns() {
+
+                    public void exchangeColumns(final int colA, final int colB) {
+                        // TODO Auto-generated method stub
+
+                    }
+                } : ExchangeColumns.NULL;
+                final NegateColumn q2NegCol = factors ? new NegateColumn() {
+
+                    public void negateColumn(final int col) {
+                        final double[] column = myVt[col];
+                        for (int i = 0; i < column.length; i++) {
+                            column[i] = -column[i];
+                        }
+                    }
+
+                } : NegateColumn.NULL;
+
+                k = SVD2D.doCase4(s, factors, myUt, myVt, n, m, pp, k, q1XchgCols, q2XchgCols, q2NegCol);
+                p--;
                 break;
 
             default:
-                break;
+
+                throw new IllegalStateException();
+
             }
 
         }

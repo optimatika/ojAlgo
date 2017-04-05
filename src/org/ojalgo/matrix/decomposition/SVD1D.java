@@ -5,11 +5,13 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
+import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
 
 public abstract class SVD1D {
 
-    static void doCase1(final double[] s, final double[] e, final int p, final int k, final RotateRight mtrxQ2) {
+    static void doCase1(final double[] s, final double[] e, final int p, final int k, final RotateRight q2RotR) {
 
         double f = e[p - 2];
         e[p - 2] = ZERO;
@@ -29,11 +31,11 @@ public abstract class SVD1D {
                 e[j - 1] = cos * tmp;
             }
 
-            mtrxQ2.rotateRight(p - 1, j, cos, sin);
+            q2RotR.rotateRight(p - 1, j, cos, sin);
         }
     }
 
-    static void doCase2(final double[] s, final double[] e, final int p, final int k, final RotateRight mtrxQ1) {
+    static void doCase2(final double[] s, final double[] e, final int p, final int k, final RotateRight q1RotR) {
 
         double f = e[k - 1];
         e[k - 1] = ZERO;
@@ -51,7 +53,7 @@ public abstract class SVD1D {
             f = -sin * tmp;
             e[j] = cos * tmp;
 
-            mtrxQ1.rotateRight(k - 1, j, cos, sin);
+            q1RotR.rotateRight(k - 1, j, cos, sin);
         }
     }
 
@@ -126,20 +128,17 @@ public abstract class SVD1D {
         e[indPm2] = f;
     }
 
-    static void doCase4(final double[] s, final int k, final DecompositionStore<?> mtrxQ1, final DecompositionStore<?> mtrxQ2) {
+    static void doCase4(final double[] s, final int k, final ExchangeColumns q1XchgCols, final ExchangeColumns q2XchgCols, final NegateColumn q2NegCol) {
 
-        final int tmpDiagDim = s.length;
+        final int size = s.length;
 
         // Make the singular values positive.
         final double tmpSk = s[k];
         if (tmpSk < ZERO) {
             s[k] = -tmpSk;
 
-            if (mtrxQ2 != null) {
-                //aQ2.modifyColumn(0, k,  NEGATE);
-                mtrxQ2.negateColumn(k);
+            q2NegCol.negateColumn(k);
 
-            }
         } else if (tmpSk == ZERO) {
             s[k] = ZERO; // To get rid of negative zeros
         }
@@ -147,7 +146,7 @@ public abstract class SVD1D {
         // Order the singular values.
         int tmpK = k;
 
-        while (tmpK < (tmpDiagDim - 1)) {
+        while (tmpK < (size - 1)) {
             if (s[tmpK] >= s[tmpK + 1]) {
                 break;
             }
@@ -155,12 +154,9 @@ public abstract class SVD1D {
             s[tmpK] = s[tmpK + 1];
             s[tmpK + 1] = t;
 
-            if (mtrxQ1 != null) {
-                mtrxQ1.exchangeColumns(tmpK + 1, tmpK);
-            }
-            if (mtrxQ2 != null) {
-                mtrxQ2.exchangeColumns(tmpK + 1, tmpK);
-            }
+            q1XchgCols.exchangeColumns(tmpK + 1, tmpK);
+
+            q2XchgCols.exchangeColumns(tmpK + 1, tmpK);
 
             tmpK++;
         }
@@ -234,13 +230,14 @@ public abstract class SVD1D {
 
             case 1: // Deflate negligible s[p]
 
-                RotateRight q2RotR = mtrxQ2 != null ? mtrxQ2 : RotateRight.NULL;
+                final RotateRight q2RotR = mtrxQ2 != null ? mtrxQ2 : RotateRight.NULL;
                 SVD1D.doCase1(s, e, p, k, q2RotR);
                 break;
 
             case 2: // Split at negligible s[k]
 
-                SVD1D.doCase2(s, e, p, k, mtrxQ1);
+                final RotateRight q1RotR = mtrxQ1 != null ? mtrxQ1 : RotateRight.NULL;
+                SVD1D.doCase2(s, e, p, k, q1RotR);
                 break;
 
             case 3: // Perform QR-step.
@@ -250,7 +247,10 @@ public abstract class SVD1D {
 
             case 4: // Convergence
 
-                SVD1D.doCase4(s, k, mtrxQ1, mtrxQ2);
+                final ExchangeColumns q1XchgCols = mtrxQ1 != null ? mtrxQ1 : ExchangeColumns.NULL;
+                final ExchangeColumns q2XchgCols = mtrxQ2 != null ? mtrxQ2 : ExchangeColumns.NULL;
+                final NegateColumn q2NegCol = mtrxQ1 != null ? mtrxQ2 : NegateColumn.NULL;
+                SVD1D.doCase4(s, k, q1XchgCols, q2XchgCols, q2NegCol);
                 p--;
                 break;
 
