@@ -167,7 +167,6 @@ public abstract class SVD2D {
         final int n = myS.length;
         final int m = myUt != null ? myUt[0].length : n;
 
-        final double[] tmpAt_k;
         // Main iteration loop for the singular values.
         final int pp = p - 1;
         final double eps = POW.invoke(TWO, -52.0);
