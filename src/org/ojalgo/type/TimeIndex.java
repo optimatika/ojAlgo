@@ -72,6 +72,12 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
             };
         }
 
+        @Override
+        public IndexMapper<Calendar> plain(CalendarDateDuration resolution) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
     };
 
     public static final TimeIndex<CalendarDate> CALENDAR_DATE = new TimeIndex<CalendarDate>() {
@@ -119,6 +125,12 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 }
 
             };
+        }
+
+        @Override
+        public IndexMapper<CalendarDate> plain(CalendarDateDuration resolution) {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     };
@@ -170,6 +182,12 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
             };
         }
 
+        @Override
+        public IndexMapper<Date> plain(CalendarDateDuration resolution) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
     };
 
     public static final TimeIndex<Instant> INSTANT = new TimeIndex<Instant>() {
@@ -219,6 +237,12 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 }
 
             };
+        }
+
+        @Override
+        public IndexMapper<Instant> plain(CalendarDateDuration resolution) {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     };
@@ -275,6 +299,12 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
             };
         }
 
+        @Override
+        public IndexMapper<LocalDate> plain(CalendarDateDuration resolution) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
     };
 
     public static final TimeIndex<LocalDateTime> LOCAL_DATE_TIME = new TimeIndex<LocalDateTime>() {
@@ -319,14 +349,20 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
             return new IndexMapper<LocalDateTime>() {
 
                 public long toIndex(final LocalDateTime key) {
-                    return key.toEpochSecond(ZoneOffset.UTC);
+                    return key.toInstant(ZoneOffset.UTC).toEpochMilli();
                 }
 
                 public LocalDateTime toKey(final long index) {
-                    return LocalDateTime.ofEpochSecond(index, 0, ZoneOffset.UTC);
+                    return LocalDateTime.ofInstant(Instant.ofEpochMilli(index), ZoneOffset.UTC);
                 }
 
             };
+        }
+
+        @Override
+        public IndexMapper<LocalDateTime> plain(CalendarDateDuration resolution) {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     };
@@ -381,6 +417,12 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 }
 
             };
+        }
+
+        @Override
+        public IndexMapper<LocalTime> plain(CalendarDateDuration resolution) {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     };
@@ -454,6 +496,12 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
             };
         }
 
+        @Override
+        public IndexMapper<OffsetDateTime> plain(CalendarDateDuration resolution) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
     };
 
     public static final TimeIndex<ZonedDateTime> ZONED_DATE_TIME = new TimeIndex<ZonedDateTime>() {
@@ -525,6 +573,12 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
             };
         }
 
+        @Override
+        public IndexMapper<ZonedDateTime> plain(CalendarDateDuration resolution) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
     };
 
     static final long DAY_SIZE = CalendarDateUnit.DAY.size();
@@ -534,5 +588,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
     public abstract IndexMapper<T> from(final T reference, final CalendarDateDuration resolution);
 
     public abstract IndexMapper<T> plain();
+
+    public abstract IndexMapper<T> plain(final CalendarDateDuration resolution);
 
 }

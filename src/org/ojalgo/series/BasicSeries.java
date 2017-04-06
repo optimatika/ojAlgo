@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.SortedMap;
 
 import org.ojalgo.access.IndexMapper;
@@ -62,7 +63,7 @@ import org.ojalgo.type.keyvalue.KeyValue;
  */
 public interface BasicSeries<K extends Comparable<? super K>, V extends Number> extends SortedMap<K, V> {
 
-    public class TimeSeriesBuilder<K extends Comparable<? super K>> {
+    public static final class TimeSeriesBuilder<K extends Comparable<? super K>> {
 
         private K myReference = null;
         private CalendarDateDuration myResolution = null;
@@ -74,19 +75,14 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         }
 
         public <N extends Number> BasicSeries<K, N> build(final DenseArray.Factory<N> arrayFactory) {
-            return build(arrayFactory, null);
+            Objects.requireNonNull(arrayFactory);
+            return doBuild(arrayFactory, null);
         }
 
         public <N extends Number> BasicSeries<K, N> build(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
-            if (myReference != null) {
-                if (myResolution != null) {
-                    return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution), accumularor);
-                } else {
-                    return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference), accumularor);
-                }
-            } else {
-                return new MappedIndexSeries<>(arrayFactory, myTimeIndex.plain(), accumularor);
-            }
+            Objects.requireNonNull(arrayFactory);
+            Objects.requireNonNull(accumularor);
+            return doBuild(arrayFactory, accumularor);
         }
 
         public TimeSeriesBuilder<K> reference(final K reference) {
@@ -97,6 +93,22 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         public TimeSeriesBuilder<K> resolution(final CalendarDateDuration resolution) {
             myResolution = resolution;
             return this;
+        }
+
+        private <N extends Number> BasicSeries<K, N> doBuild(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
+            if (myReference != null) {
+                if (myResolution != null) {
+                    return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution), accumularor);
+                } else {
+                    return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference), accumularor);
+                }
+            } else {
+                if (myResolution != null) {
+                    return new MappedIndexSeries<>(arrayFactory, myTimeIndex.plain(myResolution), accumularor);
+                } else {
+                    return new MappedIndexSeries<>(arrayFactory, myTimeIndex.plain(), accumularor);
+                }
+            }
         }
 
     }

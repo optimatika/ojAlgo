@@ -107,6 +107,10 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
         return new CalendarDate(instant.toEpochMilli());
     }
 
+    public static CalendarDate now() {
+        return new CalendarDate();
+    }
+
     static long millis(final TemporalAccessor temporal) {
         if (temporal instanceof CalendarDate) {
             return ((CalendarDate) temporal).millis;

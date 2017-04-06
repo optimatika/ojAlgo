@@ -128,37 +128,23 @@ public abstract class SVD1D {
         e[indPm2] = f;
     }
 
-    static void doCase4(final double[] s, final int k, final ExchangeColumns q1XchgCols, final ExchangeColumns q2XchgCols, final NegateColumn q2NegCol) {
-
-        final int size = s.length;
+    static void doCase4(final double[] s, final int k, final NegateColumn q2NegCol, final ExchangeColumns q1XchgCols, final ExchangeColumns q2XchgCols) {
 
         // Make the singular values positive.
-        final double tmpSk = s[k];
-        if (tmpSk < ZERO) {
-            s[k] = -tmpSk;
-
+        if (s[k] <= ZERO) {
+            s[k] = s[k] < ZERO ? -s[k] : ZERO;
             q2NegCol.negateColumn(k);
-
-        } else if (tmpSk == ZERO) {
-            s[k] = ZERO; // To get rid of negative zeros
         }
 
         // Order the singular values.
-        int tmpK = k;
+        for (int iter = k, next = iter + 1; (next < s.length) && (s[iter] < s[next]); iter++, next++) {
 
-        while (tmpK < (size - 1)) {
-            if (s[tmpK] >= s[tmpK + 1]) {
-                break;
-            }
-            final double t = s[tmpK];
-            s[tmpK] = s[tmpK + 1];
-            s[tmpK + 1] = t;
+            final double tmp = s[iter];
+            s[iter] = s[next];
+            s[next] = tmp;
 
-            q1XchgCols.exchangeColumns(tmpK + 1, tmpK);
-
-            q2XchgCols.exchangeColumns(tmpK + 1, tmpK);
-
-            tmpK++;
+            q1XchgCols.exchangeColumns(iter, next);
+            q2XchgCols.exchangeColumns(iter, next);
         }
     }
 
@@ -172,6 +158,12 @@ public abstract class SVD1D {
         for (int i = 0; i < tmpOffLength; i++) {
             e[i] = bidiagonal.superdiagonal.doubleValue(i);
         }
+
+        final RotateRight q1RotR = mtrxQ1 != null ? mtrxQ1 : RotateRight.NULL;
+        final RotateRight q2RotR = mtrxQ2 != null ? mtrxQ2 : RotateRight.NULL;
+        final ExchangeColumns q1XchgCols = mtrxQ1 != null ? mtrxQ1 : ExchangeColumns.NULL;
+        final ExchangeColumns q2XchgCols = mtrxQ2 != null ? mtrxQ2 : ExchangeColumns.NULL;
+        final NegateColumn q2NegCol = mtrxQ1 != null ? mtrxQ2 : NegateColumn.NULL;
 
         // Main iteration loop for the singular values.
         int kase;
@@ -230,13 +222,11 @@ public abstract class SVD1D {
 
             case 1: // Deflate negligible s[p]
 
-                final RotateRight q2RotR = mtrxQ2 != null ? mtrxQ2 : RotateRight.NULL;
                 SVD1D.doCase1(s, e, p, k, q2RotR);
                 break;
 
             case 2: // Split at negligible s[k]
 
-                final RotateRight q1RotR = mtrxQ1 != null ? mtrxQ1 : RotateRight.NULL;
                 SVD1D.doCase2(s, e, p, k, q1RotR);
                 break;
 
@@ -247,10 +237,7 @@ public abstract class SVD1D {
 
             case 4: // Convergence
 
-                final ExchangeColumns q1XchgCols = mtrxQ1 != null ? mtrxQ1 : ExchangeColumns.NULL;
-                final ExchangeColumns q2XchgCols = mtrxQ2 != null ? mtrxQ2 : ExchangeColumns.NULL;
-                final NegateColumn q2NegCol = mtrxQ1 != null ? mtrxQ2 : NegateColumn.NULL;
-                SVD1D.doCase4(s, k, q1XchgCols, q2XchgCols, q2NegCol);
+                SVD1D.doCase4(s, k, q2NegCol, q1XchgCols, q2XchgCols);
                 p--;
                 break;
 

@@ -132,8 +132,7 @@ public abstract class SVD2D {
         e[p - 2] = f;
     }
 
-    static int doCase4(final double[] s, final boolean factors, final double[][] myUt, final double[][] myVt, final int n, final int m, final int pp, int k,
-            final ExchangeColumns q1XchgCols, final ExchangeColumns q2XchgCols, final NegateColumn q2NegCol) {
+    static void doCase4(final double[] s, int k, final NegateColumn q2NegCol, final ExchangeColumns q1XchgCols, final ExchangeColumns q2XchgCols) {
 
         // Make the singular values positive.
         if (s[k] <= ZERO) {
@@ -142,26 +141,19 @@ public abstract class SVD2D {
         }
 
         // Order the singular values.
-        while (k < pp) {
+        while (k < (s.length - 1)) {
             if (s[k] >= s[k + 1]) {
                 break;
             }
             final double t = s[k];
             s[k] = s[k + 1];
             s[k + 1] = t;
-            if (factors && (k < (n - 1))) {
-                final double[] tmpAt_k = myVt[k + 1];
-                myVt[k + 1] = myVt[k];
-                myVt[k] = tmpAt_k;
-            }
-            if (factors && (k < (m - 1))) {
-                final double[] tmpAt_k = myUt[k + 1];
-                myUt[k + 1] = myUt[k];
-                myUt[k] = tmpAt_k;
-            }
+
+            q2XchgCols.exchangeColumns(k + 1, k);
+            q1XchgCols.exchangeColumns(k + 1, k);
+
             k++;
         }
-        return k;
     }
 
     static void toDiagonal(final double[] s, final double[] e, final boolean factors, int p, final double[][] myUt, final double[][] myVt) {
@@ -170,9 +162,84 @@ public abstract class SVD2D {
         final int m = myUt != null ? myUt[0].length : n;
 
         // Main iteration loop for the singular values.
-        final int pp = p - 1;
         final double eps = POW.invoke(TWO, -52.0);
         final double tiny = POW.invoke(TWO, -966.0);
+
+        final RotateRight q1RotR = factors ? new RotateRight() {
+
+            public void rotateRight(final int low, final int high, final double cos, final double sin) {
+                final double[] colLow = myUt[low];
+                final double[] colHigh = myUt[high];
+                double valLow;
+                double valHigh;
+                for (int i = 0; i < n; i++) {
+                    valLow = colLow[i];
+                    valHigh = colHigh[i];
+                    colLow[i] = (-sin * valHigh) + (cos * valLow);
+                    colHigh[i] = (cos * valHigh) + (sin * valLow);
+                }
+            }
+
+        } : RotateRight.NULL;
+
+        final RotateRight q2RotR = factors ? new RotateRight() {
+
+            public void rotateRight(final int low, final int high, final double cos, final double sin) {
+                final double[] colLow = myVt[low];
+                final double[] colHigh = myVt[high];
+                double valLow;
+                double valHigh;
+                for (int i = 0; i < n; i++) {
+                    valLow = colLow[i];
+                    valHigh = colHigh[i];
+                    colLow[i] = (-sin * valHigh) + (cos * valLow);
+                    colHigh[i] = (cos * valHigh) + (sin * valLow);
+                }
+            }
+
+        } : RotateRight.NULL;
+
+        final ExchangeColumns q1XchgCols = factors ? new ExchangeColumns() {
+
+            public void exchangeColumns(final int colA, final int colB) {
+                final double[] col1 = myUt[colA];
+                final double[] col2 = myUt[colB];
+                double tmp;
+                for (int i = 0; i < m; i++) {
+                    tmp = col1[i];
+                    col1[i] = col2[i];
+                    col2[i] = tmp;
+                }
+            }
+
+        } : ExchangeColumns.NULL;
+
+        final ExchangeColumns q2XchgCols = factors ? new ExchangeColumns() {
+
+            public void exchangeColumns(final int colA, final int colB) {
+                final double[] col1 = myVt[colA];
+                final double[] col2 = myVt[colB];
+                double tmp;
+                for (int i = 0; i < n; i++) {
+                    tmp = col1[i];
+                    col1[i] = col2[i];
+                    col2[i] = tmp;
+                }
+            }
+
+        } : ExchangeColumns.NULL;
+
+        final NegateColumn q2NegCol = factors ? new NegateColumn() {
+
+            public void negateColumn(final int col) {
+                final double[] column = myVt[col];
+                for (int i = 0; i < column.length; i++) {
+                    column[i] = -column[i];
+                }
+            }
+
+        } : NegateColumn.NULL;
+
         while (p > 0) {
             int k, kase;
 
@@ -228,44 +295,12 @@ public abstract class SVD2D {
             // Deflate negligible s(p).
             case 1:
 
-                final RotateRight q2RotR = factors ? new RotateRight() {
-
-                    public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                        final double[] colLow = myVt[low];
-                        final double[] colHigh = myVt[high];
-                        double valLow;
-                        double valHigh;
-                        for (int i = 0; i < n; i++) {
-                            valLow = colLow[i];
-                            valHigh = colHigh[i];
-                            colLow[i] = (-sin * valHigh) + (cos * valLow);
-                            colHigh[i] = (cos * valHigh) + (sin * valLow);
-                        }
-                    }
-
-                } : RotateRight.NULL;
                 SVD2D.doCase1(s, e, p, k, q2RotR);
                 break;
 
             // Split at negligible s(k).
             case 2:
 
-                final RotateRight q1RotR = factors ? new RotateRight() {
-
-                    public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                        final double[] colLow = myUt[low];
-                        final double[] colHigh = myUt[high];
-                        double valLow;
-                        double valHigh;
-                        for (int i = 0; i < n; i++) {
-                            valLow = colLow[i];
-                            valHigh = colHigh[i];
-                            colLow[i] = (-sin * valHigh) + (cos * valLow);
-                            colHigh[i] = (cos * valHigh) + (sin * valLow);
-                        }
-                    }
-
-                } : RotateRight.NULL;
                 SVD2D.doCase2(s, e, p, k, q1RotR);
                 break;
 
@@ -278,33 +313,7 @@ public abstract class SVD2D {
             // Convergence.
             case 4:
 
-                final ExchangeColumns q1XchgCols = factors ? new ExchangeColumns() {
-
-                    public void exchangeColumns(final int colA, final int colB) {
-                        // TODO Auto-generated method stub
-
-                    }
-                } : ExchangeColumns.NULL;
-
-                final ExchangeColumns q2XchgCols = factors ? new ExchangeColumns() {
-
-                    public void exchangeColumns(final int colA, final int colB) {
-                        // TODO Auto-generated method stub
-
-                    }
-                } : ExchangeColumns.NULL;
-                final NegateColumn q2NegCol = factors ? new NegateColumn() {
-
-                    public void negateColumn(final int col) {
-                        final double[] column = myVt[col];
-                        for (int i = 0; i < column.length; i++) {
-                            column[i] = -column[i];
-                        }
-                    }
-
-                } : NegateColumn.NULL;
-
-                k = SVD2D.doCase4(s, factors, myUt, myVt, n, m, pp, k, q1XchgCols, q2XchgCols, q2NegCol);
+                SVD2D.doCase4(s, k, q2NegCol, q1XchgCols, q2XchgCols);
                 p--;
                 break;
 
