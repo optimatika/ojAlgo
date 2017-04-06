@@ -24,12 +24,7 @@ package org.ojalgo.type;
 import static java.time.temporal.ChronoField.*;
 
 import java.io.Serializable;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -103,12 +98,60 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
         return new CalendarDate(resolution.toTimeInMillis(timeInMIllis));
     }
 
-    public static CalendarDate valueOf(final Instant instant) {
-        return new CalendarDate(instant.toEpochMilli());
-    }
-
     public static CalendarDate now() {
         return new CalendarDate();
+    }
+
+    public static Calendar toCalendar(final Instant instant) {
+        final GregorianCalendar retVal = new GregorianCalendar();
+        retVal.setTimeInMillis(instant.toEpochMilli());
+        return retVal;
+    }
+
+    public static Calendar toCalendar(final Instant instant, final Locale locale) {
+        final GregorianCalendar retVal = new GregorianCalendar(locale);
+        retVal.setTimeInMillis(instant.toEpochMilli());
+        return retVal;
+    }
+
+    public static Calendar toCalendar(final Instant instant, final TimeZone zone) {
+        final GregorianCalendar retVal = new GregorianCalendar(zone);
+        retVal.setTimeInMillis(instant.toEpochMilli());
+        return retVal;
+    }
+
+    public static Calendar toCalendar(final Instant instant, final TimeZone zone, final Locale locale) {
+        final GregorianCalendar retVal = new GregorianCalendar(zone, locale);
+        retVal.setTimeInMillis(instant.toEpochMilli());
+        return retVal;
+    }
+
+    public static Date toDate(final Instant instant) {
+        return new Date(instant.toEpochMilli());
+    }
+
+    public static LocalDate toLocalDate(final Instant instant, final ZoneId zone) {
+        return CalendarDate.toLocalDateTime(instant, zone).toLocalDate();
+    }
+
+    public static LocalDateTime toLocalDateTime(final Instant instant, final ZoneId zone) {
+        return LocalDateTime.ofInstant(instant, zone);
+    }
+
+    public static LocalTime toLocalTime(final Instant instant, final ZoneId zone) {
+        return CalendarDate.toLocalDateTime(instant, zone).toLocalTime();
+    }
+
+    public static OffsetDateTime toOffsetDateTime(final Instant instant, final ZoneId zone) {
+        return OffsetDateTime.ofInstant(instant, zone);
+    }
+
+    public static ZonedDateTime toZonedDateTime(final Instant instant, final ZoneId zone) {
+        return ZonedDateTime.ofInstant(instant, zone);
+    }
+
+    public static CalendarDate valueOf(final Instant instant) {
+        return new CalendarDate(instant.toEpochMilli());
     }
 
     static long millis(final TemporalAccessor temporal) {
@@ -309,19 +352,11 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
         return Instant.ofEpochMilli(millis);
     }
 
-    public LocalDate toLocalDate() {
-        return this.toLocalDate(ZoneOffset.UTC);
-    }
-
     public LocalDate toLocalDate(final ZoneOffset offset) {
         final long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
         final long tmpLocalSeconds = tmpSeconds + offset.getTotalSeconds();
         final long tmpLocalDay = Math.floorDiv(tmpLocalSeconds, CalendarDate.SECONDS_PER_DAY);
         return LocalDate.ofEpochDay(tmpLocalDay);
-    }
-
-    public LocalDateTime toLocalDateTime() {
-        return this.toLocalDateTime(ZoneOffset.UTC);
     }
 
     public LocalDateTime toLocalDateTime(final ZoneOffset offset) {
@@ -330,24 +365,17 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
         return LocalDateTime.ofEpochSecond(tmpSeconds, tmpNanos, offset);
     }
 
-    public LocalTime toLocalTime() {
-        return this.toLocalTime(ZoneOffset.UTC);
+    public LocalTime toLocalTime(final ZoneOffset offset) {
+        final long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
+        final int tmpNanos = (int) Math.floorMod(millis, MILLIS_PER_SECOND);
+        final long tmpLocalSeconds = tmpSeconds + offset.getTotalSeconds();
+        final int tmpSecondOfDay = (int) Math.floorMod(tmpLocalSeconds, CalendarDate.SECONDS_PER_DAY);
+        final int tmpNanoOfDay = (tmpSecondOfDay * CalendarDate.NANOS_PER_SECOND) + tmpNanos;
+        return LocalTime.ofNanoOfDay(tmpNanoOfDay);
     }
 
-    public LocalTime toLocalTime(final ZoneOffset offset) {
-
-        final long tmpSeconds = Math.floorDiv(millis, MILLIS_PER_SECOND);
-
-        final int tmpNanos = (int) Math.floorMod(millis, MILLIS_PER_SECOND);
-
-        final long tmpLocalSeconds = tmpSeconds + offset.getTotalSeconds();
-
-        final int tmpSecondOfDay = (int) Math.floorMod(tmpLocalSeconds, CalendarDate.SECONDS_PER_DAY);
-
-        final int tmpNanoOfDay = (tmpSecondOfDay * CalendarDate.NANOS_PER_SECOND) + tmpNanos;
-
-        return LocalTime.ofNanoOfDay(tmpNanoOfDay);
-
+    public OffsetDateTime toOffsetDateTime(final ZoneOffset offset) {
+        return OffsetDateTime.of(this.toLocalDateTime(offset), offset);
     }
 
     /**
@@ -355,7 +383,7 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
      */
     @Deprecated
     public Date toSqlDate() {
-        final LocalDate tmpDateOnly = this.toLocalDate();
+        final LocalDate tmpDateOnly = this.toLocalDate(ZoneOffset.UTC);
         final int tmpYear = tmpDateOnly.getYear() - 1900;
         final int tmpMonth = tmpDateOnly.getMonthValue() - 1;
         final int tmpDayOfMonth = tmpDateOnly.getDayOfMonth();
@@ -367,7 +395,7 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
      */
     @Deprecated
     public Date toSqlTime() {
-        final LocalTime tmpTimeOnly = this.toLocalTime();
+        final LocalTime tmpTimeOnly = this.toLocalTime(ZoneOffset.UTC);
         final int tmpYear = 0;
         final int tmpMonth = 0;
         final int tmpDate = 1;
@@ -396,6 +424,10 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
         } else {
             return resolution.toTimeInMillis(millis);
         }
+    }
+
+    public ZonedDateTime toZonedDateTime(final ZoneOffset offset) {
+        return ZonedDateTime.of(this.toLocalDateTime(offset), offset);
     }
 
     public long until(final Temporal endExclusive, final TemporalUnit unit) {

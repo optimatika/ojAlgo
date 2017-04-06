@@ -28,7 +28,7 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
                 }
 
                 public Calendar toKey(final long index) {
-                    final long tmpTimeInMillis = index * +reference.getTimeInMillis();
+                    final long tmpTimeInMillis = index + reference.getTimeInMillis();
                     final GregorianCalendar retVal = new GregorianCalendar();
                     retVal.setTimeInMillis(tmpTimeInMillis);
                     return retVal;
@@ -365,14 +365,14 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         public IndexMapper<LocalDateTime> from(final LocalDateTime reference) {
             return new IndexMapper<LocalDateTime>() {
 
-                private final long myReference = reference.toEpochSecond(ZoneOffset.UTC);
+                private final long myReference = reference.toInstant(ZoneOffset.UTC).toEpochMilli();
 
                 public long toIndex(final LocalDateTime key) {
-                    return key.toEpochSecond(ZoneOffset.UTC) - myReference;
+                    return key.toInstant(ZoneOffset.UTC).toEpochMilli() - myReference;
                 }
 
                 public LocalDateTime toKey(final long index) {
-                    return LocalDateTime.ofEpochSecond(myReference + index, 0, ZoneOffset.UTC);
+                    return LocalDateTime.ofInstant(Instant.ofEpochMilli(myReference + index), ZoneOffset.UTC);
                 }
 
             };
