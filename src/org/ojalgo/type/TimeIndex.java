@@ -73,9 +73,21 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         }
 
         @Override
-        public IndexMapper<Calendar> plain(CalendarDateDuration resolution) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<Calendar> plain(final CalendarDateDuration resolution) {
+            return new IndexMapper<Calendar>() {
+
+                public long toIndex(final Calendar key) {
+                    return key.getTimeInMillis() / resolution.toDurationInMillis();
+                }
+
+                public Calendar toKey(final long index) {
+                    final long tmpTimeInMillis = index * resolution.toDurationInMillis();
+                    final GregorianCalendar retVal = new GregorianCalendar();
+                    retVal.setTimeInMillis(tmpTimeInMillis);
+                    return retVal;
+                }
+
+            };
         }
 
     };
@@ -128,9 +140,18 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         }
 
         @Override
-        public IndexMapper<CalendarDate> plain(CalendarDateDuration resolution) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<CalendarDate> plain(final CalendarDateDuration resolution) {
+            return new IndexMapper<CalendarDate>() {
+
+                public long toIndex(final CalendarDate key) {
+                    return key.millis / resolution.toDurationInMillis();
+                }
+
+                public CalendarDate toKey(final long index) {
+                    return new CalendarDate(index * resolution.toDurationInMillis());
+                }
+
+            };
         }
 
     };
@@ -183,9 +204,18 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         }
 
         @Override
-        public IndexMapper<Date> plain(CalendarDateDuration resolution) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<Date> plain(final CalendarDateDuration resolution) {
+            return new IndexMapper<Date>() {
+
+                public long toIndex(final Date key) {
+                    return key.getTime() / resolution.toDurationInMillis();
+                }
+
+                public Date toKey(final long index) {
+                    return new Date(index * resolution.toDurationInMillis());
+                }
+
+            };
         }
 
     };
@@ -240,9 +270,20 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         }
 
         @Override
-        public IndexMapper<Instant> plain(CalendarDateDuration resolution) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<Instant> plain(final CalendarDateDuration resolution) {
+            return new IndexMapper<Instant>() {
+
+                private final long myResolution = resolution.toDurationInMillis();
+
+                public long toIndex(final Instant key) {
+                    return key.toEpochMilli() / myResolution;
+                }
+
+                public Instant toKey(final long index) {
+                    return Instant.ofEpochMilli(index * myResolution);
+                }
+
+            };
         }
 
     };
@@ -300,9 +341,20 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         }
 
         @Override
-        public IndexMapper<LocalDate> plain(CalendarDateDuration resolution) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<LocalDate> plain(final CalendarDateDuration resolution) {
+            return new IndexMapper<LocalDate>() {
+
+                private final long myResolution = resolution.toDurationInMillis();
+
+                public long toIndex(final LocalDate key) {
+                    return (DAY_SIZE * key.toEpochDay()) / myResolution;
+                }
+
+                public LocalDate toKey(final long index) {
+                    return LocalDate.ofEpochDay((index * myResolution) / DAY_SIZE);
+                }
+
+            };
         }
 
     };
@@ -360,9 +412,20 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         }
 
         @Override
-        public IndexMapper<LocalDateTime> plain(CalendarDateDuration resolution) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<LocalDateTime> plain(final CalendarDateDuration resolution) {
+            return new IndexMapper<LocalDateTime>() {
+
+                private final long myResolution = resolution.toDurationInMillis();
+
+                public long toIndex(final LocalDateTime key) {
+                    return key.toEpochSecond(ZoneOffset.UTC) / myResolution;
+                }
+
+                public LocalDateTime toKey(final long index) {
+                    return LocalDateTime.ofEpochSecond(index * myResolution, 0, ZoneOffset.UTC);
+                }
+
+            };
         }
 
     };
@@ -420,9 +483,20 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         }
 
         @Override
-        public IndexMapper<LocalTime> plain(CalendarDateDuration resolution) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<LocalTime> plain(final CalendarDateDuration resolution) {
+            return new IndexMapper<LocalTime>() {
+
+                final long myResolution = resolution.toDurationInNanos();
+
+                public long toIndex(final LocalTime key) {
+                    return key.toNanoOfDay() / myResolution;
+                }
+
+                public LocalTime toKey(final long index) {
+                    return LocalTime.ofNanoOfDay(index * myResolution);
+                }
+
+            };
         }
 
     };
@@ -497,9 +571,22 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         }
 
         @Override
-        public IndexMapper<OffsetDateTime> plain(CalendarDateDuration resolution) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<OffsetDateTime> plain(final CalendarDateDuration resolution) {
+            return new IndexMapper<OffsetDateTime>() {
+
+                private final IndexMapper<Instant> myDelegate = INSTANT.plain(resolution);
+
+                public long toIndex(final OffsetDateTime key) {
+                    return myDelegate.toIndex(key.toInstant());
+                }
+
+                public OffsetDateTime toKey(final long index) {
+                    final Instant tmpInstant = myDelegate.toKey(index);
+
+                    return OffsetDateTime.ofInstant(tmpInstant, ZoneOffset.UTC);
+
+                }
+            };
         }
 
     };
@@ -574,9 +661,20 @@ public abstract class TimeIndex<T extends Comparable<? super T>> {
         }
 
         @Override
-        public IndexMapper<ZonedDateTime> plain(CalendarDateDuration resolution) {
-            // TODO Auto-generated method stub
-            return null;
+        public IndexMapper<ZonedDateTime> plain(final CalendarDateDuration resolution) {
+            return new IndexMapper<ZonedDateTime>() {
+
+                private final IndexMapper<Instant> myDelegate = INSTANT.plain(resolution);
+
+                public long toIndex(final ZonedDateTime key) {
+                    return myDelegate.toIndex(key.toInstant());
+                }
+
+                public ZonedDateTime toKey(final long index) {
+                    final Instant tmpInstant = myDelegate.toKey(index);
+                    return ZonedDateTime.ofInstant(tmpInstant, ZoneOffset.UTC);
+                }
+            };
         }
 
     };

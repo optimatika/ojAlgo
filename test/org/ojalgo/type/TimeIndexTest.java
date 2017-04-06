@@ -13,15 +13,28 @@ import org.ojalgo.access.IndexMapper;
 
 public class TimeIndexTest extends TypeTests {
 
-    static <T extends Comparable<? super T>> void doTestPlain(TimeIndex<T> mapperFactory, T keyToTest) {
+    static <T extends Comparable<? super T>> void doTestPlain(final TimeIndex<T> mapperFactory, final T keyToTest) {
 
         final String implementation = keyToTest.getClass().getSimpleName();
 
-        IndexMapper<T> mapper = mapperFactory.plain();
+        final IndexMapper<T> mapper = mapperFactory.plain();
 
-        T expected = keyToTest;
+        final T expected = keyToTest;
         final long index = mapper.toIndex(expected);
-        T actual = mapper.toKey(index);
+        final T actual = mapper.toKey(index);
+
+        TestUtils.assertEquals(implementation, expected, actual);
+    }
+
+    static <T extends Comparable<? super T>> void doTestWithReference(final TimeIndex<T> mapperFactory, final T keyToTest, final T referenceKey) {
+
+        final String implementation = keyToTest.getClass().getSimpleName();
+
+        final IndexMapper<T> mapper = mapperFactory.from(referenceKey);
+
+        final T expected = keyToTest;
+        final long index = mapper.toIndex(expected);
+        final T actual = mapper.toKey(index);
 
         TestUtils.assertEquals(implementation, expected, actual);
     }
@@ -30,7 +43,7 @@ public class TimeIndexTest extends TypeTests {
         super();
     }
 
-    public TimeIndexTest(String name) {
+    public TimeIndexTest(final String name) {
         super(name);
     }
 
@@ -55,6 +68,30 @@ public class TimeIndexTest extends TypeTests {
 
         final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
         TimeIndexTest.doTestPlain(TimeIndex.ZONED_DATE_TIME, zonedDateTime);
+    }
+
+    public void testWithReference() {
+
+        // ms precision (strip micros and nanos)
+        final Instant instant = Instant.ofEpochMilli(Instant.now().toEpochMilli());
+        final Instant reference = instant.minusMillis(TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR);
+
+        TimeIndexTest.doTestWithReference(TimeIndex.CALENDAR, new GregorianCalendar(), null);
+        TimeIndexTest.doTestWithReference(TimeIndex.CALENDAR_DATE, new CalendarDate(), null);
+        TimeIndexTest.doTestWithReference(TimeIndex.DATE, new Date(), null);
+
+        TimeIndexTest.doTestWithReference(TimeIndex.INSTANT, instant, reference);
+
+        final LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        TimeIndexTest.doTestWithReference(TimeIndex.LOCAL_DATE_TIME, localDateTime, null);
+        TimeIndexTest.doTestWithReference(TimeIndex.LOCAL_DATE, localDateTime.toLocalDate(), null);
+        TimeIndexTest.doTestWithReference(TimeIndex.LOCAL_TIME, localDateTime.toLocalTime(), null);
+
+        final OffsetDateTime offsetDateTime = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
+        TimeIndexTest.doTestWithReference(TimeIndex.OFFSET_DATE_TIME, offsetDateTime, null);
+
+        final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
+        TimeIndexTest.doTestWithReference(TimeIndex.ZONED_DATE_TIME, zonedDateTime, null);
     }
 
 }
