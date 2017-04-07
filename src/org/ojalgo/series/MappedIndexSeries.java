@@ -41,7 +41,7 @@ import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TypeUtils;
 
-final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number> extends AbstractMap<K, N> implements BasicSeries<K, N> {
+final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number> extends AbstractMap<K, N> implements BasicSeries.NaturallySequenced<K, N> {
 
     static final IndexMapper<Double> MAPPER = new IndexMapper<Double>() {
 
@@ -70,21 +70,25 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
     private final BinaryFunction<N> myAccumulator;
     private ColourData myColour = null;
     private final LongToNumberMap<N> myDelegate;
-    private final IndexMapper<K> myIndexMapper;
+    private final IndexMapper<K> myMapper;
     private String myName = null;
 
     MappedIndexSeries(final DenseArray.Factory<N> arrayFactory, final IndexMapper<K> indexMapper, BinaryFunction<N> accumulator) {
         super();
         myDelegate = LongToNumberMap.factory(arrayFactory).make();
-        myIndexMapper = indexMapper;
+        myMapper = indexMapper;
         myAccumulator = accumulator;
     }
 
     MappedIndexSeries(final IndexMapper<K> indexMapper, final LongToNumberMap<N> delegate, BinaryFunction<N> accumulator) {
         super();
         myDelegate = delegate;
-        myIndexMapper = indexMapper;
+        myMapper = indexMapper;
         myAccumulator = accumulator;
+    }
+
+    public PrimitiveSeries asPrimitive() {
+        return PrimitiveSeries.wrap(myDelegate.values());
     }
 
     public MappedIndexSeries<K, N> colour(final ColourData colour) {
@@ -97,7 +101,7 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
     }
 
     public double doubleValue(final K key) {
-        return myDelegate.doubleValue(myIndexMapper.toIndex(key));
+        return myDelegate.doubleValue(myMapper.toIndex(key));
     }
 
     public double doubleValue(long key) {
@@ -126,7 +130,7 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
                         return new Map.Entry<K, N>() {
 
                             public K getKey() {
-                                return myIndexMapper.toKey(tmpDelegateNext.getKey());
+                                return myMapper.toKey(tmpDelegateNext.getKey());
                             }
 
                             public N getValue() {
@@ -151,11 +155,15 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
     }
 
     public K firstKey() {
-        return myIndexMapper.toKey(myDelegate.firstKey());
+        return myMapper.toKey(myDelegate.firstKey());
     }
 
     public N firstValue() {
         return this.get(this.firstKey());
+    }
+
+    public N get(K key) {
+        return myDelegate.get(myMapper.toIndex(key));
     }
 
     public N get(long key) {
@@ -166,7 +174,7 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
     @Override
     public N get(final Object key) {
         if (key instanceof Comparable<?>) {
-            return myDelegate.get(myIndexMapper.toIndex((K) key));
+            return myDelegate.get(myMapper.toIndex((K) key));
         } else {
             return null;
         }
@@ -213,11 +221,15 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
     }
 
     public K lastKey() {
-        return myIndexMapper.toKey(myDelegate.lastKey());
+        return myMapper.toKey(myDelegate.lastKey());
     }
 
     public N lastValue() {
         return this.get(this.lastKey());
+    }
+
+    public IndexMapper<K> mapper() {
+        return myMapper;
     }
 
     public void modifyAll(final UnaryFunction<N> function) {
@@ -232,16 +244,16 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
     }
 
     public K nextKey() {
-        return myIndexMapper.toKey(myDelegate.lastKey() + 1L);
+        return myMapper.toKey(myDelegate.lastKey() + 1L);
     }
 
     public double put(final K key, final double value) {
-        return this.put(myIndexMapper.toIndex(key), value);
+        return this.put(myMapper.toIndex(key), value);
     }
 
     @Override
     public N put(final K key, final N value) {
-        return this.put(myIndexMapper.toIndex(key), value);
+        return this.put(myMapper.toIndex(key), value);
     }
 
     public double put(long key, double value) {
@@ -260,12 +272,17 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         }
     }
 
+    public K step(K key) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     @Override
     public MappedIndexSeries<K, N> subMap(final K fromKey, final K toKey) {
-        final long tmpFromIndex = myIndexMapper.toIndex(fromKey);
-        final long tmpToIndex = myIndexMapper.toIndex(toKey);
+        final long tmpFromIndex = myMapper.toIndex(fromKey);
+        final long tmpToIndex = myMapper.toIndex(toKey);
         final LongToNumberMap<N> tmpSubMap = myDelegate.subMap(tmpFromIndex, tmpToIndex);
-        return new MappedIndexSeries<>(myIndexMapper, tmpSubMap, myAccumulator);
+        return new MappedIndexSeries<>(myMapper, tmpSubMap, myAccumulator);
     }
 
     public MappedIndexSeries<K, N> tailMap(final K fromKey) {

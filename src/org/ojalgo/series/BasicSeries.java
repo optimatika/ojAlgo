@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.SortedMap;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.BinaryFunction;
@@ -63,6 +64,65 @@ import org.ojalgo.type.keyvalue.KeyValue;
  */
 public interface BasicSeries<K extends Comparable<? super K>, V extends Number> extends SortedMap<K, V> {
 
+    /**
+     * A series with naturally sequenced keys - given any key there is a natural "next" key, e.g. with a
+     * series of daily values the natural next key is the next day. Further natural sequencing implies a
+     * bidirectional mapping between the keys and long indices.
+     *
+     * @author apete
+     */
+    interface NaturallySequenced<K extends Comparable<? super K>, V extends Number> extends BasicSeries<K, V>, Access1D<V> {
+
+        default PrimitiveSeries asPrimitive() {
+            return PrimitiveSeries.wrap(this);
+        }
+
+        /**
+         * Will fill in missing values, inbetween the first and last keys.
+         */
+        default void complete() {
+
+            K tmpKey = this.firstKey();
+            V tmpVal = null;
+
+            V patchVal = this.firstValue();
+
+            final K lastKey = this.lastKey();
+            while (tmpKey.compareTo(lastKey) <= 0) {
+
+                tmpVal = this.get(tmpKey);
+
+                if (tmpVal != null) {
+                    patchVal = tmpVal;
+                } else {
+                    this.put(tmpKey, patchVal);
+                }
+
+                tmpKey = this.step(tmpKey);
+            }
+        }
+
+        default long count() {
+            return this.size();
+        }
+
+        IndexMapper<K> mapper();
+
+        /**
+         * @return The next, after the {@link #lastKey()}, key.
+         */
+        default K nextKey() {
+            return this.step(this.lastKey());
+        }
+
+        double put(final long key, final double value);
+
+        V put(final long key, final V value);
+
+        K step(K key);
+
+    }
+
     public static final class TimeSeriesBuilder<K extends Comparable<? super K>> {
 
         private K myReference = null;
@@ -74,12 +134,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             myTimeIndex = timeIndex;
         }
 
-        public <N extends Number> BasicSeries<K, N> build(final DenseArray.Factory<N> arrayFactory) {
+        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> arrayFactory) {
             Objects.requireNonNull(arrayFactory);
             return doBuild(arrayFactory, null);
         }
 
-        public <N extends Number> BasicSeries<K, N> build(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
+        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
             Objects.requireNonNull(arrayFactory);
             Objects.requireNonNull(accumularor);
             return doBuild(arrayFactory, accumularor);
@@ -95,7 +155,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             return this;
         }
 
-        private <N extends Number> BasicSeries<K, N> doBuild(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
+        private <N extends Number> BasicSeries.NaturallySequenced<K, N> doBuild(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
             if (myReference != null) {
                 if (myResolution != null) {
                     return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution), accumularor);
@@ -209,38 +269,34 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         return retVal;
     }
 
-    public V get(long key);
+    PrimitiveSeries asPrimitive();
 
     BasicSeries<K, V> colour(ColourData colour);
 
-    default double doubleValue(double key) {
-        return this.doubleValue(MappedIndexSeries.toIndex(key));
-    }
-
     double doubleValue(final K key);
-
-    double doubleValue(final long key);
 
     V firstValue();
 
-    default V get(double key) {
-        return this.get(MappedIndexSeries.toIndex(key));
-    }
+    V get(final K key);
 
     ColourData getColour();
 
     /**
-     * @deprecated v41 Use {@link #getPrimitiveSeries()} instead
+     * @deprecated v41 Use {@link #asPrimitive()} instead
      */
     @Deprecated
     DataSeries getDataSeries();
 
     String getName();
 
+    /**
+     * @deprecated v42 Use {@link #asPrimitive()} instead
+     */
+    @Deprecated
     PrimitiveSeries getPrimitiveSeries();
 
     /**
-     * @deprecated v41 Use {@link #getPrimitiveSeries()} instead
+     * @deprecated v41 Use {@link #asPrimitive()} instead
      */
     @Deprecated
     double[] getPrimitiveValues();
@@ -248,33 +304,16 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     V lastValue();
 
     /**
-     * @deprecated v41 Use {@link #getPrimitiveSeries()} instead
+     * @deprecated v41 Use {@link #asPrimitive()} instead
      */
     @Deprecated
     void modifyAll(UnaryFunction<V> function);
 
     BasicSeries<K, V> name(String name);
 
-    /**
-     * @return The next, after the {@link #lastKey()}, key.
-     */
-    K nextKey();
-
-    default double put(double key, double value) {
-        return this.put(MappedIndexSeries.toIndex(key), value);
-    }
-
-    default V put(double key, V value) {
-        return this.put(MappedIndexSeries.toIndex(key), value);
-    }
-
     double put(final K key, final double value);
 
     V put(final K key, final V value);
-
-    double put(final long key, final double value);
-
-    V put(final long key, final V value);
 
     default void putAll(final Collection<? extends KeyValue<? extends K, ? extends V>> data) {
         for (final KeyValue<? extends K, ? extends V> tmpKeyValue : data) {

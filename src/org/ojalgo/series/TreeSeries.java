@@ -39,13 +39,13 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I e
     private ColourData myColour = null;
     private String myName = null;
 
-    protected TreeSeries() {
-        super();
-    }
-
     @SuppressWarnings("unused")
     private TreeSeries(final Comparator<? super K> comparator) {
         super(comparator);
+    }
+
+    protected TreeSeries() {
+        super();
     }
 
     protected TreeSeries(final Map<? extends K, ? extends N> map) {
@@ -56,6 +56,7 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I e
         super(sortedMap);
     }
 
+    @SuppressWarnings("unchecked")
     public I colour(final ColourData colour) {
         myColour = colour;
         return (I) this;
@@ -111,6 +112,7 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I e
         }
     }
 
+    @SuppressWarnings("unchecked")
     public I name(final String name) {
         myName = name;
         return (I) this;
@@ -165,6 +167,19 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I e
         }
 
         return retVal;
+    }
+
+    public PrimitiveSeries asPrimitive() {
+
+        final double[] retVal = new double[this.size()];
+
+        int i = 0;
+        for (final N tmpValue : this.values()) {
+            retVal[i] = tmpValue.doubleValue();
+            i++;
+        }
+
+        return DataSeries.wrap(retVal);
     }
 
 }

@@ -52,14 +52,12 @@ public class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N
         return ArrayUtils.wrapAccess1D(new ArrayList<>(this.values()));
     }
 
-    public double doubleValue(long key) {
-        // TODO Auto-generated method stub
-        return 0;
+    public N get(long key) {
+        return this.get(MappedIndexSeries.toKey(key));
     }
 
-    public N get(long key) {
-        // TODO Auto-generated method stub
-        return null;
+    public N get(N key) {
+        return this.get((Object) key);
     }
 
     public double invoke(final double arg) {
@@ -69,21 +67,6 @@ public class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N
 
     public N invoke(final N arg) {
         return this.get(arg);
-    }
-
-    public N nextKey() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public double put(long key, double value) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public N put(long key, N value) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public double put(final N key, final double value) {
