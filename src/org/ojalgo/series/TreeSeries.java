@@ -27,7 +27,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.DataSeries;
 import org.ojalgo.series.primitive.PrimitiveSeries;
@@ -74,10 +73,6 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I e
         return myColour;
     }
 
-    public DataSeries getDataSeries() {
-        return DataSeries.wrap(this.getPrimitiveValues());
-    }
-
     public String getName() {
         if (myName == null) {
             myName = UUID.randomUUID().toString();
@@ -85,31 +80,8 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I e
         return myName;
     }
 
-    public PrimitiveSeries getPrimitiveSeries() {
-        return DataSeries.wrap(this.getPrimitiveValues());
-    }
-
-    public double[] getPrimitiveValues() {
-
-        final double[] retVal = new double[this.size()];
-
-        int i = 0;
-        for (final N tmpValue : this.values()) {
-            retVal[i] = tmpValue.doubleValue();
-            i++;
-        }
-
-        return retVal;
-    }
-
     public N lastValue() {
         return this.get(this.lastKey());
-    }
-
-    public void modifyAll(final UnaryFunction<N> function) {
-        for (final Map.Entry<K, N> tmpEntry : this.entrySet()) {
-            this.put(tmpEntry.getKey(), function.invoke(tmpEntry.getValue()));
-        }
     }
 
     @SuppressWarnings("unchecked")

@@ -136,13 +136,13 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
 
         public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> arrayFactory) {
             Objects.requireNonNull(arrayFactory);
-            return doBuild(arrayFactory, null);
+            return this.doBuild(arrayFactory, null);
         }
 
-        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
+        public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> arrayFactory, final BinaryFunction<N> accumularor) {
             Objects.requireNonNull(arrayFactory);
             Objects.requireNonNull(accumularor);
-            return doBuild(arrayFactory, accumularor);
+            return this.doBuild(arrayFactory, accumularor);
         }
 
         public TimeSeriesBuilder<K> reference(final K reference) {
@@ -155,7 +155,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             return this;
         }
 
-        private <N extends Number> BasicSeries.NaturallySequenced<K, N> doBuild(final DenseArray.Factory<N> arrayFactory, BinaryFunction<N> accumularor) {
+        private <N extends Number> BasicSeries.NaturallySequenced<K, N> doBuild(final DenseArray.Factory<N> arrayFactory, final BinaryFunction<N> accumularor) {
             if (myReference != null) {
                 if (myResolution != null) {
                     return new MappedIndexSeries<>(arrayFactory, myTimeIndex.from(myReference, myResolution), accumularor);
@@ -183,11 +183,11 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     public static final BasicSeries.TimeSeriesBuilder<OffsetDateTime> OFFSET_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.OFFSET_DATE_TIME);
     public static final BasicSeries.TimeSeriesBuilder<ZonedDateTime> ZONED_DATE_TIME = new BasicSeries.TimeSeriesBuilder<>(TimeIndex.ZONED_DATE_TIME);
 
-    public static BasicSeries<Double, Double> make(DenseArray.Factory<Double> arrayFactory) {
+    public static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory) {
         return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, null);
     }
 
-    public static BasicSeries<Double, Double> make(DenseArray.Factory<Double> arrayFactory, final BinaryFunction<Double> accumulator) {
+    public static BasicSeries<Double, Double> make(final DenseArray.Factory<Double> arrayFactory, final BinaryFunction<Double> accumulator) {
         return new MappedIndexSeries<>(arrayFactory, MappedIndexSeries.MAPPER, accumulator);
     }
 
@@ -285,7 +285,9 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
      * @deprecated v41 Use {@link #asPrimitive()} instead
      */
     @Deprecated
-    DataSeries getDataSeries();
+    default DataSeries getDataSeries() {
+        return this.asPrimitive().toDataSeries();
+    }
 
     String getName();
 
@@ -293,13 +295,17 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
      * @deprecated v42 Use {@link #asPrimitive()} instead
      */
     @Deprecated
-    PrimitiveSeries getPrimitiveSeries();
+    default PrimitiveSeries getPrimitiveSeries() {
+        return this.asPrimitive();
+    }
 
     /**
      * @deprecated v41 Use {@link #asPrimitive()} instead
      */
     @Deprecated
-    double[] getPrimitiveValues();
+    default double[] getPrimitiveValues() {
+        return this.asPrimitive().toRawCopy1D();
+    }
 
     V lastValue();
 
@@ -307,7 +313,9 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
      * @deprecated v41 Use {@link #asPrimitive()} instead
      */
     @Deprecated
-    void modifyAll(UnaryFunction<V> function);
+    default void modifyAll(final UnaryFunction<V> function) {
+        this.asPrimitive().loopAll(val -> function.invoke(val));
+    }
 
     BasicSeries<K, V> name(String name);
 
