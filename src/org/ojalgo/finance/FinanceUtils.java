@@ -93,7 +93,7 @@ public abstract class FinanceUtils {
         retVal.name(series.getName()).colour(series.getColour());
 
         final double tmpSamplePeriod = (double) series.getAverageStepSize() / (double) timeUnit.size();
-        final GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.estimate(series.getPrimitiveSeries(), tmpSamplePeriod);
+        final GeometricBrownianMotion tmpProcess = GeometricBrownianMotion.estimate(series.asPrimitive(), tmpSamplePeriod);
 
         if (includeOriginalSeries) {
             for (final Entry<CalendarDate, ? extends Number> tmpEntry : series.entrySet()) {
@@ -133,7 +133,7 @@ public abstract class FinanceUtils {
 
         final ArrayList<SampleSet> tmpSampleSets = new ArrayList<>();
         for (final CalendarDateSeries<V> tmpTimeSeries : timeSeriesCollection) {
-            final double[] values = tmpCoordinator.get(tmpTimeSeries.getName()).getPrimitiveValues();
+            final double[] values = tmpCoordinator.get(tmpTimeSeries.getName()).asPrimitive().toRawCopy1D();
             final int tmpSize1 = values.length - 1;
 
             final double[] retVal = new double[tmpSize1];
@@ -196,7 +196,7 @@ public abstract class FinanceUtils {
 
         for (int j = 0; j < tmpSize; j++) {
 
-            final PrimitiveSeries tmpPrimitiveSeries = tmpCoordinated.get(listOfTimeSeries.get(j).getName()).getPrimitiveSeries();
+            final PrimitiveSeries tmpPrimitiveSeries = tmpCoordinated.get(listOfTimeSeries.get(j).getName()).asPrimitive();
 
             tmpSampleSet = SampleSet.wrap(tmpPrimitiveSeries.quotients().log().toDataSeries());
 
@@ -244,8 +244,8 @@ public abstract class FinanceUtils {
             throw new IllegalArgumentException("The two series must have the same last key (date or calendar).");
         }
 
-        final double[] tmpPrices = priceSeries.getPrimitiveValues();
-        final double[] tmpRiskFreeInterestRates = riskFreeInterestRateSeries.getPrimitiveValues();
+        final double[] tmpPrices = priceSeries.asPrimitive().toRawCopy1D();
+        final double[] tmpRiskFreeInterestRates = riskFreeInterestRateSeries.asPrimitive().toRawCopy1D();
 
         final Array1D<Double> retVal = Array1D.PRIMITIVE64.makeZero(tmpPrices.length - 1);
 
@@ -295,8 +295,8 @@ public abstract class FinanceUtils {
         }
 
         final long[] tmpDates = priceSeries.getPrimitiveKeys();
-        final double[] tmpPrices = priceSeries.getPrimitiveValues();
-        final double[] tmpRiskFreeInterestRates = riskFreeInterestRateSeries.getPrimitiveValues();
+        final double[] tmpPrices = priceSeries.asPrimitive().toRawCopy1D();
+        final double[] tmpRiskFreeInterestRates = riskFreeInterestRateSeries.asPrimitive().toRawCopy1D();
 
         final CalendarDateUnit tmpResolution = priceSeries.getResolution();
 

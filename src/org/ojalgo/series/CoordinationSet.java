@@ -29,9 +29,6 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.ParameterFunction;
-import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
@@ -171,49 +168,6 @@ public class CoordinationSet<N extends Number> extends HashMap<String, CalendarD
     public N getValue(final String series, final CalendarDate date) {
         return this.get(series).get(date);
     };
-
-    /**
-     * @deprecated v41
-     */
-    @Deprecated
-    public void modify(final BinaryFunction<N> function, final N argument) {
-        final UnaryFunction<N> tmpUnaryFunction = function.second(argument);
-        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-            tmpSeries.modifyAll(tmpUnaryFunction);
-        }
-    }
-
-    /**
-     * @deprecated v41
-     */
-    @Deprecated
-    public void modify(final N argument, final BinaryFunction<N> function) {
-        final UnaryFunction<N> tmpUnaryFunction = function.first(argument);
-        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-            tmpSeries.modifyAll(tmpUnaryFunction);
-        }
-    }
-
-    /**
-     * @deprecated v41
-     */
-    @Deprecated
-    public void modify(final ParameterFunction<N> function, final int parameter) {
-        final UnaryFunction<N> tmpUnaryFunction = function.parameter(parameter);
-        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-            tmpSeries.modifyAll(tmpUnaryFunction);
-        }
-    }
-
-    /**
-     * @deprecated v41
-     */
-    @Deprecated
-    public void modify(final UnaryFunction<N> function) {
-        for (final CalendarDateSeries<N> tmpSeries : this.values()) {
-            tmpSeries.modifyAll(function);
-        }
-    }
 
     /**
      * @return A new CoordinationSet where all series have the same first and last keys.

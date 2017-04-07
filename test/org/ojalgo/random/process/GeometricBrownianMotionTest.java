@@ -269,8 +269,8 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
         final CalendarDateSeries<Double> tmpYearSeries = tmpDaySeries.resample(CalendarDateUnit.YEAR);
         final CalendarDateSeries<Double> tmpMonthSeries = tmpDaySeries.resample(CalendarDateUnit.MONTH);
 
-        final PrimitiveSeries tmpDataY = tmpYearSeries.getPrimitiveSeries();
-        final PrimitiveSeries tmpDataM = tmpMonthSeries.getPrimitiveSeries();
+        final PrimitiveSeries tmpDataY = tmpYearSeries.asPrimitive();
+        final PrimitiveSeries tmpDataM = tmpMonthSeries.asPrimitive();
 
         final SampleSet tmpSetY = SampleSet.wrap(tmpDataY.log().differences());
         final SampleSet tmpSetM = SampleSet.wrap(tmpDataM.log().differences());

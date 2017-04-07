@@ -50,11 +50,11 @@ public class CalendarDateSeries<N extends Number> extends TreeSeries<CalendarDat
         myResolution = resolution;
         myMapper = new IndexMapper<CalendarDate>() {
 
-            public long toIndex(CalendarDate key) {
+            public long toIndex(final CalendarDate key) {
                 return key.toTimeInMillis(myResolution);
             }
 
-            public CalendarDate toKey(long index) {
+            public CalendarDate toKey(final long index) {
                 return new CalendarDate(index);
             }
 
@@ -75,7 +75,7 @@ public class CalendarDateSeries<N extends Number> extends TreeSeries<CalendarDat
         myMapper = null;
     }
 
-    CalendarDateSeries(final SortedMap<CalendarDate, ? extends N> sortedMap, final CalendarDateUnit resolution, IndexMapper<CalendarDate> mapper) {
+    CalendarDateSeries(final SortedMap<CalendarDate, ? extends N> sortedMap, final CalendarDateUnit resolution, final IndexMapper<CalendarDate> mapper) {
 
         super(sortedMap);
 
@@ -83,15 +83,15 @@ public class CalendarDateSeries<N extends Number> extends TreeSeries<CalendarDat
         myMapper = mapper;
     }
 
-    public double doubleValue(long key) {
+    public double doubleValue(final long key) {
         return this.doubleValue(CalendarDate.make(key, myResolution));
     }
 
-    public N get(CalendarDate key) {
+    public N get(final CalendarDate key) {
         return this.get((Object) key.filter(myResolution));
     }
 
-    public N get(long key) {
+    public N get(final long key) {
         return this.get(CalendarDate.make(key, myResolution));
     }
 
@@ -113,7 +113,7 @@ public class CalendarDateSeries<N extends Number> extends TreeSeries<CalendarDat
     }
 
     public ExplicitTimeSeries getPrimitiveTimeSeries() {
-        return new ExplicitTimeSeries(this.getPrimitiveKeys(), this.getPrimitiveSeries());
+        return new ExplicitTimeSeries(this.getPrimitiveKeys(), this.asPrimitive());
     }
 
     public CalendarDateUnit getResolution() {
@@ -181,7 +181,7 @@ public class CalendarDateSeries<N extends Number> extends TreeSeries<CalendarDat
         return super.put(CalendarDate.make(key, myResolution), value);
     }
 
-    public double put(long key, double value) {
+    public double put(final long key, final double value) {
         return this.put(CalendarDate.make(key, myResolution), value);
     }
 

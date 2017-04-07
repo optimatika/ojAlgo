@@ -162,9 +162,9 @@ public class MultidimensionalSimulatorTest extends RandomProcessTests {
             tmpSeries.get(2).put(tmpCalendarDateKey, tmpGB1D.getValue(2));
         }
 
-        final GeometricBrownianMotion tmpNewProc1 = GeometricBrownianMotion.estimate(tmpSeries.get(0).getDataSeries(), 1.0 / 12.0);
-        final GeometricBrownianMotion tmpNewProc2 = GeometricBrownianMotion.estimate(tmpSeries.get(1).getDataSeries(), 1.0 / 12.0);
-        final GeometricBrownianMotion tmpNewProc3 = GeometricBrownianMotion.estimate(tmpSeries.get(2).getDataSeries(), 1.0 / 12.0);
+        final GeometricBrownianMotion tmpNewProc1 = GeometricBrownianMotion.estimate(tmpSeries.get(0).asPrimitive(), 1.0 / 12.0);
+        final GeometricBrownianMotion tmpNewProc2 = GeometricBrownianMotion.estimate(tmpSeries.get(1).asPrimitive(), 1.0 / 12.0);
+        final GeometricBrownianMotion tmpNewProc3 = GeometricBrownianMotion.estimate(tmpSeries.get(2).asPrimitive(), 1.0 / 12.0);
 
         TestUtils.assertEquals(0.01, tmpNewProc1.getStandardDeviation(1.0), 0.005);
         TestUtils.assertEquals(0.02, tmpNewProc2.getStandardDeviation(1.0), 0.005);

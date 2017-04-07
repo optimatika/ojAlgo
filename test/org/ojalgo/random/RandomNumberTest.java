@@ -103,7 +103,7 @@ public class RandomNumberTest extends RandomTests {
             tmpSeries.put(i, tmpValue);
             tmpValue *= tmpRandomNumber.doubleValue();
         }
-        final double[] someValues1 = tmpSeries.getPrimitiveValues();
+        final double[] someValues1 = tmpSeries.asPrimitive().toRawCopy1D();
         final int tmpSize1 = someValues1.length - 1;
 
         final double[] retVal1 = new double[tmpSize1];
@@ -113,7 +113,7 @@ public class RandomNumberTest extends RandomTests {
         }
 
         final SampleSet tmpQuotients = SampleSet.wrap(ArrayUtils.wrapAccess1D(retVal1));
-        final double[] someValues = tmpSeries.getPrimitiveValues();
+        final double[] someValues = tmpSeries.asPrimitive().toRawCopy1D();
         final int tmpSize = someValues.length - 1;
 
         final double[] retVal = new double[tmpSize];

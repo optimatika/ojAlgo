@@ -94,7 +94,7 @@ public class SeriesInterpolator {
 
             tmpFactor = tmpInputKey.doubleValue() / tmpUpperKey.doubleValue();
 
-            tmpSeriesValues = myCoordinatedSet.get(myKeys.get(tmpUpperKey)).getPrimitiveValues();
+            tmpSeriesValues = myCoordinatedSet.get(myKeys.get(tmpUpperKey)).asPrimitive().toRawCopy1D();
             for (int i = 0; i < tmpSeriesValues.length; i++) {
                 tmpSeriesValues[i] *= tmpFactor;
             }
@@ -103,7 +103,7 @@ public class SeriesInterpolator {
 
             tmpFactor = tmpInputKey.doubleValue() / tmpLowerKey.doubleValue();
 
-            tmpSeriesValues = myCoordinatedSet.get(myKeys.get(tmpLowerKey)).getPrimitiveValues();
+            tmpSeriesValues = myCoordinatedSet.get(myKeys.get(tmpLowerKey)).asPrimitive().toRawCopy1D();
             for (int i = 0; i < tmpSeriesValues.length; i++) {
                 tmpSeriesValues[i] *= tmpFactor;
             }
@@ -112,12 +112,12 @@ public class SeriesInterpolator {
 
             if (tmpLowerKey.equals(tmpUpperKey)) {
 
-                tmpSeriesValues = myCoordinatedSet.get(myKeys.get(tmpLowerKey)).getPrimitiveValues();
+                tmpSeriesValues = myCoordinatedSet.get(myKeys.get(tmpLowerKey)).asPrimitive().toRawCopy1D();
 
             } else {
 
-                final double[] tmpLowerValues = myCoordinatedSet.get(myKeys.get(tmpLowerKey)).getPrimitiveValues();
-                final double[] tmpUpperValues = myCoordinatedSet.get(myKeys.get(tmpUpperKey)).getPrimitiveValues();
+                final double[] tmpLowerValues = myCoordinatedSet.get(myKeys.get(tmpLowerKey)).asPrimitive().toRawCopy1D();
+                final double[] tmpUpperValues = myCoordinatedSet.get(myKeys.get(tmpUpperKey)).asPrimitive().toRawCopy1D();
 
                 tmpFactor = (tmpInputKey.doubleValue() - tmpLowerKey.doubleValue()) / (tmpUpperKey.doubleValue() - tmpLowerKey.doubleValue());
 
