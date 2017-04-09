@@ -33,7 +33,7 @@ import org.ojalgo.series.primitive.ExplicitTimeSeries;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 
-public class CalendarDateSeries<N extends Number> extends TreeSeries<CalendarDate, N, CalendarDateSeries<N>>
+public final class CalendarDateSeries<N extends Number> extends TreeSeries<CalendarDate, N, CalendarDateSeries<N>>
         implements BasicSeries.NaturallySequenced<CalendarDate, N> {
 
     private final CalendarDateUnit myResolution;

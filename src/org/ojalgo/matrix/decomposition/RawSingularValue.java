@@ -31,6 +31,9 @@ import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.array.blas.DOT;
+import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
+import org.ojalgo.matrix.decomposition.function.NegateColumn;
+import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -469,8 +472,90 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 tmpVt_k[k] = ONE;
             }
         }
+        final double[] s = myS;
+        final double[][] myUt1 = myUt;
+        final double[][] myVt1 = myVt;
 
-        SVD2D.toDiagonal(myS, tmpE, factors, p, myUt, myVt);
+        final int n1 = s.length;
+        final int m1 = myUt1 != null ? myUt1[0].length : n1;
+
+        // Main iteration loop for the singular values.
+        final RotateRight q1RotR = factors ? new RotateRight() {
+
+            public void rotateRight(final int low, final int high, final double cos, final double sin) {
+                final double[] colLow = myUt1[low];
+                final double[] colHigh = myUt1[high];
+                double valLow;
+                double valHigh;
+                for (int i = 0; i < m1; i++) {
+                    valLow = colLow[i];
+                    valHigh = colHigh[i];
+                    colLow[i] = (-sin * valHigh) + (cos * valLow);
+                    colHigh[i] = (cos * valHigh) + (sin * valLow);
+                }
+            }
+
+        } : RotateRight.NULL;
+
+        final RotateRight q2RotR = factors ? new RotateRight() {
+
+            public void rotateRight(final int low, final int high, final double cos, final double sin) {
+                final double[] colLow = myVt1[low];
+                final double[] colHigh = myVt1[high];
+                double valLow;
+                double valHigh;
+                for (int i = 0; i < n1; i++) {
+                    valLow = colLow[i];
+                    valHigh = colHigh[i];
+                    colLow[i] = (-sin * valHigh) + (cos * valLow);
+                    colHigh[i] = (cos * valHigh) + (sin * valLow);
+                }
+            }
+
+        } : RotateRight.NULL;
+
+        final ExchangeColumns q1XchgCols = factors ? new ExchangeColumns() {
+
+            public void exchangeColumns(final int colA, final int colB) {
+                final double[] col1 = myUt1[colA];
+                final double[] col2 = myUt1[colB];
+                double tmp;
+                for (int i = 0; i < m1; i++) {
+                    tmp = col1[i];
+                    col1[i] = col2[i];
+                    col2[i] = tmp;
+                }
+            }
+
+        } : ExchangeColumns.NULL;
+
+        final ExchangeColumns q2XchgCols = factors ? new ExchangeColumns() {
+
+            public void exchangeColumns(final int colA, final int colB) {
+                final double[] col1 = myVt1[colA];
+                final double[] col2 = myVt1[colB];
+                double tmp;
+                for (int i = 0; i < n1; i++) {
+                    tmp = col1[i];
+                    col1[i] = col2[i];
+                    col2[i] = tmp;
+                }
+            }
+
+        } : ExchangeColumns.NULL;
+
+        final NegateColumn q2NegCol = factors ? new NegateColumn() {
+
+            public void negateColumn(final int col) {
+                final double[] column = myVt1[col];
+                for (int i = 0; i < column.length; i++) {
+                    column[i] = -column[i];
+                }
+            }
+
+        } : NegateColumn.NULL;
+
+        SVD2D.toDiagonal(s, tmpE, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 
         return this.computed(true);
     }

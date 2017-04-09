@@ -60,20 +60,23 @@ public abstract class SVD2D {
         }
     }
 
-    static void doCase3(final double[] s, final double[] e, final boolean factors, final int p, final double[][] myUt, final double[][] myVt, final int n,
-            final int m, final int k) {
+    static void doCase3(final double[] s, final double[] e, final int p, final int k, final RotateRight q1RotR, final RotateRight q2RotR) {
+
         // Calculate the shift.
         final double scale = MAX.invoke(MAX.invoke(MAX.invoke(MAX.invoke(ABS.invoke(s[p - 1]), ABS.invoke(s[p - 2])), ABS.invoke(e[p - 2])), ABS.invoke(s[k])),
                 ABS.invoke(e[k]));
-        final double sp = s[p - 1] / scale;
-        final double spm1 = s[p - 2] / scale;
-        final double epm1 = e[p - 2] / scale;
-        final double sk = s[k] / scale;
-        final double ek = e[k] / scale;
-        final double b = (((spm1 + sp) * (spm1 - sp)) + (epm1 * epm1)) / TWO;
-        final double c = (sp * epm1) * (sp * epm1);
+
+        final double s_p1 = s[p - 1] / scale;
+        final double s_m2 = s[p - 2] / scale;
+        final double e_m2 = e[p - 2] / scale;
+
+        final double s_k = s[k] / scale;
+        final double e_k = e[k] / scale;
+
+        final double b = (((s_m2 + s_p1) * (s_m2 - s_p1)) + (e_m2 * e_m2)) / TWO;
+        final double c = (s_p1 * e_m2) * (s_p1 * e_m2);
+
         double shift = ZERO;
-        // if ((b != ZERO) | (c != ZERO)) {
         if ((Double.compare(b, ZERO) != 0) || (Double.compare(c, ZERO) != 0)) {
             shift = SQRT.invoke((b * b) + c);
             if (b < ZERO) {
@@ -81,54 +84,40 @@ public abstract class SVD2D {
             }
             shift = c / (b + shift);
         }
-        double f = ((sk + sp) * (sk - sp)) + shift;
-        double g = sk * ek;
+
+        double f = ((s_k + s_p1) * (s_k - s_p1)) + shift;
+        double g = s_k * e_k;
 
         // Chase zeros.
         for (int j = k; j < (p - 1); j++) {
-            final double a = f;
-            final double b1 = g;
-            double t = HYPOT.invoke(a, b1);
-            double cs = f / t;
-            double sn = g / t;
+
+            double t = HYPOT.invoke(f, g);
+            double cos = f / t;
+            double sin = g / t;
+
             if (j != k) {
                 e[j - 1] = t;
             }
-            f = (cs * s[j]) + (sn * e[j]);
-            e[j] = (cs * e[j]) - (sn * s[j]);
-            g = sn * s[j + 1];
-            s[j + 1] = cs * s[j + 1];
-            if (factors) {
-                for (int i = 0; i < n; i++) {
-                    // t = (cs * myV[i][j]) + (sn * myV[i][j + 1]);
-                    t = (cs * myVt[j][i]) + (sn * myVt[j + 1][i]);
-                    // myV[i][j + 1] = (-sn * myV[i][j]) + (cs * myV[i][j + 1]);
-                    myVt[j + 1][i] = (-sn * myVt[j][i]) + (cs * myVt[j + 1][i]);
-                    // myV[i][j] = t;
-                    myVt[j][i] = t;
-                }
-            }
-            final double a1 = f;
-            final double b2 = g;
-            t = HYPOT.invoke(a1, b2);
-            cs = f / t;
-            sn = g / t;
+            f = (cos * s[j]) + (sin * e[j]);
+            e[j] = (cos * e[j]) - (sin * s[j]);
+            g = sin * s[j + 1];
+            s[j + 1] = cos * s[j + 1];
+
+            q2RotR.rotateRight(j + 1, j, cos, sin);
+
+            t = HYPOT.invoke(f, g);
+            cos = f / t;
+            sin = g / t;
+
             s[j] = t;
-            f = (cs * e[j]) + (sn * s[j + 1]);
-            s[j + 1] = (-sn * e[j]) + (cs * s[j + 1]);
-            g = sn * e[j + 1];
-            e[j + 1] = cs * e[j + 1];
-            if (factors && (j < (m - 1))) {
-                for (int i = 0; i < m; i++) {
-                    // t = (cs * myU[i][j]) + (sn * myU[i][j + 1]);
-                    t = (cs * myUt[j][i]) + (sn * myUt[j + 1][i]);
-                    // myU[i][j + 1] = (-sn * myU[i][j]) + (cs * myU[i][j + 1]);
-                    myUt[j + 1][i] = (-sn * myUt[j][i]) + (cs * myUt[j + 1][i]);
-                    // myU[i][j] = t;
-                    myUt[j][i] = t;
-                }
-            }
+            f = (cos * e[j]) + (sin * s[j + 1]);
+            s[j + 1] = (-sin * e[j]) + (cos * s[j + 1]);
+            g = sin * e[j + 1];
+            e[j + 1] = cos * e[j + 1];
+
+            q1RotR.rotateRight(j + 1, j, cos, sin);
         }
+
         e[p - 2] = f;
     }
 
@@ -156,90 +145,10 @@ public abstract class SVD2D {
         }
     }
 
-    static void toDiagonal(final double[] s, final double[] e, final boolean factors, int p, final double[][] myUt, final double[][] myVt) {
+    static void toDiagonal(final double[] s, final double[] e, final RotateRight q1RotR, final RotateRight q2RotR, final ExchangeColumns q1XchgCols,
+            final ExchangeColumns q2XchgCols, final NegateColumn q2NegCol) {
 
-        final int n = s.length;
-        final int m = myUt != null ? myUt[0].length : n;
-
-        // Main iteration loop for the singular values.
-        final double eps = POW.invoke(TWO, -52.0);
-        final double tiny = POW.invoke(TWO, -966.0);
-
-        final RotateRight q1RotR = factors ? new RotateRight() {
-
-            public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                final double[] colLow = myUt[low];
-                final double[] colHigh = myUt[high];
-                double valLow;
-                double valHigh;
-                for (int i = 0; i < n; i++) {
-                    valLow = colLow[i];
-                    valHigh = colHigh[i];
-                    colLow[i] = (-sin * valHigh) + (cos * valLow);
-                    colHigh[i] = (cos * valHigh) + (sin * valLow);
-                }
-            }
-
-        } : RotateRight.NULL;
-
-        final RotateRight q2RotR = factors ? new RotateRight() {
-
-            public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                final double[] colLow = myVt[low];
-                final double[] colHigh = myVt[high];
-                double valLow;
-                double valHigh;
-                for (int i = 0; i < n; i++) {
-                    valLow = colLow[i];
-                    valHigh = colHigh[i];
-                    colLow[i] = (-sin * valHigh) + (cos * valLow);
-                    colHigh[i] = (cos * valHigh) + (sin * valLow);
-                }
-            }
-
-        } : RotateRight.NULL;
-
-        final ExchangeColumns q1XchgCols = factors ? new ExchangeColumns() {
-
-            public void exchangeColumns(final int colA, final int colB) {
-                final double[] col1 = myUt[colA];
-                final double[] col2 = myUt[colB];
-                double tmp;
-                for (int i = 0; i < m; i++) {
-                    tmp = col1[i];
-                    col1[i] = col2[i];
-                    col2[i] = tmp;
-                }
-            }
-
-        } : ExchangeColumns.NULL;
-
-        final ExchangeColumns q2XchgCols = factors ? new ExchangeColumns() {
-
-            public void exchangeColumns(final int colA, final int colB) {
-                final double[] col1 = myVt[colA];
-                final double[] col2 = myVt[colB];
-                double tmp;
-                for (int i = 0; i < n; i++) {
-                    tmp = col1[i];
-                    col1[i] = col2[i];
-                    col2[i] = tmp;
-                }
-            }
-
-        } : ExchangeColumns.NULL;
-
-        final NegateColumn q2NegCol = factors ? new NegateColumn() {
-
-            public void negateColumn(final int col) {
-                final double[] column = myVt[col];
-                for (int i = 0; i < column.length; i++) {
-                    column[i] = -column[i];
-                }
-            }
-
-        } : NegateColumn.NULL;
-
+        int p = s.length;
         while (p > 0) {
             int k, kase;
 
@@ -259,7 +168,7 @@ public abstract class SVD2D {
                 if (k == -1) {
                     break;
                 }
-                if (ABS.invoke(e[k]) <= (tiny + (eps * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))))) {
+                if (ABS.invoke(e[k]) <= (TINY + (MACHINE_EPSILON * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))))) {
                     e[k] = ZERO;
                     break;
                 }
@@ -273,7 +182,7 @@ public abstract class SVD2D {
                         break;
                     }
                     final double t = (ks != p ? ABS.invoke(e[ks]) : 0.) + (ks != (k + 1) ? ABS.invoke(e[ks - 1]) : 0.);
-                    if (ABS.invoke(s[ks]) <= (tiny + (eps * t))) {
+                    if (ABS.invoke(s[ks]) <= (TINY + (MACHINE_EPSILON * t))) {
                         s[ks] = ZERO;
                         break;
                     }
@@ -307,7 +216,7 @@ public abstract class SVD2D {
             // Perform one qr step.
             case 3:
 
-                SVD2D.doCase3(s, e, factors, p, myUt, myVt, n, m, k);
+                SVD2D.doCase3(s, e, p, k, q1RotR, q2RotR);
                 break;
 
             // Convergence.

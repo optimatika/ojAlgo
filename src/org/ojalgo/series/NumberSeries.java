@@ -30,7 +30,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 
-public class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> {
+public final class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> {
 
     public NumberSeries() {
         super();
@@ -52,11 +52,11 @@ public class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N
         return ArrayUtils.wrapAccess1D(new ArrayList<>(this.values()));
     }
 
-    public N get(long key) {
+    public N get(final long key) {
         return this.get(MappedIndexSeries.toKey(key));
     }
 
-    public N get(N key) {
+    public N get(final N key) {
         return this.get((Object) key);
     }
 

@@ -27,7 +27,10 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
+import org.ojalgo.matrix.decomposition.function.NegateColumn;
+import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.BigDenseStore;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -67,12 +70,6 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
     }
 
-    /**
-     * ≈ 1.6E-291
-     */
-    @Deprecated
-    static final double TINY = PrimitiveFunction.POW.invoke(2.0, -966.0);
-
     protected SVDnew32(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory, final BidiagonalDecomposition<N> bidiagonal) {
         super(factory, bidiagonal);
     }
@@ -94,8 +91,24 @@ abstract class SVDnew32<N extends Number & Comparable<N>> extends SingularValueD
 
         final DecompositionStore<N> tmpQ1 = singularValuesOnly ? null : this.getBidiagonalQ1();
         final DecompositionStore<N> tmpQ2 = singularValuesOnly ? null : this.getBidiagonalQ2();
+        final int tmpDiagDim = (int) ((DiagonalAccess<?, ?>) tmpBidiagonal).mainDiagonal.count();
 
-        final Array1D<Double> tmpDiagonal = SVD1D.toDiagonal(tmpBidiagonal, tmpQ1, tmpQ2);
+        final double[] s = (tmpBidiagonal).mainDiagonal.toRawCopy1D(); // s
+        final double[] e = new double[tmpDiagDim]; // e
+        final int tmpOffLength = (tmpBidiagonal).superdiagonal.size();
+        for (int i = 0; i < tmpOffLength; i++) {
+            e[i] = (tmpBidiagonal).superdiagonal.doubleValue(i);
+        }
+
+        final RotateRight q1RotR = tmpQ1 != null ? tmpQ1 : RotateRight.NULL;
+        final RotateRight q2RotR = tmpQ2 != null ? tmpQ2 : RotateRight.NULL;
+        final ExchangeColumns q1XchgCols = tmpQ1 != null ? tmpQ1 : ExchangeColumns.NULL;
+        final ExchangeColumns q2XchgCols = tmpQ2 != null ? tmpQ2 : ExchangeColumns.NULL;
+        final NegateColumn q2NegCol = tmpQ1 != null ? tmpQ2 : NegateColumn.NULL;
+
+        SVD1D.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
+
+        final Array1D<Double> tmpDiagonal = Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(s));
 
         this.setSingularValues(tmpDiagonal);
 

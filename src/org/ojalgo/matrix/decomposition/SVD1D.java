@@ -57,25 +57,23 @@ public abstract class SVD1D {
         }
     }
 
-    static void doCase3(final double[] s, final double[] e, final int p, final int k, final DecompositionStore<?> mtrxQ1, final DecompositionStore<?> mtrxQ2) {
-
-        final int indPm1 = p - 1;
-        final int indPm2 = p - 2;
+    static void doCase3(final double[] s, final double[] e, final int p, final int k, final RotateRight q1RotR, final RotateRight q2RotR) {
 
         // Calculate the shift.
-        final double scale = MAX.invoke(
-                MAX.invoke(MAX.invoke(MAX.invoke(ABS.invoke(s[indPm1]), ABS.invoke(s[indPm2])), ABS.invoke(e[indPm2])), ABS.invoke(s[k])), ABS.invoke(e[k]));
+        final double scale = MAX.invoke(MAX.invoke(MAX.invoke(MAX.invoke(ABS.invoke(s[p - 1]), ABS.invoke(s[p - 2])), ABS.invoke(e[p - 2])), ABS.invoke(s[k])),
+                ABS.invoke(e[k]));
 
-        final double sPm1 = s[indPm1] / scale;
-        final double sPm2 = s[indPm2] / scale;
-        final double ePm2 = e[indPm2] / scale;
-        final double sK = s[k] / scale;
-        final double eK = e[k] / scale;
+        final double s_p1 = s[p - 1] / scale;
+        final double s_p2 = s[p - 2] / scale;
+        final double e_p2 = e[p - 2] / scale;
 
-        final double b = (((sPm2 + sPm1) * (sPm2 - sPm1)) + (ePm2 * ePm2)) / TWO;
-        final double c = (sPm1 * ePm2) * (sPm1 * ePm2);
+        final double s_k = s[k] / scale;
+        final double e_k = e[k] / scale;
+
+        final double b = (((s_p2 + s_p1) * (s_p2 - s_p1)) + (e_p2 * e_p2)) / TWO;
+        final double c = (s_p1 * e_p2) * (s_p1 * e_p2);
+
         double shift = ZERO;
-        // if ((c != ZERO) || (b != ZERO)) {
         if ((Double.compare(c, ZERO) != 0) || (Double.compare(b, ZERO) != 0)) {
             shift = SQRT.invoke((b * b) + c);
             if (b < ZERO) {
@@ -84,48 +82,44 @@ public abstract class SVD1D {
             shift = c / (b + shift);
         }
 
-        double f = ((sK + sPm1) * (sK - sPm1)) + shift;
-        double g = sK * eK;
+        double f = ((s_k + s_p1) * (s_k - s_p1)) + shift;
+        double g = s_k * e_k;
 
         double t;
-        double cs;
-        double sn;
+        double cos;
+        double sin;
 
         // Chase zeros.
-        for (int j = k; j < indPm1; j++) {
+        for (int j = k; j < (p - 1); j++) {
 
             t = HYPOT.invoke(f, g);
-            cs = f / t;
-            sn = g / t;
+            cos = f / t;
+            sin = g / t;
+
             if (j != k) {
                 e[j - 1] = t;
             }
-            f = (cs * s[j]) + (sn * e[j]);
-            e[j] = (cs * e[j]) - (sn * s[j]);
-            g = sn * s[j + 1];
-            s[j + 1] = cs * s[j + 1];
+            f = (cos * s[j]) + (sin * e[j]);
+            e[j] = (cos * e[j]) - (sin * s[j]);
+            g = sin * s[j + 1];
+            s[j + 1] = cos * s[j + 1];
 
-            if (mtrxQ2 != null) {
-                mtrxQ2.rotateRight(j + 1, j, cs, sn);
-
-            }
+            q2RotR.rotateRight(j + 1, j, cos, sin);
 
             t = HYPOT.invoke(f, g);
-            cs = f / t;
-            sn = g / t;
+            cos = f / t;
+            sin = g / t;
+
             s[j] = t;
-            f = (cs * e[j]) + (sn * s[j + 1]);
-            s[j + 1] = (-sn * e[j]) + (cs * s[j + 1]);
-            g = sn * e[j + 1];
-            e[j + 1] = cs * e[j + 1];
+            f = (cos * e[j]) + (sin * s[j + 1]);
+            s[j + 1] = (-sin * e[j]) + (cos * s[j + 1]);
+            g = sin * e[j + 1];
+            e[j + 1] = cos * e[j + 1];
 
-            if (mtrxQ1 != null) {
-                mtrxQ1.rotateRight(j + 1, j, cs, sn);
-
-            }
+            q1RotR.rotateRight(j + 1, j, cos, sin);
         }
 
-        e[indPm2] = f;
+        e[p - 2] = f;
     }
 
     static void doCase4(final double[] s, final int k, final NegateColumn q2NegCol, final ExchangeColumns q1XchgCols, final ExchangeColumns q2XchgCols) {
@@ -148,27 +142,13 @@ public abstract class SVD1D {
         }
     }
 
-    static Array1D<Double> toDiagonal(final DiagonalArray1D<?> bidiagonal, final DecompositionStore<?> mtrxQ1, final DecompositionStore<?> mtrxQ2) {
-
-        final int tmpDiagDim = bidiagonal.mainDiagonal.size();
-
-        final double[] s = bidiagonal.mainDiagonal.toRawCopy1D(); // s
-        final double[] e = new double[tmpDiagDim]; // e
-        final int tmpOffLength = bidiagonal.superdiagonal.size();
-        for (int i = 0; i < tmpOffLength; i++) {
-            e[i] = bidiagonal.superdiagonal.doubleValue(i);
-        }
-
-        final RotateRight q1RotR = mtrxQ1 != null ? mtrxQ1 : RotateRight.NULL;
-        final RotateRight q2RotR = mtrxQ2 != null ? mtrxQ2 : RotateRight.NULL;
-        final ExchangeColumns q1XchgCols = mtrxQ1 != null ? mtrxQ1 : ExchangeColumns.NULL;
-        final ExchangeColumns q2XchgCols = mtrxQ2 != null ? mtrxQ2 : ExchangeColumns.NULL;
-        final NegateColumn q2NegCol = mtrxQ1 != null ? mtrxQ2 : NegateColumn.NULL;
+    static void toDiagonal(final double[] s, final double[] e, final RotateRight q1RotR, final RotateRight q2RotR, final ExchangeColumns q1XchgCols,
+            final ExchangeColumns q2XchgCols, final NegateColumn q2NegCol) {
 
         // Main iteration loop for the singular values.
         int kase;
         int k;
-        int p = tmpDiagDim;
+        int p = s.length;
         while (p > 0) {
 
             //
@@ -188,7 +168,7 @@ public abstract class SVD1D {
                 if (k == -1) {
                     break;
                 }
-                if (ABS.invoke(e[k]) <= (SVDnew32.TINY + (MACHINE_EPSILON * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))))) {
+                if (ABS.invoke(e[k]) <= (TINY + (MACHINE_EPSILON * (ABS.invoke(s[k]) + ABS.invoke(s[k + 1]))))) {
                     e[k] = ZERO;
                     break;
                 }
@@ -202,7 +182,7 @@ public abstract class SVD1D {
                         break;
                     }
                     final double t = (ks != p ? ABS.invoke(e[ks]) : ZERO) + (ks != (k + 1) ? ABS.invoke(e[ks - 1]) : ZERO);
-                    if (ABS.invoke(s[ks]) <= (SVDnew32.TINY + (MACHINE_EPSILON * t))) {
+                    if (ABS.invoke(s[ks]) <= (TINY + (MACHINE_EPSILON * t))) {
                         s[ks] = ZERO;
                         break;
                     }
@@ -232,7 +212,7 @@ public abstract class SVD1D {
 
             case 3: // Perform QR-step.
 
-                SVD1D.doCase3(s, e, p, k, mtrxQ1, mtrxQ2);
+                SVD1D.doCase3(s, e, p, k, q1RotR, q2RotR);
                 break;
 
             case 4: // Convergence
@@ -247,9 +227,6 @@ public abstract class SVD1D {
 
             } // switch
         } // while
-
-        //return new PrimitiveArray(s).asArray1D();
-        return Array1D.PRIMITIVE64.wrap(Primitive64Array.wrap(s));
     }
 
 }
