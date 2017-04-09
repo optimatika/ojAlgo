@@ -3,8 +3,6 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import org.ojalgo.array.Array1D;
-import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
@@ -85,20 +83,18 @@ public abstract class SVD1D {
         double f = ((s_k + s_p1) * (s_k - s_p1)) + shift;
         double g = s_k * e_k;
 
-        double t;
-        double cos;
-        double sin;
+        double tmp, cos, sin;
 
         // Chase zeros.
         for (int j = k; j < (p - 1); j++) {
 
-            t = HYPOT.invoke(f, g);
-            cos = f / t;
-            sin = g / t;
-
+            tmp = HYPOT.invoke(f, g);
+            cos = f / tmp;
+            sin = g / tmp;
             if (j != k) {
-                e[j - 1] = t;
+                e[j - 1] = tmp;
             }
+
             f = (cos * s[j]) + (sin * e[j]);
             e[j] = (cos * e[j]) - (sin * s[j]);
             g = sin * s[j + 1];
@@ -106,11 +102,11 @@ public abstract class SVD1D {
 
             q2RotR.rotateRight(j + 1, j, cos, sin);
 
-            t = HYPOT.invoke(f, g);
-            cos = f / t;
-            sin = g / t;
+            tmp = HYPOT.invoke(f, g);
+            cos = f / tmp;
+            sin = g / tmp;
+            s[j] = tmp;
 
-            s[j] = t;
             f = (cos * e[j]) + (sin * s[j + 1]);
             s[j + 1] = (-sin * e[j]) + (cos * s[j + 1]);
             g = sin * e[j + 1];
@@ -130,10 +126,13 @@ public abstract class SVD1D {
             q2NegCol.negateColumn(k);
         }
 
-        // Order the singular values.
-        for (int iter = k, next = iter + 1; (next < s.length) && (s[iter] < s[next]); iter++, next++) {
+        final int size = s.length;
+        double tmp;
 
-            final double tmp = s[iter];
+        // Order the singular values.
+        for (int iter = k, next = iter + 1; (next < size) && (s[iter] < s[next]); iter++, next++) {
+
+            tmp = s[iter];
             s[iter] = s[next];
             s[next] = tmp;
 
@@ -145,24 +144,17 @@ public abstract class SVD1D {
     static void toDiagonal(final double[] s, final double[] e, final RotateRight q1RotR, final RotateRight q2RotR, final ExchangeColumns q1XchgCols,
             final ExchangeColumns q2XchgCols, final NegateColumn q2NegCol) {
 
-        // Main iteration loop for the singular values.
-        int kase;
-        int k;
         int p = s.length;
         while (p > 0) {
+            int k, kase;
 
-            //
             // This section of the program inspects for negligible elements in the s and e arrays.
             // On completion the variables kase and k are set as follows:
             //
             // kase = 1     if s[p] and e[k-1] are negligible and k<p                           => deflate negligible s[p]
             // kase = 2     if s[k] is negligible and k<p                                       => split at negligible s[k]
             // kase = 3     if e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible    => perform QR-step
-            // kase = 4     if e[p-1] is negligible                                             => convergence.
-            //
-
-            kase = 0;
-            k = 0;
+            // kase = 4     if e[p-1] is negligible                                             => convergence
 
             for (k = p - 2; k >= -1; k--) {
                 if (k == -1) {
@@ -200,27 +192,32 @@ public abstract class SVD1D {
 
             switch (kase) { // Perform the task indicated by kase.
 
+            // s[p] and e[k-1] are negligible and k<p
             case 1: // Deflate negligible s[p]
 
                 SVD1D.doCase1(s, e, p, k, q2RotR);
                 break;
 
+            // s[k] is negligible and k<p
             case 2: // Split at negligible s[k]
 
                 SVD1D.doCase2(s, e, p, k, q1RotR);
                 break;
 
+            // e[k-1] is negligible, k<p, and s(k)...s(p) are not negligible
             case 3: // Perform QR-step.
 
                 SVD1D.doCase3(s, e, p, k, q1RotR, q2RotR);
                 break;
 
+            // e[p-1] is negligible
             case 4: // Convergence
 
                 SVD1D.doCase4(s, k, q2NegCol, q1XchgCols, q2XchgCols);
                 p--;
                 break;
 
+            // Should never happen
             default:
 
                 throw new IllegalStateException();

@@ -50,13 +50,13 @@ public abstract class SVD2D {
             tmp = HYPOT.invoke(s[j], f);
             cos = s[j] / tmp;
             sin = f / tmp;
-
             s[j] = tmp;
+
+            mtrxQ1.rotateRight(k - 1, j, cos, sin);
+
             tmp = e[j];
             f = -sin * tmp;
             e[j] = cos * tmp;
-
-            mtrxQ1.rotateRight(k - 1, j, cos, sin);
         }
     }
 
@@ -67,14 +67,14 @@ public abstract class SVD2D {
                 ABS.invoke(e[k]));
 
         final double s_p1 = s[p - 1] / scale;
-        final double s_m2 = s[p - 2] / scale;
-        final double e_m2 = e[p - 2] / scale;
+        final double s_p2 = s[p - 2] / scale;
+        final double e_p2 = e[p - 2] / scale;
 
         final double s_k = s[k] / scale;
         final double e_k = e[k] / scale;
 
-        final double b = (((s_m2 + s_p1) * (s_m2 - s_p1)) + (e_m2 * e_m2)) / TWO;
-        final double c = (s_p1 * e_m2) * (s_p1 * e_m2);
+        final double b = (((s_p2 + s_p1) * (s_p2 - s_p1)) + (e_p2 * e_p2)) / TWO;
+        final double c = (s_p1 * e_p2) * (s_p1 * e_p2);
 
         double shift = ZERO;
         if ((Double.compare(b, ZERO) != 0) || (Double.compare(c, ZERO) != 0)) {
@@ -88,15 +88,17 @@ public abstract class SVD2D {
         double f = ((s_k + s_p1) * (s_k - s_p1)) + shift;
         double g = s_k * e_k;
 
+        double tmp, cos, sin;
+
         // Chase zeros.
         for (int j = k; j < (p - 1); j++) {
 
-            double t = HYPOT.invoke(f, g);
-            double cos = f / t;
-            double sin = g / t;
+            tmp = HYPOT.invoke(f, g);
+            cos = f / tmp;
+            sin = g / tmp;
 
             if (j != k) {
-                e[j - 1] = t;
+                e[j - 1] = tmp;
             }
             f = (cos * s[j]) + (sin * e[j]);
             e[j] = (cos * e[j]) - (sin * s[j]);
@@ -105,11 +107,11 @@ public abstract class SVD2D {
 
             q2RotR.rotateRight(j + 1, j, cos, sin);
 
-            t = HYPOT.invoke(f, g);
-            cos = f / t;
-            sin = g / t;
+            tmp = HYPOT.invoke(f, g);
+            cos = f / tmp;
+            sin = g / tmp;
+            s[j] = tmp;
 
-            s[j] = t;
             f = (cos * e[j]) + (sin * s[j + 1]);
             s[j + 1] = (-sin * e[j]) + (cos * s[j + 1]);
             g = sin * e[j + 1];
