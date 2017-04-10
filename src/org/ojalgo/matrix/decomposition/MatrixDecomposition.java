@@ -26,7 +26,6 @@ import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.MatrixUtils;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
@@ -208,11 +207,17 @@ public interface MatrixDecomposition<N extends Number> {
      */
     interface Values<N extends Number> extends MatrixDecomposition<N> {
 
-        boolean computeValuesOnly(ElementsSupplier<N> matrix);
+        /**
+         * @param matrix The matrix to decompose
+         * @return The same {@link Solver#compute(Collectable)} or {@link #decompose(Collectable)} if the
+         *         instance does not implement {@link Solver}.
+         */
+        boolean computeValuesOnly(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
 
         /**
-         * The eigenvalues in D (and the eigenvectors in V) are not necessarily ordered. This is a property of
-         * the algorithm/implementation, not the data.
+         * The various data structures extractable from an {@link Eigenvalue} or {@link SingularValue}
+         * decomposition can optionally be sorted. This is a property of the algorithm/implementation, not the
+         * data.
          *
          * @return true if they are ordered
          */

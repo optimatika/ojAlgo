@@ -26,7 +26,6 @@ import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.netio.BasicLogger;
@@ -78,7 +77,7 @@ abstract class EigenvalueDecomposition<N extends Number> extends GenericDecompos
         return this.compute(matrix, MatrixUtils.isHermitian(matrix), false);
     }
 
-    public boolean computeValuesOnly(final ElementsSupplier<N> matrix) {
+    public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, this.isHermitian(), true);
     }
 

@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
-
+import java.util.Objects;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
@@ -84,51 +84,51 @@ public interface SingularValue<N extends Number>
     }
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
-    
+
         final int tmpRowDim = (int) matrix.countRows();
         final int tmpColDim = (int) matrix.countColumns();
-    
+
         final MatrixStore<N> tmpQ1 = decomposition.getQ1();
         final MatrixStore<N> tmpD = decomposition.getD();
         final MatrixStore<N> tmpQ2 = decomposition.getQ2();
-    
+
         MatrixStore<N> tmpThis;
         MatrixStore<N> tmpThat;
-    
+
         boolean retVal = (tmpRowDim == tmpQ1.countRows()) && (tmpQ2.countRows() == tmpColDim);
-    
+
         // Check that [A][Q2] == [Q1][D]
         if (retVal) {
-    
+
             tmpThis = matrix.multiply(tmpQ2);
             tmpThat = tmpQ1.multiply(tmpD);
-    
+
             retVal &= tmpThis.equals(tmpThat, context);
         }
-    
+
         // If Q1 is square, then check if it is orthogonal/unitary.
         if (retVal && (tmpQ1.countRows() == tmpQ1.countColumns())) {
-    
+
             tmpThis = tmpQ1.physical().makeEye(tmpRowDim, tmpRowDim);
             tmpThat = tmpQ1.logical().conjugate().get().multiply(tmpQ1);
-    
+
             retVal &= tmpThis.equals(tmpThat, context);
         }
-    
+
         // If Q2 is square, then check if it is orthogonal/unitary.
         if (retVal && (tmpQ2.countRows() == tmpQ2.countColumns())) {
-    
+
             tmpThis = tmpQ2.physical().makeEye(tmpColDim, tmpColDim);
             tmpThat = tmpQ2.multiply(tmpQ2.logical().conjugate().get());
-    
+
             retVal &= tmpThis.equals(tmpThat, context);
         }
-    
+
         // Check the pseudoinverse.
         if (retVal) {
             retVal &= matrix.equals(matrix.multiply(decomposition.getInverse().multiply(matrix)), context);
         }
-    
+
         // Check that the singular values are sorted in descending order
         if (retVal) {
             final Array1D<Double> tmpSV = decomposition.getSingularValues();
@@ -141,7 +141,7 @@ public interface SingularValue<N extends Number>
                 }
             }
         }
-    
+
         return retVal;
     }
 
@@ -218,6 +218,21 @@ public interface SingularValue<N extends Number>
      * @return The singular values ordered in descending order.
      */
     Array1D<Double> getSingularValues();
+
+    /**
+     * @param values An array that will receive the singular values
+     */
+    default void getSingularValues(final double[] values) {
+
+        Objects.requireNonNull(values);
+
+        final Array1D<Double> singulars = this.getSingularValues();
+
+        final int length = values.length;
+        for (int i = 0; i < length; i++) {
+            values[i] = singulars.doubleValue(i);
+        }
+    }
 
     double getTraceNorm();
 

@@ -34,7 +34,6 @@ import org.ojalgo.array.blas.DOT;
 import org.ojalgo.matrix.decomposition.function.ExchangeColumns;
 import org.ojalgo.matrix.decomposition.function.NegateColumn;
 import org.ojalgo.matrix.decomposition.function.RotateRight;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -95,16 +94,17 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         super();
     }
 
-    public boolean computeValuesOnly(final ElementsSupplier<Double> matrix) {
+    public boolean computeValuesOnly(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
 
         myTransposed = matrix.countRows() < matrix.countColumns();
 
-        final double[][] tmpData = this.reset(matrix.get(), !myTransposed);
+        final double[][] tmpData = this.reset(matrix, !myTransposed);
 
         if (myTransposed) {
             matrix.supplyTo(this.getRawInPlaceStore());
         } else {
-            matrix.transpose().supplyTo(this.getRawInPlaceStore());
+            // TODO Handle case with non Stream2D
+            ((Stream2D) matrix).transpose().supplyTo(this.getRawInPlaceStore());
         }
 
         return this.doDecompose(tmpData, false);

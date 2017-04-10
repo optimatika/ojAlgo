@@ -28,7 +28,6 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.TaskException;
@@ -60,7 +59,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         myBidiagonal = bidiagonal;
     }
 
-    public boolean computeValuesOnly(final ElementsSupplier<N> matrix) {
+    public boolean computeValuesOnly(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix) {
         return this.compute(matrix, true, false);
     }
 
