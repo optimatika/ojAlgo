@@ -74,7 +74,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      *
      * @serial internal storage of singular values.
      */
-    private double[] myS;
+    private double[] s;
 
     private boolean myTransposed;
     /**
@@ -128,7 +128,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public double getCondition() {
-        return myS[0] / myS[n - 1];
+        return s[0] / s[n - 1];
     }
 
     public MatrixStore<Double> getD() {
@@ -142,7 +142,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         double tmpVal;
         for (int i = n - 1; i >= 0; i--) {
-            tmpVal = myS[i];
+            tmpVal = s[i];
             retVal += tmpVal * tmpVal;
         }
 
@@ -162,8 +162,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         double retVal = ZERO;
 
-        for (int i = Math.min(myS.length, k) - 1; i >= 0; i--) {
-            retVal += myS[i];
+        for (int i = Math.min(s.length, k) - 1; i >= 0; i--) {
+            retVal += s[i];
         }
 
         return retVal;
@@ -175,7 +175,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      * @return max(S)
      */
     public double getOperatorNorm() {
-        return myS[0];
+        return s[0];
     }
 
     public RawStore getQ1() {
@@ -188,10 +188,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     public int getRank() {
         final double eps = POW.invoke(TWO, -52.0);
-        final double tol = MAX.invoke(m, n) * (myS[0] * eps);
+        final double tol = MAX.invoke(m, n) * (s[0] * eps);
         int r = 0;
-        for (int i = 0; i < myS.length; i++) {
-            if (myS[i] > tol) {
+        for (int i = 0; i < s.length; i++) {
+            if (s[i] > tol) {
                 r++;
             }
         }
@@ -199,7 +199,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public Array1D<Double> getSingularValues() {
-        return Array1D.PRIMITIVE64.copy(myS);
+        return Array1D.PRIMITIVE64.copy(s);
     }
 
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
@@ -213,7 +213,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public double getTraceNorm() {
-        return this.getKyFanNorm(myS.length);
+        return this.getKyFanNorm(s.length);
     }
 
     @Override
@@ -306,12 +306,14 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         m = this.getMaxDim();
         n = this.getMinDim();
 
-        myUt = factors ? new double[n][m] : null;
-        myS = new double[n];
-        myVt = factors ? new double[n][n] : null;
-
+        if ((myUt == null) || (myUt.length != n) || (myUt[0].length != m)) {
+            s = new double[n];
+        }
         final double[] tmpE = new double[n];
         final double[] tmpWork = new double[m];
+
+        myUt = factors ? new double[n][m] : null;
+        myVt = factors ? new double[n][n] : null;
 
         double[] tmpAt_k;
         double nrm = ZERO;
@@ -352,7 +354,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                         AXPY.invoke(data[j], 0, 1, -t, tmpAt_k, 0, 1, k, m);
                     }
                 }
-                myS[k] = -nrm;
+                s[k] = -nrm;
             }
 
             for (int j = k + 1; j < n; j++) {
@@ -413,7 +415,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         // Set up the final bidiagonal matrix or order p. []
         final int p = n;
         if (nct < n) { // Only happens when m == n, then nct == n-1
-            myS[nct] = data[nct][nct];
+            s[nct] = data[nct][nct];
         }
         //        if (m < p) {
         //            myS[p - 1] = ZERO;
@@ -433,7 +435,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             }
             for (int k = nct - 1; k >= 0; k--) {
                 final double[] tmpUt_k = myUt[k];
-                if (myS[k] != ZERO) {
+                if (s[k] != ZERO) {
                     for (int j = k + 1; j < n; j++) {
                         double t = DOT.invoke(tmpUt_k, 0, myUt[j], 0, k, m);
                         t = t / tmpUt_k[k];
@@ -472,22 +474,15 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 tmpVt_k[k] = ONE;
             }
         }
-        final double[] s = myS;
-        final double[][] myUt1 = myUt;
-        final double[][] myVt1 = myVt;
 
-        final int n1 = s.length;
-        final int m1 = myUt1 != null ? myUt1[0].length : n1;
-
-        // Main iteration loop for the singular values.
         final RotateRight q1RotR = factors ? new RotateRight() {
 
             public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                final double[] colLow = myUt1[low];
-                final double[] colHigh = myUt1[high];
+                final double[] colLow = myUt[low];
+                final double[] colHigh = myUt[high];
                 double valLow;
                 double valHigh;
-                for (int i = 0; i < m1; i++) {
+                for (int i = 0; i < m; i++) {
                     valLow = colLow[i];
                     valHigh = colHigh[i];
                     colLow[i] = (-sin * valHigh) + (cos * valLow);
@@ -500,11 +495,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         final RotateRight q2RotR = factors ? new RotateRight() {
 
             public void rotateRight(final int low, final int high, final double cos, final double sin) {
-                final double[] colLow = myVt1[low];
-                final double[] colHigh = myVt1[high];
+                final double[] colLow = myVt[low];
+                final double[] colHigh = myVt[high];
                 double valLow;
                 double valHigh;
-                for (int i = 0; i < n1; i++) {
+                for (int i = 0; i < n; i++) {
                     valLow = colLow[i];
                     valHigh = colHigh[i];
                     colLow[i] = (-sin * valHigh) + (cos * valLow);
@@ -517,10 +512,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         final ExchangeColumns q1XchgCols = factors ? new ExchangeColumns() {
 
             public void exchangeColumns(final int colA, final int colB) {
-                final double[] col1 = myUt1[colA];
-                final double[] col2 = myUt1[colB];
+                final double[] col1 = myUt[colA];
+                final double[] col2 = myUt[colB];
                 double tmp;
-                for (int i = 0; i < m1; i++) {
+                for (int i = 0; i < m; i++) {
                     tmp = col1[i];
                     col1[i] = col2[i];
                     col2[i] = tmp;
@@ -532,10 +527,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         final ExchangeColumns q2XchgCols = factors ? new ExchangeColumns() {
 
             public void exchangeColumns(final int colA, final int colB) {
-                final double[] col1 = myVt1[colA];
-                final double[] col2 = myVt1[colB];
+                final double[] col1 = myVt[colA];
+                final double[] col2 = myVt[colB];
                 double tmp;
-                for (int i = 0; i < n1; i++) {
+                for (int i = 0; i < n; i++) {
                     tmp = col1[i];
                     col1[i] = col2[i];
                     col2[i] = tmp;
@@ -547,7 +542,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         final NegateColumn q2NegCol = factors ? new NegateColumn() {
 
             public void negateColumn(final int col) {
-                final double[] column = myVt1[col];
+                final double[] column = myVt[col];
                 for (int i = 0; i < column.length; i++) {
                     column[i] = -column[i];
                 }
@@ -565,7 +560,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         if (myPseudoinverse == null) {
 
             final double[][] tmpQ1 = this.getQ1().data;
-            final double[] tmpSingular = myS;
+            final double[] tmpSingular = s;
 
             final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
             final double[][] tmpMtrxData = tmpMtrx.data;
