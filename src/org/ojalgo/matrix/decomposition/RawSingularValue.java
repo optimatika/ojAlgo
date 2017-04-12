@@ -24,6 +24,8 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.util.Arrays;
+
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Stream2D;
@@ -60,23 +62,13 @@ import org.ojalgo.scalar.PrimitiveScalar;
 final class RawSingularValue extends RawDecomposition implements SingularValue<Double> {
 
     /**
-     * Row and column dimensions.
+     * Calculation row and column dimensions, possibly transposed from the input
      *
      * @serial row dimension.
      * @serial column dimension.
      */
     private int m, n;
-
     private transient PrimitiveDenseStore myPseudoinverse = null;
-
-    /**
-     * Array for internal storage of singular values.
-     *
-     * @serial internal storage of singular values.
-     */
-    private double[] s;
-    private double[] e;
-
     private boolean myTransposed;
     /**
      * Arrays for internal storage of U and V.
@@ -86,6 +78,14 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      */
     private double[][] myUt;
     private double[][] myVt;
+    /**
+     * Array for internal storage of singular values.
+     *
+     * @serial internal storage of singular values.
+     */
+    private double[] s;
+    private double[] w;
+    private double[] e;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
@@ -300,10 +300,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         }
     }
 
-    private boolean doDecompose(final double[][] data, final boolean factors) {
-        // Derived from JAMA which is derived from LINPACK code
+    private void setupInstanceStorage(final boolean factors) {
 
         // Input is possibly transposed so that m >= n always
+
         m = this.getMaxDim();
         n = this.getMinDim();
 
@@ -311,22 +311,49 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             s = new double[n];
             e = new double[n];
         }
+        if ((w == null) || (w.length != m)) {
+            w = new double[m];
+        }
+        if (factors) {
+            if ((myUt == null) || (myUt.length != n) || (myUt[0].length != m)) {
+                myUt = new double[n][m];
+            } else {
+                for (int i = 0; i < n; i++) {
+                    Arrays.fill(myUt[i], ZERO);
+                }
+            }
+            if ((myVt == null) || (myVt.length != n) || (myVt[0].length != n)) {
+                myVt = new double[n][n];
+            } else {
+                for (int i = 0; i < n; i++) {
+                    Arrays.fill(myVt[i], ZERO);
+                }
+            }
+        } else {
+            myUt = null;
+            myVt = null;
+        }
+    }
 
-        final double[] tmpWork = new double[m];
+    boolean doDecompose(final double[][] data, final boolean factors) {
+        // Derived from JAMA which is derived from LINPACK code
 
-        myUt = factors ? new double[n][m] : null;
-        myVt = factors ? new double[n][n] : null;
+        this.setupInstanceStorage(factors);
 
-        double[] tmpAt_k;
+        double[] tmpArr;
+        double tmpVal;
+
         double nrm = ZERO;
 
         // Reduce A to bidiagonal form, storing the diagonal elements
         // in s and the super-diagonal elements in e.
-        final int nct = Math.min(m - 1, n); // Number of Column Transformations
-        final int nrt = Math.max(0, n - 2); // Number of Row Transformations
-        final int tmpLimK = Math.max(nct, nrt);
-        for (int k = 0; k < tmpLimK; k++) {
-            tmpAt_k = data[k];
+
+        final int nct = Math.min(m - 1, n); // Number of column Transformations
+        final int nrt = Math.max(0, n - 2); // Number of row Transformations
+
+        final int limit = Math.max(nct, nrt);
+        for (int k = 0; k < limit; k++) {
+            tmpArr = data[k];
 
             if (k < nct) {
                 // Compute the transformation for the k-th column and
@@ -335,25 +362,24 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 // Compute 2-norm of k-th column without under/overflow.
                 nrm = ZERO;
                 for (int i = k; i < m; i++) {
-                    final double a = nrm;
-                    nrm = HYPOT.invoke(a, tmpAt_k[i]);
+                    nrm = HYPOT.invoke(nrm, tmpArr[i]);
                 }
 
                 // Form k-th Householder column-vector.
                 if (nrm != ZERO) {
-                    if (tmpAt_k[k] < ZERO) {
+                    if (tmpArr[k] < ZERO) {
                         nrm = -nrm;
                     }
                     for (int i = k; i < m; i++) {
-                        tmpAt_k[i] /= nrm;
+                        tmpArr[i] /= nrm;
                     }
-                    tmpAt_k[k] += ONE;
+                    tmpArr[k] += ONE;
 
                     // Apply the transformation to the remaining columns
                     for (int j = k + 1; j < n; j++) {
-                        double t = DOT.invoke(tmpAt_k, 0, data[j], 0, k, m);
-                        t = t / tmpAt_k[k];
-                        AXPY.invoke(data[j], 0, 1, -t, tmpAt_k, 0, 1, k, m);
+                        tmpVal = DOT.invoke(tmpArr, 0, data[j], 0, k, m);
+                        tmpVal /= tmpArr[k];
+                        AXPY.invoke(data[j], 0, 1, -tmpVal, tmpArr, 0, 1, k, m);
                     }
                 }
                 s[k] = -nrm;
@@ -368,7 +394,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             if (factors && (k < nct)) {
                 // Place the transformation in U for subsequent back multiplication.
                 for (int i = k; i < m; i++) {
-                    myUt[k][i] = tmpAt_k[i];
+                    myUt[k][i] = tmpArr[i];
                 }
             }
 
@@ -379,9 +405,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 // Compute 2-norm without under/overflow.
                 nrm = ZERO;
                 for (int i = k + 1; i < n; i++) {
-                    final double a = nrm;
-                    nrm = HYPOT.invoke(a, e[i]);
+                    nrm = HYPOT.invoke(nrm, e[i]);
                 }
+
                 if (nrm != ZERO) {
                     if (e[k + 1] < ZERO) {
                         nrm = -nrm;
@@ -393,14 +419,14 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
                     // Apply the transformation.
                     for (int i = k + 1; i < m; i++) {
-                        tmpWork[i] = ZERO;
+                        w[i] = ZERO;
                     }
                     // ... remining columns
                     for (int j = k + 1; j < n; j++) {
-                        AXPY.invoke(tmpWork, 0, 1, -(-e[j]), data[j], 0, 1, k + 1, m);
+                        AXPY.invoke(w, 0, 1, e[j], data[j], 0, 1, k + 1, m);
                     }
                     for (int j = k + 1; j < n; j++) {
-                        AXPY.invoke(data[j], 0, 1, -(e[j] / e[k + 1]), tmpWork, 0, 1, k + 1, m);
+                        AXPY.invoke(data[j], 0, 1, -(e[j] / e[k + 1]), w, 0, 1, k + 1, m);
                     }
                 }
                 e[k] = -nrm;
@@ -419,9 +445,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         if (nct < n) { // Only happens when m == n, then nct == n-1
             s[nct] = data[nct][nct];
         }
-        //        if (m < p) {
-        //            myS[p - 1] = ZERO;
-        //        }
         if ((nrt + 1) < p) {
             e[nrt] = data[p - 1][nrt];
         }
@@ -557,7 +580,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.computed(true);
     }
 
-    private MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
+    MatrixStore<Double> doGetInverse(final PrimitiveDenseStore preallocated) {
 
         if (myPseudoinverse == null) {
 

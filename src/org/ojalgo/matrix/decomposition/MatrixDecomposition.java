@@ -201,7 +201,8 @@ public interface MatrixDecomposition<N extends Number> {
     }
 
     /**
-     * Eigenvalue:s and Singular Value:s decompositions can calculate the "values" only.
+     * Eigenvalue:s and Singular Value:s decompositions can calculate the "values" only, and the resulting
+     * matrices and arrays can have their elements sorted or not.
      *
      * @author apete
      */
@@ -209,7 +210,7 @@ public interface MatrixDecomposition<N extends Number> {
 
         /**
          * @param matrix The matrix to decompose
-         * @return The same {@link Solver#compute(Collectable)} or {@link #decompose(Collectable)} if the
+         * @return The same as {@link Solver#compute(Collectable)} or {@link #decompose(Collectable)} if the
          *         instance does not implement {@link Solver}.
          */
         boolean computeValuesOnly(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);

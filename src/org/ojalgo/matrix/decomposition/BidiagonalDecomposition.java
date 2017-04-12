@@ -266,16 +266,16 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
         final DecompositionStore<N> tmpArray2D = this.getInPlace();
 
-        final Array1D<N> tmpMain = (Array1D<N>) tmpArray2D.sliceDiagonal(0, 0);
+        final Array1D<N> tmpMain = tmpArray2D.sliceDiagonal(0, 0);
         Array1D<N> tmpSuper;
         Array1D<N> tmpSub;
 
         if (this.isAspectRatioNormal()) {
-            tmpSuper = (Array1D<N>) tmpArray2D.sliceDiagonal(0, 1);
+            tmpSuper = tmpArray2D.sliceDiagonal(0, 1);
             tmpSub = null;
         } else {
-            tmpSub = (Array1D<N>) tmpArray2D.sliceDiagonal(1, 0);
             tmpSuper = null;
+            tmpSub = tmpArray2D.sliceDiagonal(1, 0);
         }
 
         return new DiagonalArray1D<>(tmpMain, tmpSuper, tmpSub, this.scalar().zero().getNumber());
