@@ -75,6 +75,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      * @serial internal storage of singular values.
      */
     private double[] s;
+    private double[] e;
 
     private boolean myTransposed;
     /**
@@ -178,12 +179,12 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return s[0];
     }
 
-    public RawStore getQ1() {
-        return myTransposed ? this.getV().transpose() : this.getU().transpose();
+    public MatrixStore<Double> getQ1() {
+        return myTransposed ? new RawStore(myVt, n, n).logical().transpose().get() : new RawStore(myUt, n, m).logical().transpose().get();
     }
 
-    public RawStore getQ2() {
-        return myTransposed ? this.getU().transpose() : this.getV().transpose();
+    public MatrixStore<Double> getQ2() {
+        return myTransposed ? new RawStore(myUt, n, m).logical().transpose().get() : new RawStore(myVt, n, n).logical().transpose().get();
     }
 
     public int getRank() {
@@ -306,10 +307,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         m = this.getMaxDim();
         n = this.getMinDim();
 
-        if ((myUt == null) || (myUt.length != n) || (myUt[0].length != m)) {
+        if ((s == null) || (s.length != n)) {
             s = new double[n];
+            e = new double[n];
         }
-        final double[] tmpE = new double[n];
+
         final double[] tmpWork = new double[m];
 
         myUt = factors ? new double[n][m] : null;
@@ -360,7 +362,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             for (int j = k + 1; j < n; j++) {
                 // Place the k-th row of A into e for the
                 // subsequent calculation of the row transformation.
-                tmpE[j] = data[j][k];
+                e[j] = data[j][k];
             }
 
             if (factors && (k < nct)) {
@@ -378,16 +380,16 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                 nrm = ZERO;
                 for (int i = k + 1; i < n; i++) {
                     final double a = nrm;
-                    nrm = HYPOT.invoke(a, tmpE[i]);
+                    nrm = HYPOT.invoke(a, e[i]);
                 }
                 if (nrm != ZERO) {
-                    if (tmpE[k + 1] < ZERO) {
+                    if (e[k + 1] < ZERO) {
                         nrm = -nrm;
                     }
                     for (int i = k + 1; i < n; i++) {
-                        tmpE[i] /= nrm;
+                        e[i] /= nrm;
                     }
-                    tmpE[k + 1] += ONE;
+                    e[k + 1] += ONE;
 
                     // Apply the transformation.
                     for (int i = k + 1; i < m; i++) {
@@ -395,18 +397,18 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     }
                     // ... remining columns
                     for (int j = k + 1; j < n; j++) {
-                        AXPY.invoke(tmpWork, 0, 1, -(-tmpE[j]), data[j], 0, 1, k + 1, m);
+                        AXPY.invoke(tmpWork, 0, 1, -(-e[j]), data[j], 0, 1, k + 1, m);
                     }
                     for (int j = k + 1; j < n; j++) {
-                        AXPY.invoke(data[j], 0, 1, -(tmpE[j] / tmpE[k + 1]), tmpWork, 0, 1, k + 1, m);
+                        AXPY.invoke(data[j], 0, 1, -(e[j] / e[k + 1]), tmpWork, 0, 1, k + 1, m);
                     }
                 }
-                tmpE[k] = -nrm;
+                e[k] = -nrm;
 
                 if (factors) {
                     // Place the transformation in V for subsequent back multiplication.
                     for (int i = k + 1; i < n; i++) {
-                        myVt[k][i] = tmpE[i];
+                        myVt[k][i] = e[i];
                     }
                 }
             }
@@ -421,9 +423,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         //            myS[p - 1] = ZERO;
         //        }
         if ((nrt + 1) < p) {
-            tmpE[nrt] = data[p - 1][nrt];
+            e[nrt] = data[p - 1][nrt];
         }
-        tmpE[p - 1] = ZERO;
+        e[p - 1] = ZERO;
 
         // If required, generate U.
         if (factors) {
@@ -461,7 +463,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         if (factors) {
             for (int k = n - 1; k >= 0; k--) {
                 final double[] tmpVt_k = myVt[k];
-                if ((k < nrt) && (tmpE[k] != ZERO)) {
+                if ((k < nrt) && (e[k] != ZERO)) {
                     for (int j = k + 1; j < n; j++) {
                         double t = DOT.invoke(tmpVt_k, 0, myVt[j], 0, k + 1, n);
                         t = t / tmpVt_k[k + 1];
@@ -550,7 +552,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         } : NegateColumn.NULL;
 
-        SVD2D.toDiagonal(s, tmpE, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
+        SVD2D.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 
         return this.computed(true);
     }
@@ -559,7 +561,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         if (myPseudoinverse == null) {
 
-            final double[][] tmpQ1 = this.getQ1().data;
+            final double[][] tmpQ1 = myTransposed ? new RawStore(myVt, n, n).transpose().data : new RawStore(myUt, n, m).transpose().data;
             final double[] tmpSingular = s;
 
             final RawStore tmpMtrx = new RawStore(tmpSingular.length, tmpQ1.length);
@@ -582,24 +584,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         }
 
         return myPseudoinverse;
-    }
-
-    /**
-     * Return the left singular vectors
-     *
-     * @return Ut
-     */
-    RawStore getU() {
-        return new RawStore(myUt, n, m);
-    }
-
-    /**
-     * Return the right singular vectors
-     *
-     * @return V
-     */
-    RawStore getV() {
-        return new RawStore(myVt, n, n);
     }
 
 }
