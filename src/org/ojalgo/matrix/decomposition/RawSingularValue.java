@@ -24,8 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
-import java.util.Arrays;
-
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Stream2D;
@@ -63,25 +61,17 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     /**
      * Calculation row and column dimensions, possibly transposed from the input
-     *
-     * @serial row dimension.
-     * @serial column dimension.
      */
     private int m, n;
     private transient PrimitiveDenseStore myPseudoinverse = null;
     private boolean myTransposed;
     /**
      * Arrays for internal storage of U and V.
-     *
-     * @serial internal storage of U.
-     * @serial internal storage of V.
      */
     private double[][] myUt;
     private double[][] myVt;
     /**
      * Array for internal storage of singular values.
-     *
-     * @serial internal storage of singular values.
      */
     private double[] s;
     private double[] w;
@@ -317,17 +307,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         if (factors) {
             if ((myUt == null) || (myUt.length != n) || (myUt[0].length != m)) {
                 myUt = new double[n][m];
-            } else {
-                for (int i = 0; i < n; i++) {
-                    Arrays.fill(myUt[i], ZERO);
-                }
             }
             if ((myVt == null) || (myVt.length != n) || (myVt[0].length != n)) {
                 myVt = new double[n][n];
-            } else {
-                for (int i = 0; i < n; i++) {
-                    Arrays.fill(myVt[i], ZERO);
-                }
             }
         } else {
             myUt = null;
@@ -453,31 +435,32 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         // If required, generate U.
         if (factors) {
             for (int j = nct; j < n; j++) {
+                tmpArr = myUt[j];
                 for (int i = 0; i < m; i++) {
-                    myUt[j][i] = ZERO;
+                    tmpArr[i] = ZERO;
                 }
-                myUt[j][j] = ONE;
+                tmpArr[j] = ONE;
             }
             for (int k = nct - 1; k >= 0; k--) {
-                final double[] tmpUt_k = myUt[k];
+                tmpArr = myUt[k];
                 if (s[k] != ZERO) {
                     for (int j = k + 1; j < n; j++) {
-                        double t = DOT.invoke(tmpUt_k, 0, myUt[j], 0, k, m);
-                        t = t / tmpUt_k[k];
-                        AXPY.invoke(myUt[j], 0, 1, -t, tmpUt_k, 0, 1, k, m);
+                        tmpVal = DOT.invoke(tmpArr, 0, myUt[j], 0, k, m);
+                        tmpVal /= tmpArr[k];
+                        AXPY.invoke(myUt[j], 0, 1, -tmpVal, tmpArr, 0, 1, k, m);
                     }
-                    for (int i = k; i < m; i++) {
-                        tmpUt_k[i] = -tmpUt_k[i];
+                    for (int i = 0; i < k; i++) {
+                        tmpArr[i] = ZERO;
                     }
-                    tmpUt_k[k] = ONE + tmpUt_k[k];
-                    for (int i = 0; i < (k - 1); i++) {
-                        tmpUt_k[i] = ZERO;
+                    tmpArr[k] = ONE - tmpArr[k];
+                    for (int i = k + 1; i < m; i++) {
+                        tmpArr[i] = -tmpArr[i];
                     }
                 } else {
                     for (int i = 0; i < m; i++) {
-                        tmpUt_k[i] = ZERO;
+                        tmpArr[i] = ZERO;
                     }
-                    tmpUt_k[k] = ONE;
+                    tmpArr[k] = ONE;
                 }
             }
         }
@@ -485,18 +468,18 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         // If required, generate V.
         if (factors) {
             for (int k = n - 1; k >= 0; k--) {
-                final double[] tmpVt_k = myVt[k];
+                tmpArr = myVt[k];
                 if ((k < nrt) && (e[k] != ZERO)) {
                     for (int j = k + 1; j < n; j++) {
-                        double t = DOT.invoke(tmpVt_k, 0, myVt[j], 0, k + 1, n);
-                        t = t / tmpVt_k[k + 1];
-                        AXPY.invoke(myVt[j], 0, 1, -t, tmpVt_k, 0, 1, k + 1, n);
+                        tmpVal = DOT.invoke(tmpArr, 0, myVt[j], 0, k + 1, n);
+                        tmpVal /= tmpArr[k + 1];
+                        AXPY.invoke(myVt[j], 0, 1, -tmpVal, tmpArr, 0, 1, k + 1, n);
                     }
                 }
                 for (int i = 0; i < n; i++) {
-                    tmpVt_k[i] = ZERO;
+                    tmpArr[i] = ZERO;
                 }
-                tmpVt_k[k] = ONE;
+                tmpArr[k] = ONE;
             }
         }
 
