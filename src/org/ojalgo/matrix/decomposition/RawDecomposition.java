@@ -46,11 +46,8 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
     @Override
     protected PrimitiveDenseStore allocate(final long numberOfRows, final long numberOfColumns) {
+        // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
         return PrimitiveDenseStore.FACTORY.makeZero(numberOfRows, numberOfColumns);
-    }
-
-    protected final MatrixStore<Double> collect(final Access2D.Collectable<Double, ? super DecompositionStore<Double>> source) {
-        return source.collect(PrimitiveDenseStore.FACTORY);
     }
 
     protected boolean checkSymmetry() {
@@ -61,6 +58,18 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
             }
         }
         return retVal;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected final MatrixStore<Double> collect(final Access2D.Collectable<Double, ? super DecompositionStore<Double>> source) {
+        // TODO Should use RawStore.FACTORY rather than PrimitiveDenseStore.FACTORY
+        if (source instanceof MatrixStore) {
+            return (MatrixStore<Double>) source;
+        } else if (source instanceof Access2D) {
+            return PrimitiveDenseStore.FACTORY.builder().makeWrapper((Access2D<?>) source).get();
+        } else {
+            return source.collect(PrimitiveDenseStore.FACTORY);
+        }
     }
 
     protected int getColDim() {

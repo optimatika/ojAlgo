@@ -26,7 +26,6 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
-import org.ojalgo.access.Stream2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.blas.AXPY;
@@ -59,6 +58,7 @@ import org.ojalgo.scalar.PrimitiveScalar;
  */
 final class RawSingularValue extends RawDecomposition implements SingularValue<Double> {
 
+    private double[] e;
     /**
      * Calculation row and column dimensions, possibly transposed from the input
      */
@@ -75,7 +75,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
      */
     private double[] s;
     private double[] w;
-    private double[] e;
 
     /**
      * Not recommended to use this constructor directly. Consider using the static factory method
@@ -86,36 +85,12 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public boolean computeValuesOnly(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
-
-        myTransposed = matrix.countRows() < matrix.countColumns();
-
-        final double[][] tmpData = this.reset(matrix, !myTransposed);
-
-        if (myTransposed) {
-            matrix.supplyTo(this.getRawInPlaceStore());
-        } else {
-            // TODO Handle case with non Stream2D
-            ((Stream2D) matrix).transpose().supplyTo(this.getRawInPlaceStore());
-        }
-
-        return this.doDecompose(tmpData, false);
+        return this.doDecompose(matrix, false);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
-
-        myTransposed = matrix.countRows() < matrix.countColumns();
-
-        final double[][] tmpData = this.reset(matrix, !myTransposed);
-
-        if (myTransposed) {
-            matrix.supplyTo(this.getRawInPlaceStore());
-        } else {
-            // TODO Handle case with non Stream2D
-            ((Stream2D) matrix).transpose().supplyTo(this.getRawInPlaceStore());
-        }
-
-        return this.doDecompose(tmpData, true);
+        return this.doDecompose(matrix, true);
     }
 
     public double getCondition() {
@@ -193,6 +168,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return Array1D.PRIMITIVE64.copy(s);
     }
 
+    public void getSingularValues(double[] values) {
+        System.arraycopy(s, 0, values, 0, Math.min(s.length, values.length));
+    }
+
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
         final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countRows());
         return this.getSolution(rhs, tmpPreallocated);
@@ -210,17 +189,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     @Override
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws TaskException {
 
-        myTransposed = original.countRows() < original.countColumns();
-
-        final double[][] tmpData = this.reset(original, !myTransposed);
-
-        if (myTransposed) {
-            this.getRawInPlaceStore().fillMatching(original);
-        } else {
-            MatrixStore.PRIMITIVE.makeWrapper(original).transpose().supplyTo(this.getRawInPlaceStore());
-        }
-
-        this.doDecompose(tmpData, true);
+        this.doDecompose(original.asCollectable(), true);
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
@@ -268,17 +237,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
 
-        myTransposed = body.countRows() < body.countColumns();
-
-        final double[][] tmpData = this.reset(body, !myTransposed);
-
-        if (myTransposed) {
-            this.getRawInPlaceStore().fillMatching(body);
-        } else {
-            MatrixStore.PRIMITIVE.makeWrapper(body).transpose().supplyTo(this.getRawInPlaceStore());
-        }
-
-        this.doDecompose(tmpData, true);
+        this.doDecompose(body.asCollectable(), true);
 
         if (this.isSolvable()) {
 
@@ -317,8 +276,18 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         }
     }
 
-    boolean doDecompose(final double[][] data, final boolean factors) {
-        // Derived from JAMA which is derived from LINPACK code
+    boolean doDecompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix, final boolean factors) {
+
+        myTransposed = matrix.countRows() < matrix.countColumns();
+
+        final double[][] tmpData = this.reset(matrix, !myTransposed);
+
+        if (myTransposed) {
+            matrix.supplyTo(this.getRawInPlaceStore());
+        } else {
+            this.collect(matrix).transpose().supplyTo(this.getRawInPlaceStore());
+        }
+
 
         this.setupInstanceStorage(factors);
 
@@ -335,7 +304,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         final int limit = Math.max(nct, nrt);
         for (int k = 0; k < limit; k++) {
-            tmpArr = data[k];
+            tmpArr = tmpData[k];
 
             if (k < nct) {
                 // Compute the transformation for the k-th column and
@@ -359,9 +328,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
                     // Apply the transformation to the remaining columns
                     for (int j = k + 1; j < n; j++) {
-                        tmpVal = DOT.invoke(tmpArr, 0, data[j], 0, k, m);
+                        tmpVal = DOT.invoke(tmpArr, 0, tmpData[j], 0, k, m);
                         tmpVal /= tmpArr[k];
-                        AXPY.invoke(data[j], 0, 1, -tmpVal, tmpArr, 0, 1, k, m);
+                        AXPY.invoke(tmpData[j], 0, 1, -tmpVal, tmpArr, 0, 1, k, m);
                     }
                 }
                 s[k] = -nrm;
@@ -370,7 +339,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             for (int j = k + 1; j < n; j++) {
                 // Place the k-th row of A into e for the
                 // subsequent calculation of the row transformation.
-                e[j] = data[j][k];
+                e[j] = tmpData[j][k];
             }
 
             if (factors && (k < nct)) {
@@ -405,10 +374,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     }
                     // ... remining columns
                     for (int j = k + 1; j < n; j++) {
-                        AXPY.invoke(w, 0, 1, e[j], data[j], 0, 1, k + 1, m);
+                        AXPY.invoke(w, 0, 1, e[j], tmpData[j], 0, 1, k + 1, m);
                     }
                     for (int j = k + 1; j < n; j++) {
-                        AXPY.invoke(data[j], 0, 1, -(e[j] / e[k + 1]), w, 0, 1, k + 1, m);
+                        AXPY.invoke(tmpData[j], 0, 1, -(e[j] / e[k + 1]), w, 0, 1, k + 1, m);
                     }
                 }
                 e[k] = -nrm;
@@ -425,10 +394,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         // Set up the final bidiagonal matrix or order p. []
         final int p = n;
         if (nct < n) { // Only happens when m == n, then nct == n-1
-            s[nct] = data[nct][nct];
+            s[nct] = tmpData[nct][nct];
         }
         if ((nrt + 1) < p) {
-            e[nrt] = data[p - 1][nrt];
+            e[nrt] = tmpData[p - 1][nrt];
         }
         e[p - 1] = ZERO;
 

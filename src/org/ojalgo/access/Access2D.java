@@ -273,6 +273,24 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    default <NN extends Number, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable() {
+        return new Collectable<NN, R>() {
+
+            public long countColumns() {
+                return Access2D.this.countColumns();
+            }
+
+            public long countRows() {
+                return Access2D.this.countRows();
+            }
+
+            public void supplyTo(R receiver) {
+                receiver.accept(Access2D.this);
+            }
+
+        };
+    }
+
     default Iterable<ColumnView<N>> columns() {
         return ColumnView.makeIterable(this);
     }
