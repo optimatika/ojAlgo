@@ -125,7 +125,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
         final PrimitiveMatrix input = PrimitiveMatrix.FACTORY.rows(data);
         try {
             // final SingularValue<Double> svd = SingularValue.make(input);
-            final SingularValue<Double> svd = new SVDnew32.Primitive();
+            final SingularValue<Double> svd = new SingularValueDecomposition.Primitive();
             svd.invert(input);
         } catch (final TaskException exception) {
             // TODO Auto-generated catch block

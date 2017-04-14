@@ -60,20 +60,22 @@ import org.openjdk.jmh.runner.RunnerException;
  * PrimitiveOrRawSingularValue.raw         5000  thrpt    3        0,071 ±      0,003  ops/min
  * </pre>
  *
- * MacBook Air: 2015-06-23
+ * MacBook Air: 2017-04-13
  *
  * <pre>
- * # Run complete. Total time: 02:28:37
- *
- * Benchmark                              (dim)   Mode  Cnt  Score   Error    Units
- * PrimitiveOrRawSingularValue.primitive    512  thrpt    3  50,619 ± 27,497  ops/min
- * PrimitiveOrRawSingularValue.primitive   1024  thrpt    3   7,994 ±  0,833  ops/min
- * PrimitiveOrRawSingularValue.primitive   2048  thrpt    3   1,113 ±  0,021  ops/min
- * PrimitiveOrRawSingularValue.primitive   4096  thrpt    3   0,155 ±  0,034  ops/min
- * PrimitiveOrRawSingularValue.raw          512  thrpt    3  79,906 ± 30,870  ops/min
- * PrimitiveOrRawSingularValue.raw         1024  thrpt    3   9,114 ±  0,844  ops/min
- * PrimitiveOrRawSingularValue.raw         2048  thrpt    3   1,184 ±  0,097  ops/min
- * PrimitiveOrRawSingularValue.raw         4096  thrpt    3   0,150 ±  0,024  ops/min
+# Run complete. Total time: 00:19:21
+
+Benchmark                              (dim)   Mode  Cnt    Score    Error  Units
+PrimitiveOrRawSingularValue.primitive    100  thrpt    3   89.159 ± 66.324  ops/s
+PrimitiveOrRawSingularValue.primitive    200  thrpt    3   11.214 ± 11.993  ops/s
+PrimitiveOrRawSingularValue.primitive    500  thrpt    3    0.697 ±  0.816  ops/s
+PrimitiveOrRawSingularValue.primitive   1000  thrpt    3    0.141 ±  0.053  ops/s
+PrimitiveOrRawSingularValue.primitive   2000  thrpt    3    0.018 ±  0.004  ops/s
+PrimitiveOrRawSingularValue.raw          100  thrpt    3  148.800 ± 43.192  ops/s
+PrimitiveOrRawSingularValue.raw          200  thrpt    3   20.564 ± 13.709  ops/s
+PrimitiveOrRawSingularValue.raw          500  thrpt    3    1.145 ±  0.320  ops/s
+PrimitiveOrRawSingularValue.raw         1000  thrpt    3    0.154 ±  0.014  ops/s
+PrimitiveOrRawSingularValue.raw         2000  thrpt    3    0.016 ±  0.003  ops/s
  * </pre>
  *
  * @author apete
@@ -85,22 +87,10 @@ public class PrimitiveOrRawSingularValue extends AbstractPrimitiveOrRaw<Singular
         LinearAlgebraBenchmark.run(PrimitiveOrRawSingularValue.class);
     }
 
-    @Param({ "500", "1000", "2000", "5000" })
+    @Param({ "100", "200", "500", "1000", "2000" })
     public int dim;
 
-    protected SingularValue<Double> alternative = new SVDold30.Primitive();
-
     MatrixStore<Double> matrix;
-
-    public MatrixStore<Double> alternative() {
-
-        alternative.compute(matrix);
-
-        alternative.getQ1();
-        alternative.getQ2();
-
-        return alternative.getD();
-    }
 
     @Override
     @Benchmark
@@ -134,7 +124,7 @@ public class PrimitiveOrRawSingularValue extends AbstractPrimitiveOrRaw<Singular
 
     @Override
     protected SingularValue<Double> makePrimitive() {
-        return new SVDnew32.Primitive();
+        return new SingularValueDecomposition.Primitive();
     }
 
     @Override

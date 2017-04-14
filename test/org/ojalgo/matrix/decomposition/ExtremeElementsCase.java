@@ -399,7 +399,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
                         1.6929815829013701 } });
         tmpOriginal.modifyAll(PrimitiveFunction.MULTIPLY.second(PrimitiveFunction.POWER.invoke(PrimitiveMath.TEN, 307)));
 
-        final SVDnew32.Primitive tmpAlgorithm = new SVDnew32.Primitive();
+        final SingularValueDecomposition.Primitive tmpAlgorithm = new SingularValueDecomposition.Primitive();
 
         final NumberContext tmpContext = NumberContext.getGeneral(1, Integer.MIN_VALUE);
 

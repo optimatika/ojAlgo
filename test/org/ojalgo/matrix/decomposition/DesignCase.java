@@ -129,7 +129,7 @@ public class DesignCase extends MatrixDecompositionTests {
         tmpQR.setFullSize(true);
         tmpQR.decompose(tmpA.transpose());
 
-        final SingularValue<Double> tmpSVD = new SVDnew32.Primitive();
+        final SingularValue<Double> tmpSVD = new SingularValueDecomposition.Primitive();
         tmpSVD.setFullSize(true); // Supports full size
         tmpSVD.decompose(tmpA);
 
@@ -158,13 +158,13 @@ public class DesignCase extends MatrixDecompositionTests {
                 .rows(new double[][] { { 1.0, 0.0, 0.0, 0.0, 2.0 }, { 0.0, 0.0, 3.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0, 0.0, 0.0 }, { 0.0, 4.0, 0.0, 0.0, 0.0 } });
         Array1D.PRIMITIVE64.copy(new double[] { 4.0, 3.0, PrimitiveFunction.SQRT.invoke(5.0), 0.0 });
 
-        final SingularValue<Double> tmpOldDecomp = new SVDold30.Primitive();
+        final SingularValue<Double> tmpOldDecomp = new SingularValueDecomposition.Primitive();
         tmpOldDecomp.decompose(tmpOriginalMatrix);
         tmpOldDecomp.getD();
         tmpOldDecomp.getQ1();
         tmpOldDecomp.getQ2();
 
-        final SingularValue<Double> tmpNewDecomp = SingularValue.PRIMITIVE.make();
+        final SingularValue<Double> tmpNewDecomp = new RawSingularValue();
         tmpNewDecomp.decompose(tmpOriginalMatrix);
         tmpNewDecomp.getD();
         tmpNewDecomp.getQ1();

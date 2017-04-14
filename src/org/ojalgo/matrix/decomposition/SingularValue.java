@@ -55,13 +55,13 @@ public interface SingularValue<N extends Number>
 
     }
 
-    public static final Factory<BigDecimal> BIG = typical -> new SVDnew32.Big();
+    public static final Factory<BigDecimal> BIG = typical -> new SingularValueDecomposition.Big();
 
-    public static final Factory<ComplexNumber> COMPLEX = typical -> new SVDnew32.Complex();
+    public static final Factory<ComplexNumber> COMPLEX = typical -> new SingularValueDecomposition.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> {
         if ((2048L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
-            return new SVDnew32.Primitive();
+            return new SingularValueDecomposition.Primitive();
         } else {
             return new RawSingularValue();
         }

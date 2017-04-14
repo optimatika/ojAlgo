@@ -135,15 +135,14 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final SingularValue<?>[] getSingularValueAll() {
-        return new SingularValue<?>[] { new SVDold30.Big(), new SVDold30.Complex(), new SVDold30.Primitive(), new SVDnew32.Primitive(),
-                new RawSingularValue() };
+        return new SingularValue<?>[] { new SingularValueDecomposition.Big(), new SingularValueDecomposition.Complex(), new SingularValueDecomposition.Primitive(), new RawSingularValue() };
     }
 
     @SuppressWarnings("unchecked")
     public static final SingularValue<Double>[] getSingularValuePrimitive() {
         return (SingularValue<Double>[]) new SingularValue<?>[] { /*
                                                                    * new SVDold30.Primitive (),
-                                                                   */new SVDnew32.Primitive(), new RawSingularValue() };
+                                                                   */new SingularValueDecomposition.Primitive(), new RawSingularValue() };
     }
 
     public static final Tridiagonal<?>[] getTridiagonalAll() {

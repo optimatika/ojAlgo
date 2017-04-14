@@ -88,7 +88,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return this.doDecompose(matrix, false);
     }
 
-
     public boolean decompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix) {
         return this.doDecompose(matrix, true);
     }
@@ -168,7 +167,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return Array1D.PRIMITIVE64.copy(s);
     }
 
-    public void getSingularValues(double[] values) {
+    public void getSingularValues(final double[] values) {
         System.arraycopy(s, 0, values, 0, Math.min(s.length, values.length));
     }
 
@@ -249,9 +248,17 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         }
     }
 
-    private void setupInstanceStorage(final boolean factors) {
+    boolean doDecompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix, final boolean factors) {
 
-        // Input is possibly transposed so that m >= n always
+        myTransposed = matrix.countRows() < matrix.countColumns();
+
+        final double[][] input = this.reset(matrix, !myTransposed);
+
+        if (myTransposed) {
+            matrix.supplyTo(this.getRawInPlaceStore());
+        } else {
+            this.collect(matrix).transpose().supplyTo(this.getRawInPlaceStore());
+        }
 
         m = this.getMaxDim();
         n = this.getMinDim();
@@ -264,9 +271,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             w = new double[m];
         }
         if (factors) {
-            if ((myUt == null) || (myUt.length != n) || (myUt[0].length != m)) {
-                myUt = new double[n][m];
-            }
+            myUt = input;
             if ((myVt == null) || (myVt.length != n) || (myVt[0].length != n)) {
                 myVt = new double[n][n];
             }
@@ -274,22 +279,6 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             myUt = null;
             myVt = null;
         }
-    }
-
-    boolean doDecompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix, final boolean factors) {
-
-        myTransposed = matrix.countRows() < matrix.countColumns();
-
-        final double[][] tmpData = this.reset(matrix, !myTransposed);
-
-        if (myTransposed) {
-            matrix.supplyTo(this.getRawInPlaceStore());
-        } else {
-            this.collect(matrix).transpose().supplyTo(this.getRawInPlaceStore());
-        }
-
-
-        this.setupInstanceStorage(factors);
 
         double[] tmpArr;
         double tmpVal;
@@ -299,12 +288,12 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         // Reduce A to bidiagonal form, storing the diagonal elements
         // in s and the super-diagonal elements in e.
 
-        final int nct = Math.min(m - 1, n); // Number of column Transformations
-        final int nrt = Math.max(0, n - 2); // Number of row Transformations
+        final int nct = Math.min(m - 1, n); // Number of Column Transformations
+        final int nrt = Math.max(0, n - 2); // Number of Row Transformations
 
         final int limit = Math.max(nct, nrt);
         for (int k = 0; k < limit; k++) {
-            tmpArr = tmpData[k];
+            tmpArr = input[k];
 
             if (k < nct) {
                 // Compute the transformation for the k-th column and
@@ -328,9 +317,9 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
                     // Apply the transformation to the remaining columns
                     for (int j = k + 1; j < n; j++) {
-                        tmpVal = DOT.invoke(tmpArr, 0, tmpData[j], 0, k, m);
+                        tmpVal = DOT.invoke(tmpArr, 0, input[j], 0, k, m);
                         tmpVal /= tmpArr[k];
-                        AXPY.invoke(tmpData[j], 0, 1, -tmpVal, tmpArr, 0, 1, k, m);
+                        AXPY.invoke(input[j], 0, 1, -tmpVal, tmpArr, 0, 1, k, m);
                     }
                 }
                 s[k] = -nrm;
@@ -339,7 +328,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
             for (int j = k + 1; j < n; j++) {
                 // Place the k-th row of A into e for the
                 // subsequent calculation of the row transformation.
-                e[j] = tmpData[j][k];
+                e[j] = input[j][k];
             }
 
             if (factors && (k < nct)) {
@@ -374,10 +363,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
                     }
                     // ... remining columns
                     for (int j = k + 1; j < n; j++) {
-                        AXPY.invoke(w, 0, 1, e[j], tmpData[j], 0, 1, k + 1, m);
+                        AXPY.invoke(w, 0, 1, e[j], input[j], 0, 1, k + 1, m);
                     }
                     for (int j = k + 1; j < n; j++) {
-                        AXPY.invoke(tmpData[j], 0, 1, -(e[j] / e[k + 1]), w, 0, 1, k + 1, m);
+                        AXPY.invoke(input[j], 0, 1, -(e[j] / e[k + 1]), w, 0, 1, k + 1, m);
                     }
                 }
                 e[k] = -nrm;
@@ -394,10 +383,10 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         // Set up the final bidiagonal matrix or order p. []
         final int p = n;
         if (nct < n) { // Only happens when m == n, then nct == n-1
-            s[nct] = tmpData[nct][nct];
+            s[nct] = input[nct][nct];
         }
         if ((nrt + 1) < p) {
-            e[nrt] = tmpData[p - 1][nrt];
+            e[nrt] = input[p - 1][nrt];
         }
         e[p - 1] = ZERO;
 

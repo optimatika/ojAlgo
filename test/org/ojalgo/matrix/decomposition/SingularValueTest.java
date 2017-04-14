@@ -43,7 +43,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
     private static final SingularValue<BigDecimal> IMPL_BIG = SingularValue.BIG.make();
     private static final SingularValue<ComplexNumber> IMPL_COMPLEX = SingularValue.COMPLEX.make();
-    private static final SingularValue<Double> IMPL_PRIMITIVE = new SVDnew32.Primitive();
+    private static final SingularValue<Double> IMPL_PRIMITIVE = new SingularValueDecomposition.Primitive();
     private static final SingularValue<Double> IMPL_RAW = new RawSingularValue();
 
     private static final BasicMatrix MTRX_FAT = BigMatrix.FACTORY.copy(MatrixUtils.makeRandomComplexStore(7, 9));
