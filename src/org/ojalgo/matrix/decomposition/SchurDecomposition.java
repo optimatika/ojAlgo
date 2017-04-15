@@ -37,6 +37,13 @@ import org.ojalgo.scalar.ComplexNumber;
 @Deprecated
 abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition<N> implements Schur<N> {
 
+    /**
+     * SchurDecomposition
+     *
+     * @author apete
+     * @deprecated v43 Use {@linkplain Eigenvalue} instead
+     */
+    @Deprecated
     public static final class SchurResult<N extends Number> extends Object {
 
         private final Array1D<ComplexNumber> myDiagonal;
@@ -65,6 +72,13 @@ abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition
 
     }
 
+    /**
+     * SchurDecomposition
+     *
+     * @author apete
+     * @deprecated v43 Use {@linkplain Eigenvalue} instead
+     */
+    @Deprecated
     static final class Primitive extends SchurDecomposition<Double> {
 
         Primitive() {
