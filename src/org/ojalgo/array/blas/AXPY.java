@@ -25,8 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.function.BigFunction;
-import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -46,54 +44,10 @@ public abstract class AXPY implements BLAS1 {
         }
     }
 
-    /**
-     * @deprecated v42
-     */
-    @Deprecated
-    public static void invoke(final BigDecimal[] y, final int aRowDim, final int aFirstCol, final int aColLimit, final BigDecimal aScale,
-            final MatrixStore<BigDecimal> aStore) {
-        int tmpIndex = aRowDim * aFirstCol;
-        for (int j = aFirstCol; j < aColLimit; j++) {
-            for (int i = 0; i < aRowDim; i++) {
-                y[tmpIndex] = BigFunction.ADD.invoke(BigFunction.MULTIPLY.invoke(aScale, aStore.get(i, j)), y[tmpIndex]);
-                tmpIndex++;
-            }
-        }
-    }
-
-    /**
-     * @deprecated v42
-     */
-    @Deprecated
-    public static void invoke(final ComplexNumber[] y, final int aRowDim, final int aFirstCol, final int aColLimit, final ComplexNumber aScale,
-            final MatrixStore<ComplexNumber> aStore) {
-        int tmpIndex = aRowDim * aFirstCol;
-        for (int j = aFirstCol; j < aColLimit; j++) {
-            for (int i = 0; i < aRowDim; i++) {
-                y[tmpIndex] = aScale.multiply(aStore.get(i, j)).add(y[tmpIndex]);
-                tmpIndex++;
-            }
-        }
-    }
-
     public static void invoke(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {
             y[basey + (incy * i)] += a * x[basex + (incx * i)];
-        }
-    }
-
-    /**
-     * @deprecated v42
-     */
-    @Deprecated
-    public static void invoke(final double[] y, final int aRowDim, final int aFirstCol, final int aColLimit, final double aScale,
-            final MatrixStore<Double> aStore) {
-        int tmpIndex = aRowDim * aFirstCol;
-        for (int j = aFirstCol; j < aColLimit; j++) {
-            for (int i = 0; i < aRowDim; i++) {
-                y[tmpIndex++] += aScale * aStore.doubleValue(i, j);
-            }
         }
     }
 

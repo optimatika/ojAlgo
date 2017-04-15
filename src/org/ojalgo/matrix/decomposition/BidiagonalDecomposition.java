@@ -60,7 +60,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         @Override
         Array1D<ComplexNumber>[] makeReal() {
 
-            final DiagonalArray1D<ComplexNumber> tmpDiagonalAccessD = this.getDiagonalAccessD();
+            final DiagonalArray1D<ComplexNumber> tmpDiagonalAccessD = this.getDiagonal();
 
             final Array1D<ComplexNumber> tmpInitDiagQ1 = Array1D.COMPLEX.makeZero(tmpDiagonalAccessD.getDimension());
             tmpInitDiagQ1.fillAll(ComplexNumber.ONE);
@@ -148,7 +148,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
     }
 
-    private transient DiagonalArray1D<N> myDiagonalAccessD;
+    private transient DiagonalArray1D<N> myDiagonal;
 
     private boolean myFullSize = false;
 
@@ -252,7 +252,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
 
         myQ1 = null;
         myQ2 = null;
-        myDiagonalAccessD = null;
+        myDiagonal = null;
 
         myInitDiagQ1 = null;
         myInitDiagQ2 = null;
@@ -262,7 +262,7 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         myFullSize = fullSize;
     }
 
-    private DiagonalArray1D<N> makeDiagonalAccessD() {
+    private DiagonalArray1D<N> makeDiagonal() {
 
         final DecompositionStore<N> tmpArray2D = this.getInPlace();
 
@@ -397,11 +397,11 @@ abstract class BidiagonalDecomposition<N extends Number> extends InPlaceDecompos
         return retVal;
     }
 
-    DiagonalArray1D<N> getDiagonalAccessD() {
-        if (myDiagonalAccessD == null) {
-            myDiagonalAccessD = this.makeDiagonalAccessD();
+    DiagonalArray1D<N> getDiagonal() {
+        if (myDiagonal == null) {
+            myDiagonal = this.makeDiagonal();
         }
-        return myDiagonalAccessD;
+        return myDiagonal;
     }
 
     abstract Array1D<N>[] makeReal();
