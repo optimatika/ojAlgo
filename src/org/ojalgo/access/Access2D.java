@@ -284,7 +284,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
                 return Access2D.this.countRows();
             }
 
-            public void supplyTo(R receiver) {
+            public void supplyTo(final R receiver) {
                 receiver.accept(Access2D.this);
             }
 

@@ -516,7 +516,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
         } : NegateColumn.NULL;
 
-        SVD2D.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
+        SingularValueDecomposition.toDiagonal(s, e, q1RotR, q2RotR, q1XchgCols, q2XchgCols, q2NegCol);
 
         return this.computed(true);
     }
