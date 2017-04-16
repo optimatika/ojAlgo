@@ -679,18 +679,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         };
     }
 
-    public void caxpy(final Double scalarA, final int columnX, final int columnY, final int firstRow) {
-
-        final double tmpValA = scalarA.doubleValue();
-        final double[][] tmpArray = data;
-
-        final int tmpRowDim = data.length;
-
-        for (int i = firstRow; i < tmpRowDim; i++) {
-            tmpArray[i][columnY] += tmpValA * tmpArray[i][columnX];
-        }
-    }
-
     public RawStore conjugate() {
         return this.transpose();
     }
@@ -1191,19 +1179,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
     public PhysicalStore.Factory<Double, RawStore> physical() {
         return FACTORY;
-    }
-
-    public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {
-
-        final double tmpValA = scalarA.doubleValue();
-        final double[][] tmpArray = data;
-
-        final int tmpColDim = myNumberOfColumns;
-
-        for (int j = firstColumn; j < tmpColDim; j++) {
-            tmpArray[rowY][j] += tmpValA * tmpArray[rowX][j];
-
-        }
     }
 
     public final ElementsConsumer<Double> regionByColumns(final int... columns) {

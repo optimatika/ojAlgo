@@ -588,10 +588,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         AXPY.invoke(data, (aColY * myRowDim) + aFirstRow, 1, aSclrA, data, (aColX * myRowDim) + aFirstRow, 1, 0, myRowDim - aFirstRow);
     }
 
-    public void caxpy(final Double scalarA, final int columnX, final int columnY, final int firstRow) {
-        AXPY.invoke(data, (columnY * myRowDim) + firstRow, 1, scalarA.doubleValue(), data, (columnX * myRowDim) + firstRow, 1, 0, myRowDim - firstRow);
-    }
-
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<Double> transformationCollector, final boolean eigenvalue) {
 
         // final PrimitiveDenseStore tmpThisCopy = this.copy();
@@ -997,11 +993,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public PhysicalStore.Factory<Double, PrimitiveDenseStore> physical() {
         return FACTORY;
-    }
-
-    public void raxpy(final Double scalarA, final int rowX, final int rowY, final int firstColumn) {
-        AXPY.invoke(data, rowY + (firstColumn * (data.length / myColDim)), data.length / myColDim, scalarA, data,
-                rowX + (firstColumn * (data.length / myColDim)), data.length / myColDim, 0, myColDim - firstColumn);
     }
 
     public final ElementsConsumer<Double> regionByColumns(final int... columns) {

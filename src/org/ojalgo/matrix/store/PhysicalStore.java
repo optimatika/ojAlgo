@@ -578,28 +578,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
      */
     List<N> asList();
 
-    /**
-     * <p>
-     * <b>c</b>olumn <b>a</b> * <b>x</b> <b>p</b>lus <b>y</b>
-     * </p>
-     * [this(*,aColY)] = aSclrA [this(*,aColX)] + [this(*,aColY)]
-     *
-     * @deprecated v32 Let me know if you need this
-     */
-    @Deprecated
-    void caxpy(final N scalarA, final int columnX, final int columnY, final int firstRow);
-
-    /**
-     * <p>
-     * <b>r</b>ow <b>a</b> * <b>x</b> <b>p</b>lus <b>y</b>
-     * </p>
-     * [this(aRowY,*)] = aSclrA [this(aRowX,*)] + [this(aRowY,*)]
-     *
-     * @deprecated v32 Let me know if you need this
-     */
-    @Deprecated
-    void raxpy(final N scalarA, final int rowX, final int rowY, final int firstColumn);
-
     void transformLeft(Householder<N> transformation, int firstColumn);
 
     /**
@@ -663,7 +641,7 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Element
      * </ul>
      *
      * @param body The equation system body parameters [A]
-     * @param unitDiagonal true if body as ones on the diagonal
+     * @param unitDiagonal true if body has ones on the diagonal
      * @param conjugated TODO
      * @param identity
      */

@@ -103,11 +103,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements PhysicalS
         myUtility.axpy(a, y);
     }
 
-    public void caxpy(final N scalarA, final int columnX, final int columnY, final int firstRow) {
-        // TODO Auto-generated method stub
-
-    }
-
     public Iterable<ColumnView<N>> columns() {
         return myUtility.columns();
     }
@@ -458,11 +453,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements PhysicalS
     public org.ojalgo.matrix.store.PhysicalStore.Factory<N, ?> physical() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public void raxpy(final N scalarA, final int rowX, final int rowY, final int firstColumn) {
-        // TODO Auto-generated method stub
-
     }
 
     public ElementsConsumer<N> regionByColumns(final int... columns) {

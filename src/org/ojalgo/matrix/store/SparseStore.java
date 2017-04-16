@@ -290,23 +290,23 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         return new Access2D.ElementView<>(myElements.nonzeros(), this.countRows());
     }
 
-    public final ElementsConsumer<N> regionByColumns(final int... columns) {
+    public ElementsConsumer<N> regionByColumns(final int... columns) {
         return new ColumnsRegion<>(this, myMultiplyer, columns);
     }
 
-    public final ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
+    public ElementsConsumer<N> regionByLimits(final int rowLimit, final int columnLimit) {
         return new LimitRegion<>(this, myMultiplyer, rowLimit, columnLimit);
     }
 
-    public final ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
+    public ElementsConsumer<N> regionByOffsets(final int rowOffset, final int columnOffset) {
         return new OffsetRegion<>(this, myMultiplyer, rowOffset, columnOffset);
     }
 
-    public final ElementsConsumer<N> regionByRows(final int... rows) {
+    public ElementsConsumer<N> regionByRows(final int... rows) {
         return new RowsRegion<>(this, myMultiplyer, rows);
     }
 
-    public final ElementsConsumer<N> regionByTransposing() {
+    public ElementsConsumer<N> regionByTransposing() {
         return new TransposedRegion<>(this, myMultiplyer);
     }
 
