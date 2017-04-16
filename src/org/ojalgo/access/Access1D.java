@@ -166,6 +166,20 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         }
     }
 
+    default <NN extends Number, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {
+        return new Collectable<NN, R>() {
+
+            public long count() {
+                return Access1D.this.count();
+            }
+
+            public void supplyTo(final R receiver) {
+                receiver.accept(Access1D.this);
+            }
+
+        };
+    }
+
     /**
      * Will calculate y = y + a x, will add "a" times "this" to "y"
      *

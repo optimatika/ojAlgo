@@ -273,7 +273,7 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
-    default <NN extends Number, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable() {
+    default <NN extends Number, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable2D() {
         return new Collectable<NN, R>() {
 
             public long countColumns() {

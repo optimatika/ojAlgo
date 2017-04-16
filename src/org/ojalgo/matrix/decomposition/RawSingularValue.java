@@ -188,7 +188,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     @Override
     public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws TaskException {
 
-        this.doDecompose(original.asCollectable(), true);
+        this.doDecompose(original.asCollectable2D(), true);
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
@@ -236,7 +236,7 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
 
-        this.doDecompose(body.asCollectable(), true);
+        this.doDecompose(body.asCollectable2D(), true);
 
         if (this.isSolvable()) {
 

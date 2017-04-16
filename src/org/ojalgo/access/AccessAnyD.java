@@ -81,6 +81,24 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
+    default <NN extends Number, R extends MutateAnyD.Receiver<NN>> Collectable<NN, R> asCollectableAnyD() {
+        return new Collectable<NN, R>() {
+
+            public long count(final int dimension) {
+                return AccessAnyD.this.count();
+            }
+
+            public long[] shape() {
+                return AccessAnyD.this.shape();
+            }
+
+            public void supplyTo(final R receiver) {
+                receiver.accept(AccessAnyD.this);
+            }
+
+        };
+    }
+
     /**
      * Will pass through each matching element position calling the {@code through} function. What happens is
      * entirely dictated by how you implement the callback.

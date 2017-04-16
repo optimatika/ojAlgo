@@ -59,6 +59,7 @@ import org.ojalgo.type.keyvalue.KeyValue;
  * <li>Some additional methods to work with primitive keys and values more efficiently</li>
  * <li>A few additional methods to help access and modify series entries</li>
  * </ul>
+ * The extension {@link NaturallySequenced} is typically used with time series data.
  *
  * @author apete
  */
