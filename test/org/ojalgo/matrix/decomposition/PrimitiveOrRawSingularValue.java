@@ -32,32 +32,24 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro: 2015-06-23 => 2048
+ * Mac Pro: 2017-04-17 => 2048
  *
  * <pre>
- * # Run complete. Total time: 03:49:11
- *
- * Benchmark                              (dim)   Mode  Cnt        Score        Error    Units
- * PrimitiveOrRawSingularValue.primitive      5  thrpt    3  1245689,416 ±   6939,980  ops/min
- * PrimitiveOrRawSingularValue.primitive     10  thrpt    3   335548,634 ±   8511,615  ops/min
- * PrimitiveOrRawSingularValue.primitive     20  thrpt    3    72986,841 ±    783,793  ops/min
- * PrimitiveOrRawSingularValue.primitive     50  thrpt    3    10778,273 ±    120,010  ops/min
- * PrimitiveOrRawSingularValue.primitive    100  thrpt    3     2189,222 ±     61,703  ops/min
- * PrimitiveOrRawSingularValue.primitive    200  thrpt    3      432,115 ±     20,932  ops/min
- * PrimitiveOrRawSingularValue.primitive    500  thrpt    3       44,580 ±      4,428  ops/min
- * PrimitiveOrRawSingularValue.primitive   1000  thrpt    3        7,285 ±      0,835  ops/min
- * PrimitiveOrRawSingularValue.primitive   2000  thrpt    3        1,044 ±      0,104  ops/min
- * PrimitiveOrRawSingularValue.primitive   5000  thrpt    3        0,081 ±      0,007  ops/min
- * PrimitiveOrRawSingularValue.raw            5  thrpt    3  8726260,609 ± 143736,901  ops/min
- * PrimitiveOrRawSingularValue.raw           10  thrpt    3  2410703,814 ±  85389,067  ops/min
- * PrimitiveOrRawSingularValue.raw           20  thrpt    3   492392,413 ±   7726,306  ops/min
- * PrimitiveOrRawSingularValue.raw           50  thrpt    3    55911,516 ±   1168,551  ops/min
- * PrimitiveOrRawSingularValue.raw          100  thrpt    3     8790,293 ±    205,273  ops/min
- * PrimitiveOrRawSingularValue.raw          200  thrpt    3     1247,406 ±     64,764  ops/min
- * PrimitiveOrRawSingularValue.raw          500  thrpt    3       95,638 ±      7,603  ops/min
- * PrimitiveOrRawSingularValue.raw         1000  thrpt    3        9,490 ±      1,559  ops/min
- * PrimitiveOrRawSingularValue.raw         2000  thrpt    3        1,111 ±      0,130  ops/min
- * PrimitiveOrRawSingularValue.raw         5000  thrpt    3        0,071 ±      0,003  ops/min
+# Run complete. Total time: 04:45:42
+
+Benchmark                              (dim)   Mode  Cnt     Score     Error    Units
+PrimitiveOrRawSingularValue.primitive    100  thrpt    3  5941.421 ± 649.420  ops/min
+PrimitiveOrRawSingularValue.primitive    200  thrpt    3   727.060 ±  98.187  ops/min
+PrimitiveOrRawSingularValue.primitive    500  thrpt    3    55.095 ±   3.849  ops/min
+PrimitiveOrRawSingularValue.primitive   1000  thrpt    3     7.536 ±   2.056  ops/min
+PrimitiveOrRawSingularValue.primitive   2000  thrpt    3     0.981 ±   0.070  ops/min
+PrimitiveOrRawSingularValue.primitive   5000  thrpt    3     0.066 ±   0.003  ops/min
+PrimitiveOrRawSingularValue.raw          100  thrpt    3  8469.504 ±  94.651  ops/min
+PrimitiveOrRawSingularValue.raw          200  thrpt    3  1199.734 ±  18.795  ops/min
+PrimitiveOrRawSingularValue.raw          500  thrpt    3    82.169 ±   1.427  ops/min
+PrimitiveOrRawSingularValue.raw         1000  thrpt    3     9.282 ±   0.147  ops/min
+PrimitiveOrRawSingularValue.raw         2000  thrpt    3     0.851 ±   0.130  ops/min
+PrimitiveOrRawSingularValue.raw         5000  thrpt    3     0.055 ±   0.001  ops/min
  * </pre>
  *
  * MacBook Air: 2017-04-13
@@ -87,7 +79,7 @@ public class PrimitiveOrRawSingularValue extends AbstractPrimitiveOrRaw<Singular
         LinearAlgebraBenchmark.run(PrimitiveOrRawSingularValue.class);
     }
 
-    @Param({ "100", "200", "500", "1000", "2000" })
+    @Param({ "100", "200", "500", "1000", "2000", "5000" })
     public int dim;
 
     MatrixStore<Double> matrix;

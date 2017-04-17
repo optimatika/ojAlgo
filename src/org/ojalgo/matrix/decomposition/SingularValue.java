@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
@@ -60,7 +61,7 @@ public interface SingularValue<N extends Number>
     public static final Factory<ComplexNumber> COMPLEX = typical -> new SingularValueDecomposition.Complex();
 
     public static final Factory<Double> PRIMITIVE = typical -> {
-        if ((2048L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
+        if ((1024L < typical.countColumns()) && (typical.count() <= DenseArray.MAX_ARRAY_SIZE)) {
             return new SingularValueDecomposition.Primitive();
         } else {
             return new RawSingularValue();

@@ -569,7 +569,7 @@ public abstract class EvD2D {
     /**
      * Complex scalar division.
      */
-    static void cdiv(final double xr, final double xi, final double yr, final double yi, final double[] cdiv) {
+    private static void cdiv(final double xr, final double xi, final double yr, final double yi, final double[] cdiv) {
         double r, d;
         if (ABS.invoke(yr) > ABS.invoke(yi)) {
             r = yi / yr;
