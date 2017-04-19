@@ -23,6 +23,24 @@ public class TimeIndexTest extends TypeTests {
         TestUtils.assertEquals(implementation, expected, actual);
     }
 
+    static <T extends Comparable<? super T>> void doTestFromWithResolution(final TimeIndex<T> mapperFactory, final T keyToTest, final T referenceKey) {
+
+        final String implementation = keyToTest.getClass().getSimpleName();
+
+        final IndexMapper<T> mapper = mapperFactory.from(referenceKey);
+
+        final T expected = keyToTest;
+        final long index = mapper.toIndex(expected);
+        final T actual = mapper.toKey(index);
+
+        TestUtils.assertEquals(implementation, expected, actual);
+
+        for (CalendarDateUnit resolution : CalendarDateUnit.values()) {
+
+        }
+
+    }
+
     static <T extends Comparable<? super T>> void doTestPlain(final TimeIndex<T> mapperFactory, final T keyToTest) {
 
         final String implementation = keyToTest.getClass().getSimpleName();

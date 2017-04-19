@@ -43,7 +43,7 @@ import org.ojalgo.constant.PrimitiveMath;
  * @see CalendarDateUnit
  * @author apete
  */
-public final class CalendarDateDuration extends Number implements TemporalAmount, Comparable<CalendarDateDuration>, Serializable {
+public final class CalendarDateDuration extends Number implements TemporalAmount, CalendarDate.Extent, Comparable<CalendarDateDuration>, Serializable {
 
     public final double measure;
     public final CalendarDateUnit unit;
@@ -154,6 +154,11 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
 
     long toDurationInNanos() {
         return (long) (measure * (1_000_000L * unit.size()));
+    }
+
+    public CalendarDate adjustInto(Temporal temporal) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

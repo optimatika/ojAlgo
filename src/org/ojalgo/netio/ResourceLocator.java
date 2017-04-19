@@ -46,7 +46,7 @@ public final class ResourceLocator {
     private String myPath = null;
     private int myPort = -1; // -1 ==> undefined
     private Map<String, String> myQueryParameters = new TreeMap<>();
-    private String myScheme = "http";
+    private String myScheme = "https";
 
     public ResourceLocator() {
         super();

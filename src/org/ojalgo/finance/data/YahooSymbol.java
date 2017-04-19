@@ -66,10 +66,10 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
     }
 
+    private static final String CHART_FINANCE_YAHOO_COM = "chart.finance.yahoo.com";
     private static final String CSV = ".csv";
     private static final String D = "d";
     private static final String G = "g";
-    private static final String ICHART_FINANCE_YAHOO_COM = "ichart.finance.yahoo.com";
     private static final String IGNORE = "ignore";
     private static final String M = "m";
     private static final String S = "s";
@@ -84,7 +84,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
         super(symbol, resolution);
 
-        this.setHost(ICHART_FINANCE_YAHOO_COM);
+        this.setHost(CHART_FINANCE_YAHOO_COM);
         this.setPath(TABLE_CSV);
         this.addQueryParameter(S, symbol);
         switch (resolution) {
