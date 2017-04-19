@@ -21,6 +21,7 @@
  */
 package org.ojalgo.type;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
@@ -45,7 +46,7 @@ import org.ojalgo.constant.PrimitiveMath;
  * @see CalendarDateDuration
  * @author apete
  */
-public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Extent {
+public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, Comparable<CalendarDateUnit>, Serializable {
 
     /**
      *

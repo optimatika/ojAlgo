@@ -24,24 +24,8 @@ package org.ojalgo.type;
 import static java.time.temporal.ChronoField.*;
 
 import java.io.Serializable;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
+import java.time.*;
+import java.time.temporal.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -74,7 +58,11 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
      *
      * @author apete
      */
-    public static interface Extent extends TemporalAdjuster {
+    public static interface Resolution extends TemporalAdjuster {
+
+        //TODO CalendarDate adjustInto(Calendar temporal);
+
+        //TODO CalendarDate adjustInto(Date temporal);
 
         //TODO CalendarDate adjustInto(Temporal temporal);
 
