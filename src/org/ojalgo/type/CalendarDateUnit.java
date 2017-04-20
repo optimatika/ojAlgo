@@ -128,8 +128,23 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         return temporal.plus(mySize, CalendarDateUnit.MILLIS);
     }
 
-    public Temporal adjustInto(final Temporal temporal) {
-        return temporal.with(ChronoField.INSTANT_SECONDS, mySize / 1000L).with(ChronoField.MILLI_OF_SECOND, mySize % 1000L);
+    public CalendarDate adjustInto(Calendar temporal) {
+        return CalendarDate.make(temporal, this);
+    }
+
+    public CalendarDate adjustInto(Date temporal) {
+        return CalendarDate.make(temporal, this);
+    }
+
+    public CalendarDate adjustInto(final Temporal temporal) {
+        if (temporal instanceof CalendarDate) {
+            return CalendarDate.make(((CalendarDate) temporal).millis, this);
+        } else {
+            long seconds = temporal.getLong(ChronoField.INSTANT_SECONDS);
+            long nanos = temporal.getLong(ChronoField.MILLI_OF_SECOND);
+            final long millis = (seconds / CalendarDate.MILLIS_PER_SECOND) + (nanos * (CalendarDate.MILLIS_PER_SECOND / CalendarDate.NANOS_PER_SECOND));
+            return CalendarDate.make(millis, this);
+        }
     }
 
     public long between(final Temporal temporal1Inclusive, final Temporal temporal2Exclusive) {

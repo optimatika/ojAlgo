@@ -24,8 +24,24 @@ package org.ojalgo.type;
 import static java.time.temporal.ChronoField.*;
 
 import java.io.Serializable;
-import java.time.*;
-import java.time.temporal.*;
+import java.time.DateTimeException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -43,30 +59,32 @@ import java.util.TimeZone;
  * In terms of the newer API it most closely corresponds to an {@linkplain Instant}, but does not have its
  * nanosecond granularity. At one point the plan was to remove and replace this class with
  * {@linkplain Instant}, but working with a single long as an "instant" representation is very practical and
- * efficient. It has been retrofitted to implement the {@linkplain Temporal} and {@linkplain TemporalAdjuster}
- * interfaces.
+ * efficient. It has been retrofitted to implement the {@linkplain Temporal} interface.
  * </p>
  *
  * @see CalendarDateDuration
  * @see CalendarDateUnit
  * @author apete
  */
-public final class CalendarDate implements Temporal, TemporalAdjuster, Comparable<CalendarDate>, Serializable {
+public final class CalendarDate implements Temporal, Comparable<CalendarDate>, Serializable {
 
     /**
-     * Loosely corresponds to a {@link TemporalUnit} and/or {@link TemporalAmount}
+     * Extends {@link TemporalAdjuster} but also loosely corresponds to a {@link TemporalUnit} and/or
+     * {@link TemporalAmount}
      *
      * @author apete
      */
     public static interface Resolution extends TemporalAdjuster {
 
-        //TODO CalendarDate adjustInto(Calendar temporal);
+        CalendarDate adjustInto(Calendar temporal);
 
-        //TODO CalendarDate adjustInto(Date temporal);
+        CalendarDate adjustInto(Date temporal);
 
-        //TODO CalendarDate adjustInto(Temporal temporal);
+        CalendarDate adjustInto(Temporal temporal);
 
     }
+
+
 
     static final long MILLIS_PER_SECOND = 1_000L;
     static final int NANOS_PER_SECOND = 1_000_000_000;
@@ -145,6 +163,8 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
     public static LocalDateTime toLocalDateTime(final Instant instant, final ZoneId zone) {
         return LocalDateTime.ofInstant(instant, zone);
     }
+
+
 
     public static LocalTime toLocalTime(final Instant instant, final ZoneId zone) {
         return CalendarDate.toLocalDateTime(instant, zone).toLocalTime();
@@ -226,10 +246,25 @@ public final class CalendarDate implements Temporal, TemporalAdjuster, Comparabl
         }
     }
 
-    public Temporal adjustInto(final Temporal temporal) {
-        final long tmpSeconds = millis / MILLIS_PER_SECOND;
-        final long tmpNanos = (millis % MILLIS_PER_SECOND) * (NANOS_PER_SECOND / MILLIS_PER_SECOND);
-        return temporal.with(INSTANT_SECONDS, tmpSeconds).with(NANO_OF_SECOND, tmpNanos);
+    public Calendar adjustInto(Calendar temporal) {
+        final GregorianCalendar retVal = new GregorianCalendar();
+        retVal.setTimeInMillis(millis);
+        return retVal;
+    }
+
+    public Date adjustInto(Date temporal) {
+        return new Date(millis);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Temporal> T adjustInto(final T temporal) {
+        if (temporal instanceof CalendarDate) {
+            return (T) this;
+        } else {
+            final long seconds = millis / MILLIS_PER_SECOND;
+            final long nanos = (millis % MILLIS_PER_SECOND) * (NANOS_PER_SECOND / MILLIS_PER_SECOND);
+            return (T) temporal.with(INSTANT_SECONDS, seconds).with(NANO_OF_SECOND, nanos);
+        }
     }
 
     public int compareTo(final CalendarDate ref) {

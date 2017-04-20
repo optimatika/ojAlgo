@@ -27,7 +27,9 @@ import java.time.Period;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.ojalgo.constant.PrimitiveMath;
@@ -62,6 +64,21 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
 
     public Temporal addTo(final Temporal temporal) {
         return temporal.plus(this.toDurationInMillis(), CalendarDateUnit.MILLIS);
+    }
+
+    public CalendarDate adjustInto(Calendar temporal) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public CalendarDate adjustInto(Date temporal) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public CalendarDate adjustInto(Temporal temporal) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public int compareTo(final CalendarDateDuration reference) {
@@ -154,11 +171,6 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
 
     long toDurationInNanos() {
         return (long) (measure * (1_000_000L * unit.size()));
-    }
-
-    public CalendarDate adjustInto(Temporal temporal) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }
