@@ -51,6 +51,14 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
     /**
      *
      */
+    NANOS(ChronoUnit.NANOS, TimeUnit.NANOSECONDS),
+    /**
+     *
+     */
+    MICROS(ChronoUnit.MICROS, TimeUnit.MICROSECONDS),
+    /**
+     *
+     */
     MILLIS(ChronoUnit.MILLIS, TimeUnit.MILLISECONDS),
     /**
      *
@@ -101,12 +109,14 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
     private final long myHalf;
     private final long mySize;
     private final TimeUnit myTimeUnit;
+    private final long mySizeInNanos;
 
     CalendarDateUnit(final ChronoUnit chronoUnit, final long millis) {
         myChronoUnit = chronoUnit;
         myTimeUnit = null;
         mySize = millis;
         myHalf = mySize / 2L;
+        mySizeInNanos = millis * CalendarDate.NANOS_PER_MILLIS;
     }
 
     CalendarDateUnit(final ChronoUnit chronoUnit, final TimeUnit timeUnit) {
@@ -114,6 +124,7 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         myTimeUnit = timeUnit;
         mySize = myTimeUnit.toMillis(1L);
         myHalf = mySize / 2L;
+        mySizeInNanos = timeUnit.toNanos(1L);
     }
 
     public <R extends Temporal> R addTo(final R temporal, final long amount) {
@@ -124,15 +135,11 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         }
     }
 
-    public Temporal addTo(final Temporal temporal) {
-        return temporal.plus(mySize, CalendarDateUnit.MILLIS);
-    }
-
-    public CalendarDate adjustInto(Calendar temporal) {
+    public CalendarDate adjustInto(final Calendar temporal) {
         return CalendarDate.make(temporal, this);
     }
 
-    public CalendarDate adjustInto(Date temporal) {
+    public CalendarDate adjustInto(final Date temporal) {
         return CalendarDate.make(temporal, this);
     }
 
@@ -140,8 +147,8 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         if (temporal instanceof CalendarDate) {
             return CalendarDate.make(((CalendarDate) temporal).millis, this);
         } else {
-            long seconds = temporal.getLong(ChronoField.INSTANT_SECONDS);
-            long nanos = temporal.getLong(ChronoField.MILLI_OF_SECOND);
+            final long seconds = temporal.getLong(ChronoField.INSTANT_SECONDS);
+            final long nanos = temporal.getLong(ChronoField.MILLI_OF_SECOND);
             final long millis = (seconds / CalendarDate.MILLIS_PER_SECOND) + (nanos * (CalendarDate.MILLIS_PER_SECOND / CalendarDate.NANOS_PER_SECOND));
             return CalendarDate.make(millis, this);
         }
@@ -453,10 +460,6 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
 
     public long step(final long aTimeInMillis, final int aStepCount) {
         return this.toTimeInMillis(aTimeInMillis) + (aStepCount * this.size());
-    }
-
-    public Temporal subtractFrom(final Temporal temporal) {
-        return temporal.minus(mySize, CalendarDateUnit.MILLIS);
     }
 
     public long toTimeInMillis(final Calendar aCalendar) {

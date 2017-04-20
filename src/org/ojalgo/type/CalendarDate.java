@@ -24,24 +24,8 @@ package org.ojalgo.type;
 import static java.time.temporal.ChronoField.*;
 
 import java.io.Serializable;
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.UnsupportedTemporalTypeException;
+import java.time.*;
+import java.time.temporal.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -84,10 +68,9 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
 
     }
 
-
-
     static final long MILLIS_PER_SECOND = 1_000L;
     static final int NANOS_PER_SECOND = 1_000_000_000;
+    static final int NANOS_PER_MILLIS = 1_000_000;
     static final long SECONDS_PER_DAY = 24L * 60L * 60L;
 
     public static CalendarDate from(final TemporalAccessor temporal) {
@@ -163,8 +146,6 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
     public static LocalDateTime toLocalDateTime(final Instant instant, final ZoneId zone) {
         return LocalDateTime.ofInstant(instant, zone);
     }
-
-
 
     public static LocalTime toLocalTime(final Instant instant, final ZoneId zone) {
         return CalendarDate.toLocalDateTime(instant, zone).toLocalTime();
@@ -246,13 +227,13 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
         }
     }
 
-    public Calendar adjustInto(Calendar temporal) {
+    public Calendar adjustInto(final Calendar temporal) {
         final GregorianCalendar retVal = new GregorianCalendar();
         retVal.setTimeInMillis(millis);
         return retVal;
     }
 
-    public Date adjustInto(Date temporal) {
+    public Date adjustInto(final Date temporal) {
         return new Date(millis);
     }
 
