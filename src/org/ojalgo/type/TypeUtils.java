@@ -35,6 +35,7 @@ public abstract class TypeUtils {
 
     public static final long HOURS_PER_CENTURY = 876582L; // 365.2425 * 24 * 100 = 876582
     public static final long MILLIS_PER_HOUR = 60L * 60L * 1000L;
+    public static final long NANOS_PER_MILLIS = 1000L * 1000L;
 
     private static final String HEX = "#";
     private static final char START = '{';

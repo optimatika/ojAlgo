@@ -26,6 +26,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Mutate1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionUtils;
@@ -39,7 +40,7 @@ import org.ojalgo.function.VoidFunction;
  *
  * @author apete
  */
-abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> {
+abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implements Mutate1D.Sortable {
 
     protected static <N extends Number> void exchange(final N[] data, final int firstA, final int firstB, final int step, final int aCount) {
 

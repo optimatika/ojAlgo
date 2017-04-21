@@ -54,7 +54,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public interface PhysicalStore<N extends Number> extends MatrixStore<N>, ElementsConsumer<N>, Access2D.IndexOf, Mutate2D.Special<N> {
+public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2D.IndexOf, ElementsConsumer<N>, Mutate2D.Exchangeable {
 
     public static final class ColumnsRegion<N extends Number> extends ConsumerRegion<N> {
 

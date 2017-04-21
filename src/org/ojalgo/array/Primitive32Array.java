@@ -56,13 +56,8 @@ public class Primitive32Array extends PrimitiveArray {
     public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<Double>() {
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
-        }
-
-        @Override
-        PlainArray<Double> make(final long size) {
-            return Primitive32Array.make((int) size);
+        public AggregatorSet<Double> aggregator() {
+            return PrimitiveAggregator.getSet();
         }
 
         @Override
@@ -71,13 +66,18 @@ public class Primitive32Array extends PrimitiveArray {
         }
 
         @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
         }
 
         @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
+        long getElementSize() {
+            return ELEMENT_SIZE;
+        }
+
+        @Override
+        PlainArray<Double> make(final long size) {
+            return Primitive32Array.make((int) size);
         }
 
     };
@@ -410,6 +410,18 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     @Override
+    public final void sortAscending() {
+        Arrays.parallelSort(data);
+    }
+
+    @Override
+    public void sortDescending() {
+        Primitive32Array.negate(data, 0, data.length, 1, data);
+        Arrays.parallelSort(data);
+        Primitive32Array.negate(data, 0, data.length, 1, data);
+    }
+
+    @Override
     protected void add(final int index, final double addend) {
         data[index] += addend;
     }
@@ -547,18 +559,6 @@ public class Primitive32Array extends PrimitiveArray {
     @Override
     protected int size() {
         return data.length;
-    }
-
-    @Override
-    protected final void sortAscending() {
-        Arrays.parallelSort(data);
-    }
-
-    @Override
-    protected void sortDescending() {
-        Primitive32Array.negate(data, 0, data.length, 1, data);
-        Arrays.parallelSort(data);
-        Primitive32Array.negate(data, 0, data.length, 1, data);
     }
 
     @Override

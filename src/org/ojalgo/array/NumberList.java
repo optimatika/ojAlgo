@@ -312,7 +312,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         return new Iterator1D<>(this, index);
     }
 
-    public double mix(long index, BinaryFunction<N> mixer, double addend) {
+    public double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
         Objects.requireNonNull(mixer);
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -321,12 +321,12 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
                 final double oldValue = myStorage.doubleValue(index);
                 final double newValue = mixer.invoke(oldValue, addend);
                 myStorage.set(index, newValue);
-                return oldValue;
+                return newValue;
             }
         }
     }
 
-    public N mix(long index, BinaryFunction<N> mixer, N addend) {
+    public N mix(final long index, final BinaryFunction<N> mixer, final N addend) {
         Objects.requireNonNull(mixer);
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
@@ -335,7 +335,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
                 final N oldValue = myStorage.get(index);
                 final N newValue = mixer.invoke(oldValue, addend);
                 myStorage.set(index, newValue);
-                return oldValue;
+                return newValue;
             }
         }
     }

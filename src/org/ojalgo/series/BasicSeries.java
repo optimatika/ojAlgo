@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
 
@@ -320,8 +321,19 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
 
     BasicSeries<K, V> name(String name);
 
+    /**
+     * @see #put(Comparable, Number)
+     */
     double put(final K key, final double value);
 
+    /**
+     * Some implementations may specify an accumulator function to be used with subsequent put operation with
+     * the same key. If such an accumulator is prsent it should be used here, and in that case the method
+     * returns the new/accumulated/mixed value. With out an accumulator this method should behave exactly as
+     * with any other {@link Map}.
+     *
+     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+     */
     V put(final K key, final V value);
 
     default void putAll(final Collection<? extends KeyValue<? extends K, ? extends V>> data) {

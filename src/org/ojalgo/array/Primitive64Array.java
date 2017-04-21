@@ -60,13 +60,8 @@ public class Primitive64Array extends PrimitiveArray {
     public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<Double>() {
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
-        }
-
-        @Override
-        PlainArray<Double> make(final long size) {
-            return Primitive64Array.make((int) size);
+        public AggregatorSet<Double> aggregator() {
+            return PrimitiveAggregator.getSet();
         }
 
         @Override
@@ -75,13 +70,18 @@ public class Primitive64Array extends PrimitiveArray {
         }
 
         @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
         }
 
         @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
+        long getElementSize() {
+            return ELEMENT_SIZE;
+        }
+
+        @Override
+        PlainArray<Double> make(final long size) {
+            return Primitive64Array.make((int) size);
         }
 
     };
@@ -413,6 +413,18 @@ public class Primitive64Array extends PrimitiveArray {
         return Arrays.hashCode(data);
     }
 
+    @Override
+    public final void sortAscending() {
+        Arrays.parallelSort(data);
+    }
+
+    @Override
+    public void sortDescending() {
+        Primitive64Array.negate(data, 0, data.length, 1, data);
+        Arrays.parallelSort(data);
+        Primitive64Array.negate(data, 0, data.length, 1, data);
+    }
+
     public OfDouble spliterator() {
         return Spliterators.spliterator(data, 0, data.length, PlainArray.CHARACTERISTICS);
     }
@@ -559,18 +571,6 @@ public class Primitive64Array extends PrimitiveArray {
     @Override
     protected int size() {
         return data.length;
-    }
-
-    @Override
-    protected final void sortAscending() {
-        Arrays.parallelSort(data);
-    }
-
-    @Override
-    protected void sortDescending() {
-        Primitive64Array.negate(data, 0, data.length, 1, data);
-        Arrays.parallelSort(data);
-        Primitive64Array.negate(data, 0, data.length, 1, data);
     }
 
     @Override

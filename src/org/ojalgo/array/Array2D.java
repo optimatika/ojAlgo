@@ -47,8 +47,8 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Access2D.Visitable<N>, Access2D.Sliceable<N>,
-        Mutate2D, Mutate2D.Fillable<N>, Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N>, Mutate2D.Mixable<N>, Mutate2D.Special<N>, Serializable {
+public final class Array2D<N extends Number> implements Access2D<N>, Access2D.Elements, Access2D.IndexOf, Access2D.Sliceable<N>, Access2D.Visitable<N>,
+        Mutate2D.Receiver<N>, Mutate2D.Exchangeable, Mutate2D.Mixable<N>, Mutate2D.Modifiable<N>, Mutate2D.BiModifiable<N>, Serializable {
 
     public static final class Factory<N extends Number> implements Factory2D<Array2D<N>> {
 
@@ -534,7 +534,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final double oldValue = this.doubleValue(row, col);
             final double newValue = mixer.invoke(oldValue, addend);
             this.set(row, col, newValue);
-            return oldValue;
+            return newValue;
         }
     }
 
@@ -544,7 +544,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
             final N oldValue = this.get(row, col);
             final N newValue = mixer.invoke(oldValue, addend);
             this.set(row, col, newValue);
-            return oldValue;
+            return newValue;
         }
     }
 

@@ -24,7 +24,7 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate2D;
 
-public interface ElementsConsumer<N extends Number> extends Mutate2D.Receiver<N> {
+public interface ElementsConsumer<N extends Number> extends Mutate2D.Receiver<N>, Mutate2D.BiModifiable<N>, Mutate2D.Modifiable<N> {
 
     void fillByMultiplying(final Access1D<N> left, final Access1D<N> right);
 

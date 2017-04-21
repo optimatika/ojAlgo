@@ -51,13 +51,8 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     public static final DenseArray.Factory<BigDecimal> FACTORY = new DenseArray.Factory<BigDecimal>() {
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
-        }
-
-        @Override
-        PlainArray<BigDecimal> make(final long size) {
-            return BigArray.make((int) size);
+        public AggregatorSet<BigDecimal> aggregator() {
+            return BigAggregator.getSet();
         }
 
         @Override
@@ -66,13 +61,18 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
         }
 
         @Override
-        public AggregatorSet<BigDecimal> aggregator() {
-            return BigAggregator.getSet();
+        public Scalar.Factory<BigDecimal> scalar() {
+            return BigScalar.FACTORY;
         }
 
         @Override
-        public Scalar.Factory<BigDecimal> scalar() {
-            return BigScalar.FACTORY;
+        long getElementSize() {
+            return ELEMENT_SIZE;
+        }
+
+        @Override
+        PlainArray<BigDecimal> make(final long size) {
+            return BigArray.make((int) size);
         }
 
     };
@@ -126,6 +126,16 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     }
 
     @Override
+    public final void sortAscending() {
+        Arrays.parallelSort(data);
+    }
+
+    @Override
+    public void sortDescending() {
+        Arrays.parallelSort(data, Comparator.reverseOrder());
+    }
+
+    @Override
     protected final void add(final int index, final double addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
@@ -148,16 +158,6 @@ public class BigArray extends ReferenceTypeArray<BigDecimal> {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return BigScalar.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    protected final void sortAscending() {
-        Arrays.parallelSort(data);
-    }
-
-    @Override
-    protected void sortDescending() {
-        Arrays.parallelSort(data, Comparator.reverseOrder());
     }
 
     @Override

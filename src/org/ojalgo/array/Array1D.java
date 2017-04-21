@@ -52,8 +52,8 @@ import org.ojalgo.scalar.Scalar;
  * @author apete
  */
 public final class Array1D<N extends Number> extends AbstractList<N>
-        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Visitable<N>, Access1D.Sliceable<N>, Mutate1D, Mutate1D.Fillable<N>,
-        Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>, Mutate1D.Mixable<N>, RandomAccess, Serializable {
+        implements Access1D<N>, Access1D.Elements, Access1D.IndexOf, Access1D.Sliceable<N>, Access1D.Visitable<N>, Mutate1D.Receiver<N>,
+        Mutate1D.BiModifiable<N>, Mutate1D.Modifiable<N>, Mutate1D.Mixable<N>, Mutate1D.Sortable, RandomAccess, Serializable {
 
     public static final class Factory<N extends Number> implements Factory1D<Array1D<N>> {
 
@@ -487,7 +487,7 @@ public final class Array1D<N extends Number> extends AbstractList<N>
             final double oldValue = this.doubleValue(index);
             final double newValue = mixer.invoke(oldValue, addend);
             this.set(index, newValue);
-            return oldValue;
+            return newValue;
         }
     }
 
@@ -497,7 +497,7 @@ public final class Array1D<N extends Number> extends AbstractList<N>
             final N oldValue = this.get(index);
             final N newValue = mixer.invoke(oldValue, addend);
             this.set(index, newValue);
-            return oldValue;
+            return newValue;
         }
     }
 
@@ -568,9 +568,9 @@ public final class Array1D<N extends Number> extends AbstractList<N>
 
     public void sortAscending() {
 
-        if ((myDelegate instanceof PlainArray<?>) && (this.count() == myDelegate.count())) {
+        if ((myDelegate instanceof Mutate1D.Sortable) && (this.count() == myDelegate.count())) {
 
-            ((PlainArray<N>) myDelegate).sortAscending();
+            ((Mutate1D.Sortable) myDelegate).sortAscending();
 
         } else {
 
@@ -586,9 +586,9 @@ public final class Array1D<N extends Number> extends AbstractList<N>
 
     public void sortDescending() {
 
-        if ((myDelegate instanceof PlainArray<?>) && (this.count() == myDelegate.count())) {
+        if ((myDelegate instanceof Mutate1D.Sortable) && (this.count() == myDelegate.count())) {
 
-            ((PlainArray<N>) myDelegate).sortDescending();
+            ((Mutate1D.Sortable) myDelegate).sortDescending();
 
         } else {
 
@@ -625,7 +625,7 @@ public final class Array1D<N extends Number> extends AbstractList<N>
         myDelegate.visit(tmpFirst, tmpLimit, myStep, visitor);
     }
 
-    final void exchange(final long indexA, final long indexB) {
+    void exchange(final long indexA, final long indexB) {
 
         if (myDelegate.isPrimitive()) {
 

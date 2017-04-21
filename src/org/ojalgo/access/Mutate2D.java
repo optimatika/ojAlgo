@@ -39,6 +39,19 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     }
 
+    /**
+     * A few operations with no 1D or AnyD counterpart.
+     *
+     * @author apete
+     */
+    interface Exchangeable extends Structure2D {
+
+        void exchangeColumns(final long colA, final long colB);
+
+        void exchangeRows(final long rowA, final long rowB);
+
+    }
+
     interface Fillable<N extends Number> extends Structure2D, Mutate1D.Fillable<N> {
 
         default void fillColumn(final long col, final Access1D<N> values) {
@@ -126,12 +139,12 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     interface Mixable<N extends Number> extends Structure2D, Mutate1D.Mixable<N> {
 
-        default double mix(long index, BinaryFunction<N> mixer, double addend) {
+        default double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
             final long structure = this.countRows();
             return this.mix(Structure2D.row(index, structure), Structure2D.column(index, structure), mixer, addend);
         }
 
-        default N mix(long index, BinaryFunction<N> mixer, N addend) {
+        default N mix(final long index, final BinaryFunction<N> mixer, final N addend) {
             final long structure = this.countRows();
             return this.mix(Structure2D.row(index, structure), Structure2D.column(index, structure), mixer, addend);
         }
@@ -172,7 +185,7 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
     }
 
-    interface Receiver<N extends Number> extends Mutate2D, Fillable<N>, Modifiable<N>, BiModifiable<N>, Consumer<Access2D<?>> {
+    interface Receiver<N extends Number> extends Mutate2D, Fillable<N>, Consumer<Access2D<?>> {
 
         default void accept(final Access2D<?> supplied) {
             if (this.isAcceptable(supplied)) {
@@ -185,19 +198,6 @@ public interface Mutate2D extends Structure2D, Mutate1D {
         default boolean isAcceptable(final Structure2D supplier) {
             return (this.countRows() >= supplier.countRows()) && (this.countColumns() >= supplier.countColumns());
         }
-
-    }
-
-    /**
-     * A few operations with no 1D or AnyD counterpart.
-     *
-     * @author apete
-     */
-    interface Special<N extends Number> extends Structure2D {
-
-        void exchangeColumns(final long colA, final long colB);
-
-        void exchangeRows(final long rowA, final long rowB);
 
     }
 

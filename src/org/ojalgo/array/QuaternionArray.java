@@ -44,13 +44,8 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
     public static final DenseArray.Factory<Quaternion> FACTORY = new DenseArray.Factory<Quaternion>() {
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
-        }
-
-        @Override
-        PlainArray<Quaternion> make(final long size) {
-            return QuaternionArray.make((int) size);
+        public AggregatorSet<Quaternion> aggregator() {
+            return QuaternionAggregator.getSet();
         }
 
         @Override
@@ -59,13 +54,18 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
         }
 
         @Override
-        public AggregatorSet<Quaternion> aggregator() {
-            return QuaternionAggregator.getSet();
+        public Scalar.Factory<Quaternion> scalar() {
+            return Quaternion.FACTORY;
         }
 
         @Override
-        public Scalar.Factory<Quaternion> scalar() {
-            return Quaternion.FACTORY;
+        long getElementSize() {
+            return ELEMENT_SIZE;
+        }
+
+        @Override
+        PlainArray<Quaternion> make(final long size) {
+            return QuaternionArray.make((int) size);
         }
 
     };
@@ -115,6 +115,16 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
     }
 
     @Override
+    public final void sortAscending() {
+        Arrays.parallelSort(data);
+    }
+
+    @Override
+    public void sortDescending() {
+        Arrays.parallelSort(data, Comparator.reverseOrder());
+    }
+
+    @Override
     protected final void add(final int index, final double addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
@@ -132,16 +142,6 @@ public class QuaternionArray extends ScalarArray<Quaternion> {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return Quaternion.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    protected final void sortAscending() {
-        Arrays.parallelSort(data);
-    }
-
-    @Override
-    protected void sortDescending() {
-        Arrays.parallelSort(data, Comparator.reverseOrder());
     }
 
     @Override

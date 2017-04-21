@@ -44,13 +44,8 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
     public static final DenseArray.Factory<ComplexNumber> FACTORY = new DenseArray.Factory<ComplexNumber>() {
 
         @Override
-        long getElementSize() {
-            return ELEMENT_SIZE;
-        }
-
-        @Override
-        PlainArray<ComplexNumber> make(final long size) {
-            return ComplexArray.make((int) size);
+        public AggregatorSet<ComplexNumber> aggregator() {
+            return ComplexAggregator.getSet();
         }
 
         @Override
@@ -59,13 +54,18 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
         }
 
         @Override
-        public AggregatorSet<ComplexNumber> aggregator() {
-            return ComplexAggregator.getSet();
+        public Scalar.Factory<ComplexNumber> scalar() {
+            return ComplexNumber.FACTORY;
         }
 
         @Override
-        public Scalar.Factory<ComplexNumber> scalar() {
-            return ComplexNumber.FACTORY;
+        long getElementSize() {
+            return ELEMENT_SIZE;
+        }
+
+        @Override
+        PlainArray<ComplexNumber> make(final long size) {
+            return ComplexArray.make((int) size);
         }
 
     };
@@ -115,6 +115,16 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
     }
 
     @Override
+    public final void sortAscending() {
+        Arrays.parallelSort(data);
+    }
+
+    @Override
+    public void sortDescending() {
+        Arrays.parallelSort(data, Comparator.reverseOrder());
+    }
+
+    @Override
     protected final void add(final int index, final double addend) {
         this.fillOne(index, this.get(index).add(this.valueOf(addend)));
     }
@@ -132,16 +142,6 @@ public class ComplexArray extends ScalarArray<ComplexNumber> {
     @Override
     protected boolean isSmall(final int index, final double comparedTo) {
         return ComplexNumber.isSmall(comparedTo, data[index]);
-    }
-
-    @Override
-    protected final void sortAscending() {
-        Arrays.parallelSort(data);
-    }
-
-    @Override
-    protected void sortDescending() {
-        Arrays.parallelSort(data, Comparator.reverseOrder());
     }
 
     @Override

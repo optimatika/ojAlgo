@@ -164,6 +164,7 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         default void visitRange(final long first, final long limit, final VoidFunction<N> visitor) {
             Structure1D.loopRange(first, limit, i -> this.visitOne(i, visitor));
         }
+
     }
 
     default <NN extends Number, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {

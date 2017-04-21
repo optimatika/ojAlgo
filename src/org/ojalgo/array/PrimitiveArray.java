@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import org.ojalgo.access.Mutate1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
@@ -29,7 +30,7 @@ import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 
-public abstract class PrimitiveArray extends PlainArray<Double> {
+public abstract class PrimitiveArray extends PlainArray<Double> implements Mutate1D.Sortable {
 
     /**
      * @deprecated v43 Use {@link Primitive64Array#FACTORY}

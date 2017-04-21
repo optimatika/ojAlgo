@@ -275,7 +275,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
             final double oldValue = this.doubleValue(reference);
             final double newValue = mixer.invoke(oldValue, addend);
             this.set(reference, newValue);
-            return oldValue;
+            return newValue;
         }
     }
 
@@ -285,7 +285,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
             final N oldValue = this.get(reference);
             final N newValue = mixer.invoke(oldValue, addend);
             this.set(reference, newValue);
-            return oldValue;
+            return newValue;
         }
     }
 

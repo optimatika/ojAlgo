@@ -94,7 +94,7 @@ public interface Mutate1D extends Structure1D {
     interface Mixable<N extends Number> extends Structure1D {
 
         /**
-         * @return The original/previous value
+         * @return The new/mixed value
          */
         double mix(long index, BinaryFunction<N> mixer, double addend);
 
@@ -116,7 +116,12 @@ public interface Mutate1D extends Structure1D {
 
     }
 
-    interface Receiver<N extends Number> extends Mutate1D, Mutate1D.Fillable<N>, Mutate1D.Modifiable<N>, Mutate1D.BiModifiable<N>, Consumer<Access1D<?>> {
+    /**
+     * Anything/everything that does not require interaction with already existing elements.
+     *
+     * @author apete
+     */
+    interface Receiver<N extends Number> extends Mutate1D, Mutate1D.Fillable<N>, Consumer<Access1D<?>> {
 
         default void accept(final Access1D<?> supplied) {
             if (this.isAcceptable(supplied)) {
@@ -129,6 +134,14 @@ public interface Mutate1D extends Structure1D {
         default boolean isAcceptable(final Structure1D supplier) {
             return this.count() >= supplier.count();
         }
+
+    }
+
+    interface Sortable extends Structure1D {
+
+        void sortAscending();
+
+        void sortDescending();
 
     }
 
