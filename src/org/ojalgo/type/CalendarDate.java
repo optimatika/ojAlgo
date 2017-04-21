@@ -66,6 +66,10 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
 
         CalendarDate adjustInto(Temporal temporal);
 
+        long toDurationInMillis();
+
+        long toDurationInNanos();
+
     }
 
     static final long MILLIS_PER_SECOND = 1_000L;

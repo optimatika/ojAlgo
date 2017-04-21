@@ -66,17 +66,17 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
         return temporal.plus(this.toDurationInMillis(), CalendarDateUnit.MILLIS);
     }
 
-    public CalendarDate adjustInto(Calendar temporal) {
+    public CalendarDate adjustInto(final Calendar temporal) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public CalendarDate adjustInto(Date temporal) {
+    public CalendarDate adjustInto(final Date temporal) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public CalendarDate adjustInto(Temporal temporal) {
+    public CalendarDate adjustInto(final Temporal temporal) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -160,17 +160,17 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
         return temporal.minus(this.toDurationInMillis(), CalendarDateUnit.MILLIS);
     }
 
-    @Override
-    public String toString() {
-        return Double.toString(measure) + unit.toString();
-    }
-
-    long toDurationInMillis() {
+    public long toDurationInMillis() {
         return (long) (measure * unit.size());
     }
 
-    long toDurationInNanos() {
+    public long toDurationInNanos() {
         return (long) (measure * (1_000_000L * unit.size()));
+    }
+
+    @Override
+    public String toString() {
+        return Double.toString(measure) + unit.toString();
     }
 
 }
