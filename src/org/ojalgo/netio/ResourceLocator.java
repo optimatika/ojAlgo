@@ -91,7 +91,7 @@ public final class ResourceLocator {
     }
 
     /**
-     * Protocol The default value is "http"
+     * Protocol The default value is "https"
      */
     public void setScheme(final String someScheme) {
         myScheme = someScheme;
