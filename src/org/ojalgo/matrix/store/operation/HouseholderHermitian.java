@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -209,20 +209,11 @@ public final class HouseholderHermitian extends MatrixOperation {
         }
     }
 
-    private HouseholderHermitian() {
-        super();
-    }
-
-    @Override
-    public int threshold() {
-        return Math.min(MultiplyHermitianAndVector.THRESHOLD, HermitianRank2Update.THRESHOLD);
-    }
-
     /**
      * Ursprung JAMA men refactored till ojAlgos egna strukturer
      */
     public static void tred2j(final double[] data, final double[] d, final double[] e, final boolean yesvecs) {
-    
+
         /*
          * Symmetric Householder reduction to tridiagonal form. The original version of this code was taken
          * from JAMA. That code is in turn derived from the Algol procedures tred2 by Bowdler, Martin,
@@ -231,34 +222,34 @@ public final class HouseholderHermitian extends MatrixOperation {
          * the main diagonal of the tridiagonal result, and e will hold the off (super and sub) diagonals of
          * the tridiagonal result
          */
-    
+
         final int n = d.length; // rows, columns, structure
         final int tmpLast = n - 1;
-    
+
         double scale;
         double h;
         double f;
         double g;
         double tmpVal; // Nothing special, just some transient value
-    
+
         final int tmpRowDim = n;
-    
+
         // Copy the last column (same as the last row) of z to d
         // The last row/column is the first to be worked on in the main loop
         COPY.invoke(data, tmpRowDim * tmpLast, d, 0, 0, n);
-    
+
         // Householder reduction to tridiagonal form.
         for (int i = tmpLast; i > 0; i--) { // row index of target householder point
             final int l = i - 1; // col index of target householder point
-    
+
             h = scale = PrimitiveMath.ZERO;
-    
+
             // Calc the norm of the row/col to zero out - to avoid under/overflow.
             for (int k = 0; k < i; k++) {
                 // scale += PrimitiveFunction.ABS.invoke(d[k]);
                 scale = PrimitiveFunction.MAX.invoke(scale, PrimitiveFunction.ABS.invoke(d[k]));
             }
-    
+
             if (scale == PrimitiveMath.ZERO) {
                 // Skip generation, already zero
                 e[i] = d[l];
@@ -267,10 +258,10 @@ public final class HouseholderHermitian extends MatrixOperation {
                     data[i + (tmpRowDim * j)] = PrimitiveMath.ZERO; // Are both needed?
                     data[j + (tmpRowDim * i)] = PrimitiveMath.ZERO; // Could cause cache-misses
                 }
-    
+
             } else {
                 // Generate Householder vector.
-    
+
                 for (int k = 0; k < i; k++) {
                     tmpVal = d[k] /= scale;
                     h += tmpVal * tmpVal; // d[k] * d[k]
@@ -284,7 +275,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                 h -= f * g;
                 d[l] = f - g;
                 Arrays.fill(e, 0, i, PrimitiveMath.ZERO);
-    
+
                 // Apply similarity transformation to remaining columns.
                 // Remaing refers to all columns "before" the target col
                 for (int j = 0; j < i; j++) {
@@ -317,14 +308,14 @@ public final class HouseholderHermitian extends MatrixOperation {
             }
             d[i] = h;
         }
-    
+
         // Accumulate transformations.
         if (yesvecs) {
-    
+
             for (int i = 0; i < tmpLast; i++) {
-    
+
                 final int l = i + 1;
-    
+
                 data[tmpLast + (tmpRowDim * i)] = data[i + (tmpRowDim * i)];
                 data[i + (tmpRowDim * i)] = PrimitiveMath.ONE;
                 h = d[l];
@@ -351,10 +342,10 @@ public final class HouseholderHermitian extends MatrixOperation {
                 data[tmpLast + (tmpRowDim * j)] = PrimitiveMath.ZERO;
             }
             data[tmpLast + (tmpRowDim * tmpLast)] = PrimitiveMath.ONE;
-    
+
             e[0] = PrimitiveMath.ZERO;
         }
-    
+
         for (int i = 1; i < e.length; i++) {
             e[i - 1] = e[i];
         }
@@ -365,30 +356,30 @@ public final class HouseholderHermitian extends MatrixOperation {
      * Ursprung Numerical Recipies. Samma som tred2j, men är inte lika snabb.
      */
     public static void tred2nr(final double[] data, final double[] d, final double[] e, final boolean yesvecs) {
-    
+
         final int n = d.length;
         int l;
         final int tmpRowDim = n;
-    
+
         double scale;
         double h;
         double hh;
         double g;
         double f;
-    
+
         for (int i = n - 1; i > 0; i--) {
-    
+
             l = i - 1;
-    
+
             scale = PrimitiveMath.ZERO;
             h = PrimitiveMath.ZERO;
-    
+
             if (l > 0) {
-    
+
                 for (int k = 0; k < i; k++) {
                     scale += PrimitiveFunction.ABS.invoke(data[i + (k * tmpRowDim)]);
                 }
-    
+
                 // if (scale == PrimitiveMath.ZERO) {
                 if (Double.compare(scale, PrimitiveMath.ZERO) == 0) {
                     e[i] = data[i + (l * tmpRowDim)];
@@ -458,6 +449,15 @@ public final class HouseholderHermitian extends MatrixOperation {
                 d[i] = data[i + (i * tmpRowDim)];
             }
         }
+    }
+
+    private HouseholderHermitian() {
+        super();
+    }
+
+    @Override
+    public int threshold() {
+        return Math.min(MultiplyHermitianAndVector.THRESHOLD, HermitianRank2Update.THRESHOLD);
     }
 
 }

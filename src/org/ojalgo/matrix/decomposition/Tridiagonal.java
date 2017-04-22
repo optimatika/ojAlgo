@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -67,10 +67,10 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
     }
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
-    
+
         // Check that [A] == [Q][D][Q]<sup>T</sup>
         return AccessUtils.equals(matrix, Tridiagonal.reconstruct(decomposition), context);
-    
+
         // Check that Q is orthogonal/unitary...
     }
 

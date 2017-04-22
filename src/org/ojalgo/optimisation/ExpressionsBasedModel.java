@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -577,7 +577,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         boolean retVal = false;
 
-        for (Expression value : myExpressions.values()) {
+        for (final Expression value : myExpressions.values()) {
             retVal |= value.isAnyQuadraticFactorNonZero() && (value.isConstraint() || value.isObjective());
         }
 

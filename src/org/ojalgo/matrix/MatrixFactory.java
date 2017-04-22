@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -191,6 +191,11 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         myConstructor = (Constructor<I>) MatrixFactory.getConstructor(template);
     }
 
+    @Override
+    public final AggregatorSet<N> aggregator() {
+        return myPhysicalFactory.aggregator();
+    }
+
     public I columns(final Access1D<?>... source) {
         return this.instantiate(myPhysicalFactory.columns(source));
     }
@@ -209,6 +214,11 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
     public I copy(final Access2D<?> source) {
         return this.instantiate(myPhysicalFactory.copy(source));
+    }
+
+    @Override
+    public final FunctionSet<N> function() {
+        return myPhysicalFactory.function();
     }
 
     public Builder<I> getBuilder(final int count) {
@@ -260,6 +270,11 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
         return this.instantiate(myPhysicalFactory.rows(source));
     }
 
+    @Override
+    public final Scalar.Factory<N> scalar() {
+        return myPhysicalFactory.scalar();
+    }
+
     /**
      * This method is for internal use only - YOU should NOT use it!
      */
@@ -279,21 +294,6 @@ final class MatrixFactory<N extends Number, I extends BasicMatrix> implements Ba
 
     final MatrixBuilder wrap(final PhysicalStore<N> store) {
         return new MatrixBuilder(store);
-    }
-
-    @Override
-    public final FunctionSet<N> function() {
-        return myPhysicalFactory.function();
-    }
-
-    @Override
-    public final AggregatorSet<N> aggregator() {
-        return myPhysicalFactory.aggregator();
-    }
-
-    @Override
-    public final Scalar.Factory<N> scalar() {
-        return myPhysicalFactory.scalar();
     }
 
 }

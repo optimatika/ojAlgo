@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
         final K first = BasicSeries.findLatestFirstKey(uncoordinated);
         final K last = BasicSeries.findEarliestLastKey(uncoordinated);
 
-        final SortedSet<K> tmpAllKeys = new TreeSet<K>();
+        final SortedSet<K> tmpAllKeys = new TreeSet<>();
 
         for (final BasicSeries<K, ?> individual : uncoordinated) {
             tmpAllKeys.addAll(individual.subMap(first, last).keySet());
@@ -66,7 +66,7 @@ public class CoordinatedSet<K extends Comparable<? super K>> {
             coordinated[s] = DataSeries.wrap(outputSeries);
         }
 
-        return new CoordinatedSet<K>(coordinated, first, last);
+        return new CoordinatedSet<>(coordinated, first, last);
     }
 
     private final PrimitiveSeries[] myCoordinated;

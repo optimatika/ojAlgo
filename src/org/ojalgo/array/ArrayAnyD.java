@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -89,14 +89,14 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     }
 
-    public static final Factory<BigDecimal> BIG = new Factory<BigDecimal>(BigArray.FACTORY);
-    public static final Factory<ComplexNumber> COMPLEX = new Factory<ComplexNumber>(ComplexArray.FACTORY);
-    public static final Factory<Double> DIRECT32 = new Factory<Double>(BufferArray.DIRECT32);
-    public static final Factory<Double> DIRECT64 = new Factory<Double>(BufferArray.DIRECT64);
-    public static final Factory<Double> PRIMITIVE32 = new Factory<Double>(Primitive32Array.FACTORY);
-    public static final Factory<Double> PRIMITIVE64 = new Factory<Double>(Primitive64Array.FACTORY);
-    public static final Factory<Quaternion> QUATERNION = new Factory<Quaternion>(QuaternionArray.FACTORY);
-    public static final Factory<RationalNumber> RATIONAL = new Factory<RationalNumber>(RationalArray.FACTORY);
+    public static final Factory<BigDecimal> BIG = new Factory<>(BigArray.FACTORY);
+    public static final Factory<ComplexNumber> COMPLEX = new Factory<>(ComplexArray.FACTORY);
+    public static final Factory<Double> DIRECT32 = new Factory<>(BufferArray.DIRECT32);
+    public static final Factory<Double> DIRECT64 = new Factory<>(BufferArray.DIRECT64);
+    public static final Factory<Double> PRIMITIVE32 = new Factory<>(Primitive32Array.FACTORY);
+    public static final Factory<Double> PRIMITIVE64 = new Factory<>(Primitive64Array.FACTORY);
+    public static final Factory<Quaternion> QUATERNION = new Factory<>(QuaternionArray.FACTORY);
+    public static final Factory<RationalNumber> RATIONAL = new Factory<>(RationalArray.FACTORY);
 
     /**
      * @deprecated v43 Use {@link #PRIMITIVE64} instead
@@ -105,7 +105,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     public static final Factory<Double> PRIMITIVE = PRIMITIVE64;
 
     public static <N extends Number> ArrayAnyD.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
-        return new ArrayAnyD.Factory<N>(denseArray);
+        return new ArrayAnyD.Factory<>(denseArray);
     }
 
     private final BasicArray<N> myDelegate;

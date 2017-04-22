@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2014 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -58,8 +58,8 @@ public class HypotTest {
     double b;
 
     @Benchmark
-    public Double testStrictMath() {
-        return StrictMath.hypot(a, b);
+    public Double testMath() {
+        return Math.hypot(a, b);
     }
 
     @Benchmark
@@ -68,8 +68,8 @@ public class HypotTest {
     }
 
     @Benchmark
-    public Double testMath() {
-        return Math.hypot(a, b);
+    public Double testStrictMath() {
+        return StrictMath.hypot(a, b);
     }
 
 }

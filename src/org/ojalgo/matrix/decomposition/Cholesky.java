@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -83,13 +83,13 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
     }
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
-    
+
         boolean retVal = false;
-    
+
         final MatrixStore<N> tmpL = decomposition.getL();
-    
+
         retVal = AccessUtils.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
-    
+
         return retVal;
     }
 

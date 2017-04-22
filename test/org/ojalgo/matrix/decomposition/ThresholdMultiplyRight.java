@@ -36,12 +36,12 @@ import org.openjdk.jmh.runner.RunnerException;
 
 /**
  * Mac Pro. 2015-06-24 => ?
- * 
+ *
  * <pre>
  * </pre>
- * 
+ *
  * MacBook Air. 2015-06-27 => 32
- * 
+ *
  * <pre>
 # Run complete. Total time: 00:01:25
 

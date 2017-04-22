@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         private final MatrixStore<N> myLeft;
         private final BinaryFunction<N> myOperator;
 
-        BinaryOperatorLeft(MatrixStore<N> left, BinaryFunction<N> operator, ElementsSupplier<N> right) {
+        BinaryOperatorLeft(final MatrixStore<N> left, final BinaryFunction<N> operator, final ElementsSupplier<N> right) {
             super(right);
             myLeft = left;
             myOperator = operator;
@@ -51,7 +51,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
         private final BinaryFunction<N> myOperator;
         private final MatrixStore<N> myRight;
 
-        BinaryOperatorRight(ElementsSupplier<N> left, BinaryFunction<N> operator, MatrixStore<N> right) {
+        BinaryOperatorRight(final ElementsSupplier<N> left, final BinaryFunction<N> operator, final MatrixStore<N> right) {
             super(left);
             myRight = right;
             myOperator = operator;
@@ -96,7 +96,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 
     static final class Transpose<N extends Number> extends MatrixPipeline<N> {
 
-        Transpose(ElementsSupplier<N> context) {
+        Transpose(final ElementsSupplier<N> context) {
             super(context);
         }
 
@@ -145,7 +145,7 @@ abstract class MatrixPipeline<N extends Number> implements ElementsSupplier<N> {
 
         private final UnaryFunction<N> myOperator;
 
-        UnaryOperator(ElementsSupplier<N> context, UnaryFunction<N> operator) {
+        UnaryOperator(final ElementsSupplier<N> context, final UnaryFunction<N> operator) {
             super(context);
             myOperator = operator;
         }

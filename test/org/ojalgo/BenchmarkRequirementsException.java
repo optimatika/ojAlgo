@@ -31,16 +31,16 @@ public class BenchmarkRequirementsException extends Exception {
         super(message);
     }
 
-    public BenchmarkRequirementsException(final Throwable cause) {
-        super(cause);
-    }
-
     public BenchmarkRequirementsException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
     public BenchmarkRequirementsException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public BenchmarkRequirementsException(final Throwable cause) {
+        super(cause);
     }
 
 }

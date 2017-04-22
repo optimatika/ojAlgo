@@ -56,6 +56,16 @@ public class Multiply {
     public BasicMatrix left;
     public BasicMatrix right;
 
+    @Benchmark
+    public double hypot() {
+        return Math.hypot(rows, columns);
+    };
+
+    @Benchmark
+    public BasicMatrix multiply() {
+        return left.multiply(right);
+    }
+
     @Setup
     public void setup() {
         BasicLogger.DEBUG.println();
@@ -65,15 +75,5 @@ public class Multiply {
         BasicLogger.DEBUG.println("columns: " + columns);
         left = PrimitiveMatrix.FACTORY.makeFilled(rows, complexity, new Normal());
         right = PrimitiveMatrix.FACTORY.makeFilled(complexity, columns, new Normal());
-    };
-
-    @Benchmark
-    public BasicMatrix multiply() {
-        return left.multiply(right);
-    }
-
-    @Benchmark
-    public double hypot() {
-        return Math.hypot(rows, columns);
     }
 }

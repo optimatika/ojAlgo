@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -135,7 +135,8 @@ public abstract class MatrixDecompositionTests extends FunctionalityTest {
     }
 
     public static final SingularValue<?>[] getSingularValueAll() {
-        return new SingularValue<?>[] { new SingularValueDecomposition.Big(), new SingularValueDecomposition.Complex(), new SingularValueDecomposition.Primitive(), new RawSingularValue() };
+        return new SingularValue<?>[] { new SingularValueDecomposition.Big(), new SingularValueDecomposition.Complex(),
+                new SingularValueDecomposition.Primitive(), new RawSingularValue() };
     }
 
     @SuppressWarnings("unchecked")

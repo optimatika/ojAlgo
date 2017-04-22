@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ public interface IndexMapper<T extends Comparable<? super T>> {
             super();
         }
 
-        public synchronized long toIndex(T key) {
+        public synchronized long toIndex(final T key) {
             long retVal = myKeys.indexOf(key);
             if (retVal < 0L) {
                 retVal = myKeys.size();
@@ -43,7 +43,7 @@ public interface IndexMapper<T extends Comparable<? super T>> {
             return retVal;
         }
 
-        public T toKey(long index) {
+        public T toKey(final long index) {
             return myKeys.get((int) index);
         }
 

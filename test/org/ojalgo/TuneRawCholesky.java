@@ -72,6 +72,15 @@ public class TuneRawCholesky {
     PrimitiveDenseStore matrix;
     double[][] rawInPlace;
 
+    @Setup
+    public void setup() {
+
+        final int dim1 = dim;
+        matrix = MatrixUtils.makeSPD(dim1);
+
+        rawInPlace = new double[dim][dim];
+    }
+
     /**
      * Copy-and-paste from the actual compute() implementation - change as little as possible
      */
@@ -174,15 +183,6 @@ public class TuneRawCholesky {
 
     private double[][] setRawInPlace(final PrimitiveDenseStore matrix2, final boolean transpose) {
         return rawInPlace;
-    }
-
-    @Setup
-    public void setup() {
-
-        final int dim1 = dim;
-        matrix = MatrixUtils.makeSPD(dim1);
-
-        rawInPlace = new double[dim][dim];
     }
 
 }

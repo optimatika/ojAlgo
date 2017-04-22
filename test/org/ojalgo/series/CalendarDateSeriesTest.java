@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,11 +48,11 @@ public class CalendarDateSeriesTest extends SeriesTests {
 
     public void testDoubleKeys() {
 
-        int dim = 1000;
+        final int dim = 1000;
         final Uniform tmpUniform = new Uniform(0, Double.MAX_VALUE);
 
-        double[] keys = new double[dim];
-        long[] indices = new long[dim];
+        final double[] keys = new double[dim];
+        final long[] indices = new long[dim];
 
         for (int i = 0; i < dim; i++) {
             keys[i] = tmpUniform.doubleValue();

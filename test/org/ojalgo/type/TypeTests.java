@@ -10,7 +10,7 @@ public abstract class TypeTests extends FunctionalityTest {
         super();
     }
 
-    protected TypeTests(String name) {
+    protected TypeTests(final String name) {
         super(name);
     }
 

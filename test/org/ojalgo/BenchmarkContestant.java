@@ -117,7 +117,7 @@ public abstract class BenchmarkContestant<T> {
 
     }
 
-    public static final Map<String, BenchmarkContestant<?>> CONTESTANTS = new HashMap<String, BenchmarkContestant<?>>();
+    public static final Map<String, BenchmarkContestant<?>> CONTESTANTS = new HashMap<>();
 
     static {
     }

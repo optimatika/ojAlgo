@@ -35,13 +35,6 @@ import org.openjdk.jmh.runner.RunnerException;
 @State(Scope.Benchmark)
 public class TuneAXPYorder {
 
-    public static void invokeBSI(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
-            final int first, final int limit) {
-        for (int i = first; i < limit; i++) {
-            y[basey + (incy * i)] += a * x[basex + (incx * i)]; // y += a*x
-        }
-    }
-
     public static void invokeBIS(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {
@@ -49,10 +42,10 @@ public class TuneAXPYorder {
         }
     }
 
-    public static void invokeSIB(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
+    public static void invokeBSI(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {
-            y[(incy * i) + basey] += a * x[(incx * i) + basex]; // y += a*x
+            y[basey + (incy * i)] += a * x[basex + (incx * i)]; // y += a*x
         }
     }
 
@@ -60,6 +53,13 @@ public class TuneAXPYorder {
             final int first, final int limit) {
         for (int i = first; i < limit; i++) {
             y[(i * incy) + basey] += a * x[(i * incx) + basex]; // y += a*x
+        }
+    }
+
+    public static void invokeSIB(final double[] y, final int basey, final int incy, final double a, final double[] x, final int basex, final int incx,
+            final int first, final int limit) {
+        for (int i = first; i < limit; i++) {
+            y[(incy * i) + basey] += a * x[(incx * i) + basex]; // y += a*x
         }
     }
 
@@ -72,6 +72,16 @@ public class TuneAXPYorder {
     int row;
     int col;
 
+    @Param({ "100", "200", "500", "1000" })
+    public int dim;
+
+    public double[] bis() {
+
+        TuneAXPYorder.invokeBIS(mat, row, dim, a, mat, dim * col, 1, 0, dim);
+
+        return mat;
+    }
+
     public double[] bsi() {
 
         TuneAXPYorder.invokeBSI(mat, row, dim, a, mat, dim * col, 1, 0, dim);
@@ -79,9 +89,9 @@ public class TuneAXPYorder {
         return mat;
     }
 
-    public double[] bis() {
+    public double[] isb() {
 
-        TuneAXPYorder.invokeBIS(mat, row, dim, a, mat, dim * col, 1, 0, dim);
+        TuneAXPYorder.invokeISB(mat, row, dim, a, mat, dim * col, 1, 0, dim);
 
         return mat;
     }
@@ -114,23 +124,6 @@ public class TuneAXPYorder {
         return retVal;
     }
 
-    public double[] sib() {
-
-        TuneAXPYorder.invokeSIB(mat, row, dim, a, mat, dim * col, 1, 0, dim);
-
-        return mat;
-    }
-
-    public double[] isb() {
-
-        TuneAXPYorder.invokeISB(mat, row, dim, a, mat, dim * col, 1, 0, dim);
-
-        return mat;
-    }
-
-    @Param({ "100", "200", "500", "1000" })
-    public int dim;
-
     @Setup
     public void setup() {
 
@@ -146,6 +139,13 @@ public class TuneAXPYorder {
         row = Uniform.randomInteger(dim);
         col = Uniform.randomInteger(dim);
 
+    }
+
+    public double[] sib() {
+
+        TuneAXPYorder.invokeSIB(mat, row, dim, a, mat, dim * col, 1, 0, dim);
+
+        return mat;
     }
 
 }

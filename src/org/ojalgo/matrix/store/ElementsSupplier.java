@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,22 +48,22 @@ public interface ElementsSupplier<N extends Number> extends Stream2D<N, MatrixSt
     }
 
     default ElementsSupplier<N> operateOnAll(final UnaryFunction<N> operator) {
-        return new MatrixPipeline.UnaryOperator<N>(this, operator);
+        return new MatrixPipeline.UnaryOperator<>(this, operator);
     }
 
     default ElementsSupplier<N> operateOnMatching(final BinaryFunction<N> operator, final MatrixStore<N> right) {
-        return new MatrixPipeline.BinaryOperatorRight<N>(this, operator, right);
+        return new MatrixPipeline.BinaryOperatorRight<>(this, operator, right);
 
     }
 
     default ElementsSupplier<N> operateOnMatching(final MatrixStore<N> left, final BinaryFunction<N> operator) {
-        return new MatrixPipeline.BinaryOperatorLeft<N>(left, operator, this);
+        return new MatrixPipeline.BinaryOperatorLeft<>(left, operator, this);
     }
 
     PhysicalStore.Factory<N, ?> physical();
 
     default ElementsSupplier<N> transpose() {
-        return new MatrixPipeline.Transpose<N>(this);
+        return new MatrixPipeline.Transpose<>(this);
     }
 
 }

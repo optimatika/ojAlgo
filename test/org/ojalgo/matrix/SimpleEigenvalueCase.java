@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@ package org.ojalgo.matrix;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.type.context.NumberContext;
 
@@ -72,7 +71,7 @@ public class SimpleEigenvalueCase extends BasicMatrixTest {
     public void testProblem() {
 
         final Eigenvalue<Double> tmpEigen = Eigenvalue.PRIMITIVE.make();
-        tmpEigen.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
+        tmpEigen.decompose(PrimitiveDenseStore.FACTORY.copy(SimpleEigenvalueCase.getOriginal()));
 
         final MatrixStore<Double> tmpV = tmpEigen.getV();
         final MatrixStore<Double> tmpD = tmpEigen.getD();

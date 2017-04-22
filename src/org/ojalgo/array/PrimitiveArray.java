@@ -39,13 +39,8 @@ public abstract class PrimitiveArray extends PlainArray<Double> implements Mutat
     public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<Double>() {
 
         @Override
-        long getElementSize() {
-            return Primitive64Array.FACTORY.getElementSize();
-        }
-
-        @Override
-        DenseArray<Double> make(final long size) {
-            return Primitive64Array.FACTORY.make(size);
+        public AggregatorSet<Double> aggregator() {
+            return PrimitiveAggregator.getSet();
         }
 
         @Override
@@ -54,13 +49,18 @@ public abstract class PrimitiveArray extends PlainArray<Double> implements Mutat
         }
 
         @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
         }
 
         @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
+        long getElementSize() {
+            return Primitive64Array.FACTORY.getElementSize();
+        }
+
+        @Override
+        DenseArray<Double> make(final long size) {
+            return Primitive64Array.FACTORY.make(size);
         }
 
     };

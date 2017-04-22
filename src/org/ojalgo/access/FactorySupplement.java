@@ -27,9 +27,9 @@ import org.ojalgo.scalar.Scalar;
 
 interface FactorySupplement {
 
-    FunctionSet<?> function();
-
     AggregatorSet<?> aggregator();
+
+    FunctionSet<?> function();
 
     Scalar.Factory<?> scalar();
 

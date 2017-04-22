@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,9 @@ public class DirectCleanupTest {
 
             final DenseArray<Double> tmpCopy = BufferArray.DIRECT64.makeZero(SIZE);
 
-            long start = System.nanoTime();
+            final long start = System.nanoTime();
             tmpCopy.fillMatching(tmpOrg);
-            long stop = System.nanoTime();
+            final long stop = System.nanoTime();
 
             tmpOrg = tmpCopy;
 
@@ -52,7 +52,7 @@ public class DirectCleanupTest {
             try {
                 TimeUnit.SECONDS.sleep(1);
                 System.gc();
-            } catch (InterruptedException exception) {
+            } catch (final InterruptedException exception) {
                 exception.printStackTrace();
             }
         }

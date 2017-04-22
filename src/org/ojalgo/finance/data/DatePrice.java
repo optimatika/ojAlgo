@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ public abstract class DatePrice implements KeyValue<CalendarDate, Double> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -74,7 +74,7 @@ public abstract class DatePrice implements KeyValue<CalendarDate, Double> {
         if (!(obj instanceof DatePrice)) {
             return false;
         }
-        DatePrice other = (DatePrice) obj;
+        final DatePrice other = (DatePrice) obj;
         if (key == null) {
             if (other.key != null) {
                 return false;

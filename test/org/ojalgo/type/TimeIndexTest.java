@@ -35,7 +35,7 @@ public class TimeIndexTest extends TypeTests {
 
         TestUtils.assertEquals(implementation, expected, actual);
 
-        for (CalendarDateUnit resolution : CalendarDateUnit.values()) {
+        for (final CalendarDateUnit resolution : CalendarDateUnit.values()) {
 
         }
 

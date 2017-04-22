@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.SingularValue;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.type.CalendarDateUnit;
@@ -56,7 +55,7 @@ public class FinanceUtilsTest extends FinanceTests {
         final PrimitiveMatrix tmpVolatilities = FinanceUtils.toVolatilities(tmpOriginal, true);
         final PrimitiveMatrix tmpCovariances = FinanceUtils.toCovariances(tmpVolatilities, tmpCorrelations);
 
-        tmpSVD.decompose((PhysicalStore<Double>) PrimitiveDenseStore.FACTORY.copy(tmpCovariances));
+        tmpSVD.decompose(PrimitiveDenseStore.FACTORY.copy(tmpCovariances));
         final double tmpNewCond = tmpSVD.getCondition();
         final int tmpNewRank = tmpSVD.getRank();
         final double tmpNewNorm = tmpSVD.getFrobeniusNorm();

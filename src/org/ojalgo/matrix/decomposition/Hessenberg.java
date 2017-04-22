@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -69,13 +69,13 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
     }
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Hessenberg<N> decomposition, final NumberContext context) {
-    
+
         final MatrixStore<N> tmpH = decomposition.getH();
         final MatrixStore<N> tmpQ = decomposition.getQ();
-    
+
         final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
         final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpH);
-    
+
         return AccessUtils.equals(tmpStore1, tmpStore2, context);
     }
 

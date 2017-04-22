@@ -54,6 +54,28 @@ public class MultLeftRight {
     PrimitiveDenseStore.PrimitiveMultiplyNeither MN;
     PrimitiveDenseStore.PrimitiveMultiplyBoth MB;
 
+    @Benchmark
+    public PrimitiveDenseStore multiplyLeftFixed() {
+        ML.invoke(product.data, left, complexity, right.data);
+        return product;
+    };
+
+    @Benchmark
+    public PrimitiveDenseStore multiplyLeftStandard() {
+        MultiplyLeft.invoke(product.data, 0, complexity, left, complexity, right.data);
+        return product;
+    }
+
+    public PrimitiveDenseStore multiplyRightFixed() {
+        MR.invoke(product.data, left.data, complexity, right);
+        return product;
+    }
+
+    public PrimitiveDenseStore multiplyRightStandard() {
+        MultiplyRight.invoke(product.data, 0, complexity, left.data, complexity, right);
+        return product;
+    }
+
     @Setup
     public void setup() {
         left = PrimitiveDenseStore.FACTORY.makeFilled(complexity, complexity, new Normal());
@@ -63,27 +85,5 @@ public class MultLeftRight {
         MR = MultiplyRight.getPrimitive(complexity, complexity);
         MN = MultiplyNeither.getPrimitive(complexity, complexity);
         MB = MultiplyBoth.getPrimitive(complexity, complexity);
-    };
-
-    @Benchmark
-    public PrimitiveDenseStore multiplyLeftStandard() {
-        MultiplyLeft.invoke(product.data, 0, complexity, left, complexity, right.data);
-        return product;
-    }
-
-    public PrimitiveDenseStore multiplyRightStandard() {
-        MultiplyRight.invoke(product.data, 0, complexity, left.data, complexity, right);
-        return product;
-    }
-
-    @Benchmark
-    public PrimitiveDenseStore multiplyLeftFixed() {
-        ML.invoke(product.data, left, complexity, right.data);
-        return product;
-    }
-
-    public PrimitiveDenseStore multiplyRightFixed() {
-        MR.invoke(product.data, left.data, complexity, right);
-        return product;
     }
 }

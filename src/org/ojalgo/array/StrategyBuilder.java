@@ -11,7 +11,7 @@ abstract class StrategyBuilder<N extends Number, I extends Access1D<N>, SB exten
 
         super();
 
-        myStrategy = new DenseStrategy<N>(denseFactory);
+        myStrategy = new DenseStrategy<>(denseFactory);
     }
 
     /**
@@ -48,10 +48,10 @@ abstract class StrategyBuilder<N extends Number, I extends Access1D<N>, SB exten
         return (SB) this;
     }
 
+    public abstract I make();
+
     DenseStrategy<N> getStrategy() {
         return myStrategy;
     }
-
-    public abstract I make();
 
 }

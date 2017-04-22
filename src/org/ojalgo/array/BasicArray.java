@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 package org.ojalgo.array;
 
 import java.io.Serializable;
+
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
@@ -58,7 +59,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
         private final DenseArray.Factory<N> myDenseFactory;
 
-        Factory(org.ojalgo.array.DenseArray.Factory<N> denseFactory) {
+        Factory(final org.ojalgo.array.DenseArray.Factory<N> denseFactory) {
             super();
             myDenseFactory = denseFactory;
         }
@@ -131,7 +132,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
     }
 
     public static <N extends Number> BasicArray.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
-        return new BasicArray.Factory<N>(denseFactory);
+        return new BasicArray.Factory<>(denseFactory);
     }
 
     protected BasicArray() {

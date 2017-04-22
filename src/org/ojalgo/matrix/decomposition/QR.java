@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -81,12 +81,12 @@ public interface QR<N extends Number>
     }
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
-    
+
         final MatrixStore<N> tmpQ = decomposition.getQ();
         final MatrixStore<N> tmpR = decomposition.getR();
-    
+
         final MatrixStore<N> tmpStore = tmpQ.multiply(tmpR);
-    
+
         return AccessUtils.equals(tmpStore, matrix, context);
     }
 

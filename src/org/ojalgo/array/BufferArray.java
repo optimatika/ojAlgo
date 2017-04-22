@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -112,6 +112,21 @@ public abstract class BufferArray extends PlainArray<Double> {
     public static final DenseArray.Factory<Double> DIRECT32 = new DenseArray.Factory<Double>() {
 
         @Override
+        public AggregatorSet<Double> aggregator() {
+            return PrimitiveAggregator.getSet();
+        }
+
+        @Override
+        public FunctionSet<Double> function() {
+            return PrimitiveFunction.getSet();
+        }
+
+        @Override
+        public Scalar.Factory<Double> scalar() {
+            return PrimitiveScalar.FACTORY;
+        }
+
+        @Override
         long getCapacityLimit() {
             return MAX_ARRAY_SIZE / FLOAT_ELEMENT_SIZE;
         }
@@ -128,10 +143,9 @@ public abstract class BufferArray extends PlainArray<Double> {
             return new FloatBufferArray(tmpAllocateDirect.asFloatBuffer(), null);
         }
 
-        @Override
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
+    };
+
+    public static final DenseArray.Factory<Double> DIRECT64 = new DenseArray.Factory<Double>() {
 
         @Override
         public AggregatorSet<Double> aggregator() {
@@ -139,13 +153,14 @@ public abstract class BufferArray extends PlainArray<Double> {
         }
 
         @Override
+        public FunctionSet<Double> function() {
+            return PrimitiveFunction.getSet();
+        }
+
+        @Override
         public Scalar.Factory<Double> scalar() {
             return PrimitiveScalar.FACTORY;
         }
-
-    };
-
-    public static final DenseArray.Factory<Double> DIRECT64 = new DenseArray.Factory<Double>() {
 
         @Override
         long getCapacityLimit() {
@@ -162,21 +177,6 @@ public abstract class BufferArray extends PlainArray<Double> {
             final int tmpSize = (int) size;
             final ByteBuffer tmpAllocateDirect = ByteBuffer.allocateDirect(tmpSize * 8);
             return new DoubleBufferArray(tmpAllocateDirect.asDoubleBuffer(), null);
-        }
-
-        @Override
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
-        @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
-        }
-
-        @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
         }
 
     };
@@ -229,6 +229,21 @@ public abstract class BufferArray extends PlainArray<Double> {
                     long offset = 0L;
 
                     @Override
+                    public AggregatorSet<Double> aggregator() {
+                        return PrimitiveAggregator.getSet();
+                    }
+
+                    @Override
+                    public FunctionSet<Double> function() {
+                        return PrimitiveFunction.getSet();
+                    }
+
+                    @Override
+                    public Scalar.Factory<Double> scalar() {
+                        return PrimitiveScalar.FACTORY;
+                    }
+
+                    @Override
                     long getElementSize() {
                         return DOUBLE_ELEMENT_SIZE;
                     }
@@ -247,21 +262,6 @@ public abstract class BufferArray extends PlainArray<Double> {
                         } finally {
                             offset += tmpSize2;
                         }
-                    }
-
-                    @Override
-                    public FunctionSet<Double> function() {
-                        return PrimitiveFunction.getSet();
-                    }
-
-                    @Override
-                    public AggregatorSet<Double> aggregator() {
-                        return PrimitiveAggregator.getSet();
-                    }
-
-                    @Override
-                    public Scalar.Factory<Double> scalar() {
-                        return PrimitiveScalar.FACTORY;
                     }
 
                 };

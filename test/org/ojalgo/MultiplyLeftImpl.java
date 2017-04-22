@@ -271,14 +271,14 @@ public class MultiplyLeftImpl {
     public int rows;
 
     @Benchmark
-    public PrimitiveDenseStore defined() {
-        MultiplyLeftImpl.invoke1(product.data, 0, rows, left, complexity, right.data);
+    public PrimitiveDenseStore changed() {
+        MultiplyLeftImpl.invoke2(product.data, 0, rows, left, complexity, right.data);
         return product;
     };
 
     @Benchmark
-    public PrimitiveDenseStore changed() {
-        MultiplyLeftImpl.invoke2(product.data, 0, rows, left, complexity, right.data);
+    public PrimitiveDenseStore defined() {
+        MultiplyLeftImpl.invoke1(product.data, 0, rows, left, complexity, right.data);
         return product;
     };
 

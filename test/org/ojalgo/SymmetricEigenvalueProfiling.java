@@ -27,10 +27,6 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public class SymmetricEigenvalueProfiling {
 
-    public SymmetricEigenvalueProfiling() {
-        super();
-    }
-
     public static void main(final String[] args) {
 
         final PrimitiveDenseStore tmpOrg = MatrixUtils.makeSPD(200);
@@ -41,6 +37,10 @@ public class SymmetricEigenvalueProfiling {
             tmpEvD.decompose(tmpOrg);
         }
 
+    }
+
+    public SymmetricEigenvalueProfiling() {
+        super();
     }
 
 }

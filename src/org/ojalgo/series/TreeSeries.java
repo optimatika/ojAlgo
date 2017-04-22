@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2016 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika (www.optimatika.se)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,6 +53,19 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I e
 
     protected TreeSeries(final SortedMap<K, ? extends N> sortedMap) {
         super(sortedMap);
+    }
+
+    public PrimitiveSeries asPrimitive() {
+
+        final double[] retVal = new double[this.size()];
+
+        int i = 0;
+        for (final N tmpValue : this.values()) {
+            retVal[i] = tmpValue.doubleValue();
+            i++;
+        }
+
+        return DataSeries.wrap(retVal);
     }
 
     @SuppressWarnings("unchecked")
@@ -139,19 +152,6 @@ abstract class TreeSeries<K extends Comparable<? super K>, N extends Number, I e
         }
 
         return retVal;
-    }
-
-    public PrimitiveSeries asPrimitive() {
-
-        final double[] retVal = new double[this.size()];
-
-        int i = 0;
-        for (final N tmpValue : this.values()) {
-            retVal[i] = tmpValue.doubleValue();
-            i++;
-        }
-
-        return DataSeries.wrap(retVal);
     }
 
 }

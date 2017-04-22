@@ -29,12 +29,12 @@ import org.ojalgo.scalar.Scalar;
 
 public interface Tensor<N extends Number> extends AccessAnyD<N>, NormedVectorSpace<Tensor<N>, N> {
 
-    static <N extends Number & Scalar<N>> Tensor<N> make(DenseArray.Factory<N> arrayFactory, final int rank, final int dimensions) {
-        return new AnyTensor<N>(rank, dimensions, arrayFactory);
+    static <N extends Number & Scalar<N>> Tensor<N> make(final DenseArray.Factory<N> arrayFactory, final int rank, final int dimensions) {
+        return new AnyTensor<>(rank, dimensions, arrayFactory);
     }
 
     static Tensor<Double> makePrimitive(final int rank, final int dimensions) {
-        return new AnyTensor<Double>(rank, dimensions, Primitive64Array.FACTORY);
+        return new AnyTensor<>(rank, dimensions, Primitive64Array.FACTORY);
     }
 
     default long count(final int dimension) {
