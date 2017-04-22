@@ -115,7 +115,7 @@
         <jmh.version>1.18</jmh.version>
     </properties>
     <groupId>org.ojalgo</groupId>
-    <version>43-SNAPSHOT</version>
+    <version>43.0</version>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
