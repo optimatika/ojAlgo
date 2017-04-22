@@ -16,7 +16,7 @@ ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/
 <dependency>
     <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
-    <version>42.0.0</version>
+    <version>43.0</version>
 </dependency>
 ```
 
@@ -31,4 +31,4 @@ You can ofcourse also use something like [stack overflow](http://stackoverflow.c
 
 ## Contributions
 
-Feel free to contribute any way you want. One very good way to contribute is to supply test cases that verify that the functionality you use works as expected. The ojAlgo code base is often refactored. Test cases specific to your use case can be very beneficial (for you) in assuring future releases.
+Feel free to contribute any way you want. One very good way to contribute is to supply test cases that verify that the functionality you use works as expected. The ojAlgo code base is often refactored. Having tests specific to your use case can be very beneficial (for you) in assuring future releases.
