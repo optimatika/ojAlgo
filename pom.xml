@@ -3,21 +3,26 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
     xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
+    <groupId>org.ojalgo</groupId>
     <artifactId>ojalgo</artifactId>
+    <version>44-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>oj! Algorithms</name>
-    <organization>
-        <url>http://optimatika.se/</url>
-        <name>Optimatika</name>
-    </organization>
-    <url>http://ojalgo.org/</url>
+    <name>ojAlgo</name>
+    <url>http://ojalgo.org</url>
     <description>oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.</description>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <organization>
+        <name>Optimatika</name>
+        <url>http://optimatika.se</url>
+    </organization>
     <developers>
         <developer>
             <name>Anders Peterson</name>
             <email>apete@optimatika.se</email>
             <organization>Optimatika</organization>
-            <organizationUrl>http://optimatika.se/</organizationUrl>
+            <organizationUrl>http://optimatika.se</organizationUrl>
         </developer>
     </developers>
     <licenses>
@@ -36,9 +41,12 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+    <issueManagement>
+        <url>https://github.com/optimatika/ojAlgo/issues</url>
+        <system>GitHub</system>
+    </issueManagement>
     <scm>
-        <connection>scm:cvs:pserver:anonymous@ojalgo.cvs.sourceforge.net:/cvsroot/ojalgo co -P DevProj</connection>
-        <url>http://ojalgo.cvs.sourceforge.net/viewvc/ojalgo/DevProj/</url>
+        <url>https://github.com/optimatika/ojAlgo</url>
     </scm>
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -50,6 +58,18 @@
                     <compilerVersion>1.8</compilerVersion>
                     <source>1.8</source>
                     <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
             <plugin>
@@ -108,31 +128,23 @@
             </plugin>
         </plugins>
     </build>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>4.12</junit.version>
-        <mockito.version>2.7.0</mockito.version>
-        <jmh.version>1.18</jmh.version>
-    </properties>
-    <groupId>org.ojalgo</groupId>
-    <version>44-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
+            <version>2.7.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-generator-annprocess</artifactId>
-            <version>${jmh.version}</version>
+            <version>1.18</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
