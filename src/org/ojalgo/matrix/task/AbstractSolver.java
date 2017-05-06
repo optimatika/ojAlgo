@@ -435,10 +435,12 @@ abstract class AbstractSolver implements SolverTask<Double> {
         final PrimitiveDenseStore tmpTranspBody = PrimitiveDenseStore.FACTORY.transpose(body);
 
         final int tmpCountRows = (int) tmpTranspBody.countRows();
-        final PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.makeZero(tmpCountRows, tmpCountRows);
 
-        tmpBody.fillByMultiplying(tmpTranspBody, (Access1D<Double>) body);
-        final MatrixStore<Double> tmpRHS = tmpTranspBody.multiply((MatrixStore<Double>) rhs);
+        final PrimitiveDenseStore tmpBody = PrimitiveDenseStore.FACTORY.makeZero(tmpCountRows, tmpCountRows);
+        tmpTranspBody.multiply(tmpTranspBody.transpose(), tmpBody);
+
+        final PrimitiveDenseStore tmpRHS = PrimitiveDenseStore.FACTORY.makeZero(tmpCountRows, solution.countColumns());
+        tmpTranspBody.multiply((Access1D<Double>) rhs, tmpRHS);
 
         switch (tmpCountRows) {
         case 1:

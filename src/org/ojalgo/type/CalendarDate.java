@@ -33,6 +33,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
+import org.ojalgo.RecoverableCondition;
+
 /**
  * <p>
  * Originally, long before Java 8 and its new Date and Time API, this class was designed to provide an
@@ -213,21 +215,26 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
         millis = timeInMillis;
     }
 
-    public CalendarDate(final String anSqlString) {
+    /**
+     * @param sqlString The String to parse
+     * @throws RecoverableCondition When(if parsing the String fails
+     */
+    public CalendarDate(final String sqlString) throws RecoverableCondition {
 
         super();
 
-        final boolean tmpDatePart = anSqlString.indexOf('-') >= 0;
-        final boolean tmpTimePart = anSqlString.indexOf(':') >= 0;
+        final boolean tmpDatePart = sqlString.indexOf('-') >= 0;
+        final boolean tmpTimePart = sqlString.indexOf(':') >= 0;
 
         if (tmpDatePart && tmpTimePart) {
-            millis = StandardType.SQL_DATETIME.parse(anSqlString).getTime();
+            millis = StandardType.SQL_DATETIME.parse(sqlString).getTime();
         } else if (tmpDatePart && !tmpTimePart) {
-            millis = StandardType.SQL_DATE.parse(anSqlString).getTime();
+            millis = StandardType.SQL_DATE.parse(sqlString).getTime();
         } else if (!tmpDatePart && tmpTimePart) {
-            millis = StandardType.SQL_TIME.parse(anSqlString).getTime();
+            millis = StandardType.SQL_TIME.parse(sqlString).getTime();
         } else {
-            millis = 0L;
+            millis = Long.MIN_VALUE;
+            throw new RecoverableCondition("Failed to parse string to CalendarDate!");
         }
     }
 

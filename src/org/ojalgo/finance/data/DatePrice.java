@@ -24,6 +24,7 @@ package org.ojalgo.finance.data;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.keyvalue.KeyValue;
 
@@ -52,7 +53,7 @@ public abstract class DatePrice implements KeyValue<CalendarDate, Double> {
         key = new CalendarDate(millis);
     }
 
-    protected DatePrice(final String sqlString) {
+    protected DatePrice(final String sqlString) throws RecoverableCondition {
 
         super();
 

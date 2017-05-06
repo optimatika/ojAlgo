@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.function.Consumer;
 
+import org.ojalgo.RecoverableCondition;
+
 abstract class AbstractParser<T> implements BasicParser<T> {
 
     private transient BufferedReader myBufferedReader = null;
@@ -30,7 +32,7 @@ abstract class AbstractParser<T> implements BasicParser<T> {
         }
     }
 
-    public final T parse(final String line) {
+    public final T parse(final String line) throws RecoverableCondition {
         return this.parse(line, myBufferedReader);
     }
 

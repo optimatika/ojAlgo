@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.GenericContext;
@@ -53,7 +54,7 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
             super(millis);
         }
 
-        protected Data(final String sqlString) {
+        protected Data(final String sqlString) throws RecoverableCondition {
             super(sqlString);
         }
 
@@ -100,7 +101,7 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
     }
 
     @Override
-    public GoogleSymbol.Data parse(final String line) {
+    public GoogleSymbol.Data parse(final String line) throws RecoverableCondition {
 
         Data retVal = null;
 

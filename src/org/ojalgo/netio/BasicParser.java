@@ -31,6 +31,8 @@ import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
+import org.ojalgo.RecoverableCondition;
+
 public interface BasicParser<T> {
 
     /**
@@ -39,7 +41,7 @@ public interface BasicParser<T> {
      * @param line The text line to parse
      * @return An object containing (referencing) the parsed data
      */
-    public abstract T parse(String line);
+    public abstract T parse(String line) throws RecoverableCondition;
 
     /**
      * Will parse this file, line by line, passing the reulting objects (1 per line) to the supplied consumer.
@@ -79,8 +81,12 @@ public interface BasicParser<T> {
         T tmpItem = null;
         try (final BufferedReader tmpBufferedReader = new BufferedReader(reader)) {
             while ((tmpLine = tmpBufferedReader.readLine()) != null) {
-                if ((tmpLine.length() > 0) && !tmpLine.startsWith("#") && ((tmpItem = this.parse(tmpLine)) != null)) {
-                    consumer.accept(tmpItem);
+                try {
+                    if ((tmpLine.length() > 0) && !tmpLine.startsWith("#") && ((tmpItem = this.parse(tmpLine)) != null)) {
+                        consumer.accept(tmpItem);
+                    }
+                } catch (final RecoverableCondition xcptn) {
+                    // Skip this line and try the next
                 }
             }
         } catch (final IOException exception) {

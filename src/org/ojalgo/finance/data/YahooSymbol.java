@@ -24,6 +24,7 @@ package org.ojalgo.finance.data;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.type.CalendarDateUnit;
 
@@ -55,7 +56,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
             super(millis);
         }
 
-        protected Data(final String sqlString) {
+        protected Data(final String sqlString) throws RecoverableCondition {
             super(sqlString);
         }
 
@@ -102,7 +103,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
     }
 
     @Override
-    public YahooSymbol.Data parse(final String line) {
+    public YahooSymbol.Data parse(final String line) throws RecoverableCondition {
 
         Data retVal = null;
 

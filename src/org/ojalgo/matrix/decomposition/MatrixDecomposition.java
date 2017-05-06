@@ -246,7 +246,7 @@ public interface MatrixDecomposition<N extends Number> {
 
     /**
      * @return true if computation has been attemped; false if not.
-     * @see #decompose(Access2D.Collectable<N, ? super PhysicalStore<N>>)
+     * @see #decompose(Access2D.Collectable)
      */
     boolean isComputed();
 
