@@ -112,34 +112,34 @@ public class CalendarDateSeriesTest extends SeriesTests {
         TestUtils.assertEquals("Century Series Last Value", tmpLastPrice, tmpCenturySeries.lastValue(), 1E-14 / PrimitiveMath.THREE);
         TestUtils.assertEquals("Millenium Series Last Value", tmpLastPrice, tmpMilleniumSeries.lastValue(), 1E-14 / PrimitiveMath.THREE);
 
-        TestUtils.assertEquals(tmpMilleniumSeries, tmpCenturySeries.resample(CalendarDateUnit.MILLENIUM));
-        TestUtils.assertEquals(tmpMilleniumSeries, tmpDecadeSeries.resample(CalendarDateUnit.MILLENIUM));
-        TestUtils.assertEquals(tmpMilleniumSeries, tmpYearSeries.resample(CalendarDateUnit.MILLENIUM));
-        TestUtils.assertEquals(tmpMilleniumSeries, tmpQuarterSeries.resample(CalendarDateUnit.MILLENIUM));
-        TestUtils.assertEquals(tmpMilleniumSeries, tmpMonthSeries.resample(CalendarDateUnit.MILLENIUM));
-        TestUtils.assertEquals(tmpMilleniumSeries, tmpDaySeries.resample(CalendarDateUnit.MILLENIUM));
+        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpCenturySeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
+        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpDecadeSeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
+        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpYearSeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
+        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpQuarterSeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
+        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpMonthSeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
+        TestUtils.assertEquals(tmpMilleniumSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.MILLENIUM).asPrimitive());
 
-        TestUtils.assertEquals(tmpCenturySeries, tmpDecadeSeries.resample(CalendarDateUnit.CENTURY));
-        TestUtils.assertEquals(tmpCenturySeries, tmpYearSeries.resample(CalendarDateUnit.CENTURY));
-        TestUtils.assertEquals(tmpCenturySeries, tmpQuarterSeries.resample(CalendarDateUnit.CENTURY));
-        TestUtils.assertEquals(tmpCenturySeries, tmpMonthSeries.resample(CalendarDateUnit.CENTURY));
-        TestUtils.assertEquals(tmpCenturySeries, tmpDaySeries.resample(CalendarDateUnit.CENTURY));
+        TestUtils.assertEquals(tmpCenturySeries.asPrimitive(), tmpDecadeSeries.resample(CalendarDateUnit.CENTURY).asPrimitive());
+        TestUtils.assertEquals(tmpCenturySeries.asPrimitive(), tmpYearSeries.resample(CalendarDateUnit.CENTURY).asPrimitive());
+        TestUtils.assertEquals(tmpCenturySeries.asPrimitive(), tmpQuarterSeries.resample(CalendarDateUnit.CENTURY).asPrimitive());
+        TestUtils.assertEquals(tmpCenturySeries.asPrimitive(), tmpMonthSeries.resample(CalendarDateUnit.CENTURY).asPrimitive());
+        TestUtils.assertEquals(tmpCenturySeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.CENTURY).asPrimitive());
 
-        TestUtils.assertEquals(tmpDecadeSeries, tmpYearSeries.resample(CalendarDateUnit.DECADE));
-        TestUtils.assertEquals(tmpDecadeSeries, tmpQuarterSeries.resample(CalendarDateUnit.DECADE));
-        TestUtils.assertEquals(tmpDecadeSeries, tmpMonthSeries.resample(CalendarDateUnit.DECADE));
-        TestUtils.assertEquals(tmpDecadeSeries, tmpDaySeries.resample(CalendarDateUnit.DECADE));
+        TestUtils.assertEquals(tmpDecadeSeries.asPrimitive(), tmpYearSeries.resample(CalendarDateUnit.DECADE).asPrimitive());
+        TestUtils.assertEquals(tmpDecadeSeries.asPrimitive(), tmpQuarterSeries.resample(CalendarDateUnit.DECADE).asPrimitive());
+        TestUtils.assertEquals(tmpDecadeSeries.asPrimitive(), tmpMonthSeries.resample(CalendarDateUnit.DECADE).asPrimitive());
+        TestUtils.assertEquals(tmpDecadeSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.DECADE).asPrimitive());
 
-        TestUtils.assertEquals(tmpYearSeries, tmpQuarterSeries.resample(CalendarDateUnit.YEAR));
-        TestUtils.assertEquals(tmpYearSeries, tmpMonthSeries.resample(CalendarDateUnit.YEAR));
-        TestUtils.assertEquals(tmpYearSeries, tmpDaySeries.resample(CalendarDateUnit.YEAR));
+        TestUtils.assertEquals(tmpYearSeries.asPrimitive(), tmpQuarterSeries.resample(CalendarDateUnit.YEAR).asPrimitive());
+        TestUtils.assertEquals(tmpYearSeries.asPrimitive(), tmpMonthSeries.resample(CalendarDateUnit.YEAR).asPrimitive());
+        TestUtils.assertEquals(tmpYearSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.YEAR).asPrimitive());
 
-        TestUtils.assertEquals(tmpQuarterSeries, tmpMonthSeries.resample(CalendarDateUnit.QUARTER));
-        TestUtils.assertEquals(tmpQuarterSeries, tmpDaySeries.resample(CalendarDateUnit.QUARTER));
+        TestUtils.assertEquals(tmpQuarterSeries.asPrimitive(), tmpMonthSeries.resample(CalendarDateUnit.QUARTER).asPrimitive());
+        TestUtils.assertEquals(tmpQuarterSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.QUARTER).asPrimitive());
 
-        TestUtils.assertEquals(tmpMonthSeries, tmpDaySeries.resample(CalendarDateUnit.MONTH));
+        TestUtils.assertEquals(tmpMonthSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.MONTH).asPrimitive());
 
-        TestUtils.assertEquals(tmpWeekSeries, tmpDaySeries.resample(CalendarDateUnit.WEEK));
+        TestUtils.assertEquals(tmpWeekSeries.asPrimitive(), tmpDaySeries.resample(CalendarDateUnit.WEEK).asPrimitive());
     }
 
 }

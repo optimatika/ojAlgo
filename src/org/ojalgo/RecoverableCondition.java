@@ -21,21 +21,47 @@
  */
 package org.ojalgo;
 
+import org.ojalgo.type.TypeUtils;
+
 /**
  * Something that potentially could go wrong, actually did go wrong. The API user is expected to recover and
  * continue execution. Is always declared to be thrown, and must be caught.
  *
  * @author apete
  */
-public class RecoverableCondition extends Exception {
+public final class RecoverableCondition extends Exception implements EffectiveThrowable {
 
-    public RecoverableCondition(final String description) {
-        super(description);
+    public static RecoverableCondition newEquationSystemNotSolvable() {
+        return new RecoverableCondition("Equation System Not Solvable!");
     }
 
-    @SuppressWarnings("unused")
-    private RecoverableCondition() {
+    public static RecoverableCondition newFailedToParseString(final String stringToParse, final Class<?> classToInstantiate) {
+        return new RecoverableCondition(TypeUtils.format("Failed to parse \"{}\" to a {}!", String.valueOf(stringToParse),
+                classToInstantiate != null ? classToInstantiate.getName() : "unspecified type"));
+    }
+
+    public static RecoverableCondition newMatrixNotInvertible() {
+        return new RecoverableCondition("Matrix Not Invertible!");
+    }
+
+    RecoverableCondition() {
         super();
+    }
+
+    RecoverableCondition(final String message) {
+        super(message);
+    }
+
+    RecoverableCondition(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    RecoverableCondition(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    RecoverableCondition(final Throwable cause) {
+        super(cause);
     }
 
     @Override
@@ -44,4 +70,5 @@ public class RecoverableCondition extends Exception {
         final String tmpMessage = this.getLocalizedMessage();
         return (tmpMessage != null) ? (retVal + ": " + tmpMessage) : retVal;
     }
+
 }

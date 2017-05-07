@@ -23,6 +23,7 @@ package org.ojalgo.matrix.task;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.BasicMatrix;
@@ -127,10 +128,11 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     /**
      * The output must be a "right inverse" and a "generalised inverse".
+     * @throws RecoverableCondition TODO
      *
      * @see BasicMatrix#invert()
      */
-    default MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
+    default MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
         return this.invert(original, this.preallocate(original));
     }
 
@@ -149,8 +151,9 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
      * @param preallocated Preallocated memory for the results, possibly some intermediate results. You must
      *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
      * @return The inverse
+     * @throws RecoverableCondition TODO
      */
-    MatrixStore<N> invert(Access2D<?> original, PhysicalStore<N> preallocated) throws TaskException;
+    MatrixStore<N> invert(Access2D<?> original, PhysicalStore<N> preallocated) throws RecoverableCondition;
 
     /**
      * <p>

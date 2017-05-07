@@ -102,8 +102,8 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         return myDelegate.doubleValue(myMapper.toIndex(key));
     }
 
-    public double doubleValue(final long key) {
-        return myDelegate.doubleValue(key);
+    public double doubleValue(final long index) {
+        return myDelegate.doubleValue(index);
     }
 
     @Override
@@ -164,8 +164,8 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         return myDelegate.get(myMapper.toIndex(key));
     }
 
-    public N get(final long key) {
-        return myDelegate.get(key);
+    public N get(final long index) {
+        return myDelegate.get(index);
     }
 
     @SuppressWarnings("unchecked")
@@ -227,19 +227,19 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
         return this.put(myMapper.toIndex(key), value);
     }
 
-    public double put(final long key, final double value) {
+    public double put(final long index, final double value) {
         if (myAccumulator != null) {
-            return myDelegate.mix(key, myAccumulator, value);
+            return myDelegate.mix(index, myAccumulator, value);
         } else {
-            return myDelegate.put(key, value);
+            return myDelegate.put(index, value);
         }
     }
 
-    public N put(final long key, final N value) {
+    public N put(final long index, final N value) {
         if (myAccumulator != null) {
-            return myDelegate.mix(key, myAccumulator, value);
+            return myDelegate.mix(index, myAccumulator, value);
         } else {
-            return myDelegate.put(key, value);
+            return myDelegate.put(index, value);
         }
     }
 

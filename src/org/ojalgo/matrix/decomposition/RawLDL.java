@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
@@ -32,7 +33,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.task.TaskException;
 
 final class RawLDL extends RawDecomposition implements LDL<Double> {
 
@@ -109,7 +109,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
     }
 
     @Override
-    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final double[][] retVal = this.reset(original, false);
 
@@ -118,7 +118,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw TaskException.newNotInvertible();
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
     }
 
@@ -143,12 +143,12 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return this.allocate(templateBody.countRows(), templateRHS.countColumns());
     }
 
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
         return this.solve(body, rhs, this.preallocate(body, rhs));
     }
 
     @Override
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final double[][] retVal = this.reset(body, false);
 
@@ -158,7 +158,7 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
 
             return this.doSolve(MatrixStore.PRIMITIVE.makeWrapper(rhs), preallocated);
         } else {
-            throw TaskException.newNotSolvable();
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
     }
 

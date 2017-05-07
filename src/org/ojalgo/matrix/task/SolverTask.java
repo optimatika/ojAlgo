@@ -23,6 +23,7 @@ package org.ojalgo.matrix.task;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.matrix.MatrixUtils;
@@ -169,7 +170,7 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
     /**
      * [A][X]=[B] or [body][return]=[rhs]
      */
-    default MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
+    default MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
         return this.solve(body, rhs, this.preallocate(body, rhs));
     }
 
@@ -190,6 +191,6 @@ public interface SolverTask<N extends Number> extends MatrixTask<N> {
      *        assume this is modified, but you cannot assume it will contain the full/final/correct solution.
      * @return The solution
      */
-    MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, PhysicalStore<N> preallocated) throws TaskException;
+    MatrixStore<N> solve(Access2D<?> body, Access2D<?> rhs, PhysicalStore<N> preallocated) throws RecoverableCondition;
 
 }

@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
@@ -41,7 +42,6 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.DeterminantTask;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -76,7 +76,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I add(final BasicMatrix addend) {
 
-        MatrixError.throwIfNotEqualDimensions(myStore, addend);
+        ProgrammingError.throwIfNotEqualDimensions(myStore, addend);
 
         final PhysicalStore<N> retVal = myStore.physical().copy(addend);
 
@@ -177,7 +177,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I divideElements(final Access2D<?> divisor) {
 
-        MatrixError.throwIfNotEqualDimensions(myStore, divisor);
+        ProgrammingError.throwIfNotEqualDimensions(myStore, divisor);
 
         final PhysicalStore<N> retVal = myStore.physical().copy(divisor);
 
@@ -389,7 +389,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
                 try {
                     tmpInverse = tmpTask.invert(myStore);
-                } catch (final TaskException xcptn) {
+                } catch (final RecoverableCondition xcptn) {
                     xcptn.printStackTrace();
                     tmpInverse = null;
                 }
@@ -431,7 +431,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I mergeColumns(final Access2D<?> belowRows) {
 
-        MatrixError.throwIfNotEqualColumnDimensions(myStore, belowRows);
+        ProgrammingError.throwIfNotEqualColumnDimensions(myStore, belowRows);
 
         final MatrixStore<N> tmpBelow = this.cast(belowRows).get();
 
@@ -440,7 +440,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I mergeRows(final Access2D<?> rightColumns) {
 
-        MatrixError.throwIfNotEqualRowDimensions(myStore, rightColumns);
+        ProgrammingError.throwIfNotEqualRowDimensions(myStore, rightColumns);
 
         final MatrixStore<N> tmpRight = this.cast(rightColumns).get();
 
@@ -458,7 +458,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I multiply(final BasicMatrix multiplicand) {
 
-        MatrixError.throwIfMultiplicationNotPossible(myStore, multiplicand);
+        ProgrammingError.throwIfMultiplicationNotPossible(myStore, multiplicand);
 
         return this.getFactory().instantiate(myStore.multiply(this.cast(multiplicand).get()));
     }
@@ -487,7 +487,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I multiplyElements(final Access2D<?> multiplicand) {
 
-        MatrixError.throwIfNotEqualDimensions(myStore, multiplicand);
+        ProgrammingError.throwIfNotEqualDimensions(myStore, multiplicand);
 
         final PhysicalStore<N> retVal = myStore.physical().copy(multiplicand);
 
@@ -556,7 +556,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
                 try {
                     tmpSolution = tmpTask.solve(myStore, rhs);
-                } catch (final TaskException xcptn) {
+                } catch (final RecoverableCondition xcptn) {
                     xcptn.printStackTrace();
                     tmpSolution = null;
                 }
@@ -568,7 +568,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
 
     public I subtract(final BasicMatrix subtrahend) {
 
-        MatrixError.throwIfNotEqualDimensions(myStore, subtrahend);
+        ProgrammingError.throwIfNotEqualDimensions(myStore, subtrahend);
 
         final PhysicalStore<N> retVal = myStore.physical().copy(subtrahend);
 

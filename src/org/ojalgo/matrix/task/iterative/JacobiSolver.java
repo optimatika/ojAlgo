@@ -24,12 +24,12 @@ package org.ojalgo.matrix.task.iterative;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
 public final class JacobiSolver extends StationaryIterativeSolver {
@@ -39,7 +39,7 @@ public final class JacobiSolver extends StationaryIterativeSolver {
     }
 
     @SuppressWarnings("unchecked")
-    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws TaskException {
+    public final MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> current) throws RecoverableCondition {
 
         MatrixStore<Double> tmpBody = null;
         if ((body instanceof MatrixStore<?>) && (body.get(0L) instanceof Double)) {

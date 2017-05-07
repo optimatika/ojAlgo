@@ -21,13 +21,16 @@
  */
 package org.ojalgo;
 
+import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.BasicMatrix;
+
 /**
  * Incorrect use of the API. The code needs to be changed. Typically execution can't continue. Is never
  * declared to be thrown, and should not be caught.
  *
  * @author apete
  */
-public class ProgrammingError extends RuntimeException {
+public final class ProgrammingError extends RuntimeException implements EffectiveThrowable {
 
     /**
      * For hidden, not-to-be-used, constructors and methods.
@@ -44,21 +47,59 @@ public class ProgrammingError extends RuntimeException {
         throw new ProgrammingError("Unsupported optional operation!");
     }
 
-    public ProgrammingError(final String aString) {
-        super(aString);
+    public static void throwIfMultiplicationNotPossible(final Access2D<?> aMtrxLeft, final Access2D<?> aMtrxRight) {
+
+        if (aMtrxLeft.countColumns() != aMtrxRight.countRows()) {
+            throw new ProgrammingError("The column dimension of the left matrix does not match the row dimension of the right matrix!");
+        }
     }
 
-    public ProgrammingError(final Throwable someCause) {
-        super(someCause);
+    public static void throwIfNotEqualColumnDimensions(final Access2D<?> aMtrx1, final Access2D<?> aMtrx2) {
+
+        if (aMtrx1.countColumns() != aMtrx2.countColumns()) {
+            throw new ProgrammingError("Column dimensions are not equal!");
+        }
     }
 
-    @SuppressWarnings("unused")
-    private ProgrammingError() {
+    public static void throwIfNotEqualDimensions(final Access2D<?> aMtrx1, final Access2D<?> aMtrx2) {
+
+        ProgrammingError.throwIfNotEqualRowDimensions(aMtrx1, aMtrx2);
+
+        ProgrammingError.throwIfNotEqualColumnDimensions(aMtrx1, aMtrx2);
+    }
+
+    public static void throwIfNotEqualRowDimensions(final Access2D<?> aMtrx1, final Access2D<?> aMtrx2) {
+
+        if (aMtrx1.countRows() != aMtrx2.countRows()) {
+            throw new ProgrammingError("Row dimensions are not equal!");
+        }
+    }
+
+    public static void throwIfNotSquare(final BasicMatrix aMtrx) {
+
+        if (aMtrx.countRows() != aMtrx.countColumns()) {
+            throw new ProgrammingError("Matrix is not square!");
+        }
+    }
+
+    ProgrammingError() {
         super();
     }
 
-    ProgrammingError(final String someMessage, final Throwable someCause) {
-        super(someMessage, someCause);
+    public ProgrammingError(final String message) {
+        super(message);
+    }
+
+    ProgrammingError(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    ProgrammingError(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public ProgrammingError(final Throwable cause) {
+        super(cause);
     }
 
     @Override

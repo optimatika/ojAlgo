@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
@@ -29,7 +30,6 @@ import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
@@ -102,7 +102,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
 
             TestUtils.assertEquals(tmpOrg, tmpOrg.multiply(tmpInv).multiply(tmpOrg), NumberContext.getGeneral(6, 6));
 
-        } catch (final TaskException exception) {
+        } catch (final RecoverableCondition exception) {
             exception.printStackTrace();
         }
 
@@ -127,7 +127,7 @@ public class DecompositionProblems extends MatrixDecompositionTests {
             // final SingularValue<Double> svd = SingularValue.make(input);
             final SingularValue<Double> svd = new SingularValueDecomposition.Primitive();
             svd.invert(input);
-        } catch (final TaskException exception) {
+        } catch (final RecoverableCondition exception) {
             // TODO Auto-generated catch block
             exception.printStackTrace();
         }

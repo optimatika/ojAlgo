@@ -83,16 +83,16 @@ public final class CalendarDateSeries<N extends Number> extends TreeSeries<Calen
         myMapper = mapper;
     }
 
-    public double doubleValue(final long key) {
-        return this.doubleValue(CalendarDate.make(key, myResolution));
+    public double doubleValue(final long index) {
+        return this.doubleValue(myMapper.toKey(index));
     }
 
     public N get(final CalendarDate key) {
         return this.get((Object) key.filter(myResolution));
     }
 
-    public N get(final long key) {
-        return this.get(CalendarDate.make(key, myResolution));
+    public N get(final long index) {
+        return this.get(myMapper.toKey(index));
     }
 
     public long getAverageStepSize() {
@@ -181,12 +181,12 @@ public final class CalendarDateSeries<N extends Number> extends TreeSeries<Calen
         return super.put(CalendarDate.make(key, myResolution), value);
     }
 
-    public double put(final long key, final double value) {
-        return this.put(CalendarDate.make(key, myResolution), value);
+    public double put(final long index, final double value) {
+        return this.put(myMapper.toKey(index), value);
     }
 
-    public N put(final long key, final N value) {
-        return super.put(CalendarDate.make(key, myResolution), value);
+    public N put(final long index, final N value) {
+        return super.put(myMapper.toKey(index), value);
     }
 
     @Override

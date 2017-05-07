@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
@@ -38,7 +39,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 
@@ -229,25 +229,25 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return preallocated.logical().row(tmpOrder).get();
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
+    public final MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
         if (this.isSolvable()) {
             return this.getInverse();
         } else {
-            throw TaskException.newNotInvertible();
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws TaskException {
+    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(original));
 
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw TaskException.newNotInvertible();
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
     }
 
@@ -280,25 +280,25 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return this.allocate(templateRHS.countRows(), templateRHS.countColumns());
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs));
         } else {
-            throw TaskException.newNotSolvable();
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws TaskException {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs), preallocated);
         } else {
-            throw TaskException.newNotSolvable();
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
     }
 

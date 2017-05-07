@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import java.util.List;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
@@ -32,7 +33,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.Uniform;
@@ -98,7 +98,7 @@ public class DesignCase extends MatrixDecompositionTests {
                 final SolverTask<Double> tmpSolverTask = (SolverTask<Double>) tmpDecomp;
                 try {
                     TestUtils.assertEquals(tmpDecomp.getClass().toString(), tmpRandom, tmpSolverTask.solve(tmpIdentity, tmpRandom));
-                } catch (final TaskException xcptn) {
+                } catch (final RecoverableCondition xcptn) {
                     TestUtils.fail(tmpDecomp.getClass().toString() + " " + xcptn.getMessage());
                 }
             }

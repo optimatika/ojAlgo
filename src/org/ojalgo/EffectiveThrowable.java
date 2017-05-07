@@ -19,22 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.matrix.task;
+package org.ojalgo;
 
-import org.ojalgo.RecoverableCondition;
 
-public class TaskException extends RecoverableCondition {
-
-    public static TaskException newNotInvertible() {
-        return new TaskException("Matrix Not Invertible!");
-    }
-
-    public static TaskException newNotSolvable() {
-        return new TaskException("Equation System Not Solvable!");
-    }
-
-    public TaskException(final String description) {
-        super(description);
-    }
+interface EffectiveThrowable {
 
 }

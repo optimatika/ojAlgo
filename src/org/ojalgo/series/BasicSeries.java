@@ -117,9 +117,9 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             return this.step(this.lastKey());
         }
 
-        double put(final long key, final double value);
+        double put(long index, double value);
 
-        V put(final long key, final V value);
+        V put(long index, V value);
 
         K step(K key);
 

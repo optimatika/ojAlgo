@@ -23,6 +23,7 @@ package org.ojalgo.matrix.task;
 
 import java.util.List;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.MatrixDecomposition;
@@ -93,7 +94,7 @@ public final class InverterTest extends AbstractMatrixDecompositionTaskTest {
                 }
             }
 
-        } catch (final TaskException exception) {
+        } catch (final RecoverableCondition exception) {
             TestUtils.fail(exception.getMessage());
         }
     }

@@ -25,13 +25,13 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.util.List;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure1D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -139,7 +139,7 @@ public final class ConjugateGradientSolver extends KrylovSubspaceSolver implemen
         return tmpNormErr / tmpNormRHS;
     }
 
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final List<Equation> tmpRows = IterativeSolverTask.toListOfRows(body, rhs);
 

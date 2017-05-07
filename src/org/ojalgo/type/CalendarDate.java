@@ -234,7 +234,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
             millis = StandardType.SQL_TIME.parse(sqlString).getTime();
         } else {
             millis = Long.MIN_VALUE;
-            throw new RecoverableCondition("Failed to parse string to CalendarDate!");
+            throw RecoverableCondition.newFailedToParseString(sqlString, CalendarDate.class);
         }
     }
 

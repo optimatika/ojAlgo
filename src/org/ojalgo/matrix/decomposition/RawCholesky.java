@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
@@ -32,7 +33,6 @@ import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.task.TaskException;
 
 final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
@@ -125,7 +125,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     @Override
-    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final double[][] retVal = this.reset(original, false);
 
@@ -134,7 +134,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw TaskException.newNotInvertible();
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
     }
 
@@ -160,7 +160,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     }
 
     @Override
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final double[][] retVal = this.reset(body, false);
 
@@ -173,7 +173,7 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
             return this.doSolve(preallocated);
 
         } else {
-            throw TaskException.newNotSolvable();
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
     }
 

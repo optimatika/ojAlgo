@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.MatrixUtils;
@@ -32,7 +33,6 @@ import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
@@ -181,7 +181,7 @@ public class QRTest extends MatrixDecompositionTests {
             TestUtils.assertEquals(tmpIdentity, tmpDenseInv.multiply(tmpA));
             TestUtils.assertEquals(tmpIdentity, tmpRawInv.multiply(tmpA));
 
-        } catch (final TaskException anException) {
+        } catch (final RecoverableCondition anException) {
             anException.printStackTrace();
             TestUtils.fail(anException.toString());
         }

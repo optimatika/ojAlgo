@@ -24,6 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
@@ -34,7 +35,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.InverterTask;
 import org.ojalgo.matrix.task.SolverTask;
-import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
@@ -58,7 +58,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
             TestUtils.assertEquals(task.getClass().toString(), tmpExpected, tmpActual, context);
 
-        } catch (final TaskException exception) {
+        } catch (final RecoverableCondition exception) {
             TestUtils.fail(task.getClass() + " " + exception.toString());
         }
 
@@ -76,7 +76,7 @@ public class ExtremeElementsCase extends MatrixDecompositionTests {
 
             TestUtils.assertEquals(task.getClass().toString(), tmpExpected, tmpActual, context);
 
-        } catch (final TaskException exception) {
+        } catch (final RecoverableCondition exception) {
             TestUtils.fail(task.getClass() + " " + exception.toString());
         }
 

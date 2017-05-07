@@ -27,6 +27,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
@@ -41,7 +42,6 @@ import org.ojalgo.matrix.decomposition.function.RotateRight;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
-import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 
@@ -316,7 +316,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         return new RawStore(myTransposedV, n, n).logical().transpose().get();
     }
 
-    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> invert(final Access2D<?> original, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final double[][] tmpData = this.reset(original, false);
 
@@ -327,7 +327,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw TaskException.newNotInvertible();
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
     }
 
@@ -344,7 +344,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         myInverse = null;
     }
 
-    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws TaskException {
+    public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 
         final double[][] tmpData = this.reset(body, false);
 
@@ -359,7 +359,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
             return this.getInverse().multiply(preallocated);
 
         } else {
-            throw TaskException.newNotSolvable();
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
     }
 

@@ -27,6 +27,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
@@ -42,7 +43,6 @@ import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.task.TaskException;
 import org.ojalgo.scalar.ComplexNumber;
 
 /**
@@ -292,21 +292,21 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
         return tmpVisitor.getNumber();
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original) throws TaskException {
+    public final MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {
         this.decompose(this.wrap(original));
         if (this.isSolvable()) {
             return this.getInverse();
         } else {
-            throw TaskException.newNotInvertible();
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
     }
 
-    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws TaskException {
+    public final MatrixStore<N> invert(final Access2D<?> original, final PhysicalStore<N> preallocated) throws RecoverableCondition {
         this.decompose(this.wrap(original));
         if (this.isSolvable()) {
             return this.getInverse(preallocated);
         } else {
-            throw TaskException.newNotInvertible();
+            throw RecoverableCondition.newMatrixNotInvertible();
         }
     }
 
@@ -341,25 +341,25 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
         myInverse = null;
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws TaskException {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs));
         } else {
-            throw TaskException.newNotSolvable();
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
     }
 
-    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws TaskException {
+    public MatrixStore<N> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<N> preallocated) throws RecoverableCondition {
 
         this.decompose(this.wrap(body));
 
         if (this.isSolvable()) {
             return this.getSolution(this.wrap(rhs), preallocated);
         } else {
-            throw TaskException.newNotSolvable();
+            throw RecoverableCondition.newEquationSystemNotSolvable();
         }
     }
 
