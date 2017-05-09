@@ -22,6 +22,7 @@
 package org.ojalgo.finance.portfolio;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import org.ojalgo.TestUtils;
@@ -358,6 +359,41 @@ public class PortfolioProblems extends FinancePortfolioTests {
         TestUtils.assertEquals(0.4411, tmpWeights.get(0).doubleValue(), tmpTestPrecision); // 0.4411
         TestUtils.assertEquals(0.3656, tmpWeights.get(1).doubleValue(), tmpTestPrecision); // 0.3656
         TestUtils.assertEquals(0.1933, tmpWeights.get(2).doubleValue(), tmpTestPrecision); // 0.1933
+    }
+
+    public void testP20170508() {
+
+        for (int j = 0; j <= 100; j++) {
+
+            Builder<PrimitiveMatrix> tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2, 2);
+            tmpBuilder.add(0, 0, 0.040000);
+            tmpBuilder.add(0, 1, 0.1000);
+            tmpBuilder.add(1, 0, 0.1000);
+            tmpBuilder.add(1, 1, 0.250000);
+            final BasicMatrix covariances = tmpBuilder.build();
+
+            tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
+            tmpBuilder.add(0, 0.20000);
+            tmpBuilder.add(1, 0.40000);
+            final BasicMatrix expectedExcessReturns = tmpBuilder.build();
+
+            final MarkowitzModel markowitzModel = new MarkowitzModel(covariances, expectedExcessReturns);
+            markowitzModel.setShortingAllowed(false);
+            markowitzModel.optimiser().validate(true);
+            markowitzModel.optimiser().debug(true);
+
+            final BigDecimal tmpTargetReturn = new BigDecimal(0.2 + (0.002 * j)).setScale(4, RoundingMode.HALF_EVEN);
+            markowitzModel.setTargetReturn(tmpTargetReturn);
+            //            for (int i = 0; i < 2; i++) {
+            //                markowitzModel.setLowerLimit(i, new BigDecimal(0.00000));
+            //                markowitzModel.setUpperLimit(i, new BigDecimal(1.00000));
+            //            }
+
+            markowitzModel.getWeights();
+            BasicLogger.debug("Target={} => {}, {} as {} with {}", tmpTargetReturn, markowitzModel.getMeanReturn(), markowitzModel.getReturnVariance(),
+                    markowitzModel.optimiser().getState(), markowitzModel.getWeights());
+
+        }
     }
 
 }
