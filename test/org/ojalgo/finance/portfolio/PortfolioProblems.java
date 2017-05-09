@@ -33,6 +33,7 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -372,25 +373,42 @@ public class PortfolioProblems extends FinancePortfolioTests {
             tmpBuilder.add(1, 1, 0.250000);
             final BasicMatrix covariances = tmpBuilder.build();
 
+            Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(covariances);
+            tmpEvD.decompose(covariances.asCollectable2D());
+
+            BasicLogger.debug(tmpEvD.getEigenvalues().toString(), tmpEvD.getD());
+
             tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
             tmpBuilder.add(0, 0.20000);
             tmpBuilder.add(1, 0.40000);
             final BasicMatrix expectedExcessReturns = tmpBuilder.build();
 
-            final MarkowitzModel markowitzModel = new MarkowitzModel(covariances, expectedExcessReturns);
+            MarketEquilibrium tmpMQ = new MarketEquilibrium(covariances);
+
+            for (int w1 = 0; w1 <= 100; w1++) {
+
+                tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
+                tmpBuilder.add(0, w1 / 100.0);
+                tmpBuilder.add(1, 1.0 - (w1 / 100.0));
+                final BasicMatrix weights = tmpBuilder.build();
+
+                double ret = MarketEquilibrium.calculatePortfolioReturn(weights, expectedExcessReturns).doubleValue();
+                double var = tmpMQ.calculatePortfolioVariance(weights).doubleValue();
+
+                BasicLogger.debug("({}, {}) => {} and {}", weights.doubleValue(0), weights.doubleValue(1), ret, var);
+            }
+
+            tmpMQ = tmpMQ.clean();
+
+            final MarkowitzModel markowitzModel = new MarkowitzModel(tmpMQ, expectedExcessReturns);
             markowitzModel.setShortingAllowed(false);
-            markowitzModel.optimiser().validate(true);
-            markowitzModel.optimiser().debug(true);
+            markowitzModel.optimiser().validate(false);
+            markowitzModel.optimiser().debug(false);
 
             final BigDecimal tmpTargetReturn = new BigDecimal(0.2 + (0.002 * j)).setScale(4, RoundingMode.HALF_EVEN);
             markowitzModel.setTargetReturn(tmpTargetReturn);
-            //            for (int i = 0; i < 2; i++) {
-            //                markowitzModel.setLowerLimit(i, new BigDecimal(0.00000));
-            //                markowitzModel.setUpperLimit(i, new BigDecimal(1.00000));
-            //            }
 
-            markowitzModel.getWeights();
-            BasicLogger.debug("Target={} => {}, {} as {} with {}", tmpTargetReturn, markowitzModel.getMeanReturn(), markowitzModel.getReturnVariance(),
+            BasicLogger.debug("Target={} => ( {}, {} ) as {} with {}", tmpTargetReturn, markowitzModel.getMeanReturn(), markowitzModel.getReturnVariance(),
                     markowitzModel.optimiser().getState(), markowitzModel.getWeights());
 
         }

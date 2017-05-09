@@ -71,7 +71,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
 
         public boolean isOrdered() {
-            return false;
+            return this.isHermitian();
         }
 
         @Override

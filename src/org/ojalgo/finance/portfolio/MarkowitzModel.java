@@ -21,7 +21,7 @@
  */
 package org.ojalgo.finance.portfolio;
 
-import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.constant.BigMath.ZERO;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -96,7 +96,7 @@ public final class MarkowitzModel extends OptimisedPortfolio {
     private static final double INIT = PrimitiveFunction.SQRT.invoke(PrimitiveMath.TEN);
     private static final double MAX = PrimitiveMath.HUNDRED * PrimitiveMath.HUNDRED;
     private static final double MIN = PrimitiveMath.HUNDREDTH;
-    private static final NumberContext TARGET_CONTEXT = NumberContext.getGeneral(7, 14);
+    private static final NumberContext TARGET_CONTEXT = NumberContext.getGeneral(5, 2);
 
     private final HashMap<int[], LowerUpper> myConstraints = new HashMap<>();
     private transient ExpressionsBasedModel myOptimisationModel;
@@ -270,13 +270,6 @@ public final class MarkowitzModel extends OptimisedPortfolio {
                     }
                     tmpTargetDiff = tmpTargetNow - tmpTargetValue;
 
-                    if (tmpTargetDiff < _0_0) {
-                        tmpLow = tmpCurrent;
-                    } else if (tmpTargetDiff > _0_0) {
-                        tmpHigh = tmpCurrent;
-                    }
-                    tmpCurrent = PrimitiveFunction.SQRT.invoke(tmpLow * tmpHigh);
-
                     if (this.getOptimisationOptions().debug_appender != null) {
                         BasicLogger.debug();
                         BasicLogger.debug("RAF:   {}", tmpCurrent);
@@ -285,6 +278,13 @@ public final class MarkowitzModel extends OptimisedPortfolio {
                         BasicLogger.debug("Target: {}", tmpTargetValue);
                         BasicLogger.debug("Diff:   {}", tmpTargetDiff);
                     }
+
+                    if (tmpTargetDiff < _0_0) {
+                        tmpLow = tmpCurrent;
+                    } else if (tmpTargetDiff > _0_0) {
+                        tmpHigh = tmpCurrent;
+                    }
+                    tmpCurrent = PrimitiveFunction.SQRT.invoke(tmpLow * tmpHigh);
 
                 } while (!TARGET_CONTEXT.isSmall(tmpTargetValue, tmpTargetDiff) && TARGET_CONTEXT.isDifferent(tmpTargetLast, tmpTargetNow));
             }
