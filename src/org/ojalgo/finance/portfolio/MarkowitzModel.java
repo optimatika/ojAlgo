@@ -21,7 +21,7 @@
  */
 package org.ojalgo.finance.portfolio;
 
-import static org.ojalgo.constant.BigMath.ZERO;
+import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -96,7 +96,7 @@ public final class MarkowitzModel extends OptimisedPortfolio {
     private static final double INIT = PrimitiveFunction.SQRT.invoke(PrimitiveMath.TEN);
     private static final double MAX = PrimitiveMath.HUNDRED * PrimitiveMath.HUNDRED;
     private static final double MIN = PrimitiveMath.HUNDREDTH;
-    private static final NumberContext TARGET_CONTEXT = NumberContext.getGeneral(5, 2);
+    private static final NumberContext TARGET_CONTEXT = NumberContext.getGeneral(5, 4);
 
     private final HashMap<int[], LowerUpper> myConstraints = new HashMap<>();
     private transient ExpressionsBasedModel myOptimisationModel;
@@ -258,7 +258,8 @@ public final class MarkowitzModel extends OptimisedPortfolio {
 
                 do {
 
-                    tmpResult = this.generateOptimisationModel(tmpCurrent).minimise();
+                    final ExpressionsBasedModel tmpModel = this.generateOptimisationModel(tmpCurrent);
+                    tmpResult = tmpModel.minimise();
 
                     tmpTargetLast = tmpTargetNow;
                     if (myTargetVariance != null) {
@@ -286,7 +287,7 @@ public final class MarkowitzModel extends OptimisedPortfolio {
                     }
                     tmpCurrent = PrimitiveFunction.SQRT.invoke(tmpLow * tmpHigh);
 
-                } while (!TARGET_CONTEXT.isSmall(tmpTargetValue, tmpTargetDiff) && TARGET_CONTEXT.isDifferent(tmpTargetLast, tmpTargetNow));
+                } while (!TARGET_CONTEXT.isSmall(tmpTargetValue, tmpTargetDiff) && TARGET_CONTEXT.isDifferent(tmpHigh, tmpLow));
             }
 
         } else {

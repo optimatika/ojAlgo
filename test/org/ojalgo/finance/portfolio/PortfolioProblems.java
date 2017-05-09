@@ -22,8 +22,10 @@
 package org.ojalgo.finance.portfolio;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.AccessUtils;
@@ -374,43 +376,54 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
         tmpBuilder.add(0, 0.20000);
         tmpBuilder.add(1, 0.40000);
-        final BasicMatrix expectedExcessReturns = tmpBuilder.build();
+        final BasicMatrix returns = tmpBuilder.build();
 
-        MarketEquilibrium tmpMQ = new MarketEquilibrium(covariances);
+        final MarketEquilibrium tmpMEq = new MarketEquilibrium(covariances);
 
         final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(covariances);
         tmpEvD.decompose(covariances.asCollectable2D());
 
         BasicLogger.debug(tmpEvD.getEigenvalues().toString(), tmpEvD.getD());
 
+        final SortedMap<BigDecimal, BigDecimal> ret_to_weight0 = new TreeMap<>();
+
         for (int w1 = 0; w1 <= 10; w1++) {
 
+            final BigDecimal weight0 = StandardType.PERCENT.enforce(new BigDecimal(w1 / 10.0));
+            final BigDecimal weight1 = BigMath.ONE.subtract(weight0);
+
             tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
-            tmpBuilder.add(0, w1 / 10.0);
-            tmpBuilder.add(1, 1.0 - (w1 / 10.0));
+
+            tmpBuilder.add(0, weight0);
+            tmpBuilder.add(1, weight1);
             final BasicMatrix weights = tmpBuilder.build();
 
-            final double ret = MarketEquilibrium.calculatePortfolioReturn(weights, expectedExcessReturns).doubleValue();
-            final double var = tmpMQ.calculatePortfolioVariance(weights).doubleValue();
+            final BigDecimal ret = StandardType.PERCENT.enforce(MarketEquilibrium.calculatePortfolioReturn(weights, returns).toBigDecimal());
+            final BigDecimal var = StandardType.PERCENT.enforce(tmpMEq.calculatePortfolioVariance(weights).toBigDecimal());
 
-            BasicLogger.debug("({}, {}) => {} and {}", weights.doubleValue(0), weights.doubleValue(1), ret, var);
+            BasicLogger.debug("({}, {}) => {} and {}", weight0, weight1, ret, var);
+
+            ret_to_weight0.put(ret, weight0);
         }
 
-        for (int j = 0; j <= 10; j++) {
+        for (final Entry<BigDecimal, BigDecimal> testcase : ret_to_weight0.entrySet()) {
 
-            tmpMQ = tmpMQ.clean();
-
-            final MarkowitzModel markowitzModel = new MarkowitzModel(tmpMQ, expectedExcessReturns);
+            final MarkowitzModel markowitzModel = new MarkowitzModel(tmpMEq, returns);
             markowitzModel.setShortingAllowed(false);
             markowitzModel.optimiser().validate(false);
             markowitzModel.optimiser().debug(false);
 
-            final BigDecimal tmpTargetReturn = new BigDecimal(0.2 + (0.02 * j)).setScale(4, RoundingMode.HALF_EVEN);
+            final BigDecimal tmpTargetReturn = testcase.getKey();
             markowitzModel.setTargetReturn(tmpTargetReturn);
 
             BasicLogger.debug("Target={} => ( {}, {} ) as {} with {}", tmpTargetReturn, markowitzModel.getMeanReturn(), markowitzModel.getReturnVariance(),
                     markowitzModel.optimiser().getState(), markowitzModel.getWeights());
 
+            // TestUtils.assertEquals(testcase.getValue(), markowitzModel.getWeights().get(0), StandardType.PERCENT);
+
+        }
+
+        for (int j = 0; j <= 10; j++) {
         }
     }
 
