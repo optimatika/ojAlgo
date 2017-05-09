@@ -364,39 +364,39 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
     public void testP20170508() {
 
-        for (int j = 0; j <= 100; j++) {
+        Builder<PrimitiveMatrix> tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2, 2);
+        tmpBuilder.add(0, 0, 0.040000);
+        tmpBuilder.add(0, 1, 0.1000);
+        tmpBuilder.add(1, 0, 0.1000);
+        tmpBuilder.add(1, 1, 0.250000);
+        final BasicMatrix covariances = tmpBuilder.build();
 
-            Builder<PrimitiveMatrix> tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2, 2);
-            tmpBuilder.add(0, 0, 0.040000);
-            tmpBuilder.add(0, 1, 0.1000);
-            tmpBuilder.add(1, 0, 0.1000);
-            tmpBuilder.add(1, 1, 0.250000);
-            final BasicMatrix covariances = tmpBuilder.build();
+        tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
+        tmpBuilder.add(0, 0.20000);
+        tmpBuilder.add(1, 0.40000);
+        final BasicMatrix expectedExcessReturns = tmpBuilder.build();
 
-            Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(covariances);
-            tmpEvD.decompose(covariances.asCollectable2D());
+        MarketEquilibrium tmpMQ = new MarketEquilibrium(covariances);
 
-            BasicLogger.debug(tmpEvD.getEigenvalues().toString(), tmpEvD.getD());
+        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(covariances);
+        tmpEvD.decompose(covariances.asCollectable2D());
+
+        BasicLogger.debug(tmpEvD.getEigenvalues().toString(), tmpEvD.getD());
+
+        for (int w1 = 0; w1 <= 10; w1++) {
 
             tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
-            tmpBuilder.add(0, 0.20000);
-            tmpBuilder.add(1, 0.40000);
-            final BasicMatrix expectedExcessReturns = tmpBuilder.build();
+            tmpBuilder.add(0, w1 / 10.0);
+            tmpBuilder.add(1, 1.0 - (w1 / 10.0));
+            final BasicMatrix weights = tmpBuilder.build();
 
-            MarketEquilibrium tmpMQ = new MarketEquilibrium(covariances);
+            final double ret = MarketEquilibrium.calculatePortfolioReturn(weights, expectedExcessReturns).doubleValue();
+            final double var = tmpMQ.calculatePortfolioVariance(weights).doubleValue();
 
-            for (int w1 = 0; w1 <= 100; w1++) {
+            BasicLogger.debug("({}, {}) => {} and {}", weights.doubleValue(0), weights.doubleValue(1), ret, var);
+        }
 
-                tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
-                tmpBuilder.add(0, w1 / 100.0);
-                tmpBuilder.add(1, 1.0 - (w1 / 100.0));
-                final BasicMatrix weights = tmpBuilder.build();
-
-                double ret = MarketEquilibrium.calculatePortfolioReturn(weights, expectedExcessReturns).doubleValue();
-                double var = tmpMQ.calculatePortfolioVariance(weights).doubleValue();
-
-                BasicLogger.debug("({}, {}) => {} and {}", weights.doubleValue(0), weights.doubleValue(1), ret, var);
-            }
+        for (int j = 0; j <= 10; j++) {
 
             tmpMQ = tmpMQ.clean();
 
@@ -405,7 +405,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
             markowitzModel.optimiser().validate(false);
             markowitzModel.optimiser().debug(false);
 
-            final BigDecimal tmpTargetReturn = new BigDecimal(0.2 + (0.002 * j)).setScale(4, RoundingMode.HALF_EVEN);
+            final BigDecimal tmpTargetReturn = new BigDecimal(0.2 + (0.02 * j)).setScale(4, RoundingMode.HALF_EVEN);
             markowitzModel.setTargetReturn(tmpTargetReturn);
 
             BasicLogger.debug("Target={} => ( {}, {} ) as {} with {}", tmpTargetReturn, markowitzModel.getMeanReturn(), markowitzModel.getReturnVariance(),
