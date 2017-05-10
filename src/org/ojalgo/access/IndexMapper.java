@@ -60,12 +60,20 @@ public interface IndexMapper<T extends Comparable<? super T>> {
         return 1L;
     }
 
-    default long step(long index) {
+    default long next(final long index) {
         return index + this.increment();
     }
 
-    default T step(T key) {
-        return this.toKey(this.step(this.toIndex(key)));
+    default long previous(final long index) {
+        return index - this.increment();
+    }
+
+    default T previous(final T key) {
+        return this.toKey(this.previous(this.toIndex(key)));
+    }
+
+    default T next(final T key) {
+        return this.toKey(this.next(this.toIndex(key)));
     }
 
     long toIndex(T key);
