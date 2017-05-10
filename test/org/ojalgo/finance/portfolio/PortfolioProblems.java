@@ -23,9 +23,6 @@ package org.ojalgo.finance.portfolio;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.AccessUtils;
@@ -378,53 +375,29 @@ public class PortfolioProblems extends FinancePortfolioTests {
         final BasicMatrix returns = tmpBuilder.build();
 
         final MarketEquilibrium marketEq = new MarketEquilibrium(covariances);
+        final MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, returns);
 
-        final SortedMap<BigDecimal, BigDecimal> ret_to_weight0 = new TreeMap<>();
-        for (int w0 = 0; w0 <= 10; w0++) {
+        for (int r = 0; r <= 10; r++) {
+            final BigDecimal targetReturn = StandardType.PERCENT.enforce(new BigDecimal(0.2 + (0.02 * r)));
+            final BigDecimal expectedWeight1 = new BigDecimal(r / 10.0);
+            final BigDecimal expectedWeight0 = BigMath.ONE.subtract(expectedWeight1);
 
-            final BigDecimal weight0 = StandardType.PERCENT.enforce(new BigDecimal(w0 / 10.0));
-            final BigDecimal weight1 = BigMath.ONE.subtract(weight0);
-
-            tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
-            tmpBuilder.add(0, weight0);
-            tmpBuilder.add(1, weight1);
-            final BasicMatrix weights = tmpBuilder.build();
-
-            final BigDecimal ret = StandardType.PERCENT.enforce(MarketEquilibrium.calculatePortfolioReturn(weights, returns).toBigDecimal());
-            final BigDecimal var = StandardType.PERCENT.enforce(marketEq.calculatePortfolioVariance(weights).toBigDecimal());
-
-            if (DEBUG) {
-                BasicLogger.debug("({}, {}) => ret = {} and var = {}", weight0, weight1, ret, var);
-            }
-
-            ret_to_weight0.put(ret, weight0);
-        }
-
-        BigDecimal minExpReturn = new BigDecimal("0.2");
-        BigDecimal minExpWeight = new BigDecimal("1.0");
-        for (final Entry<BigDecimal, BigDecimal> testcase : ret_to_weight0.entrySet()) {
-            final BigDecimal tmpReturn = testcase.getKey();
-            final BigDecimal tmpWeight = testcase.getValue();
-
-            final MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, returns);
-            markowitzModel.setTargetReturn(tmpReturn);
+            markowitzModel.setTargetReturn(targetReturn);
 
             markowitzModel.optimiser().validate(false);
             markowitzModel.optimiser().debug(false);
 
-            final double actReturn = markowitzModel.getMeanReturn();
-            final double actWeight = markowitzModel.getWeights().get(0).doubleValue();
+            final List<BigDecimal> tmpWeights = markowitzModel.getWeights();
 
             if (DEBUG) {
-                BasicLogger.debug("Target=( {}, {} ) => ( {}, {} ) as {} with {}", tmpReturn, tmpWeight, actReturn, actWeight,
-                        markowitzModel.optimiser().getState(), markowitzModel.getWeights());
+                BasicLogger.debug("{} => {} {}", targetReturn, markowitzModel.optimiser().getState(), markowitzModel.toSimplePortfolio());
             }
 
-            TestUtils.assertTrue(Double.compare(actReturn, minExpReturn.doubleValue()) >= 0);
-            TestUtils.assertTrue(Double.compare(actWeight, minExpWeight.doubleValue()) <= 0);
+            TestUtils.assertTrue("Weight 0", tmpWeights.get(0).compareTo(expectedWeight0) <= 0);
+            TestUtils.assertTrue("Weight 1", tmpWeights.get(1).compareTo(expectedWeight1) >= 0);
+            TestUtils.assertTrue("Weights 0+1", tmpWeights.get(0).add(tmpWeights.get(1)).compareTo(BigMath.ONE) == 0);
 
-            minExpReturn = tmpReturn;
-            minExpWeight = tmpWeight;
+            TestUtils.assertEquals("Return", targetReturn, markowitzModel.getMeanReturn(), StandardType.PERCENT);
         }
 
     }
