@@ -35,7 +35,6 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BasicMatrix.Builder;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
-import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -378,53 +377,56 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpBuilder.add(1, 0.40000);
         final BasicMatrix returns = tmpBuilder.build();
 
-        final MarketEquilibrium tmpMEq = new MarketEquilibrium(covariances);
-
-        final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(covariances);
-        tmpEvD.decompose(covariances.asCollectable2D());
-
-        BasicLogger.debug(tmpEvD.getEigenvalues().toString(), tmpEvD.getD());
+        final MarketEquilibrium marketEq = new MarketEquilibrium(covariances);
 
         final SortedMap<BigDecimal, BigDecimal> ret_to_weight0 = new TreeMap<>();
+        for (int w0 = 0; w0 <= 10; w0++) {
 
-        for (int w1 = 0; w1 <= 10; w1++) {
-
-            final BigDecimal weight0 = StandardType.PERCENT.enforce(new BigDecimal(w1 / 10.0));
+            final BigDecimal weight0 = StandardType.PERCENT.enforce(new BigDecimal(w0 / 10.0));
             final BigDecimal weight1 = BigMath.ONE.subtract(weight0);
 
             tmpBuilder = PrimitiveMatrix.FACTORY.getBuilder(2);
-
             tmpBuilder.add(0, weight0);
             tmpBuilder.add(1, weight1);
             final BasicMatrix weights = tmpBuilder.build();
 
             final BigDecimal ret = StandardType.PERCENT.enforce(MarketEquilibrium.calculatePortfolioReturn(weights, returns).toBigDecimal());
-            final BigDecimal var = StandardType.PERCENT.enforce(tmpMEq.calculatePortfolioVariance(weights).toBigDecimal());
+            final BigDecimal var = StandardType.PERCENT.enforce(marketEq.calculatePortfolioVariance(weights).toBigDecimal());
 
-            BasicLogger.debug("({}, {}) => {} and {}", weight0, weight1, ret, var);
+            if (DEBUG) {
+                BasicLogger.debug("({}, {}) => ret = {} and var = {}", weight0, weight1, ret, var);
+            }
 
             ret_to_weight0.put(ret, weight0);
         }
 
+        BigDecimal minExpReturn = new BigDecimal("0.2");
+        BigDecimal minExpWeight = new BigDecimal("1.0");
         for (final Entry<BigDecimal, BigDecimal> testcase : ret_to_weight0.entrySet()) {
+            final BigDecimal tmpReturn = testcase.getKey();
+            final BigDecimal tmpWeight = testcase.getValue();
 
-            final MarkowitzModel markowitzModel = new MarkowitzModel(tmpMEq, returns);
-            markowitzModel.setShortingAllowed(false);
+            final MarkowitzModel markowitzModel = new MarkowitzModel(marketEq, returns);
+            markowitzModel.setTargetReturn(tmpReturn);
+
             markowitzModel.optimiser().validate(false);
             markowitzModel.optimiser().debug(false);
 
-            final BigDecimal tmpTargetReturn = testcase.getKey();
-            markowitzModel.setTargetReturn(tmpTargetReturn);
+            final double actReturn = markowitzModel.getMeanReturn();
+            final double actWeight = markowitzModel.getWeights().get(0).doubleValue();
 
-            BasicLogger.debug("Target={} => ( {}, {} ) as {} with {}", tmpTargetReturn, markowitzModel.getMeanReturn(), markowitzModel.getReturnVariance(),
-                    markowitzModel.optimiser().getState(), markowitzModel.getWeights());
+            if (DEBUG) {
+                BasicLogger.debug("Target=( {}, {} ) => ( {}, {} ) as {} with {}", tmpReturn, tmpWeight, actReturn, actWeight,
+                        markowitzModel.optimiser().getState(), markowitzModel.getWeights());
+            }
 
-            // TestUtils.assertEquals(testcase.getValue(), markowitzModel.getWeights().get(0), StandardType.PERCENT);
+            TestUtils.assertTrue(Double.compare(actReturn, minExpReturn.doubleValue()) >= 0);
+            TestUtils.assertTrue(Double.compare(actWeight, minExpWeight.doubleValue()) <= 0);
 
+            minExpReturn = tmpReturn;
+            minExpWeight = tmpWeight;
         }
 
-        for (int j = 0; j <= 10; j++) {
-        }
     }
 
 }

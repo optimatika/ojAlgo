@@ -244,8 +244,7 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
     }
 
     public K step(final K key) {
-        // TODO Auto-generated method stub
-        return null;
+        return myMapper.next(key);
     }
 
     @Override

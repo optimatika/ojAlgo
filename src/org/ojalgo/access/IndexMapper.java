@@ -56,24 +56,12 @@ public interface IndexMapper<T extends Comparable<? super T>> {
         return new AnyIndex<>();
     }
 
-    default long increment() {
-        return 1L;
-    }
-
-    default long next(final long index) {
-        return index + this.increment();
-    }
-
-    default long previous(final long index) {
-        return index - this.increment();
+    default T next(final T key) {
+        return this.toKey(this.toIndex(key) + 1L);
     }
 
     default T previous(final T key) {
-        return this.toKey(this.previous(this.toIndex(key)));
-    }
-
-    default T next(final T key) {
-        return this.toKey(this.next(this.toIndex(key)));
+        return this.toKey(this.toIndex(key) - 1L);
     }
 
     long toIndex(T key);
