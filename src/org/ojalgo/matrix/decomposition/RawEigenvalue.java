@@ -62,15 +62,21 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     static final class Dynamic extends RawEigenvalue {
 
+        private transient Boolean mySymmetric = null;
+
         Dynamic() {
             super();
         }
 
         public boolean isHermitian() {
-            return this.checkSymmetry();
+            if (mySymmetric == null) {
+                mySymmetric = Boolean.valueOf(this.checkSymmetry());
+            }
+            return mySymmetric.booleanValue();
         }
 
         public boolean isOrdered() {
+            // The symmetric implementation is sorted, the general is not.
             return this.isHermitian();
         }
 
