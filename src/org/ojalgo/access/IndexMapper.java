@@ -56,10 +56,24 @@ public interface IndexMapper<T extends Comparable<? super T>> {
         return new AnyIndex<>();
     }
 
+    /**
+     * This default implementation assumes that the index is incremented by 1 when incrementing the key to the
+     * next value.
+     *
+     * @param key The value to increment
+     * @return The next (incremented) value
+     */
     default T next(final T key) {
         return this.toKey(this.toIndex(key) + 1L);
     }
 
+    /**
+     * This default implementation assumes that the index is decremented by 1 when decrementing the key to the
+     * previous value.
+     *
+     * @param key The value to decrement
+     * @return The previous (decremented) value
+     */
     default T previous(final T key) {
         return this.toKey(this.toIndex(key) - 1L);
     }
