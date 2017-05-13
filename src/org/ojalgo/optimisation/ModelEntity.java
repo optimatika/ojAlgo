@@ -26,8 +26,8 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.util.Objects;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.VoidFunction;
@@ -78,7 +78,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
         myName = name;
 
-        Objects.requireNonNull(name);
+        ProgrammingError.throwIfNull(name);
     }
 
     public final int compareTo(final ME obj) {

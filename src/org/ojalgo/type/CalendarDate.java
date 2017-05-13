@@ -30,9 +30,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.TimeZone;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 
 /**
@@ -80,7 +80,7 @@ public final class CalendarDate implements Temporal, Comparable<CalendarDate>, S
     static final long SECONDS_PER_DAY = 24L * 60L * 60L;
 
     public static CalendarDate from(final TemporalAccessor temporal) {
-        Objects.requireNonNull(temporal, "temporal");
+        ProgrammingError.throwIfNull(temporal, "temporal");
         if (temporal instanceof CalendarDate) {
             return (CalendarDate) temporal;
         } else if (temporal instanceof Instant) {

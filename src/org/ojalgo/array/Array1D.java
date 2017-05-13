@@ -25,13 +25,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.AbstractList;
 import java.util.List;
-import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.Spliterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Factory1D;
 import org.ojalgo.access.Mutate1D;
@@ -482,7 +482,7 @@ public final class Array1D<N extends Number> extends AbstractList<N>
     }
 
     public double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
-        Objects.requireNonNull(mixer);
+        ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
             final double oldValue = this.doubleValue(index);
             final double newValue = mixer.invoke(oldValue, addend);
@@ -492,7 +492,7 @@ public final class Array1D<N extends Number> extends AbstractList<N>
     }
 
     public N mix(final long index, final BinaryFunction<N> mixer, final N addend) {
-        Objects.requireNonNull(mixer);
+        ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
             final N oldValue = this.get(index);
             final N newValue = mixer.invoke(oldValue, addend);

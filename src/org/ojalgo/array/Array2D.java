@@ -24,8 +24,8 @@ package org.ojalgo.array;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Factory2D;
@@ -529,7 +529,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     public double mix(final long row, final long col, final BinaryFunction<N> mixer, final double addend) {
-        Objects.requireNonNull(mixer);
+        ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
             final double oldValue = this.doubleValue(row, col);
             final double newValue = mixer.invoke(oldValue, addend);
@@ -539,7 +539,7 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     }
 
     public N mix(final long row, final long col, final BinaryFunction<N> mixer, final N addend) {
-        Objects.requireNonNull(mixer);
+        ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
             final N oldValue = this.get(row, col);
             final N newValue = mixer.invoke(oldValue, addend);

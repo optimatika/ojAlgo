@@ -24,8 +24,8 @@ package org.ojalgo.array;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Objects;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessAnyD;
 import org.ojalgo.access.AccessUtils;
@@ -270,7 +270,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public double mix(final long[] reference, final BinaryFunction<N> mixer, final double addend) {
-        Objects.requireNonNull(mixer);
+        ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
             final double oldValue = this.doubleValue(reference);
             final double newValue = mixer.invoke(oldValue, addend);
@@ -280,7 +280,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public N mix(final long[] reference, final BinaryFunction<N> mixer, final N addend) {
-        Objects.requireNonNull(mixer);
+        ProgrammingError.throwIfNull(mixer);
         synchronized (myDelegate) {
             final N oldValue = this.get(reference);
             final N newValue = mixer.invoke(oldValue, addend);

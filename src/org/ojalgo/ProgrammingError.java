@@ -21,8 +21,10 @@
  */
 package org.ojalgo;
 
+import java.util.Objects;
+
 import org.ojalgo.access.Access2D;
-import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.access.Structure2D;
 
 /**
  * Incorrect use of the API. The code needs to be changed. Typically execution can't continue. Is never
@@ -30,7 +32,7 @@ import org.ojalgo.matrix.BasicMatrix;
  *
  * @author apete
  */
-public final class ProgrammingError extends RuntimeException implements EffectiveThrowable {
+public class ProgrammingError extends RuntimeException implements EffectiveThrowable {
 
     /**
      * For hidden, not-to-be-used, constructors and methods.
@@ -47,47 +49,66 @@ public final class ProgrammingError extends RuntimeException implements Effectiv
         throw new ProgrammingError("Unsupported optional operation!");
     }
 
-    public static void throwIfMultiplicationNotPossible(final Access2D<?> aMtrxLeft, final Access2D<?> aMtrxRight) {
-
-        if (aMtrxLeft.countColumns() != aMtrxRight.countRows()) {
+    public static void throwIfMultiplicationNotPossible(final Access2D<?> left, final Access2D<?> right) {
+        if (left.countColumns() != right.countRows()) {
             throw new ProgrammingError("The column dimension of the left matrix does not match the row dimension of the right matrix!");
         }
     }
 
-    public static void throwIfNotEqualColumnDimensions(final Access2D<?> aMtrx1, final Access2D<?> aMtrx2) {
-
-        if (aMtrx1.countColumns() != aMtrx2.countColumns()) {
+    public static void throwIfNotEqualColumnDimensions(final Access2D<?> mtrx1, final Access2D<?> mtrx2) {
+        if (mtrx1.countColumns() != mtrx2.countColumns()) {
             throw new ProgrammingError("Column dimensions are not equal!");
         }
     }
 
-    public static void throwIfNotEqualDimensions(final Access2D<?> aMtrx1, final Access2D<?> aMtrx2) {
-
-        ProgrammingError.throwIfNotEqualRowDimensions(aMtrx1, aMtrx2);
-
-        ProgrammingError.throwIfNotEqualColumnDimensions(aMtrx1, aMtrx2);
+    public static void throwIfNotEqualDimensions(final Access2D<?> mtrx1, final Access2D<?> mtrx2) {
+        ProgrammingError.throwIfNotEqualRowDimensions(mtrx1, mtrx2);
+        ProgrammingError.throwIfNotEqualColumnDimensions(mtrx1, mtrx2);
     }
 
-    public static void throwIfNotEqualRowDimensions(final Access2D<?> aMtrx1, final Access2D<?> aMtrx2) {
-
-        if (aMtrx1.countRows() != aMtrx2.countRows()) {
-            throw new ProgrammingError("Row dimensions are not equal!");
+    public static void throwIfNotEqualRowDimensions(final Structure2D mtrx1, final Structure2D mtrx2) {
+        if (mtrx1.countRows() != mtrx2.countRows()) {
+            throw new IllegalArgumentException("Row dimensions are not equal!");
         }
     }
 
-    public static void throwIfNotSquare(final BasicMatrix aMtrx) {
-
-        if (aMtrx.countRows() != aMtrx.countColumns()) {
-            throw new ProgrammingError("Matrix is not square!");
+    public static void throwIfNotSquare(final Structure2D mtrx) {
+        if (mtrx.countRows() != mtrx.countColumns()) {
+            throw new IllegalArgumentException("Matrix is not square!");
         }
     }
 
-    ProgrammingError() {
-        super();
+    public static void throwIfNull(final Object obj) {
+        Objects.requireNonNull(obj);
+    }
+
+    public static void throwIfNull(final Object... objs) {
+        for (int i = 0; i < objs.length; i++) {
+            Objects.requireNonNull(objs[i]);
+        }
+    }
+
+    public static void throwIfNull(final Object obj1, final Object obj2) {
+        Objects.requireNonNull(obj1);
+        Objects.requireNonNull(obj2);
+    }
+
+    public static void throwIfNull(final Object obj1, final Object obj2, final Object obj3) {
+        Objects.requireNonNull(obj1);
+        Objects.requireNonNull(obj2);
+        Objects.requireNonNull(obj3);
     }
 
     public ProgrammingError(final String message) {
         super(message);
+    }
+
+    public ProgrammingError(final Throwable cause) {
+        super(cause);
+    }
+
+    ProgrammingError() {
+        super();
     }
 
     ProgrammingError(final String message, final Throwable cause) {
@@ -96,10 +117,6 @@ public final class ProgrammingError extends RuntimeException implements Effectiv
 
     ProgrammingError(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
-    }
-
-    public ProgrammingError(final Throwable cause) {
-        super(cause);
     }
 
     @Override

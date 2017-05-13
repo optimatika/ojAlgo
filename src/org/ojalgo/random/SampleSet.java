@@ -25,7 +25,6 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
@@ -360,7 +359,7 @@ public final class SampleSet implements Access1D<Double> {
      * Replace the underlying samples and reset the sample set.
      */
     public void swap(final Access1D<?> samples) {
-        Objects.requireNonNull(samples);
+        ProgrammingError.throwIfNull(samples);
         mySamples = samples;
         this.reset();
     }

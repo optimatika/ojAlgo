@@ -21,9 +21,9 @@
  */
 package org.ojalgo.function.multiary;
 
-import java.util.Objects;
 import java.util.function.Function;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.function.BasicFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -104,7 +104,7 @@ public interface MultiaryFunction<N extends Number> extends BasicFunction<N>, Fu
     }
 
     default MultiaryFunction<N> andThen(final UnaryFunction<N> after) {
-        Objects.requireNonNull(after);
+        ProgrammingError.throwIfNull(after);
         return new MultiaryFunction<N>() {
 
             public int arity() {

@@ -21,9 +21,10 @@
  */
 package org.ojalgo.function;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
+
+import org.ojalgo.ProgrammingError;
 
 public interface VoidFunction<N extends Number> extends BasicFunction<N>, Consumer<N>, DoubleConsumer {
 
@@ -36,7 +37,7 @@ public interface VoidFunction<N extends Number> extends BasicFunction<N>, Consum
     }
 
     default VoidFunction<N> compose(final UnaryFunction<N> before) {
-        Objects.requireNonNull(before);
+        ProgrammingError.throwIfNull(before);
         return new VoidFunction<N>() {
 
             public void invoke(final double arg) {

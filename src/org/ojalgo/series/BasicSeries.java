@@ -32,9 +32,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.SortedMap;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.array.DenseArray;
@@ -137,13 +137,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
         }
 
         public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> arrayFactory) {
-            Objects.requireNonNull(arrayFactory);
+            ProgrammingError.throwIfNull(arrayFactory);
             return this.doBuild(arrayFactory, null);
         }
 
         public <N extends Number> BasicSeries.NaturallySequenced<K, N> build(final DenseArray.Factory<N> arrayFactory, final BinaryFunction<N> accumularor) {
-            Objects.requireNonNull(arrayFactory);
-            Objects.requireNonNull(accumularor);
+            ProgrammingError.throwIfNull(arrayFactory, accumularor);
             return this.doBuild(arrayFactory, accumularor);
         }
 

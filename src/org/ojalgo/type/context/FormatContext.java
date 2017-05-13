@@ -24,8 +24,8 @@ package org.ojalgo.type.context;
 import java.io.Serializable;
 import java.text.Format;
 import java.text.ParseException;
-import java.util.Objects;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.netio.ASCII;
 
 /**
@@ -46,7 +46,7 @@ abstract class FormatContext<T> implements TypeContext<T>, Serializable {
 
         super();
 
-        Objects.requireNonNull(format);
+        ProgrammingError.throwIfNull(format);
 
         myFormat = (Format) format.clone();
     }

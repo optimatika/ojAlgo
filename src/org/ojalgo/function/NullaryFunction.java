@@ -21,14 +21,15 @@
  */
 package org.ojalgo.function;
 
-import java.util.Objects;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.ojalgo.ProgrammingError;
 
 public interface NullaryFunction<N extends Number> extends BasicFunction<N>, Supplier<N>, DoubleSupplier {
 
     default NullaryFunction<N> andThen(final UnaryFunction<N> after) {
-        Objects.requireNonNull(after);
+        ProgrammingError.throwIfNull(after);
         return new NullaryFunction<N>() {
 
             public double doubleValue() {

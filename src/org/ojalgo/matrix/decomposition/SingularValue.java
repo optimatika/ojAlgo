@@ -22,8 +22,8 @@
 package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
@@ -225,7 +225,7 @@ public interface SingularValue<N extends Number>
      */
     default void getSingularValues(final double[] values) {
 
-        Objects.requireNonNull(values);
+        ProgrammingError.throwIfNull(values);
 
         final Array1D<Double> singulars = this.getSingularValues();
 

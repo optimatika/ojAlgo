@@ -5,10 +5,10 @@ import java.util.AbstractSet;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.array.DenseArray.Factory;
@@ -253,7 +253,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     }
 
     public double mix(final long key, final BinaryFunction<N> mixer, final double addend) {
-        Objects.requireNonNull(mixer);
+        ProgrammingError.throwIfNull(mixer);
         synchronized (myStorage) {
             final int tmpIndex = myStorage.index(key);
             final double oldValue = tmpIndex >= 0 ? myStorage.doubleValueInternally(tmpIndex) : PrimitiveMath.NaN;
@@ -264,7 +264,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     }
 
     public N mix(final long key, final BinaryFunction<N> mixer, final N addend) {
-        Objects.requireNonNull(mixer);
+        ProgrammingError.throwIfNull(mixer);
         synchronized (myStorage) {
             final int tmpIndex = myStorage.index(key);
             final N oldValue = tmpIndex >= 0 ? myStorage.getInternally(tmpIndex) : null;

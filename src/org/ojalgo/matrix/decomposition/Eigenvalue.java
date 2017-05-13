@@ -22,9 +22,9 @@
 package org.ojalgo.matrix.decomposition;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 import java.util.Optional;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
@@ -280,8 +280,7 @@ public interface Eigenvalue<N extends Number>
      */
     default void getEigenvalues(final double[] realParts, final Optional<double[]> imaginaryParts) {
 
-        Objects.requireNonNull(realParts);
-        Objects.requireNonNull(imaginaryParts);
+        ProgrammingError.throwIfNull(realParts, imaginaryParts);
 
         final Array1D<ComplexNumber> values = this.getEigenvalues();
 

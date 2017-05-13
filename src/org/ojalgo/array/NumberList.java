@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Objects;
 import java.util.RandomAccess;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
@@ -34,6 +33,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.Mutate1D;
@@ -313,7 +313,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public double mix(final long index, final BinaryFunction<N> mixer, final double addend) {
-        Objects.requireNonNull(mixer);
+        ProgrammingError.throwIfNull(mixer);
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
@@ -327,7 +327,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public N mix(final long index, final BinaryFunction<N> mixer, final N addend) {
-        Objects.requireNonNull(mixer);
+        ProgrammingError.throwIfNull(mixer);
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
