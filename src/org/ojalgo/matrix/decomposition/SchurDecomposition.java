@@ -132,7 +132,8 @@ abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition
         return false;
     }
 
-    public boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return false;
     }
 

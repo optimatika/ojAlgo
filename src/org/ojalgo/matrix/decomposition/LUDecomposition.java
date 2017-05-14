@@ -211,7 +211,8 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    public boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isComputed() && this.isSquareAndNotSingular();
     }
 

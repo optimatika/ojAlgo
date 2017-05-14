@@ -337,7 +337,8 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    public boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isComputed() && this.isHermitian();
     }
 

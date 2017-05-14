@@ -255,7 +255,8 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         return true;
     }
 
-    public boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isComputed() && this.isSquareAndNotSingular();
     }
 

@@ -162,7 +162,8 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         }
     }
 
-    public boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isSquareAndNotSingular();
     }
 

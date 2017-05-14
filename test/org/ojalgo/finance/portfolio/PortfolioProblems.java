@@ -22,6 +22,7 @@
 package org.ojalgo.finance.portfolio;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import org.ojalgo.TestUtils;
@@ -379,13 +380,10 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         for (int r = 0; r <= 10; r++) {
             final BigDecimal targetReturn = StandardType.PERCENT.enforce(new BigDecimal(0.2 + (0.02 * r)));
-            final BigDecimal expectedWeight1 = new BigDecimal(r / 10.0);
-            final BigDecimal expectedWeight0 = BigMath.ONE.subtract(expectedWeight1);
-
             markowitzModel.setTargetReturn(targetReturn);
 
             markowitzModel.optimiser().validate(false);
-            markowitzModel.optimiser().debug(true);
+            markowitzModel.optimiser().debug(false);
 
             final List<BigDecimal> tmpWeights = markowitzModel.getWeights();
 
@@ -393,11 +391,10 @@ public class PortfolioProblems extends FinancePortfolioTests {
                 BasicLogger.debug("{} => {} {}", targetReturn, markowitzModel.optimiser().getState(), markowitzModel.toSimplePortfolio());
             }
 
-            TestUtils.assertTrue("Weight 0", tmpWeights.get(0).compareTo(expectedWeight0) <= 0);
-            TestUtils.assertTrue("Weight 1", tmpWeights.get(1).compareTo(expectedWeight1) >= 0);
-            TestUtils.assertTrue("Weights 0+1", tmpWeights.get(0).add(tmpWeights.get(1)).compareTo(BigMath.ONE) == 0);
-
-            // TestUtils.assertEquals("Return", targetReturn, markowitzModel.getMeanReturn(), StandardType.PERCENT);
+            TestUtils.assertTrue("Optimiser completed normally", markowitzModel.optimiser().getState().isOptimal());
+            TestUtils.assertTrue("Weights sum to 100%",
+                    tmpWeights.get(0).add(tmpWeights.get(1)).setScale(2, RoundingMode.HALF_EVEN).compareTo(BigMath.ONE) == 0);
+            TestUtils.assertEquals("Return is close to target", targetReturn, markowitzModel.getMeanReturn(), StandardType.PERCENT.newPrecision(2).newScale(2));
         }
 
     }

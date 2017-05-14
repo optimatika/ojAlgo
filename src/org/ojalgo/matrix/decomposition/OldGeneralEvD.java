@@ -93,7 +93,8 @@ abstract class OldGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
         return false;
     }
 
-    public final boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isComputed() && this.isHermitian();
     }
 

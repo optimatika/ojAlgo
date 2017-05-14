@@ -244,7 +244,8 @@ final class RawQR extends RawDecomposition implements QR<Double> {
         return myFullSize;
     }
 
-    public boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isFullColumnRank();
     }
 

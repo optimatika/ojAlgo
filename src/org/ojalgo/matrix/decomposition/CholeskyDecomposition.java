@@ -170,7 +170,8 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return true;
     }
 
-    public boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isComputed() && mySPD;
     }
 

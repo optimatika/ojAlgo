@@ -205,7 +205,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         return true;
     }
 
-    public boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isComputed();
     }
 

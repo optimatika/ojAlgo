@@ -204,6 +204,7 @@ public final class NumberContext extends FormatContext<Number> {
 
         if (precision > 0) {
             myEpsilon = PrimitiveFunction.MAX.invoke(PrimitiveMath.MACHINE_EPSILON, PrimitiveFunction.POW.invoke(PrimitiveMath.TEN, 1 - precision));
+            //myEpsilon = PrimitiveMath.MACHINE_EPSILON * PrimitiveFunction.POW.invoke(PrimitiveMath.TEN, 16 - precision);
         } else {
             myEpsilon = PrimitiveMath.MACHINE_EPSILON;
         }

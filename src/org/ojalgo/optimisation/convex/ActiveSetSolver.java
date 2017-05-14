@@ -53,6 +53,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myIterationL = PrimitiveDenseStore.FACTORY.makeZero(tmpCountEqualityConstraints + tmpCountInequalityConstraints, 1L);
         myIterationX = PrimitiveDenseStore.FACTORY.makeZero(tmpCountVariables, 1L);
+
     }
 
     public int countExcluded() {
@@ -480,7 +481,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             //            }
 
         } else if (this.checkFeasibility(false)) {
-            // Subproblem NOT solved successfully
+            // Subproblem solved successfully
             // 0 active inequalities
             // Q SPD
             // Feasible current solution
@@ -503,20 +504,20 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             if ((this.getAE() != null) && (this.getAE().count() > 0)) {
                 this.debug("\tE-slack: {}", this.getSE().copy().asList());
                 if (!options.slack.isZero(this.getSE().aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                    // throw new IllegalStateException("Slack!");
+                    // throw new IllegalStateException("E-slack!");
                 }
             }
             if ((this.getAI() != null) && (this.getAI().count() > 0)) {
                 if (included.length != 0) {
                     this.debug("\tI-included-slack: {}", this.getSI(included).copy().asList());
                     if (!options.slack.isZero(this.getSI(included).aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                        // throw new IllegalStateException("Slack!");
+                        // throw new IllegalStateException("I-included-slack!");
                     }
                 }
                 if (myActivator.getExcluded().length != 0) {
                     this.debug("\tI-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy().asList());
                     if (this.getSI(myActivator.getExcluded()).aggregateAll(Aggregator.MAXIMUM).doubleValue() < ZERO) {
-                        //  throw new IllegalStateException("Slack!");
+                        // throw new IllegalStateException("I-excluded-slack!");
                     }
                 }
             }

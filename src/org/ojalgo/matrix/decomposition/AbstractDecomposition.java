@@ -28,6 +28,7 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
 
     private boolean myAspectRatioNormal = true;
     private boolean myComputed = false;
+    private Boolean mySolvable = null;
 
     AbstractDecomposition() {
         super();
@@ -37,15 +38,31 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
         return myComputed;
     }
 
+    public final boolean isSolvable() {
+        if (myComputed && (mySolvable == null)) {
+            if (this instanceof MatrixDecomposition.Solver) {
+                mySolvable = Boolean.valueOf(this.checkSolvability());
+            } else {
+                mySolvable = Boolean.FALSE;
+            }
+        }
+        return myComputed && mySolvable.booleanValue();
+    }
+
     public void reset() {
         myAspectRatioNormal = true;
         myComputed = false;
+        mySolvable = null;
     }
 
     protected abstract DecompositionStore<N> allocate(long numberOfRows, long numberOfColumns);
 
     protected final boolean aspectRatioNormal(final boolean aspectRatioNormal) {
         return (myAspectRatioNormal = aspectRatioNormal);
+    }
+
+    protected boolean checkSolvability() {
+        return false;
     }
 
     protected final boolean computed(final boolean computed) {
@@ -55,4 +72,5 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
     protected final boolean isAspectRatioNormal() {
         return myAspectRatioNormal;
     }
+
 }

@@ -516,7 +516,8 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return true;
     }
 
-    public boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isComputed();
     }
 

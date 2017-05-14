@@ -318,7 +318,8 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
         return false;
     }
 
-    public final boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isComputed() && this.isHermitian();
     }
 

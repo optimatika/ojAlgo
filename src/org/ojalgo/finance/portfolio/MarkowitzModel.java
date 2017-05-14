@@ -205,6 +205,15 @@ public final class MarkowitzModel extends OptimisedPortfolio {
 
         myOptimisationModel.getExpression(VARIANCE).weight(riskAversion / 2.0);
 
+        if (this.getOptimisationOptions().debug_appender != null) {
+            BasicLogger.debug();
+            BasicLogger.debug("@@@@@@@@@@@");
+            BasicLogger.debug("Iteration RAF: {}", riskAversion);
+            BasicLogger.debug("Iteration point: {}", myOptimisationModel.getVariableValues());
+            BasicLogger.debug("@@@@@@@@@@@");
+            BasicLogger.debug();
+        }
+
         return myOptimisationModel;
     }
 
@@ -278,6 +287,8 @@ public final class MarkowitzModel extends OptimisedPortfolio {
                         BasicLogger.debug("Now: {}", tmpTargetNow);
                         BasicLogger.debug("Target: {}", tmpTargetValue);
                         BasicLogger.debug("Diff:   {}", tmpTargetDiff);
+                        BasicLogger.debug("Iteration:   {}", tmpResult);
+                        BasicLogger.debug();
                     }
 
                     if (tmpTargetDiff < _0_0) {

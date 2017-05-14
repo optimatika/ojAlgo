@@ -239,7 +239,8 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return myFullSize;
     }
 
-    public boolean isSolvable() {
+    @Override
+    protected boolean checkSolvability() {
         return this.isComputed() && this.isFullColumnRank();
     }
 
