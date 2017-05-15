@@ -195,9 +195,9 @@ public interface MatrixDecomposition<N extends Number> {
         MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs, PhysicalStore<N> preallocated);
 
         /**
-         * Please note that producing a pseudoinverse and/or a least squares solution is ok! This is not an
-         * indication of if the matrix was square, had full rank, was postive definite or whatever. It's that
-         * in combination with the specific decomposition algorithm's capabilities.
+         * Please note that producing a pseudoinverse and/or a least squares solution is ok! The return value
+         * is not an indication of if the matrix was square, had full rank, was postive definite or whatever.
+         * It's that in combination with the specific decomposition algorithm's capabilities.
          *
          * @return true if this matrix decomposition is in a state to be able to deliver an inverse or an
          *         equation system solution (with some degree of numerical stability).
