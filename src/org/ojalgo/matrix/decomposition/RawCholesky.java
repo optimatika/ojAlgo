@@ -36,6 +36,8 @@ import org.ojalgo.matrix.store.RawStore;
 
 final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
+    private static final double ALGORITHM_EPSILON = TEN * SQRT.invoke(MACHINE_EPSILON);
+
     private boolean mySPD = false;
 
     /**
@@ -138,26 +140,6 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         }
     }
 
-    @Override
-    protected boolean checkSolvability() {
-        final boolean spd = this.isComputed() && this.isSPD();
-        if (spd) {
-            double max = ZERO;
-            double min = POSITIVE_INFINITY;
-            double val;
-            final RawStore inPlaceStore = this.getRawInPlaceStore();
-            for (int ij = 0; ij < this.getMinDim(); ij++) {
-                val = inPlaceStore.doubleValue(ij, ij);
-                max = MAX.invoke(val, max);
-                min = MIN.invoke(val, min);
-            }
-            val = min / max;
-            val = val * val;
-            return (val / TEN) > MACHINE_EPSILON;
-        }
-        return spd;
-    }
-
     public boolean isSPD() {
         return mySPD;
     }
@@ -236,6 +218,25 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         preallocated.substituteBackwards(tmpBody, false, true, false);
 
         return preallocated;
+    }
+
+    @Override
+    protected boolean checkSolvability() {
+        final boolean spd = this.isComputed() && this.isSPD();
+        if (spd) {
+            double max = ZERO;
+            double min = POSITIVE_INFINITY;
+            double val;
+            final RawStore inPlaceStore = this.getRawInPlaceStore();
+            final int tmpMinDim = this.getMinDim();
+            for (int ij = 0; ij < tmpMinDim; ij++) {
+                val = inPlaceStore.doubleValue(ij, ij);
+                max = MAX.invoke(val, max);
+                min = MIN.invoke(val, min);
+            }
+            return (min / max) > ALGORITHM_EPSILON;
+        }
+        return spd;
     }
 
 }
