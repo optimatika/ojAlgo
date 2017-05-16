@@ -127,7 +127,43 @@ public interface MatrixDecomposition<N extends Number> {
         }
     }
 
-    interface RankRevealing<N extends Number> extends MatrixDecomposition<N> {
+    interface Ordered<N extends Number> extends MatrixDecomposition<N> {
+
+        /**
+         * The various data structures extractable from an {@link Eigenvalue} or {@link SingularValue}
+         * decomposition can optionally be sorted. This is a property of the algorithm/implementation, not the
+         * data.
+         *
+         * @return true if they are ordered
+         */
+        boolean isOrdered();
+
+    }
+
+    /**
+     * A rank-revealing matrix decomposition of a matrix [A] is a decomposition that is, or can be transformed
+     * to be, on the form [A]=[X][D][Y]<sup>T</sup> where:
+     * <ul>
+     * <li>[X] and [Y] are square and well conditioned.</li>
+     * <li>[D] is diagonal with nonnegative and non-increasing values on the diagonal.</li>
+     * </ul>
+     * <p>
+     * The defintion that [X] and [Y] should be well conditioned is subject to interpretation. A specific
+     * decomposition algorithm can be more or less good at revealing the rank. Typically the
+     * {@link SingularValue} decomposition is the best.
+     * </p>
+     * <p>
+     * The requirement to have the diagonal elements of [D] ordered can be very practical, but is not always
+     * strictly necessary in order to reveal the rank. The method {@link #isOrdered()} indicates if the
+     * elements (rows and columns) of the returned matrix factors actually are ordered or not for this
+     * particular implementation.
+     * </p>
+     */
+    interface RankRevealing<N extends Number> extends Ordered<N> {
+
+        int getRank();
+
+        boolean isFullRank();
 
     }
 
@@ -195,9 +231,10 @@ public interface MatrixDecomposition<N extends Number> {
         MatrixStore<N> getSolution(Collectable<N, ? super PhysicalStore<N>> rhs, PhysicalStore<N> preallocated);
 
         /**
-         * Please note that producing a pseudoinverse and/or a least squares solution is ok! The return value
-         * is not an indication of if the matrix was square, had full rank, was postive definite or whatever.
-         * It's that in combination with the specific decomposition algorithm's capabilities.
+         * Please note that producing a pseudoinverse and/or a least squares solution is ok! The return value,
+         * of this method, is not an indication of if the decomposed matrix is square, has full rank, is
+         * postive definite or whatever. It's that in combination with the specific decomposition algorithm's
+         * capabilities.
          *
          * @return true if this matrix decomposition is in a state to be able to deliver an inverse or an
          *         equation system solution (with some degree of numerical stability).
@@ -215,7 +252,7 @@ public interface MatrixDecomposition<N extends Number> {
      *
      * @author apete
      */
-    interface Values<N extends Number> extends MatrixDecomposition<N> {
+    interface Values<N extends Number> extends Ordered<N> {
 
         /**
          * @param matrix The matrix to decompose
@@ -223,15 +260,6 @@ public interface MatrixDecomposition<N extends Number> {
          *         instance does not implement {@link Solver}.
          */
         boolean computeValuesOnly(Access2D.Collectable<N, ? super PhysicalStore<N>> matrix);
-
-        /**
-         * The various data structures extractable from an {@link Eigenvalue} or {@link SingularValue}
-         * decomposition can optionally be sorted. This is a property of the algorithm/implementation, not the
-         * data.
-         *
-         * @return true if they are ordered
-         */
-        boolean isOrdered();
 
     }
 
