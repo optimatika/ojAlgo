@@ -36,8 +36,8 @@ import org.ojalgo.matrix.store.RawStore;
 
 final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
-    private static final double ALGORITHM_EPSILON = TEN * SQRT.invoke(MACHINE_EPSILON);
-
+    private double myMaxDiag = ONE;
+    private double myMinDiag = ZERO;
     private boolean mySPD = false;
 
     /**
@@ -113,6 +113,21 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.getRawInPlaceStore().logical().triangular(false, false).get();
     }
 
+    public int getRank() {
+
+        final double tolerance = SQRT.invoke(this.getAlgorithmEpsilon());
+        int rank = 1;
+
+        final RawStore inPlaceStore = this.getRawInPlaceStore();
+        final int limit = this.getMinDim();
+        for (int ij = 1; ij < limit; ij++) {
+            if (inPlaceStore.doubleValue(ij, ij) > tolerance) {
+                rank++;
+            }
+        }
+        return rank;
+    }
+
     public MatrixStore<Double> getSolution(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
         final DecompositionStore<Double> tmpPreallocated = this.allocate(rhs.countRows(), rhs.countColumns());
         return this.getSolution(rhs, tmpPreallocated);
@@ -138,6 +153,10 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
+    }
+
+    public boolean isFullRank() {
+        return this.isSolvable();
     }
 
     public boolean isSPD() {
@@ -179,21 +198,27 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
         final int tmpDiagDim = this.getRowDim();
         mySPD = (this.getColDim() == tmpDiagDim);
+        myMaxDiag = ZERO;
+        myMinDiag = POSITIVE_INFINITY;
 
         double[] tmpRowIJ;
         double[] tmpRowI;
+        double tmpVal;
 
         // Main loop.
-        for (int ij = 0; ij < tmpDiagDim; ij++) { // For each row/column, along the diagonal
+        for (int ij = 0; mySPD && (ij < tmpDiagDim); ij++) { // For each row/column, along the diagonal
             tmpRowIJ = data[ij];
 
-            final double tmpD = tmpRowIJ[ij] = SQRT.invoke(MAX.invoke(input.doubleValue(ij, ij) - DOT.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO));
-            mySPD &= (tmpD > ZERO);
+            tmpVal = MAX.invoke(input.doubleValue(ij, ij) - DOT.invoke(tmpRowIJ, 0, tmpRowIJ, 0, 0, ij), ZERO);
+            myMaxDiag = MAX.invoke(myMaxDiag, tmpVal);
+            myMinDiag = MIN.invoke(myMinDiag, tmpVal);
+            tmpVal = tmpRowIJ[ij] = SQRT.invoke(tmpVal);
+            mySPD = mySPD && (tmpVal > ZERO);
 
             for (int i = ij + 1; i < tmpDiagDim; i++) { // Update column below current row
                 tmpRowI = data[i];
 
-                tmpRowI[ij] = (input.doubleValue(i, ij) - DOT.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij)) / tmpD;
+                tmpRowI[ij] = (input.doubleValue(i, ij) - DOT.invoke(tmpRowI, 0, tmpRowIJ, 0, 0, ij)) / tmpVal;
             }
         }
 
@@ -222,46 +247,11 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        final boolean spd = this.isComputed() && this.isSPD();
-        if (spd) {
-            double max = ZERO;
-            double min = POSITIVE_INFINITY;
-            double val;
-            final RawStore inPlaceStore = this.getRawInPlaceStore();
-            final int tmpMinDim = this.getMinDim();
-            for (int ij = 0; ij < tmpMinDim; ij++) {
-                val = inPlaceStore.doubleValue(ij, ij);
-                max = MAX.invoke(val, max);
-                min = MIN.invoke(val, min);
-            }
-            return (min / max) > ALGORITHM_EPSILON;
-        }
-        return spd;
+        return mySPD && (myMinDiag > this.getAlgorithmEpsilon());
     }
 
-    public int getRank() {
-
-        int rank = 0;
-
-        double max = ZERO;
-        double min = POSITIVE_INFINITY;
-        double val;
-        final RawStore inPlaceStore = this.getRawInPlaceStore();
-        final int tmpMinDim = this.getMinDim();
-        for (int ij = 0; ij < tmpMinDim; ij++) {
-            val = inPlaceStore.doubleValue(ij, ij);
-            max = MAX.invoke(val, max);
-            min = MIN.invoke(val, min);
-            if ((min / max) > ALGORITHM_EPSILON) {
-                rank++;
-            }
-
-        }
-        return rank;
-    }
-
-    public boolean isFullRank() {
-        return this.isSolvable();
+    double getAlgorithmEpsilon() {
+        return myMaxDiag * TEN * this.getDimensionalEpsilon();
     }
 
 }
