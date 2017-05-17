@@ -152,15 +152,14 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
     }
 
     public int getRank() {
-        final double eps = POW.invoke(TWO, -52.0);
-        final double tol = MAX.invoke(m, n) * (s[0] * eps);
-        int r = 0;
-        for (int i = 0; i < s.length; i++) {
-            if (s[i] > tol) {
-                r++;
+        final double tolerance = s[0] * this.getDimensionalEpsilon();
+        int rank = 1;
+        for (int i = 1; i < s.length; i++) {
+            if (s[i] > tolerance) {
+                rank++;
             }
         }
-        return r;
+        return rank;
     }
 
     public Array1D<Double> getSingularValues() {
@@ -197,17 +196,17 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         }
     }
 
+    public boolean isFullRank() {
+        final double tolerance = s[0] * this.getDimensionalEpsilon();
+        return s[s.length - 1] > tolerance;
+    }
+
     public boolean isFullSize() {
         return false;
     }
 
     public boolean isOrdered() {
         return true;
-    }
-
-    @Override
-    protected boolean checkSolvability() {
-        return this.isComputed();
     }
 
     public PhysicalStore<Double> preallocate(final Structure2D template) {
@@ -247,6 +246,11 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
         } else {
             throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+    }
+
+    @Override
+    protected boolean checkSolvability() {
+        return true;
     }
 
     boolean doDecompose(final Access2D.Collectable<Double, ? super PhysicalStore<Double>> matrix, final boolean factors) {

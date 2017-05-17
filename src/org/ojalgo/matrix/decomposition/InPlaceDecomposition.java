@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 
@@ -45,6 +46,11 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
 
     protected final int getColDim() {
         return myColDim;
+    }
+
+    @Override
+    protected double getDimensionalEpsilon() {
+        return this.getMaxDim() * PrimitiveMath.MACHINE_EPSILON;
     }
 
     protected final DecompositionStore<N> getInPlace() {

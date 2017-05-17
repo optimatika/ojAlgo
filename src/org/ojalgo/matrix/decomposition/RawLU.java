@@ -162,13 +162,26 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         }
     }
 
-    @Override
-    protected boolean checkSolvability() {
-        return this.isSquareAndNotSingular();
+    /**
+     * Is the matrix nonsingular?
+     *
+     * @return true if U, and hence A, is nonsingular.
+     */
+    public boolean isFullRank() {
+
+        final double[][] raw = this.getRawInPlaceData();
+        final int size = this.getMinDim();
+        for (int ij = 0; ij < size; ij++) {
+            if (raw[ij][ij] == ZERO) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public boolean isSquareAndNotSingular() {
-        return (this.getRowDim() == this.getColDim()) && this.isNonsingular();
+        return (this.getRowDim() == this.getColDim()) && this.isFullRank();
     }
 
     public PhysicalStore<Double> preallocate(final Structure2D template) {
@@ -291,21 +304,9 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return preallocated;
     }
 
-    /**
-     * Is the matrix nonsingular?
-     *
-     * @return true if U, and hence A, is nonsingular.
-     */
-    boolean isNonsingular() {
-        final int n = this.getColDim();
-
-        final double[][] LU = this.getRawInPlaceData();
-        for (int j = 0; j < n; j++) {
-            if (LU[j][j] == 0.0) {
-                return false;
-            }
-        }
-
-        return true;
+    @Override
+    protected boolean checkSolvability() {
+        return this.isSquareAndNotSingular();
     }
+
 }

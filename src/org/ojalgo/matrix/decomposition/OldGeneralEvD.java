@@ -147,6 +147,11 @@ abstract class OldGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
     }
 
     @Override
+    protected double getDimensionalEpsilon() {
+        return this.getD().countRows() * PrimitiveMath.MACHINE_EPSILON;
+    }
+
+    @Override
     protected final MatrixStore<N> makeD() {
         return null;
     }

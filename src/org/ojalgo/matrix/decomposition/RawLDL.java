@@ -122,9 +122,8 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         }
     }
 
-    @Override
-    protected boolean checkSolvability() {
-        return this.isComputed() && this.isSquareAndNotSingular();
+    public boolean isFullRank() {
+        return this.getRank() == this.getMinDim();
     }
 
     public boolean isSPD() {
@@ -224,5 +223,10 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         preallocated.substituteBackwards(tmpBody, true, true, false);
 
         return preallocated;
+    }
+
+    @Override
+    protected boolean checkSolvability() {
+        return this.isComputed() && this.isSquareAndNotSingular();
     }
 }

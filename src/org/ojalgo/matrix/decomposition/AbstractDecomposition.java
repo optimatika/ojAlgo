@@ -69,6 +69,8 @@ abstract class AbstractDecomposition<N extends Number> implements MatrixDecompos
         return (myComputed = computed);
     }
 
+    protected abstract double getDimensionalEpsilon();
+
     protected final boolean isAspectRatioNormal() {
         return myAspectRatioNormal;
     }

@@ -33,6 +33,7 @@ import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.ComplexAggregator;
@@ -180,10 +181,10 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     }
 
     private double[] d;
+
     private double[] e;
     private transient MatrixStore<N> myInverse;
     private final TridiagonalDecomposition<N> myTridiagonal;
-
     @SuppressWarnings("unused")
     private HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         this(aFactory, null);
@@ -318,11 +319,6 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
         return false;
     }
 
-    @Override
-    protected boolean checkSolvability() {
-        return this.isComputed() && this.isHermitian();
-    }
-
     public PhysicalStore<N> preallocate(final Structure2D template) {
         final long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);
@@ -365,6 +361,11 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     }
 
     @Override
+    protected boolean checkSolvability() {
+        return this.isComputed() && this.isHermitian();
+    }
+
+    @Override
     protected final boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
         throw new UnsupportedOperationException();
     }
@@ -396,6 +397,11 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
         }
 
         return this.computed(true);
+    }
+
+    @Override
+    protected double getDimensionalEpsilon() {
+        return d.length * PrimitiveMath.MACHINE_EPSILON;
     }
 
     @Override

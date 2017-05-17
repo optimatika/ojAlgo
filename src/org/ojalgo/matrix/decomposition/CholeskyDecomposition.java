@@ -288,4 +288,32 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.computed(mySPD = tmpPositiveDefinite);
     }
 
+    private static final double ALGORITHM_EPSILON = TEN * SQRT.invoke(MACHINE_EPSILON);
+
+    public int getRank() {
+
+        int rank = 0;
+
+        double max = ZERO;
+        double min = POSITIVE_INFINITY;
+        double val;
+        final DecompositionStore<N> inPlaceStore = this.getInPlace();
+        final int tmpMinDim = this.getMinDim();
+        for (int ij = 0; ij < tmpMinDim; ij++) {
+            val = inPlaceStore.doubleValue(ij, ij);
+            max = MAX.invoke(val, max);
+            min = MIN.invoke(val, min);
+            if ((min / max) > ALGORITHM_EPSILON) {
+                rank++;
+            }
+
+        }
+        return rank;
+    }
+
+    public boolean isFullRank() {
+        // TODO Auto-generated method stub
+        return this.getRank() == this.getMinDim();
+    }
+
 }

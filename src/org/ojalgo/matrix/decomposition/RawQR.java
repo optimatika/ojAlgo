@@ -228,7 +228,7 @@ final class RawQR extends RawDecomposition implements QR<Double> {
      *
      * @return true if R, and hence A, has full rank.
      */
-    public boolean isFullColumnRank() {
+    public boolean isFullRank() {
 
         final int n = this.getColDim();
 
@@ -242,11 +242,6 @@ final class RawQR extends RawDecomposition implements QR<Double> {
 
     public boolean isFullSize() {
         return myFullSize;
-    }
-
-    @Override
-    protected boolean checkSolvability() {
-        return this.isFullColumnRank();
     }
 
     public PhysicalStore<Double> preallocate(final Structure2D template) {
@@ -388,6 +383,11 @@ final class RawQR extends RawDecomposition implements QR<Double> {
             }
         }
         return preallocated.logical().limits(n, (int) preallocated.countColumns()).get();
+    }
+
+    @Override
+    protected boolean checkSolvability() {
+        return this.isFullColumnRank();
     }
 
 }

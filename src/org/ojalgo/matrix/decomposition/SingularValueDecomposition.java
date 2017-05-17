@@ -298,7 +298,9 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     private double[] e = null;
+
     private final BidiagonalDecomposition<N> myBidiagonal;
+
     private transient MatrixStore<N> myD = null;
     private boolean myFullSize = false;
     private final Structure2D myInputStructure = new Structure2D() {
@@ -318,7 +320,6 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     private boolean myTransposed = false;
     private boolean myValuesOnly = false;
     private double[] s = null;
-
     @SuppressWarnings("unused")
     private SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
         this(factory, null);
@@ -508,17 +509,16 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         }
     }
 
+    public boolean isFullRank() {
+        return this.getRank() == myBidiagonal.getMinDim();
+    }
+
     public boolean isFullSize() {
         return myFullSize;
     }
 
     public boolean isOrdered() {
         return true;
-    }
-
-    @Override
-    protected boolean checkSolvability() {
-        return this.isComputed();
     }
 
     public PhysicalStore<N> preallocate(final Structure2D template) {
@@ -601,6 +601,11 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         return myInverse;
     }
 
+    @Override
+    protected boolean checkSolvability() {
+        return this.isComputed();
+    }
+
     protected boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean valuesOnly, final boolean fullSize) {
 
         this.reset();
@@ -676,6 +681,11 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
 
     protected DecompositionStore<N> getBidiagonalQ2() {
         return (DecompositionStore<N>) myBidiagonal.getQ2();
+    }
+
+    @Override
+    protected double getDimensionalEpsilon() {
+        return myBidiagonal.getMaxDim() * PrimitiveMath.MACHINE_EPSILON;
     }
 
     protected boolean isTransposed() {

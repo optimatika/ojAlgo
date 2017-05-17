@@ -45,8 +45,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface QR<N extends Number>
-        extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>, MatrixDecomposition.Determinant<N> {
+public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
+        MatrixDecomposition.Determinant<N>, MatrixDecomposition.RankRevealing<N> {
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<QR<N>> {
 
@@ -105,8 +105,17 @@ public interface QR<N extends Number>
      * method will never fail. The primary use of the QR decomposition is in the least squares solution of
      * overdetermined systems of simultaneous linear equations. This will fail if the matrix does not have
      * full column rank. The rank must be equal to the number of columns.
+     *
+     * @deprecated v44 Use {@link #isFullRank()} instead
      */
-    boolean isFullColumnRank();
+    @Deprecated
+    default boolean isFullColumnRank() {
+        return this.isFullRank();
+    }
+
+    default boolean isOrdered() {
+        return false;
+    }
 
     default MatrixStore<N> reconstruct() {
         return QR.reconstruct(this);

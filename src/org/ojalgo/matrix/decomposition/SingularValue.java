@@ -49,8 +49,8 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public interface SingularValue<N extends Number>
-        extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>, MatrixDecomposition.Values<N> {
+public interface SingularValue<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
+        MatrixDecomposition.RankRevealing<N>, MatrixDecomposition.Values<N> {
 
     interface Factory<N extends Number> extends MatrixDecomposition.Factory<SingularValue<N>> {
 

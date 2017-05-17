@@ -211,9 +211,8 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
     }
 
-    @Override
-    protected boolean checkSolvability() {
-        return this.isComputed() && this.isSquareAndNotSingular();
+    public boolean isFullRank() {
+        return this.isSolvable();
     }
 
     public final boolean isSquareAndNotSingular() {
@@ -318,6 +317,11 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         }
 
         return this.computed(true);
+    }
+
+    @Override
+    protected boolean checkSolvability() {
+        return this.isComputed() && this.isSquareAndNotSingular();
     }
 
     int[] getReducedPivots() {

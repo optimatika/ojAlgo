@@ -130,11 +130,11 @@ public interface MatrixDecomposition<N extends Number> {
     interface Ordered<N extends Number> extends MatrixDecomposition<N> {
 
         /**
-         * The various data structures extractable from an {@link Eigenvalue} or {@link SingularValue}
-         * decomposition can optionally be sorted. This is a property of the algorithm/implementation, not the
-         * data.
+         * This is a property of the algorithm/implementation, not the data. Typically relevant for
+         * {@link SingularValue}, {@link Eigenvalue} or any {@link RankRevealing} decomposition.
          *
-         * @return true if they are ordered
+         * @return true if the rows/columns of the returned matrix factors are guaranteed some specific order;
+         *         false if there is no such guarantee.
          */
         boolean isOrdered();
 
@@ -154,15 +154,21 @@ public interface MatrixDecomposition<N extends Number> {
      * </p>
      * <p>
      * The requirement to have the diagonal elements of [D] ordered can be very practical, but is not always
-     * strictly necessary in order to reveal the rank. The method {@link #isOrdered()} indicates if the
+     * strictly necessary in order to just reveal the rank. The method {@link #isOrdered()} indicates if the
      * elements (rows and columns) of the returned matrix factors actually are ordered or not for this
      * particular implementation.
      * </p>
      */
     interface RankRevealing<N extends Number> extends Ordered<N> {
 
+        /**
+         * @return The effective numerical rank (best estimate)
+         */
         int getRank();
 
+        /**
+         * @return true is the rank is equal to the minimum of the row and column dimensions; false if not
+         */
         boolean isFullRank();
 
     }

@@ -231,17 +231,12 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
     /**
      * @see org.ojalgo.matrix.decomposition.QR#isFullColumnRank()
      */
-    public boolean isFullColumnRank() {
+    public boolean isFullRank() {
         return this.getRank() == this.getMinDim();
     }
 
     public boolean isFullSize() {
         return myFullSize;
-    }
-
-    @Override
-    protected boolean checkSolvability() {
-        return this.isComputed() && this.isFullColumnRank();
     }
 
     public PhysicalStore<N> preallocate(final Structure2D template) {
@@ -277,6 +272,11 @@ abstract class QRDecomposition<N extends Number> extends InPlaceDecomposition<N>
         } else {
             throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+    }
+
+    @Override
+    protected boolean checkSolvability() {
+        return this.isComputed() && this.isFullColumnRank();
     }
 
     /**

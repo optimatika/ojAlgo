@@ -23,6 +23,7 @@ package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
@@ -74,6 +75,11 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
 
     protected int getColDim() {
         return myColDim;
+    }
+
+    @Override
+    protected double getDimensionalEpsilon() {
+        return this.getMaxDim() * PrimitiveMath.MACHINE_EPSILON;
     }
 
     protected int getMaxDim() {
