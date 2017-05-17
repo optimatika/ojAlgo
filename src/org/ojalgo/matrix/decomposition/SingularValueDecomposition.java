@@ -320,6 +320,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     private boolean myTransposed = false;
     private boolean myValuesOnly = false;
     private double[] s = null;
+
     @SuppressWarnings("unused")
     private SingularValueDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> factory) {
         this(factory, null);
@@ -447,22 +448,14 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
     }
 
     public int getRank() {
-
-        final Array1D<Double> tmpSingularValues = this.getSingularValues();
-        int retVal = tmpSingularValues.size();
-
-        // Tolerance based on min-dim but should be max-dim
-        final double tmpTolerance = retVal * (tmpSingularValues.doubleValue(0) * PrimitiveMath.MACHINE_EPSILON);
-
-        for (int i = retVal - 1; i >= 0; i--) {
-            if (tmpSingularValues.doubleValue(i) <= tmpTolerance) {
-                retVal--;
-            } else {
-                return retVal;
+        final double tolerance = s[0] * this.getDimensionalEpsilon();
+        int rank = 0;
+        for (int i = 0; i < s.length; i++) {
+            if (s[i] > tolerance) {
+                rank++;
             }
         }
-
-        return retVal;
+        return rank;
     }
 
     public Array1D<Double> getSingularValues() {

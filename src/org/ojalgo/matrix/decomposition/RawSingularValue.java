@@ -153,8 +153,8 @@ final class RawSingularValue extends RawDecomposition implements SingularValue<D
 
     public int getRank() {
         final double tolerance = s[0] * this.getDimensionalEpsilon();
-        int rank = 1;
-        for (int i = 1; i < s.length; i++) {
+        int rank = 0;
+        for (int i = 0; i < s.length; i++) {
             if (s[i] > tolerance) {
                 rank++;
             }

@@ -116,11 +116,11 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
     public int getRank() {
 
         final double tolerance = SQRT.invoke(this.getAlgorithmEpsilon());
-        int rank = 1;
+        int rank = 0;
 
         final RawStore inPlaceStore = this.getRawInPlaceStore();
         final int limit = this.getMinDim();
-        for (int ij = 1; ij < limit; ij++) {
+        for (int ij = 0; ij < limit; ij++) {
             if (inPlaceStore.doubleValue(ij, ij) > tolerance) {
                 rank++;
             }
