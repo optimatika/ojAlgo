@@ -167,7 +167,7 @@ public interface MatrixDecomposition<N extends Number> {
         int getRank();
 
         /**
-         * @return true is the rank is equal to the minimum of the row and column dimensions; false if not
+         * @return true if the rank is equal to the minimum of the row and column dimensions; false if not
          */
         boolean isFullRank();
 
@@ -254,7 +254,7 @@ public interface MatrixDecomposition<N extends Number> {
 
     /**
      * Eigenvalue:s and Singular Value:s decompositions can calculate the "values" only, and the resulting
-     * matrices and arrays can have their elements sorted or not.
+     * matrices and arrays can have their elements sorted (descending) or not.
      *
      * @author apete
      */
