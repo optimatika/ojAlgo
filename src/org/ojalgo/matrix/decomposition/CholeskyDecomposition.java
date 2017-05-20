@@ -90,6 +90,8 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
     }
 
     private boolean mySPD = false;
+    private final double myMaxDiag = ONE;
+    private final double myMinDiag = ZERO;
 
     protected CholeskyDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
