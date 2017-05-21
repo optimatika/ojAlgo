@@ -59,6 +59,11 @@ abstract class OptimisedPortfolio extends EquilibriumModel {
             return this;
         }
 
+        /**
+         * You have to call some method that will trigger the calculation (any method that requires the
+         * calculation results) before you check the optimisation state. Otherwise you'll simply get
+         * State.UNEXPLORED.
+         */
         public State getState() {
             if (myOptimisationState == null) {
                 myOptimisationState = State.UNEXPLORED;
