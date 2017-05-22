@@ -104,10 +104,12 @@ public class SamplePerformanceIssueSolvingILP {
     }
 
     private void solve(final long maxContainerSize, final List<Container> containers) {
-        final Optimisation.Options options = new Optimisation.Options();
-        options.iterations_suffice = 64;
 
-        final ExpressionsBasedModel expressionsBasedModel = new ExpressionsBasedModel(options);
+        final ExpressionsBasedModel expressionsBasedModel = new ExpressionsBasedModel();
+
+        expressionsBasedModel.options.time_suffice = 60 * 1000;
+        expressionsBasedModel.options.iterations_suffice = 64;
+        expressionsBasedModel.options.mip_gap = 0.01;
 
         final double firstContainerSize = maxContainerSize * FIRST_CONTAINER_SIZE_PERC;
         final Expression firstContainerExpression = expressionsBasedModel.addExpression("expression:first").lower(firstContainerSize * (1 - DEVIATION))
@@ -140,7 +142,7 @@ public class SamplePerformanceIssueSolvingILP {
             }
         }
 
-        expressionsBasedModel.options.debug(IntegerSolver.class);
+        // expressionsBasedModel.options.debug(IntegerSolver.class);
         // expressionsBasedModel.relax(true);
 
         final Optimisation.Result result = expressionsBasedModel.maximise();

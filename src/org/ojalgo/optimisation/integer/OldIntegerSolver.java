@@ -22,6 +22,7 @@
 package org.ojalgo.optimisation.integer;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -33,8 +34,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 import org.ojalgo.access.AccessUtils;
-import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -249,9 +248,9 @@ public final class OldIntegerSolver extends IntegerSolver {
 
             final ExpressionsBasedModel retVal = OldIntegerSolver.this.getModel().relax(false);
 
-            if (retVal.options.debug_appender != null) {
-                retVal.options.debug_appender = new CharacterRing().asPrinter();
-            }
+            //            if (retVal.options.debug_appender != null) {
+            //                retVal.options.debug_appender = new CharacterRing().asPrinter();
+            //            }
 
             final int[] tmpIntegerIndeces = OldIntegerSolver.this.getIntegerIndeces();
             for (int i = 0; i < tmpIntegerIndeces.length; i++) {
@@ -277,7 +276,7 @@ public final class OldIntegerSolver extends IntegerSolver {
 
             if (OldIntegerSolver.this.isIntegerSolutionFound()) {
                 final double tmpBestValue = OldIntegerSolver.this.getBestResultSoFar().getValue();
-                final double tmpGap = PrimitiveFunction.ABS.invoke(tmpBestValue * OldIntegerSolver.this.options.mip_gap);
+                final double tmpGap = ABS.invoke(tmpBestValue * OldIntegerSolver.this.options.mip_gap);
                 if (retVal.isMinimisation()) {
                     retVal.limitObjective(null, TypeUtils.toBigDecimal(tmpBestValue - tmpGap, OldIntegerSolver.this.options.problem));
                 } else {
@@ -405,23 +404,24 @@ public final class OldIntegerSolver extends IntegerSolver {
      */
     int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey) {
 
-        final MatrixStore<Double> tmpGradient = this.getGradient(AccessUtils.asPrimitive1D(nodeResult));
-
         int retVal = -1;
 
-        double tmpFraction, tmpWeightedFraction;
+        double tmpFraction;
+
         double tmpMaxFraction = ZERO;
 
         for (int i = 0; i < myIntegerIndeces.length; i++) {
 
             tmpFraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndeces[i]));
-            tmpWeightedFraction = tmpFraction * (PrimitiveMath.ONE + PrimitiveFunction.ABS.invoke(tmpGradient.doubleValue(myIntegerIndeces[i])));
-
-            if ((tmpWeightedFraction > tmpMaxFraction) && !options.integer.isZero(tmpWeightedFraction)) {
-                retVal = i;
-                tmpMaxFraction = tmpWeightedFraction;
+            if (this.isIntegerSolutionFound()) {
+                final MatrixStore<Double> tmpGradient = this.getGradient(AccessUtils.asPrimitive1D(nodeResult));
+                tmpFraction *= (ONE + (ABS.invoke(tmpGradient.doubleValue(myIntegerIndeces[i])) / tmpGradient.norm()));
             }
 
+            if ((tmpFraction > tmpMaxFraction) && !options.integer.isZero(tmpFraction)) {
+                retVal = i;
+                tmpMaxFraction = tmpFraction;
+            }
         }
 
         return retVal;
