@@ -399,6 +399,10 @@ public final class OldIntegerSolver extends IntegerSolver {
         return myIntegerIndeces;
     }
 
+    /**
+     * Should return the index of the (best) variable to branch on. Returning a negative index means an
+     * integer solition has been found (no further branching).
+     */
     int identifyNonIntegerVariable(final Optimisation.Result nodeResult, final NodeKey nodeKey) {
 
         final MatrixStore<Double> tmpGradient = this.getGradient(AccessUtils.asPrimitive1D(nodeResult));
