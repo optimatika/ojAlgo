@@ -34,6 +34,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 import org.ojalgo.access.AccessUtils;
+import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
@@ -415,7 +416,7 @@ public final class OldIntegerSolver extends IntegerSolver {
             tmpFraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndeces[i]));
             if (this.isIntegerSolutionFound()) {
                 final MatrixStore<Double> tmpGradient = this.getGradient(AccessUtils.asPrimitive1D(nodeResult));
-                tmpFraction *= (ONE + (ABS.invoke(tmpGradient.doubleValue(myIntegerIndeces[i])) / tmpGradient.norm()));
+                tmpFraction *= (ONE + (ABS.invoke(tmpGradient.doubleValue(myIntegerIndeces[i])) / tmpGradient.aggregateAll(Aggregator.LARGEST)));
             }
 
             if ((tmpFraction > tmpMaxFraction) && !options.integer.isZero(tmpFraction)) {
