@@ -22,7 +22,7 @@
 package org.ojalgo.optimisation.integer;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.PrimitiveFunction.ABS;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -408,7 +408,7 @@ public final class OldIntegerSolver extends IntegerSolver {
         int retVal = -1;
 
         double tmpFraction;
-
+        double tmpScale;
         double tmpMaxFraction = ZERO;
 
         for (int i = 0; i < myIntegerIndeces.length; i++) {
@@ -416,7 +416,9 @@ public final class OldIntegerSolver extends IntegerSolver {
             tmpFraction = nodeKey.getFraction(i, nodeResult.doubleValue(myIntegerIndeces[i]));
             if (this.isIntegerSolutionFound()) {
                 final MatrixStore<Double> tmpGradient = this.getGradient(AccessUtils.asPrimitive1D(nodeResult));
-                tmpFraction *= (ONE + (ABS.invoke(tmpGradient.doubleValue(myIntegerIndeces[i])) / tmpGradient.aggregateAll(Aggregator.LARGEST)));
+                if ((tmpScale = tmpGradient.aggregateAll(Aggregator.LARGEST)) > ZERO) {
+                    tmpFraction *= (ONE + (ABS.invoke(tmpGradient.doubleValue(myIntegerIndeces[i])) / tmpScale));
+                }
             }
 
             if ((tmpFraction > tmpMaxFraction) && !options.integer.isZero(tmpFraction)) {
