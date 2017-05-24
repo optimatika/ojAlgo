@@ -90,8 +90,8 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
     }
 
     private boolean mySPD = false;
-    private final double myMaxDiag = ONE;
-    private final double myMinDiag = ZERO;
+    private double myMaxDiag = ONE;
+    private double myMinDiag = ZERO;
 
     protected CholeskyDecomposition(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         super(aFactory);
@@ -241,7 +241,7 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
     @Override
     protected boolean checkSolvability() {
-        return this.isComputed() && mySPD;
+        return mySPD && (myMinDiag > this.getAlgorithmEpsilon());
     }
 
     final boolean compute(final Access2D.Collectable<N, ? super PhysicalStore<N>> matrix, final boolean checkHermitian) {
@@ -256,6 +256,8 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
         // true if (Hermitian) Positive Definite
         boolean tmpPositiveDefinite = tmpRowDim == tmpColDim;
+        myMaxDiag = ZERO;
+        myMinDiag = POSITIVE_INFINITY;
 
         final BasicArray<N> tmpMultipliers = this.makeArray(tmpRowDim);
 
@@ -270,7 +272,10 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         for (int ij = 0; tmpPositiveDefinite && (ij < tmpMinDim); ij++) {
 
             // Do the calculations...
-            if (tmpInPlace.doubleValue(ij, ij) > PrimitiveMath.ZERO) {
+            final double tmpVal = tmpInPlace.doubleValue(ij, ij);
+            myMaxDiag = MAX.invoke(myMaxDiag, tmpVal);
+            myMinDiag = MIN.invoke(myMinDiag, tmpVal);
+            if (tmpVal > PrimitiveMath.ZERO) {
 
                 tmpInPlace.modifyOne(ij, ij, tmpSqrtFunc);
 
@@ -290,32 +295,27 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.computed(mySPD = tmpPositiveDefinite);
     }
 
-    private static final double ALGORITHM_EPSILON = TEN * SQRT.invoke(MACHINE_EPSILON);
-
     public int getRank() {
 
+        final double tolerance = SQRT.invoke(this.getAlgorithmEpsilon());
         int rank = 0;
 
-        double max = ZERO;
-        double min = POSITIVE_INFINITY;
-        double val;
         final DecompositionStore<N> inPlaceStore = this.getInPlace();
-        final int tmpMinDim = this.getMinDim();
-        for (int ij = 0; ij < tmpMinDim; ij++) {
-            val = inPlaceStore.doubleValue(ij, ij);
-            max = MAX.invoke(val, max);
-            min = MIN.invoke(val, min);
-            if ((min / max) > ALGORITHM_EPSILON) {
+        final int limit = this.getMinDim();
+        for (int ij = 0; ij < limit; ij++) {
+            if (inPlaceStore.doubleValue(ij, ij) > tolerance) {
                 rank++;
             }
-
         }
         return rank;
     }
 
     public boolean isFullRank() {
-        // TODO Auto-generated method stub
-        return this.getRank() == this.getMinDim();
+        return this.isSolvable();
+    }
+
+    double getAlgorithmEpsilon() {
+        return myMaxDiag * TEN * this.getDimensionalEpsilon();
     }
 
 }
