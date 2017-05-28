@@ -180,10 +180,6 @@ final class RawLU extends RawDecomposition implements LU<Double> {
         return true;
     }
 
-    public boolean isSquareAndNotSingular() {
-        return (this.getRowDim() == this.getColDim()) && this.isFullRank();
-    }
-
     public PhysicalStore<Double> preallocate(final Structure2D template) {
         return this.allocate(template.countRows(), template.countRows());
     }
@@ -306,7 +302,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return this.isSquareAndNotSingular();
+        return (this.getRowDim() == this.getColDim()) && this.isFullRank();
     }
 
 }

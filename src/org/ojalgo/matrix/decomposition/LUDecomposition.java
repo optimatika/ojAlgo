@@ -215,21 +215,6 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
         return this.isSolvable();
     }
 
-    public final boolean isSquareAndNotSingular() {
-
-        boolean retVal = this.getRowDim() == this.getColDim();
-
-        final DecompositionStore<N> tmpStore = this.getInPlace();
-        final int tmpMinDim = (int) Math.min(tmpStore.countRows(), tmpStore.countColumns());
-
-        for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
-            // retVal &= tmpStore.doubleValue(ij, ij) != PrimitiveMath.ZERO;
-            retVal &= Double.compare(tmpStore.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0;
-        }
-
-        return retVal;
-    }
-
     public PhysicalStore<N> preallocate(final Structure2D template) {
         final long tmpCountRows = template.countRows();
         return this.allocate(tmpCountRows, tmpCountRows);
@@ -321,7 +306,18 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
     @Override
     protected boolean checkSolvability() {
-        return this.isComputed() && this.isSquareAndNotSingular();
+
+        boolean retVal = this.getRowDim() == this.getColDim();
+
+        final DecompositionStore<N> tmpStore = this.getInPlace();
+        final int tmpMinDim = (int) Math.min(tmpStore.countRows(), tmpStore.countColumns());
+
+        for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
+            // retVal &= tmpStore.doubleValue(ij, ij) != PrimitiveMath.ZERO;
+            retVal &= Double.compare(tmpStore.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0;
+        }
+
+        return retVal;
     }
 
     int[] getReducedPivots() {

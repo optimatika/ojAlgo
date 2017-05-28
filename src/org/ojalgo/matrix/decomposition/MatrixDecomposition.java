@@ -162,6 +162,9 @@ public interface MatrixDecomposition<N extends Number> {
     interface RankRevealing<N extends Number> extends Ordered<N> {
 
         /**
+         * The best (and most expensive) way to get the effective numerical rank is by calculating a
+         * {@link SingularValue} decomposition and then find the number of nonnegligible singular values.
+         *
          * @return The effective numerical rank (best estimate)
          */
         int getRank();

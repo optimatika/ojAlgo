@@ -62,29 +62,8 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
 
     static final class Primitive extends CholeskyDecomposition<Double> {
 
-        private static final double ALGORITHM_EPSILON = TEN * SQRT.invoke(MACHINE_EPSILON);
-
         Primitive() {
             super(PrimitiveDenseStore.FACTORY);
-        }
-
-        @Override
-        protected boolean checkSolvability() {
-            final boolean spd = this.isComputed() && this.isSPD();
-            if (spd) {
-                double max = ZERO;
-                double min = POSITIVE_INFINITY;
-                double val;
-                final DecompositionStore<Double> inPlaceStore = this.getInPlace();
-                final int tmpMinDim = this.getMinDim();
-                for (int ij = 0; ij < tmpMinDim; ij++) {
-                    val = inPlaceStore.doubleValue(ij, ij);
-                    max = MAX.invoke(val, max);
-                    min = MIN.invoke(val, min);
-                }
-                return (min / max) > ALGORITHM_EPSILON;
-            }
-            return spd;
         }
 
     }

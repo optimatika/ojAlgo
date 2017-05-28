@@ -257,10 +257,6 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
     @Override
     protected boolean checkSolvability() {
-        return this.isComputed() && this.isSquareAndNotSingular();
-    }
-
-    public boolean isSquareAndNotSingular() {
 
         boolean retVal = this.getRowDim() == this.getColDim();
 

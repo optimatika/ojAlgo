@@ -171,11 +171,6 @@ final class RawCholesky extends RawDecomposition implements Cholesky<Double> {
         return this.allocate(templateBody.countRows(), templateRHS.countColumns());
     }
 
-    public MatrixStore<Double> reconstruct() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     @Override
     public MatrixStore<Double> solve(final Access2D<?> body, final Access2D<?> rhs, final PhysicalStore<Double> preallocated) throws RecoverableCondition {
 

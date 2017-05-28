@@ -209,13 +209,6 @@ public interface SingularValue<N extends Number> extends MatrixDecomposition<N>,
     MatrixStore<N> getQ2();
 
     /**
-     * Effective numerical matrix rank.
-     *
-     * @return The number of nonnegligible singular values.
-     */
-    int getRank();
-
-    /**
      * @return The singular values ordered in descending order.
      */
     Array1D<Double> getSingularValues();

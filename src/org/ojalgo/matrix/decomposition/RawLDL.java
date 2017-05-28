@@ -130,11 +130,6 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
         return mySPD;
     }
 
-    public boolean isSquareAndNotSingular() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
     public PhysicalStore<Double> preallocate(final Structure2D template) {
         return this.allocate(template.countRows(), template.countRows());
     }

@@ -42,7 +42,13 @@ import org.ojalgo.type.context.NumberContext;
  * You create instances of (some subclass of) this class by calling one of the static factory methods:
  * {@linkplain #BIG}, {@linkplain #COMPLEX}, {@linkplain #PRIMITIVE} or {@linkplain #make(Access2D)}
  * </p>
- *
+ * <p>
+ * The QR decompostion always exists, even if the matrix does not have full column rank, so the compute method
+ * will never fail. The primary use of the QR decomposition is in the least squares solution of overdetermined
+ * systems of simultaneous linear equations. This will fail if the matrix does not have full column rank. The
+ * rank must be equal to the number of columns.
+ * </p>
+ * 
  * @author apete
  */
 public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,
@@ -98,14 +104,7 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
 
     MatrixStore<N> getR();
 
-    int getRank();
-
     /**
-     * The QR decompostion always exists, even if the matrix does not have full column rank, so the compute
-     * method will never fail. The primary use of the QR decomposition is in the least squares solution of
-     * overdetermined systems of simultaneous linear equations. This will fail if the matrix does not have
-     * full column rank. The rank must be equal to the number of columns.
-     *
      * @deprecated v44 Use {@link #isFullRank()} instead
      */
     @Deprecated
