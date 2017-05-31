@@ -22,7 +22,7 @@
 package org.ojalgo.optimisation.integer;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.ABS;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

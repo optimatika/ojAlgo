@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -41,7 +42,8 @@ abstract class InPlaceDecomposition<N extends Number> extends GenericDecompositi
     }
 
     public MatrixStore<N> getInverse(final PhysicalStore<N> preallocated) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return null;
     }
 
     protected final int getColDim() {

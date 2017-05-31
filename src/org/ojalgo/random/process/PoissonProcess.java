@@ -23,6 +23,7 @@ package org.ojalgo.random.process;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.random.Exponential;
 import org.ojalgo.random.Poisson;
@@ -78,7 +79,8 @@ public final class PoissonProcess extends AbstractProcess<Poisson> {
 
     @Override
     double getLowerConfidenceQuantile(final double stepSize, final double confidence) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return 0;
     }
 
     @Override
@@ -88,7 +90,8 @@ public final class PoissonProcess extends AbstractProcess<Poisson> {
 
     @Override
     double getUpperConfidenceQuantile(final double stepSize, final double confidence) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return 0;
     }
 
     @Override

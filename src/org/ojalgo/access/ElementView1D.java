@@ -24,10 +24,12 @@ package org.ojalgo.access;
 import java.util.Iterator;
 import java.util.ListIterator;
 
+import org.ojalgo.ProgrammingError;
+
 public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>> extends AccessScalar<N>, ListIterator<V>, Iterable<V> {
 
     default void add(final V e) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
     long index();
@@ -45,11 +47,11 @@ public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>> 
     }
 
     default void remove() {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
     default void set(final V e) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
 }

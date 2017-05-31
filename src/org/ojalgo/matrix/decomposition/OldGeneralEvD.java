@@ -21,6 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -69,11 +70,13 @@ abstract class OldGeneralEvD<N extends Number> extends EigenvalueDecomposition<N
     }
 
     public MatrixStore<N> getInverse() {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return null;
     }
 
     public MatrixStore<N> getInverse(final DecompositionStore<N> newPreallocated) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return null;
     }
 
     public final ComplexNumber getTrace() {

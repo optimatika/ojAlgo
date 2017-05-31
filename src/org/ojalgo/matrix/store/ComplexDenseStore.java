@@ -25,6 +25,7 @@ import static org.ojalgo.function.ComplexFunction.*;
 
 import java.util.List;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
@@ -595,7 +596,8 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<ComplexNumber> transformationCollector, final boolean eigenvalue) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return null;
     }
 
     public MatrixStore<ComplexNumber> conjugate() {
@@ -1159,7 +1161,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public void tred2(final BasicArray<ComplexNumber> mainDiagonal, final BasicArray<ComplexNumber> offDiagonal, final boolean yesvecs) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
     public void visitColumn(final long row, final long col, final VoidFunction<ComplexNumber> visitor) {

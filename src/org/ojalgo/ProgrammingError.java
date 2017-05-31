@@ -46,7 +46,7 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
     }
 
     public static void throwForUnsupportedOptionalOperation() {
-        throw new ProgrammingError("Unsupported optional operation!");
+        throw new UnsupportedOperationException("Unsupported optional operation!");
     }
 
     public static void throwIfMultiplicationNotPossible(final Access2D<?> left, final Access2D<?> right) {

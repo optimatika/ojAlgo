@@ -146,10 +146,6 @@ abstract class SchurDecomposition<N extends Number> extends InPlaceDecomposition
         myQ = null;
     }
 
-    public MatrixStore<N> solve(final Access2D<N> rhs, final DecompositionStore<N> preallocated) {
-        throw new UnsupportedOperationException();
-    }
-
     final void setDiagonal(final Array1D<ComplexNumber> newDiagonal) {
         myDiagonal = newDiagonal;
     }

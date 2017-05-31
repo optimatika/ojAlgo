@@ -23,6 +23,8 @@ package org.ojalgo.access;
 
 import java.util.ListIterator;
 
+import org.ojalgo.ProgrammingError;
+
 public final class Iterator1D<N extends Number> implements ListIterator<N> {
 
     private final Access1D<? extends N> myAccess;
@@ -43,7 +45,7 @@ public final class Iterator1D<N extends Number> implements ListIterator<N> {
     }
 
     public void add(final N e) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
     public boolean hasNext() {
@@ -71,11 +73,11 @@ public final class Iterator1D<N extends Number> implements ListIterator<N> {
     }
 
     public void remove() {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
     public void set(final N e) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
 }

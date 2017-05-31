@@ -187,7 +187,8 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
                             }
 
                             public N setValue(final N value) {
-                                throw new UnsupportedOperationException();
+                                ProgrammingError.throwForUnsupportedOptionalOperation();
+                                return null;
                             }
 
                         };

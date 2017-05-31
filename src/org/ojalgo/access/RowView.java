@@ -23,6 +23,8 @@ package org.ojalgo.access;
 
 import java.util.Iterator;
 
+import org.ojalgo.ProgrammingError;
+
 public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<N>> {
 
     public static <S extends Number> Iterable<RowView<S>> makeIterable(final Access2D<S> access) {
@@ -80,7 +82,7 @@ public class RowView<N extends Number> implements Access1D<N>, Iterator<RowView<
     }
 
     public void remove() {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
     public long row() {

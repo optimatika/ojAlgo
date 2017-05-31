@@ -27,6 +27,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
@@ -185,6 +186,7 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
     private double[] e;
     private transient MatrixStore<N> myInverse;
     private final TridiagonalDecomposition<N> myTridiagonal;
+
     @SuppressWarnings("unused")
     private HermitianEvD(final DecompositionStore.Factory<N, ? extends DecompositionStore<N>> aFactory) {
         this(aFactory, null);
@@ -367,7 +369,8 @@ public abstract class HermitianEvD<N extends Number> extends EigenvalueDecomposi
 
     @Override
     protected final boolean doGeneral(final Collectable<N, ? super PhysicalStore<N>> matrix, final boolean eigenvaluesOnly) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return false;
     }
 
     @Override

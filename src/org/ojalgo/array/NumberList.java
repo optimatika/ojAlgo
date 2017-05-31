@@ -156,7 +156,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public void add(final int index, final N element) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
     public void add(final long index, final double addend) {
@@ -199,7 +199,8 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public boolean addAll(final int index, final Collection<? extends N> c) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return false;
     }
 
     /**
@@ -341,23 +342,28 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public N remove(final int index) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return null;
     }
 
     public boolean remove(final Object o) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return false;
     }
 
     public boolean removeAll(final Collection<?> c) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return false;
     }
 
     public boolean retainAll(final Collection<?> c) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return false;
     }
 
     public N set(final int index, final N element) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return null;
     }
 
     public void set(final long index, final double value) {

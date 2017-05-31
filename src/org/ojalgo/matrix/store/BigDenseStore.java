@@ -27,6 +27,7 @@ import static org.ojalgo.function.BigFunction.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.AccessUtils;
@@ -576,7 +577,8 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     }
 
     public Array1D<ComplexNumber> computeInPlaceSchur(final PhysicalStore<BigDecimal> transformationCollector, final boolean eigenvalue) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
+        return null;
     }
 
     public MatrixStore<BigDecimal> conjugate() {
@@ -1137,7 +1139,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
     }
 
     public void tred2(final BasicArray<BigDecimal> mainDiagonal, final BasicArray<BigDecimal> offDiagonal, final boolean yesvecs) {
-        throw new UnsupportedOperationException();
+        ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
     public void visitColumn(final long row, final long col, final VoidFunction<BigDecimal> visitor) {
