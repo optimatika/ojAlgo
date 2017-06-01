@@ -21,11 +21,15 @@
  */
 package org.ojalgo.finance.data;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
+import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.netio.ResourceLocator;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
@@ -67,15 +71,8 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
     }
 
-    private static final String CHART_FINANCE_YAHOO_COM = "chart.finance.yahoo.com";
-    private static final String CSV = ".csv";
-    private static final String D = "d";
-    private static final String G = "g";
-    private static final String IGNORE = "ignore";
-    private static final String M = "m";
-    private static final String S = "s";
-    private static final String TABLE_CSV = "/table.csv";
-    private static final String W = "w";
+    private static final String HOST = "query1.finance.yahoo.com";
+    private static final String PATH = "/v7/finance/download/";
 
     public YahooSymbol(final String symbol) {
         this(symbol, CalendarDateUnit.DAY);
@@ -85,21 +82,50 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
         super(symbol, resolution);
 
-        this.setHost(CHART_FINANCE_YAHOO_COM);
-        this.setPath(TABLE_CSV);
-        this.addQueryParameter(S, symbol);
+        // https://finance.yahoo.com/quote/AAPL
+
+        final ResourceLocator tmpResourceLocator = new ResourceLocator();
+        tmpResourceLocator.setScheme("https");
+        tmpResourceLocator.setHost("finance.yahoo.com");
+        tmpResourceLocator.setPath("/quote/" + symbol);
+
+        final String tmpStr = "CrumbStore\":{\"crumb\":\"";
+
+        String crumb = null;
+
+        String tmpLine;
+        int from, to;
+        try (final BufferedReader tmpBufferedReader = new BufferedReader(tmpResourceLocator.getStreamReader())) {
+            while ((crumb == null) && ((tmpLine = tmpBufferedReader.readLine()) != null)) {
+
+                if ((from = tmpLine.indexOf(tmpStr)) >= 0) {
+                    to = tmpLine.indexOf("\"}", from);
+                    BasicLogger.debug(tmpLine);
+                    crumb = tmpLine.substring(from + tmpStr.length(), to);
+                }
+
+            }
+        } catch (final IOException exception) {
+            exception.printStackTrace();
+        }
+        BasicLogger.debug(crumb);
+
+        this.setHost(HOST);
+        this.setPath(PATH + symbol);
         switch (resolution) {
         case MONTH:
-            this.addQueryParameter(G, M);
+            this.addQueryParameter("interval", 1 + "m");
             break;
         case WEEK:
-            this.addQueryParameter(G, W);
+            this.addQueryParameter("interval", 1 + "w");
             break;
         default:
-            this.addQueryParameter(G, D);
+            this.addQueryParameter("interval", 1 + "d");
             break;
         }
-        this.addQueryParameter(IGNORE, CSV);
+        this.addQueryParameter("events", "history");
+        this.addQueryParameter("crumb", crumb);
+
     }
 
     @Override

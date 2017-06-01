@@ -46,7 +46,7 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
     }
 
     public static void throwForUnsupportedOptionalOperation() {
-        throw new UnsupportedOperationException("Unsupported optional operation!");
+        throw new UnsupportedOperationException();
     }
 
     public static void throwIfMultiplicationNotPossible(final Access2D<?> left, final Access2D<?> right) {
@@ -68,13 +68,13 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
 
     public static void throwIfNotEqualRowDimensions(final Structure2D mtrx1, final Structure2D mtrx2) {
         if (mtrx1.countRows() != mtrx2.countRows()) {
-            throw new IllegalArgumentException("Row dimensions are not equal!");
+            throw new ProgrammingError("Row dimensions are not equal!");
         }
     }
 
     public static void throwIfNotSquare(final Structure2D mtrx) {
         if (mtrx.countRows() != mtrx.countColumns()) {
-            throw new IllegalArgumentException("Matrix is not square!");
+            throw new ProgrammingError("Matrix is not square!");
         }
     }
 
