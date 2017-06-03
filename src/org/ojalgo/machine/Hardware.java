@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.TreeSet;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.array.ArrayUtils;
+import org.ojalgo.array.Raw1D;
 import org.ojalgo.netio.ASCII;
 
 /**
@@ -435,7 +435,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
             throw new IllegalArgumentException();
         }
 
-        myLevels = ArrayUtils.copyOf(levels);
+        myLevels = Raw1D.copyOf(levels);
     }
 
     private Hardware(final Hardware aHardware, final Runtime aRuntime) {

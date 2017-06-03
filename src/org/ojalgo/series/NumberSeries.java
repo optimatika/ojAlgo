@@ -27,7 +27,6 @@ import java.util.SortedMap;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 
 public final class NumberSeries<N extends Number & Comparable<N>> extends TreeSeries<N, N, NumberSeries<N>> {
@@ -45,11 +44,11 @@ public final class NumberSeries<N extends Number & Comparable<N>> extends TreeSe
     }
 
     public Access1D<N> accessKeys() {
-        return ArrayUtils.wrapAccess1D(new ArrayList<>(this.keySet()));
+        return Access1D.wrapAccess1D(new ArrayList<>(this.keySet()));
     }
 
     public Access1D<N> accessValues() {
-        return ArrayUtils.wrapAccess1D(new ArrayList<>(this.values()));
+        return Access1D.wrapAccess1D(new ArrayList<>(this.values()));
     }
 
     public N get(final long key) {

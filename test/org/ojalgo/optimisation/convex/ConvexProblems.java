@@ -30,7 +30,6 @@ import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.finance.portfolio.GitHubIssue24;
@@ -1175,7 +1174,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final int numElm = (int) result.count();
 
         final double[] expectedSolution = new double[] { -0.4, 0.12, -0.0196, -2.45785 };
-        tmpObj.invoke(ArrayUtils.wrapAccess1D(expectedSolution));
+        tmpObj.invoke(Access1D.wrapAccess1D(expectedSolution));
         tmpObj.invoke(Access1D.asPrimitive1D(result));
 
         JamaBI.subtract(JamaAI.multiply(PrimitiveDenseStore.FACTORY.columns(expectedSolution)));

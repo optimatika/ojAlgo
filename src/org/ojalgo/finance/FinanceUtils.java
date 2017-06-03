@@ -34,7 +34,6 @@ import java.util.Map.Entry;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -141,7 +140,7 @@ public abstract class FinanceUtils {
             for (int i = 0; i < tmpSize1; i++) {
                 retVal[i] = PrimitiveFunction.LOG.invoke(values[i + 1] / values[i]);
             }
-            final SampleSet tmpMakeUsingLogarithmicChanges = SampleSet.wrap(ArrayUtils.wrapAccess1D(retVal));
+            final SampleSet tmpMakeUsingLogarithmicChanges = SampleSet.wrap(Access1D.wrapAccess1D(retVal));
             tmpSampleSets.add(tmpMakeUsingLogarithmicChanges);
         }
 

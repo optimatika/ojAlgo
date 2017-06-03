@@ -23,6 +23,7 @@ package org.ojalgo.access;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.atomic.DoubleAdder;
 import java.util.stream.BaseStream;
 import java.util.stream.StreamSupport;
@@ -297,6 +298,60 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
             retVal *= access.doubleValue(ij);
         }
         return retVal;
+    }
+
+    static Access1D<Double> wrapAccess1D(final double[] target) {
+        return new Access1D<Double>() {
+
+            public long count() {
+                return target.length;
+            }
+
+            public double doubleValue(final long index) {
+                return target[(int) index];
+            }
+
+            public Double get(final long index) {
+                return target[(int) index];
+            }
+
+        };
+    }
+
+    static <N extends Number> Access1D<N> wrapAccess1D(final List<? extends N> target) {
+        return new Access1D<N>() {
+
+            public long count() {
+                return target.size();
+            }
+
+            public double doubleValue(final long index) {
+                return target.get((int) index).doubleValue();
+            }
+
+            public N get(final long index) {
+                return target.get((int) index);
+            }
+
+        };
+    }
+
+    static <N extends Number> Access1D<N> wrapAccess1D(final N[] target) {
+        return new Access1D<N>() {
+
+            public long count() {
+                return target.length;
+            }
+
+            public double doubleValue(final long index) {
+                return target[(int) index].doubleValue();
+            }
+
+            public N get(final long index) {
+                return target[(int) index];
+            }
+
+        };
     }
 
     default <NN extends Number, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {

@@ -23,8 +23,8 @@ package org.ojalgo.function.polynomial;
 
 import java.util.List;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.series.NumberSeries;
 
 abstract class AbstractPolynomial<N extends Number> implements PolynomialFunction<N> {
@@ -92,7 +92,7 @@ abstract class AbstractPolynomial<N extends Number> implements PolynomialFunctio
     }
 
     public final void estimate(final List<? extends Number> x, final List<? extends Number> y) {
-        this.estimate(ArrayUtils.wrapAccess1D(x), ArrayUtils.wrapAccess1D(y));
+        this.estimate(Access1D.wrapAccess1D(x), Access1D.wrapAccess1D(y));
     }
 
     public final void estimate(final NumberSeries<?> samples) {

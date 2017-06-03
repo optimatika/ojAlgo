@@ -23,7 +23,7 @@ package org.ojalgo.finance.portfolio;
 
 import java.math.BigDecimal;
 
-import org.ojalgo.array.ArrayUtils;
+import org.ojalgo.array.Raw1D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.finance.FinanceUtils;
@@ -101,7 +101,7 @@ public class MarketEquilibrium {
 
         super();
 
-        myAssetKeys = ArrayUtils.copyOf(assetNamesOrKeys);
+        myAssetKeys = Raw1D.copyOf(assetNamesOrKeys);
         myCovariances = covarianceMatrix;
         myRiskAversion = DEFAULT_RISK_AVERSION;
     }
@@ -110,7 +110,7 @@ public class MarketEquilibrium {
 
         super();
 
-        myAssetKeys = ArrayUtils.copyOf(assetNamesOrKeys);
+        myAssetKeys = Raw1D.copyOf(assetNamesOrKeys);
         myCovariances = covarianceMatrix;
         myRiskAversion = TypeUtils.toBigDecimal(riskAversionFactor);
     }
@@ -195,7 +195,7 @@ public class MarketEquilibrium {
     }
 
     public String[] getAssetKeys() {
-        return ArrayUtils.copyOf(myAssetKeys);
+        return Raw1D.copyOf(myAssetKeys);
     }
 
     public BasicMatrix getCovariances() {

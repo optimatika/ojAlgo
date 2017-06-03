@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.ojalgo.array.ArrayUtils;
+import org.ojalgo.array.Raw1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -252,7 +252,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     }
 
     int[] getLowerBounds() {
-        return ArrayUtils.copyOf(myLowerBounds);
+        return Raw1D.copyOf(myLowerBounds);
     }
 
     BigDecimal getUpperBound(final int index) {
@@ -265,7 +265,7 @@ final class NodeKey implements Serializable, Comparable<NodeKey> {
     }
 
     int[] getUpperBounds() {
-        return ArrayUtils.copyOf(myUpperBounds);
+        return Raw1D.copyOf(myUpperBounds);
     }
 
 }

@@ -432,7 +432,7 @@ public class Primitive32Array extends PrimitiveArray {
     }
 
     protected final float[] copyOfData() {
-        return ArrayUtils.copyOf(data);
+        return Raw1D.copyOf(data);
     }
 
     @Override

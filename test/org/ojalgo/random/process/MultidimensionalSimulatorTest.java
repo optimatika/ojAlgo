@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.finance.portfolio.SimpleAsset;
 import org.ojalgo.finance.portfolio.SimplePortfolio;
@@ -80,7 +79,7 @@ public class MultidimensionalSimulatorTest extends RandomProcessTests {
                         -0.002148308071200791, 0.8083204130337523, 0.6830967821186095, 0.17092481883773306, 0.9999999999999998, 1.0, 0.2925123800699666 },
                 { -0.29110060025606405, 0.2925123800699666, 0.7797230267924377, 0.7207853187826451, 0.2435934037819271, 0.446149304907719, -0.28615035938713,
                         0.3003301609236652, 0.5463500182343711, 0.7175346866777632, 0.2925123800699666, 0.2925123800699666, 1.0 } };
-        final Access2D<Double> tmpCorrMtrx = ArrayUtils.wrapAccess2D(tmpCorrelations);
+        final Access2D<Double> tmpCorrMtrx = Access2D.wrapAccess2D(tmpCorrelations);
 
         final double[] tmpReturns = new double[] { 0.04582240030511955, 0.05556513020194605, 0.0075608287398083035, 0.026401783542103284, 0.019107275479030267,
                 0.026634284056767113, 0.049130046880785455, 0.05093391949085686, 0.06147942284537679, 0.04847598428157901, 0.05556513020194605,

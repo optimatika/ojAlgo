@@ -444,7 +444,7 @@ public class Primitive64Array extends PrimitiveArray {
     }
 
     protected final double[] copyOfData() {
-        return ArrayUtils.copyOf(data);
+        return Raw1D.copyOf(data);
     }
 
     @Override

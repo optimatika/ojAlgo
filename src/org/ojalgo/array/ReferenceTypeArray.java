@@ -155,7 +155,7 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
     }
 
     protected final N[] copyOfData() {
-        return ArrayUtils.copyOf(data);
+        return Raw1D.copyOf(data);
     }
 
     @Override

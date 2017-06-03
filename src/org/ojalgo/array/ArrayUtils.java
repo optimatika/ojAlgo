@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleConsumer;
@@ -30,397 +29,300 @@ import java.util.function.DoubleUnaryOperator;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.Structure2D;
 
+@Deprecated
 public abstract class ArrayUtils {
 
+    /**
+     * @deprecated v44 Use {@link Raw1D#copyOf(double[])} instead
+     */
+    @Deprecated
     public static double[] copyOf(final double[] original) {
-        final int tmpLength = original.length;
-        final double[] retVal = new double[tmpLength];
-        System.arraycopy(original, 0, retVal, 0, tmpLength);
-        return retVal;
+        return Raw1D.copyOf(original);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw1D#copyOf(float[])} instead
+     */
+    @Deprecated
     public static float[] copyOf(final float[] original) {
-        final int tmpLength = original.length;
-        final float[] retVal = new float[tmpLength];
-        System.arraycopy(original, 0, retVal, 0, tmpLength);
-        return retVal;
+        return Raw1D.copyOf(original);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw1D#copyOf(int[])} instead
+     */
+    @Deprecated
     public static int[] copyOf(final int[] original) {
-        final int tmpLength = original.length;
-        final int[] retVal = new int[tmpLength];
-        System.arraycopy(original, 0, retVal, 0, tmpLength);
-        return retVal;
+        return Raw1D.copyOf(original);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw1D#copyOf(long[])} instead
+     */
+    @Deprecated
     public static long[] copyOf(final long[] original) {
-        final int tmpLength = original.length;
-        final long[] retVal = new long[tmpLength];
-        System.arraycopy(original, 0, retVal, 0, tmpLength);
-        return retVal;
+        return Raw1D.copyOf(original);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw1D#copyOf(T[])} instead
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static <T> T[] copyOf(final T[] original) {
-        final int tmpLength = original.length;
-        final T[] retVal = (T[]) Array.newInstance(original.getClass().getComponentType(), tmpLength);
-        System.arraycopy(original, 0, retVal, 0, tmpLength);
-        return retVal;
+        return Raw1D.copyOf(original);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#exchangeColumns(double[][],int,int)} instead
+     */
+    @Deprecated
     public static void exchangeColumns(final double[][] target, final int columnA, final int columnB) {
-        double tmpElem;
-        final int tmpLength = target.length;
-        for (int i = 0; i < tmpLength; i++) {
-            tmpElem = target[i][columnA];
-            target[i][columnA] = target[i][columnB];
-            target[i][columnB] = tmpElem;
-        }
+        Raw2D.exchangeColumns(target, columnA, columnB);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#exchangeRows(double[][],int,int)} instead
+     */
+    @Deprecated
     public static void exchangeRows(final double[][] target, final int rowA, final int rowB) {
-        final double[] tmpRow = target[rowA];
-        target[rowA] = target[rowB];
-        target[rowB] = tmpRow;
+        Raw2D.exchangeRows(target, rowA, rowB);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillAll(double[][],double)} instead
+     */
+    @Deprecated
     public static void fillAll(final double[][] target, final double value) {
-        final int tmpLength = target.length;
-        for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = target[i].length;
-            for (int j = 0; j < tmpInnerLength; j++) {
-                target[i][j] = value;
-            }
-        }
+        Raw2D.fillAll(target, value);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillAll(double[][],DoubleSupplier)} instead
+     */
+    @Deprecated
     public static void fillAll(final double[][] target, final DoubleSupplier supplier) {
-        final int tmpLength = target.length;
-        for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = target[i].length;
-            for (int j = 0; j < tmpInnerLength; j++) {
-                target[i][j] = supplier.getAsDouble();
-            }
-        }
+        Raw2D.fillAll(target, supplier);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillColumn(double[][],int,int,double)} instead
+     */
+    @Deprecated
     public static void fillColumn(final double[][] target, final int row, final int column, final double value) {
-        final int tmpLength = target.length;
-        for (int i = row; i < tmpLength; i++) {
-            target[i][column] = value;
-        }
+        Raw2D.fillColumn(target, row, column, value);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillColumn(double[][],int,int,DoubleSupplier)} instead
+     */
+    @Deprecated
     public static void fillColumn(final double[][] target, final int row, final int column, final DoubleSupplier supplier) {
-        final int tmpLength = target.length;
-        for (int i = row; i < tmpLength; i++) {
-            target[i][column] = supplier.getAsDouble();
-        }
+        Raw2D.fillColumn(target, row, column, supplier);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillDiagonal(double[][],int,int,double)} instead
+     */
+    @Deprecated
     public static void fillDiagonal(final double[][] target, final int row, final int column, final double value) {
-        final int tmpLength = target.length;
-        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < target[row + ij].length); ij++) {
-            target[row + ij][column + ij] = value;
-        }
+        Raw2D.fillDiagonal(target, row, column, value);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillDiagonal(double[][],int,int,DoubleSupplier)} instead
+     */
+    @Deprecated
     public static void fillDiagonal(final double[][] target, final int row, final int column, final DoubleSupplier supplier) {
-        final int tmpLength = target.length;
-        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < target[row + ij].length); ij++) {
-            target[row + ij][column + ij] = supplier.getAsDouble();
-        }
+        Raw2D.fillDiagonal(target, row, column, supplier);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillMatching(double[][],double,DoubleBinaryOperator,double[][])}
+     *             instead
+     */
+    @Deprecated
     public static void fillMatching(final double[][] target, final double left, final DoubleBinaryOperator function, final double[][] right) {
-        final int tmpLength = target.length;
-        for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = target[i].length;
-            for (int j = 0; j < tmpInnerLength; j++) {
-                target[i][j] = function.applyAsDouble(left, right[i][j]);
-            }
-        }
+        Raw2D.fillMatching(target, left, function, right);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillMatching(double[][],double[][],DoubleBinaryOperator,double)}
+     *             instead
+     */
+    @Deprecated
     public static void fillMatching(final double[][] target, final double[][] left, final DoubleBinaryOperator function, final double right) {
-        final int tmpLength = target.length;
-        for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = target[i].length;
-            for (int j = 0; j < tmpInnerLength; j++) {
-                target[i][j] = function.applyAsDouble(left[i][j], right);
-            }
-        }
+        Raw2D.fillMatching(target, left, function, right);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillMatching(double[][],double[][],DoubleBinaryOperator,double[][])}
+     *             instead
+     */
+    @Deprecated
     public static void fillMatching(final double[][] target, final double[][] left, final DoubleBinaryOperator function, final double[][] right) {
-        final int tmpLength = target.length;
-        for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = target[i].length;
-            for (int j = 0; j < tmpInnerLength; j++) {
-                target[i][j] = function.applyAsDouble(left[i][j], right[i][j]);
-            }
-        }
+        Raw2D.fillMatching(target, left, function, right);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillRange(double[][],int,int,double)} instead
+     */
+    @Deprecated
     public static void fillRange(final double[][] target, final int first, final int limit, final double value) {
-
-        final int tmpLength = target.length;
-
-        for (int index = first; index < limit; index++) {
-            final int tmpRow = Structure2D.row(index, tmpLength);
-            final int tmpColumn = Structure2D.column(index, tmpLength);
-            target[tmpRow][tmpColumn] = value;
-        }
+        Raw2D.fillRange(target, first, limit, value);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillRange(double[][],int,int,DoubleSupplier)} instead
+     */
+    @Deprecated
     public static void fillRange(final double[][] target, final int first, final int limit, final DoubleSupplier supplier) {
-
-        final int tmpLength = target.length;
-
-        for (int index = first; index < limit; index++) {
-            final int tmpRow = Structure2D.row(index, tmpLength);
-            final int tmpColumn = Structure2D.column(index, tmpLength);
-            target[tmpRow][tmpColumn] = supplier.getAsDouble();
-        }
+        Raw2D.fillRange(target, first, limit, supplier);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillRow(double[][],int,int,double)} instead
+     */
+    @Deprecated
     public static void fillRow(final double[][] target, final int row, final int column, final double value) {
-        final int tmpLength = target[row].length;
-        for (int j = column; j < tmpLength; j++) {
-            target[row][j] = value;
-        }
+        Raw2D.fillRow(target, row, column, value);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#fillRow(double[][],int,int,DoubleSupplier)} instead
+     */
+    @Deprecated
     public static void fillRow(final double[][] target, final int row, final int column, final DoubleSupplier supplier) {
-        final int tmpLength = target[row].length;
-        for (int j = column; j < tmpLength; j++) {
-            target[row][j] = supplier.getAsDouble();
-        }
+        Raw2D.fillRow(target, row, column, supplier);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#modifyAll(double[][],DoubleUnaryOperator)} instead
+     */
+    @Deprecated
     public static void modifyAll(final double[][] target, final DoubleUnaryOperator function) {
-        final int tmpLength = target.length;
-        for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = target[i].length;
-            for (int j = 0; j < tmpInnerLength; j++) {
-                target[i][j] = function.applyAsDouble(target[i][j]);
-            }
-        }
+        Raw2D.modifyAll(target, function);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#modifyColumn(double[][],int,int,DoubleUnaryOperator)} instead
+     */
+    @Deprecated
     public static void modifyColumn(final double[][] target, final int row, final int column, final DoubleUnaryOperator function) {
-        final int tmpLength = target.length;
-        for (int i = row; i < tmpLength; i++) {
-            target[i][column] = function.applyAsDouble(target[i][column]);
-        }
+        Raw2D.modifyColumn(target, row, column, function);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#modifyDiagonal(double[][],int,int,DoubleUnaryOperator)} instead
+     */
+    @Deprecated
     public static void modifyDiagonal(final double[][] target, final int row, final int column, final DoubleUnaryOperator function) {
-        final int tmpLength = target.length;
-        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < target[row + ij].length); ij++) {
-            target[row + ij][column + ij] = function.applyAsDouble(target[row + ij][column + ij]);
-        }
+        Raw2D.modifyDiagonal(target, row, column, function);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#modifyRow(double[][],int,int,DoubleUnaryOperator)} instead
+     */
+    @Deprecated
     public static void modifyRow(final double[][] target, final int row, final int column, final DoubleUnaryOperator function) {
-        final int tmpLength = target[row].length;
-        for (int j = column; j < tmpLength; j++) {
-            target[row][j] = function.applyAsDouble(target[row][j]);
-        }
+        Raw2D.modifyRow(target, row, column, function);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw1D#sort(long[],double[])} instead
+     */
+    @Deprecated
     public static void sort(final long[] primary, final double[] secondary) {
-
-        boolean tmpSwapped;
-
-        final int tmpLimit = Math.min(primary.length, secondary.length) - 1;
-
-        do {
-            tmpSwapped = false;
-            for (int i = 0; i < tmpLimit; i++) {
-                if (primary[i] > primary[i + 1]) {
-                    final long tmpPrimVal = primary[i];
-                    primary[i] = primary[i + 1];
-                    primary[i + 1] = tmpPrimVal;
-                    final double tmpSecoVal = secondary[i];
-                    secondary[i] = secondary[i + 1];
-                    secondary[i + 1] = tmpSecoVal;
-                    tmpSwapped = true;
-                }
-            }
-        } while (tmpSwapped);
+        Raw1D.sort(primary, secondary);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw1D#sort(long[],Object[])} instead
+     */
+    @Deprecated
     public static void sort(final long[] primary, final Object[] secondary) {
-
-        boolean tmpSwapped;
-
-        final int tmpLimit = Math.min(primary.length, secondary.length) - 1;
-
-        do {
-            tmpSwapped = false;
-            for (int i = 0; i < tmpLimit; i++) {
-                if (primary[i] > primary[i + 1]) {
-                    final long tmpPrimVal = primary[i];
-                    primary[i] = primary[i + 1];
-                    primary[i + 1] = tmpPrimVal;
-                    final Object tmpSecoVal = secondary[i];
-                    secondary[i] = secondary[i + 1];
-                    secondary[i + 1] = tmpSecoVal;
-                    tmpSwapped = true;
-                }
-            }
-        } while (tmpSwapped);
+        Raw1D.sort(primary, secondary);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#visitAll(double[][],DoubleConsumer)} instead
+     */
+    @Deprecated
     public static void visitAll(final double[][] target, final DoubleConsumer visitor) {
-        final int tmpLength = target.length;
-        for (int i = 0; i < tmpLength; i++) {
-            final int tmpInnerLength = target[i].length;
-            for (int j = 0; j < tmpInnerLength; j++) {
-                visitor.accept(target[i][j]);
-            }
-        }
+        Raw2D.visitAll(target, visitor);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#visitColumn(double[][],int,int,DoubleConsumer)} instead
+     */
+    @Deprecated
     public static void visitColumn(final double[][] target, final int row, final int column, final DoubleConsumer visitor) {
-        final int tmpLength = target[row].length;
-        for (int j = column; j < tmpLength; j++) {
-            visitor.accept(target[row][j]);
-        }
+        Raw2D.visitColumn(target, row, column, visitor);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#visitDiagonal(double[][],int,int,DoubleConsumer)} instead
+     */
+    @Deprecated
     public static void visitDiagonal(final double[][] target, final int row, final int column, final DoubleConsumer visitor) {
-        final int tmpLength = target.length;
-        for (int ij = 0; ((row + ij) < tmpLength) && ((column + ij) < target[row + ij].length); ij++) {
-            visitor.accept(target[row + ij][column + ij]);
-        }
+        Raw2D.visitDiagonal(target, row, column, visitor);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#visitRange(double[][],int,int,DoubleConsumer)} instead
+     */
+    @Deprecated
     public static void visitRange(final double[][] target, final int first, final int limit, final DoubleConsumer visitor) {
-        final int tmpStructure = target.length;
-        for (int index = first; index < limit; index++) {
-            visitor.accept(target[Structure2D.row(index, tmpStructure)][Structure2D.column(index, tmpStructure)]);
-        }
+        Raw2D.visitRange(target, first, limit, visitor);
     }
 
+    /**
+     * @deprecated v44 Use {@link Raw2D#visitRow(double[][],int,int,DoubleConsumer)} instead
+     */
+    @Deprecated
     public static void visitRow(final double[][] target, final int row, final int column, final DoubleConsumer visitor) {
-        final int tmpLength = target.length;
-        for (int i = row; i < tmpLength; i++) {
-            visitor.accept(target[i][column]);
-        }
+        Raw2D.visitRow(target, row, column, visitor);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access1D#wrapAccess1D(double[])} instead
+     */
+    @Deprecated
     public static Access1D<Double> wrapAccess1D(final double[] target) {
-        return new Access1D<Double>() {
-
-            public long count() {
-                return target.length;
-            }
-
-            public double doubleValue(final long index) {
-                return target[(int) index];
-            }
-
-            public Double get(final long index) {
-                return target[(int) index];
-            }
-
-        };
+        return Access1D.wrapAccess1D(target);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access1D#wrapAccess1D(List<? extends N>)} instead
+     */
+    @Deprecated
     public static <N extends Number> Access1D<N> wrapAccess1D(final List<? extends N> target) {
-        return new Access1D<N>() {
-
-            public long count() {
-                return target.size();
-            }
-
-            public double doubleValue(final long index) {
-                return target.get((int) index).doubleValue();
-            }
-
-            public N get(final long index) {
-                return target.get((int) index);
-            }
-
-        };
+        return Access1D.wrapAccess1D(target);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access1D#wrapAccess1D(N[])} instead
+     */
+    @Deprecated
     public static <N extends Number> Access1D<N> wrapAccess1D(final N[] target) {
-        return new Access1D<N>() {
-
-            public long count() {
-                return target.length;
-            }
-
-            public double doubleValue(final long index) {
-                return target[(int) index].doubleValue();
-            }
-
-            public N get(final long index) {
-                return target[(int) index];
-            }
-
-        };
+        return Access1D.wrapAccess1D(target);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access2D#wrapAccess2D(double[][])} instead
+     */
+    @Deprecated
     public static Access2D<Double> wrapAccess2D(final double[][] target) {
-        return new Access2D<Double>() {
-
-            public long count() {
-                return target.length * target[0].length;
-            }
-
-            public long countColumns() {
-                return target[0].length;
-            }
-
-            public long countRows() {
-                return target.length;
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return target[(int) row][(int) col];
-            }
-
-            public Double get(final long row, final long col) {
-                return target[(int) row][(int) col];
-            }
-
-        };
+        return Access2D.wrapAccess2D(target);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access2D#wrapAccess2D(N[][])} instead
+     */
+    @Deprecated
     public static <N extends Number> Access2D<N> wrapAccess2D(final N[][] target) {
-        return new Access2D<N>() {
-
-            public long count() {
-                return target.length * target[0].length;
-            }
-
-            public long countColumns() {
-                return target[0].length;
-            }
-
-            public long countRows() {
-                return target.length;
-            }
-
-            public double doubleValue(final long index) {
-                return this.get(index).doubleValue();
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return this.get(row, col).doubleValue();
-            }
-
-            public N get(final long row, final long col) {
-                return target[(int) row][(int) col];
-            }
-
-        };
+        return Access2D.wrapAccess2D(target);
     }
 
     private ArrayUtils() {

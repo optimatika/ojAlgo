@@ -453,6 +453,62 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         return (accessA.countRows() == accessB.countRows()) && (accessA.countColumns() == accessB.countColumns()) && Access1D.equals(accessA, accessB, context);
     }
 
+    static Access2D<Double> wrapAccess2D(final double[][] target) {
+        return new Access2D<Double>() {
+
+            public long count() {
+                return target.length * target[0].length;
+            }
+
+            public long countColumns() {
+                return target[0].length;
+            }
+
+            public long countRows() {
+                return target.length;
+            }
+
+            public double doubleValue(final long row, final long col) {
+                return target[(int) row][(int) col];
+            }
+
+            public Double get(final long row, final long col) {
+                return target[(int) row][(int) col];
+            }
+
+        };
+    }
+
+    static <N extends Number> Access2D<N> wrapAccess2D(final N[][] target) {
+        return new Access2D<N>() {
+
+            public long count() {
+                return target.length * target[0].length;
+            }
+
+            public long countColumns() {
+                return target[0].length;
+            }
+
+            public long countRows() {
+                return target.length;
+            }
+
+            public double doubleValue(final long index) {
+                return this.get(index).doubleValue();
+            }
+
+            public double doubleValue(final long row, final long col) {
+                return this.get(row, col).doubleValue();
+            }
+
+            public N get(final long row, final long col) {
+                return target[(int) row][(int) col];
+            }
+
+        };
+    }
+
     default <NN extends Number, R extends Mutate2D.Receiver<NN>> Collectable<NN, R> asCollectable2D() {
         return new Collectable<NN, R>() {
 

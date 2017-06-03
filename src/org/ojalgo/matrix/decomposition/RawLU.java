@@ -28,7 +28,7 @@ import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.Structure2D;
-import org.ojalgo.array.ArrayUtils;
+import org.ojalgo.array.Raw2D;
 import org.ojalgo.array.blas.DOT;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
@@ -253,7 +253,7 @@ final class RawLU extends RawDecomposition implements LU<Double> {
                 }
             }
             if (p != j) {
-                ArrayUtils.exchangeRows(data, j, p);
+                Raw2D.exchangeRows(data, j, p);
                 myPivot.change(j, p);
             }
 
