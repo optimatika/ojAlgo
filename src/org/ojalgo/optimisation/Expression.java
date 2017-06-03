@@ -32,7 +32,6 @@ import java.util.Set;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.constant.BigMath;
@@ -583,7 +582,7 @@ public final class Expression extends ModelEntity<Expression> {
 
         builder.append(this.getName());
         builder.append(": ");
-        builder.append(OptimisationUtils.DISPLAY.enforce(this.toFunction().invoke(AccessUtils.asPrimitive1D(currentSolution))));
+        builder.append(OptimisationUtils.DISPLAY.enforce(this.toFunction().invoke(Access1D.asPrimitive1D(currentSolution))));
 
         if (this.isObjective()) {
             builder.append(" (");

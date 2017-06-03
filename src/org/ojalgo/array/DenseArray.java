@@ -24,7 +24,7 @@ package org.ojalgo.array;
 import java.util.ArrayList;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
 
@@ -51,7 +51,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
         @Override
         final DenseArray<N> makeStructuredZero(final long... structure) {
 
-            final long tmpTotal = AccessUtils.count(structure);
+            final long tmpTotal = StructureAnyD.count(structure);
 
             if (tmpTotal > this.getCapacityLimit()) {
 
@@ -66,7 +66,7 @@ public abstract class DenseArray<N extends Number> extends BasicArray<N> {
         @Override
         final DenseArray<N> makeToBeFilled(final long... structure) {
 
-            final long tmpTotal = AccessUtils.count(structure);
+            final long tmpTotal = StructureAnyD.count(structure);
 
             if (tmpTotal > this.getCapacityLimit()) {
 

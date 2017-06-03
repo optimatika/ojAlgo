@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.decomposition;
 
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.array.BasicArray;
 
 final class Pivot {
 
@@ -33,7 +33,7 @@ final class Pivot {
 
         super();
 
-        myOrder = AccessUtils.makeIncreasingRange(0, numberOfRows);
+        myOrder = BasicArray.makeIncreasingRange(0, numberOfRows);
         mySign = 1;
     }
 

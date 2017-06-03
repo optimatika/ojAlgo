@@ -23,574 +23,240 @@ package org.ojalgo.access;
 
 import java.math.BigDecimal;
 
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
 import org.ojalgo.scalar.RationalNumber;
-import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
 
+@Deprecated
 public abstract class AccessUtils {
 
+    /**
+     * @deprecated v44 Use {@link Access1D#asBig1D(Access1D<?>)} instead
+     */
+    @Deprecated
     public static Access1D<BigDecimal> asBig1D(final Access1D<?> access) {
-        return new Access1D<BigDecimal>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public BigDecimal get(final long index) {
-                return TypeUtils.toBigDecimal(access.get(index));
-            }
-
-        };
+        return Access1D.asBig1D(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access2D#asBig2D(Access2D<?>)} instead
+     */
+    @Deprecated
     public static Access2D<BigDecimal> asBig2D(final Access2D<?> access) {
-        return new Access2D<BigDecimal>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long countColumns() {
-                return access.countColumns();
-            }
-
-            public long countRows() {
-                return access.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-            public BigDecimal get(final long index) {
-                return TypeUtils.toBigDecimal(access.get(index));
-            }
-
-            public BigDecimal get(final long row, final long col) {
-                return TypeUtils.toBigDecimal(access.get(row, col));
-            }
-
-        };
+        return Access2D.asBig2D(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link AccessAnyD#asBigAnyD(AccessAnyD<?>)} instead
+     */
+    @Deprecated
     public static AccessAnyD<BigDecimal> asBigAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<BigDecimal>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long count(final int dimension) {
-                return access.count(dimension);
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long[] ref) {
-                return access.doubleValue(ref);
-            }
-
-            public BigDecimal get(final long index) {
-                return TypeUtils.toBigDecimal(access.get(index));
-            }
-
-            public BigDecimal get(final long[] ref) {
-                return TypeUtils.toBigDecimal(access.get(ref));
-            }
-
-            public long[] shape() {
-                return access.shape();
-            }
-
-        };
+        return AccessAnyD.asBigAnyD(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access1D#asComplex1D(Access1D<?>)} instead
+     */
+    @Deprecated
     public static Access1D<ComplexNumber> asComplex1D(final Access1D<?> access) {
-        return new Access1D<ComplexNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public ComplexNumber get(final long index) {
-                return ComplexNumber.valueOf(access.get(index));
-            }
-
-        };
+        return Access1D.asComplex1D(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access2D#asComplex2D(Access2D<?>)} instead
+     */
+    @Deprecated
     public static Access2D<ComplexNumber> asComplex2D(final Access2D<?> access) {
-        return new Access2D<ComplexNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long countColumns() {
-                return access.countColumns();
-            }
-
-            public long countRows() {
-                return access.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-            public ComplexNumber get(final long index) {
-                return ComplexNumber.valueOf(access.get(index));
-            }
-
-            public ComplexNumber get(final long row, final long col) {
-                return ComplexNumber.valueOf(access.get(row, col));
-            }
-
-        };
+        return Access2D.asComplex2D(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link AccessAnyD#asComplexAnyD(AccessAnyD<?>)} instead
+     */
+    @Deprecated
     public static AccessAnyD<ComplexNumber> asComplexAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<ComplexNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long count(final int dimension) {
-                return access.count(dimension);
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long[] ref) {
-                return access.doubleValue(ref);
-            }
-
-            public ComplexNumber get(final long index) {
-                return ComplexNumber.valueOf(access.get(index));
-            }
-
-            public ComplexNumber get(final long[] ref) {
-                return ComplexNumber.valueOf(access.get(ref));
-            }
-
-            public long[] shape() {
-                return access.shape();
-            }
-
-        };
+        return AccessAnyD.asComplexAnyD(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access1D#asPrimitive1D(Access1D<?>)} instead
+     */
+    @Deprecated
     public static Access1D<Double> asPrimitive1D(final Access1D<?> access) {
-        return new Access1D<Double>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public Double get(final long index) {
-                return access.doubleValue(index);
-            }
-
-        };
+        return Access1D.asPrimitive1D(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access2D#asPrimitive2D(Access2D<?>)} instead
+     */
+    @Deprecated
     public static Access2D<Double> asPrimitive2D(final Access2D<?> access) {
-        return new Access2D<Double>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long countColumns() {
-                return access.countColumns();
-            }
-
-            public long countRows() {
-                return access.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-            public Double get(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public Double get(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-        };
+        return Access2D.asPrimitive2D(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link AccessAnyD#asPrimitiveAnyD(AccessAnyD<?>)} instead
+     */
+    @Deprecated
     public static AccessAnyD<Double> asPrimitiveAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<Double>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long count(final int dimension) {
-                return access.count(dimension);
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long[] ref) {
-                return access.doubleValue(ref);
-            }
-
-            public Double get(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public Double get(final long[] ref) {
-                return access.doubleValue(ref);
-            }
-
-            public long[] shape() {
-                return access.shape();
-            }
-
-        };
+        return AccessAnyD.asPrimitiveAnyD(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access1D#asQuaternion1D(Access1D<?>)} instead
+     */
+    @Deprecated
     public static Access1D<Quaternion> asQuaternion1D(final Access1D<?> access) {
-        return new Access1D<Quaternion>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public Quaternion get(final long index) {
-                return Quaternion.valueOf(access.get(index));
-            }
-
-        };
+        return Access1D.asQuaternion1D(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access2D#asQuaternion2D(Access2D<?>)} instead
+     */
+    @Deprecated
     public static Access2D<Quaternion> asQuaternion2D(final Access2D<?> access) {
-        return new Access2D<Quaternion>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long countColumns() {
-                return access.countColumns();
-            }
-
-            public long countRows() {
-                return access.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-            public Quaternion get(final long index) {
-                return Quaternion.valueOf(access.get(index));
-            }
-
-            public Quaternion get(final long row, final long col) {
-                return Quaternion.valueOf(access.get(row, col));
-            }
-
-        };
+        return Access2D.asQuaternion2D(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link AccessAnyD#asQuaternionAnyD(AccessAnyD<?>)} instead
+     */
+    @Deprecated
     public static AccessAnyD<Quaternion> asQuaternionAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<Quaternion>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long count(final int dimension) {
-                return access.count(dimension);
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long[] ref) {
-                return access.doubleValue(ref);
-            }
-
-            public Quaternion get(final long index) {
-                return Quaternion.valueOf(access.get(index));
-            }
-
-            public Quaternion get(final long[] ref) {
-                return Quaternion.valueOf(access.get(ref));
-            }
-
-            public long[] shape() {
-                return access.shape();
-            }
-
-        };
+        return AccessAnyD.asQuaternionAnyD(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access1D#asRational1D(Access1D<?>)} instead
+     */
+    @Deprecated
     public static Access1D<RationalNumber> asRational1D(final Access1D<?> access) {
-        return new Access1D<RationalNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public RationalNumber get(final long index) {
-                return RationalNumber.valueOf(access.get(index));
-            }
-
-        };
+        return Access1D.asRational1D(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access2D#asRational2D(Access2D<?>)} instead
+     */
+    @Deprecated
     public static Access2D<RationalNumber> asRational2D(final Access2D<?> access) {
-        return new Access2D<RationalNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long countColumns() {
-                return access.countColumns();
-            }
-
-            public long countRows() {
-                return access.countRows();
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long row, final long col) {
-                return access.doubleValue(row, col);
-            }
-
-            public RationalNumber get(final long index) {
-                return RationalNumber.valueOf(access.get(index));
-            }
-
-            public RationalNumber get(final long row, final long col) {
-                return RationalNumber.valueOf(access.get(row, col));
-            }
-
-        };
+        return Access2D.asRational2D(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link AccessAnyD#asRationalAnyD(AccessAnyD<?>)} instead
+     */
+    @Deprecated
     public static AccessAnyD<RationalNumber> asRationalAnyD(final AccessAnyD<?> access) {
-        return new AccessAnyD<RationalNumber>() {
-
-            public long count() {
-                return access.count();
-            }
-
-            public long count(final int dimension) {
-                return access.count(dimension);
-            }
-
-            public double doubleValue(final long index) {
-                return access.doubleValue(index);
-            }
-
-            public double doubleValue(final long[] ref) {
-                return access.doubleValue(ref);
-            }
-
-            public RationalNumber get(final long index) {
-                return RationalNumber.valueOf(access.get(index));
-            }
-
-            public RationalNumber get(final long[] ref) {
-                return RationalNumber.valueOf(access.get(ref));
-            }
-
-            public long[] shape() {
-                return access.shape();
-            }
-
-        };
+        return AccessAnyD.asRationalAnyD(access);
     }
 
     /**
      * @param structure An access structure
      * @return The size of an access with that structure
+     * @deprecated v44 Use {@link StructureAnyD#count(int[])} instead
      */
+    @Deprecated
     public static int count(final int[] structure) {
-        int retVal = 1;
-        final int tmpLength = structure.length;
-        for (int i = 0; i < tmpLength; i++) {
-            retVal *= structure[i];
-        }
-        return retVal;
+        return StructureAnyD.count(structure);
     }
 
     /**
      * @param structure An access structure
      * @param dimension A dimension index
      * @return The size of that dimension
+     * @deprecated v44 Use {@link StructureAnyD#count(int[],int)} instead
      */
+    @Deprecated
     public static int count(final int[] structure, final int dimension) {
-        return structure.length > dimension ? structure[dimension] : 1;
+        return StructureAnyD.count(structure, dimension);
     }
 
     /**
      * @param structure An access structure
      * @return The size of an access with that structure
+     * @deprecated v44 Use {@link StructureAnyD#count(long[])} instead
      */
+    @Deprecated
     public static long count(final long[] structure) {
-        long retVal = 1;
-        final int tmpLength = structure.length;
-        for (int i = 0; i < tmpLength; i++) {
-            retVal *= structure[i];
-        }
-        return retVal;
+        return StructureAnyD.count(structure);
     }
 
     /**
      * @param structure An access structure
      * @param dimension A dimension index
      * @return The size of that dimension
+     * @deprecated v44 Use {@link StructureAnyD#count(long[],int)} instead
      */
+    @Deprecated
     public static long count(final long[] structure, final int dimension) {
-        return structure.length > dimension ? structure[dimension] : 1;
+        return StructureAnyD.count(structure, dimension);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access1D#equals(Access1D<?>,Access1D<?>,NumberContext)} instead
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static boolean equals(final Access1D<?> accessA, final Access1D<?> accessB, final NumberContext context) {
-
-        final long tmpLength = accessA.count();
-
-        boolean retVal = tmpLength == accessB.count();
-
-        if ((accessA.get(0) instanceof ComplexNumber) && (accessB.get(0) instanceof ComplexNumber)) {
-
-            final Access1D<ComplexNumber> tmpAccessA = (Access1D<ComplexNumber>) accessA;
-            final Access1D<ComplexNumber> tmpAccessB = (Access1D<ComplexNumber>) accessB;
-
-            for (int i = 0; retVal && (i < tmpLength); i++) {
-                retVal &= !context.isDifferent(tmpAccessA.get(i).getReal(), tmpAccessB.get(i).getReal());
-                retVal &= !context.isDifferent(tmpAccessA.get(i).i, tmpAccessB.get(i).i);
-            }
-
-        } else {
-
-            for (int i = 0; retVal && (i < tmpLength); i++) {
-                retVal &= !context.isDifferent(accessA.doubleValue(i), accessB.doubleValue(i));
-            }
-        }
-
-        return retVal;
+        return Access1D.equals(accessA, accessB, context);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access2D#equals(Access2D<?>,Access2D<?>,NumberContext)} instead
+     */
+    @Deprecated
     public static boolean equals(final Access2D<?> accessA, final Access2D<?> accessB, final NumberContext context) {
-        return (accessA.countRows() == accessB.countRows()) && (accessA.countColumns() == accessB.countColumns())
-                && AccessUtils.equals((Access1D<?>) accessA, (Access1D<?>) accessB, context);
+        return Access2D.equals(accessA, accessB, context);
     }
 
+    /**
+     * @deprecated v44 Use {@link AccessAnyD#equals(AccessAnyD<?>,AccessAnyD<?>,NumberContext)} instead
+     */
+    @Deprecated
     public static boolean equals(final AccessAnyD<?> accessA, final AccessAnyD<?> accessB, final NumberContext context) {
-
-        boolean retVal = true;
-        int d = 0;
-        long tmpCount;
-
-        do {
-            tmpCount = accessA.count(d);
-            retVal &= tmpCount == accessB.count(d);
-            d++;
-        } while (retVal && ((d <= 3) || (tmpCount > 1)));
-
-        return retVal && AccessUtils.equals((Access1D<?>) accessA, (Access1D<?>) accessB, context);
+        return AccessAnyD.equals(accessA, accessB, context);
     }
 
+    /**
+     * @deprecated v44 Use {@link Access1D#hashCode(Access1D<?>)} instead
+     */
+    @Deprecated
     public static int hashCode(final Access1D<?> access) {
-        final int tmpSize = (int) access.count();
-        int retVal = tmpSize + 31;
-        for (int ij = 0; ij < tmpSize; ij++) {
-            retVal *= access.doubleValue(ij);
-        }
-        return retVal;
+        return Access1D.hashCode(access);
     }
 
+    /**
+     * @deprecated v44 Use {@link BasicArray#makeDecreasingRange(int,int)} instead
+     */
+    @Deprecated
     public static int[] makeDecreasingRange(final int first, final int count) {
-        final int[] retVal = new int[count];
-        for (int i = 0; i < count; i++) {
-            retVal[i] = first - i;
-        }
-        return retVal;
+        return BasicArray.makeDecreasingRange(first, count);
     }
 
+    /**
+     * @deprecated v44 Use {@link BasicArray#makeDecreasingRange(long,int)} instead
+     */
+    @Deprecated
     public static long[] makeDecreasingRange(final long first, final int count) {
-        final long[] retVal = new long[count];
-        for (int i = 0; i < count; i++) {
-            retVal[i] = first - i;
-        }
-        return retVal;
+        return BasicArray.makeDecreasingRange(first, count);
     }
 
+    /**
+     * @deprecated v44 Use {@link BasicArray#makeIncreasingRange(int,int)} instead
+     */
+    @Deprecated
     public static int[] makeIncreasingRange(final int first, final int count) {
-        final int[] retVal = new int[count];
-        for (int i = 0; i < count; i++) {
-            retVal[i] = first + i;
-        }
-        return retVal;
+        return BasicArray.makeIncreasingRange(first, count);
     }
 
+    /**
+     * @deprecated v44 Use {@link BasicArray#makeIncreasingRange(long,int)} instead
+     */
+    @Deprecated
     public static long[] makeIncreasingRange(final long first, final int count) {
-        final long[] retVal = new long[count];
-        for (int i = 0; i < count; i++) {
-            retVal[i] = first + i;
-        }
-        return retVal;
+        return BasicArray.makeIncreasingRange(first, count);
     }
 
     private AccessUtils() {

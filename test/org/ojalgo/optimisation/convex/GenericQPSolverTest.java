@@ -22,7 +22,7 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -68,7 +68,7 @@ public abstract class GenericQPSolverTest extends OptimisationConvexTests {
         final MatrixStore<Double> tmpExpected = myBE;
 
         MatrixStore<Double> tmpActual = myAE.multiply(myXE);
-        AccessUtils.equals(tmpExpected, tmpActual, myEvaluationContext);
+        Access2D.equals(tmpExpected, tmpActual, myEvaluationContext);
 
         tmpActual = myAE.multiply(myXI);
         TestUtils.assertEquals(tmpExpected, tmpActual, myEvaluationContext);

@@ -30,7 +30,6 @@ import java.util.List;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 import org.ojalgo.TestUtils;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
@@ -163,7 +162,7 @@ public class CommonsMathSimplexSolverTest extends OptimisationLinearTests {
 
         public double getValue() {
             final Access1D<?> tmpAccess = ArrayUtils.wrapAccess1D(this.getPoint());
-            return myObjFunc.getObjectiveFunction().invoke(AccessUtils.asPrimitive1D(tmpAccess)) + myObjFunc.getConstant();
+            return myObjFunc.getObjectiveFunction().invoke(Access1D.asPrimitive1D(tmpAccess)) + myObjFunc.getConstant();
         }
     }
 

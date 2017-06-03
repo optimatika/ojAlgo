@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -76,7 +75,7 @@ public interface Hessenberg<N extends Number> extends MatrixDecomposition<N> {
         final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
         final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpH);
 
-        return AccessUtils.equals(tmpStore1, tmpStore2, context);
+        return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
     static <N extends Number> MatrixStore<N> reconstruct(final Hessenberg<N> decomposition) {

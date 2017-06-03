@@ -22,7 +22,6 @@
 package org.ojalgo.array;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.StructureAnyD;
 
 /**
@@ -53,7 +52,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_1D[i] = 2 - i;
         }
 
-        ARRAY_1D = new Primitive64Array(AccessUtils.count(STRUCTURE_1D));
+        ARRAY_1D = new Primitive64Array(StructureAnyD.count(STRUCTURE_1D));
 
         for (int i = 0; i < ARRAY_1D.size(); i++) {
             ARRAY_1D.set(i, Double.valueOf(i));
@@ -68,7 +67,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_2D[i] = 3 - i;
         }
 
-        ARRAY_2D = new Primitive64Array(AccessUtils.count(STRUCTURE_2D));
+        ARRAY_2D = new Primitive64Array(StructureAnyD.count(STRUCTURE_2D));
 
         for (int i = 0; i < ARRAY_2D.size(); i++) {
             ARRAY_2D.set(i, Double.valueOf(i));
@@ -83,7 +82,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_3D[i] = 4 - i;
         }
 
-        ARRAY_3D = new Primitive64Array(AccessUtils.count(STRUCTURE_3D));
+        ARRAY_3D = new Primitive64Array(StructureAnyD.count(STRUCTURE_3D));
 
         for (int i = 0; i < ARRAY_3D.size(); i++) {
             ARRAY_3D.set(i, Double.valueOf(i));
@@ -98,7 +97,7 @@ public class ArrayStructureTest extends ArrayTests {
             STRUCTURE_4D[i] = 5 - i;
         }
 
-        ARRAY_4D = new Primitive64Array(AccessUtils.count(STRUCTURE_4D));
+        ARRAY_4D = new Primitive64Array(StructureAnyD.count(STRUCTURE_4D));
 
         for (int i = 0; i < ARRAY_4D.size(); i++) {
             ARRAY_4D.set(i, Double.valueOf(i));

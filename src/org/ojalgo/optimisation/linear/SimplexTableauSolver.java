@@ -27,8 +27,8 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 import java.util.Arrays;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
@@ -147,7 +147,7 @@ final class SimplexTableauSolver extends LinearSolver {
             myBasis = tmpBasis;
             this.include(tmpBasis);
         } else {
-            myBasis = AccessUtils.makeIncreasingRange(-tmpConstraintsCount, tmpConstraintsCount);
+            myBasis = BasicArray.makeIncreasingRange(-tmpConstraintsCount, tmpConstraintsCount);
         }
 
         for (int i = 0; i < tmpConstraintsCount; i++) {

@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.stream.LongStream;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.ElementView1D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.constant.PrimitiveMath;
@@ -295,7 +294,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
             final int tmpSize = (int) this.count();
 
             if (tmpSize != myIndices.length) {
-                myIndices = AccessUtils.makeIncreasingRange(0L, tmpSize);
+                myIndices = BasicArray.makeIncreasingRange(0L, tmpSize);
                 myValues = myStrategy.make(tmpSize);
                 myActualLength = tmpSize;
             }
@@ -312,7 +311,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         final int tmpSize = (int) this.count();
 
         if (tmpSize != myIndices.length) {
-            myIndices = AccessUtils.makeIncreasingRange(0L, tmpSize);
+            myIndices = BasicArray.makeIncreasingRange(0L, tmpSize);
             myValues = myStrategy.make(tmpSize);
             myActualLength = tmpSize;
         }

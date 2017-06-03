@@ -22,7 +22,6 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -69,7 +68,7 @@ public interface Schur<N extends Number> extends MatrixDecomposition<N> {
         final MatrixStore<N> tmpStore1 = matrix.multiply(tmpQ);
         final MatrixStore<N> tmpStore2 = tmpQ.multiply(tmpU);
 
-        return AccessUtils.equals(tmpStore1, tmpStore2, context);
+        return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
     static <N extends Number> MatrixStore<N> reconstruct(final Schur<N> decomposition) {

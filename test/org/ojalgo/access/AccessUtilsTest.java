@@ -42,7 +42,7 @@ public class AccessUtilsTest extends FunctionalityTest {
         final long tmpCount = tmpCountRows * tmpCountColumns;
 
         final long[] tmpStructure = new long[] { tmpCountRows, tmpCountColumns };
-        TestUtils.assertEquals(tmpCount, AccessUtils.count(tmpStructure));
+        TestUtils.assertEquals(tmpCount, StructureAnyD.count(tmpStructure));
 
         final long tmpExpIndex = Uniform.randomInteger(tmpCount);
 
@@ -71,7 +71,7 @@ public class AccessUtilsTest extends FunctionalityTest {
         final long[] tmpStructure = new long[] { 3, 3, 4, 2 };
 
         final long tmpExpCount = 72;
-        TestUtils.assertEquals(tmpExpCount, AccessUtils.count(tmpStructure));
+        TestUtils.assertEquals(tmpExpCount, StructureAnyD.count(tmpStructure));
 
         final long tmpMatchingInd1 = 50;
         final long[] tmpMatchingRef1 = new long[] { 2, 1, 1, 1 };

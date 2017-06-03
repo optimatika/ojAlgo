@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -158,7 +158,7 @@ public class BidiagonalTest extends MatrixDecompositionTests {
         }
 
         final MatrixStore<Double> tmpReconstructed = Bidiagonal.reconstruct(tmpDecomposition);
-        if (!AccessUtils.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
+        if (!Access2D.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Failed to reconstruct!");
         }

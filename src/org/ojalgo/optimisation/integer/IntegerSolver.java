@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.integer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.multiary.MultiaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -156,7 +155,7 @@ public abstract class IntegerSolver extends GenericSolver {
     @Override
     protected final double evaluateFunction(final Access1D<?> solution) {
         if ((myFunction != null) && (solution != null) && (myFunction.arity() == solution.count())) {
-            return myFunction.invoke(AccessUtils.asPrimitive1D(solution));
+            return myFunction.invoke(Access1D.asPrimitive1D(solution));
         } else {
             return Double.NaN;
         }

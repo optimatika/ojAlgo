@@ -39,7 +39,7 @@ import java.nio.channels.FileChannel.MapMode;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.FunctionSet;
@@ -211,7 +211,7 @@ public abstract class BufferArray extends PlainArray<Double> {
 
     private static BasicArray<Double> create(final File file, final long... structure) {
 
-        final long tmpCount = AccessUtils.count(structure);
+        final long tmpCount = StructureAnyD.count(structure);
 
         DoubleBuffer tmpDoubleBuffer = null;
 

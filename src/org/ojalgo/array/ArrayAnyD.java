@@ -28,7 +28,6 @@ import java.util.Arrays;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.AccessAnyD;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.FactoryAnyD;
 import org.ojalgo.access.MutateAnyD;
 import org.ojalgo.access.StructureAnyD;
@@ -75,7 +74,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
         }
 
         public final ArrayAnyD<N> makeFilled(final long[] structure, final NullaryFunction<?> supplier) {
-            return myDelegate.makeFilled(AccessUtils.count(structure), supplier).asArrayAnyD(structure);
+            return myDelegate.makeFilled(StructureAnyD.count(structure), supplier).asArrayAnyD(structure);
         }
 
         public final ArrayAnyD<N> makeZero(final long... structure) {
@@ -160,7 +159,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     }
 
     public long count(final int dimension) {
-        return AccessUtils.count(myStructure, dimension);
+        return StructureAnyD.count(myStructure, dimension);
     }
 
     public double doubleValue(final long index) {
@@ -220,7 +219,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public void fillSet(final long[] first, final int dimension, final N number) {
 
-        final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
+        final long tmpCount = StructureAnyD.count(myStructure, dimension) - first[dimension];
 
         final long tmpFirst = StructureAnyD.index(myStructure, first);
         final long tmpStep = StructureAnyD.step(myStructure, dimension);
@@ -315,7 +314,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public void modifySet(final long[] first, final int dimension, final UnaryFunction<N> function) {
 
-        final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
+        final long tmpCount = StructureAnyD.count(myStructure, dimension) - first[dimension];
 
         final long tmpFirst = StructureAnyD.index(myStructure, first);
         final long tmpStep = StructureAnyD.step(myStructure, dimension);
@@ -350,7 +349,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public Array1D<N> slice(final long[] first, final int dimension) {
 
-        final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
+        final long tmpCount = StructureAnyD.count(myStructure, dimension) - first[dimension];
 
         final long tmpFirst = StructureAnyD.index(myStructure, first);
         final long tmpStep = StructureAnyD.step(myStructure, dimension);
@@ -403,7 +402,7 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
 
     public void visitSet(final long[] first, final int dimension, final VoidFunction<N> visitor) {
 
-        final long tmpCount = AccessUtils.count(myStructure, dimension) - first[dimension];
+        final long tmpCount = StructureAnyD.count(myStructure, dimension) - first[dimension];
 
         final long tmpFirst = StructureAnyD.index(myStructure, first);
         final long tmpStep = StructureAnyD.step(myStructure, dimension);

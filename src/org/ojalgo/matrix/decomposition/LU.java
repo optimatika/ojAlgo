@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -93,7 +92,7 @@ public interface LU<N extends Number> extends LDU<N> {
         final MatrixStore<N> tmpU = decomposition.getU();
         final int[] tmpPivotOrder = decomposition.getPivotOrder();
 
-        return AccessUtils.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
+        return Access2D.equals(matrix.logical().row(tmpPivotOrder).get(), tmpL.multiply(tmpU), context);
     }
 
     static <N extends Number> MatrixStore<N> reconstruct(final LU<N> decomposition) {

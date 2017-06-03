@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.IntIndex;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
@@ -144,7 +144,7 @@ public abstract class LinearSolver extends BaseSolver {
                 + tmpVarsNegUp.size();
         final int tmpTotalVarCount = tmpProblVarCount + tmpSlackVarCount;
 
-        final int[] tmpBasis = AccessUtils.makeIncreasingRange(-tmpConstraiCount, tmpConstraiCount);
+        final int[] tmpBasis = BasicArray.makeIncreasingRange(-tmpConstraiCount, tmpConstraiCount);
 
         final PhysicalStore<Double> tmpC = FACTORY.makeZero(tmpTotalVarCount, 1);
         final PhysicalStore<Double> tmpAE = FACTORY.makeZero(tmpConstraiCount, tmpTotalVarCount);

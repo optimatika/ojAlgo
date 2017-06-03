@@ -27,7 +27,6 @@ import java.util.Optional;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.DenseArray;
@@ -196,7 +195,7 @@ public interface Eigenvalue<N extends Number>
         final MatrixStore<N> tmpStore1 = matrix.multiply(tmpV);
         final MatrixStore<N> tmpStore2 = tmpV.multiply(tmpD);
 
-        return AccessUtils.equals(tmpStore1, tmpStore2, context);
+        return Access2D.equals(tmpStore1, tmpStore2, context);
     }
 
     static <N extends Number> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {

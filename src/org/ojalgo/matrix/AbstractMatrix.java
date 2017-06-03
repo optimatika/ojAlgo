@@ -28,7 +28,6 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.algebra.NormedVectorSpace;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -204,7 +203,7 @@ abstract class AbstractMatrix<N extends Number, I extends BasicMatrix> extends O
     }
 
     public boolean equals(final Access2D<?> aMtrx, final NumberContext aCntxt) {
-        return AccessUtils.equals(myStore, aMtrx, aCntxt);
+        return Access2D.equals(myStore, aMtrx, aCntxt);
     }
 
     @Override

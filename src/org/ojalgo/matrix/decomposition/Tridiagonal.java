@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
@@ -69,7 +68,7 @@ public interface Tridiagonal<N extends Number> extends MatrixDecomposition<N> {
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
 
         // Check that [A] == [Q][D][Q]<sup>T</sup>
-        return AccessUtils.equals(matrix, Tridiagonal.reconstruct(decomposition), context);
+        return Access2D.equals(matrix, Tridiagonal.reconstruct(decomposition), context);
 
         // Check that Q is orthogonal/unitary...
     }

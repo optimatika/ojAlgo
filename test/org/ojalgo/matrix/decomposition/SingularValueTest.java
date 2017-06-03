@@ -24,7 +24,7 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
@@ -172,7 +172,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
         final MatrixStore<ComplexNumber> tmpReconstructed = tmpDecomposition.reconstruct();
 
-        if (!AccessUtils.equals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6))) {
+        if (!Access2D.equals(tmpOriginal, tmpReconstructed, new NumberContext(7, 6))) {
             BasicLogger.error("Recreation failed for: {}", tmpDecomposition.getClass().getName());
         }
         if (!SingularValue.equals(tmpOriginal, tmpDecomposition, new NumberContext(7, 6))) {
@@ -348,7 +348,7 @@ public class SingularValueTest extends MatrixDecompositionTests {
 
             tmpImpls[i].decompose(aMtrx);
             final MatrixStore<Double> tmpReconstructed = SingularValue.reconstruct(tmpImpls[i]);
-            if (!AccessUtils.equals(aMtrx, tmpReconstructed, new NumberContext(7, 6))) {
+            if (!Access2D.equals(aMtrx, tmpReconstructed, new NumberContext(7, 6))) {
                 BasicLogger.error("Recreation failed for: {}", tmpImpls[i].getClass().getName());
             }
             if (!SingularValue.equals(aMtrx, tmpImpls[i], new NumberContext(7, 6))) {

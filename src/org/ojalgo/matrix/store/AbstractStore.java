@@ -25,7 +25,7 @@ import java.io.Serializable;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -73,7 +73,7 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
     }
 
     public final boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        return AccessUtils.equals(this, other, context);
+        return Access2D.equals(this, other, context);
     }
 
     @SuppressWarnings("unchecked")

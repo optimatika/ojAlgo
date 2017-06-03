@@ -44,6 +44,50 @@ public interface StructureAnyD extends Structure1D {
 
     /**
      * @param structure An access structure
+     * @return The size of an access with that structure
+     */
+    static int count(final int[] structure) {
+        int retVal = 1;
+        final int tmpLength = structure.length;
+        for (int i = 0; i < tmpLength; i++) {
+            retVal *= structure[i];
+        }
+        return retVal;
+    }
+
+    /**
+     * @param structure An access structure
+     * @param dimension A dimension index
+     * @return The size of that dimension
+     */
+    static int count(final int[] structure, final int dimension) {
+        return structure.length > dimension ? structure[dimension] : 1;
+    }
+
+    /**
+     * @param structure An access structure
+     * @return The size of an access with that structure
+     */
+    static long count(final long[] structure) {
+        long retVal = 1;
+        final int tmpLength = structure.length;
+        for (int i = 0; i < tmpLength; i++) {
+            retVal *= structure[i];
+        }
+        return retVal;
+    }
+
+    /**
+     * @param structure An access structure
+     * @param dimension A dimension index
+     * @return The size of that dimension
+     */
+    static long count(final long[] structure, final int dimension) {
+        return structure.length > dimension ? structure[dimension] : 1;
+    }
+
+    /**
+     * @param structure An access structure
      * @param reference An access element reference
      * @return The index of that element
      */
@@ -145,7 +189,7 @@ public interface StructureAnyD extends Structure1D {
     static int step(final int[] structure, final int dimension) {
         int retVal = 1;
         for (int i = 0; i < dimension; i++) {
-            retVal *= AccessUtils.count(structure, i);
+            retVal *= StructureAnyD.count(structure, i);
         }
         return retVal;
     }
@@ -176,7 +220,7 @@ public interface StructureAnyD extends Structure1D {
     static long step(final long[] structure, final int dimension) {
         long retVal = 1;
         for (int i = 0; i < dimension; i++) {
-            retVal *= AccessUtils.count(structure, i);
+            retVal *= StructureAnyD.count(structure, i);
         }
         return retVal;
     }
@@ -203,7 +247,7 @@ public interface StructureAnyD extends Structure1D {
      * count() == count(0) * count(1) * count(2) * count(3) * ...
      */
     default long count() {
-        return AccessUtils.count(this.shape());
+        return StructureAnyD.count(this.shape());
     }
 
     long count(int dimension);

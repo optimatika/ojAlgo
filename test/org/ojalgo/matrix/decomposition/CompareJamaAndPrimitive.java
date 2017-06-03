@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.matrix.SimpleCholeskyCase;
 import org.ojalgo.matrix.SimpleEigenvalueCase;
 import org.ojalgo.matrix.SimpleLUCase;
@@ -138,7 +138,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
 
         TestUtils.assertEquals(JAMA_QR.decompose(tmpMtrxA), PRIMITIVE_QR.decompose(tmpMtrxA));
 
-        final int[] tmpEconSet = AccessUtils.makeIncreasingRange(0, tmpMinDim);
+        final int[] tmpEconSet = BasicArray.makeIncreasingRange(0, tmpMinDim);
 
         TestUtils.assertEquals(JAMA_QR.getQ(), PRIMITIVE_QR.getQ().logical().column(tmpEconSet).get(), COMPARE_CONTEXT);
         TestUtils.assertEquals(JAMA_QR.getR(), PRIMITIVE_QR.getR().logical().row(tmpEconSet).get(), COMPARE_CONTEXT);

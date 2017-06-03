@@ -26,7 +26,7 @@ import java.math.RoundingMode;
 import java.util.List;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Access1D;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.matrix.BasicMatrix;
@@ -170,7 +170,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpResult = tmpSolver.solve();
 
         // Should NOT be equal in this case!
-        TestUtils.assertFalse(AccessUtils.equals(tmpX, tmpResult, new NumberContext(7, 6)));
+        TestUtils.assertFalse(Access1D.equals(tmpX, tmpResult, new NumberContext(7, 6)));
 
         // No problem with both the lower and upper limits set.
 

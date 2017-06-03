@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -93,7 +92,7 @@ public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDeco
 
         final MatrixStore<N> tmpStore = tmpQ.multiply(tmpR);
 
-        return AccessUtils.equals(tmpStore, matrix, context);
+        return Access2D.equals(tmpStore, matrix, context);
     }
 
     static <N extends Number> MatrixStore<N> reconstruct(final QR<N> decomposition) {

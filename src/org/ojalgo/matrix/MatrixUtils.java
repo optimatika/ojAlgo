@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionUtils;
@@ -278,11 +277,11 @@ public abstract class MatrixUtils {
     }
 
     public static <N extends Number> int hashCode(final BasicMatrix matrix) {
-        return AccessUtils.hashCode(matrix);
+        return Access1D.hashCode(matrix);
     }
 
     public static <N extends Number> int hashCode(final MatrixStore<N> matrix) {
-        return AccessUtils.hashCode(matrix);
+        return Access1D.hashCode(matrix);
     }
 
     public static boolean isHermitian(final Access2D<?> matrix) {

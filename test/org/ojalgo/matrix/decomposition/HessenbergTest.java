@@ -22,7 +22,7 @@
 package org.ojalgo.matrix.decomposition;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.AccessUtils;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -78,12 +78,12 @@ public class HessenbergTest extends MatrixDecompositionTests {
         }
 
         final MatrixStore<Double> tmpReconstructed = Hessenberg.reconstruct(tmpDecomposition);
-        if (!AccessUtils.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
+        if (!Access2D.equals(aMatrix, tmpReconstructed, new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);
             TestUtils.fail("Failed to reconstruct!");
         }
 
-        if (!AccessUtils.equals(tmpDecomposition.getQ(),
+        if (!Access2D.equals(tmpDecomposition.getQ(),
                 tmpDecomposition.doQ(this.makeEye((int) aMatrix.countRows(), (int) Math.min(aMatrix.countRows(), aMatrix.countColumns()))),
                 new NumberContext(7, 6))) {
             this.doPrint(tmpDecomposition, aMatrix);

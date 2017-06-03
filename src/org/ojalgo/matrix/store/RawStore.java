@@ -33,7 +33,6 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Structure2D;
 import org.ojalgo.array.ArrayUtils;
 import org.ojalgo.array.BasicArray;
@@ -721,13 +720,13 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
     }
 
     public boolean equals(final MatrixStore<Double> other, final NumberContext context) {
-        return AccessUtils.equals(this, other, context);
+        return Access2D.equals(this, other, context);
     }
 
     @Override
     public boolean equals(final Object other) {
         if (other instanceof Access2D<?>) {
-            return AccessUtils.equals(this, (Access2D<?>) other, NumberContext.getGeneral(6));
+            return Access2D.equals(this, (Access2D<?>) other, NumberContext.getGeneral(6));
         } else {
             return super.equals(other);
         }

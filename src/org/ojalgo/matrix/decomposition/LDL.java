@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -85,7 +84,7 @@ public interface LDL<N extends Number> extends LDU<N>, MatrixDecomposition.Hermi
     }
 
     static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
-        return AccessUtils.equals(matrix, decomposition.reconstruct(), context);
+        return Access2D.equals(matrix, decomposition.reconstruct(), context);
     }
 
     static <N extends Number> MatrixStore<N> reconstruct(final LDL<N> decomposition) {

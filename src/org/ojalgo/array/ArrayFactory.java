@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Factory1D;
+import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.NullaryFunction;
@@ -97,7 +97,7 @@ abstract class ArrayFactory<N extends Number, I extends BasicArray<N>> extends O
 
     final SegmentedArray<N> makeSegmented(final long... structure) {
 
-        final long tmpTotalCount = AccessUtils.count(structure);
+        final long tmpTotalCount = StructureAnyD.count(structure);
 
         final int tmpMax = PrimitiveMath.powerOf2Smaller(Math.min(tmpTotalCount, this.getCapacityLimit()));
         final int tmpMin = PrimitiveMath.powerOf2Larger(tmpTotalCount / DenseArray.MAX_ARRAY_SIZE);

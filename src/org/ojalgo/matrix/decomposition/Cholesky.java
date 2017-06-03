@@ -24,7 +24,6 @@ package org.ojalgo.matrix.decomposition;
 import java.math.BigDecimal;
 
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.scalar.ComplexNumber;
@@ -88,7 +87,7 @@ public interface Cholesky<N extends Number> extends LDU<N>, MatrixDecomposition.
 
         final MatrixStore<N> tmpL = decomposition.getL();
 
-        retVal = AccessUtils.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
+        retVal = Access2D.equals(tmpL.multiply(tmpL.logical().conjugate().get()), matrix, context);
 
         return retVal;
     }

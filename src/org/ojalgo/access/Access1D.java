@@ -21,6 +21,7 @@
  */
 package org.ojalgo.access;
 
+import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.concurrent.atomic.DoubleAdder;
 import java.util.stream.BaseStream;
@@ -28,7 +29,12 @@ import java.util.stream.StreamSupport;
 
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.Aggregator;
+import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.scalar.Quaternion;
+import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.TypeUtils;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * 1-dimensional accessor (get) methods. The nested interfaces declare additional methods that indirectly
@@ -165,6 +171,132 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
             Structure1D.loopRange(first, limit, i -> this.visitOne(i, visitor));
         }
 
+    }
+
+    static Access1D<BigDecimal> asBig1D(final Access1D<?> access) {
+        return new Access1D<BigDecimal>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public BigDecimal get(final long index) {
+                return TypeUtils.toBigDecimal(access.get(index));
+            }
+
+        };
+    }
+
+    static Access1D<ComplexNumber> asComplex1D(final Access1D<?> access) {
+        return new Access1D<ComplexNumber>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public ComplexNumber get(final long index) {
+                return ComplexNumber.valueOf(access.get(index));
+            }
+
+        };
+    }
+
+    static Access1D<Double> asPrimitive1D(final Access1D<?> access) {
+        return new Access1D<Double>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public Double get(final long index) {
+                return access.doubleValue(index);
+            }
+
+        };
+    }
+
+    static Access1D<Quaternion> asQuaternion1D(final Access1D<?> access) {
+        return new Access1D<Quaternion>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public Quaternion get(final long index) {
+                return Quaternion.valueOf(access.get(index));
+            }
+
+        };
+    }
+
+    static Access1D<RationalNumber> asRational1D(final Access1D<?> access) {
+        return new Access1D<RationalNumber>() {
+
+            public long count() {
+                return access.count();
+            }
+
+            public double doubleValue(final long index) {
+                return access.doubleValue(index);
+            }
+
+            public RationalNumber get(final long index) {
+                return RationalNumber.valueOf(access.get(index));
+            }
+
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    static boolean equals(final Access1D<?> accessA, final Access1D<?> accessB, final NumberContext context) {
+
+        final long tmpLength = accessA.count();
+
+        boolean retVal = tmpLength == accessB.count();
+
+        if ((accessA.get(0) instanceof ComplexNumber) && (accessB.get(0) instanceof ComplexNumber)) {
+
+            final Access1D<ComplexNumber> tmpAccessA = (Access1D<ComplexNumber>) accessA;
+            final Access1D<ComplexNumber> tmpAccessB = (Access1D<ComplexNumber>) accessB;
+
+            for (int i = 0; retVal && (i < tmpLength); i++) {
+                retVal &= !context.isDifferent(tmpAccessA.get(i).getReal(), tmpAccessB.get(i).getReal());
+                retVal &= !context.isDifferent(tmpAccessA.get(i).i, tmpAccessB.get(i).i);
+            }
+
+        } else {
+
+            for (int i = 0; retVal && (i < tmpLength); i++) {
+                retVal &= !context.isDifferent(accessA.doubleValue(i), accessB.doubleValue(i));
+            }
+        }
+
+        return retVal;
+    }
+
+    static int hashCode(final Access1D<?> access) {
+        final int tmpSize = (int) access.count();
+        int retVal = tmpSize + 31;
+        for (int ij = 0; ij < tmpSize; ij++) {
+            retVal *= access.doubleValue(ij);
+        }
+        return retVal;
     }
 
     default <NN extends Number, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {

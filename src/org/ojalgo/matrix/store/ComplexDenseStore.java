@@ -28,7 +28,6 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
@@ -637,7 +636,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
     }
 
     public boolean equals(final MatrixStore<ComplexNumber> other, final NumberContext context) {
-        return AccessUtils.equals(this, other, context);
+        return Access2D.equals(this, other, context);
     }
 
     @SuppressWarnings("unchecked")

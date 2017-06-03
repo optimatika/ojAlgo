@@ -24,8 +24,8 @@ package org.ojalgo.array;
 import java.io.Serializable;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.AccessUtils;
 import org.ojalgo.access.Mutate1D;
+import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.array.blas.AMAX;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
@@ -88,7 +88,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         final BasicArray<N> makeStructuredZero(final long... structure) {
             // Typically sparse, very large are also segmented, and very small are dense
 
-            final long tmpTotal = AccessUtils.count(structure);
+            final long tmpTotal = StructureAnyD.count(structure);
 
             final DenseStrategy<N> tmpStrategy = this.strategy();
 
@@ -111,7 +111,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         final BasicArray<N> makeToBeFilled(final long... structure) {
             // Always dense, but maybe segmented
 
-            final long tmpTotal = AccessUtils.count(structure);
+            final long tmpTotal = StructureAnyD.count(structure);
 
             final DenseStrategy<N> tmpStrategy = this.strategy();
 
@@ -133,6 +133,38 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
     public static <N extends Number> BasicArray.Factory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new BasicArray.Factory<>(denseFactory);
+    }
+
+    public static int[] makeDecreasingRange(final int first, final int count) {
+        final int[] retVal = new int[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first - i;
+        }
+        return retVal;
+    }
+
+    public static long[] makeDecreasingRange(final long first, final int count) {
+        final long[] retVal = new long[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first - i;
+        }
+        return retVal;
+    }
+
+    public static int[] makeIncreasingRange(final int first, final int count) {
+        final int[] retVal = new int[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first + i;
+        }
+        return retVal;
+    }
+
+    public static long[] makeIncreasingRange(final long first, final int count) {
+        final long[] retVal = new long[count];
+        for (int i = 0; i < count; i++) {
+            retVal[i] = first + i;
+        }
+        return retVal;
     }
 
     protected BasicArray() {
