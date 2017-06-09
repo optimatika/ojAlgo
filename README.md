@@ -2,10 +2,6 @@
 
 oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.
 
-General information about ojAlgo can be found at: http://ojalgo.org/
-
-User documentation: https://github.com/optimatika/ojAlgo/wiki
-
 <p align="center">
 <a href="https://sourceforge.net/projects/ojalgo/files/latest/download" rel="nofollow"><img alt="Download oj! Algorithms" src="https://a.fsdn.com/con/app/sf-download-button"></a>
 </p>
@@ -20,15 +16,25 @@ ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/
 </dependency>
 ```
 
-## Issues and Discussions
+## Documentation and Support
 
-For bug reports, questions or discussions related to ojAlgo; use the ojAlgo-user mailing list: http://sourceforge.net/p/ojalgo/mailman/ojalgo-user/
-(Note that you have to be a member to post to that list!)
+General information about ojAlgo is available at the project web site: http://ojalgo.org/
 
-If you prefer you may also use "Issues" here at GitHub, but then please make sure your post actually relates to an issue with the source code (bug reports or suggested improvements). The issue tracker is not for user support or general discussions. Use the mailing list for that.
+User documentation wiki with examples is here at GitHub: https://github.com/optimatika/ojAlgo/wiki
 
-You can ofcourse also use something like [stack overflow](http://stackoverflow.com/search?tab=newest&q=ojalgo).
+Programming questions related to ojAlgo are best asked at [stack overflow](https://stackoverflow.com/search?tab=newest&q=ojalgo). Just remember to actually mention ojAlgo and tag the question using 'ojalgo' and whatever other tags you find suitable.
+
+Bug reports and feature requests should preferably be posted here at GitHub: https://github.com/optimatika/ojAlgo/issues
+(Please do not use GitHub Issues for questions, discussions or support requests!)
+
+The [ojAlgo-user mailing list](https://sourceforge.net/p/ojalgo/mailman/ojalgo-user/) can be used for just about anything as long as it relates to ojAlgo. (Note that you have to be a member to post to that list!)
+
+ojAlgo is Open Source, and you are strongly encouraged to clone or fork this repository and work directly with the source code. The source code is (part of) the documentation, and you should read it.
 
 ## Contributions
 
-Feel free to contribute any way you want. One very good way to contribute is to supply test cases that verify that the functionality you use works as expected. The ojAlgo code base is often refactored. Having tests specific to your use case can be very beneficial (for you) in assuring future releases.
+Feel free to contribute any way you want.
+
+One very good way to contribute is to supply test cases that verify that the functionality you use works as expected. The ojAlgo code base is often refactored. Having tests specific to your use case can be very beneficial (for you) in assuring future releases.
+
+...or have a look at the list of [open issues](https://github.com/optimatika/ojAlgo/issues) and see if there is something you can help out with.

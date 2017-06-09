@@ -58,15 +58,15 @@ public interface Householder<N extends Number> extends Access1D<N> {
             this(0);
         }
 
-        public final Householder.Big copy(final Householder<BigDecimal> aSource) {
+        public final Householder.Big copy(final Householder<BigDecimal> source) {
 
-            first = aSource.first();
+            first = source.first();
 
             final BigDecimal[] tmpVector = vector;
             BigDecimal tmpVal, tmpVal2 = BigMath.ZERO;
-            final int tmpSize = (int) aSource.count();
-            for (int i = aSource.first(); i < tmpSize; i++) {
-                tmpVal = aSource.get(i);
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpVal = source.get(i);
                 tmpVal2 = BigFunction.ADD.invoke(tmpVal2, BigFunction.MULTIPLY.invoke(tmpVal, tmpVal));
                 tmpVector[i] = tmpVal;
             }
@@ -76,15 +76,15 @@ public interface Householder<N extends Number> extends Access1D<N> {
             return this;
         }
 
-        public final Householder.Big copy(final Householder<BigDecimal> aSource, final BigDecimal precalculatedBeta) {
+        public final Householder.Big copy(final Householder<BigDecimal> source, final BigDecimal precalculatedBeta) {
 
-            first = aSource.first();
+            first = source.first();
 
             final BigDecimal[] tmpVector = vector;
 
-            final int tmpSize = (int) aSource.count();
-            for (int i = aSource.first(); i < tmpSize; i++) {
-                tmpVector[i] = aSource.get(i);
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpVector[i] = source.get(i);
             }
 
             beta = precalculatedBeta;
@@ -159,16 +159,16 @@ public interface Householder<N extends Number> extends Access1D<N> {
             this(0);
         }
 
-        public final Householder.Complex copy(final Householder<ComplexNumber> aSource) {
+        public final Householder.Complex copy(final Householder<ComplexNumber> source) {
 
-            first = aSource.first();
+            first = source.first();
 
             final ComplexNumber[] tmpVector = vector;
             ComplexNumber tmpNmbr;
             double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
-            final int tmpSize = (int) aSource.count();
-            for (int i = aSource.first(); i < tmpSize; i++) {
-                tmpNmbr = aSource.get(i);
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpNmbr = source.get(i);
                 tmpVal = tmpNmbr.norm();
                 tmpVal2 += tmpVal * tmpVal;
                 tmpVector[i] = tmpNmbr;
@@ -179,15 +179,15 @@ public interface Householder<N extends Number> extends Access1D<N> {
             return this;
         }
 
-        public final Householder.Complex copy(final Householder<ComplexNumber> aSource, final ComplexNumber precalculatedBeta) {
+        public final Householder.Complex copy(final Householder<ComplexNumber> source, final ComplexNumber precalculatedBeta) {
 
-            first = aSource.first();
+            first = source.first();
 
             final ComplexNumber[] tmpVector = vector;
 
-            final int tmpSize = (int) aSource.count();
-            for (int i = aSource.first(); i < tmpSize; i++) {
-                tmpVector[i] = aSource.get(i);
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpVector[i] = source.get(i);
             }
 
             beta = precalculatedBeta;
@@ -262,15 +262,15 @@ public interface Householder<N extends Number> extends Access1D<N> {
             this(0);
         }
 
-        public final Householder.Primitive copy(final Householder<Double> aSource) {
+        public final Householder.Primitive copy(final Householder<Double> source) {
 
-            first = aSource.first();
+            first = source.first();
 
             final double[] tmpVector = vector;
             double tmpVal, tmpVal2 = PrimitiveMath.ZERO;
-            final int tmpSize = (int) aSource.count();
-            for (int i = aSource.first(); i < tmpSize; i++) {
-                tmpVal = aSource.doubleValue(i);
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpVal = source.doubleValue(i);
                 tmpVal2 += tmpVal * tmpVal;
                 tmpVector[i] = tmpVal;
             }
@@ -280,15 +280,15 @@ public interface Householder<N extends Number> extends Access1D<N> {
             return this;
         }
 
-        public final Householder.Primitive copy(final Householder<Double> aSource, final double precalculatedBeta) {
+        public final Householder.Primitive copy(final Householder<Double> source, final double precalculatedBeta) {
 
-            first = aSource.first();
+            first = source.first();
 
             final double[] tmpVector = vector;
 
-            final int tmpSize = (int) aSource.count();
-            for (int i = aSource.first(); i < tmpSize; i++) {
-                tmpVector[i] = aSource.doubleValue(i);
+            final int tmpSize = (int) source.count();
+            for (int i = source.first(); i < tmpSize; i++) {
+                tmpVector[i] = source.doubleValue(i);
             }
 
             beta = precalculatedBeta;
