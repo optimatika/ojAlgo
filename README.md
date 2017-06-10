@@ -13,7 +13,7 @@ ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/
     <version>43.0</version>
 </dependency>
 ```
-
+...or download the jar from SourceForge.
 <p align="center">
 <a href="https://sourceforge.net/projects/ojalgo/files/latest/download" rel="nofollow"><img alt="Download oj! Algorithms" src="https://a.fsdn.com/con/app/sf-download-button"></a>
 </p>
