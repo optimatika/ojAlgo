@@ -2,9 +2,7 @@
 
 oj! Algorithms - ojAlgo - is Open Source Java code that has to do with mathematics, linear algebra and optimisation.
 
-<p align="center">
-<a href="https://sourceforge.net/projects/ojalgo/files/latest/download" rel="nofollow"><img alt="Download oj! Algorithms" src="https://a.fsdn.com/con/app/sf-download-button"></a>
-</p>
+http://ojalgo.org/
 
 ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.ojalgo%22%20AND%20a%3A%22ojalgo%22) to be used with your favourite dependency management tool.
 
@@ -16,7 +14,11 @@ ojAlgo is available at [The Central (Maven) Repository](http://search.maven.org/
 </dependency>
 ```
 
-## Documentation and Support
+<p align="center">
+<a href="https://sourceforge.net/projects/ojalgo/files/latest/download" rel="nofollow"><img alt="Download oj! Algorithms" src="https://a.fsdn.com/con/app/sf-download-button"></a>
+</p>
+
+### Documentation and Support
 
 General information about ojAlgo is available at the project web site: http://ojalgo.org/
 
@@ -31,10 +33,10 @@ The [ojAlgo-user mailing list](https://sourceforge.net/p/ojalgo/mailman/ojalgo-u
 
 ojAlgo is Open Source, and you are strongly encouraged to clone or fork this repository and work directly with the source code. The source code is (part of) the documentation, and you should read it.
 
-## Contributions
+### Contributions
 
-Feel free to contribute any way you want.
+Feel free to contribute any way you want. Whatever you feel is missing or "wrong", just fix it.
 
 One very good way to contribute is to supply test cases that verify that the functionality you use works as expected. The ojAlgo code base is often refactored. Having tests specific to your use case can be very beneficial (for you) in assuring future releases.
 
-...or have a look at the list of [open issues](https://github.com/optimatika/ojAlgo/issues) and see if there is something you can help out with.
+...or have a look at the list of [open issues](https://github.com/optimatika/ojAlgo/issues) to see if there is something you can help out with.
