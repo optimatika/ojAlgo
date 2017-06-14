@@ -256,7 +256,7 @@ public interface MatrixDecomposition<N extends Number> {
     }
 
     /**
-     * Eigenvalue:s and Singular Value:s decompositions can calculate the "values" only, and the resulting
+     * Eigenvalue and Singular Value decompositions can calculate the "values" only, and the resulting
      * matrices and arrays can have their elements sorted (descending) or not.
      *
      * @author apete
