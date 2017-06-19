@@ -34,7 +34,6 @@ import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.ResourceLocator;
 import org.ojalgo.type.CalendarDateUnit;
 
@@ -141,7 +140,6 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
                 if ((from = tmpLine.indexOf(tmpStr)) >= 0) {
                     to = tmpLine.indexOf("\"}", from);
-                    BasicLogger.debug(tmpLine);
                     crumb = tmpLine.substring(from + tmpStr.length(), to);
                 }
 
@@ -149,7 +147,6 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
         } catch (final IOException exception) {
             exception.printStackTrace();
         }
-        BasicLogger.debug(crumb);
 
         this.getResourceLocator().path("/v7/finance/download/" + symbol);
         switch (resolution) {
@@ -178,8 +175,6 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
     @Override
     public YahooSymbol.Data parse(final String line) throws RecoverableCondition {
-
-        BasicLogger.debug(line);
 
         Data retVal = null;
 
