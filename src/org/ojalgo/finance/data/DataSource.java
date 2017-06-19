@@ -22,6 +22,7 @@
 package org.ojalgo.finance.data;
 
 import java.io.Reader;
+import java.net.CookieHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,20 +39,22 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
     protected static final boolean DEBUG = false;
 
     private final CalendarDateUnit myResolution;
-    private final ResourceLocator myResourceLocator = new ResourceLocator();
+    private final ResourceLocator myResourceLocator;
     private final String mySymbol;
 
     @SuppressWarnings("unused")
     private DataSource() {
 
-        this(null, null);
+        this(null, null, null);
 
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected DataSource(final String symbol, final CalendarDateUnit resolution) {
+    protected DataSource(final String host, final String symbol, final CalendarDateUnit resolution) {
 
         super();
+
+        myResourceLocator = new ResourceLocator(host);
 
         mySymbol = symbol;
         myResolution = resolution;
@@ -86,7 +89,8 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
     }
 
     public List<DP> getHistoricalPrices() {
-        return this.getHistoricalPrices(myResourceLocator.getStreamReader());
+        final Reader tmpStreamReader = this.getResourceLocator().getStreamReader();
+        return this.getHistoricalPrices(tmpStreamReader);
     }
 
     public List<DP> getHistoricalPrices(final Reader reader) {
@@ -101,7 +105,7 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
     }
 
     public CalendarDateSeries<Double> getPriceSeries() {
-        return this.getPriceSeries(myResourceLocator.getStreamReader());
+        return this.getPriceSeries(this.getResourceLocator().getStreamReader());
     }
 
     public CalendarDateSeries<Double> getPriceSeries(final Reader reader) {
@@ -142,16 +146,8 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
         return result;
     }
 
-    protected String addQueryParameter(final String key, final String value) {
-        return myResourceLocator.addQueryParameter(key, value);
-    }
-
-    protected void setHost(final String host) {
-        myResourceLocator.setHost(host);
-    }
-
-    protected void setPath(final String path) {
-        myResourceLocator.setPath(path);
+    protected ResourceLocator getResourceLocator() {
+        return myResourceLocator;
     }
 
 }

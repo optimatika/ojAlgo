@@ -29,6 +29,7 @@ import java.util.Locale;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
+import org.ojalgo.netio.ResourceLocator;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.GenericContext;
 
@@ -83,21 +84,24 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
 
     public GoogleSymbol(final String symbol, final CalendarDateUnit resolution) {
 
-        super(symbol, resolution);
+        super(FINANCE_GOOGLE_COM, symbol, resolution);
 
-        this.setHost(FINANCE_GOOGLE_COM);
-        this.setPath(FINANCE_HISTORICAL);
-        this.addQueryParameter(Q, symbol);
-        this.addQueryParameter(STARTDATE, JAN_2_1970);
+        final ResourceLocator tmpResourceLocator = this.getResourceLocator();
+
+        tmpResourceLocator.cookies(null);
+
+        tmpResourceLocator.path(FINANCE_HISTORICAL);
+        tmpResourceLocator.parameter(Q, symbol);
+        tmpResourceLocator.parameter(STARTDATE, JAN_2_1970);
         switch (resolution) {
         case WEEK:
-            this.addQueryParameter(HISTPERIOD, WEEKLY);
+            tmpResourceLocator.parameter(HISTPERIOD, WEEKLY);
             break;
         default:
-            this.addQueryParameter(HISTPERIOD, DAILY);
+            tmpResourceLocator.parameter(HISTPERIOD, DAILY);
             break;
         }
-        this.addQueryParameter(OUTPUT, CSV);
+        tmpResourceLocator.parameter(OUTPUT, CSV);
     }
 
     @Override

@@ -22,12 +22,16 @@
 package org.ojalgo.netio;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,73 +40,109 @@ import java.util.TreeMap;
 import org.ojalgo.ProgrammingError;
 
 /**
- * ResourceLocator
+ * ResourceLocator - it's a URI/URL builder.
  *
  * @author apete
  */
 public final class ResourceLocator {
 
-    private String myHost = null;
-    private String myPath = null;
+    public static final CookieManager DEFAULT_COOKIE_MANAGER = new CookieManager();
+
+    private CookieHandler myCookieHandler = DEFAULT_COOKIE_MANAGER;
+    private String myFragment = null;
+    private final String myHost;
+    private String myPath = "";
     private int myPort = -1; // -1 ==> undefined
-    private Map<String, String> myQueryParameters = new TreeMap<>();
+    private final Map<String, String> myQueryParameters = new TreeMap<>();
     private String myScheme = "https";
 
-    public ResourceLocator() {
+    public ResourceLocator(final String host) {
         super();
+        myHost = host;
     }
 
-    public String addQueryParameter(final String aKey, final String aValue) {
-        return myQueryParameters.put(aKey, aValue);
+    public ResourceLocator cookies(final CookieHandler cookieHandler) {
+        myCookieHandler = cookieHandler;
+        return this;
+    }
+
+    public ResourceLocator fragment(final String fragment) {
+        myFragment = fragment;
+        return this;
     }
 
     /**
-     * Open connection and return a buffered input stream reader.
+     * Open a connection and get a stream reader.
+     */
+    public InputStream getInputStream() {
+
+        final URLConnection connection = this.openConnection();
+
+        InputStream stream = null;
+        try {
+            stream = connection.getInputStream();
+        } catch (final IOException exception) {
+            exception.printStackTrace();
+        }
+        return stream;
+    }
+
+    /**
+     * Open connection and return an input stream reader.
      */
     public Reader getStreamReader() {
+        return new InputStreamReader(this.getInputStream());
+    }
+
+    public URLConnection openConnection() {
+
+        CookieHandler.setDefault(myCookieHandler);
+
+        final URL url = this.toURL();
+
+        URLConnection connection = null;
         try {
-            return new InputStreamReader(this.toURL().openStream());
-        } catch (final IOException anException) {
-            return null;
+            connection = url.openConnection();
+        } catch (final IOException exception) {
+            exception.printStackTrace();
         }
+        return connection;
     }
 
-    public String removeQueryParameter(final String aKey) {
-        return myQueryParameters.remove(aKey);
+    public ResourceLocator parameter(final String key, final String value) {
+        ProgrammingError.throwIfNull(key, value);
+        myQueryParameters.put(key, value);
+        return this;
     }
 
-    public void setHost(final String someHost) {
-        myHost = someHost;
+    public Map<String, String> parameters() {
+        return myQueryParameters;
     }
 
-    public void setPath(final String somePath) {
-        myPath = somePath;
+    public ResourceLocator path(final String path) {
+        ProgrammingError.throwIfNull(path);
+        myPath = path;
+        return this;
     }
 
     /**
      * The default (null) value is -1.
+     *
+     * @return
      */
-    public void setPort(final int somePort) {
-        myPort = somePort;
-    }
-
-    public void setQueryParameters(final Map<String, String> someQueryParameters) {
-        myQueryParameters = someQueryParameters;
+    public ResourceLocator port(final int port) {
+        myPort = port;
+        return this;
     }
 
     /**
      * Protocol The default value is "https"
+     *
+     * @return
      */
-    public void setScheme(final String someScheme) {
-        myScheme = someScheme;
-    }
-
-    private URI makeURI() {
-        try {
-            return new URI(myScheme, null, myHost, myPort, myPath, this.query(), null);
-        } catch (final URISyntaxException anException) {
-            throw new ProgrammingError(anException);
-        }
+    public ResourceLocator scheme(final String scheme) {
+        myScheme = scheme;
+        return this;
     }
 
     private String query() {
@@ -131,11 +171,12 @@ public final class ResourceLocator {
         }
     }
 
-    private URL toURL() {
+    URL toURL() {
         try {
-            return this.makeURI().toURL();
-        } catch (final MalformedURLException anException) {
-            throw new ProgrammingError(anException);
+            final URI uri = new URI(myScheme, null, myHost, myPort, myPath, this.query(), myFragment);
+            return uri.toURL();
+        } catch (final URISyntaxException | MalformedURLException xcptn) {
+            throw new ProgrammingError(xcptn);
         }
     }
 

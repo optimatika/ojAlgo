@@ -23,8 +23,14 @@ package org.ojalgo.finance.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.CookieManager;
+import java.net.CookieStore;
+import java.net.HttpCookie;
+import java.net.URI;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
@@ -38,6 +44,45 @@ import org.ojalgo.type.CalendarDateUnit;
  * @author apete
  */
 public class YahooSymbol extends DataSource<YahooSymbol.Data> {
+
+    private static final CookieManager COOKIE_MANAGER;
+
+    static {
+
+        final CookieStore tmpCS = ResourceLocator.DEFAULT_COOKIE_MANAGER.getCookieStore();
+
+        COOKIE_MANAGER = new CookieManager(new CookieStore() {
+
+            public void add(final URI uri, final HttpCookie cookie) {
+                if (cookie.getMaxAge() == 0L) {
+                    cookie.setMaxAge(-1L);
+                }
+                tmpCS.add(uri, cookie);
+            }
+
+            public List<HttpCookie> get(final URI uri) {
+                return tmpCS.get(uri);
+            }
+
+            public List<HttpCookie> getCookies() {
+                return tmpCS.getCookies();
+            }
+
+            public List<URI> getURIs() {
+                return tmpCS.getURIs();
+            }
+
+            public boolean remove(final URI uri, final HttpCookie cookie) {
+                return tmpCS.remove(uri, cookie);
+            }
+
+            public boolean removeAll() {
+                return tmpCS.removeAll();
+            }
+
+        }, null);
+
+    }
 
     public static final class Data extends DatePrice {
 
@@ -71,23 +116,19 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
     }
 
-    private static final String HOST = "query1.finance.yahoo.com";
-    private static final String PATH = "/v7/finance/download/";
-
     public YahooSymbol(final String symbol) {
         this(symbol, CalendarDateUnit.DAY);
     }
 
     public YahooSymbol(final String symbol, final CalendarDateUnit resolution) {
 
-        super(symbol, resolution);
+        super("query1.finance.yahoo.com", symbol, resolution);
 
         // https://finance.yahoo.com/quote/AAPL
 
-        final ResourceLocator tmpResourceLocator = new ResourceLocator();
-        tmpResourceLocator.setScheme("https");
-        tmpResourceLocator.setHost("finance.yahoo.com");
-        tmpResourceLocator.setPath("/quote/" + symbol);
+        final ResourceLocator tmpResourceLocator = new ResourceLocator("finance.yahoo.com");
+        tmpResourceLocator.path("/quote/" + symbol);
+        tmpResourceLocator.cookies(COOKIE_MANAGER);
 
         final String tmpStr = "CrumbStore\":{\"crumb\":\"";
 
@@ -110,26 +151,35 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
         }
         BasicLogger.debug(crumb);
 
-        this.setHost(HOST);
-        this.setPath(PATH + symbol);
+        this.getResourceLocator().path("/v7/finance/download/" + symbol);
         switch (resolution) {
         case MONTH:
-            this.addQueryParameter("interval", 1 + "m");
+            this.getResourceLocator().parameter("interval", 1 + "mo");
             break;
         case WEEK:
-            this.addQueryParameter("interval", 1 + "w");
+            this.getResourceLocator().parameter("interval", 1 + "wk");
             break;
         default:
-            this.addQueryParameter("interval", 1 + "d");
+            this.getResourceLocator().parameter("interval", 1 + "d");
             break;
         }
-        this.addQueryParameter("events", "history");
-        this.addQueryParameter("crumb", crumb);
+        this.getResourceLocator().parameter("events", "history");
+
+        final Instant now = Instant.now();
+
+        this.getResourceLocator().parameter("period1", Long.toString(now.minusSeconds(60L * 60L * 24 * 366L * 10L).getEpochSecond()));
+        this.getResourceLocator().parameter("period2", Long.toString(now.getEpochSecond()));
+        final String value = crumb;
+
+        this.getResourceLocator().parameter("crumb", value);
+        this.getResourceLocator().cookies(COOKIE_MANAGER);
 
     }
 
     @Override
     public YahooSymbol.Data parse(final String line) throws RecoverableCondition {
+
+        BasicLogger.debug(line);
 
         Data retVal = null;
 
@@ -155,7 +205,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
             try {
                 retVal.high = Double.parseDouble(tmpString);
             } catch (final NumberFormatException ex) {
-                retVal.open = Double.NaN;
+                retVal.high = Double.NaN;
             }
 
             tmpInclusiveBegin = tmpExclusiveEnd + 1;
@@ -164,7 +214,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
             try {
                 retVal.low = Double.parseDouble(tmpString);
             } catch (final NumberFormatException ex) {
-                retVal.open = Double.NaN;
+                retVal.low = Double.NaN;
             }
 
             tmpInclusiveBegin = tmpExclusiveEnd + 1;
@@ -173,24 +223,24 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
             try {
                 retVal.close = Double.parseDouble(tmpString);
             } catch (final NumberFormatException ex) {
-                retVal.open = Double.NaN;
+                retVal.close = Double.NaN;
             }
 
             tmpInclusiveBegin = tmpExclusiveEnd + 1;
             tmpExclusiveEnd = line.indexOf(ASCII.COMMA, tmpInclusiveBegin);
             tmpString = line.substring(tmpInclusiveBegin, tmpExclusiveEnd);
             try {
-                retVal.volume = Double.parseDouble(tmpString);
+                retVal.adjustedClose = Double.parseDouble(tmpString);
             } catch (final NumberFormatException ex) {
-                retVal.open = Double.NaN;
+                retVal.adjustedClose = Double.NaN;
             }
 
             tmpInclusiveBegin = tmpExclusiveEnd + 1;
             tmpString = line.substring(tmpInclusiveBegin);
             try {
-                retVal.adjustedClose = Double.parseDouble(tmpString);
+                retVal.volume = Double.parseDouble(tmpString);
             } catch (final NumberFormatException ex) {
-                retVal.open = Double.NaN;
+                retVal.volume = Double.NaN;
             }
 
         } catch (final Exception exception) {

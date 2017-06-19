@@ -24,7 +24,7 @@ General information about ojAlgo is available at the project web site: http://oj
 
 User documentation wiki with examples is here at GitHub: https://github.com/optimatika/ojAlgo/wiki
 
-Programming questions related to ojAlgo are best asked at [stack overflow](https://stackoverflow.com/search?tab=newest&q=ojalgo). Just remember to actually mention ojAlgo and tag the question using 'ojalgo' and whatever other tags you find suitable.
+Programming questions related to ojAlgo are best asked at [stack overflow](https://stackoverflow.com/search?tab=relevance&q=ojalgo). Just remember to actually mention ojAlgo and tag the question using 'ojalgo' and whatever other tags you find suitable.
 
 Bug reports and feature requests should preferably be posted here at GitHub: https://github.com/optimatika/ojAlgo/issues
 (Please do not use GitHub Issues for questions, discussions or support requests!)
