@@ -8,27 +8,24 @@ public class TypeParser {
 
     public static ToDoubleFunction<CharSequence> DOUBLE = new ToDoubleFunction<CharSequence>() {
 
-        public double applyAsDouble(CharSequence value) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-    };
-
-    public static ToLongFunction<CharSequence> LONG = new ToLongFunction<CharSequence>() {
-
-        public long applyAsLong(CharSequence value) {
-            // TODO Auto-generated method stub
-            return 0;
+        public double applyAsDouble(final CharSequence value) {
+            return Double.parseDouble(value.toString());
         }
 
     };
 
     public static ToIntFunction<CharSequence> INT = new ToIntFunction<CharSequence>() {
 
-        public int applyAsInt(CharSequence value) {
-            // TODO Auto-generated method stub
-            return 0;
+        public int applyAsInt(final CharSequence value) {
+            return Integer.parseInt(value.toString());
+        }
+
+    };
+
+    public static ToLongFunction<CharSequence> LONG = new ToLongFunction<CharSequence>() {
+
+        public long applyAsLong(final CharSequence value) {
+            return Long.parseLong(value.toString());
         }
 
     };
