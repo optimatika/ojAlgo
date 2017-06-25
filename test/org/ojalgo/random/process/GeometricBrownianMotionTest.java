@@ -37,8 +37,10 @@ import org.ojalgo.random.LogNormal;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.SampleSet;
+import org.ojalgo.series.BasicSeries.NaturallySequenced;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.series.primitive.PrimitiveSeries;
+import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
@@ -266,8 +268,8 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
 
         final CalendarDateSeries<Double> tmpDaySeries = new CalendarDateSeries<>(CalendarDateUnit.DAY);
         tmpDaySeries.putAll(tmpRows);
-        final CalendarDateSeries<Double> tmpYearSeries = tmpDaySeries.resample(CalendarDateUnit.YEAR);
-        final CalendarDateSeries<Double> tmpMonthSeries = tmpDaySeries.resample(CalendarDateUnit.MONTH);
+        final NaturallySequenced<CalendarDate, Double> tmpYearSeries = tmpDaySeries.resample(CalendarDateUnit.YEAR);
+        final NaturallySequenced<CalendarDate, Double> tmpMonthSeries = tmpDaySeries.resample(CalendarDateUnit.MONTH);
 
         final PrimitiveSeries tmpDataY = tmpYearSeries.asPrimitive();
         final PrimitiveSeries tmpDataM = tmpMonthSeries.asPrimitive();

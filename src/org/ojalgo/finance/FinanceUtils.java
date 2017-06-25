@@ -49,6 +49,8 @@ import org.ojalgo.random.RandomNumber;
 import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.SampleSet;
 import org.ojalgo.random.process.GeometricBrownianMotion;
+import org.ojalgo.series.BasicSeries;
+import org.ojalgo.series.BasicSeries.NaturallySequenced;
 import org.ojalgo.series.CalendarDateSeries;
 import org.ojalgo.series.CoordinationSet;
 import org.ojalgo.series.primitive.PrimitiveSeries;
@@ -64,8 +66,8 @@ public abstract class FinanceUtils {
         return PrimitiveFunction.MAX.invoke((PrimitiveFunction.SQRT.invoke(time) * stdDev * tmpConfidenceScale) - (time * expRet), ZERO);
     }
 
-    public static GeometricBrownianMotion estimateExcessDiffusionProcess(final CalendarDateSeries<?> priceSeries,
-            final CalendarDateSeries<?> riskFreeInterestRateSeries, final CalendarDateUnit timeUnit) {
+    public static <N extends Number> GeometricBrownianMotion estimateExcessDiffusionProcess(final CalendarDateSeries<?> priceSeries,
+            final NaturallySequenced<CalendarDate, N> riskFreeInterestRateSeries, final CalendarDateUnit timeUnit) {
 
         final SampleSet tmpSampleSet = FinanceUtils.makeExcessGrowthRateSampleSet(priceSeries, riskFreeInterestRateSeries);
 
@@ -85,10 +87,10 @@ public abstract class FinanceUtils {
         return retVal;
     }
 
-    public static CalendarDateSeries<RandomNumber> forecast(final CalendarDateSeries<? extends Number> series, final int pointCount,
+    public static NaturallySequenced<CalendarDate, RandomNumber> forecast(final CalendarDateSeries<? extends Number> series, final int pointCount,
             final CalendarDateUnit timeUnit, final boolean includeOriginalSeries) {
 
-        final CalendarDateSeries<RandomNumber> retVal = new CalendarDateSeries<>(timeUnit);
+        final NaturallySequenced<CalendarDate, RandomNumber> retVal = new CalendarDateSeries<>(timeUnit);
         retVal.name(series.getName()).colour(series.getColour());
 
         final double tmpSamplePeriod = (double) series.getAverageStepSize() / (double) timeUnit.size();
@@ -131,7 +133,7 @@ public abstract class FinanceUtils {
         final CoordinationSet<V> tmpCoordinator = new CoordinationSet<>(timeSeriesCollection).prune();
 
         final ArrayList<SampleSet> tmpSampleSets = new ArrayList<>();
-        for (final CalendarDateSeries<V> tmpTimeSeries : timeSeriesCollection) {
+        for (final NaturallySequenced<CalendarDate, V> tmpTimeSeries : timeSeriesCollection) {
             final double[] values = tmpCoordinator.get(tmpTimeSeries.getName()).asPrimitive().toRawCopy1D();
             final int tmpSize1 = values.length - 1;
 
@@ -214,9 +216,10 @@ public abstract class FinanceUtils {
         return tmpMatrixBuilder.get();
     }
 
-    public static CalendarDateSeries<BigDecimal> makeDatePriceSeries(final double[] prices, final Date startDate, final CalendarDateUnit resolution) {
+    public static NaturallySequenced<CalendarDate, BigDecimal> makeDatePriceSeries(final double[] prices, final Date startDate,
+            final CalendarDateUnit resolution) {
 
-        final CalendarDateSeries<BigDecimal> retVal = new CalendarDateSeries<>(resolution);
+        final NaturallySequenced<CalendarDate, BigDecimal> retVal = new CalendarDateSeries<>(resolution);
 
         FinanceUtils.copyValues(retVal, new CalendarDate(startDate), prices);
 
@@ -229,7 +232,8 @@ public abstract class FinanceUtils {
      *        means 5.0% annualized risk free return)
      * @return A sample set of price growth rates adjusted for risk free return
      */
-    public static SampleSet makeExcessGrowthRateSampleSet(final CalendarDateSeries<?> priceSeries, final CalendarDateSeries<?> riskFreeInterestRateSeries) {
+    public static <N extends Number> SampleSet makeExcessGrowthRateSampleSet(final CalendarDateSeries<?> priceSeries,
+            final NaturallySequenced<CalendarDate, N> riskFreeInterestRateSeries) {
 
         if (priceSeries.size() != riskFreeInterestRateSeries.size()) {
             throw new IllegalArgumentException("The two series must have the same size (number of elements).");
@@ -278,8 +282,8 @@ public abstract class FinanceUtils {
      *        means 5.0% annualized risk free return)
      * @return A sample set of price growth rates adjusted for risk free return
      */
-    public static CalendarDateSeries<Double> makeNormalisedExcessPrice(final CalendarDateSeries<?> priceSeries,
-            final CalendarDateSeries<?> riskFreeInterestRateSeries) {
+    public static BasicSeries<CalendarDate, Double> makeNormalisedExcessPrice(final CalendarDateSeries<?> priceSeries,
+            final NaturallySequenced<CalendarDate, ? extends Number> riskFreeInterestRateSeries) {
 
         if (priceSeries.size() != riskFreeInterestRateSeries.size()) {
             throw new IllegalArgumentException("The two series must have the same size (number of elements).");
@@ -299,7 +303,7 @@ public abstract class FinanceUtils {
 
         final CalendarDateUnit tmpResolution = priceSeries.getResolution();
 
-        final CalendarDateSeries<Double> retVal = new CalendarDateSeries<>(tmpResolution);
+        final NaturallySequenced<CalendarDate, Double> retVal = new CalendarDateSeries<>(tmpResolution);
 
         double tmpThisRiskFree, tmpLastRiskFree, tmpAvgRiskFree, tmpRiskFreeGrowthFactor, tmpThisPrice, tmpLastPrice, tmpPriceGrowthFactor,
                 tmpAdjustedPriceGrowthFactor;
@@ -498,7 +502,7 @@ public abstract class FinanceUtils {
         return retVal.get();
     }
 
-    private static <K extends Comparable<? super K>> void copyValues(final CalendarDateSeries<BigDecimal> series, final CalendarDate firstKey,
+    private static <K extends Comparable<? super K>> void copyValues(final NaturallySequenced<CalendarDate, BigDecimal> series, final CalendarDate firstKey,
             final double[] values) {
 
         CalendarDate tmpKey = firstKey;
