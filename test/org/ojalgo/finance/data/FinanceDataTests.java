@@ -21,6 +21,10 @@
  */
 package org.ojalgo.finance.data;
 
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.ojalgo.FunctionalityTest;
 
 /**
@@ -31,6 +35,20 @@ import org.ojalgo.FunctionalityTest;
 public abstract class FinanceDataTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
+
+    static {
+
+        if (DEBUG) {
+
+            final ConsoleHandler handler = new ConsoleHandler();
+            handler.setLevel(Level.FINE);
+
+            final Logger logger = Logger.getLogger("");
+            logger.setLevel(Level.FINE);
+            logger.setUseParentHandlers(false);
+            logger.addHandler(handler);
+        }
+    }
 
     protected FinanceDataTests() {
         super();

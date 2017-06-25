@@ -24,6 +24,7 @@ package org.ojalgo.finance.data;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.URI;
@@ -44,7 +45,41 @@ import org.ojalgo.type.CalendarDateUnit;
  */
 public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
+    public static final class Data extends DatePrice {
+
+        public double adjustedClose;
+        public double close;
+        public double high;
+        public double low;
+        public double open;
+        public double volume;
+
+        protected Data(final Calendar calendar) {
+            super(calendar);
+        }
+
+        protected Data(final Date date) {
+            super(date);
+        }
+
+        protected Data(final long millis) {
+            super(millis);
+        }
+
+        protected Data(final String sqlString) throws RecoverableCondition {
+            super(sqlString);
+        }
+
+        @Override
+        public double getPrice() {
+            return adjustedClose;
+        }
+
+    }
+
     private static final CookieManager COOKIE_MANAGER;
+    private static final String MATCH_BEGIN = "CrumbStore\":{\"crumb\":\"";
+    private static final String MATCH_END = "\"}";
 
     static {
 
@@ -79,39 +114,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
                 return tmpCS.removeAll();
             }
 
-        }, null);
-
-    }
-
-    public static final class Data extends DatePrice {
-
-        public double adjustedClose;
-        public double close;
-        public double high;
-        public double low;
-        public double open;
-        public double volume;
-
-        protected Data(final Calendar calendar) {
-            super(calendar);
-        }
-
-        protected Data(final Date date) {
-            super(date);
-        }
-
-        protected Data(final long millis) {
-            super(millis);
-        }
-
-        protected Data(final String sqlString) throws RecoverableCondition {
-            super(sqlString);
-        }
-
-        @Override
-        public double getPrice() {
-            return adjustedClose;
-        }
+        }, CookiePolicy.ACCEPT_ALL);
 
     }
 
@@ -129,20 +132,15 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
         tmpResourceLocator.path("/quote/" + symbol);
         tmpResourceLocator.cookies(COOKIE_MANAGER);
 
-        final String tmpStr = "CrumbStore\":{\"crumb\":\"";
-
         String crumb = null;
-
         String tmpLine;
-        int from, to;
+        int begin, end;
         try (final BufferedReader tmpBufferedReader = new BufferedReader(tmpResourceLocator.getStreamReader())) {
             while ((crumb == null) && ((tmpLine = tmpBufferedReader.readLine()) != null)) {
-
-                if ((from = tmpLine.indexOf(tmpStr)) >= 0) {
-                    to = tmpLine.indexOf("\"}", from);
-                    crumb = tmpLine.substring(from + tmpStr.length(), to);
+                if ((begin = tmpLine.indexOf(MATCH_BEGIN)) >= 0) {
+                    end = tmpLine.indexOf(MATCH_END, begin);
+                    crumb = tmpLine.substring(begin + MATCH_BEGIN.length(), end);
                 }
-
             }
         } catch (final IOException exception) {
             exception.printStackTrace();
@@ -166,9 +164,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
         this.getResourceLocator().parameter("period1", Long.toString(now.minusSeconds(60L * 60L * 24 * 366L * 10L).getEpochSecond()));
         this.getResourceLocator().parameter("period2", Long.toString(now.getEpochSecond()));
-        final String value = crumb;
-
-        this.getResourceLocator().parameter("crumb", value);
+        this.getResourceLocator().parameter("crumb", crumb);
         this.getResourceLocator().cookies(COOKIE_MANAGER);
 
     }
