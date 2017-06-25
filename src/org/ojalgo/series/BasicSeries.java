@@ -44,7 +44,6 @@ import org.ojalgo.series.primitive.CoordinatedSet;
 import org.ojalgo.series.primitive.DataSeries;
 import org.ojalgo.series.primitive.PrimitiveSeries;
 import org.ojalgo.type.CalendarDate;
-import org.ojalgo.type.CalendarDateDuration;
 import org.ojalgo.type.ColourData;
 import org.ojalgo.type.TimeIndex;
 import org.ojalgo.type.keyvalue.KeyValue;
@@ -128,7 +127,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     public static final class TimeSeriesBuilder<K extends Comparable<? super K>> {
 
         private K myReference = null;
-        private CalendarDateDuration myResolution = null;
+        private CalendarDate.Resolution myResolution = null;
         private final TimeIndex<K> myTimeIndex;
 
         TimeSeriesBuilder(final TimeIndex<K> timeIndex) {
@@ -151,7 +150,7 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
             return this;
         }
 
-        public TimeSeriesBuilder<K> resolution(final CalendarDateDuration resolution) {
+        public TimeSeriesBuilder<K> resolution(final CalendarDate.Resolution resolution) {
             myResolution = resolution;
             return this;
         }
