@@ -29,9 +29,7 @@ import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.series.BasicSeries.NaturallySequenced;
 import org.ojalgo.series.CalendarDateSeries;
-import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -100,7 +98,7 @@ public class RandomNumberTest extends RandomTests {
 
         final RandomNumber tmpRandomNumber = new Normal(ONE, TENTH);
         double tmpValue = HUNDRED;
-        final NaturallySequenced<CalendarDate, Double> tmpSeries = new CalendarDateSeries<>();
+        final CalendarDateSeries<Double> tmpSeries = new CalendarDateSeries<>();
         for (int i = 0; i < 1000; i++) {
             tmpSeries.put(i, tmpValue);
             tmpValue *= tmpRandomNumber.doubleValue();

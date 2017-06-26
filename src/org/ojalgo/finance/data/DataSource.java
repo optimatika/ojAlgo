@@ -29,9 +29,7 @@ import java.util.List;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.netio.BasicParser;
 import org.ojalgo.netio.ResourceLocator;
-import org.ojalgo.series.BasicSeries.NaturallySequenced;
 import org.ojalgo.series.CalendarDateSeries;
-import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.TypeCache;
 
@@ -105,13 +103,13 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
         return retVal;
     }
 
-    public NaturallySequenced<CalendarDate, Double> getPriceSeries() {
+    public CalendarDateSeries<Double> getPriceSeries() {
         return this.getPriceSeries(this.getResourceLocator().getStreamReader());
     }
 
-    public NaturallySequenced<CalendarDate, Double> getPriceSeries(final Reader reader) {
+    public CalendarDateSeries<Double> getPriceSeries(final Reader reader) {
 
-        final NaturallySequenced<CalendarDate, Double> retVal = new CalendarDateSeries<Double>(myResolution).name(mySymbol);
+        final CalendarDateSeries<Double> retVal = new CalendarDateSeries<Double>(myResolution).name(mySymbol);
 
         for (final DatePrice tmpDatePrice : this.getHistoricalPrices(reader)) {
             retVal.put(tmpDatePrice.getKey(), tmpDatePrice.getValue());

@@ -50,10 +50,10 @@ public class SymbolDataTest extends FinanceDataTests {
         final String tmpGoogleSymbol = "NASDAQ:AAPL";
 
         final YahooSymbol tmpYahooSource = new YahooSymbol(tmpYahooSymbol, CalendarDateUnit.DAY);
-        final CalendarDateSeries<Double> tmpYahooPrices = (CalendarDateSeries<Double>) tmpYahooSource.getPriceSeries();
+        final CalendarDateSeries<Double> tmpYahooPrices = tmpYahooSource.getPriceSeries();
 
         final GoogleSymbol tmpGoogleSource = new GoogleSymbol(tmpGoogleSymbol, CalendarDateUnit.DAY);
-        final CalendarDateSeries<Double> tmpGooglePrices = (CalendarDateSeries<Double>) tmpGoogleSource.getPriceSeries();
+        final CalendarDateSeries<Double> tmpGooglePrices = tmpGoogleSource.getPriceSeries();
 
         CoordinationSet<Double> tmpCoordinator = new CoordinationSet<>();
         tmpCoordinator.put(tmpYahooPrices);

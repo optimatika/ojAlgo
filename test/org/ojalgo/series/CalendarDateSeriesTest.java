@@ -29,8 +29,6 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.finance.data.DatePrice;
 import org.ojalgo.finance.data.YahooSymbol;
 import org.ojalgo.random.Uniform;
-import org.ojalgo.series.BasicSeries.NaturallySequenced;
-import org.ojalgo.type.CalendarDate;
 import org.ojalgo.type.CalendarDateUnit;
 
 /**
@@ -77,13 +75,13 @@ public class CalendarDateSeriesTest extends SeriesTests {
         final double tmpLastPrice = tmpHistoricalPrices.get(tmpHistoricalPrices.size() - 1).getPrice();
 
         final CalendarDateSeries<Double> tmpDaySeries = new CalendarDateSeries<Double>(CalendarDateUnit.DAY).name("Day");
-        final NaturallySequenced<CalendarDate, Double> tmpWeekSeries = new CalendarDateSeries<Double>(CalendarDateUnit.WEEK).name("Week");
+        final CalendarDateSeries<Double> tmpWeekSeries = new CalendarDateSeries<Double>(CalendarDateUnit.WEEK).name("Week");
         final CalendarDateSeries<Double> tmpMonthSeries = new CalendarDateSeries<Double>(CalendarDateUnit.MONTH).name("Month");
         final CalendarDateSeries<Double> tmpQuarterSeries = new CalendarDateSeries<Double>(CalendarDateUnit.QUARTER).name("Quarter");
         final CalendarDateSeries<Double> tmpYearSeries = new CalendarDateSeries<Double>(CalendarDateUnit.YEAR).name("Year");
         final CalendarDateSeries<Double> tmpDecadeSeries = new CalendarDateSeries<Double>(CalendarDateUnit.DECADE).name("Decade");
         final CalendarDateSeries<Double> tmpCenturySeries = new CalendarDateSeries<Double>(CalendarDateUnit.CENTURY).name("Century");
-        final NaturallySequenced<CalendarDate, Double> tmpMilleniumSeries = new CalendarDateSeries<Double>(CalendarDateUnit.MILLENIUM).name("MIllenium");
+        final CalendarDateSeries<Double> tmpMilleniumSeries = new CalendarDateSeries<Double>(CalendarDateUnit.MILLENIUM).name("MIllenium");
 
         for (final DatePrice tmpDatePrice : tmpHistoricalPrices) {
             tmpDaySeries.put(tmpDatePrice.key, tmpDatePrice.getPrice());
