@@ -25,6 +25,7 @@ import java.util.Objects;
 
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
+import org.ojalgo.type.TypeUtils;
 
 /**
  * Incorrect use of the API. The code needs to be changed. Typically execution can't continue. Is never
@@ -97,6 +98,10 @@ public class ProgrammingError extends RuntimeException implements EffectiveThrow
         Objects.requireNonNull(obj1);
         Objects.requireNonNull(obj2);
         Objects.requireNonNull(obj3);
+    }
+
+    public static void throwWithMessage(final String messagePattern, final Object... args) {
+        throw new ProgrammingError(TypeUtils.format(messagePattern, args));
     }
 
     public ProgrammingError(final String message) {

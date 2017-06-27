@@ -120,6 +120,10 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
 
         V put(long index, V value);
 
+        NaturallySequenced<K, V> resample(CalendarDate.Resolution resolution);
+
+        NaturallySequenced<K, V> resample(K firstKey, K lastKey, CalendarDate.Resolution resolution);
+
         K step(K key);
 
     }

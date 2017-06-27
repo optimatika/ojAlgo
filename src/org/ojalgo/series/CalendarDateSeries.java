@@ -27,17 +27,19 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.SortedMap;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.IndexMapper;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.ExplicitTimeSeries;
 import org.ojalgo.type.CalendarDate;
+import org.ojalgo.type.CalendarDate.Resolution;
 import org.ojalgo.type.CalendarDateUnit;
 
 public final class CalendarDateSeries<N extends Number> extends TreeSeries<CalendarDate, N, CalendarDateSeries<N>>
         implements BasicSeries.NaturallySequenced<CalendarDate, N> {
 
-    private final CalendarDateUnit myResolution;
     private final IndexMapper<CalendarDate> myMapper;
+    private final CalendarDateUnit myResolution;
 
     public CalendarDateSeries() {
         this(CalendarDateUnit.MILLIS);
@@ -196,29 +198,44 @@ public final class CalendarDateSeries<N extends Number> extends TreeSeries<Calen
         }
     }
 
-    public CalendarDateSeries<N> resample(final CalendarDate firstKey, final CalendarDate lastKey, final CalendarDateUnit resolution) {
+    public CalendarDateSeries<N> resample(final CalendarDate firstKey, final CalendarDate lastKey, final Resolution resolution) {
 
-        final CalendarDateSeries<N> retVal = new CalendarDateSeries<>(resolution);
-        retVal.setColour(this.getColour());
-        retVal.setName(this.getName());
+        if (resolution instanceof CalendarDateUnit) {
 
-        final SortedMap<CalendarDate, N> tmpSubMap = this.subMap(firstKey, true, lastKey, true);
+            final CalendarDateSeries<N> retVal = new CalendarDateSeries<>((CalendarDateUnit) resolution);
+            retVal.setColour(this.getColour());
+            retVal.setName(this.getName());
 
-        retVal.putAll(tmpSubMap);
+            final SortedMap<CalendarDate, N> tmpSubMap = this.subMap(firstKey, true, lastKey, true);
 
-        return retVal;
+            retVal.putAll(tmpSubMap);
 
+            return retVal;
+
+        } else {
+
+            ProgrammingError.throwWithMessage("Only {} supported!", CalendarDateUnit.class.getSimpleName());
+            return null;
+        }
     }
 
-    public CalendarDateSeries<N> resample(final CalendarDateUnit resolution) {
+    public CalendarDateSeries<N> resample(final CalendarDate.Resolution resolution) {
 
-        final CalendarDateSeries<N> retVal = new CalendarDateSeries<>(resolution);
-        retVal.setColour(this.getColour());
-        retVal.setName(this.getName());
+        if (resolution instanceof CalendarDateUnit) {
 
-        retVal.putAll(this);
+            final CalendarDateSeries<N> retVal = new CalendarDateSeries<>((CalendarDateUnit) resolution);
+            retVal.setColour(this.getColour());
+            retVal.setName(this.getName());
 
-        return retVal;
+            retVal.putAll(this);
+
+            return retVal;
+
+        } else {
+
+            ProgrammingError.throwWithMessage("Only {} supported!", CalendarDateUnit.class.getSimpleName());
+            return null;
+        }
     }
 
     public CalendarDate step(final CalendarDate key) {
