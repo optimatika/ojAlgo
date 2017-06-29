@@ -35,8 +35,6 @@ import org.ojalgo.type.TypeCache;
 
 public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP> {
 
-    protected static final boolean DEBUG = false;
-
     private final CalendarDateUnit myResolution;
     private final ResourceLocator myResourceLocator;
     private final String mySymbol;
@@ -88,8 +86,7 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
     }
 
     public List<DP> getHistoricalPrices() {
-        final Reader tmpStreamReader = this.getResourceLocator().getStreamReader();
-        return this.getHistoricalPrices(tmpStreamReader);
+        return this.getHistoricalPrices(this.getResourceLocator().getStreamReader());
     }
 
     public List<DP> getHistoricalPrices(final Reader reader) {
