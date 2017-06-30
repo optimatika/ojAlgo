@@ -471,7 +471,7 @@ public final class NumberContext extends FormatContext<Number> {
             final int tmpModScale = myScale - (int) PrimitiveFunction.LOG10.invoke(tmpDF.getMultiplier());
 
             tmpDF.setMaximumFractionDigits(tmpModScale);
-            tmpDF.setMinimumFractionDigits(tmpModScale);
+            tmpDF.setMinimumFractionDigits(Math.min(2, tmpModScale));
 
             if (object instanceof BigDecimal) {
                 ((DecimalFormat) this.getFormat()).setParseBigDecimal(true);
