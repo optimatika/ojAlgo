@@ -26,7 +26,7 @@ import java.text.Format;
 /**
  * @author apete
  */
-public final class GenericContext<T> extends FormatContext<T> {
+public final class GenericContext<T> extends FormatContext<T, Format> {
 
     private final TypeContext<T> myDelegate;
 

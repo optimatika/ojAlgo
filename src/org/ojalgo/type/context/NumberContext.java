@@ -53,7 +53,7 @@ import org.ojalgo.type.format.NumberStyle;
  *
  * @author apete
  */
-public final class NumberContext extends FormatContext<Number> {
+public final class NumberContext extends FormatContext<Number, NumberFormat> {
 
     public static interface Enforceable<N extends Number> {
 
@@ -313,7 +313,7 @@ public final class NumberContext extends FormatContext<Number> {
         return true;
     }
 
-    public String format(double number) {
+    public String format(final double number) {
         if (!Double.isFinite(number)) {
             return Double.toString(number);
         }
@@ -324,7 +324,7 @@ public final class NumberContext extends FormatContext<Number> {
         }
     }
 
-    public String format(long number) {
+    public String format(final long number) {
         return this.format().format(number);
     }
 
@@ -462,7 +462,7 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     @Override
-    protected void configureFormat(final Format format, final Object object) {
+    protected void configureFormat(final NumberFormat format, final Object object) {
 
         if (format instanceof DecimalFormat) {
 
@@ -482,18 +482,13 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     @Override
-    protected String handleFormatException(final Format format, final Object object) {
+    protected String handleFormatException(final NumberFormat format, final Object object) {
         return "";
     }
 
     @Override
-    protected Number handleParseException(final Format format, final String string) {
+    protected Number handleParseException(final NumberFormat format, final String string) {
         return BigMath.ZERO;
-    }
-
-    @Override
-    NumberFormat format() {
-        return (NumberFormat) super.format();
     }
 
 }

@@ -31,7 +31,7 @@ import org.ojalgo.type.format.BooleanFormat;
  *
  * @author apete
  */
-public final class BooleanContext extends FormatContext<Boolean> {
+public final class BooleanContext extends FormatContext<Boolean, Format> {
 
     private static final Format DEFAULT_FORMAT = new BooleanFormat();
 

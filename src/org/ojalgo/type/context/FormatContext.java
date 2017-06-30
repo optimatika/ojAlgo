@@ -33,22 +33,23 @@ import org.ojalgo.netio.ASCII;
  *
  * @author apete
  */
-abstract class FormatContext<T> implements TypeContext<T>, Serializable {
+abstract class FormatContext<T, F extends Format> implements TypeContext<T>, Serializable {
 
     /**
      * Use 'Non-Breaking SPace' character instead of ardinary 'space' character.
      */
     public static final boolean NBSP = true;
     private boolean myConfigured = false;
-    private final Format myFormat;
+    private final F myFormat;
 
-    FormatContext(final Format format) {
+    @SuppressWarnings("unchecked")
+    FormatContext(final F format) {
 
         super();
 
         ProgrammingError.throwIfNull(format);
 
-        myFormat = (Format) format.clone();
+        myFormat = (F) format.clone();
     }
 
     /**
@@ -83,11 +84,12 @@ abstract class FormatContext<T> implements TypeContext<T>, Serializable {
         }
     }
 
-    public final Format getFormat() {
-        return (Format) this.format().clone();
+    @SuppressWarnings("unchecked")
+    public final F getFormat() {
+        return (F) this.format().clone();
     }
 
-    public final <G> TypeContext<G> newFormat(final Format format) {
+    public final <G> TypeContext<G> newFormat(final F format) {
         return new GenericContext<>(this, format);
     }
 
@@ -112,13 +114,13 @@ abstract class FormatContext<T> implements TypeContext<T>, Serializable {
         }
     }
 
-    protected abstract void configureFormat(Format format, Object object);
+    protected abstract void configureFormat(F format, Object object);
 
-    protected abstract String handleFormatException(Format format, Object object);
+    protected abstract String handleFormatException(F format, Object object);
 
-    protected abstract T handleParseException(Format format, String string);
+    protected abstract T handleParseException(F format, String string);
 
-    Format format() {
+    final F format() {
         return myFormat;
     }
 

@@ -31,7 +31,7 @@ import org.ojalgo.type.format.StringFormat;
  *
  * @author apete
  */
-public final class StringContext extends FormatContext<String> {
+public final class StringContext extends FormatContext<String, Format> {
 
     private static final Format DEFAULT_FORMAT = new StringFormat();
 
