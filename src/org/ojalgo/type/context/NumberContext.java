@@ -187,7 +187,6 @@ public final class NumberContext extends FormatContext<Number> {
 
     private final double myEpsilon;
     private final MathContext myMathContext;
-    private final NumberFormat myNumberFormat;
     private final double myRoundingFactor;
 
     private final int myScale;
@@ -232,8 +231,6 @@ public final class NumberContext extends FormatContext<Number> {
             myZeroError = PrimitiveMath.MACHINE_SMALLEST;
             myRoundingFactor = PrimitiveMath.ONE;
         }
-
-        myNumberFormat = format;
 
     }
 
@@ -321,19 +318,14 @@ public final class NumberContext extends FormatContext<Number> {
             return Double.toString(number);
         }
         if (this.isConfigured()) {
-            return myNumberFormat.format(number);
+            return this.format().format(number);
         } else {
             return this.format(Double.valueOf(number));
         }
     }
 
     public String format(long number) {
-        return myNumberFormat.format(number);
-    }
-
-    @Override
-    public NumberFormat getFormat() {
-        return (NumberFormat) myNumberFormat.clone();
+        return this.format().format(number);
     }
 
     public <N extends Number> UnaryFunction<N> getFunction(final FunctionSet<N> functions) {
@@ -390,19 +382,19 @@ public final class NumberContext extends FormatContext<Number> {
     }
 
     public NumberContext newMathContext(final MathContext context) {
-        return new NumberContext(this.getFormat(), context.getPrecision(), this.getScale(), context.getRoundingMode());
+        return new NumberContext(this.format(), context.getPrecision(), this.getScale(), context.getRoundingMode());
     }
 
     public NumberContext newPrecision(final int precision) {
-        return new NumberContext(this.getFormat(), precision, this.getScale(), this.getRoundingMode());
+        return new NumberContext(this.format(), precision, this.getScale(), this.getRoundingMode());
     }
 
     public NumberContext newRoundingMode(final RoundingMode mode) {
-        return new NumberContext(this.getFormat(), this.getPrecision(), this.getScale(), mode);
+        return new NumberContext(this.format(), this.getPrecision(), this.getScale(), mode);
     }
 
     public NumberContext newScale(final int scale) {
-        return new NumberContext(this.getFormat(), this.getPrecision(), scale, this.getRoundingMode());
+        return new NumberContext(this.format(), this.getPrecision(), scale, this.getRoundingMode());
     }
 
     /**
@@ -497,6 +489,11 @@ public final class NumberContext extends FormatContext<Number> {
     @Override
     protected Number handleParseException(final Format format, final String string) {
         return BigMath.ZERO;
+    }
+
+    @Override
+    NumberFormat format() {
+        return (NumberFormat) super.format();
     }
 
 }

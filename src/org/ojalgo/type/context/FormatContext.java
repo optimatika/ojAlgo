@@ -83,8 +83,8 @@ abstract class FormatContext<T> implements TypeContext<T>, Serializable {
         }
     }
 
-    public Format getFormat() {
-        return (Format) myFormat.clone();
+    public final Format getFormat() {
+        return (Format) this.format().clone();
     }
 
     public final <G> TypeContext<G> newFormat(final Format format) {
@@ -117,6 +117,10 @@ abstract class FormatContext<T> implements TypeContext<T>, Serializable {
     protected abstract String handleFormatException(Format format, Object object);
 
     protected abstract T handleParseException(Format format, String string);
+
+    Format format() {
+        return myFormat;
+    }
 
     final boolean isConfigured() {
         return myConfigured;
