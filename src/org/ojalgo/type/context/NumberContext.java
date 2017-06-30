@@ -187,16 +187,29 @@ public final class NumberContext extends FormatContext<Number> {
 
     private final double myEpsilon;
     private final MathContext myMathContext;
+    private final NumberFormat myNumberFormat;
     private final double myRoundingFactor;
-    private final int myScale;
 
+    private final int myScale;
     private final double myZeroError;
 
     public NumberContext() {
         this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, DEFAULT_MATH.getRoundingMode());
     }
 
-    public NumberContext(final Format format, final int precision, final int scale, final RoundingMode mode) {
+    public NumberContext(final int precision, final int scale) {
+        this(DEFAULT_STYLE.getFormat(), precision, scale, DEFAULT_MATH.getRoundingMode());
+    }
+
+    public NumberContext(final int precision, final int scale, final RoundingMode mode) {
+        this(DEFAULT_STYLE.getFormat(), precision, scale, mode);
+    }
+
+    public NumberContext(final int scale, final RoundingMode mode) {
+        this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), scale, mode);
+    }
+
+    public NumberContext(final NumberFormat format, final int precision, final int scale, final RoundingMode mode) {
 
         super(format);
 
@@ -220,25 +233,15 @@ public final class NumberContext extends FormatContext<Number> {
             myRoundingFactor = PrimitiveMath.ONE;
         }
 
-    }
+        myNumberFormat = format;
 
-    public NumberContext(final int precision, final int scale) {
-        this(DEFAULT_STYLE.getFormat(), precision, scale, DEFAULT_MATH.getRoundingMode());
-    }
-
-    public NumberContext(final int precision, final int scale, final RoundingMode mode) {
-        this(DEFAULT_STYLE.getFormat(), precision, scale, mode);
-    }
-
-    public NumberContext(final int scale, final RoundingMode mode) {
-        this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), scale, mode);
     }
 
     public NumberContext(final RoundingMode mode) {
         this(DEFAULT_STYLE.getFormat(), DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, mode);
     }
 
-    private NumberContext(final Format format) {
+    private NumberContext(final NumberFormat format) {
         this(format, DEFAULT_MATH.getPrecision(), DEFAULT_SCALE, DEFAULT_MATH.getRoundingMode());
         ProgrammingError.throwForIllegalInvocation();
     }
@@ -311,6 +314,22 @@ public final class NumberContext extends FormatContext<Number> {
             return false;
         }
         return true;
+    }
+
+    public final String format(double number) {
+        if (!Double.isFinite(number)) {
+            return Double.toString(number);
+        }
+        return myNumberFormat.format(number);
+    }
+
+    public final String format(long number) {
+        return myNumberFormat.format(number);
+    }
+
+    @Override
+    public NumberFormat getFormat() {
+        return (NumberFormat) myNumberFormat.clone();
     }
 
     public <N extends Number> UnaryFunction<N> getFunction(final FunctionSet<N> functions) {

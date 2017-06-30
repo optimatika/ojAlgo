@@ -83,7 +83,7 @@ abstract class FormatContext<T> implements TypeContext<T>, Serializable {
         }
     }
 
-    public final Format getFormat() {
+    public Format getFormat() {
         return (Format) myFormat.clone();
     }
 
