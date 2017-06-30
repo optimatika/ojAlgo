@@ -316,14 +316,18 @@ public final class NumberContext extends FormatContext<Number> {
         return true;
     }
 
-    public final String format(double number) {
+    public String format(double number) {
         if (!Double.isFinite(number)) {
             return Double.toString(number);
         }
-        return myNumberFormat.format(number);
+        if (this.isConfigured()) {
+            return myNumberFormat.format(number);
+        } else {
+            return this.format(Double.valueOf(number));
+        }
     }
 
-    public final String format(long number) {
+    public String format(long number) {
         return myNumberFormat.format(number);
     }
 

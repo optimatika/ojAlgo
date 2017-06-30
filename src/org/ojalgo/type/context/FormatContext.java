@@ -118,4 +118,8 @@ abstract class FormatContext<T> implements TypeContext<T>, Serializable {
 
     protected abstract T handleParseException(Format format, String string);
 
+    final boolean isConfigured() {
+        return myConfigured;
+    }
+
 }
