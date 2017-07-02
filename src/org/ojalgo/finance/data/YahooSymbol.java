@@ -23,6 +23,7 @@ package org.ojalgo.finance.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.CookieStore;
@@ -32,6 +33,7 @@ import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
@@ -142,6 +144,12 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
                         end = tmpLine.indexOf(MATCH_END, begin);
                         CRUMB = tmpLine.substring(begin + MATCH_BEGIN.length(), end);
                     }
+                }
+                if ((CRUMB != null) && CRUMB.contains("\\u")) {
+                    // Hack that takes advantage of the fact that java.util.Properties supports strings with unicode escape sequences
+                    final Properties properties = new Properties();
+                    properties.load(new StringReader("crumb=" + CRUMB));
+                    CRUMB = properties.getProperty("crumb");
                 }
             } catch (final IOException exception) {
                 exception.printStackTrace();
