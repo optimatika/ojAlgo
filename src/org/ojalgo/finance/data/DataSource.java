@@ -86,7 +86,13 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
     }
 
     public List<DP> getHistoricalPrices() {
-        return this.getHistoricalPrices(this.getResourceLocator().getStreamReader());
+        try {
+            return this.getHistoricalPrices(this.getResourceLocator().getStreamReader());
+        } catch (final Exception exception) {
+            exception.printStackTrace();
+            this.handleException(mySymbol, myResolution, myResourceLocator, exception);
+            return Collections.emptyList();
+        }
     }
 
     public List<DP> getHistoricalPrices(final Reader reader) {
@@ -98,10 +104,17 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
         Collections.sort(retVal);
 
         return retVal;
+
     }
 
     public CalendarDateSeries<Double> getPriceSeries() {
-        return this.getPriceSeries(this.getResourceLocator().getStreamReader());
+        try {
+            return this.getPriceSeries(this.getResourceLocator().getStreamReader());
+        } catch (final Exception exception) {
+            exception.printStackTrace();
+            this.handleException(mySymbol, myResolution, myResourceLocator, exception);
+            return new CalendarDateSeries<Double>(myResolution).name(mySymbol);
+        }
     }
 
     public CalendarDateSeries<Double> getPriceSeries(final Reader reader) {
@@ -145,5 +158,7 @@ public abstract class DataSource<DP extends DatePrice> implements BasicParser<DP
     protected ResourceLocator getResourceLocator() {
         return myResourceLocator;
     }
+
+    abstract void handleException(String symbol, CalendarDateUnit resolution, ResourceLocator locator, Exception exception);
 
 }

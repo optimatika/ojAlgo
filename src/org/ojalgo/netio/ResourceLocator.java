@@ -145,6 +145,11 @@ public final class ResourceLocator {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return this.toURL().toString();
+    }
+
     private String query() {
 
         if (myQueryParameters.size() >= 1) {

@@ -29,6 +29,7 @@ import java.util.Locale;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.ResourceLocator;
 import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.GenericContext;
@@ -169,6 +170,13 @@ public class GoogleSymbol extends DataSource<GoogleSymbol.Data> {
         }
 
         return retVal;
+    }
+
+    @Override
+    void handleException(final String symbol, final CalendarDateUnit resolution, final ResourceLocator locator, Exception exception) {
+        BasicLogger.error("Problem downloading from Google!");
+        BasicLogger.error("Symbol & Resolution: {} & {}", symbol, resolution);
+        BasicLogger.error("Resource locator: {}", locator);
     }
 
 }

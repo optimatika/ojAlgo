@@ -35,6 +35,7 @@ import java.util.List;
 
 import org.ojalgo.RecoverableCondition;
 import org.ojalgo.netio.ASCII;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.netio.ResourceLocator;
 import org.ojalgo.type.CalendarDateUnit;
 
@@ -78,6 +79,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
     }
 
     private static final CookieManager COOKIE_MANAGER;
+    private static String CRUMB = null;
     private static final String MATCH_BEGIN = "CrumbStore\":{\"crumb\":\"";
     private static final String MATCH_END = "\"}";
 
@@ -126,47 +128,49 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
         super("query1.finance.yahoo.com", symbol, resolution);
 
-        // https://finance.yahoo.com/quote/AAPL
+        if (CRUMB == null) {
 
-        final ResourceLocator tmpResourceLocator = new ResourceLocator("finance.yahoo.com");
-        tmpResourceLocator.path("/quote/" + symbol);
-        tmpResourceLocator.cookies(COOKIE_MANAGER);
+            final ResourceLocator tmpCrumbLocator = new ResourceLocator("finance.yahoo.com");
+            tmpCrumbLocator.path("/quote/" + symbol);
+            tmpCrumbLocator.cookies(COOKIE_MANAGER);
 
-        String crumb = null;
-        String tmpLine;
-        int begin, end;
-        try (final BufferedReader tmpBufferedReader = new BufferedReader(tmpResourceLocator.getStreamReader())) {
-            while ((crumb == null) && ((tmpLine = tmpBufferedReader.readLine()) != null)) {
-                if ((begin = tmpLine.indexOf(MATCH_BEGIN)) >= 0) {
-                    end = tmpLine.indexOf(MATCH_END, begin);
-                    crumb = tmpLine.substring(begin + MATCH_BEGIN.length(), end);
+            String tmpLine;
+            int begin, end;
+            try (final BufferedReader tmpBufferedReader = new BufferedReader(tmpCrumbLocator.getStreamReader())) {
+                while ((CRUMB == null) && ((tmpLine = tmpBufferedReader.readLine()) != null)) {
+                    if ((begin = tmpLine.indexOf(MATCH_BEGIN)) >= 0) {
+                        end = tmpLine.indexOf(MATCH_END, begin);
+                        CRUMB = tmpLine.substring(begin + MATCH_BEGIN.length(), end);
+                    }
                 }
+            } catch (final IOException exception) {
+                exception.printStackTrace();
             }
-        } catch (final IOException exception) {
-            exception.printStackTrace();
         }
 
-        this.getResourceLocator().path("/v7/finance/download/" + symbol);
+        final ResourceLocator tmpResourceLocator = this.getResourceLocator();
+
+        tmpResourceLocator.path("/v7/finance/download/" + symbol);
+
         switch (resolution) {
         case MONTH:
-            this.getResourceLocator().parameter("interval", 1 + "mo");
+            tmpResourceLocator.parameter("interval", 1 + "mo");
             break;
         case WEEK:
-            this.getResourceLocator().parameter("interval", 1 + "wk");
+            tmpResourceLocator.parameter("interval", 1 + "wk");
             break;
         default:
-            this.getResourceLocator().parameter("interval", 1 + "d");
+            tmpResourceLocator.parameter("interval", 1 + "d");
             break;
         }
-        this.getResourceLocator().parameter("events", "history");
+        tmpResourceLocator.parameter("events", "history");
 
         final Instant now = Instant.now();
 
-        this.getResourceLocator().parameter("period1", Long.toString(now.minusSeconds(60L * 60L * 24 * 366L * 10L).getEpochSecond()));
-        this.getResourceLocator().parameter("period2", Long.toString(now.getEpochSecond()));
-        this.getResourceLocator().parameter("crumb", crumb);
-        this.getResourceLocator().cookies(COOKIE_MANAGER);
-
+        tmpResourceLocator.parameter("period1", Long.toString(now.minusSeconds(60L * 60L * 24 * 366L * 10L).getEpochSecond()));
+        tmpResourceLocator.parameter("period2", Long.toString(now.getEpochSecond()));
+        tmpResourceLocator.parameter("crumb", CRUMB);
+        tmpResourceLocator.cookies(COOKIE_MANAGER);
     }
 
     @Override
@@ -240,6 +244,15 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
         }
 
         return retVal;
+    }
+
+    @Override
+    void handleException(final String symbol, final CalendarDateUnit resolution, final ResourceLocator locator, final Exception exception) {
+        BasicLogger.error("Problem downloading from Yahoo!");
+        BasicLogger.error("Symbol & Resolution: {} & {}", symbol, resolution);
+        BasicLogger.error("Resource locator: {}", locator);
+        BasicLogger.error("Cookies: {}", COOKIE_MANAGER.getCookieStore().getCookies());
+        BasicLogger.error("Crumb: {}", CRUMB);
     }
 
 }
