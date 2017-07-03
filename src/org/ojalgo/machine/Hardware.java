@@ -163,7 +163,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
-     * <li>Peter Abeles's (EJML) Intel Core i7-620M laptop
+     * <li>PA's Intel Core i7-620M laptop
      * <ul>
      * <li></li>
      * <li>1 processors</li>
@@ -177,7 +177,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
-     * <li>Peter Abeles' (EJML) Q9400
+     * <li>PA's Q9400
      * <ul>
      * <li></li>
      * <li>1 processors</li>
@@ -190,7 +190,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
-     * <li>Peter Abeles' (EJML) Q6600
+     * <li>PA's Q6600
      * <ul>
      * <li></li>
      * <li>1 processors</li>
@@ -203,14 +203,28 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
+     * <li>Intel i5-4670K with 16GB of RAM
+     * <ul>
+     * <li></li>
+     * <li>1 processors</li>
+     * <li>4 cores per processor</li>
+     * <li>1 thread per core</li>
+     * <li>==>> Total 4 threads</li>
+     * <li></li>
+     * <li>16GB system RAM</li>
+     * <li>6MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
      * </ul>
      */
-    static final Hardware X86_64__04 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(8L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
+    static final Hardware X86_64__04 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(16L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**
      * <ul>
-     * <li>Holger Arndt's (UJMP) Intel Core i7-920 server
+     * <li>HA's Intel Core i7-920 server
      * <ul>
      * <li></li>
      * <li>1 processor</li>
