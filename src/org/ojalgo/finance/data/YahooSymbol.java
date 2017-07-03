@@ -87,7 +87,7 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
 
     static {
 
-        final CookieStore tmpCS = ResourceLocator.DEFAULT_COOKIE_MANAGER.getCookieStore();
+        final CookieStore delegateCS = ResourceLocator.DEFAULT_COOKIE_MANAGER.getCookieStore();
 
         COOKIE_MANAGER = new CookieManager(new CookieStore() {
 
@@ -95,27 +95,27 @@ public class YahooSymbol extends DataSource<YahooSymbol.Data> {
                 if (cookie.getMaxAge() == 0L) {
                     cookie.setMaxAge(-1L);
                 }
-                tmpCS.add(uri, cookie);
+                delegateCS.add(uri, cookie);
             }
 
             public List<HttpCookie> get(final URI uri) {
-                return tmpCS.get(uri);
+                return delegateCS.get(uri);
             }
 
             public List<HttpCookie> getCookies() {
-                return tmpCS.getCookies();
+                return delegateCS.getCookies();
             }
 
             public List<URI> getURIs() {
-                return tmpCS.getURIs();
+                return delegateCS.getURIs();
             }
 
             public boolean remove(final URI uri, final HttpCookie cookie) {
-                return tmpCS.remove(uri, cookie);
+                return delegateCS.remove(uri, cookie);
             }
 
             public boolean removeAll() {
-                return tmpCS.removeAll();
+                return delegateCS.removeAll();
             }
 
         }, CookiePolicy.ACCEPT_ALL);
