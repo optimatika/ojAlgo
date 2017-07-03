@@ -42,9 +42,9 @@ public abstract class OjAlgoUtils {
         final long tmpMemory = VirtualMachine.getMemory();
         final int tmpThreads = VirtualMachine.getThreads();
 
-        for (final Hardware tmpHardware : Hardware.PREDEFINED) {
-            if (tmpHardware.architecture.equals(tmpArchitecture) && (tmpHardware.threads <= tmpThreads) && (tmpHardware.memory >= tmpMemory)) {
-                ENVIRONMENT = tmpHardware.virtualise();
+        for (final Hardware hw : Hardware.PREDEFINED) {
+            if (hw.architecture.equals(tmpArchitecture) && (hw.threads <= tmpThreads) && (hw.memory >= tmpMemory)) {
+                ENVIRONMENT = hw.virtualise();
             }
         }
 

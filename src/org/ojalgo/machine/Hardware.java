@@ -22,6 +22,7 @@
 package org.ojalgo.machine;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.ojalgo.ProgrammingError;
@@ -65,7 +66,7 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
     /**
      * Should contain all available hardware in ascending "power" order.
      */
-    public static final TreeSet<Hardware> PREDEFINED = new TreeSet<>();
+    public static final Set<Hardware> PREDEFINED = new TreeSet<>();
 
     /**
      * <ul>
@@ -149,6 +150,60 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
 
     /**
      * <ul>
+     * <li>PA's Q9400
+     * <ul>
+     * <li></li>
+     * <li>1 processors</li>
+     * <li>4 cores per processor</li>
+     * <li>1 thread per core</li>
+     * <li>==>> Total 4 threads</li>
+     * <li></li>
+     * <li>3GB system RAM</li>
+     * <li>3MB L2 cache per 2 cores</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
+     * <li>PA's Q6600
+     * <ul>
+     * <li></li>
+     * <li>1 processors</li>
+     * <li>4 cores per processor</li>
+     * <li>1 thread per core</li>
+     * <li>==>> Total 4 threads</li>
+     * <li></li>
+     * <li>8GB system RAM</li>
+     * <li>4MB L2 cache per 2 cores</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
+     * </ul>
+     */
+    static final Hardware X86_64__04_1_L2 = new Hardware("x86_64",
+            new BasicMachine[] { new BasicMachine(8L * K * K * K, 4), new BasicMachine(3L * K * K, 2), new BasicMachine(32L * K, 1) });
+
+    /**
+     * <ul>
+     * <li>Intel i5-4670K with 16GB of RAM
+     * <ul>
+     * <li></li>
+     * <li>1 processors</li>
+     * <li>4 cores per processor</li>
+     * <li>1 thread per core</li>
+     * <li>==>> Total 4 threads</li>
+     * <li></li>
+     * <li>16GB system RAM</li>
+     * <li>6MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
+     * </ul>
+     */
+    static final Hardware X86_64__04_1_L3 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(16L * K * K * K, 4), new BasicMachine(6L * K * K, 4),
+            new BasicMachine(256L * K, 1), new BasicMachine(32L * K, 1) });
+
+    /**
+     * <ul>
      * <li>BUBBLE / MacBookAir4,2
      * <ul>
      * <li></li>
@@ -177,49 +232,9 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
-     * <li>PA's Q9400
-     * <ul>
-     * <li></li>
-     * <li>1 processors</li>
-     * <li>4 cores per processor</li>
-     * <li>1 thread per core</li>
-     * <li>==>> Total 4 threads</li>
-     * <li></li>
-     * <li>3GB system RAM</li>
-     * <li>3MB L2 cache per 2 cores</li>
-     * <li>32kB L1 cache per core</li>
-     * </ul>
-     * </li>
-     * <li>PA's Q6600
-     * <ul>
-     * <li></li>
-     * <li>1 processors</li>
-     * <li>4 cores per processor</li>
-     * <li>1 thread per core</li>
-     * <li>==>> Total 4 threads</li>
-     * <li></li>
-     * <li>8GB system RAM</li>
-     * <li>4MB L2 cache per 2 cores</li>
-     * <li>32kB L1 cache per core</li>
-     * </ul>
-     * </li>
-     * <li>Intel i5-4670K with 16GB of RAM
-     * <ul>
-     * <li></li>
-     * <li>1 processors</li>
-     * <li>4 cores per processor</li>
-     * <li>1 thread per core</li>
-     * <li>==>> Total 4 threads</li>
-     * <li></li>
-     * <li>16GB system RAM</li>
-     * <li>6MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
-     * </ul>
-     * </li>
      * </ul>
      */
-    static final Hardware X86_64__04 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(16L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
+    static final Hardware X86_64__04_2 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(8L * K * K * K, 4), new BasicMachine(3L * K * K, 4),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**
@@ -381,7 +396,9 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
         PREDEFINED.add(X86__01);
         PREDEFINED.add(X86__02);
         PREDEFINED.add(X86_64__02);
-        PREDEFINED.add(X86_64__04);
+        PREDEFINED.add(X86_64__04_2);
+        PREDEFINED.add(X86_64__04_1_L2);
+        PREDEFINED.add(X86_64__04_1_L3);
         PREDEFINED.add(X86_64__08);
         PREDEFINED.add(X86_64__12);
         PREDEFINED.add(X86_64__16);
@@ -461,17 +478,17 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    public int compareTo(final Hardware aReference) {
-        if (units != aReference.units) {
-            return units - aReference.units;
-        } else if (cache != aReference.cache) {
-            return (int) (cache - aReference.cache);
-        } else if (cores != aReference.cores) {
-            return cores - aReference.cores;
-        } else if (threads != aReference.threads) {
-            return threads - aReference.threads;
-        } else if (memory != aReference.memory) {
-            return (int) (memory - aReference.memory);
+    public int compareTo(final Hardware other) {
+        if (cores != other.cores) {
+            return cores - other.cores;
+        } else if (threads != other.threads) {
+            return threads - other.threads;
+        } else if (cache != other.cache) {
+            return (int) (cache - other.cache);
+        } else if (units != other.units) {
+            return units - other.units;
+        } else if (memory != other.memory) {
+            return (int) (memory - other.memory);
         } else {
             return 0;
         }

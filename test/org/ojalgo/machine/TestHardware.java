@@ -56,9 +56,31 @@ public class TestHardware extends MachineTests {
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
     }
 
-    public void testX86_64__04() {
+    public void testX86_64__04_1_L2() {
 
-        final Hardware tmpHardware = Hardware.X86_64__04;
+        final Hardware tmpHardware = Hardware.X86_64__04_1_L2;
+
+        final int tmpThreads = 4;
+        final int tmpCores = 4;
+        final int tmpUnits = 2;
+
+        this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
+    }
+
+    public void testX86_64__04_1_L3() {
+
+        final Hardware tmpHardware = Hardware.X86_64__04_1_L3;
+
+        final int tmpThreads = 4;
+        final int tmpCores = 4;
+        final int tmpUnits = 1;
+
+        this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
+    }
+
+    public void testX86_64__04_2() {
+
+        final Hardware tmpHardware = Hardware.X86_64__04_2;
 
         final int tmpThreads = 4;
         final int tmpCores = 2;
@@ -87,6 +109,11 @@ public class TestHardware extends MachineTests {
         final int tmpUnits = 1;
 
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
+    }
+
+    public void testCompare() {
+        TestUtils.assertTrue(Hardware.X86_64__04_2.compareTo(Hardware.X86_64__04_1_L2) < 0);
+        TestUtils.assertTrue(Hardware.X86_64__04_1_L3.compareTo(Hardware.X86_64__04_1_L2) > 0);
     }
 
     public void testX86_64__16() {
