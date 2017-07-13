@@ -97,12 +97,6 @@ public final class ArrayAnyD<N extends Number> implements AccessAnyD<N>, AccessA
     public static final Factory<Quaternion> QUATERNION = new Factory<>(QuaternionArray.FACTORY);
     public static final Factory<RationalNumber> RATIONAL = new Factory<>(RationalArray.FACTORY);
 
-    /**
-     * @deprecated v43 Use {@link #PRIMITIVE64} instead
-     */
-    @Deprecated
-    public static final Factory<Double> PRIMITIVE = PRIMITIVE64;
-
     public static <N extends Number> ArrayAnyD.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
         return new ArrayAnyD.Factory<>(denseArray);
     }

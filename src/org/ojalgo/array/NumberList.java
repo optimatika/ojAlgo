@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -37,12 +36,8 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Iterator1D;
 import org.ojalgo.access.Mutate1D;
-import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 
 public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D, Mutate1D.Mixable<N> {
 
@@ -72,54 +67,6 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
     public static <N extends Number> ListFactory<N> factory(final DenseArray.Factory<N> arrayFactory) {
         return new ListFactory<>(arrayFactory);
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static <N extends Number> NumberList<N> make(final DenseArray.Factory<N> arrayFactory) {
-        return NumberList.factory(arrayFactory).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static NumberList<BigDecimal> makeBig() {
-        return NumberList.factory(BigArray.FACTORY).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static NumberList<ComplexNumber> makeComplex() {
-        return NumberList.factory(ComplexArray.FACTORY).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static NumberList<Double> makePrimitive() {
-        return NumberList.factory(Primitive64Array.FACTORY).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static NumberList<Quaternion> makeQuaternion() {
-        return NumberList.factory(QuaternionArray.FACTORY).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static NumberList<RationalNumber> makeRational() {
-        return NumberList.factory(RationalArray.FACTORY).make();
     }
 
     private long myActualCount;

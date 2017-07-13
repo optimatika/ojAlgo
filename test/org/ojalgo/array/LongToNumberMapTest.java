@@ -50,7 +50,7 @@ public class LongToNumberMapTest extends ArrayTests {
 
     public void testSubmap() {
 
-        final LongToNumberMap<Double> tmpMap = LongToNumberMap.makePrimitive();
+        final LongToNumberMap<Double> tmpMap = LongToNumberMap.factory(Primitive64Array.FACTORY).make();
 
         tmpMap.put(10, 1);
         tmpMap.put(20, 2);

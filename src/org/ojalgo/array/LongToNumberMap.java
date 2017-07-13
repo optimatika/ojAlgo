@@ -1,6 +1,5 @@
 package org.ojalgo.array;
 
-import java.math.BigDecimal;
 import java.util.AbstractSet;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -15,9 +14,6 @@ import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.scalar.ComplexNumber;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 
 public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N>, Mutate1D.Mixable<N> {
 
@@ -36,54 +32,6 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
 
     public static <N extends Number> MapFactory<N> factory(final DenseArray.Factory<N> denseFactory) {
         return new MapFactory<>(denseFactory);
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static <N extends Number> LongToNumberMap<N> make(final DenseArray.Factory<N> arrayFactory) {
-        return LongToNumberMap.factory(arrayFactory).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static LongToNumberMap<BigDecimal> makeBig() {
-        return LongToNumberMap.factory(BigArray.FACTORY).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static LongToNumberMap<ComplexNumber> makeComplex() {
-        return LongToNumberMap.factory(ComplexArray.FACTORY).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static LongToNumberMap<Double> makePrimitive() {
-        return LongToNumberMap.factory(Primitive64Array.FACTORY).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static LongToNumberMap<Quaternion> makeQuaternion() {
-        return LongToNumberMap.factory(QuaternionArray.FACTORY).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(Factory)} instead.
-     */
-    @Deprecated
-    public static LongToNumberMap<RationalNumber> makeRational() {
-        return LongToNumberMap.factory(RationalArray.FACTORY).make();
     }
 
     private final SparseArray<N> myStorage;

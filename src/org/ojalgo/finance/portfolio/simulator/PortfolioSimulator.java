@@ -81,7 +81,7 @@ public class PortfolioSimulator {
         }
         final List<BigDecimal> tmpWeights = new SimplePortfolio(tmpValues).normalise().getWeights();
 
-        final Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE.makeZero(aNumberOfRealisations, aNumberOfSteps);
+        final Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE64.makeZero(aNumberOfRealisations, aNumberOfSteps);
 
         for (int r = 0; r < aNumberOfRealisations; r++) {
 

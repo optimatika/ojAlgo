@@ -21,7 +21,6 @@
  */
 package org.ojalgo.array;
 
-import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
 import java.util.stream.LongStream;
@@ -35,10 +34,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Quaternion;
-import org.ojalgo.scalar.RationalNumber;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
 
@@ -120,86 +116,6 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     public static <N extends Number> SparseFactory<N> factory(final DenseArray.Factory<N> denseFactory, final long count) {
         return new SparseFactory<>(denseFactory, count);
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
-     */
-    @Deprecated
-    public static SparseArray<BigDecimal> makeBig(final long count) {
-        return SparseArray.factory(BigArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
-     */
-    @Deprecated
-    public static SparseArray<BigDecimal> makeBig(final long count, final int initialCapacity) {
-        return SparseArray.factory(BigArray.FACTORY, count).initial(initialCapacity).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
-     */
-    @Deprecated
-    public static SparseArray<ComplexNumber> makeComplex(final long count) {
-        return SparseArray.factory(ComplexArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
-     */
-    @Deprecated
-    public static SparseArray<ComplexNumber> makeComplex(final long count, final int initialCapacity) {
-        return SparseArray.factory(ComplexArray.FACTORY, count).initial(initialCapacity).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
-     */
-    @Deprecated
-    public static SparseArray<Double> makePrimitive(final long count) {
-        return SparseArray.factory(Primitive64Array.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
-     */
-    @Deprecated
-    public static SparseArray<Double> makePrimitive(final long count, final int initialCapacity) {
-        return SparseArray.factory(Primitive64Array.FACTORY, count).initial(initialCapacity).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
-     */
-    @Deprecated
-    public static SparseArray<Quaternion> makeQuaternion(final long count) {
-        return SparseArray.factory(QuaternionArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
-     */
-    @Deprecated
-    public static SparseArray<Quaternion> makeQuaternion(final long count, final int initialCapacity) {
-        return SparseArray.factory(QuaternionArray.FACTORY, count).initial(initialCapacity).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
-     */
-    @Deprecated
-    public static SparseArray<RationalNumber> makeRational(final long count) {
-        return SparseArray.factory(RationalArray.FACTORY, count).initial(DenseStrategy.capacity(count)).make();
-    }
-
-    /**
-     * @deprecated v43 Use {@link #factory(DenseArray.Factory, long)} instead.
-     */
-    @Deprecated
-    public static SparseArray<RationalNumber> makeRational(final long count, final int initialCapacity) {
-        return SparseArray.factory(RationalArray.FACTORY, count).initial(initialCapacity).make();
     }
 
     /**

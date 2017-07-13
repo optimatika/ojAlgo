@@ -108,7 +108,7 @@ abstract class AbstractProcess<D extends Distribution> implements RandomProcess<
         final List<ComparableToDouble<Double>> tmpInitialState = new ArrayList<>(myObservations);
         final double tmpInitialValue = this.getValue();
 
-        final Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE.makeZero(numberOfRealisations, numberOfSteps);
+        final Array2D<Double> tmpRealisationValues = Array2D.PRIMITIVE64.makeZero(numberOfRealisations, numberOfSteps);
 
         for (int r = 0; r < numberOfRealisations; r++) {
             double tmpCurrentValue = tmpInitialValue;

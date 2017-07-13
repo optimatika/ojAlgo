@@ -281,11 +281,6 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
     public static final Factory<Double> PRIMITIVE64 = new Factory<>(Primitive64Array.FACTORY);
     public static final Factory<Quaternion> QUATERNION = new Factory<>(QuaternionArray.FACTORY);
     public static final Factory<RationalNumber> RATIONAL = new Factory<>(RationalArray.FACTORY);
-    /**
-     * @deprecated v43 Use {@link #PRIMITIVE64} instead
-     */
-    @Deprecated
-    public static final Factory<Double> PRIMITIVE = PRIMITIVE64;
 
     public static <N extends Number> Array2D.Factory<N> factory(final DenseArray.Factory<N> denseArray) {
         return new Array2D.Factory<>(denseArray);
