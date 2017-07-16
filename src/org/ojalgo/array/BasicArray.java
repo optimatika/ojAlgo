@@ -304,10 +304,4 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
         return this instanceof SparseArray;
     }
 
-    /**
-     * Reset the array to some standard (all zeros) initial state. The array must still be usuable after this
-     * call, and the structure/shape of the array must not change.
-     */
-    abstract void reset();
-
 }

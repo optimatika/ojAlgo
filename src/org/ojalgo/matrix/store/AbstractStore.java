@@ -60,10 +60,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return retVal;
     }
 
-    public long count() {
-        return myRowDim * myColDim;
-    }
-
     public long countColumns() {
         return myColDim;
     }
@@ -133,7 +129,7 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
     }
 
     public void supplyTo(final ElementsConsumer<N> receiver) {
-        receiver.fillAll(this.physical().scalar().zero().getNumber());
+        receiver.reset();
         this.addNonzerosTo(receiver);
     }
 

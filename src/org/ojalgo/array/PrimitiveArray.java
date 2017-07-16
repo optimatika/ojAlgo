@@ -83,7 +83,7 @@ public abstract class PrimitiveArray extends PlainArray<Double> implements Mutat
     }
 
     @Override
-    final void reset() {
+    public final void reset() {
         this.fillAll(PrimitiveMath.ZERO);
     }
 

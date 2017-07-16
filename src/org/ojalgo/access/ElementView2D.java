@@ -27,4 +27,6 @@ public interface ElementView2D<N extends Number, V extends ElementView2D<N, V>> 
 
     long row();
 
+    abstract ElementView2D<N, V> trySplit();
+
 }

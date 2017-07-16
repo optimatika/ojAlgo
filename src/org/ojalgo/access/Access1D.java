@@ -100,20 +100,30 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     public static final class ElementView<N extends Number> implements ElementView1D<N, ElementView<N>> {
 
-        private long myCursor = -1;
+        private long myCursor;
         private final long myLastCursor;
         private final Access1D<N> myValues;
 
-        ElementView(final Access1D<N> values) {
+        private ElementView(final Access1D<N> values, final long initial, final long last) {
 
             super();
 
             myValues = values;
-            myLastCursor = values.count() - 1;
+            myCursor = initial;
+            myLastCursor = last;
+
+        }
+
+        ElementView(final Access1D<N> values) {
+            this(values, -1L, values.count() - 1L);
         }
 
         public double doubleValue() {
             return myValues.doubleValue(myCursor);
+        }
+
+        public long estimateSize() {
+            return myLastCursor - myCursor;
         }
 
         public N getNumber() {
@@ -140,6 +150,26 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         public ElementView<N> previous() {
             myCursor--;
             return this;
+        }
+
+        public ElementView<N> trySplit() {
+
+            final long remaining = myLastCursor - myCursor;
+
+            if (remaining > 1L) {
+
+                final long split = myCursor + (remaining / 2L);
+
+                final ElementView<N> retVal = new ElementView<N>(myValues, myCursor, split);
+
+                myCursor = split;
+
+                return retVal;
+
+            } else {
+
+                return null;
+            }
         }
 
     }

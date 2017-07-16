@@ -21,6 +21,8 @@
  */
 package org.ojalgo.matrix.store;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 
@@ -33,7 +35,6 @@ import org.ojalgo.array.BigArray;
 import org.ojalgo.array.ComplexArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -62,18 +63,22 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     public static final SparseStore.Factory<Double> PRIMITIVE = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
 
     public static SparseStore<BigDecimal> makeBig(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount,
-                SparseArray.factory(BigArray.FACTORY, rowsCount * columnsCount).initial(rowsCount + columnsCount).make());
+        final long count = (long) rowsCount * (long) columnsCount;
+        final int max = Math.max(rowsCount, columnsCount);
+        return new SparseStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.factory(BigArray.FACTORY, count).initial(max).make());
     }
 
     public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
-        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount,
-                SparseArray.factory(ComplexArray.FACTORY, rowsCount * columnsCount).initial(rowsCount + columnsCount).make());
+        final long count = (long) rowsCount * (long) columnsCount;
+        final int max = Math.max(rowsCount, columnsCount);
+        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.factory(ComplexArray.FACTORY, count).initial(max).make());
     }
 
     public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {
+        final long count = (long) rowsCount * (long) columnsCount;
+        final int max = Math.max(rowsCount, columnsCount);
         return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount,
-                SparseArray.factory(Primitive64Array.FACTORY, rowsCount * columnsCount).initial(rowsCount + columnsCount).make());
+                SparseArray.factory(Primitive64Array.FACTORY, count).initial(max).make());
     }
 
     private final SparseArray<N> myElements;
@@ -113,10 +118,8 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public void add(final long row, final long col, final double addend) {
-        if (addend != PrimitiveMath.ZERO) {
-            myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
-            this.updateNonZeros(row, col);
-        }
+        myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
+        this.updateNonZeros(row, col);
     }
 
     public void add(final long row, final long col, final Number addend) {
@@ -124,9 +127,9 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         this.updateNonZeros(row, col);
     }
 
-    public void clear() {
+    public void reset() {
         myElements.reset();
-        Arrays.fill(myFirsts, (int) this.countColumns());
+        Arrays.fill(myFirsts, this.getColDim());
         Arrays.fill(myLimits, 0);
     }
 
@@ -249,41 +252,34 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
         if (this.isPrimitive()) {
 
-            final long tmpRightStructure = this.countColumns();
-            final long tmpRightColumns = target.countColumns();
+            final long structure = this.countColumns();
+            final long numberOfColumns = target.countColumns();
 
-            if (target instanceof SparseStore) {
-                ((SparseStore<?>) target).clear();
-            } else {
-                target.fillAll(this.physical().scalar().zero().getNumber());
-            }
+            target.reset();
 
-            long tmpRow;
-            long tmpCol;
-            double tmpValue;
+            this.nonzeros().stream(true).forEach(element -> {
 
-            long tmpFirst;
-            long tmpLimit;
-            long tmpIndex;
+                final long row = element.row();
+                final long col = element.column();
+                final double val = element.doubleValue();
 
-            for (final ElementView2D<N, ?> tmpNonzero : this.nonzeros()) {
-                tmpRow = tmpNonzero.row();
-                tmpCol = tmpNonzero.column();
-                tmpValue = tmpNonzero.doubleValue();
-
-                tmpFirst = MatrixUtils.firstInRow(right, tmpRow, 0L);
-                tmpLimit = MatrixUtils.limitOfRow(right, tmpRow, tmpRightColumns);
-                for (long j = tmpFirst; j < tmpLimit; j++) {
-                    tmpIndex = Structure2D.index(tmpRightStructure, tmpCol, j);
-                    target.add(tmpRow, j, tmpValue * right.doubleValue(tmpIndex));
+                final long first = MatrixUtils.firstInRow(right, col, 0L);
+                final long limit = MatrixUtils.limitOfRow(right, col, numberOfColumns);
+                for (long j = first; j < limit; j++) {
+                    final long index = Structure2D.index(structure, col, j);
+                    final double addition = val * right.doubleValue(index);
+                    if (Double.compare(addition, ZERO) != 0) {
+                        synchronized (target) {
+                            target.add(row, j, addition);
+                        }
+                    }
                 }
-            }
+            });
 
         } else {
 
             super.multiply(right, target);
         }
-
     }
 
     public ElementView2D<N, ?> nonzeros() {

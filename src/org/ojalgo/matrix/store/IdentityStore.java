@@ -22,6 +22,8 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.scalar.Scalar;
 
@@ -83,6 +85,15 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
     @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
         return right.copy();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+        if (right instanceof Access2D.Collectable) {
+            ((Access2D.Collectable<N, ElementsConsumer<N>>) right).supplyTo(target);
+        } else {
+            super.multiply(right, target);
+        }
     }
 
     public Scalar<N> toScalar(final long row, final long column) {

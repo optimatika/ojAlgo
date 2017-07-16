@@ -157,6 +157,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
             return myDelegate.doubleValue();
         }
 
+        public long estimateSize() {
+            return myDelegate.estimateSize();
+        }
+
         public N getNumber() {
             return myDelegate.getNumber();
         }
@@ -189,6 +193,17 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
         public long row() {
             return Structure2D.row(myDelegate.index(), myStructure);
+        }
+
+        public ElementView<N> trySplit() {
+
+            final ElementView1D<N, ?> delegateSpliterator = myDelegate.trySplit();
+
+            if (delegateSpliterator != null) {
+                return new ElementView<>(delegateSpliterator, myStructure);
+            } else {
+                return null;
+            }
         }
 
     }

@@ -562,7 +562,7 @@ public abstract class BufferArray extends PlainArray<Double> {
     }
 
     @Override
-    void reset() {
+    public void reset() {
         this.fillAll(PrimitiveMath.ZERO);
         myBuffer.clear();
     }

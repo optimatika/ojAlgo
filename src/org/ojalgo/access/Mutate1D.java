@@ -24,6 +24,7 @@ package org.ojalgo.access;
 import java.util.function.Consumer;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -152,5 +153,13 @@ public interface Mutate1D extends Structure1D {
     void set(long index, double value);
 
     void set(long index, Number value);
+
+    /**
+     * Reset this mutable structure to some standard (all zeros) initial state. It must still be usuable after
+     * this call, and the structure/size/shape of must not change.
+     */
+    default void reset() {
+        this.loopAll(i -> this.set(i, PrimitiveMath.ZERO));
+    }
 
 }

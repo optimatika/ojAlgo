@@ -23,6 +23,7 @@ package org.ojalgo.array;
 
 import java.math.MathContext;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
 import org.ojalgo.access.Access1D;
@@ -34,6 +35,7 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
+import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -55,17 +57,34 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         private final int myLastCursor;
         private final DenseArray<N> myValues;
 
-        NonzeroView(final long[] indices, final DenseArray<N> values, final int actualLength) {
+        private NonzeroView(final long[] indices, final DenseArray<N> values, final int initial, final int last) {
 
             super();
 
             myIndices = indices;
             myValues = values;
-            myLastCursor = actualLength - 1;
+
+            myCursor = initial;
+            myLastCursor = last;
+        }
+
+        NonzeroView(final long[] indices, final DenseArray<N> values, final int actualLength) {
+            this(indices, values, -1, actualLength - 1);
         }
 
         public double doubleValue() {
             return myValues.doubleValue(myCursor);
+        }
+
+        public long estimateSize() {
+            return myLastCursor - myCursor;
+        }
+
+        public void forEachRemaining(final Consumer<? super NonzeroView<N>> action) {
+
+            BasicLogger.debug("forEachRemaining [{}, {})", myCursor, myLastCursor);
+
+            ElementView1D.super.forEachRemaining(action);
         }
 
         public N getNumber() {
@@ -92,6 +111,32 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         public NonzeroView<N> previous() {
             myCursor--;
             return this;
+        }
+
+        public boolean tryAdvance(final Consumer<? super NonzeroView<N>> action) {
+            return ElementView1D.super.tryAdvance(action);
+        }
+
+        public NonzeroView<N> trySplit() {
+
+            final int remaining = myLastCursor - myCursor;
+
+            if (remaining > 1) {
+
+                final int split = myCursor + (remaining / 2);
+
+                // BasicLogger.debug("Splitting [{}, {}) into [{}, {}) and [{}, {})", myCursor, myLastCursor, myCursor, split, split, myLastCursor);
+
+                final NonzeroView<N> retVal = new NonzeroView<N>(myIndices, myValues, myCursor, split);
+
+                myCursor = split;
+
+                return retVal;
+
+            } else {
+
+                return null;
+            }
         }
 
     }

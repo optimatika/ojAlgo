@@ -21,16 +21,38 @@
  */
 package org.ojalgo.access;
 
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.ojalgo.ProgrammingError;
 
-public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>> extends AccessScalar<N>, ListIterator<V>, Iterable<V> {
+public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>>
+        extends AccessScalar<N>, Iterable<V>, Iterator<V>, Spliterator<V>, Comparable<V> {
 
-    default void add(final V e) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
+    static final int CHARACTERISTICS = Spliterator.CONCURRENT | Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED
+            | Spliterator.SIZED | Spliterator.SORTED | Spliterator.SUBSIZED;
+
+    default int characteristics() {
+        return CHARACTERISTICS;
     }
+
+    default int compareTo(final V other) {
+        return Long.compare(this.index(), other.index());
+    }
+
+    default void forEachRemaining(final Consumer<? super V> action) {
+        Spliterator.super.forEachRemaining(action);
+    }
+
+    default Comparator<? super V> getComparator() {
+        return null;
+    }
+
+    boolean hasPrevious();
 
     long index();
 
@@ -38,20 +60,33 @@ public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>> 
         return this;
     }
 
-    default int nextIndex() {
-        return (int) (this.index() + 1);
+    default long nextIndex() {
+        return this.index() + 1L;
     }
 
-    default int previousIndex() {
-        return (int) (this.index() - 1);
+    V previous();
+
+    default long previousIndex() {
+        return this.index() - 1L;
     }
 
     default void remove() {
         ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
-    default void set(final V e) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
+    default Stream<V> stream(final boolean parallel) {
+        return StreamSupport.stream(this, parallel);
     }
+
+    default boolean tryAdvance(final Consumer<? super V> action) {
+        if (this.hasNext()) {
+            action.accept(this.next());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    abstract ElementView1D<N, V> trySplit();
 
 }
