@@ -84,16 +84,17 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
         return 0;
     }
 
-    public ZeroStore<N> premultiply(final Access1D<N> left) {
-        return new ZeroStore<>(this.physical(), (int) (left.count() / this.getRowDim()), this.getColDim());
-    }
-
     public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
         target.reset();
     }
 
     public ZeroStore<N> multiply(final double scalar) {
         return new ZeroStore<>(this.physical(), this.getRowDim(), this.getColDim());
+    }
+
+    @Override
+    public ZeroStore<N> multiply(final MatrixStore<N> right) {
+        return new ZeroStore<>(this.physical(), this.getRowDim(), (int) (right.count() / this.getColDim()));
     }
 
     public ZeroStore<N> multiply(final N scalar) {
@@ -105,9 +106,8 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
         return this.physical().scalar().zero().getNumber();
     }
 
-    @Override
-    public ZeroStore<N> multiply(final MatrixStore<N> right) {
-        return new ZeroStore<>(this.physical(), this.getRowDim(), (int) (right.count() / this.getColDim()));
+    public ZeroStore<N> premultiply(final Access1D<N> left) {
+        return new ZeroStore<>(this.physical(), (int) (left.count() / this.getRowDim()), this.getColDim());
     }
 
     public Scalar<N> toScalar(final long row, final long column) {

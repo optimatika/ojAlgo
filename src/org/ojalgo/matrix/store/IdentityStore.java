@@ -82,11 +82,6 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
         return row + 1;
     }
 
-    @Override
-    public MatrixStore<N> multiply(final MatrixStore<N> right) {
-        return right.copy();
-    }
-
     @SuppressWarnings("unchecked")
     public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
         if (right instanceof Access2D.Collectable) {
@@ -94,6 +89,32 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
         } else {
             super.multiply(right, target);
         }
+    }
+
+    public MatrixStore<N> multiply(double scalar) {
+        // TODO Auto-generated method stub
+        return super.multiply(scalar);
+    }
+
+    @Override
+    public MatrixStore<N> multiply(final MatrixStore<N> right) {
+        return right.copy();
+    }
+
+    public MatrixStore<N> multiply(N scalar) {
+        // TODO Auto-generated method stub
+        return super.multiply(scalar);
+    }
+
+    @Override
+    public N multiplyBoth(Access1D<N> leftAndRight) {
+        // TODO Auto-generated method stub
+        return super.multiplyBoth(leftAndRight);
+    }
+
+    public ElementsSupplier<N> premultiply(Access1D<N> left) {
+        // TODO Auto-generated method stub
+        return super.premultiply(left);
     }
 
     public Scalar<N> toScalar(final long row, final long column) {

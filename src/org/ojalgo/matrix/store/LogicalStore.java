@@ -24,7 +24,7 @@ package org.ojalgo.matrix.store;
 import org.ojalgo.ProgrammingError;
 
 /**
- * Logical stores are (intended to be) immutable. Therefore LogicalStore subclasses should be made .
+ * Logical stores are (intended to be) immutable.
  *
  * @author apete
  */

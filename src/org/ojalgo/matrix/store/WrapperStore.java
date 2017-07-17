@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 
 /**
@@ -50,6 +51,37 @@ final class WrapperStore<N extends Number> extends FactoryStore<N> {
 
     public N get(final long aRow, final long aCol) {
         return this.physical().scalar().cast(myAccess.get(aRow, aCol));
+    }
+
+    public void multiply(Access1D<N> right, ElementsConsumer<N> target) {
+        // TODO Auto-generated method stub
+        super.multiply(right, target);
+    }
+
+    public MatrixStore<N> multiply(double scalar) {
+        // TODO Auto-generated method stub
+        return super.multiply(scalar);
+    }
+
+    public MatrixStore<N> multiply(MatrixStore<N> right) {
+        // TODO Auto-generated method stub
+        return super.multiply(right);
+    }
+
+    public MatrixStore<N> multiply(N scalar) {
+        // TODO Auto-generated method stub
+        return super.multiply(scalar);
+    }
+
+    @Override
+    public N multiplyBoth(Access1D<N> leftAndRight) {
+        // TODO Auto-generated method stub
+        return super.multiplyBoth(leftAndRight);
+    }
+
+    public ElementsSupplier<N> premultiply(Access1D<N> left) {
+        // TODO Auto-generated method stub
+        return super.premultiply(left);
     }
 
     @Override

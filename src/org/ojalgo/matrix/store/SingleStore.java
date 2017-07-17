@@ -22,6 +22,7 @@
 package org.ojalgo.matrix.store;
 
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.Scalar;
 
 final class SingleStore<N extends Number> extends FactoryStore<N> {
@@ -62,6 +63,16 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
         return myNumber;
     }
 
+    public void multiply(Access1D<N> right, ElementsConsumer<N> target) {
+        // TODO Auto-generated method stub
+        super.multiply(right, target);
+    }
+
+    public MatrixStore<N> multiply(double scalar) {
+        // TODO Auto-generated method stub
+        return super.multiply(scalar);
+    }
+
     @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
@@ -72,6 +83,22 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
         retVal.modifyAll(tmpFactory.function().multiply().first(myNumber));
 
         return retVal;
+    }
+
+    public MatrixStore<N> multiply(N scalar) {
+        // TODO Auto-generated method stub
+        return super.multiply(scalar);
+    }
+
+    @Override
+    public N multiplyBoth(Access1D<N> leftAndRight) {
+        // TODO Auto-generated method stub
+        return super.multiplyBoth(leftAndRight);
+    }
+
+    public ElementsSupplier<N> premultiply(Access1D<N> left) {
+        // TODO Auto-generated method stub
+        return super.premultiply(left);
     }
 
     @Override

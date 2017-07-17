@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.constant.PrimitiveMath.ZERO;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -125,12 +125,6 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     public void add(final long row, final long col, final Number addend) {
         myElements.add(Structure2D.index(myFirsts.length, row, col), addend);
         this.updateNonZeros(row, col);
-    }
-
-    public void reset() {
-        myElements.reset();
-        Arrays.fill(myFirsts, this.getColDim());
-        Arrays.fill(myLimits, 0);
     }
 
     public double doubleValue(final long row, final long col) {
@@ -282,8 +276,34 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         }
     }
 
+    public MatrixStore<N> multiply(double scalar) {
+        // TODO Auto-generated method stub
+        return super.multiply(scalar);
+    }
+
+    public MatrixStore<N> multiply(MatrixStore<N> right) {
+        // TODO Auto-generated method stub
+        return super.multiply(right);
+    }
+
+    public MatrixStore<N> multiply(N scalar) {
+        // TODO Auto-generated method stub
+        return super.multiply(scalar);
+    }
+
+    @Override
+    public N multiplyBoth(Access1D<N> leftAndRight) {
+        // TODO Auto-generated method stub
+        return super.multiplyBoth(leftAndRight);
+    }
+
     public ElementView2D<N, ?> nonzeros() {
         return new Access2D.ElementView<>(myElements.nonzeros(), this.countRows());
+    }
+
+    public ElementsSupplier<N> premultiply(Access1D<N> left) {
+        // TODO Auto-generated method stub
+        return super.premultiply(left);
     }
 
     public ElementsConsumer<N> regionByColumns(final int... columns) {
@@ -304,6 +324,12 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public ElementsConsumer<N> regionByTransposing() {
         return new TransposedRegion<>(this, myMultiplyer);
+    }
+
+    public void reset() {
+        myElements.reset();
+        Arrays.fill(myFirsts, this.getColDim());
+        Arrays.fill(myLimits, 0);
     }
 
     public void set(final long row, final long col, final double value) {
