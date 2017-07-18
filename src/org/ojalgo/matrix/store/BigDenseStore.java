@@ -34,6 +34,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.BigArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.BigFunction;
@@ -92,6 +93,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
         public AggregatorSet<BigDecimal> aggregator() {
             return BigAggregator.getSet();
+        }
+
+        public DenseArray.Factory<BigDecimal> array() {
+            return BigArray.FACTORY;
         }
 
         public MatrixStore.Factory<BigDecimal> builder() {
@@ -204,10 +209,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
         public FunctionSet<BigDecimal> function() {
             return BigFunction.getSet();
-        }
-
-        public BigArray makeArray(final int length) {
-            return BigArray.make(length);
         }
 
         public BigDenseStore makeEye(final long rows, final long columns) {
@@ -354,6 +355,7 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
             return retVal;
         }
+
     };
 
     static BigDenseStore cast(final Access1D<BigDecimal> matrix) {

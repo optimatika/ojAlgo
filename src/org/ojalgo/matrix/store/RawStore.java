@@ -34,7 +34,7 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Structure2D;
-import org.ojalgo.array.BasicArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.Raw1D;
 import org.ojalgo.array.Raw2D;
@@ -68,6 +68,10 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
         public AggregatorSet<Double> aggregator() {
             return PrimitiveAggregator.getSet();
+        }
+
+        public DenseArray.Factory<Double> array() {
+            return Primitive64Array.FACTORY;
         }
 
         public MatrixStore.Factory<Double> builder() {
@@ -164,10 +168,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
 
         public FunctionSet<Double> function() {
             return PrimitiveFunction.getSet();
-        }
-
-        public BasicArray<Double> makeArray(final int length) {
-            return Primitive64Array.make(length);
         }
 
         public RawStore makeEye(final long rows, final long columns) {

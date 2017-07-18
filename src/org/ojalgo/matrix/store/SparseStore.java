@@ -30,11 +30,7 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.ElementView2D;
 import org.ojalgo.access.Structure2D;
-import org.ojalgo.array.BigArray;
-import org.ojalgo.array.ComplexArray;
-import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
-import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -64,18 +60,15 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     public static final SparseStore.Factory<Double> PRIMITIVE = (rowsCount, columnsCount) -> SparseStore.makePrimitive((int) rowsCount, (int) columnsCount);
 
     public static SparseStore<BigDecimal> makeBig(final int rowsCount, final int columnsCount) {
-        final long count = (long) rowsCount * (long) columnsCount;
-        return new SparseStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.factory(BigArray.FACTORY, count));
+        return new SparseStore<>(BigDenseStore.FACTORY, rowsCount, columnsCount);
     }
 
     public static SparseStore<ComplexNumber> makeComplex(final int rowsCount, final int columnsCount) {
-        final long count = (long) rowsCount * (long) columnsCount;
-        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.factory(ComplexArray.FACTORY, count));
+        return new SparseStore<>(ComplexDenseStore.FACTORY, rowsCount, columnsCount);
     }
 
     public static SparseStore<Double> makePrimitive(final int rowsCount, final int columnsCount) {
-        final long count = (long) rowsCount * (long) columnsCount;
-        return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount, SparseArray.factory(Primitive64Array.FACTORY, count));
+        return new SparseStore<>(PrimitiveDenseStore.FACTORY, rowsCount, columnsCount);
     }
 
     private final SparseArray<N> myElements;
@@ -83,15 +76,11 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     private final int[] myLimits;
     private final FillByMultiplying<N> myMultiplyer;
 
-    private final SparseFactory<N> mySparseFactory;
-
-    SparseStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount, final SparseFactory<N> sparseFactory) {
+    SparseStore(final PhysicalStore.Factory<N, ?> factory, final int rowsCount, final int columnsCount) {
 
         super(factory, rowsCount, columnsCount);
 
-        mySparseFactory = sparseFactory;
-
-        myElements = sparseFactory.initial(Math.max(rowsCount, columnsCount)).make();
+        myElements = SparseArray.factory(factory.array(), this.count()).initial(Math.max(rowsCount, columnsCount)).make();
         myFirsts = new int[rowsCount];
         myLimits = new int[rowsCount];
         Arrays.fill(myFirsts, columnsCount);
@@ -270,7 +259,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public MatrixStore<N> multiply(final double scalar) {
 
-        final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim(), mySparseFactory);
+        final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim());
 
         if (this.isPrimitive()) {
 
@@ -297,7 +286,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
 
     public MatrixStore<N> multiply(final N scalar) {
 
-        final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim(), mySparseFactory);
+        final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim());
 
         if (this.isPrimitive()) {
 

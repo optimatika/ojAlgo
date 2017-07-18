@@ -33,6 +33,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ComplexArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.concurrent.DivideAndConquer;
@@ -94,6 +95,10 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         public AggregatorSet<Double> aggregator() {
             return PrimitiveAggregator.getSet();
+        }
+
+        public DenseArray.Factory<Double> array() {
+            return Primitive64Array.FACTORY;
         }
 
         public MatrixStore.Factory<Double> builder() {
@@ -206,10 +211,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
         public FunctionSet<Double> function() {
             return PrimitiveFunction.getSet();
-        }
-
-        public Primitive64Array makeArray(final int length) {
-            return Primitive64Array.make(length);
         }
 
         public PrimitiveDenseStore makeEye(final long rows, final long columns) {
@@ -356,6 +357,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
             return retVal;
         }
+
     };
 
     static final long ELEMENT_SIZE = JavaType.DOUBLE.memory();

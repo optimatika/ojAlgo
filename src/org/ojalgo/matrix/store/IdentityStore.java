@@ -91,9 +91,13 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
         }
     }
 
-    public MatrixStore<N> multiply(double scalar) {
-        // TODO Auto-generated method stub
-        return super.multiply(scalar);
+    public MatrixStore<N> multiply(final double scalar) {
+
+        final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim());
+
+        retVal.loopDiagonal(0L, 0L, (r, c) -> retVal.set(r, c, scalar));
+
+        return retVal;
     }
 
     @Override
@@ -101,18 +105,22 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
         return right.copy();
     }
 
-    public MatrixStore<N> multiply(N scalar) {
-        // TODO Auto-generated method stub
-        return super.multiply(scalar);
+    public MatrixStore<N> multiply(final N scalar) {
+
+        final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), this.getColDim());
+
+        retVal.loopDiagonal(0L, 0L, (r, c) -> retVal.set(r, c, scalar));
+
+        return retVal;
     }
 
     @Override
-    public N multiplyBoth(Access1D<N> leftAndRight) {
+    public N multiplyBoth(final Access1D<N> leftAndRight) {
         // TODO Auto-generated method stub
         return super.multiplyBoth(leftAndRight);
     }
 
-    public ElementsSupplier<N> premultiply(Access1D<N> left) {
+    public ElementsSupplier<N> premultiply(final Access1D<N> left) {
         // TODO Auto-generated method stub
         return super.premultiply(left);
     }

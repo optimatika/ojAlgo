@@ -32,6 +32,7 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Array2D;
 import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.ComplexArray;
+import org.ojalgo.array.DenseArray;
 import org.ojalgo.concurrent.DivideAndConquer;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.ComplexFunction;
@@ -87,6 +88,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         public AggregatorSet<ComplexNumber> aggregator() {
             return ComplexAggregator.getSet();
+        }
+
+        public DenseArray.Factory<ComplexNumber> array() {
+            return ComplexArray.FACTORY;
         }
 
         public MatrixStore.Factory<ComplexNumber> builder() {
@@ -223,10 +228,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
         public FunctionSet<ComplexNumber> function() {
             return ComplexFunction.getSet();
-        }
-
-        public ComplexArray makeArray(final int length) {
-            return ComplexArray.make(length);
         }
 
         public ComplexDenseStore makeEye(final long rows, final long columns) {
@@ -373,6 +374,7 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
             return retVal;
         }
+
     };
 
     static ComplexDenseStore cast(final Access1D<ComplexNumber> matrix) {
