@@ -34,7 +34,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
+final class LeftRightStore<N extends Number> extends ComposingStore<N> {
 
     private final MatrixStore<N> myRight;
     private final int mySplit;
@@ -80,15 +80,60 @@ final class LeftRightStore<N extends Number> extends DelegatingStore<N> {
         return mySplit + myRight.limitOfRow(row);
     }
 
-    public MatrixStore<N> premultiply(final Access1D<N> leftMtrx) {
+    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+        // TODO Auto-generated method stub
+        super.multiply(right, target);
+    }
 
-        final Future<MatrixStore<N>> tmpBaseFuture = this.executeMultiplyLeftOnBase(leftMtrx);
+    public MatrixStore<N> multiply(final double scalar) {
 
-        final MatrixStore<N> tmpRight = myRight.premultiply(leftMtrx).get();
+        final Future<MatrixStore<N>> futureLeft = this.executeMultiply(scalar);
+
+        final MatrixStore<N> right = myRight.multiply(scalar);
 
         try {
-            return new LeftRightStore<>(tmpBaseFuture.get(), tmpRight);
+            return new LeftRightStore<>(futureLeft.get(), right);
         } catch (final InterruptedException | ExecutionException ex) {
+            ex.printStackTrace(System.err);
+            return null;
+        }
+    }
+
+    public MatrixStore<N> multiply(final MatrixStore<N> right) {
+        // TODO Auto-generated method stub
+        return super.multiply(right);
+    }
+
+    public MatrixStore<N> multiply(final N scalar) {
+
+        final Future<MatrixStore<N>> futureLeft = this.executeMultiply(scalar);
+
+        final MatrixStore<N> right = myRight.multiply(scalar);
+
+        try {
+            return new LeftRightStore<>(futureLeft.get(), right);
+        } catch (final InterruptedException | ExecutionException ex) {
+            ex.printStackTrace(System.err);
+            return null;
+        }
+    }
+
+    @Override
+    public N multiplyBoth(final Access1D<N> leftAndRight) {
+        // TODO Auto-generated method stub
+        return super.multiplyBoth(leftAndRight);
+    }
+
+    public MatrixStore<N> premultiply(final Access1D<N> left) {
+
+        final Future<ElementsSupplier<N>> futureLeft = this.executePremultiply(left);
+
+        final MatrixStore<N> right = myRight.premultiply(left).get();
+
+        try {
+            return new LeftRightStore<>(futureLeft.get().get(), right);
+        } catch (final InterruptedException | ExecutionException ex) {
+            ex.printStackTrace(System.err);
             return null;
         }
     }

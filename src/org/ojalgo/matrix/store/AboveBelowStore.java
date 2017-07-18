@@ -24,6 +24,7 @@ package org.ojalgo.matrix.store;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.scalar.Scalar;
 
 /**
@@ -33,7 +34,7 @@ import org.ojalgo.scalar.Scalar;
  *
  * @author apete
  */
-final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
+final class AboveBelowStore<N extends Number> extends ComposingStore<N> {
 
     private final MatrixStore<N> myBelow;
     private final int mySplit;
@@ -79,18 +80,71 @@ final class AboveBelowStore<N extends Number> extends DelegatingStore<N> {
         return (row < mySplit) ? this.getBase().limitOfRow(row) : myBelow.limitOfRow(row - mySplit);
     }
 
+    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+
+        final Future<?> futureAbove = this.executeMultiply(right, target.regionByLimits(mySplit, this.getColDim()));
+
+        myBelow.multiply(right, target.regionByOffsets(mySplit, 0));
+
+        try {
+            futureAbove.get();
+        } catch (final InterruptedException | ExecutionException ex) {
+            ex.printStackTrace(System.err);
+        }
+    }
+
+    public MatrixStore<N> multiply(final double scalar) {
+
+        final Future<MatrixStore<N>> futureAbove = this.executeMultiply(scalar);
+
+        final MatrixStore<N> below = myBelow.multiply(scalar);
+
+        try {
+            return new AboveBelowStore<>(futureAbove.get(), below);
+        } catch (final InterruptedException | ExecutionException ex) {
+            ex.printStackTrace(System.err);
+            return null;
+        }
+    }
+
     @Override
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
 
-        final Future<MatrixStore<N>> tmpBaseFuture = this.executeMultiplyRightOnBase(right);
+        final Future<MatrixStore<N>> futureAbove = this.executeMultiply(right);
 
-        final MatrixStore<N> tmpLower = myBelow.multiply(right);
+        final MatrixStore<N> below = myBelow.multiply(right);
 
         try {
-            return new AboveBelowStore<>(tmpBaseFuture.get(), tmpLower);
+            return new AboveBelowStore<>(futureAbove.get(), below);
         } catch (final InterruptedException | ExecutionException ex) {
+            ex.printStackTrace(System.err);
             return null;
         }
+    }
+
+    public MatrixStore<N> multiply(final N scalar) {
+
+        final Future<MatrixStore<N>> futureAbove = this.executeMultiply(scalar);
+
+        final MatrixStore<N> below = myBelow.multiply(scalar);
+
+        try {
+            return new AboveBelowStore<>(futureAbove.get(), below);
+        } catch (final InterruptedException | ExecutionException ex) {
+            ex.printStackTrace(System.err);
+            return null;
+        }
+    }
+
+    @Override
+    public N multiplyBoth(final Access1D<N> leftAndRight) {
+        // TODO Auto-generated method stub
+        return super.multiplyBoth(leftAndRight);
+    }
+
+    public ElementsSupplier<N> premultiply(final Access1D<N> left) {
+        // TODO Auto-generated method stub
+        return super.premultiply(left);
     }
 
     @Override

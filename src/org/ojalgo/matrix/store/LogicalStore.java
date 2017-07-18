@@ -21,7 +21,11 @@
  */
 package org.ojalgo.matrix.store;
 
+import java.util.concurrent.Future;
+
 import org.ojalgo.ProgrammingError;
+import org.ojalgo.access.Access1D;
+import org.ojalgo.concurrent.DaemonPoolExecutor;
 
 /**
  * Logical stores are (intended to be) immutable.
@@ -53,6 +57,30 @@ abstract class LogicalStore<N extends Number> extends AbstractStore<N> {
 
     public final PhysicalStore.Factory<N, ?> physical() {
         return myBase.physical();
+    }
+
+    protected final Future<?> executeMultiply(final Access1D<N> right, final ElementsConsumer<N> target) {
+        return DaemonPoolExecutor.invoke(() -> myBase.multiply(right, target));
+    }
+
+    protected final Future<MatrixStore<N>> executeMultiply(final double scalar) {
+        return DaemonPoolExecutor.invoke(() -> myBase.multiply(scalar));
+    }
+
+    protected final Future<MatrixStore<N>> executeMultiply(final MatrixStore<N> right) {
+        return DaemonPoolExecutor.invoke(() -> myBase.multiply(right));
+    }
+
+    protected final Future<MatrixStore<N>> executeMultiply(final N scalar) {
+        return DaemonPoolExecutor.invoke(() -> myBase.multiply(scalar));
+    }
+
+    protected final Future<N> executeMultiplyBoth(final Access1D<N> leftAndRight) {
+        return DaemonPoolExecutor.invoke(() -> myBase.multiplyBoth(leftAndRight));
+    }
+
+    protected final Future<ElementsSupplier<N>> executePremultiply(final Access1D<N> left) {
+        return DaemonPoolExecutor.invoke(() -> myBase.premultiply(left));
     }
 
     protected final MatrixStore<N> getBase() {

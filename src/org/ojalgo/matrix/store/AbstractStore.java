@@ -43,12 +43,12 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         ProgrammingError.throwForIllegalInvocation();
     }
 
-    protected AbstractStore(final int rowsCount, final int columnsCount) {
+    protected AbstractStore(final int numberOfRows, final int numberOfColumns) {
 
         super();
 
-        myRowDim = rowsCount;
-        myColDim = columnsCount;
+        myRowDim = numberOfRows;
+        myColDim = numberOfColumns;
     }
 
     public final PhysicalStore<N> copy() {
