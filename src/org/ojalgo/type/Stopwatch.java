@@ -21,8 +21,6 @@
  */
 package org.ojalgo.type;
 
-import java.time.Duration;
-
 /**
  * This stopwatch is always running. It start as soon as you create the instance.
  *
@@ -36,13 +34,17 @@ public class Stopwatch {
      * @param task The task to meassure
      * @return The meassured duration
      */
-    public static Duration meassure(final Runnable task) {
+    public static CalendarDateDuration meassure(final Runnable task) {
+        return Stopwatch.meassure(task, CalendarDateUnit.MILLIS);
+    }
+
+    public static CalendarDateDuration meassure(final Runnable task, final CalendarDateUnit unit) {
 
         final Stopwatch timer = new Stopwatch();
 
         task.run();
 
-        return timer.stop();
+        return timer.stop(unit);
     }
 
     private long myStart;
@@ -68,9 +70,14 @@ public class Stopwatch {
      *
      * @return The duration since instantiation or reset.
      */
-    public Duration stop() {
+    public CalendarDateDuration stop() {
+        return this.stop(CalendarDateUnit.MILLIS);
+    }
+
+    public CalendarDateDuration stop(final CalendarDateUnit unit) {
         myStop = System.nanoTime();
-        return Duration.ofNanos(myStop - myStart);
+        final CalendarDateDuration duration = new CalendarDateDuration(myStop - myStart, CalendarDateUnit.NANOS);
+        return duration.convertTo(unit);
     }
 
 }

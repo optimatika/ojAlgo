@@ -173,8 +173,8 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
 
     public double convert(final double aSourceDurationMeasure, final CalendarDateUnit aSourceDurationUnit) {
 
-        final double tmpSourceSize = aSourceDurationUnit.size();
-        final double tmpDestinationSize = myDurationInMillis;
+        final double tmpSourceSize = aSourceDurationUnit.toDurationInNanos();
+        final double tmpDestinationSize = myDurationInNanos;
 
         if (tmpSourceSize > tmpDestinationSize) {
 
