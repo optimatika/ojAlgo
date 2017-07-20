@@ -52,80 +52,83 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
     /**
      *
      */
-    NANOS(ChronoUnit.NANOS, TimeUnit.NANOSECONDS),
+    NANOS(ChronoUnit.NANOS, TimeUnit.NANOSECONDS, "ns"),
     /**
      *
      */
-    MICROS(ChronoUnit.MICROS, TimeUnit.MICROSECONDS),
+    MICROS(ChronoUnit.MICROS, TimeUnit.MICROSECONDS, "micros"),
     /**
      *
      */
-    MILLIS(ChronoUnit.MILLIS, TimeUnit.MILLISECONDS),
+    MILLIS(ChronoUnit.MILLIS, TimeUnit.MILLISECONDS, "ms"),
     /**
      *
      */
-    SECOND(ChronoUnit.SECONDS, TimeUnit.SECONDS),
+    SECOND(ChronoUnit.SECONDS, TimeUnit.SECONDS, "s"),
     /**
      *
      */
-    MINUTE(ChronoUnit.MINUTES, TimeUnit.MINUTES),
+    MINUTE(ChronoUnit.MINUTES, TimeUnit.MINUTES, "min"),
     /**
      *
      */
-    HOUR(ChronoUnit.HOURS, TimeUnit.HOURS),
+    HOUR(ChronoUnit.HOURS, TimeUnit.HOURS, "h"),
     /**
      *
      */
-    DAY(ChronoUnit.DAYS, TimeUnit.DAYS),
+    DAY(ChronoUnit.DAYS, TimeUnit.DAYS, "days"),
     /**
      *
      */
-    WEEK(ChronoUnit.WEEKS, 7L * 24L * TypeUtils.MILLIS_PER_HOUR),
+    WEEK(ChronoUnit.WEEKS, 7L * 24L * TypeUtils.MILLIS_PER_HOUR, "weeks"),
     /**
      *
      */
-    MONTH(ChronoUnit.MONTHS, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 1200L),
+    MONTH(ChronoUnit.MONTHS, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 1200L, "months"),
     /**
      *
      */
-    QUARTER(null, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 400L),
+    QUARTER(null, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 400L, "quarters"),
     /**
      *
      */
-    YEAR(ChronoUnit.YEARS, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 100L),
+    YEAR(ChronoUnit.YEARS, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 100L, "years"),
     /**
      *
      */
-    DECADE(ChronoUnit.DECADES, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 10L),
+    DECADE(ChronoUnit.DECADES, (TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR) / 10L, "decades"),
     /**
      *
      */
-    CENTURY(ChronoUnit.CENTURIES, TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR),
+    CENTURY(ChronoUnit.CENTURIES, TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR, "centuries"),
     /**
      *
      */
-    MILLENIUM(ChronoUnit.MILLENNIA, 10L * TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR);
+    MILLENIUM(ChronoUnit.MILLENNIA, 10L * TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR, "millennia");
 
     private final ChronoUnit myChronoUnit;
     private final long myHalf;
     private final long myDurationInMillis;
     private final TimeUnit myTimeUnit;
     private final long myDurationInNanos;
+    private final String myLabel;
 
-    CalendarDateUnit(final ChronoUnit chronoUnit, final long millis) {
+    CalendarDateUnit(final ChronoUnit chronoUnit, final long millis, final String label) {
         myChronoUnit = chronoUnit;
         myTimeUnit = null;
         myDurationInMillis = millis;
         myHalf = myDurationInMillis / 2L;
         myDurationInNanos = millis * CalendarDate.NANOS_PER_MILLIS;
+        myLabel = label;
     }
 
-    CalendarDateUnit(final ChronoUnit chronoUnit, final TimeUnit timeUnit) {
+    CalendarDateUnit(final ChronoUnit chronoUnit, final TimeUnit timeUnit, final String label) {
         myChronoUnit = chronoUnit;
         myTimeUnit = timeUnit;
         myDurationInMillis = myTimeUnit.toMillis(1L);
         myHalf = myDurationInMillis / 2L;
         myDurationInNanos = timeUnit.toNanos(1L);
+        myLabel = label;
     }
 
     public <R extends Temporal> R addTo(final R temporal, final long amount) {
@@ -233,6 +236,10 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         } else { // QUARTER
             return ChronoUnit.MONTHS.getDuration().multipliedBy(3L);
         }
+    }
+
+    public String getLabel() {
+        return myLabel;
     }
 
     public Optional<TimeUnit> getTimeUnit() {

@@ -170,7 +170,7 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
 
     @Override
     public String toString() {
-        return Double.toString(measure) + unit.toString();
+        return Double.toString(measure) + unit.getLabel();
     }
 
 }

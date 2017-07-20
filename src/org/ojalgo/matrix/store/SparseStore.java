@@ -280,8 +280,13 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
     }
 
     public MatrixStore<N> multiply(final MatrixStore<N> right) {
-        // TODO Auto-generated method stub
-        return super.multiply(right);
+        if (right instanceof SparseStore) {
+            final SparseStore<N> retVal = new SparseStore<>(this.physical(), this.getRowDim(), (int) right.countColumns());
+            this.multiply(right, retVal);
+            return retVal;
+        } else {
+            return super.multiply(right);
+        }
     }
 
     public MatrixStore<N> multiply(final N scalar) {
