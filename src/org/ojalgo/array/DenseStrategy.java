@@ -19,6 +19,7 @@ final class DenseStrategy<N extends Number> {
     static long CHUNK = 512L;
     static long INITIAL = 8L;
     static long SEGMENT = 32_768L;
+    static long MAX = Long.MAX_VALUE;
 
     /**
      * Will suggest an initial capacity (for a SparseArray) given the total count.
@@ -39,6 +40,7 @@ final class DenseStrategy<N extends Number> {
     private final DenseArray.Factory<N> myDenseFactory;
     private long myInitial = INITIAL;
     private long mySegment = SEGMENT;
+    private long myMax = MAX;
 
     DenseStrategy(final DenseArray.Factory<N> denseFactory) {
 
@@ -81,9 +83,27 @@ final class DenseStrategy<N extends Number> {
         return myChunk;
     }
 
+    long max() {
+        return myMax;
+    }
+
     DenseStrategy<N> chunk(final long chunk) {
+        if (myMax != MAX) {
+            throw new IllegalStateException();
+        }
         final int power = PrimitiveMath.powerOf2Smaller(Math.min(chunk, mySegment));
         myChunk = 1L << power;
+        return this;
+    }
+
+    DenseStrategy<N> max(final long max) {
+        if (max < myInitial) {
+            throw new IllegalArgumentException();
+        } else if (max > myChunk) {
+            throw new IllegalArgumentException();
+        } else {
+            myMax = max;
+        }
         return this;
     }
 
@@ -95,21 +115,40 @@ final class DenseStrategy<N extends Number> {
 
         final long required = current + 1L;
 
-        long retVal = myChunk;
+        if (myMax != MAX) {
 
-        if (required >= myChunk) {
-            while (retVal < required) {
-                retVal += myChunk;
+            if (required > myMax) {
+                throw new IllegalStateException();
             }
-        } else {
-            long maybe = retVal / 2L;
+
+            long retVal = myMax;
+            long maybe = Math.round(retVal / PrimitiveMath.GOLDEN_RATIO);
+
             while (maybe >= required) {
                 retVal = maybe;
-                maybe /= 2L;
+                maybe = Math.round(maybe / PrimitiveMath.GOLDEN_RATIO);
             }
-        }
 
-        return retVal;
+            return retVal;
+
+        } else {
+
+            long retVal = myChunk;
+
+            if (required >= myChunk) {
+                while (retVal < required) {
+                    retVal += myChunk;
+                }
+            } else {
+                long maybe = retVal / 2L;
+                while (maybe >= required) {
+                    retVal = maybe;
+                    maybe /= 2L;
+                }
+            }
+
+            return retVal;
+        }
     }
 
     int initial() {
@@ -120,6 +159,9 @@ final class DenseStrategy<N extends Number> {
      * Enforced to be &gt;= 1
      */
     DenseStrategy<N> initial(final long initial) {
+        if (myMax != MAX) {
+            throw new IllegalStateException();
+        }
         myInitial = Math.max(1, initial);
         return this;
     }
@@ -165,6 +207,9 @@ final class DenseStrategy<N extends Number> {
     }
 
     DenseStrategy<N> segment(final long segment) {
+        if (myMax != MAX) {
+            throw new IllegalStateException();
+        }
         final int power = PrimitiveMath.powerOf2Smaller(Math.max(myChunk, segment));
         mySegment = 1L << power;
         return this;

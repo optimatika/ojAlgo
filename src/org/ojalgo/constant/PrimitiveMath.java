@@ -61,6 +61,7 @@ public abstract class PrimitiveMath {
 
     public static final double E = BigMath.E.doubleValue();
     public static final double PI = BigMath.PI.doubleValue();
+    public static final double GOLDEN_RATIO = BigMath.GOLDEN_RATIO.doubleValue();
 
     public static final double HALF_PI = BigMath.HALF_PI.doubleValue();
     public static final double TWO_PI = BigMath.TWO_PI.doubleValue();
