@@ -25,21 +25,18 @@ import java.math.BigDecimal;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
-import org.ojalgo.array.blas.AXPY;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.FunctionUtils;
-import org.ojalgo.matrix.decomposition.*;
 import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.ElementsConsumer;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.matrix.store.operation.*;
+import org.ojalgo.matrix.store.operation.MatrixOperation;
 import org.ojalgo.random.Uniform;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.type.TypeUtils;
-import org.ojalgo.type.context.NumberContext;
 
 public abstract class MatrixUtils {
 
@@ -118,86 +115,6 @@ public abstract class MatrixUtils {
             realDest.set(i, tmpComplexNumber.getReal());
             imagDest.set(i, tmpComplexNumber.getImaginary());
         }
-    }
-
-    /**
-     * @deprecated v43 Use {@link Bidiagonal#equals(MatrixStore,Bidiagonal,NumberContext)} instead
-     */
-    @Deprecated
-    public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Bidiagonal<N> decomposition, final NumberContext context) {
-        return Bidiagonal.equals(matrix, decomposition, context);
-    }
-
-    /**
-     * @deprecated v43 Use {@link Cholesky#equals(MatrixStore,Cholesky,NumberContext)} instead
-     */
-    @Deprecated
-    public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Cholesky<N> decomposition, final NumberContext context) {
-        return Cholesky.equals(matrix, decomposition, context);
-    }
-
-    /**
-     * @deprecated v43 Use {@link Eigenvalue#equals(MatrixStore,Eigenvalue,NumberContext)} instead
-     */
-    @Deprecated
-    public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Eigenvalue<N> decomposition, final NumberContext context) {
-        return Eigenvalue.equals(matrix, decomposition, context);
-    }
-
-    /**
-     * @deprecated v43 Use {@link Hessenberg#equals(MatrixStore,Hessenberg,NumberContext)} instead
-     */
-    @Deprecated
-    public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Hessenberg<N> decomposition, final NumberContext context) {
-        return Hessenberg.equals(matrix, decomposition, context);
-    }
-
-    /**
-     * @deprecated v43 Use {@link LDL#equals(MatrixStore,LDL,NumberContext)} instead
-     */
-    @Deprecated
-    public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LDL<N> decomposition, final NumberContext context) {
-        return LDL.equals(matrix, decomposition, context);
-    }
-
-    /**
-     * @deprecated v43 Use {@link LU#equals(MatrixStore,LU,NumberContext)} instead
-     */
-    @Deprecated
-    public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final LU<N> decomposition, final NumberContext context) {
-        return LU.equals(matrix, decomposition, context);
-    }
-
-    /**
-     * @deprecated v43 Use {@link QR#equals(MatrixStore,QR,NumberContext)} instead
-     */
-    @Deprecated
-    public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final QR<N> decomposition, final NumberContext context) {
-        return QR.equals(matrix, decomposition, context);
-    }
-
-    /**
-     * @deprecated v43 Use {@link Schur#equals(MatrixStore,Schur,NumberContext)} instead
-     */
-    @Deprecated
-    public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Schur<N> decomposition, final NumberContext context) {
-        return Schur.equals(matrix, decomposition, context);
-    }
-
-    /**
-     * @deprecated v43 Use {@link SingularValue#equals(MatrixStore,SingularValue,NumberContext)} instead
-     */
-    @Deprecated
-    public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final SingularValue<N> decomposition, final NumberContext context) {
-        return SingularValue.equals(matrix, decomposition, context);
-    }
-
-    /**
-     * @deprecated v43 Use {@link Tridiagonal#equals(MatrixStore,Tridiagonal,NumberContext)} instead
-     */
-    @Deprecated
-    public static <N extends Number> boolean equals(final MatrixStore<N> matrix, final Tridiagonal<N> decomposition, final NumberContext context) {
-        return Tridiagonal.equals(matrix, decomposition, context);
     }
 
     public static final int firstInColumn(final Access1D<?> matrix, final int col, final int defaultAndMinimum) {
@@ -381,148 +298,38 @@ public abstract class MatrixUtils {
     }
 
     /**
-     * @deprecated v43 Use {@link Bidiagonal#reconstruct(Bidiagonal)} instead
+     * Sets all matrix size operation thresholds to precisly this value.
+     *
+     * @param value The threshold
+     * @deprecated v44 Use {@link MatrixOperation#setAllOperationThresholds(int)} instead
      */
     @Deprecated
-    public static <N extends Number> MatrixStore<N> reconstruct(final Bidiagonal<N> decomposition) {
-        return Bidiagonal.reconstruct(decomposition);
-    }
-
-    /**
-     * @deprecated v43 Use {@link Cholesky#reconstruct(Cholesky)} instead
-     */
-    @Deprecated
-    public static <N extends Number> MatrixStore<N> reconstruct(final Cholesky<N> decomposition) {
-        return Cholesky.reconstruct(decomposition);
-    }
-
-    /**
-     * @deprecated v43 Use {@link Eigenvalue#reconstruct(Eigenvalue)} instead
-     */
-    @Deprecated
-    public static <N extends Number> MatrixStore<N> reconstruct(final Eigenvalue<N> decomposition) {
-        return Eigenvalue.reconstruct(decomposition);
-    }
-
-    /**
-     * @deprecated v43 Use {@link Hessenberg#reconstruct(Hessenberg)} instead
-     */
-    @Deprecated
-    public static <N extends Number> MatrixStore<N> reconstruct(final Hessenberg<N> decomposition) {
-        return Hessenberg.reconstruct(decomposition);
-    }
-
-    /**
-     * @deprecated v43 Use {@link LDL#reconstruct(LDL)} instead
-     */
-    @Deprecated
-    public static <N extends Number> MatrixStore<N> reconstruct(final LDL<N> decomposition) {
-        return LDL.reconstruct(decomposition);
-    }
-
-    /**
-     * @deprecated v43 Use {@link LU#reconstruct(LU)} instead
-     */
-    @Deprecated
-    public static <N extends Number> MatrixStore<N> reconstruct(final LU<N> decomposition) {
-        return LU.reconstruct(decomposition);
-    }
-
-    /**
-     * @deprecated v43 Use {@link QR#reconstruct(QR)} instead
-     */
-    @Deprecated
-    public static <N extends Number> MatrixStore<N> reconstruct(final QR<N> decomposition) {
-        return QR.reconstruct(decomposition);
-    }
-
-    /**
-     * @deprecated v43 Use {@link Schur#reconstruct(Schur)} instead
-     */
-    @Deprecated
-    public static <N extends Number> MatrixStore<N> reconstruct(final Schur<N> decomposition) {
-        return Schur.reconstruct(decomposition);
-    }
-
-    /**
-     * @deprecated v43 Use {@link SingularValue#reconstruct(SingularValue)} instead
-     */
-    @Deprecated
-    public static <N extends Number> MatrixStore<N> reconstruct(final SingularValue<N> decomposition) {
-        return SingularValue.reconstruct(decomposition);
-    }
-
-    /**
-     * @deprecated v43 Use {@link Tridiagonal#reconstruct(Tridiagonal)} instead
-     */
-    @Deprecated
-    public static <N extends Number> MatrixStore<N> reconstruct(final Tridiagonal<N> decomposition) {
-        return Tridiagonal.reconstruct(decomposition);
-    }
-
     public static void setAllOperationThresholds(final int value) {
-        MatrixUtils.setThresholdsMaxValue(value);
-        MatrixUtils.setThresholdsMinValue(value);
+        MatrixOperation.setAllOperationThresholds(value);
     }
 
     /**
-     * @param maxValue The max allowed/required value
+     * Will make sure no matrix size operation thresholds are larger than the supplied value. Existing smaller
+     * values are unchanged.
+     *
+     * @param maxValue The max allowed value
+     * @deprecated v44 Use {@link MatrixOperation#setThresholdsMaxValue(int)} instead
      */
+    @Deprecated
     public static void setThresholdsMaxValue(final int maxValue) {
-        AggregateAll.THRESHOLD = Math.min(maxValue, AggregateAll.THRESHOLD);
-        ApplyCholesky.THRESHOLD = Math.min(maxValue, ApplyCholesky.THRESHOLD);
-        ApplyLU.THRESHOLD = Math.min(maxValue, ApplyLU.THRESHOLD);
-        FillMatchingBoth.THRESHOLD = Math.min(maxValue, FillMatchingBoth.THRESHOLD);
-        FillConjugated.THRESHOLD = Math.min(maxValue, FillConjugated.THRESHOLD);
-        FillMatchingLeft.THRESHOLD = Math.min(maxValue, FillMatchingLeft.THRESHOLD);
-        FillMatchingRight.THRESHOLD = Math.min(maxValue, FillMatchingRight.THRESHOLD);
-        FillMatchingSingle.THRESHOLD = Math.min(maxValue, FillMatchingSingle.THRESHOLD);
-        FillTransposed.THRESHOLD = Math.min(maxValue, FillTransposed.THRESHOLD);
-        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
-        GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
-        HermitianRank2Update.THRESHOLD = Math.min(maxValue, HermitianRank2Update.THRESHOLD);
-        HouseholderLeft.THRESHOLD = Math.min(maxValue, HouseholderLeft.THRESHOLD);
-        HouseholderRight.THRESHOLD = Math.min(maxValue, HouseholderRight.THRESHOLD);
-        AXPY.THRESHOLD = Math.min(maxValue, AXPY.THRESHOLD);
-        ModifyAll.THRESHOLD = Math.min(maxValue, ModifyAll.THRESHOLD);
-        MultiplyBoth.THRESHOLD = Math.min(maxValue, MultiplyBoth.THRESHOLD);
-        MultiplyHermitianAndVector.THRESHOLD = Math.min(maxValue, MultiplyHermitianAndVector.THRESHOLD);
-        MultiplyLeft.THRESHOLD = Math.min(maxValue, MultiplyLeft.THRESHOLD);
-        MultiplyRight.THRESHOLD = Math.min(maxValue, MultiplyRight.THRESHOLD);
-        RotateLeft.THRESHOLD = Math.min(maxValue, RotateLeft.THRESHOLD);
-        RotateRight.THRESHOLD = Math.min(maxValue, RotateRight.THRESHOLD);
-        SubstituteBackwards.THRESHOLD = Math.min(maxValue, SubstituteBackwards.THRESHOLD);
-        SubstituteForwards.THRESHOLD = Math.min(maxValue, SubstituteForwards.THRESHOLD);
+        MatrixOperation.setThresholdsMaxValue(maxValue);
     }
 
     /**
-     * @param minValue The min allowed/required value
+     * Will make sure all matrix size operation thresholds are at least as large as the supplied value.
+     * Existing larger values are unchanged.
+     *
+     * @param minValue The min allowed value
+     * @deprecated v44 Use {@link MatrixOperation#setThresholdsMinValue(int)} instead
      */
+    @Deprecated
     public static void setThresholdsMinValue(final int minValue) {
-        AggregateAll.THRESHOLD = Math.max(minValue, AggregateAll.THRESHOLD);
-        ApplyCholesky.THRESHOLD = Math.max(minValue, ApplyCholesky.THRESHOLD);
-        ApplyLU.THRESHOLD = Math.max(minValue, ApplyLU.THRESHOLD);
-        FillMatchingBoth.THRESHOLD = Math.max(minValue, FillMatchingBoth.THRESHOLD);
-        FillConjugated.THRESHOLD = Math.max(minValue, FillConjugated.THRESHOLD);
-        FillMatchingLeft.THRESHOLD = Math.max(minValue, FillMatchingLeft.THRESHOLD);
-        FillMatchingRight.THRESHOLD = Math.max(minValue, FillMatchingRight.THRESHOLD);
-        FillMatchingSingle.THRESHOLD = Math.max(minValue, FillMatchingSingle.THRESHOLD);
-        FillTransposed.THRESHOLD = Math.max(minValue, FillTransposed.THRESHOLD);
-        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
-        GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
-        HermitianRank2Update.THRESHOLD = Math.max(minValue, HermitianRank2Update.THRESHOLD);
-        HouseholderLeft.THRESHOLD = Math.max(minValue, HouseholderLeft.THRESHOLD);
-        HouseholderRight.THRESHOLD = Math.max(minValue, HouseholderRight.THRESHOLD);
-        AXPY.THRESHOLD = Math.max(minValue, AXPY.THRESHOLD);
-        ModifyAll.THRESHOLD = Math.max(minValue, ModifyAll.THRESHOLD);
-        MultiplyBoth.THRESHOLD = Math.max(minValue, MultiplyBoth.THRESHOLD);
-        MultiplyHermitianAndVector.THRESHOLD = Math.max(minValue, MultiplyHermitianAndVector.THRESHOLD);
-        MultiplyLeft.THRESHOLD = Math.max(minValue, MultiplyLeft.THRESHOLD);
-        MultiplyRight.THRESHOLD = Math.max(minValue, MultiplyRight.THRESHOLD);
-        RotateLeft.THRESHOLD = Math.max(minValue, RotateLeft.THRESHOLD);
-        RotateRight.THRESHOLD = Math.max(minValue, RotateRight.THRESHOLD);
-        SubstituteBackwards.THRESHOLD = Math.max(minValue, SubstituteBackwards.THRESHOLD);
-        SubstituteForwards.THRESHOLD = Math.max(minValue, SubstituteForwards.THRESHOLD);
+        MatrixOperation.setThresholdsMinValue(minValue);
     }
 
     public static String toString(final Access2D<?> matrix) {

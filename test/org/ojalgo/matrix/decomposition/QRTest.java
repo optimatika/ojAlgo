@@ -33,6 +33,7 @@ import org.ojalgo.matrix.store.ComplexDenseStore;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.operation.MatrixOperation;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
@@ -159,7 +160,7 @@ public class QRTest extends MatrixDecompositionTests {
 
     public void testLeastSquaresInvert() {
 
-        MatrixUtils.setThresholdsMinValue(100000);
+        MatrixOperation.setThresholdsMinValue(100000);
 
         final int tmpDim = 3;
         final MatrixStore<Double> tmpA = MatrixUtils.makeSPD(tmpDim).logical().below(MatrixStore.PRIMITIVE.makeIdentity(tmpDim).get()).get();

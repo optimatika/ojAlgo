@@ -22,11 +22,88 @@
 package org.ojalgo.matrix.store.operation;
 
 import org.ojalgo.OjAlgoUtils;
+import org.ojalgo.array.blas.AXPY;
 
 /**
  * @author apete
  */
-abstract class MatrixOperation {
+public abstract class MatrixOperation {
+
+    /**
+     * Sets all matrix size operation thresholds to precisly this value.
+     *
+     * @param value The threshold
+     */
+    public static void setAllOperationThresholds(final int value) {
+        MatrixOperation.setThresholdsMaxValue(value);
+        MatrixOperation.setThresholdsMinValue(value);
+    }
+
+    /**
+     * Will make sure no matrix size operation thresholds are larger than the supplied value. Existing smaller
+     * values are unchanged.
+     *
+     * @param maxValue The max allowed value
+     */
+    public static void setThresholdsMaxValue(final int maxValue) {
+        AggregateAll.THRESHOLD = Math.min(maxValue, AggregateAll.THRESHOLD);
+        ApplyCholesky.THRESHOLD = Math.min(maxValue, ApplyCholesky.THRESHOLD);
+        ApplyLU.THRESHOLD = Math.min(maxValue, ApplyLU.THRESHOLD);
+        FillMatchingBoth.THRESHOLD = Math.min(maxValue, FillMatchingBoth.THRESHOLD);
+        FillConjugated.THRESHOLD = Math.min(maxValue, FillConjugated.THRESHOLD);
+        FillMatchingLeft.THRESHOLD = Math.min(maxValue, FillMatchingLeft.THRESHOLD);
+        FillMatchingRight.THRESHOLD = Math.min(maxValue, FillMatchingRight.THRESHOLD);
+        FillMatchingSingle.THRESHOLD = Math.min(maxValue, FillMatchingSingle.THRESHOLD);
+        FillTransposed.THRESHOLD = Math.min(maxValue, FillTransposed.THRESHOLD);
+        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
+        GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.min(maxValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
+        HermitianRank2Update.THRESHOLD = Math.min(maxValue, HermitianRank2Update.THRESHOLD);
+        HouseholderLeft.THRESHOLD = Math.min(maxValue, HouseholderLeft.THRESHOLD);
+        HouseholderRight.THRESHOLD = Math.min(maxValue, HouseholderRight.THRESHOLD);
+        AXPY.THRESHOLD = Math.min(maxValue, AXPY.THRESHOLD);
+        ModifyAll.THRESHOLD = Math.min(maxValue, ModifyAll.THRESHOLD);
+        MultiplyBoth.THRESHOLD = Math.min(maxValue, MultiplyBoth.THRESHOLD);
+        MultiplyHermitianAndVector.THRESHOLD = Math.min(maxValue, MultiplyHermitianAndVector.THRESHOLD);
+        MultiplyLeft.THRESHOLD = Math.min(maxValue, MultiplyLeft.THRESHOLD);
+        MultiplyRight.THRESHOLD = Math.min(maxValue, MultiplyRight.THRESHOLD);
+        RotateLeft.THRESHOLD = Math.min(maxValue, RotateLeft.THRESHOLD);
+        RotateRight.THRESHOLD = Math.min(maxValue, RotateRight.THRESHOLD);
+        SubstituteBackwards.THRESHOLD = Math.min(maxValue, SubstituteBackwards.THRESHOLD);
+        SubstituteForwards.THRESHOLD = Math.min(maxValue, SubstituteForwards.THRESHOLD);
+    }
+
+    /**
+     * Will make sure all matrix size operation thresholds are at least as large as the supplied value.
+     * Existing larger values are unchanged.
+     *
+     * @param minValue The min allowed value
+     */
+    public static void setThresholdsMinValue(final int minValue) {
+        AggregateAll.THRESHOLD = Math.max(minValue, AggregateAll.THRESHOLD);
+        ApplyCholesky.THRESHOLD = Math.max(minValue, ApplyCholesky.THRESHOLD);
+        ApplyLU.THRESHOLD = Math.max(minValue, ApplyLU.THRESHOLD);
+        FillMatchingBoth.THRESHOLD = Math.max(minValue, FillMatchingBoth.THRESHOLD);
+        FillConjugated.THRESHOLD = Math.max(minValue, FillConjugated.THRESHOLD);
+        FillMatchingLeft.THRESHOLD = Math.max(minValue, FillMatchingLeft.THRESHOLD);
+        FillMatchingRight.THRESHOLD = Math.max(minValue, FillMatchingRight.THRESHOLD);
+        FillMatchingSingle.THRESHOLD = Math.max(minValue, FillMatchingSingle.THRESHOLD);
+        FillTransposed.THRESHOLD = Math.max(minValue, FillTransposed.THRESHOLD);
+        GenerateApplyAndCopyHouseholderColumn.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderColumn.THRESHOLD);
+        GenerateApplyAndCopyHouseholderRow.THRESHOLD = Math.max(minValue, GenerateApplyAndCopyHouseholderRow.THRESHOLD);
+        HermitianRank2Update.THRESHOLD = Math.max(minValue, HermitianRank2Update.THRESHOLD);
+        HouseholderLeft.THRESHOLD = Math.max(minValue, HouseholderLeft.THRESHOLD);
+        HouseholderRight.THRESHOLD = Math.max(minValue, HouseholderRight.THRESHOLD);
+        AXPY.THRESHOLD = Math.max(minValue, AXPY.THRESHOLD);
+        ModifyAll.THRESHOLD = Math.max(minValue, ModifyAll.THRESHOLD);
+        MultiplyBoth.THRESHOLD = Math.max(minValue, MultiplyBoth.THRESHOLD);
+        MultiplyHermitianAndVector.THRESHOLD = Math.max(minValue, MultiplyHermitianAndVector.THRESHOLD);
+        MultiplyLeft.THRESHOLD = Math.max(minValue, MultiplyLeft.THRESHOLD);
+        MultiplyRight.THRESHOLD = Math.max(minValue, MultiplyRight.THRESHOLD);
+        RotateLeft.THRESHOLD = Math.max(minValue, RotateLeft.THRESHOLD);
+        RotateRight.THRESHOLD = Math.max(minValue, RotateRight.THRESHOLD);
+        SubstituteBackwards.THRESHOLD = Math.max(minValue, SubstituteBackwards.THRESHOLD);
+        SubstituteForwards.THRESHOLD = Math.max(minValue, SubstituteForwards.THRESHOLD);
+    }
 
     protected MatrixOperation() {
         super();

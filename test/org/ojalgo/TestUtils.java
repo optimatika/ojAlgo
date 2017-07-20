@@ -31,7 +31,6 @@ import org.ojalgo.access.StructureAnyD;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.decomposition.Bidiagonal;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
@@ -41,6 +40,7 @@ import org.ojalgo.matrix.decomposition.QR;
 import org.ojalgo.matrix.decomposition.SingularValue;
 import org.ojalgo.matrix.decomposition.Tridiagonal;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.operation.MatrixOperation;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Quaternion;
@@ -369,7 +369,7 @@ public abstract class TestUtils {
     }
 
     public static void minimiseAllBranchLimits() {
-        MatrixUtils.setAllOperationThresholds(2);
+        MatrixOperation.setAllOperationThresholds(2);
     }
 
     private TestUtils() {
