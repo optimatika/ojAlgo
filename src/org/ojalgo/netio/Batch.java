@@ -38,20 +38,20 @@ public class Batch extends ArrayList<Message> {
         super(anInitialCapacity);
     }
 
-    public boolean add(final String aCommand) {
-        return super.add(new Message(aCommand));
+    public boolean add(final String command) {
+        return super.add(new Message(command));
     }
 
-    public boolean add(final String aCommand, final String anArgument) {
-        return super.add(new Message(aCommand, anArgument));
+    public boolean add(final String command, final String anArgument) {
+        return super.add(new Message(command, anArgument));
     }
 
-    public boolean add(final String aCommand, final String anArgument, final String aParameter) {
-        return super.add(new Message(aCommand, anArgument, aParameter));
+    public boolean add(final String command, final String anArgument, final String aParameter) {
+        return super.add(new Message(command, anArgument, aParameter));
     }
 
-    public boolean add(final String[] aCommand) {
-        return super.add(new Message(aCommand));
+    public boolean add(final String[] command) {
+        return super.add(new Message(command));
     }
 
     @Override
