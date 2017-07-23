@@ -169,13 +169,13 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
     private int myActualLength = 0;
     private final long myCount;
     private long[] myIndices;
-    private final DenseStrategy<N> myStrategy;
+    private final DenseCapacityStrategy<N> myStrategy;
     private DenseArray<N> myValues;
     private final N myZeroNumber;
     private final Scalar<N> myZeroScalar;
     private final double myZeroValue;
 
-    SparseArray(final long count, final DenseStrategy<N> strategy) {
+    SparseArray(final long count, final DenseCapacityStrategy<N> strategy) {
 
         super();
 

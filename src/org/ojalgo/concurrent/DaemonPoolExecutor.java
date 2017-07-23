@@ -51,6 +51,10 @@ public final class DaemonPoolExecutor extends ThreadPoolExecutor {
         return INSTANCE.submit(task, result);
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     public static boolean isDaemonAvailable() {
         return INSTANCE.getActiveCount() < OjAlgoUtils.ENVIRONMENT.threads;
     }

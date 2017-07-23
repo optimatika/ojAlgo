@@ -35,9 +35,9 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     }
 
     private final SparseArray<N> myStorage;
-    private final DenseStrategy<N> myStrategy;
+    private final DenseCapacityStrategy<N> myStrategy;
 
-    LongToNumberMap(final DenseStrategy<N> strategy) {
+    LongToNumberMap(final DenseCapacityStrategy<N> strategy) {
 
         super();
 

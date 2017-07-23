@@ -44,29 +44,31 @@ public abstract class DivideAndConquer extends Object {
      * @param threshold
      */
     public final void invoke(final int first, final int limit, final int threshold) {
-        final int tmpThreshold = Math.max(1, (threshold * threshold) / (limit - first));
-        final int tmpWorkers = OjAlgoUtils.ENVIRONMENT.threads;
-        this.divide(first, limit, tmpThreshold, tmpWorkers);
+
+        final int modifiedThreshold = Math.max(1, (threshold * threshold) / (limit - first));
+        final int availableWorkers = OjAlgoUtils.ENVIRONMENT.threads - (DaemonPoolExecutor.INSTANCE.getActiveCount() / 2);
+
+        this.divide(first, limit, modifiedThreshold, availableWorkers);
     }
 
     protected abstract void conquer(final int first, final int limit);
 
     final void divide(final int first, final int limit, final int threshold, final int workers) {
 
-        final int tmpCount = limit - first;
+        final int count = limit - first;
 
-        if ((tmpCount > threshold) && (workers > 1)) {
+        if ((count > threshold) && (workers > 1)) {
 
-            final int tmpSplit = first + (tmpCount / 2);
+            final int split = first + (count / 2);
             final int tmpWorkers = workers / 2;
 
             final Future<Void> tmpFirstPart = DaemonPoolExecutor.INSTANCE.submit(() -> {
-                DivideAndConquer.this.divide(first, tmpSplit, threshold, tmpWorkers);
+                DivideAndConquer.this.divide(first, split, threshold, tmpWorkers);
                 return null;
             });
 
             final Future<Void> tmpSecondPart = DaemonPoolExecutor.INSTANCE.submit(() -> {
-                DivideAndConquer.this.divide(tmpSplit, limit, threshold, tmpWorkers);
+                DivideAndConquer.this.divide(split, limit, threshold, tmpWorkers);
                 return null;
             });
 

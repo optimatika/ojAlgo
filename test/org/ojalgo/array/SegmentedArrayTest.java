@@ -21,9 +21,6 @@
  */
 package org.ojalgo.array;
 
-import org.ojalgo.TestUtils;
-import org.ojalgo.random.Uniform;
-
 /**
  * AbstractArrayTest
  *
@@ -39,46 +36,22 @@ public class SegmentedArrayTest extends ArrayTests {
         super(aName);
     }
 
-    public void testRandomGetSePrimitiveDenset() {
+    public void testRandomSetAndGetBackPrimitive64() {
 
         final long tmpCount = 5000L;
 
         final SegmentedArray<Double> tmpArray = Primitive64Array.FACTORY.makeSegmented(tmpCount);
 
-        this.doTestGetSet(tmpArray);
-
+        ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
     }
 
-    public void testRandomGetSetLargeBasicArray() {
+    public void testVeryLargeRandomSetAndGetBackBasic() {
 
         final long tmpCount = Long.MAX_VALUE;
 
         final BasicArray<Double> tmpArray = BasicArray.factory(Primitive64Array.FACTORY).makeZero(tmpCount);
 
-        this.doTestGetSet(tmpArray);
-
-    }
-
-    private void doTestGetSet(final BasicArray<Double> array) {
-
-        final long tmpCount = array.count();
-
-        TestUtils.assertEquals(tmpCount, array.count());
-
-        final Uniform tmpUniform = new Uniform();
-
-        for (int i = 0; i < 100; i++) {
-
-            final long tmpIndex = Uniform.randomInteger(tmpCount);
-
-            final double tmpExpected = tmpUniform.doubleValue();
-
-            array.set(tmpIndex, tmpExpected);
-
-            final double tmpActual = array.doubleValue(tmpIndex);
-
-            TestUtils.assertEquals(tmpExpected, tmpActual);
-        }
+        ArrayTests.doTestRandomSetAndGetBack(tmpArray, tmpCount);
     }
 
 }

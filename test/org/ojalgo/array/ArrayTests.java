@@ -21,7 +21,13 @@
  */
 package org.ojalgo.array;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.ojalgo.FunctionalityTest;
+import org.ojalgo.TestUtils;
+import org.ojalgo.random.Uniform;
 
 /**
  * ArrayPackageTests
@@ -32,6 +38,32 @@ public abstract class ArrayTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
 
+    static void doTestRandomSetAndGetBack(final BasicArray<Double> array, final long expectedCount) {
+
+        TestUtils.assertEquals(expectedCount, array.count());
+
+        final Uniform tmpUniform = new Uniform();
+
+        final Map<Long, Double> pairs = new HashMap<>();
+
+        for (int i = 0; i < 100; i++) {
+
+            final long tmpIndex = Uniform.randomInteger(expectedCount);
+            final double tmpValue = tmpUniform.doubleValue();
+
+            array.set(tmpIndex, tmpValue);
+
+            TestUtils.assertEquals(tmpValue, array.doubleValue(tmpIndex));
+
+            pairs.put(tmpIndex, tmpValue);
+        }
+
+        for (final Entry<Long, Double> pair : pairs.entrySet()) {
+            TestUtils.assertEquals(pair.getValue().doubleValue(), array.doubleValue(pair.getKey().longValue()));
+        }
+
+    }
+
     protected ArrayTests() {
         super();
     }
@@ -39,4 +71,5 @@ public abstract class ArrayTests extends FunctionalityTest {
     protected ArrayTests(final String name) {
         super(name);
     }
+
 }

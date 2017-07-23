@@ -5,13 +5,13 @@ import org.ojalgo.random.Distribution;
 
 abstract class StrategyBuilder<N extends Number, I extends Access1D<N>, SB extends StrategyBuilder<N, I, SB>> {
 
-    private final DenseStrategy<N> myStrategy;
+    private final DenseCapacityStrategy<N> myStrategy;
 
     public StrategyBuilder(final DenseArray.Factory<N> denseFactory) {
 
         super();
 
-        myStrategy = new DenseStrategy<>(denseFactory);
+        myStrategy = new DenseCapacityStrategy<>(denseFactory);
     }
 
     /**
@@ -39,7 +39,7 @@ abstract class StrategyBuilder<N extends Number, I extends Access1D<N>, SB exten
     }
 
     public SB fixed(final long fixed) {
-        return this.initial(fixed).max(fixed);
+        return this.initial(fixed).limit(fixed);
     }
 
     /**
@@ -52,10 +52,8 @@ abstract class StrategyBuilder<N extends Number, I extends Access1D<N>, SB exten
         return (SB) this;
     }
 
-    public abstract I make();
-
     /**
-     * @param max Defines a maximum size. Only set this if you know the precise max size, and it should be
+     * @param limit Defines a maximum size. Only set this if you know the precise max size, and it should be
      *        something relatively small. Setting the max size is meant as an alternative to setting any/all
      *        of the other paramaters, and will switch to a tighter capacity strategy. The only other
      *        configuration you may want to set in combination with this one is the initial capacity (set that
@@ -63,12 +61,14 @@ abstract class StrategyBuilder<N extends Number, I extends Access1D<N>, SB exten
      * @return this
      */
     @SuppressWarnings("unchecked")
-    public SB max(final long max) {
-        myStrategy.max(max);
+    public SB limit(final long limit) {
+        myStrategy.limit(limit);
         return (SB) this;
     }
 
-    DenseStrategy<N> getStrategy() {
+    public abstract I make();
+
+    DenseCapacityStrategy<N> getStrategy() {
         return myStrategy;
     }
 

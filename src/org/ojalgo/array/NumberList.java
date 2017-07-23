@@ -71,9 +71,9 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
     private long myActualCount;
     private BasicArray<N> myStorage;
-    private final DenseStrategy<N> myStrategy;
+    private final DenseCapacityStrategy<N> myStrategy;
 
-    NumberList(final BasicArray<N> storage, final DenseStrategy<N> strategy, final long actualCount) {
+    NumberList(final BasicArray<N> storage, final DenseCapacityStrategy<N> strategy, final long actualCount) {
 
         super();
 
@@ -83,7 +83,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         myActualCount = actualCount;
     }
 
-    NumberList(final DenseStrategy<N> strategy) {
+    NumberList(final DenseCapacityStrategy<N> strategy) {
 
         super();
 

@@ -40,7 +40,7 @@ public class NumberListTest extends ArrayTests {
 
     public void testGrowCapacity() {
 
-        final DenseStrategy<Double> tmpStrategy = new DenseStrategy<>(Primitive64Array.FACTORY);
+        final DenseCapacityStrategy<Double> tmpStrategy = new DenseCapacityStrategy<>(Primitive64Array.FACTORY);
 
         final long initial = tmpStrategy.initial();
         final long chunk = tmpStrategy.chunk();

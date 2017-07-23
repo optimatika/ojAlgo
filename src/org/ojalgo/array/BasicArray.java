@@ -90,7 +90,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
             final long tmpTotal = StructureAnyD.count(structure);
 
-            final DenseStrategy<N> tmpStrategy = this.strategy();
+            final DenseCapacityStrategy<N> tmpStrategy = this.strategy();
 
             if (tmpTotal > SPARSE_SEGMENTATION_LIMIT) {
 
@@ -113,7 +113,7 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
             final long tmpTotal = StructureAnyD.count(structure);
 
-            final DenseStrategy<N> tmpStrategy = this.strategy();
+            final DenseCapacityStrategy<N> tmpStrategy = this.strategy();
 
             if (tmpStrategy.isSegmented(tmpTotal)) {
 
@@ -125,8 +125,8 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
             }
         }
 
-        DenseStrategy<N> strategy() {
-            return new DenseStrategy<>(myDenseFactory);
+        DenseCapacityStrategy<N> strategy() {
+            return new DenseCapacityStrategy<>(myDenseFactory);
         }
 
     }
