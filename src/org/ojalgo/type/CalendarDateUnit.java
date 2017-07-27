@@ -107,11 +107,11 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
     MILLENIUM(ChronoUnit.MILLENNIA, 10L * TypeUtils.HOURS_PER_CENTURY * TypeUtils.MILLIS_PER_HOUR, "millennia");
 
     private final ChronoUnit myChronoUnit;
-    private final long myHalf;
     private final long myDurationInMillis;
-    private final TimeUnit myTimeUnit;
     private final long myDurationInNanos;
+    private final long myHalf;
     private final String myLabel;
+    private final TimeUnit myTimeUnit;
 
     CalendarDateUnit(final ChronoUnit chronoUnit, final long millis, final String label) {
         myChronoUnit = chronoUnit;
@@ -174,26 +174,26 @@ public enum CalendarDateUnit implements TemporalUnit, CalendarDate.Resolution, C
         return this.convert(PrimitiveMath.ONE, aSourceDurationUnit);
     }
 
-    public double convert(final double aSourceDurationMeasure, final CalendarDateUnit aSourceDurationUnit) {
+    public double convert(final double sourceDurationMeasure, final CalendarDateUnit sourceDurationUnit) {
 
-        final double tmpSourceSize = aSourceDurationUnit.toDurationInNanos();
-        final double tmpDestinationSize = myDurationInNanos;
+        final double sourceDurationInNanos = sourceDurationUnit.toDurationInNanos();
+        final double destinationDurationInNanos = myDurationInNanos;
 
-        if (tmpSourceSize > tmpDestinationSize) {
+        if (sourceDurationInNanos > destinationDurationInNanos) {
 
-            final double tmpScale = tmpSourceSize / tmpDestinationSize;
+            final double scaleUp = sourceDurationInNanos / destinationDurationInNanos;
 
-            return aSourceDurationMeasure * tmpScale;
+            return sourceDurationMeasure * scaleUp;
 
-        } else if (tmpSourceSize < tmpDestinationSize) {
+        } else if (sourceDurationInNanos < destinationDurationInNanos) {
 
-            final double tmpScale = tmpDestinationSize / tmpSourceSize;
+            final double scaleDown = destinationDurationInNanos / sourceDurationInNanos;
 
-            return aSourceDurationMeasure / tmpScale;
+            return sourceDurationMeasure / scaleDown;
 
         } else {
 
-            return aSourceDurationMeasure;
+            return sourceDurationMeasure;
         }
     }
 

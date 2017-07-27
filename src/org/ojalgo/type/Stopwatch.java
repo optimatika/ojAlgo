@@ -66,7 +66,7 @@ public class Stopwatch {
     }
 
     /**
-     * This method can be called repeatedly without resetting
+     * This method can be called repeatedly without resetting (doesn't actually stop the timing process)
      *
      * @return The duration since instantiation or reset.
      */

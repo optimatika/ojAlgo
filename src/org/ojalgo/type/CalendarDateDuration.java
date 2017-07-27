@@ -88,8 +88,8 @@ public final class CalendarDateDuration extends Number implements TemporalAmount
     }
 
     public CalendarDateDuration convertTo(final CalendarDateUnit newUnit) {
-        final double tmpNewMeasure = newUnit.convert(measure, unit);
-        return new CalendarDateDuration(tmpNewMeasure, newUnit);
+        final double newMeasure = newUnit.convert(measure, unit);
+        return new CalendarDateDuration(newMeasure, newUnit);
     }
 
     @Override

@@ -62,14 +62,12 @@ public abstract class DivideAndConquer extends Object {
             final int split = first + (count / 2);
             final int tmpWorkers = workers / 2;
 
-            final Future<Void> tmpFirstPart = DaemonPoolExecutor.INSTANCE.submit(() -> {
+            final Future<?> tmpFirstPart = DaemonPoolExecutor.INSTANCE.submit(() -> {
                 DivideAndConquer.this.divide(first, split, threshold, tmpWorkers);
-                return null;
             });
 
-            final Future<Void> tmpSecondPart = DaemonPoolExecutor.INSTANCE.submit(() -> {
+            final Future<?> tmpSecondPart = DaemonPoolExecutor.INSTANCE.submit(() -> {
                 DivideAndConquer.this.divide(split, limit, threshold, tmpWorkers);
-                return null;
             });
 
             try {
