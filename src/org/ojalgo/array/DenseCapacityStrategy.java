@@ -172,13 +172,7 @@ final class DenseCapacityStrategy<N extends Number> {
     }
 
     DenseCapacityStrategy<N> limit(final long limit) {
-        if (limit < myInitial) {
-            throw new IllegalArgumentException();
-        } else if (limit > myChunk) {
-            throw new IllegalArgumentException();
-        } else {
-            myLimit = limit;
-        }
+        myLimit = limit;
         return this;
     }
 
