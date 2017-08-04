@@ -30,11 +30,13 @@ import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-final class SparseTableau extends SimplexTabeau {
+final class SparseTableau extends SimplexTableau {
 
     class ConstraintsBody implements Mutate2D {
 
@@ -225,55 +227,75 @@ final class SparseTableau extends SimplexTabeau {
         return myObjective;
     }
 
-    void pivot(final int row, final int col) {
+    @Override
+    protected void pivot(final IterationPoint iterationPoint) {
 
-        final SparseArray<Double> tmpPivotRow = myRows[row];
-        final double tmpPivotElement = tmpPivotRow.doubleValue(col);
+        final int row = iterationPoint.row;
+        final int col = iterationPoint.col;
 
-        if (PrimitiveFunction.ABS.invoke(tmpPivotElement) < ONE) {
-            final UnaryFunction<Double> tmpModifier = DIVIDE.second(tmpPivotElement);
-            tmpPivotRow.modifyAll(tmpModifier);
+        final SparseArray<Double> pivotRow = myRows[row];
+        final double pivotElement = pivotRow.doubleValue(col);
+
+        if (PrimitiveFunction.ABS.invoke(pivotElement) < ONE) {
+            final UnaryFunction<Double> tmpModifier = DIVIDE.second(pivotElement);
+            pivotRow.modifyAll(tmpModifier);
             myRHS.modifyOne(row, tmpModifier);
-        } else if (tmpPivotElement != ONE) {
-            final UnaryFunction<Double> tmpModifier = MULTIPLY.second(ONE / tmpPivotElement);
-            tmpPivotRow.modifyAll(tmpModifier);
+        } else if (pivotElement != ONE) {
+            final UnaryFunction<Double> tmpModifier = MULTIPLY.second(ONE / pivotElement);
+            pivotRow.modifyAll(tmpModifier);
             myRHS.modifyOne(row, tmpModifier);
         }
 
-        final double tmpPivotedRHS = myRHS.doubleValue(row);
+        final double pivotedRHS = myRHS.doubleValue(row);
 
-        double tmpVal;
+        double colVal;
 
-        for (int i = 0; i < row; i++) {
-            final SparseArray<Double> tmpY = myRows[i];
-            tmpVal = -tmpY.doubleValue(col);
-            if (tmpVal != ZERO) {
-                tmpPivotRow.axpy(tmpVal, tmpY);
-                myRHS.add(i, (tmpVal * tmpPivotedRHS));
+        for (int i = 0; i < myRows.length; i++) {
+            if (i != row) {
+                final SparseArray<Double> rowY = myRows[i];
+                colVal = -rowY.doubleValue(col);
+                if (colVal != ZERO) {
+                    pivotRow.axpy(colVal, rowY);
+                    myRHS.add(i, colVal * pivotedRHS);
+                }
             }
         }
 
-        for (int i = row + 1; i < myRows.length; i++) {
-            final SparseArray<Double> tmpY = myRows[i];
-            tmpVal = -tmpY.doubleValue(col);
-            if (tmpVal != ZERO) {
-                tmpPivotRow.axpy(tmpVal, tmpY);
-                myRHS.add(i, tmpVal * tmpPivotedRHS);
+        colVal = -myObjectiveWeights.doubleValue(col);
+        if (colVal != ZERO) {
+            pivotRow.axpy(colVal, myObjectiveWeights);
+            myValue += colVal * pivotedRHS;
+        }
+
+        // TODO Stop updating phase 1 objective hen in phase 2.
+
+        colVal = -myPhase1Weights.doubleValue(col);
+        if (colVal != ZERO) {
+            pivotRow.axpy(colVal, myPhase1Weights);
+            myInfeasibility += colVal * pivotedRHS;
+        }
+
+    }
+
+    PrimitiveDenseStore transpose() {
+
+        final PrimitiveDenseStore retVal = PrimitiveDenseStore.FACTORY.makeZero(this.countColumns(), this.countRows());
+
+        for (int i = 0; i < myRows.length; i++) {
+            for (final NonzeroView<Double> nz : myRows[i].nonzeros()) {
+                retVal.set(nz.index(), i, nz.doubleValue());
             }
         }
 
-        tmpVal = -myObjectiveWeights.doubleValue(col);
-        if (tmpVal != ZERO) {
-            tmpPivotRow.axpy(tmpVal, myObjectiveWeights);
-            myValue += tmpVal * tmpPivotedRHS;
-        }
+        retVal.fillColumn(myRows.length, myObjectiveWeights);
+        retVal.fillColumn(myRows.length + 1, myPhase1Weights);
 
-        tmpVal = -myPhase1Weights.doubleValue(col);
-        if (tmpVal != ZERO) {
-            tmpPivotRow.axpy(tmpVal, myPhase1Weights);
-            myInfeasibility += tmpVal * tmpPivotedRHS;
-        }
+        retVal.fillRow(myNumberOfVariables + myNumberOfConstraints, myRHS);
 
+        retVal.fillOne(myNumberOfVariables + myNumberOfConstraints, myNumberOfConstraints, myValue);
+        retVal.fillOne(myNumberOfVariables + myNumberOfConstraints, myNumberOfConstraints + 1, myInfeasibility);
+
+        return retVal;
     }
 
 }

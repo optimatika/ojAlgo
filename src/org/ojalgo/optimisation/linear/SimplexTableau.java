@@ -23,6 +23,15 @@ package org.ojalgo.optimisation.linear;
 
 import org.ojalgo.access.Access2D;
 
-abstract class SimplexTabeau implements SimplexStore, Access2D<Double> {
+abstract class SimplexTableau implements SimplexStore, Access2D<Double> {
+
+    static final class IterationPoint {
+
+        int row;
+        int col;
+
+    }
+
+    protected abstract void pivot(IterationPoint iterationPoint);
 
 }

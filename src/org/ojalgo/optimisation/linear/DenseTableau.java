@@ -21,11 +21,22 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.function.PrimitiveFunction.*;
+
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
-final class DenseTableau extends SimplexTabeau {
+final class DenseTableau extends SimplexTableau {
 
-    private final PrimitiveDenseStore myTransposed = null;
+    private final PrimitiveDenseStore myTransposed;
+
+    DenseTableau(final SparseTableau sparse) {
+
+        super();
+
+        myTransposed = sparse.transpose();
+    }
 
     public long countColumns() {
         return myTransposed.countRows();
@@ -41,6 +52,31 @@ final class DenseTableau extends SimplexTabeau {
 
     public Double get(final long row, final long col) {
         return myTransposed.get(col, row);
+    }
+
+    @Override
+    protected void pivot(final IterationPoint iterationPoint) {
+
+        final int row = iterationPoint.row;
+        final int col = iterationPoint.col;
+
+        final double pivotElement = myTransposed.doubleValue(col, row);
+
+        for (int i = 0; i < myTransposed.countColumns(); i++) {
+            // TODO Stop updating phase 1 objective when in phase 2.
+            if (i != row) {
+                final double colVal = myTransposed.doubleValue(col, i);
+                if (colVal != ZERO) {
+                    myTransposed.caxpy(-colVal / pivotElement, row, i, 0);
+                }
+            }
+        }
+
+        if (PrimitiveFunction.ABS.invoke(pivotElement) < ONE) {
+            myTransposed.modifyColumn(0, row, DIVIDE.second(pivotElement));
+        } else if (pivotElement != ONE) {
+            myTransposed.modifyColumn(0, row, MULTIPLY.second(ONE / pivotElement));
+        }
     }
 
 }
