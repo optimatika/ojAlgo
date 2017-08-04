@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.linear;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
@@ -33,7 +34,7 @@ final class DenseTableau extends SimplexTableau {
 
     DenseTableau(final SparseTableau sparse) {
 
-        super();
+        super(sparse.countConstraints(), sparse.countProblemVariables(), sparse.countSlackVariables());
 
         myTransposed = sparse.transpose();
     }
@@ -77,6 +78,21 @@ final class DenseTableau extends SimplexTableau {
         } else if (pivotElement != ONE) {
             myTransposed.modifyColumn(0, row, MULTIPLY.second(ONE / pivotElement));
         }
+    }
+
+    @Override
+    protected Array1D<Double> sliceConstraintsRHS() {
+        return myTransposed.sliceRow(this.countVariablesTotally()).subList(0, this.countConstraints());
+    }
+
+    @Override
+    protected Array1D<Double> sliceTableauColumn(final int col) {
+        return myTransposed.sliceRow(col).subList(0, this.countConstraints());
+    }
+
+    @Override
+    protected Array1D<Double> sliceTableauRow(final int row) {
+        return myTransposed.sliceColumn(row).subList(0, this.countVariablesTotally());
     }
 
 }

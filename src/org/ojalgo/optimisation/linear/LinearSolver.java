@@ -142,7 +142,7 @@ public abstract class LinearSolver extends BaseSolver {
                 + tmpVarsNegUp.size();
         final int tmpTotalVarCount = tmpProblVarCount + tmpSlackVarCount;
 
-        final SparseTableau retVal = new SparseTableau(tmpConstraiCount, tmpTotalVarCount);
+        final SparseTableau retVal = new SparseTableau(tmpConstraiCount, tmpProblVarCount, tmpSlackVarCount);
 
         final int tmpPosVarsBaseIndex = 0;
         final int tmpNegVarsBaseIndex = tmpPosVarsBaseIndex + tmpPosVariables.size();

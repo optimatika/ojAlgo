@@ -21,17 +21,60 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.array.Array1D;
 
 abstract class SimplexTableau implements SimplexStore, Access2D<Double> {
 
     static final class IterationPoint {
 
-        int row;
         int col;
+        int row;
 
     }
 
+    private final int myNumberOfConstraints;
+    private final int myNumberOfProblemVariables;
+    private final int myNumberOfSlackVariables;
+
+    protected SimplexTableau(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
+        super();
+        myNumberOfConstraints = numberOfConstraints;
+        myNumberOfProblemVariables = numberOfProblemVariables;
+        myNumberOfSlackVariables = numberOfSlackVariables;
+    }
+
+    protected int countArtificialVariables() {
+        return myNumberOfConstraints;
+    }
+
+    protected int countConstraints() {
+        return myNumberOfConstraints;
+    }
+
+    protected int countProblemVariables() {
+        return myNumberOfProblemVariables;
+    }
+
+    protected int countSlackVariables() {
+        return myNumberOfSlackVariables;
+    }
+
+    protected int countVariables() {
+        return myNumberOfProblemVariables + myNumberOfSlackVariables;
+    }
+
+    protected int countVariablesTotally() {
+        return myNumberOfProblemVariables + myNumberOfSlackVariables + myNumberOfConstraints;
+    }
+
     protected abstract void pivot(IterationPoint iterationPoint);
+
+    protected abstract Access1D<Double> sliceTableauColumn(final int col);
+
+    protected abstract Access1D<Double> sliceTableauRow(final int row);
+
+    protected abstract Array1D<Double> sliceConstraintsRHS();
 
 }

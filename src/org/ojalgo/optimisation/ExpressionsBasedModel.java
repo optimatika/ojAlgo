@@ -998,7 +998,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             } else if (this.isAnyExpressionQuadratic()) {
                 retVal = new ExpressionsBasedConvexIntegration();
             } else {
-                retVal = new ExpressionsBasedLinearIntegration();
+                retVal = new ExpressionsBasedLinearIntegration2();
             }
         }
 
