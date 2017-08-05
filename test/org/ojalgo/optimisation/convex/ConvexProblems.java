@@ -54,7 +54,7 @@ import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
-import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.optimisation.linear.OldLinearSolver;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -200,9 +200,9 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         // Test that the LinearSolver can determine feasibility
 
-        final LinearSolver.Builder tmpLinearBuilder = LinearSolver.getBuilder();
-        LinearSolver.copy(tmpModel, tmpLinearBuilder);
-        final LinearSolver tmpLinearSolver = tmpLinearBuilder.build();
+        final OldLinearSolver.Builder tmpLinearBuilder = OldLinearSolver.getBuilder();
+        OldLinearSolver.copy(tmpModel, tmpLinearBuilder);
+        final OldLinearSolver tmpLinearSolver = tmpLinearBuilder.build();
         final Optimisation.Result tmpLinearResult = tmpLinearSolver.solve();
         TestUtils.assertStateNotLessThanFeasible(tmpLinearResult);
 

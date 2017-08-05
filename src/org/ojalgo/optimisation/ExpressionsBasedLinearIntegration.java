@@ -26,15 +26,15 @@ import java.util.List;
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.optimisation.linear.OldLinearSolver;
 
-final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
+final class ExpressionsBasedLinearIntegration extends ExpressionsBasedModel.Integration<OldLinearSolver> {
 
-    public LinearSolver build(final ExpressionsBasedModel model) {
+    public OldLinearSolver build(final ExpressionsBasedModel model) {
 
-        final LinearSolver.Builder tmpBuilder = LinearSolver.getBuilder();
+        final OldLinearSolver.Builder tmpBuilder = OldLinearSolver.getBuilder();
 
-        LinearSolver.copy(model, tmpBuilder);
+        OldLinearSolver.copy(model, tmpBuilder);
 
         return tmpBuilder.build(model.options);
     }

@@ -43,7 +43,7 @@ import org.ojalgo.optimisation.Optimisation;
  *
  * @author apete
  */
-final class SimplexTableauSolver extends LinearSolver {
+final class SimplexTableauSolver extends OldLinearSolver {
 
     static final class PivotPoint {
 
@@ -104,7 +104,7 @@ final class SimplexTableauSolver extends LinearSolver {
     // private final Tableau myTableau;
     private final PrimitiveDenseStore myTransposedTableau;
 
-    SimplexTableauSolver(final LinearSolver.Builder matrices, final Optimisation.Options solverOptions) {
+    SimplexTableauSolver(final OldLinearSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
         super(matrices, solverOptions);
 

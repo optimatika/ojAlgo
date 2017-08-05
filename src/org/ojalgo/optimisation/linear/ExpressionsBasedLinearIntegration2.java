@@ -19,27 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.ojalgo.optimisation;
+package org.ojalgo.optimisation.linear;
 
 import java.util.List;
 
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.optimisation.linear.AbstractLinearSolver;
-import org.ojalgo.optimisation.linear.LinearSolver;
-import org.ojalgo.optimisation.linear.SimplexTableauSolver2;
-import org.ojalgo.optimisation.linear.SparseTableau;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Variable;
 
-final class ExpressionsBasedLinearIntegration2 extends ExpressionsBasedModel.Integration<AbstractLinearSolver> {
+public final class ExpressionsBasedLinearIntegration2 extends ExpressionsBasedModel.Integration<LinearSolver> {
 
-    public AbstractLinearSolver build(final ExpressionsBasedModel model) {
+    public LinearSolver build(final ExpressionsBasedModel model) {
 
-        final LinearSolver.Builder tmpBuilder = LinearSolver.getBuilder();
+        final SparseTableau tableau = SimplexSolver.build(model);
 
-        final SparseTableau tableau = LinearSolver.build(model);
-
-        return new SimplexTableauSolver2(tableau, model.options);
+        return new SimplexSolver(tableau, model.options);
     }
 
     public boolean isCapable(final ExpressionsBasedModel model) {
