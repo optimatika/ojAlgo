@@ -25,7 +25,9 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.array.Array1D;
+import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 final class DenseTableau extends SimplexTableau {
@@ -37,6 +39,50 @@ final class DenseTableau extends SimplexTableau {
         super(sparse.countConstraints(), sparse.countProblemVariables(), sparse.countSlackVariables());
 
         myTransposed = sparse.transpose();
+    }
+
+    DenseTableau(final LinearSolver.Builder matrices) {
+
+        super(matrices.countEqualityConstraints(), matrices.countVariables(), 0);
+
+        final int tmpConstraintsCount = this.countConstraints();
+        final int tmpVariablesCount = this.countVariables();
+
+        final MatrixStore.LogicalBuilder<Double> tmpTableauBuilder = MatrixStore.PRIMITIVE.makeZero(1, 1);
+        tmpTableauBuilder.left(matrices.getC().transpose().logical().right(MatrixStore.PRIMITIVE.makeZero(1, tmpConstraintsCount).get()).get());
+
+        if (tmpConstraintsCount >= 1) {
+            tmpTableauBuilder.above(matrices.getAE(), MatrixStore.PRIMITIVE.makeIdentity(tmpConstraintsCount).get(), matrices.getBE());
+        }
+        tmpTableauBuilder.below(MatrixStore.PRIMITIVE.makeZero(1, tmpVariablesCount).get(),
+                PrimitiveDenseStore.FACTORY.makeFilled(1, tmpConstraintsCount, new NullaryFunction<Double>() {
+
+                    public double doubleValue() {
+                        return ONE;
+                    }
+
+                    public Double get() {
+                        return ONE;
+                    }
+
+                    public double getAsDouble() {
+                        return ONE;
+                    }
+
+                    public Double invoke() {
+                        return ONE;
+                    }
+                }));
+        //myTransposedTableau = (PrimitiveDenseStore) tmpTableauBuilder.build().transpose().copy();
+        myTransposed = PrimitiveDenseStore.FACTORY.transpose(tmpTableauBuilder.get());
+        // myTableau = LinearSolver.make(myTransposedTableau);
+
+        for (int i = 0; i < tmpConstraintsCount; i++) {
+
+            myTransposed.caxpy(NEG, i, tmpConstraintsCount + 1, 0);
+
+        }
+
     }
 
     public long countColumns() {

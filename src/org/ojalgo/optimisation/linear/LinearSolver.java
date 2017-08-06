@@ -21,9 +21,56 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.optimisation.BaseSolver;
+import org.ojalgo.optimisation.BaseSolver.AbstractBuilder;
 import org.ojalgo.optimisation.GenericSolver;
+import org.ojalgo.optimisation.Optimisation;
 
 public abstract class LinearSolver extends GenericSolver {
+
+    public static final class Builder extends AbstractBuilder<LinearSolver.Builder, SimplexSolver> {
+
+        public Builder(final MatrixStore<Double> C) {
+            super(C);
+        }
+
+        Builder() {
+            super();
+        }
+
+        Builder(final BaseSolver.AbstractBuilder<LinearSolver.Builder, SimplexSolver> matrices) {
+            super(matrices);
+        }
+
+        Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
+            super(Q, C);
+        }
+
+        Builder(final MatrixStore<Double>[] aMtrxArr) {
+            super(aMtrxArr);
+        }
+
+        @Override
+        public SimplexSolver build(final Optimisation.Options options) {
+
+            this.validate();
+
+            final SimplexTableau tableau = new DenseTableau(this);
+
+            return new SimplexSolver(tableau, options);
+        }
+
+        @Override
+        public LinearSolver.Builder equalities(final MatrixStore<Double> AE, final MatrixStore<Double> BE) {
+            return super.equalities(AE, BE);
+        }
+
+        @Override
+        public LinearSolver.Builder objective(final MatrixStore<Double> C) {
+            return super.objective(C);
+        }
+    }
 
     protected LinearSolver(final Options solverOptions) {
         super(solverOptions);

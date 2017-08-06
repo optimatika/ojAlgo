@@ -38,7 +38,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 
 public abstract class BaseSolver extends GenericSolver {
 
-    protected static abstract class AbstractBuilder<B extends AbstractBuilder<?, ?>, S extends BaseSolver> implements Cloneable {
+    public static abstract class AbstractBuilder<B extends AbstractBuilder<?, ?>, S extends GenericSolver> implements Cloneable {
 
         static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
