@@ -34,7 +34,7 @@ import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.netio.BasicLogger.Printer;
-import org.ojalgo.optimisation.linear.ExpressionsBasedLinearIntegration2;
+import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -999,7 +999,7 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
             } else if (this.isAnyExpressionQuadratic()) {
                 retVal = new ExpressionsBasedConvexIntegration();
             } else {
-                retVal = new ExpressionsBasedLinearIntegration2();
+                retVal = new LinearSolver.ModelIntegration();
             }
         }
 

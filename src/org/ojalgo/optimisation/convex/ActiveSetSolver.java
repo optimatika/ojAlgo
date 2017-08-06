@@ -30,7 +30,8 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.optimisation.linear.OldLinearSolver;
+import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.optimisation.linear.SimplexSolver;
 import org.ojalgo.type.IndexSelector;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
@@ -557,7 +558,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         final MatrixStore<Double> tmpLinearC = convexC.negate().logical().below(convexC).below(tmpNumInes).get();
 
-        final OldLinearSolver.Builder tmpLinearBuilder = OldLinearSolver.getBuilder(tmpLinearC);
+        final LinearSolver.Builder tmpLinearBuilder = LinearSolver.getBuilder(tmpLinearC);
 
         MatrixStore<Double> tmpAEpart = null;
         MatrixStore<Double> tmpBEpart = null;
@@ -594,7 +595,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             tmpLinearBuilder.equalities(tmpLinearAE, tmpLinearBE);
         }
 
-        final OldLinearSolver tmpLinearSolver = tmpLinearBuilder.build(options);
+        final SimplexSolver tmpLinearSolver = tmpLinearBuilder.build(options);
 
         final Result tmpLinearResult = tmpLinearSolver.solve();
 

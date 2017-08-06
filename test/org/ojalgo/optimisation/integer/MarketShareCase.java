@@ -29,7 +29,8 @@ import org.ojalgo.optimisation.MathProgSysModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.linear.OldLinearSolver;
+import org.ojalgo.optimisation.linear.LinearSolver;
+import org.ojalgo.optimisation.linear.SimplexSolver;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -210,13 +211,13 @@ public final class MarketShareCase extends OptimisationIntegerTests {
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
-        final OldLinearSolver.Builder tmpBuilder = new OldLinearSolver.Builder(tmpC);
+        final LinearSolver.Builder tmpBuilder = new LinearSolver.Builder(tmpC);
         tmpBuilder.equalities(tmpAE, tmpBE);
 
         final Optimisation.Options tmpOptions = new Optimisation.Options();
         //tmpOptions.debug(LinearSolver.class);
 
-        final OldLinearSolver tmpSolver = tmpBuilder.build(tmpOptions);
+        final SimplexSolver tmpSolver = tmpBuilder.build(tmpOptions);
 
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
@@ -348,7 +349,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         final PrimitiveDenseStore tmpC = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
-        final OldLinearSolver.Builder tmpBuilder = new OldLinearSolver.Builder(tmpC);
+        final LinearSolver.Builder tmpBuilder = new LinearSolver.Builder(tmpC);
         tmpBuilder.equalities(tmpAE, tmpBE);
 
         final Optimisation.Options tmpOptions = new Optimisation.Options();
@@ -357,7 +358,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         //        tmpOptions.debug_solver = LinearSolver.class;
         //        tmpOptions.validate = true;
 
-        final OldLinearSolver tmpSolver = tmpBuilder.build(tmpOptions);
+        final SimplexSolver tmpSolver = tmpBuilder.build(tmpOptions);
 
         final Optimisation.Result tmpResult = tmpSolver.solve();
 

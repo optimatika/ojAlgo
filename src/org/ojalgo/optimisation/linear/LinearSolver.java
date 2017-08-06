@@ -21,11 +21,20 @@
  */
 package org.ojalgo.optimisation.linear;
 
+import java.util.List;
+
+import org.ojalgo.access.IntIndex;
+import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.BaseSolver;
 import org.ojalgo.optimisation.BaseSolver.AbstractBuilder;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
+import org.ojalgo.optimisation.linear.SimplexTableau.SparseTableau;
 
 public abstract class LinearSolver extends GenericSolver {
 
@@ -70,6 +79,81 @@ public abstract class LinearSolver extends GenericSolver {
         public LinearSolver.Builder objective(final MatrixStore<Double> C) {
             return super.objective(C);
         }
+    }
+
+    public static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
+
+        public LinearSolver build(final ExpressionsBasedModel model) {
+
+            final SparseTableau tableau = SimplexSolver.build(model);
+
+            return new SimplexSolver(tableau, model.options);
+        }
+
+        public boolean isCapable(final ExpressionsBasedModel model) {
+            return !(model.isAnyVariableInteger() || model.isAnyExpressionQuadratic());
+        }
+
+        @Override
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+
+            final Primitive64Array tmpModelSolution = Primitive64Array.make(model.countVariables());
+
+            for (final IntIndex tmpFixed : model.getFixedVariables()) {
+                tmpModelSolution.set(tmpFixed.index, model.getVariable(tmpFixed.index).getValue().doubleValue());
+            }
+
+            final List<Variable> tmpPositives = model.getPositiveVariables();
+            for (int p = 0; p < tmpPositives.size(); p++) {
+                final Variable tmpVariable = tmpPositives.get(p);
+                final int tmpIndex = model.indexOf(tmpVariable);
+                tmpModelSolution.set(tmpIndex, solverState.doubleValue(p));
+            }
+
+            final List<Variable> tmpNegatives = model.getNegativeVariables();
+            for (int n = 0; n < tmpNegatives.size(); n++) {
+                final Variable tmpVariable = tmpNegatives.get(n);
+                final int tmpIndex = model.indexOf(tmpVariable);
+                tmpModelSolution.set(tmpIndex, tmpModelSolution.doubleValue(tmpIndex) - solverState.doubleValue(tmpPositives.size() + n));
+            }
+
+            return new Result(solverState.getState(), solverState.getValue(), tmpModelSolution);
+        }
+
+        @Override
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+
+            final List<Variable> tmpPositives = model.getPositiveVariables();
+            final List<Variable> tmpNegatives = model.getNegativeVariables();
+
+            final int tmpCountPositives = tmpPositives.size();
+            final int tmpCountNegatives = tmpNegatives.size();
+
+            final Primitive64Array tmpSolverSolution = Primitive64Array.make(tmpCountPositives + tmpCountNegatives);
+
+            for (int p = 0; p < tmpCountPositives; p++) {
+                final Variable tmpVariable = tmpPositives.get(p);
+                final int tmpIndex = model.indexOf(tmpVariable);
+                tmpSolverSolution.set(p, PrimitiveFunction.MAX.invoke(modelState.doubleValue(tmpIndex), 0.0));
+            }
+
+            for (int n = 0; n < tmpCountNegatives; n++) {
+                final Variable tmpVariable = tmpNegatives.get(n);
+                final int tmpIndex = model.indexOf(tmpVariable);
+                tmpSolverSolution.set(tmpCountPositives + n, PrimitiveFunction.MAX.invoke(-modelState.doubleValue(tmpIndex), 0.0));
+            }
+
+            return new Result(modelState.getState(), modelState.getValue(), tmpSolverSolution);
+        }
+
+    }
+
+    public static LinearSolver.Builder getBuilder() {
+        return new LinearSolver.Builder();
+    }
+
+    public static LinearSolver.Builder getBuilder(final MatrixStore<Double> C) {
+        return LinearSolver.getBuilder().objective(C);
     }
 
     protected LinearSolver(final Options solverOptions) {

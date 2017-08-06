@@ -21,6 +21,8 @@
  */
 package org.ojalgo.optimisation.linear;
 
-abstract class SimplexDictionary implements SimplexStore {
+import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
+
+abstract class SimplexDictionary implements AlgorithmStore {
 
 }
