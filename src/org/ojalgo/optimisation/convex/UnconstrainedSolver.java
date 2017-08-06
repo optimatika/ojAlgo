@@ -33,9 +33,9 @@ import org.ojalgo.optimisation.Optimisation;
  *
  * @author apete
  */
-final class UnconstrainedSolver extends ConvexSolver2 {
+final class UnconstrainedSolver extends ConvexSolver {
 
-    UnconstrainedSolver(final ConvexSolver2.Builder matrices, final Optimisation.Options solverOptions) {
+    UnconstrainedSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
         super(matrices, solverOptions);
     }
 

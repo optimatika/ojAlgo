@@ -25,7 +25,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 
 final class DirectPureASS extends DirectASS {
 
-    DirectPureASS(final Builder matrices, final Options solverOptions) {
+    DirectPureASS(final ConvexSolver.Builder matrices, final Options solverOptions) {
         super(matrices, solverOptions);
     }
 

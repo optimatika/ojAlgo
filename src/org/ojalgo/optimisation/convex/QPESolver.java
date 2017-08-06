@@ -42,7 +42,7 @@ final class QPESolver extends ConstrainedSolver {
 
     private final PrimitiveDenseStore myIterationX;
 
-    QPESolver(final ConvexSolver2.Builder matrices, final Optimisation.Options solverOptions) {
+    QPESolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
         super(matrices, solverOptions);
 

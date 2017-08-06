@@ -25,7 +25,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 
 final class IterativeMixedASS extends IterativeASS {
 
-    IterativeMixedASS(final Builder matrices, final Options solverOptions) {
+    IterativeMixedASS(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
         super(matrices, solverOptions);
 

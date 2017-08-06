@@ -24,11 +24,11 @@ package org.ojalgo.optimisation.convex;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-abstract class ConstrainedSolver extends ConvexSolver2 {
+abstract class ConstrainedSolver extends ConvexSolver {
 
     private transient PhysicalStore<Double> myIterationQ = null;
 
-    protected ConstrainedSolver(final Builder matrices, final Options solverOptions) {
+    protected ConstrainedSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
         super(matrices, solverOptions);
     }
 

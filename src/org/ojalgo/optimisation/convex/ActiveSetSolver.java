@@ -42,7 +42,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     final PrimitiveDenseStore myIterationL;
     final PrimitiveDenseStore myIterationX;
 
-    ActiveSetSolver(final Builder matrices, final Options solverOptions) {
+    ActiveSetSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
         super(matrices, solverOptions);
 

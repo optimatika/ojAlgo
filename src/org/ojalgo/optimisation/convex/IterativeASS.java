@@ -158,7 +158,7 @@ abstract class IterativeASS extends ActiveSetSolver {
 
     private final MyIterativeSolver myS;
 
-    IterativeASS(final ConvexSolver2.Builder matrices, final Optimisation.Options solverOptions) {
+    IterativeASS(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
         super(matrices, solverOptions);
 

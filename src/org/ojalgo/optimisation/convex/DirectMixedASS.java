@@ -25,7 +25,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 
 final class DirectMixedASS extends DirectASS {
 
-    DirectMixedASS(final Builder matrices, final Options solverOptions) {
+    DirectMixedASS(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
         super(matrices, solverOptions);
 

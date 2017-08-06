@@ -25,7 +25,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 
 final class IterativePureASS extends IterativeASS {
 
-    IterativePureASS(final Builder matrices, final Options solverOptions) {
+    IterativePureASS(final ConvexSolver.Builder matrices, final Options solverOptions) {
         super(matrices, solverOptions);
     }
 
