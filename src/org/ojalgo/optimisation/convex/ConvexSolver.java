@@ -37,8 +37,8 @@ import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
+import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
-import org.ojalgo.optimisation.OptimisationUtils;
 
 public abstract class ConvexSolver extends GenericSolver {
 
@@ -459,7 +459,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 }
             }
 
-            final double tmpExponent = OptimisationUtils.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
+            final double tmpExponent = ModelEntity.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
             final double tmpFactor = PrimitiveFunction.POW.invoke(TEN, tmpExponent);
 
             final UnaryFunction<Double> tmpModifier = PrimitiveFunction.MULTIPLY.second(tmpFactor);
@@ -517,7 +517,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 tmpRHS.visitRow(i, 0, tmpLargestAggr);
                 tmpRHS.visitRow(i, 0, tmpSmallestAggr);
 
-                tmpExponent = OptimisationUtils.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
+                tmpExponent = ModelEntity.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
                 tmpFactor = PrimitiveFunction.POW.invoke(TEN, tmpExponent);
                 if (assertPositiveRHS && (PrimitiveFunction.SIGNUM.invoke(tmpRHS.doubleValue(i, 0)) < ZERO)) {
                     tmpFactor = -tmpFactor;

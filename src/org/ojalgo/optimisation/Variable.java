@@ -200,12 +200,12 @@ public final class Variable extends ModelEntity<Variable> {
 
         if (myValue != null) {
             aStringBuilder.append(": ");
-            aStringBuilder.append(OptimisationUtils.DISPLAY.enforce(myValue).toPlainString());
+            aStringBuilder.append(ModelEntity.DISPLAY.enforce(myValue).toPlainString());
         }
 
         if (this.isObjective()) {
             aStringBuilder.append(" (");
-            aStringBuilder.append(OptimisationUtils.DISPLAY.enforce(this.getContributionWeight()).toPlainString());
+            aStringBuilder.append(ModelEntity.DISPLAY.enforce(this.getContributionWeight()).toPlainString());
             aStringBuilder.append(")");
         }
     }

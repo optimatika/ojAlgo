@@ -582,11 +582,11 @@ public final class Expression extends ModelEntity<Expression> {
 
         builder.append(this.getName());
         builder.append(": ");
-        builder.append(OptimisationUtils.DISPLAY.enforce(this.toFunction().invoke(Access1D.asPrimitive1D(currentSolution))));
+        builder.append(ModelEntity.DISPLAY.enforce(this.toFunction().invoke(Access1D.asPrimitive1D(currentSolution))));
 
         if (this.isObjective()) {
             builder.append(" (");
-            builder.append(OptimisationUtils.DISPLAY.enforce(this.getContributionWeight()));
+            builder.append(ModelEntity.DISPLAY.enforce(this.getContributionWeight()));
             builder.append(")");
         }
     }

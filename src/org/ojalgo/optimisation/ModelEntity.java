@@ -21,7 +21,10 @@
  */
 package org.ojalgo.optimisation;
 
-import static org.ojalgo.constant.BigMath.*;
+import static org.ojalgo.constant.BigMath.ONE;
+import static org.ojalgo.constant.PrimitiveMath.EIGHT;
+import static org.ojalgo.constant.PrimitiveMath.TWO;
+import static org.ojalgo.constant.PrimitiveMath.ZERO;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -30,6 +33,7 @@ import java.math.RoundingMode;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.VoidFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
@@ -44,15 +48,36 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
+public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
 
+    private static final double _32_0 = EIGHT + EIGHT + EIGHT + EIGHT;
     private static final BigDecimal LARGEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_LARGEST), new MathContext(8, RoundingMode.DOWN));
     private static final BigDecimal SMALLEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_SMALLEST), new MathContext(8, RoundingMode.UP));
+
+    static final NumberContext DISPLAY = NumberContext.getGeneral(6);
+
+    public static int getAdjustmentExponent(final double largest, final double smallest) {
+
+        final double tmpLargestExp = largest > ZERO ? PrimitiveFunction.LOG10.invoke(largest) : ZERO;
+        final double tmpSmallestExp = smallest > ZERO ? PrimitiveFunction.LOG10.invoke(smallest) : -EIGHT;
+
+        if ((tmpLargestExp - tmpSmallestExp) > ModelEntity._32_0) {
+
+            return 0;
+
+        } else {
+
+            final double tmpNegatedAverage = (tmpLargestExp + tmpSmallestExp) / (-TWO);
+
+            return (int) PrimitiveFunction.RINT.invoke(tmpNegatedAverage);
+        }
+    }
 
     private transient int myAdjustmentExponent = Integer.MIN_VALUE;
     private BigDecimal myContributionWeight = null;
     private BigDecimal myLowerLimit = null;
     private final String myName;
+
     private BigDecimal myUpperLimit = null;
 
     @SuppressWarnings("unused")
@@ -276,7 +301,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
     protected void appendLeftPart(final StringBuilder builder) {
         if (this.isLowerConstraint() || this.isEqualityConstraint()) {
-            builder.append(OptimisationUtils.DISPLAY.enforce(this.getLowerLimit()).toPlainString());
+            builder.append(ModelEntity.DISPLAY.enforce(this.getLowerLimit()).toPlainString());
             builder.append(" <= ");
         }
     }
@@ -287,7 +312,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
         if (this.isObjective()) {
             builder.append(" (");
-            builder.append(OptimisationUtils.DISPLAY.enforce(this.getContributionWeight()).toPlainString());
+            builder.append(ModelEntity.DISPLAY.enforce(this.getContributionWeight()).toPlainString());
             builder.append(")");
         }
     }
@@ -295,7 +320,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
     protected void appendRightPart(final StringBuilder builder) {
         if (this.isUpperConstraint() || this.isEqualityConstraint()) {
             builder.append(" <= ");
-            builder.append(OptimisationUtils.DISPLAY.enforce(this.getUpperLimit()).toPlainString());
+            builder.append(ModelEntity.DISPLAY.enforce(this.getUpperLimit()).toPlainString());
         }
     }
 
@@ -316,7 +341,7 @@ abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.C
 
             this.visitAllParameters(tmpLargest, tmpSmallest);
 
-            myAdjustmentExponent = OptimisationUtils.getAdjustmentExponent(tmpLargest.doubleValue(), tmpSmallest.doubleValue());
+            myAdjustmentExponent = ModelEntity.getAdjustmentExponent(tmpLargest.doubleValue(), tmpSmallest.doubleValue());
         }
 
         return myAdjustmentExponent;
