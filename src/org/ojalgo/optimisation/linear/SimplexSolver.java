@@ -467,16 +467,11 @@ public final class SimplexSolver extends LinearSolver {
 
     public double[] getDualVariables() {
 
-        this.logDebugTableau("Tableau extracted");
+        final Array1D<Double> negatedDualVariables = myTableau.sliceDualVariables();
+        final double[] retVal = new double[negatedDualVariables.size()];
 
-        final double[] retVal = new double[myTableau.countConstraints()];
-
-        final int tmpRowObjective = myTableau.countConstraints();
-
-        final int tmpCountVariables = myTableau.countVariables();
         for (int j = 0; j < retVal.length; j++) {
-            // retVal[j] = -myTransposedTableau.doubleValue(tmpCountVariables + j, tmpRowObjective);
-            retVal[j] = -myTableau.doubleValue(tmpRowObjective, tmpCountVariables + j);
+            retVal[j] = -negatedDualVariables.doubleValue(j);
         }
 
         return retVal;

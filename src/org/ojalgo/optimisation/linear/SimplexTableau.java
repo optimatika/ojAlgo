@@ -135,17 +135,22 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
         @Override
         protected Array1D<Double> sliceConstraintsRHS() {
-            return myTransposed.sliceRow(this.countVariablesTotally()).subList(0, this.countConstraints());
+            return myTransposed.sliceRow(this.countVariablesTotally()).sliceRange(0, this.countConstraints());
+        }
+
+        @Override
+        protected Array1D<Double> sliceDualVariables() {
+            return myTransposed.sliceColumn(this.countConstraints()).sliceRange(this.countVariables(), this.countVariables() + this.countConstraints());
         }
 
         @Override
         protected Array1D<Double> sliceTableauColumn(final int col) {
-            return myTransposed.sliceRow(col).subList(0, this.countConstraints());
+            return myTransposed.sliceRow(col).sliceRange(0, this.countConstraints());
         }
 
         @Override
         protected Array1D<Double> sliceTableauRow(final int row) {
-            return myTransposed.sliceColumn(row).subList(0, this.countVariablesTotally());
+            return myTransposed.sliceColumn(row).sliceRange(0, this.countVariablesTotally());
         }
 
     }
@@ -246,7 +251,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         private double myInfeasibility = ZERO;
 
         private transient Objective myObjective = null;
-        private final DenseArray<Double> myObjectiveWeights;
+        private final Array1D<Double> myObjectiveWeights;
         private final DenseArray<Double> myPhase1Weights;
         private final Array1D<Double> myRHS;
         private final SparseArray<Double>[] myRows;
@@ -262,14 +267,16 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
             final Factory<Double> denseFactory = Primitive64Array.FACTORY;
             final SparseFactory<Double> sparseFactory = SparseArray.factory(denseFactory, totNumbVars).initial(3).limit(totNumbVars);
+            final Array1D.Factory<Double> factory1D = Array1D.factory(denseFactory);
 
             myRows = new SparseArray[numberOfConstraints];
             for (int r = 0; r < numberOfConstraints; r++) {
                 myRows[r] = sparseFactory.make();
             }
-            myRHS = Array1D.factory(denseFactory).makeZero(numberOfConstraints);
 
-            myObjectiveWeights = denseFactory.makeZero(totNumbVars);
+            myRHS = factory1D.makeZero(numberOfConstraints);
+
+            myObjectiveWeights = factory1D.makeZero(totNumbVars);
             myPhase1Weights = denseFactory.makeZero(totNumbVars);
         }
 
@@ -371,6 +378,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         @Override
         protected Array1D<Double> sliceConstraintsRHS() {
             return myRHS;
+        }
+
+        @Override
+        protected Array1D<Double> sliceDualVariables() {
+            return myObjectiveWeights.sliceRange(this.countVariables(), this.countVariables() + this.countConstraints());
         }
 
         @Override
@@ -491,6 +503,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     protected abstract void pivot(IterationPoint iterationPoint);
 
     protected abstract Array1D<Double> sliceConstraintsRHS();
+
+    /**
+     * @return An array of the dual variable values (of the original problem, not phase 1).
+     */
+    protected abstract Array1D<Double> sliceDualVariables();
 
     protected abstract Access1D<Double> sliceTableauColumn(final int col);
 
