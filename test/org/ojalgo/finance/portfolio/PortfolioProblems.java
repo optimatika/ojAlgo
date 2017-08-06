@@ -38,7 +38,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.State;
-import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.convex.ConvexSolver2;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.context.NumberContext;
 
@@ -147,9 +147,9 @@ public class PortfolioProblems extends FinancePortfolioTests {
 
         final MatrixStore<Double> tmpX = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.5217391304347826 }, { 0.4782608695652173 } });
 
-        ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
+        ConvexSolver2.Builder tmpBuilder = new ConvexSolver2.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
 
-        ConvexSolver tmpSolver = tmpBuilder.build();
+        ConvexSolver2 tmpSolver = tmpBuilder.build();
         // tmpSolver.options.debug(ConvexSolver.class);
         Optimisation.Result tmpResult = tmpSolver.solve();
         // BasicMatrix tmpSolution = tmpResult.getSolution();
@@ -165,7 +165,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
         tmpAI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
         tmpBI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 1.0 } });
 
-        tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
+        tmpBuilder = new ConvexSolver2.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
         tmpSolver = tmpBuilder.build();
         tmpResult = tmpSolver.solve();
 
@@ -178,7 +178,7 @@ public class PortfolioProblems extends FinancePortfolioTests {
                 .rows(new double[][] { { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } });
         tmpBI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.0 }, { 0.0 }, { 0.0 }, { 1.0 }, { 1.0 }, { 1.0 } });
 
-        tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
+        tmpBuilder = new ConvexSolver2.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI);
         tmpSolver = tmpBuilder.build();
         tmpResult = tmpSolver.solve();
 

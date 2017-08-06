@@ -39,7 +39,7 @@ class P20150809 {
 
     static void attempt5(final boolean identity, final boolean addDummyConstraints) {
 
-        final ConvexSolver cs = P20150809.buildModel(identity, addDummyConstraints);
+        final ConvexSolver2 cs = P20150809.buildModel(identity, addDummyConstraints);
 
         try {
             final Optimisation.Result solution = cs.solve();
@@ -64,7 +64,7 @@ class P20150809 {
         }
     }
 
-    static ConvexSolver buildModel(final boolean identity, final boolean addDummyConstraints) {
+    static ConvexSolver2 buildModel(final boolean identity, final boolean addDummyConstraints) {
 
         if (OptimisationConvexTests.DEBUG) {
             if (!identity && !addDummyConstraints) {
@@ -86,7 +86,7 @@ class P20150809 {
             }
         }
         final RawStore linPart = new RawStore(C, 4);
-        ConvexSolver.Builder builder = ConvexSolver.getBuilder(cov, linPart);
+        ConvexSolver2.Builder builder = ConvexSolver2.getBuilder(cov, linPart);
 
         if (addDummyConstraints) {
             final RawStore ineq = RawStore.FACTORY.rows(new double[][] { { -1.0, 0.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0, 0.0 }, { 0.0, 0.0, -1.0, 0.0 },
@@ -100,7 +100,7 @@ class P20150809 {
         opts.iterations_abort = 10000;
         opts.iterations_suffice = 100;
         if (OptimisationConvexTests.DEBUG) {
-            opts.debug(ConvexSolver.class);
+            opts.debug(ConvexSolver2.class);
         }
 
         return builder.build(opts);

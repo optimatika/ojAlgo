@@ -27,12 +27,12 @@ import org.ojalgo.access.IntIndex;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.optimisation.BaseSolver;
-import org.ojalgo.optimisation.BaseSolver.AbstractBuilder;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.convex.ConvexSolver.AbstractBuilder;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 import org.ojalgo.optimisation.linear.SimplexTableau.SparseTableau;
 
@@ -48,7 +48,7 @@ public abstract class LinearSolver extends GenericSolver {
             super();
         }
 
-        Builder(final BaseSolver.AbstractBuilder<LinearSolver.Builder, SimplexSolver> matrices) {
+        Builder(final ConvexSolver.AbstractBuilder<LinearSolver.Builder, SimplexSolver> matrices) {
             super(matrices);
         }
 

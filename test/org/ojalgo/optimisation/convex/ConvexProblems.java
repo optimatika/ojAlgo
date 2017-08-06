@@ -53,7 +53,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
+import org.ojalgo.optimisation.convex.ConvexSolver2.Builder;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -81,7 +81,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final ExpressionsBasedModel tmpModel = ConvexProblems.buildModel(matrices, expectedSolution);
 
         if (DEBUG) {
-            tmpModel.options.debug(ConvexSolver.class);
+            tmpModel.options.debug(ConvexSolver2.class);
             tmpModel.options.validate = false;
         }
 
@@ -110,9 +110,9 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         if (testSolverDirectly) {
 
-            final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(matrices);
+            final ConvexSolver2.Builder tmpBuilder = new ConvexSolver2.Builder(matrices);
             tmpBuilder.balance(); // Changes the objective function value
-            final ConvexSolver tmpSolver = tmpBuilder.build();
+            final ConvexSolver2 tmpSolver = tmpBuilder.build();
             // tmpSolver.options.debug(ConvexSolver.class);
             // tmpSolver.options.validate = false;
             final Optimisation.Result tmpResult = tmpSolver.solve();
@@ -580,10 +580,10 @@ public class ConvexProblems extends OptimisationConvexTests {
             }
         }
 
-        final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(retVal);
+        final ConvexSolver2.Builder tmpBuilder = new ConvexSolver2.Builder(retVal);
 
         // final ActiveSetSolver tmpSolver = new ActiveSetSolver(tmpMatrices);
-        final ConvexSolver tmpSolver = tmpBuilder.build();
+        final ConvexSolver2 tmpSolver = tmpBuilder.build();
 
         // Test that the matrices were input in the right order
         // JUnitUtils.assertEquals(tmpSolver.getAE(), tmpMatrices[0].toPrimitiveStore(),
@@ -803,9 +803,9 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpMtrxs[5] = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 1.0 }, { 0.0 }, { 0.0 },
                 { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
-        final ConvexSolver.Builder tmpBuilder = new Builder(tmpMtrxs);
+        final ConvexSolver2.Builder tmpBuilder = new Builder(tmpMtrxs);
 
-        final ConvexSolver tmpSolver = tmpBuilder.build();
+        final ConvexSolver2 tmpSolver = tmpBuilder.build();
 
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
@@ -831,9 +831,9 @@ public class ConvexProblems extends OptimisationConvexTests {
                 { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } });
         tmpMtrxs[5] = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 1.0 }, { -0.06 }, { 0.0 }, { 0.0 }, { 0.0 } });
 
-        final ConvexSolver.Builder tmpBuilder = new Builder(tmpMtrxs);
+        final ConvexSolver2.Builder tmpBuilder = new Builder(tmpMtrxs);
 
-        final ConvexSolver tmpSolver = tmpBuilder.build();
+        final ConvexSolver2 tmpSolver = tmpBuilder.build();
 
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
@@ -870,9 +870,9 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpMtrxs[5] = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 0.17 }, { 0.52 }, { 0.3 }, { 0.3 }, { 0.3 }, { 0.15 }, { 1.0 }, { 0.31 },
                 { -0.05960220972942152 }, { -0.1144024630877301 }, { -0.12289286964304823 }, { 0.0 }, { -0.02 }, { 0.0 } });
 
-        final ConvexSolver.Builder tmpBuilder = new Builder(tmpMtrxs);
+        final ConvexSolver2.Builder tmpBuilder = new Builder(tmpMtrxs);
 
-        final ConvexSolver tmpSolver = tmpBuilder.build();
+        final ConvexSolver2 tmpSolver = tmpBuilder.build();
 
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
@@ -901,9 +901,9 @@ public class ConvexProblems extends OptimisationConvexTests {
         // Solve the same problem several times
         for (int i = 0; i < 20; i++) {
 
-            final ConvexSolver.Builder tmpBuilder = new Builder(tmpMtrxs);
+            final ConvexSolver2.Builder tmpBuilder = new Builder(tmpMtrxs);
 
-            final ConvexSolver tmpSolver = tmpBuilder.build();
+            final ConvexSolver2 tmpSolver = tmpBuilder.build();
 
             final Optimisation.Result tmpResult = tmpSolver.solve();
 
@@ -931,9 +931,9 @@ public class ConvexProblems extends OptimisationConvexTests {
                 { -1.0, 0.0, 0.0 }, { 0.0, -1.0, 0.0 }, { 0.0, 0.0, -1.0 } });
         tmpMtrxs[5] = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0 }, { 1.0 }, { 1.0 }, { -0.06 }, { -0.8 }, { 0.0 }, { 0.0 } });
 
-        final ConvexSolver.Builder tmpBuilder = new Builder(tmpMtrxs);
+        final ConvexSolver2.Builder tmpBuilder = new Builder(tmpMtrxs);
 
-        final ConvexSolver tmpSolver = tmpBuilder.build();
+        final ConvexSolver2 tmpSolver = tmpBuilder.build();
 
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
@@ -1097,7 +1097,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         try {
 
-            final ConvexSolver qSolver = new ConvexSolver.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
+            final ConvexSolver2 qSolver = new ConvexSolver2.Builder(tmpQ, tmpC).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
 
             // qSolver.options.debug(ConvexSolver.class);
 
@@ -1113,7 +1113,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         // ... and check that the correctly defined problem does solve.
 
-        final ConvexSolver tmpCorrectSolver = new ConvexSolver.Builder(tmpQ, tmpC.transpose()).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
+        final ConvexSolver2 tmpCorrectSolver = new ConvexSolver2.Builder(tmpQ, tmpC.transpose()).equalities(tmpAE, tmpBE).inequalities(tmpAI, tmpBI).build();
 
         final Optimisation.Result tmpResult = tmpCorrectSolver.solve();
 
@@ -1152,10 +1152,10 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         try {
 
-            final ConvexSolver.Builder qsBuilder = new ConvexSolver.Builder(JamaQ, JamaC);
+            final ConvexSolver2.Builder qsBuilder = new ConvexSolver2.Builder(JamaQ, JamaC);
             qsBuilder.inequalities(JamaAI, JamaBI);
 
-            final ConvexSolver qSolver = qsBuilder.build();
+            final ConvexSolver2 qSolver = qsBuilder.build();
 
             // qSolver.options.debug(ConvexSolver.class);
 
@@ -1269,7 +1269,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Primitive64Array tmpExpectedSolution = Primitive64Array.wrap(new double[] { 0.12, -0.05, 0.08, 0.07 });
         final Primitive64Array tmpBoundedSolution = Primitive64Array.wrap(new double[] { 99999, -99999, 99999, 99999 });
 
-        ConvexSolver tmpSolver = P20150809.buildModel(true, false);
+        ConvexSolver2 tmpSolver = P20150809.buildModel(true, false);
         Result tmpResult = tmpSolver.solve();
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
         TestUtils.assertEquals(tmpExpectedSolution, tmpResult);
@@ -1300,7 +1300,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final PrimitiveDenseStore tmpC = PrimitiveDenseStore.FACTORY.columns(new double[] { 0, 0 });
         final PrimitiveDenseStore tmpAI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { -1, -1 } });
         final PrimitiveDenseStore tmpBI = PrimitiveDenseStore.FACTORY.columns(new double[] { -1 });
-        final ConvexSolver tmpSolver = new ConvexSolver.Builder(tmpQ, tmpC).inequalities(tmpAI, tmpBI).build();
+        final ConvexSolver2 tmpSolver = new ConvexSolver2.Builder(tmpQ, tmpC).inequalities(tmpAI, tmpBI).build();
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
         final PrimitiveDenseStore tmpExpectedSolution = PrimitiveDenseStore.FACTORY.columns(new double[] { 0.5, 0.5 });
@@ -1328,14 +1328,14 @@ public class ConvexProblems extends OptimisationConvexTests {
         final PrimitiveDenseStore Q = PrimitiveDenseStore.FACTORY.rows(new double[][] { { 1.0, 0 }, { 0, 1.0 } });
         final PrimitiveDenseStore C = PrimitiveDenseStore.FACTORY.columns(new double[] { 0, 0 });
 
-        final Builder myBuilderI = new ConvexSolver.Builder(Q, C);
+        final Builder myBuilderI = new ConvexSolver2.Builder(Q, C);
 
         final PrimitiveDenseStore AI = PrimitiveDenseStore.FACTORY.rows(new double[] { 1, 1 });
         final PrimitiveDenseStore BI = PrimitiveDenseStore.FACTORY.columns(new double[] { 1 });
 
         myBuilderI.inequalities(AI, BI);
 
-        final ConvexSolver prob = myBuilderI.build();
+        final ConvexSolver2 prob = myBuilderI.build();
         final Result solved = prob.solve(); // java.lang.ArithmeticException: / by zero
 
         if (DEBUG) {
@@ -1347,7 +1347,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         // Discovered that you got (fixed now) a problem if you modify a builder after it has been used to build a solver
         myBuilderI.inequalities(AI2, BI2);
 
-        final ConvexSolver prob2 = myBuilderI.build();
+        final ConvexSolver2 prob2 = myBuilderI.build();
         final Result solved2 = prob2.solve(); // java.lang.ArithmeticException: / by zero
 
         if (DEBUG) {

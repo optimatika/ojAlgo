@@ -26,13 +26,13 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.type.context.NumberContext;
 
-abstract class OptimisationUtils {
+public abstract class OptimisationUtils {
 
     private static final double _32_0 = EIGHT + EIGHT + EIGHT + EIGHT;
 
     static final NumberContext DISPLAY = NumberContext.getGeneral(6);
 
-    static int getAdjustmentExponent(final double largest, final double smallest) {
+    public static int getAdjustmentExponent(final double largest, final double smallest) {
 
         final double tmpLargestExp = largest > ZERO ? PrimitiveFunction.LOG10.invoke(largest) : ZERO;
         final double tmpSmallestExp = smallest > ZERO ? PrimitiveFunction.LOG10.invoke(smallest) : -EIGHT;

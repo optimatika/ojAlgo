@@ -24,7 +24,7 @@ package org.ojalgo.optimisation.convex;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 
-abstract class ConstrainedSolver extends ConvexSolver {
+abstract class ConstrainedSolver extends ConvexSolver2 {
 
     private transient PhysicalStore<Double> myIterationQ = null;
 

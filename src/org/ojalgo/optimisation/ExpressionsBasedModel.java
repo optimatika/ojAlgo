@@ -34,6 +34,8 @@ import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.netio.BasicLogger.Printer;
+import org.ojalgo.optimisation.convex.ConvexSolver;
+import org.ojalgo.optimisation.integer.IntegerSolver;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.context.NumberContext;
 
@@ -995,9 +997,9 @@ public final class ExpressionsBasedModel extends AbstractModel<GenericSolver> {
 
         if (retVal == null) {
             if (this.isAnyVariableInteger()) {
-                retVal = new ExpressionsBasedIntegerIntegration();
+                retVal = new IntegerSolver.ModelIntegration();
             } else if (this.isAnyExpressionQuadratic()) {
-                retVal = new ExpressionsBasedConvexIntegration();
+                retVal = new ConvexSolver.ModelIntegration();
             } else {
                 retVal = new LinearSolver.ModelIntegration();
             }

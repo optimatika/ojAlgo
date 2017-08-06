@@ -33,6 +33,28 @@ import org.ojalgo.optimisation.Optimisation;
 
 public abstract class IntegerSolver extends GenericSolver {
 
+    public static final class ModelIntegration extends ExpressionsBasedModel.Integration<IntegerSolver> {
+
+        public IntegerSolver build(final ExpressionsBasedModel model) {
+            return IntegerSolver.make(model);
+        }
+
+        public boolean isCapable(final ExpressionsBasedModel model) {
+            return true;
+        }
+
+        @Override
+        public Result toModelState(final Result solverState, final ExpressionsBasedModel model) {
+            return solverState;
+        }
+
+        @Override
+        public Result toSolverState(final Result modelState, final ExpressionsBasedModel model) {
+            return modelState;
+        }
+
+    }
+
     static final class NodeStatistics {
 
         private final AtomicInteger myAbandoned = new AtomicInteger();
@@ -53,13 +75,13 @@ public abstract class IntegerSolver extends GenericSolver {
          */
         private final AtomicInteger myInfeasible = new AtomicInteger();
         /**
-         * Noninteger solution
-         */
-        private final AtomicInteger myTruncated = new AtomicInteger();
-        /**
          * Integer solution
          */
         private final AtomicInteger myInteger = new AtomicInteger();
+        /**
+         * Noninteger solution
+         */
+        private final AtomicInteger myTruncated = new AtomicInteger();
 
         public int countCreated() {
             return myTruncated.get() + myAbandoned.get() + this.countEvaluated();
@@ -129,14 +151,14 @@ public abstract class IntegerSolver extends GenericSolver {
         //return new NewIntegerSolver(model, model.options);
     }
 
-    private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     private volatile Optimisation.Result myBestResultSoFar = null;
+    private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     private final AtomicInteger myIntegerSolutionsCount = new AtomicInteger();
     private final boolean myMinimisation;
 
-    private final NodeStatistics myNodeStatistics = new NodeStatistics();
-
     private final ExpressionsBasedModel myModel;
+
+    private final NodeStatistics myNodeStatistics = new NodeStatistics();
 
     protected IntegerSolver(final ExpressionsBasedModel model, final Options solverOptions) {
 
