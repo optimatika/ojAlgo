@@ -14,6 +14,7 @@ import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.SparseArray.NonzeroView;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.type.context.NumberContext;
 
 public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N>, Mutate1D.Mixable<N> {
 
@@ -78,7 +79,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     public boolean containsValue(final double value) {
         for (final NonzeroView<N> tmpView : myStorage.nonzeros()) {
             // if (tmpView.doubleValue() == value) {
-            if (Double.compare(tmpView.doubleValue(), value) == 0) {
+            if (NumberContext.compare(tmpView.doubleValue(), value) == 0) {
                 return true;
             }
         }

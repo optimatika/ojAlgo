@@ -24,6 +24,7 @@ package org.ojalgo.type.keyvalue;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.netio.ASCII;
+import org.ojalgo.type.context.NumberContext;
 
 public final class IntToDouble implements KeyValue<Integer, Double> {
 
@@ -71,7 +72,7 @@ public final class IntToDouble implements KeyValue<Integer, Double> {
     }
 
     public int compareTo(final KeyValue<Integer, ?> aReference) {
-        return Double.compare(key, aReference.getKey());
+        return NumberContext.compare(key, aReference.getKey());
     }
 
     @Override

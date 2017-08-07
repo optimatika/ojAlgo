@@ -33,6 +33,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.optimisation.linear.SimplexSolver;
 import org.ojalgo.type.IndexSelector;
+import org.ojalgo.type.context.NumberContext;
 
 abstract class ActiveSetSolver extends ConstrainedSolver {
 
@@ -411,7 +412,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                                 this.debug("Best so far: {} @ {} ({}).", tmpStepLength, i, myConstraintToInclude);
                             }
                             // } else if ((tmpVal == ZERO) && this.isDebug()) {
-                        } else if ((Double.compare(tmpVal, ZERO) == 0) && this.isDebug()) {
+                        } else if ((NumberContext.compare(tmpVal, ZERO) == 0) && this.isDebug()) {
                             this.debug("Zero, but still not good...");
                             this.debug("Numer/slack: {}", tmpN);
                             this.debug("Denom/chang: {}", tmpD);

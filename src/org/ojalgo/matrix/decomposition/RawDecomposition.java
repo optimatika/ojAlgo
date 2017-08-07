@@ -27,6 +27,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RawStore;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * In many ways similar to InPlaceDecomposition but this class is hardwired to work with double[][] data. Most
@@ -55,7 +56,7 @@ abstract class RawDecomposition extends AbstractDecomposition<Double> {
         boolean retVal = myRowDim == myColDim;
         for (int i = 0; retVal && (i < myRowDim); i++) {
             for (int j = 0; retVal && (j < i); j++) {
-                retVal &= (Double.compare(myRawInPlaceData[i][j], myRawInPlaceData[j][i]) == 0);
+                retVal &= (NumberContext.compare(myRawInPlaceData[i][j], myRawInPlaceData[j][i]) == 0);
             }
         }
         return retVal;

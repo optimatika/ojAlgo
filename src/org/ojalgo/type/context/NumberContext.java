@@ -73,6 +73,28 @@ public final class NumberContext extends FormatContext<Number, NumberFormat> {
     private static final int DEFAULT_SCALE = Integer.MIN_VALUE;
     private static final NumberStyle DEFAULT_STYLE = NumberStyle.GENERAL;
 
+    /**
+     * Variation of {@link Double#compare(double, double)} that returns 0 if arg1 == arg2.
+     */
+    public static int compare(final double arg1, final double arg2) {
+        if (arg1 == arg2) {
+            return 0;
+        } else {
+            return Double.compare(arg1, arg2);
+        }
+    }
+
+    /**
+     * Variation of {@link Float#compare(float, float)} that returns 0 if arg1 == arg2.
+     */
+    public static int compare(final float arg1, final float arg2) {
+        if (arg1 == arg2) {
+            return 0;
+        } else {
+            return Float.compare(arg1, arg2);
+        }
+    }
+
     public static NumberContext getCurrency(final Locale locale) {
 
         final NumberFormat tmpFormat = NumberStyle.CURRENCY.getFormat(locale);

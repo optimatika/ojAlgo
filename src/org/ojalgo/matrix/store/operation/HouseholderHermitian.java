@@ -36,6 +36,7 @@ import org.ojalgo.function.ComplexFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Performs Householder transformation from both sides simultaneously assuming that [A] is hermitian (square
@@ -381,7 +382,7 @@ public final class HouseholderHermitian extends MatrixOperation {
                 }
 
                 // if (scale == PrimitiveMath.ZERO) {
-                if (Double.compare(scale, PrimitiveMath.ZERO) == 0) {
+                if (NumberContext.compare(scale, PrimitiveMath.ZERO) == 0) {
                     e[i] = data[i + (l * tmpRowDim)];
                 } else {
                     for (int k = 0; k < i; k++) {

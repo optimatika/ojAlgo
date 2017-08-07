@@ -3,6 +3,8 @@ package org.ojalgo.matrix.decomposition;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.ojalgo.type.context.NumberContext;
+
 public abstract class EvD2D {
 
     /**
@@ -51,7 +53,7 @@ public abstract class EvD2D {
             while (l > 0) {
                 s = ABS.invoke(mtrxH[l - 1][l - 1]) + ABS.invoke(mtrxH[l][l]);
                 // if (s == ZERO) {
-                if (Double.compare(s, ZERO) == 0) {
+                if (NumberContext.compare(s, ZERO) == 0) {
                     s = norm;
                 }
                 if (ABS.invoke(mtrxH[l][l - 1]) < (MACHINE_EPSILON * s)) {
@@ -92,7 +94,7 @@ public abstract class EvD2D {
                     d[n - 1] = x + z;
                     d[n] = d[n - 1];
                     // if (z != ZERO) {
-                    if (Double.compare(z, ZERO) != 0) {
+                    if (NumberContext.compare(z, ZERO) != 0) {
                         d[n] = x - (w / z);
                     }
                     e[n - 1] = ZERO;
@@ -232,7 +234,7 @@ public abstract class EvD2D {
                         r = (notlast ? mtrxH[k + 2][k - 1] : ZERO);
                         x = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
                         // if (x == ZERO) {
-                        if (Double.compare(x, ZERO) == 0) {
+                        if (NumberContext.compare(x, ZERO) == 0) {
                             continue;
                         }
                         p = p / x;
@@ -305,7 +307,7 @@ public abstract class EvD2D {
         // Backsubstitute to find vectors of upper triangular form
 
         // if (norm == ZERO) {
-        if (Double.compare(norm, ZERO) == 0) {
+        if (NumberContext.compare(norm, ZERO) == 0) {
             return;
         }
 
@@ -331,7 +333,7 @@ public abstract class EvD2D {
                         l = i;
                         if (e[i] == ZERO) {
                             // if (w != ZERO) {
-                            if (Double.compare(w, ZERO) != 0) {
+                            if (NumberContext.compare(w, ZERO) != 0) {
                                 mtrxH[i][n] = -r / w;
                             } else {
                                 mtrxH[i][n] = -r / (MACHINE_EPSILON * norm);
@@ -411,7 +413,7 @@ public abstract class EvD2D {
                             vr = (((d[i] - p) * (d[i] - p)) + (e[i] * e[i])) - (q * q);
                             vi = (d[i] - p) * TWO * q;
                             // if ((vr == ZERO) & (vi == ZERO)) {
-                            if ((Double.compare(vr, ZERO) == 0) && (Double.compare(vi, ZERO) == 0)) {
+                            if ((NumberContext.compare(vr, ZERO) == 0) && (NumberContext.compare(vi, ZERO) == 0)) {
                                 vr = MACHINE_EPSILON * norm * (ABS.invoke(w) + ABS.invoke(q) + ABS.invoke(x) + ABS.invoke(y) + ABS.invoke(z));
                             }
                             EvD2D.cdiv(((x * r) - (z * ra)) + (q * sa), (x * s) - (z * sa) - (q * ra), vr, vi, cdiv);
@@ -488,7 +490,7 @@ public abstract class EvD2D {
             }
 
             // if (scale != ZERO) {
-            if (Double.compare(scale, ZERO) != 0) {
+            if (NumberContext.compare(scale, ZERO) != 0) {
 
                 // Compute Householder transformation.
 

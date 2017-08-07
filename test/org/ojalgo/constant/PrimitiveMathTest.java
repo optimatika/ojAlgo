@@ -22,6 +22,7 @@
 package org.ojalgo.constant;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.type.context.NumberContext;
 
 public class PrimitiveMathTest extends ConstantTests {
 
@@ -45,6 +46,50 @@ public class PrimitiveMathTest extends ConstantTests {
             TestUtils.assertEquals(2, tmpVal / tmpPrev);
 
             tmpPrev = tmpVal;
+        }
+
+    }
+
+    public void testCompareToZeros() {
+
+        final double negDbl = -0.0;
+        final double posInt = 0;
+        final double posDbl = 0.0;
+        final double negInt = -0;
+
+        PrimitiveMathTest.compare("negDbl <-> posInt", negDbl, posInt);
+        PrimitiveMathTest.compare("negDbl <-> posDbl", negDbl, posDbl);
+        PrimitiveMathTest.compare("negDbl <-> negInt", negDbl, negInt);
+
+        PrimitiveMathTest.compare("posInt <-> negDbl", posInt, negDbl);
+        PrimitiveMathTest.compare("posInt <-> posDbl", posInt, posDbl);
+        PrimitiveMathTest.compare("posInt <-> negInt", posInt, negInt);
+
+        PrimitiveMathTest.compare("posDbl <-> negDbl", posDbl, negDbl);
+        PrimitiveMathTest.compare("posDbl <-> posInt", posDbl, posInt);
+        PrimitiveMathTest.compare("posDbl <-> negInt", posDbl, negInt);
+
+        PrimitiveMathTest.compare("negInt <-> negDbl", negInt, negDbl);
+        PrimitiveMathTest.compare("negInt <-> posInt", negInt, posInt);
+        PrimitiveMathTest.compare("negInt <-> posDbl", negInt, posDbl);
+    }
+
+    static void compare(final String id, final double arg0, final double arg1) {
+
+        System.out.print(id + ": ");
+
+        if (arg0 == arg1) {
+            if (NumberContext.compare(arg0, arg1) == 0) {
+                ;
+            } else {
+                TestUtils.fail();
+            }
+        } else {
+            if (NumberContext.compare(arg0, arg1) == 0) {
+                TestUtils.fail();
+            } else {
+                TestUtils.fail();
+            }
         }
 
     }

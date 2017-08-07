@@ -68,7 +68,7 @@ public abstract class FinancePortfolio implements Comparable<FinancePortfolio> {
     }
 
     public final int compareTo(final FinancePortfolio reference) {
-        return Double.compare(this.getSharpeRatio(), reference.getSharpeRatio());
+        return NumberContext.compare(this.getSharpeRatio(), reference.getSharpeRatio());
     }
 
     public final GeometricBrownianMotion forecast() {

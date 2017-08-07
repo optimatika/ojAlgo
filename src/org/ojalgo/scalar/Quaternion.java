@@ -309,11 +309,11 @@ public final class Quaternion extends Number
 
         int retVal = 0;
 
-        if ((retVal = Double.compare(this.norm(), reference.norm())) == 0) {
-            if ((retVal = Double.compare(myScalar, reference.scalar())) == 0) {
-                if ((retVal = Double.compare(i, reference.i)) == 0) {
-                    if ((retVal = Double.compare(j, reference.j)) == 0) {
-                        retVal = Double.compare(k, reference.k);
+        if ((retVal = NumberContext.compare(this.norm(), reference.norm())) == 0) {
+            if ((retVal = NumberContext.compare(myScalar, reference.scalar())) == 0) {
+                if ((retVal = NumberContext.compare(i, reference.i)) == 0) {
+                    if ((retVal = NumberContext.compare(j, reference.j)) == 0) {
+                        retVal = NumberContext.compare(k, reference.k);
                     }
                 }
             }

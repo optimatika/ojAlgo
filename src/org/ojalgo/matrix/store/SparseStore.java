@@ -44,6 +44,7 @@ import org.ojalgo.matrix.store.PhysicalStore.TransposedRegion;
 import org.ojalgo.matrix.store.operation.MultiplyBoth;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.context.NumberContext;
 
 public final class SparseStore<N extends Number> extends FactoryStore<N> implements ElementsConsumer<N> {
 
@@ -243,7 +244,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
                 for (long j = first; j < limit; j++) {
                     final long index = Structure2D.index(structure, col, j);
                     final double addition = val * right.doubleValue(index);
-                    if (Double.compare(addition, ZERO) != 0) {
+                    if (NumberContext.compare(addition, ZERO) != 0) {
                         synchronized (target) {
                             target.add(row, j, addition);
                         }

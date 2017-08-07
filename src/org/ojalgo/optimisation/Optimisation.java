@@ -307,7 +307,7 @@ public interface Optimisation {
         }
 
         public int compareTo(final Result reference) {
-            return Double.compare(myValue, reference.getValue());
+            return NumberContext.compare(myValue, reference.getValue());
         }
 
         public long count() {

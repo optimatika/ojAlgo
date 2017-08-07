@@ -135,7 +135,7 @@ public final class PrimitiveScalar extends Number implements Scalar<Double>, Enf
     }
 
     public int compareTo(final Double reference) {
-        return Double.compare(myValue, reference);
+        return NumberContext.compare(myValue, reference);
     }
 
     public PrimitiveScalar conjugate() {

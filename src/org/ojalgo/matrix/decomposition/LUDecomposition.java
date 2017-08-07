@@ -39,6 +39,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LU<N> {
 
@@ -285,7 +286,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
             // Do the calculations...
             // if (!tmpInPlace.isZero(ij, ij)) {
             // if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
-            if (Double.compare(tmpInPlace.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0) {
+            if (NumberContext.compare(tmpInPlace.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0) {
 
                 // Calculate multipliers and copy to local column
                 // Current column, below the diagonal
@@ -314,7 +315,7 @@ abstract class LUDecomposition<N extends Number> extends InPlaceDecomposition<N>
 
         for (int ij = 0; retVal && (ij < tmpMinDim); ij++) {
             // retVal &= tmpStore.doubleValue(ij, ij) != PrimitiveMath.ZERO;
-            retVal &= Double.compare(tmpStore.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0;
+            retVal &= NumberContext.compare(tmpStore.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0;
         }
 
         return retVal;

@@ -46,6 +46,7 @@ import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.context.NumberContext;
 
 abstract class SingularValueDecomposition<N extends Number & Comparable<N>> extends GenericDecomposition<N> implements SingularValue<N> {
 
@@ -141,7 +142,7 @@ abstract class SingularValueDecomposition<N extends Number & Comparable<N>> exte
         final double c = (s_p1 * e_p2) * (s_p1 * e_p2);
 
         double shift = ZERO;
-        if ((Double.compare(b, ZERO) != 0) || (Double.compare(c, ZERO) != 0)) {
+        if ((NumberContext.compare(b, ZERO) != 0) || (NumberContext.compare(c, ZERO) != 0)) {
             shift = SQRT.invoke((b * b) + c);
             if (b < ZERO) {
                 shift = -shift;

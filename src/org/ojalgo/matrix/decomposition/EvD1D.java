@@ -4,6 +4,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 public abstract class EvD1D {
 
@@ -41,7 +42,7 @@ public abstract class EvD1D {
             while (l > 0) {
                 s = ABS.invoke(mtrxH[(l - 1) + (tmpDiagDim * (l - 1))]) + ABS.invoke(mtrxH[l + (tmpDiagDim * l)]);
                 // if (s ==  ZERO) {
-                if (Double.compare(s, ZERO) == 0) {
+                if (NumberContext.compare(s, ZERO) == 0) {
                     s = tmpNorm1;
                 }
                 if (ABS.invoke(mtrxH[l + (tmpDiagDim * (l - 1))]) < (MACHINE_EPSILON * s)) {
@@ -80,7 +81,7 @@ public abstract class EvD1D {
                     d[tmpMainIterIndex - 1] = x + z;
                     d[tmpMainIterIndex] = d[tmpMainIterIndex - 1];
                     // if (z !=  ZERO) {
-                    if (Double.compare(z, ZERO) != 0) {
+                    if (NumberContext.compare(z, ZERO) != 0) {
                         d[tmpMainIterIndex] = x - (w / z);
                     }
                     e[tmpMainIterIndex - 1] = ZERO;
@@ -207,7 +208,7 @@ public abstract class EvD1D {
                         r = (notlast ? mtrxH[(k + 2) + (tmpDiagDim * (k - 1))] : ZERO);
                         x = ABS.invoke(p) + ABS.invoke(q) + ABS.invoke(r);
                         // if (x ==  ZERO) {
-                        if (Double.compare(x, ZERO) == 0) {
+                        if (NumberContext.compare(x, ZERO) == 0) {
                             continue;
                         }
                         p = p / x;
@@ -271,7 +272,7 @@ public abstract class EvD1D {
 
         // Backsubstitute to find vectors of upper triangular form
         // if (allTheWay && (tmpNorm1 !=  ZERO)) {
-        if (allTheWay && (Double.compare(tmpNorm1, ZERO) != 0)) {
+        if (allTheWay && (NumberContext.compare(tmpNorm1, ZERO) != 0)) {
             final int tmpDiagDim1 = (int) SQRT.invoke(mtrxH.length);
             final int tmpDiagDimMinusOne1 = tmpDiagDim1 - 1;
 
@@ -306,7 +307,7 @@ public abstract class EvD1D {
                             l = i;
                             if (e[i] == ZERO) {
                                 // if (w !=  ZERO) {
-                                if (Double.compare(w1, ZERO) != 0) {
+                                if (NumberContext.compare(w1, ZERO) != 0) {
                                     mtrxH[i + (tmpDiagDim1 * ij)] = -r / w1;
                                 } else {
                                     mtrxH[i + (tmpDiagDim1 * ij)] = -r / (MACHINE_EPSILON * tmpNorm1);
@@ -391,7 +392,7 @@ public abstract class EvD1D {
                                 vr = (((d[i] - p1) * (d[i] - p1)) + (e[i] * e[i])) - (q1 * q1);
                                 vi = (d[i] - p1) * 2.0 * q1;
                                 // if ((vr ==  ZERO) & (vi ==  ZERO)) {
-                                if ((Double.compare(vr, ZERO) == 0) && (Double.compare(vi, ZERO) == 0)) {
+                                if ((NumberContext.compare(vr, ZERO) == 0) && (NumberContext.compare(vi, ZERO) == 0)) {
                                     vr = MACHINE_EPSILON * tmpNorm1 * (ABS.invoke(w1) + ABS.invoke(q1) + ABS.invoke(x1) + ABS.invoke(y1) + ABS.invoke(z));
                                 }
 
@@ -474,7 +475,7 @@ public abstract class EvD1D {
             }
 
             // if (tmpColNorm1 !=  ZERO) {
-            if (Double.compare(tmpColNorm1, ZERO) != 0) {
+            if (NumberContext.compare(tmpColNorm1, ZERO) != 0) {
 
                 // Compute Householder transformation.
                 double tmpInvBeta = ZERO;

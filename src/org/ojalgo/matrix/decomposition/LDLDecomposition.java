@@ -41,6 +41,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.type.context.NumberContext;
 
 abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N> implements LDL<N> {
 
@@ -107,7 +108,7 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
 
             // Do the calculations...
             // if (tmpInPlace.doubleValue(ij, ij) != PrimitiveMath.ZERO) {
-            if (Double.compare(tmpInPlace.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0) {
+            if (NumberContext.compare(tmpInPlace.doubleValue(ij, ij), PrimitiveMath.ZERO) != 0) {
 
                 // Calculate multipliers and copy to local column
                 // Current column, below the diagonal

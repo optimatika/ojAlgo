@@ -44,6 +44,7 @@ import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.RawStore;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.PrimitiveScalar;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.
@@ -435,7 +436,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
             h = ZERO;
 
-            if (Double.compare(scale, ZERO) == 0) {
+            if (NumberContext.compare(scale, ZERO) == 0) {
                 // Skip generation, already zero
 
                 e[m] = d[m - 1];
@@ -509,7 +510,7 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
                 data[m][last] = data[m][m];
                 data[m][m] = ONE;
                 h = d[m + 1];
-                if (Double.compare(h, ZERO) != 0) {
+                if (NumberContext.compare(h, ZERO) != 0) {
                     for (int j = 0; j <= m; j++) {
                         d[j] = row[j] / h;
                     }

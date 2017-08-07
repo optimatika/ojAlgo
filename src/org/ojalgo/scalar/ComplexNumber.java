@@ -214,9 +214,9 @@ public final class ComplexNumber extends Number
 
         int retVal = 0;
 
-        if ((retVal = Double.compare(this.norm(), reference.norm())) == 0) {
-            if ((retVal = Double.compare(this.doubleValue(), reference.doubleValue())) == 0) {
-                retVal = Double.compare(i, reference.i);
+        if ((retVal = NumberContext.compare(this.norm(), reference.norm())) == 0) {
+            if ((retVal = NumberContext.compare(this.doubleValue(), reference.doubleValue())) == 0) {
+                retVal = NumberContext.compare(i, reference.i);
             }
         }
 

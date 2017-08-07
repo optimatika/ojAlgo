@@ -27,6 +27,7 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
+import org.ojalgo.type.context.NumberContext;
 
 public final class PrimitiveAggregator extends AggregatorSet<Double> {
 
@@ -449,7 +450,7 @@ public final class PrimitiveAggregator extends AggregatorSet<Double> {
                 public void invoke(final double anArg) {
                     final double tmpArg = PrimitiveFunction.ABS.invoke(anArg);
                     // if (tmpArg != ZERO) {
-                    if (Double.compare(tmpArg, ZERO) != 0) {
+                    if (NumberContext.compare(tmpArg, ZERO) != 0) {
                         myValue = PrimitiveFunction.MIN.invoke(myValue, tmpArg);
                     }
                 }

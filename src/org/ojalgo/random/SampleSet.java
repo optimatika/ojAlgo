@@ -29,6 +29,7 @@ import java.util.Arrays;
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.Primitive64Array;
+import org.ojalgo.type.context.NumberContext;
 
 public final class SampleSet implements Access1D<Double> {
 
@@ -98,7 +99,7 @@ public final class SampleSet implements Access1D<Double> {
         final double tmpCovar = this.getCovariance(anotherSampleSet);
 
         // if (tmpCovar != ZERO) {
-        if (Double.compare(tmpCovar, ZERO) != 0) {
+        if (NumberContext.compare(tmpCovar, ZERO) != 0) {
 
             final double tmpThisStdDev = this.getStandardDeviation();
             final double tmpThatStdDev = anotherSampleSet.getStandardDeviation();
