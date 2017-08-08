@@ -157,8 +157,32 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
     static final class IterationPoint {
 
-        int col;
+        private boolean myPhase1 = true;
+
         int row;
+        int col;
+
+        IterationPoint() {
+            super();
+            this.reset();
+        }
+
+        boolean isPhase1() {
+            return myPhase1;
+        }
+
+        boolean isPhase2() {
+            return !myPhase1;
+        }
+
+        void reset() {
+            row = -1;
+            col = -1;
+        }
+
+        void switchToPhase2() {
+            myPhase1 = false;
+        }
 
     }
 

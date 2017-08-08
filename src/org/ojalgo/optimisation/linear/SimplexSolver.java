@@ -77,60 +77,6 @@ public final class SimplexSolver extends LinearSolver {
 
     }
 
-    static final class PivotPoint {
-
-        private int myRowObjective = -1;
-
-        private final SimplexSolver mySolver;
-        int col = -1;
-        int row = -1;
-
-        PivotPoint(final SimplexSolver solver) {
-
-            super();
-
-            mySolver = solver;
-
-            myRowObjective = mySolver.myTableau.countConstraints() + 1;
-
-            this.reset();
-        }
-
-        int getColRHS() {
-            return mySolver.myTableau.countConstraints() + mySolver.myTableau.countVariables();
-        }
-
-        int getRowObjective() {
-            return myRowObjective;
-        }
-
-        boolean isPhase1() {
-            return myRowObjective == (mySolver.myTableau.countConstraints() + 1);
-        }
-
-        boolean isPhase2() {
-            return myRowObjective == mySolver.myTableau.countConstraints();
-        }
-
-        double objective() {
-            return mySolver.myTableau.doubleValue(this.getRowObjective(), mySolver.myTableau.countConstraints() + mySolver.myTableau.countVariables());
-        }
-
-        int phase() {
-            return myRowObjective == mySolver.myTableau.countConstraints() ? 2 : 1;
-        }
-
-        void reset() {
-            row = -1;
-            col = -1;
-        }
-
-        void switchToPhase2() {
-            myRowObjective = mySolver.myTableau.countConstraints();
-        }
-
-    }
-
     static SparseTableau build(final ExpressionsBasedModel model) {
 
         final List<Variable> tmpPosVariables = model.getPositiveVariables();
@@ -441,7 +387,7 @@ public final class SimplexSolver extends LinearSolver {
     }
 
     private final int[] myBasis;
-    private final PivotPoint myPoint;
+    private final IterationPoint myPoint;
     private final IndexSelector mySelector;
     private final SimplexTableau myTableau;
 
@@ -451,7 +397,7 @@ public final class SimplexSolver extends LinearSolver {
 
         myTableau = tableau;
 
-        myPoint = new PivotPoint(this);
+        myPoint = new IterationPoint();
 
         mySelector = new IndexSelector(tableau.countVariables());
         myBasis = BasicArray.makeIncreasingRange(-myTableau.countConstraints(), myTableau.countConstraints());
@@ -545,7 +491,7 @@ public final class SimplexSolver extends LinearSolver {
 
     @Override
     protected double evaluateFunction(final Access1D<?> solution) {
-        return myPoint.objective();
+        return this.objective();
     }
 
     protected final void exclude(final int anIndexToExclude) {
@@ -600,7 +546,7 @@ public final class SimplexSolver extends LinearSolver {
     protected boolean needsAnotherIteration() {
 
         if (this.isDebug()) {
-            this.debug("\nNeeds Another Iteration? Phase={} Artificials={} Objective={}", myPoint.phase(), this.countBasisDeficit(), myPoint.objective());
+            this.debug("\nNeeds Another Iteration? Phase={} Artificials={} Objective={}", this.phase(), this.countBasisDeficit(), this.objective());
         }
 
         boolean retVal = false;
@@ -609,7 +555,7 @@ public final class SimplexSolver extends LinearSolver {
         if (myPoint.isPhase1()) {
 
             // final double tmpPhaseOneValue = myTransposedTableau.doubleValue(this.countConstraints() + this.countVariables(), myPoint.getRowObjective());
-            final double tmpPhaseOneValue = myTableau.doubleValue(myPoint.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
+            final double tmpPhaseOneValue = myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
 
             if (!this.isBasicArtificials() || options.objective.isZero(tmpPhaseOneValue)) {
 
@@ -687,7 +633,7 @@ public final class SimplexSolver extends LinearSolver {
         if (this.isDebug()) {
             if (options.validate) {
                 this.debug("\nfindNextPivotCol (index of most negative value) among these:\n{}",
-                        Array1D.PRIMITIVE64.copy(myTableau.sliceTableauRow(myPoint.getRowObjective())).copy(tmpExcluded));
+                        Array1D.PRIMITIVE64.copy(myTableau.sliceTableauRow(this.getRowObjective())).copy(tmpExcluded));
             } else {
                 this.debug("\nfindNextPivotCol");
             }
@@ -704,7 +650,7 @@ public final class SimplexSolver extends LinearSolver {
         for (int e = 0; e < tmpExcluded.length; e++) {
             tmpCol = tmpExcluded[e];
             // tmpVal = myTransposedTableau.doubleValue(tmpCol, myPoint.getRowObjective());
-            tmpVal = myTableau.doubleValue(myPoint.getRowObjective(), tmpCol);
+            tmpVal = myTableau.doubleValue(this.getRowObjective(), tmpCol);
             if (tmpVal < tmpMinVal) {
                 retVal = tmpCol;
                 tmpMinVal = tmpVal;
@@ -719,7 +665,7 @@ public final class SimplexSolver extends LinearSolver {
 
     int findNextPivotRow() {
 
-        final int tmpNumerCol = myPoint.getColRHS();
+        final int tmpNumerCol = this.getColRHS();
         final int tmpDenomCol = myPoint.col;
 
         if (this.isDebug()) {
@@ -789,7 +735,7 @@ public final class SimplexSolver extends LinearSolver {
     void performIteration(final int pivotRow, final int pivotCol) {
 
         final double tmpPivotElement = myTableau.doubleValue(pivotRow, pivotCol);
-        final double tmpPivotRHS = myTableau.doubleValue(pivotRow, myPoint.getColRHS());
+        final double tmpPivotRHS = myTableau.doubleValue(pivotRow, this.getColRHS());
 
         final IterationPoint point = new IterationPoint();
         point.row = pivotRow;
@@ -799,7 +745,7 @@ public final class SimplexSolver extends LinearSolver {
 
         if (this.isDebug()) {
             this.debug("Iteration Point <{},{}>\tPivot: {} => {}\tRHS: {} => {}.", pivotRow, pivotCol, tmpPivotElement,
-                    myTableau.doubleValue(pivotRow, pivotCol), tmpPivotRHS, myTableau.doubleValue(pivotRow, myPoint.getColRHS()));
+                    myTableau.doubleValue(pivotRow, pivotCol), tmpPivotRHS, myTableau.doubleValue(pivotRow, this.getColRHS()));
         }
 
         final int tmpOld = myBasis[pivotRow];
@@ -829,6 +775,22 @@ public final class SimplexSolver extends LinearSolver {
             }
 
         }
+    }
+
+    int getColRHS() {
+        return myTableau.countConstraints() + myTableau.countVariables();
+    }
+
+    int getRowObjective() {
+        return myPoint.isPhase1() ? myTableau.countConstraints() + 1 : myTableau.countConstraints();
+    }
+
+    double objective() {
+        return myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
+    }
+
+    int phase() {
+        return myPoint.isPhase2() ? 2 : 1;
     }
 
 }

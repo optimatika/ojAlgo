@@ -76,8 +76,6 @@ public class PrimitiveMathTest extends ConstantTests {
 
     static void compare(final String id, final double arg0, final double arg1) {
 
-        System.out.print(id + ": ");
-
         if (arg0 == arg1) {
             if (NumberContext.compare(arg0, arg1) == 0) {
                 ;
