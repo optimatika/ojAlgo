@@ -31,6 +31,14 @@ import org.ojalgo.netio.BasicLogger;
 
 public abstract class GenericSolver implements Optimisation.Solver, Serializable {
 
+    public static abstract class VeryAbstractBuilder {
+
+        protected int getAdjustmentExponent(final double largest, final double smallest) {
+            return ModelEntity.getAdjustmentExponent(largest, smallest);
+        }
+
+    }
+
     public final Optimisation.Options options;
 
     private final AtomicInteger myIterationsCount = new AtomicInteger(0);

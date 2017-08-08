@@ -48,7 +48,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
+abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimisation.Constraint, Optimisation.Objective, Comparable<ME> {
 
     private static final double _32_0 = EIGHT + EIGHT + EIGHT + EIGHT;
     private static final BigDecimal LARGEST = new BigDecimal(Double.toString(PrimitiveMath.MACHINE_LARGEST), new MathContext(8, RoundingMode.DOWN));
@@ -56,7 +56,7 @@ public abstract class ModelEntity<ME extends ModelEntity<ME>> implements Optimis
 
     static final NumberContext DISPLAY = NumberContext.getGeneral(6);
 
-    public static int getAdjustmentExponent(final double largest, final double smallest) {
+    static int getAdjustmentExponent(final double largest, final double smallest) {
 
         final double tmpLargestExp = largest > ZERO ? PrimitiveFunction.LOG10.invoke(largest) : ZERO;
         final double tmpSmallestExp = smallest > ZERO ? PrimitiveFunction.LOG10.invoke(smallest) : -EIGHT;

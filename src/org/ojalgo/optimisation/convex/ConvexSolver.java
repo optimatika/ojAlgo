@@ -52,7 +52,6 @@ import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
-import org.ojalgo.optimisation.ModelEntity;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.scalar.ComplexNumber;
@@ -89,7 +88,7 @@ import org.ojalgo.scalar.ComplexNumber;
  */
 public abstract class ConvexSolver extends GenericSolver {
 
-    public static abstract class AbstractBuilder<B extends AbstractBuilder<?, ?>, S extends GenericSolver> implements Cloneable {
+    public static abstract class AbstractBuilder<B extends AbstractBuilder<?, ?>, S extends GenericSolver> extends VeryAbstractBuilder implements Cloneable {
 
         static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
@@ -506,7 +505,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 }
             }
 
-            final double tmpExponent = ModelEntity.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
+            final double tmpExponent = this.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
             final double tmpFactor = PrimitiveFunction.POW.invoke(TEN, tmpExponent);
 
             final UnaryFunction<Double> tmpModifier = PrimitiveFunction.MULTIPLY.second(tmpFactor);
@@ -564,7 +563,7 @@ public abstract class ConvexSolver extends GenericSolver {
                 tmpRHS.visitRow(i, 0, tmpLargestAggr);
                 tmpRHS.visitRow(i, 0, tmpSmallestAggr);
 
-                tmpExponent = ModelEntity.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
+                tmpExponent = this.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
                 tmpFactor = PrimitiveFunction.POW.invoke(TEN, tmpExponent);
                 if (assertPositiveRHS && (PrimitiveFunction.SIGNUM.invoke(tmpRHS.doubleValue(i, 0)) < ZERO)) {
                     tmpFactor = -tmpFactor;
