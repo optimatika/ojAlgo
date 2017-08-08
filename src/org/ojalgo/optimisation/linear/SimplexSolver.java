@@ -445,7 +445,7 @@ public final class SimplexSolver extends LinearSolver {
 
         while (this.needsAnotherIteration()) {
 
-            this.performIteration(myPoint.row, myPoint.col);
+            this.performIteration(myPoint);
 
             if (this.isDebug() && this.isTableauPrintable()) {
                 this.logDebugTableau("Tableau Iteration");
@@ -732,14 +732,13 @@ public final class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
-    void performIteration(final int pivotRow, final int pivotCol) {
+    void performIteration(final IterationPoint point) {
+
+        final int pivotRow = point.row;
+        final int pivotCol = point.col;
 
         final double tmpPivotElement = myTableau.doubleValue(pivotRow, pivotCol);
         final double tmpPivotRHS = myTableau.doubleValue(pivotRow, this.getColRHS());
-
-        final IterationPoint point = new IterationPoint();
-        point.row = pivotRow;
-        point.col = pivotCol;
 
         myTableau.pivot(point);
 
