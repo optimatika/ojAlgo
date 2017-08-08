@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.array.Array1D;
-import org.ojalgo.array.BasicArray;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
@@ -44,7 +43,6 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.SimplexTableau.IterationPoint;
 import org.ojalgo.optimisation.linear.SimplexTableau.SparseTableau;
-import org.ojalgo.type.IndexSelector;
 
 /**
  * LinearSolver solves optimisation problems of the (LP standard) form:
@@ -386,9 +384,7 @@ public final class SimplexSolver extends LinearSolver {
 
     }
 
-    private final int[] myBasis;
     private final IterationPoint myPoint;
-    private final IndexSelector mySelector;
     private final SimplexTableau myTableau;
 
     SimplexSolver(final SimplexTableau tableau, final Optimisation.Options solverOptions) {
@@ -399,16 +395,9 @@ public final class SimplexSolver extends LinearSolver {
 
         myPoint = new IterationPoint();
 
-        mySelector = new IndexSelector(tableau.countVariables());
-        myBasis = BasicArray.makeIncreasingRange(-myTableau.countConstraints(), myTableau.countConstraints());
-
         if (this.isDebug() && this.isTableauPrintable()) {
             this.logDebugTableau("Tableau Created");
         }
-    }
-
-    public int[] getBasis() {
-        return myBasis.clone();
     }
 
     public double[] getDualVariables() {
@@ -455,25 +444,8 @@ public final class SimplexSolver extends LinearSolver {
         return this.buildResult();
     }
 
-    private int countBasicArtificials() {
-        int retVal = 0;
-        final int tmpLength = myBasis.length;
-        for (int i = 0; i < tmpLength; i++) {
-            if (myBasis[i] < 0) {
-                retVal++;
-            }
-        }
-        return retVal;
-    }
-
-    private boolean isBasicArtificials() {
-        final int tmpLength = myBasis.length;
-        for (int i = 0; i < tmpLength; i++) {
-            if (myBasis[i] < 0) {
-                return true;
-            }
-        }
-        return false;
+    private int getRowObjective() {
+        return myPoint.isPhase1() ? myTableau.countConstraints() + 1 : myTableau.countConstraints();
     }
 
     private final boolean isTableauPrintable() {
@@ -481,21 +453,21 @@ public final class SimplexSolver extends LinearSolver {
     }
 
     private final void logDebugTableau(final String message) {
-        this.debug(message + "; Basics: " + Arrays.toString(myBasis), myTableau);
+        this.debug(message + "; Basics: " + Arrays.toString(myTableau.getBasis()), myTableau);
         // this.debug("New/alt " + message + "; Basics: " + Arrays.toString(myBasis), myTableau);
     }
 
-    protected final int countBasisDeficit() {
-        return myTableau.countConstraints() - mySelector.countIncluded();
+    private double objective() {
+        return myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
+    }
+
+    private int phase() {
+        return myPoint.isPhase2() ? 2 : 1;
     }
 
     @Override
     protected double evaluateFunction(final Access1D<?> solution) {
         return this.objective();
-    }
-
-    protected final void exclude(final int anIndexToExclude) {
-        mySelector.exclude(anIndexToExclude);
     }
 
     /**
@@ -504,37 +476,19 @@ public final class SimplexSolver extends LinearSolver {
     @Override
     protected PhysicalStore<Double> extractSolution() {
 
-        final int tmpCountVariables = myTableau.countConstraints() + myTableau.countVariables();
+        final int colRHS = myTableau.countConstraints() + myTableau.countVariables();
 
         final PrimitiveDenseStore solution = PrimitiveDenseStore.FACTORY.makeZero(myTableau.countVariables(), 1);
 
-        final int tmpLength = myBasis.length;
-        for (int i = 0; i < tmpLength; i++) {
-            final int tmpBasisIndex = myBasis[i];
-            if (tmpBasisIndex >= 0) {
-                // this.setX(tmpBasisIndex, myTransposedTableau.doubleValue(tmpCountVariables, i));
-                solution.set(tmpBasisIndex, myTableau.doubleValue(i, tmpCountVariables));
+        final int numberOfConstraints = myTableau.countConstraints();
+        for (int row = 0; row < numberOfConstraints; row++) {
+            final int variableIndex = myTableau.getBasis(row);
+            if (variableIndex >= 0) {
+                solution.set(variableIndex, myTableau.doubleValue(row, colRHS));
             }
         }
 
         return solution;
-
-    }
-
-    protected final int[] getExcluded() {
-        return mySelector.getExcluded();
-    }
-
-    protected final int[] getIncluded() {
-        return mySelector.getIncluded();
-    }
-
-    protected final void include(final int anIndexToInclude) {
-        mySelector.include(anIndexToInclude);
-    }
-
-    protected final void include(final int[] someIndecesToInclude) {
-        mySelector.include(someIndecesToInclude);
     }
 
     @Override
@@ -546,7 +500,7 @@ public final class SimplexSolver extends LinearSolver {
     protected boolean needsAnotherIteration() {
 
         if (this.isDebug()) {
-            this.debug("\nNeeds Another Iteration? Phase={} Artificials={} Objective={}", this.phase(), this.countBasisDeficit(), this.objective());
+            this.debug("\nNeeds Another Iteration? Phase={} Artificials={} Objective={}", this.phase(), myTableau.countBasisDeficit(), this.objective());
         }
 
         boolean retVal = false;
@@ -557,10 +511,10 @@ public final class SimplexSolver extends LinearSolver {
             // final double tmpPhaseOneValue = myTransposedTableau.doubleValue(this.countConstraints() + this.countVariables(), myPoint.getRowObjective());
             final double tmpPhaseOneValue = myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
 
-            if (!this.isBasicArtificials() || options.objective.isZero(tmpPhaseOneValue)) {
+            if (!myTableau.isBasicArtificials() || options.objective.isZero(tmpPhaseOneValue)) {
 
                 if (this.isDebug()) {
-                    this.debug("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", this.countBasicArtificials());
+                    this.debug("\nSwitching to Phase2 with {} artificial variable(s) still in the basis.\n", myTableau.countBasicArtificials());
                     // this.debug("Reduced artificial costs:\n{}", this.sliceTableauRow(myPoint.getRowObjective()).copy(this.getExcluded()));
                 }
 
@@ -608,7 +562,7 @@ public final class SimplexSolver extends LinearSolver {
 
         if (this.isDebug()) {
             if (retVal) {
-                this.debug("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row, myBasis[myPoint.row], myPoint.col);
+                this.debug("\n==>>\tRow: {},\tExit: {},\tColumn/Enter: {}.\n", myPoint.row, myTableau.getBasis(myPoint.row), myPoint.col);
             } else {
                 this.debug("\n==>>\tNo more iterations needed/possible.\n");
             }
@@ -628,7 +582,7 @@ public final class SimplexSolver extends LinearSolver {
 
     int findNextPivotCol() {
 
-        final int[] tmpExcluded = this.getExcluded();
+        final int[] tmpExcluded = myTableau.getExcluded();
 
         if (this.isDebug()) {
             if (options.validate) {
@@ -665,7 +619,7 @@ public final class SimplexSolver extends LinearSolver {
 
     int findNextPivotRow() {
 
-        final int tmpNumerCol = this.getColRHS();
+        final int tmpNumerCol = myTableau.countConstraints() + myTableau.countVariables();
         final int tmpDenomCol = myPoint.col;
 
         if (this.isDebug()) {
@@ -692,7 +646,7 @@ public final class SimplexSolver extends LinearSolver {
         for (int i = 0; i < tmpConstraintsCount; i++) {
 
             // Phase 2 with artificials still in the basis
-            final boolean tmpSpecialCase = tmpPhase2 && (myBasis[i] < 0);
+            final boolean tmpSpecialCase = tmpPhase2 && (myTableau.getBasis(i) < 0);
 
             // tmpDenom = myTransposedTableau.doubleValue(tmpDenomCol, i);
             tmpDenom = myTableau.doubleValue(i, tmpDenomCol);
@@ -732,30 +686,18 @@ public final class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
-    void performIteration(final IterationPoint point) {
+    void performIteration(final IterationPoint pivot) {
 
-        final int pivotRow = point.row;
-        final int pivotCol = point.col;
+        final double tmpPivotElement = myTableau.doubleValue(pivot.row, pivot.col);
+        final int tmpColRHS = myTableau.countConstraints() + myTableau.countVariables();
+        final double tmpPivotRHS = myTableau.doubleValue(pivot.row, tmpColRHS);
 
-        final double tmpPivotElement = myTableau.doubleValue(pivotRow, pivotCol);
-        final double tmpPivotRHS = myTableau.doubleValue(pivotRow, this.getColRHS());
-
-        myTableau.pivot(point);
+        myTableau.pivot(pivot);
 
         if (this.isDebug()) {
-            this.debug("Iteration Point <{},{}>\tPivot: {} => {}\tRHS: {} => {}.", pivotRow, pivotCol, tmpPivotElement,
-                    myTableau.doubleValue(pivotRow, pivotCol), tmpPivotRHS, myTableau.doubleValue(pivotRow, this.getColRHS()));
+            this.debug("Iteration Point <{},{}>\tPivot: {} => {}\tRHS: {} => {}.", pivot.row, pivot.col, tmpPivotElement,
+                    myTableau.doubleValue(pivot.row, pivot.col), tmpPivotRHS, myTableau.doubleValue(pivot.row, tmpColRHS));
         }
-
-        final int tmpOld = myBasis[pivotRow];
-        if (tmpOld >= 0) {
-            this.exclude(tmpOld);
-        }
-        final int tmpNew = pivotCol;
-        if (tmpNew >= 0) {
-            this.include(tmpNew);
-        }
-        myBasis[pivotRow] = pivotCol;
 
         if (options.validate) {
 
@@ -774,22 +716,6 @@ public final class SimplexSolver extends LinearSolver {
             }
 
         }
-    }
-
-    int getColRHS() {
-        return myTableau.countConstraints() + myTableau.countVariables();
-    }
-
-    int getRowObjective() {
-        return myPoint.isPhase1() ? myTableau.countConstraints() + 1 : myTableau.countConstraints();
-    }
-
-    double objective() {
-        return myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
-    }
-
-    int phase() {
-        return myPoint.isPhase2() ? 2 : 1;
     }
 
 }

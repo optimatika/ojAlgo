@@ -29,6 +29,7 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.BasicArray;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.DenseArray.Factory;
 import org.ojalgo.array.Primitive64Array;
@@ -41,6 +42,7 @@ import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
+import org.ojalgo.type.IndexSelector;
 
 abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
@@ -131,6 +133,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
             } else if (pivotElement != ONE) {
                 myTransposed.modifyColumn(0, row, MULTIPLY.second(ONE / pivotElement));
             }
+
+            this.update(iterationPoint);
         }
 
         @Override
@@ -159,8 +163,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
         private boolean myPhase1 = true;
 
-        int row;
         int col;
+        int row;
 
         IterationPoint() {
             super();
@@ -397,6 +401,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 myInfeasibility += colVal * pivotedRHS;
             }
 
+            this.update(iterationPoint);
         }
 
         @Override
@@ -489,19 +494,41 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
     }
 
+    private final int[] myBasis;
     private final int myNumberOfConstraints;
     private final int myNumberOfProblemVariables;
     private final int myNumberOfSlackVariables;
+    private final IndexSelector mySelector;
 
     protected SimplexTableau(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
+
         super();
+
         myNumberOfConstraints = numberOfConstraints;
         myNumberOfProblemVariables = numberOfProblemVariables;
         myNumberOfSlackVariables = numberOfSlackVariables;
+
+        mySelector = new IndexSelector(this.countVariables());
+        myBasis = BasicArray.makeIncreasingRange(-numberOfConstraints, numberOfConstraints);
     }
 
     protected int countArtificialVariables() {
         return myNumberOfConstraints;
+    }
+
+    protected int countBasicArtificials() {
+        int retVal = 0;
+        final int tmpLength = myBasis.length;
+        for (int i = 0; i < tmpLength; i++) {
+            if (myBasis[i] < 0) {
+                retVal++;
+            }
+        }
+        return retVal;
+    }
+
+    protected final int countBasisDeficit() {
+        return this.countConstraints() - mySelector.countIncluded();
     }
 
     protected int countConstraints() {
@@ -524,6 +551,44 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         return myNumberOfProblemVariables + myNumberOfSlackVariables + myNumberOfConstraints;
     }
 
+    protected final void exclude(final int anIndexToExclude) {
+        mySelector.exclude(anIndexToExclude);
+    }
+
+    protected int[] getBasis() {
+        return myBasis.clone();
+    }
+
+    protected int getBasis(final int basisIndex) {
+        return myBasis[basisIndex];
+    }
+
+    protected final int[] getExcluded() {
+        return mySelector.getExcluded();
+    }
+
+    protected final int[] getIncluded() {
+        return mySelector.getIncluded();
+    }
+
+    protected final void include(final int anIndexToInclude) {
+        mySelector.include(anIndexToInclude);
+    }
+
+    protected final void include(final int[] someIndecesToInclude) {
+        mySelector.include(someIndecesToInclude);
+    }
+
+    protected boolean isBasicArtificials() {
+        final int tmpLength = myBasis.length;
+        for (int i = 0; i < tmpLength; i++) {
+            if (myBasis[i] < 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected abstract void pivot(IterationPoint iterationPoint);
 
     protected abstract Array1D<Double> sliceConstraintsRHS();
@@ -536,5 +601,21 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     protected abstract Access1D<Double> sliceTableauColumn(final int col);
 
     protected abstract Access1D<Double> sliceTableauRow(final int row);
+
+    protected void update(final IterationPoint point) {
+
+        final int pivotRow = point.row;
+        final int pivotCol = point.col;
+
+        final int tmpOld = myBasis[pivotRow];
+        if (tmpOld >= 0) {
+            this.exclude(tmpOld);
+        }
+        final int tmpNew = pivotCol;
+        if (tmpNew >= 0) {
+            this.include(tmpNew);
+        }
+        myBasis[pivotRow] = pivotCol;
+    }
 
 }
