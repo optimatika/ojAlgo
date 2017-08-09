@@ -24,6 +24,7 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -31,7 +32,6 @@ import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.linear.LinearSolver;
-import org.ojalgo.optimisation.linear.SimplexSolver;
 import org.ojalgo.type.IndexSelector;
 import org.ojalgo.type.context.NumberContext;
 
@@ -596,7 +596,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             tmpLinearBuilder.equalities(tmpLinearAE, tmpLinearBE);
         }
 
-        final SimplexSolver tmpLinearSolver = tmpLinearBuilder.build(options);
+        final LinearSolver tmpLinearSolver = tmpLinearBuilder.build(options);
 
         final Result tmpLinearResult = tmpLinearSolver.solve();
 
@@ -606,14 +606,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.setX(i, tmpLinearResult.doubleValue(i) - tmpLinearResult.doubleValue(tmpNumVars + i));
             }
 
-            @SuppressWarnings("deprecation")
-            final double[] tmpResidual = tmpLinearSolver.getDualVariables();
+            final Access1D<?> lagrangeMultipliers = tmpLinearResult.getMultipliers().get();
 
-            if (tmpResidual.length != (this.countEqualityConstraints() + this.countInequalityConstraints())) {
+            if (lagrangeMultipliers.count() != (this.countEqualityConstraints() + this.countInequalityConstraints())) {
                 throw new IllegalStateException();
             } else {
-                for (int i = 0; i < tmpResidual.length; i++) {
-                    myIterationL.set(i, tmpResidual[i]);
+                for (int i = 0; i < lagrangeMultipliers.count(); i++) {
+                    myIterationL.set(i, lagrangeMultipliers.doubleValue(i));
                 }
             }
 

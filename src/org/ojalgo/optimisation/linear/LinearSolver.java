@@ -38,7 +38,7 @@ import org.ojalgo.optimisation.linear.SimplexTableau.SparseTableau;
 
 public abstract class LinearSolver extends GenericSolver {
 
-    public static final class Builder extends AbstractBuilder<LinearSolver.Builder, SimplexSolver> {
+    public static final class Builder extends AbstractBuilder<LinearSolver.Builder, LinearSolver> {
 
         public Builder(final MatrixStore<Double> C) {
             super(C);
@@ -61,7 +61,7 @@ public abstract class LinearSolver extends GenericSolver {
         }
 
         @Override
-        public SimplexSolver build(final Optimisation.Options options) {
+        public LinearSolver build(final Optimisation.Options options) {
 
             this.validate();
 

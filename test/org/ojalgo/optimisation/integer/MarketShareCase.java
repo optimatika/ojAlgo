@@ -30,7 +30,6 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.LinearSolver;
-import org.ojalgo.optimisation.linear.SimplexSolver;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -217,7 +216,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         final Optimisation.Options tmpOptions = new Optimisation.Options();
         //tmpOptions.debug(LinearSolver.class);
 
-        final SimplexSolver tmpSolver = tmpBuilder.build(tmpOptions);
+        final LinearSolver tmpSolver = tmpBuilder.build(tmpOptions);
 
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
@@ -358,7 +357,7 @@ public final class MarketShareCase extends OptimisationIntegerTests {
         //        tmpOptions.debug_solver = LinearSolver.class;
         //        tmpOptions.validate = true;
 
-        final SimplexSolver tmpSolver = tmpBuilder.build(tmpOptions);
+        final LinearSolver tmpSolver = tmpBuilder.build(tmpOptions);
 
         final Optimisation.Result tmpResult = tmpSolver.solve();
 

@@ -24,6 +24,7 @@ package org.ojalgo.optimisation;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
@@ -283,6 +284,7 @@ public interface Optimisation {
 
     public static final class Result implements Optimisation, Access1D<BigDecimal>, Comparable<Optimisation.Result>, Serializable {
 
+        private transient Access1D<?> myMultipliers = null;
         private final Access1D<?> mySolution;
         private final Optimisation.State myState;
         private final double myValue; // Objective Function Value
@@ -343,6 +345,13 @@ public interface Optimisation {
             return TypeUtils.toBigDecimal(mySolution.get(index));
         }
 
+        /**
+         * The dual variables or Lagrange multipliers associated with the problem.
+         */
+        public Optional<Access1D<?>> getMultipliers() {
+            return Optional.ofNullable(myMultipliers);
+        }
+
         public Optimisation.State getState() {
             return myState;
         }
@@ -365,6 +374,11 @@ public interface Optimisation {
             return result;
         }
 
+        public Result multipliers(final Access1D<?> multipliers) {
+            myMultipliers = multipliers;
+            return this;
+        }
+
         public int size() {
             return (int) this.count();
         }
@@ -373,6 +387,7 @@ public interface Optimisation {
         public String toString() {
             return myState + " " + myValue + " @ " + Array1D.PRIMITIVE64.copy(mySolution);
         }
+
     }
 
     /**

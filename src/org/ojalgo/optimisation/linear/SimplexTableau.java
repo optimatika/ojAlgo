@@ -143,8 +143,24 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         }
 
         @Override
-        protected Array1D<Double> sliceDualVariables() {
-            return myTransposed.sliceColumn(this.countConstraints()).sliceRange(this.countVariables(), this.countVariables() + this.countConstraints());
+        protected Access1D<Double> sliceDualVariables() {
+            final Array1D<Double> tmpSliceRange = myTransposed.sliceColumn(this.countConstraints()).sliceRange(this.countVariables(),
+                    this.countVariables() + this.countConstraints());
+            return new Access1D<Double>() {
+
+                public long count() {
+                    return tmpSliceRange.count();
+                }
+
+                public double doubleValue(final long index) {
+                    return -tmpSliceRange.doubleValue(index);
+                }
+
+                public Double get(final long index) {
+                    return -tmpSliceRange.doubleValue(index);
+                }
+
+            };
         }
 
         @Override
@@ -410,8 +426,23 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         }
 
         @Override
-        protected Array1D<Double> sliceDualVariables() {
-            return myObjectiveWeights.sliceRange(this.countVariables(), this.countVariables() + this.countConstraints());
+        protected Access1D<Double> sliceDualVariables() {
+            final Array1D<Double> tmpSliceRange = myObjectiveWeights.sliceRange(this.countVariables(), this.countVariables() + this.countConstraints());
+            return new Access1D<Double>() {
+
+                public long count() {
+                    return tmpSliceRange.count();
+                }
+
+                public double doubleValue(final long index) {
+                    return -tmpSliceRange.doubleValue(index);
+                }
+
+                public Double get(final long index) {
+                    return -tmpSliceRange.doubleValue(index);
+                }
+
+            };
         }
 
         @Override
@@ -596,7 +627,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     /**
      * @return An array of the dual variable values (of the original problem, not phase 1).
      */
-    protected abstract Array1D<Double> sliceDualVariables();
+    protected abstract Access1D<Double> sliceDualVariables();
 
     protected abstract Access1D<Double> sliceTableauColumn(final int col);
 

@@ -400,36 +400,6 @@ public final class SimplexSolver extends LinearSolver {
         }
     }
 
-    public double[] getDualVariables() {
-
-        final Array1D<Double> negatedDualVariables = myTableau.sliceDualVariables();
-        final double[] retVal = new double[negatedDualVariables.size()];
-
-        for (int j = 0; j < retVal.length; j++) {
-            retVal[j] = -negatedDualVariables.doubleValue(j);
-        }
-
-        return retVal;
-    }
-
-    public double[] getResidualCosts() {
-
-        this.logDebugTableau("Tableau extracted");
-
-        final double[] retVal = new double[myTableau.countVariables()];
-
-        final int tmpRowObjective = myTableau.countConstraints();
-
-        // final double tmpObjVal = myTransposedTableau.doubleValue(32, tmpRowObjective);
-
-        for (int j = 0; j < retVal.length; j++) {
-            // retVal[j] = myTransposedTableau.doubleValue(j, tmpRowObjective);
-            retVal[j] = myTableau.doubleValue(tmpRowObjective, j);
-        }
-
-        return retVal;
-    }
-
     public Result solve(final Result kickStarter) {
 
         while (this.needsAnotherIteration()) {
@@ -463,6 +433,11 @@ public final class SimplexSolver extends LinearSolver {
 
     private int phase() {
         return myPoint.isPhase2() ? 2 : 1;
+    }
+
+    @Override
+    protected Result buildResult() {
+        return super.buildResult().multipliers(myTableau.sliceDualVariables());
     }
 
     @Override
