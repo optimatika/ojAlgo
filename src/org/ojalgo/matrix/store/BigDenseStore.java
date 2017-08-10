@@ -688,6 +688,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         }
     }
 
+    public void fillColumn(final long row, final long col, final Access1D<BigDecimal> values) {
+        myUtility.fillColumn(row, col, values);
+    }
+
     public void fillColumn(final long row, final long col, final BigDecimal value) {
         myUtility.fillColumn(row, col, value);
     }
@@ -762,6 +766,10 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
 
     public void fillOne(final long row, final long col, final NullaryFunction<BigDecimal> supplier) {
         myUtility.fillOne(row, col, supplier);
+    }
+
+    public void fillRow(final long row, final long col, final Access1D<BigDecimal> values) {
+        myUtility.fillRow(row, col, values);
     }
 
     public void fillRow(final long row, final long col, final BigDecimal value) {

@@ -34,7 +34,6 @@ import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.convex.ConvexSolver.AbstractBuilder;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
-import org.ojalgo.optimisation.linear.SimplexTableau.SparseTableau;
 
 public abstract class LinearSolver extends GenericSolver {
 
@@ -85,7 +84,7 @@ public abstract class LinearSolver extends GenericSolver {
 
         public LinearSolver build(final ExpressionsBasedModel model) {
 
-            final SparseTableau tableau = SimplexSolver.build(model);
+            final SimplexTableau tableau = SimplexSolver.build(model);
 
             return new SimplexSolver(tableau, model.options);
         }

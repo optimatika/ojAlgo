@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.array.Array1D;
@@ -42,7 +43,6 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.linear.SimplexTableau.IterationPoint;
-import org.ojalgo.optimisation.linear.SimplexTableau.SparseTableau;
 
 /**
  * LinearSolver solves optimisation problems of the (LP standard) form:
@@ -75,7 +75,7 @@ public final class SimplexSolver extends LinearSolver {
 
     }
 
-    static SparseTableau build(final ExpressionsBasedModel model) {
+    static SimplexTableau build(final ExpressionsBasedModel model) {
 
         final List<Variable> tmpPosVariables = model.getPositiveVariables();
         final List<Variable> tmpNegVariables = model.getNegativeVariables();
@@ -107,7 +107,7 @@ public final class SimplexSolver extends LinearSolver {
                 + tmpVarsNegUp.size();
         final int tmpTotalVarCount = tmpProblVarCount + tmpSlackVarCount;
 
-        final SparseTableau retVal = new SparseTableau(tmpConstraiCount, tmpProblVarCount, tmpSlackVarCount);
+        final SimplexTableau retVal = SimplexTableau.make(tmpConstraiCount, tmpProblVarCount, tmpSlackVarCount);
 
         final int tmpPosVarsBaseIndex = 0;
         final int tmpNegVarsBaseIndex = tmpPosVarsBaseIndex + tmpPosVariables.size();
@@ -380,8 +380,14 @@ public final class SimplexSolver extends LinearSolver {
         }
         tmpConstrBaseIndex += tmpVarsNegUpLength;
 
-        return retVal;
+        //        BasicLogger.DEBUG.printmtrx("Sparse", retVal);
+        //        BasicLogger.DEBUG.printmtrx("Dense", retVal.toDense());
 
+        if (retVal.getOvercapacity() <= OjAlgoUtils.ENVIRONMENT.getCacheElements(8L)) {
+            return retVal.toDense();
+        } else {
+            return retVal;
+        }
     }
 
     private final IterationPoint myPoint;

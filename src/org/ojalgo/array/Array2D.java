@@ -383,6 +383,22 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
         myDelegate.fill(0L, this.count(), 1L, supplier);
     }
 
+    public void fillColumn(final long row, final long col, final Access1D<N> values) {
+
+        final long offset = Structure2D.index(myRowsCount, row, col);
+        final long limit = Math.min(this.countRows() - row, values.count());
+
+        if (myDelegate.isPrimitive()) {
+            for (long i = 0L; i < limit; i++) {
+                this.set(offset + i, values.doubleValue(i));
+            }
+        } else {
+            for (long i = 0L; i < limit; i++) {
+                this.fillOne(offset + i, values.get(i));
+            }
+        }
+    }
+
     public void fillColumn(final long row, final long col, final N value) {
         myDelegate.fill(Structure2D.index(myRowsCount, row, col), Structure2D.index(myRowsCount, myRowsCount, col), 1L, value);
     }
@@ -431,6 +447,22 @@ public final class Array2D<N extends Number> implements Access2D<N>, Access2D.El
 
     public void fillRange(final long first, final long limit, final NullaryFunction<N> supplier) {
         myDelegate.fill(first, limit, 1L, supplier);
+    }
+
+    public void fillRow(final long row, final long col, final Access1D<N> values) {
+
+        final long offset = Structure2D.index(myRowsCount, row, col);
+        final long limit = Math.min(this.countColumns() - col, values.count());
+
+        if (myDelegate.isPrimitive()) {
+            for (long i = 0L; i < limit; i++) {
+                this.set(offset + (i * myRowsCount), values.doubleValue(i));
+            }
+        } else {
+            for (long i = 0L; i < limit; i++) {
+                this.fillOne(offset + (i * myRowsCount), values.get(i));
+            }
+        }
     }
 
     public void fillRow(final long row, final long col, final N value) {

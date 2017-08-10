@@ -732,11 +732,7 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
     }
 
     public void fillColumn(final long row, final long col, final Access1D<Double> values) {
-        final long tmpOffset = row + (col * myRowDim);
-        final long tmpCount = values.count();
-        for (long i = 0L; i < tmpCount; i++) {
-            this.set(tmpOffset + i, values.doubleValue(i));
-        }
+        myUtility.fillColumn(row, col, values);
     }
 
     public void fillColumn(final long row, final long col, final Double value) {
@@ -845,6 +841,10 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
 
     public void fillOne(final long row, final long col, final NullaryFunction<Double> supplier) {
         myUtility.fillOne(row, col, supplier);
+    }
+
+    public void fillRow(final long row, final long col, final Access1D<Double> values) {
+        myUtility.fillRow(row, col, values);
     }
 
     public void fillRow(final long row, final long col, final Double value) {

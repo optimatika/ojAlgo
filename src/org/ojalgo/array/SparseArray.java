@@ -219,6 +219,14 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
         return myCount;
     }
 
+    public final long countNonzeros() {
+        return myActualLength;
+    }
+
+    public final long countZeros() {
+        return myCount - myActualLength;
+    }
+
     @Override
     public double dot(final Access1D<?> vector) {
 

@@ -707,6 +707,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         }
     }
 
+    public void fillColumn(final long row, final long col, final Access1D<ComplexNumber> values) {
+        myUtility.fillColumn(row, col, values);
+    }
+
     public void fillColumn(final long row, final long col, final ComplexNumber value) {
         myUtility.fillColumn(row, col, value);
     }
@@ -781,6 +785,10 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
 
     public void fillOne(final long row, final long col, final NullaryFunction<ComplexNumber> supplier) {
         myUtility.fillOne(row, col, supplier);
+    }
+
+    public void fillRow(final long row, final long col, final Access1D<ComplexNumber> values) {
+        myUtility.fillRow(row, col, values);
     }
 
     public void fillRow(final long row, final long col, final ComplexNumber value) {
