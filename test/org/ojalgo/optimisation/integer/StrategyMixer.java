@@ -39,7 +39,7 @@ public class StrategyMixer extends OptimisationIntegerTests {
         super(someName);
     }
 
-    public void _testStratCombPortfolioMixerRandom() {
+    public void testStratCombPortfolioMixerRandom() {
 
         final FinancePortfolio tmpTarget = new SimplePortfolio(QUARTER, QUARTER, QUARTER, QUARTER).normalise();
 
