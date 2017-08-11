@@ -31,13 +31,11 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.optimisation.convex.ConvexSolver;
-import org.ojalgo.optimisation.convex.ConvexSolver.AbstractBuilder;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 
 public abstract class LinearSolver extends GenericSolver {
 
-    public static final class Builder extends AbstractBuilder<LinearSolver.Builder, LinearSolver> {
+    public static final class Builder extends GenericSolver.AbstractBuilder<LinearSolver.Builder, LinearSolver> {
 
         public Builder(final MatrixStore<Double> C) {
             super(C);
@@ -47,7 +45,7 @@ public abstract class LinearSolver extends GenericSolver {
             super();
         }
 
-        Builder(final ConvexSolver.AbstractBuilder<LinearSolver.Builder, SimplexSolver> matrices) {
+        Builder(final GenericSolver.AbstractBuilder<LinearSolver.Builder, SimplexSolver> matrices) {
             super(matrices);
         }
 
