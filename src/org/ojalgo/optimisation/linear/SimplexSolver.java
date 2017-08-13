@@ -408,6 +408,10 @@ public final class SimplexSolver extends LinearSolver {
 
     public Result solve(final Result kickStarter) {
 
+        if (this.isDebug() && this.isTableauPrintable()) {
+            this.logDebugTableau("Initial Tableau");
+        }
+
         while (this.needsAnotherIteration()) {
 
             this.performIteration(myPoint);
@@ -434,7 +438,7 @@ public final class SimplexSolver extends LinearSolver {
     }
 
     private double objective() {
-        return myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
+        return -myTableau.doubleValue(this.getRowObjective(), myTableau.countConstraints() + myTableau.countVariables());
     }
 
     private int phase() {

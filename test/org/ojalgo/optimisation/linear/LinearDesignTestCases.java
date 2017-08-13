@@ -26,6 +26,7 @@ import static org.ojalgo.constant.BigMath.*;
 import java.math.BigDecimal;
 
 import org.ojalgo.TestUtils;
+import org.ojalgo.access.Access1D;
 import org.ojalgo.array.BigArray;
 import org.ojalgo.constant.BigMath;
 import org.ojalgo.function.PrimitiveFunction;
@@ -33,6 +34,7 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.BigMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -440,6 +442,114 @@ public class LinearDesignTestCases extends OptimisationLinearTests {
 
         TestUtils.assertEquals("Solution Not Correct", tmpExpSol, tmpResult, new NumberContext(8, 8));
         TestUtils.assertTrue("Solver State Not Optimal", tmpResult.getState().isOptimal());
+    }
+
+    /**
+     * http://web.mit.edu/15.053/www/AMP-Chapter-04.pdf
+     * https://web.fe.up.pt/~mac/ensino/docs/OT20122013/Chapter%204%20-%20Duality%20in%20Linear%20Programming.pdf
+     */
+    public void testDuality() {
+
+        final Factory<Double, PrimitiveDenseStore> factory = PrimitiveDenseStore.FACTORY;
+
+        final PrimitiveDenseStore expPrimSol = factory.rows(new double[] { 36.0, 0.0, 6.0 });
+        final PrimitiveDenseStore expDualSol = factory.rows(new double[] { 11.0, 0.5 });
+        final double expOptVal = 294.0;
+
+        final LinearSolver.Builder primal = LinearSolver.getBuilder();
+
+        // Negated since actual problem is max and algorithm expects min
+        final PrimitiveDenseStore pC = factory.makeZero(5, 1);
+        pC.set(0, -6.0);
+        pC.set(1, -14.0);
+        pC.set(2, -13.0);
+        pC.set(3, 0);
+        pC.set(4, 0);
+
+        primal.objective(pC);
+
+        final PrimitiveDenseStore pAE = factory.makeZero(2, 5);
+        pAE.set(0, 0, 0.5);
+        pAE.set(0, 1, 2.0);
+        pAE.set(0, 2, 1.0);
+        pAE.set(0, 3, 1.0);
+        pAE.set(0, 4, 0.0);
+        pAE.set(1, 0, 1.0);
+        pAE.set(1, 1, 2.0);
+        pAE.set(1, 2, 4.0);
+        pAE.set(1, 3, 0.0);
+        pAE.set(1, 4, 1.0);
+
+        final PrimitiveDenseStore pBE = factory.makeZero(2, 1);
+        pBE.set(0, 24.0);
+        pBE.set(1, 60.0);
+
+        primal.equalities(pAE, pBE);
+
+        final LinearSolver primalSolver = primal.build();
+        // primalSolver.options.debug(LinearSolver.class);
+        final Result pRes = primalSolver.solve();
+        final Access1D<?> pMultipliers = factory.columns(pRes.getMultipliers().get());
+
+        TestUtils.assertStateNotLessThanOptimal(pRes);
+        // Negated since actual problem is max and algorithm expects min
+        TestUtils.assertEquals(expOptVal, -pRes.getValue());
+        for (int i = 0; i < expPrimSol.count(); i++) {
+            TestUtils.assertEquals(expPrimSol.doubleValue(i), pRes.doubleValue(i));
+        }
+        for (int i = 0; i < expDualSol.count(); i++) {
+            // Negated since actual problem is max and algorithm expects min
+            TestUtils.assertEquals(expDualSol.doubleValue(i), -pMultipliers.doubleValue(i));
+        }
+
+        final LinearSolver.Builder dual = LinearSolver.getBuilder();
+
+        final PrimitiveDenseStore dC = factory.makeZero(5, 1);
+        dC.set(0, 24.0);
+        dC.set(1, 60.0);
+        dC.set(2, 0.0);
+        dC.set(3, 0.0);
+        dC.set(4, 0.0);
+
+        dual.objective(dC);
+
+        final PrimitiveDenseStore dAE = factory.makeZero(3, 5);
+        dAE.set(0, 0, 0.5);
+        dAE.set(0, 1, 1.0);
+        dAE.set(0, 2, -1.0);
+        dAE.set(0, 3, 0.0);
+        dAE.set(0, 4, 0.0);
+        dAE.set(1, 0, 2.0);
+        dAE.set(1, 1, 2.0);
+        dAE.set(1, 2, 0.0);
+        dAE.set(1, 3, -1.0);
+        dAE.set(1, 4, 0.0);
+        dAE.set(2, 0, 1.0);
+        dAE.set(2, 1, 4.0);
+        dAE.set(2, 2, 0.0);
+        dAE.set(2, 3, 0.0);
+        dAE.set(2, 4, -1.0);
+
+        final PrimitiveDenseStore dBE = factory.makeZero(3, 1);
+        dBE.set(0, 6.0);
+        dBE.set(1, 14.0);
+        dBE.set(2, 13.0);
+
+        dual.equalities(dAE, dBE);
+
+        final LinearSolver dualSolver = dual.build();
+        // dualSolver.options.debug(LinearSolver.class);
+        final Result dRes = dualSolver.solve();
+        final Access1D<?> dMultipliers = factory.columns(dRes.getMultipliers().get());
+
+        TestUtils.assertStateNotLessThanOptimal(dRes);
+        TestUtils.assertEquals(expOptVal, dRes.getValue());
+        for (int i = 0; i < expDualSol.count(); i++) {
+            TestUtils.assertEquals(expDualSol.doubleValue(i), dRes.doubleValue(i));
+        }
+        for (int i = 0; i < expPrimSol.count(); i++) {
+            TestUtils.assertEquals(expPrimSol.doubleValue(i), dMultipliers.doubleValue(i));
+        }
     }
 
     public void testUnboundedCase() {
