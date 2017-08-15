@@ -32,11 +32,3 @@ Bug reports and feature requests should preferably be posted here at GitHub: htt
 The [ojAlgo-user mailing list](https://sourceforge.net/p/ojalgo/mailman/ojalgo-user/) can be used for just about anything as long as it relates to ojAlgo. (Note that you have to be a member to post to that list!)
 
 ojAlgo is Open Source, and you are strongly encouraged to clone or fork this repository and work directly with the source code. The source code is (part of) the documentation, and you should read it.
-
-### Contributions
-
-Feel free to contribute any way you want. Whatever you feel is missing or "wrong", just fix it.
-
-One very good way to contribute is to supply test cases that verify that the functionality you use works as expected. The ojAlgo code base is often refactored. Having tests specific to your use case can be very beneficial (for you) in assuring future releases.
-
-...or have a look at the list of [open issues](https://github.com/optimatika/ojAlgo/issues) to see if there is something you can help out with.
