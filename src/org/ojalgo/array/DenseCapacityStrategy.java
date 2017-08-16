@@ -114,9 +114,6 @@ final class DenseCapacityStrategy<N extends Number> {
     }
 
     DenseCapacityStrategy<N> chunk(final long chunk) {
-        if (myLimit != LIMIT) {
-            throw new IllegalStateException();
-        }
         final int power = PrimitiveMath.powerOf2Smaller(Math.min(chunk, mySegment));
         myChunk = 1L << power;
         return this;
@@ -131,7 +128,7 @@ final class DenseCapacityStrategy<N extends Number> {
         final long required = current + 1L;
 
         if (required > myLimit) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Requires a count/size greater than the limit!");
         }
 
         if (myLimit <= CHUNK) {
@@ -152,9 +149,6 @@ final class DenseCapacityStrategy<N extends Number> {
      * Enforced to be &gt;= 1
      */
     DenseCapacityStrategy<N> initial(final long initial) {
-        if (myLimit != LIMIT) {
-            throw new IllegalStateException();
-        }
         myInitial = Math.max(1, initial);
         return this;
     }
@@ -209,9 +203,6 @@ final class DenseCapacityStrategy<N extends Number> {
     }
 
     DenseCapacityStrategy<N> segment(final long segment) {
-        if (myLimit != LIMIT) {
-            throw new IllegalStateException();
-        }
         final int power = PrimitiveMath.powerOf2Smaller(Math.max(myChunk, segment));
         mySegment = 1L << power;
         return this;
