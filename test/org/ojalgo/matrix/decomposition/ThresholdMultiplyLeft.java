@@ -35,9 +35,22 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 /**
- * Mac Pro. 2015-06-24 => ?
+ * Mac Pro. 2017-08-16 => 16
  *
  * <pre>
+# Run complete. Total time: 00:01:28
+
+Benchmark                   (dim)  (z)   Mode  Cnt        Score         Error    Units
+ThresholdMultiplyLeft.tune      8    1  thrpt    3  7486576.379 ±   50550.285  ops/min
+ThresholdMultiplyLeft.tune      8    2  thrpt    3  1256364.920 ±   15629.756  ops/min
+ThresholdMultiplyLeft.tune     16    1  thrpt    3  6034091.209 ±  449494.011  ops/min
+ThresholdMultiplyLeft.tune     16    2  thrpt    3  1219166.636 ±   79791.638  ops/min
+ThresholdMultiplyLeft.tune     32    1  thrpt    3   931258.161 ± 2242906.125  ops/min
+ThresholdMultiplyLeft.tune     32    2  thrpt    3   942363.439 ±  294455.026  ops/min
+ThresholdMultiplyLeft.tune     64    1  thrpt    3   158591.994 ±    1437.316  ops/min
+ThresholdMultiplyLeft.tune     64    2  thrpt    3   412682.819 ±  143663.913  ops/min
+ThresholdMultiplyLeft.tune    128    1  thrpt    3    22318.964 ±     357.957  ops/min
+ThresholdMultiplyLeft.tune    128    2  thrpt    3    77806.891 ±    1061.067  ops/min
  * </pre>
  *
  * MacBook Air. 2015-06-27 => 32
