@@ -31,51 +31,69 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 
 public abstract class LinearSolver extends GenericSolver {
 
     public static final class Builder extends GenericSolver.AbstractBuilder<LinearSolver.Builder, LinearSolver> {
 
+        private final ConvexSolver.Builder myDelegate;
+
         public Builder(final MatrixStore<Double> C) {
-            super(C);
+
+            super();
+
+            myDelegate = new ConvexSolver.Builder(C);
         }
 
         Builder() {
+
             super();
-        }
 
-        Builder(final GenericSolver.AbstractBuilder<LinearSolver.Builder, SimplexSolver> matrices) {
-            super(matrices);
-        }
-
-        Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
-            super(Q, C);
-        }
-
-        Builder(final MatrixStore<Double>[] aMtrxArr) {
-            super(aMtrxArr);
+            myDelegate = new ConvexSolver.Builder();
         }
 
         @Override
         public LinearSolver build(final Optimisation.Options options) {
 
-            this.validate();
+            myDelegate.validate();
 
             final SimplexTableau tableau = new DenseTableau(this);
 
             return new SimplexSolver(tableau, options);
         }
 
-        @Override
-        public LinearSolver.Builder equalities(final MatrixStore<Double> AE, final MatrixStore<Double> BE) {
-            return super.equalities(AE, BE);
+        public int countEqualityConstraints() {
+            return myDelegate.countEqualityConstraints();
         }
 
-        @Override
-        public LinearSolver.Builder objective(final MatrixStore<Double> C) {
-            return super.objective(C);
+        public int countVariables() {
+            return myDelegate.countVariables();
         }
+
+        public LinearSolver.Builder equalities(final MatrixStore<Double> AE, final MatrixStore<Double> BE) {
+            myDelegate.equalities(AE, BE);
+            return this;
+        }
+
+        public MatrixStore<Double> getAE() {
+            return myDelegate.getAE();
+        }
+
+        public MatrixStore<Double> getBE() {
+            return myDelegate.getBE();
+        }
+
+        public MatrixStore<Double> getC() {
+            return myDelegate.getC();
+        }
+
+        public LinearSolver.Builder objective(final MatrixStore<Double> C) {
+            myDelegate.objective(C);
+            return this;
+        }
+
     }
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {

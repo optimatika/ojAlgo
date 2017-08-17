@@ -28,18 +28,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.function.BinaryFunction;
+import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.MatrixUtils;
+import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.decomposition.Cholesky;
 import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.optimisation.Expression;
@@ -48,6 +53,7 @@ import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.scalar.ComplexNumber;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * ConvexSolver solves optimisation problems of the form:
@@ -83,24 +89,75 @@ public abstract class ConvexSolver extends GenericSolver {
 
     public static final class Builder extends GenericSolver.AbstractBuilder<ConvexSolver.Builder, ConvexSolver> {
 
-        public Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
-            super(Q, C);
-        }
+        static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
+        static final NumberContext NC = NumberContext.getGeneral(12);
 
-        Builder() {
+        private MatrixStore<Double> myAE = null;
+        private SparseStore<Double> myAI = null;
+        private MatrixStore<Double> myBE = null;
+        private MatrixStore<Double> myBI = null;
+        private MatrixStore<Double> myC = null;
+        private MatrixStore<Double> myQ = null;
+        private PrimitiveDenseStore myX = null;
+
+        public Builder() {
             super();
         }
 
-        Builder(final ConvexSolver.Builder matrices) {
-            super(matrices);
+        public Builder(final MatrixStore<Double> C) {
+
+            super();
+
+            this.objective(C);
         }
 
-        Builder(final MatrixStore<Double> C) {
-            super(C);
+        public Builder(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
+
+            super();
+
+            this.objective(Q, C);
         }
 
-        Builder(final MatrixStore<Double>[] aMtrxArr) {
-            super(aMtrxArr);
+        protected Builder(final ConvexSolver.Builder matrices) {
+
+            super();
+
+            if (matrices.hasEqualityConstraints()) {
+                this.equalities(matrices.getAE(), matrices.getBE());
+            }
+
+            if (matrices.hasObjective()) {
+                if (matrices.getQ() != null) {
+                    this.objective(matrices.getQ(), matrices.getC());
+                } else {
+                    this.objective(matrices.getC());
+                }
+            }
+
+            if (matrices.hasInequalityConstraints()) {
+                this.inequalities(matrices.getAI(), matrices.getBI());
+            }
+        }
+
+        Builder(final MatrixStore<Double>[] matrices) {
+
+            super();
+
+            if ((matrices.length >= 2) && (matrices[0] != null) && (matrices[1] != null)) {
+                this.equalities(matrices[0], matrices[1]);
+            }
+
+            if (matrices.length >= 4) {
+                if (matrices[2] != null) {
+                    this.objective(matrices[2], matrices[3]);
+                } else if (matrices[3] != null) {
+                    this.objective(matrices[3]);
+                }
+            }
+
+            if ((matrices.length >= 6) && (matrices[4] != null) && (matrices[5] != null)) {
+                this.inequalities(matrices[4], matrices[5]);
+            }
         }
 
         @Override
@@ -121,19 +178,378 @@ public abstract class ConvexSolver extends GenericSolver {
             }
         }
 
-        @Override
+        public int countEqualityConstraints() {
+            return (int) ((this.getAE() != null) ? this.getAE().countRows() : 0);
+        }
+
+        public int countInequalityConstraints() {
+            return (int) ((this.getAI() != null) ? this.getAI().countRows() : 0);
+        }
+
+        public int countVariables() {
+
+            int retVal = -1;
+
+            if (this.getAE() != null) {
+                retVal = (int) this.getAE().countColumns();
+            } else if (this.getAI() != null) {
+                retVal = (int) this.getAI().countColumns();
+            } else if (this.getQ() != null) {
+                retVal = (int) this.getQ().countRows();
+            } else if (this.getC() != null) {
+                retVal = (int) this.getC().countRows();
+            } else {
+                throw new ProgrammingError("Cannot deduce the number of variables!");
+            }
+
+            return retVal;
+        }
+
         public ConvexSolver.Builder equalities(final MatrixStore<Double> AE, final MatrixStore<Double> BE) {
-            return super.equalities(AE, BE);
+
+            if ((AE == null) || (BE == null) || (AE.countRows() != BE.countRows())) {
+                throw new IllegalArgumentException();
+            }
+
+            myAE = AE;
+            myBE = BE;
+
+            return this;
         }
 
-        @Override
+        /**
+         * [AE][X] == [BE]
+         */
+        public MatrixStore<Double> getAE() {
+            return myAE;
+        }
+
+        public MatrixStore<Double> getAEX() {
+
+            final MatrixStore<Double> tmpAE = this.getAE();
+            final PhysicalStore<Double> tmpX = this.getX();
+
+            if ((tmpAE != null) && (tmpX != null)) {
+                return tmpAE.multiply(tmpX);
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * [AI][X] &lt;= [BI]
+         */
+        public MatrixStore<Double> getAI() {
+            return myAI;
+        }
+
+        public MatrixStore<Double> getAIX(final int[] selector) {
+
+            final MatrixStore<Double> tmpAI = this.getAI();
+            final PhysicalStore<Double> tmpX = this.getX();
+
+            if ((tmpAI != null) && (tmpX != null)) {
+                return tmpAI.logical().row(selector).get().multiply(tmpX);
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * [AE][X] == [BE]
+         */
+        public MatrixStore<Double> getBE() {
+            return myBE;
+        }
+
+        /**
+         * [AI][X] &lt;= [BI]
+         */
+        public MatrixStore<Double> getBI() {
+            return myBI;
+        }
+
+        public MatrixStore<Double> getBI(final int[] selector) {
+            return this.getBI().logical().row(selector).get();
+        }
+
+        /**
+         * Linear objective: [C]
+         */
+        public MatrixStore<Double> getC() {
+            return myC;
+        }
+
+        /**
+         * Quadratic objective: [Q]
+         */
+        public MatrixStore<Double> getQ() {
+            return myQ;
+        }
+
+        /**
+         * Slack for Equalities: [SE] = [BE] - [AE][X]
+         */
+        public PhysicalStore<Double> getSE() {
+
+            PhysicalStore<Double> retVal = null;
+
+            if ((this.getAE() != null) && (this.getBE() != null) && (this.getX() != null)) {
+
+                retVal = this.getBE().copy();
+
+                retVal.modifyMatching(PrimitiveFunction.SUBTRACT, this.getAEX());
+            }
+
+            return retVal;
+        }
+
+        /**
+         * Selected Slack for Inequalities
+         */
+        public MatrixStore<Double> getSI(final int... selector) {
+            final PhysicalStore<Double> tmpSI = this.getSI();
+            if (tmpSI != null) {
+                return tmpSI.logical().row(selector).get();
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Solution / Variables: [X]
+         */
+        public PhysicalStore<Double> getX() {
+            if (myX == null) {
+                myX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1);
+            }
+            return myX;
+        }
+
+        public boolean hasEqualityConstraints() {
+            return (this.getAE() != null) && (this.getAE().countRows() > 0);
+        }
+
+        public boolean hasInequalityConstraints() {
+            return (this.getAI() != null) && (this.getAI().countRows() > 0);
+        }
+
+        public boolean hasObjective() {
+            return (this.getQ() != null) || (this.getC() != null);
+        }
+
         public ConvexSolver.Builder inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI) {
-            return super.inequalities(AI, BI);
+
+            if ((AI == null) || (BI == null) || (AI.countRows() != BI.countRows())) {
+                throw new IllegalArgumentException();
+            }
+
+            if (AI instanceof SparseStore) {
+
+                myAI = (SparseStore<Double>) AI;
+
+            } else {
+
+                myAI = SparseStore.PRIMITIVE.make(AI.countRows(), AI.countColumns());
+
+                double value;
+                for (int j = 0; j < AI.countColumns(); j++) {
+                    for (int i = 0; i < AI.countRows(); i++) {
+                        value = AI.doubleValue(i, j);
+                        if (!NC.isZero(value)) {
+                            myAI.set(i, j, value);
+                        }
+                    }
+                }
+            }
+
+            myBI = BI;
+
+            return this;
+        }
+
+        public boolean isX() {
+            return myX != null;
+        }
+
+        public Builder objective(final MatrixStore<Double> C) {
+
+            if (C == null) {
+                throw new IllegalArgumentException();
+            }
+
+            myC = C;
+
+            return this;
+        }
+
+        public Builder objective(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
+
+            if (Q == null) {
+                throw new IllegalArgumentException();
+            }
+
+            myQ = Q;
+
+            final MatrixStore<Double> tmpC = C != null ? C : MatrixStore.PRIMITIVE.makeZero((int) Q.countRows(), 1).get();
+
+            myC = tmpC;
+
+            return this;
+        }
+
+        public void reset() {
+            myAE = null;
+            myAI = null;
+            myBE = null;
+            myBI = null;
+            myC = null;
+            myQ = null;
+            myX = null;
+        }
+
+        public void resetX() {
+            if (myX != null) {
+                myX.fillAll(ZERO);
+            }
+        }
+
+        public void setX(final int index, final double value) {
+            this.getX().set(index, 0, value);
         }
 
         @Override
-        public Builder objective(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
-            return super.objective(Q, C);
+        public String toString() {
+
+            final StringBuilder retVal = new StringBuilder("<" + this.getClass().getSimpleName() + ">");
+
+            retVal.append("\n[AE] = " + (this.getAE() != null ? PrimitiveMatrix.FACTORY.copy(this.getAE()) : "?"));
+
+            retVal.append("\n[BE] = " + (this.getBE() != null ? PrimitiveMatrix.FACTORY.copy(this.getBE()) : "?"));
+
+            retVal.append("\n[Q] = " + (this.getQ() != null ? PrimitiveMatrix.FACTORY.copy(this.getQ()) : "?"));
+
+            retVal.append("\n[C] = " + (this.getC() != null ? PrimitiveMatrix.FACTORY.copy(this.getC()) : "?"));
+
+            retVal.append("\n[AI] = " + (this.getAI() != null ? PrimitiveMatrix.FACTORY.copy(this.getAI()) : "?"));
+
+            retVal.append("\n[BI] = " + (this.getBI() != null ? PrimitiveMatrix.FACTORY.copy(this.getBI()) : "?"));
+
+            retVal.append("\n[X] = " + (this.getX() != null ? PrimitiveMatrix.FACTORY.copy(this.getX()) : "?"));
+
+            retVal.append("\n[SE] = " + (this.getSE() != null ? PrimitiveMatrix.FACTORY.copy(this.getSE()) : "?"));
+
+            retVal.append("\n[SI] = " + (this.getSI() != null ? PrimitiveMatrix.FACTORY.copy(this.getSI()) : "?"));
+
+            retVal.append("\n</" + this.getClass().getSimpleName() + ">");
+
+            return retVal.toString();
+        }
+
+        public void validate() {
+
+            if (this.hasEqualityConstraints()) {
+
+                if (this.getAE() == null) {
+                    throw new ProgrammingError("AE cannot be null!");
+                } else if (this.getAE().countColumns() != this.countVariables()) {
+                    throw new ProgrammingError("AE has the wrong number of columns!");
+                } else if (this.getAE().countRows() != this.getBE().countRows()) {
+                    throw new ProgrammingError("AE and BE do not have the same number of rows!");
+                } else if (this.getBE().countColumns() != 1) {
+                    throw new ProgrammingError("BE must have precisely one column!");
+                }
+
+            } else {
+
+                myAE = null;
+                myBE = null;
+            }
+
+            if (this.hasObjective()) {
+
+                if ((this.getQ() != null) && ((this.getQ().countRows() != this.countVariables()) || (this.getQ().countColumns() != this.countVariables()))) {
+                    throw new ProgrammingError("Q has the wrong number of rows and/or columns!");
+                }
+
+                if (((this.getC() != null) && (this.getC().countRows() != this.countVariables())) || (this.getC().countColumns() != 1)) {
+                    throw new ProgrammingError("C has the wrong number of rows and/or columns!");
+                }
+
+            } else {
+
+                myQ = null;
+                myC = null;
+            }
+
+            if (this.hasInequalityConstraints()) {
+
+                if (this.getAI() == null) {
+                    throw new ProgrammingError("AI cannot be null!");
+                } else if (this.getAI().countColumns() != this.countVariables()) {
+                    throw new ProgrammingError("AI has the wrong number of columns!");
+                } else if (this.getAI().countRows() != this.getBI().countRows()) {
+                    throw new ProgrammingError("AI and BI do not have the same number of rows!");
+                } else if (this.getBI().countColumns() != 1) {
+                    throw new ProgrammingError("BI must have precisely one column!");
+                }
+
+            } else {
+
+                myAI = null;
+                myBI = null;
+            }
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected Object clone() throws CloneNotSupportedException {
+
+            final ConvexSolver.Builder retVal = (ConvexSolver.Builder) super.clone();
+
+            if (myX != null) {
+                retVal.getX().fillMatching(myX);
+            }
+
+            return retVal;
+        }
+
+        protected MatrixStore<Double> getAIX() {
+
+            final MatrixStore<Double> tmpAI = this.getAI();
+            final PhysicalStore<Double> tmpX = this.getX();
+
+            if ((tmpAI != null) && (tmpX != null)) {
+                return tmpAI.multiply(tmpX);
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Slack for Inequalities: [SI] = [BI] - [AI][X]
+         */
+        protected PhysicalStore<Double> getSI() {
+
+            PhysicalStore<Double> retVal = null;
+
+            if ((this.getAI() != null) && (this.getBI() != null) && (this.getX() != null)) {
+
+                retVal = this.getBI().copy();
+
+                retVal.modifyMatching(PrimitiveFunction.SUBTRACT, this.getAIX());
+            }
+
+            return retVal;
+        }
+
+        PhysicalStore<Double> cast(final Access2D<Double> matrix) {
+            if (matrix instanceof PhysicalStore<?>) {
+                return (PhysicalStore<Double>) matrix;
+            } else {
+                return FACTORY.copy(matrix);
+            }
+
         }
 
     }
@@ -315,7 +731,7 @@ public abstract class ConvexSolver extends GenericSolver {
         return ConvexSolver.getBuilder().objective(Q, C);
     }
 
-    private final GenericSolver.AbstractBuilder<?, ?> myMatrices;
+    private final ConvexSolver.Builder myMatrices;
 
     final Cholesky<Double> myCholesky;
 
@@ -326,7 +742,7 @@ public abstract class ConvexSolver extends GenericSolver {
         this(null, solverOptions);
     }
 
-    protected ConvexSolver(final GenericSolver.AbstractBuilder<?, ?> matrices, final Optimisation.Options solverOptions) {
+    protected ConvexSolver(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
         super(solverOptions);
 
