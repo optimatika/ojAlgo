@@ -30,15 +30,14 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.UnaryFunction;
-import org.ojalgo.function.aggregator.AggregatorFunction;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.netio.BasicLogger;
+import org.ojalgo.type.context.NumberContext;
 
 public abstract class GenericSolver implements Optimisation.Solver, Serializable {
 
@@ -47,17 +46,11 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
         private MatrixStore<Double> myAE = null;
-        private MatrixStore.LogicalBuilder<Double> myAEbuilder = null;
-        private MatrixStore<Double> myAI = null;
-        private MatrixStore.LogicalBuilder<Double> myAIbuilder = null;
+        private SparseStore<Double> myAI = null;
         private MatrixStore<Double> myBE = null;
-        private MatrixStore.LogicalBuilder<Double> myBEbuilder = null;
         private MatrixStore<Double> myBI = null;
-        private MatrixStore.LogicalBuilder<Double> myBIbuilder = null;
         private MatrixStore<Double> myC = null;
-        private MatrixStore.LogicalBuilder<Double> myCbuilder = null;
         private MatrixStore<Double> myQ = null;
-        private MatrixStore.LogicalBuilder<Double> myQbuilder = null;
         private PrimitiveDenseStore myX = null;
 
         protected AbstractBuilder() {
@@ -123,21 +116,25 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         /**
          * Will rescale problem parameters to minimise rounding and representation errors. Warning! This will
          * rescale the objective function and therefore also the optimal value (but not the solution).
+         *
+         * @deprecated v44 If you need/want this kind of functionality then use {@link ExpressionsBasedModel}
+         *             instead.
          */
+        @Deprecated
         @SuppressWarnings("unchecked")
         public B balance() {
 
-            if (this.hasEqualityConstraints()) {
-                this.balanceEqualityConstraints();
-            }
-
-            if (this.hasInequalityConstraints()) {
-                this.balanceInequalityConstraints();
-            }
-
-            if (this.hasObjective()) {
-                this.balanceObjective();
-            }
+            //            if (this.hasEqualityConstraints()) {
+            //                this.balanceEqualityConstraints();
+            //            }
+            //
+            //            if (this.hasInequalityConstraints()) {
+            //                this.balanceInequalityConstraints();
+            //            }
+            //
+            //            if (this.hasObjective()) {
+            //                this.balanceObjective();
+            //            }
 
             return (B) this;
         }
@@ -177,14 +174,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
          * [AE][X] == [BE]
          */
         public MatrixStore<Double> getAE() {
-            if (myAEbuilder != null) {
-                if (myAE == null) {
-                    myAE = myAEbuilder.get().copy();
-                }
-                return myAE;
-            } else {
-                return null;
-            }
+            return myAE;
         }
 
         public MatrixStore<Double> getAEX() {
@@ -203,14 +193,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
          * [AI][X] &lt;= [BI]
          */
         public MatrixStore<Double> getAI() {
-            if (myAIbuilder != null) {
-                if (myAI == null) {
-                    myAI = myAIbuilder.get().copy();
-                }
-                return myAI;
-            } else {
-                return null;
-            }
+            return myAI;
         }
 
         public MatrixStore<Double> getAIX(final int[] selector) {
@@ -229,28 +212,14 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
          * [AE][X] == [BE]
          */
         public MatrixStore<Double> getBE() {
-            if (myBEbuilder != null) {
-                if (myBE == null) {
-                    myBE = myBEbuilder.get().copy();
-                }
-                return myBE;
-            } else {
-                return null;
-            }
+            return myBE;
         }
 
         /**
          * [AI][X] &lt;= [BI]
          */
         public MatrixStore<Double> getBI() {
-            if (myBIbuilder != null) {
-                if (myBI == null) {
-                    myBI = myBIbuilder.get().copy();
-                }
-                return myBI;
-            } else {
-                return null;
-            }
+            return myBI;
         }
 
         public MatrixStore<Double> getBI(final int[] selector) {
@@ -261,28 +230,14 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
          * Linear objective: [C]
          */
         public MatrixStore<Double> getC() {
-            if (myCbuilder != null) {
-                if (myC == null) {
-                    myC = myCbuilder.get().copy();
-                }
-                return myC;
-            } else {
-                return null;
-            }
+            return myC;
         }
 
         /**
          * Quadratic objective: [Q]
          */
         public MatrixStore<Double> getQ() {
-            if (myQbuilder != null) {
-                if (myQ == null) {
-                    myQ = myQbuilder.get().copy();
-                }
-                return myQ;
-            } else {
-                return null;
-            }
+            return myQ;
         }
 
         /**
@@ -388,118 +343,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
             return retVal.toString();
         }
 
-        private void balanceEqualityConstraints() {
-
-            final PhysicalStore<Double> tmpBody = this.cast(this.getAE());
-            final PhysicalStore<Double> tmpRHS = this.cast(this.getBE());
-
-            this.balanceRows(tmpBody, tmpRHS, true);
-
-            myAE = tmpBody;
-            myBE = tmpRHS;
-
-            this.validate();
-        }
-
-        private void balanceInequalityConstraints() {
-
-            final PhysicalStore<Double> tmpBody = this.cast(this.getAI());
-            final PhysicalStore<Double> tmpRHS = this.cast(this.getBI());
-
-            this.balanceRows(tmpBody, tmpRHS, false);
-
-            myAI = tmpBody;
-            myBI = tmpRHS;
-
-            this.validate();
-        }
-
-        private double balanceMatrices(final PhysicalStore<Double>[] someMatrices) {
-
-            final AggregatorFunction<Double> tmpLargestAggr = PrimitiveAggregator.getSet().largest();
-            final AggregatorFunction<Double> tmpSmallestAggr = PrimitiveAggregator.getSet().smallest();
-
-            tmpLargestAggr.invoke(ONE);
-            tmpSmallestAggr.invoke(ONE);
-
-            for (final PhysicalStore<Double> tmpMatrix : someMatrices) {
-                if (tmpMatrix != null) {
-                    tmpMatrix.visitAll(tmpLargestAggr);
-                    tmpMatrix.visitAll(tmpSmallestAggr);
-                }
-            }
-
-            final double tmpExponent = this.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
-            final double tmpFactor = PrimitiveFunction.POW.invoke(TEN, tmpExponent);
-
-            final UnaryFunction<Double> tmpModifier = PrimitiveFunction.MULTIPLY.second(tmpFactor);
-
-            for (final PhysicalStore<Double> tmpMatrix : someMatrices) {
-                if (tmpMatrix != null) {
-                    tmpMatrix.modifyAll(tmpModifier);
-                }
-            }
-
-            return tmpFactor;
-        }
-
-        @SuppressWarnings("unchecked")
-        private void balanceObjective() {
-
-            final PhysicalStore<Double>[] tmpMatrices = (PhysicalStore<Double>[]) new PhysicalStore<?>[2];
-
-            if (this.getQ() != null) {
-                tmpMatrices[0] = this.cast(this.getQ());
-            }
-            if (this.getC() != null) {
-                tmpMatrices[1] = this.cast(this.getC());
-            }
-
-            this.balanceMatrices(tmpMatrices);
-            myQ = tmpMatrices[0];
-            myC = tmpMatrices[1];
-
-            this.validate();
-
-        }
-
-        private void balanceRows(final PhysicalStore<Double> tmpBody, final PhysicalStore<Double> tmpRHS, final boolean assertPositiveRHS) {
-
-            final AggregatorFunction<Double> tmpLargestAggr = PrimitiveAggregator.getSet().largest();
-            final AggregatorFunction<Double> tmpSmallestAggr = PrimitiveAggregator.getSet().smallest();
-
-            double tmpExponent;
-            double tmpFactor;
-
-            UnaryFunction<Double> tmpModifier;
-
-            for (int i = 0; i < tmpBody.countRows(); i++) {
-
-                tmpLargestAggr.reset();
-                tmpSmallestAggr.reset();
-
-                tmpLargestAggr.invoke(ONE);
-                tmpSmallestAggr.invoke(ONE);
-
-                tmpBody.visitRow(i, 0, tmpLargestAggr);
-                tmpBody.visitRow(i, 0, tmpSmallestAggr);
-
-                tmpRHS.visitRow(i, 0, tmpLargestAggr);
-                tmpRHS.visitRow(i, 0, tmpSmallestAggr);
-
-                tmpExponent = this.getAdjustmentExponent(tmpLargestAggr.doubleValue(), tmpSmallestAggr.doubleValue());
-                tmpFactor = PrimitiveFunction.POW.invoke(TEN, tmpExponent);
-                if (assertPositiveRHS && (PrimitiveFunction.SIGNUM.invoke(tmpRHS.doubleValue(i, 0)) < ZERO)) {
-                    tmpFactor = -tmpFactor;
-                }
-
-                tmpModifier = PrimitiveFunction.MULTIPLY.second(tmpFactor);
-
-                tmpBody.modifyRow(i, 0, tmpModifier);
-                tmpRHS.modifyRow(i, 0, tmpModifier);
-            }
-        }
-
         protected abstract S build(Optimisation.Options options);
 
         @Override
@@ -531,27 +374,10 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
                 throw new IllegalArgumentException();
             }
 
-            if (myAEbuilder != null) {
-                myAEbuilder.below(AE);
-                this.reset();
-            } else {
-                myAE = AE;
-                myAEbuilder = myAE.logical();
-            }
-
-            if (myBEbuilder != null) {
-                myBEbuilder.below(BE);
-                this.reset();
-            } else {
-                myBE = BE;
-                myBEbuilder = BE.logical();
-            }
+            myAE = AE;
+            myBE = BE;
 
             return (B) this;
-        }
-
-        protected int getAdjustmentExponent(final double largest, final double smallest) {
-            return ModelEntity.getAdjustmentExponent(largest, smallest);
         }
 
         protected MatrixStore<Double> getAIX() {
@@ -590,21 +416,26 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
                 throw new IllegalArgumentException();
             }
 
-            if (myAIbuilder != null) {
-                myAIbuilder.below(AI);
-                this.reset();
+            if (AI instanceof SparseStore) {
+
+                myAI = (SparseStore<Double>) AI;
+
             } else {
-                myAI = AI;
-                myAIbuilder = myAI.logical();
+
+                myAI = SparseStore.PRIMITIVE.make(AI.countRows(), AI.countColumns());
+
+                double value;
+                for (int j = 0; j < AI.countColumns(); j++) {
+                    for (int i = 0; i < AI.countRows(); i++) {
+                        value = AI.doubleValue(i, j);
+                        if (!NC.isZero(value)) {
+                            myAI.set(i, j, value);
+                        }
+                    }
+                }
             }
 
-            if (myBIbuilder != null) {
-                myBIbuilder.below(BI);
-                this.reset();
-            } else {
-                myBI = BI;
-                myBIbuilder = BI.logical();
-            }
+            myBI = BI;
 
             return (B) this;
         }
@@ -616,13 +447,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
                 throw new IllegalArgumentException();
             }
 
-            if (myCbuilder != null) {
-                myCbuilder.below(C);
-                this.reset();
-            } else {
-                myC = C;
-                myCbuilder = myC.logical();
-            }
+            myC = C;
 
             return (B) this;
         }
@@ -634,22 +459,11 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
                 throw new IllegalArgumentException();
             }
 
-            if (myQbuilder != null) {
-                myQbuilder.below(Q);
-                this.reset();
-            } else {
-                myQ = Q;
-                myQbuilder = myQ.logical();
-            }
+            myQ = Q;
 
             final MatrixStore<Double> tmpC = C != null ? C : MatrixStore.PRIMITIVE.makeZero((int) Q.countRows(), 1).get();
-            if (myCbuilder != null) {
-                myCbuilder.below(tmpC);
-                this.reset();
-            } else {
-                myC = tmpC;
-                myCbuilder = myC.logical();
-            }
+
+            myC = tmpC;
 
             return (B) this;
         }
@@ -719,6 +533,8 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         }
 
     }
+
+    static NumberContext NC = NumberContext.getGeneral(12);
 
     public final Optimisation.Options options;
 
