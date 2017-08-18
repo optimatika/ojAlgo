@@ -24,6 +24,7 @@ package org.ojalgo.optimisation;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -31,7 +32,7 @@ import org.ojalgo.netio.BasicLogger;
 
 public abstract class GenericSolver implements Optimisation.Solver, Serializable {
 
-    public static abstract class Builder<B extends Builder<?, ?>, S extends GenericSolver> implements Cloneable {
+    public static abstract class Builder<B extends Builder<?, ?>, S extends GenericSolver> {
 
         protected Builder() {
             super();
@@ -50,23 +51,19 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
         }
 
         public final S build() {
-            return this.build(null);
+            return this.doBuild(new Optimisation.Options());
         }
 
-        public abstract S build(Optimisation.Options options);
+        public final S build(final Optimisation.Options options) {
+            ProgrammingError.throwIfNull(options);
+            return this.doBuild(options);
+        }
 
         public abstract int countConstraints();
 
         public abstract int countVariables();
 
-        @SuppressWarnings("unchecked")
-        protected GenericSolver.Builder<B, S> copy() {
-            try {
-                return (GenericSolver.Builder<B, S>) this.clone();
-            } catch (final CloneNotSupportedException anException) {
-                return null;
-            }
-        }
+        protected abstract S doBuild(Optimisation.Options options);
 
     }
 

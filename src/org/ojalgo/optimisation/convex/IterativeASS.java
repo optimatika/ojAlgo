@@ -29,6 +29,7 @@ import java.math.MathContext;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.MatrixStore;
+import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.Equation;
@@ -188,9 +189,16 @@ abstract class IterativeASS extends ActiveSetSolver {
         final int tmpCountE = this.countEqualityConstraints();
 
         if (tmpToInclude >= 0) {
-            final MatrixStore<Double> tmpElements = myCholesky.getSolution(this.getAI().logical().row(tmpToInclude).transpose());
-            final double tmpRHS = myInvQC.premultiply(this.getAI().sliceRow(tmpToInclude, 0L)).get().doubleValue(0L) - this.getBI().doubleValue(tmpToInclude);
-            myS.add(tmpCountE + tmpToInclude, tmpElements, tmpRHS, 3);
+
+            final LogicalBuilder<Double> rowAlt1 = this.getAI().logical().row(tmpToInclude);
+            final Access1D<Double> rowAlt2 = this.getAI().sliceRow(tmpToInclude);
+
+            final LogicalBuilder<Double> rowToIncludeTransposed = rowAlt1.transpose();
+
+            final MatrixStore<Double> body = myCholesky.getSolution(rowToIncludeTransposed);
+            final double rhs = myInvQC.premultiply(rowAlt2).get().doubleValue(0L) - this.getBI().doubleValue(tmpToInclude);
+
+            myS.add(tmpCountE + tmpToInclude, body, rhs, 3);
         }
 
         if ((tmpCountRowsIterA < tmpCountColsIterA) && (tmpSolvable = myCholesky.isSolvable())) {

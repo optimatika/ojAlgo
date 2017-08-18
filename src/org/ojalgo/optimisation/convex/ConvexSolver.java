@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.List;
@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
@@ -44,7 +43,6 @@ import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
-import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.optimisation.Expression;
@@ -89,8 +87,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
     public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 
-        static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
-        static final NumberContext NC = NumberContext.getGeneral(12);
+        private static final NumberContext NC = NumberContext.getGeneral(12);
 
         private MatrixStore<Double> myAE = null;
         private SparseStore<Double> myAI = null;
@@ -98,7 +95,6 @@ public abstract class ConvexSolver extends GenericSolver {
         private MatrixStore<Double> myBI = null;
         private MatrixStore<Double> myC = null;
         private MatrixStore<Double> myQ = null;
-        private PrimitiveDenseStore myX = null;
 
         public Builder() {
             super();
@@ -161,24 +157,6 @@ public abstract class ConvexSolver extends GenericSolver {
         }
 
         @Override
-        public ConvexSolver build(final Optimisation.Options options) {
-
-            this.validate();
-
-            if (this.hasInequalityConstraints()) {
-                if (this.hasEqualityConstraints()) {
-                    return new IterativeMixedASS(this, options);
-                } else {
-                    return new IterativePureASS(this, options);
-                }
-            } else if (this.hasEqualityConstraints()) {
-                return new QPESolver(this, options);
-            } else {
-                return new UnconstrainedSolver(this, options);
-            }
-        }
-
-        @Override
         public int countConstraints() {
             return this.countEqualityConstraints() + this.countInequalityConstraints();
         }
@@ -230,35 +208,11 @@ public abstract class ConvexSolver extends GenericSolver {
             return myAE;
         }
 
-        public MatrixStore<Double> getAEX() {
-
-            final MatrixStore<Double> tmpAE = this.getAE();
-            final PhysicalStore<Double> tmpX = this.getX();
-
-            if ((tmpAE != null) && (tmpX != null)) {
-                return tmpAE.multiply(tmpX);
-            } else {
-                return null;
-            }
-        }
-
         /**
          * [AI][X] &lt;= [BI]
          */
         public MatrixStore<Double> getAI() {
             return myAI;
-        }
-
-        public MatrixStore<Double> getAIX(final int[] selector) {
-
-            final MatrixStore<Double> tmpAI = this.getAI();
-            final PhysicalStore<Double> tmpX = this.getX();
-
-            if ((tmpAI != null) && (tmpX != null)) {
-                return tmpAI.logical().row(selector).get().multiply(tmpX);
-            } else {
-                return null;
-            }
         }
 
         /**
@@ -275,10 +229,6 @@ public abstract class ConvexSolver extends GenericSolver {
             return myBI;
         }
 
-        public MatrixStore<Double> getBI(final int[] selector) {
-            return this.getBI().logical().row(selector).get();
-        }
-
         /**
          * Linear objective: [C]
          */
@@ -293,55 +243,16 @@ public abstract class ConvexSolver extends GenericSolver {
             return myQ;
         }
 
-        /**
-         * Slack for Equalities: [SE] = [BE] - [AE][X]
-         */
-        public PhysicalStore<Double> getSE() {
-
-            PhysicalStore<Double> retVal = null;
-
-            if ((this.getAE() != null) && (this.getBE() != null) && (this.getX() != null)) {
-
-                retVal = this.getBE().copy();
-
-                retVal.modifyMatching(PrimitiveFunction.SUBTRACT, this.getAEX());
-            }
-
-            return retVal;
-        }
-
-        /**
-         * Selected Slack for Inequalities
-         */
-        public MatrixStore<Double> getSI(final int... selector) {
-            final PhysicalStore<Double> tmpSI = this.getSI();
-            if (tmpSI != null) {
-                return tmpSI.logical().row(selector).get();
-            } else {
-                return null;
-            }
-        }
-
-        /**
-         * Solution / Variables: [X]
-         */
-        public PhysicalStore<Double> getX() {
-            if (myX == null) {
-                myX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1);
-            }
-            return myX;
-        }
-
         public boolean hasEqualityConstraints() {
-            return (this.getAE() != null) && (this.getAE().countRows() > 0);
+            return (myAE != null) && (myAE.countRows() > 0);
         }
 
         public boolean hasInequalityConstraints() {
-            return (this.getAI() != null) && (this.getAI().countRows() > 0);
+            return (myAI != null) && (myAI.countRows() > 0);
         }
 
         public boolean hasObjective() {
-            return (this.getQ() != null) || (this.getC() != null);
+            return (myQ != null) || (myC != null);
         }
 
         public ConvexSolver.Builder inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI) {
@@ -372,10 +283,6 @@ public abstract class ConvexSolver extends GenericSolver {
             myBI = BI;
 
             return this;
-        }
-
-        public boolean isX() {
-            return myX != null;
         }
 
         public Builder objective(final MatrixStore<Double> C) {
@@ -411,43 +318,28 @@ public abstract class ConvexSolver extends GenericSolver {
             myBI = null;
             myC = null;
             myQ = null;
-            myX = null;
-        }
-
-        public void resetX() {
-            if (myX != null) {
-                myX.fillAll(ZERO);
-            }
-        }
-
-        public void setX(final int index, final double value) {
-            this.getX().set(index, 0, value);
         }
 
         @Override
         public String toString() {
 
-            final StringBuilder retVal = new StringBuilder("<" + this.getClass().getSimpleName() + ">");
+            final String simpleName = this.getClass().getSimpleName();
 
-            retVal.append("\n[AE] = " + (this.getAE() != null ? PrimitiveMatrix.FACTORY.copy(this.getAE()) : "?"));
+            final StringBuilder retVal = new StringBuilder("<" + simpleName + ">");
 
-            retVal.append("\n[BE] = " + (this.getBE() != null ? PrimitiveMatrix.FACTORY.copy(this.getBE()) : "?"));
+            retVal.append("\n[AE] = " + (myAE != null ? PrimitiveMatrix.FACTORY.copy(this.getAE()) : "?"));
 
-            retVal.append("\n[Q] = " + (this.getQ() != null ? PrimitiveMatrix.FACTORY.copy(this.getQ()) : "?"));
+            retVal.append("\n[BE] = " + (myBE != null ? PrimitiveMatrix.FACTORY.copy(this.getBE()) : "?"));
 
-            retVal.append("\n[C] = " + (this.getC() != null ? PrimitiveMatrix.FACTORY.copy(this.getC()) : "?"));
+            retVal.append("\n[Q] = " + (myQ != null ? PrimitiveMatrix.FACTORY.copy(this.getQ()) : "?"));
 
-            retVal.append("\n[AI] = " + (this.getAI() != null ? PrimitiveMatrix.FACTORY.copy(this.getAI()) : "?"));
+            retVal.append("\n[C] = " + (myC != null ? PrimitiveMatrix.FACTORY.copy(this.getC()) : "?"));
 
-            retVal.append("\n[BI] = " + (this.getBI() != null ? PrimitiveMatrix.FACTORY.copy(this.getBI()) : "?"));
+            retVal.append("\n[AI] = " + (myAI != null ? PrimitiveMatrix.FACTORY.copy(this.getAI()) : "?"));
 
-            retVal.append("\n[X] = " + (this.getX() != null ? PrimitiveMatrix.FACTORY.copy(this.getX()) : "?"));
+            retVal.append("\n[BI] = " + (myBI != null ? PrimitiveMatrix.FACTORY.copy(this.getBI()) : "?"));
 
-            retVal.append("\n[SE] = " + (this.getSE() != null ? PrimitiveMatrix.FACTORY.copy(this.getSE()) : "?"));
-
-            retVal.append("\n[SI] = " + (this.getSI() != null ? PrimitiveMatrix.FACTORY.copy(this.getSI()) : "?"));
-
-            retVal.append("\n</" + this.getClass().getSimpleName() + ">");
+            retVal.append("\n</" + simpleName + ">");
 
             return retVal.toString();
         }
@@ -508,54 +400,21 @@ public abstract class ConvexSolver extends GenericSolver {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
-        protected Object clone() throws CloneNotSupportedException {
+        protected ConvexSolver doBuild(final Optimisation.Options options) {
 
-            final ConvexSolver.Builder retVal = (ConvexSolver.Builder) super.clone();
+            this.validate();
 
-            if (myX != null) {
-                retVal.getX().fillMatching(myX);
-            }
-
-            return retVal;
-        }
-
-        protected MatrixStore<Double> getAIX() {
-
-            final MatrixStore<Double> tmpAI = this.getAI();
-            final PhysicalStore<Double> tmpX = this.getX();
-
-            if ((tmpAI != null) && (tmpX != null)) {
-                return tmpAI.multiply(tmpX);
+            if (this.hasInequalityConstraints()) {
+                if (this.hasEqualityConstraints()) {
+                    return new IterativeMixedASS(this, options);
+                } else {
+                    return new IterativePureASS(this, options);
+                }
+            } else if (this.hasEqualityConstraints()) {
+                return new QPESolver(this, options);
             } else {
-                return null;
+                return new UnconstrainedSolver(this, options);
             }
-        }
-
-        /**
-         * Slack for Inequalities: [SI] = [BI] - [AI][X]
-         */
-        protected PhysicalStore<Double> getSI() {
-
-            PhysicalStore<Double> retVal = null;
-
-            if ((this.getAI() != null) && (this.getBI() != null) && (this.getX() != null)) {
-
-                retVal = this.getBI().copy();
-
-                retVal.modifyMatching(PrimitiveFunction.SUBTRACT, this.getAIX());
-            }
-
-            return retVal;
-        }
-
-        PhysicalStore<Double> cast(final Access2D<Double> matrix) {
-            if (matrix instanceof PhysicalStore<?>) {
-                return (PhysicalStore<Double>) matrix;
-            } else {
-                return FACTORY.copy(matrix);
-            }
-
         }
 
     }
@@ -576,8 +435,6 @@ public abstract class ConvexSolver extends GenericSolver {
         }
 
     }
-
-    static final PhysicalStore.Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
 
     public static void copy(final ExpressionsBasedModel sourceModel, final Builder destinationBuilder) {
 
@@ -603,7 +460,7 @@ public abstract class ConvexSolver extends GenericSolver {
         if (tmpEqExprDim > 0) {
 
             final SparseStore<Double> tmpAE = SparseStore.PRIMITIVE.make(tmpEqExprDim, tmpFreeVarDim);
-            final PhysicalStore<Double> tmpBE = FACTORY.makeZero(tmpEqExprDim, 1);
+            final PhysicalStore<Double> tmpBE = PrimitiveDenseStore.FACTORY.makeZero(tmpEqExprDim, 1);
 
             for (int i = 0; i < tmpEqExprDim; i++) {
 
@@ -627,7 +484,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         PhysicalStore<Double> tmpQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
-            tmpQ = FACTORY.makeZero(tmpFreeVarDim, tmpFreeVarDim);
+            tmpQ = PrimitiveDenseStore.FACTORY.makeZero(tmpFreeVarDim, tmpFreeVarDim);
 
             final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
             UnaryFunction<Double> tmpModifier;
@@ -644,7 +501,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         PhysicalStore<Double> tmpC = null;
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
-            tmpC = FACTORY.makeZero(tmpFreeVarDim, 1);
+            tmpC = PrimitiveDenseStore.FACTORY.makeZero(tmpFreeVarDim, 1);
             if (sourceModel.isMinimisation()) {
                 for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
@@ -681,7 +538,7 @@ public abstract class ConvexSolver extends GenericSolver {
         if ((tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim) > 0) {
 
             final SparseStore<Double> tmpAI = SparseStore.PRIMITIVE.make(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim, tmpFreeVarDim);
-            final PhysicalStore<Double> tmpBI = FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim, 1);
+            final PhysicalStore<Double> tmpBI = PrimitiveDenseStore.FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim, 1);
 
             if (tmpUpExprDim > 0) {
                 for (int i = 0; i < tmpUpExprDim; i++) {
@@ -738,6 +595,8 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     private final ConvexSolver.Builder myMatrices;
+
+    private PrimitiveDenseStore myX = null;
 
     final Cholesky<Double> myCholesky;
 
@@ -830,14 +689,14 @@ public abstract class ConvexSolver extends GenericSolver {
     protected void fillX(final Access1D<?> solution) {
         final int tmpLimit = this.countVariables();
         for (int i = 0; i < tmpLimit; i++) {
-            myMatrices.setX(i, solution.doubleValue(i));
+            this.setX(i, solution.doubleValue(i));
         }
     }
 
     protected void fillX(final double value) {
         final int tmpLimit = this.countVariables();
         for (int i = 0; i < tmpLimit; i++) {
-            myMatrices.setX(i, value);
+            this.setX(i, value);
         }
     }
 
@@ -846,7 +705,15 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     protected MatrixStore<Double> getAEX() {
-        return myMatrices.getAEX();
+        MatrixStore<Double> retVal = null;
+
+        final MatrixStore<Double> tmpAE = myMatrices.getAE();
+        final PhysicalStore<Double> tmpX = this.getX();
+
+        if ((tmpAE != null) && (tmpX != null)) {
+            retVal = tmpAE.multiply(tmpX);
+        }
+        return retVal;
     }
 
     protected MatrixStore<Double> getAI() {
@@ -854,7 +721,14 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     protected MatrixStore<Double> getAIX(final int[] selector) {
-        return myMatrices.getAIX(selector);
+        final MatrixStore<Double> tmpAI = myMatrices.getAI();
+        final PhysicalStore<Double> tmpX = this.getX();
+
+        if ((tmpAI != null) && (tmpX != null)) {
+            return tmpAI.logical().row(selector).get().multiply(tmpX);
+        } else {
+            return null;
+        }
     }
 
     protected MatrixStore<Double> getBE() {
@@ -866,7 +740,7 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     protected MatrixStore<Double> getBI(final int[] selector) {
-        return myMatrices.getBI(selector);
+        return myMatrices.getBI().logical().row(selector).get();
     }
 
     protected MatrixStore<Double> getC() {
@@ -882,15 +756,70 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     protected PhysicalStore<Double> getSE() {
-        return myMatrices.getSE();
+
+        PhysicalStore<Double> retVal = null;
+
+        final MatrixStore<Double> mtrxAE = this.getAE();
+        final MatrixStore<Double> mtrxBE = this.getBE();
+        final PhysicalStore<Double> mtrxX = this.getX();
+
+        if ((mtrxAE != null) && (mtrxBE != null)) {
+
+            retVal = mtrxBE.copy();
+
+            retVal.modifyMatching(PrimitiveFunction.SUBTRACT, mtrxAE.multiply(mtrxX));
+        }
+
+        return retVal;
     }
 
-    protected MatrixStore<Double> getSI(final int... rowSelector) {
-        return myMatrices.getSI(rowSelector);
+    protected PhysicalStore<Double> getSI() {
+
+        PhysicalStore<Double> retVal = null;
+
+        final MatrixStore<Double> mtrxAI = this.getAI();
+        final MatrixStore<Double> mtrxBI = this.getBI();
+        final PhysicalStore<Double> mtrxX = this.getX();
+
+        if ((mtrxAI != null) && (mtrxBI != null)) {
+
+            retVal = mtrxBI.copy();
+
+            retVal.modifyMatching(PrimitiveFunction.SUBTRACT, mtrxAI.multiply(mtrxX));
+        }
+
+        return retVal;
     }
 
+    protected MatrixStore<Double> getSI(final int... selector) {
+
+        PhysicalStore<Double> retVal = null;
+
+        final MatrixStore<Double> mtrxAI = this.getAI();
+        final MatrixStore<Double> mtrxBI = this.getBI();
+        final PhysicalStore<Double> mtrxX = this.getX();
+
+        if ((mtrxAI != null) && (mtrxBI != null)) {
+
+            final MatrixStore<Double> selectedAI = mtrxAI.logical().row(selector).get();
+            final MatrixStore<Double> selectedBI = mtrxBI.logical().row(selector).get();
+
+            retVal = selectedBI.copy();
+
+            retVal.modifyMatching(PrimitiveFunction.SUBTRACT, selectedAI.multiply(mtrxX));
+        }
+
+        return retVal;
+    }
+
+    /**
+     * Solution / Variables: [X]
+     */
     protected PhysicalStore<Double> getX() {
-        return myMatrices.getX();
+        if (myX == null) {
+            myX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1);
+        }
+        return myX;
     }
 
     protected boolean hasEqualityConstraints() {
@@ -906,17 +835,19 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     protected boolean isX() {
-        return myMatrices.isX();
+        return myX != null;
     }
 
     abstract protected void performIteration();
 
     protected void resetX() {
-        myMatrices.resetX();
+        if (myX != null) {
+            myX.fillAll(ZERO);
+        }
     }
 
     protected void setX(final int index, final double value) {
-        myMatrices.setX(index, value);
+        this.getX().set(index, 0, value);
     }
 
     @Override

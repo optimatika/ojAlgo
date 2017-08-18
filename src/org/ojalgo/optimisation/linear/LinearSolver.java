@@ -55,7 +55,7 @@ public abstract class LinearSolver extends GenericSolver {
         }
 
         @Override
-        public LinearSolver build(final Optimisation.Options options) {
+        protected LinearSolver doBuild(final Optimisation.Options options) {
 
             myDelegate.validate();
 
@@ -82,8 +82,8 @@ public abstract class LinearSolver extends GenericSolver {
             return myDelegate.countVariables();
         }
 
-        public LinearSolver.Builder equalities(final MatrixStore<Double> AE, final MatrixStore<Double> BE) {
-            myDelegate.equalities(AE, BE);
+        public LinearSolver.Builder equalities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
+            myDelegate.equalities(mtrxAE, mtrxBE);
             return this;
         }
 
@@ -99,8 +99,8 @@ public abstract class LinearSolver extends GenericSolver {
             return myDelegate.getC();
         }
 
-        public LinearSolver.Builder objective(final MatrixStore<Double> C) {
-            myDelegate.objective(C);
+        public LinearSolver.Builder objective(final MatrixStore<Double> mtrxC) {
+            myDelegate.objective(mtrxC);
             return this;
         }
 
