@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.constant.PrimitiveMath.ZERO;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.List;
@@ -87,7 +87,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public abstract class ConvexSolver extends GenericSolver {
 
-    public static final class Builder extends GenericSolver.AbstractBuilder<ConvexSolver.Builder, ConvexSolver> {
+    public static final class Builder extends GenericSolver.Builder<ConvexSolver.Builder, ConvexSolver> {
 
         static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
         static final NumberContext NC = NumberContext.getGeneral(12);
@@ -178,6 +178,11 @@ public abstract class ConvexSolver extends GenericSolver {
             }
         }
 
+        @Override
+        public int countConstraints() {
+            return this.countEqualityConstraints() + this.countInequalityConstraints();
+        }
+
         public int countEqualityConstraints() {
             return (int) ((this.getAE() != null) ? this.getAE().countRows() : 0);
         }
@@ -186,6 +191,7 @@ public abstract class ConvexSolver extends GenericSolver {
             return (int) ((this.getAI() != null) ? this.getAI().countRows() : 0);
         }
 
+        @Override
         public int countVariables() {
 
             int retVal = -1;

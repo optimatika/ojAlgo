@@ -36,22 +36,22 @@ import org.ojalgo.optimisation.linear.SimplexTableau.DenseTableau;
 
 public abstract class LinearSolver extends GenericSolver {
 
-    public static final class Builder extends GenericSolver.AbstractBuilder<LinearSolver.Builder, LinearSolver> {
+    public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
 
         private final ConvexSolver.Builder myDelegate;
+
+        public Builder() {
+
+            super();
+
+            myDelegate = new ConvexSolver.Builder();
+        }
 
         public Builder(final MatrixStore<Double> C) {
 
             super();
 
             myDelegate = new ConvexSolver.Builder(C);
-        }
-
-        Builder() {
-
-            super();
-
-            myDelegate = new ConvexSolver.Builder();
         }
 
         @Override
@@ -64,10 +64,20 @@ public abstract class LinearSolver extends GenericSolver {
             return new SimplexSolver(tableau, options);
         }
 
-        public int countEqualityConstraints() {
+        @Override
+        public int countConstraints() {
             return myDelegate.countEqualityConstraints();
         }
 
+        /**
+         * @deprecated v44 Use {@link #countConstraints()} instead
+         */
+        @Deprecated
+        public int countEqualityConstraints() {
+            return this.countConstraints();
+        }
+
+        @Override
         public int countVariables() {
             return myDelegate.countVariables();
         }

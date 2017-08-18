@@ -31,9 +31,9 @@ import org.ojalgo.netio.BasicLogger;
 
 public abstract class GenericSolver implements Optimisation.Solver, Serializable {
 
-    public static abstract class AbstractBuilder<B extends AbstractBuilder<?, ?>, S extends GenericSolver> implements Cloneable {
+    public static abstract class Builder<B extends Builder<?, ?>, S extends GenericSolver> implements Cloneable {
 
-        protected AbstractBuilder() {
+        protected Builder() {
             super();
         }
 
@@ -45,20 +45,7 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
          */
         @Deprecated
         @SuppressWarnings("unchecked")
-        public B balance() {
-
-            //            if (this.hasEqualityConstraints()) {
-            //                this.balanceEqualityConstraints();
-            //            }
-            //
-            //            if (this.hasInequalityConstraints()) {
-            //                this.balanceInequalityConstraints();
-            //            }
-            //
-            //            if (this.hasObjective()) {
-            //                this.balanceObjective();
-            //            }
-
+        public final B balance() {
             return (B) this;
         }
 
@@ -68,10 +55,14 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
 
         public abstract S build(Optimisation.Options options);
 
+        public abstract int countConstraints();
+
+        public abstract int countVariables();
+
         @SuppressWarnings("unchecked")
-        protected GenericSolver.AbstractBuilder<B, S> copy() {
+        protected GenericSolver.Builder<B, S> copy() {
             try {
-                return (GenericSolver.AbstractBuilder<B, S>) this.clone();
+                return (GenericSolver.Builder<B, S>) this.clone();
             } catch (final CloneNotSupportedException anException) {
                 return null;
             }
