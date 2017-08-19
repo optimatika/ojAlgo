@@ -13,6 +13,10 @@
 package org.ojalgo.optimisation.convex;
 
 import org.ojalgo.FunctionalityTest;
+import org.ojalgo.TestUtils;
+import org.ojalgo.optimisation.ExpressionsBasedModel;
+import org.ojalgo.optimisation.Optimisation;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * @author apete
@@ -20,6 +24,57 @@ import org.ojalgo.FunctionalityTest;
 public abstract class OptimisationConvexTests extends FunctionalityTest {
 
     static final boolean DEBUG = false;
+
+    protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder) {
+        OptimisationConvexTests.assertDirectAndIterativeEquals(builder, null);
+    }
+
+    protected static void assertDirectAndIterativeEquals(final ConvexSolver.Builder builder, final NumberContext accuracy) {
+
+        final Optimisation.Options options = new Optimisation.Options();
+
+        if (builder.hasInequalityConstraints()) {
+            // ActiveSetSolver (ASS)
+
+            if (builder.hasEqualityConstraints()) {
+                // Mixed ASS
+
+                final Optimisation.Result direct = new DirectMixedASS(builder, options).solve();
+                final Optimisation.Result iterative = new IterativeMixedASS(builder, options).solve();
+
+                if (accuracy != null) {
+                    TestUtils.assertStateAndSolution(direct, iterative, accuracy);
+                } else {
+                    TestUtils.assertStateAndSolution(direct, iterative);
+                }
+
+            } else {
+                // Pure ASS
+
+                final Optimisation.Result direct = new DirectPureASS(builder, options).solve();
+                final Optimisation.Result iterative = new IterativePureASS(builder, options).solve();
+
+                if (accuracy != null) {
+                    TestUtils.assertStateAndSolution(direct, iterative, accuracy);
+                } else {
+                    TestUtils.assertStateAndSolution(direct, iterative);
+                }
+            }
+        }
+    }
+
+    protected static void assertDirectAndIterativeEquals(final ExpressionsBasedModel model) {
+        OptimisationConvexTests.assertDirectAndIterativeEquals(model, null);
+    }
+
+    protected static void assertDirectAndIterativeEquals(final ExpressionsBasedModel model, final NumberContext accuracy) {
+
+        final ConvexSolver.Builder builder = new ConvexSolver.Builder();
+
+        ConvexSolver.copy(model, builder);
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(builder, accuracy);
+    }
 
     protected OptimisationConvexTests() {
         super();

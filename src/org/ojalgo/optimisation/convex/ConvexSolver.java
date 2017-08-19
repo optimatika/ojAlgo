@@ -436,7 +436,9 @@ public abstract class ConvexSolver extends GenericSolver {
 
     }
 
-    public static void copy(final ExpressionsBasedModel sourceModel, final Builder destinationBuilder) {
+    public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
+
+        destinationBuilder.reset();
 
         final List<Variable> tmpFreeVariables = sourceModel.getFreeVariables();
         final Set<IntIndex> tmpFixedVariables = sourceModel.getFixedVariables();

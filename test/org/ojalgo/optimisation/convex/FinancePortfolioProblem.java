@@ -133,6 +133,7 @@ public class FinancePortfolioProblem extends OptimisationConvexTests {
         TestUtils.assertTrue(model.validate());
         TestUtils.assertTrue(model.validate(result));
 
+        OptimisationConvexTests.assertDirectAndIterativeEquals(model);
     }
 
 }

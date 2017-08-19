@@ -202,5 +202,7 @@ public class ComPictetPamBamTest extends OptimisationConvexTests {
         } else {
             TestUtils.assertFalse("No solution but state FEASIBLE", result.getState().isFeasible());
         }
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(model);
     }
 }

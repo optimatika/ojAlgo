@@ -76,6 +76,28 @@ public abstract class TestUtils {
         }
     }
 
+    public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {
+        TestUtils.assertStateAndSolution(expected, actual, EQUALS);
+    }
+
+    public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual, final NumberContext context) {
+        TestUtils.assertStateAndSolution("Optimisation.Result != Optimisation.Result", expected, actual, context);
+    }
+
+    public static void assertStateAndSolution(final String message, final Optimisation.Result expected, final Optimisation.Result actual,
+            final NumberContext context) {
+
+        TestUtils.assertEquals(message + ", different Optimisation.State", expected.getState(), actual.getState());
+
+        if (expected.getState().isFeasible()) {
+            TestUtils.assertEquals(message, expected, actual, context);
+        }
+    }
+
+    public static void assertStateAndSolution(final String message, final Optimisation.Result expected, final Optimisation.Result actual) {
+        TestUtils.assertStateAndSolution(message, expected, actual, EQUALS);
+    }
+
     public static void assertEquals(final Access1D<?> expected, final Access1D<?> actual) {
         TestUtils.assertEquals(expected, actual, EQUALS);
     }

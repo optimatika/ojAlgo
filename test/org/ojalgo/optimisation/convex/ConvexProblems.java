@@ -53,6 +53,7 @@ import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Optimisation.Result;
 import org.ojalgo.optimisation.Optimisation.State;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.convex.ConvexSolver.Builder;
 import org.ojalgo.type.StandardType;
 import org.ojalgo.type.TypeUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -78,6 +79,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Optimisation.Result tmpExpectedResult = new Optimisation.Result(Optimisation.State.OPTIMAL, tmpExpectedValue, expectedSolution);
 
         final ExpressionsBasedModel tmpModel = ConvexProblems.buildModel(matrices, expectedSolution);
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel, modelValidationContext);
 
         if (DEBUG) {
             tmpModel.options.debug(ConvexSolver.class);
@@ -120,7 +123,6 @@ public class ConvexProblems extends OptimisationConvexTests {
             TestUtils.assertEquals(tmpExpectedResult, tmpResult, NumberContext.getGeneral(2, 4));
             TestUtils.assertEquals(tmpExpectedValue, tmpModel.objective().evaluate(tmpResult).doubleValue(), NumberContext.getGeneral(4, 8));
         }
-
     }
 
     static ExpressionsBasedModel buildModel(final PrimitiveDenseStore[] matrices, final PrimitiveDenseStore expectedSolution) {
@@ -203,6 +205,7 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Optimisation.Result tmpLinearResult = relaxedModel.minimise();
         TestUtils.assertStateNotLessThanFeasible(tmpLinearResult);
 
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel, tmpAccuracy);
     }
 
     public ConvexProblems() {
@@ -251,6 +254,7 @@ public class ConvexProblems extends OptimisationConvexTests {
 
         TestUtils.assertFalse(tmpResult.getState().isFeasible());
 
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel, null);
     }
 
     /**
@@ -601,6 +605,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
         TestUtils.assertEquals(tmpMatrices[6], BigMatrix.FACTORY.columns(tmpResult), tmpEvalCntxt);
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null);
     }
 
     /**
@@ -809,6 +815,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
         TestUtils.assertBounds(BigMath.ZERO, tmpResult, BigMath.ONE, StandardType.PERCENT);
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null);
     }
 
     /**
@@ -845,6 +853,8 @@ public class ConvexProblems extends OptimisationConvexTests {
                 TestUtils.fail("!(0.0 <= " + tmpBigDecimal + " <= 1.0)");
             }
         }
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null);
     }
 
     /**
@@ -876,6 +886,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
         TestUtils.assertStateLessThanFeasible(tmpResult);
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null);
     }
 
     /**
@@ -937,6 +949,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
         TestUtils.assertStateLessThanFeasible(tmpResult);
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null);
     }
 
     /**
@@ -997,6 +1011,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             TestUtils.assertEquals(tmpExpected[i], tmpVariables[i].getValue().doubleValue(), new NumberContext(5, 4));
         }
 
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel, null);
     }
 
     /**
@@ -1159,6 +1174,9 @@ public class ConvexProblems extends OptimisationConvexTests {
             // qSolver.options.debug(ConvexSolver.class);
 
             result = qSolver.solve();
+
+            OptimisationConvexTests.assertDirectAndIterativeEquals(qsBuilder, null);
+
         } catch (final Exception e) {
             e.printStackTrace();
             assert false;
@@ -1208,6 +1226,10 @@ public class ConvexProblems extends OptimisationConvexTests {
         final Result tmpBaseResult1 = tmpModel1.maximise();
         final Result tmpBaseResult2 = tmpModel2.maximise();
         final Result tmpBaseResult3 = tmpModel3.maximise();
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel1, null);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel2, null);
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpModel3, null);
 
         for (int l = 0; l < 10; l++) {
 
@@ -1299,7 +1321,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         final PrimitiveDenseStore tmpC = PrimitiveDenseStore.FACTORY.columns(new double[] { 0, 0 });
         final PrimitiveDenseStore tmpAI = PrimitiveDenseStore.FACTORY.rows(new double[][] { { -1, -1 } });
         final PrimitiveDenseStore tmpBI = PrimitiveDenseStore.FACTORY.columns(new double[] { -1 });
-        final ConvexSolver tmpSolver = new ConvexSolver.Builder(tmpQ, tmpC).inequalities(tmpAI, tmpBI).build();
+        final Builder tmpBuilder = new ConvexSolver.Builder(tmpQ, tmpC).inequalities(tmpAI, tmpBI);
+        final ConvexSolver tmpSolver = tmpBuilder.build();
         final Optimisation.Result tmpResult = tmpSolver.solve();
 
         final PrimitiveDenseStore tmpExpectedSolution = PrimitiveDenseStore.FACTORY.columns(new double[] { 0.5, 0.5 });
@@ -1308,6 +1331,8 @@ public class ConvexProblems extends OptimisationConvexTests {
         TestUtils.assertStateNotLessThanOptimal(tmpResult);
 
         TestUtils.assertEquals(tmpExpectedResult, tmpResult);
+
+        OptimisationConvexTests.assertDirectAndIterativeEquals(tmpBuilder, null);
     }
 
     /**
@@ -1353,6 +1378,7 @@ public class ConvexProblems extends OptimisationConvexTests {
             BasicLogger.debug(solved2);
         }
 
+        OptimisationConvexTests.assertDirectAndIterativeEquals(myBuilderI, null);
     }
 
     public void testP20160705() {
@@ -1362,7 +1388,6 @@ public class ConvexProblems extends OptimisationConvexTests {
         tmpModel.getWeights();
 
         TestUtils.assertTrue(tmpModel.optimiser().getState().isFeasible());
-
     }
 
 }
