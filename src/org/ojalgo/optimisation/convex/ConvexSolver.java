@@ -707,9 +707,10 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     protected MatrixStore<Double> getAEX() {
+
         MatrixStore<Double> retVal = null;
 
-        final MatrixStore<Double> tmpAE = myMatrices.getAE();
+        final MatrixStore<Double> tmpAE = this.getAE();
         final PhysicalStore<Double> tmpX = this.getX();
 
         if ((tmpAE != null) && (tmpX != null)) {
@@ -723,7 +724,8 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     protected MatrixStore<Double> getAIX(final int[] selector) {
-        final MatrixStore<Double> tmpAI = myMatrices.getAI();
+
+        final MatrixStore<Double> tmpAI = this.getAI();
         final PhysicalStore<Double> tmpX = this.getX();
 
         if ((tmpAI != null) && (tmpX != null)) {

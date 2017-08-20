@@ -26,9 +26,7 @@ import org.ojalgo.matrix.store.MatrixStore;
 final class IterativeMixedASS extends IterativeASS {
 
     IterativeMixedASS(final ConvexSolver.Builder matrices, final Options solverOptions) {
-
         super(matrices, solverOptions);
-
     }
 
     @Override
@@ -49,8 +47,6 @@ final class IterativeMixedASS extends IterativeASS {
 
     @Override
     MatrixStore<Double> getIterationB(final int[] included) {
-
-        // return MatrixStore.PRIMITIVE.makeZero((int) this.getBE().count() + included.length, 1).get();
 
         final MatrixStore<Double> tmpBE = this.getBE();
         final MatrixStore<Double> tmpBI = this.getBI();
