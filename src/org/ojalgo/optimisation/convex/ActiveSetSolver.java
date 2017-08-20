@@ -450,7 +450,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.performIteration();
 
-        } else if (!myCholesky.isSolvable()) {
+        } else if (!this.isSolvableQ()) {
             // Subproblem NOT solved successfully
             // 0 active inequalities
             // Q not SPD
@@ -463,7 +463,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             //this.setIterationQ(tmpIterationQ);
 
-            myCholesky.compute(this.getIterationQ());
+            this.computeQ(this.getIterationQ());
 
             myIterationL.modifyAll((Unary) arg -> {
                 if (Double.isFinite(arg)) {

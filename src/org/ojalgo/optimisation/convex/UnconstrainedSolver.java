@@ -51,7 +51,7 @@ final class UnconstrainedSolver extends ConvexSolver {
 
     @Override
     protected boolean initialise(final Result kickStarter) {
-        myCholesky.compute(this.getQ());
+        this.computeQ(this.getQ());
         this.resetX();
         return true;
     }
@@ -70,10 +70,10 @@ final class UnconstrainedSolver extends ConvexSolver {
 
         boolean tmpSolvable = true;
 
-        if (tmpSolvable = myCholesky.isSolvable()) {
+        if (tmpSolvable = this.isSolvableQ()) {
             // Q is SPD
 
-            myCholesky.getSolution(tmpC, tmpX);
+            this.getSolutionQ(tmpC, tmpX);
 
         } else if (tmpSolvable = myLU.compute(tmpQ)) {
             // The above failed, but the KKT system is solvable

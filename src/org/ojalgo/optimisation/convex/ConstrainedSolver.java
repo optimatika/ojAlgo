@@ -35,7 +35,7 @@ abstract class ConstrainedSolver extends ConvexSolver {
     @Override
     protected boolean initialise(final Result kickStarter) {
 
-        myCholesky.compute(this.getIterationQ());
+        this.computeQ(this.getIterationQ());
 
         return true;
     }

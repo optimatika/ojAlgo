@@ -73,18 +73,18 @@ abstract class DirectASS extends ActiveSetSolver {
         final PrimitiveDenseStore tmpIterX = myIterationX;
         final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(tmpIterA.countRows(), 1L);
 
-        if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (tmpSolvable = myCholesky.isSolvable())) {
+        if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (tmpSolvable = this.isSolvableQ())) {
             // Q is SPD
 
             if (tmpIterA.countRows() == 0L) {
                 // Unconstrained - can happen when PureASS and all inequalities are inactive
 
-                myCholesky.getSolution(tmpIterC, tmpIterX);
+                this.getSolutionQ(tmpIterC, tmpIterX);
 
             } else {
                 // Actual/normal optimisation problem
 
-                final MatrixStore<Double> tmpInvQAT = myCholesky.getSolution(tmpIterA.transpose());
+                final MatrixStore<Double> tmpInvQAT = this.getSolutionQ(tmpIterA.transpose());
                 // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
                 // BasicLogger.debug("tmpInvQAT", tmpInvQAT);
 
@@ -115,7 +115,7 @@ abstract class DirectASS extends ActiveSetSolver {
                     }
 
                     //myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
-                    myCholesky.getSolution(tmpIterL.premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
+                    this.getSolutionQ(tmpIterL.premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
                 }
             }
         }
@@ -177,7 +177,7 @@ abstract class DirectASS extends ActiveSetSolver {
             this.debug("Redundant contraints!");
         }
 
-        myInvQC = myCholesky.getSolution(this.getIterationC());
+        myInvQC = this.getSolutionQ(this.getIterationC());
     }
 
 }

@@ -114,11 +114,11 @@ final class QPESolver extends ConstrainedSolver {
         final PrimitiveDenseStore tmpIterX = myIterationX;
         final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(tmpIterA.countRows(), 1L);
 
-        if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (tmpSolvable = myCholesky.isSolvable())) {
+        if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (tmpSolvable = this.isSolvableQ())) {
             // Q is SPD
             // Actual/normal optimisation problem
 
-            final MatrixStore<Double> tmpInvQAT = myCholesky.getSolution(tmpIterA.transpose());
+            final MatrixStore<Double> tmpInvQAT = this.getSolutionQ(tmpIterA.transpose());
             // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
 
             // Negated Schur complement
@@ -127,10 +127,10 @@ final class QPESolver extends ConstrainedSolver {
             if (tmpSolvable = myLU.compute(tmpS)) {
 
                 // tmpX temporarely used to store tmpInvQC
-                final MatrixStore<Double> tmpInvQC = myCholesky.getSolution(tmpIterC, tmpIterX); //TODO Constant if C doesn't change
+                final MatrixStore<Double> tmpInvQC = this.getSolutionQ(tmpIterC, tmpIterX); //TODO Constant if C doesn't change
 
                 myLU.getSolution(tmpIterA.multiply(tmpInvQC).subtract(tmpIterB), tmpIterL);
-                myCholesky.getSolution(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
+                this.getSolutionQ(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
             }
 
         }

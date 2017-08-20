@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
@@ -600,7 +601,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
     private PrimitiveDenseStore myX = null;
 
-    final Cholesky<Double> myCholesky;
+    private final Cholesky<Double> mySolverQ;
 
     final LU<Double> myLU;
 
@@ -617,7 +618,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         final MatrixStore<Double> tmpQ = this.getQ();
 
-        myCholesky = Cholesky.make(tmpQ);
+        mySolverQ = Cholesky.make(tmpQ);
         myLU = LU.make(tmpQ);
     }
 
@@ -871,7 +872,7 @@ public abstract class ConvexSolver extends GenericSolver {
             throw new IllegalArgumentException("Q must be symmetric!");
         }
 
-        if (!myCholesky.isSPD()) {
+        if (!mySolverQ.isSPD()) {
             // Not symmetric positive definite. Check if at least positive semidefinite.
 
             final Eigenvalue<Double> tmpEvD = Eigenvalue.PRIMITIVE.make(true);
@@ -895,6 +896,22 @@ public abstract class ConvexSolver extends GenericSolver {
 
         this.setState(State.VALID);
         return true;
+    }
+
+    protected boolean computeQ(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+        return mySolverQ.compute(matrix);
+    }
+
+    protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
+        return mySolverQ.getSolution(rhs);
+    }
+
+    protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
+        return mySolverQ.getSolution(rhs, preallocated);
+    }
+
+    protected boolean isSolvableQ() {
+        return mySolverQ.isSolvable();
     }
 
 }
