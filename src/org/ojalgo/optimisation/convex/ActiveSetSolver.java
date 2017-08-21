@@ -58,27 +58,27 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     }
 
-    public int countExcluded() {
+    protected int countExcluded() {
         return myActivator.countExcluded();
     }
 
-    public int countIncluded() {
+    protected int countIncluded() {
         return myActivator.countIncluded();
     }
 
-    public int[] getExcluded() {
+    protected int[] getExcluded() {
         return myActivator.getExcluded();
     }
 
-    public int[] getIncluded() {
+    protected int[] getIncluded() {
         return myActivator.getIncluded();
     }
 
-    public int getLastExcluded() {
+    protected int getLastExcluded() {
         return myActivator.getLastExcluded();
     }
 
-    public int getLastIncluded() {
+    protected int getLastIncluded() {
         return myActivator.getLastIncluded();
     }
 

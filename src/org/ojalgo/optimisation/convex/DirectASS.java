@@ -61,7 +61,7 @@ abstract class DirectASS extends ActiveSetSolver {
         }
 
         myConstraintToInclude = -1;
-        final int[] tmpIncluded = myActivator.getIncluded();
+        final int[] tmpIncluded = this.getIncluded();
 
         this.getIterationQ();
         final MatrixStore<Double> tmpIterC = this.getIterationC();
@@ -98,7 +98,7 @@ abstract class DirectASS extends ActiveSetSolver {
                     BasicLogger.debug(Arrays.toString(tmpIncluded), tmpS.get());
                 }
 
-                if (tmpSolvable = myLU.compute(tmpS)) {
+                if (tmpSolvable = this.computeGeneral(tmpS)) {
 
                     // tmpIterX temporarely used to store tmpInvQC
                     // final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpIterC, tmpIterX);
@@ -106,7 +106,7 @@ abstract class DirectASS extends ActiveSetSolver {
 
                     //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
                     //myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
-                    myLU.getSolution(myInvQC.premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
+                    this.getSolutionGeneral(myInvQC.premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
 
                     //BasicLogger.debug("L", tmpIterL);
 
@@ -120,11 +120,11 @@ abstract class DirectASS extends ActiveSetSolver {
             }
         }
 
-        if (!tmpSolvable && (tmpSolvable = myLU.compute(this.getIterationKKT(tmpIncluded)))) {
+        if (!tmpSolvable && (tmpSolvable = this.computeGeneral(this.getIterationKKT(tmpIncluded)))) {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = myLU.getSolution(this.getIterationRHS(tmpIncluded));
+            final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS(tmpIncluded));
             tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), (int) tmpXL.countColumns()).get());
             tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
         }

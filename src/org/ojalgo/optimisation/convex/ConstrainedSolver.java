@@ -53,8 +53,8 @@ abstract class ConstrainedSolver extends ConvexSolver {
         }
 
         if (tmpA != null) {
-            myLU.decompose(tmpA.countRows() < tmpA.countColumns() ? tmpA.transpose() : tmpA);
-            if (myLU.getRank() != tmpA.countRows()) {
+            this.computeGeneral(tmpA.countRows() < tmpA.countColumns() ? tmpA.transpose() : tmpA);
+            if (this.getRankGeneral() != tmpA.countRows()) {
                 throw new IllegalArgumentException("A must have full (row) rank!");
             }
         }

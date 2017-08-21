@@ -223,11 +223,11 @@ abstract class IterativeASS extends ActiveSetSolver {
             }
         }
 
-        if (!tmpSolvable && (tmpSolvable = myLU.compute(this.getIterationKKT(tmpIncluded)))) {
+        if (!tmpSolvable && (tmpSolvable = this.computeGeneral(this.getIterationKKT(tmpIncluded)))) {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = myLU.getSolution(this.getIterationRHS(tmpIncluded));
+            final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS(tmpIncluded));
             final int tmpCountVariables = this.countVariables();
             myIterationX.fillMatching(tmpXL.logical().limits(tmpCountVariables, (int) tmpXL.countColumns()).get());
 

@@ -599,11 +599,11 @@ public abstract class ConvexSolver extends GenericSolver {
 
     private final ConvexSolver.Builder myMatrices;
 
-    private PrimitiveDenseStore myX = null;
+    private final LU<Double> mySolverGeneral;
 
     private final Cholesky<Double> mySolverQ;
 
-    final LU<Double> myLU;
+    private PrimitiveDenseStore myX = null;
 
     @SuppressWarnings("unused")
     private ConvexSolver(final Options solverOptions) {
@@ -619,7 +619,7 @@ public abstract class ConvexSolver extends GenericSolver {
         final MatrixStore<Double> tmpQ = this.getQ();
 
         mySolverQ = Cholesky.make(tmpQ);
-        myLU = LU.make(tmpQ);
+        mySolverGeneral = LU.make(tmpQ);
     }
 
     public void dispose() {
@@ -660,6 +660,14 @@ public abstract class ConvexSolver extends GenericSolver {
     @Override
     public String toString() {
         return myMatrices.toString();
+    }
+
+    protected boolean computeGeneral(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+        return mySolverGeneral.compute(matrix);
+    }
+
+    protected boolean computeQ(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
+        return mySolverQ.compute(matrix);
     }
 
     protected int countEqualityConstraints() {
@@ -760,6 +768,10 @@ public abstract class ConvexSolver extends GenericSolver {
         return myMatrices.getQ();
     }
 
+    protected int getRankGeneral() {
+        return mySolverGeneral.getRank();
+    }
+
     protected PhysicalStore<Double> getSE() {
 
         PhysicalStore<Double> retVal = null;
@@ -817,6 +829,22 @@ public abstract class ConvexSolver extends GenericSolver {
         return retVal;
     }
 
+    protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
+        return mySolverGeneral.getSolution(rhs);
+    }
+
+    protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
+        return mySolverGeneral.getSolution(rhs, preallocated);
+    }
+
+    protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
+        return mySolverQ.getSolution(rhs);
+    }
+
+    protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
+        return mySolverQ.getSolution(rhs, preallocated);
+    }
+
     /**
      * Solution / Variables: [X]
      */
@@ -837,6 +865,14 @@ public abstract class ConvexSolver extends GenericSolver {
 
     protected boolean hasObjective() {
         return myMatrices.hasObjective();
+    }
+
+    protected boolean isSolvableGeneral() {
+        return mySolverGeneral.isSolvable();
+    }
+
+    protected boolean isSolvableQ() {
+        return mySolverQ.isSolvable();
     }
 
     protected boolean isX() {
@@ -896,22 +932,6 @@ public abstract class ConvexSolver extends GenericSolver {
 
         this.setState(State.VALID);
         return true;
-    }
-
-    protected boolean computeQ(final Collectable<Double, ? super PhysicalStore<Double>> matrix) {
-        return mySolverQ.compute(matrix);
-    }
-
-    protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-        return mySolverQ.getSolution(rhs);
-    }
-
-    protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
-        return mySolverQ.getSolution(rhs, preallocated);
-    }
-
-    protected boolean isSolvableQ() {
-        return mySolverQ.isSolvable();
     }
 
 }

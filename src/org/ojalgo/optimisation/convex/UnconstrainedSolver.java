@@ -75,11 +75,11 @@ final class UnconstrainedSolver extends ConvexSolver {
 
             this.getSolutionQ(tmpC, tmpX);
 
-        } else if (tmpSolvable = myLU.compute(tmpQ)) {
+        } else if (tmpSolvable = this.computeGeneral(tmpQ)) {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
 
-            myLU.getSolution(tmpC, tmpX);
+            this.getSolutionGeneral(tmpC, tmpX);
         }
 
         if (!tmpSolvable && this.isDebug()) {

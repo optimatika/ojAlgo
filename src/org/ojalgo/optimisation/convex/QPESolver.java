@@ -124,22 +124,22 @@ final class QPESolver extends ConstrainedSolver {
             // Negated Schur complement
             final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
             // TODO Symmetric, only need to calculate halv the Schur complement
-            if (tmpSolvable = myLU.compute(tmpS)) {
+            if (tmpSolvable = this.computeGeneral(tmpS)) {
 
                 // tmpX temporarely used to store tmpInvQC
                 final MatrixStore<Double> tmpInvQC = this.getSolutionQ(tmpIterC, tmpIterX); //TODO Constant if C doesn't change
 
-                myLU.getSolution(tmpIterA.multiply(tmpInvQC).subtract(tmpIterB), tmpIterL);
+                this.getSolutionGeneral(tmpIterA.multiply(tmpInvQC).subtract(tmpIterB), tmpIterL);
                 this.getSolutionQ(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
             }
 
         }
 
-        if (!tmpSolvable && (tmpSolvable = myLU.compute(this.getIterationKKT()))) {
+        if (!tmpSolvable && (tmpSolvable = this.computeGeneral(this.getIterationKKT()))) {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = myLU.getSolution(this.getIterationRHS());
+            final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS());
             tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), (int) tmpXL.countColumns()).get());
             tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
         }
