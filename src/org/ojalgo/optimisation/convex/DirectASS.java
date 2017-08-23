@@ -57,10 +57,11 @@ abstract class DirectASS extends ActiveSetSolver {
 
         if (this.isDebug()) {
             this.debug("\nPerformIteration {}", 1 + this.countIterations());
-            this.debug(myActivator.toString());
+            this.debug(this.toActivatorString());
         }
 
-        myConstraintToInclude = -1;
+        final int tmpToInclude = this.getConstraintToInclude();
+        this.setConstraintToInclude(-1);
         final int[] tmpIncluded = this.getIncluded();
 
         this.getIterationQ();
@@ -70,7 +71,7 @@ abstract class DirectASS extends ActiveSetSolver {
 
         boolean tmpSolvable = false;
 
-        final PrimitiveDenseStore tmpIterX = myIterationX;
+        final PrimitiveDenseStore tmpIterX = this.getIterationX();
         final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(tmpIterA.countRows(), 1L);
 
         if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (tmpSolvable = this.isSolvableQ())) {
@@ -106,7 +107,7 @@ abstract class DirectASS extends ActiveSetSolver {
 
                     //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
                     //myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
-                    this.getSolutionGeneral(myInvQC.premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
+                    this.getSolutionGeneral(this.getInvQC().premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
 
                     //BasicLogger.debug("L", tmpIterL);
 
@@ -135,13 +136,13 @@ abstract class DirectASS extends ActiveSetSolver {
             options.debug_appender.printmtrx("RHS", this.getIterationRHS());
         }
 
-        myIterationL.fillAll(0.0);
+        this.getIterationL().fillAll(0.0);
         final int tmpCountE = this.countEqualityConstraints();
         for (int i = 0; i < tmpCountE; i++) {
-            myIterationL.set(i, tmpIterL.doubleValue(i));
+            this.getIterationL().set(i, tmpIterL.doubleValue(i));
         }
         for (int i = 0; i < tmpIncluded.length; i++) {
-            myIterationL.set(tmpCountE + tmpIncluded[i], tmpIterL.doubleValue(tmpCountE + i));
+            this.getIterationL().set(tmpCountE + tmpIncluded[i], tmpIterL.doubleValue(tmpCountE + i));
         }
 
         this.handleSubsolution(tmpSolvable, tmpIterX, tmpIncluded);
@@ -149,7 +150,7 @@ abstract class DirectASS extends ActiveSetSolver {
 
     @Override
     void excludeAndRemove(final int toExclude) {
-        myActivator.exclude(toExclude);
+        this.exclude(toExclude);
     }
 
     @Override
@@ -157,27 +158,27 @@ abstract class DirectASS extends ActiveSetSolver {
 
         if (this.hasInequalityConstraints()) {
 
-            final int[] tmpExcluded = myActivator.getExcluded();
+            final int[] tmpExcluded = this.getExcluded();
 
             final MatrixStore<Double> tmpAIX = this.getAIX(tmpExcluded);
             for (int i = 0; i < tmpExcluded.length; i++) {
                 final double tmpBody = tmpAIX.doubleValue(i);
                 final double tmpRHS = tmpBI.doubleValue(tmpExcluded[i]);
-                if (!options.slack.isDifferent(tmpRHS, tmpBody) && (myIterationL.doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
-                    myActivator.include(tmpExcluded[i]);
+                if (!options.slack.isDifferent(tmpRHS, tmpBody) && (this.getIterationL().doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
+                    this.include(tmpExcluded[i]);
                 }
             }
         }
 
-        while (((tmpNumEqus + myActivator.countIncluded()) >= tmpNumVars) && (myActivator.countIncluded() > 0)) {
+        while (((tmpNumEqus + this.countIncluded()) >= tmpNumVars) && (this.countIncluded() > 0)) {
             this.shrink();
         }
 
-        if (this.isDebug() && ((tmpNumEqus + myActivator.countIncluded()) > tmpNumVars)) {
+        if (this.isDebug() && ((tmpNumEqus + this.countIncluded()) > tmpNumVars)) {
             this.debug("Redundant contraints!");
         }
 
-        myInvQC = this.getSolutionQ(this.getIterationC());
+        this.setInvQC(this.getSolutionQ(this.getIterationC()));
     }
 
 }
