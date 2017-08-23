@@ -177,6 +177,11 @@ final class QPESolver extends ConstrainedSolver {
     }
 
     @Override
+    int countIterationConstraints() {
+        return (int) this.getIterationA().countRows();
+    }
+
+    @Override
     final MatrixStore<Double> getIterationA() {
         return this.getAE();
     }

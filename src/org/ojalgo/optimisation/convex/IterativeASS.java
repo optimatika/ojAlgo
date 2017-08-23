@@ -178,15 +178,7 @@ abstract class IterativeASS extends ActiveSetSolver {
         this.setConstraintToInclude(-1);
         final int[] tmpIncluded = this.getIncluded();
 
-        final MatrixStore<Double> tmpIterC = this.getIterationC();
-        final MatrixStore<Double> tmpIterA = this.getIterationA(tmpIncluded);
-
-        final long tmpCountRowsIterA = tmpIterA.countRows();
-        final long tmpCountColsIterA = tmpIterA.countColumns();
-
         boolean tmpSolvable = false;
-
-        final int tmpCountE = this.countEqualityConstraints();
 
         if (tmpToInclude >= 0) {
 
@@ -198,16 +190,16 @@ abstract class IterativeASS extends ActiveSetSolver {
             final MatrixStore<Double> body = this.getSolutionQ(rowToIncludeTransposed);
             final double rhs = this.getInvQC().premultiply(rowAlt2).get().doubleValue(0L) - this.getBI().doubleValue(tmpToInclude);
 
-            myS.add(tmpCountE + tmpToInclude, body, rhs, 3);
+            myS.add(this.countEqualityConstraints() + tmpToInclude, body, rhs, 3);
         }
 
-        if ((tmpCountRowsIterA < tmpCountColsIterA) && (tmpSolvable = this.isSolvableQ())) {
+        if ((this.countIterationConstraints() < this.countVariables()) && (tmpSolvable = this.isSolvableQ())) {
             // Q is SPD
 
-            if (tmpCountRowsIterA == 0L) {
+            if (this.countIterationConstraints() == 0L) {
                 // Unconstrained - can happen when PureASS and all inequalities are inactive
 
-                this.getSolutionQ(tmpIterC, this.getIterationX());
+                this.getSolutionQ(this.getIterationC(), this.getIterationX());
 
             } else {
                 // Actual/normal optimisation problem
@@ -219,8 +211,8 @@ abstract class IterativeASS extends ActiveSetSolver {
                     // this.debug("Iteration L", this.getIterationL(tmpIncluded));
                 }
 
-                this.getSolutionQ(this.getIterationL(tmpIncluded).premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT),
-                        this.getIterationX());
+                this.getSolutionQ(this.getIterationL(tmpIncluded).premultiply(this.getIterationA(tmpIncluded).transpose())
+                        .operateOnMatching(this.getIterationC(), SUBTRACT), this.getIterationX());
             }
         }
 
@@ -232,19 +224,20 @@ abstract class IterativeASS extends ActiveSetSolver {
             final int tmpCountVariables = this.countVariables();
             this.getIterationX().fillMatching(tmpXL.logical().limits(tmpCountVariables, (int) tmpXL.countColumns()).get());
 
-            for (int i = 0; i < tmpCountE; i++) {
+            for (int i = 0; i < this.countEqualityConstraints(); i++) {
                 this.getIterationL().set(i, tmpXL.doubleValue(tmpCountVariables + i));
             }
             final int tmpLengthIncluded = tmpIncluded.length;
             for (int i = 0; i < tmpLengthIncluded; i++) {
-                this.getIterationL().set(tmpCountE + tmpIncluded[i], tmpXL.doubleValue(tmpCountVariables + tmpCountE + i));
+                this.getIterationL().set(this.countEqualityConstraints() + tmpIncluded[i],
+                        tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
             }
 
         }
 
         if (!tmpSolvable && this.isDebug()) {
             options.debug_appender.println("KKT system unsolvable!");
-            if ((this.countVariables() + tmpCountColsIterA) < 20) {
+            if ((this.countVariables() + (long) this.countVariables()) < 20) {
                 options.debug_appender.printmtrx("KKT", this.getIterationKKT());
                 options.debug_appender.printmtrx("RHS", this.getIterationRHS());
             }

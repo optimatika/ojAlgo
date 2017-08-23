@@ -65,6 +65,12 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
     abstract MatrixStore<Double> getIterationA();
 
+    /**
+     * The number of rows in {@link #getIterationA()} and {@link #getIterationB()} without having to actually
+     * create them.
+     */
+    abstract int countIterationConstraints();
+
     abstract MatrixStore<Double> getIterationB();
 
     abstract MatrixStore<Double> getIterationC();

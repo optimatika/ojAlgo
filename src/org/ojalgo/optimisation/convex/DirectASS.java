@@ -64,34 +64,28 @@ abstract class DirectASS extends ActiveSetSolver {
         this.setConstraintToInclude(-1);
         final int[] tmpIncluded = this.getIncluded();
 
-        this.getIterationQ();
-        final MatrixStore<Double> tmpIterC = this.getIterationC();
-        final MatrixStore<Double> tmpIterA = this.getIterationA(tmpIncluded);
-        final MatrixStore<Double> tmpIterB = this.getIterationB(tmpIncluded);
-
         boolean tmpSolvable = false;
 
-        final PrimitiveDenseStore tmpIterX = this.getIterationX();
-        final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(tmpIterA.countRows(), 1L);
+        final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(this.getIterationA(tmpIncluded).countRows(), 1L);
 
-        if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (tmpSolvable = this.isSolvableQ())) {
+        if ((this.getIterationA(tmpIncluded).countRows() < this.getIterationA(tmpIncluded).countColumns()) && (tmpSolvable = this.isSolvableQ())) {
             // Q is SPD
 
-            if (tmpIterA.countRows() == 0L) {
+            if (this.getIterationA(tmpIncluded).countRows() == 0L) {
                 // Unconstrained - can happen when PureASS and all inequalities are inactive
 
-                this.getSolutionQ(tmpIterC, tmpIterX);
+                this.getSolutionQ(this.getIterationC(), this.getIterationX());
 
             } else {
                 // Actual/normal optimisation problem
 
-                final MatrixStore<Double> tmpInvQAT = this.getSolutionQ(tmpIterA.transpose());
+                final MatrixStore<Double> tmpInvQAT = this.getSolutionQ(this.getIterationA(tmpIncluded).transpose());
                 // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
                 // BasicLogger.debug("tmpInvQAT", tmpInvQAT);
 
                 // Negated Schur complement
                 // final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
-                final ElementsSupplier<Double> tmpS = tmpInvQAT.premultiply(tmpIterA);
+                final ElementsSupplier<Double> tmpS = tmpInvQAT.premultiply(this.getIterationA(tmpIncluded));
                 // TODO Symmetric, only need to calculate halv the Schur complement, and only 1 row/column changes per iteration
                 //BasicLogger.debug("Negated Schur complement", tmpS.get());
 
@@ -107,7 +101,9 @@ abstract class DirectASS extends ActiveSetSolver {
 
                     //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
                     //myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
-                    this.getSolutionGeneral(this.getInvQC().premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB), tmpIterL);
+                    this.getSolutionGeneral(
+                            this.getInvQC().premultiply(this.getIterationA(tmpIncluded)).operateOnMatching(SUBTRACT, this.getIterationB(tmpIncluded)),
+                            tmpIterL);
 
                     //BasicLogger.debug("L", tmpIterL);
 
@@ -116,7 +112,8 @@ abstract class DirectASS extends ActiveSetSolver {
                     }
 
                     //myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
-                    this.getSolutionQ(tmpIterL.premultiply(tmpIterA.transpose()).operateOnMatching(tmpIterC, SUBTRACT), tmpIterX);
+                    this.getSolutionQ(tmpIterL.premultiply(this.getIterationA(tmpIncluded).transpose()).operateOnMatching(this.getIterationC(), SUBTRACT),
+                            this.getIterationX());
                 }
             }
         }
@@ -126,7 +123,7 @@ abstract class DirectASS extends ActiveSetSolver {
             // Try solving the full KKT system instaed
 
             final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS(tmpIncluded));
-            tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), (int) tmpXL.countColumns()).get());
+            this.getIterationX().fillMatching(tmpXL.logical().limits(this.countVariables(), (int) tmpXL.countColumns()).get());
             tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
         }
 
@@ -145,7 +142,7 @@ abstract class DirectASS extends ActiveSetSolver {
             this.getIterationL().set(tmpCountE + tmpIncluded[i], tmpIterL.doubleValue(tmpCountE + i));
         }
 
-        this.handleSubsolution(tmpSolvable, tmpIterX, tmpIncluded);
+        this.handleSubsolution(tmpSolvable, this.getIterationX(), tmpIncluded);
     }
 
     @Override

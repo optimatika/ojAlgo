@@ -61,4 +61,9 @@ final class IterativeMixedASS extends IterativeASS {
         return retVal;
     }
 
+    @Override
+    int countIterationConstraints(final int[] included) {
+        return this.countEqualityConstraints() + included.length;
+    }
+
 }

@@ -342,6 +342,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     abstract void excludeAndRemove(int toExclude);
 
+    @Override
+    final int countIterationConstraints() {
+        return this.countIterationConstraints(this.getIncluded());
+    }
+
+    abstract int countIterationConstraints(int[] included);
+
     int getConstraintToInclude() {
         return myConstraintToInclude;
     }
