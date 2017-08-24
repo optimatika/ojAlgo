@@ -65,20 +65,6 @@ final class QPESolver extends ConstrainedSolver {
     }
 
     @Override
-    protected final MatrixStore<Double> getIterationKKT() {
-        final MatrixStore<Double> tmpIterationQ = this.getIterationQ();
-        final MatrixStore<Double> tmpIterationA = this.getIterationA();
-        return tmpIterationQ.logical().right(tmpIterationA.transpose()).below(tmpIterationA).get();
-    }
-
-    @Override
-    protected final MatrixStore<Double> getIterationRHS() {
-        final MatrixStore<Double> tmpIterationC = this.getIterationC();
-        final MatrixStore<Double> tmpIterationB = this.getIterationB();
-        return tmpIterationC.logical().below(tmpIterationB).get();
-    }
-
-    @Override
     protected boolean initialise(final Result kickStarter) {
 
         super.initialise(kickStarter);

@@ -26,10 +26,22 @@ import org.ojalgo.matrix.store.PhysicalStore;
 
 abstract class ConstrainedSolver extends ConvexSolver {
 
-    private transient PhysicalStore<Double> myIterationQ = null;
-
     protected ConstrainedSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
         super(matrices, solverOptions);
+    }
+
+    @Override
+    protected final MatrixStore<Double> getIterationKKT() {
+        final MatrixStore<Double> iterQ = this.getIterationQ();
+        final MatrixStore<Double> iterA = this.getIterationA();
+        return iterQ.logical().right(iterA.transpose()).below(iterA).get();
+    }
+
+    @Override
+    protected final MatrixStore<Double> getIterationRHS() {
+        final MatrixStore<Double> iterC = this.getIterationC();
+        final MatrixStore<Double> iterB = this.getIterationB();
+        return iterC.logical().below(iterB).get();
     }
 
     @Override
@@ -63,32 +75,20 @@ abstract class ConstrainedSolver extends ConvexSolver {
         return true;
     }
 
-    abstract MatrixStore<Double> getIterationA();
-
     /**
      * The number of rows in {@link #getIterationA()} and {@link #getIterationB()} without having to actually
      * create them.
      */
     abstract int countIterationConstraints();
 
+    abstract MatrixStore<Double> getIterationA();
+
     abstract MatrixStore<Double> getIterationB();
 
     abstract MatrixStore<Double> getIterationC();
 
     final PhysicalStore<Double> getIterationQ() {
-
-        if (myIterationQ == null) {
-
-            final MatrixStore<Double> tmpQ = this.getMatrixQ();
-
-            if (tmpQ instanceof PhysicalStore) {
-                myIterationQ = (PhysicalStore<Double>) tmpQ;
-            } else {
-                myIterationQ = tmpQ.copy();
-            }
-        }
-
-        return myIterationQ;
+        return this.getMatrixQ();
     }
 
 }

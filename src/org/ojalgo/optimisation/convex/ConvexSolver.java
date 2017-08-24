@@ -95,7 +95,7 @@ public abstract class ConvexSolver extends GenericSolver {
         private MatrixStore<Double> myBE = null;
         private MatrixStore<Double> myBI = null;
         private MatrixStore<Double> myC = null;
-        private MatrixStore<Double> myQ = null;
+        private PhysicalStore<Double> myQ = null;
 
         public Builder() {
             super();
@@ -190,14 +190,13 @@ public abstract class ConvexSolver extends GenericSolver {
             return retVal;
         }
 
-        public ConvexSolver.Builder equalities(final MatrixStore<Double> AE, final MatrixStore<Double> BE) {
+        public ConvexSolver.Builder equalities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
 
-            if ((AE == null) || (BE == null) || (AE.countRows() != BE.countRows())) {
-                throw new IllegalArgumentException();
-            }
+            ProgrammingError.throwIfNull(mtrxAE, mtrxBE);
+            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAE, mtrxBE);
 
-            myAE = AE;
-            myBE = BE;
+            myAE = mtrxAE;
+            myBE = mtrxBE;
 
             return this;
         }
@@ -240,7 +239,7 @@ public abstract class ConvexSolver extends GenericSolver {
         /**
          * Quadratic objective: [Q]
          */
-        public MatrixStore<Double> getQ() {
+        public PhysicalStore<Double> getQ() {
             return myQ;
         }
 
@@ -256,24 +255,23 @@ public abstract class ConvexSolver extends GenericSolver {
             return (myQ != null) || (myC != null);
         }
 
-        public ConvexSolver.Builder inequalities(final MatrixStore<Double> AI, final MatrixStore<Double> BI) {
+        public ConvexSolver.Builder inequalities(final MatrixStore<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
 
-            if ((AI == null) || (BI == null) || (AI.countRows() != BI.countRows())) {
-                throw new IllegalArgumentException();
-            }
+            ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
+            ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
 
-            if (AI instanceof SparseStore) {
+            if (mtrxAI instanceof SparseStore) {
 
-                myAI = (SparseStore<Double>) AI;
+                myAI = (SparseStore<Double>) mtrxAI;
 
             } else {
 
-                myAI = SparseStore.PRIMITIVE.make(AI.countRows(), AI.countColumns());
+                myAI = SparseStore.PRIMITIVE.make(mtrxAI.countRows(), mtrxAI.countColumns());
 
                 double value;
-                for (int j = 0; j < AI.countColumns(); j++) {
-                    for (int i = 0; i < AI.countRows(); i++) {
-                        value = AI.doubleValue(i, j);
+                for (int j = 0; j < mtrxAI.countColumns(); j++) {
+                    for (int i = 0; i < mtrxAI.countRows(); i++) {
+                        value = mtrxAI.doubleValue(i, j);
                         if (!NC.isZero(value)) {
                             myAI.set(i, j, value);
                         }
@@ -281,33 +279,35 @@ public abstract class ConvexSolver extends GenericSolver {
                 }
             }
 
-            myBI = BI;
+            myBI = mtrxBI;
 
             return this;
         }
 
-        public Builder objective(final MatrixStore<Double> C) {
+        public Builder objective(final MatrixStore<Double> mtrxC) {
 
-            if (C == null) {
-                throw new IllegalArgumentException();
-            }
+            ProgrammingError.throwIfNull(mtrxC);
 
-            myC = C;
+            myC = mtrxC;
 
             return this;
         }
 
-        public Builder objective(final MatrixStore<Double> Q, final MatrixStore<Double> C) {
+        public Builder objective(final MatrixStore<Double> mtrxQ, final MatrixStore<Double> mtrxC) {
 
-            if (Q == null) {
+            ProgrammingError.throwIfNull(mtrxQ);
+
+            if (mtrxQ == null) {
                 throw new IllegalArgumentException();
             }
 
-            myQ = Q;
+            if (mtrxQ instanceof PhysicalStore) {
+                myQ = (PhysicalStore<Double>) mtrxQ;
+            } else {
+                myQ = mtrxQ.copy();
+            }
 
-            final MatrixStore<Double> tmpC = C != null ? C : MatrixStore.PRIMITIVE.makeZero((int) Q.countRows(), 1).get();
-
-            myC = tmpC;
+            myC = mtrxC != null ? mtrxC : MatrixStore.PRIMITIVE.makeZero((int) mtrxQ.countRows(), 1).get();
 
             return this;
         }
@@ -763,7 +763,7 @@ public abstract class ConvexSolver extends GenericSolver {
         return myMatrices.getC();
     }
 
-    protected MatrixStore<Double> getMatrixQ() {
+    protected PhysicalStore<Double> getMatrixQ() {
         return myMatrices.getQ();
     }
 

@@ -217,11 +217,11 @@ abstract class IterativeASS extends ActiveSetSolver {
             }
         }
 
-        if (!tmpSolvable && (tmpSolvable = this.computeGeneral(this.getIterationKKT(tmpIncluded)))) {
+        if (!tmpSolvable && (tmpSolvable = this.computeGeneral(this.getIterationKKT()))) {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS(tmpIncluded));
+            final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS());
             final int tmpCountVariables = this.countVariables();
             this.getIterationX().fillMatching(tmpXL.logical().limits(tmpCountVariables, (int) tmpXL.countColumns()).get());
 
@@ -230,8 +230,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             }
             final int tmpLengthIncluded = tmpIncluded.length;
             for (int i = 0; i < tmpLengthIncluded; i++) {
-                this.getL().set(this.countEqualityConstraints() + tmpIncluded[i],
-                        tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
+                this.getL().set(this.countEqualityConstraints() + tmpIncluded[i], tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
             }
 
         }

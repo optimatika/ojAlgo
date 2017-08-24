@@ -120,11 +120,11 @@ abstract class DirectASS extends ActiveSetSolver {
             }
         }
 
-        if (!tmpSolvable && (tmpSolvable = this.computeGeneral(this.getIterationKKT(tmpIncluded)))) {
+        if (!tmpSolvable && (tmpSolvable = this.computeGeneral(this.getIterationKKT()))) {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS(tmpIncluded));
+            final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS());
             this.getIterationX().fillMatching(tmpXL.logical().limits(this.countVariables(), (int) tmpXL.countColumns()).get());
             tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
         }

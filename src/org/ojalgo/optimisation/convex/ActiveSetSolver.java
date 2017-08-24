@@ -128,28 +128,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return myActivator.getIncluded();
     }
 
-    @Override
-    protected final MatrixStore<Double> getIterationKKT() {
-        return this.getIterationKKT(myActivator.getIncluded());
-    }
-
-    protected final MatrixStore<Double> getIterationKKT(final int[] included) {
-        final MatrixStore<Double> tmpIterationQ = this.getIterationQ();
-        final MatrixStore<Double> tmpIterationA = this.getIterationA(included);
-        return tmpIterationQ.logical().right(tmpIterationA.transpose()).below(tmpIterationA).get();
-    }
-
-    @Override
-    protected final MatrixStore<Double> getIterationRHS() {
-        return this.getIterationRHS(myActivator.getIncluded());
-    }
-
-    protected final MatrixStore<Double> getIterationRHS(final int[] included) {
-        final MatrixStore<Double> tmpIterationC = this.getIterationC();
-        final MatrixStore<Double> tmpIterationB = this.getIterationB(included);
-        return tmpIterationC.logical().below(tmpIterationB).get();
-    }
-
     protected int getLastExcluded() {
         return myActivator.getLastExcluded();
     }
