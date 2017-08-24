@@ -37,7 +37,7 @@ final class IterativePureASS extends IterativeASS {
     @Override
     MatrixStore<Double> getIterationA(final int[] included) {
 
-        final MatrixStore<Double> tmpAI = this.getAI();
+        final MatrixStore<Double> tmpAI = this.getMatrixAI();
 
         MatrixStore<Double> retVal = null;
         if (included.length == 0) {
@@ -52,7 +52,7 @@ final class IterativePureASS extends IterativeASS {
     @Override
     MatrixStore<Double> getIterationB(final int[] included) {
 
-        final MatrixStore<Double> tmpBI = this.getBI();
+        final MatrixStore<Double> tmpBI = this.getMatrixBI();
 
         MatrixStore<Double> retVal = null;
         if (included.length == 0) {

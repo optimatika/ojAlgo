@@ -41,17 +41,17 @@ final class UnconstrainedSolver extends ConvexSolver {
 
     @Override
     protected MatrixStore<Double> getIterationKKT() {
-        return this.getQ();
+        return this.getMatrixQ();
     }
 
     @Override
     protected MatrixStore<Double> getIterationRHS() {
-        return this.getC();
+        return this.getMatrixC();
     }
 
     @Override
     protected boolean initialise(final Result kickStarter) {
-        this.computeQ(this.getQ());
+        this.computeQ(this.getMatrixQ());
         this.resetX();
         return true;
     }
@@ -64,9 +64,9 @@ final class UnconstrainedSolver extends ConvexSolver {
     @Override
     protected void performIteration() {
 
-        final MatrixStore<Double> tmpQ = this.getQ();
-        final MatrixStore<Double> tmpC = this.getC();
-        final PhysicalStore<Double> tmpX = this.getX();
+        final MatrixStore<Double> tmpQ = this.getMatrixQ();
+        final MatrixStore<Double> tmpC = this.getMatrixC();
+        final PhysicalStore<Double> tmpX = this.getMatrixX();
 
         boolean tmpSolvable = true;
 

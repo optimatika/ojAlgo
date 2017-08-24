@@ -26,6 +26,7 @@ import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
 
+import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
@@ -66,12 +67,12 @@ abstract class DirectASS extends ActiveSetSolver {
 
         boolean tmpSolvable = false;
 
-        final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(this.getIterationA(tmpIncluded).countRows(), 1L);
+        final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(this.countIterationConstraints(), 1L);
 
-        if ((this.getIterationA(tmpIncluded).countRows() < this.getIterationA(tmpIncluded).countColumns()) && (tmpSolvable = this.isSolvableQ())) {
+        if ((this.countIterationConstraints() < this.countVariables()) && (tmpSolvable = this.isSolvableQ())) {
             // Q is SPD
 
-            if (this.getIterationA(tmpIncluded).countRows() == 0L) {
+            if (this.countIterationConstraints() == 0L) {
                 // Unconstrained - can happen when PureASS and all inequalities are inactive
 
                 this.getSolutionQ(this.getIterationC(), this.getIterationX());
@@ -108,12 +109,13 @@ abstract class DirectASS extends ActiveSetSolver {
                     //BasicLogger.debug("L", tmpIterL);
 
                     if (this.isDebug()) {
-                        this.debug("Iteration L", tmpIterL);
+                        this.debug("Relative error {} in solution for L={}", PrimitiveMath.NaN, tmpIterL);
                     }
 
                     //myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
-                    this.getSolutionQ(tmpIterL.premultiply(this.getIterationA(tmpIncluded).transpose()).operateOnMatching(this.getIterationC(), SUBTRACT),
-                            this.getIterationX());
+                    final ElementsSupplier<Double> tmpRHS = tmpIterL.premultiply(this.getIterationA(tmpIncluded).transpose())
+                            .operateOnMatching(this.getIterationC(), SUBTRACT);
+                    this.getSolutionQ(tmpRHS, this.getIterationX());
                 }
             }
         }
@@ -133,13 +135,13 @@ abstract class DirectASS extends ActiveSetSolver {
             options.debug_appender.printmtrx("RHS", this.getIterationRHS());
         }
 
-        this.getIterationL().fillAll(0.0);
+        this.getL().fillAll(0.0);
         final int tmpCountE = this.countEqualityConstraints();
         for (int i = 0; i < tmpCountE; i++) {
-            this.getIterationL().set(i, tmpIterL.doubleValue(i));
+            this.getL().set(i, tmpIterL.doubleValue(i));
         }
         for (int i = 0; i < tmpIncluded.length; i++) {
-            this.getIterationL().set(tmpCountE + tmpIncluded[i], tmpIterL.doubleValue(tmpCountE + i));
+            this.getL().set(tmpCountE + tmpIncluded[i], tmpIterL.doubleValue(tmpCountE + i));
         }
 
         this.handleSubsolution(tmpSolvable, this.getIterationX(), tmpIncluded);
@@ -161,7 +163,7 @@ abstract class DirectASS extends ActiveSetSolver {
             for (int i = 0; i < tmpExcluded.length; i++) {
                 final double tmpBody = tmpAIX.doubleValue(i);
                 final double tmpRHS = tmpBI.doubleValue(tmpExcluded[i]);
-                if (!options.slack.isDifferent(tmpRHS, tmpBody) && (this.getIterationL().doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
+                if (!options.slack.isDifferent(tmpRHS, tmpBody) && (this.getL().doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
                     this.include(tmpExcluded[i]);
                 }
             }

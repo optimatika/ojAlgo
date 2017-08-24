@@ -28,6 +28,7 @@ import java.math.MathContext;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -104,10 +105,10 @@ abstract class IterativeASS extends ActiveSetSolver {
             myIterationRows[j] = tmpNewRow;
             this.add(tmpNewRow);
 
-            if (IterativeASS.this.getAE() != null) {
+            if (IterativeASS.this.getMatrixAE() != null) {
 
-                final PhysicalStore<Double> tmpProdE = IterativeASS.this.getAE().physical().makeZero(IterativeASS.this.getAE().countRows(), 1L);
-                IterativeASS.this.getAE().multiply(column, tmpProdE);
+                final PhysicalStore<Double> tmpProdE = IterativeASS.this.getMatrixAE().physical().makeZero(IterativeASS.this.getMatrixAE().countRows(), 1L);
+                IterativeASS.this.getMatrixAE().multiply(column, tmpProdE);
 
                 for (int i = 0; i < myCountE; i++) {
                     final double tmpVal = tmpProdE.doubleValue(i);
@@ -121,10 +122,10 @@ abstract class IterativeASS extends ActiveSetSolver {
                 }
             }
 
-            if ((IterativeASS.this.getAI() != null) && (myIncluded.length > 0)) {
+            if ((IterativeASS.this.getMatrixAI() != null) && (myIncluded.length > 0)) {
 
-                final PhysicalStore<Double> tmpProdI = IterativeASS.this.getAI().physical().makeZero(myIncluded.length, 1L);
-                IterativeASS.this.getAI().logical().row(myIncluded).get().multiply(column, tmpProdI);
+                final PhysicalStore<Double> tmpProdI = IterativeASS.this.getMatrixAI().physical().makeZero(myIncluded.length, 1L);
+                IterativeASS.this.getMatrixAI().logical().row(myIncluded).get().multiply(column, tmpProdI);
 
                 for (int _i = 0; _i < myIncluded.length; _i++) {
                     final double tmpVal = tmpProdI.doubleValue(_i);
@@ -140,7 +141,7 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             }
 
-            tmpNewRow.initialise(IterativeASS.this.getIterationL());
+            tmpNewRow.initialise(IterativeASS.this.getL());
 
         }
 
@@ -152,7 +153,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             }
             myIterationRows[i] = null;
 
-            IterativeASS.this.getIterationL().set(i, ZERO);
+            IterativeASS.this.getL().set(i, ZERO);
         }
 
     }
@@ -182,13 +183,13 @@ abstract class IterativeASS extends ActiveSetSolver {
 
         if (tmpToInclude >= 0) {
 
-            final LogicalBuilder<Double> rowAlt1 = this.getAI().logical().row(tmpToInclude);
-            final Access1D<Double> rowAlt2 = this.getAI().sliceRow(tmpToInclude);
+            final LogicalBuilder<Double> rowAlt1 = this.getMatrixAI().logical().row(tmpToInclude);
+            final Access1D<Double> rowAlt2 = this.getMatrixAI().sliceRow(tmpToInclude);
 
             final LogicalBuilder<Double> rowToIncludeTransposed = rowAlt1.transpose();
 
             final MatrixStore<Double> body = this.getSolutionQ(rowToIncludeTransposed);
-            final double rhs = this.getInvQC().premultiply(rowAlt2).get().doubleValue(0L) - this.getBI().doubleValue(tmpToInclude);
+            final double rhs = this.getInvQC().premultiply(rowAlt2).get().doubleValue(0L) - this.getMatrixBI().doubleValue(tmpToInclude);
 
             myS.add(this.countEqualityConstraints() + tmpToInclude, body, rhs, 3);
         }
@@ -204,15 +205,15 @@ abstract class IterativeASS extends ActiveSetSolver {
             } else {
                 // Actual/normal optimisation problem
 
-                final double tmpRelativeError = myS.resolve(this.getIterationL());
+                final double tmpRelativeError = myS.resolve(this.getL());
 
                 if (this.isDebug()) {
-                    this.debug("Relative error in solution for L={}", tmpRelativeError);
-                    // this.debug("Iteration L", this.getIterationL(tmpIncluded));
+                    this.debug("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(tmpIncluded));
                 }
 
-                this.getSolutionQ(this.getIterationL(tmpIncluded).premultiply(this.getIterationA(tmpIncluded).transpose())
-                        .operateOnMatching(this.getIterationC(), SUBTRACT), this.getIterationX());
+                final ElementsSupplier<Double> tmpRHS = this.getIterationL(tmpIncluded).premultiply(this.getIterationA(tmpIncluded).transpose())
+                        .operateOnMatching(this.getIterationC(), SUBTRACT);
+                this.getSolutionQ(tmpRHS, this.getIterationX());
             }
         }
 
@@ -225,11 +226,11 @@ abstract class IterativeASS extends ActiveSetSolver {
             this.getIterationX().fillMatching(tmpXL.logical().limits(tmpCountVariables, (int) tmpXL.countColumns()).get());
 
             for (int i = 0; i < this.countEqualityConstraints(); i++) {
-                this.getIterationL().set(i, tmpXL.doubleValue(tmpCountVariables + i));
+                this.getL().set(i, tmpXL.doubleValue(tmpCountVariables + i));
             }
             final int tmpLengthIncluded = tmpIncluded.length;
             for (int i = 0; i < tmpLengthIncluded; i++) {
-                this.getIterationL().set(this.countEqualityConstraints() + tmpIncluded[i],
+                this.getL().set(this.countEqualityConstraints() + tmpIncluded[i],
                         tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
             }
 
@@ -265,7 +266,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             for (int i = 0; i < tmpExcluded.length; i++) {
                 final double tmpBody = tmpAIX.doubleValue(i);
                 final double tmpRHS = tmpBI.doubleValue(tmpExcluded[i]);
-                if (!options.slack.isDifferent(tmpRHS, tmpBody) && (this.getIterationL().doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
+                if (!options.slack.isDifferent(tmpRHS, tmpBody) && (this.getL().doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
                     this.include(tmpExcluded[i]);
                 }
             }

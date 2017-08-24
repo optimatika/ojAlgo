@@ -79,7 +79,7 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
         if (myIterationQ == null) {
 
-            final MatrixStore<Double> tmpQ = this.getQ();
+            final MatrixStore<Double> tmpQ = this.getMatrixQ();
 
             if (tmpQ instanceof PhysicalStore) {
                 myIterationQ = (PhysicalStore<Double>) tmpQ;

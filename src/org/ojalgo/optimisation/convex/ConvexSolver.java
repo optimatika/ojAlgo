@@ -598,12 +598,9 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     private final ConvexSolver.Builder myMatrices;
-
+    private PrimitiveDenseStore myMatrixX = null;
     private final LU<Double> mySolverGeneral;
-
     private final Cholesky<Double> mySolverQ;
-
-    private PrimitiveDenseStore myX = null;
 
     @SuppressWarnings("unused")
     private ConvexSolver(final Options solverOptions) {
@@ -616,7 +613,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         myMatrices = matrices;
 
-        final MatrixStore<Double> tmpQ = this.getQ();
+        final MatrixStore<Double> tmpQ = this.getMatrixQ();
 
         mySolverQ = Cholesky.make(tmpQ);
         mySolverGeneral = LU.make(tmpQ);
@@ -685,42 +682,40 @@ public abstract class ConvexSolver extends GenericSolver {
     @Override
     protected double evaluateFunction(final Access1D<?> solution) {
 
-        final MatrixStore<Double> tmpX = this.getX();
+        final MatrixStore<Double> tmpX = this.getMatrixX();
 
-        return tmpX.transpose().multiply(this.getQ().multiply(tmpX)).multiply(0.5).subtract(tmpX.transpose().multiply(this.getC())).doubleValue(0L);
+        return tmpX.transpose().multiply(this.getMatrixQ().multiply(tmpX)).multiply(0.5).subtract(tmpX.transpose().multiply(this.getMatrixC())).doubleValue(0L);
     }
 
     @Override
     protected MatrixStore<Double> extractSolution() {
 
-        return this.getX().copy();
+        return this.getMatrixX().copy();
 
     }
 
     protected void fillX(final Access1D<?> solution) {
         final int tmpLimit = this.countVariables();
         for (int i = 0; i < tmpLimit; i++) {
-            this.setX(i, solution.doubleValue(i));
+            final int index = i;
+            this.getMatrixX().set(index, 0, solution.doubleValue(i));
         }
     }
 
     protected void fillX(final double value) {
         final int tmpLimit = this.countVariables();
         for (int i = 0; i < tmpLimit; i++) {
-            this.setX(i, value);
+            final int index = i;
+            this.getMatrixX().set(index, 0, value);
         }
-    }
-
-    protected MatrixStore<Double> getAE() {
-        return myMatrices.getAE();
     }
 
     protected MatrixStore<Double> getAEX() {
 
         MatrixStore<Double> retVal = null;
 
-        final MatrixStore<Double> tmpAE = this.getAE();
-        final PhysicalStore<Double> tmpX = this.getX();
+        final MatrixStore<Double> tmpAE = this.getMatrixAE();
+        final PhysicalStore<Double> tmpX = this.getMatrixX();
 
         if ((tmpAE != null) && (tmpX != null)) {
             retVal = tmpAE.multiply(tmpX);
@@ -728,14 +723,10 @@ public abstract class ConvexSolver extends GenericSolver {
         return retVal;
     }
 
-    protected MatrixStore<Double> getAI() {
-        return myMatrices.getAI();
-    }
-
     protected MatrixStore<Double> getAIX(final int[] selector) {
 
-        final MatrixStore<Double> tmpAI = this.getAI();
-        final PhysicalStore<Double> tmpX = this.getX();
+        final MatrixStore<Double> tmpAI = this.getMatrixAI();
+        final PhysicalStore<Double> tmpX = this.getMatrixX();
 
         if ((tmpAI != null) && (tmpX != null)) {
             return tmpAI.logical().row(selector).get().multiply(tmpX);
@@ -744,28 +735,46 @@ public abstract class ConvexSolver extends GenericSolver {
         }
     }
 
-    protected MatrixStore<Double> getBE() {
-        return myMatrices.getBE();
-    }
-
-    protected MatrixStore<Double> getBI() {
-        return myMatrices.getBI();
-    }
-
-    protected MatrixStore<Double> getBI(final int[] selector) {
-        return myMatrices.getBI().logical().row(selector).get();
-    }
-
-    protected MatrixStore<Double> getC() {
-        return myMatrices.getC();
-    }
-
     protected abstract MatrixStore<Double> getIterationKKT();
 
     protected abstract MatrixStore<Double> getIterationRHS();
 
-    protected MatrixStore<Double> getQ() {
+    protected MatrixStore<Double> getMatrixAE() {
+        return myMatrices.getAE();
+    }
+
+    protected MatrixStore<Double> getMatrixAI() {
+        return myMatrices.getAI();
+    }
+
+    protected MatrixStore<Double> getMatrixBE() {
+        return myMatrices.getBE();
+    }
+
+    protected MatrixStore<Double> getMatrixBI() {
+        return myMatrices.getBI();
+    }
+
+    protected MatrixStore<Double> getMatrixBI(final int[] selector) {
+        return myMatrices.getBI().logical().row(selector).get();
+    }
+
+    protected MatrixStore<Double> getMatrixC() {
+        return myMatrices.getC();
+    }
+
+    protected MatrixStore<Double> getMatrixQ() {
         return myMatrices.getQ();
+    }
+
+    /**
+     * Solution / Variables: [X]
+     */
+    protected PhysicalStore<Double> getMatrixX() {
+        if (myMatrixX == null) {
+            myMatrixX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
+        }
+        return myMatrixX;
     }
 
     protected int getRankGeneral() {
@@ -776,9 +785,9 @@ public abstract class ConvexSolver extends GenericSolver {
 
         PhysicalStore<Double> retVal = null;
 
-        final MatrixStore<Double> mtrxAE = this.getAE();
-        final MatrixStore<Double> mtrxBE = this.getBE();
-        final PhysicalStore<Double> mtrxX = this.getX();
+        final MatrixStore<Double> mtrxAE = this.getMatrixAE();
+        final MatrixStore<Double> mtrxBE = this.getMatrixBE();
+        final PhysicalStore<Double> mtrxX = this.getMatrixX();
 
         if ((mtrxAE != null) && (mtrxBE != null)) {
 
@@ -794,9 +803,9 @@ public abstract class ConvexSolver extends GenericSolver {
 
         PhysicalStore<Double> retVal = null;
 
-        final MatrixStore<Double> mtrxAI = this.getAI();
-        final MatrixStore<Double> mtrxBI = this.getBI();
-        final PhysicalStore<Double> mtrxX = this.getX();
+        final MatrixStore<Double> mtrxAI = this.getMatrixAI();
+        final MatrixStore<Double> mtrxBI = this.getMatrixBI();
+        final PhysicalStore<Double> mtrxX = this.getMatrixX();
 
         if ((mtrxAI != null) && (mtrxBI != null)) {
 
@@ -812,9 +821,9 @@ public abstract class ConvexSolver extends GenericSolver {
 
         PhysicalStore<Double> retVal = null;
 
-        final MatrixStore<Double> mtrxAI = this.getAI();
-        final MatrixStore<Double> mtrxBI = this.getBI();
-        final PhysicalStore<Double> mtrxX = this.getX();
+        final MatrixStore<Double> mtrxAI = this.getMatrixAI();
+        final MatrixStore<Double> mtrxBI = this.getMatrixBI();
+        final PhysicalStore<Double> mtrxX = this.getMatrixX();
 
         if ((mtrxAI != null) && (mtrxBI != null)) {
 
@@ -845,16 +854,6 @@ public abstract class ConvexSolver extends GenericSolver {
         return mySolverQ.getSolution(rhs, preallocated);
     }
 
-    /**
-     * Solution / Variables: [X]
-     */
-    protected PhysicalStore<Double> getX() {
-        if (myX == null) {
-            myX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1);
-        }
-        return myX;
-    }
-
     protected boolean hasEqualityConstraints() {
         return myMatrices.hasEqualityConstraints();
     }
@@ -875,27 +874,19 @@ public abstract class ConvexSolver extends GenericSolver {
         return mySolverQ.isSolvable();
     }
 
-    protected boolean isX() {
-        return myX != null;
-    }
-
     abstract protected void performIteration();
 
     protected void resetX() {
-        if (myX != null) {
-            myX.fillAll(ZERO);
+        if (myMatrixX != null) {
+            myMatrixX.fillAll(ZERO);
         }
-    }
-
-    protected void setX(final int index, final double value) {
-        this.getX().set(index, 0, value);
     }
 
     @Override
     protected boolean validate() {
 
-        final MatrixStore<Double> tmpQ = this.getQ();
-        final MatrixStore<Double> tmpC = this.getC();
+        final MatrixStore<Double> tmpQ = this.getMatrixQ();
+        final MatrixStore<Double> tmpC = this.getMatrixC();
 
         if ((tmpQ == null) || (tmpC == null)) {
             throw new IllegalArgumentException("Neither Q nor C may be null!");

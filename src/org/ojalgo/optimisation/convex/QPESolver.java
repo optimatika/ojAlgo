@@ -54,7 +54,7 @@ final class QPESolver extends ConstrainedSolver {
         boolean retVal = true;
 
         final MatrixStore<Double> tmpAEX = this.getAEX();
-        final MatrixStore<Double> tmpBE = this.getBE();
+        final MatrixStore<Double> tmpBE = this.getMatrixBE();
         for (int i = 0; retVal && (i < tmpBE.countRows()); i++) {
             if (options.slack.isDifferent(tmpBE.doubleValue(i), tmpAEX.doubleValue(i))) {
                 retVal = false;
@@ -155,9 +155,9 @@ final class QPESolver extends ConstrainedSolver {
             this.setState(State.OPTIMAL);
 
             if (myFeasible) {
-                this.getX().modifyMatching(PrimitiveFunction.ADD, tmpIterX);
+                this.getMatrixX().modifyMatching(PrimitiveFunction.ADD, tmpIterX);
             } else {
-                this.getX().fillMatching(tmpIterX);
+                this.getMatrixX().fillMatching(tmpIterX);
             }
 
             // this.getLE().fillMatching(tmpIterL);
@@ -183,7 +183,7 @@ final class QPESolver extends ConstrainedSolver {
 
     @Override
     final MatrixStore<Double> getIterationA() {
-        return this.getAE();
+        return this.getMatrixAE();
     }
 
     @Override
@@ -191,7 +191,7 @@ final class QPESolver extends ConstrainedSolver {
         if (myFeasible) {
             return MatrixStore.PRIMITIVE.makeZero(this.countEqualityConstraints(), 1).get();
         } else {
-            return this.getBE();
+            return this.getMatrixBE();
         }
     }
 
@@ -200,16 +200,16 @@ final class QPESolver extends ConstrainedSolver {
 
         if (myFeasible) {
 
-            final MatrixStore<Double> tmpQ = this.getQ();
-            final MatrixStore<Double> tmpC = this.getC();
+            final MatrixStore<Double> tmpQ = this.getMatrixQ();
+            final MatrixStore<Double> tmpC = this.getMatrixC();
 
-            final PhysicalStore<Double> tmpX = this.getX();
+            final PhysicalStore<Double> tmpX = this.getMatrixX();
 
             return tmpC.subtract(tmpQ.multiply(tmpX));
 
         } else {
 
-            return this.getC();
+            return this.getMatrixC();
         }
     }
 
