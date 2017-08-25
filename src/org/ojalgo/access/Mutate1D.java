@@ -156,7 +156,7 @@ public interface Mutate1D extends Structure1D {
 
     /**
      * Reset this mutable structure to some standard (all zeros) initial state. It must still be usuable after
-     * this call, and the structure/size/shape of must not change.
+     * this call, and the structure/size/shape must not change.
      */
     default void reset() {
         this.loopAll(i -> this.set(i, PrimitiveMath.ZERO));

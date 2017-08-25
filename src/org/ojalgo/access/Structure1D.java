@@ -39,8 +39,8 @@ public interface Structure1D {
     }
 
     static void loopMatching(final Structure1D structureA, final Structure1D structureB, final IndexCallback callback) {
-        final long tmpLimit = Math.min(structureA.count(), structureB.count());
-        Structure1D.loopRange(0L, tmpLimit, callback);
+        final long limit = Math.min(structureA.count(), structureB.count());
+        Structure1D.loopRange(0L, limit, callback);
     }
 
     static void loopRange(final long first, final long limit, final IndexCallback callback) {

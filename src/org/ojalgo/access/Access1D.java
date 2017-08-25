@@ -384,6 +384,9 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         };
     }
 
+    /**
+     * Transforms this {@link Access1D} to a {@link Access1D.Collectable} of a different {@link Number} type.
+     */
     default <NN extends Number, R extends Mutate1D.Receiver<NN>> Collectable<NN, R> asCollectable1D() {
         return new Collectable<NN, R>() {
 
