@@ -202,6 +202,8 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
 
         AggregatorSet<N> aggregator();
 
+        DenseArray.Factory<N> array();
+
         MatrixStore.Factory<N> builder();
 
         I conjugate(Access2D<?> source);
@@ -233,8 +235,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
         Scalar.Factory<N> scalar();
 
         I transpose(Access2D<?> source);
-
-        DenseArray.Factory<N> array();
 
     }
 

@@ -5,11 +5,14 @@ import java.util.List;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.access.Mutate1D;
+import org.ojalgo.array.SparseArray;
+import org.ojalgo.array.SparseArray.SparseFactory;
 import org.ojalgo.matrix.store.PhysicalStore.Factory;
 
 public final class ColumnsSupplier<N extends Number> implements Access2D<N>, ElementsSupplier<N> {
 
-    private final List<Access1D<N>> myColumns = new ArrayList<>();
+    private final List<SparseArray<N>> myColumns = new ArrayList<>();
     private final PhysicalStore.Factory<N, ?> myFactory;
     private final int myRowsCount;
 
@@ -19,8 +22,8 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
         myFactory = factory;
     }
 
-    public PhysicalStore<N> addColumn() {
-        final PhysicalStore<N> retVal = myFactory.makeZero(myRowsCount, 1L);
+    public SparseArray<N> addColumn() {
+        final SparseArray<N> retVal = SparseArray.factory(myFactory.array(), myRowsCount).make();
         if (myColumns.add(retVal)) {
             return retVal;
         } else {
@@ -28,14 +31,10 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
         }
     }
 
-    public Access1D<N> addColumn(final Access1D<N> column) {
-        if (column.count() != myRowsCount) {
-            throw new IllegalArgumentException("All columns must have the same legth!");
-        }
-        if (myColumns.add(column)) {
-            return column;
-        } else {
-            return null;
+    public void addColumns(final int numberToAdd) {
+        final SparseFactory<N> factory = SparseArray.factory(myFactory.array(), myRowsCount);
+        for (int j = 0; j < numberToAdd; j++) {
+            myColumns.add(factory.make());
         }
     }
 
@@ -68,6 +67,38 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
     }
 
     public void supplyTo(final ElementsConsumer<N> receiver) {
+
+        receiver.reset();
+
+        final int limit = myColumns.size();
+        for (int j = 0; j < limit; j++) {
+            final long col = j;
+
+            myColumns.get(j).supplyNonZerosTo(new Mutate1D() {
+
+                public void add(final long index, final double addend) {
+                    receiver.add(index, col, addend);
+                }
+
+                public void add(final long index, final Number addend) {
+                    receiver.add(index, col, addend);
+                }
+
+                public long count() {
+                    return receiver.countRows();
+                }
+
+                public void set(final long index, final double value) {
+                    receiver.set(index, col, value);
+                }
+
+                public void set(final long index, final Number value) {
+                    receiver.set(index, col, value);
+                }
+
+            });
+        }
+
         final int tmpLimit = myColumns.size();
         for (int j = 0; j < tmpLimit; j++) {
             receiver.fillColumn(j, myColumns.get(j));

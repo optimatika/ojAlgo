@@ -30,10 +30,12 @@ import java.util.stream.Collectors;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
+import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -45,6 +47,7 @@ import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
@@ -91,7 +94,7 @@ public abstract class ConvexSolver extends GenericSolver {
         private static final NumberContext NC = NumberContext.getGeneral(12);
 
         private MatrixStore<Double> myAE = null;
-        private SparseStore<Double> myAI = null;
+        private RowsSupplier<Double> myAI = null;
         private MatrixStore<Double> myBE = null;
         private MatrixStore<Double> myBI = null;
         private MatrixStore<Double> myC = null;
@@ -132,7 +135,7 @@ public abstract class ConvexSolver extends GenericSolver {
             }
 
             if (matrices.hasInequalityConstraints()) {
-                this.inequalities(matrices.getAI(), matrices.getBI());
+                this.inequalities(matrices.getAI().get(), matrices.getBI());
             }
         }
 
@@ -211,8 +214,15 @@ public abstract class ConvexSolver extends GenericSolver {
         /**
          * [AI][X] &lt;= [BI]
          */
-        public MatrixStore<Double> getAI() {
+        /**
+         * @return
+         */
+        public RowsSupplier<Double> getAI() {
             return myAI;
+        }
+
+        public SparseArray<Double> getAI(final int row) {
+            return myAI.getRow(row);
         }
 
         /**
@@ -255,25 +265,34 @@ public abstract class ConvexSolver extends GenericSolver {
             return (myQ != null) || (myC != null);
         }
 
-        public ConvexSolver.Builder inequalities(final MatrixStore<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
+        public ConvexSolver.Builder inequalities(final Access2D<Double> mtrxAI, final MatrixStore<Double> mtrxBI) {
 
             ProgrammingError.throwIfNull(mtrxAI, mtrxBI);
             ProgrammingError.throwIfNotEqualRowDimensions(mtrxAI, mtrxBI);
 
-            if (mtrxAI instanceof SparseStore) {
+            if (mtrxAI instanceof RowsSupplier) {
 
-                myAI = (SparseStore<Double>) mtrxAI;
+                myAI = (RowsSupplier<Double>) mtrxAI;
 
             } else {
 
-                myAI = SparseStore.PRIMITIVE.make(mtrxAI.countRows(), mtrxAI.countColumns());
+                myAI = PrimitiveDenseStore.FACTORY.makeRowsSupplier((int) mtrxAI.countColumns());
+                myAI.addRows((int) mtrxAI.countRows());
 
-                double value;
-                for (int j = 0; j < mtrxAI.countColumns(); j++) {
+                if (mtrxAI instanceof SparseStore) {
+
+                    ((SparseStore<Double>) mtrxAI).nonzeros().forEach(nz -> myAI.getRow((int) nz.row()).set((int) nz.column(), nz.doubleValue()));
+
+                } else {
+
+                    double value;
                     for (int i = 0; i < mtrxAI.countRows(); i++) {
-                        value = mtrxAI.doubleValue(i, j);
-                        if (!NC.isZero(value)) {
-                            myAI.set(i, j, value);
+                        final SparseArray<Double> tmpRow = myAI.getRow(i);
+                        for (int j = 0; j < mtrxAI.countColumns(); j++) {
+                            value = mtrxAI.doubleValue(i, j);
+                            if (!NC.isZero(value)) {
+                                tmpRow.set(j, value);
+                            }
                         }
                     }
                 }
@@ -744,7 +763,11 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     protected MatrixStore<Double> getMatrixAI() {
-        return myMatrices.getAI();
+        return myMatrices.getAI().get();
+    }
+
+    protected SparseArray<Double> getMatrixAI(final int row) {
+        return myMatrices.getAI().getRow(row);
     }
 
     protected MatrixStore<Double> getMatrixBE() {

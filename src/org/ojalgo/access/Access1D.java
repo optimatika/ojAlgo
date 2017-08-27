@@ -396,6 +396,46 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
             public void supplyTo(final R receiver) {
                 receiver.accept(Access1D.this);
+                //                receiver.reset();
+                //                Access1D.this.nonzeros().forEach(nz -> receiver.set(nz.index(), nz.doubleValue()));
+            }
+
+        };
+    }
+
+    default <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> asPrimitiveColumnCollectable2D() {
+        return new Access2D.Collectable<Double, R>() {
+
+            public long countColumns() {
+                return 1L;
+            }
+
+            public long countRows() {
+                return Access1D.this.count();
+            }
+
+            public void supplyTo(final R receiver) {
+                receiver.reset();
+                Access1D.this.nonzeros().forEach(nz -> receiver.set(nz.index(), 0L, nz.doubleValue()));
+            }
+
+        };
+    }
+
+    default <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> asPrimitiveRowCollectable2D() {
+        return new Access2D.Collectable<Double, R>() {
+
+            public long countColumns() {
+                return Access1D.this.count();
+            }
+
+            public long countRows() {
+                return 1L;
+            }
+
+            public void supplyTo(final R receiver) {
+                receiver.reset();
+                Access1D.this.nonzeros().forEach(nz -> receiver.set(0L, nz.index(), nz.doubleValue()));
             }
 
         };
@@ -437,6 +477,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     default Iterator<N> iterator() {
         return new Iterator1D<>(this);
+    }
+
+    default ElementView1D<N, ?> nonzeros() {
+        return this.elements();
     }
 
     default BaseStream<N, ? extends BaseStream<N, ?>> stream(final boolean parallel) {
