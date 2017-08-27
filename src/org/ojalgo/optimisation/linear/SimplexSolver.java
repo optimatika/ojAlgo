@@ -556,7 +556,6 @@ public final class SimplexSolver extends LinearSolver {
         return retVal;
     }
 
-    @Override
     protected boolean validate() {
 
         final boolean retVal = true;

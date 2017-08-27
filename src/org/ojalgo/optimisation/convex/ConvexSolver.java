@@ -889,6 +889,8 @@ public abstract class ConvexSolver extends GenericSolver {
         return myMatrices.hasObjective();
     }
 
+    protected abstract boolean initialise(Result kickStarter);
+
     protected boolean isSolvableGeneral() {
         return mySolverGeneral.isSolvable();
     }
@@ -896,6 +898,8 @@ public abstract class ConvexSolver extends GenericSolver {
     protected boolean isSolvableQ() {
         return mySolverQ.isSolvable();
     }
+
+    protected abstract boolean needsAnotherIteration();
 
     abstract protected void performIteration();
 
@@ -905,7 +909,16 @@ public abstract class ConvexSolver extends GenericSolver {
         }
     }
 
-    @Override
+    /**
+     * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the
+     * method should only be called if {@linkplain Optimisation.Options#validate} is set to true. In addition
+     * to returning true or false the implementation should set the state to either
+     * {@linkplain Optimisation.State#VALID} or {@linkplain Optimisation.State#INVALID} (or possibly
+     * {@linkplain Optimisation.State#FAILED}). Typically the method should be called at the very beginning of
+     * the solve-method.
+     *
+     * @return Is the solver instance valid?
+     */
     protected boolean validate() {
 
         final MatrixStore<Double> tmpQ = this.getMatrixQ();

@@ -55,16 +55,6 @@ public abstract class LinearSolver extends GenericSolver {
         }
 
         @Override
-        protected LinearSolver doBuild(final Optimisation.Options options) {
-
-            myDelegate.validate();
-
-            final SimplexTableau tableau = new DenseTableau(this);
-
-            return new SimplexSolver(tableau, options);
-        }
-
-        @Override
         public int countConstraints() {
             return myDelegate.countEqualityConstraints();
         }
@@ -102,6 +92,16 @@ public abstract class LinearSolver extends GenericSolver {
         public LinearSolver.Builder objective(final MatrixStore<Double> mtrxC) {
             myDelegate.objective(mtrxC);
             return this;
+        }
+
+        @Override
+        protected LinearSolver doBuild(final Optimisation.Options options) {
+
+            myDelegate.validate();
+
+            final SimplexTableau tableau = new DenseTableau(this);
+
+            return new SimplexSolver(tableau, options);
         }
 
     }
@@ -184,5 +184,9 @@ public abstract class LinearSolver extends GenericSolver {
     protected LinearSolver(final Options solverOptions) {
         super(solverOptions);
     }
+
+    protected abstract boolean initialise(Result kickStarter);
+
+    protected abstract boolean needsAnotherIteration();
 
 }

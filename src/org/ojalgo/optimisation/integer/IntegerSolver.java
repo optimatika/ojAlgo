@@ -152,10 +152,10 @@ public abstract class IntegerSolver extends GenericSolver {
     }
 
     private volatile Optimisation.Result myBestResultSoFar = null;
+
     private final MultiaryFunction.TwiceDifferentiable<Double> myFunction;
     private final AtomicInteger myIntegerSolutionsCount = new AtomicInteger();
     private final boolean myMinimisation;
-
     private final ExpressionsBasedModel myModel;
 
     private final NodeStatistics myNodeStatistics = new NodeStatistics();
@@ -208,6 +208,8 @@ public abstract class IntegerSolver extends GenericSolver {
     protected final ExpressionsBasedModel getModel() {
         return myModel;
     }
+
+    protected abstract boolean initialise(Result kickStarter);
 
     protected final boolean isFunctionSet() {
         return myFunction != null;
@@ -277,5 +279,19 @@ public abstract class IntegerSolver extends GenericSolver {
 
         myIntegerSolutionsCount.incrementAndGet();
     }
+
+    protected abstract boolean needsAnotherIteration();
+
+    /**
+     * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the
+     * method should only be called if {@linkplain Optimisation.Options#validate} is set to true. In addition
+     * to returning true or false the implementation should set the state to either
+     * {@linkplain Optimisation.State#VALID} or {@linkplain Optimisation.State#INVALID} (or possibly
+     * {@linkplain Optimisation.State#FAILED}). Typically the method should be called at the very beginning of
+     * the solve-method.
+     *
+     * @return Is the solver instance valid?
+     */
+    protected abstract boolean validate();
 
 }
