@@ -30,8 +30,8 @@ import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.MatrixStore.LogicalBuilder;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.task.iterative.ConjugateGradientSolver;
 import org.ojalgo.matrix.task.iterative.Equation;
 import org.ojalgo.matrix.task.iterative.MutableSolver;
@@ -122,9 +122,9 @@ abstract class IterativeASS extends ActiveSetSolver {
                 }
             }
 
-            if ((IterativeASS.this.getMatrixAI() != null) && (myIncluded.length > 0)) {
+            if (IterativeASS.this.countIncluded() > 0) {
 
-                final PhysicalStore<Double> tmpProdI = IterativeASS.this.getMatrixAI().physical().makeZero(myIncluded.length, 1L);
+                final PhysicalStore<Double> tmpProdI = PrimitiveDenseStore.FACTORY.makeZero(myIncluded.length, 1L);
                 IterativeASS.this.getMatrixAI().logical().row(myIncluded).get().multiply(column, tmpProdI);
 
                 for (int _i = 0; _i < myIncluded.length; _i++) {
@@ -183,12 +183,12 @@ abstract class IterativeASS extends ActiveSetSolver {
 
         if (tmpToInclude >= 0) {
 
-            final LogicalBuilder<Double> rowAlt1 = this.getMatrixAI().logical().row(tmpToInclude);
-            final Access1D<Double> rowAlt2 = this.getMatrixAI().sliceRow(tmpToInclude);
+            // final LogicalBuilder<Double> rowAlt1 = this.getMatrixAI().logical().row(tmpToInclude);
+            final Access1D<Double> rowAlt2 = this.getMatrixAI(tmpToInclude);
 
-            final LogicalBuilder<Double> rowToIncludeTransposed = rowAlt1.transpose();
+            // final LogicalBuilder<Double> rowToIncludeTransposed = rowAlt1.transpose();
 
-            final MatrixStore<Double> body = this.getSolutionQ(rowToIncludeTransposed);
+            final MatrixStore<Double> body = this.getSolutionQ(Access2D.newPrimitiveColumnCollectable(rowAlt2));
             final double rhs = this.getInvQC().premultiply(rowAlt2).get().doubleValue(0L) - this.getMatrixBI().doubleValue(tmpToInclude);
 
             myS.add(this.countEqualityConstraints() + tmpToInclude, body, rhs, 3);

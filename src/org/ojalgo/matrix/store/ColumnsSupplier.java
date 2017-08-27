@@ -23,12 +23,7 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
     }
 
     public SparseArray<N> addColumn() {
-        final SparseArray<N> retVal = SparseArray.factory(myFactory.array(), myRowsCount).make();
-        if (myColumns.add(retVal)) {
-            return retVal;
-        } else {
-            return null;
-        }
+        return this.addColumn(SparseArray.factory(myFactory.array(), myRowsCount).make());
     }
 
     public void addColumns(final int numberToAdd) {
@@ -54,7 +49,7 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
         return myColumns.get((int) col).get(row);
     }
 
-    public Access1D<N> getColumn(final int index) {
+    public SparseArray<N> getColumn(final int index) {
         return myColumns.get(index);
     }
 
@@ -64,6 +59,14 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
 
     public Access1D<N> removeColumn(final int index) {
         return myColumns.remove(index);
+    }
+
+    public ColumnsSupplier<N> selectColumns(final int[] indices) {
+        final ColumnsSupplier<N> retVal = new ColumnsSupplier<>(myFactory, myRowsCount);
+        for (int i = 0; i < indices.length; i++) {
+            retVal.addColumn(this.getColumn(indices[i]));
+        }
+        return retVal;
     }
 
     public void supplyTo(final ElementsConsumer<N> receiver) {
@@ -102,6 +105,14 @@ public final class ColumnsSupplier<N extends Number> implements Access2D<N>, Ele
         final int tmpLimit = myColumns.size();
         for (int j = 0; j < tmpLimit; j++) {
             receiver.fillColumn(j, myColumns.get(j));
+        }
+    }
+
+    SparseArray<N> addColumn(final SparseArray<N> columnToAdd) {
+        if (myColumns.add(columnToAdd)) {
+            return columnToAdd;
+        } else {
+            return null;
         }
     }
 

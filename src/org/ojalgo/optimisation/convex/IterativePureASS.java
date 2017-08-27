@@ -37,13 +37,12 @@ final class IterativePureASS extends IterativeASS {
     @Override
     MatrixStore<Double> getIterationA(final int[] included) {
 
-        final MatrixStore<Double> tmpAI = this.getMatrixAI();
-
         MatrixStore<Double> retVal = null;
+
         if (included.length == 0) {
             retVal = MatrixStore.PRIMITIVE.makeZero(0, this.countVariables()).get();
         } else {
-            retVal = tmpAI.logical().row(included).get();
+            retVal = this.getMatrixAI().logical().row(included).get();
         }
 
         return retVal;

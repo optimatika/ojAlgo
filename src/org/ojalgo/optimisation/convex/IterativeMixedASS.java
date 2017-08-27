@@ -32,14 +32,12 @@ final class IterativeMixedASS extends IterativeASS {
     @Override
     MatrixStore<Double> getIterationA(final int[] included) {
 
-        final MatrixStore<Double> tmpAE = this.getMatrixAE();
-        final MatrixStore<Double> tmpAI = this.getMatrixAI();
-
         MatrixStore<Double> retVal = null;
+
         if (included.length == 0) {
-            retVal = tmpAE;
+            retVal = this.getMatrixAE();
         } else {
-            retVal = tmpAI.logical().row(included).above(tmpAE).get();
+            retVal = this.getMatrixAI().logical().row(included).above(this.getMatrixAE()).get();
         }
 
         return retVal;

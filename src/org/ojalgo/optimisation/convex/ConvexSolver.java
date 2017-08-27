@@ -617,8 +617,10 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     private final ConvexSolver.Builder myMatrices;
+    private transient PhysicalStore<Double> myMatrixAI = null;
     private PrimitiveDenseStore myMatrixX = null;
     private final LU<Double> mySolverGeneral;
+
     private final Cholesky<Double> mySolverQ;
 
     @SuppressWarnings("unused")
@@ -762,12 +764,23 @@ public abstract class ConvexSolver extends GenericSolver {
         return myMatrices.getAE();
     }
 
+    /**
+     * @deprecated
+     */
+    @Deprecated
     protected MatrixStore<Double> getMatrixAI() {
-        return myMatrices.getAI().get();
+        if (myMatrixAI == null) {
+            myMatrixAI = myMatrices.getAI().collect(PrimitiveDenseStore.FACTORY);
+        }
+        return myMatrixAI;
     }
 
     protected SparseArray<Double> getMatrixAI(final int row) {
         return myMatrices.getAI().getRow(row);
+    }
+
+    protected RowsSupplier<Double> getMatrixAI(final int[] rows) {
+        return myMatrices.getAI().selectRows(rows);
     }
 
     protected MatrixStore<Double> getMatrixBE() {

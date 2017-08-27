@@ -468,6 +468,44 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         return (accessA.countRows() == accessB.countRows()) && (accessA.countColumns() == accessB.countColumns()) && Access1D.equals(accessA, accessB, context);
     }
 
+    static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveColumnCollectable(final Access1D<?> anything1D) {
+        return new Access2D.Collectable<Double, R>() {
+
+            public long countColumns() {
+                return 1L;
+            }
+
+            public long countRows() {
+                return anything1D.count();
+            }
+
+            public void supplyTo(final R receiver) {
+                receiver.reset();
+                anything1D.nonzeros().forEach(nz -> receiver.set(nz.index(), 0L, nz.doubleValue()));
+            }
+
+        };
+    }
+
+    static <R extends Mutate2D.Receiver<Double>> Access2D.Collectable<Double, R> newPrimitiveRowCollectable(final Access1D<?> anything1D) {
+        return new Access2D.Collectable<Double, R>() {
+
+            public long countColumns() {
+                return anything1D.count();
+            }
+
+            public long countRows() {
+                return 1L;
+            }
+
+            public void supplyTo(final R receiver) {
+                receiver.reset();
+                anything1D.nonzeros().forEach(nz -> receiver.set(0L, nz.index(), nz.doubleValue()));
+            }
+
+        };
+    }
+
     static Access2D<Double> wrapAccess2D(final double[][] target) {
         return new Access2D<Double>() {
 

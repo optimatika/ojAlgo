@@ -22,12 +22,7 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
     }
 
     public SparseArray<N> addRow() {
-        final SparseArray<N> retVal = SparseArray.factory(myFactory.array(), myColumnsCount).make();
-        if (myRows.add(retVal)) {
-            return retVal;
-        } else {
-            return null;
-        }
+        return this.addRow(SparseArray.factory(myFactory.array(), myColumnsCount).make());
     }
 
     public void addRows(final int numberToAdd) {
@@ -65,6 +60,14 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
         return myRows.remove(index);
     }
 
+    public RowsSupplier<N> selectRows(final int[] indices) {
+        final RowsSupplier<N> retVal = new RowsSupplier<>(myFactory, myColumnsCount);
+        for (int i = 0; i < indices.length; i++) {
+            retVal.addRow(this.getRow(indices[i]));
+        }
+        return retVal;
+    }
+
     public void supplyTo(final ElementsConsumer<N> receiver) {
 
         receiver.reset();
@@ -75,16 +78,16 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
 
             myRows.get(i).supplyNonZerosTo(new Mutate1D() {
 
-                public long count() {
-                    return receiver.countColumns();
-                }
-
                 public void add(final long index, final double addend) {
                     receiver.add(row, index, addend);
                 }
 
                 public void add(final long index, final Number addend) {
                     receiver.add(row, index, addend);
+                }
+
+                public long count() {
+                    return receiver.countColumns();
                 }
 
                 public void set(final long index, final double value) {
@@ -96,6 +99,14 @@ public final class RowsSupplier<N extends Number> implements Access2D<N>, Elemen
                 }
 
             });
+        }
+    }
+
+    SparseArray<N> addRow(final SparseArray<N> rowToAdd) {
+        if (myRows.add(rowToAdd)) {
+            return rowToAdd;
+        } else {
+            return null;
         }
     }
 
