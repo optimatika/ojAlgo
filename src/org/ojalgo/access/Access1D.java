@@ -204,6 +204,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
 
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static Access1D<BigDecimal> asBig1D(final Access1D<?> access) {
         return new Access1D<BigDecimal>() {
 
@@ -222,6 +226,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         };
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static Access1D<ComplexNumber> asComplex1D(final Access1D<?> access) {
         return new Access1D<ComplexNumber>() {
 
@@ -258,6 +266,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         };
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static Access1D<Quaternion> asQuaternion1D(final Access1D<?> access) {
         return new Access1D<Quaternion>() {
 
@@ -276,6 +288,10 @@ public interface Access1D<N extends Number> extends Structure1D, Iterable<N> {
         };
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static Access1D<RationalNumber> asRational1D(final Access1D<?> access) {
         return new Access1D<RationalNumber>() {
 

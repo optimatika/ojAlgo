@@ -88,6 +88,10 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
 
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static AccessAnyD<BigDecimal> asBigAnyD(final AccessAnyD<?> access) {
         return new AccessAnyD<BigDecimal>() {
 
@@ -122,6 +126,10 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         };
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static AccessAnyD<ComplexNumber> asComplexAnyD(final AccessAnyD<?> access) {
         return new AccessAnyD<ComplexNumber>() {
 
@@ -190,6 +198,10 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         };
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static AccessAnyD<Quaternion> asQuaternionAnyD(final AccessAnyD<?> access) {
         return new AccessAnyD<Quaternion>() {
 
@@ -224,6 +236,10 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         };
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static AccessAnyD<RationalNumber> asRationalAnyD(final AccessAnyD<?> access) {
         return new AccessAnyD<RationalNumber>() {
 
@@ -277,7 +293,7 @@ public interface AccessAnyD<N extends Number> extends StructureAnyD, Access1D<N>
         return new Collectable<NN, R>() {
 
             public long count(final int dimension) {
-                return AccessAnyD.this.count();
+                return AccessAnyD.this.count(dimension);
             }
 
             public long[] shape() {

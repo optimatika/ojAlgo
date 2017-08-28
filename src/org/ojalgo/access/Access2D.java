@@ -294,6 +294,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
 
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static Access2D<BigDecimal> asBig2D(final Access2D<?> access) {
         return new Access2D<BigDecimal>() {
 
@@ -328,6 +332,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         };
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static Access2D<ComplexNumber> asComplex2D(final Access2D<?> access) {
         return new Access2D<ComplexNumber>() {
 
@@ -396,6 +404,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         };
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static Access2D<Quaternion> asQuaternion2D(final Access2D<?> access) {
         return new Access2D<Quaternion>() {
 
@@ -430,6 +442,10 @@ public interface Access2D<N extends Number> extends Structure2D, Access1D<N> {
         };
     }
 
+    /**
+     * @deprecated v44
+     */
+    @Deprecated
     static Access2D<RationalNumber> asRational2D(final Access2D<?> access) {
         return new Access2D<RationalNumber>() {
 

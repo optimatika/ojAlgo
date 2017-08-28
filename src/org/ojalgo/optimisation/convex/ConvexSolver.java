@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.constant.PrimitiveMath.ZERO;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.List;
@@ -620,7 +620,6 @@ public abstract class ConvexSolver extends GenericSolver {
     private transient PhysicalStore<Double> myMatrixAI = null;
     private PrimitiveDenseStore myMatrixX = null;
     private final LU<Double> mySolverGeneral;
-
     private final Cholesky<Double> mySolverQ;
 
     @SuppressWarnings("unused")
