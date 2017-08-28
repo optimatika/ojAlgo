@@ -37,7 +37,7 @@ final class IterativeMixedASS extends IterativeASS {
         if (included.length == 0) {
             retVal = this.getMatrixAE();
         } else {
-            retVal = this.getMatrixAI().logical().row(included).above(this.getMatrixAE()).get();
+            retVal = this.getMatrixAE().logical().below(this.getMatrixAI(included).get()).get();
         }
 
         return retVal;

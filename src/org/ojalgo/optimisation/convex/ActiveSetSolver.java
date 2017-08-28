@@ -401,7 +401,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 if (tmpExcluded.length > 0) {
 
                     final MatrixStore<Double> tmpNumer = this.getSI(tmpExcluded);
-                    final MatrixStore<Double> tmpDenom = this.getMatrixAI().logical().row(tmpExcluded).get().multiply(iterationSolution);
+                    final MatrixStore<Double> tmpDenom = this.getMatrixAI(tmpExcluded).get().multiply(iterationSolution);
 
                     if (this.isDebug()) {
                         final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
@@ -521,18 +521,16 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     // throw new IllegalStateException("E-slack!");
                 }
             }
-            if ((this.getMatrixAI() != null) && (this.getMatrixAI().count() > 0)) {
-                if (included.length != 0) {
-                    this.debug("\tI-included-slack: {}", this.getSI(included).copy().asList());
-                    if (!options.slack.isZero(this.getSI(included).aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                        // throw new IllegalStateException("I-included-slack!");
-                    }
+            if (included.length != 0) {
+                this.debug("\tI-included-slack: {}", this.getSI(included).copy().asList());
+                if (!options.slack.isZero(this.getSI(included).aggregateAll(Aggregator.LARGEST).doubleValue())) {
+                    // throw new IllegalStateException("I-included-slack!");
                 }
-                if (myActivator.getExcluded().length != 0) {
-                    this.debug("\tI-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy().asList());
-                    if (this.getSI(myActivator.getExcluded()).aggregateAll(Aggregator.MAXIMUM).doubleValue() < ZERO) {
-                        // throw new IllegalStateException("I-excluded-slack!");
-                    }
+            }
+            if (myActivator.getExcluded().length != 0) {
+                this.debug("\tI-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy().asList());
+                if (this.getSI(myActivator.getExcluded()).aggregateAll(Aggregator.MAXIMUM).doubleValue() < ZERO) {
+                    // throw new IllegalStateException("I-excluded-slack!");
                 }
             }
         }

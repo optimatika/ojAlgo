@@ -125,7 +125,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             if (IterativeASS.this.countIncluded() > 0) {
 
                 final PhysicalStore<Double> tmpProdI = PrimitiveDenseStore.FACTORY.makeZero(myIncluded.length, 1L);
-                IterativeASS.this.getMatrixAI().logical().row(myIncluded).get().multiply(column, tmpProdI);
+                IterativeASS.this.getMatrixAI(myIncluded).get().multiply(column, tmpProdI);
 
                 for (int _i = 0; _i < myIncluded.length; _i++) {
                     final double tmpVal = tmpProdI.doubleValue(_i);

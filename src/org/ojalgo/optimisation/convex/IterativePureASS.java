@@ -42,7 +42,7 @@ final class IterativePureASS extends IterativeASS {
         if (included.length == 0) {
             retVal = MatrixStore.PRIMITIVE.makeZero(0, this.countVariables()).get();
         } else {
-            retVal = this.getMatrixAI().logical().row(included).get();
+            retVal = this.getMatrixAI(included).get();
         }
 
         return retVal;
