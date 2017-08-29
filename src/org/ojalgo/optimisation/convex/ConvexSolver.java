@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.List;
@@ -836,41 +836,21 @@ public abstract class ConvexSolver extends GenericSolver {
 
     protected PhysicalStore<Double> getSI() {
 
-        PhysicalStore<Double> retVal = null;
-
-        final MatrixStore<Double> mtrxAI = this.getMatrixAI();
+        final RowsSupplier<Double> mtrxAI = myMatrices.getAI();
         final MatrixStore<Double> mtrxBI = this.getMatrixBI();
         final PhysicalStore<Double> mtrxX = this.getMatrixX();
 
-        if ((mtrxAI != null) && (mtrxBI != null)) {
+        final PhysicalStore<Double> retVal = mtrxBI.copy();
 
-            retVal = mtrxBI.copy();
-
-            retVal.modifyMatching(PrimitiveFunction.SUBTRACT, mtrxAI.multiply(mtrxX));
+        for (int i = 0; i < mtrxAI.countRows(); i++) {
+            retVal.add(i, -mtrxAI.getRow(i).dot(mtrxX));
         }
 
         return retVal;
     }
 
     protected MatrixStore<Double> getSI(final int... selector) {
-
-        PhysicalStore<Double> retVal = null;
-
-        final MatrixStore<Double> mtrxAI = this.getMatrixAI();
-        final MatrixStore<Double> mtrxBI = this.getMatrixBI();
-        final PhysicalStore<Double> mtrxX = this.getMatrixX();
-
-        if ((mtrxAI != null) && (mtrxBI != null)) {
-
-            final MatrixStore<Double> selectedAI = mtrxAI.logical().row(selector).get();
-            final MatrixStore<Double> selectedBI = mtrxBI.logical().row(selector).get();
-
-            retVal = selectedBI.copy();
-
-            retVal.modifyMatching(PrimitiveFunction.SUBTRACT, selectedAI.multiply(mtrxX));
-        }
-
-        return retVal;
+        return this.getSI().logical().row(selector).get();
     }
 
     protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {

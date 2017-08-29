@@ -42,6 +42,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
     private final PhysicalStore<Double> myL;
+    private final PhysicalStore<Double> mySlackI;
 
     ActiveSetSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
@@ -55,6 +56,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         myL = PrimitiveDenseStore.FACTORY.makeZero(tmpCountEqualityConstraints + tmpCountInequalityConstraints, 1L);
         myIterationX = PrimitiveDenseStore.FACTORY.makeZero(tmpCountVariables, 1L);
+
+        mySlackI = this.getMatrixBI().copy();
     }
 
     protected boolean checkFeasibility(final boolean onlyExcluded) {
