@@ -37,7 +37,6 @@ import org.ojalgo.access.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;
-import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.matrix.PrimitiveMatrix;
@@ -730,31 +729,6 @@ public abstract class ConvexSolver extends GenericSolver {
         }
     }
 
-    protected MatrixStore<Double> getAEX() {
-
-        MatrixStore<Double> retVal = null;
-
-        final MatrixStore<Double> tmpAE = this.getMatrixAE();
-        final PhysicalStore<Double> tmpX = this.getMatrixX();
-
-        if ((tmpAE != null) && (tmpX != null)) {
-            retVal = tmpAE.multiply(tmpX);
-        }
-        return retVal;
-    }
-
-    protected MatrixStore<Double> getAIX(final int[] selector) {
-
-        final MatrixStore<Double> tmpAI = this.getMatrixAI();
-        final PhysicalStore<Double> tmpX = this.getMatrixX();
-
-        if ((tmpAI != null) && (tmpX != null)) {
-            return tmpAI.logical().row(selector).get().multiply(tmpX);
-        } else {
-            return null;
-        }
-    }
-
     protected abstract MatrixStore<Double> getIterationKKT();
 
     protected abstract MatrixStore<Double> getIterationRHS();
@@ -816,22 +790,8 @@ public abstract class ConvexSolver extends GenericSolver {
         return mySolverGeneral.getRank();
     }
 
-    protected PhysicalStore<Double> getSE() {
-
-        PhysicalStore<Double> retVal = null;
-
-        final MatrixStore<Double> mtrxAE = this.getMatrixAE();
-        final MatrixStore<Double> mtrxBE = this.getMatrixBE();
-        final PhysicalStore<Double> mtrxX = this.getMatrixX();
-
-        if ((mtrxAE != null) && (mtrxBE != null)) {
-
-            retVal = mtrxBE.copy();
-
-            retVal.modifyMatching(PrimitiveFunction.SUBTRACT, mtrxAE.multiply(mtrxX));
-        }
-
-        return retVal;
+    protected MatrixStore<Double> getSE() {
+        return this.getMatrixX().premultiply(this.getMatrixAE()).operateOnMatching(this.getMatrixBE(), SUBTRACT).get();
     }
 
     protected PhysicalStore<Double> getSI() {

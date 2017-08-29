@@ -67,10 +67,9 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         if (!onlyExcluded) {
 
             if (this.hasEqualityConstraints()) {
-                final MatrixStore<Double> tmpAEX = this.getAEX();
-                final MatrixStore<Double> tmpBE = this.getMatrixBE();
-                for (int i = 0; retVal && (i < tmpBE.countRows()); i++) {
-                    if (options.slack.isDifferent(tmpBE.doubleValue(i), tmpAEX.doubleValue(i))) {
+                final MatrixStore<Double> tmpSE = this.getSE();
+                for (int i = 0; retVal && (i < tmpSE.countRows()); i++) {
+                    if (!options.slack.isZero(tmpSE.doubleValue(i))) {
                         retVal = false;
                     }
                 }
@@ -78,26 +77,23 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             if (this.hasInequalityConstraints() && (myActivator.countIncluded() > 0)) {
                 final int[] tmpIncluded = myActivator.getIncluded();
-                final MatrixStore<Double> tmpAIX = this.getAIX(tmpIncluded);
-                final MatrixStore<Double> tmpBI = this.getMatrixBI(tmpIncluded);
+                final MatrixStore<Double> tmpSI = this.getSI();
                 for (int i = 0; retVal && (i < tmpIncluded.length); i++) {
-                    final double tmpBody = tmpAIX.doubleValue(i);
-                    final double tmpRHS = tmpBI.doubleValue(i);
-                    if ((tmpBody > tmpRHS) && options.slack.isDifferent(tmpRHS, tmpBody)) {
+                    final double tmpSlack = tmpSI.doubleValue(tmpIncluded[i]);
+                    if ((tmpSlack < ZERO) && !options.slack.isZero(tmpSlack)) {
                         retVal = false;
                     }
                 }
             }
+
         }
 
         if (this.hasInequalityConstraints() && (myActivator.countExcluded() > 0)) {
             final int[] tmpExcluded = myActivator.getExcluded();
-            final MatrixStore<Double> tmpAIX = this.getAIX(tmpExcluded);
-            final MatrixStore<Double> tmpBI = this.getMatrixBI(tmpExcluded);
-            for (int i = 0; retVal && (i < tmpExcluded.length); i++) {
-                final double tmpBody = tmpAIX.doubleValue(i);
-                final double tmpRHS = tmpBI.doubleValue(i);
-                if ((tmpBody > tmpRHS) && options.slack.isDifferent(tmpRHS, tmpBody)) {
+            final MatrixStore<Double> tmpSI = this.getSI();
+            for (int e = 0; retVal && (e < tmpExcluded.length); e++) {
+                final double tmpSlack = tmpSI.doubleValue(tmpExcluded[e]);
+                if ((tmpSlack < ZERO) && !options.slack.isZero(tmpSlack)) {
                     retVal = false;
                 }
             }

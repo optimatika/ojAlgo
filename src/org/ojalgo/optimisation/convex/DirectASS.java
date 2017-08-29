@@ -158,12 +158,11 @@ abstract class DirectASS extends ActiveSetSolver {
         if (this.hasInequalityConstraints()) {
 
             final int[] tmpExcluded = this.getExcluded();
+            final MatrixStore<Double> tmpSI = this.getSI();
 
-            final MatrixStore<Double> tmpAIX = this.getAIX(tmpExcluded);
             for (int i = 0; i < tmpExcluded.length; i++) {
-                final double tmpBody = tmpAIX.doubleValue(i);
-                final double tmpRHS = tmpBI.doubleValue(tmpExcluded[i]);
-                if (!options.slack.isDifferent(tmpRHS, tmpBody) && (this.getL().doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
+                final double tmpSlack = tmpSI.doubleValue(tmpExcluded[i]);
+                if (options.slack.isZero(tmpSlack) && (this.getL().doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
                     this.include(tmpExcluded[i]);
                 }
             }
