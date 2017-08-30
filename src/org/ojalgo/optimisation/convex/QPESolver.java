@@ -21,6 +21,9 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
+import org.ojalgo.access.Access1D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -69,12 +72,12 @@ final class QPESolver extends ConstrainedSolver {
         super.initialise(kickStarter);
 
         if (kickStarter != null) {
-            this.fillX(kickStarter);
+            this.getMatrixX().fillMatching((Access1D<?>) kickStarter);
             if (!(myFeasible = this.isFeasible())) {
-                this.resetX();
+                this.getMatrixX().fillAll(ZERO);
             }
         } else {
-            this.resetX();
+            this.getMatrixX().fillAll(ZERO);
             myFeasible = false; // Could still be feasible, but doesn't matter...
         }
 
@@ -156,7 +159,7 @@ final class QPESolver extends ConstrainedSolver {
             } else {
 
                 this.setState(State.INFEASIBLE);
-                this.resetX();
+                this.getMatrixX().fillAll(ZERO);
             }
         }
     }

@@ -713,22 +713,6 @@ public abstract class ConvexSolver extends GenericSolver {
 
     }
 
-    protected void fillX(final Access1D<?> solution) {
-        final int tmpLimit = this.countVariables();
-        for (int i = 0; i < tmpLimit; i++) {
-            final int index = i;
-            this.getMatrixX().set(index, 0, solution.doubleValue(i));
-        }
-    }
-
-    protected void fillX(final double value) {
-        final int tmpLimit = this.countVariables();
-        for (int i = 0; i < tmpLimit; i++) {
-            final int index = i;
-            this.getMatrixX().set(index, 0, value);
-        }
-    }
-
     protected abstract MatrixStore<Double> getIterationKKT();
 
     protected abstract MatrixStore<Double> getIterationRHS();
@@ -748,6 +732,10 @@ public abstract class ConvexSolver extends GenericSolver {
         return myMatrixAI;
     }
 
+    /**
+     * @param row
+     * @return
+     */
     protected SparseArray<Double> getMatrixAI(final int row) {
         return myMatrices.getAI().getRow(row);
     }
@@ -794,27 +782,21 @@ public abstract class ConvexSolver extends GenericSolver {
         return this.getMatrixX().premultiply(this.getMatrixAE()).operateOnMatching(this.getMatrixBE(), SUBTRACT).get();
     }
 
-    protected PhysicalStore<Double> getSI() {
+    protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
+        return mySolverGeneral.getSolution(rhs);
+    }
+
+    void supplySI(final PhysicalStore<Double> slack) {
 
         final RowsSupplier<Double> mtrxAI = myMatrices.getAI();
         final MatrixStore<Double> mtrxBI = this.getMatrixBI();
         final PhysicalStore<Double> mtrxX = this.getMatrixX();
 
-        final PhysicalStore<Double> retVal = mtrxBI.copy();
+        slack.fillMatching(mtrxBI);
 
         for (int i = 0; i < mtrxAI.countRows(); i++) {
-            retVal.add(i, -mtrxAI.getRow(i).dot(mtrxX));
+            slack.add(i, -mtrxAI.getRow(i).dot(mtrxX));
         }
-
-        return retVal;
-    }
-
-    protected MatrixStore<Double> getSI(final int... selector) {
-        return this.getSI().logical().row(selector).get();
-    }
-
-    protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
-        return mySolverGeneral.getSolution(rhs);
     }
 
     protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
@@ -854,12 +836,6 @@ public abstract class ConvexSolver extends GenericSolver {
     protected abstract boolean needsAnotherIteration();
 
     abstract protected void performIteration();
-
-    protected void resetX() {
-        if (myMatrixX != null) {
-            myMatrixX.fillAll(ZERO);
-        }
-    }
 
     /**
      * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the

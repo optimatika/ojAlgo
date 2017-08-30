@@ -21,6 +21,8 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import static org.ojalgo.constant.PrimitiveMath.*;
+
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.optimisation.Optimisation;
@@ -52,7 +54,7 @@ final class UnconstrainedSolver extends ConvexSolver {
     @Override
     protected boolean initialise(final Result kickStarter) {
         this.computeQ(this.getMatrixQ());
-        this.resetX();
+        this.getMatrixX().fillAll(ZERO);
         return true;
     }
 
@@ -92,7 +94,7 @@ final class UnconstrainedSolver extends ConvexSolver {
             this.setState(State.DISTINCT);
         } else {
             this.setState(State.UNBOUNDED);
-            this.resetX();
+            this.getMatrixX().fillAll(ZERO);
         }
     }
 

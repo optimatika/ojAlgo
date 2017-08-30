@@ -25,6 +25,7 @@ import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import org.ojalgo.access.Access1D;
+import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.PrimitiveFunction.Unary;
 import org.ojalgo.function.aggregator.Aggregator;
@@ -154,15 +155,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int tmpNumVars = (int) tmpC.countRows();
         final int tmpNumEqus = tmpAE != null ? (int) tmpAE.countRows() : 0;
 
-        final PhysicalStore<Double> tmpX = this.getMatrixX();
-
         myActivator.excludeAll();
 
         boolean tmpFeasible = false;
         final boolean tmpUsableKickStarter = (kickStarter != null) && kickStarter.getState().isApproximate();
 
         if (tmpUsableKickStarter) {
-            this.fillX(kickStarter);
+            this.getMatrixX().fillMatching(kickStarter);
             tmpFeasible = this.checkFeasibility(false);
         }
 
@@ -180,18 +179,17 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.setState(State.INFEASIBLE);
 
-            this.resetX();
+            this.getMatrixX().fillAll(ZERO);
         }
 
         if (this.isDebug()) {
 
-            this.debug("Initial solution: {}", tmpX.copy().asList());
+            this.debug("Initial solution: {}", this.getMatrixX().copy().asList());
             if (tmpAE != null) {
                 this.debug("Initial E-slack: {}", this.getSE().copy().asList());
             }
             if (tmpAI != null) {
-                this.debug("Initial I-included-slack: {}", this.getSI(myActivator.getIncluded()).copy().asList());
-                this.debug("Initial I-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy().asList());
+                this.debug("Initial I-slack: {}", this.getSI().copy().asList());
             }
         }
 
@@ -377,6 +375,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return myL;
     }
 
+    PhysicalStore<Double> getSI() {
+        this.supplySI(mySlackI);
+        return mySlackI;
+    }
+
     final void handleSubsolution(final boolean solved, final PrimitiveDenseStore iterationSolution, final int[] included) {
 
         if (solved) {
@@ -399,21 +402,24 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final int[] tmpExcluded = myActivator.getExcluded();
                 if (tmpExcluded.length > 0) {
 
-                    final MatrixStore<Double> tmpNumer = this.getSI(tmpExcluded);
-                    final MatrixStore<Double> tmpDenom = this.getMatrixAI(tmpExcluded).get().multiply(iterationSolution);
+                    final MatrixStore<Double> tmpNumer = this.getSI();
+
+                    // final MatrixStore<Double> tmpDenom = this.getMatrixAI(tmpExcluded).get().multiply(iterationSolution);
 
                     if (this.isDebug()) {
-                        final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
-                        tmpStepLengths.modifyMatching(DIVIDE, tmpDenom);
-                        this.debug("Numer/slack: {}", tmpNumer.copy().asList());
-                        this.debug("Denom/chang: {}", tmpDenom.copy().asList());
-                        this.debug("Looking for the largest possible step length (smallest positive scalar) among these: {}).", tmpStepLengths.asList());
+                        //                        final PhysicalStore<Double> tmpStepLengths = tmpNumer.copy();
+                        //                        tmpStepLengths.modifyMatching(DIVIDE, tmpDenom);
+                        //                        this.debug("Numer/slack: {}", tmpNumer.copy().asList());
+                        //                        this.debug("Denom/chang: {}", tmpDenom.copy().asList());
+                        //                        this.debug("Looking for the largest possible step length (smallest positive scalar) among these: {}).", tmpStepLengths.asList());
                     }
 
                     for (int i = 0; i < tmpExcluded.length; i++) {
 
-                        final double tmpN = tmpNumer.doubleValue(i); // Current slack
-                        final double tmpD = tmpDenom.doubleValue(i); // Proposed slack change
+                        final SparseArray<Double> excludedInequalityRow = this.getMatrixAI(tmpExcluded[i]);
+
+                        final double tmpN = tmpNumer.doubleValue(tmpExcluded[i]); // Current slack
+                        final double tmpD = excludedInequalityRow.dot(iterationSolution); // Proposed slack change
                         final double tmpVal = options.slack.isSmall(tmpD, tmpN) ? ZERO : tmpN / tmpD;
 
                         if ((tmpD > ZERO) && (tmpVal >= ZERO) && (tmpVal < tmpStepLength) && !options.solution.isSmall(tmpNormStepX, tmpD)) {
@@ -436,6 +442,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 if (tmpStepLength > ZERO) { // It is possible that it becomes == 0.0
                     // this.getX().maxpy(tmpStepLength, iterationSolution);
                     iterationSolution.axpy(tmpStepLength, this.getMatrixX());
+
                 } else if (((this.getConstraintToInclude() >= 0) && (myActivator.getLastExcluded() == this.getConstraintToInclude()))
                         && (myActivator.getLastIncluded() == this.getConstraintToInclude())) {
                     this.setConstraintToInclude(-1);
@@ -520,18 +527,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                     // throw new IllegalStateException("E-slack!");
                 }
             }
-            if (included.length != 0) {
-                this.debug("\tI-included-slack: {}", this.getSI(included).copy().asList());
-                if (!options.slack.isZero(this.getSI(included).aggregateAll(Aggregator.LARGEST).doubleValue())) {
-                    // throw new IllegalStateException("I-included-slack!");
-                }
+
+            this.debug("\tI-slack: {}", mySlackI.copy().asList());
+            if (!options.slack.isZero(mySlackI.aggregateAll(Aggregator.LARGEST).doubleValue())) {
+                // throw new IllegalStateException("I-slack!");
             }
-            if (myActivator.getExcluded().length != 0) {
-                this.debug("\tI-excluded-slack: {}", this.getSI(myActivator.getExcluded()).copy().asList());
-                if (this.getSI(myActivator.getExcluded()).aggregateAll(Aggregator.MAXIMUM).doubleValue() < ZERO) {
-                    // throw new IllegalStateException("I-excluded-slack!");
-                }
-            }
+
         }
     }
 

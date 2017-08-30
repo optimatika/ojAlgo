@@ -28,6 +28,7 @@ import java.math.MathContext;
 
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
+import org.ojalgo.array.SparseArray;
 import org.ojalgo.matrix.store.ElementsSupplier;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -57,6 +58,7 @@ abstract class IterativeASS extends ActiveSetSolver {
         private final int myCountE = IterativeASS.this.countEqualityConstraints();
         private final long myFullDim = myCountE + IterativeASS.this.countInequalityConstraints();
         private final Equation[] myIterationRows;
+        private final PhysicalStore<Double> myColumnE;
 
         MyIterativeSolver() {
 
@@ -70,6 +72,8 @@ abstract class IterativeASS extends ActiveSetSolver {
             this.setAccuracyContext(NumberContext.getMath(MathContext.DECIMAL64).newPrecision(9));
 
             myIterationRows = new Equation[(int) myFullDim];
+
+            myColumnE = PrimitiveDenseStore.FACTORY.makeZero(myCountE, 1);
         }
 
         @Override
@@ -105,13 +109,12 @@ abstract class IterativeASS extends ActiveSetSolver {
             myIterationRows[j] = tmpNewRow;
             this.add(tmpNewRow);
 
-            if (IterativeASS.this.getMatrixAE() != null) {
+            if (myCountE > 0) {
 
-                final PhysicalStore<Double> tmpProdE = IterativeASS.this.getMatrixAE().physical().makeZero(IterativeASS.this.getMatrixAE().countRows(), 1L);
-                IterativeASS.this.getMatrixAE().multiply(column, tmpProdE);
+                IterativeASS.this.getMatrixAE().multiply(column, myColumnE);
 
                 for (int i = 0; i < myCountE; i++) {
-                    final double tmpVal = tmpProdE.doubleValue(i);
+                    final double tmpVal = myColumnE.doubleValue(i);
                     if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
                         final Equation tmpRowE = myIterationRows[i];
                         if (tmpRowE != null) {
@@ -124,11 +127,12 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             if (IterativeASS.this.countIncluded() > 0) {
 
-                final PhysicalStore<Double> tmpProdI = PrimitiveDenseStore.FACTORY.makeZero(myIncluded.length, 1L);
-                IterativeASS.this.getMatrixAI(myIncluded).get().multiply(column, tmpProdI);
+                //                final PhysicalStore<Double> tmpProdI = PrimitiveDenseStore.FACTORY.makeZero(myIncluded.length, 1L);
+                //                IterativeASS.this.getMatrixAI(myIncluded).get().multiply(column, tmpProdI);
 
                 for (int _i = 0; _i < myIncluded.length; _i++) {
-                    final double tmpVal = tmpProdI.doubleValue(_i);
+                    // final double tmpVal = tmpProdI.doubleValue(_i);
+                    final double tmpVal = IterativeASS.this.getMatrixAI(myIncluded[_i]).dot(column);
                     if (!PrimitiveScalar.isSmall(ONE, tmpVal)) {
                         final int i = myCountE + myIncluded[_i];
                         final Equation tmpRowI = myIterationRows[i];
@@ -142,7 +146,6 @@ abstract class IterativeASS extends ActiveSetSolver {
             }
 
             tmpNewRow.initialise(IterativeASS.this.getL());
-
         }
 
         void remove(final int i) {
@@ -159,12 +162,14 @@ abstract class IterativeASS extends ActiveSetSolver {
     }
 
     private final MyIterativeSolver myS;
+    private final PhysicalStore<Double> myColumnS;
 
     IterativeASS(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 
         super(matrices, solverOptions);
 
         myS = new MyIterativeSolver();
+        myColumnS = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1);
     }
 
     @Override
@@ -184,12 +189,13 @@ abstract class IterativeASS extends ActiveSetSolver {
         if (tmpToInclude >= 0) {
 
             // final LogicalBuilder<Double> rowAlt1 = this.getMatrixAI().logical().row(tmpToInclude);
-            final Access1D<Double> rowAlt2 = this.getMatrixAI(tmpToInclude);
+            final SparseArray<Double> rowAlt2 = this.getMatrixAI(tmpToInclude);
 
             // final LogicalBuilder<Double> rowToIncludeTransposed = rowAlt1.transpose();
 
-            final MatrixStore<Double> body = this.getSolutionQ(Access2D.newPrimitiveColumnCollectable(rowAlt2));
-            final double rhs = this.getInvQC().premultiply(rowAlt2).get().doubleValue(0L) - this.getMatrixBI().doubleValue(tmpToInclude);
+            final MatrixStore<Double> body = this.getSolutionQ(Access2D.newPrimitiveColumnCollectable(rowAlt2), myColumnS);
+            // final double rhs = this.getInvQC().premultiply(rowAlt2).get().doubleValue(0L) - this.getMatrixBI().doubleValue(tmpToInclude);
+            final double rhs = rowAlt2.dot(this.getInvQC()) - this.getMatrixBI().doubleValue(tmpToInclude);
 
             myS.add(this.countEqualityConstraints() + tmpToInclude, body, rhs, 3);
         }
