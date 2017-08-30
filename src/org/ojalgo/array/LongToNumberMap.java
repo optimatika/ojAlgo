@@ -306,6 +306,31 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
         return this.tailMap(fromKey.longValue());
     }
 
+    @Override
+    public String toString() {
+
+        NonzeroView<N> nz = myStorage.nonzeros();
+
+        if (!nz.hasNext()) {
+            return "{}";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append('{');
+        for (;;) {
+            NonzeroView<N> entry = nz.next();
+            long key = entry.index();
+            N value = entry.getNumber();
+            builder.append(key);
+            builder.append('=');
+            builder.append(value);
+            if (!nz.hasNext()) {
+                return builder.append('}').toString();
+            }
+            builder.append(',').append(' ');
+        }
+    }
+
     public NumberList<N> values() {
         return new NumberList<>(myStorage.getValues(), myStrategy, myStorage.getActualLength());
     }
