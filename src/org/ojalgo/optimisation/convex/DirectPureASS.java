@@ -54,9 +54,4 @@ final class DirectPureASS extends DirectASS {
         return retVal;
     }
 
-    @Override
-    int countIterationConstraints(final int[] included) {
-        return included.length;
-    }
-
 }

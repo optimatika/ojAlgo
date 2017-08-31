@@ -30,11 +30,6 @@ final class IterativePureASS extends IterativeASS {
     }
 
     @Override
-    int countIterationConstraints(final int[] included) {
-        return included.length;
-    }
-
-    @Override
     MatrixStore<Double> getIterationA(final int[] included) {
 
         MatrixStore<Double> retVal = null;

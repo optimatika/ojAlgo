@@ -55,10 +55,10 @@ abstract class IterativeASS extends ActiveSetSolver {
 
     final class MyIterativeSolver extends MutableSolver<ConjugateGradientSolver> implements Access2D<Double> {
 
+        private final PhysicalStore<Double> myColumnE;
         private final int myCountE = IterativeASS.this.countEqualityConstraints();
         private final long myFullDim = myCountE + IterativeASS.this.countInequalityConstraints();
         private final Equation[] myIterationRows;
-        private final PhysicalStore<Double> myColumnE;
 
         MyIterativeSolver() {
 
@@ -161,8 +161,8 @@ abstract class IterativeASS extends ActiveSetSolver {
 
     }
 
-    private final MyIterativeSolver myS;
     private final PhysicalStore<Double> myColumnS;
+    private final MyIterativeSolver myS;
 
     IterativeASS(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
 

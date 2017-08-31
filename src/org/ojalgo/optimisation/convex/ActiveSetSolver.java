@@ -145,15 +145,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         super.initialise(kickStarter);
 
-        this.getMatrixQ();
-        final MatrixStore<Double> tmpC = this.getMatrixC();
-        final MatrixStore<Double> tmpAE = this.getMatrixAE();
-        final MatrixStore<Double> tmpBE = this.getMatrixBE();
-        final MatrixStore<Double> tmpAI = this.getMatrixAI();
-        final MatrixStore<Double> tmpBI = this.getMatrixBI();
-
-        final int tmpNumVars = (int) tmpC.countRows();
-        final int tmpNumEqus = tmpAE != null ? (int) tmpAE.countRows() : 0;
+        final int tmpNumVars = (int) this.getMatrixC().countRows();
+        final int tmpNumEqus = this.getMatrixAE() != null ? (int) this.getMatrixAE().countRows() : 0;
 
         myActivator.excludeAll();
 
@@ -166,14 +159,14 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         if (!tmpFeasible) {
-            tmpFeasible = this.solveLP(tmpC, tmpAE, tmpBE, tmpAI, tmpBI);
+            tmpFeasible = this.solveLP(this.getMatrixC(), this.getMatrixAE(), this.getMatrixBE(), this.getMatrixAI(), this.getMatrixBI());
         }
 
         if (tmpFeasible) {
 
             this.setState(State.FEASIBLE);
 
-            this.initSolution(tmpBI, tmpNumVars, tmpNumEqus);
+            this.initSolution(this.getMatrixBI(), tmpNumVars, tmpNumEqus);
 
         } else {
 
@@ -185,10 +178,10 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         if (this.isDebug()) {
 
             this.debug("Initial solution: {}", this.getMatrixX().copy().asList());
-            if (tmpAE != null) {
+            if (this.getMatrixAE() != null) {
                 this.debug("Initial E-slack: {}", this.getSE().copy().asList());
             }
-            if (tmpAI != null) {
+            if (this.getMatrixAI() != null) {
                 this.debug("Initial I-slack: {}", this.getSI().copy().asList());
             }
         }
@@ -316,10 +309,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     @Override
     final int countIterationConstraints() {
-        return this.countIterationConstraints(this.getIncluded());
+        return this.countEqualityConstraints() + this.countIncluded();
     }
-
-    abstract int countIterationConstraints(int[] included);
 
     abstract void excludeAndRemove(int toExclude);
 
