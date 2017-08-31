@@ -31,31 +31,20 @@ final class IterativePureASS extends IterativeASS {
 
     @Override
     MatrixStore<Double> getIterationA(final int[] included) {
-
-        MatrixStore<Double> retVal = null;
-
         if (included.length == 0) {
-            retVal = MatrixStore.PRIMITIVE.makeZero(0, this.countVariables()).get();
+            return MatrixStore.PRIMITIVE.makeZero(0, this.countVariables()).get();
         } else {
-            retVal = this.getMatrixAI(included).get();
+            return this.getMatrixAI(included).get();
         }
-
-        return retVal;
     }
 
     @Override
     MatrixStore<Double> getIterationB(final int[] included) {
-
-        final MatrixStore<Double> tmpBI = this.getMatrixBI();
-
-        MatrixStore<Double> retVal = null;
         if (included.length == 0) {
-            retVal = MatrixStore.PRIMITIVE.makeZero(0, 1).get();
+            return MatrixStore.PRIMITIVE.makeZero(0, 1).get();
         } else {
-            retVal = tmpBI.logical().row(included).get();
+            return this.getMatrixBI().logical().row(included).get();
         }
-
-        return retVal;
     }
 
 }

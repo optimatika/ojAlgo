@@ -72,12 +72,12 @@ final class QPESolver extends ConstrainedSolver {
         super.initialise(kickStarter);
 
         if (kickStarter != null) {
-            this.getMatrixX().fillMatching((Access1D<?>) kickStarter);
+            this.getSolutionX().fillMatching((Access1D<?>) kickStarter);
             if (!(myFeasible = this.isFeasible())) {
-                this.getMatrixX().fillAll(ZERO);
+                this.getSolutionX().fillAll(ZERO);
             }
         } else {
-            this.getMatrixX().fillAll(ZERO);
+            this.getSolutionX().fillAll(ZERO);
             myFeasible = false; // Could still be feasible, but doesn't matter...
         }
 
@@ -143,9 +143,9 @@ final class QPESolver extends ConstrainedSolver {
             this.setState(State.OPTIMAL);
 
             if (myFeasible) {
-                this.getMatrixX().modifyMatching(PrimitiveFunction.ADD, tmpIterX);
+                this.getSolutionX().modifyMatching(PrimitiveFunction.ADD, tmpIterX);
             } else {
-                this.getMatrixX().fillMatching(tmpIterX);
+                this.getSolutionX().fillMatching(tmpIterX);
             }
 
             // this.getLE().fillMatching(tmpIterL);
@@ -159,7 +159,7 @@ final class QPESolver extends ConstrainedSolver {
             } else {
 
                 this.setState(State.INFEASIBLE);
-                this.getMatrixX().fillAll(ZERO);
+                this.getSolutionX().fillAll(ZERO);
             }
         }
     }
@@ -191,7 +191,7 @@ final class QPESolver extends ConstrainedSolver {
             final MatrixStore<Double> tmpQ = this.getMatrixQ();
             final MatrixStore<Double> tmpC = this.getMatrixC();
 
-            final PhysicalStore<Double> tmpX = this.getMatrixX();
+            final PhysicalStore<Double> tmpX = this.getSolutionX();
 
             return tmpC.subtract(tmpQ.multiply(tmpX));
 

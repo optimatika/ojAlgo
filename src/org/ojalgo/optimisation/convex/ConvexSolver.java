@@ -616,8 +616,7 @@ public abstract class ConvexSolver extends GenericSolver {
     }
 
     private final ConvexSolver.Builder myMatrices;
-    private transient PhysicalStore<Double> myMatrixAI = null;
-    private PrimitiveDenseStore myMatrixX = null;
+    private final PrimitiveDenseStore mySolutionX;
     private final LU<Double> mySolverGeneral;
     private final Cholesky<Double> mySolverQ;
 
@@ -632,10 +631,10 @@ public abstract class ConvexSolver extends GenericSolver {
 
         myMatrices = matrices;
 
-        final MatrixStore<Double> tmpQ = this.getMatrixQ();
+        mySolutionX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
 
-        mySolverQ = Cholesky.make(tmpQ);
-        mySolverGeneral = LU.make(tmpQ);
+        mySolverQ = Cholesky.make(this.getMatrixQ());
+        mySolverGeneral = LU.make(this.getMatrixQ());
     }
 
     public void dispose() {
@@ -701,7 +700,7 @@ public abstract class ConvexSolver extends GenericSolver {
     @Override
     protected double evaluateFunction(final Access1D<?> solution) {
 
-        final MatrixStore<Double> tmpX = this.getMatrixX();
+        final MatrixStore<Double> tmpX = this.getSolutionX();
 
         return tmpX.transpose().multiply(this.getMatrixQ().multiply(tmpX)).multiply(0.5).subtract(tmpX.transpose().multiply(this.getMatrixC())).doubleValue(0L);
     }
@@ -709,7 +708,7 @@ public abstract class ConvexSolver extends GenericSolver {
     @Override
     protected MatrixStore<Double> extractSolution() {
 
-        return this.getMatrixX().copy();
+        return this.getSolutionX().copy();
 
     }
 
@@ -721,15 +720,8 @@ public abstract class ConvexSolver extends GenericSolver {
         return myMatrices.getAE();
     }
 
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    protected MatrixStore<Double> getMatrixAI() {
-        if (myMatrixAI == null) {
-            myMatrixAI = myMatrices.getAI().collect(PrimitiveDenseStore.FACTORY);
-        }
-        return myMatrixAI;
+    protected RowsSupplier<Double> getMatrixAI() {
+        return myMatrices.getAI();
     }
 
     /**
@@ -764,39 +756,16 @@ public abstract class ConvexSolver extends GenericSolver {
         return myMatrices.getQ();
     }
 
-    /**
-     * Solution / Variables: [X]
-     */
-    protected PhysicalStore<Double> getMatrixX() {
-        if (myMatrixX == null) {
-            myMatrixX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
-        }
-        return myMatrixX;
-    }
-
     protected int getRankGeneral() {
         return mySolverGeneral.getRank();
     }
 
     protected MatrixStore<Double> getSE() {
-        return this.getMatrixX().premultiply(this.getMatrixAE()).operateOnMatching(this.getMatrixBE(), SUBTRACT).get();
+        return this.getSolutionX().premultiply(this.getMatrixAE()).operateOnMatching(this.getMatrixBE(), SUBTRACT).get();
     }
 
     protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs) {
         return mySolverGeneral.getSolution(rhs);
-    }
-
-    void supplySI(final PhysicalStore<Double> slack) {
-
-        final RowsSupplier<Double> mtrxAI = myMatrices.getAI();
-        final MatrixStore<Double> mtrxBI = this.getMatrixBI();
-        final PhysicalStore<Double> mtrxX = this.getMatrixX();
-
-        slack.fillMatching(mtrxBI);
-
-        for (int i = 0; i < mtrxAI.countRows(); i++) {
-            slack.add(i, -mtrxAI.getRow(i).dot(mtrxX));
-        }
     }
 
     protected MatrixStore<Double> getSolutionGeneral(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
@@ -809,6 +778,13 @@ public abstract class ConvexSolver extends GenericSolver {
 
     protected MatrixStore<Double> getSolutionQ(final Collectable<Double, ? super PhysicalStore<Double>> rhs, final PhysicalStore<Double> preallocated) {
         return mySolverQ.getSolution(rhs, preallocated);
+    }
+
+    /**
+     * Solution / Variables: [X]
+     */
+    protected PhysicalStore<Double> getSolutionX() {
+        return mySolutionX;
     }
 
     protected boolean hasEqualityConstraints() {
@@ -887,6 +863,19 @@ public abstract class ConvexSolver extends GenericSolver {
 
         this.setState(State.VALID);
         return true;
+    }
+
+    void supplySI(final PhysicalStore<Double> slack) {
+
+        final RowsSupplier<Double> mtrxAI = myMatrices.getAI();
+        final MatrixStore<Double> mtrxBI = this.getMatrixBI();
+        final PhysicalStore<Double> mtrxX = this.getSolutionX();
+
+        slack.fillMatching(mtrxBI);
+
+        for (int i = 0; i < mtrxAI.countRows(); i++) {
+            slack.add(i, -mtrxAI.getRow(i).dot(mtrxX));
+        }
     }
 
 }

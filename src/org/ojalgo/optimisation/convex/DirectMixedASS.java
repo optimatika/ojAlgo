@@ -41,18 +41,11 @@ final class DirectMixedASS extends DirectASS {
 
     @Override
     MatrixStore<Double> getIterationB(final int[] included) {
-
-        final MatrixStore<Double> tmpBE = this.getMatrixBE();
-        final MatrixStore<Double> tmpBI = this.getMatrixBI();
-
-        MatrixStore<Double> retVal = null;
         if (included.length == 0) {
-            retVal = tmpBE;
+            return this.getMatrixBE();
         } else {
-            retVal = tmpBI.logical().row(included).above(tmpBE).get();
+            return this.getMatrixBI().logical().row(included).above(this.getMatrixBE()).get();
         }
-
-        return retVal;
     }
 
 }

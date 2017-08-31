@@ -154,12 +154,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final boolean tmpUsableKickStarter = (kickStarter != null) && kickStarter.getState().isApproximate();
 
         if (tmpUsableKickStarter) {
-            this.getMatrixX().fillMatching(kickStarter);
+            this.getSolutionX().fillMatching(kickStarter);
             tmpFeasible = this.checkFeasibility(false);
         }
 
         if (!tmpFeasible) {
-            tmpFeasible = this.solveLP(this.getMatrixC(), this.getMatrixAE(), this.getMatrixBE(), this.getMatrixAI(), this.getMatrixBI());
+            tmpFeasible = this.solveLP(this.getMatrixC(), this.getMatrixAE(), this.getMatrixBE(), this.getMatrixAI().get(), this.getMatrixBI());
         }
 
         if (tmpFeasible) {
@@ -172,12 +172,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             this.setState(State.INFEASIBLE);
 
-            this.getMatrixX().fillAll(ZERO);
+            this.getSolutionX().fillAll(ZERO);
         }
 
         if (this.isDebug()) {
 
-            this.debug("Initial solution: {}", this.getMatrixX().copy().asList());
+            this.debug("Initial solution: {}", this.getSolutionX().copy().asList());
             if (this.getMatrixAE() != null) {
                 this.debug("Initial E-slack: {}", this.getSE().copy().asList());
             }
@@ -375,14 +375,14 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (solved) {
 
-            iterationSolution.fillMatching(iterationSolution, SUBTRACT, this.getMatrixX());
+            iterationSolution.fillMatching(iterationSolution, SUBTRACT, this.getSolutionX());
 
             if (this.isDebug()) {
-                this.debug("Current: {}", this.getMatrixX().asList());
+                this.debug("Current: {}", this.getSolutionX().asList());
                 this.debug("Step: {}", iterationSolution.copy().asList());
             }
 
-            final double tmpNormCurrentX = this.getMatrixX().aggregateAll(Aggregator.NORM2);
+            final double tmpNormCurrentX = this.getSolutionX().aggregateAll(Aggregator.NORM2);
             final double tmpNormStepX = iterationSolution.aggregateAll(Aggregator.NORM2);
             if (!options.solution.isSmall(tmpNormCurrentX, tmpNormStepX)
                     && (options.solution.isSmall(ONE, tmpNormCurrentX) || !options.solution.isSmall(tmpNormStepX, tmpNormCurrentX))) {
@@ -432,7 +432,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
                 if (tmpStepLength > ZERO) { // It is possible that it becomes == 0.0
                     // this.getX().maxpy(tmpStepLength, iterationSolution);
-                    iterationSolution.axpy(tmpStepLength, this.getMatrixX());
+                    iterationSolution.axpy(tmpStepLength, this.getSolutionX());
 
                 } else if (((this.getConstraintToInclude() >= 0) && (myActivator.getLastExcluded() == this.getConstraintToInclude()))
                         && (myActivator.getLastIncluded() == this.getConstraintToInclude())) {
@@ -510,7 +510,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (this.isDebug()) {
             this.debug("Post iteration");
-            this.debug("\tSolution: {}", this.getMatrixX().copy().asList());
+            this.debug("\tSolution: {}", this.getSolutionX().copy().asList());
             this.debug("\tL: {}", this.getL().asList());
             if ((this.getMatrixAE() != null) && (this.getMatrixAE().count() > 0)) {
                 this.debug("\tE-slack: {}", this.getSE().copy().asList());
@@ -613,7 +613,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             for (int i = 0; i < tmpNumVars; i++) {
                 final int index = i;
-                this.getMatrixX().set(index, 0, tmpLinearResult.doubleValue(i) - tmpLinearResult.doubleValue(tmpNumVars + i));
+                this.getSolutionX().set(index, 0, tmpLinearResult.doubleValue(i) - tmpLinearResult.doubleValue(tmpNumVars + i));
             }
 
             final Access1D<?> lagrangeMultipliers = tmpLinearResult.getMultipliers().get();

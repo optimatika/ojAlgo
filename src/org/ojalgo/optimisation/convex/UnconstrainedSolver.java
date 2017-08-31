@@ -54,7 +54,7 @@ final class UnconstrainedSolver extends ConvexSolver {
     @Override
     protected boolean initialise(final Result kickStarter) {
         this.computeQ(this.getMatrixQ());
-        this.getMatrixX().fillAll(ZERO);
+        this.getSolutionX().fillAll(ZERO);
         return true;
     }
 
@@ -68,7 +68,7 @@ final class UnconstrainedSolver extends ConvexSolver {
 
         final MatrixStore<Double> tmpQ = this.getMatrixQ();
         final MatrixStore<Double> tmpC = this.getMatrixC();
-        final PhysicalStore<Double> tmpX = this.getMatrixX();
+        final PhysicalStore<Double> tmpX = this.getSolutionX();
 
         boolean tmpSolvable = true;
 
@@ -94,7 +94,7 @@ final class UnconstrainedSolver extends ConvexSolver {
             this.setState(State.DISTINCT);
         } else {
             this.setState(State.UNBOUNDED);
-            this.getMatrixX().fillAll(ZERO);
+            this.getSolutionX().fillAll(ZERO);
         }
     }
 

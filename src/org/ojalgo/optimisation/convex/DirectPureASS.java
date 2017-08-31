@@ -41,17 +41,11 @@ final class DirectPureASS extends DirectASS {
 
     @Override
     MatrixStore<Double> getIterationB(final int[] included) {
-
-        final MatrixStore<Double> tmpBI = this.getMatrixBI();
-
-        MatrixStore<Double> retVal = null;
         if (included.length == 0) {
-            retVal = MatrixStore.PRIMITIVE.makeZero(0, 1).get();
+            return MatrixStore.PRIMITIVE.makeZero(0, 1).get();
         } else {
-            retVal = tmpBI.logical().row(included).get();
+            return this.getMatrixBI().logical().row(included).get();
         }
-
-        return retVal;
     }
 
 }
