@@ -36,12 +36,14 @@ import org.ojalgo.array.Array1D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
+import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.IterationPoint;
 
 /**
@@ -700,6 +702,57 @@ public final class SimplexSolver extends LinearSolver {
             }
 
         }
+    }
+
+    static SimplexTableau build(final ConvexSolver.Builder convex) {
+
+        final MatrixStore<Double> convexC = convex.getC();
+        final MatrixStore<Double> convexAE = convex.getAE();
+        final MatrixStore<Double> convexAI = convex.getAI().get();
+        final int tmpNumVars = convex.countVariables();
+        final int tmpNumEqus = convex.countEqualityConstraints();
+        final int tmpNumInes = convex.countInequalityConstraints();
+
+        final MatrixStore<Double> tmpLinearC = convexC.negate().logical().below(convexC).below(tmpNumInes).get();
+
+        final LinearSolver.Builder tmpLinearBuilder = LinearSolver.getBuilder(tmpLinearC);
+
+        MatrixStore<Double> tmpAEpart = null;
+        MatrixStore<Double> tmpBEpart = null;
+
+        if (tmpNumEqus > 0) {
+            tmpAEpart = convexAE.logical().right(convexAE.negate()).right(tmpNumInes).get();
+            tmpBEpart = convex.getBE();
+        }
+
+        if (tmpNumInes > 0) {
+            final MatrixStore<Double> tmpAIpart = convexAI.logical().right(convexAI.negate()).right(MatrixStore.PRIMITIVE.makeIdentity(tmpNumInes).get()).get();
+            final MatrixStore<Double> tmpBIpart = convex.getBI();
+            if (tmpAEpart != null) {
+                tmpAEpart = tmpAEpart.logical().below(tmpAIpart).get();
+                tmpBEpart = tmpBEpart.logical().below(tmpBIpart).get();
+            } else {
+                tmpAEpart = tmpAIpart;
+                tmpBEpart = tmpBIpart;
+            }
+        }
+
+        if (tmpAEpart != null) {
+
+            final PhysicalStore<Double> tmpLinearAE = tmpAEpart.copy();
+            final PhysicalStore<Double> tmpLinearBE = tmpBEpart.copy();
+
+            for (int i = 0; i < tmpLinearBE.countRows(); i++) {
+                if (tmpLinearBE.doubleValue(i) < 0.0) {
+                    tmpLinearAE.modifyRow(i, 0, NEGATE);
+                    tmpLinearBE.modifyRow(i, 0, NEGATE);
+                }
+            }
+
+            tmpLinearBuilder.equalities(tmpLinearAE, tmpLinearBE);
+        }
+
+        return null;
     }
 
 }

@@ -159,7 +159,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         if (!tmpFeasible) {
-            tmpFeasible = this.solveLP(this.getMatrixC(), this.getMatrixAE(), this.getMatrixBE(), this.getMatrixAI().get(), this.getMatrixBI());
+            tmpFeasible = this.solveLP();
         }
 
         if (tmpFeasible) {
@@ -556,12 +556,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         this.excludeAndRemove(tmpToExclude);
     }
 
-    /**
-     * Form and solve LP to find initial/feasible solution
-     */
-    final boolean solveLP(final MatrixStore<Double> convexC, final MatrixStore<Double> convexAE, final MatrixStore<Double> convexBE,
-            final MatrixStore<Double> convexAI, final MatrixStore<Double> convexBI) {
+    final boolean solveLP() {
 
+        final MatrixStore<Double> convexC = this.getMatrixC();
+        final MatrixStore<Double> convexAE = this.getMatrixAE();
+        final MatrixStore<Double> convexAI = this.getMatrixAI().get();
         final int tmpNumVars = this.countVariables();
         final int tmpNumEqus = this.countEqualityConstraints();
         final int tmpNumInes = this.countInequalityConstraints();
@@ -575,12 +574,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (tmpNumEqus > 0) {
             tmpAEpart = convexAE.logical().right(convexAE.negate()).right(tmpNumInes).get();
-            tmpBEpart = convexBE;
+            tmpBEpart = this.getMatrixBE();
         }
 
         if (tmpNumInes > 0) {
             final MatrixStore<Double> tmpAIpart = convexAI.logical().right(convexAI.negate()).right(MatrixStore.PRIMITIVE.makeIdentity(tmpNumInes).get()).get();
-            final MatrixStore<Double> tmpBIpart = convexBI;
+            final MatrixStore<Double> tmpBIpart = this.getMatrixBI();
             if (tmpAEpart != null) {
                 tmpAEpart = tmpAEpart.logical().below(tmpAIpart).get();
                 tmpBEpart = tmpBEpart.logical().below(tmpBIpart).get();
@@ -609,6 +608,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         final Result tmpLinearResult = tmpLinearSolver.solve();
 
+        boolean retVal;
+
         if (tmpLinearResult.getState().isFeasible()) {
 
             for (int i = 0; i < tmpNumVars; i++) {
@@ -626,15 +627,14 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 }
             }
 
-            //            BasicLogger.debug();
-            //            BasicLogger.debug("Initial L: {}", myIterationL.asList().copy());
-
-            return true;
+            retVal = true;
 
         } else {
 
-            return false;
+            retVal = false;
         }
+
+        return retVal;
     }
 
 }

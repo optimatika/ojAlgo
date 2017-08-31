@@ -115,6 +115,13 @@ public abstract class LinearSolver extends GenericSolver {
             return new SimplexSolver(tableau, model.options);
         }
 
+        public LinearSolver build(final ConvexSolver.Builder convexBuilder, final Optimisation.Options options) {
+
+            final SimplexTableau tableau = SimplexSolver.build(convexBuilder);
+
+            return new SimplexSolver(tableau, options);
+        }
+
         public boolean isCapable(final ExpressionsBasedModel model) {
             return !(model.isAnyVariableInteger() || model.isAnyExpressionQuadratic());
         }
