@@ -38,6 +38,7 @@ public abstract class LinearSolver extends GenericSolver {
 
     public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
 
+        private final boolean myConvex;
         private final ConvexSolver.Builder myDelegate;
 
         public Builder() {
@@ -45,6 +46,13 @@ public abstract class LinearSolver extends GenericSolver {
             super();
 
             myDelegate = new ConvexSolver.Builder();
+            myConvex = false;
+        }
+
+        public Builder(ConvexSolver.Builder convex) {
+            super();
+            myDelegate = convex;
+            myConvex = true;
         }
 
         public Builder(final MatrixStore<Double> C) {
@@ -52,11 +60,12 @@ public abstract class LinearSolver extends GenericSolver {
             super();
 
             myDelegate = new ConvexSolver.Builder(C);
+            myConvex = false;
         }
 
         @Override
         public int countConstraints() {
-            return myDelegate.countEqualityConstraints();
+            return myDelegate.countConstraints();
         }
 
         /**
@@ -69,28 +78,48 @@ public abstract class LinearSolver extends GenericSolver {
 
         @Override
         public int countVariables() {
-            return myDelegate.countVariables();
+            return myConvex ? ((2 * myDelegate.countVariables()) + myDelegate.countInequalityConstraints()) : myDelegate.countVariables();
         }
 
         public LinearSolver.Builder equalities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
-            myDelegate.equalities(mtrxAE, mtrxBE);
+            if (myConvex) {
+                throw new IllegalStateException();
+            } else {
+                myDelegate.equalities(mtrxAE, mtrxBE);
+            }
             return this;
         }
 
         public MatrixStore<Double> getAE() {
-            return myDelegate.getAE();
+            if (myConvex) {
+                return null;
+            } else {
+                return myDelegate.getAE();
+            }
         }
 
         public MatrixStore<Double> getBE() {
-            return myDelegate.getBE();
+            if (myConvex) {
+                return null;
+            } else {
+                return myDelegate.getBE();
+            }
         }
 
         public MatrixStore<Double> getC() {
-            return myDelegate.getC();
+            if (myConvex) {
+                return null;
+            } else {
+                return myDelegate.getC();
+            }
         }
 
         public LinearSolver.Builder objective(final MatrixStore<Double> mtrxC) {
-            myDelegate.objective(mtrxC);
+            if (myConvex) {
+                throw new IllegalStateException();
+            } else {
+                myDelegate.objective(mtrxC);
+            }
             return this;
         }
 
@@ -99,27 +128,37 @@ public abstract class LinearSolver extends GenericSolver {
 
             myDelegate.validate();
 
-            final SimplexTableau tableau = new DenseTableau(this);
+            if (myConvex) {
 
-            return new SimplexSolver(tableau, options);
+                final SimplexTableau tableau = SimplexSolver.build(myDelegate);
+
+                return new SimplexSolver(tableau, options);
+
+            } else {
+
+                final SimplexTableau tableau = new DenseTableau(this);
+
+                return new SimplexSolver(tableau, options);
+            }
+
         }
 
     }
 
     public static final class ModelIntegration extends ExpressionsBasedModel.Integration<LinearSolver> {
 
-        public LinearSolver build(final ExpressionsBasedModel model) {
-
-            final SimplexTableau tableau = SimplexSolver.build(model);
-
-            return new SimplexSolver(tableau, model.options);
-        }
-
         public LinearSolver build(final ConvexSolver.Builder convexBuilder, final Optimisation.Options options) {
 
             final SimplexTableau tableau = SimplexSolver.build(convexBuilder);
 
             return new SimplexSolver(tableau, options);
+        }
+
+        public LinearSolver build(final ExpressionsBasedModel model) {
+
+            final SimplexTableau tableau = SimplexSolver.build(model);
+
+            return new SimplexSolver(tableau, model.options);
         }
 
         public boolean isCapable(final ExpressionsBasedModel model) {

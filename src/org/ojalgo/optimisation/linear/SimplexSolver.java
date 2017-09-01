@@ -752,7 +752,7 @@ public final class SimplexSolver extends LinearSolver {
             tmpLinearBuilder.equalities(tmpLinearAE, tmpLinearBE);
         }
 
-        return null;
+        return SimplexTableau.make(tmpNumVars, tmpNumEqus, tmpNumInes);
     }
 
 }
