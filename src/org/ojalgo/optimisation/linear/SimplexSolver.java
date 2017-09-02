@@ -32,19 +32,24 @@ import java.util.stream.Collectors;
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.IntIndex;
+import org.ojalgo.access.Mutate1D;
+import org.ojalgo.access.Mutate2D;
 import org.ojalgo.array.Array1D;
+import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorFunction;
 import org.ojalgo.function.aggregator.PrimitiveAggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
+import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
 import org.ojalgo.optimisation.convex.ConvexSolver;
 import org.ojalgo.optimisation.linear.SimplexTableau.IterationPoint;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * LinearSolver solves optimisation problems of the (LP standard) form:
@@ -706,53 +711,54 @@ public final class SimplexSolver extends LinearSolver {
 
     static SimplexTableau build(final ConvexSolver.Builder convex) {
 
+        final int numbVars = convex.countVariables();
+        final int numbEqus = convex.countEqualityConstraints();
+        final int numbInes = convex.countInequalityConstraints();
+
+        final SimplexTableau retVal = SimplexTableau.make(numbEqus + numbInes, numbVars + numbVars, numbInes);
+
+        final Mutate1D obj = retVal.objective();
+
         final MatrixStore<Double> convexC = convex.getC();
+
+        for (int v = 0; v < numbVars; v++) {
+            final double val = convexC.doubleValue(v);
+            obj.set(v, -val);
+            obj.set(numbVars + v, val);
+        }
+
+        final Mutate2D constrBody = retVal.constraintsBody();
+        final Mutate1D constrRHS = retVal.constraintsRHS();
+
         final MatrixStore<Double> convexAE = convex.getAE();
-        final MatrixStore<Double> convexAI = convex.getAI().get();
-        final int tmpNumVars = convex.countVariables();
-        final int tmpNumEqus = convex.countEqualityConstraints();
-        final int tmpNumInes = convex.countInequalityConstraints();
+        final MatrixStore<Double> convexBE = convex.getBE();
 
-        final MatrixStore<Double> tmpLinearC = convexC.negate().logical().below(convexC).below(tmpNumInes).get();
-
-        final LinearSolver.Builder tmpLinearBuilder = LinearSolver.getBuilder(tmpLinearC);
-
-        MatrixStore<Double> tmpAEpart = null;
-        MatrixStore<Double> tmpBEpart = null;
-
-        if (tmpNumEqus > 0) {
-            tmpAEpart = convexAE.logical().right(convexAE.negate()).right(tmpNumInes).get();
-            tmpBEpart = convex.getBE();
-        }
-
-        if (tmpNumInes > 0) {
-            final MatrixStore<Double> tmpAIpart = convexAI.logical().right(convexAI.negate()).right(MatrixStore.PRIMITIVE.makeIdentity(tmpNumInes).get()).get();
-            final MatrixStore<Double> tmpBIpart = convex.getBI();
-            if (tmpAEpart != null) {
-                tmpAEpart = tmpAEpart.logical().below(tmpAIpart).get();
-                tmpBEpart = tmpBEpart.logical().below(tmpBIpart).get();
-            } else {
-                tmpAEpart = tmpAIpart;
-                tmpBEpart = tmpBIpart;
+        for (int i = 0; i < numbEqus; i++) {
+            final double rhs = convexBE.doubleValue(i);
+            final boolean neg = NumberContext.compare(rhs, ZERO) < 0;
+            for (int j = 0; j < numbVars; j++) {
+                final double val = convexAE.doubleValue(i, j);
+                constrBody.set(i, j, neg ? -val : val);
+                constrBody.set(i, numbVars + j, neg ? val : -val);
             }
+            constrRHS.set(i, neg ? -rhs : rhs);
         }
 
-        if (tmpAEpart != null) {
+        final RowsSupplier<Double> convexAI = convex.getAI();
+        final MatrixStore<Double> convexBI = convex.getBI();
 
-            final PhysicalStore<Double> tmpLinearAE = tmpAEpart.copy();
-            final PhysicalStore<Double> tmpLinearBE = tmpBEpart.copy();
-
-            for (int i = 0; i < tmpLinearBE.countRows(); i++) {
-                if (tmpLinearBE.doubleValue(i) < 0.0) {
-                    tmpLinearAE.modifyRow(i, 0, NEGATE);
-                    tmpLinearBE.modifyRow(i, 0, NEGATE);
-                }
-            }
-
-            tmpLinearBuilder.equalities(tmpLinearAE, tmpLinearBE);
+        for (int i = 0; i < numbInes; i++) {
+            final int r = i;
+            final SparseArray<Double> row = convexAI.getRow(r);
+            final double rhs = convexBI.doubleValue(r);
+            final boolean neg = NumberContext.compare(rhs, ZERO) < 0;
+            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
+            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
+            constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
+            constrRHS.set(numbEqus + i, neg ? -rhs : rhs);
         }
 
-        return SimplexTableau.make(tmpNumVars, tmpNumEqus, tmpNumInes);
+        return retVal;
     }
 
 }

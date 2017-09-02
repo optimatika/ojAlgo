@@ -24,6 +24,8 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
+import java.util.Optional;
+
 import org.ojalgo.access.Access1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.PrimitiveFunction;
@@ -32,7 +34,6 @@ import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
-import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.type.IndexSelector;
 import org.ojalgo.type.context.NumberContext;
 
@@ -159,7 +160,20 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         }
 
         if (!tmpFeasible) {
-            tmpFeasible = this.solveLP();
+
+            final Result resultLP = this.solveLP();
+
+            if (tmpFeasible = resultLP.getState().isFeasible()) {
+
+                this.getSolutionX().fillMatching(resultLP);
+
+                final Optional<Access1D<?>> tmpMultipliers = resultLP.getMultipliers();
+                if (tmpMultipliers.isPresent()) {
+                    this.getL().fillMatching(tmpMultipliers.get());
+                } else {
+                    this.getL().fillAll(ZERO);
+                }
+            }
         }
 
         if (tmpFeasible) {
@@ -554,87 +568,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
         this.excludeAndRemove(tmpToExclude);
-    }
-
-    final boolean solveLP() {
-
-        final MatrixStore<Double> convexC = this.getMatrixC();
-        final MatrixStore<Double> convexAE = this.getMatrixAE();
-        final MatrixStore<Double> convexAI = this.getMatrixAI().get();
-        final int tmpNumVars = this.countVariables();
-        final int tmpNumEqus = this.countEqualityConstraints();
-        final int tmpNumInes = this.countInequalityConstraints();
-
-        final MatrixStore<Double> tmpLinearC = convexC.negate().logical().below(convexC).below(tmpNumInes).get();
-
-        final LinearSolver.Builder tmpLinearBuilder = LinearSolver.getBuilder(tmpLinearC);
-
-        MatrixStore<Double> tmpAEpart = null;
-        MatrixStore<Double> tmpBEpart = null;
-
-        if (tmpNumEqus > 0) {
-            tmpAEpart = convexAE.logical().right(convexAE.negate()).right(tmpNumInes).get();
-            tmpBEpart = this.getMatrixBE();
-        }
-
-        if (tmpNumInes > 0) {
-            final MatrixStore<Double> tmpAIpart = convexAI.logical().right(convexAI.negate()).right(MatrixStore.PRIMITIVE.makeIdentity(tmpNumInes).get()).get();
-            final MatrixStore<Double> tmpBIpart = this.getMatrixBI();
-            if (tmpAEpart != null) {
-                tmpAEpart = tmpAEpart.logical().below(tmpAIpart).get();
-                tmpBEpart = tmpBEpart.logical().below(tmpBIpart).get();
-            } else {
-                tmpAEpart = tmpAIpart;
-                tmpBEpart = tmpBIpart;
-            }
-        }
-
-        if (tmpAEpart != null) {
-
-            final PhysicalStore<Double> tmpLinearAE = tmpAEpart.copy();
-            final PhysicalStore<Double> tmpLinearBE = tmpBEpart.copy();
-
-            for (int i = 0; i < tmpLinearBE.countRows(); i++) {
-                if (tmpLinearBE.doubleValue(i) < 0.0) {
-                    tmpLinearAE.modifyRow(i, 0, NEGATE);
-                    tmpLinearBE.modifyRow(i, 0, NEGATE);
-                }
-            }
-
-            tmpLinearBuilder.equalities(tmpLinearAE, tmpLinearBE);
-        }
-
-        final LinearSolver tmpLinearSolver = tmpLinearBuilder.build(options);
-
-        final Result tmpLinearResult = tmpLinearSolver.solve();
-
-        boolean retVal;
-
-        if (tmpLinearResult.getState().isFeasible()) {
-
-            for (int i = 0; i < tmpNumVars; i++) {
-                final int index = i;
-                this.getSolutionX().set(index, 0, tmpLinearResult.doubleValue(i) - tmpLinearResult.doubleValue(tmpNumVars + i));
-            }
-
-            final Access1D<?> lagrangeMultipliers = tmpLinearResult.getMultipliers().get();
-
-            if (lagrangeMultipliers.count() != (this.countEqualityConstraints() + this.countInequalityConstraints())) {
-                throw new IllegalStateException();
-            } else {
-                for (int i = 0; i < lagrangeMultipliers.count(); i++) {
-                    this.getL().set(i, lagrangeMultipliers.doubleValue(i));
-                }
-            }
-
-            retVal = true;
-
-        } else {
-
-            retVal = false;
-        }
-
-        return retVal;
     }
 
 }

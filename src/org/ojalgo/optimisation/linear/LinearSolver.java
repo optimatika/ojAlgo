@@ -23,6 +23,7 @@ package org.ojalgo.optimisation.linear;
 
 import java.util.List;
 
+import org.ojalgo.access.Access1D;
 import org.ojalgo.access.IntIndex;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.function.PrimitiveFunction;
@@ -38,7 +39,6 @@ public abstract class LinearSolver extends GenericSolver {
 
     public static final class Builder extends GenericSolver.Builder<LinearSolver.Builder, LinearSolver> {
 
-        private final boolean myConvex;
         private final ConvexSolver.Builder myDelegate;
 
         public Builder() {
@@ -46,13 +46,7 @@ public abstract class LinearSolver extends GenericSolver {
             super();
 
             myDelegate = new ConvexSolver.Builder();
-            myConvex = false;
-        }
-
-        public Builder(ConvexSolver.Builder convex) {
-            super();
-            myDelegate = convex;
-            myConvex = true;
+            ;
         }
 
         public Builder(final MatrixStore<Double> C) {
@@ -60,7 +54,6 @@ public abstract class LinearSolver extends GenericSolver {
             super();
 
             myDelegate = new ConvexSolver.Builder(C);
-            myConvex = false;
         }
 
         @Override
@@ -78,69 +71,37 @@ public abstract class LinearSolver extends GenericSolver {
 
         @Override
         public int countVariables() {
-            return myConvex ? ((2 * myDelegate.countVariables()) + myDelegate.countInequalityConstraints()) : myDelegate.countVariables();
+            return myDelegate.countVariables();
         }
 
         public LinearSolver.Builder equalities(final MatrixStore<Double> mtrxAE, final MatrixStore<Double> mtrxBE) {
-            if (myConvex) {
-                throw new IllegalStateException();
-            } else {
-                myDelegate.equalities(mtrxAE, mtrxBE);
-            }
+            myDelegate.equalities(mtrxAE, mtrxBE);
             return this;
         }
 
         public MatrixStore<Double> getAE() {
-            if (myConvex) {
-                return null;
-            } else {
-                return myDelegate.getAE();
-            }
+            return myDelegate.getAE();
         }
 
         public MatrixStore<Double> getBE() {
-            if (myConvex) {
-                return null;
-            } else {
-                return myDelegate.getBE();
-            }
+            return myDelegate.getBE();
         }
 
         public MatrixStore<Double> getC() {
-            if (myConvex) {
-                return null;
-            } else {
-                return myDelegate.getC();
-            }
+            return myDelegate.getC();
         }
 
         public LinearSolver.Builder objective(final MatrixStore<Double> mtrxC) {
-            if (myConvex) {
-                throw new IllegalStateException();
-            } else {
-                myDelegate.objective(mtrxC);
-            }
+            myDelegate.objective(mtrxC);
             return this;
         }
 
         @Override
         protected LinearSolver doBuild(final Optimisation.Options options) {
 
-            myDelegate.validate();
+            final SimplexTableau tableau = new DenseTableau(this);
 
-            if (myConvex) {
-
-                final SimplexTableau tableau = SimplexSolver.build(myDelegate);
-
-                return new SimplexSolver(tableau, options);
-
-            } else {
-
-                final SimplexTableau tableau = new DenseTableau(this);
-
-                return new SimplexSolver(tableau, options);
-            }
-
+            return new SimplexSolver(tableau, options);
         }
 
     }
@@ -225,6 +186,37 @@ public abstract class LinearSolver extends GenericSolver {
 
     public static LinearSolver.Builder getBuilder(final MatrixStore<Double> C) {
         return LinearSolver.getBuilder().objective(C);
+    }
+
+    public static Optimisation.Result solve(final ConvexSolver.Builder convex, final Optimisation.Options options) {
+
+        final int numbVars = convex.countVariables();
+
+        final SimplexTableau tableau = SimplexSolver.build(convex);
+
+        final LinearSolver solver = new SimplexSolver(tableau, options);
+
+        final Result result = solver.solve();
+
+        final Optimisation.Result retVal = new Optimisation.Result(result.getState(), result.getValue(), new Access1D<Double>() {
+
+            public long count() {
+                return numbVars;
+            }
+
+            public double doubleValue(final long index) {
+                return result.doubleValue(index) - result.doubleValue(numbVars + index);
+            }
+
+            public Double get(final long index) {
+                return this.doubleValue(index);
+            }
+
+        });
+
+        retVal.multipliers(result.getMultipliers().get());
+
+        return retVal;
     }
 
     protected LinearSolver(final Options solverOptions) {

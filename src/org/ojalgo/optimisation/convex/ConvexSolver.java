@@ -53,6 +53,7 @@ import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.GenericSolver;
 import org.ojalgo.optimisation.Optimisation;
 import org.ojalgo.optimisation.Variable;
+import org.ojalgo.optimisation.linear.LinearSolver;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.type.context.NumberContext;
 
@@ -812,6 +813,10 @@ public abstract class ConvexSolver extends GenericSolver {
     protected abstract boolean needsAnotherIteration();
 
     abstract protected void performIteration();
+
+    protected Optimisation.Result solveLP() {
+        return LinearSolver.solve(myMatrices, options);
+    }
 
     /**
      * Should validate the solver data/input/structue. Even "expensive" validation can be performed as the
