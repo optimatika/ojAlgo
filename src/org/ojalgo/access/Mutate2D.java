@@ -168,6 +168,10 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.loopDiagonal(row, col, (r, c) -> this.modifyOne(r, c, modifier));
         }
 
+        default void modifyDiagonal(final UnaryFunction<N> modifier) {
+            this.modifyDiagonal(0L, 0L, modifier);
+        }
+
         void modifyOne(long row, long col, UnaryFunction<N> modifier);
 
         default void modifyOne(final long index, final UnaryFunction<N> modifier) {

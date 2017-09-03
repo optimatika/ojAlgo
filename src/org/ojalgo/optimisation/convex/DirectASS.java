@@ -21,7 +21,6 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
@@ -135,13 +134,13 @@ abstract class DirectASS extends ActiveSetSolver {
             options.debug_appender.printmtrx("RHS", this.getIterationRHS());
         }
 
-        this.getL().fillAll(0.0);
+        this.getSolutionL().fillAll(0.0);
         final int tmpCountE = this.countEqualityConstraints();
         for (int i = 0; i < tmpCountE; i++) {
-            this.getL().set(i, tmpIterL.doubleValue(i));
+            this.getSolutionL().set(i, tmpIterL.doubleValue(i));
         }
         for (int i = 0; i < tmpIncluded.length; i++) {
-            this.getL().set(tmpCountE + tmpIncluded[i], tmpIterL.doubleValue(tmpCountE + i));
+            this.getSolutionL().set(tmpCountE + tmpIncluded[i], tmpIterL.doubleValue(tmpCountE + i));
         }
 
         this.handleSubsolution(tmpSolvable, this.getIterationX(), tmpIncluded);
@@ -150,33 +149,6 @@ abstract class DirectASS extends ActiveSetSolver {
     @Override
     void excludeAndRemove(final int toExclude) {
         this.exclude(toExclude);
-    }
-
-    @Override
-    void initSolution(final MatrixStore<Double> tmpBI, final int tmpNumVars, final int tmpNumEqus) {
-
-        if (this.hasInequalityConstraints()) {
-
-            final int[] tmpExcluded = this.getExcluded();
-            final MatrixStore<Double> tmpSI = this.getSI();
-
-            for (int i = 0; i < tmpExcluded.length; i++) {
-                final double tmpSlack = tmpSI.doubleValue(tmpExcluded[i]);
-                if (options.slack.isZero(tmpSlack) && (this.getL().doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
-                    this.include(tmpExcluded[i]);
-                }
-            }
-        }
-
-        while (((tmpNumEqus + this.countIncluded()) >= tmpNumVars) && (this.countIncluded() > 0)) {
-            this.shrink();
-        }
-
-        if (this.isDebug() && ((tmpNumEqus + this.countIncluded()) > tmpNumVars)) {
-            this.debug("Redundant contraints!");
-        }
-
-        this.setInvQC(this.getSolutionQ(this.getIterationC()));
     }
 
 }

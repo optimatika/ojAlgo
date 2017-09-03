@@ -145,7 +145,7 @@ abstract class IterativeASS extends ActiveSetSolver {
 
             }
 
-            tmpNewRow.initialise(IterativeASS.this.getL());
+            tmpNewRow.initialise(IterativeASS.this.getSolutionL());
         }
 
         void remove(final int i) {
@@ -156,7 +156,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             }
             myIterationRows[i] = null;
 
-            IterativeASS.this.getL().set(i, ZERO);
+            IterativeASS.this.getSolutionL().set(i, ZERO);
         }
 
     }
@@ -170,6 +170,15 @@ abstract class IterativeASS extends ActiveSetSolver {
 
         myS = new MyIterativeSolver();
         myColumnS = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1);
+    }
+
+    private void addConstraint(final int constrIndex, final Access1D<?> constrBody, final double constrRHS) {
+
+        final MatrixStore<Double> body = this.getSolutionQ(Access2D.newPrimitiveColumnCollectable(constrBody), myColumnS);
+
+        final double rhs = constrBody.dot(this.getInvQC()) - constrRHS;
+
+        myS.add(constrIndex, body, rhs, 3);
     }
 
     @Override
@@ -188,16 +197,11 @@ abstract class IterativeASS extends ActiveSetSolver {
 
         if (tmpToInclude >= 0) {
 
-            // final LogicalBuilder<Double> rowAlt1 = this.getMatrixAI().logical().row(tmpToInclude);
-            final SparseArray<Double> rowAlt2 = this.getMatrixAI(tmpToInclude);
+            final int constrIndex = this.countEqualityConstraints() + tmpToInclude;
+            final SparseArray<Double> constrBody = this.getMatrixAI(tmpToInclude);
+            final double constrRHS = this.getMatrixBI().doubleValue(tmpToInclude);
 
-            // final LogicalBuilder<Double> rowToIncludeTransposed = rowAlt1.transpose();
-
-            final MatrixStore<Double> body = this.getSolutionQ(Access2D.newPrimitiveColumnCollectable(rowAlt2), myColumnS);
-            // final double rhs = this.getInvQC().premultiply(rowAlt2).get().doubleValue(0L) - this.getMatrixBI().doubleValue(tmpToInclude);
-            final double rhs = rowAlt2.dot(this.getInvQC()) - this.getMatrixBI().doubleValue(tmpToInclude);
-
-            myS.add(this.countEqualityConstraints() + tmpToInclude, body, rhs, 3);
+            this.addConstraint(constrIndex, constrBody, constrRHS);
         }
 
         if ((this.countIterationConstraints() < this.countVariables()) && (tmpSolvable = this.isSolvableQ())) {
@@ -211,7 +215,7 @@ abstract class IterativeASS extends ActiveSetSolver {
             } else {
                 // Actual/normal optimisation problem
 
-                final double tmpRelativeError = myS.resolve(this.getL());
+                final double tmpRelativeError = myS.resolve(this.getSolutionL());
 
                 if (this.isDebug()) {
                     this.debug("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(tmpIncluded));
@@ -232,11 +236,11 @@ abstract class IterativeASS extends ActiveSetSolver {
             this.getIterationX().fillMatching(tmpXL.logical().limits(tmpCountVariables, (int) tmpXL.countColumns()).get());
 
             for (int i = 0; i < this.countEqualityConstraints(); i++) {
-                this.getL().set(i, tmpXL.doubleValue(tmpCountVariables + i));
+                this.getSolutionL().set(i, tmpXL.doubleValue(tmpCountVariables + i));
             }
             final int tmpLengthIncluded = tmpIncluded.length;
             for (int i = 0; i < tmpLengthIncluded; i++) {
-                this.getL().set(this.countEqualityConstraints() + tmpIncluded[i], tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
+                this.getSolutionL().set(this.countEqualityConstraints() + tmpIncluded[i], tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
             }
 
         }
@@ -261,50 +265,32 @@ abstract class IterativeASS extends ActiveSetSolver {
     }
 
     @Override
-    void initSolution(final MatrixStore<Double> tmpBI, final int tmpNumVars, final int tmpNumEqus) {
+    void resetActivator() {
 
-        if (this.hasInequalityConstraints()) {
+        super.resetActivator();
 
-            final int[] tmpExcluded = this.getExcluded();
-            final MatrixStore<Double> tmpSI = this.getSI();
-
-            for (int i = 0; i < tmpExcluded.length; i++) {
-                final double tmpSlack = tmpSI.doubleValue(tmpExcluded[i]);
-                if (options.slack.isZero(tmpSlack) && (this.getL().doubleValue(tmpNumEqus + tmpExcluded[i]) != ZERO)) {
-                    this.include(tmpExcluded[i]);
-                }
-            }
-        }
-
-        while (((tmpNumEqus + this.countIncluded()) >= tmpNumVars) && (this.countIncluded() > 0)) {
-            this.shrink();
-        }
-
-        if (this.isDebug() && ((tmpNumEqus + this.countIncluded()) > tmpNumVars)) {
-            this.debug("Redundant contraints!");
-        }
-
-        this.setInvQC(this.getSolutionQ(this.getIterationC()));
-
-        final int[] tmpIncluded = this.getIncluded();
+        final int numbEqus = this.countEqualityConstraints();
+        final int numbVars = this.countVariables();
 
         myS.clear();
+        final int[] included = this.getIncluded();
 
-        if ((tmpNumEqus + tmpIncluded.length) > 0) {
+        if ((numbEqus + included.length) > 0) {
 
-            final MatrixStore<Double> tmpIterA = this.getIterationA(tmpIncluded);
-            final MatrixStore<Double> tmpIterB = this.getIterationB(tmpIncluded);
+            final MatrixStore<Double> tmpIterA = this.getIterationA(included);
+            final MatrixStore<Double> tmpIterB = this.getIterationB(included);
 
             final MatrixStore<Double> tmpCols = this.getSolutionQ(tmpIterA.transpose());
             final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB).get();
 
-            for (int j = 0; j < tmpNumEqus; j++) {
-                myS.add(j, tmpCols.sliceColumn(0, j), tmpRHS.doubleValue(j), tmpNumVars);
+            for (int j = 0; j < numbEqus; j++) {
+                myS.add(j, tmpCols.sliceColumn(j), tmpRHS.doubleValue(j), numbVars);
             }
-            for (int j = 0; j < tmpIncluded.length; j++) {
-                myS.add(tmpNumEqus + tmpIncluded[j], tmpCols.sliceColumn(0, tmpNumEqus + j), tmpRHS.doubleValue(tmpNumEqus + j), 3);
+            for (int j = 0; j < included.length; j++) {
+                myS.add(numbEqus + included[j], tmpCols.sliceColumn(numbEqus + j), tmpRHS.doubleValue(numbEqus + j), 3);
             }
         }
+
     }
 
 }
