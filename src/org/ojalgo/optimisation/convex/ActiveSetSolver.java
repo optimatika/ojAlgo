@@ -346,14 +346,41 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
     @Override
     final MatrixStore<Double> getIterationA() {
-        return this.getIterationA(myActivator.getIncluded());
+
+        int numbEqus = this.countEqualityConstraints();
+        int numbVars = this.countVariables();
+        final int[] incl = myActivator.getIncluded();
+
+        PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.makeZero(numbEqus + incl.length, numbVars);
+
+        if (numbEqus > 0) {
+            this.getMatrixAE().supplyTo(retVal.regionByLimits(numbEqus, numbVars));
+        }
+        for (int i = 0; i < incl.length; i++) {
+            this.getMatrixAI(incl[i]).supplyNonZerosTo(retVal.regionByRows(numbEqus + i));
+        }
+
+        return retVal;
     }
 
     abstract MatrixStore<Double> getIterationA(int[] included);
 
     @Override
     final MatrixStore<Double> getIterationB() {
-        return this.getIterationB(myActivator.getIncluded());
+
+        int numbEqus = this.countEqualityConstraints();
+        final int[] incl = myActivator.getIncluded();
+
+        PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.makeZero(numbEqus + incl.length, 1);
+
+        for (int i = 0; i < numbEqus; i++) {
+            retVal.set(i, this.getMatrixBE().doubleValue(i));
+        }
+        for (int i = 0; i < incl.length; i++) {
+            retVal.set(numbEqus + i, this.getMatrixBI().doubleValue(incl[i]));
+        }
+
+        return retVal;
     }
 
     abstract MatrixStore<Double> getIterationB(int[] included);

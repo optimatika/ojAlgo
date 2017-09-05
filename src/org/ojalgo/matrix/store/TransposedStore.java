@@ -51,6 +51,11 @@ final class TransposedStore<N extends Number> extends TransjugatedStore<N> {
         return retVal;
     }
 
+    @Override
+    public void supplyTo(ElementsConsumer<N> receiver) {
+        this.getBase().supplyTo(receiver.regionByTransposing());
+    }
+
     public Scalar<N> toScalar(final long row, final long column) {
         return this.getBase().toScalar(column, row);
     }
