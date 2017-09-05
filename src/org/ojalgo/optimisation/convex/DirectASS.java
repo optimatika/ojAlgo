@@ -58,8 +58,6 @@ final class DirectASS extends ActiveSetSolver {
             this.debug(this.toActivatorString());
         }
 
-        this.reset();
-
         this.setConstraintToInclude(-1);
         final int[] tmpIncluded = this.getIncluded();
 

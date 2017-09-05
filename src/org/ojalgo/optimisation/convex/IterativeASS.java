@@ -189,8 +189,6 @@ final class IterativeASS extends ActiveSetSolver {
             this.debug(this.toActivatorString());
         }
 
-        this.reset();
-
         final int tmpToInclude = this.getConstraintToInclude();
         this.setConstraintToInclude(-1);
         final int[] tmpIncluded = this.getIncluded();
