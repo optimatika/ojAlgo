@@ -43,12 +43,10 @@ import org.ojalgo.optimisation.Optimisation;
  *
  * @author apete
  */
-abstract class DirectASS extends ActiveSetSolver {
+final class DirectASS extends ActiveSetSolver {
 
     DirectASS(final ConvexSolver.Builder matrices, final Optimisation.Options solverOptions) {
-
         super(matrices, solverOptions);
-
     }
 
     @SuppressWarnings("deprecation")
@@ -60,7 +58,6 @@ abstract class DirectASS extends ActiveSetSolver {
             this.debug(this.toActivatorString());
         }
 
-        final int tmpToInclude = this.getConstraintToInclude();
         this.setConstraintToInclude(-1);
         final int[] tmpIncluded = this.getIncluded();
 
@@ -79,13 +76,14 @@ abstract class DirectASS extends ActiveSetSolver {
             } else {
                 // Actual/normal optimisation problem
 
-                final MatrixStore<Double> tmpInvQAT = this.getSolutionQ(this.getIterationA(tmpIncluded).transpose());
+                final MatrixStore<Double> iterA = this.getIterationA();
+                final MatrixStore<Double> tmpInvQAT = this.getSolutionQ(iterA.transpose());
                 // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
                 // BasicLogger.debug("tmpInvQAT", tmpInvQAT);
 
                 // Negated Schur complement
                 // final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
-                final ElementsSupplier<Double> tmpS = tmpInvQAT.premultiply(this.getIterationA(tmpIncluded));
+                final ElementsSupplier<Double> tmpS = tmpInvQAT.premultiply(iterA);
                 // TODO Symmetric, only need to calculate halv the Schur complement, and only 1 row/column changes per iteration
                 //BasicLogger.debug("Negated Schur complement", tmpS.get());
 
@@ -101,9 +99,7 @@ abstract class DirectASS extends ActiveSetSolver {
 
                     //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
                     //myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
-                    this.getSolutionGeneral(
-                            this.getInvQC().premultiply(this.getIterationA(tmpIncluded)).operateOnMatching(SUBTRACT, this.getIterationB(tmpIncluded)),
-                            tmpIterL);
+                    this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, this.getIterationB()), tmpIterL);
 
                     //BasicLogger.debug("L", tmpIterL);
 
@@ -111,9 +107,7 @@ abstract class DirectASS extends ActiveSetSolver {
                         this.debug("Relative error {} in solution for L={}", PrimitiveMath.NaN, tmpIterL);
                     }
 
-                    //myCholesky.solve(tmpIterC.subtract(tmpIterA.transpose().multiply(tmpIterL)), tmpIterX);
-                    final ElementsSupplier<Double> tmpRHS = tmpIterL.premultiply(this.getIterationA(tmpIncluded).transpose())
-                            .operateOnMatching(this.getIterationC(), SUBTRACT);
+                    final ElementsSupplier<Double> tmpRHS = tmpIterL.premultiply(iterA.transpose()).operateOnMatching(this.getIterationC(), SUBTRACT);
                     this.getSolutionQ(tmpRHS, this.getIterationX());
                 }
             }

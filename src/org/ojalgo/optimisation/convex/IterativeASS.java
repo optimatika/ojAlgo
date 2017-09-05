@@ -51,7 +51,7 @@ import org.ojalgo.type.context.NumberContext;
  *
  * @author apete
  */
-abstract class IterativeASS extends ActiveSetSolver {
+final class IterativeASS extends ActiveSetSolver {
 
     final class MyIterativeSolver extends MutableSolver<ConjugateGradientSolver> implements Access2D<Double> {
 
@@ -221,7 +221,7 @@ abstract class IterativeASS extends ActiveSetSolver {
                     this.debug("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(tmpIncluded));
                 }
 
-                final ElementsSupplier<Double> tmpRHS = this.getIterationL(tmpIncluded).premultiply(this.getIterationA(tmpIncluded).transpose())
+                final ElementsSupplier<Double> tmpRHS = this.getIterationL(tmpIncluded).premultiply(this.getIterationA().transpose())
                         .operateOnMatching(this.getIterationC(), SUBTRACT);
                 this.getSolutionQ(tmpRHS, this.getIterationX());
             }
@@ -240,7 +240,8 @@ abstract class IterativeASS extends ActiveSetSolver {
             }
             final int tmpLengthIncluded = tmpIncluded.length;
             for (int i = 0; i < tmpLengthIncluded; i++) {
-                this.getSolutionL().set(this.countEqualityConstraints() + tmpIncluded[i], tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
+                this.getSolutionL().set(this.countEqualityConstraints() + tmpIncluded[i],
+                        tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
             }
 
         }
@@ -277,11 +278,11 @@ abstract class IterativeASS extends ActiveSetSolver {
 
         if ((numbEqus + included.length) > 0) {
 
-            final MatrixStore<Double> tmpIterA = this.getIterationA(included);
-            final MatrixStore<Double> tmpIterB = this.getIterationB(included);
+            final MatrixStore<Double> iterA = this.getIterationA();
+            final MatrixStore<Double> iterB = this.getIterationB();
 
-            final MatrixStore<Double> tmpCols = this.getSolutionQ(tmpIterA.transpose());
-            final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(tmpIterA).operateOnMatching(SUBTRACT, tmpIterB).get();
+            final MatrixStore<Double> tmpCols = this.getSolutionQ(iterA.transpose());
+            final MatrixStore<Double> tmpRHS = this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB).get();
 
             for (int j = 0; j < numbEqus; j++) {
                 myS.add(j, tmpCols.sliceColumn(j), tmpRHS.doubleValue(j), numbVars);

@@ -74,6 +74,15 @@ public interface ElementView1D<N extends Number, V extends ElementView1D<N, V>>
         ProgrammingError.throwForUnsupportedOptionalOperation();
     }
 
+    default boolean step() {
+        if (this.hasNext()) {
+            this.next();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     default Stream<V> stream(final boolean parallel) {
         return StreamSupport.stream(this, parallel);
     }

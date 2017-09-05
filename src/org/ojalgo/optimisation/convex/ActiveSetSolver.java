@@ -154,11 +154,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         super.initialise(kickStarter);
 
-        final int tmpNumVars = (int) this.getMatrixC().countRows();
-        final int tmpNumEqus = this.getMatrixAE() != null ? (int) this.getMatrixAE().countRows() : 0;
-
-        myActivator.excludeAll();
-
         boolean tmpFeasible = false;
         final boolean tmpUsableKickStarter = (kickStarter != null) && kickStarter.getState().isApproximate();
 
@@ -347,11 +342,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     @Override
     final MatrixStore<Double> getIterationA() {
 
-        int numbEqus = this.countEqualityConstraints();
-        int numbVars = this.countVariables();
+        final int numbEqus = this.countEqualityConstraints();
+        final int numbVars = this.countVariables();
         final int[] incl = myActivator.getIncluded();
 
-        PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.makeZero(numbEqus + incl.length, numbVars);
+        final PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.makeZero(numbEqus + incl.length, numbVars);
 
         if (numbEqus > 0) {
             this.getMatrixAE().supplyTo(retVal.regionByLimits(numbEqus, numbVars));
@@ -363,15 +358,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return retVal;
     }
 
-    abstract MatrixStore<Double> getIterationA(int[] included);
-
     @Override
     final MatrixStore<Double> getIterationB() {
 
-        int numbEqus = this.countEqualityConstraints();
+        final int numbEqus = this.countEqualityConstraints();
         final int[] incl = myActivator.getIncluded();
 
-        PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.makeZero(numbEqus + incl.length, 1);
+        final PhysicalStore<Double> retVal = PrimitiveDenseStore.FACTORY.makeZero(numbEqus + incl.length, 1);
 
         for (int i = 0; i < numbEqus; i++) {
             retVal.set(i, this.getMatrixBE().doubleValue(i));
@@ -382,8 +375,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         return retVal;
     }
-
-    abstract MatrixStore<Double> getIterationB(int[] included);
 
     @Override
     final MatrixStore<Double> getIterationC() {

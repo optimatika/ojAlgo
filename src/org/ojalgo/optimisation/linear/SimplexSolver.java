@@ -289,7 +289,6 @@ public final class SimplexSolver extends LinearSolver {
 
         final int tmpVarsPosLoLength = tmpVarsPosLo.size();
         for (int c = 0; c < tmpVarsPosLoLength; c++) {
-
             final Variable tmpVar = tmpVarsPosLo.get(c);
 
             retVal.constraintsRHS().set(tmpConstrBaseIndex + c, tmpVar.getAdjustedLowerLimit());
@@ -314,7 +313,6 @@ public final class SimplexSolver extends LinearSolver {
 
         final int tmpVarsPosUpLength = tmpVarsPosUp.size();
         for (int c = 0; c < tmpVarsPosUpLength; c++) {
-
             final Variable tmpVar = tmpVarsPosUp.get(c);
 
             retVal.constraintsRHS().set(tmpConstrBaseIndex + c, tmpVar.getAdjustedUpperLimit());
@@ -339,7 +337,6 @@ public final class SimplexSolver extends LinearSolver {
 
         final int tmpVarsNegLoLength = tmpVarsNegLo.size();
         for (int c = 0; c < tmpVarsNegLoLength; c++) {
-
             final Variable tmpVar = tmpVarsNegLo.get(c);
 
             retVal.constraintsRHS().set(tmpConstrBaseIndex + c, -tmpVar.getAdjustedLowerLimit());
@@ -364,7 +361,6 @@ public final class SimplexSolver extends LinearSolver {
 
         final int tmpVarsNegUpLength = tmpVarsNegUp.size();
         for (int c = 0; c < tmpVarsNegUpLength; c++) {
-
             final Variable tmpVar = tmpVarsNegUp.get(c);
 
             retVal.constraintsRHS().set(tmpConstrBaseIndex + c, -tmpVar.getAdjustedUpperLimit());

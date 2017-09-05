@@ -425,11 +425,7 @@ public abstract class ConvexSolver extends GenericSolver {
             this.validate();
 
             if (this.hasInequalityConstraints()) {
-                if (this.hasEqualityConstraints()) {
-                    return new IterativeMixedASS(this, options);
-                } else {
-                    return new IterativePureASS(this, options);
-                }
+                return new IterativeASS(this, options);
             } else if (this.hasEqualityConstraints()) {
                 return new QPESolver(this, options);
             } else {

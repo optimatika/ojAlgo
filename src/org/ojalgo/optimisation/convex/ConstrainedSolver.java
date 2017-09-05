@@ -57,16 +57,16 @@ abstract class ConstrainedSolver extends ConvexSolver {
 
         super.validate();
 
-        final MatrixStore<Double> tmpA = this.getIterationA();
-        final MatrixStore<Double> tmpB = this.getIterationB();
+        final MatrixStore<Double> iterA = this.getIterationA();
+        final MatrixStore<Double> iterB = this.getIterationB();
 
-        if (((tmpA != null) && (tmpB == null)) || ((tmpA == null) && (tmpB != null))) {
+        if (((iterA != null) && (iterB == null)) || ((iterA == null) && (iterB != null))) {
             throw new IllegalArgumentException("Either A or B is null, and the other one is not!");
         }
 
-        if (tmpA != null) {
-            this.computeGeneral(tmpA.countRows() < tmpA.countColumns() ? tmpA.transpose() : tmpA);
-            if (this.getRankGeneral() != tmpA.countRows()) {
+        if (iterA != null) {
+            this.computeGeneral(iterA.countRows() < iterA.countColumns() ? iterA.transpose() : iterA);
+            if (this.getRankGeneral() != iterA.countRows()) {
                 throw new IllegalArgumentException("A must have full (row) rank!");
             }
         }

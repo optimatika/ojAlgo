@@ -39,8 +39,8 @@ public abstract class OptimisationConvexTests extends FunctionalityTest {
             if (builder.hasEqualityConstraints()) {
                 // Mixed ASS
 
-                final Optimisation.Result direct = new DirectMixedASS(builder, options).solve();
-                final Optimisation.Result iterative = new IterativeMixedASS(builder, options).solve();
+                final Optimisation.Result direct = new DirectASS(builder, options).solve();
+                final Optimisation.Result iterative = new IterativeASS(builder, options).solve();
 
                 if (accuracy != null) {
                     TestUtils.assertStateAndSolution(direct, iterative, accuracy);
@@ -51,8 +51,8 @@ public abstract class OptimisationConvexTests extends FunctionalityTest {
             } else {
                 // Pure ASS
 
-                final Optimisation.Result direct = new DirectPureASS(builder, options).solve();
-                final Optimisation.Result iterative = new IterativePureASS(builder, options).solve();
+                final Optimisation.Result direct = new DirectASS(builder, options).solve();
+                final Optimisation.Result iterative = new IterativeASS(builder, options).solve();
 
                 if (accuracy != null) {
                     TestUtils.assertStateAndSolution(direct, iterative, accuracy);
