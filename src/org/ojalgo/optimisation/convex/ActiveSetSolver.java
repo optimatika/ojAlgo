@@ -154,19 +154,23 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         super.initialise(kickStarter);
 
-        boolean tmpFeasible = false;
-        final boolean tmpUsableKickStarter = (kickStarter != null) && kickStarter.getState().isApproximate();
+        boolean feasible = false;
+        final boolean usableKickStarter = (kickStarter != null) && kickStarter.getState().isApproximate();
 
-        if (tmpUsableKickStarter) {
+        if (usableKickStarter) {
             this.getSolutionX().fillMatching(kickStarter);
-            tmpFeasible = this.checkFeasibility(false);
+            if (kickStarter.getState().isFeasible()) {
+                feasible = true;
+            } else {
+                feasible = this.checkFeasibility(false);
+            }
         }
 
-        if (!tmpFeasible) {
+        if (!feasible) {
 
             final Result resultLP = this.solveLP();
 
-            if (tmpFeasible = resultLP.getState().isFeasible()) {
+            if (feasible = resultLP.getState().isFeasible()) {
 
                 this.getSolutionX().fillMatching(resultLP);
 
@@ -179,7 +183,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         }
 
-        if (tmpFeasible) {
+        if (feasible) {
 
             this.setState(State.FEASIBLE);
 

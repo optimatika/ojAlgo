@@ -21,6 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
+import org.ojalgo.access.Access2D.Collectable;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
 
@@ -31,25 +32,17 @@ abstract class ConstrainedSolver extends ConvexSolver {
     }
 
     @Override
-    protected final MatrixStore<Double> getIterationKKT() {
+    protected final Collectable<Double, ? super PhysicalStore<Double>> getIterationKKT() {
         final MatrixStore<Double> iterQ = this.getIterationQ();
         final MatrixStore<Double> iterA = this.getIterationA();
-        return iterQ.logical().right(iterA.transpose()).below(iterA).get();
+        return iterQ.logical().right(iterA.transpose()).below(iterA);
     }
 
     @Override
-    protected final MatrixStore<Double> getIterationRHS() {
+    protected final Collectable<Double, ? super PhysicalStore<Double>> getIterationRHS() {
         final MatrixStore<Double> iterC = this.getIterationC();
         final MatrixStore<Double> iterB = this.getIterationB();
-        return iterC.logical().below(iterB).get();
-    }
-
-    @Override
-    protected boolean initialise(final Result kickStarter) {
-
-        this.computeQ(this.getIterationQ());
-
-        return true;
+        return iterC.logical().below(iterB);
     }
 
     @Override

@@ -24,7 +24,6 @@ package org.ojalgo.optimisation.convex;
 import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.matrix.store.MatrixStore;
-import org.ojalgo.matrix.store.PhysicalStore;
 import org.ojalgo.optimisation.Optimisation;
 
 /**
@@ -52,13 +51,6 @@ final class UnconstrainedSolver extends ConvexSolver {
     }
 
     @Override
-    protected boolean initialise(final Result kickStarter) {
-        this.computeQ(this.getMatrixQ());
-        this.getSolutionX().fillAll(ZERO);
-        return true;
-    }
-
-    @Override
     protected boolean needsAnotherIteration() {
         return this.countIterations() < 1;
     }
@@ -66,31 +58,25 @@ final class UnconstrainedSolver extends ConvexSolver {
     @Override
     protected void performIteration() {
 
-        final MatrixStore<Double> tmpQ = this.getMatrixQ();
-        final MatrixStore<Double> tmpC = this.getMatrixC();
-        final PhysicalStore<Double> tmpX = this.getSolutionX();
+        boolean solvable = true;
 
-        boolean tmpSolvable = true;
-
-        if (tmpSolvable = this.isSolvableQ()) {
+        if (solvable = this.isSolvableQ()) {
             // Q is SPD
 
-            this.getSolutionQ(tmpC, tmpX);
+            this.getSolutionQ(this.getMatrixC(), this.getSolutionX());
 
-        } else if (tmpSolvable = this.computeGeneral(tmpQ)) {
+        } else if (solvable = this.solveFullKKT(this.getSolutionX())) {
             // The above failed, but the KKT system is solvable
             // Try solving the full KKT system instaed
-
-            this.getSolutionGeneral(tmpC, tmpX);
         }
 
-        if (!tmpSolvable && this.isDebug()) {
+        if (!solvable && this.isDebug()) {
             options.debug_appender.println("KKT system unsolvable!");
             options.debug_appender.printmtrx("KKT", this.getIterationKKT());
             options.debug_appender.printmtrx("RHS", this.getIterationRHS());
         }
 
-        if (tmpSolvable) {
+        if (solvable) {
             this.setState(State.DISTINCT);
         } else {
             this.setState(State.UNBOUNDED);

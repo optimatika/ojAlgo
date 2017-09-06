@@ -124,8 +124,8 @@ final class DirectASS extends ActiveSetSolver {
 
         if (!tmpSolvable && this.isDebug()) {
             options.debug_appender.println("KKT system unsolvable!");
-            options.debug_appender.printmtrx("KKT", this.getIterationKKT());
-            options.debug_appender.printmtrx("RHS", this.getIterationRHS());
+            options.debug_appender.printmtrx("KKT", this.getIterationKKT().collect(PrimitiveDenseStore.FACTORY));
+            options.debug_appender.printmtrx("RHS", this.getIterationRHS().collect(PrimitiveDenseStore.FACTORY));
         }
 
         this.getSolutionL().fillAll(0.0);

@@ -23,7 +23,6 @@ package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import org.ojalgo.access.Access1D;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
@@ -71,8 +70,8 @@ final class QPESolver extends ConstrainedSolver {
 
         super.initialise(kickStarter);
 
-        if (kickStarter != null) {
-            this.getSolutionX().fillMatching((Access1D<?>) kickStarter);
+        if ((kickStarter != null) && kickStarter.getState().isFeasible()) {
+            this.getSolutionX().fillMatching(kickStarter);
             if (!(myFeasible = this.isFeasible())) {
                 this.getSolutionX().fillAll(ZERO);
             }
@@ -123,19 +122,21 @@ final class QPESolver extends ConstrainedSolver {
 
         }
 
-        if (!tmpSolvable && (tmpSolvable = this.computeGeneral(this.getIterationKKT()))) {
-            // The above failed, but the KKT system is solvable
-            // Try solving the full KKT system instaed
+        if (!tmpSolvable) {
+            // The above failed, try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS());
-            tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), (int) tmpXL.countColumns()).get());
+            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
+
+            tmpSolvable = this.solveFullKKT(tmpXL);
+
+            tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
             tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
         }
 
         if (!tmpSolvable && this.isDebug()) {
             options.debug_appender.println("KKT system unsolvable!");
-            options.debug_appender.printmtrx("KKT", this.getIterationKKT());
-            options.debug_appender.printmtrx("RHS", this.getIterationRHS());
+            options.debug_appender.printmtrx("KKT", this.getIterationKKT().collect(PrimitiveDenseStore.FACTORY));
+            options.debug_appender.printmtrx("RHS", this.getIterationRHS().collect(PrimitiveDenseStore.FACTORY));
         }
 
         if (tmpSolvable) {

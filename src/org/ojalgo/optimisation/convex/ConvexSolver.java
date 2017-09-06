@@ -709,9 +709,9 @@ public abstract class ConvexSolver extends GenericSolver {
 
     }
 
-    protected abstract MatrixStore<Double> getIterationKKT();
+    protected abstract Collectable<Double, ? super PhysicalStore<Double>> getIterationKKT();
 
-    protected abstract MatrixStore<Double> getIterationRHS();
+    protected abstract Collectable<Double, ? super PhysicalStore<Double>> getIterationRHS();
 
     protected MatrixStore<Double> getMatrixAE() {
         return myMatrices.getAE();
@@ -796,7 +796,12 @@ public abstract class ConvexSolver extends GenericSolver {
         return myMatrices.hasObjective();
     }
 
-    protected abstract boolean initialise(Result kickStarter);
+    protected boolean initialise(final Result kickStarter) {
+
+        this.computeQ(this.getMatrixQ());
+
+        return true;
+    }
 
     protected boolean isSolvableGeneral() {
         return mySolverGeneral.isSolvable();
@@ -809,6 +814,14 @@ public abstract class ConvexSolver extends GenericSolver {
     protected abstract boolean needsAnotherIteration();
 
     abstract protected void performIteration();
+
+    protected boolean solveFullKKT(final PhysicalStore<Double> preallocated) {
+        if (this.computeGeneral(this.getIterationKKT())) {
+            this.getSolutionGeneral(this.getIterationRHS(), preallocated);
+            return true;
+        }
+        return false;
+    }
 
     protected Optimisation.Result solveLP() {
         return LinearSolver.solve(myMatrices, options);

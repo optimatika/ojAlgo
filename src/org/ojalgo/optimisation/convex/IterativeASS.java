@@ -249,8 +249,8 @@ final class IterativeASS extends ActiveSetSolver {
         if (!tmpSolvable && this.isDebug()) {
             options.debug_appender.println("KKT system unsolvable!");
             if ((this.countVariables() + (long) this.countVariables()) < 20) {
-                options.debug_appender.printmtrx("KKT", this.getIterationKKT());
-                options.debug_appender.printmtrx("RHS", this.getIterationRHS());
+                options.debug_appender.printmtrx("KKT", this.getIterationKKT().collect(PrimitiveDenseStore.FACTORY));
+                options.debug_appender.printmtrx("RHS", this.getIterationRHS().collect(PrimitiveDenseStore.FACTORY));
             }
         }
 
