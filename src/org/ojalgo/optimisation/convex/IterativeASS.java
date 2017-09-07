@@ -22,7 +22,7 @@
 package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.SUBTRACT;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.MathContext;
 
@@ -182,7 +182,7 @@ final class IterativeASS extends ActiveSetSolver {
     }
 
     @Override
-    protected void exclude(int toExclude) {
+    protected void exclude(final int toExclude) {
         super.exclude(toExclude);
         myS.remove(this.countEqualityConstraints() + toExclude);
     }
@@ -199,7 +199,7 @@ final class IterativeASS extends ActiveSetSolver {
         this.setConstraintToInclude(-1);
         final int[] incl = this.getIncluded();
 
-        boolean tmpSolvable = false;
+        boolean solvable = false;
 
         if (toInclude >= 0) {
 
@@ -210,13 +210,15 @@ final class IterativeASS extends ActiveSetSolver {
             this.addConstraint(constrIndex, constrBody, constrRHS);
         }
 
-        if ((this.countIterationConstraints() < this.countVariables()) && (tmpSolvable = this.isSolvableQ())) {
+        final PrimitiveDenseStore iterX = this.getIterationX();
+
+        if ((this.countIterationConstraints() < this.countVariables()) && (solvable = this.isSolvableQ())) {
             // Q is SPD
 
             if (this.countIterationConstraints() == 0L) {
                 // Unconstrained - can happen when PureASS and all inequalities are inactive
 
-                this.getSolutionQ(this.getIterationC(), this.getIterationX());
+                this.getSolutionQ(this.getIterationC(), iterX);
 
             } else {
                 // Actual/normal optimisation problem
@@ -229,39 +231,31 @@ final class IterativeASS extends ActiveSetSolver {
 
                 final ElementsSupplier<Double> tmpRHS = this.getIterationL(incl).premultiply(this.getIterationA().transpose())
                         .operateOnMatching(this.getIterationC(), SUBTRACT);
-                this.getSolutionQ(tmpRHS, this.getIterationX());
+                this.getSolutionQ(tmpRHS, iterX);
             }
         }
 
-        if (!tmpSolvable && (tmpSolvable = this.computeGeneral(this.getIterationKKT()))) {
-            // The above failed, but the KKT system is solvable
-            // Try solving the full KKT system instaed
+        if (!solvable) {
+            // The above failed, try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS());
-            final int tmpCountVariables = this.countVariables();
-            this.getIterationX().fillMatching(tmpXL.logical().limits(tmpCountVariables, (int) tmpXL.countColumns()).get());
+            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
 
-            for (int i = 0; i < this.countEqualityConstraints(); i++) {
-                this.getSolutionL().set(i, tmpXL.doubleValue(tmpCountVariables + i));
-            }
-            final int tmpLengthIncluded = incl.length;
-            for (int i = 0; i < tmpLengthIncluded; i++) {
-                this.getSolutionL().set(this.countEqualityConstraints() + incl[i], tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
-            }
+            if (solvable = this.solveFullKKT(tmpXL)) {
 
-        }
+                iterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
 
-        if (!tmpSolvable && this.isDebug()) {
-            options.debug_appender.println("KKT system unsolvable!");
-            if ((this.countVariables() + (long) this.countVariables()) < 20) {
-                options.debug_appender.printmtrx("KKT", this.getIterationKKT().collect(PrimitiveDenseStore.FACTORY));
-                options.debug_appender.printmtrx("RHS", this.getIterationRHS().collect(PrimitiveDenseStore.FACTORY));
+                for (int i = 0; i < this.countEqualityConstraints(); i++) {
+                    this.getSolutionL().set(i, tmpXL.doubleValue(this.countVariables() + i));
+                }
+                final int tmpLengthIncluded = incl.length;
+                for (int i = 0; i < tmpLengthIncluded; i++) {
+                    this.getSolutionL().set(this.countEqualityConstraints() + incl[i],
+                            tmpXL.doubleValue(this.countVariables() + this.countEqualityConstraints() + i));
+                }
             }
         }
 
-        this.handleSubsolution(tmpSolvable, this.getIterationX(), incl);
-
-        // BasicLogger.debug("Iteration L: {}", myIterationL.asList().copy());
+        this.handleSubsolution(solvable, iterX, incl);
     }
 
     @Override
@@ -273,9 +267,9 @@ final class IterativeASS extends ActiveSetSolver {
         final int numbVars = this.countVariables();
 
         myS.clear();
-        final int[] included = this.getIncluded();
+        final int[] incl = this.getIncluded();
 
-        if ((numbEqus + included.length) > 0) {
+        if ((numbEqus + incl.length) > 0) {
 
             final MatrixStore<Double> iterA = this.getIterationA();
             final MatrixStore<Double> iterB = this.getIterationB();
@@ -286,8 +280,8 @@ final class IterativeASS extends ActiveSetSolver {
             for (int j = 0; j < numbEqus; j++) {
                 myS.add(j, tmpCols.sliceColumn(j), tmpRHS.doubleValue(j), numbVars);
             }
-            for (int j = 0; j < included.length; j++) {
-                myS.add(numbEqus + included[j], tmpCols.sliceColumn(numbEqus + j), tmpRHS.doubleValue(numbEqus + j), 3);
+            for (int j = 0; j < incl.length; j++) {
+                myS.add(numbEqus + incl[j], tmpCols.sliceColumn(numbEqus + j), tmpRHS.doubleValue(numbEqus + j), 3);
             }
         }
 

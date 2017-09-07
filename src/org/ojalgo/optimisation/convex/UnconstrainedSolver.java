@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.optimisation.Optimisation;
@@ -66,8 +66,7 @@ final class UnconstrainedSolver extends ConvexSolver {
             this.getSolutionQ(this.getMatrixC(), this.getSolutionX());
 
         } else if (solvable = this.solveFullKKT(this.getSolutionX())) {
-            // The above failed, but the KKT system is solvable
-            // Try solving the full KKT system instaed
+            // Q not SPD, but the KKT system is solvable
         }
 
         if (solvable) {

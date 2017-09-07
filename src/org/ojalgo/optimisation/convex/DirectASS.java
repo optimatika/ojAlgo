@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.PrimitiveFunction.SUBTRACT;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
 
@@ -62,17 +62,18 @@ final class DirectASS extends ActiveSetSolver {
         this.setConstraintToInclude(-1);
         final int[] incl = this.getIncluded();
 
-        boolean tmpSolvable = false;
+        boolean solvable = false;
 
-        final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(this.countIterationConstraints(), 1L);
+        final PrimitiveDenseStore iterX = this.getIterationX();
+        final PrimitiveDenseStore iterL = PrimitiveDenseStore.FACTORY.makeZero(this.countIterationConstraints(), 1L);
 
-        if ((this.countIterationConstraints() < this.countVariables()) && (tmpSolvable = this.isSolvableQ())) {
+        if ((this.countIterationConstraints() < this.countVariables()) && (solvable = this.isSolvableQ())) {
             // Q is SPD
 
             if (this.countIterationConstraints() == 0L) {
                 // Unconstrained - can happen when PureASS and all inequalities are inactive
 
-                this.getSolutionQ(this.getIterationC(), this.getIterationX());
+                this.getSolutionQ(this.getIterationC(), iterX);
 
             } else {
                 // Actual/normal optimisation problem
@@ -92,7 +93,7 @@ final class DirectASS extends ActiveSetSolver {
                     BasicLogger.debug(Arrays.toString(incl), tmpS.get());
                 }
 
-                if (tmpSolvable = this.computeGeneral(tmpS)) {
+                if (solvable = this.computeGeneral(tmpS)) {
 
                     // tmpIterX temporarely used to store tmpInvQC
                     // final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpIterC, tmpIterX);
@@ -100,45 +101,43 @@ final class DirectASS extends ActiveSetSolver {
 
                     //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
                     //myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
-                    this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, this.getIterationB()), tmpIterL);
+                    this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, this.getIterationB()), iterL);
 
                     //BasicLogger.debug("L", tmpIterL);
 
                     if (this.isDebug()) {
-                        this.debug("Relative error {} in solution for L={}", PrimitiveMath.NaN, tmpIterL);
+                        this.debug("Relative error {} in solution for L={}", PrimitiveMath.NaN, iterL);
                     }
 
-                    final ElementsSupplier<Double> tmpRHS = tmpIterL.premultiply(iterA.transpose()).operateOnMatching(this.getIterationC(), SUBTRACT);
-                    this.getSolutionQ(tmpRHS, this.getIterationX());
+                    final ElementsSupplier<Double> tmpRHS = iterL.premultiply(iterA.transpose()).operateOnMatching(this.getIterationC(), SUBTRACT);
+                    this.getSolutionQ(tmpRHS, iterX);
                 }
             }
         }
 
-        if (!tmpSolvable && (tmpSolvable = this.computeGeneral(this.getIterationKKT()))) {
-            // The above failed, but the KKT system is solvable
-            // Try solving the full KKT system instaed
+        if (!solvable) {
+            // The above failed, try solving the full KKT system instaed
 
-            final MatrixStore<Double> tmpXL = this.getSolutionGeneral(this.getIterationRHS());
-            this.getIterationX().fillMatching(tmpXL.logical().limits(this.countVariables(), (int) tmpXL.countColumns()).get());
-            tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
-        }
+            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
 
-        if (!tmpSolvable && this.isDebug()) {
-            options.debug_appender.println("KKT system unsolvable!");
-            options.debug_appender.printmtrx("KKT", this.getIterationKKT().collect(PrimitiveDenseStore.FACTORY));
-            options.debug_appender.printmtrx("RHS", this.getIterationRHS().collect(PrimitiveDenseStore.FACTORY));
+            if (solvable = this.solveFullKKT(tmpXL)) {
+
+                iterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
+                iterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
+            }
         }
 
         this.getSolutionL().fillAll(0.0);
-        final int tmpCountE = this.countEqualityConstraints();
-        for (int i = 0; i < tmpCountE; i++) {
-            this.getSolutionL().set(i, tmpIterL.doubleValue(i));
-        }
-        for (int i = 0; i < incl.length; i++) {
-            this.getSolutionL().set(tmpCountE + incl[i], tmpIterL.doubleValue(tmpCountE + i));
+        if (solvable) {
+            for (int i = 0; i < this.countEqualityConstraints(); i++) {
+                this.getSolutionL().set(i, iterL.doubleValue(i));
+            }
+            for (int i = 0; i < incl.length; i++) {
+                this.getSolutionL().set(this.countEqualityConstraints() + incl[i], iterL.doubleValue(this.countEqualityConstraints() + i));
+            }
         }
 
-        this.handleSubsolution(tmpSolvable, this.getIterationX(), incl);
+        this.handleSubsolution(solvable, iterX, incl);
     }
 
 }

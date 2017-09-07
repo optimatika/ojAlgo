@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -127,10 +127,10 @@ final class QPESolver extends ConstrainedSolver {
 
             final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
 
-            tmpSolvable = this.solveFullKKT(tmpXL);
-
-            tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
-            tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
+            if (tmpSolvable = this.solveFullKKT(tmpXL)) {
+                tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
+                tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
+            }
         }
 
         if (tmpSolvable) {
