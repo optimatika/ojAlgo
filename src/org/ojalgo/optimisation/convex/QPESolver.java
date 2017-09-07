@@ -186,18 +186,12 @@ final class QPESolver extends ConstrainedSolver {
 
     @Override
     final MatrixStore<Double> getIterationC() {
-
         if (myFeasible) {
-
-            final MatrixStore<Double> tmpQ = this.getMatrixQ();
-            final MatrixStore<Double> tmpC = this.getMatrixC();
-
-            final PhysicalStore<Double> tmpX = this.getSolutionX();
-
-            return tmpC.subtract(tmpQ.multiply(tmpX));
-
+            final MatrixStore<Double> mtrxQ = this.getMatrixQ();
+            final MatrixStore<Double> mtrxC = this.getMatrixC();
+            final PhysicalStore<Double> solX = this.getSolutionX();
+            return mtrxC.subtract(mtrxQ.multiply(solX));
         } else {
-
             return this.getMatrixC();
         }
     }
