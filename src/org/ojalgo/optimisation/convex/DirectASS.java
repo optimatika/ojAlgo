@@ -64,16 +64,21 @@ final class DirectASS extends ActiveSetSolver {
 
         boolean solvable = false;
 
-        final PrimitiveDenseStore iterX = this.getIterationX();
-        final PrimitiveDenseStore iterL = PrimitiveDenseStore.FACTORY.makeZero(this.countIterationConstraints(), 1L);
+        final int numbConstr = this.countIterationConstraints();
+        final int numbVars = this.countVariables();
 
-        if ((this.countIterationConstraints() < this.countVariables()) && (solvable = this.isSolvableQ())) {
+        final PrimitiveDenseStore iterX = this.getIterationX();
+        final PrimitiveDenseStore iterL = PrimitiveDenseStore.FACTORY.makeZero(numbConstr, 1L);
+
+        if ((numbConstr < numbVars) && (solvable = this.isSolvableQ())) {
             // Q is SPD
 
-            if (this.countIterationConstraints() == 0L) {
-                // Unconstrained - can happen when PureASS and all inequalities are inactive
+            if (numbConstr == 0L) {
+                // Unconstrained - can happen when there are no equality constraints and all inequalities are inactive
 
-                this.getSolutionQ(this.getIterationC(), iterX);
+                // this.getSolutionQ(this.getIterationC(), iterX);
+
+                iterX.fillMatching(this.getInvQC());
 
             } else {
                 // Actual/normal optimisation problem
@@ -118,12 +123,12 @@ final class DirectASS extends ActiveSetSolver {
         if (!solvable) {
             // The above failed, try solving the full KKT system instaed
 
-            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
+            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(numbVars + numbConstr, 1L);
 
             if (solvable = this.solveFullKKT(tmpXL)) {
 
-                iterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
-                iterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
+                iterX.fillMatching(tmpXL.logical().limits(numbVars, 1).get());
+                iterL.fillMatching(tmpXL.logical().offsets(numbVars, 0).get());
             }
         }
 
