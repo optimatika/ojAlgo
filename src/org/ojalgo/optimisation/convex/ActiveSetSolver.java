@@ -44,8 +44,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private int myConstraintToInclude = -1;
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
-    private final PhysicalStore<Double> mySlackI;
-    private final PhysicalStore<Double> mySolutionL;
+    private final PrimitiveDenseStore mySlackI;
+    private final PrimitiveDenseStore mySolutionL;
 
     ActiveSetSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
@@ -60,7 +60,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         mySolutionL = PrimitiveDenseStore.FACTORY.makeZero(tmpCountEqualityConstraints + tmpCountInequalityConstraints, 1L);
         myIterationX = PrimitiveDenseStore.FACTORY.makeZero(tmpCountVariables, 1L);
 
-        mySlackI = this.getMatrixBI().copy();
+        mySlackI = PrimitiveDenseStore.FACTORY.makeZero(tmpCountInequalityConstraints, 1L);
     }
 
     protected boolean checkFeasibility(final boolean onlyExcluded) {
@@ -80,7 +80,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
             if (this.hasInequalityConstraints() && (myActivator.countIncluded() > 0)) {
                 final int[] tmpIncluded = myActivator.getIncluded();
-                final MatrixStore<Double> tmpSI = this.getSI();
+                final MatrixStore<Double> tmpSI = this.getSlackI();
                 for (int i = 0; retVal && (i < tmpIncluded.length); i++) {
                     final double tmpSlack = tmpSI.doubleValue(tmpIncluded[i]);
                     if ((tmpSlack < ZERO) && !options.slack.isZero(tmpSlack)) {
@@ -93,7 +93,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
 
         if (this.hasInequalityConstraints() && (myActivator.countExcluded() > 0)) {
             final int[] tmpExcluded = myActivator.getExcluded();
-            final MatrixStore<Double> tmpSI = this.getSI();
+            final MatrixStore<Double> tmpSI = this.getSlackI();
             for (int e = 0; retVal && (e < tmpExcluded.length); e++) {
                 final double tmpSlack = tmpSI.doubleValue(tmpExcluded[e]);
                 if ((tmpSlack < ZERO) && !options.slack.isZero(tmpSlack)) {
@@ -203,7 +203,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 this.debug("Initial E-slack: {}", this.getSE().copy().asList());
             }
             if (this.getMatrixAI() != null) {
-                this.debug("Initial I-slack: {}", this.getSI().copy().asList());
+                this.debug("Initial I-slack: {}", this.getSlackI().copy().asList());
             }
         }
 
@@ -404,12 +404,12 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return myIterationX;
     }
 
-    PhysicalStore<Double> getSI() {
-        this.supplySI(mySlackI);
+    PhysicalStore<Double> getSlackI() {
+        this.supplySlackI(mySlackI);
         return mySlackI;
     }
 
-    PhysicalStore<Double> getSolutionL() {
+    PrimitiveDenseStore getSolutionL() {
         return mySolutionL;
     }
 
@@ -435,7 +435,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 final int[] tmpExcluded = myActivator.getExcluded();
                 if (tmpExcluded.length > 0) {
 
-                    final MatrixStore<Double> tmpNumer = this.getSI();
+                    final MatrixStore<Double> tmpNumer = this.getSlackI();
 
                     // final MatrixStore<Double> tmpDenom = this.getMatrixAI(tmpExcluded).get().multiply(iterationSolution);
 
@@ -577,7 +577,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         final int numbVars = this.countVariables();
 
         if (this.hasInequalityConstraints()) {
-            final MatrixStore<Double> slack = this.getSI();
+            final MatrixStore<Double> slack = this.getSlackI();
             final int[] excl = this.getExcluded();
 
             for (int i = 0; i < excl.length; i++) {

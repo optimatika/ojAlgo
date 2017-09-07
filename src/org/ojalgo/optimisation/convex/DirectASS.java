@@ -69,6 +69,7 @@ final class DirectASS extends ActiveSetSolver {
 
         final PrimitiveDenseStore iterX = this.getIterationX();
         final PrimitiveDenseStore iterL = PrimitiveDenseStore.FACTORY.makeZero(numbConstr, 1L);
+        final PrimitiveDenseStore soluL = this.getSolutionL();
 
         if ((numbConstr < numbVars) && (solvable = this.isSolvableQ())) {
             // Q is SPD
@@ -76,45 +77,36 @@ final class DirectASS extends ActiveSetSolver {
             if (numbConstr == 0L) {
                 // Unconstrained - can happen when there are no equality constraints and all inequalities are inactive
 
-                // this.getSolutionQ(this.getIterationC(), iterX);
-
                 iterX.fillMatching(this.getInvQC());
 
             } else {
                 // Actual/normal optimisation problem
 
                 final MatrixStore<Double> iterA = this.getIterationA();
+                final MatrixStore<Double> iterB = this.getIterationB();
+                final MatrixStore<Double> iterC = this.getIterationC();
+
                 final MatrixStore<Double> tmpInvQAT = this.getSolutionQ(iterA.transpose());
                 // TODO Only 1 column change inbetween active set iterations (add or remove 1 column)
                 // BasicLogger.debug("tmpInvQAT", tmpInvQAT);
 
                 // Negated Schur complement
-                // final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
                 final ElementsSupplier<Double> tmpS = tmpInvQAT.premultiply(iterA);
-                // TODO Symmetric, only need to calculate halv the Schur complement, and only 1 row/column changes per iteration
-                //BasicLogger.debug("Negated Schur complement", tmpS.get());
+                // TODO Symmetric, only need to calculate half the Schur complement, and only 1 row/column changes per iteration
 
                 if (this.isDebug()) {
-                    BasicLogger.debug(Arrays.toString(incl), tmpS.get());
+                    BasicLogger.debug("Negated Schur complement: " + Arrays.toString(incl), tmpS.get());
                 }
 
                 if (solvable = this.computeGeneral(tmpS)) {
 
-                    // tmpIterX temporarely used to store tmpInvQC
-                    // final MatrixStore<Double> tmpInvQC = myCholesky.solve(tmpIterC, tmpIterX);
-                    //TODO Constant if C doesn't change
-
-                    //tmpIterL = myLU.solve(tmpInvQC.multiplyLeft(tmpIterA));
-                    //myLU.solve(tmpIterA.multiply(myInvQC).subtract(tmpIterB), tmpIterL);
-                    this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, this.getIterationB()), iterL);
-
-                    //BasicLogger.debug("L", tmpIterL);
+                    this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB), iterL);
 
                     if (this.isDebug()) {
                         this.debug("Relative error {} in solution for L={}", PrimitiveMath.NaN, iterL);
                     }
 
-                    final ElementsSupplier<Double> tmpRHS = iterL.premultiply(iterA.transpose()).operateOnMatching(this.getIterationC(), SUBTRACT);
+                    final ElementsSupplier<Double> tmpRHS = iterL.premultiply(iterA.transpose()).operateOnMatching(iterC, SUBTRACT);
                     this.getSolutionQ(tmpRHS, iterX);
                 }
             }
@@ -132,13 +124,13 @@ final class DirectASS extends ActiveSetSolver {
             }
         }
 
-        this.getSolutionL().fillAll(0.0);
+        soluL.fillAll(0.0);
         if (solvable) {
             for (int i = 0; i < this.countEqualityConstraints(); i++) {
-                this.getSolutionL().set(i, iterL.doubleValue(i));
+                soluL.set(i, iterL.doubleValue(i));
             }
             for (int i = 0; i < incl.length; i++) {
-                this.getSolutionL().set(this.countEqualityConstraints() + incl[i], iterL.doubleValue(this.countEqualityConstraints() + i));
+                soluL.set(this.countEqualityConstraints() + incl[i], iterL.doubleValue(this.countEqualityConstraints() + i));
             }
         }
 

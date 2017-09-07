@@ -216,9 +216,7 @@ final class IterativeASS extends ActiveSetSolver {
             // Q is SPD
 
             if (this.countIterationConstraints() == 0L) {
-                // Unconstrained - can happen when PureASS and all inequalities are inactive
-
-                // this.getSolutionQ(this.getIterationC(), iterX);
+                // Unconstrained - can happen when there are no equality constraints and all inequalities are inactive
 
                 iterX.fillMatching(this.getInvQC());
 

@@ -889,7 +889,7 @@ public abstract class ConvexSolver extends GenericSolver {
         return true;
     }
 
-    void supplySI(final PhysicalStore<Double> slack) {
+    void supplySlackI(final PhysicalStore<Double> slack) {
 
         final RowsSupplier<Double> mtrxAI = myMatrices.getAI();
         final MatrixStore<Double> mtrxBI = this.getMatrixBI();
