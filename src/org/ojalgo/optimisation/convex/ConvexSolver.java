@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.constant.PrimitiveMath.ZERO;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.List;
@@ -741,6 +741,10 @@ public abstract class ConvexSolver extends GenericSolver {
         return myMatrices.getBI();
     }
 
+    protected double getMatrixBI(final int row) {
+        return myMatrices.getBI().doubleValue(row);
+    }
+
     protected MatrixStore<Double> getMatrixBI(final int[] selector) {
         return myMatrices.getBI().logical().row(selector).get();
     }
@@ -819,8 +823,14 @@ public abstract class ConvexSolver extends GenericSolver {
         if (this.computeGeneral(this.getIterationKKT())) {
             this.getSolutionGeneral(this.getIterationRHS(), preallocated);
             return true;
+        } else {
+            if (this.isDebug()) {
+                options.debug_appender.println("KKT system unsolvable!");
+                options.debug_appender.printmtrx("KKT", this.getIterationKKT().collect(PrimitiveDenseStore.FACTORY));
+                options.debug_appender.printmtrx("RHS", this.getIterationRHS().collect(PrimitiveDenseStore.FACTORY));
+            }
+            return false;
         }
-        return false;
     }
 
     protected Optimisation.Result solveLP() {

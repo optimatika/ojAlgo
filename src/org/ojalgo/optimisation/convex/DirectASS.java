@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.PrimitiveFunction.SUBTRACT;
 
 import java.util.Arrays;
 
@@ -58,8 +58,9 @@ final class DirectASS extends ActiveSetSolver {
             this.debug(this.toActivatorString());
         }
 
+        final int toInclude = this.getConstraintToInclude();
         this.setConstraintToInclude(-1);
-        final int[] tmpIncluded = this.getIncluded();
+        final int[] incl = this.getIncluded();
 
         boolean tmpSolvable = false;
 
@@ -88,7 +89,7 @@ final class DirectASS extends ActiveSetSolver {
                 //BasicLogger.debug("Negated Schur complement", tmpS.get());
 
                 if (this.isDebug()) {
-                    BasicLogger.debug(Arrays.toString(tmpIncluded), tmpS.get());
+                    BasicLogger.debug(Arrays.toString(incl), tmpS.get());
                 }
 
                 if (tmpSolvable = this.computeGeneral(tmpS)) {
@@ -133,16 +134,11 @@ final class DirectASS extends ActiveSetSolver {
         for (int i = 0; i < tmpCountE; i++) {
             this.getSolutionL().set(i, tmpIterL.doubleValue(i));
         }
-        for (int i = 0; i < tmpIncluded.length; i++) {
-            this.getSolutionL().set(tmpCountE + tmpIncluded[i], tmpIterL.doubleValue(tmpCountE + i));
+        for (int i = 0; i < incl.length; i++) {
+            this.getSolutionL().set(tmpCountE + incl[i], tmpIterL.doubleValue(tmpCountE + i));
         }
 
-        this.handleSubsolution(tmpSolvable, this.getIterationX(), tmpIncluded);
-    }
-
-    @Override
-    void excludeAndRemove(final int toExclude) {
-        this.exclude(toExclude);
+        this.handleSubsolution(tmpSolvable, this.getIterationX(), incl);
     }
 
 }

@@ -22,7 +22,7 @@
 package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.PrimitiveFunction.SUBTRACT;
 
 import java.math.MathContext;
 
@@ -182,6 +182,12 @@ final class IterativeASS extends ActiveSetSolver {
     }
 
     @Override
+    protected void exclude(int toExclude) {
+        super.exclude(toExclude);
+        myS.remove(this.countEqualityConstraints() + toExclude);
+    }
+
+    @Override
     protected void performIteration() {
 
         if (this.isDebug()) {
@@ -189,17 +195,17 @@ final class IterativeASS extends ActiveSetSolver {
             this.debug(this.toActivatorString());
         }
 
-        final int tmpToInclude = this.getConstraintToInclude();
+        final int toInclude = this.getConstraintToInclude();
         this.setConstraintToInclude(-1);
-        final int[] tmpIncluded = this.getIncluded();
+        final int[] incl = this.getIncluded();
 
         boolean tmpSolvable = false;
 
-        if (tmpToInclude >= 0) {
+        if (toInclude >= 0) {
 
-            final int constrIndex = this.countEqualityConstraints() + tmpToInclude;
-            final SparseArray<Double> constrBody = this.getMatrixAI(tmpToInclude);
-            final double constrRHS = this.getMatrixBI().doubleValue(tmpToInclude);
+            final int constrIndex = this.countEqualityConstraints() + toInclude;
+            final SparseArray<Double> constrBody = this.getMatrixAI(toInclude);
+            final double constrRHS = this.getMatrixBI(toInclude);
 
             this.addConstraint(constrIndex, constrBody, constrRHS);
         }
@@ -218,10 +224,10 @@ final class IterativeASS extends ActiveSetSolver {
                 final double tmpRelativeError = myS.resolve(this.getSolutionL());
 
                 if (this.isDebug()) {
-                    this.debug("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(tmpIncluded));
+                    this.debug("Relative error {} in solution for L={}", tmpRelativeError, this.getIterationL(incl));
                 }
 
-                final ElementsSupplier<Double> tmpRHS = this.getIterationL(tmpIncluded).premultiply(this.getIterationA().transpose())
+                final ElementsSupplier<Double> tmpRHS = this.getIterationL(incl).premultiply(this.getIterationA().transpose())
                         .operateOnMatching(this.getIterationC(), SUBTRACT);
                 this.getSolutionQ(tmpRHS, this.getIterationX());
             }
@@ -238,10 +244,9 @@ final class IterativeASS extends ActiveSetSolver {
             for (int i = 0; i < this.countEqualityConstraints(); i++) {
                 this.getSolutionL().set(i, tmpXL.doubleValue(tmpCountVariables + i));
             }
-            final int tmpLengthIncluded = tmpIncluded.length;
+            final int tmpLengthIncluded = incl.length;
             for (int i = 0; i < tmpLengthIncluded; i++) {
-                this.getSolutionL().set(this.countEqualityConstraints() + tmpIncluded[i],
-                        tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
+                this.getSolutionL().set(this.countEqualityConstraints() + incl[i], tmpXL.doubleValue(tmpCountVariables + this.countEqualityConstraints() + i));
             }
 
         }
@@ -254,15 +259,9 @@ final class IterativeASS extends ActiveSetSolver {
             }
         }
 
-        this.handleSubsolution(tmpSolvable, this.getIterationX(), tmpIncluded);
+        this.handleSubsolution(tmpSolvable, this.getIterationX(), incl);
 
         // BasicLogger.debug("Iteration L: {}", myIterationL.asList().copy());
-    }
-
-    @Override
-    void excludeAndRemove(final int toExclude) {
-        this.exclude(toExclude);
-        myS.remove(this.countEqualityConstraints() + toExclude);
     }
 
     @Override

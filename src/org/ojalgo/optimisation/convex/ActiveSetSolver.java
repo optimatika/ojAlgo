@@ -44,8 +44,8 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
     private int myConstraintToInclude = -1;
     private MatrixStore<Double> myInvQC;
     private final PrimitiveDenseStore myIterationX;
-    private final PhysicalStore<Double> mySolutionL;
     private final PhysicalStore<Double> mySlackI;
+    private final PhysicalStore<Double> mySolutionL;
 
     ActiveSetSolver(final ConvexSolver.Builder matrices, final Options solverOptions) {
 
@@ -246,11 +246,11 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
             }
         } else {
             if (tmpToInclude == -1) {
-                this.excludeAndRemove(tmpToExclude);
+                this.exclude(tmpToExclude);
                 this.setState(State.APPROXIMATE);
                 return true;
             } else {
-                this.excludeAndRemove(tmpToExclude);
+                this.exclude(tmpToExclude);
                 myActivator.include(tmpToInclude);
                 this.setState(State.APPROXIMATE);
                 return true;
@@ -333,8 +333,6 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return this.countEqualityConstraints() + this.countIncluded();
     }
 
-    abstract void excludeAndRemove(int toExclude);
-
     int getConstraintToInclude() {
         return myConstraintToInclude;
     }
@@ -406,13 +404,13 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
         return myIterationX;
     }
 
-    PhysicalStore<Double> getSolutionL() {
-        return mySolutionL;
-    }
-
     PhysicalStore<Double> getSI() {
         this.supplySI(mySlackI);
         return mySlackI;
+    }
+
+    PhysicalStore<Double> getSolutionL() {
+        return mySolutionL;
     }
 
     final void handleSubsolution(final boolean solved, final PrimitiveDenseStore iterationSolution, final int[] included) {
@@ -618,7 +616,7 @@ abstract class ActiveSetSolver extends ConstrainedSolver {
                 tmpToExclude = tmpIncluded[i];
             }
         }
-        this.excludeAndRemove(tmpToExclude);
+        this.exclude(tmpToExclude);
     }
 
 }
