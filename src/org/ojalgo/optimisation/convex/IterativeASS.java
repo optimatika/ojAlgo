@@ -22,7 +22,7 @@
 package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.*;
+import static org.ojalgo.function.PrimitiveFunction.SUBTRACT;
 
 import java.math.MathContext;
 
@@ -198,6 +198,7 @@ final class IterativeASS extends ActiveSetSolver {
         final int toInclude = this.getConstraintToInclude();
         this.setConstraintToInclude(-1);
         final int[] incl = this.getIncluded();
+        final int[] excl = this.getExcluded();
 
         boolean solved = false;
 
@@ -255,7 +256,7 @@ final class IterativeASS extends ActiveSetSolver {
             }
         }
 
-        this.handleSubsolution(solved, iterX, incl);
+        this.handleIterationResults(solved, iterX, incl, excl);
     }
 
     @Override

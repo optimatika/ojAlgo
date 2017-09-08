@@ -45,6 +45,7 @@ import org.ojalgo.matrix.decomposition.Eigenvalue;
 import org.ojalgo.matrix.decomposition.LU;
 import org.ojalgo.matrix.store.MatrixStore;
 import org.ojalgo.matrix.store.PhysicalStore;
+import org.ojalgo.matrix.store.PhysicalStore.Factory;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.matrix.store.RowsSupplier;
 import org.ojalgo.matrix.store.SparseStore;
@@ -276,7 +277,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
             } else {
 
-                myAI = PrimitiveDenseStore.FACTORY.makeRowsSupplier((int) mtrxAI.countColumns());
+                myAI = FACTORY.makeRowsSupplier((int) mtrxAI.countColumns());
                 myAI.addRows((int) mtrxAI.countRows());
 
                 if (mtrxAI instanceof SparseStore) {
@@ -452,6 +453,8 @@ public abstract class ConvexSolver extends GenericSolver {
 
     }
 
+    static final Factory<Double, PrimitiveDenseStore> FACTORY = PrimitiveDenseStore.FACTORY;
+
     public static void copy(final ExpressionsBasedModel sourceModel, final ConvexSolver.Builder destinationBuilder) {
 
         destinationBuilder.reset();
@@ -478,7 +481,7 @@ public abstract class ConvexSolver extends GenericSolver {
         if (tmpEqExprDim > 0) {
 
             final SparseStore<Double> tmpAE = SparseStore.PRIMITIVE.make(tmpEqExprDim, tmpFreeVarDim);
-            final PhysicalStore<Double> tmpBE = PrimitiveDenseStore.FACTORY.makeZero(tmpEqExprDim, 1);
+            final PhysicalStore<Double> tmpBE = FACTORY.makeZero(tmpEqExprDim, 1);
 
             for (int i = 0; i < tmpEqExprDim; i++) {
 
@@ -502,7 +505,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         PhysicalStore<Double> tmpQ = null;
         if (tmpObjExpr.isAnyQuadraticFactorNonZero()) {
-            tmpQ = PrimitiveDenseStore.FACTORY.makeZero(tmpFreeVarDim, tmpFreeVarDim);
+            tmpQ = FACTORY.makeZero(tmpFreeVarDim, tmpFreeVarDim);
 
             final BinaryFunction<Double> tmpBaseFunc = sourceModel.isMaximisation() ? SUBTRACT : ADD;
             UnaryFunction<Double> tmpModifier;
@@ -519,7 +522,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         PhysicalStore<Double> tmpC = null;
         if (tmpObjExpr.isAnyLinearFactorNonZero()) {
-            tmpC = PrimitiveDenseStore.FACTORY.makeZero(tmpFreeVarDim, 1);
+            tmpC = FACTORY.makeZero(tmpFreeVarDim, 1);
             if (sourceModel.isMinimisation()) {
                 for (final IntIndex tmpKey : tmpObjExpr.getLinearKeySet()) {
                     final int tmpIndex = sourceModel.indexOfFreeVariable(tmpKey.index);
@@ -556,7 +559,7 @@ public abstract class ConvexSolver extends GenericSolver {
         if ((tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim) > 0) {
 
             final SparseStore<Double> tmpAI = SparseStore.PRIMITIVE.make(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim, tmpFreeVarDim);
-            final PhysicalStore<Double> tmpBI = PrimitiveDenseStore.FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim, 1);
+            final PhysicalStore<Double> tmpBI = FACTORY.makeZero(tmpUpExprDim + tmpUpVarDim + tmpLoExprDim + tmpLoVarDim, 1);
 
             if (tmpUpExprDim > 0) {
                 for (int i = 0; i < tmpUpExprDim; i++) {
@@ -628,7 +631,7 @@ public abstract class ConvexSolver extends GenericSolver {
 
         myMatrices = matrices;
 
-        mySolutionX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
+        mySolutionX = FACTORY.makeZero(this.countVariables(), 1L);
 
         mySolverQ = Cholesky.make(this.getMatrixQ());
         mySolverGeneral = LU.make(this.getMatrixQ());
@@ -643,17 +646,17 @@ public abstract class ConvexSolver extends GenericSolver {
 
     public final Optimisation.Result solve(final Optimisation.Result kickStarter) {
 
-        boolean tmpContinue = true;
+        boolean ok = true;
 
         if (options.validate) {
-            tmpContinue = this.validate();
+            ok = this.validate();
         }
 
-        if (tmpContinue) {
-            tmpContinue = this.initialise(kickStarter);
+        if (ok) {
+            ok = this.initialise(kickStarter);
         }
 
-        if (tmpContinue) {
+        if (ok) {
 
             this.resetIterationsCount();
 
@@ -826,8 +829,8 @@ public abstract class ConvexSolver extends GenericSolver {
         } else {
             if (this.isDebug()) {
                 options.debug_appender.println("KKT system unsolvable!");
-                options.debug_appender.printmtrx("KKT", this.getIterationKKT().collect(PrimitiveDenseStore.FACTORY));
-                options.debug_appender.printmtrx("RHS", this.getIterationRHS().collect(PrimitiveDenseStore.FACTORY));
+                options.debug_appender.printmtrx("KKT", this.getIterationKKT().collect(FACTORY));
+                options.debug_appender.printmtrx("RHS", this.getIterationRHS().collect(FACTORY));
             }
             return false;
         }

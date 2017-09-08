@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.*;
+import static org.ojalgo.constant.PrimitiveMath.ZERO;
 
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;
@@ -48,7 +48,7 @@ final class QPESolver extends ConstrainedSolver {
 
         super(matrices, solverOptions);
 
-        myIterationX = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables(), 1L);
+        myIterationX = FACTORY.makeZero(this.countVariables(), 1L);
     }
 
     private boolean isFeasible() {
@@ -99,7 +99,7 @@ final class QPESolver extends ConstrainedSolver {
         boolean solved = false;
 
         final PrimitiveDenseStore tmpIterX = myIterationX;
-        final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(tmpIterA.countRows(), 1L);
+        final PrimitiveDenseStore tmpIterL = FACTORY.makeZero(tmpIterA.countRows(), 1L);
 
         if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (solved = this.isSolvableQ())) {
             // Q is SPD
@@ -125,7 +125,7 @@ final class QPESolver extends ConstrainedSolver {
         if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
-            final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
+            final PrimitiveDenseStore tmpXL = FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
 
             if (solved = this.solveFullKKT(tmpXL)) {
                 tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
