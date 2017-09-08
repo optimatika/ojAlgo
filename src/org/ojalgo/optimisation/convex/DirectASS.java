@@ -62,7 +62,7 @@ final class DirectASS extends ActiveSetSolver {
         this.setConstraintToInclude(-1);
         final int[] incl = this.getIncluded();
 
-        boolean solvable = false;
+        boolean solved = false;
 
         final int numbConstr = this.countIterationConstraints();
         final int numbVars = this.countVariables();
@@ -71,7 +71,7 @@ final class DirectASS extends ActiveSetSolver {
         final PrimitiveDenseStore iterL = PrimitiveDenseStore.FACTORY.makeZero(numbConstr, 1L);
         final PrimitiveDenseStore soluL = this.getSolutionL();
 
-        if ((numbConstr < numbVars) && (solvable = this.isSolvableQ())) {
+        if ((numbConstr < numbVars) && (solved = this.isSolvableQ())) {
             // Q is SPD
 
             if (numbConstr == 0L) {
@@ -98,7 +98,7 @@ final class DirectASS extends ActiveSetSolver {
                     BasicLogger.debug("Negated Schur complement: " + Arrays.toString(incl), tmpS.get());
                 }
 
-                if (solvable = this.computeGeneral(tmpS)) {
+                if (solved = this.computeGeneral(tmpS)) {
 
                     this.getSolutionGeneral(this.getInvQC().premultiply(iterA).operateOnMatching(SUBTRACT, iterB), iterL);
 
@@ -112,12 +112,12 @@ final class DirectASS extends ActiveSetSolver {
             }
         }
 
-        if (!solvable) {
+        if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
             final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(numbVars + numbConstr, 1L);
 
-            if (solvable = this.solveFullKKT(tmpXL)) {
+            if (solved = this.solveFullKKT(tmpXL)) {
 
                 iterX.fillMatching(tmpXL.logical().limits(numbVars, 1).get());
                 iterL.fillMatching(tmpXL.logical().offsets(numbVars, 0).get());
@@ -125,7 +125,7 @@ final class DirectASS extends ActiveSetSolver {
         }
 
         soluL.fillAll(0.0);
-        if (solvable) {
+        if (solved) {
             for (int i = 0; i < this.countEqualityConstraints(); i++) {
                 soluL.set(i, iterL.doubleValue(i));
             }
@@ -134,7 +134,7 @@ final class DirectASS extends ActiveSetSolver {
             }
         }
 
-        this.handleSubsolution(solvable, iterX, incl);
+        this.handleSubsolution(solved, iterX, incl);
     }
 
 }

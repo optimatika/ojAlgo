@@ -58,18 +58,18 @@ final class UnconstrainedSolver extends ConvexSolver {
     @Override
     protected void performIteration() {
 
-        boolean solvable = true;
+        boolean solved = false;
 
-        if (solvable = this.isSolvableQ()) {
+        if (solved = this.isSolvableQ()) {
             // Q is SPD
 
             this.getSolutionQ(this.getMatrixC(), this.getSolutionX());
 
-        } else if (solvable = this.solveFullKKT(this.getSolutionX())) {
+        } else if (solved = this.solveFullKKT(this.getSolutionX())) {
             // Q not SPD, but the KKT system is solvable
         }
 
-        if (solvable) {
+        if (solved) {
             this.setState(State.DISTINCT);
         } else {
             this.setState(State.UNBOUNDED);

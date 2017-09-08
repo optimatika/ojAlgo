@@ -199,7 +199,7 @@ final class IterativeASS extends ActiveSetSolver {
         this.setConstraintToInclude(-1);
         final int[] incl = this.getIncluded();
 
-        boolean solvable = false;
+        boolean solved = false;
 
         if (toInclude >= 0) {
 
@@ -212,7 +212,7 @@ final class IterativeASS extends ActiveSetSolver {
 
         final PrimitiveDenseStore iterX = this.getIterationX();
 
-        if ((this.countIterationConstraints() < this.countVariables()) && (solvable = this.isSolvableQ())) {
+        if ((this.countIterationConstraints() < this.countVariables()) && (solved = this.isSolvableQ())) {
             // Q is SPD
 
             if (this.countIterationConstraints() == 0L) {
@@ -235,12 +235,12 @@ final class IterativeASS extends ActiveSetSolver {
             }
         }
 
-        if (!solvable) {
+        if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
             final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
 
-            if (solvable = this.solveFullKKT(tmpXL)) {
+            if (solved = this.solveFullKKT(tmpXL)) {
 
                 iterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
 
@@ -255,7 +255,7 @@ final class IterativeASS extends ActiveSetSolver {
             }
         }
 
-        this.handleSubsolution(solvable, iterX, incl);
+        this.handleSubsolution(solved, iterX, incl);
     }
 
     @Override

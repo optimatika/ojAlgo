@@ -96,12 +96,12 @@ final class QPESolver extends ConstrainedSolver {
         final MatrixStore<Double> tmpIterA = this.getIterationA();
         final MatrixStore<Double> tmpIterB = this.getIterationB();
 
-        boolean tmpSolvable = false;
+        boolean solved = false;
 
         final PrimitiveDenseStore tmpIterX = myIterationX;
         final PrimitiveDenseStore tmpIterL = PrimitiveDenseStore.FACTORY.makeZero(tmpIterA.countRows(), 1L);
 
-        if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (tmpSolvable = this.isSolvableQ())) {
+        if ((tmpIterA.countRows() < tmpIterA.countColumns()) && (solved = this.isSolvableQ())) {
             // Q is SPD
             // Actual/normal optimisation problem
 
@@ -111,7 +111,7 @@ final class QPESolver extends ConstrainedSolver {
             // Negated Schur complement
             final MatrixStore<Double> tmpS = tmpIterA.multiply(tmpInvQAT);
             // TODO Symmetric, only need to calculate halv the Schur complement
-            if (tmpSolvable = this.computeGeneral(tmpS)) {
+            if (solved = this.computeGeneral(tmpS)) {
 
                 // tmpX temporarely used to store tmpInvQC
                 final MatrixStore<Double> tmpInvQC = this.getSolutionQ(tmpIterC, tmpIterX); //TODO Constant if C doesn't change
@@ -122,18 +122,18 @@ final class QPESolver extends ConstrainedSolver {
 
         }
 
-        if (!tmpSolvable) {
+        if (!solved) {
             // The above failed, try solving the full KKT system instaed
 
             final PrimitiveDenseStore tmpXL = PrimitiveDenseStore.FACTORY.makeZero(this.countVariables() + this.countIterationConstraints(), 1L);
 
-            if (tmpSolvable = this.solveFullKKT(tmpXL)) {
+            if (solved = this.solveFullKKT(tmpXL)) {
                 tmpIterX.fillMatching(tmpXL.logical().limits(this.countVariables(), 1).get());
                 tmpIterL.fillMatching(tmpXL.logical().offsets(this.countVariables(), 0).get());
             }
         }
 
-        if (tmpSolvable) {
+        if (solved) {
 
             this.setState(State.OPTIMAL);
 
