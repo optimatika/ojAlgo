@@ -32,8 +32,6 @@ import org.ojalgo.access.Access2D;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.BigMath;
-import org.ojalgo.finance.portfolio.GitHubIssue24;
-import org.ojalgo.finance.portfolio.MarkowitzModel;
 import org.ojalgo.function.BigFunction;
 import org.ojalgo.function.multiary.CompoundFunction;
 import org.ojalgo.function.multiary.MultiaryFunction.TwiceDifferentiable;
@@ -1379,15 +1377,6 @@ public class ConvexProblems extends OptimisationConvexTests {
         }
 
         OptimisationConvexTests.assertDirectAndIterativeEquals(myBuilderI, null);
-    }
-
-    public void testP20160705() {
-
-        final MarkowitzModel tmpModel = GitHubIssue24.buildProblematicMarkowitzModel(true, true, DEBUG);
-
-        tmpModel.getWeights();
-
-        TestUtils.assertTrue(tmpModel.optimiser().getState().isFeasible());
     }
 
 }

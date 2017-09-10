@@ -16,18 +16,13 @@ import static org.ojalgo.constant.BigMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.List;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.finance.portfolio.FinancePortfolio;
-import org.ojalgo.finance.portfolio.PortfolioMixer;
-import org.ojalgo.finance.portfolio.SimplePortfolio;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.optimisation.Expression;
 import org.ojalgo.optimisation.ExpressionsBasedModel;
 import org.ojalgo.optimisation.Variable;
-import org.ojalgo.random.Uniform;
 
 public class StrategyMixer extends OptimisationIntegerTests {
 
@@ -37,65 +32,6 @@ public class StrategyMixer extends OptimisationIntegerTests {
 
     public StrategyMixer(final String someName) {
         super(someName);
-    }
-
-    public void testStratCombPortfolioMixerRandom() {
-
-        final FinancePortfolio tmpTarget = new SimplePortfolio(QUARTER, QUARTER, QUARTER, QUARTER).normalise();
-
-        final Uniform tmpGen = new Uniform();
-
-        final FinancePortfolio tmpStrat1 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
-                .normalise();
-        final FinancePortfolio tmpStrat2 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
-                .normalise();
-        final FinancePortfolio tmpStrat3 = new SimplePortfolio(tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue(), tmpGen.doubleValue())
-                .normalise();
-
-        final PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
-
-        final int tmpExpectedNumberOfStrategies = 2;
-        final List<BigDecimal> tmpStrategyWeights = tmpMixer.mix(tmpExpectedNumberOfStrategies);
-
-        int tmpUseCount = 0;
-        double tmpTotalWeight = 0D;
-
-        for (final BigDecimal tmpWeight : tmpStrategyWeights) {
-            if (tmpWeight.signum() != 0) {
-                tmpUseCount++;
-                tmpTotalWeight += tmpWeight.doubleValue();
-            }
-        }
-
-        TestUtils.assertEquals(tmpExpectedNumberOfStrategies, tmpUseCount);
-        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE / PrimitiveMath.HUNDRED);
-    }
-
-    public void testStratCombPortfolioMixer() {
-
-        final FinancePortfolio tmpTarget = new SimplePortfolio(THIRD, THIRD, THIRD).normalise();
-
-        final FinancePortfolio tmpStrat1 = new SimplePortfolio(HALF, HALF, ZERO);
-        final FinancePortfolio tmpStrat2 = new SimplePortfolio(HALF, ZERO, HALF);
-        final FinancePortfolio tmpStrat3 = new SimplePortfolio(ZERO, HALF, HALF);
-
-        final PortfolioMixer tmpMixer = new PortfolioMixer(tmpTarget, tmpStrat1, tmpStrat2, tmpStrat3);
-
-        final int tmpExpectedNumberOfStrategies = 2;
-        final List<BigDecimal> tmpStrategyWeights = tmpMixer.mix(tmpExpectedNumberOfStrategies);
-
-        int tmpUseCount = 0;
-        double tmpTotalWeight = 0D;
-
-        for (final BigDecimal tmpWeight : tmpStrategyWeights) {
-            if (tmpWeight.signum() != 0) {
-                tmpUseCount++;
-                tmpTotalWeight += tmpWeight.doubleValue();
-            }
-        }
-
-        TestUtils.assertEquals(tmpExpectedNumberOfStrategies, tmpUseCount);
-        TestUtils.assertEquals(PrimitiveMath.ONE, tmpTotalWeight, 1E-14 / PrimitiveMath.THREE);
     }
 
     /**

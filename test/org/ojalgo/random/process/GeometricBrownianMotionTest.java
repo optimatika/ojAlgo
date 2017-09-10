@@ -23,13 +23,9 @@ package org.ojalgo.random.process;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
 
-import java.util.List;
-
 import org.ojalgo.TestUtils;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.finance.data.DatePrice;
-import org.ojalgo.finance.data.YahooSymbol;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.random.ContinuousDistribution;
@@ -37,9 +33,6 @@ import org.ojalgo.random.LogNormal;
 import org.ojalgo.random.Normal;
 import org.ojalgo.random.RandomUtils;
 import org.ojalgo.random.SampleSet;
-import org.ojalgo.series.CalendarDateSeries;
-import org.ojalgo.series.primitive.PrimitiveSeries;
-import org.ojalgo.type.CalendarDateUnit;
 import org.ojalgo.type.context.NumberContext;
 
 /**
@@ -256,43 +249,6 @@ public class GeometricBrownianMotionTest extends RandomProcessTests {
             }
         }
 
-    }
-
-    public void testYahooWeeklyAAPL() {
-
-        final YahooSymbol tmpYahoo = new YahooSymbol("AAPL", CalendarDateUnit.WEEK);
-
-        final List<? extends DatePrice> tmpRows = tmpYahoo.getHistoricalPrices();
-
-        final CalendarDateSeries<Double> tmpDaySeries = new CalendarDateSeries<>(CalendarDateUnit.DAY);
-        tmpDaySeries.putAll(tmpRows);
-        final CalendarDateSeries<Double> tmpYearSeries = tmpDaySeries.resample(CalendarDateUnit.YEAR);
-        final CalendarDateSeries<Double> tmpMonthSeries = tmpDaySeries.resample(CalendarDateUnit.MONTH);
-
-        final PrimitiveSeries tmpDataY = tmpYearSeries.asPrimitive();
-        final PrimitiveSeries tmpDataM = tmpMonthSeries.asPrimitive();
-
-        final SampleSet tmpSetY = SampleSet.wrap(tmpDataY.log().differences());
-        final SampleSet tmpSetM = SampleSet.wrap(tmpDataM.log().differences());
-
-        final GeometricBrownianMotion tmpProcY = GeometricBrownianMotion.estimate(tmpDataY, 1.0);
-        tmpProcY.setValue(1.0);
-        final GeometricBrownianMotion tmpProcM = GeometricBrownianMotion.estimate(tmpDataM, 1.0 / 12.0);
-        tmpProcM.setValue(1.0);
-
-        LogNormal tmpExpDistr = new LogNormal(tmpSetY.getMean(), tmpSetY.getStandardDeviation());
-        LogNormal tmpActDistr = tmpProcY.getDistribution(1.0);
-
-        TestUtils.assertEquals("Yearly Expected", tmpExpDistr.getExpected(), tmpActDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
-        TestUtils.assertEquals("Yearly Var", tmpExpDistr.getVariance(), tmpActDistr.getVariance(), 1E-14 / PrimitiveMath.THREE);
-        TestUtils.assertEquals("Yearly StdDev", tmpExpDistr.getStandardDeviation(), tmpActDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
-
-        tmpExpDistr = new LogNormal(tmpSetM.getMean() * 12.0, tmpSetM.getStandardDeviation() * PrimitiveFunction.SQRT.invoke(12.0));
-        tmpActDistr = tmpProcM.getDistribution(1.0);
-
-        TestUtils.assertEquals("Monthly Expected", tmpExpDistr.getExpected(), tmpActDistr.getExpected(), 1E-14 / PrimitiveMath.THREE);
-        TestUtils.assertEquals("Monthly Var", tmpExpDistr.getVariance(), tmpActDistr.getVariance(), 1E-14 / PrimitiveMath.THREE);
-        TestUtils.assertEquals("Monthly StdDev", tmpExpDistr.getStandardDeviation(), tmpActDistr.getStandardDeviation(), 1E-14 / PrimitiveMath.THREE);
     }
 
     private void logDebug(final String aLabel, final double aGiven, final double aPlain, final double aLog, final double aProc, final double aGeom) {
