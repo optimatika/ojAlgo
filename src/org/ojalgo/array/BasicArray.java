@@ -86,7 +86,8 @@ public abstract class BasicArray<N extends Number> implements Access1D<N>, Acces
 
         @Override
         final BasicArray<N> makeStructuredZero(final long... structure) {
-            // Typically sparse, very large are also segmented, and very small are dense
+            // Typically sparse, but if very small then dense
+            // If very large then also segmented
 
             final long tmpTotal = StructureAnyD.count(structure);
 

@@ -1,7 +1,6 @@
 package org.ojalgo.array;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.random.Distribution;
 
 abstract class StrategyBuilder<N extends Number, I extends Access1D<N>, SB extends StrategyBuilder<N, I, SB>> {
 
@@ -12,19 +11,6 @@ abstract class StrategyBuilder<N extends Number, I extends Access1D<N>, SB exten
         super();
 
         myStrategy = new DenseCapacityStrategy<>(denseFactory);
-    }
-
-    /**
-     * Updates both the initial capacity and the capacity chunk.
-     *
-     * @param countDistribution A probability distribution that estimates the count/size of the "arrays" to be
-     *        created using this factory.
-     * @return this
-     */
-    @SuppressWarnings("unchecked")
-    public SB capacity(final Distribution countDistribution) {
-        myStrategy.capacity(countDistribution);
-        return (SB) this;
     }
 
     /**

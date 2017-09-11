@@ -6,7 +6,6 @@ import org.ojalgo.function.FunctionSet;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.aggregator.AggregatorSet;
 import org.ojalgo.machine.Hardware;
-import org.ojalgo.random.Distribution;
 import org.ojalgo.scalar.Scalar.Factory;
 
 /**
@@ -16,8 +15,11 @@ import org.ojalgo.scalar.Scalar.Factory;
  */
 final class DenseCapacityStrategy<N extends Number> {
 
-    static long CHUNK = 512L;
-    static long INITIAL = 8L;
+    /**
+     * 512
+     */
+    static long CHUNK = Hardware.OS_MEMORY_PAGE_SIZE / Primitive64Array.ELEMENT_SIZE;
+    static long INITIAL = 4L;
     static long LIMIT = Long.MAX_VALUE;
     static long SEGMENT = 32_768L;
 
@@ -55,36 +57,6 @@ final class DenseCapacityStrategy<N extends Number> {
         this.chunk(tmpMemoryPageElements);
     }
 
-    private long expandToLarge(final long required) {
-
-        long retVal = myChunk;
-
-        if (required >= myChunk) {
-            while (retVal < required) {
-                retVal += myChunk;
-            }
-        } else {
-            long maybe = retVal;
-            while ((maybe /= 2L) >= required) {
-                retVal = maybe;
-            }
-        }
-
-        return retVal;
-    }
-
-    private long expandToSmall(final long required) {
-
-        long maybe, retVal = myLimit;
-
-        while ((maybe = Math.round(retVal / PrimitiveMath.GOLDEN_RATIO)) >= required) {
-            retVal = maybe;
-        }
-
-        return retVal;
-
-    }
-
     protected AggregatorSet<N> aggregator() {
         return myDenseFactory.aggregator();
     }
@@ -95,18 +67,6 @@ final class DenseCapacityStrategy<N extends Number> {
 
     protected Factory<N> scalar() {
         return myDenseFactory.scalar();
-    }
-
-    DenseCapacityStrategy<N> capacity(final Distribution countDistribution) {
-
-        final double expected = countDistribution.getExpected();
-        final double stdDev = countDistribution.getStandardDeviation();
-
-        this.chunk((long) stdDev);
-
-        this.initial((long) (expected - (stdDev + stdDev)));
-
-        return this;
     }
 
     long chunk() {
@@ -131,14 +91,20 @@ final class DenseCapacityStrategy<N extends Number> {
             throw new IllegalStateException("Requires a count/size greater than the limit!");
         }
 
-        if (myLimit <= CHUNK) {
+        long retVal = myChunk;
 
-            return this.expandToSmall(required);
-
+        if (required >= myChunk) {
+            while (retVal < required) {
+                retVal += myChunk;
+            }
         } else {
-
-            return this.expandToLarge(required);
+            long maybe = retVal;
+            while ((maybe = Math.round(retVal / PrimitiveMath.GOLDEN_RATIO)) >= required) {
+                retVal = maybe;
+            }
         }
+
+        return retVal;
     }
 
     int initial() {
