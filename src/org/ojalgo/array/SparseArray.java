@@ -35,7 +35,6 @@ import org.ojalgo.function.NullaryFunction;
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.function.UnaryFunction;
 import org.ojalgo.function.VoidFunction;
-import org.ojalgo.netio.BasicLogger;
 import org.ojalgo.scalar.PrimitiveScalar;
 import org.ojalgo.scalar.Scalar;
 import org.ojalgo.type.context.NumberContext;
@@ -82,7 +81,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
         public void forEachRemaining(final Consumer<? super NonzeroView<N>> action) {
 
-            BasicLogger.debug("forEachRemaining [{}, {})", myCursor, myLastCursor);
+            // BasicLogger.debug("forEachRemaining [{}, {})", myCursor, myLastCursor);
 
             ElementView1D.super.forEachRemaining(action);
         }
