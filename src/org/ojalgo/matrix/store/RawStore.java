@@ -720,10 +720,6 @@ public final class RawStore extends Object implements PhysicalStore<Double>, Ser
         return data[(int) row][(int) col];
     }
 
-    public boolean equals(final MatrixStore<Double> other, final NumberContext context) {
-        return Access2D.equals(this, other, context);
-    }
-
     @Override
     public boolean equals(final Object other) {
         if (other instanceof Access2D<?>) {

@@ -46,7 +46,6 @@ import org.ojalgo.matrix.transformation.Householder;
 import org.ojalgo.matrix.transformation.Rotation;
 import org.ojalgo.scalar.ComplexNumber;
 import org.ojalgo.scalar.Scalar;
-import org.ojalgo.type.context.NumberContext;
 
 /**
  * @deprecated Experimental code. Doesn't work and may never do so.
@@ -148,11 +147,6 @@ final class GenericDenseStore<N extends Number & Scalar<N>> implements PhysicalS
 
     public ElementView2D<N, ?> elements() {
         return myUtility.elements();
-    }
-
-    public boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     public void exchangeColumns(final long colA, final long colB) {

@@ -637,10 +637,6 @@ public final class ComplexDenseStore extends ComplexArray implements PhysicalSto
         return this.doubleValue(aRow + (aCol * myRowDim));
     }
 
-    public boolean equals(final MatrixStore<ComplexNumber> other, final NumberContext context) {
-        return Access2D.equals(this, other, context);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public boolean equals(final Object anObj) {

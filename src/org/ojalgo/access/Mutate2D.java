@@ -78,6 +78,18 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillColumn(0L, col, supplier);
         }
 
+        default void fillDiagonal(final Access1D<N> values) {
+            this.fillDiagonal(0L, 0L, values);
+        }
+
+        default void fillDiagonal(final N value) {
+            this.fillDiagonal(0L, 0L, value);
+        }
+
+        default void fillDiagonal(final NullaryFunction<N> supplier) {
+            this.fillDiagonal(0L, 0L, supplier);
+        }
+
         default void fillDiagonal(final long row, final long col, final Access1D<N> values) {
             this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, values.get(r - row)));
         }

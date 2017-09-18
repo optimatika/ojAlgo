@@ -37,6 +37,14 @@ public interface Factory1D<I extends Structure1D> extends FactorySupplement {
 
     I makeFilled(long count, NullaryFunction<?> supplier);
 
+    default I makeFilled(final Structure1D shape, final NullaryFunction<?> supplier) {
+        return this.makeFilled(shape.count(), supplier);
+    }
+
     I makeZero(long count);
+
+    default I makeZero(final Structure1D shape) {
+        return this.makeZero(shape.count());
+    }
 
 }

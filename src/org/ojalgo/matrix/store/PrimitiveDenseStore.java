@@ -659,10 +659,6 @@ public final class PrimitiveDenseStore extends Primitive64Array implements Physi
         return myUtility.doubleValue(aRow, aCol);
     }
 
-    public boolean equals(final MatrixStore<Double> other, final NumberContext context) {
-        return Access2D.equals(this, other, context);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public boolean equals(final Object anObj) {

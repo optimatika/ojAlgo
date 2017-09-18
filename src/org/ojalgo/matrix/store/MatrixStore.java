@@ -512,9 +512,18 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
      *
      * @return A new {@linkplain PhysicalStore} copy.
      */
-    PhysicalStore<N> copy();
+    default PhysicalStore<N> copy() {
 
-    boolean equals(MatrixStore<N> other, NumberContext context);
+        final PhysicalStore<N> retVal = this.physical().makeZero(this);
+
+        this.supplyTo(retVal);
+
+        return retVal;
+    }
+
+    default boolean equals(final MatrixStore<N> other, final NumberContext context) {
+        return Access2D.equals(this, other, context);
+    }
 
     /**
      * The default value is simply <code>0</code>, and if all elements are zeros then
@@ -542,8 +551,16 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return this;
     }
 
+    default boolean isAbsolute(final long row, final long col) {
+        return this.toScalar(row, col).isAbsolute();
+    }
+
     default boolean isSmall(final double comparedTo) {
         return PrimitiveScalar.isSmall(comparedTo, this.norm());
+    }
+
+    default boolean isSmall(final long row, final long col, final double comparedTo) {
+        return this.toScalar(row, col).isSmall(comparedTo);
     }
 
     /**
@@ -604,7 +621,19 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
      * @param leftAndRight The argument vector
      * @return A scalar (extracted from the resulting 1 x 1 matrix)
      */
-    N multiplyBoth(final Access1D<N> leftAndRight);
+    default N multiplyBoth(final Access1D<N> leftAndRight) {
+
+        final PhysicalStore<N> tmpStep1 = this.physical().makeZero(1L, leftAndRight.count());
+        final PhysicalStore<N> tmpStep2 = this.physical().makeZero(1L, 1L);
+
+        final PhysicalStore<N> tmpLeft = this.physical().rows(leftAndRight);
+        tmpLeft.modifyAll(this.physical().function().conjugate());
+        tmpStep1.fillByMultiplying(tmpLeft.conjugate(), this);
+
+        tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
+
+        return tmpStep2.get(0L);
+    }
 
     default MatrixStore<N> negate() {
         return this.operateOnAll(this.physical().function().negate()).get();
@@ -707,6 +736,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
 
     default MatrixStore<N> subtract(final MatrixStore<N> subtrahend) {
         return this.operateOnMatching(this.physical().function().subtract(), subtrahend).get();
+    }
+
+    default void supplyTo(final ElementsConsumer<N> receiver) {
+        receiver.fillMatching(this);
     }
 
     default Scalar<N> toScalar(final long row, final long column) {

@@ -618,10 +618,6 @@ public final class BigDenseStore extends BigArray implements PhysicalStore<BigDe
         return myUtility.doubleValue(aRow, aCol);
     }
 
-    public boolean equals(final MatrixStore<BigDecimal> other, final NumberContext context) {
-        return Access2D.equals(this, other, context);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public boolean equals(final Object anObj) {

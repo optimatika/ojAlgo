@@ -42,7 +42,15 @@ public interface Factory2D<I extends Structure2D> extends FactorySupplement {
 
     I makeFilled(long rows, long columns, NullaryFunction<?> supplier);
 
+    default I makeFilled(final Structure2D shape, final NullaryFunction<?> supplier) {
+        return this.makeFilled(shape.countRows(), shape.countColumns(), supplier);
+    }
+
     I makeZero(long rows, long columns);
+
+    default I makeZero(final Structure2D shape) {
+        return this.makeZero(shape.countRows(), shape.countColumns());
+    }
 
     I rows(Access1D<?>... source);
 

@@ -25,7 +25,6 @@ import java.io.Serializable;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.Access2D;
 import org.ojalgo.matrix.MatrixUtils;
 import org.ojalgo.type.context.NumberContext;
 
@@ -68,10 +67,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return myRowDim;
     }
 
-    public final boolean equals(final MatrixStore<N> other, final NumberContext context) {
-        return Access2D.equals(this, other, context);
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public final boolean equals(final Object someObj) {
@@ -91,17 +86,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         return MatrixUtils.hashCode(this);
     }
 
-    public boolean isAbsolute(final long row, final long col) {
-        return this.toScalar(row, col).isAbsolute();
-    }
-
-    /**
-     * @see org.ojalgo.access.Access2D.Elements#isSmall(long, long, double)
-     */
-    public boolean isSmall(final long row, final long col, final double comparedTo) {
-        return this.toScalar(row, col).isSmall(comparedTo);
-    }
-
     public int limitOfColumn(final int col) {
         return myRowDim;
     }
@@ -112,20 +96,20 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
 
     public N multiplyBoth(final Access1D<N> leftAndRight) {
 
-        final PhysicalStore<N> tmpStep1 = this.physical().makeZero(1L, leftAndRight.count());
-        final PhysicalStore<N> tmpStep2 = this.physical().makeZero(1L, 1L);
-
         if (this.isPrimitive()) {
+
+            final PhysicalStore<N> tmpStep1 = this.physical().makeZero(1L, leftAndRight.count());
             tmpStep1.fillByMultiplying(leftAndRight, this);
+
+            final PhysicalStore<N> tmpStep2 = this.physical().makeZero(1L, 1L);
+            tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
+
+            return tmpStep2.get(0L);
+
         } else {
-            final PhysicalStore<N> tmpLeft = this.physical().rows(leftAndRight);
-            tmpLeft.modifyAll(this.physical().function().conjugate());
-            tmpStep1.fillByMultiplying(tmpLeft.conjugate(), this);
+
+            return MatrixStore.super.multiplyBoth(leftAndRight);
         }
-
-        tmpStep2.fillByMultiplying(tmpStep1, leftAndRight);
-
-        return tmpStep2.get(0L);
     }
 
     public void supplyTo(final ElementsConsumer<N> receiver) {

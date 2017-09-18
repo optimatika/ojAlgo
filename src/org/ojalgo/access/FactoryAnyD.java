@@ -29,6 +29,14 @@ public interface FactoryAnyD<I extends StructureAnyD> extends FactorySupplement 
 
     I makeFilled(long[] structure, NullaryFunction<?> supplier);
 
+    default I makeFilled(final StructureAnyD shape, final NullaryFunction<?> supplier) {
+        return this.makeFilled(shape.shape(), supplier);
+    }
+
     I makeZero(long... structure);
+
+    default I makeZero(final StructureAnyD shape) {
+        return this.makeZero(shape.shape());
+    }
 
 }
