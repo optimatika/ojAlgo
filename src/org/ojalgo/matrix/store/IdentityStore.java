@@ -125,6 +125,13 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
         return super.premultiply(left);
     }
 
+    public void supplyTo(final ElementsConsumer<N> receiver) {
+
+        receiver.reset();
+
+        receiver.fillDiagonal(this.physical().scalar().one().getNumber());
+    }
+
     public Scalar<N> toScalar(final long row, final long column) {
         if (row == column) {
             return this.physical().scalar().one();
@@ -136,10 +143,6 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
     @Override
     public MatrixStore<N> transpose() {
         return this;
-    }
-
-    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
-        consumer.fillDiagonal(0L, 0L, this.physical().scalar().one().getNumber());
     }
 
 }

@@ -96,15 +96,15 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
 
     }
 
-    public Scalar<N> toScalar(final long row, final long column) {
-        return this.getBase().toScalar(myRows[(int) row], column);
-    }
-
-    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
+    public void supplyTo(final ElementsConsumer<N> consumer) {
         final MatrixStore<N> tmpBase = this.getBase();
         for (int r = 0; r < myRows.length; r++) {
             consumer.fillRow(r, 0, tmpBase.sliceRow(myRows[r], 0));
         }
+    }
+
+    public Scalar<N> toScalar(final long row, final long column) {
+        return this.getBase().toScalar(myRows[(int) row], column);
     }
 
 }

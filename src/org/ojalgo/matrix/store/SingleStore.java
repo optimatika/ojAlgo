@@ -101,6 +101,10 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
         return super.premultiply(left);
     }
 
+    public void supplyTo(final ElementsConsumer<N> receiver) {
+        receiver.fillOne(0L, 0L, myNumber);
+    }
+
     public Scalar<N> toScalar(final long row, final long column) {
         return this.physical().scalar().convert(myNumber);
     }
@@ -108,10 +112,6 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
     @Override
     public MatrixStore<N> transpose() {
         return this;
-    }
-
-    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
-        consumer.fillOne(0L, 0L, myNumber);
     }
 
 }

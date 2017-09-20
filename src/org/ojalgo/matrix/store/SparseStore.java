@@ -21,7 +21,7 @@
  */
 package org.ojalgo.matrix.store;
 
-import static org.ojalgo.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.constant.PrimitiveMath.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -365,12 +365,15 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         this.updateNonZeros(row, col);
     }
 
-    private void updateNonZeros(final long row, final long col) {
-        this.updateNonZeros((int) row, (int) col);
+    public void supplyTo(final ElementsConsumer<N> receiver) {
+
+        receiver.reset();
+
+        myElements.supplyNonZerosTo(receiver);
     }
 
-    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
-        myElements.supplyNonZerosTo(consumer);
+    private void updateNonZeros(final long row, final long col) {
+        this.updateNonZeros((int) row, (int) col);
     }
 
     void updateNonZeros(final int row, final int col) {

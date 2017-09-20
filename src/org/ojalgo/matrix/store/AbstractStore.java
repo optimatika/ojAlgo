@@ -50,15 +50,6 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         myColDim = numberOfColumns;
     }
 
-    public final PhysicalStore<N> copy() {
-
-        final PhysicalStore<N> retVal = this.physical().makeZero(this);
-
-        this.addNonzerosTo(retVal);
-
-        return retVal;
-    }
-
     public long countColumns() {
         return myColDim;
     }
@@ -112,18 +103,9 @@ abstract class AbstractStore<N extends Number> implements MatrixStore<N>, Serial
         }
     }
 
-    public void supplyTo(final ElementsConsumer<N> receiver) {
-        receiver.reset();
-        this.addNonzerosTo(receiver);
-    }
-
     @Override
     public final String toString() {
         return MatrixUtils.toString(this);
-    }
-
-    void addNonzerosTo(final ElementsConsumer<N> consumer) {
-        consumer.modifyMatching(this.physical().function().add(), this);
     }
 
     protected final int getColDim() {

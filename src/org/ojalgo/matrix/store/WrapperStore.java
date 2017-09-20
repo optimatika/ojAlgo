@@ -84,8 +84,4 @@ final class WrapperStore<N extends Number> extends FactoryStore<N> {
         return super.premultiply(left);
     }
 
-    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
-        consumer.modifyMatching(this.physical().function().add(), this);
-    }
-
 }

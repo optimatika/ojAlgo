@@ -110,6 +110,10 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
         return new ZeroStore<>(this.physical(), (int) (left.count() / this.getRowDim()), this.getColDim());
     }
 
+    public void supplyTo(final ElementsConsumer<N> receiver) {
+        receiver.reset();
+    }
+
     public Scalar<N> toScalar(final long row, final long column) {
         return myScalarZero;
     }
@@ -117,9 +121,6 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
     @Override
     public MatrixStore<N> transpose() {
         return new ZeroStore<>(this.physical(), this.getColDim(), this.getRowDim());
-    }
-
-    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
     }
 
 }

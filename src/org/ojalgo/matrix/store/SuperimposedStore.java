@@ -113,6 +113,11 @@ final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
         return super.premultiply(left);
     }
 
+    public void supplyTo(final ElementsConsumer<N> consumer) {
+        consumer.fillMatching(this.getBase());
+        consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.physical().function().add(), myDiff);
+    }
+
     public Scalar<N> toScalar(final long row, final long column) {
 
         Scalar<N> retVal = this.getBase().toScalar(row, column);
@@ -126,11 +131,6 @@ final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
 
     private final boolean isCovered(final int row, final int column) {
         return (myRowFirst <= row) && (myColFirst <= column) && (row < myRowLimit) && (column < myColLimit);
-    }
-
-    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
-        consumer.fillMatching(this.getBase());
-        consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.physical().function().add(), myDiff);
     }
 
 }

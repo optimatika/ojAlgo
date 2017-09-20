@@ -521,6 +521,10 @@ public interface MatrixStore<N extends Number> extends ElementsSupplier<N>, Acce
         return retVal;
     }
 
+    default double doubleValue(final long row, final long col) {
+        return this.get(row, col).doubleValue();
+    }
+
     default boolean equals(final MatrixStore<N> other, final NumberContext context) {
         return Access2D.equals(this, other, context);
     }
