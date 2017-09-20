@@ -62,14 +62,4 @@ abstract class TransjugatedStore<N extends Number> extends LogicalStore<N> {
         return this.getBase().limitOfColumn(row);
     }
 
-    @Override
-    public void supplyTo(final ElementsConsumer<N> receiver) {
-        this.addNonzerosTo(receiver);
-    }
-
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
-        consumer.fillMatching(this);
-    }
-
 }

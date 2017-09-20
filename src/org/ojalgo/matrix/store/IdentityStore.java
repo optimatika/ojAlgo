@@ -138,8 +138,7 @@ final class IdentityStore<N extends Number> extends FactoryStore<N> {
         return this;
     }
 
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
+    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillDiagonal(0L, 0L, this.physical().scalar().one().getNumber());
     }
 

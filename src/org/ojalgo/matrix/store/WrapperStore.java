@@ -53,45 +53,39 @@ final class WrapperStore<N extends Number> extends FactoryStore<N> {
         return this.physical().scalar().cast(myAccess.get(aRow, aCol));
     }
 
-    public void multiply(Access1D<N> right, ElementsConsumer<N> target) {
+    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
         // TODO Auto-generated method stub
         super.multiply(right, target);
     }
 
-    public MatrixStore<N> multiply(double scalar) {
+    public MatrixStore<N> multiply(final double scalar) {
         // TODO Auto-generated method stub
         return super.multiply(scalar);
     }
 
-    public MatrixStore<N> multiply(MatrixStore<N> right) {
+    public MatrixStore<N> multiply(final MatrixStore<N> right) {
         // TODO Auto-generated method stub
         return super.multiply(right);
     }
 
-    public MatrixStore<N> multiply(N scalar) {
+    public MatrixStore<N> multiply(final N scalar) {
         // TODO Auto-generated method stub
         return super.multiply(scalar);
     }
 
     @Override
-    public N multiplyBoth(Access1D<N> leftAndRight) {
+    public N multiplyBoth(final Access1D<N> leftAndRight) {
         // TODO Auto-generated method stub
         return super.multiplyBoth(leftAndRight);
     }
 
-    public ElementsSupplier<N> premultiply(Access1D<N> left) {
+    public ElementsSupplier<N> premultiply(final Access1D<N> left) {
         // TODO Auto-generated method stub
         return super.premultiply(left);
     }
 
-    @Override
-    public void supplyTo(final ElementsConsumer<N> receiver) {
-        this.addNonzerosTo(receiver);
-    }
-
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
-        consumer.fillMatching(myAccess);
+    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
+        consumer.modifyMatching(this.physical().function().add(), this);
     }
 
 }

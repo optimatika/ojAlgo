@@ -27,9 +27,4 @@ abstract class ComposingStore<N extends Number> extends LogicalStore<N> {
         super(base, rowsCount, columnsCount);
     }
 
-    @Override
-    public void supplyTo(final ElementsConsumer<N> receiver) {
-        this.addNonzerosTo(receiver);
-    }
-
 }

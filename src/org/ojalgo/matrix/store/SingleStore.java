@@ -63,12 +63,12 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
         return myNumber;
     }
 
-    public void multiply(Access1D<N> right, ElementsConsumer<N> target) {
+    public void multiply(final Access1D<N> right, final ElementsConsumer<N> target) {
         // TODO Auto-generated method stub
         super.multiply(right, target);
     }
 
-    public MatrixStore<N> multiply(double scalar) {
+    public MatrixStore<N> multiply(final double scalar) {
         // TODO Auto-generated method stub
         return super.multiply(scalar);
     }
@@ -85,25 +85,20 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
         return retVal;
     }
 
-    public MatrixStore<N> multiply(N scalar) {
+    public MatrixStore<N> multiply(final N scalar) {
         // TODO Auto-generated method stub
         return super.multiply(scalar);
     }
 
     @Override
-    public N multiplyBoth(Access1D<N> leftAndRight) {
+    public N multiplyBoth(final Access1D<N> leftAndRight) {
         // TODO Auto-generated method stub
         return super.multiplyBoth(leftAndRight);
     }
 
-    public ElementsSupplier<N> premultiply(Access1D<N> left) {
+    public ElementsSupplier<N> premultiply(final Access1D<N> left) {
         // TODO Auto-generated method stub
         return super.premultiply(left);
-    }
-
-    @Override
-    public void supplyTo(final ElementsConsumer<N> receiver) {
-        this.addNonzerosTo(receiver);
     }
 
     public Scalar<N> toScalar(final long row, final long column) {
@@ -115,8 +110,7 @@ final class SingleStore<N extends Number> extends FactoryStore<N> {
         return this;
     }
 
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
+    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillOne(0L, 0L, myNumber);
     }
 

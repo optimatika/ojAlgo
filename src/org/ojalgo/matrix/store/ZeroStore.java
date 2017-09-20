@@ -119,8 +119,7 @@ final class ZeroStore<N extends Number> extends FactoryStore<N> {
         return new ZeroStore<>(this.physical(), this.getColDim(), this.getRowDim());
     }
 
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
+    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
     }
 
 }

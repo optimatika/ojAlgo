@@ -128,8 +128,7 @@ final class SuperimposedStore<N extends Number> extends ComposingStore<N> {
         return (myRowFirst <= row) && (myColFirst <= column) && (row < myRowLimit) && (column < myColLimit);
     }
 
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
+    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
         consumer.fillMatching(this.getBase());
         consumer.regionByLimits(myRowLimit, myColLimit).regionByOffsets(myRowFirst, myColFirst).modifyMatching(this.physical().function().add(), myDiff);
     }

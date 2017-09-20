@@ -369,8 +369,7 @@ public final class SparseStore<N extends Number> extends FactoryStore<N> impleme
         this.updateNonZeros((int) row, (int) col);
     }
 
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
+    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
         myElements.supplyNonZerosTo(consumer);
     }
 

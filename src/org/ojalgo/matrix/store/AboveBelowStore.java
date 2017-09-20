@@ -157,9 +157,4 @@ final class AboveBelowStore<N extends Number> extends ComposingStore<N> {
         return (row >= mySplit) ? myBelow.toScalar(row - mySplit, column) : this.getBase().toScalar(row, column);
     }
 
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
-        this.supplyTo(consumer);
-    }
-
 }

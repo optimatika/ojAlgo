@@ -33,8 +33,7 @@ abstract class ShadingStore<N extends Number> extends LogicalStore<N> {
         super(base, rowsCount, columnsCount);
     }
 
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
+    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
 
         final int tmpColDim = this.getColDim();
 

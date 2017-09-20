@@ -148,9 +148,4 @@ final class LeftRightStore<N extends Number> extends ComposingStore<N> {
         return (column >= mySplit) ? myRight.toScalar(row, column - mySplit) : this.getBase().toScalar(row, column);
     }
 
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
-        this.supplyTo(consumer);
-    }
-
 }

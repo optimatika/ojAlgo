@@ -100,8 +100,7 @@ final class RowsStore<N extends Number> extends SelectingStore<N> {
         return this.getBase().toScalar(myRows[(int) row], column);
     }
 
-    @Override
-    protected void addNonzerosTo(final ElementsConsumer<N> consumer) {
+    @Override void addNonzerosTo(final ElementsConsumer<N> consumer) {
         final MatrixStore<N> tmpBase = this.getBase();
         for (int r = 0; r < myRows.length; r++) {
             consumer.fillRow(r, 0, tmpBase.sliceRow(myRows[r], 0));
