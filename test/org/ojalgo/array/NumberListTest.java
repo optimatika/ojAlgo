@@ -21,7 +21,12 @@
  */
 package org.ojalgo.array;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.ojalgo.TestUtils;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * NumberListTest
@@ -30,12 +35,72 @@ import org.ojalgo.TestUtils;
  */
 public class NumberListTest extends ArrayTests {
 
+    private static final NumberContext CONTEXT = new NumberContext();
+    static final Random RANDOM = new Random();
+
     public NumberListTest() {
         super();
     }
 
     public NumberListTest(final String aName) {
         super(aName);
+    }
+
+    public void testCompareWithArrayList() {
+
+        NumberList<Double> primit64List = NumberList.factory(Primitive64Array.FACTORY).make();
+        NumberList<Double> direct64List = NumberList.factory(BufferArray.DIRECT64).make();
+
+        List<Double> expectedList = new ArrayList<Double>();
+
+        for (int c = 0; c < 10_000; c++) {
+
+            Double value = RANDOM.nextDouble();
+
+            primit64List.add(value);
+            direct64List.add(value);
+            expectedList.add(value);
+        }
+
+        for (int c = 0; c < 100; c++) {
+
+            int index = RANDOM.nextInt(10_000);
+            Double value = RANDOM.nextDouble();
+
+            primit64List.add(index, value);
+            direct64List.add(index, value);
+            expectedList.add(index, value);
+        }
+
+        for (int c = 0; c < 100; c++) {
+
+            int index = RANDOM.nextInt(10_000);
+            Double value = RANDOM.nextDouble();
+
+            primit64List.set(index, value);
+            direct64List.set(index, value);
+            expectedList.set(index, value);
+        }
+
+        for (int c = 0; c < 100; c++) {
+
+            int index = RANDOM.nextInt(10_000);
+
+            primit64List.remove(index);
+            direct64List.remove(index);
+            expectedList.remove(index);
+        }
+
+        TestUtils.assertEquals(expectedList.size(), primit64List.size());
+        TestUtils.assertEquals(expectedList.size(), direct64List.size());
+
+        for (int i = 0; i < expectedList.size(); i++) {
+            TestUtils.assertEquals(expectedList.get(i).doubleValue(), primit64List.get(i).doubleValue(), CONTEXT);
+            TestUtils.assertEquals(expectedList.get(i).doubleValue(), primit64List.doubleValue(i), CONTEXT);
+            TestUtils.assertEquals(expectedList.get(i).doubleValue(), direct64List.get(i).doubleValue(), CONTEXT);
+            TestUtils.assertEquals(expectedList.get(i).doubleValue(), direct64List.doubleValue(i), CONTEXT);
+        }
+
     }
 
     public void testGrowCapacity() {

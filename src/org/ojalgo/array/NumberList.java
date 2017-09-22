@@ -93,17 +93,25 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         myActualCount = 0L;
     }
 
-    public boolean add(final double e) {
+    public boolean add(final double element) {
 
         this.ensureCapacity();
 
-        myStorage.set(myActualCount++, e);
+        myStorage.set(myActualCount++, element);
 
         return true;
     }
 
     public void add(final int index, final N element) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
+
+        this.ensureCapacity();
+
+        for (long i = (myActualCount - 1); i >= index; i--) {
+            myStorage.set(i + 1, myStorage.get(i));
+        }
+        myStorage.set(index, element);
+
+        myActualCount++;
     }
 
     public void add(final long index, final double addend) {
@@ -122,11 +130,11 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         }
     }
 
-    public boolean add(final N e) {
+    public boolean add(final N element) {
 
         this.ensureCapacity();
 
-        myStorage.set(myActualCount++, e);
+        myStorage.set(myActualCount++, element);
 
         return true;
     }
@@ -145,9 +153,12 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         return true;
     }
 
-    public boolean addAll(final int index, final Collection<? extends N> c) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
-        return false;
+    public boolean addAll(final int index, final Collection<? extends N> elements) {
+        int counter = 0;
+        for (N value : elements) {
+            this.add(index + counter++, value);
+        }
+        return elements.size() > 0;
     }
 
     /**
@@ -289,28 +300,55 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public N remove(final int index) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
-        return null;
+
+        final N oldValue = myStorage.get(index);
+
+        myActualCount--;
+
+        for (long i = index; i < myActualCount; i++) {
+            myStorage.set(i, myStorage.get(i + 1));
+        }
+
+        return oldValue;
     }
 
     public boolean remove(final Object o) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
-        return false;
+        int index = this.indexOf(o);
+        if (index >= 0) {
+            this.remove(index);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean removeAll(final Collection<?> c) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
-        return false;
+        boolean retVal = false;
+        for (Object o : c) {
+            retVal &= this.remove(o);
+        }
+        return retVal;
     }
 
-    public boolean retainAll(final Collection<?> c) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
-        return false;
+    public boolean retainAll(final Collection<?> onlyKeep) {
+        boolean retVal = false;
+        final Object[] values = this.toArray();
+        for (Object v : values) {
+            if (!onlyKeep.contains(v)) {
+                retVal &= this.remove(v);
+            }
+        }
+        return retVal;
     }
 
     public N set(final int index, final N element) {
-        ProgrammingError.throwForUnsupportedOptionalOperation();
-        return null;
+        if (index >= myActualCount) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            N previous = myStorage.get(index);
+            myStorage.set(index, element);
+            return previous;
+        }
     }
 
     public void set(final long index, final double value) {
