@@ -16,6 +16,14 @@ import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.type.context.NumberContext;
 
+/**
+ * A {@link SortedMap} with primitive valued long keys and {@link Number} values (incl. possibly primitive
+ * double values). The main benefits of using this class is its use of primitive keys and values, and how it
+ * integrates with other parts of ojAlgo. As a general purpose {@link Map} implementation (usage with high
+ * frequency of randomly ordered put and remove operations) it is not very efficient.
+ *
+ * @author apete
+ */
 public final class LongToNumberMap<N extends Number> implements SortedMap<Long, N>, Access1D<N>, Mutate1D.Mixable<N> {
 
     public static final class MapFactory<N extends Number> extends StrategyBuilder<N, LongToNumberMap<N>, MapFactory<N>> {
@@ -208,7 +216,7 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
             final int tmpIndex = myStorage.index(key);
             final double oldValue = tmpIndex >= 0 ? myStorage.doubleValueInternally(tmpIndex) : PrimitiveMath.NaN;
             final double newValue = tmpIndex >= 0 ? mixer.invoke(oldValue, addend) : addend;
-            myStorage.doSet(key, tmpIndex, newValue, true);
+            myStorage.put(key, tmpIndex, newValue);
             return newValue;
         }
     }
@@ -219,23 +227,23 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
             final int tmpIndex = myStorage.index(key);
             final N oldValue = tmpIndex >= 0 ? myStorage.getInternally(tmpIndex) : null;
             final N newValue = tmpIndex >= 0 ? mixer.invoke(oldValue, addend) : addend;
-            myStorage.doSet(key, tmpIndex, newValue, true);
+            myStorage.put(key, tmpIndex, newValue);
             return newValue;
         }
     }
 
     public double put(final long key, final double value) {
-        final int tmpIndex = myStorage.index(key);
-        final double tmpOldValue = tmpIndex >= 0 ? myStorage.doubleValueInternally(tmpIndex) : PrimitiveMath.NaN;
-        myStorage.doSet(key, tmpIndex, value, true);
-        return tmpOldValue;
+        final int index = myStorage.index(key);
+        final double oldValue = index >= 0 ? myStorage.doubleValueInternally(index) : PrimitiveMath.NaN;
+        myStorage.put(key, index, value);
+        return oldValue;
     }
 
     public N put(final long key, final N value) {
-        final int tmpIndex = myStorage.index(key);
-        final N tmpOldValue = tmpIndex >= 0 ? myStorage.getInternally(tmpIndex) : null;
-        myStorage.doSet(key, tmpIndex, value, true);
-        return tmpOldValue;
+        final int index = myStorage.index(key);
+        final N oldValue = index >= 0 ? myStorage.getInternally(index) : null;
+        myStorage.put(key, index, value);
+        return oldValue;
     }
 
     public N put(final Long key, final N value) {
@@ -261,9 +269,10 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     }
 
     public N remove(final long key) {
-        final N tmpOldVal = myStorage.get(key);
-        myStorage.set(key, 0.0);
-        return tmpOldVal;
+        final int index = myStorage.index(key);
+        final N oldValue = index >= 0 ? myStorage.getInternally(index) : null;
+        myStorage.remove(key, index);
+        return oldValue;
     }
 
     public N remove(final Object key) {
@@ -309,18 +318,18 @@ public final class LongToNumberMap<N extends Number> implements SortedMap<Long, 
     @Override
     public String toString() {
 
-        NonzeroView<N> nz = myStorage.nonzeros();
+        final NonzeroView<N> nz = myStorage.nonzeros();
 
         if (!nz.hasNext()) {
             return "{}";
         }
 
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append('{');
         for (;;) {
-            NonzeroView<N> entry = nz.next();
-            long key = entry.index();
-            N value = entry.getNumber();
+            final NonzeroView<N> entry = nz.next();
+            final long key = entry.index();
+            final N value = entry.getNumber();
             builder.append(key);
             builder.append('=');
             builder.append(value);

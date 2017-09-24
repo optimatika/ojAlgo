@@ -21,6 +21,7 @@
  */
 package org.ojalgo.array;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +40,13 @@ import org.ojalgo.access.Mutate1D;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.VoidFunction;
 
+/**
+ * Think of this as an {@link ArrayList} that can only contain numbers, but with a few extra features. Among
+ * other things it can be arbitrarily large (using long indices rather than int) and contain primitive double
+ * values. And of course it integrates perfectly with everything else in ojAlgo.
+ *
+ * @author apete
+ */
 public final class NumberList<N extends Number> implements List<N>, RandomAccess, Access1D<N>, Access1D.Visitable<N>, Mutate1D, Mutate1D.Mixable<N> {
 
     public static final class ListFactory<N extends Number> extends StrategyBuilder<N, NumberList<N>, ListFactory<N>> {
@@ -155,7 +163,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
     public boolean addAll(final int index, final Collection<? extends N> elements) {
         int counter = 0;
-        for (N value : elements) {
+        for (final N value : elements) {
             this.add(index + counter++, value);
         }
         return elements.size() > 0;
@@ -313,7 +321,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     }
 
     public boolean remove(final Object o) {
-        int index = this.indexOf(o);
+        final int index = this.indexOf(o);
         if (index >= 0) {
             this.remove(index);
             return true;
@@ -324,7 +332,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
 
     public boolean removeAll(final Collection<?> c) {
         boolean retVal = false;
-        for (Object o : c) {
+        for (final Object o : c) {
             retVal &= this.remove(o);
         }
         return retVal;
@@ -333,7 +341,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
     public boolean retainAll(final Collection<?> onlyKeep) {
         boolean retVal = false;
         final Object[] values = this.toArray();
-        for (Object v : values) {
+        for (final Object v : values) {
             if (!onlyKeep.contains(v)) {
                 retVal &= this.remove(v);
             }
@@ -345,7 +353,7 @@ public final class NumberList<N extends Number> implements List<N>, RandomAccess
         if (index >= myActualCount) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
-            N previous = myStorage.get(index);
+            final N previous = myStorage.get(index);
             myStorage.set(index, element);
             return previous;
         }

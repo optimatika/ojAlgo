@@ -22,8 +22,10 @@
 package org.ojalgo.array;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.type.context.NumberContext;
@@ -48,14 +50,14 @@ public class NumberListTest extends ArrayTests {
 
     public void testCompareWithArrayList() {
 
-        NumberList<Double> primit64List = NumberList.factory(Primitive64Array.FACTORY).make();
-        NumberList<Double> direct64List = NumberList.factory(BufferArray.DIRECT64).make();
+        final NumberList<Double> primit64List = NumberList.factory(Primitive64Array.FACTORY).make();
+        final NumberList<Double> direct64List = NumberList.factory(BufferArray.DIRECT64).make();
 
-        List<Double> expectedList = new ArrayList<Double>();
+        final List<Double> expectedList = new ArrayList<Double>();
 
         for (int c = 0; c < 10_000; c++) {
 
-            Double value = RANDOM.nextDouble();
+            final Double value = RANDOM.nextDouble();
 
             primit64List.add(value);
             direct64List.add(value);
@@ -64,8 +66,8 @@ public class NumberListTest extends ArrayTests {
 
         for (int c = 0; c < 100; c++) {
 
-            int index = RANDOM.nextInt(10_000);
-            Double value = RANDOM.nextDouble();
+            final int index = RANDOM.nextInt(10_000);
+            final Double value = RANDOM.nextDouble();
 
             primit64List.add(index, value);
             direct64List.add(index, value);
@@ -74,8 +76,8 @@ public class NumberListTest extends ArrayTests {
 
         for (int c = 0; c < 100; c++) {
 
-            int index = RANDOM.nextInt(10_000);
-            Double value = RANDOM.nextDouble();
+            final int index = RANDOM.nextInt(10_000);
+            final Double value = RANDOM.nextDouble();
 
             primit64List.set(index, value);
             direct64List.set(index, value);
@@ -84,12 +86,25 @@ public class NumberListTest extends ArrayTests {
 
         for (int c = 0; c < 100; c++) {
 
-            int index = RANDOM.nextInt(10_000);
+            final int index = RANDOM.nextInt(10_000);
 
             primit64List.remove(index);
             direct64List.remove(index);
             expectedList.remove(index);
         }
+
+        final Set<Double> toAdd = new HashSet<>();
+        final Set<Double> toRemove = new HashSet<>();
+        for (int i = 0; i < 100; i++) {
+            toAdd.add(RANDOM.nextDouble());
+            toRemove.add(RANDOM.nextDouble());
+        }
+        primit64List.addAll(toAdd);
+        direct64List.addAll(toAdd);
+        expectedList.addAll(toAdd);
+        primit64List.removeAll(toRemove);
+        direct64List.removeAll(toRemove);
+        expectedList.removeAll(toRemove);
 
         TestUtils.assertEquals(expectedList.size(), primit64List.size());
         TestUtils.assertEquals(expectedList.size(), direct64List.size());

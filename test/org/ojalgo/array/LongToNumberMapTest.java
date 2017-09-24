@@ -22,9 +22,13 @@
 package org.ojalgo.array;
 
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.ojalgo.TestUtils;
 import org.ojalgo.constant.PrimitiveMath;
+import org.ojalgo.type.context.NumberContext;
 
 /**
  * LongToNumberMap
@@ -32,6 +36,9 @@ import org.ojalgo.constant.PrimitiveMath;
  * @author apete
  */
 public class LongToNumberMapTest extends ArrayTests {
+
+    static final NumberContext CONTEXT = new NumberContext();
+    static final Random RANDOM = new Random();
 
     public LongToNumberMapTest() {
         super();
@@ -46,6 +53,60 @@ public class LongToNumberMapTest extends ArrayTests {
         TestUtils.assertEquals(16, 1L << PrimitiveMath.powerOf2Larger(16L));
         TestUtils.assertEquals(512, 1L << PrimitiveMath.powerOf2Larger(365L));
         TestUtils.assertEquals(16_384, 1L << PrimitiveMath.powerOf2Larger(16_384L));
+    }
+
+    public void testCompareWithTreeMap() {
+
+        final LongToNumberMap<Double> primit64Map = LongToNumberMap.factory(Primitive64Array.FACTORY).make();
+        final LongToNumberMap<Double> direct64Map = LongToNumberMap.factory(BufferArray.DIRECT64).make();
+
+        final SortedMap<Long, Double> expectedMap = new TreeMap<Long, Double>();
+
+        for (long index = 0L; index < 1_000; index++) {
+
+            final Double value = RANDOM.nextDouble();
+
+            primit64Map.put(index, value);
+            direct64Map.put(index, value);
+            expectedMap.put(index, value);
+        }
+
+        for (int c = 0; c < 1_000; c++) {
+
+            final Long index = Long.valueOf(RANDOM.nextInt(1_000));
+            final Double value = RANDOM.nextDouble();
+
+            primit64Map.put(index, value);
+            direct64Map.put(index, value);
+            expectedMap.put(index, value);
+        }
+
+        for (int c = 0; c < 1_000; c++) {
+
+            final Long index = Long.valueOf(RANDOM.nextInt(1_000));
+
+            primit64Map.remove(index);
+            direct64Map.remove(index);
+            expectedMap.remove(index);
+        }
+
+        for (long index = 0L; index < 100; index++) {
+            primit64Map.remove(index);
+            direct64Map.remove(index);
+            expectedMap.remove(index);
+        }
+
+        TestUtils.assertEquals(expectedMap.size(), primit64Map.size());
+        TestUtils.assertEquals(expectedMap.size(), direct64Map.size());
+
+        for (final Entry<Long, Double> entry : expectedMap.entrySet()) {
+            final double expectedValue = entry.getValue().doubleValue();
+            TestUtils.assertEquals(expectedValue, primit64Map.get(entry.getKey()).doubleValue(), CONTEXT);
+            TestUtils.assertEquals(expectedValue, primit64Map.doubleValue(entry.getKey()), CONTEXT);
+            TestUtils.assertEquals(expectedValue, direct64Map.get(entry.getKey()).doubleValue(), CONTEXT);
+            TestUtils.assertEquals(expectedValue, direct64Map.doubleValue(entry.getKey()), CONTEXT);
+        }
+
     }
 
     public void testSubmap() {
