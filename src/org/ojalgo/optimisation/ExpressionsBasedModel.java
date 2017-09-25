@@ -29,8 +29,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.IntIndex;
-import org.ojalgo.access.IntRowColumn;
+import org.ojalgo.access.Structure1D.IntIndex;
+import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.Primitive64Array;
 import org.ojalgo.netio.BasicLogger.Printer;

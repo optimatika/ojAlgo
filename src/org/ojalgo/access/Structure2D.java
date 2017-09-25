@@ -28,6 +28,140 @@ package org.ojalgo.access;
  */
 public interface Structure2D extends Structure1D {
 
+    public final class IntRowColumn implements Comparable<IntRowColumn> {
+
+        public final int column;
+        public final int row;
+
+        public IntRowColumn(final int aRow, final int aCol) {
+
+            super();
+
+            row = aRow;
+            column = aCol;
+        }
+
+        @SuppressWarnings("unused")
+        private IntRowColumn() {
+            this(-1, -1);
+        }
+
+        public int compareTo(final IntRowColumn ref) {
+
+            if (column == ref.column) {
+
+                return Integer.compare(row, ref.row);
+
+            } else {
+
+                return Integer.compare(column, ref.column);
+            }
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (this.getClass() != obj.getClass()) {
+                return false;
+            }
+            final IntRowColumn other = (IntRowColumn) obj;
+            if (column != other.column) {
+                return false;
+            }
+            if (row != other.row) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + column;
+            result = (prime * result) + row;
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "<" + Integer.toString(row) + "," + Integer.toString(column) + ">";
+        }
+
+    }
+
+    public final class LongRowColumn implements Comparable<LongRowColumn> {
+
+        public final long column;
+        public final long row;
+
+        public LongRowColumn(final long aRow, final long aCol) {
+
+            super();
+
+            row = aRow;
+            column = aCol;
+        }
+
+        @SuppressWarnings("unused")
+        private LongRowColumn() {
+            this(-1L, -1L);
+        }
+
+        public int compareTo(final LongRowColumn ref) {
+
+            if (column == ref.column) {
+
+                return Long.compare(row, ref.row);
+
+            } else {
+
+                return Long.compare(column, ref.column);
+            }
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof LongRowColumn)) {
+                return false;
+            }
+            final LongRowColumn other = (LongRowColumn) obj;
+            if (column != other.column) {
+                return false;
+            }
+            if (row != other.row) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + (int) (column ^ (column >>> 32));
+            result = (prime * result) + (int) (row ^ (row >>> 32));
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "<" + Long.toString(row) + "," + Long.toString(column) + ">";
+        }
+
+    }
+
     @FunctionalInterface
     public interface RowColumnCallback {
 

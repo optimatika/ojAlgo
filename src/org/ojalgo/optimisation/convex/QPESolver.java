@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.constant.PrimitiveMath.*;
 
 import org.ojalgo.function.PrimitiveFunction;
 import org.ojalgo.matrix.store.MatrixStore;

@@ -22,7 +22,7 @@
 package org.ojalgo.optimisation.convex;
 
 import static org.ojalgo.constant.PrimitiveMath.*;
-import static org.ojalgo.function.PrimitiveFunction.SUBTRACT;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.math.MathContext;
 

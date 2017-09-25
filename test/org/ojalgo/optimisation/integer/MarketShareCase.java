@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.IntIndex;
+import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.constant.PrimitiveMath;
 import org.ojalgo.matrix.store.PrimitiveDenseStore;
 import org.ojalgo.netio.BasicLogger;

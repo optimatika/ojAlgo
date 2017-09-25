@@ -31,9 +31,9 @@ import java.util.stream.Collectors;
 
 import org.ojalgo.OjAlgoUtils;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.IntIndex;
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.access.Mutate2D;
+import org.ojalgo.access.Structure1D.IntIndex;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.PrimitiveFunction;

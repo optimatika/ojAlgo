@@ -32,6 +32,130 @@ import org.ojalgo.ProgrammingError;
  */
 public interface StructureAnyD extends Structure1D {
 
+    public final class IntReference implements Comparable<IntReference> {
+
+        public final int[] reference;
+
+        public IntReference(final int... aReference) {
+
+            super();
+
+            reference = aReference;
+        }
+
+        @SuppressWarnings("unused")
+        private IntReference() {
+            this(-1);
+        }
+
+        public int compareTo(final IntReference ref) {
+
+            int retVal = reference.length - ref.reference.length;
+
+            int i = reference.length - 1;
+            while ((retVal == 0) && (i >= 0)) {
+                retVal = reference[i] - ref.reference[i];
+                i--;
+            }
+
+            return retVal;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof IntReference)) {
+                return false;
+            }
+            final IntReference other = (IntReference) obj;
+            if (!Arrays.equals(reference, other.reference)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + Arrays.hashCode(reference);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return Arrays.toString(reference);
+        }
+
+    }
+
+    public final class LongReference implements Comparable<LongReference> {
+
+        public final long[] reference;
+
+        public LongReference(final long... aReference) {
+
+            super();
+
+            reference = aReference;
+        }
+
+        @SuppressWarnings("unused")
+        private LongReference() {
+            this(-1L);
+        }
+
+        public int compareTo(final LongReference ref) {
+
+            int retVal = Integer.compare(reference.length, ref.reference.length);
+
+            int i = reference.length - 1;
+            while ((retVal == 0) && (i >= 0)) {
+                retVal = Long.compare(reference[i], ref.reference[i]);
+                i--;
+            }
+
+            return retVal;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof LongReference)) {
+                return false;
+            }
+            final LongReference other = (LongReference) obj;
+            if (!Arrays.equals(reference, other.reference)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + Arrays.hashCode(reference);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return Arrays.toString(reference);
+        }
+
+    }
+
     @FunctionalInterface
     public interface ReferenceCallback {
 

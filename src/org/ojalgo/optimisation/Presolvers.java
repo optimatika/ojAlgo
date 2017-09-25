@@ -30,7 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.ojalgo.access.IntIndex;
+import org.ojalgo.access.Structure1D.IntIndex;
 
 public abstract class Presolvers {
 

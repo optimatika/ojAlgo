@@ -31,11 +31,11 @@ import java.util.List;
  */
 public interface Structure1D {
 
-    class AnyIndex<T> implements IndexMapper<T> {
+    class BasicMapper<T> implements IndexMapper<T> {
 
         private final List<T> myKeys = new ArrayList<>();
 
-        AnyIndex() {
+        BasicMapper() {
             super();
         }
 
@@ -99,6 +99,112 @@ public interface Structure1D {
 
     }
 
+    public final class IntIndex implements Comparable<IntIndex> {
+
+        public final int index;
+
+        public IntIndex(final int anIndex) {
+
+            super();
+
+            index = anIndex;
+        }
+
+        @SuppressWarnings("unused")
+        private IntIndex() {
+            this(-1);
+        }
+
+        public int compareTo(final IntIndex ref) {
+            return Integer.compare(index, ref.index);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof IntIndex)) {
+                return false;
+            }
+            final IntIndex other = (IntIndex) obj;
+            if (index != other.index) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + index;
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return Integer.toString(index);
+        }
+
+    }
+
+    public final class LongIndex implements Comparable<LongIndex> {
+
+        public final long index;
+
+        public LongIndex(final long anIndex) {
+
+            super();
+
+            index = anIndex;
+        }
+
+        @SuppressWarnings("unused")
+        private LongIndex() {
+            this(-1L);
+        }
+
+        public int compareTo(final LongIndex ref) {
+            return Long.compare(index, ref.index);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof LongIndex)) {
+                return false;
+            }
+            final LongIndex other = (LongIndex) obj;
+            if (index != other.index) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + (int) (index ^ (index >>> 32));
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return Long.toString(index);
+        }
+
+    }
+
     static void loopMatching(final Structure1D structureA, final Structure1D structureB, final IndexCallback callback) {
         final long limit = Math.min(structureA.count(), structureB.count());
         Structure1D.loopRange(0L, limit, callback);
@@ -114,7 +220,7 @@ public interface Structure1D {
      * @return A very simple implementation - you better come up with something else.
      */
     static <T> IndexMapper<T> mapper() {
-        return new AnyIndex<>();
+        return new BasicMapper<>();
     }
 
     /**

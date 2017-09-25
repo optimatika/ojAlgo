@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.constant.PrimitiveMath.ZERO;
+import static org.ojalgo.constant.PrimitiveMath.*;
 import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.List;
@@ -32,8 +32,8 @@ import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
 import org.ojalgo.access.Access2D;
 import org.ojalgo.access.Access2D.Collectable;
-import org.ojalgo.access.IntIndex;
-import org.ojalgo.access.IntRowColumn;
+import org.ojalgo.access.Structure1D.IntIndex;
+import org.ojalgo.access.Structure2D.IntRowColumn;
 import org.ojalgo.array.Array1D;
 import org.ojalgo.array.SparseArray;
 import org.ojalgo.function.BinaryFunction;

@@ -21,7 +21,7 @@
  */
 package org.ojalgo.optimisation.convex;
 
-import static org.ojalgo.function.PrimitiveFunction.SUBTRACT;
+import static org.ojalgo.function.PrimitiveFunction.*;
 
 import java.util.Arrays;
 
