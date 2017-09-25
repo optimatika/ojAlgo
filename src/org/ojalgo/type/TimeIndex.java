@@ -13,7 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.ojalgo.access.IndexMapper;
+import org.ojalgo.access.Structure1D.IndexMapper;
 import org.ojalgo.type.CalendarDate.Resolution;
 
 public abstract class TimeIndex<T extends Comparable<? super T>> {

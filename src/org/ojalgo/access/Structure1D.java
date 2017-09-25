@@ -21,12 +21,43 @@
  */
 package org.ojalgo.access;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A (fixed size) 1-dimensional data structure.
  *
  * @author apete
  */
 public interface Structure1D {
+
+    class AnyIndex<T> implements IndexMapper<T> {
+
+        private final List<T> myKeys = new ArrayList<>();
+
+        AnyIndex() {
+            super();
+        }
+
+        public synchronized long toIndex(final T key) {
+            long retVal = myKeys.indexOf(key);
+            if (retVal < 0L) {
+                retVal = this.indexForNewKey(key);
+            }
+            return retVal;
+        }
+
+        public final T toKey(final long index) {
+            return myKeys.get((int) index);
+        }
+
+        final long indexForNewKey(final T newKey) {
+            final long retVal = myKeys.size();
+            myKeys.add(newKey);
+            return retVal;
+        }
+
+    }
 
     @FunctionalInterface
     public interface IndexCallback {
@@ -35,6 +66,36 @@ public interface Structure1D {
          * @param index Index
          */
         void call(final long index);
+
+    }
+
+    public interface IndexMapper<T> {
+
+        /**
+         * This default implementation assumes that the index is incremented by 1 when incrementing the key to
+         * the next value.
+         *
+         * @param key The value to increment
+         * @return The next (incremented) value
+         */
+        default T next(final T key) {
+            return this.toKey(this.toIndex(key) + 1L);
+        }
+
+        /**
+         * This default implementation assumes that the index is decremented by 1 when decrementing the key to
+         * the previous value.
+         *
+         * @param key The value to decrement
+         * @return The previous (decremented) value
+         */
+        default T previous(final T key) {
+            return this.toKey(this.toIndex(key) - 1L);
+        }
+
+        long toIndex(T key);
+
+        T toKey(long index);
 
     }
 
@@ -47,6 +108,13 @@ public interface Structure1D {
         for (long i = first; i < limit; i++) {
             callback.call(i);
         }
+    }
+
+    /**
+     * @return A very simple implementation - you better come up with something else.
+     */
+    static <T> IndexMapper<T> mapper() {
+        return new AnyIndex<>();
     }
 
     /**

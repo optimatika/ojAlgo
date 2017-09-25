@@ -36,7 +36,7 @@ import java.util.SortedMap;
 
 import org.ojalgo.ProgrammingError;
 import org.ojalgo.access.Access1D;
-import org.ojalgo.access.IndexMapper;
+import org.ojalgo.access.Structure1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.function.BinaryFunction;
 import org.ojalgo.function.UnaryFunction;
@@ -196,12 +196,12 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
     }
 
     public static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
-            final IndexMapper<N> indexMapper) {
+            final Structure1D.IndexMapper<N> indexMapper) {
         return new MappedIndexSeries<>(arrayFactory, indexMapper, null);
     }
 
-    public static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory, final IndexMapper<N> indexMapper,
-            final BinaryFunction<N> accumulator) {
+    public static <N extends Number & Comparable<? super N>> BasicSeries<N, N> make(final DenseArray.Factory<N> arrayFactory,
+            final Structure1D.IndexMapper<N> indexMapper, final BinaryFunction<N> accumulator) {
         return new MappedIndexSeries<>(arrayFactory, indexMapper, accumulator);
     }
 

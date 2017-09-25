@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ojalgo.access.IndexMapper;
+import org.ojalgo.access.Structure1D;
 import org.ojalgo.array.DenseArray;
 import org.ojalgo.array.LongToNumberMap;
 import org.ojalgo.constant.PrimitiveMath;
@@ -42,7 +42,7 @@ import org.ojalgo.type.TypeUtils;
 
 final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number> extends AbstractMap<K, N> implements BasicSeries.NaturallySequenced<K, N> {
 
-    static final IndexMapper<Double> MAPPER = new IndexMapper<Double>() {
+    static final Structure1D.IndexMapper<Double> MAPPER = new Structure1D.IndexMapper<Double>() {
 
         public long toIndex(final Double key) {
             return MappedIndexSeries.toIndex(key);

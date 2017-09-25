@@ -39,6 +39,108 @@ public interface Structure2D extends Structure1D {
 
     }
 
+    class RowColumnKey<R, C> {
+
+        public static <R, C> RowColumnKey<R, C> of(final R row, final C col) {
+            return new RowColumnKey<>(row, col);
+        }
+
+        public final C column;
+        public final R row;
+
+        public RowColumnKey(final R row, final C col) {
+            super();
+            this.row = row;
+            this.column = col;
+        }
+
+        @SuppressWarnings("rawtypes")
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof RowColumnKey)) {
+                return false;
+            }
+            final RowColumnKey other = (RowColumnKey) obj;
+            if (column == null) {
+                if (other.column != null) {
+                    return false;
+                }
+            } else if (!column.equals(other.column)) {
+                return false;
+            }
+            if (row == null) {
+                if (other.row != null) {
+                    return false;
+                }
+            } else if (!row.equals(other.row)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) + ((column == null) ? 0 : column.hashCode());
+            result = (prime * result) + ((row == null) ? 0 : row.hashCode());
+            return result;
+        }
+
+    }
+
+    class RowColumnMapper<R, C> implements IndexMapper<RowColumnKey<R, C>> {
+
+        private final Structure1D.IndexMapper<C> myColumnMapper;
+        private final Structure1D.IndexMapper<R> myRowMapper;
+        private final long myStructure;
+
+        protected RowColumnMapper(final Structure2D structure, final Structure1D.IndexMapper<R> rowMapper, final Structure1D.IndexMapper<C> columnMapper) {
+            super();
+            myStructure = structure.countRows();
+            myRowMapper = rowMapper;
+            myColumnMapper = columnMapper;
+        }
+
+        public C toColumnKey(final long index) {
+            final long col = Structure2D.column(index, myStructure);
+            return myColumnMapper.toKey(col);
+        }
+
+        public long toIndex(final R rowKey, final C colKey) {
+
+            final long row = myRowMapper.toIndex(rowKey);
+            final long col = myColumnMapper.toIndex(colKey);
+
+            return Structure2D.index(myStructure, row, col);
+        }
+
+        public long toIndex(final RowColumnKey<R, C> key) {
+            return this.toIndex(key.row, key.column);
+        }
+
+        public RowColumnKey<R, C> toKey(final long index) {
+            return RowColumnKey.of(this.toRowKey(index), this.toColumnKey(index));
+        }
+
+        public R toRowKey(final long index) {
+            final long row = Structure2D.row(index, myStructure);
+            return myRowMapper.toKey(row);
+        }
+
+    }
+
+    public static <R, C> RowColumnMapper<R, C> mapperOf(final Structure2D structure, final Structure1D.IndexMapper<R> rowMappwer,
+            final Structure1D.IndexMapper<C> columnMappwer) {
+        return new RowColumnMapper<>(structure, rowMappwer, columnMappwer);
+    }
+
     static int column(final int index, final int structure) {
         return index / structure;
     }

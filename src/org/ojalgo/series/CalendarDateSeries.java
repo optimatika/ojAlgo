@@ -28,7 +28,6 @@ import java.util.NavigableMap;
 import java.util.SortedMap;
 
 import org.ojalgo.ProgrammingError;
-import org.ojalgo.access.IndexMapper;
 import org.ojalgo.netio.ASCII;
 import org.ojalgo.series.primitive.ExplicitTimeSeries;
 import org.ojalgo.type.CalendarDate;

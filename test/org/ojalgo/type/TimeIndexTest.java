@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 import org.ojalgo.TestUtils;
-import org.ojalgo.access.IndexMapper;
+import org.ojalgo.access.Structure1D.IndexMapper;
 
 public class TimeIndexTest extends TypeTests {
 

@@ -42,6 +42,62 @@ public interface StructureAnyD extends Structure1D {
 
     }
 
+    class ReferenceMapper implements IndexMapper<Object[]> {
+
+        private final IndexMapper<Object>[] myMappers;
+        private final long[] myStructure;
+
+        protected ReferenceMapper(final StructureAnyD structure, final IndexMapper<Object>[] mappers) {
+            super();
+            myMappers = mappers;
+            myStructure = structure.shape();
+        }
+
+        public <T> long toIndex(final int dim, final T key) {
+            return myMappers[dim].toIndex(key);
+        }
+
+        public long toIndex(final Object[] keys) {
+
+            final long[] ref = new long[keys.length];
+
+            for (int i = 0; i < ref.length; i++) {
+                ref[i] = myMappers[i].toIndex(keys[i]);
+            }
+
+            return StructureAnyD.index(myStructure, ref);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T toKey(final int dim, final long index) {
+            return (T) myMappers[dim].toKey(index);
+        }
+
+        public Object[] toKey(final long index) {
+
+            final long[] ref = StructureAnyD.reference(index, myStructure);
+
+            final Object[] retVal = new Object[ref.length];
+
+            for (int i = 0; i < ref.length; i++) {
+                retVal[i] = myMappers[i].toKey(ref[i]);
+
+            }
+            return retVal;
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T extends Comparable<? super T>> T toKey(final long index, final int dim) {
+            final long[] ref = StructureAnyD.reference(index, myStructure);
+            return (T) myMappers[dim].toKey(ref[dim]);
+        }
+
+    }
+
+    public static StructureAnyD.ReferenceMapper mapperOf(final StructureAnyD structure, final Structure1D.IndexMapper<Object>[] mappers) {
+        return new StructureAnyD.ReferenceMapper(structure, mappers);
+    }
+
     /**
      * @param structure An access structure
      * @return The size of an access with that structure
