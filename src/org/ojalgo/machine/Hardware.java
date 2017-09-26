@@ -351,11 +351,11 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
 
     /**
      * <ul>
-     * <li>CBF (test)
+     * <li>CBL (prod & test) 2 x Intel(R) Xeon(R) CPU E5-2697A v4 @ 2.60GHz
      * <ul>
      * <li></li>
-     * <li>? processors</li>
-     * <li>? cores per processor (32 cores in total)</li>
+     * <li>2 processors</li>
+     * <li>16 cores per processor (32 cores in total)</li>
      * <li>2 threads per core</li>
      * <li>==>> Total 64 threads</li>
      * <li></li>
@@ -365,9 +365,23 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
+     * <li>CBF (test)
+     * <ul>
+     * <li></li>
+     * <li>? processors</li>
+     * <li>? cores per processor (32 cores in total)</li>
+     * <li>? threads per core</li>
+     * <li>==>> Total 64 threads</li>
+     * <li></li>
+     * <li>512GB system RAM</li>
+     * <li>40MB L3 cache per processor</li>
+     * <li>256kB L2 cache per core</li>
+     * <li>32kB L1 cache per core</li>
+     * </ul>
+     * </li>
      * </ul>
      */
-    static final Hardware X86_64__64 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 64), new BasicMachine(8L * K * K, 8),
+    static final Hardware X86_64__64 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 64), new BasicMachine(40L * K * K, 32),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     /**
