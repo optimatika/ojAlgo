@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ import org.ojalgo.type.context.NumberContext;
  * systems of simultaneous linear equations. This will fail if the matrix does not have full column rank. The
  * rank must be equal to the number of columns.
  * </p>
- * 
+ *
  * @author apete
  */
 public interface QR<N extends Number> extends MatrixDecomposition<N>, MatrixDecomposition.Solver<N>, MatrixDecomposition.EconomySize<N>,

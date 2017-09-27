@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,28 +26,30 @@ import org.ojalgo.type.context.NumberContext;
 
 public class PrimitiveMathTest extends ConstantTests {
 
+    static void compare(final String id, final double arg0, final double arg1) {
+
+        if (arg0 == arg1) {
+            if (NumberContext.compare(arg0, arg1) == 0) {
+                ;
+            } else {
+                TestUtils.fail();
+            }
+        } else {
+            if (NumberContext.compare(arg0, arg1) == 0) {
+                TestUtils.fail();
+            } else {
+                TestUtils.fail();
+            }
+        }
+
+    }
+
     public PrimitiveMathTest() {
         super();
     }
 
     public PrimitiveMathTest(final String arg0) {
         super(arg0);
-    }
-
-    public void testPowersOf2() {
-
-        long tmpPrev = PrimitiveMath.POWERS_OF_2[0];
-        TestUtils.assertEquals(1L, tmpPrev);
-
-        for (int i = 1; i < PrimitiveMath.POWERS_OF_2.length; i++) {
-            final long tmpVal = PrimitiveMath.POWERS_OF_2[i];
-
-            TestUtils.assertTrue(tmpPrev < tmpVal);
-            TestUtils.assertEquals(2, tmpVal / tmpPrev);
-
-            tmpPrev = tmpVal;
-        }
-
     }
 
     public void testCompareToZeros() {
@@ -74,20 +76,18 @@ public class PrimitiveMathTest extends ConstantTests {
         PrimitiveMathTest.compare("negInt <-> posDbl", negInt, posDbl);
     }
 
-    static void compare(final String id, final double arg0, final double arg1) {
+    public void testPowersOf2() {
 
-        if (arg0 == arg1) {
-            if (NumberContext.compare(arg0, arg1) == 0) {
-                ;
-            } else {
-                TestUtils.fail();
-            }
-        } else {
-            if (NumberContext.compare(arg0, arg1) == 0) {
-                TestUtils.fail();
-            } else {
-                TestUtils.fail();
-            }
+        long tmpPrev = PrimitiveMath.POWERS_OF_2[0];
+        TestUtils.assertEquals(1L, tmpPrev);
+
+        for (int i = 1; i < PrimitiveMath.POWERS_OF_2.length; i++) {
+            final long tmpVal = PrimitiveMath.POWERS_OF_2[i];
+
+            TestUtils.assertTrue(tmpPrev < tmpVal);
+            TestUtils.assertEquals(2, tmpVal / tmpPrev);
+
+            tmpPrev = tmpVal;
         }
 
     }

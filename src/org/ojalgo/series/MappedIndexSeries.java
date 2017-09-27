@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -252,7 +252,7 @@ final class MappedIndexSeries<K extends Comparable<? super K>, N extends Number>
 
         final long conversion = resolution.toDurationInMillis();
 
-        return new MappedIndexSeries<K, N>(new IndexMapper<K>() {
+        return new MappedIndexSeries<>(new IndexMapper<K>() {
 
             public long toIndex(final K key) {
                 return myMapper.toIndex(key) / conversion;

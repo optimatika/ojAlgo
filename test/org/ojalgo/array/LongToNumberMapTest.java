@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,7 @@ public class LongToNumberMapTest extends ArrayTests {
         final LongToNumberMap<Double> primit64Map = LongToNumberMap.factory(Primitive64Array.FACTORY).make();
         final LongToNumberMap<Double> direct64Map = LongToNumberMap.factory(BufferArray.DIRECT64).make();
 
-        final SortedMap<Long, Double> expectedMap = new TreeMap<Long, Double>();
+        final SortedMap<Long, Double> expectedMap = new TreeMap<>();
 
         for (long index = 0L; index < 1_000; index++) {
 

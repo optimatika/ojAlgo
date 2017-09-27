@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,15 +37,34 @@ import org.ojalgo.optimisation.Variable;
  */
 public class SamplePerformanceIssueSolvingILP {
 
+    static class Container {
+
+        private final String type;
+        private final double size;
+
+        public Container(final String type, final long size) {
+            this.type = type;
+            this.size = size;
+        }
+
+        public double getSize() {
+            return size;
+        }
+
+        public String getType() {
+            return type;
+        }
+    }
+
     private static final Random RANDOM = new Random();
 
     // Weighting so we don't have preference to smaller or bigger container
     private static final int MAX_OBJECTIVE_VALUE = 1000000000;
 
     private static final double DEVIATION = 0.02D;
-
     private static final double FIRST_CONTAINER_SIZE_PERC = 0.8;
     private static final double SECOND_CONTAINER_SIZE_PERC = 0.1;
+
     private static final double THIRD_CONTAINER_SIZE_PERC = 0.1;
 
     public static void main(final String[] args) {
@@ -159,25 +178,6 @@ public class SamplePerformanceIssueSolvingILP {
         }
 
         System.out.println("RESULT: " + resultContainer.size());
-    }
-
-    static class Container {
-
-        private final String type;
-        private final double size;
-
-        public Container(final String type, final long size) {
-            this.type = type;
-            this.size = size;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public double getSize() {
-            return size;
-        }
     }
 
 }

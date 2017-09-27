@@ -30,9 +30,7 @@ public class CookieTest {
     private final static String[] COOKIE_DATE_FORMATS = { "EEE',' dd-MMM-yyyy HH:mm:ss 'GMT'", "EEE',' dd MMM yyyy HH:mm:ss 'GMT'",
             "EEE MMM dd yyyy HH:mm:ss 'GMT'Z", "EEE',' dd-MMM-yy HH:mm:ss 'GMT'", "EEE',' dd MMM yy HH:mm:ss 'GMT'", "EEE MMM dd yy HH:mm:ss 'GMT'Z" };
 
-    public CookieTest() {
-        super();
-    }
+    static final TimeZone GMT = TimeZone.getTimeZone("GMT");
 
     public static void main(final String[] args) {
 
@@ -57,9 +55,7 @@ public class CookieTest {
             final Reader reader = new InputStreamReader(stream);
             final BufferedReader buffered = new BufferedReader(reader);
 
-            int numberOfLines = 0;
             while (buffered.readLine() != null) {
-                numberOfLines++;
             }
 
             // manager.getCookieStore().getCookies().forEach(cookie -> System.out.println("Cookie store entry: " + cookie.toString()));
@@ -77,7 +73,7 @@ public class CookieTest {
             final String timestamp = "Wed, 14-Jun-2018 19:34:58 GMT";
 
             final CookieTest test = new CookieTest();
-            final long delta = test.expiryDate2DeltaSeconds(timestamp);
+            test.expiryDate2DeltaSeconds(timestamp);
 
             for (final String pattern : COOKIE_DATE_FORMATS) {
                 final SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.US);
@@ -93,9 +89,11 @@ public class CookieTest {
         }
     }
 
-    static final TimeZone GMT = TimeZone.getTimeZone("GMT");
-
     long whenCreated = System.currentTimeMillis();
+
+    public CookieTest() {
+        super();
+    }
 
     long expiryDate2DeltaSeconds(final String dateString) {
         final Calendar cal = new GregorianCalendar(GMT);

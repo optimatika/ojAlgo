@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -82,14 +82,6 @@ public interface Mutate2D extends Structure2D, Mutate1D {
             this.fillDiagonal(0L, 0L, values);
         }
 
-        default void fillDiagonal(final N value) {
-            this.fillDiagonal(0L, 0L, value);
-        }
-
-        default void fillDiagonal(final NullaryFunction<N> supplier) {
-            this.fillDiagonal(0L, 0L, supplier);
-        }
-
         default void fillDiagonal(final long row, final long col, final Access1D<N> values) {
             this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, values.get(r - row)));
         }
@@ -100,6 +92,14 @@ public interface Mutate2D extends Structure2D, Mutate1D {
 
         default void fillDiagonal(final long row, final long col, final NullaryFunction<N> supplier) {
             this.loopDiagonal(row, col, (r, c) -> this.fillOne(r, c, supplier));
+        }
+
+        default void fillDiagonal(final N value) {
+            this.fillDiagonal(0L, 0L, value);
+        }
+
+        default void fillDiagonal(final NullaryFunction<N> supplier) {
+            this.fillDiagonal(0L, 0L, supplier);
         }
 
         default void fillOne(final long index, final Access1D<?> values, final long valueIndex) {

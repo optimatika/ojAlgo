@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -78,13 +78,13 @@ public abstract class PrimitiveArray extends PlainArray<Double> implements Mutat
     }
 
     @Override
-    final boolean isPrimitive() {
-        return true;
+    public final void reset() {
+        this.fillAll(PrimitiveMath.ZERO);
     }
 
     @Override
-    public final void reset() {
-        this.fillAll(PrimitiveMath.ZERO);
+    final boolean isPrimitive() {
+        return true;
     }
 
 }

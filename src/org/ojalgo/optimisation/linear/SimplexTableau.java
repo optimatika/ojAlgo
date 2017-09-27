@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,19 +46,6 @@ import org.ojalgo.optimisation.linear.SimplexSolver.AlgorithmStore;
 import org.ojalgo.type.IndexSelector;
 
 abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
-
-    protected static SimplexTableau make(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
-
-        final int numbRows = numberOfConstraints + 2;
-        final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
-        final int totCount = numbRows * numbCols;
-
-        if (totCount <= OjAlgoUtils.ENVIRONMENT.getCacheElements(8L)) {
-            return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
-        } else {
-            return new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
-        }
-    }
 
     static final class DenseTableau extends SimplexTableau {
 
@@ -132,6 +119,11 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
         public Double get(final long row, final long col) {
             return myTransposed.get(col, row);
+        }
+
+        @Override
+        protected int getOvercapacity() {
+            return 0;
         }
 
         @Override
@@ -312,11 +304,6 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
                 }
 
             };
-        }
-
-        @Override
-        protected int getOvercapacity() {
-            return 0;
         }
 
     }
@@ -665,6 +652,19 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
     }
 
+    protected static SimplexTableau make(final int numberOfConstraints, final int numberOfProblemVariables, final int numberOfSlackVariables) {
+
+        final int numbRows = numberOfConstraints + 2;
+        final int numbCols = numberOfProblemVariables + numberOfSlackVariables + numberOfConstraints + 1;
+        final int totCount = numbRows * numbCols;
+
+        if (totCount <= OjAlgoUtils.ENVIRONMENT.getCacheElements(8L)) {
+            return new DenseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+        } else {
+            return new SparseTableau(numberOfConstraints, numberOfProblemVariables, numberOfSlackVariables);
+        }
+    }
+
     private final int[] myBasis;
     private transient Mutate2D myConstraintsBody = null;
     private transient Mutate1D myConstraintsRHS = null;
@@ -743,8 +743,6 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
         return myBasis[basisIndex];
     }
 
-    protected abstract int getOvercapacity();
-
     protected final int[] getExcluded() {
         return mySelector.getExcluded();
     }
@@ -752,6 +750,8 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
     protected final int[] getIncluded() {
         return mySelector.getIncluded();
     }
+
+    protected abstract int getOvercapacity();
 
     protected boolean isBasicArtificials() {
         final int tmpLength = myBasis.length;

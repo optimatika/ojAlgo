@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -74,28 +74,6 @@ public abstract class TestUtils {
         if ((tmpValue.compareTo(tmpLower) == -1) || (tmpValue.compareTo(tmpUpper) == 1)) {
             Assert.fail("!(" + tmpLower.toPlainString() + " <= " + tmpValue.toPlainString() + " <= " + tmpUpper.toPlainString() + ")");
         }
-    }
-
-    public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {
-        TestUtils.assertStateAndSolution(expected, actual, EQUALS);
-    }
-
-    public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual, final NumberContext context) {
-        TestUtils.assertStateAndSolution("Optimisation.Result != Optimisation.Result", expected, actual, context);
-    }
-
-    public static void assertStateAndSolution(final String message, final Optimisation.Result expected, final Optimisation.Result actual,
-            final NumberContext context) {
-
-        TestUtils.assertEquals(message + ", different Optimisation.State", expected.getState(), actual.getState());
-
-        if (expected.getState().isFeasible()) {
-            TestUtils.assertEquals(message, expected, actual, context);
-        }
-    }
-
-    public static void assertStateAndSolution(final String message, final Optimisation.Result expected, final Optimisation.Result actual) {
-        TestUtils.assertStateAndSolution(message, expected, actual, EQUALS);
     }
 
     public static void assertEquals(final Access1D<?> expected, final Access1D<?> actual) {
@@ -360,6 +338,28 @@ public abstract class TestUtils {
 
     public static void assertFalse(final String message, final boolean condition) {
         Assert.assertFalse(message, condition);
+    }
+
+    public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual) {
+        TestUtils.assertStateAndSolution(expected, actual, EQUALS);
+    }
+
+    public static void assertStateAndSolution(final Optimisation.Result expected, final Optimisation.Result actual, final NumberContext context) {
+        TestUtils.assertStateAndSolution("Optimisation.Result != Optimisation.Result", expected, actual, context);
+    }
+
+    public static void assertStateAndSolution(final String message, final Optimisation.Result expected, final Optimisation.Result actual) {
+        TestUtils.assertStateAndSolution(message, expected, actual, EQUALS);
+    }
+
+    public static void assertStateAndSolution(final String message, final Optimisation.Result expected, final Optimisation.Result actual,
+            final NumberContext context) {
+
+        TestUtils.assertEquals(message + ", different Optimisation.State", expected.getState(), actual.getState());
+
+        if (expected.getState().isFeasible()) {
+            TestUtils.assertEquals(message, expected, actual, context);
+        }
     }
 
     public static void assertStateLessThanFeasible(final Optimisation.Result actual) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -128,8 +128,8 @@ public interface InverterTask<N extends Number> extends MatrixTask<N> {
 
     /**
      * The output must be a "right inverse" and a "generalised inverse".
+     * 
      * @throws RecoverableCondition TODO
-     *
      * @see BasicMatrix#invert()
      */
     default MatrixStore<N> invert(final Access2D<?> original) throws RecoverableCondition {

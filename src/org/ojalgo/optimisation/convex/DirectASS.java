@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,7 @@ final class DirectASS extends ActiveSetSolver {
             this.debug(this.toActivatorString());
         }
 
-        final int toInclude = this.getConstraintToInclude();
+        this.getConstraintToInclude();
         this.setConstraintToInclude(-1);
         final int[] incl = this.getIncluded();
         final int[] excl = this.getExcluded();

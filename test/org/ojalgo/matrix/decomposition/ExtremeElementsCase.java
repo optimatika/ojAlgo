@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ import org.ojalgo.type.context.NumberContext;
  */
 public class ExtremeElementsCase extends MatrixDecompositionTests {
 
-    static final NumberContext PRECISION = new NumberContext().newPrecision(12);
+    static final NumberContext PRECISION = new NumberContext().newPrecision(12).newScale(148);
 
     private static void performInvertTest(final PrimitiveDenseStore original, final InverterTask<Double> task, final NumberContext context) {
 

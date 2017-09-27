@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -82,6 +82,58 @@ public final class SimplexSolver extends LinearSolver {
 
     }
 
+    static SimplexTableau build(final ConvexSolver.Builder convex) {
+
+        final int numbVars = convex.countVariables();
+        final int numbEqus = convex.countEqualityConstraints();
+        final int numbInes = convex.countInequalityConstraints();
+
+        final SimplexTableau retVal = SimplexTableau.make(numbEqus + numbInes, numbVars + numbVars, numbInes);
+
+        final Mutate1D obj = retVal.objective();
+
+        final MatrixStore<Double> convexC = convex.getC();
+
+        for (int v = 0; v < numbVars; v++) {
+            final double val = convexC.doubleValue(v);
+            obj.set(v, -val);
+            obj.set(numbVars + v, val);
+        }
+
+        final Mutate2D constrBody = retVal.constraintsBody();
+        final Mutate1D constrRHS = retVal.constraintsRHS();
+
+        final MatrixStore<Double> convexAE = convex.getAE();
+        final MatrixStore<Double> convexBE = convex.getBE();
+
+        for (int i = 0; i < numbEqus; i++) {
+            final double rhs = convexBE.doubleValue(i);
+            final boolean neg = NumberContext.compare(rhs, ZERO) < 0;
+            for (int j = 0; j < numbVars; j++) {
+                final double val = convexAE.doubleValue(i, j);
+                constrBody.set(i, j, neg ? -val : val);
+                constrBody.set(i, numbVars + j, neg ? val : -val);
+            }
+            constrRHS.set(i, neg ? -rhs : rhs);
+        }
+
+        final RowsSupplier<Double> convexAI = convex.getAI();
+        final MatrixStore<Double> convexBI = convex.getBI();
+
+        for (int i = 0; i < numbInes; i++) {
+            final int r = i;
+            final SparseArray<Double> row = convexAI.getRow(r);
+            final double rhs = convexBI.doubleValue(r);
+            final boolean neg = NumberContext.compare(rhs, ZERO) < 0;
+            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
+            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
+            constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
+            constrRHS.set(numbEqus + i, neg ? -rhs : rhs);
+        }
+
+        return retVal;
+    }
+
     static SimplexTableau build(final ExpressionsBasedModel model) {
 
         final List<Variable> tmpPosVariables = model.getPositiveVariables();
@@ -112,8 +164,6 @@ public final class SimplexSolver extends LinearSolver {
         final int tmpProblVarCount = tmpPosVariables.size() + tmpNegVariables.size();
         final int tmpSlackVarCount = tmpExprsLo.size() + tmpExprsUp.size() + tmpVarsPosLo.size() + tmpVarsPosUp.size() + tmpVarsNegLo.size()
                 + tmpVarsNegUp.size();
-        final int tmpTotalVarCount = tmpProblVarCount + tmpSlackVarCount;
-
         final SimplexTableau retVal = SimplexTableau.make(tmpConstraiCount, tmpProblVarCount, tmpSlackVarCount);
 
         final int tmpPosVarsBaseIndex = 0;
@@ -394,6 +444,7 @@ public final class SimplexSolver extends LinearSolver {
     }
 
     private final IterationPoint myPoint;
+
     private final SimplexTableau myTableau;
 
     SimplexSolver(final SimplexTableau tableau, final Optimisation.Options solverOptions) {
@@ -703,58 +754,6 @@ public final class SimplexSolver extends LinearSolver {
             }
 
         }
-    }
-
-    static SimplexTableau build(final ConvexSolver.Builder convex) {
-
-        final int numbVars = convex.countVariables();
-        final int numbEqus = convex.countEqualityConstraints();
-        final int numbInes = convex.countInequalityConstraints();
-
-        final SimplexTableau retVal = SimplexTableau.make(numbEqus + numbInes, numbVars + numbVars, numbInes);
-
-        final Mutate1D obj = retVal.objective();
-
-        final MatrixStore<Double> convexC = convex.getC();
-
-        for (int v = 0; v < numbVars; v++) {
-            final double val = convexC.doubleValue(v);
-            obj.set(v, -val);
-            obj.set(numbVars + v, val);
-        }
-
-        final Mutate2D constrBody = retVal.constraintsBody();
-        final Mutate1D constrRHS = retVal.constraintsRHS();
-
-        final MatrixStore<Double> convexAE = convex.getAE();
-        final MatrixStore<Double> convexBE = convex.getBE();
-
-        for (int i = 0; i < numbEqus; i++) {
-            final double rhs = convexBE.doubleValue(i);
-            final boolean neg = NumberContext.compare(rhs, ZERO) < 0;
-            for (int j = 0; j < numbVars; j++) {
-                final double val = convexAE.doubleValue(i, j);
-                constrBody.set(i, j, neg ? -val : val);
-                constrBody.set(i, numbVars + j, neg ? val : -val);
-            }
-            constrRHS.set(i, neg ? -rhs : rhs);
-        }
-
-        final RowsSupplier<Double> convexAI = convex.getAI();
-        final MatrixStore<Double> convexBI = convex.getBI();
-
-        for (int i = 0; i < numbInes; i++) {
-            final int r = i;
-            final SparseArray<Double> row = convexAI.getRow(r);
-            final double rhs = convexBI.doubleValue(r);
-            final boolean neg = NumberContext.compare(rhs, ZERO) < 0;
-            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, nz.index(), neg ? -nz.doubleValue() : nz.doubleValue()));
-            row.nonzeros().forEach(nz -> constrBody.set(numbEqus + r, numbVars + nz.index(), neg ? nz.doubleValue() : -nz.doubleValue()));
-            constrBody.set(numbEqus + r, numbVars + numbVars + r, neg ? NEG : ONE);
-            constrRHS.set(numbEqus + i, neg ? -rhs : rhs);
-        }
-
-        return retVal;
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -338,11 +338,6 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
         }
     }
 
-    @Override
-    protected boolean checkSolvability() {
-        return this.isComputed() && this.isHermitian();
-    }
-
     public MatrixStore<Double> reconstruct() {
         return Eigenvalue.reconstruct(this);
     }
@@ -373,6 +368,11 @@ abstract class RawEigenvalue extends RawDecomposition implements Eigenvalue<Doub
 
     public MatrixStore<Double> solve(final MatrixStore<Double> rhs, final DecompositionStore<Double> preallocated) {
         return null;
+    }
+
+    @Override
+    protected boolean checkSolvability() {
+        return this.isComputed() && this.isHermitian();
     }
 
     protected abstract boolean doDecompose(double[][] data, boolean valuesOnly);

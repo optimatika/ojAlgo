@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -126,7 +126,7 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
                 // BasicLogger.debug("Splitting [{}, {}) into [{}, {}) and [{}, {})", myCursor, myLastCursor, myCursor, split, split, myLastCursor);
 
-                final NonzeroView<N> retVal = new NonzeroView<N>(myIndices, myValues, myCursor, split);
+                final NonzeroView<N> retVal = new NonzeroView<>(myIndices, myValues, myCursor, split);
 
                 myCursor = split;
 

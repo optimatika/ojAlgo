@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -150,10 +150,6 @@ public interface Mutate1D extends Structure1D {
 
     void add(long index, Number addend);
 
-    void set(long index, double value);
-
-    void set(long index, Number value);
-
     /**
      * Reset this mutable structure to some standard (all zeros) initial state. It must still be usuable after
      * this call, and the structure/size/shape must not change.
@@ -161,5 +157,9 @@ public interface Mutate1D extends Structure1D {
     default void reset() {
         this.loopAll(i -> this.set(i, PrimitiveMath.ZERO));
     }
+
+    void set(long index, double value);
+
+    void set(long index, Number value);
 
 }

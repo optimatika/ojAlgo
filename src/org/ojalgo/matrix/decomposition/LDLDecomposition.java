@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -252,29 +252,16 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         }
     }
 
-    public boolean isFullSize() {
-        return true;
-    }
-
-    @Override
-    protected boolean checkSolvability() {
-
-        boolean retVal = this.getRowDim() == this.getColDim();
-
-        final int tmpFirst = 0;
-        final int tmpLast = this.getColDim() - 1;
-
-        retVal = retVal && PrimitiveScalar.isSmall(this.getInPlace().doubleValue(tmpFirst, tmpFirst), this.getInPlace().doubleValue(tmpLast, tmpLast));
-
-        return retVal;
-    }
-
     public boolean isFullRank() {
 
         final int tmpFirst = 0;
         final int tmpLast = this.getColDim() - 1;
 
         return PrimitiveScalar.isSmall(this.getInPlace().doubleValue(tmpFirst, tmpFirst), this.getInPlace().doubleValue(tmpLast, tmpLast));
+    }
+
+    public boolean isFullSize() {
+        return true;
     }
 
     public PhysicalStore<N> preallocate(final Structure2D template) {
@@ -306,6 +293,19 @@ abstract class LDLDecomposition<N extends Number> extends InPlaceDecomposition<N
         } else {
             throw RecoverableCondition.newEquationSystemNotSolvable();
         }
+    }
+
+    @Override
+    protected boolean checkSolvability() {
+
+        boolean retVal = this.getRowDim() == this.getColDim();
+
+        final int tmpFirst = 0;
+        final int tmpLast = this.getColDim() - 1;
+
+        retVal = retVal && PrimitiveScalar.isSmall(this.getInPlace().doubleValue(tmpFirst, tmpFirst), this.getInPlace().doubleValue(tmpLast, tmpLast));
+
+        return retVal;
     }
 
 }

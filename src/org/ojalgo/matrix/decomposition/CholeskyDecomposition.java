@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -114,6 +114,21 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         return this.getInPlace().logical().triangular(false, false).get();
     }
 
+    public int getRank() {
+
+        final double tolerance = SQRT.invoke(this.getAlgorithmEpsilon());
+        int rank = 0;
+
+        final DecompositionStore<N> inPlaceStore = this.getInPlace();
+        final int limit = this.getMinDim();
+        for (int ij = 0; ij < limit; ij++) {
+            if (inPlaceStore.doubleValue(ij, ij) > tolerance) {
+                rank++;
+            }
+        }
+        return rank;
+    }
+
     public final MatrixStore<N> getSolution(final Collectable<N, ? super PhysicalStore<N>> rhs) {
         return this.getSolution(rhs, this.preallocate(this.getInPlace(), rhs));
     }
@@ -169,6 +184,10 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         } else {
             throw RecoverableCondition.newMatrixNotInvertible();
         }
+    }
+
+    public boolean isFullRank() {
+        return this.isSolvable();
     }
 
     public final boolean isFullSize() {
@@ -272,25 +291,6 @@ abstract class CholeskyDecomposition<N extends Number> extends InPlaceDecomposit
         }
 
         return this.computed(mySPD = tmpPositiveDefinite);
-    }
-
-    public int getRank() {
-
-        final double tolerance = SQRT.invoke(this.getAlgorithmEpsilon());
-        int rank = 0;
-
-        final DecompositionStore<N> inPlaceStore = this.getInPlace();
-        final int limit = this.getMinDim();
-        for (int ij = 0; ij < limit; ij++) {
-            if (inPlaceStore.doubleValue(ij, ij) > tolerance) {
-                rank++;
-            }
-        }
-        return rank;
-    }
-
-    public boolean isFullRank() {
-        return this.isSolvable();
     }
 
     double getAlgorithmEpsilon() {

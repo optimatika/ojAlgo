@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -150,6 +150,11 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
         return Arrays.hashCode(data);
     }
 
+    @Override
+    public final void reset() {
+        Arrays.fill(data, this.valueOf(PrimitiveMath.ZERO));
+    }
+
     public final Spliterator<N> spliterator() {
         return Spliterators.spliterator(data, 0, data.length, PlainArray.CHARACTERISTICS);
     }
@@ -297,11 +302,6 @@ abstract class ReferenceTypeArray<N extends Number> extends PlainArray<N> implem
     @Override
     final void modify(final long extIndex, final int intIndex, final UnaryFunction<N> function) {
         data[intIndex] = function.invoke(data[intIndex]);
-    }
-
-    @Override
-    public final void reset() {
-        Arrays.fill(data, this.valueOf(PrimitiveMath.ZERO));
     }
 
     abstract N valueOf(double value);

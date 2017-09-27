@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ public class NumberListTest extends ArrayTests {
         final NumberList<Double> primit64List = NumberList.factory(Primitive64Array.FACTORY).make();
         final NumberList<Double> direct64List = NumberList.factory(BufferArray.DIRECT64).make();
 
-        final List<Double> expectedList = new ArrayList<Double>();
+        final List<Double> expectedList = new ArrayList<>();
 
         for (int c = 0; c < 10_000; c++) {
 

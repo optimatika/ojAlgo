@@ -12,6 +12,11 @@ public class TestHardware extends MachineTests {
         super(someName);
     }
 
+    public void testCompare() {
+        TestUtils.assertTrue(Hardware.X86_64__04_2.compareTo(Hardware.X86_64__04_1_L2) < 0);
+        TestUtils.assertTrue(Hardware.X86_64__04_1_L3.compareTo(Hardware.X86_64__04_1_L2) > 0);
+    }
+
     public void testPPC__01() {
 
         final Hardware tmpHardware = Hardware.PPC__01;
@@ -109,11 +114,6 @@ public class TestHardware extends MachineTests {
         final int tmpUnits = 1;
 
         this.doTest(tmpHardware, tmpThreads, tmpCores, tmpUnits);
-    }
-
-    public void testCompare() {
-        TestUtils.assertTrue(Hardware.X86_64__04_2.compareTo(Hardware.X86_64__04_1_L2) < 0);
-        TestUtils.assertTrue(Hardware.X86_64__04_1_L3.compareTo(Hardware.X86_64__04_1_L2) > 0);
     }
 
     public void testX86_64__16() {

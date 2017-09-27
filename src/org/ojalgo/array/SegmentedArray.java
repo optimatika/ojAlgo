@@ -1,5 +1,5 @@
 /*
- * Copyright 1997-2017 Optimatika (www.optimatika.se)
+ * Copyright 1997-2017 Optimatika
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -235,6 +235,13 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
         tmpSegment.set(tmpIndex, modifier.invoke(tmpSegment.get(tmpIndex)));
     }
 
+    @Override
+    public void reset() {
+        for (final BasicArray<N> tmpSegment : mySegments) {
+            tmpSegment.reset();
+        }
+    }
+
     public void set(final long index, final double value) {
         mySegments[(int) (index >> myIndexBits)].set(index & myIndexMask, value);
     }
@@ -457,13 +464,6 @@ final class SegmentedArray<N extends Number> extends BasicArray<N> {
     @Override
     boolean isPrimitive() {
         return mySegments[0].isPrimitive();
-    }
-
-    @Override
-    public void reset() {
-        for (final BasicArray<N> tmpSegment : mySegments) {
-            tmpSegment.reset();
-        }
     }
 
 }
