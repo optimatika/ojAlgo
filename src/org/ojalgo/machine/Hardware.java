@@ -72,12 +72,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>CLAM / PowerBook6,5
      * <ul>
-     * <li></li>
      * <li>1 processor</li>
      * <li>1 core per processor</li>
      * <li>1 thread per core</li>
-     * <li>==>> Total 1 threads</li>
-     * <li></li>
+     * <li>===</li>
      * <li>1.25GB system RAM</li>
      * <li>512kB L2 cache per processor</li>
      * <li>64kB L1 cache per core</li>
@@ -92,12 +90,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>INTEL1
      * <ul>
-     * <li></li>
      * <li>1 processor</li>
      * <li>1 core per processor</li>
      * <li>1 thread per core</li>
-     * <li>==>> Total 1 threads</li>
-     * <li></li>
+     * <li>===</li>
      * <li>1GB system RAM</li>
      * <li>1MB L2 cache per processor</li>
      * <li>32kB L1 cache per core</li>
@@ -112,12 +108,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>B5950053
      * <ul>
-     * <li></li>
      * <li>1 processor</li>
      * <li>2 cores per processor</li>
      * <li>1 thread per core</li>
-     * <li>==>> Total 2 threads</li>
-     * <li></li>
+     * <li>===</li>
      * <li>3.5GB system RAM</li>
      * <li>6MB L2 cache per processor (2 cores)</li>
      * <li>32kB L1 cache per core</li>
@@ -132,12 +126,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>MANTA / iMac7,1
      * <ul>
-     * <li></li>
      * <li>1 processor</li>
      * <li>2 cores per processor</li>
      * <li>1 thread per core</li>
-     * <li>==>> Total 2 threads</li>
-     * <li></li>
+     * <li>===</li>
      * <li>3GB system RAM</li>
      * <li>4MB L2 cache per processor (2 cores)</li>
      * <li>32kB L1 cache per core</li>
@@ -152,12 +144,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>PA's Q9400
      * <ul>
-     * <li></li>
      * <li>1 processors</li>
      * <li>4 cores per processor</li>
-     * <li>1 thread per core</li>
-     * <li>==>> Total 4 threads</li>
-     * <li></li>
+     * <li>1 thread per core (4 threads in total)</li>
+     * <li>===</li>
      * <li>3GB system RAM</li>
      * <li>3MB L2 cache per 2 cores</li>
      * <li>32kB L1 cache per core</li>
@@ -165,12 +155,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * <li>PA's Q6600
      * <ul>
-     * <li></li>
      * <li>1 processors</li>
      * <li>4 cores per processor</li>
-     * <li>1 thread per core</li>
-     * <li>==>> Total 4 threads</li>
-     * <li></li>
+     * <li>1 thread per core (4 threads in total)</li>
+     * <li>===</li>
      * <li>8GB system RAM</li>
      * <li>4MB L2 cache per 2 cores</li>
      * <li>32kB L1 cache per core</li>
@@ -185,12 +173,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>Intel i5-4670K with 16GB of RAM
      * <ul>
-     * <li></li>
      * <li>1 processors</li>
      * <li>4 cores per processor</li>
-     * <li>1 thread per core</li>
-     * <li>==>> Total 4 threads</li>
-     * <li></li>
+     * <li>1 thread per core (4 threads in total)</li>
+     * <li>===</li>
      * <li>16GB system RAM</li>
      * <li>6MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
@@ -206,12 +192,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>BUBBLE / MacBookAir4,2
      * <ul>
-     * <li></li>
      * <li>1 processors</li>
      * <li>2 cores per processor</li>
-     * <li>2 threads per core</li>
-     * <li>==>> Total 4 threads</li>
-     * <li></li>
+     * <li>2 threads per core (4 threads in total)</li>
+     * <li>===</li>
      * <li>4GB system RAM</li>
      * <li>3MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
@@ -220,12 +204,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * <li>PA's Intel Core i7-620M laptop
      * <ul>
-     * <li></li>
      * <li>1 processors</li>
      * <li>2 cores per processor</li>
-     * <li>2 threads per core</li>
-     * <li>==>> Total 4 threads</li>
-     * <li></li>
+     * <li>2 threads per core (4 threads in total)</li>
+     * <li>===</li>
      * <li>8GB system RAM</li>
      * <li>4MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
@@ -241,12 +223,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>HA's Intel Core i7-920 server
      * <ul>
-     * <li></li>
      * <li>1 processor</li>
      * <li>4 cores per processor</li>
-     * <li>2 threads per core</li>
-     * <li>==>> Total 8 threads</li>
-     * <li></li>
+     * <li>2 threads per core (8 threads in total)</li>
+     * <li>===</li>
      * <li>8GB system RAM</li>
      * <li>8MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
@@ -255,12 +235,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * <li>Core i7-2600 3.4 GHz - 4 cores - 8 threads from Java Matrix Benchmark
      * <ul>
-     * <li></li>
      * <li>1 processor</li>
      * <li>4 cores per processor</li>
-     * <li>2 threads per core</li>
-     * <li>==>> Total 8 threads</li>
-     * <li></li>
+     * <li>2 threads per core (8 threads in total)</li>
+     * <li>===</li>
      * <li>11GB system RAM</li>
      * <li>8MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
@@ -269,12 +247,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * <li>Core i7-3770 3.4 GHz - 4 cores - 8 threads (whale @ MSC/MSB)
      * <ul>
-     * <li></li>
      * <li>1 processor</li>
      * <li>4 cores per processor</li>
-     * <li>2 threads per core</li>
-     * <li>==>> Total 8 threads</li>
-     * <li></li>
+     * <li>2 threads per core (8 threads in total)</li>
+     * <li>===</li>
      * <li>8GB system RAM</li>
      * <li>8MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
@@ -283,12 +259,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * </li>
      * <li>Core i7-2600 3.4 GHz - 4 cores - 8 threads (Vostro-460 @ Scila)
      * <ul>
-     * <li></li>
      * <li>1 processor</li>
      * <li>4 cores per processor</li>
-     * <li>2 threads per core</li>
-     * <li>==>> Total 8 threads</li>
-     * <li></li>
+     * <li>2 threads per core (8 threads in total)</li>
+     * <li>===</li>
      * <li>32GB system RAM</li>
      * <li>8MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
@@ -314,9 +288,8 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>1 processor</li>
      * <li>6 cores per processor</li>
-     * <li>2 threads per core</li>
-     * <li>==>> Total 12 threads</li>
-     * <li></li>
+     * <li>2 threads per core (12 threads in total)</li>
+     * <li>===</li>
      * <li>12GB system RAM</li>
      * <li>12MB L3 cache per processor</li>
      * <li>256kB L2 cache per core (x6)</li>
@@ -332,12 +305,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>SAILFISH / MacPro4,1
      * <ul>
-     * <li></li>
      * <li>2 processors</li>
-     * <li>4 cores per processor</li>
-     * <li>2 threads per core</li>
-     * <li>==>> Total 16 threads</li>
-     * <li></li>
+     * <li>4 cores per processor (8 cores in total)</li>
+     * <li>2 threads per core (16 threads in total)</li>
+     * <li>===</li>
      * <li>12GB system RAM</li>
      * <li>8MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
@@ -353,26 +324,10 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
      * <ul>
      * <li>CBL (prod & test) 2 x Intel(R) Xeon(R) CPU E5-2697A v4 @ 2.60GHz
      * <ul>
-     * <li></li>
      * <li>2 processors</li>
      * <li>16 cores per processor (32 cores in total)</li>
-     * <li>2 threads per core</li>
-     * <li>==>> Total 64 threads</li>
-     * <li></li>
-     * <li>512GB system RAM</li>
-     * <li>8MB L3 cache per processor</li>
-     * <li>256kB L2 cache per core</li>
-     * <li>32kB L1 cache per core</li>
-     * </ul>
-     * </li>
-     * <li>CBF (test)
-     * <ul>
-     * <li></li>
-     * <li>? processors</li>
-     * <li>? cores per processor (32 cores in total)</li>
-     * <li>? threads per core</li>
-     * <li>==>> Total 64 threads</li>
-     * <li></li>
+     * <li>2 threads per core (64 threads in total)</li>
+     * <li>===</li>
      * <li>512GB system RAM</li>
      * <li>40MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
@@ -386,23 +341,21 @@ public final class Hardware extends AbstractMachine implements Comparable<Hardwa
 
     /**
      * <ul>
-     * <li>CBF (prod)
+     * <li>CBF (prod, guessing)
      * <ul>
-     * <li></li>
-     * <li>? processors</li>
-     * <li>? cores per processor (48 cores in total)</li>
-     * <li>2 threads per core</li>
-     * <li>==>> Total 96 threads</li>
-     * <li></li>
+     * <li>4 processors</li>
+     * <li>12 cores per processor (48 cores in total)</li>
+     * <li>2 threads per core (96 threads in total)</li>
+     * <li>===</li>
      * <li>512GB system RAM</li>
-     * <li>8MB L3 cache per processor</li>
+     * <li>30MB L3 cache per processor</li>
      * <li>256kB L2 cache per core</li>
      * <li>32kB L1 cache per core</li>
      * </ul>
      * </li>
      * </ul>
      */
-    static final Hardware X86_64__96 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 64), new BasicMachine(8L * K * K, 12),
+    static final Hardware X86_64__96 = new Hardware("x86_64", new BasicMachine[] { new BasicMachine(512L * K * K * K, 96), new BasicMachine(30L * K * K, 24),
             new BasicMachine(256L * K, 2), new BasicMachine(32L * K, 2) });
 
     static {

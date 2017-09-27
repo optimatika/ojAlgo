@@ -780,30 +780,30 @@ public final class SparseArray<N extends Number> extends BasicArray<N> {
 
     Access1D<N> getValues(final long fromIncl, final long toExcl) {
 
-        int tmpFromIncl = this.index(fromIncl);
-        if (tmpFromIncl < 0) {
-            tmpFromIncl = -(tmpFromIncl + 1);
+        int intFrom = this.index(fromIncl);
+        if (intFrom < 0) {
+            intFrom = -(intFrom + 1);
         }
-        final int tmpFirst = tmpFromIncl;
+        final int first = intFrom;
 
-        int tmpToExcl = this.index(toExcl);
-        if (tmpToExcl < 0) {
-            tmpToExcl = -(tmpToExcl + 1);
+        int intTo = this.index(toExcl);
+        if (intTo < 0) {
+            intTo = -(intTo + 1);
         }
-        final int tmpLimit = tmpToExcl;
+        final int limit = intTo;
 
         return new Access1D<N>() {
 
             public long count() {
-                return tmpLimit - tmpFirst;
+                return limit - first;
             }
 
             public double doubleValue(final long index) {
-                return myValues.doubleValue(tmpFirst + index);
+                return myValues.doubleValue(first + index);
             }
 
             public N get(final long index) {
-                return myValues.get(tmpFirst + index);
+                return myValues.get(first + index);
             }
 
         };

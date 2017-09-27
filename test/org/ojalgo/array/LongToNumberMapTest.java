@@ -144,6 +144,25 @@ public class LongToNumberMapTest extends ArrayTests {
             tmpSubSum += tmpEntry.getValue();
         }
         TestUtils.assertEquals(8.0, tmpSubSum);
+        TestUtils.assertEquals(tmpSubMap.values(), tmpMap.values(35, 350));
+
+        final LongToNumberMap<Double> tmpSubMap2 = tmpMap.subMap(50, 350);
+        TestUtils.assertEquals(3, tmpSubMap2.size());
+        double tmpSubSum2 = 0.0;
+        for (final Entry<Long, Double> tmpEntry : tmpSubMap2.entrySet()) {
+            tmpSubSum2 += tmpEntry.getValue();
+        }
+        TestUtils.assertEquals(8.0, tmpSubSum2);
+        TestUtils.assertEquals(tmpSubMap.values(), tmpMap.values(50, 350));
+
+        final LongToNumberMap<Double> tmpSubMap3 = tmpMap.subMap(35, 500);
+        TestUtils.assertEquals(3, tmpSubMap3.size());
+        double tmpSubSum3 = 0.0;
+        for (final Entry<Long, Double> tmpEntry : tmpSubMap3.entrySet()) {
+            tmpSubSum3 += tmpEntry.getValue();
+        }
+        TestUtils.assertEquals(8.0, tmpSubSum3);
+        TestUtils.assertEquals(tmpSubMap.values(), tmpMap.values(35, 500));
 
         TestUtils.assertEquals(7, tmpMap.size());
         double tmpKeySum = 0.0;
