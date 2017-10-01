@@ -19,6 +19,7 @@
     </organization>
     <developers>
         <developer>
+            <id>apete</id>
             <name>Anders Peterson</name>
             <email>apete@optimatika.se</email>
             <organization>Optimatika</organization>
