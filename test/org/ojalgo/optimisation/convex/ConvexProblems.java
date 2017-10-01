@@ -111,7 +111,6 @@ public class ConvexProblems extends OptimisationConvexTests {
         if (testSolverDirectly) {
 
             final ConvexSolver.Builder tmpBuilder = new ConvexSolver.Builder(matrices);
-            tmpBuilder.balance(); // Changes the objective function value
             final ConvexSolver tmpSolver = tmpBuilder.build();
             // tmpSolver.options.debug(ConvexSolver.class);
             // tmpSolver.options.validate = false;

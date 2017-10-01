@@ -106,7 +106,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         TestUtils.assertEquals(JAMA_LU.getDeterminant(), PRIMITIVE_DENSE_LU.getDeterminant(), COMPARE_CONTEXT);
 
         TestUtils.assertEquals(JAMA_LU.isComputed(), PRIMITIVE_DENSE_LU.isComputed());
-        TestUtils.assertEquals(JAMA_LU.isSquareAndNotSingular(), PRIMITIVE_DENSE_LU.isSquareAndNotSingular());
+        TestUtils.assertEquals(JAMA_LU.isSolvable(), PRIMITIVE_DENSE_LU.isSolvable());
         TestUtils.assertEquals(JAMA_LU.isSolvable(), PRIMITIVE_DENSE_LU.isSolvable());
 
         if (JAMA_LU.isSolvable()) {
@@ -123,7 +123,7 @@ public class CompareJamaAndPrimitive extends MatrixDecompositionTests {
         TestUtils.assertEquals(JAMA_LU.getDeterminant(), PRIMITIVE_RAW_LU.getDeterminant(), COMPARE_CONTEXT);
 
         TestUtils.assertEquals(JAMA_LU.isComputed(), PRIMITIVE_RAW_LU.isComputed());
-        TestUtils.assertEquals(JAMA_LU.isSquareAndNotSingular(), PRIMITIVE_RAW_LU.isSquareAndNotSingular());
+        TestUtils.assertEquals(JAMA_LU.isSolvable(), PRIMITIVE_RAW_LU.isSolvable());
         TestUtils.assertEquals(JAMA_LU.isSolvable(), PRIMITIVE_RAW_LU.isSolvable());
 
         if (JAMA_LU.isSolvable()) {

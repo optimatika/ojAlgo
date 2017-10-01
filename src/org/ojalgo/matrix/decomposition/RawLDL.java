@@ -222,6 +222,6 @@ final class RawLDL extends RawDecomposition implements LDL<Double> {
 
     @Override
     protected boolean checkSolvability() {
-        return this.isComputed() && this.isSquareAndNotSingular();
+        return this.isComputed() && this.isSolvable();
     }
 }

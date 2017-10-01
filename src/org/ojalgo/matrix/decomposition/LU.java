@@ -127,14 +127,6 @@ public interface LU<N extends Number> extends LDU<N> {
      */
     MatrixStore<N> getU();
 
-    /**
-     * @deprecated v44 Use {@link #isSolvable()} or {@link #isFullRank()} instead.
-     */
-    @Deprecated
-    default boolean isSquareAndNotSingular() {
-        return this.isSolvable();
-    }
-
     default MatrixStore<N> reconstruct() {
         return LU.reconstruct(this);
     }

@@ -38,18 +38,6 @@ public abstract class GenericSolver implements Optimisation.Solver, Serializable
             super();
         }
 
-        /**
-         * Will rescale problem parameters to minimise rounding and representation errors. Warning! This will
-         * rescale the objective function and therefore also the optimal value (but not the solution).
-         *
-         * @deprecated v44 If you need this kind of functionality then use {@link ExpressionsBasedModel}.
-         */
-        @Deprecated
-        @SuppressWarnings("unchecked")
-        public final B balance() {
-            return (B) this;
-        }
-
         public final S build() {
             return this.doBuild(new Optimisation.Options());
         }

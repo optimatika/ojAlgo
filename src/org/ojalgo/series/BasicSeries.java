@@ -285,41 +285,9 @@ public interface BasicSeries<K extends Comparable<? super K>, V extends Number> 
 
     ColourData getColour();
 
-    /**
-     * @deprecated v41 Use {@link #asPrimitive()} instead
-     */
-    @Deprecated
-    default DataSeries getDataSeries() {
-        return this.asPrimitive().toDataSeries();
-    }
-
     String getName();
 
-    /**
-     * @deprecated v42 Use {@link #asPrimitive()} instead
-     */
-    @Deprecated
-    default PrimitiveSeries getPrimitiveSeries() {
-        return this.asPrimitive();
-    }
-
-    /**
-     * @deprecated v41 Use {@link #asPrimitive()} instead
-     */
-    @Deprecated
-    default double[] getPrimitiveValues() {
-        return this.asPrimitive().toRawCopy1D();
-    }
-
     V lastValue();
-
-    /**
-     * @deprecated v41 Use {@link #asPrimitive()} instead
-     */
-    @Deprecated
-    default void modifyAll(final UnaryFunction<V> function) {
-        this.asPrimitive().loopAll(val -> function.invoke(val));
-    }
 
     BasicSeries<K, V> name(String name);
 

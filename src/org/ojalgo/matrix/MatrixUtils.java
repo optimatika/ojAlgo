@@ -297,41 +297,6 @@ public abstract class MatrixUtils {
         return retVal;
     }
 
-    /**
-     * Sets all matrix size operation thresholds to precisly this value.
-     *
-     * @param value The threshold
-     * @deprecated v44 Use {@link MatrixOperation#setAllOperationThresholds(int)} instead
-     */
-    @Deprecated
-    public static void setAllOperationThresholds(final int value) {
-        MatrixOperation.setAllOperationThresholds(value);
-    }
-
-    /**
-     * Will make sure no matrix size operation thresholds are larger than the supplied value. Existing smaller
-     * values are unchanged.
-     *
-     * @param maxValue The max allowed value
-     * @deprecated v44 Use {@link MatrixOperation#setThresholdsMaxValue(int)} instead
-     */
-    @Deprecated
-    public static void setThresholdsMaxValue(final int maxValue) {
-        MatrixOperation.setThresholdsMaxValue(maxValue);
-    }
-
-    /**
-     * Will make sure all matrix size operation thresholds are at least as large as the supplied value.
-     * Existing larger values are unchanged.
-     *
-     * @param minValue The min allowed value
-     * @deprecated v44 Use {@link MatrixOperation#setThresholdsMinValue(int)} instead
-     */
-    @Deprecated
-    public static void setThresholdsMinValue(final int minValue) {
-        MatrixOperation.setThresholdsMinValue(minValue);
-    }
-
     public static String toString(final Access2D<?> matrix) {
 
         final StringBuilder retVal = new StringBuilder();

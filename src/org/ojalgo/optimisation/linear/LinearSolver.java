@@ -61,14 +61,6 @@ public abstract class LinearSolver extends GenericSolver {
             return myDelegate.countConstraints();
         }
 
-        /**
-         * @deprecated v44 Use {@link #countConstraints()} instead
-         */
-        @Deprecated
-        public int countEqualityConstraints() {
-            return this.countConstraints();
-        }
-
         @Override
         public int countVariables() {
             return myDelegate.countVariables();

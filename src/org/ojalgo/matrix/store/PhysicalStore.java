@@ -210,14 +210,6 @@ public interface PhysicalStore<N extends Number> extends MatrixStore<N>, Access2
 
         FunctionSet<N> function();
 
-        /**
-         * @deprecated v44 Use {@link #array()} instead.
-         */
-        @Deprecated
-        default BasicArray<N> makeArray(final int length) {
-            return this.array().makeZero(length);
-        }
-
         default ColumnsSupplier<N> makeColumnsSupplier(final int numberOfRows) {
             return new ColumnsSupplier<>(this, numberOfRows);
         }

@@ -63,7 +63,7 @@ abstract class SimplexTableau implements AlgorithmStore, Access2D<Double> {
 
         DenseTableau(final LinearSolver.Builder matrices) {
 
-            super(matrices.countEqualityConstraints(), matrices.countVariables(), 0);
+            super(matrices.countConstraints(), matrices.countVariables(), 0);
 
             final int tmpConstraintsCount = this.countConstraints();
             final int tmpVariablesCount = this.countVariables();

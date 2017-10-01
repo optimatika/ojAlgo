@@ -134,40 +134,8 @@ abstract class AbstractMachine extends BasicMachine {
         return true;
     }
 
-    /**
-     * @deprecated v44 Use {@link #getCacheElements(long)} instead
-     */
-    @Deprecated
-    public long getCacheDim1D(final long elementSize) {
-        return this.getCacheElements(elementSize);
-    }
-
-    /**
-     * @deprecated v44 Use {@link #getCacheElements(long)} instead
-     */
-    @Deprecated
-    public long getCacheDim2D(final long elementSize) {
-        return (long) PrimitiveFunction.SQRT.invoke(AbstractMachine.elements(cache, elementSize));
-    }
-
     public long getCacheElements(final long elementSize) {
         return AbstractMachine.elements(cache, elementSize);
-    }
-
-    /**
-     * @deprecated v44 Use {@link #getMemoryElements(long)} instead
-     */
-    @Deprecated
-    public long getMemoryDim1D(final long elementSize) {
-        return this.getMemoryElements(elementSize);
-    }
-
-    /**
-     * @deprecated v44 Use {@link #getMemoryElements(long)} instead
-     */
-    @Deprecated
-    public long getMemoryDim2D(final long elementSize) {
-        return (long) PrimitiveFunction.SQRT.invoke(AbstractMachine.elements(memory, elementSize));
     }
 
     public long getMemoryElements(final long elementSize) {

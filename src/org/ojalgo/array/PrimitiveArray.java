@@ -23,47 +23,8 @@ package org.ojalgo.array;
 
 import org.ojalgo.access.Mutate1D;
 import org.ojalgo.constant.PrimitiveMath;
-import org.ojalgo.function.FunctionSet;
-import org.ojalgo.function.PrimitiveFunction;
-import org.ojalgo.function.aggregator.AggregatorSet;
-import org.ojalgo.function.aggregator.PrimitiveAggregator;
-import org.ojalgo.scalar.PrimitiveScalar;
-import org.ojalgo.scalar.Scalar;
 
 public abstract class PrimitiveArray extends PlainArray<Double> implements Mutate1D.Sortable {
-
-    /**
-     * @deprecated v43 Use {@link Primitive64Array#FACTORY}
-     */
-    @Deprecated
-    public static final DenseArray.Factory<Double> FACTORY = new DenseArray.Factory<Double>() {
-
-        @Override
-        public AggregatorSet<Double> aggregator() {
-            return PrimitiveAggregator.getSet();
-        }
-
-        @Override
-        public FunctionSet<Double> function() {
-            return PrimitiveFunction.getSet();
-        }
-
-        @Override
-        public Scalar.Factory<Double> scalar() {
-            return PrimitiveScalar.FACTORY;
-        }
-
-        @Override
-        long getElementSize() {
-            return Primitive64Array.FACTORY.getElementSize();
-        }
-
-        @Override
-        DenseArray<Double> make(final long size) {
-            return Primitive64Array.FACTORY.make(size);
-        }
-
-    };
 
     public static PrimitiveArray make(final int size) {
         return Primitive64Array.make(size);

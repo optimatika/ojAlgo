@@ -78,7 +78,7 @@ abstract class GenericDecomposition<N extends Number> extends AbstractDecomposit
     }
 
     protected final BasicArray<N> makeArray(final int length) {
-        return myFactory.makeArray(length);
+        return myFactory.array().makeZero(length);
     }
 
     protected final DecompositionStore<N> makeEye(final int numberOfRows, final int numberOfColumns) {
